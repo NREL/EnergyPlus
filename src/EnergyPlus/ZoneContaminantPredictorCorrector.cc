@@ -1495,7 +1495,7 @@ namespace ZoneContaminantPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PredictZoneContaminants" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1635,7 +1635,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 				if ( ControlledCO2ZoneFlag ) {
 					// The density of air
-					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "PredictZoneContaminants" );
+					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 
 					// Calculate Co2 from infiltration + humidity added from latent load
 					// to determine system added/subtracted moisture.
@@ -1717,7 +1717,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 				if ( ControlledGCZoneFlag ) {
 					// The density of air
-					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "PredictZoneContaminants" );
+					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 
 					// Calculate generic contaminant from infiltration + humidity added from latent load
 					// to determine system added/subtracted moisture.
@@ -2006,7 +2006,7 @@ namespace ZoneContaminantPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CorrectZoneContaminants" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2212,7 +2212,7 @@ namespace ZoneContaminantPredictorCorrector {
 			// CO2 balance.  There are 2 cases that should be considered, system
 			// operating and system shutdown.
 
-			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "CorrectZoneContaminants" );
+			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 			//    RhoAir = ZoneAirDensityCO(ZoneNum)
 
 			if ( Contaminant.CO2Simulation ) ZoneAirDensityCO( ZoneNum ) = RhoAir;

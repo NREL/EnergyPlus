@@ -47,7 +47,7 @@ namespace MatrixDataManager {
 	//INTEGER, PARAMETER :: OneDimensional = 1
 	int const TwoDimensional( 2 );
 	//INTEGER, PARAMETER :: ThreeDimensional = 3
-	std::string const Blank;
+	static std::string const BlankString;
 	// DERIVED TYPE DEFINITIONS:
 	// na
 

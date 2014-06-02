@@ -72,7 +72,7 @@ namespace ConvectionCoefficients {
 
 	Real64 const MinFlow( 0.01 ); // Minimum mass flow rate
 	Real64 const MaxACH( 100.0 ); // Maximum ceiling diffuser correlation limit
-	std::string const Blank;
+	static std::string const BlankString;
 
 	Real64 const OneThird( ( 1.0 / 3. ) ); // 1/3 in highest precision
 	Real64 const OneFourth( ( 1.0 / 4. ) ); // 1/4 in highest precision
@@ -1588,7 +1588,7 @@ namespace ConvectionCoefficients {
 						Surface( Found ).IntConvCoeff = PotentialAssignedValue;
 					}
 
-				} else if ( SELECT_CASE_var == "" ) { // Blank
+				} else if ( SELECT_CASE_var == BlankString ) { // Blank
 
 				} else {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
@@ -1788,7 +1788,7 @@ namespace ConvectionCoefficients {
 						}
 					}
 
-				} else if ( SELECT_CASE_var == "" ) { // Blank
+				} else if ( SELECT_CASE_var == BlankString ) { // Blank
 
 				} else { // Error Case
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + ", invalid value" );
@@ -1831,7 +1831,7 @@ namespace ConvectionCoefficients {
 				// Tests show that Zone will override the simple convection specification of global.
 				if ( SurfNum <= 0 ) continue; // ignore this error condition
 				if ( Surface( SurfNum ).Zone == 0 ) continue; // ignore this error condition
-				if ( Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple && ( UserExtConvectionCoeffs( Loop ).OverrideType == ConvCoefSpecifiedModel && UserExtConvectionCoeffs( Loop ).HcModelEq != ASHRAESimple ) || UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSpecifiedModel ) { //Autodesk Parens don't match actual logic
+				if ( Zone( Surface( SurfNum ).Zone ).OutsideConvectionAlgo == ASHRAESimple && ( ( UserExtConvectionCoeffs( Loop ).OverrideType == ConvCoefSpecifiedModel && UserExtConvectionCoeffs( Loop ).HcModelEq != ASHRAESimple ) || UserExtConvectionCoeffs( Loop ).OverrideType != ConvCoefSpecifiedModel ) ) { 
 					++Count;
 					if ( DisplayExtraWarnings ) {
 						ShowSevereError( RoutineName + "Surface=\"" + UserExtConvectionCoeffs( Loop ).SurfaceName + "\", mixed algorithms." );
@@ -3932,10 +3932,10 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 			if ( ! BeginEnvrnFlag ) {
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				ZoneMassFlowRate = Node( ZoneNode ).MassFlowRate / ZoneMult;
 			} else { // because these are not updated yet for new environment
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, 0.0, PsyWFnTdpPb( 0.0, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, 0.0, PsyWFnTdpPb( 0.0, OutBaroPress, BlankString ), BlankString );
 				ZoneMassFlowRate = 0.0;
 			}
 
@@ -4030,7 +4030,7 @@ namespace ConvectionCoefficients {
 			ZoneVolume = Zone( ZoneNum ).Volume;
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 			ZoneMassFlowRate = Node( ZoneNode ).MassFlowRate / ZoneMult;
 
 			if ( ZoneMassFlowRate < MinFlow ) {
@@ -4509,6 +4509,7 @@ namespace ConvectionCoefficients {
 
 		// Locals
 		Real64 const OneThird( ( 1.0 / 3.0 ) ); // 1/3 in highest precision
+		static std::string const RoutineName( "WindowTempsForNominalCond" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4564,7 +4565,7 @@ namespace ConvectionCoefficients {
 		TmeanFilmKelvin = AirTempKelvin + 0.25 * ( SurfTempKelvin - AirTempKelvin ); // eq. 133 in ISO 15099
 		TmeanFilm = TmeanFilmKelvin - 273.15;
 
-		rho = PsyRhoAirFnPbTdbW( OutBaroPress, TmeanFilm, AirHumRat, "WindowTempsForNominalCond" );
+		rho = PsyRhoAirFnPbTdbW( OutBaroPress, TmeanFilm, AirHumRat, RoutineName );
 		g = 9.81;
 		Height = Surface( SurfNum ).Height;
 
@@ -4572,7 +4573,7 @@ namespace ConvectionCoefficients {
 		lambda = 2.873E-3 + 7.76E-5 * TmeanFilmKelvin; // Table B.1 in ISO 15099,
 		mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin; // Table B.2 in ISO 15099
 
-		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm, "WindowTempsForNominalCond" );
+		Cp = PsyCpAirFnWTdb( AirHumRat, TmeanFilm );
 
 		TiltDeg = Surface( SurfNum ).Tilt;
 		sineTilt = Surface( SurfNum ).SinTilt;
@@ -5525,7 +5526,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				AirChangeRate = min( AirChangeRate, MaxACH );
 				AirChangeRate = max( AirChangeRate, 0.0 );
@@ -5541,7 +5542,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				AirChangeRate = min( AirChangeRate, MaxACH );
 				AirChangeRate = max( AirChangeRate, 0.0 );
@@ -5557,7 +5558,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				AirChangeRate = min( AirChangeRate, MaxACH );
 				AirChangeRate = max( AirChangeRate, 0.0 );
@@ -5613,7 +5614,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				SumMdotTemp = 0.0;
 				SumMdot = 0.0;
@@ -5646,7 +5647,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				SumMdotTemp = 0.0;
 				SumMdot = 0.0;
@@ -5681,7 +5682,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				SumMdotTemp = 0.0;
 				SumMdot = 0.0;
@@ -5714,7 +5715,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				SumMdotTemp = 0.0;
 				SumMdot = 0.0;
@@ -5747,7 +5748,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				SumMdotTemp = 0.0;
 				SumMdot = 0.0;
@@ -5780,7 +5781,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0.0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume * ZoneMult );
 				SumMdotTemp = 0.0;
 				SumMdot = 0.0;
@@ -5826,7 +5827,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirSystemVolFlowRate = Node( ZoneNode ).MassFlowRate / ( AirDensity * ZoneMult );
 				Surface( SurfNum ).TAirRef = ZoneSupplyAirTemp;
 			} else {
@@ -5840,7 +5841,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirSystemVolFlowRate = Node( ZoneNode ).MassFlowRate / ( AirDensity * ZoneMult );
 				Surface( SurfNum ).TAirRef = ZoneSupplyAirTemp;
 			} else {
@@ -5854,7 +5855,7 @@ namespace ConvectionCoefficients {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
 			if ( ZoneNode > 0 ) {
 				ZoneMult = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				AirSystemVolFlowRate = Node( ZoneNode ).MassFlowRate / ( AirDensity * ZoneMult );
 				Surface( SurfNum ).TAirRef = ZoneSupplyAirTemp;
 			} else {
@@ -6447,7 +6448,7 @@ namespace ConvectionCoefficients {
 
 			// Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)
 			if ( Node( ZoneNode ).MassFlowRate > 0.0 ) {
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 				Re = Node( ZoneNode ).MassFlowRate / ( v * AirDensity * ( std::pow( Zone( ZoneNum ).Volume, OneThird ) ) );
 			} else {
 				Re = 0.0;
@@ -7266,7 +7267,7 @@ namespace ConvectionCoefficients {
 		SupplyAirTemp = MAT( ZoneNum );
 		if ( Zone( ZoneNum ).IsControlled ) {
 			ZoneNode = Zone( ZoneNum ).SystemZoneNodeNumber;
-			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress ) );
+			AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ZoneNode ).Temp, PsyWFnTdpPb( Node( ZoneNode ).Temp, OutBaroPress, BlankString ), BlankString );
 			AirChangeRate = ( Node( ZoneNode ).MassFlowRate * SecInHour ) / ( AirDensity * Zone( ZoneNum ).Volume );
 			if ( ZoneEquipConfig( ZoneNum ).EquipListIndex > 0 ) {
 				for ( EquipNum = 1; EquipNum <= ZoneEquipList( ZoneEquipConfig( ZoneNum ).EquipListIndex ).NumOfEquipTypes; ++EquipNum ) {
@@ -9871,7 +9872,7 @@ namespace ConvectionCoefficients {
 		}
 		DeltaTemp = SurfTemp - AirTemp;
 		BetaFilm = 1.0 / ( KelvinConv + SurfTemp + 0.5 * DeltaTemp );
-		AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, AirTemp, OutHumRat );
+		AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, AirTemp, OutHumRat, BlankString );
 
 		GrLn = g * ( std::pow( AirDensity, 2 ) ) * ( std::pow( Ln, 3 ) ) * std::abs( DeltaTemp ) * BetaFilm / std::pow( v, 2 );
 		RaLn = GrLn * Pr;

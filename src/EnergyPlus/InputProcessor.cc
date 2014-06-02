@@ -81,7 +81,8 @@ namespace InputProcessor {
 	std::string::size_type const MaxInputLineLength( 500 ); // Maximum number of characters in an input line (in.idf, energy+.idd)
 	std::string::size_type const MaxFieldNameLength( 140 ); // Maximum number of characters in a field name string // Not used with std::string
 	std::string const Blank;
-	std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
+	static std::string const BlankString;
+	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
 	gio::Fmt const fmta( "(A)" );
 	Real64 const DefAutoSizeValue( AutoSize );
 	Real64 const DefAutoCalculateValue( AutoCalculate );
@@ -365,13 +366,13 @@ namespace InputProcessor {
 		gio::close( IDFFile );
 
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaFieldNames = Blank;
+		cAlphaFieldNames = BlankString;
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaArgs = Blank;
+		cAlphaArgs = BlankString;
 		lAlphaFieldBlanks.allocate( MaxAlphaIDFDefArgsFound );
 		lAlphaFieldBlanks = false;
 		cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		cNumericFieldNames = Blank;
+		cNumericFieldNames = BlankString;
 		rNumericArgs.allocate( MaxNumericIDFDefArgsFound );
 		rNumericArgs = 0.0;
 		lNumericFieldBlanks.allocate( MaxNumericIDFDefArgsFound );
@@ -625,7 +626,7 @@ namespace InputProcessor {
 		}
 		errFlag = false;
 
-		if ( SqueezedSection != Blank ) {
+		if ( SqueezedSection != BlankString ) {
 			if ( FindItemInList( SqueezedSection, SectionDef.Name(), NumSectionDefs ) > 0 ) {
 				ShowSevereError( "IP: Already a Section called " + SqueezedSection + ". This definition ignored.", EchoInputFile );
 				// Error Condition
@@ -757,7 +758,7 @@ namespace InputProcessor {
 		AutoCalculate = false;
 		WhichMinMax = 0;
 
-		if ( SqueezedObject != Blank ) {
+		if ( SqueezedObject != BlankString ) {
 			if ( FindItemInList( SqueezedObject, ObjectDef.Name(), NumObjectDefs ) > 0 ) {
 				ShowSevereError( "IP: Already an Object called " + SqueezedObject + ". This definition ignored.", EchoInputFile );
 				// Error Condition
@@ -797,8 +798,8 @@ namespace InputProcessor {
 			PrevSizeNumAlpha = MaxANArgs;
 		}
 
-		AlphFieldChecks( {1,PrevSizeNumAlpha} ) = Blank;
-		AlphFieldDefaults( {1,PrevSizeNumAlpha} ) = Blank;
+		AlphFieldChecks( {1,PrevSizeNumAlpha} ) = BlankString;
+		AlphFieldDefaults( {1,PrevSizeNumAlpha} ) = BlankString;
 
 		if ( PrevSizeNumNumeric == -1 ) {
 			PrevSizeNumNumeric = MaxANArgs;
@@ -811,8 +812,8 @@ namespace InputProcessor {
 			RangeCheck.MinMaxChk = false;
 			RangeCheck.WhichMinMax( 1 ) = 0;
 			RangeCheck.WhichMinMax( 2 ) = 0;
-			RangeCheck.MinMaxString( 1 ) = Blank;
-			RangeCheck.MinMaxString( 2 ) = Blank;
+			RangeCheck.MinMaxString( 1 ) = BlankString;
+			RangeCheck.MinMaxString( 2 ) = BlankString;
 			RangeCheck.MinMaxValue( 1 ) = 0.0;
 			RangeCheck.MinMaxValue( 2 ) = 0.0;
 			RangeCheck.Default = 0.0;
@@ -820,7 +821,7 @@ namespace InputProcessor {
 			RangeCheck.DefAutoSize = false;
 			RangeCheck.DefAutoCalculate = false;
 			RangeCheck.FieldNumber = 0;
-			RangeCheck.FieldName = Blank;
+			RangeCheck.FieldName = BlankString;
 			RangeCheck.AutoSizable = false;
 			RangeCheck.AutoSizeValue = DefAutoSizeValue;
 			RangeCheck.AutoCalculatable = false;
@@ -858,11 +859,11 @@ namespace InputProcessor {
 						TempChecks( {1,MaxANArgs} ) = NumRangeChecks( {1,MaxANArgs} );
 						NumRangeChecks.deallocate();
 						TempAFC.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFC = Blank;
+						TempAFC = BlankString;
 						TempAFC( {1,MaxANArgs} ) = AlphFieldChecks;
 						AlphFieldChecks.deallocate();
 						TempAFD.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFD = Blank;
+						TempAFD = BlankString;
 						TempAFD( {1,MaxANArgs} ) = AlphFieldDefaults;
 						AlphFieldDefaults.deallocate();
 						AlphaOrNumeric.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
@@ -1572,7 +1573,7 @@ namespace InputProcessor {
 
 				errFlag = false;
 				LineItem.Name = SqueezedObject;
-				LineItem.Alphas = Blank;
+				LineItem.Alphas = BlankString;
 				LineItem.AlphBlank = false;
 				LineItem.NumAlphas = 0;
 				LineItem.Numbers = 0.0;
@@ -1604,11 +1605,11 @@ namespace InputProcessor {
 		++CurPos;
 
 		//  Keep context buffer in case of errors
-		LineBuf = Blank;
+		LineBuf = BlankString;
 		NumConxLines = 0;
 		StartLine = NumLines;
 		cStartLine = InputLine.substr( 0, 300 );
-		cStartName = Blank;
+		cStartName = BlankString;
 		NumConxLines = 0;
 		CurLines = NumLines;
 		CurQPtr = 0;
@@ -1668,7 +1669,7 @@ namespace InputProcessor {
 							ShowContinueError( "Will be processed as Alpha=" + SqueezedArg, EchoInputFile );
 						}
 					} else {
-						SqueezedArg = Blank;
+						SqueezedArg = BlankString;
 					}
 					if ( NumArg == NumArgExpected && ! ObjectDef( Found ).ExtensibleObject ) {
 						DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
@@ -1693,10 +1694,10 @@ namespace InputProcessor {
 									SqueezedArg = InputLine.substr( CurPos, Pos );
 									strip( SqueezedArg );
 								}
-								if ( SqueezedArg != Blank ) {
+								if ( SqueezedArg != BlankString ) {
 									LineItem.Alphas( NumAlpha ) = SqueezedArg;
 								} else if ( ObjectDef( Found ).ReqField( NumArg ) ) { // Blank Argument
-									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != Blank ) {
+									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != BlankString ) {
 										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
 									} else {
 										if ( ObjectDef( Found ).NameAlpha1 && NumAlpha != 1 ) {
@@ -1711,7 +1712,7 @@ namespace InputProcessor {
 									}
 								} else {
 									LineItem.AlphBlank( NumAlpha ) = true;
-									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != Blank ) {
+									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != BlankString ) {
 										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
 									}
 								}
@@ -1725,7 +1726,7 @@ namespace InputProcessor {
 							} else {
 								++NumNumeric;
 								LineItem.NumNumbers = NumNumeric;
-								if ( SqueezedArg != Blank ) {
+								if ( SqueezedArg != BlankString ) {
 									if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoSizable && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculatable ) {
 										LineItem.Numbers( NumNumeric ) = ProcessNumber( SqueezedArg, errFlag );
 									} else if ( SqueezedArg == "AUTOSIZE" ) {
@@ -1770,7 +1771,7 @@ namespace InputProcessor {
 									if ( SqueezedArg[ 0 ] != '=' ) { // argument does not start with "=" (parametric)
 										FieldString = IPTrimSigDigits( NumNumeric );
 										FieldNameString = ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName;
-										if ( FieldNameString != Blank ) {
+										if ( FieldNameString != BlankString ) {
 											Message = "Invalid Number in Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + SqueezedArg;
 										} else { // Field Name not recorded
 											Message = "Invalid Number in Numeric Field#" + FieldString + ", value=" + SqueezedArg;
@@ -1831,7 +1832,7 @@ namespace InputProcessor {
 							++NumAlpha;
 							if ( NumAlpha <= LineItem.NumAlphas ) continue;
 							++LineItem.NumAlphas;
-							if ( ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) != Blank ) {
+							if ( ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) != BlankString ) {
 								LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas );
 								ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
 							} else if ( ObjectDef( Found ).ReqField( Count ) ) {
@@ -1842,7 +1843,7 @@ namespace InputProcessor {
 								}
 								errFlag = true;
 							} else {
-								LineItem.Alphas( LineItem.NumAlphas ) = Blank;
+								LineItem.Alphas( LineItem.NumAlphas ) = BlankString;
 								LineItem.AlphBlank( LineItem.NumAlphas ) = true;
 								ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
 							}
@@ -2336,7 +2337,7 @@ namespace InputProcessor {
 				cfld2 = IPTrimSigDigits( MaxAlphas );
 				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Alpha Args [" + cfld1 + "] > Size of AlphaArg array [" + cfld2 + "]." );
 			}
-			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = Blank;
+			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = BlankString;
 		}
 		if ( ObjectDef( Found ).NumNumeric > 0 ) {
 			if ( ObjectDef( Found ).NumNumeric > MaxNumbers ) {
@@ -2758,7 +2759,7 @@ namespace InputProcessor {
 		LineTooLong = false;
 		{ IOFlags flags; gio::read( UnitNumber, fmta, flags ) >> InputLine; ReadStat = flags.ios(); }
 
-		if ( ReadStat != 0 ) InputLine = Blank;
+		if ( ReadStat != 0 ) InputLine = BlankString;
 
 		// Following section of code allows same software to read Win or Unix files without translating
 		if ( StripCR ) {
@@ -2877,7 +2878,7 @@ namespace InputProcessor {
 							}
 						}
 					} // Min-Fields Arg
-					if ( UCInputLine.substr( Slash, 10 ) == "\\OBSOLETE" ) {
+					if ( UCInputLine.substr( Slash, 9 ) == "\\OBSOLETE" ) {
 						NSpace = index( UCInputLine.substr( Slash + 9 ), "=>" );
 						if ( NSpace == std::string::npos ) {
 							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
@@ -2910,7 +2911,7 @@ namespace InputProcessor {
 							// WhichMinMax, MinMaxString not filled here
 							Default = true;
 							ProcessMinMaxDefLine( InputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ! RetainCase && DefString != Blank ) uppercase( DefString );
+							if ( ! RetainCase && DefString != BlankString ) uppercase( DefString );
 							if ( ErrLevel > 1 ) {
 								ShowContinueError( "Blank Default Field Encountered", EchoInputFile );
 								errFlag = true;
@@ -3095,7 +3096,7 @@ namespace InputProcessor {
 		if ( NumAlphaField > 0 ) {
 			TempFieldCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			TempFieldCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldChks;
-			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 			ObjectDef( ObjectNum ).AlphFieldChks.deallocate();
 			ObjectDef( ObjectNum ).AlphFieldChks.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			ObjectDef( ObjectNum ).AlphFieldChks = TempFieldCharacter;
@@ -3108,7 +3109,7 @@ namespace InputProcessor {
 
 			TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldDefs;
-			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 			ObjectDef( ObjectNum ).AlphFieldDefs.deallocate();
 			ObjectDef( ObjectNum ).AlphFieldDefs.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			ObjectDef( ObjectNum ).AlphFieldDefs = TempCharacter;
@@ -3118,7 +3119,7 @@ namespace InputProcessor {
 				// must redimension LineItem args
 				TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 				TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = LineItem.Alphas;
-				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 				LineItem.Alphas.deallocate();
 				LineItem.Alphas.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 				LineItem.Alphas = TempCharacter;
@@ -3311,9 +3312,9 @@ namespace InputProcessor {
 		ErrLevel = 0;
 		std::string::size_type Pos = scan( UCInputLine, ' ' );
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( UCInputLine.substr( 0, 4 ) ) );
+		{ auto const maxMinDefLine( UCInputLine.substr( 0, 4 ) );
 
-		if ( SELECT_CASE_var == "\\MIN" ) {
+		if ( SameString(maxMinDefLine, "\\MIN") ) {
 			WhichMinMax = 1;
 			if ( has( UCInputLine, '>' ) ) {
 				Pos = scan( UCInputLine, '>' ) + 1;
@@ -3325,7 +3326,7 @@ namespace InputProcessor {
 				MinMaxString = ">";
 			}
 
-		} else if ( SELECT_CASE_var == "\\MAX" ) {
+		} else if ( SameString(maxMinDefLine, "\\MAX") ) {
 			WhichMinMax = 3;
 			if ( has( UCInputLine, '<' ) ) {
 				Pos = scan( UCInputLine, '<' ) + 1;
@@ -3337,17 +3338,17 @@ namespace InputProcessor {
 				MinMaxString = "<";
 			}
 
-		} else if ( SELECT_CASE_var == "\\DEF" ) {
+		} else if ( SameString(maxMinDefLine, "\\DEF") ) {
 			WhichMinMax = 5;
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 
-		} else if ( SELECT_CASE_var == "\\AUT" ) {
+		} else if ( SameString(maxMinDefLine, "\\AUT") ) {
 			WhichMinMax = 6;
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 
 		} else {
 			WhichMinMax = 0; // invalid field
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 			Value = -999999.0;
 
 		}}
@@ -3378,7 +3379,7 @@ namespace InputProcessor {
 					DefaultString = UCInputLine.substr( Pos );
 				}
 				strip( DefaultString );
-				if ( DefaultString == Blank ) {
+				if ( DefaultString == BlankString ) {
 					if ( WhichMinMax == 6 ) {
 						if ( has_prefix( UCInputLine, "\\AUTOS" ) ) {
 							Value = DefAutoSizeValue;
@@ -3647,62 +3648,6 @@ namespace InputProcessor {
 
 	}
 
-	bool
-	SameString(
-		std::string const & TestString1, // First String to Test
-		std::string const & TestString2 // Second String to Test
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   November 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This function returns true if the two strings are equal (case insensitively)
-
-		// METHODOLOGY EMPLOYED:
-		// Make both strings uppercase.  Do internal compare.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-//		bool SameString;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-//		if ( len( TestString1 ) != len( TestString2 ) ) {
-//			SameString = false;
-//		} else if ( TestString1 == TestString2 ) {
-//			SameString = true;
-//		} else {
-//			SameString = MakeUPPERCase( TestString1 ) == MakeUPPERCase( TestString2 );
-//		}
-//
-//		return SameString;
-
-		return equali( TestString1, TestString2 ); //Autodesk:Tune Avoid string creation
-	}
-
 	void
 	VerifyName(
 		std::string const & NameToVerify,
@@ -3846,18 +3791,18 @@ namespace InputProcessor {
 			}
 			Message2 += "}";
 
-			{ auto const SELECT_CASE_var( ErrorString[ 0 ] );
+			{ auto const errorCheck( ErrorString[ 0 ] );
 
-			if ( ( SELECT_CASE_var == 'W' ) || ( SELECT_CASE_var == 'w' ) ) {
+			if ( ( errorCheck == 'W' ) || ( errorCheck == 'w' ) ) {
 				ShowWarningError( Message1 );
 				ShowContinueError( Message2 );
 
-			} else if ( ( SELECT_CASE_var == 'S' ) || ( SELECT_CASE_var == 's' ) ) {
+			} else if ( ( errorCheck == 'S' ) || ( errorCheck == 's' ) ) {
 				ShowSevereError( Message1 );
 				ShowContinueError( Message2 );
 				ErrorsFound = true;
 
-			} else if ( ( SELECT_CASE_var == 'F' ) || ( SELECT_CASE_var == 'f' ) ) {
+			} else if ( ( errorCheck == 'F' ) || ( errorCheck == 'f' ) ) {
 				ShowSevereError( Message1 );
 				ShowContinueError( Message2 );
 				ShowFatalError( "Program terminates due to preceding condition(s)." );
@@ -3941,7 +3886,7 @@ namespace InputProcessor {
 					FieldNameString = ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).FieldName;
 					gio::write( ValueString, "(F20.5)" ) << Value;
 					strip( ValueString );
-					if ( FieldNameString != Blank ) {
+					if ( FieldNameString != BlankString ) {
 						Message = "Out of range value Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + ValueString + ", range={";
 					} else { // Field Name not recorded
 						Message = "Out of range value Numeric Field#" + FieldString + ", value=" + ValueString + ", range={";
@@ -4377,8 +4322,8 @@ namespace InputProcessor {
 			if ( IDFRecords( iRecord ).ObjectDefPtr <= 0 || IDFRecords( iRecord ).ObjectDefPtr > NumObjectDefs ) continue;
 			iObjectDef = IDFRecords( iRecord ).ObjectDefPtr;
 			for ( iField = 1; iField <= IDFRecords( iRecord ).NumAlphas; ++iField ) {
-				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != Blank ) ++iTotalFieldsWithDefaults;
-				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != Blank && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
+				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != BlankString ) ++iTotalFieldsWithDefaults;
+				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != BlankString && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
 			}
 			for ( iField = 1; iField <= IDFRecords( iRecord ).NumNumbers; ++iField ) {
 				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).DefaultChk ) ++iTotalFieldsWithDefaults;
@@ -4440,8 +4385,8 @@ namespace InputProcessor {
 
 		OrphanObjectNames.allocate( NumIDFRecords );
 		OrphanNames.allocate( NumIDFRecords );
-		OrphanObjectNames = Blank;
-		OrphanNames = Blank;
+		OrphanObjectNames = BlankString;
+		OrphanNames = BlankString;
 		NumOrphObjNames = 0;
 
 		for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
@@ -4488,7 +4433,7 @@ namespace InputProcessor {
 		if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
 			gio::write( EchoInputFile, "*" ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanNames( Count ) != Blank ) {
+				if ( OrphanNames( Count ) != BlankString ) {
 					gio::write( EchoInputFile, fmta ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
 				} else {
 					gio::write( EchoInputFile, "*" ) << OrphanObjectNames( Count );
@@ -4502,13 +4447,13 @@ namespace InputProcessor {
 				ShowContinueError( " Each unused object is shown." );
 			}
 			ShowContinueError( " See InputOutputReference document for more details." );
-			if ( OrphanNames( 1 ) != Blank ) {
+			if ( OrphanNames( 1 ) != BlankString ) {
 				ShowMessage( "Object=" + OrphanObjectNames( 1 ) + '=' + OrphanNames( 1 ) );
 			} else {
 				ShowMessage( "Object=" + OrphanObjectNames( 1 ) );
 			}
 			for ( Count = 2; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanNames( Count ) != Blank ) {
+				if ( OrphanNames( Count ) != BlankString ) {
 					ShowContinueError( "Object=" + OrphanObjectNames( Count ) + '=' + OrphanNames( Count ) );
 				} else {
 					ShowContinueError( "Object=" + OrphanObjectNames( Count ) );
@@ -4625,9 +4570,9 @@ namespace InputProcessor {
 		if ( ! equali( LineItem.Name, "OUTPUT:REPORTS" ) ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
 		if ( LineItem.NumAlphas < 1 ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( LineItem.Alphas( 1 ) ) );
+		{ auto const makeTransition( LineItem.Alphas( 1 ) );
 
-		if ( SELECT_CASE_var == "VARIABLEDICTIONARY" ) {
+		if ( SameString(makeTransition, "VARIABLEDICTIONARY") ) {
 			LineItem.Name = "OUTPUT:VARIABLEDICTIONARY";
 			if ( SameString( LineItem.Alphas( 2 ), "IDF" ) ) {
 				LineItem.Alphas( 1 ) = "IDF";
@@ -4643,28 +4588,28 @@ namespace InputProcessor {
 				LineItem.NumAlphas = 2;
 			}
 
-		} else if ( SELECT_CASE_var == "SURFACES" ) {
+		} else if ( SameString(makeTransition, "SURFACES") ) {
 			// Depends on first Alpha
-			{ auto const SELECT_CASE_var1( MakeUPPERCase( LineItem.Alphas( 2 ) ) );
+			{ auto const surfacesTransition( LineItem.Alphas( 2 ) );
 
-			if ( ( SELECT_CASE_var1 == "DXF" ) || ( SELECT_CASE_var1 == "DXF:WIREFRAME" ) || ( SELECT_CASE_var1 == "VRML" ) ) {
+			if ( SameString(surfacesTransition, "DXF") || SameString(surfacesTransition, "DXF:WIREFRAME") || SameString(surfacesTransition, "VRML") ) {
 				LineItem.Name = "OUTPUT:SURFACES:DRAWING";
 				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 				LineItem.NumAlphas = 1;
-				if ( LineItem.Alphas( 3 ) != Blank ) {
+				if ( LineItem.Alphas( 3 ) != BlankString ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
 				}
-				if ( LineItem.Alphas( 4 ) != Blank ) {
+				if ( LineItem.Alphas( 4 ) != BlankString ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 3 ) = LineItem.Alphas( 4 );
 				}
 
-			} else if ( ( SELECT_CASE_var1 == "LINES" ) || ( SELECT_CASE_var1 == "DETAILS" ) || ( SELECT_CASE_var1 == "VERTICES" ) || ( SELECT_CASE_var1 == "DETAILSWITHVERTICES" ) || ( SELECT_CASE_var1 == "VIEWFACTORINFO" ) || ( SELECT_CASE_var1 == "COSTINFO" ) ) {
+			} else if ( SameString(surfacesTransition, "LINES") || SameString(surfacesTransition, "DETAILS") || SameString(surfacesTransition, "VERTICES") || SameString(surfacesTransition, "DETAILSWITHVERTICES") || SameString(surfacesTransition, "VIEWFACTORINFO") || SameString(surfacesTransition, "COSTINFO") ) {
 				LineItem.Name = "OUTPUT:SURFACES:LIST";
 				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 				LineItem.NumAlphas = 1;
-				if ( LineItem.Alphas( 3 ) != Blank ) {
+				if ( LineItem.Alphas( 3 ) != BlankString ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
 				}
@@ -4674,17 +4619,17 @@ namespace InputProcessor {
 
 			}}
 
-		} else if ( ( SELECT_CASE_var == "CONSTRUCTIONS" ) || ( SELECT_CASE_var == "CONSTRUCTION" ) ) {
+		} else if ( SameString(makeTransition, "CONSTRUCTIONS") || SameString(makeTransition, "CONSTRUCTION") ) {
 			LineItem.Name = "OUTPUT:CONSTRUCTIONS";
 			LineItem.Alphas( 1 ) = "CONSTRUCTIONS";
 			LineItem.NumAlphas = 1;
 
-		} else if ( ( SELECT_CASE_var == "MATERIALS" ) || ( SELECT_CASE_var == "MATERIAL" ) ) {
+		} else if ( SameString(makeTransition, "MATERIALS") || SameString(makeTransition, "MATERIAL") ) {
 			LineItem.Name = "OUTPUT:CONSTRUCTIONS";
 			LineItem.Alphas( 1 ) = "MATERIALS";
 			LineItem.NumAlphas = 1;
 
-		} else if ( SELECT_CASE_var == "SCHEDULES" ) {
+		} else if ( SameString(makeTransition, "SCHEDULES") ) {
 			LineItem.Name = "OUTPUT:SCHEDULES";
 			LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 			LineItem.NumAlphas = 1;
@@ -4747,7 +4692,7 @@ namespace InputProcessor {
 
 		NumArg = 0;
 		LineItem.Name = ObjectDef( Which ).Name;
-		LineItem.Alphas = Blank;
+		LineItem.Alphas = BlankString;
 		LineItem.AlphBlank = false;
 		LineItem.NumAlphas = 0;
 		LineItem.Numbers = 0.0;
@@ -4777,7 +4722,7 @@ namespace InputProcessor {
 						++NumAlpha;
 						if ( NumAlpha <= LineItem.NumAlphas ) continue;
 						++LineItem.NumAlphas;
-						if ( ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) != Blank ) {
+						if ( ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) != BlankString ) {
 							LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas );
 							ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
 						} else if ( ObjectDef( Which ).ReqField( Count ) ) {
@@ -4788,7 +4733,7 @@ namespace InputProcessor {
 							}
 							//            errFlag=.TRUE.
 						} else {
-							LineItem.Alphas( LineItem.NumAlphas ) = Blank;
+							LineItem.Alphas( LineItem.NumAlphas ) = BlankString;
 							LineItem.AlphBlank( LineItem.NumAlphas ) = true;
 							ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
 						}
@@ -4926,24 +4871,24 @@ namespace InputProcessor {
 		NumPrePM = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumPrePM > 0 ) {
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNumbers );
-			cAlphaArgs( {1,NumAlphas} ) = Blank;
+			cAlphaArgs( {1,NumAlphas} ) = BlankString;
 			for ( CountP = 1; CountP <= NumPrePM; ++CountP ) {
 				GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ) == Blank ) cAlphaArgs( 1 ) = "Unknown";
+				if ( cAlphaArgs( 1 ) == BlankString ) cAlphaArgs( 1 ) = "Unknown";
 				if ( NumAlphas > 3 ) {
 					Multiples = "s";
 				} else {
-					Multiples = Blank;
+					Multiples = BlankString;
 				}
-				if ( cAlphaArgs( 2 ) == Blank ) cAlphaArgs( 2 ) = "Unknown";
-				{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 2 ) ) );
-				if ( SELECT_CASE_var == "INFORMATION" ) {
+				if ( cAlphaArgs( 2 ) == BlankString ) cAlphaArgs( 2 ) = "Unknown";
+				{ auto const errorType( cAlphaArgs( 2 ) );
+				if ( SameString(errorType, "INFORMATION") ) {
 					ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Information message" + Multiples + ':' );
-				} else if ( SELECT_CASE_var == "WARNING" ) {
+				} else if ( SameString(errorType, "WARNING") ) {
 					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Warning condition" + Multiples + ':' );
-				} else if ( SELECT_CASE_var == "SEVERE" ) {
+				} else if ( SameString(errorType, "SEVERE") ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Severe condition" + Multiples + ':' );
-				} else if ( SELECT_CASE_var == "FATAL" ) {
+				} else if ( SameString(errorType, "FATAL") ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Fatal condition" + Multiples + ':' );
 					PreP_Fatal = true;
 				} else {
@@ -5188,7 +5133,7 @@ namespace InputProcessor {
 		CurrentRecord = FindFirstRecord( EMSSensor );
 		while ( CurrentRecord != 0 ) {
 			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( EMSSensor, CurrentRecord );
-			if ( IDFRecords( CurrentRecord ).Alphas( 2 ) != Blank ) {
+			if ( IDFRecords( CurrentRecord ).Alphas( 2 ) != BlankString ) {
 				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 2 ), IDFRecords( CurrentRecord ).Alphas( 3 ) );
 			} else {
 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 3 ) );
@@ -5289,25 +5234,23 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		{ auto const SELECT_CASE_var( reportName );
-
-		if ( SELECT_CASE_var == "ZONECOOLINGSUMMARYMONTHLY" ) {
+		if ( SameString(reportName, "ZONECOOLINGSUMMARYMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" );
 
-		} else if ( SELECT_CASE_var == "ZONEHEATINGSUMMARYMONTHLY" ) {
+		} else if ( SameString(reportName, "ZONEHEATINGSUMMARYMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE HEATING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE HEATING RATE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 
-		} else if ( SELECT_CASE_var == "ZONEELECTRICSUMMARYMONTHLY" ) {
+		} else if ( SameString(reportName, "ZONEELECTRICSUMMARYMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY" );
 
-		} else if ( SELECT_CASE_var == "SPACEGAINSMONTHLY" ) {
+		} else if ( SameString(reportName, "SPACEGAINSMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" );
@@ -5318,7 +5261,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "PEAKSPACEGAINSMONTHLY" ) {
+		} else if ( SameString(reportName, "PEAKSPACEGAINSMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" );
@@ -5329,7 +5272,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY" ) {
+		} else if ( SameString(reportName, "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" );
@@ -5341,39 +5284,39 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY" ) {
+		} else if ( SameString(reportName, "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE HEATING SETPOINT NOT MET TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MEAN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE HEATING SETPOINT NOT MET WHILE OCCUPIED TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE COOLING SETPOINT NOT MET TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME" );
 
-		} else if ( SELECT_CASE_var == "COMFORTREPORTSIMPLE55MONTHLY" ) {
+		} else if ( SameString(reportName, "COMFORTREPORTSIMPLE55MONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MEAN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
 
-		} else if ( SELECT_CASE_var == "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY" ) {
+		} else if ( SameString(reportName, "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY" );
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR OUTSIDE FACE SUCTION VELOCITY" );
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR SENSIBLE HEATING RATE" );
 
-		} else if ( SELECT_CASE_var == "OCCUPANTCOMFORTDATASUMMARYMONTHLY" ) {
+		} else if ( SameString(reportName, "OCCUPANTCOMFORTDATASUMMARYMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "PEOPLE OCCUPANT COUNT" );
 			AddRecordToOutputVariableStructure( "*", "PEOPLE AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "PEOPLE AIR RELATIVE HUMIDITY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT FANGER MODEL PMV" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT FANGER MODEL PPD" );
 
-		} else if ( SELECT_CASE_var == "CHILLERREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "CHILLERREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "CHILLER ELECTRIC ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "CHILLER ELECTRIC POWER" );
 			AddRecordToOutputVariableStructure( "*", "CHILLER EVAPORATOR COOLING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "CHILLER CONDENSER HEAT TRANSFER ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "CHILLER COP" );
 
-		} else if ( SELECT_CASE_var == "TOWERREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "TOWERREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER FAN ELECTRIC ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER FAN ELECTRIC POWER" );
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER HEAT TRANSFER RATE" );
@@ -5381,7 +5324,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER OUTLET TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER MASS FLOW RATE" );
 
-		} else if ( SELECT_CASE_var == "BOILERREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "BOILERREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "BOILER HEATING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "BOILER GAS CONSUMPTION" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "BOILER HEATING ENERGY" ); // on meter
@@ -5392,7 +5335,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "BOILER MASS FLOW RATE" );
 			AddRecordToOutputVariableStructure( "*", "BOILER ANCILLARY ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "DXREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "DXREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL TOTAL COOLING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL ELECTRIC ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL SENSIBLE COOLING ENERGY" );
@@ -5405,7 +5348,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL ELECTRIC POWER" );
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "WINDOWREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "WINDOWREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
@@ -5415,14 +5358,14 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SURFACE SHADING DEVICE IS ON TIME FRACTION" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE STORM WINDOW ON OFF STATUS" );
 
-		} else if ( SELECT_CASE_var == "WINDOWENERGYREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "WINDOWENERGYREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "WINDOWZONESUMMARYMONTHLY" ) {
+		} else if ( SameString(reportName, "WINDOWZONESUMMARYMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE" );
@@ -5431,7 +5374,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
 
-		} else if ( SELECT_CASE_var == "WINDOWENERGYZONESUMMARYMONTHLY" ) {
+		} else if ( SameString(reportName, "WINDOWENERGYZONESUMMARYMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY" );
@@ -5440,7 +5383,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 
-		} else if ( SELECT_CASE_var == "AVERAGEOUTDOORCONDITIONSMONTHLY" ) {
+		} else if ( SameString(reportName, "AVERAGEOUTDOORCONDITIONSMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5450,7 +5393,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE RAIN STATUS" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY" ) {
+		} else if ( SameString(reportName, "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5459,7 +5402,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY" ) {
+		} else if ( SameString(reportName, "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5468,7 +5411,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY" ) {
+		} else if ( SameString(reportName, "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5477,7 +5420,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY" ) {
+		} else if ( SameString(reportName, "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
@@ -5486,7 +5429,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORGROUNDCONDITIONSMONTHLY" ) {
+		} else if ( SameString(reportName, "OUTDOORGROUNDCONDITIONSMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SITE GROUND TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE SURFACE GROUND TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE DEEP GROUND TEMPERATURE" );
@@ -5494,7 +5437,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE GROUND REFLECTED SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE SNOW ON GROUND STATUS" );
 
-		} else if ( SELECT_CASE_var == "WINDOWACREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "WINDOWACREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY" );
@@ -5505,7 +5448,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "WATERHEATERREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "WATERHEATERREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER BURNER HEATING ENERGY" );
@@ -5517,7 +5460,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER SOURCE ENERGY" );
 
-		} else if ( SELECT_CASE_var == "GENERATORREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "GENERATORREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "GENERATOR PRODUCED ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "GENERATOR DIESEL CONSUMPTION" );
 			AddRecordToOutputVariableStructure( "*", "GENERATOR GAS CONSUMPTION" );
@@ -5528,7 +5471,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "GENERATOR EXHAUST HEAT RECOVERY ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "GENERATOR EXHAUST AIR TEMPERATURE" );
 
-		} else if ( SELECT_CASE_var == "DAYLIGHTINGREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "DAYLIGHTINGREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "SITE EXTERIOR BEAM NORMAL ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER" );
@@ -5541,7 +5484,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 
-		} else if ( SELECT_CASE_var == "COILREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "COILREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "HEATING COIL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "HEATING COIL HEATING RATE" );
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL SENSIBLE COOLING ENERGY" );
@@ -5550,16 +5493,16 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL SENSIBLE COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL WETTED AREA FRACTION" );
 
-		} else if ( SELECT_CASE_var == "PLANTLOOPDEMANDREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "PLANTLOOPDEMANDREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" );
 
-		} else if ( SELECT_CASE_var == "FANREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "FANREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "FAN ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "FAN RISE IN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "FAN ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "PUMPREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "PUMPREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "PUMP ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "PUMP FLUID HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "PUMP ELECTRIC POWER" );
@@ -5568,17 +5511,17 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "PUMP OUTLET TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "PUMP MASS FLOW RATE" );
 
-		} else if ( SELECT_CASE_var == "CONDLOOPDEMANDREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "CONDLOOPDEMANDREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE INLET TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE OUTLET TEMPERATURE" );
 
-		} else if ( SELECT_CASE_var == "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY" ) {
+		} else if ( SameString(reportName, "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE OSCILLATING TEMPERATURES TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE OCCUPANT COUNT" );
 
-		} else if ( SELECT_CASE_var == "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY" ) {
+		} else if ( SameString(reportName, "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM HOT WATER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM STEAM ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM CHILLED WATER ENERGY" );
@@ -5586,7 +5529,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM GAS ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM WATER VOLUME" );
 
-		} else if ( SELECT_CASE_var == "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY" ) {
+		} else if ( SameString(reportName, "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM FAN AIR HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM COOLING COIL TOTAL COOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM HEATING COIL TOTAL HEATING ENERGY" );
@@ -5596,7 +5539,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM EVAPORATIVE COOLER TOTAL COOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY" );
 
-		} else if ( SELECT_CASE_var == "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY" ) {
+		} else if ( SameString(reportName, "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM FAN ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY" );
@@ -5609,7 +5552,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRIC ENERGY" );
 
-		} else if ( SELECT_CASE_var == "MECHANICALVENTILATIONLOADSMONTHLY" ) {
+		} else if ( SameString(reportName, "MECHANICALVENTILATIONLOADSMONTHLY") ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
@@ -5622,7 +5565,7 @@ namespace InputProcessor {
 
 		} else {
 
-		}}
+		}
 
 	}
 
@@ -5949,7 +5892,7 @@ namespace InputProcessor {
 			gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << cStartLine;
 		}
 		ShowMessage( TextLine );
-		if ( cStartName != Blank ) {
+		if ( cStartName != BlankString ) {
 			ShowMessage( "indicated Name=" + cStartName );
 		}
 		ShowMessage( "Only last " + IPTrimSigDigits( NumConxLines ) + " lines before error line shown....." );
@@ -6018,7 +5961,7 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( Severity != Blank ) {
+		if ( Severity != BlankString ) {
 			++TotalAuditErrors;
 			gio::write( EchoInputFile, ErrorFormat ) << Severity + ErrorMessage;
 		} else {

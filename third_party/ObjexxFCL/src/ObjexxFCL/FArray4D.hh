@@ -70,6 +70,10 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::isize1;
+	using Super::isize2;
+	using Super::isize3;
+	using Super::isize4;
 	using Super::l;
 	using Super::operator ();
 	using Super::reassign;
@@ -508,7 +512,7 @@ public: // Creation
 	FArray4D
 	shape( FArray4< U > const & a )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4() );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
 	}
 
 	// Array Shape + Initializer Value Named Constructor Template
@@ -518,7 +522,7 @@ public: // Creation
 	FArray4D
 	shape( FArray4< U > const & a, T const & t )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4(), t );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), t );
 	}
 
 	// Slice Shape Named Constructor Template
@@ -528,7 +532,7 @@ public: // Creation
 	FArray4D
 	shape( FArray4S< U > const & a )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4() );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
 	}
 
 	// Slice Shape + Initializer Value Named Constructor Template
@@ -538,7 +542,7 @@ public: // Creation
 	FArray4D
 	shape( FArray4S< U > const & a, T const & t )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4(), t );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), t );
 	}
 
 	// MArray Shape Named Constructor Template
@@ -548,7 +552,7 @@ public: // Creation
 	FArray4D
 	shape( MArray4< A, M > const & a )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4() );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4() );
 	}
 
 	// MArray Shape + Initializer Value Named Constructor Template
@@ -558,7 +562,7 @@ public: // Creation
 	FArray4D
 	shape( MArray4< A, M > const & a, T const & t )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4(), t );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), t );
 	}
 
 	// One-Based Copy Named Constructor Template
@@ -568,7 +572,7 @@ public: // Creation
 	FArray4D
 	one_based( FArray4< U > const & a )
 	{
-		return FArray4D( a, a.size1(), a.size2(), a.size3(), a.size4() );
+		return FArray4D( a, a.isize1(), a.isize2(), a.isize3(), a.isize4() );
 	}
 
 	// One-Based Slice Named Constructor Template
@@ -578,7 +582,7 @@ public: // Creation
 	FArray4D
 	one_based( FArray4S< U > const & a )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4(), a );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a );
 	}
 
 	// One-Based MArray Named Constructor Template
@@ -588,7 +592,7 @@ public: // Creation
 	FArray4D
 	one_based( MArray4< A, M > const & a )
 	{
-		return FArray4D( a.size1(), a.size2(), a.size3(), a.size4(), a );
+		return FArray4D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a );
 	}
 
 	// Destructor
@@ -1008,6 +1012,14 @@ public: // Inspector
 	size4() const
 	{
 		return I4_.size();
+	}
+
+	// Size of Dimension 4
+	inline
+	int
+	isize4() const
+	{
+		return I4_.isize();
 	}
 
 public: // Modifier

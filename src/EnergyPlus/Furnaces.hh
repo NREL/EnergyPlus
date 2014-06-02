@@ -20,7 +20,7 @@ namespace Furnaces {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern std::string const Blank;
+	// na
 
 	// Last mode of operation
 	extern int const CoolingMode; // last compressor operating mode was in cooling

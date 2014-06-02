@@ -100,6 +100,8 @@ namespace ThermalComfort {
 	Real64 const RadSurfEff( 0.72 ); // Fraction of surface effective for radiation
 	Real64 const StefanBoltz( 5.67e-8 ); // Stefan-Boltzmann constant (W/m2K4)
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -521,9 +523,9 @@ namespace ThermalComfort {
 			RadTemp = CalcRadTemp( PeopleNum );
 			// Use mean air temp for calculating RH when thermal comfort control is used
 			if ( present( PNum ) ) {
-				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
 			} else {
-				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
+				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress, BlankString );
 			}
 			People( PeopleNum ).TemperatureInZone = AirTemp;
 			People( PeopleNum ).RelativeHumidityInZone = RelHum * 100.0;
@@ -583,7 +585,7 @@ namespace ThermalComfort {
 			// VapPress    = CalcSatVapPressFromTemp(AirTemp)  !original
 			// VapPress    = RelHum*VapPress                   !original might be in torrs
 
-			VapPress = PsyPsatFnTemp( AirTemp ); // use psych routines inside E+ , returns Pa
+			VapPress = PsyPsatFnTemp( AirTemp, BlankString ); // use psych routines inside E+ , returns Pa
 
 			VapPress *= RelHum; // in units of [Pa]
 
@@ -803,7 +805,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
 			// Metabolic rate of body (W/m2)
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			// Energy consumption by external work (W/m2)
@@ -1230,7 +1232,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
+			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			WorkEff = GetCurrentScheduleValue( People( PeopleNum ).WorkEffPtr ) * ActLevel;
 			{ auto const SELECT_CASE_var( People( PeopleNum ).ClothingType );
@@ -1684,7 +1686,6 @@ namespace ThermalComfort {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const AngleFacLimit( 0.01 ); // To set the limit of sum of angle factors
-		static std::string const Blank;
 		int const MaxSurfaces( 20 ); // Maximum number of surfaces in each AngleFactor List
 
 		// INTERFACE BLOCK SPECIFICATIONS:

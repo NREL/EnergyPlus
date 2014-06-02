@@ -9,6 +9,37 @@
 
 namespace EnergyPlus {
 
+SQLiteOutput::SQLiteOutput()
+	: 
+	m_maxMessageSize(4096),
+	m_writeOutputToSQLite(true),
+	m_writeTabularDataToSQLite(true),
+	m_sqlDBTimeIndex(0)
+{
+}
+
+SQLiteOutput::~SQLiteOutput()
+{
+}
+
+//int SQLiteOutput::SQLiteExecuteCommand(const std::string & commandBuffer)
+//{
+//	char *zErrMsg = 0;
+//	int rc = -1;
+//
+//	if (outputFile == NULL)
+//		fprintf(stderr, "SQLite3 message, can't open error file: sqlite.err\n");
+//	else
+//	{
+//		rc = sqlite3_exec(db, commandBuffer, callback, 0, &zErrMsg);
+//		if( rc != SQLITE_OK ){
+//			fprintf(outputFile, "SQLite3 message, error: %s\n", zErrMsg);
+//			sqlite3_free(zErrMsg);
+//		}
+//	}
+//	return rc;
+//}
+
 namespace SQLiteProcedures {
 
 	// Note most of the procedures below are stubs -- they have no function other than to satisfy compiler requirements

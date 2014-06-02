@@ -21,7 +21,6 @@ namespace NodeInputManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	extern std::string const Blank;
 
 	// DERIVED TYPE DEFINITIONS
 

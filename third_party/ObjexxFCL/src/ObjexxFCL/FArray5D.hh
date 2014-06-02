@@ -70,6 +70,11 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::isize1;
+	using Super::isize2;
+	using Super::isize3;
+	using Super::isize4;
+	using Super::isize5;
 	using Super::l;
 	using Super::operator ();
 	using Super::reassign;
@@ -537,7 +542,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5< U > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// Array Shape + Initializer Value Named Constructor Template
@@ -547,7 +552,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5< U > const & a, T const & t )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), t );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), t );
 	}
 
 	// Slice Shape Named Constructor Template
@@ -557,7 +562,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5S< U > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// Slice Shape + Initializer Value Named Constructor Template
@@ -567,7 +572,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5S< U > const & a, T const & t )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), t );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), t );
 	}
 
 	// MArray Shape Named Constructor Template
@@ -577,7 +582,7 @@ public: // Creation
 	FArray5D
 	shape( MArray5< A, M > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// MArray Shape + Initializer Value Named Constructor Template
@@ -587,7 +592,7 @@ public: // Creation
 	FArray5D
 	shape( MArray5< A, M > const & a, T const & t )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), t );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), t );
 	}
 
 	// One-Based Copy Named Constructor Template
@@ -597,7 +602,7 @@ public: // Creation
 	FArray5D
 	one_based( FArray5< U > const & a )
 	{
-		return FArray5D( a, a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a, a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// One-Based Slice Named Constructor Template
@@ -607,7 +612,7 @@ public: // Creation
 	FArray5D
 	one_based( FArray5S< U > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a );
 	}
 
 	// One-Based MArray Named Constructor Template
@@ -617,7 +622,7 @@ public: // Creation
 	FArray5D
 	one_based( MArray5< A, M > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a );
 	}
 
 	// Destructor
@@ -1061,6 +1066,14 @@ public: // Inspector
 	size5() const
 	{
 		return I5_.size();
+	}
+
+	// Size of Dimension 5
+	inline
+	int
+	isize5() const
+	{
+		return I5_.isize();
 	}
 
 public: // Modifier

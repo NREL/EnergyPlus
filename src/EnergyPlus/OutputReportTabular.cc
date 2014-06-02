@@ -148,7 +148,8 @@ namespace OutputReportTabular {
 	int const numResourceTypes( 14 );
 	int const numSourceTypes( 12 );
 
-	std::string const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
+	static std::string const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
+	static std::string const BlankString;
 
 	//MODULE VARIABLE DECLARATIONS:
 
@@ -11653,7 +11654,7 @@ namespace OutputReportTabular {
 					//Outside  Wet Bulb Temperature
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
 					if ( CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) < 1.0 && CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ) > 0.0 ) {
-						tableBody( 3, 1 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 101325.0 ) ), 2 );
+						tableBody( 3, 1 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolOutTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolOutHumRatSeq( timeCoolMax ), 101325.0, BlankString ) ), 2 );
 					}
 
 					//Outside Humidity Ratio at Peak
@@ -11664,7 +11665,7 @@ namespace OutputReportTabular {
 
 					//Zone Relative Humdity
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					tableBody( 6, 1 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 101325.0 ), 2 );
+					tableBody( 6, 1 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).CoolZoneTempSeq( timeCoolMax ), CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 101325.0, BlankString ), 2 );
 
 					//Zone Humidity Ratio at Peak
 					tableBody( 7, 1 ) = RealToStr( CalcFinalZoneSizing( iZone ).CoolZoneHumRatSeq( timeCoolMax ), 5 );
@@ -12131,7 +12132,7 @@ namespace OutputReportTabular {
 					//Outside  Wet Bulb Temperature
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
 					if ( CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) < 1.0 && CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ) > 0.0 ) {
-						tableBody( 3, 1 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 101325.0 ) ), 2 );
+						tableBody( 3, 1 ) = RealToStr( ConvertIP( tempConvIndx, PsyTwbFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatOutTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatOutHumRatSeq( timeHeatMax ), 101325.0, BlankString ) ), 2 );
 					}
 
 					//Humidity Ratio at Peak
@@ -12142,7 +12143,7 @@ namespace OutputReportTabular {
 
 					//Zone Relative Temperature
 					//use standard sea level air pressure because air pressure is not tracked with sizing data
-					tableBody( 6, 1 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 101325.0 ), 2 );
+					tableBody( 6, 1 ) = RealToStr( 100 * PsyRhFnTdbWPb( CalcFinalZoneSizing( iZone ).HeatZoneTempSeq( timeHeatMax ), CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 101325.0, BlankString ), 2 );
 
 					//Zone Relative Humdity
 					tableBody( 7, 1 ) = RealToStr( CalcFinalZoneSizing( iZone ).HeatZoneHumRatSeq( timeHeatMax ), 5 );

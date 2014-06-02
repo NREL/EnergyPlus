@@ -57,7 +57,7 @@ TEST( FArraySTest, FArray1SEmptySlice )
 	EXPECT_EQ( 0u, s.size() );
 	EXPECT_EQ( 1, s.l() );
 	EXPECT_EQ( 0, s.u() );
-	EXPECT_EQ( 0, s.size() );
+	EXPECT_EQ( 0u, s.size() );
 }
 
 TEST( FArraySTest, FArray1SEmptySliceOfEmptyArray )
@@ -67,7 +67,7 @@ TEST( FArraySTest, FArray1SEmptySliceOfEmptyArray )
 	EXPECT_EQ( 0u, s.size() );
 	EXPECT_EQ( 1, s.l() );
 	EXPECT_EQ( 0, s.u() );
-	EXPECT_EQ( 0, s.size() );
+	EXPECT_EQ( 0u, s.size() );
 }
 
 TEST( FArraySTest, FArray1SSliceOfUnboundedArray )
@@ -179,7 +179,7 @@ TEST( FArraySTest, FArray2SSlice3D )
 //END PROGRAM
 
 	FArray3D_int M( 9, 9, 9 );
-	for ( FArray3D_int::size_type i = 0; i < 9*9*9; ++i ) M[ i ] = i; // Memory offset values
+	for ( FArray3D_int::size_type i = 0; i < 9*9*9; ++i ) M[ i ] = static_cast< int >( i ); // Memory offset values
 
 	FArray2S_int S( M( 7, {8,2,-2}, {8,2,-2} ) );
 	EXPECT_EQ( 1, S.l1() );

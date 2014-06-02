@@ -39,12 +39,12 @@ operator <<( std::ostream & stream, ChunkVector< T > const & v )
 
 		// Save current stream state and set persistent state
 		std::ios_base::fmtflags const old_flags( stream.flags() );
-		int const old_precision( stream.precision( Traits::precision() ) );
+		std::streamsize const old_precision( stream.precision( Traits::precision() ) );
 		stream << std::right << std::showpoint << std::uppercase;
 
 		// Output array to stream
 		size_type const e( v.size() - 1 );
-		int const w( Traits::width() );
+		int const w( Traits::iwidth() );
 		for ( size_type i = 0; i < e; ++i ) {
 			stream << setw( w ) << v[ i ] << ' ';
 		} stream << setw( w ) << v[ e ];

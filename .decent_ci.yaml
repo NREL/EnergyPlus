@@ -1,0 +1,3 @@
+results_repository : NREL/EnergyPlusBuildResults
+results_path : _posts
+results_base_url : https://nrel.github.io/EnergyPlusBuildResults

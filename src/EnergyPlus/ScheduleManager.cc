@@ -66,7 +66,7 @@ namespace ScheduleManager {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	int const MaxDayTypes( 12 );
-	std::string const Blank;
+	static std::string const BlankString;
 	FArray1D_string const ValidDayTypes( MaxDayTypes, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 
 	int const NumScheduleTypeLimitUnitTypes( 14 );
@@ -1145,7 +1145,7 @@ namespace ScheduleManager {
 							ErrorsFound = true;
 							goto Through_exit;
 						}
-						if ( Alphas( NumField ) == Blank ) goto Until_exit;
+						if ( Alphas( NumField ) == BlankString ) goto Until_exit;
 						Until_loop: ;
 					}
 					Until_exit: ;
@@ -1483,7 +1483,7 @@ namespace ScheduleManager {
 						} else {
 							//no more commas
 							subString = LineIn.substr( wordStart );
-							if ( firstLine && subString == Blank ) {
+							if ( firstLine && subString == BlankString ) {
 								ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\" first line does not contain the indicated column separator=" + Alphas( 4 ) + '.' );
 								ShowContinueError( "...first 40 characters of line=[" + LineIn.substr( 0, 40 ) + ']' );
 								firstLine = false;
@@ -1945,9 +1945,9 @@ namespace ScheduleManager {
 		ShowMinute.allocate( NumOfTimeStepInHour );
 		TimeHHMM.allocate( NumOfTimeStepInHour * 24 );
 		RoundTSValue.allocate( 24, NumOfTimeStepInHour );
-		ShowMinute = Blank;
-		TimeHHMM = Blank;
-		RoundTSValue = Blank;
+		ShowMinute = BlankString;
+		TimeHHMM = BlankString;
+		RoundTSValue = BlankString;
 
 		CurMinute = MinutesPerTimeStep;
 		for ( Count = 1; Count <= NumOfTimeStepInHour - 1; ++Count ) {
@@ -4607,7 +4607,7 @@ namespace ScheduleManager {
 
 		for ( Item = 1; Item <= NumWeekSchedules; ++Item ) {
 			if ( WeekSchedule( Item ).Used ) continue;
-			if ( WeekSchedule( Item ).Name == Blank ) continue;
+			if ( WeekSchedule( Item ).Name == BlankString ) continue;
 			if ( NeedOrphanMessage && DisplayUnusedSchedules ) {
 				ShowWarningError( "The following week schedule names are \"Unused Schedules\".  These schedules are in the idf" );
 				ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );
@@ -4630,7 +4630,7 @@ namespace ScheduleManager {
 
 		for ( Item = 1; Item <= NumDaySchedules; ++Item ) {
 			if ( DaySchedule( Item ).Used ) continue;
-			if ( DaySchedule( Item ).Name == Blank ) continue;
+			if ( DaySchedule( Item ).Name == BlankString ) continue;
 			if ( NeedOrphanMessage && DisplayUnusedSchedules ) {
 				ShowWarningError( "The following day schedule names are \"Unused Schedules\".  These schedules are in the idf" );
 				ShowContinueError( " file but are never obtained by the simulation and therefore are NOT used." );

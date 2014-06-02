@@ -71,7 +71,7 @@ namespace BranchInputManager {
 	//MODULE PARAMETER DEFINITIONS
 	std::string const cMIXER( "Connector:Mixer" );
 	std::string const cSPLITTER( "Connector:Splitter" );
-	std::string const Blank;
+	static std::string const BlankString;
 
 	//DERIVED TYPE DEFINITIONS
 
@@ -221,7 +221,7 @@ namespace BranchInputManager {
 		}
 
 		// Set data
-		if ( BranchList( Found ).LoopName == Blank ) {
+		if ( BranchList( Found ).LoopName == BlankString ) {
 			BranchList( Found ).LoopName = LoopName;
 			BranchList( Found ).LoopType = LoopType;
 		} else if ( BranchList( Found ).LoopName != LoopName ) {
@@ -610,7 +610,7 @@ namespace BranchInputManager {
 		using General::TrimSigDigits;
 
 		// Locals
-		static std::string const Blank;
+		// na
 
 		// FUNCTION ARGUMENT DEFINITIONS:
 
@@ -634,8 +634,8 @@ namespace BranchInputManager {
 		ErrFound = false;
 		NumBranches = size( Branch );
 
-		FanType = Blank;
-		FanName = Blank;
+		FanType = BlankString;
+		FanName = BlankString;
 
 		if ( NumBranches == 0 ) {
 			ShowSevereError( "GetBranchFanTypeName:  Branch index not found = " + TrimSigDigits( BranchNum ) );
@@ -649,7 +649,7 @@ namespace BranchInputManager {
 						break;
 					}
 				}
-				if ( FanType == Blank ) ErrFound = true;
+				if ( FanType == BlankString ) ErrFound = true;
 			} else {
 				ShowSevereError( "GetBranchFanTypeName:  Branch index not found = " + TrimSigDigits( BranchNum ) );
 				ErrFound = true;
@@ -686,7 +686,7 @@ namespace BranchInputManager {
 		using General::TrimSigDigits;
 
 		// Locals
-		static std::string const Blank;
+		// na
 
 		// FUNCTION ARGUMENT DEFINITIONS:
 
@@ -803,7 +803,7 @@ namespace BranchInputManager {
 			BranchMaxFlow = 0.0;
 			NumComps = 0;
 		} else {
-			if ( Branch( Found ).AssignedLoopName == Blank ) {
+			if ( Branch( Found ).AssignedLoopName == BlankString ) {
 				Branch( Found ).AssignedLoopName = LoopName;
 				BranchMaxFlow = Branch( Found ).MaxFlowRate;
 				PressCurveType = Branch( Found ).PressureCurveType;
@@ -1074,8 +1074,8 @@ namespace BranchInputManager {
 
 		// Set defaults for later error potential
 		IsMixer = false;
-		MixerName = Blank;
-		OutletNodeName = Blank;
+		MixerName = BlankString;
+		OutletNodeName = BlankString;
 		OutletNodeNum = 0;
 		NumInletNodes = 0;
 		InletNodeNames = "";
@@ -1205,7 +1205,7 @@ namespace BranchInputManager {
 			GetSplitterInputFlag = false;
 		}
 
-		if ( ConnectorListName == Blank ) {
+		if ( ConnectorListName == BlankString ) {
 			ShowSevereError( "GetLoopSplitter: ConnectorListName is blank.  LoopName=" + LoopName );
 			ShowFatalError( "Program terminates due to previous condition." );
 		}
@@ -1226,9 +1226,9 @@ namespace BranchInputManager {
 		}
 
 		// Default for any errors
-		SplitterName = Blank;
+		SplitterName = BlankString;
 		IsSplitter = false;
-		InletNodeName = Blank;
+		InletNodeName = BlankString;
 		InletNodeNum = 0;
 		NumOutletNodes = 0;
 		OutletNodeNames = "";
@@ -1873,7 +1873,7 @@ namespace BranchInputManager {
 					if ( NumOfBranches == 0 ) {
 						GetBranchInput();
 					}
-					if ( BranchList( BCount ).BranchNames( Loop ) != Blank ) {
+					if ( BranchList( BCount ).BranchNames( Loop ) != BlankString ) {
 						Found = FindItemInList( BranchList( BCount ).BranchNames( Loop ), Branch.Name(), NumOfBranches );
 						if ( Found == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + BranchList( BCount ).Name + "\", invalid data." );
@@ -2324,11 +2324,11 @@ namespace BranchInputManager {
 		}
 
 		//  Everything supposed to be good.  Now make sure all branches in Splitter on same side of loop.
-		SaveSupplyDemandAir = Blank;
+		SaveSupplyDemandAir = BlankString;
 		for ( Count = 1; Count <= NumSplitters; ++Count ) {
 			// 2.  Find the branch name in branchlist
 			TestName = Splitters( Count ).InletBranchName;
-			BranchListName = Blank;
+			BranchListName = BlankString;
 			for ( Loop1 = 1; Loop1 <= NumOfBranchLists; ++Loop1 ) {
 				if ( any_eq( BranchList( Loop1 ).BranchNames, TestName ) ) {
 					BranchListName = BranchList( Loop1 ).Name;
@@ -2336,9 +2336,9 @@ namespace BranchInputManager {
 				}
 			}
 
-			if ( BranchListName != Blank ) {
-				FoundSupplyDemandAir = Blank;
-				FoundLoop = Blank;
+			if ( BranchListName != BlankString ) {
+				FoundSupplyDemandAir = BlankString;
+				FoundLoop = BlankString;
 				MatchedLoop = false;
 				// 3.  Find the loop and type
 				FindAirPlantCondenserLoopFromBranchList( BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop );
@@ -2359,7 +2359,7 @@ namespace BranchInputManager {
 			}
 			for ( Loop = 1; Loop <= Splitters( Count ).NumOutletBranches; ++Loop ) {
 				TestName = Splitters( Count ).OutletBranchNames( Loop );
-				BranchListName = Blank;
+				BranchListName = BlankString;
 				for ( Loop1 = 1; Loop1 <= NumOfBranchLists; ++Loop1 ) {
 					if ( any_eq( BranchList( Loop1 ).BranchNames, TestName ) ) {
 						BranchListName = BranchList( Loop1 ).Name;
@@ -2367,9 +2367,9 @@ namespace BranchInputManager {
 					}
 				}
 
-				if ( BranchListName != Blank ) {
-					FoundSupplyDemandAir = Blank;
-					FoundLoop = Blank;
+				if ( BranchListName != BlankString ) {
+					FoundSupplyDemandAir = BlankString;
+					FoundLoop = BlankString;
 					MatchedLoop = false;
 					// 3.  Find the loop and type
 					FindAirPlantCondenserLoopFromBranchList( BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop );
@@ -2565,11 +2565,11 @@ namespace BranchInputManager {
 		}
 
 		//  Everything supposed to be good.  Now make sure all branches in Splitter on same side of loop.
-		SaveSupplyDemandAir = Blank;
+		SaveSupplyDemandAir = BlankString;
 		for ( Count = 1; Count <= NumMixers; ++Count ) {
 			// 2.  Find the branch name in branchlist
 			TestName = Mixers( Count ).OutletBranchName;
-			BranchListName = Blank;
+			BranchListName = BlankString;
 			for ( Loop1 = 1; Loop1 <= NumOfBranchLists; ++Loop1 ) {
 				if ( any_eq( BranchList( Loop1 ).BranchNames, TestName ) ) {
 					BranchListName = BranchList( Loop1 ).Name;
@@ -2577,9 +2577,9 @@ namespace BranchInputManager {
 				}
 			}
 
-			if ( BranchListName != Blank ) {
-				FoundSupplyDemandAir = Blank;
-				FoundLoop = Blank;
+			if ( BranchListName != BlankString ) {
+				FoundSupplyDemandAir = BlankString;
+				FoundLoop = BlankString;
 				MatchedLoop = false;
 				// 3.  Find the loop and type
 				FindAirPlantCondenserLoopFromBranchList( BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop );
@@ -2600,7 +2600,7 @@ namespace BranchInputManager {
 			}
 			for ( Loop = 1; Loop <= Mixers( Count ).NumInletBranches; ++Loop ) {
 				TestName = Mixers( Count ).InletBranchNames( Loop );
-				BranchListName = Blank;
+				BranchListName = BlankString;
 				for ( Loop1 = 1; Loop1 <= NumOfBranchLists; ++Loop1 ) {
 					if ( any_eq( BranchList( Loop1 ).BranchNames, TestName ) ) {
 						BranchListName = BranchList( Loop1 ).Name;
@@ -2608,9 +2608,9 @@ namespace BranchInputManager {
 					}
 				}
 
-				if ( BranchListName != Blank ) {
-					FoundSupplyDemandAir = Blank;
-					FoundLoop = Blank;
+				if ( BranchListName != BlankString ) {
+					FoundSupplyDemandAir = BlankString;
+					FoundLoop = BlankString;
 					MatchedLoop = false;
 					// 3.  Find the plant loop and type
 					FindAirPlantCondenserLoopFromBranchList( BranchListName, FoundLoop, FoundSupplyDemandAir, MatchedLoop );
@@ -2933,20 +2933,20 @@ namespace BranchInputManager {
 		int FoundLoopNum;
 		Real64 FoundLoopVolFlowRate;
 
-		LoopSupplyDemandAir = Blank;
-		FoundLoopName = Blank;
+		LoopSupplyDemandAir = BlankString;
+		FoundLoopName = BlankString;
 		FoundLoopNum = 0;
 		FoundLoopVolFlowRate = 0.0;
 		MatchedLoop = false;
-		LoopType = Blank;
+		LoopType = BlankString;
 
 		// Try Plant first
 		FindPlantLoopBranchConnection( BranchListName, FoundLoopName, FoundLoopNum, LoopSupplyDemandAir, FoundLoopVolFlowRate, MatchedLoop );
 
 		if ( MatchedLoop ) LoopType = "Plant";
 		if ( ! MatchedLoop ) { // Try Condenser Loop
-			LoopSupplyDemandAir = Blank;
-			FoundLoopName = Blank;
+			LoopSupplyDemandAir = BlankString;
+			FoundLoopName = BlankString;
 			FoundLoopNum = 0;
 			FoundLoopVolFlowRate = 0.0;
 			MatchedLoop = false;
@@ -2957,8 +2957,8 @@ namespace BranchInputManager {
 		}
 
 		if ( ! MatchedLoop ) { // Try Air Loop
-			LoopSupplyDemandAir = Blank;
-			FoundLoopName = Blank;
+			LoopSupplyDemandAir = BlankString;
+			FoundLoopName = BlankString;
 			FoundLoopNum = 0;
 			FoundLoopVolFlowRate = 0.0;
 			MatchedLoop = false;
@@ -3207,7 +3207,7 @@ namespace BranchInputManager {
 			BranchPtrs( BranchList( BCount ).NumOfBranchNames + 1 ) = BranchPtrs( BranchList( BCount ).NumOfBranchNames ) + 1;
 			BranchFluidNodes.allocate( NumNodesOnBranchList );
 			BranchFluidNodes = 0;
-			OriginalBranchFluidType = Blank;
+			OriginalBranchFluidType = BlankString;
 			NumFluidNodes = 0;
 			for ( Count = 1; Count <= BranchList( BCount ).NumOfBranchNames; ++Count ) {
 
@@ -3282,7 +3282,7 @@ namespace BranchInputManager {
 					ErrFound = true;
 				}
 				BranchOutletNodeName = MatchNodeName;
-				if ( Branch( Found ).AssignedLoopName == Blank ) {
+				if ( Branch( Found ).AssignedLoopName == BlankString ) {
 					BranchLoopName = "**Unknown**";
 					BranchLoopType = "**Unknown**";
 				} else if ( Branch( Found ).AssignedLoopName == BranchList( BCount ).LoopName ) {
@@ -3297,7 +3297,7 @@ namespace BranchInputManager {
 			if ( MixedFluidTypesOnBranchList ) {
 				ShowSevereError( "BranchList=" + BranchList( BCount ).Name + " has mixed fluid types in its nodes." );
 				ErrFound = true;
-				if ( OriginalBranchFluidType == Blank ) OriginalBranchFluidType = "**Unknown**";
+				if ( OriginalBranchFluidType == BlankString ) OriginalBranchFluidType = "**Unknown**";
 				ShowContinueError( "Initial Node=" + NodeID( InitialBranchFluidNode ) + ", Fluid Type=" + OriginalBranchFluidType );
 				ShowContinueError( "BranchList Topology - Note nodes which do not match that fluid type:" );
 				Ptr = 1;
@@ -3311,7 +3311,7 @@ namespace BranchInputManager {
 					}
 					for ( Loop2 = Ptr; Loop2 <= EndPtr; ++Loop2 ) {
 						cBranchFluidType = ValidNodeFluidTypes( Node( BranchFluidNodes( Loop2 ) ).FluidType );
-						if ( cBranchFluidType == Blank ) cBranchFluidType = "**Unknown**";
+						if ( cBranchFluidType == BlankString ) cBranchFluidType = "**Unknown**";
 						ShowContinueError( "....Node=" + NodeID( BranchFluidNodes( Loop2 ) ) + ", Fluid Type=" + cBranchFluidType );
 					}
 					Ptr = EndPtr + 1;
@@ -3326,7 +3326,7 @@ namespace BranchInputManager {
 		// Build node names in branches
 		for ( Count = 1; Count <= NumOfBranches; ++Count ) {
 			BranchNodes( Count ).UniqueNodeNames.allocate( Branch( Count ).NumOfComponents * 2 );
-			BranchNodes( Count ).UniqueNodeNames = Blank;
+			BranchNodes( Count ).UniqueNodeNames = BlankString;
 			NodeNum = 0;
 			for ( Loop = 1; Loop <= Branch( Count ).NumOfComponents; ++Loop ) {
 				Found = FindItemInList( Branch( Count ).Component( Loop ).InletNodeName, BranchNodes( Count ).UniqueNodeNames, NodeNum );
@@ -3404,7 +3404,7 @@ namespace BranchInputManager {
 					}
 				}
 				BranchOutletNodeName = MatchNodeName;
-				if ( Branch( Count ).AssignedLoopName == Blank ) {
+				if ( Branch( Count ).AssignedLoopName == BlankString ) {
 					BranchLoopName = "**Unknown**";
 					BranchLoopType = "**Unknown**";
 				} else {

@@ -105,6 +105,8 @@ namespace EvaporativeFluidCoolers {
 	int const EvapFluidCooler_SingleSpeed( 1 );
 	int const EvapFluidCooler_TwoSpeed( 2 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -340,7 +342,7 @@ namespace EvaporativeFluidCoolers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -416,7 +418,7 @@ namespace EvaporativeFluidCoolers {
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).FluidIndex = PlantLoop( CurLoopNum ).FluidIndex;
 			FluidName = GetGlycolNameByIndex( SimpleEvapFluidCooler( EvapFluidCoolerNum ).FluidIndex );
 
-			if ( lAlphaFieldBlanks( 4 ) || AlphArray( 4 ) == Blank ) {
+			if ( lAlphaFieldBlanks( 4 ) || AlphArray( 4 ) == BlankString ) {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\" Performance input method is not specified. " );
 				ErrorsFound = true;
 			}
@@ -442,7 +444,7 @@ namespace EvaporativeFluidCoolers {
 			}
 
 			//   fluid bypass for single speed evaporative fluid cooler
-			if ( lAlphaFieldBlanks( 6 ) || AlphArray( 6 ) == Blank ) {
+			if ( lAlphaFieldBlanks( 6 ) || AlphArray( 6 ) == BlankString ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).CapacityControl = 0; // FanCycling
 			} else {
 				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 6 ) ) );
@@ -464,7 +466,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByUserFactor;
 			} else if ( SameString( AlphArray( 7 ), "SaturatedExit" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
-			} else if ( AlphArray( 7 ) == Blank ) {
+			} else if ( AlphArray( 7 ) == BlankString ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else {
 				ShowSevereError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + AlphArray( 7 ) );
@@ -495,7 +497,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownBySchedule;
 			} else if ( SameString( AlphArray( 8 ), "ConcentrationRatio" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
-			} else if ( AlphArray( 8 ) == Blank ) {
+			} else if ( AlphArray( 8 ) == BlankString ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
 				if ( ( NumNums < 15 ) && ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).ConcentrationRatio == 0.0 ) ) {
 					// assume Concetration ratio was omitted and should be defaulted
@@ -514,7 +516,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( AlphArray( 10 ) == Blank ) {
+			if ( AlphArray( 10 ) == BlankString ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
 				SetupTankDemandComponent( AlphArray( 1 ), cCurrentModuleObject, AlphArray( 10 ), ErrorsFound, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterTankID, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterTankDemandARRID );
@@ -1007,7 +1009,7 @@ namespace EvaporativeFluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitEvapFluidCooler" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1080,7 +1082,7 @@ namespace EvaporativeFluidCoolers {
 		if ( MyEnvrnFlag( EvapFluidCoolerNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
 			if ( PlantSizeNotComplete ) SizeEvapFluidCooler( EvapFluidCoolerNum );
 
-			rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "InitEvapFluidCooler" );
+			rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesWaterMassFlowRate = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate * rho;
 			InitComponentNodes( 0.0, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesWaterMassFlowRate, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterInletNodeNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterOutletNodeNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopSideNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).BranchNum, SimpleEvapFluidCooler( EvapFluidCoolerNum ).CompNum );
 			MyEnvrnFlag( EvapFluidCoolerNum ) = false;
@@ -1225,8 +1227,8 @@ namespace EvaporativeFluidCoolers {
 
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UFactor && SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedEvapFluidCoolerUA != AutoSize ) {
 			if ( PltSizCondNum > 0 ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity = DesEvapFluidCoolerLoad / SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio;
 			} else {
@@ -1261,8 +1263,8 @@ namespace EvaporativeFluidCoolers {
 					if ( PlantSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
 				} else if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizCondNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-						rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
-						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
+						rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+						Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 						DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 						tmpHighSpeedFanPower = 0.0105 * DesEvapFluidCoolerLoad;
 						if ( PlantSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedFanPower = tmpHighSpeedFanPower;
@@ -1308,8 +1310,8 @@ namespace EvaporativeFluidCoolers {
 						ShowContinueError( "If using HVACTemplate:Plant:ChilledWaterLoop, then check that input field " "Condenser Water Design Setpoint must be > 25.6 C if autosizing the Evaporative Fluid Cooler." );
 						ShowFatalError( "Review and revise design input values as appropriate." );
 					}
-					rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
-					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
+					rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 					DesEvapFluidCoolerLoad = rho * Cp * tmpDesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 					Par( 1 ) = DesEvapFluidCoolerLoad;
 					Par( 2 ) = double( EvapFluidCoolerNum );
@@ -1322,7 +1324,7 @@ namespace EvaporativeFluidCoolers {
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1378,8 +1380,8 @@ namespace EvaporativeFluidCoolers {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
 				// Standard Design Capacity doesn't include compressor heat;
 				// predefined factor was 1.25 W heat rejection per W of delivered cooling, now a user input with 1.25 default
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, 35., PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, 35., PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
 				Par( 2 ) = double( EvapFluidCoolerNum );
@@ -1392,7 +1394,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1416,8 +1418,8 @@ namespace EvaporativeFluidCoolers {
 
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity ) {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedUserSpecifiedDesignCapacity;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
 				Par( 2 ) = double( EvapFluidCoolerNum );
@@ -1431,7 +1433,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1495,8 +1497,8 @@ namespace EvaporativeFluidCoolers {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow && SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacity > 0.0 ) {
 				// Standard design capacity doesn't include compressor heat;
 				// predefined factor was 1.25 W heat rejection per W of delivered cooling, now user input with default 1.25
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedStandardDesignCapacity * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
 				Par( 2 ) = double( EvapFluidCoolerNum );
@@ -1509,7 +1511,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1529,8 +1531,8 @@ namespace EvaporativeFluidCoolers {
 
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).PerformanceInputMethod_Num == PIM_UserSpecifiedDesignCapacity && SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignWaterFlowRate >= SmallWaterVolFlow && SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity > 0.0 ) {
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SizeEvapFluidCooler" );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).LowSpeedUserSpecifiedDesignCapacity;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
 				Par( 2 ) = double( EvapFluidCoolerNum );
@@ -1543,7 +1545,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating EvaporativeFluidCooler UA" );
@@ -1651,6 +1653,7 @@ namespace EvaporativeFluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcSingleSpeedEvapFluidCooler" );
 		int const MaxIteration( 100 ); // Maximum fluid bypass iteration calculations
 		static std::string const MaxItChar( "100" );
 		Real64 const BypassFractionThreshold( 0.01 ); // Threshold to stop bypass iteration
@@ -1801,7 +1804,7 @@ namespace EvaporativeFluidCoolers {
 		}
 
 		//Should this be water inlet node num?????
-		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "CalcSingleSpeedEvapFluidCooler" );
+		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 		Qactual = WaterMassFlowRate * CpWater * ( Node( WaterInletNode ).Temp - OutletWaterTemp );
 		AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate;
 
@@ -1871,7 +1874,7 @@ namespace EvaporativeFluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcTwoSpeedEvapFluidCooler" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1955,7 +1958,7 @@ namespace EvaporativeFluidCoolers {
 		}
 
 		//Should this be water inlet node num??
-		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "CalcTwoSpeedEvapFluidCooler" );
+		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 		Qactual = WaterMassFlowRate * CpWater * ( Node( WaterInletNode ).Temp - OutletWaterTemp );
 		AirFlowRateRatio = AirFlowRate / SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate;
 
@@ -2001,6 +2004,7 @@ namespace EvaporativeFluidCoolers {
 		Real64 const WetBulbTolerance( 0.00001 ); // Maximum error for exiting wet-bulb temperature between iterations
 		// [delta K/K]
 		Real64 const DeltaTwbTolerance( 0.001 ); // Maximum error (tolerance) in DeltaTwb for iteration convergence [C]
+		static std::string const RoutineName( "SimSimpleEvapFluidCooler" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2050,11 +2054,11 @@ namespace EvaporativeFluidCoolers {
 		if ( UAdesign == 0.0 ) return;
 
 		// set water and air properties
-		AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, InletAirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat );
+		AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, InletAirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat, BlankString );
 		AirMassFlowRate = AirFlowRate * AirDensity;
 		CpAir = PsyCpAirFnWTdb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat, InletAirTemp );
-		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InletWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "SimSimpleEvapFluidCooler" );
-		InletAirEnthalpy = PsyHFnTdbRhPb( InletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InletWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
+		InletAirEnthalpy = PsyHFnTdbRhPb( InletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 
 		// initialize exiting wet bulb temperature before iterating on final solution
 		OutletAirWetBulb = InletAirWetBulb + 6.0;
@@ -2064,7 +2068,7 @@ namespace EvaporativeFluidCoolers {
 		Iter = 0;
 		while ( ( WetBulbError > WetBulbTolerance ) && ( Iter <= IterMax ) && ( DeltaTwb > DeltaTwbTolerance ) ) {
 			++Iter;
-			OutletAirEnthalpy = PsyHFnTdbRhPb( OutletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+			OutletAirEnthalpy = PsyHFnTdbRhPb( OutletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 			// calculate the airside specific heat and capacity
 			CpAirside = ( OutletAirEnthalpy - InletAirEnthalpy ) / ( OutletAirWetBulb - InletAirWetBulb );
 			AirCapacity = AirMassFlowRate * CpAirside;
@@ -2195,7 +2199,7 @@ namespace EvaporativeFluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalculateWaterUseage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2228,16 +2232,16 @@ namespace EvaporativeFluidCoolers {
 		// Set water and air properties
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode == EvapLossByMoistTheory ) {
 
-			AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat );
+			AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat, BlankString );
 			AirMassFlowRate = AirFlowRateRatio * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate * AirDensity;
-			InletAirEnthalpy = PsyHFnTdbRhPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+			InletAirEnthalpy = PsyHFnTdbRhPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
 
 			if ( AirMassFlowRate > 0.0 ) {
 				// Calculate outlet air conditions for determining water usage
 
 				OutletAirEnthalpy = InletAirEnthalpy + Qactual / AirMassFlowRate;
-				OutletAirTSat = PsyTsatFnHPb( OutletAirEnthalpy, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
-				OutletAirHumRatSat = PsyWFnTdbH( OutletAirTSat, OutletAirEnthalpy );
+				OutletAirTSat = PsyTsatFnHPb( OutletAirEnthalpy, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+				OutletAirHumRatSat = PsyWFnTdbH( OutletAirTSat, OutletAirEnthalpy, BlankString );
 
 				// calculate specific humidity ratios (HUMRAT to mass of moist air not dry air)
 				InSpecificHumRat = SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat / ( 1 + SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat );
@@ -2247,7 +2251,7 @@ namespace EvaporativeFluidCoolers {
 				TairAvg = ( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp + OutletAirTSat ) / 2.0;
 
 				// Amount of water evaporated
-				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, TairAvg, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "CalculateWaterUseage" );
+				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, TairAvg, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 				EvapVdot = ( AirMassFlowRate * ( OutSpecificHumRat - InSpecificHumRat ) ) / rho; // [m3/s]
 				if ( EvapVdot < 0.0 ) EvapVdot = 0.0;
 			} else {
@@ -2255,7 +2259,7 @@ namespace EvaporativeFluidCoolers {
 			}
 
 		} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode == EvapLossByUserFactor ) {
-			rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, AverageWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, "CalculateWaterUseage" );
+			rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, AverageWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
 			EvapVdot = SimpleEvapFluidCooler( EvapFluidCoolerNum ).UserEvapLossFactor * ( InletWaterTemp - OutletWaterTemp ) * ( WaterMassFlowRate / rho );
 			if ( EvapVdot < 0.0 ) EvapVdot = 0.0;
 		} else {

@@ -1,6 +1,11 @@
 set( target_name objexx )
 
-set(src 
+if(MSVC)
+  ADD_DEFINITIONS("-Za") # Disables MS language extensions
+endif()
+
+
+set(src
   src/ObjexxFCL/array.iterator.hh
   src/ObjexxFCL/ArrayTraits.hh
   src/ObjexxFCL/Backspace.cc
@@ -20,8 +25,8 @@ set(src
   src/ObjexxFCL/char.constants.hh
   src/ObjexxFCL/char.functions.cc
   src/ObjexxFCL/char.functions.hh
-  src/ObjexxFCL/ChunkExponent.hh
   src/ObjexxFCL/Chunk.hh
+  src/ObjexxFCL/ChunkExponent.hh
   src/ObjexxFCL/ChunkVector.fwd.hh
   src/ObjexxFCL/ChunkVector.hh
   src/ObjexxFCL/ChunkVector.io.hh
@@ -29,11 +34,13 @@ set(src
   src/ObjexxFCL/Cstring.fwd.hh
   src/ObjexxFCL/Cstring.hh
   src/ObjexxFCL/Dimension.cc
+  src/ObjexxFCL/Dimension.fwd.hh
+  src/ObjexxFCL/Dimension.hh
   src/ObjexxFCL/DimensionExpression.cc
+  src/ObjexxFCL/DimensionExpression.hh
   src/ObjexxFCL/DimensionExpressionCon.hh
   src/ObjexxFCL/DimensionExpressionCube.hh
   src/ObjexxFCL/DimensionExpressionDiv.hh
-  src/ObjexxFCL/DimensionExpression.hh
   src/ObjexxFCL/DimensionExpressionMax.hh
   src/ObjexxFCL/DimensionExpressionMin.hh
   src/ObjexxFCL/DimensionExpressionMul.hh
@@ -44,8 +51,6 @@ set(src
   src/ObjexxFCL/DimensionExpressionSquare.hh
   src/ObjexxFCL/DimensionExpressionSub.hh
   src/ObjexxFCL/DimensionExpressionSum.hh
-  src/ObjexxFCL/Dimension.fwd.hh
-  src/ObjexxFCL/Dimension.hh
   src/ObjexxFCL/DimensionSlice.fwd.hh
   src/ObjexxFCL/DimensionSlice.hh
   src/ObjexxFCL/DynamicIndexRange.cc
@@ -53,103 +58,103 @@ set(src
   src/ObjexxFCL/DynamicIndexRange.hh
   src/ObjexxFCL/environment.cc
   src/ObjexxFCL/environment.hh
-  src/ObjexxFCL/FArray1A.fwd.hh
-  src/ObjexxFCL/FArray1A.hh
-  src/ObjexxFCL/FArray1.all.fwd.hh
-  src/ObjexxFCL/FArray1.all.hh
-  src/ObjexxFCL/FArray1D.fwd.hh
-  src/ObjexxFCL/FArray1D.hh
-  src/ObjexxFCL/FArray1.fwd.hh
-  src/ObjexxFCL/FArray1.hh
-  src/ObjexxFCL/FArray1.io.hh
-  src/ObjexxFCL/FArray1P.fwd.hh
-  src/ObjexxFCL/FArray1P.hh
-  src/ObjexxFCL/FArray1.Project.MArray.hh
-  src/ObjexxFCL/FArray1S.fwd.hh
-  src/ObjexxFCL/FArray1S.hh
-  src/ObjexxFCL/FArray1S.io.hh
-  src/ObjexxFCL/FArray1S.Project.MArray.hh
-  src/ObjexxFCL/FArray2A.fwd.hh
-  src/ObjexxFCL/FArray2A.hh
-  src/ObjexxFCL/FArray2.all.fwd.hh
-  src/ObjexxFCL/FArray2.all.hh
-  src/ObjexxFCL/FArray2D.fwd.hh
-  src/ObjexxFCL/FArray2D.hh
-  src/ObjexxFCL/FArray2.fwd.hh
-  src/ObjexxFCL/FArray2.hh
-  src/ObjexxFCL/FArray2.io.hh
-  src/ObjexxFCL/FArray2P.fwd.hh
-  src/ObjexxFCL/FArray2P.hh
-  src/ObjexxFCL/FArray2.Project.MArray.hh
-  src/ObjexxFCL/FArray2S.fwd.hh
-  src/ObjexxFCL/FArray2S.hh
-  src/ObjexxFCL/FArray2S.io.hh
-  src/ObjexxFCL/FArray2S.Project.MArray.hh
-  src/ObjexxFCL/FArray3A.fwd.hh
-  src/ObjexxFCL/FArray3A.hh
-  src/ObjexxFCL/FArray3.all.fwd.hh
-  src/ObjexxFCL/FArray3.all.hh
-  src/ObjexxFCL/FArray3D.fwd.hh
-  src/ObjexxFCL/FArray3D.hh
-  src/ObjexxFCL/FArray3.fwd.hh
-  src/ObjexxFCL/FArray3.hh
-  src/ObjexxFCL/FArray3.io.hh
-  src/ObjexxFCL/FArray3P.fwd.hh
-  src/ObjexxFCL/FArray3P.hh
-  src/ObjexxFCL/FArray3S.fwd.hh
-  src/ObjexxFCL/FArray3S.hh
-  src/ObjexxFCL/FArray3S.io.hh
-  src/ObjexxFCL/FArray4A.fwd.hh
-  src/ObjexxFCL/FArray4A.hh
-  src/ObjexxFCL/FArray4.all.fwd.hh
-  src/ObjexxFCL/FArray4.all.hh
-  src/ObjexxFCL/FArray4D.fwd.hh
-  src/ObjexxFCL/FArray4D.hh
-  src/ObjexxFCL/FArray4.fwd.hh
-  src/ObjexxFCL/FArray4.hh
-  src/ObjexxFCL/FArray4.io.hh
-  src/ObjexxFCL/FArray4P.fwd.hh
-  src/ObjexxFCL/FArray4P.hh
-  src/ObjexxFCL/FArray4S.fwd.hh
-  src/ObjexxFCL/FArray4S.hh
-  src/ObjexxFCL/FArray4S.io.hh
-  src/ObjexxFCL/FArray5A.fwd.hh
-  src/ObjexxFCL/FArray5A.hh
-  src/ObjexxFCL/FArray5.all.fwd.hh
-  src/ObjexxFCL/FArray5.all.hh
-  src/ObjexxFCL/FArray5D.fwd.hh
-  src/ObjexxFCL/FArray5D.hh
-  src/ObjexxFCL/FArray5.fwd.hh
-  src/ObjexxFCL/FArray5.hh
-  src/ObjexxFCL/FArray5.io.hh
-  src/ObjexxFCL/FArray5P.fwd.hh
-  src/ObjexxFCL/FArray5P.hh
-  src/ObjexxFCL/FArray5S.fwd.hh
-  src/ObjexxFCL/FArray5S.hh
-  src/ObjexxFCL/FArray5S.io.hh
-  src/ObjexxFCL/FArray6A.fwd.hh
-  src/ObjexxFCL/FArray6A.hh
-  src/ObjexxFCL/FArray6.all.fwd.hh
-  src/ObjexxFCL/FArray6.all.hh
-  src/ObjexxFCL/FArray6D.fwd.hh
-  src/ObjexxFCL/FArray6D.hh
-  src/ObjexxFCL/FArray6.fwd.hh
-  src/ObjexxFCL/FArray6.hh
-  src/ObjexxFCL/FArray6.io.hh
-  src/ObjexxFCL/FArray6P.fwd.hh
-  src/ObjexxFCL/FArray6P.hh
-  src/ObjexxFCL/FArray6S.fwd.hh
-  src/ObjexxFCL/FArray6S.hh
-  src/ObjexxFCL/FArray6S.io.hh
   src/ObjexxFCL/FArray.all.fwd.hh
   src/ObjexxFCL/FArray.all.hh
   src/ObjexxFCL/FArray.all.io.hh
   src/ObjexxFCL/FArray.functions.hh
   src/ObjexxFCL/FArray.fwd.hh
   src/ObjexxFCL/FArray.hh
+  src/ObjexxFCL/FArray.io.hh
+  src/ObjexxFCL/FArray1.all.fwd.hh
+  src/ObjexxFCL/FArray1.all.hh
+  src/ObjexxFCL/FArray1.fwd.hh
+  src/ObjexxFCL/FArray1.hh
+  src/ObjexxFCL/FArray1.io.hh
+  src/ObjexxFCL/FArray1.Project.MArray.hh
+  src/ObjexxFCL/FArray1A.fwd.hh
+  src/ObjexxFCL/FArray1A.hh
+  src/ObjexxFCL/FArray1D.fwd.hh
+  src/ObjexxFCL/FArray1D.hh
+  src/ObjexxFCL/FArray1P.fwd.hh
+  src/ObjexxFCL/FArray1P.hh
+  src/ObjexxFCL/FArray1S.fwd.hh
+  src/ObjexxFCL/FArray1S.hh
+  src/ObjexxFCL/FArray1S.io.hh
+  src/ObjexxFCL/FArray1S.Project.MArray.hh
+  src/ObjexxFCL/FArray2.all.fwd.hh
+  src/ObjexxFCL/FArray2.all.hh
+  src/ObjexxFCL/FArray2.fwd.hh
+  src/ObjexxFCL/FArray2.hh
+  src/ObjexxFCL/FArray2.io.hh
+  src/ObjexxFCL/FArray2.Project.MArray.hh
+  src/ObjexxFCL/FArray2A.fwd.hh
+  src/ObjexxFCL/FArray2A.hh
+  src/ObjexxFCL/FArray2D.fwd.hh
+  src/ObjexxFCL/FArray2D.hh
+  src/ObjexxFCL/FArray2P.fwd.hh
+  src/ObjexxFCL/FArray2P.hh
+  src/ObjexxFCL/FArray2S.fwd.hh
+  src/ObjexxFCL/FArray2S.hh
+  src/ObjexxFCL/FArray2S.io.hh
+  src/ObjexxFCL/FArray2S.Project.MArray.hh
+  src/ObjexxFCL/FArray3.all.fwd.hh
+  src/ObjexxFCL/FArray3.all.hh
+  src/ObjexxFCL/FArray3.fwd.hh
+  src/ObjexxFCL/FArray3.hh
+  src/ObjexxFCL/FArray3.io.hh
+  src/ObjexxFCL/FArray3A.fwd.hh
+  src/ObjexxFCL/FArray3A.hh
+  src/ObjexxFCL/FArray3D.fwd.hh
+  src/ObjexxFCL/FArray3D.hh
+  src/ObjexxFCL/FArray3P.fwd.hh
+  src/ObjexxFCL/FArray3P.hh
+  src/ObjexxFCL/FArray3S.fwd.hh
+  src/ObjexxFCL/FArray3S.hh
+  src/ObjexxFCL/FArray3S.io.hh
+  src/ObjexxFCL/FArray4.all.fwd.hh
+  src/ObjexxFCL/FArray4.all.hh
+  src/ObjexxFCL/FArray4.fwd.hh
+  src/ObjexxFCL/FArray4.hh
+  src/ObjexxFCL/FArray4.io.hh
+  src/ObjexxFCL/FArray4A.fwd.hh
+  src/ObjexxFCL/FArray4A.hh
+  src/ObjexxFCL/FArray4D.fwd.hh
+  src/ObjexxFCL/FArray4D.hh
+  src/ObjexxFCL/FArray4P.fwd.hh
+  src/ObjexxFCL/FArray4P.hh
+  src/ObjexxFCL/FArray4S.fwd.hh
+  src/ObjexxFCL/FArray4S.hh
+  src/ObjexxFCL/FArray4S.io.hh
+  src/ObjexxFCL/FArray5.all.fwd.hh
+  src/ObjexxFCL/FArray5.all.hh
+  src/ObjexxFCL/FArray5.fwd.hh
+  src/ObjexxFCL/FArray5.hh
+  src/ObjexxFCL/FArray5.io.hh
+  src/ObjexxFCL/FArray5A.fwd.hh
+  src/ObjexxFCL/FArray5A.hh
+  src/ObjexxFCL/FArray5D.fwd.hh
+  src/ObjexxFCL/FArray5D.hh
+  src/ObjexxFCL/FArray5P.fwd.hh
+  src/ObjexxFCL/FArray5P.hh
+  src/ObjexxFCL/FArray5S.fwd.hh
+  src/ObjexxFCL/FArray5S.hh
+  src/ObjexxFCL/FArray5S.io.hh
+  src/ObjexxFCL/FArray6.all.fwd.hh
+  src/ObjexxFCL/FArray6.all.hh
+  src/ObjexxFCL/FArray6.fwd.hh
+  src/ObjexxFCL/FArray6.hh
+  src/ObjexxFCL/FArray6.io.hh
+  src/ObjexxFCL/FArray6A.fwd.hh
+  src/ObjexxFCL/FArray6A.hh
+  src/ObjexxFCL/FArray6D.fwd.hh
+  src/ObjexxFCL/FArray6D.hh
+  src/ObjexxFCL/FArray6P.fwd.hh
+  src/ObjexxFCL/FArray6P.hh
+  src/ObjexxFCL/FArray6S.fwd.hh
+  src/ObjexxFCL/FArray6S.hh
+  src/ObjexxFCL/FArray6S.io.hh
   src/ObjexxFCL/FArrayInitializer.fwd.hh
   src/ObjexxFCL/FArrayInitializer.hh
-  src/ObjexxFCL/FArray.io.hh
   src/ObjexxFCL/FArrayRS.fwd.hh
   src/ObjexxFCL/FArrayRS.hh
   src/ObjexxFCL/FArrayS.all.fwd.hh
@@ -173,9 +178,9 @@ set(src
   src/ObjexxFCL/Fstring.fwd.hh
   src/ObjexxFCL/Fstring.hh
   src/ObjexxFCL/gio.cc
+  src/ObjexxFCL/gio.hh
   src/ObjexxFCL/gio_Fmt.fwd.hh
   src/ObjexxFCL/gio_Fmt.hh
-  src/ObjexxFCL/gio.hh
   src/ObjexxFCL/GlobalStreams.cc
   src/ObjexxFCL/GlobalStreams.hh
   src/ObjexxFCL/Index.cc
@@ -193,6 +198,13 @@ set(src
   src/ObjexxFCL/IOFlags.cc
   src/ObjexxFCL/IOFlags.fwd.hh
   src/ObjexxFCL/IOFlags.hh
+  src/ObjexxFCL/MArray.all.fwd.hh
+  src/ObjexxFCL/MArray.all.hh
+  src/ObjexxFCL/MArray.all.io.hh
+  src/ObjexxFCL/MArray.functions.hh
+  src/ObjexxFCL/MArray.fwd.hh
+  src/ObjexxFCL/MArray.hh
+  src/ObjexxFCL/MArray.io.hh
   src/ObjexxFCL/MArray1.fwd.hh
   src/ObjexxFCL/MArray1.hh
   src/ObjexxFCL/MArray1.io.hh
@@ -212,13 +224,6 @@ set(src
   src/ObjexxFCL/MArray6.fwd.hh
   src/ObjexxFCL/MArray6.hh
   src/ObjexxFCL/MArray6.io.hh
-  src/ObjexxFCL/MArray.all.fwd.hh
-  src/ObjexxFCL/MArray.all.hh
-  src/ObjexxFCL/MArray.all.io.hh
-  src/ObjexxFCL/MArray.functions.hh
-  src/ObjexxFCL/MArray.fwd.hh
-  src/ObjexxFCL/MArray.hh
-  src/ObjexxFCL/MArray.io.hh
   src/ObjexxFCL/MArrayR.fwd.hh
   src/ObjexxFCL/MArrayR.hh
   src/ObjexxFCL/numeric.cc
@@ -228,9 +233,9 @@ set(src
   src/ObjexxFCL/ObjexxFCL.Project.hh
   src/ObjexxFCL/Observer.cc
   src/ObjexxFCL/Observer.fwd.hh
+  src/ObjexxFCL/Observer.hh
   src/ObjexxFCL/ObserverGraph.cc
   src/ObjexxFCL/ObserverGraph.hh
-  src/ObjexxFCL/Observer.hh
   src/ObjexxFCL/ObserverMediator.cc
   src/ObjexxFCL/ObserverMediator.hh
   src/ObjexxFCL/ObserverMulti.cc
@@ -267,8 +272,11 @@ set(src
   src/ObjexxFCL/StaticIndexRange.hh
   src/ObjexxFCL/Sticky.fwd.hh
   src/ObjexxFCL/Sticky.hh
+  src/ObjexxFCL/Stream.cc
   src/ObjexxFCL/Stream.fwd.hh
   src/ObjexxFCL/Stream.hh
+  src/ObjexxFCL/stream.functions.cc
+  src/ObjexxFCL/stream.functions.hh
   src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc
@@ -285,13 +293,17 @@ set(src
   src/ObjexxFCL/TypeTraits.hh
   src/ObjexxFCL/ubyte.fwd.hh
   src/ObjexxFCL/ubyte.hh
+  src/ObjexxFCL/Write.cc
   src/ObjexxFCL/Write.fwd.hh
   src/ObjexxFCL/Write.hh
-) 
+)
 
 set( test_src
+  tst/unit/bit.unit.cc
+  tst/unit/byte.unit.cc
   tst/unit/CArray.unit.cc
   tst/unit/CArrayP.unit.cc
+  tst/unit/char.functions.unit.cc
   tst/unit/Chunk.unit.cc
   tst/unit/ChunkVector.unit.cc
   tst/unit/Cstring.unit.cc
@@ -302,12 +314,17 @@ set( test_src
   tst/unit/FArray1.unit.cc
   tst/unit/FArray2.unit.cc
   tst/unit/FArrayS.unit.cc
+  tst/unit/floops.unit.cc
   tst/unit/Fmath.unit.cc
+  tst/unit/fmt.unit.cc
   tst/unit/Fstring.unit.cc
+  tst/unit/gio.unit.cc
   tst/unit/GlobalStreams.unit.cc
   tst/unit/Index.unit.cc
   tst/unit/IndexSlice.unit.cc
+  tst/unit/main.cc
   tst/unit/MArray.unit.cc
+  tst/unit/numeric.unit.cc
   tst/unit/Optional.unit.cc
   tst/unit/Print.unit.cc
   tst/unit/Read.unit.cc
@@ -316,19 +333,12 @@ set( test_src
   tst/unit/Required.unit.cc
   tst/unit/StaticIndexRange.unit.cc
   tst/unit/Stream.unit.cc
-  tst/unit/TypeTraits.unit.cc
-  tst/unit/Write.unit.cc
-  tst/unit/bit.unit.cc
-  tst/unit/byte.unit.cc
-  tst/unit/char.functions.unit.cc
-  tst/unit/floops.unit.cc
-  tst/unit/fmt.unit.cc
-  tst/unit/gio.unit.cc
-  tst/unit/main.cc
-  tst/unit/numeric.unit.cc
   tst/unit/string.functions.unit.cc
+  tst/unit/TypeTraits.unit.cc
   tst/unit/ubyte.unit.cc
+  tst/unit/Write.unit.cc
 )
+
 
 add_library( ${target_name} ${src} )
 

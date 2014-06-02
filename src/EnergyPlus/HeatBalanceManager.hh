@@ -15,7 +15,6 @@ namespace HeatBalanceManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern std::string const Blank;
 	extern gio::Fmt const fmtA;
 
 	extern FArray1D_string const PassFail;

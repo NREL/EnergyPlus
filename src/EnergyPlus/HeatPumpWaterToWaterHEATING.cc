@@ -462,7 +462,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitGshp" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -500,12 +500,12 @@ namespace HeatPumpWaterToWaterHEATING {
 
 			MyEnvrnFlag( GSHPNum ) = false;
 
-			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "InitGshp" );
+			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 			GSHP( GSHPNum ).LoadSideDesignMassFlow = GSHP( GSHPNum ).LoadSideVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, GSHP( GSHPNum ).LoadSideDesignMassFlow, GSHP( GSHPNum ).LoadSideInletNodeNum, GSHP( GSHPNum ).LoadSideOutletNodeNum, GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum );
 
-			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "InitGshp" );
+			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 			GSHP( GSHPNum ).SourceSideDesignMassFlow = GSHP( GSHPNum ).SourceSideVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, GSHP( GSHPNum ).SourceSideDesignMassFlow, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).SourceBranchNum, GSHP( GSHPNum ).SourceCompNum );
@@ -571,6 +571,12 @@ namespace HeatPumpWaterToWaterHEATING {
 		Real64 const RelaxParam( 0.6 );
 		Real64 const SmallNum( 1.0e-20 );
 		int const IterationLimit( 500 );
+		static std::string const RoutineName( "CalcGshpModel" );
+		static std::string const RoutineNameLoadSideTemp( "CalcGSHPModel:LoadSideTemp" );
+		static std::string const RoutineNameSourceSideTemp( "CalcGSHPModel:SourceSideTemp" );
+		static std::string const RoutineNameCompressInletTemp( "CalcGSHPModel:CompressInletTemp" );
+		static std::string const RoutineNameSuctionPr( "CalcGSHPModel:SuctionPr" );
+		static std::string const RoutineNameCompSuctionTemp( "CalcGSHPModel:CompSuctionTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -730,9 +736,9 @@ namespace HeatPumpWaterToWaterHEATING {
 		initialQLoad = 0.0;
 		IterationCount = 0;
 
-		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "CalcGshpModel" );
+		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 
-		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "CalcGshpModel" );
+		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 
 		// Determine effectiveness of Source Side (the Evaporator in heating mode)
 		SourceSideEffect = 1.0 - std::exp( -SourceSideUA / ( CpSourceSide * SourceSideWaterMassFlowRate ) );
@@ -748,8 +754,8 @@ namespace HeatPumpWaterToWaterHEATING {
 			LoadSideTemp = LoadSideWaterInletTemp + initialQLoad / ( LoadSideEffect * CpLoadSide * LoadSideWaterMassFlowRate );
 
 			// Determine the evaporating and condensing pressures
-			SourceSidePressure = GetSatPressureRefrig( GSHPRefrigerant, SourceSideTemp, GSHPRefrigIndex, "CalcGSHPModel:SourceSideTemp" );
-			LoadSidePressure = GetSatPressureRefrig( GSHPRefrigerant, LoadSideTemp, GSHPRefrigIndex, "CalcGSHPModel:LoadSideTemp" );
+			SourceSidePressure = GetSatPressureRefrig( GSHPRefrigerant, SourceSideTemp, GSHPRefrigIndex, RoutineNameSourceSideTemp );
+			LoadSidePressure = GetSatPressureRefrig( GSHPRefrigerant, LoadSideTemp, GSHPRefrigIndex, RoutineNameLoadSideTemp );
 
 			// check cutoff pressures
 			if ( SourceSidePressure < LowPressCutoff ) {
@@ -781,23 +787,23 @@ namespace HeatPumpWaterToWaterHEATING {
 
 			// Determine the Source Side Outlet Enthalpy
 			qual = 1.0;
-			SourceSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, SourceSideTemp, qual, GSHPRefrigIndex, "CalcGSHPModel:SourceSideTemp" );
+			SourceSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, SourceSideTemp, qual, GSHPRefrigIndex, RoutineNameSourceSideTemp );
 
 			// Determine Load Side Outlet Enthalpy
 			qual = 0.0;
-			LoadSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, LoadSideTemp, qual, GSHPRefrigIndex, "CalcGSHPModel:LoadSideTemp" );
+			LoadSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, LoadSideTemp, qual, GSHPRefrigIndex, RoutineNameLoadSideTemp );
 
 			// Determine superheated temperature of the Source Side outlet/compressor inlet
 			CompressInletTemp = SourceSideTemp + ShTemp;
 			// Determine the enathalpy of the super heated fluid at Source Side outlet
-			SuperHeatEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompressInletTemp, SourceSidePressure, GSHPRefrigIndex, "CalcGSHPModel:CompressInletTemp" );
+			SuperHeatEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompressInletTemp, SourceSidePressure, GSHPRefrigIndex, RoutineNameCompressInletTemp );
 
 			// Determining the suction state of the fluid from inlet state involves interation
 			// Method employed...
 			// Determine the saturated temp at suction pressure, shoot out into the superheated region find the enthalpy
 			// check that with the inlet enthalpy ( as suction loss is isenthalpic). Iterate till desired accuracy is reached
 
-			CompSuctionSatTemp = GetSatTemperatureRefrig( GSHPRefrigerant, SuctionPr, GSHPRefrigIndex, "CalcGSHPModel:SuctionPr" );
+			CompSuctionSatTemp = GetSatTemperatureRefrig( GSHPRefrigerant, SuctionPr, GSHPRefrigIndex, RoutineNameSuctionPr );
 
 			T110 = CompSuctionSatTemp;
 			//Shoot into the super heated region
@@ -807,7 +813,7 @@ namespace HeatPumpWaterToWaterHEATING {
 			LOOP: while ( true ) {
 				CompSuctionTemp = 0.5 * ( T110 + T111 );
 
-				CompSuctionEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, "CalcGSHPModel:CompSuctionTemp" );
+				CompSuctionEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
 				if ( std::abs( CompSuctionEnth - SuperHeatEnth ) / SuperHeatEnth < 0.0001 ) {
 					goto LOOP_exit;
 				}
@@ -822,7 +828,7 @@ namespace HeatPumpWaterToWaterHEATING {
 			LOOP_exit: ;
 
 			// Determine the Mass flow rate of refrigerant
-			CompSuctionDensity = GetSupHeatDensityRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, "CalcGSHPModel:CompSuctionTemp" );
+			CompSuctionDensity = GetSupHeatDensityRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
 			MassRef = PistonDisp * CompSuctionDensity * ( 1.0 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1. / gamma ) ) ) );
 
 			// Find the  Source Side Heat Transfer

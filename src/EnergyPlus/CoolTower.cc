@@ -59,6 +59,8 @@ namespace CoolTower {
 	int const WaterFlowSchedule( 0 );
 	int const WindDrivenFlow( 1 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLES DECLARATIONS:
@@ -163,7 +165,6 @@ namespace CoolTower {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const CurrentModuleObject( "ZoneCoolTower:Shower" );
 		Real64 const MaximumWaterFlowRate( 0.016667 ); // Maximum limit of water flow rate in m3/s (1000 l/min)
 		Real64 const MinimumWaterFlowRate( 0.0 ); // Minimum limit of water flow rate
@@ -540,16 +541,16 @@ namespace CoolTower {
 				}
 
 				// Determine air mass flow rate and volume flow rate
-				InletHumRat = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress );
+				InletHumRat = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress, BlankString );
 				// Assume no pressure drops and no changes in enthalpy between inlet and outlet air
-				IntHumRat = PsyWFnTdbH( OutletTemp, OutEnthalpy ); // Initialized humidity ratio
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, IntHumRat );
+				IntHumRat = PsyWFnTdbH( OutletTemp, OutEnthalpy, BlankString ); // Initialized humidity ratio
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, IntHumRat, BlankString );
 				AirMassFlowRate = AirDensity * CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate;
 				// From the mass balance W_in*(m_air + m_water) = W_out*m_air
 				RhoWater = RhoH2O( OutletTemp ); // Assume T_water = T_outlet
 				OutletHumRat = ( InletHumRat * ( AirMassFlowRate + ( CoolTowerSys( CoolTowerNum ).ActualWaterFlowRate * RhoWater ) ) ) / AirMassFlowRate;
 				AirSpecHeat = PsyCpAirFnWTdb( OutletHumRat, OutletTemp );
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, OutletHumRat ); // Outlet air density
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, OutletHumRat, BlankString ); // Outlet air density
 				CVF( ZoneNum ) = CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate * GetCurrentScheduleValue( CoolTowerSys( CoolTowerNum ).SchedPtr );
 				MCPC( ZoneNum ) = CVF( ZoneNum ) * AirDensity * AirSpecHeat;
 				MCPTC( ZoneNum ) = MCPC( ZoneNum ) * OutletTemp;

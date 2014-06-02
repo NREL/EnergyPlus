@@ -89,7 +89,7 @@ namespace HeatBalanceIntRadExchange {
 		int const SurfIterations, // Number of iterations in calling subroutine
 		FArray1S< Real64 > NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
 		Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
-		Optional_string CalledFrom
+		std::string const & CalledFrom
 	)
 	{
 
@@ -116,6 +116,7 @@ namespace HeatBalanceIntRadExchange {
 		using General::InterpSlatAng; // Function for slat angle interpolation
 		using namespace DataTimings;
 		using WindowEquivalentLayer::EQLWindowInsideEffectiveEmiss;
+		using InputProcessor::SameString;
 
 		// Argument array dimensioning
 
@@ -151,7 +152,6 @@ namespace HeatBalanceIntRadExchange {
 		// one window in a zone has changed from previous time step
 		int ShadeFlag; // Window shading status current time step
 		int ShadeFlagPrev; // Window shading status previous time step
-		std::string tdstring;
 
 		//variables added as part of strategy to reduce calculation time - Glazer 2011-04-22
 		Real64 SendSurfTempInKTo4th; // Sending surface temperature in K to 4th power
@@ -172,6 +172,7 @@ namespace HeatBalanceIntRadExchange {
 #endif
 			firstTime = false;
 			if ( DeveloperFlag ) {
+				std::string tdstring;
 				gio::write( tdstring, "*" ) << " OMP turned off, HBIRE loop executed in serial";
 				DisplayString( tdstring );
 			}
@@ -185,11 +186,13 @@ namespace HeatBalanceIntRadExchange {
 		} else {
 			++NumIntRadExchangeZ_Calls;
 		}
-		if ( CalledFrom == "Main" ) {
+		if ( CalledFrom.empty() ) {
+			// do nothing
+		} else if ( SameString( CalledFrom, "Main" ) ) {
 			++NumIntRadExchangeMain_Calls;
-		} else if ( CalledFrom == "Outside" ) {
+		} else if ( SameString( CalledFrom, "Outside" ) ) {
 			++NumIntRadExchangeOSurf_Calls;
-		} else if ( CalledFrom == "Inside" ) {
+		} else if ( SameString( CalledFrom, "Inside" ) ) {
 			++NumIntRadExchangeISurf_Calls;
 		}
 #endif

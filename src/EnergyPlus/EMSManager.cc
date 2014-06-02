@@ -61,6 +61,8 @@ namespace EMSManager {
 	int const iMassFlowRateMinSetPoint( 108 ); // integer for node setpoint control type
 	int const iMassFlowRateMaxSetPoint( 109 ); // integer for node setpoint control type
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -556,7 +558,7 @@ namespace EMSManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -687,7 +689,7 @@ namespace EMSManager {
 					}
 				}
 
-				if ( cAlphaArgs( 2 ) == "*" ) cAlphaArgs( 2 ) = Blank;
+				if ( cAlphaArgs( 2 ) == "*" ) cAlphaArgs( 2 ) = BlankString;
 				Sensor( SensorNum ).UniqueKeyName = cAlphaArgs( 2 );
 				Sensor( SensorNum ).OutputVarName = cAlphaArgs( 3 );
 
