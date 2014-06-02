@@ -640,7 +640,7 @@ public: // Array Accessor
 		return data_;
 	}
 
-private: // Static Functions
+private: // Static Methods
 
 	// square( x ) == x^2
 	inline

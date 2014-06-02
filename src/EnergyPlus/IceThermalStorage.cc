@@ -72,7 +72,7 @@ namespace IceThermalStorage {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
-	
+
 	std::string const cIceStorageSimple( "ThermalStorage:Ice:Simple" );
 	std::string const cIceStorageDetailed( "ThermalStorage:Ice:Detailed" );
 
@@ -1016,7 +1016,7 @@ namespace IceThermalStorage {
 			DetIceStor( IceNum ).ThawProcessIndicator = cAlphaArgs( 9 );
 			if ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt;
-			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, BlankString ) ) ) {
+			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
 				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );

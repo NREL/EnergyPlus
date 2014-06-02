@@ -1335,7 +1335,7 @@ namespace BranchNodeConnections {
 								InletNodeNum( CountNum ) = ChildInNodeNum( Loop );
 								OutletNodeName( CountNum ) = ChildOutNodeName( Loop );
 								OutletNodeNum( CountNum ) = ChildOutNodeNum( Loop );
-								ChildInNodeName( Loop ) = BlankString; // So it won't match anymore
+								ChildInNodeName( Loop ).clear(); // So it won't match anymore
 								//              Matched=.TRUE.
 								MatchNodeName = ChildOutNodeName( Loop );
 								break;
@@ -1357,7 +1357,7 @@ namespace BranchNodeConnections {
 					}
 					if ( MatchNodeName != ParentOutletNodeName ) {
 						for ( Loop = 1; Loop <= NumChildren; ++Loop ) {
-							if ( ChildInNodeName( Loop ) == BlankString ) continue;
+							if ( ChildInNodeName( Loop ).empty() ) continue;
 							if ( ChildOutNodeName( Loop ) == ParentOutletNodeName ) break;
 							//            CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
 							//                                 'Required Child Node, not matched.  Expected (Last) Outlet Node='//  &
@@ -1369,7 +1369,7 @@ namespace BranchNodeConnections {
 						}
 					}
 					for ( Loop = 1; Loop <= NumChildren; ++Loop ) {
-						if ( ChildInNodeName( Loop ) == BlankString ) continue;
+						if ( ChildInNodeName( Loop ).empty() ) continue;
 						++CountNum;
 						ChildrenCType( CountNum ) = ChildCType( Loop );
 						ChildrenCName( CountNum ) = ChildCName( Loop );

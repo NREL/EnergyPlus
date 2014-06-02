@@ -1016,7 +1016,7 @@ namespace RefrigeratedCase {
 					ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + RefrigCase( CaseNum ).Name + "\", " + cNumericFieldNames( 2 ) + " must be greater than 0% and less than 100%" );
 					ErrorsFound = true;
 				}
-				RefrigCase( CaseNum ).RatedAmbientDewPoint = PsyTdpFnWPb( PsyWFnTdbRhPb( RefrigCase( CaseNum ).RatedAmbientTemp, ( RefrigCase( CaseNum ).RatedAmbientRH / 100.0 ), StdBaroPress, BlankString ), StdBaroPress, BlankString );
+				RefrigCase( CaseNum ).RatedAmbientDewPoint = PsyTdpFnWPb( PsyWFnTdbRhPb( RefrigCase( CaseNum ).RatedAmbientTemp, ( RefrigCase( CaseNum ).RatedAmbientRH / 100.0 ), StdBaroPress ), StdBaroPress );
 
 				RefrigCase( CaseNum ).RateTotCapPerLength = Numbers( 3 );
 				if ( Numbers( 3 ) <= 0.0 ) {
@@ -7268,7 +7268,7 @@ namespace RefrigeratedCase {
 				} else {
 					HumRatIn = OutHumRat;
 				} //outsideairnode
-				OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress, BlankString );
+				OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress );
 				EffectTemp = OutWbTemp + ( 1.0 - RefrigRack( RackNum ).EvapEffect ) * ( OutDbTemp - OutWbTemp );
 			} //evapAvail
 
@@ -7328,8 +7328,8 @@ namespace RefrigeratedCase {
 		// assumes pump runs whenever evap cooling is available to minimize scaling
 		if ( RefrigRack( RackNum ).CondenserType == RefrigCondenserTypeEvap && EvapAvail ) {
 			TotalCondenserPumpPower = RefrigRack( RackNum ).EvapPumpPower;
-			HumRatOut = PsyWFnTdbTwbPb( EffectTemp, OutWbTemp, BPress, BlankString );
-			TotalEvapWaterUseRate = RefrigRack( RackNum ).CondenserAirFlowRate * CondenserFrac * PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn, BlankString ) * ( HumRatOut - HumRatIn ) / RhoH2O( EffectTemp );
+			HumRatOut = PsyWFnTdbTwbPb( EffectTemp, OutWbTemp, BPress );
+			TotalEvapWaterUseRate = RefrigRack( RackNum ).CondenserAirFlowRate * CondenserFrac * PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn ) * ( HumRatOut - HumRatIn ) / RhoH2O( EffectTemp );
 		} //evapAvail
 		// calculate basin water heater load
 		if ( RefrigRack( RackNum ).CondenserType == RefrigCondenserTypeEvap ) {
@@ -7619,8 +7619,8 @@ namespace RefrigeratedCase {
 		//Set local subroutine variables for convenience
 		ActualZoneNum = RefrigCase( CaseID ).ActualZoneNum;
 		ZoneNodeNum = RefrigCase( CaseID ).ZoneNodeNum;
-		ZoneRHPercent = PsyRhFnTdbWPb( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat, OutBaroPress, BlankString ) * 100.0;
-		ZoneDewPoint = PsyTdpFnWPb( Node( ZoneNodeNum ).HumRat, OutBaroPress, BlankString );
+		ZoneRHPercent = PsyRhFnTdbWPb( Node( ZoneNodeNum ).Temp, Node( ZoneNodeNum ).HumRat, OutBaroPress ) * 100.0;
+		ZoneDewPoint = PsyTdpFnWPb( Node( ZoneNodeNum ).HumRat, OutBaroPress );
 		Length = RefrigCase( CaseID ).Length;
 		TCase = RefrigCase( CaseID ).Temperature;
 		DesignRatedCap = RefrigCase( CaseID ).DesignRatedCap;
@@ -9384,8 +9384,8 @@ namespace RefrigeratedCase {
 				BPress = OutBaroPress;
 				HumRatIn = OutHumRat;
 			}
-			AirDensity = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn, BlankString );
-			AirDensityDry = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, 0.0, BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, HumRatIn );
+			AirDensityDry = PsyRhoAirFnPbTdbW( BPress, OutDbTemp, 0.0 );
 			// Evaporative condensers will have their water flow shut off in cold months to avoid
 			//  'spectacular' icing problems.  Ideally, the user will use the evaporative schedule input
 			//  to set such a schedule.  However, sometimes, users will use a single input deck to model
@@ -9414,7 +9414,7 @@ namespace RefrigeratedCase {
 				HRCF = min( HRCF, Condenser( CondID ).MaxCapFacEvap );
 				HRCF = max( HRCF, Condenser( CondID ).MinCapFacEvap );
 				if ( EvapAvail ) {
-					OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress, BlankString );
+					OutWbTemp = PsyTwbFnTdbWPb( OutDbTemp, HumRatIn, BPress );
 					SinkTemp = OutWbTemp;
 				} else { //evaporative condenser with water spray scheduled off so use Tdb
 					HRCF /= 3.0; //reference Menske, cap of evap cond operating dry about 1/3 of rated cap
@@ -9495,14 +9495,14 @@ namespace RefrigeratedCase {
 				PurgeRate = TotalCondenserHeat * BleedRateConstant;
 				EnthalpyAirIn = PsyHFnTdbW( OutDbTemp, HumRatIn );
 				//calculate effectiveness at rated conditions, so use Tcondcalc)
-				EnthalpyAtTcond = PsyHFnTdbRhPb( TCondCalc, 1.0, BPress, BlankString );
+				EnthalpyAtTcond = PsyHFnTdbRhPb( TCondCalc, 1.0, BPress );
 				Effectiveness = TotalCondenserHeat / ( RatedAirFlowRate * AirDensity * ( EnthalpyAtTcond - EnthalpyAirIn ) );
 				//need to limit max effectiveness for errors due to working beyond limits of HRCF in manuf data
 				Effectiveness = min( Effectiveness, 0.9 );
 				EnthalpyAirOut = EnthalpyAirIn + Effectiveness * ( EnthalpyAtTcond - EnthalpyAirIn );
 				//Air leaving the evaporative condenser is saturated
-				TAirOut = PsyTsatFnHPb( EnthalpyAirOut, BPress, BlankString );
-				HumRatOut = PsyWFnTdpPb( TAirOut, BPress, BlankString );
+				TAirOut = PsyTsatFnHPb( EnthalpyAirOut, BPress );
+				HumRatOut = PsyWFnTdpPb( TAirOut, BPress );
 				TotalEvapWaterUseRate = PurgeRate + RatedAirFlowRate * AirVolRatio * AirDensityDry * ( HumRatOut - HumRatIn ) / RhoH2O( OutWbTemp );
 				// assumes evap water pump runs whenever evap cooling is available to minimize scaling
 				TotalCondenserPumpPower = Condenser( CondID ).EvapPumpPower;
@@ -11299,9 +11299,9 @@ namespace RefrigeratedCase {
 		DefrostCap = WalkIn( WalkInID ).DefrostCapacity;
 		// %DefrostCapacity already set to zero for WalkInDefrostNone , WalkInDefrostOffCycle
 		DesignLighting = WalkIn( WalkInID ).DesignLighting;
-		EnthalpyAirWalkIn = PsyHFnTdbRhPb( TWalkIn, 0.9, OutBaroPress, BlankString ); //assume 90%RH in cooler
-		HumRatioAirWalkIn = PsyWFnTdbH( TWalkIn, EnthalpyAirWalkIn, BlankString );
-		DensityAirWalkIn = PsyRhoAirFnPbTdbW( OutBaroPress, TWalkIn, HumRatioAirWalkIn, BlankString );
+		EnthalpyAirWalkIn = PsyHFnTdbRhPb( TWalkIn, 0.9, OutBaroPress ); //assume 90%RH in cooler
+		HumRatioAirWalkIn = PsyWFnTdbH( TWalkIn, EnthalpyAirWalkIn );
+		DensityAirWalkIn = PsyRhoAirFnPbTdbW( OutBaroPress, TWalkIn, HumRatioAirWalkIn );
 		Conv = Latitude * 2.0 * Pi / 360.0; //Convert Latitude to radians
 		Gravity = 9.780373 * ( 1.0 + 0.0052891 * std::pow( ( std::sin( Conv ) ), 2 ) - 0.0000059 * std::pow( ( std::sin( 2.0 * Conv ) ), 2 ) );
 

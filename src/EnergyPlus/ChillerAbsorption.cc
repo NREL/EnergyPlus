@@ -352,7 +352,7 @@ namespace ChillerAbsorption {
 			if ( NumAlphas > 8 ) {
 				if ( SameString( cAlphaArgs( 9 ), "HotWater" ) || SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
-				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || SameString( cAlphaArgs( 9 ), BlankString ) ) {
+				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );

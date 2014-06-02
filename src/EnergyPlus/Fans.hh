@@ -16,6 +16,7 @@ namespace Fans {
 
 	// Using/Aliasing
 	using DataHVACGlobals::MinFrac;
+	using DataHVACGlobals::SystemAirflowSizing;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -508,9 +509,27 @@ namespace Fans {
 
 	};
 
+	struct FanNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		FanNumericFieldData()
+		{}
+
+		// Member Constructor
+		FanNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+		) :
+			FieldNames( FieldNames )
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< FanEquipConditions > Fan;
 	extern FArray1D< NightVentPerfData > NightVentPerf;
+	extern FArray1D< FanNumericFieldData > FanNumericFields;
 
 	// Functions
 

@@ -228,6 +228,14 @@ read( std::string const & str, gio::Fmt const & fmt )
 	return Read( str, fmt );
 }
 
+// Read Line from Unit
+void
+read_line( Unit const unit, IOFlags & flags, std::string & line );
+
+// Read Line from Unit
+void
+read_line( Unit const unit, std::string & line );
+
 // Write /////
 
 // Write to Unit

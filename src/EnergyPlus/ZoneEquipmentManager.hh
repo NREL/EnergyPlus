@@ -129,6 +129,22 @@ namespace ZoneEquipmentManager {
 	CalcZoneMassBalance();
 
 	void
+	CalcAirFlowSimple(Optional_int_const SysTimestepLoop = _, // System time step index
+		Optional_bool_const AdjustZoneMixingFlowFlag = _); // flags to adjust zone mxing mass flow rate
+
+	void
+	GetStandAloneERVNodes(int const OutdoorNum); // Zone Air Balance Outdoor index
+
+	void
+	CalcZoneMixingFlowRateOfReceivingZone(
+		int const ZoneNum,
+		Real64 & ZoneMixingAirMassFlowRate
+		);
+
+	void
+	CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum);
+
+	void
 	CalcZoneLeavingConditions();
 
 	void

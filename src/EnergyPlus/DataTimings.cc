@@ -560,7 +560,7 @@ namespace DataTimings {
 		//value(8)   Milliseconds (0-999)
 
 		date_and_time_string( _, _, _, clockvalues );
-		calctime = clockvalues( 5 ) * 3600. + clockvalues( 6 ) * 60. + clockvalues( 7 ) + clockvalues( 8 ) / 1000.;
+		calctime = clockvalues( 5 ) * 3600.0 + clockvalues( 6 ) * 60.0 + clockvalues( 7 ) + clockvalues( 8 ) / 1000.0;
 
 		return calctime;
 

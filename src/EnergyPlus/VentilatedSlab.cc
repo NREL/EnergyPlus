@@ -2002,7 +2002,7 @@ namespace VentilatedSlab {
 		} else if ( SELECT_CASE_var == SURControl ) {
 			SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
 		} else if ( SELECT_CASE_var == DPTZControl ) {
-			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress, BlankString );
+			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
 
 		} else { // Should never get here
 			ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
@@ -2956,7 +2956,7 @@ namespace VentilatedSlab {
 					// conditions.
 
 					if ( OperatingMode == CoolingMode ) {
-						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress, BlankString );
+						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
 							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system
@@ -3180,7 +3180,7 @@ namespace VentilatedSlab {
 					// conditions.
 
 					if ( OperatingMode == CoolingMode ) {
-						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress, BlankString );
+						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress );
 						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
 							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
 								// Condensation warning--must shut off radiant system

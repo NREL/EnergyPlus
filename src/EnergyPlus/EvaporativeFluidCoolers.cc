@@ -418,7 +418,7 @@ namespace EvaporativeFluidCoolers {
 			SimpleEvapFluidCooler( EvapFluidCoolerNum ).FluidIndex = PlantLoop( CurLoopNum ).FluidIndex;
 			FluidName = GetGlycolNameByIndex( SimpleEvapFluidCooler( EvapFluidCoolerNum ).FluidIndex );
 
-			if ( lAlphaFieldBlanks( 4 ) || AlphArray( 4 ) == BlankString ) {
+			if ( lAlphaFieldBlanks( 4 ) || AlphArray( 4 ).empty() ) {
 				ShowSevereError( cCurrentModuleObject + ", \"" + SimpleEvapFluidCooler( EvapFluidCoolerNum ).Name + "\" Performance input method is not specified. " );
 				ErrorsFound = true;
 			}
@@ -444,7 +444,7 @@ namespace EvaporativeFluidCoolers {
 			}
 
 			//   fluid bypass for single speed evaporative fluid cooler
-			if ( lAlphaFieldBlanks( 6 ) || AlphArray( 6 ) == BlankString ) {
+			if ( lAlphaFieldBlanks( 6 ) || AlphArray( 6 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).CapacityControl = 0; // FanCycling
 			} else {
 				{ auto const SELECT_CASE_var( MakeUPPERCase( AlphArray( 6 ) ) );
@@ -466,7 +466,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByUserFactor;
 			} else if ( SameString( AlphArray( 7 ), "SaturatedExit" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
-			} else if ( AlphArray( 7 ) == BlankString ) {
+			} else if ( AlphArray( 7 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode = EvapLossByMoistTheory;
 			} else {
 				ShowSevereError( "Invalid, " + cAlphaFieldNames( 7 ) + " = " + AlphArray( 7 ) );
@@ -497,7 +497,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownBySchedule;
 			} else if ( SameString( AlphArray( 8 ), "ConcentrationRatio" ) ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
-			} else if ( AlphArray( 8 ) == BlankString ) {
+			} else if ( AlphArray( 8 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).BlowdownMode = BlowdownByConcentration;
 				if ( ( NumNums < 15 ) && ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).ConcentrationRatio == 0.0 ) ) {
 					// assume Concetration ratio was omitted and should be defaulted
@@ -516,7 +516,7 @@ namespace EvaporativeFluidCoolers {
 				ErrorsFound = true;
 			}
 
-			if ( AlphArray( 10 ) == BlankString ) {
+			if ( AlphArray( 10 ).empty() ) {
 				SimpleEvapFluidCooler( EvapFluidCoolerNum ).SuppliedByWaterSystem = false;
 			} else { // water from storage tank
 				SetupTankDemandComponent( AlphArray( 1 ), cCurrentModuleObject, AlphArray( 10 ), ErrorsFound, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterTankID, SimpleEvapFluidCooler( EvapFluidCoolerNum ).WaterTankDemandARRID );
@@ -1324,7 +1324,7 @@ namespace EvaporativeFluidCoolers {
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 					if ( SolFla == -1 ) {
 						ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1394,7 +1394,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1433,7 +1433,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1511,7 +1511,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowWarningError( "Iteration limit exceeded in calculating evaporative fluid cooler UA." );
@@ -1545,7 +1545,7 @@ namespace EvaporativeFluidCoolers {
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = SimpleEvapFluidCooler( EvapFluidCoolerNum ).DesignEnteringAirWetBulbTemp;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 				SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleEvapFluidCoolerUAResidual, UA0, UA1, Par );
 				if ( SolFla == -1 ) {
 					ShowSevereError( "Iteration limit exceeded in calculating EvaporativeFluidCooler UA" );
@@ -2054,11 +2054,11 @@ namespace EvaporativeFluidCoolers {
 		if ( UAdesign == 0.0 ) return;
 
 		// set water and air properties
-		AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, InletAirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat, BlankString );
+		AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, InletAirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat );
 		AirMassFlowRate = AirFlowRate * AirDensity;
 		CpAir = PsyCpAirFnWTdb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat, InletAirTemp );
 		CpWater = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InletWaterTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, RoutineName );
-		InletAirEnthalpy = PsyHFnTdbRhPb( InletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+		InletAirEnthalpy = PsyHFnTdbRhPb( InletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 
 		// initialize exiting wet bulb temperature before iterating on final solution
 		OutletAirWetBulb = InletAirWetBulb + 6.0;
@@ -2068,7 +2068,7 @@ namespace EvaporativeFluidCoolers {
 		Iter = 0;
 		while ( ( WetBulbError > WetBulbTolerance ) && ( Iter <= IterMax ) && ( DeltaTwb > DeltaTwbTolerance ) ) {
 			++Iter;
-			OutletAirEnthalpy = PsyHFnTdbRhPb( OutletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+			OutletAirEnthalpy = PsyHFnTdbRhPb( OutletAirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 			// calculate the airside specific heat and capacity
 			CpAirside = ( OutletAirEnthalpy - InletAirEnthalpy ) / ( OutletAirWetBulb - InletAirWetBulb );
 			AirCapacity = AirMassFlowRate * CpAirside;
@@ -2232,16 +2232,16 @@ namespace EvaporativeFluidCoolers {
 		// Set water and air properties
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapLossMode == EvapLossByMoistTheory ) {
 
-			AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat, BlankString );
+			AirDensity = PsyRhoAirFnPbTdbW( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat );
 			AirMassFlowRate = AirFlowRateRatio * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate * AirDensity;
-			InletAirEnthalpy = PsyHFnTdbRhPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
+			InletAirEnthalpy = PsyHFnTdbRhPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, 1.0, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
 
 			if ( AirMassFlowRate > 0.0 ) {
 				// Calculate outlet air conditions for determining water usage
 
 				OutletAirEnthalpy = InletAirEnthalpy + Qactual / AirMassFlowRate;
-				OutletAirTSat = PsyTsatFnHPb( OutletAirEnthalpy, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress, BlankString );
-				OutletAirHumRatSat = PsyWFnTdbH( OutletAirTSat, OutletAirEnthalpy, BlankString );
+				OutletAirTSat = PsyTsatFnHPb( OutletAirEnthalpy, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
+				OutletAirHumRatSat = PsyWFnTdbH( OutletAirTSat, OutletAirEnthalpy );
 
 				// calculate specific humidity ratios (HUMRAT to mass of moist air not dry air)
 				InSpecificHumRat = SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat / ( 1 + SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat );

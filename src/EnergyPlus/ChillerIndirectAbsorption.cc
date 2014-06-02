@@ -76,7 +76,6 @@ namespace ChillerIndirectAbsorption {
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 	static std::string const calcChillerAbsorptionIndirect( "CALC Chiller:Absorption:Indirect " );
-	
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -376,7 +375,7 @@ namespace ChillerIndirectAbsorption {
 				if ( SameString( cAlphaArgs( 16 ), "HotWater" ) || SameString( cAlphaArgs( 16 ), "HotWater" ) ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
 					//       Default to Steam if left blank
-				} else if ( SameString( cAlphaArgs( 16 ), "Steam" ) || SameString( cAlphaArgs( 16 ), BlankString ) ) {
+				} else if ( SameString( cAlphaArgs( 16 ), "Steam" ) || cAlphaArgs( 16 ).empty() ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
@@ -389,7 +388,7 @@ namespace ChillerIndirectAbsorption {
 				IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 			}
 
-			if ( ! SameString( cAlphaArgs( 9 ), BlankString ) && ! SameString( cAlphaArgs( 10 ), BlankString ) ) {
+			if ( ( ! cAlphaArgs( 9 ).empty() ) && ( ! cAlphaArgs( 10 ).empty() ) ) {
 				GenInputOutputNodesUsed( AbsorberNum ) = true;
 				if ( IndirectAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
 					IndirectAbsorber( AbsorberNum ).GeneratorInletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
@@ -401,7 +400,7 @@ namespace ChillerIndirectAbsorption {
 					IndirectAbsorber( AbsorberNum ).GeneratorOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 					TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 9 ), cAlphaArgs( 10 ), "Steam Nodes" );
 				}
-			} else if ( ( SameString( cAlphaArgs( 9 ), BlankString ) && ! SameString( cAlphaArgs( 10 ), BlankString ) ) || ( ! SameString( cAlphaArgs( 9 ), BlankString ) && SameString( cAlphaArgs( 10 ), BlankString ) ) ) {
+			} else if ( ! ( cAlphaArgs( 9 ).empty() == cAlphaArgs( 10 ).empty() ) ) {
 				ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
 				ShowContinueError( "...Generator fluid nodes must both be entered (or both left blank)." );
 				ShowContinueError( "...Generator fluid inlet node  = " + cAlphaArgs( 9 ) );

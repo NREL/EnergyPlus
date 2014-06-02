@@ -581,6 +581,8 @@ namespace HeatBalanceManager {
 		static gio::Fmt const Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
 		static gio::Fmt const Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
 		static gio::Fmt const Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
+		static gio::Fmt const Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
+		static gio::Fmt const Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
 
 		//Assign the values to the building data
 
@@ -1003,6 +1005,65 @@ namespace HeatBalanceManager {
 			gio::write( OutputFileInits, Format_731 ) << "Yes" << AlphaName( 3 );
 		} else {
 			gio::write( OutputFileInits, Format_731 ) << "No" << "N/A";
+		}
+
+		// A new object is added by B. Nigusse, 02/14
+		CurrentModuleObject = "ZoneAirMassFlowConservation";
+		NumObjects = GetNumObjectsFound(CurrentModuleObject);
+
+		if (NumObjects > 0) {
+			GetObjectItem(CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+			if (NumAlpha > 0) {
+				{ auto const SELECT_CASE_var(AlphaName(1));
+				if (SELECT_CASE_var == "YES") {
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+				}
+				else if (SELECT_CASE_var == "NO") {
+					ZoneAirMassFlow.EnforceZoneMassBalance = false;
+				}
+				else {
+					ZoneAirMassFlow.EnforceZoneMassBalance = false;
+					AlphaName(1) = "NO";
+					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO");
+				} }
+			}
+			if (NumAlpha > 1) {
+				{ auto const SELECT_CASE_var(AlphaName(2));
+				if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
+					ZoneAirMassFlow.InfiltrationTreatment = true;
+					if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+				}
+				else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
+					ZoneAirMassFlow.InfiltrationTreatment = 2;
+				}
+				else {
+					ZoneAirMassFlow.InfiltrationTreatment = 1;
+					AlphaName(2) = "ADDINFILTRATIONFLOW";
+					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO");
+				} }
+			}
+			else {
+				ZoneAirMassFlow.InfiltrationTreatment = 1;
+				AlphaName(2) = "ADDINFILTRATIONFLOW";
+			}
+
+
+		}
+		else{
+			ZoneAirMassFlow.EnforceZoneMassBalance = false;
+			AlphaName(1) = "NO";
+		}
+		//// allocate if the global variable ZoneAirMassFlow is ON 
+		//if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
+		//	MassConservation.allocate( NumOfZones );
+		//}
+
+		gio::write(OutputFileInits, Format_732);
+		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1);
+		}
+		else {
+			gio::write(OutputFileInits, Format_733) << "No" << "N/A";
 		}
 
 	}
@@ -4403,6 +4464,14 @@ namespace HeatBalanceManager {
 		MixingMassFlowZone = 0.0;
 		MixingMassFlowXHumRat.allocate( NumOfZones );
 		MixingMassFlowXHumRat = 0.0;
+		ZoneMassBalanceRepVarFlag.allocate( NumOfZones );
+		ZoneMassBalanceRepVarFlag = true;
+		ZoneReOrder.allocate( NumOfZones );
+		ZoneMassBalanceFlag.allocate( NumOfZones );
+		ZoneMassBalanceFlag = false;
+		ZoneInfiltrationFlag.allocate( NumOfZones );
+		ZoneInfiltrationFlag = false;
+		ZoneReOrder = 0;
 		ZoneLatentGain.allocate( NumOfZones );
 		ZoneLatentGain = 0.0;
 		OAMFL.allocate( NumOfZones );
@@ -4513,6 +4582,7 @@ namespace HeatBalanceManager {
 		WarmupConvergenceValues.allocate( NumOfZones );
 		TempZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
 		LoadZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
+		//MassConservation.allocate( NumOfZones );
 
 		CountWarmupDayPoints = 0;
 
@@ -5264,7 +5334,6 @@ namespace HeatBalanceManager {
 		FArray1D< Real64 > DividerVisAbsorp( 2 );
 		FArray1D< Real64 > DividerEmis( 2 );
 		std::string::size_type endcol;
-		bool StripCR;
 
 		// Object Data
 		FArray1D< FrameDividerProperties > FrameDividerSave;
@@ -5290,13 +5359,9 @@ namespace HeatBalanceManager {
 
 		W5DataFileNum = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "read" ); gio::open( W5DataFileNum, TempFullFileName, flags ); if ( flags.err() ) goto Label999; }
-		StripCR = false;
 		gio::read( W5DataFileNum, fmtA ) >> NextLine;
 		endcol = len( NextLine );
 		if ( endcol > 0 ) {
-			if ( int( NextLine[ endcol - 1 ] ) == iASCII_CR ) {
-				StripCR = true;
-			}
 			if ( int( NextLine[ endcol - 1 ] ) == iUnicode_end ) {
 				ShowSevereError( "SearchWindow5DataFile: For \"" + DesiredConstructionName + "\" in " + DesiredFileName + " fiile, appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
@@ -5309,10 +5374,6 @@ namespace HeatBalanceManager {
 
 		{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 		if ( ReadStat < GoodIOStatValue ) goto Label1000;
-		if ( StripCR ) {
-			endcol = len( NextLine );
-			if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-		}
 		++FileLineCount;
 		if ( ! has_prefixi( NextLine, "WINDOW5" ) ) {
 			ShowSevereError( "HeatBalanceManager: SearchWindow5DataFile: Error in Data File=" + DesiredFileName );
@@ -5323,10 +5384,6 @@ Label10: ;
 		for ( LineNum = 2; LineNum <= 5; ++LineNum ) {
 			{ IOFlags flags; gio::read( W5DataFileNum, "(A)", flags ) >> DataLine( LineNum ); ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( DataLine( LineNum ) );
-				if ( endcol > 0 ) DataLine( LineNum ).erase( endcol - 1 );
-			}
 			++FileLineCount;
 		}
 
@@ -5338,10 +5395,6 @@ Label10: ;
 Label20: ;
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			if ( ! has_prefixi( NextLine, "WINDOW5" ) ) goto Label20;
 			// Beginning of next window entry found
@@ -5355,10 +5408,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			gio::read( NextLine.substr( 19 ), "*" ) >> NGlSys;
 			if ( NGlSys <= 0 || NGlSys > 2 ) {
@@ -5366,18 +5415,10 @@ Label20: ;
 			}
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( NextLine );
-					if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-				}
 				++FileLineCount;
 				{ IOFlags flags; gio::read( NextLine.substr( 19 ), "*", flags ) >> WinHeight( IGlSys ) >> WinWidth( IGlSys ) >> NGlass( IGlSys ) >> UValCenter( IGlSys ) >> SCCenter( IGlSys ) >> SHGCCenter( IGlSys ) >> TVisCenter( IGlSys ); ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {
@@ -5411,10 +5452,6 @@ Label20: ;
 			for ( LineNum = 1; LineNum <= 11; ++LineNum ) {
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> DataLine( LineNum ); ReadStat = flags.ios(); }
 				if ( ReadStat == -1 ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( DataLine( LineNum ) );
-					if ( endcol > 0 ) DataLine( LineNum ).erase( endcol - 1 );
-				}
 			}
 
 			// Mullion width and orientation
@@ -5479,10 +5516,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 
 			// Divider data for each glazing system
@@ -5633,10 +5666,6 @@ Label20: ;
 			// Glass objects
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			MaterNum = TotMaterialsPrev;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -5669,10 +5698,6 @@ Label20: ;
 			// Gap objects
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				for ( IGap = 1; IGap <= NGaps( IGlSys ); ++IGap ) {
@@ -5693,10 +5718,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
 				for ( IGap = 1; IGap <= NGaps( IGlSys ); ++IGap ) {
@@ -5743,10 +5764,6 @@ Label20: ;
 
 			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
-			if ( StripCR ) {
-				endcol = len( NextLine );
-				if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-			}
 			++FileLineCount;
 
 			for ( IGlSys = 1; IGlSys <= NGlSys; ++IGlSys ) {
@@ -5836,26 +5853,14 @@ Label20: ;
 
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( NextLine );
-					if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-				}
 				++FileLineCount;
 				if ( IGlSys == 1 ) {
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 					if ( ReadStat < GoodIOStatValue ) goto Label1000;
-					if ( StripCR ) {
-						endcol = len( NextLine );
-						if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-					}
 					++FileLineCount;
 				}
 				{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 				if ( ReadStat < GoodIOStatValue ) goto Label1000;
-				if ( StripCR ) {
-					endcol = len( NextLine );
-					if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-				}
 				++FileLineCount;
 				{ IOFlags flags; gio::read( NextLine.substr( 5 ), "*", flags ) >> Tsol; ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {
@@ -5869,10 +5874,6 @@ Label20: ;
 				}
 				for ( IGlass = 1; IGlass <= NGlass( IGlSys ); ++IGlass ) {
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
-					if ( StripCR ) {
-						endcol = len( NextLine );
-						if ( endcol > 0 ) NextLine.erase( endcol - 1 );
-					}
 					++FileLineCount;
 					{ IOFlags flags; gio::read( NextLine.substr( 5 ), "*", flags ) >> AbsSol( IGlass, _ ); ReadStat = flags.ios(); }
 					if ( ReadStat != 0 ) {
@@ -5887,10 +5888,6 @@ Label20: ;
 				}
 				for ( ILine = 1; ILine <= 5; ++ILine ) {
 					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> DataLine( ILine ); ReadStat = flags.ios(); }
-					if ( StripCR ) {
-						endcol = len( DataLine( ILine ) );
-						if ( endcol > 0 ) DataLine( ILine ).erase( endcol - 1 );
-					}
 				}
 				{ IOFlags flags; gio::read( DataLine( 1 ).substr( 5 ), "*", flags ) >> Rfsol; ReadStat = flags.ios(); }
 				if ( ReadStat != 0 ) {

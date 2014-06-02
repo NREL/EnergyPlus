@@ -541,16 +541,16 @@ namespace CoolTower {
 				}
 
 				// Determine air mass flow rate and volume flow rate
-				InletHumRat = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress, BlankString );
+				InletHumRat = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress );
 				// Assume no pressure drops and no changes in enthalpy between inlet and outlet air
-				IntHumRat = PsyWFnTdbH( OutletTemp, OutEnthalpy, BlankString ); // Initialized humidity ratio
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, IntHumRat, BlankString );
+				IntHumRat = PsyWFnTdbH( OutletTemp, OutEnthalpy ); // Initialized humidity ratio
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, IntHumRat );
 				AirMassFlowRate = AirDensity * CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate;
 				// From the mass balance W_in*(m_air + m_water) = W_out*m_air
 				RhoWater = RhoH2O( OutletTemp ); // Assume T_water = T_outlet
 				OutletHumRat = ( InletHumRat * ( AirMassFlowRate + ( CoolTowerSys( CoolTowerNum ).ActualWaterFlowRate * RhoWater ) ) ) / AirMassFlowRate;
 				AirSpecHeat = PsyCpAirFnWTdb( OutletHumRat, OutletTemp );
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, OutletHumRat, BlankString ); // Outlet air density
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, OutletHumRat ); // Outlet air density
 				CVF( ZoneNum ) = CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate * GetCurrentScheduleValue( CoolTowerSys( CoolTowerNum ).SchedPtr );
 				MCPC( ZoneNum ) = CVF( ZoneNum ) * AirDensity * AirSpecHeat;
 				MCPTC( ZoneNum ) = MCPC( ZoneNum ) * OutletTemp;

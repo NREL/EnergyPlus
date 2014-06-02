@@ -57,6 +57,9 @@ extends_type_of( A const & a, B const & b )
 	}
 #else // Support for static type of b
 	assert( typeid( b ) == typeid( B ) ); // Check that we are safe using simple support
+#ifdef NDEBUG
+	static_cast< void >( b ); // Suppress unused warning
+#endif
 	return ( dynamic_cast< B const * >( &a ) != nullptr );
 #endif
 }

@@ -1132,6 +1132,7 @@ public: // Slice Proxy Generators
 		k += slice_k( I1(), i1 );
 		DS const d2( I2(), s2, z1_ );
 		k += slice_k( I3(), i3, z1_ * z2_ );
+		k += slice_k( I4(), i4, z1_ * z2_ * z3_ );
 		return FArray1S< T >( data_, k, d2 );
 	}
 
@@ -1325,6 +1326,7 @@ public: // Slice Proxy Generators
 		k += slice_k( I1(), i1 );
 		DS const d2( I2(), s2, z1_ );
 		k += slice_k( I3(), i3, z1_ * z2_ );
+		k += slice_k( I4(), i4, z1_ * z2_ * z3_ );
 		return FArray1S< T >( data_, k, d2 );
 	}
 
