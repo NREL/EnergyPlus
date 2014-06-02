@@ -581,6 +581,8 @@ namespace HeatBalanceManager {
 		static gio::Fmt const Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
 		static gio::Fmt const Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
 		static gio::Fmt const Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
+		static gio::Fmt const Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
+		static gio::Fmt const Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
 
 		//Assign the values to the building data
 
@@ -1003,6 +1005,65 @@ namespace HeatBalanceManager {
 			gio::write( OutputFileInits, Format_731 ) << "Yes" << AlphaName( 3 );
 		} else {
 			gio::write( OutputFileInits, Format_731 ) << "No" << "N/A";
+		}
+
+		// A new object is added by B. Nigusse, 02/14
+		CurrentModuleObject = "ZoneAirMassFlowConservation";
+		NumObjects = GetNumObjectsFound(CurrentModuleObject);
+
+		if (NumObjects > 0) {
+			GetObjectItem(CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+			if (NumAlpha > 0) {
+				{ auto const SELECT_CASE_var(AlphaName(1));
+				if (SELECT_CASE_var == "YES") {
+					ZoneAirMassFlow.EnforceZoneMassBalance = true;
+				}
+				else if (SELECT_CASE_var == "NO") {
+					ZoneAirMassFlow.EnforceZoneMassBalance = false;
+				}
+				else {
+					ZoneAirMassFlow.EnforceZoneMassBalance = false;
+					AlphaName(1) = "NO";
+					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(1) + ". The default choice is assigned = NO");
+				} }
+			}
+			if (NumAlpha > 1) {
+				{ auto const SELECT_CASE_var(AlphaName(2));
+				if (SELECT_CASE_var == "ADDINFILTRATIONFLOW") {
+					ZoneAirMassFlow.InfiltrationTreatment = true;
+					if (!Contaminant.CO2Simulation) Contaminant.SimulateContaminants = true;
+				}
+				else if (SELECT_CASE_var == "ADJUSTINFILTRATIONFLOW") {
+					ZoneAirMassFlow.InfiltrationTreatment = 2;
+				}
+				else {
+					ZoneAirMassFlow.InfiltrationTreatment = 1;
+					AlphaName(2) = "ADDINFILTRATIONFLOW";
+					ShowWarningError(trim(CurrentModuleObject) + ": Invalid input of " + cAlphaFieldNames(2) + ". The default choice is assigned = NO");
+				} }
+			}
+			else {
+				ZoneAirMassFlow.InfiltrationTreatment = 1;
+				AlphaName(2) = "ADDINFILTRATIONFLOW";
+			}
+
+
+		}
+		else{
+			ZoneAirMassFlow.EnforceZoneMassBalance = false;
+			AlphaName(1) = "NO";
+		}
+		//// allocate if the global variable ZoneAirMassFlow is ON 
+		//if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
+		//	MassConservation.allocate( NumOfZones );
+		//}
+
+		gio::write(OutputFileInits, Format_732);
+		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1);
+		}
+		else {
+			gio::write(OutputFileInits, Format_733) << "No" << "N/A";
 		}
 
 	}
@@ -4403,6 +4464,14 @@ namespace HeatBalanceManager {
 		MixingMassFlowZone = 0.0;
 		MixingMassFlowXHumRat.allocate( NumOfZones );
 		MixingMassFlowXHumRat = 0.0;
+		ZoneMassBalanceRepVarFlag.allocate( NumOfZones );
+		ZoneMassBalanceRepVarFlag = true;
+		ZoneReOrder.allocate( NumOfZones );
+		ZoneMassBalanceFlag.allocate( NumOfZones );
+		ZoneMassBalanceFlag = false;
+		ZoneInfiltrationFlag.allocate( NumOfZones );
+		ZoneInfiltrationFlag = false;
+		ZoneReOrder = 0;
 		ZoneLatentGain.allocate( NumOfZones );
 		ZoneLatentGain = 0.0;
 		OAMFL.allocate( NumOfZones );
@@ -4513,6 +4582,7 @@ namespace HeatBalanceManager {
 		WarmupConvergenceValues.allocate( NumOfZones );
 		TempZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
 		LoadZoneRptStdDev.allocate( NumOfTimeStepInHour * 24 );
+		//MassConservation.allocate( NumOfZones );
 
 		CountWarmupDayPoints = 0;
 
