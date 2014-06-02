@@ -41,10 +41,6 @@ ADD_SUBDIRECTORY(src/EnergyPlus)
 ADD_SUBDIRECTORY(testfiles)
 
 if( BUILD_FORTRAN )
-  # the Fortran apps require a DEF for proper path handling on Windows
-  if( WIN32 ) 
-    add_definition(-D_WIN32) 
-  endif()
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )

@@ -12,5 +12,10 @@ SET_TARGET_PROPERTIES(ExpandObjects PROPERTIES
   COMPILE_FLAGS "-std=legacy -ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
+# the Fortran apps require a DEF for proper path handling on Windows
+if( WIN32 ) 
+  add_definition(-D_WIN32) 
+endif()
+  
 install(TARGETS ExpandObjects DESTINATION ./)
 
