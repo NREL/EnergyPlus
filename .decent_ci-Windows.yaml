@@ -1,11 +1,11 @@
 compilers:
   - name: Visual Studio
     version: 12
-    cmake_extra_flags: -DBUILD_TESTING:BOOL=ON -DBUILD_FORTRAN:BOOL=ON
+    cmake_extra_flags: -DBUILD_TESTING:BOOL=ON
   - name: Visual Studio
     version: 12
     architecture: Win64
-    cmake_extra_flags: -DBUILD_TESTING:BOOL=ON -DBUILD_FORTRAN:BOOL=ON
+    cmake_extra_flags: -DBUILD_TESTING:BOOL=ON 
 
 regression_script : python Testing/RegressionSuite/Scripts/build_files_to_run.py && python Testing/RegressionSuite/Scripts/CIRegressions.py 1 %REGRESSION_BASE_INSTALL% %REGRESSION_BASE_SRC% %REGRESSION_CUR_INSTALL% %REGRESSION_CUR_SRC% 20
 
