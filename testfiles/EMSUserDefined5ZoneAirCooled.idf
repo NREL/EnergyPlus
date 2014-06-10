@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -3092,7 +3092,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -4180,16 +4180,16 @@
     HW_Tin,                  !- <none>
     HW_Cp,                   !- <none>
     HW_Tout,                 !- <none>
-    HW_MdotRequest,          !- Extended Field
-    Zone_T,                  !- Extended Field
-    Zone_W,                  !- Extended Field
-    Space1ATU_DesignAirMdot, !- Extended Field
-    Space2ATU_DesignAirMdot, !- Extended Field
-    Space3ATU_DesignAirMdot, !- Extended Field
-    Space4ATU_DesignAirMdot, !- Extended Field
-    Space5ATU_DesignAirMdot, !- Extended Field
-    Zone_Tsp_Cool,           !- Extended Field
-    Zone_Tsp_Heat;           !- Extended Field
+    HW_MdotRequest,          !- <none>
+    Zone_T,                  !- <none>
+    Zone_W,                  !- <none>
+    Space1ATU_DesignAirMdot, !- <none>
+    Space2ATU_DesignAirMdot, !- <none>
+    Space3ATU_DesignAirMdot, !- <none>
+    Space4ATU_DesignAirMdot, !- <none>
+    Space5ATU_DesignAirMdot, !- <none>
+    Zone_Tsp_Cool,           !- <none>
+    Zone_Tsp_Heat;           !- <none>
 
   EnergyManagementSystem:InternalVariable,
     Space1ATU_HeatAirMdot,   !- Name

@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1233,7 +1233,7 @@
   Fan:OnOff,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     1.6,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
