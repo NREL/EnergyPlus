@@ -10,6 +10,15 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 
+if( BUILD_TESTING )
+  option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
+  if( ENABLE_REGRESSION_TESTING )
+    find_package(PythonInterp REQUIRED)
+    set( REGRESSION_SCRIPT_PATH "" CACHE PATH "Path to regression scripts" )
+    set( REGRESSION_BASELINE_PATH "" CACHE PATH "Path to energyplus baseline folder to compare against" )
+  endif()
+endif()
+
 # Not yet released by CMake, but is being developed
 # This will help us set the proper options for c++11 across various configurations
 #FIND_PACKAGE( CXXFeatures ) 
