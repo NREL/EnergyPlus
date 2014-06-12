@@ -1,5 +1,6 @@
 
 # These need to be defined by the caller
+# IDF_FILE
 # BINARY_DIR
 # PYTHON_EXECUTABLE
 # REGRESSION_SCRIPT_PATH
