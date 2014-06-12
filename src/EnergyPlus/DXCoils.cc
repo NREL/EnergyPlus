@@ -2247,7 +2247,7 @@ namespace DXCoils {
 				DXCoil( DXCoilNum ).InternalStaticPressureDrop = Numbers( 5 );
 				DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject = true;
 			} else {
-				DXCoil( DXCoilNum ).InternalStaticPressureDrop = -999.;
+				DXCoil( DXCoilNum ).InternalStaticPressureDrop = -999.0;
 				DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject = false;
 			}
 
@@ -6428,11 +6428,11 @@ namespace DXCoils {
 						// of flow/capacity ratio vs SHR for several actual coils.
 						RatedVolFlowPerRatedTotCap = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode ) / DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
 						if ( RatedVolFlowPerRatedTotCap > MaxRatedVolFlowPerRatedTotCap( DXCT ) ) {
-							MSRatedSHRDes = 0.431 + 6086. * MaxRatedVolFlowPerRatedTotCap( DXCT );
+							MSRatedSHRDes = 0.431 + 6086.0 * MaxRatedVolFlowPerRatedTotCap( DXCT );
 						} else if ( RatedVolFlowPerRatedTotCap < MinRatedVolFlowPerRatedTotCap( DXCT ) ) {
-							MSRatedSHRDes = 0.431 + 6086. * MinRatedVolFlowPerRatedTotCap( DXCT );
+							MSRatedSHRDes = 0.431 + 6086.0 * MinRatedVolFlowPerRatedTotCap( DXCT );
 						} else {
-							MSRatedSHRDes = 0.431 + 6086. * RatedVolFlowPerRatedTotCap;
+							MSRatedSHRDes = 0.431 + 6086.0 * RatedVolFlowPerRatedTotCap;
 						}
 					} else {
 						MSRatedSHRDes = 1.0;
@@ -7558,7 +7558,7 @@ namespace DXCoils {
 
 			DXCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
 			DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction = PartLoadRatio / PLF;
-			if ( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction - 1.0 ) > .001 ) {
+			if ( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction - 1.0 ) > 0.001 ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex3 == 0 ) {
 					if ( DXCoil( DXCoilNum ).DXCoilType_Num == CoilDX_HeatPumpWaterHeater ) {
 						ShowWarningMessage( RoutineName + DXCoil( DXCoilNum ).DXCoilType + "=\"" + DXCoil( DXCoilNum ).Name + "\", runtime fraction" );
@@ -8362,7 +8362,7 @@ Label50: ;
 
 			DXCoil( DXCoilNum ).PartLoadRatio = PartLoadRatio;
 			DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction = CompCycRatio / PLF;
-			if ( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction - 1.0 ) > .001 ) {
+			if ( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction - 1.0 ) > 0.001 ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex3 == 0 ) {
 					ShowWarningMessage( "The runtime fraction for DX cooling coil " + DXCoil( DXCoilNum ).Name + " exceeded 1.0. [" + RoundSigDigits( DXCoil( DXCoilNum ).CoolingCoilRuntimeFraction, 4 ) + "]." );
 					ShowContinueError( "Runtime fraction reset to 1 and the simulation will continue." );
@@ -8846,7 +8846,7 @@ Label50: ;
 			}
 
 			DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction = ( PLRHeating / PLF );
-			if ( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction - 1.0 ) > .001 ) {
+			if ( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction - 1.0 ) > 0.001 ) {
 				if ( DXCoil( DXCoilNum ).ErrIndex4 == 0 ) {
 					ShowWarningMessage( "The runtime fraction for DX heating coil " + DXCoil( DXCoilNum ).Name + " exceeded 1.0. [" + RoundSigDigits( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, 4 ) + "]." );
 					ShowContinueError( "Runtime fraction is set to 1.0 and the simulation continues..." );
@@ -9653,10 +9653,10 @@ Label50: ;
 			ADPTemp = PsyTdpFnWPb( OutletAirHumRat, StdBaroPress );
 
 			Tolerance = 1.0; // initial conditions for iteration
-			ErrorLast = 100.;
+			ErrorLast = 100.0;
 			Iter = 0;
 			DeltaADPTemp = 5.0;
-			while ( ( Iter <= IterMax ) && ( Tolerance > .001 ) ) {
+			while ( ( Iter <= IterMax ) && ( Tolerance > 0.001 ) ) {
 				//     Do for IterMax iterations or until the error gets below .1%
 				if ( Iter > 0 ) ADPTemp += DeltaADPTemp;
 				++Iter;
@@ -9671,8 +9671,8 @@ Label50: ;
 				//     check for convergence (slopes are equal to within error tolerance)
 
 				Error = ( Slope - SlopeAtConds ) / SlopeAtConds;
-				if ( ( Error > 0.0 ) && ( ErrorLast < 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.;
-				if ( ( Error < 0.0 ) && ( ErrorLast > 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.;
+				if ( ( Error > 0.0 ) && ( ErrorLast < 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.0;
+				if ( ( Error < 0.0 ) && ( ErrorLast > 0.0 ) ) DeltaADPTemp = -DeltaADPTemp / 2.0;
 				ErrorLast = Error;
 
 				Tolerance = std::abs( Error );
@@ -9821,12 +9821,12 @@ Label50: ;
 		Gamma = Gamma_Rated * QLatRated * ( EnteringDB - EnteringWB ) / ( ( 26.7 - 19.4 ) * QLatActual + 1.e-10 );
 
 		//  Calculate the compressor on and off times using a converntional thermostat curve
-		Ton = 3600. / ( 4. * Nmax * ( 1.0 - RTF ) ); // duration of cooling coil on-cycle (sec)
-		Toff = 3600. / ( 4. * Nmax * RTF ); // duration of cooling coil off-cycle (sec)
+		Ton = 3600.0 / ( 4.0 * Nmax * ( 1.0 - RTF ) ); // duration of cooling coil on-cycle (sec)
+		Toff = 3600.0 / ( 4.0 * Nmax * RTF ); // duration of cooling coil off-cycle (sec)
 
 		//  Cap Toff to meet the equation restriction
 		if ( Gamma > 0.0 ) {
-			Toffa = min( Toff, 2. * Twet / Gamma );
+			Toffa = min( Toff, 2.0 * Twet / Gamma );
 		} else {
 			Toffa = Toff;
 		}
@@ -9842,7 +9842,7 @@ Label50: ;
 		if ( present( HeatingRTF ) ) {
 			if ( HeatingRTF < 1.0 && HeatingRTF > RTF ) {
 				Ton_heating = 3600.0 / ( 4.0 * Nmax * ( 1.0 - HeatingRTF ) );
-				Toff_heating = 3600. / ( 4. * Nmax * HeatingRTF );
+				Toff_heating = 3600.0 / ( 4.0 * Nmax * HeatingRTF );
 				//    add additional heating coil operation during cooling coil off cycle (due to cycling rate difference of coils)
 				Ton_heating += max( 0.0, min( Ton_heating, ( Ton + Toffa ) - ( Ton_heating + Toff_heating ) ) );
 				Toffa = min( Toffa, Ton_heating - Ton );
@@ -9850,7 +9850,7 @@ Label50: ;
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( std::pow( Gamma, 2 ) ) * ( std::pow( Toffa, 2 ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * pow_2( Gamma ) * pow_2( Toffa );
 		To1 = aa + Tcl;
 		Error = 1.0;
 		while ( Error > 0.001 ) {
@@ -10975,7 +10975,7 @@ Label50: ;
 				}
 
 				DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction = ( PLRHeating / PLF );
-				if ( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction - 1.0 ) > .001 ) {
+				if ( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction - 1.0 ) > 0.001 ) {
 					if ( DXCoil( DXCoilNum ).ErrIndex4 == 0 ) {
 						ShowWarningMessage( "The runtime fraction at high speed for DX multispeed heating coil " + DXCoil( DXCoilNum ).Name + " exceeded 1.0. [" + RoundSigDigits( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction is set to 1.0 and the simulation continues..." );
@@ -11174,7 +11174,7 @@ Label50: ;
 				}
 
 				DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction = ( PLRHeating / PLF );
-				if ( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction - 1.0 ) > .001 ) {
+				if ( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction > 1.0 && std::abs( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction - 1.0 ) > 0.001 ) {
 					if ( DXCoil( DXCoilNum ).ErrIndex4 == 0 ) {
 						ShowWarningMessage( "The runtime fraction for DX heating coil " + DXCoil( DXCoilNum ).Name + " exceeded 1.0. [" + RoundSigDigits( DXCoil( DXCoilNum ).HeatingCoilRuntimeFraction, 4 ) + "]." );
 						ShowContinueError( "Runtime fraction is set to 1.0 and the simulation continues..." );
@@ -11585,24 +11585,24 @@ Label50: ;
 			TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).CCapFTemp( 1 ), CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated );
 			for ( Iter = 1; Iter <= 4; ++Iter ) { // iterative solution in the event that net capacity is near a threshold for external static
 				//Obtain external static pressure from Table 5 in ANSI/AHRI Std. 340/360-2007
-				if ( NetCoolingCapRated <= 21000. ) {
-					ExternalStatic = 50.;
-				} else if ( 21000. < NetCoolingCapRated && NetCoolingCapRated <= 30800. ) {
-					ExternalStatic = 60.;
-				} else if ( 30800. < NetCoolingCapRated && NetCoolingCapRated <= 39300. ) {
-					ExternalStatic = 70.;
-				} else if ( 39300. < NetCoolingCapRated && NetCoolingCapRated <= 61500. ) {
-					ExternalStatic = 90.;
-				} else if ( 61500. < NetCoolingCapRated && NetCoolingCapRated <= 82100. ) {
-					ExternalStatic = 100.;
-				} else if ( 82100. < NetCoolingCapRated && NetCoolingCapRated <= 103000. ) {
-					ExternalStatic = 110.;
-				} else if ( 103000. < NetCoolingCapRated && NetCoolingCapRated <= 117000. ) {
-					ExternalStatic = 140.;
-				} else if ( 117000. < NetCoolingCapRated && NetCoolingCapRated <= 147000. ) {
-					ExternalStatic = 160.;
-				} else if ( 147000. < NetCoolingCapRated ) {
-					ExternalStatic = 190.;
+				if ( NetCoolingCapRated <= 21000.0 ) {
+					ExternalStatic = 50.0;
+				} else if ( 21000.0 < NetCoolingCapRated && NetCoolingCapRated <= 30800.0 ) {
+					ExternalStatic = 60.0;
+				} else if ( 30800.0 < NetCoolingCapRated && NetCoolingCapRated <= 39300.0 ) {
+					ExternalStatic = 70.0;
+				} else if ( 39300.0 < NetCoolingCapRated && NetCoolingCapRated <= 61500.0 ) {
+					ExternalStatic = 90.0;
+				} else if ( 61500.0 < NetCoolingCapRated && NetCoolingCapRated <= 82100.0 ) {
+					ExternalStatic = 100.0;
+				} else if ( 82100.0 < NetCoolingCapRated && NetCoolingCapRated <= 103000.0 ) {
+					ExternalStatic = 110.0;
+				} else if ( 103000.0 < NetCoolingCapRated && NetCoolingCapRated <= 117000.0 ) {
+					ExternalStatic = 140.0;
+				} else if ( 117000.0 < NetCoolingCapRated && NetCoolingCapRated <= 147000.0 ) {
+					ExternalStatic = 160.0;
+				} else if ( 147000.0 < NetCoolingCapRated ) {
+					ExternalStatic = 190.0;
 				}
 				FanStaticPressureRise = ExternalStatic + DXCoil( DXCoilNum ).InternalStaticPressureDrop;
 
@@ -11711,20 +11711,20 @@ Label50: ;
 
 				ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: air flow rate solver failed. Iteration limit exceeded " );
 
-				SupAirMdot_TestPoint( 1 + PartLoadTestPoint ) = -999.;
-				EER_TestPoint_SI( 1 + PartLoadTestPoint ) = -999.;
-				EER_TestPoint_IP( 1 + PartLoadTestPoint ) = -999.;
-				NetCapacity_TestPoint( 1 + PartLoadTestPoint ) = -999.;
-				NetPower_TestPoint( 1 + PartLoadTestPoint ) = -999.;
+				SupAirMdot_TestPoint( 1 + PartLoadTestPoint ) = -999.0;
+				EER_TestPoint_SI( 1 + PartLoadTestPoint ) = -999.0;
+				EER_TestPoint_IP( 1 + PartLoadTestPoint ) = -999.0;
+				NetCapacity_TestPoint( 1 + PartLoadTestPoint ) = -999.0;
+				NetPower_TestPoint( 1 + PartLoadTestPoint ) = -999.0;
 
 			} else if ( SolverFlag == -2 ) {
 				ShowWarningError( "CalcTwoSpeedDXCoilStandardRating: air flow rate solver failed. root not bounded " );
 
-				SupAirMdot_TestPoint( 1 + PartLoadTestPoint ) = -999.;
-				EER_TestPoint_SI( 1 + PartLoadTestPoint ) = -999.;
-				EER_TestPoint_IP( 1 + PartLoadTestPoint ) = -999.;
-				NetCapacity_TestPoint( 1 + PartLoadTestPoint ) = -999.;
-				NetPower_TestPoint( 1 + PartLoadTestPoint ) = -999.;
+				SupAirMdot_TestPoint( 1 + PartLoadTestPoint ) = -999.0;
+				EER_TestPoint_SI( 1 + PartLoadTestPoint ) = -999.0;
+				EER_TestPoint_IP( 1 + PartLoadTestPoint ) = -999.0;
+				NetCapacity_TestPoint( 1 + PartLoadTestPoint ) = -999.0;
+				NetPower_TestPoint( 1 + PartLoadTestPoint ) = -999.0;
 			} else {
 				// now we have the supply air flow rate
 				SupAirMdot_TestPoint( 1 + PartLoadTestPoint ) = PartLoadAirMassFlowRate;
@@ -11734,7 +11734,7 @@ Label50: ;
 				SupplyAirVolFlowRate = PartLoadAirMassFlowRate / SupplyAirRho;
 
 				if ( DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject ) {
-					FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( ExternalStatic * ( std::pow( AirMassFlowRatio, 2 ) ) );
+					FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( ExternalStatic * pow_2( AirMassFlowRatio ) );
 					Node( FanInletNode ).MassFlowRate = PartLoadAirMassFlowRate;
 					Node( FanInletNode ).Temp = CoolingCoilInletAirDryBulbTempRated;
 					Node( FanInletNode ).HumRat = SupplyAirHumRat;
@@ -12086,7 +12086,7 @@ Label50: ;
 
 		if ( DXCoil( DXCoilNum ).RateWithInternalStaticAndFanObject ) {
 			// modify external static per AHRI 340/360, Table 6, note 1.
-			FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( FanExternalStaticFull * ( std::pow( AirMassFlowRatio, 2 ) ) );
+			FanStaticPressureRise = DXCoil( DXCoilNum ).InternalStaticPressureDrop + ( FanExternalStaticFull * pow_2( AirMassFlowRatio ) );
 			Node( FanInletNodeNum ).MassFlowRate = SupplyAirMassFlowRate;
 			Node( FanOutletNodeNum ).MassFlowRate = SupplyAirMassFlowRate;
 			Node( FanInletNodeNum ).Temp = IndoorUnitInletDryBulb;

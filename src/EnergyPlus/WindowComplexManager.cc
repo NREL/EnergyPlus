@@ -1424,10 +1424,10 @@ namespace WindowComplexManager {
 					}
 					DPhi = 2.0 * Pi / NPhis( I );
 					if ( I == 1 ) {
-						Lamda = Pi * std::pow( ( std::sin( UpperTheta ) ), 2 );
+						Lamda = Pi * pow_2( std::sin( UpperTheta ) );
 						SolAng = 2.0 * Pi * ( 1.0 - std::cos( UpperTheta ) );
 					} else {
-						Lamda = 0.5 * DPhi * ( std::pow( ( std::sin( UpperTheta ) ), 2 ) - std::pow( ( std::sin( LowerTheta ) ), 2 ) ); //For W6 basis, lamda is funct of Theta and
+						Lamda = 0.5 * DPhi * ( pow_2( std::sin( UpperTheta ) ) - pow_2( std::sin( LowerTheta ) ) ); //For W6 basis, lamda is funct of Theta and
 						// NPhis, not individual Phi
 						SolAng = DPhi * ( std::cos( LowerTheta ) - std::cos( UpperTheta ) );
 					}
@@ -1490,10 +1490,10 @@ namespace WindowComplexManager {
 						UpperTheta = 0.5 * Pi;
 					}
 					if ( I == 1 ) {
-						Lamda = Pi * std::pow( ( std::sin( UpperTheta ) ), 2 );
+						Lamda = Pi * pow_2( std::sin( UpperTheta ) );
 						SolAng = 2.0 * Pi * ( 1.0 - std::cos( UpperTheta ) );
 					} else {
-						Lamda = 0.5 * DPhi * ( std::pow( ( std::sin( UpperTheta ) ), 2 ) - std::pow( ( std::sin( LowerTheta ) ), 2 ) ); //For W6 basis, lamda is funct of Theta and
+						Lamda = 0.5 * DPhi * ( pow_2( std::sin( UpperTheta ) ) - pow_2( std::sin( LowerTheta ) ) ); //For W6 basis, lamda is funct of Theta and
 						// NPhis, not individual Phi
 						SolAng = DPhi * ( std::cos( LowerTheta ) - std::cos( UpperTheta ) );
 					}
@@ -2900,7 +2900,7 @@ namespace WindowComplexManager {
 		if ( SELECT_CASE_var == Front_Incident ) {
 			RdotZ = dot( W6z, RayVect );
 			Cost = -RdotZ;
-			Sint = std::sqrt( 1.0 - std::pow( Cost, 2 ) );
+			Sint = std::sqrt( 1.0 - pow_2( Cost ) );
 			Theta = std::acos( Cost );
 			RdotY = dot( W6y, RayVect );
 			RdotX = dot( W6x, RayVect );
@@ -2912,7 +2912,7 @@ namespace WindowComplexManager {
 			}
 		} else if ( SELECT_CASE_var == Front_Transmitted ) {
 			Cost = dot( W6z, RayVect );
-			Sint = std::sqrt( 1.0 - std::pow( Cost, 2 ) );
+			Sint = std::sqrt( 1.0 - pow_2( Cost ) );
 			Theta = std::acos( Cost );
 			RdotY = dot( W6y, RayVect );
 			RdotX = dot( W6x, RayVect );
@@ -2925,7 +2925,7 @@ namespace WindowComplexManager {
 		} else if ( SELECT_CASE_var == Front_Reflected ) {
 			RdotZ = dot( W6z, RayVect );
 			Cost = -RdotZ;
-			Sint = std::sqrt( 1.0 - std::pow( Cost, 2 ) );
+			Sint = std::sqrt( 1.0 - pow_2( Cost ) );
 			Theta = std::acos( Cost );
 			RdotY = dot( W6y, RayVect );
 			RdotX = dot( W6x, RayVect );
@@ -2937,7 +2937,7 @@ namespace WindowComplexManager {
 			}
 		} else if ( SELECT_CASE_var == Back_Incident ) {
 			Cost = dot( W6z, RayVect );
-			Sint = std::sqrt( 1.0 - std::pow( Cost, 2 ) );
+			Sint = std::sqrt( 1.0 - pow_2( Cost ) );
 			Theta = std::acos( Cost );
 			RdotY = dot( W6y, RayVect );
 			RdotX = dot( W6x, RayVect );
@@ -2950,7 +2950,7 @@ namespace WindowComplexManager {
 		} else if ( SELECT_CASE_var == Back_Transmitted ) { //This is same as front reflected
 			RdotZ = dot( W6z, RayVect );
 			Cost = -RdotZ;
-			Sint = std::sqrt( 1.0 - std::pow( Cost, 2 ) );
+			Sint = std::sqrt( 1.0 - pow_2( Cost ) );
 			Theta = std::acos( Cost );
 			RdotY = dot( W6y, RayVect );
 			RdotX = dot( W6x, RayVect );
@@ -2962,7 +2962,7 @@ namespace WindowComplexManager {
 			}
 		} else if ( SELECT_CASE_var == Back_Reflected ) { //This is same as front transmitted
 			Cost = dot( W6z, RayVect );
-			Sint = std::sqrt( 1.0 - std::pow( Cost, 2 ) );
+			Sint = std::sqrt( 1.0 - pow_2( Cost ) );
 			Theta = std::acos( Cost );
 			RdotY = dot( W6y, RayVect );
 			RdotX = dot( W6x, RayVect );
@@ -3468,8 +3468,8 @@ namespace WindowComplexManager {
 				}
 				//tsky = SkyTemp + TKelvin
 				tsky = SkyTempKelvin;
-				Ebout = sigma * std::pow( tout, 4 );
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * std::pow( tsky, 4 ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
+				Ebout = sigma * pow_4( tout );
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * sigma * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
 
 			}
 
@@ -3487,7 +3487,7 @@ namespace WindowComplexManager {
 			//indoor mean radiant temperature.
 			// IR incident on window from zone surfaces and high-temp radiant sources
 			rmir = SurfaceWindow( SurfNum ).IRfromParentZone + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum );
-			trmin = std::pow( ( rmir / StefanBoltzmann ), 0.25 ); // TODO check model equation.
+			trmin = root_4( rmir / StefanBoltzmann ); // TODO check model equation.
 
 			// outdoor wind speed
 			if ( ! Surface( SurfNum ).ExtWind ) {
@@ -3808,8 +3808,8 @@ namespace WindowComplexManager {
 				RhoShIR2 = max( 0.0, 1.0 - TauShIR - EpsShIR2 );
 				RhoGlIR2 = 1.0 - emis( 2 * ngllayer );
 				ShGlReflFacIR = 1.0 - RhoGlIR2 * RhoShIR1;
-				NetIRHeatGainShade = ShadeArea * EpsShIR2 * ( sigma * std::pow( theta( nglfacep ), 4 ) - rmir ) + EpsShIR1 * ( sigma * std::pow( theta( nglfacep - 1 ), 4 ) - rmir ) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
-				NetIRHeatGainGlass = ShadeArea * ( emis( 2 * ngllayer ) * TauShIR / ShGlReflFacIR ) * ( sigma * std::pow( theta( 2 * ngllayer ), 4 ) - rmir );
+				NetIRHeatGainShade = ShadeArea * EpsShIR2 * ( sigma * pow_4( theta( nglfacep ) ) - rmir ) + EpsShIR1 * ( sigma * pow_4( theta( nglfacep - 1 ) ) - rmir ) * RhoGlIR2 * TauShIR / ShGlReflFacIR;
+				NetIRHeatGainGlass = ShadeArea * ( emis( 2 * ngllayer ) * TauShIR / ShGlReflFacIR ) * ( sigma * pow_4( theta( 2 * ngllayer ) ) - rmir );
 				ConvHeatGainFrZoneSideOfShade = ShadeArea * hcin * ( theta( nglfacep ) - tind );
 				WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatFlowNatural + ConvHeatGainFrZoneSideOfShade + NetIRHeatGainGlass + NetIRHeatGainShade;
 				// store components for reporting
@@ -3820,7 +3820,7 @@ namespace WindowComplexManager {
 			} else {
 				// Interior shade or blind not present; innermost layer is glass
 				CondHeatGainGlass = Surface( SurfNum ).Area * scon( nlayer ) / thick( nlayer ) * ( theta( 2 * nlayer - 1 ) - theta( 2 * nlayer ) );
-				NetIRHeatGainGlass = Surface( SurfNum ).Area * emis( 2 * nlayer ) * ( sigma * std::pow( theta( 2 * nlayer ), 4 ) - rmir );
+				NetIRHeatGainGlass = Surface( SurfNum ).Area * emis( 2 * nlayer ) * ( sigma * pow_4( theta( 2 * nlayer ) ) - rmir );
 				ConvHeatGainFrZoneSideOfGlass = Surface( SurfNum ).Area * hcin * ( theta( 2 * nlayer ) - tind );
 				WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainFrZoneSideOfGlass + NetIRHeatGainGlass;
 				// store components for reporting

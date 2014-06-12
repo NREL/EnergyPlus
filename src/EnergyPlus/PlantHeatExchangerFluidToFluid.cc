@@ -505,13 +505,13 @@ namespace PlantHeatExchangerFluidToFluid {
 				if ( ! lNumericFieldBlanks( 6 ) ) {
 					FluidHX( CompLoop ).MinOperationTemp = rNumericArgs( 6 );
 				} else {
-					FluidHX( CompLoop ).MinOperationTemp = -9999.;
+					FluidHX( CompLoop ).MinOperationTemp = -9999.0;
 				}
 
 				if ( ! lNumericFieldBlanks( 7 ) ) {
 					FluidHX( CompLoop ).MaxOperationTemp = rNumericArgs( 7 );
 				} else {
-					FluidHX( CompLoop ).MaxOperationTemp = 9999.;
+					FluidHX( CompLoop ).MaxOperationTemp = 9999.0;
 				}
 
 			}
@@ -823,7 +823,7 @@ namespace PlantHeatExchangerFluidToFluid {
 					tmpDeltaTloopToLoop = std::abs( ( PlantSizData( PltSizNumSupSide ).ExitTemp - PlantSizData( PltSizNumSupSide ).DeltaT ) - PlantSizData( PltSizNumDmdSide ).ExitTemp );
 				}}
 
-				tmpDeltaTloopToLoop = max( 2., tmpDeltaTloopToLoop );
+				tmpDeltaTloopToLoop = max( 2.0, tmpDeltaTloopToLoop );
 				tmpDeltaTSupLoop = PlantSizData( PltSizNumSupSide ).DeltaT;
 				if ( tmpSupSideDesignVolFlowRate >= SmallWaterVolFlow ) {
 
@@ -870,7 +870,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				if ( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).LoopDemandCalcScheme == SingleSetPoint ) {
 					Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).Temp = Node( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPoint;
 				} else if ( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).LoopDemandCalcScheme == DualSetPointDeadBand ) {
-					Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).Temp = ( Node( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointHi + Node( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointLo ) / 2.;
+					Node( FluidHX( CompNum ).SupplySideLoop.InletNodeNum ).Temp = ( Node( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointHi + Node( PlantLoop( FluidHX( CompNum ).SupplySideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointLo ) / 2.0;
 				}
 
 			}
@@ -882,7 +882,7 @@ namespace PlantHeatExchangerFluidToFluid {
 				if ( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).LoopDemandCalcScheme == SingleSetPoint ) {
 					Node( FluidHX( CompNum ).DemandSideLoop.InletNodeNum ).Temp = Node( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPoint;
 				} else if ( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).LoopDemandCalcScheme == DualSetPointDeadBand ) {
-					Node( FluidHX( CompNum ).DemandSideLoop.InletNodeNum ).Temp = ( Node( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointHi + Node( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointLo ) / 2.;
+					Node( FluidHX( CompNum ).DemandSideLoop.InletNodeNum ).Temp = ( Node( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointHi + Node( PlantLoop( FluidHX( CompNum ).DemandSideLoop.LoopNum ).TempSetPointNodeNum ).TempSetPointLo ) / 2.0;
 				}
 			}
 

@@ -1202,7 +1202,7 @@ namespace SolarReflectionManager {
 						// Divide hemisphere centered at ground hit point into elements of altitude Phi and
 						// azimuth Theta and create upward-going ray unit vector at each Phi,Theta pair.
 						// Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
-						DPhi = PiOvr2 / ( AltAngStepsForSolReflCalc / 2. );
+						DPhi = PiOvr2 / ( AltAngStepsForSolReflCalc / 2.0 );
 						dReflSkyGnd = 0.0;
 						// Altitude loop
 						for ( IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
@@ -1211,7 +1211,7 @@ namespace SolarReflectionManager {
 							CPhi = std::cos( Phi );
 							// Third component of ray unit vector in (Theta,Phi) direction
 							URay( 3 ) = SPhi;
-							DTheta = 2. * Pi / ( 2. * AzimAngStepsForSolReflCalc );
+							DTheta = 2.0 * Pi / ( 2.0 * AzimAngStepsForSolReflCalc );
 							dOmega = CPhi * DTheta * DPhi;
 							// Cosine of angle of incidence of ray on ground
 							CosIncAngRayToSky = SPhi;

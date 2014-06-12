@@ -727,7 +727,7 @@ namespace DaylightingManager {
 							gio::write( OutputFileDFS, fmtA ) << CurMnDy + ',' + Zone( ZoneNum ).Name + ',' + Surface( IWin ).Name + ", ";
 						} else {
 							// blind with variable slat angle
-							SlatAngle = 180. / double( MaxSlatAngs - 1 ) * double( ISlatAngle - 2 );
+							SlatAngle = 180.0 / double( MaxSlatAngs - 1 ) * double( ISlatAngle - 2 );
 							gio::write( OutputFileDFS, fmtA ) << CurMnDy + ',' + Zone( ZoneNum ).Name + ',' + Surface( IWin ).Name + ',' + RoundSigDigits( SlatAngle, 1 );
 						}
 
@@ -1592,9 +1592,9 @@ namespace DaylightingManager {
 		HW = std::sqrt( dot( W21, W21 ) );
 		WW = std::sqrt( dot( W23, W23 ) );
 		if ( Rectangle ) {
-			WC = W2 + ( W23 + W21 ) / 2.;
+			WC = W2 + ( W23 + W21 ) / 2.0;
 		} else if ( Triangle ) {
-			WC = W2 + ( W23 + W21 ) / 3.;
+			WC = W2 + ( W23 + W21 ) / 3.0;
 		}
 		SurfaceWindow( IWin ).WinCenter = WC;
 		REFWC = WC - RREF;
@@ -1645,14 +1645,14 @@ namespace DaylightingManager {
 		}
 		// Number of window elements in X and Y for daylighting calculation
 		if ( ALF > 0.1524 ) {
-			NDIVX = 1 + int( 4. * WW / ALF );
-			NDIVY = 1 + int( 4. * HW / ALF );
+			NDIVX = 1 + int( 4.0 * WW / ALF );
+			NDIVY = 1 + int( 4.0 * HW / ALF );
 		}
 
 		if ( ExtWinType == AdjZoneExtWin ) {
 			// Adjust number of exterior window elements to give acceptable number of rays through
 			// interior windows in the zone (for accuracy of interior window daylighting calculation)
-			SolidAngExtWin = SafeDivide( ( ( Surface( IWin ).Area + SurfaceWindow( IWin ).DividerArea ) / Surface( IWin ).Multiplier ), std::pow( ALF, 2 ) );
+			SolidAngExtWin = SafeDivide( ( ( Surface( IWin ).Area + SurfaceWindow( IWin ).DividerArea ) / Surface( IWin ).Multiplier ), pow_2( ALF ) );
 			SolidAngMinIntWin = ZoneDaylight( ZoneNum ).MinIntWinSolidAng;
 			SolidAngRatio = max( 1.0, SolidAngExtWin / SolidAngMinIntWin );
 			NDIVX *= std::sqrt( SolidAngRatio );
@@ -1722,7 +1722,7 @@ namespace DaylightingManager {
 			HW = std::sqrt( dot( U21, U21 ) );
 			WW = std::sqrt( dot( U23, U23 ) );
 			if ( Surface( IWin2 ).Sides == 4 ) {
-				WC = U2 + ( U23 + U21 ) / 2.;
+				WC = U2 + ( U23 + U21 ) / 2.0;
 			} else if ( Surface( IWin2 ).Sides == 3 ) {
 				WC = U2 + ( U23 + U21 ) / 3.0;
 			}
@@ -1821,7 +1821,7 @@ namespace DaylightingManager {
 		if ( Rectangle ) {
 			DAXY = DWX * DWY;
 		} else if ( Triangle ) {
-			SinCornerAng = std::sqrt( 1.0 - std::pow( dot( W21, W23 ), 2 ) );
+			SinCornerAng = std::sqrt( 1.0 - pow_2( dot( W21, W23 ) ) );
 			DAXY = DWX * DWY * SinCornerAng;
 		}
 
@@ -2333,7 +2333,7 @@ namespace DaylightingManager {
 
 		WinElArea = DWX * DWY;
 		if ( Surface( IWin ).Sides == 3 ) {
-			WinElArea *= std::sqrt( 1.0 - std::pow( dot( W21, W23 ), 2 ) );
+			WinElArea *= std::sqrt( 1.0 - pow_2( dot( W21, W23 ) ) );
 		}
 
 		if ( CalledFrom == CalledForMapPoint ) {
@@ -3047,7 +3047,7 @@ namespace DaylightingManager {
 		int ObsSurfNum; // Surface number of obstruction
 		FArray1D< Real64 > ObsHitPt( 3 ); // Coordinates of hit point on an obstruction (m)
 
-		DPhi = PiOvr2 / ( AltSteps / 2. );
+		DPhi = PiOvr2 / ( AltSteps / 2.0 );
 		DTheta = Pi / AzimSteps;
 		SkyGndObs = 0.0;
 		SkyGndUnObs = 0.0;
@@ -3594,7 +3594,7 @@ namespace DaylightingManager {
 							// direct normal solar illuminance = 1.0.
 							// Solid angle subtended by sun is 0.000068 steradians
 
-							XAVWL = 14700. * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / std::pow( WindowSolidAngleDaylightPoint, 0.8 );
+							XAVWL = 14700.0 * std::sqrt( 0.000068 * POSFAC ) * double( NWX * NWY ) / std::pow( WindowSolidAngleDaylightPoint, 0.8 );
 							AVWLSUdisk( 1, iHour ) = XAVWL * TVISS * ObTransDisk; // Bare window
 
 							if ( ShType == WSC_ST_ExteriorBlind || ShType == WSC_ST_InteriorBlind || ShType == WSC_ST_BetweenGlassBlind ) {
@@ -4082,7 +4082,7 @@ namespace DaylightingManager {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -4257,7 +4257,7 @@ namespace DaylightingManager {
 				bEndofErrFile = false;
 				bRecordsOnErrFile = false;
 				while ( ! bEndofErrFile ) {
-					{ IOFlags flags; gio::read( iDElightErrorFile, "(A)", flags ) >> cErrorLine; iReadStatus = flags.ios(); }
+					{ IOFlags flags; gio::read( iDElightErrorFile, fmtA, flags ) >> cErrorLine; iReadStatus = flags.ios(); }
 					if ( iReadStatus < GoodIOStatValue ) {
 						bEndofErrFile = true;
 						continue;
@@ -4357,7 +4357,7 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: na
 		// DERIVED TYPE DEFINITIONS: na
@@ -4493,7 +4493,7 @@ namespace DaylightingManager {
 					cAlphaArgs( 1 ) = "COMMA";
 				}
 			}
-			gio::write( OutputFileInits, "(A)" ) << "! <Daylighting:Illuminance Maps>,#Maps,Style";
+			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps>,#Maps,Style";
 			ConvertCaseToLower( cAlphaArgs( 1 ), cAlphaArgs( 2 ) );
 			cAlphaArgs( 1 ).erase( 1 );
 			cAlphaArgs( 1 ) += cAlphaArgs( 2 ).substr( 1 );
@@ -4825,7 +4825,7 @@ namespace DaylightingManager {
 								IllumMap( MapNum ).Ymin = min( IllumMap( MapNum ).Ymin, IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) );
 								IllumMap( MapNum ).Xmax = max( IllumMap( MapNum ).Xmax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) );
 								IllumMap( MapNum ).Ymax = max( IllumMap( MapNum ).Ymax, IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) );
-								if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) < Zone( ZoneFound ).MinimumX && ( Zone( ZoneFound ).MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) ) > .001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) > Zone( ZoneFound ).MaximumX && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) - Zone( ZoneFound ).MaximumX ) > .001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) < Zone( ZoneFound ).MinimumY && ( Zone( ZoneFound ).MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) ) > .001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) > Zone( ZoneFound ).MaximumY && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) - Zone( ZoneFound ).MaximumY ) > .001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) < Zone( ZoneFound ).MinimumZ && ( Zone( ZoneFound ).MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) ) > .001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) > Zone( ZoneFound ).MaximumZ && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) - Zone( ZoneFound ).MaximumZ ) > .001 ) ) {
+								if ( ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) < Zone( ZoneFound ).MinimumX && ( Zone( ZoneFound ).MinimumX - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) > Zone( ZoneFound ).MaximumX && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 1 ) - Zone( ZoneFound ).MaximumX ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) < Zone( ZoneFound ).MinimumY && ( Zone( ZoneFound ).MinimumY - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) > Zone( ZoneFound ).MaximumY && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 2 ) - Zone( ZoneFound ).MaximumY ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) < Zone( ZoneFound ).MinimumZ && ( Zone( ZoneFound ).MinimumZ - IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) ) > 0.001 ) || ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) > Zone( ZoneFound ).MaximumZ && ( IllumMapCalc( MapNum ).MapRefPtAbsCoord( RefPt, 3 ) - Zone( ZoneFound ).MaximumZ ) > 0.001 ) ) {
 									IllumMapCalc( MapNum ).MapRefPtInBounds( RefPt ) = false;
 								}
 								// Test extremes of Map Points against Zone Min/Max
@@ -4880,7 +4880,7 @@ namespace DaylightingManager {
 		ZoneMsgDone.deallocate();
 
 		if ( TotIllumMaps > 0 ) {
-			gio::write( OutputFileInits, "(A)" ) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points," "YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
+			gio::write( OutputFileInits, fmtA ) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points," "YMin {m},YMax {m},Yinc {m},#Y Points,Z {m}";
 		}
 		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 			gio::write( OutputFileInits, "('Daylighting:Illuminance Maps:Detail',11(',',A))" ) << IllumMap( MapNum ).Name << Zone( IllumMap( MapNum ).Zone ).Name << RoundSigDigits( IllumMap( MapNum ).Xmin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xmax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Xnum ) << RoundSigDigits( IllumMap( MapNum ).Ymin, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ymax, 2 ) << RoundSigDigits( IllumMap( MapNum ).Yinc, 2 ) << RoundSigDigits( IllumMap( MapNum ).Ynum ) << RoundSigDigits( IllumMap( MapNum ).Z, 2 );
@@ -4965,7 +4965,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4997,35 +4997,35 @@ namespace DaylightingManager {
 					ShowContinueError( "A sufficient control is provided on the .dbg file." );
 					ErrorsFound = true;
 					if ( CheckTDDZone( Surface( SurfNum ).Zone ) ) {
-						gio::write( OutputFileDebug, fmta ) << " ! Following control is to allow tubular reporting in this Zone";
-						gio::write( OutputFileDebug, fmta ) << "Daylighting:Controls,  !- this control controls 0% of zone.";
-						gio::write( OutputFileDebug, fmta ) << "   " + Zone( Surface( SurfNum ).Zone ).Name + ",  !- Zone Name";
-						gio::write( OutputFileDebug, fmta ) << "     1,   !- Total Daylighting Reference Points";
+						gio::write( OutputFileDebug, fmtA ) << " ! Following control is to allow tubular reporting in this Zone";
+						gio::write( OutputFileDebug, fmtA ) << "Daylighting:Controls,  !- this control controls 0% of zone.";
+						gio::write( OutputFileDebug, fmtA ) << "   " + Zone( Surface( SurfNum ).Zone ).Name + ",  !- Zone Name";
+						gio::write( OutputFileDebug, fmtA ) << "     1,   !- Total Daylighting Reference Points";
 						if ( DaylRefWorldCoordSystem ) {
 							// world coordinates, use zone origin for ref pt
-							gio::write( OutputFileDebug, fmta ) << "   " + RoundSigDigits( Zone( Surface( SurfNum ).Zone ).OriginX, 2 ) + ",   !- X-Coordinate of First Reference Point {m}";
-							gio::write( OutputFileDebug, fmta ) << "   " + RoundSigDigits( Zone( Surface( SurfNum ).Zone ).OriginY, 2 ) + ",   !- Y-Coordinate of First Reference Point {m}";
-							gio::write( OutputFileDebug, fmta ) << "   " + RoundSigDigits( Zone( Surface( SurfNum ).Zone ).OriginZ, 2 ) + ",   !- Z-Coordinate of First Reference Point {m}";
+							gio::write( OutputFileDebug, fmtA ) << "   " + RoundSigDigits( Zone( Surface( SurfNum ).Zone ).OriginX, 2 ) + ",   !- X-Coordinate of First Reference Point {m}";
+							gio::write( OutputFileDebug, fmtA ) << "   " + RoundSigDigits( Zone( Surface( SurfNum ).Zone ).OriginY, 2 ) + ",   !- Y-Coordinate of First Reference Point {m}";
+							gio::write( OutputFileDebug, fmtA ) << "   " + RoundSigDigits( Zone( Surface( SurfNum ).Zone ).OriginZ, 2 ) + ",   !- Z-Coordinate of First Reference Point {m}";
 						} else {
 							// relative coordinates, use 0,0,0 for ref pt
-							gio::write( OutputFileDebug, fmta ) << "   0.0,   !- X-Coordinate of First Reference Point {m}";
-							gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Y-Coordinate of First Reference Point {m}";
-							gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Z-Coordinate of First Reference Point {m}";
+							gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- X-Coordinate of First Reference Point {m}";
+							gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Y-Coordinate of First Reference Point {m}";
+							gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Z-Coordinate of First Reference Point {m}";
 						}
-						gio::write( OutputFileDebug, fmta ) << "      ,   !- X-Coordinate of Second Reference Point";
-						gio::write( OutputFileDebug, fmta ) << "      ,   !- Y-Coordinate of Second Reference Point";
-						gio::write( OutputFileDebug, fmta ) << "      ,   !- Z-Coordinate of Second Reference Point";
-						gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Fraction of Zone Controlled by First Reference Point";
-						gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Fraction of Zone Controlled by Second Reference Point";
-						gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Illuminance Setpoint at First Reference Point";
-						gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Illuminance Setpoint at Second Reference Point";
-						gio::write( OutputFileDebug, fmta ) << "     3,   !- Lighting Control Type";
-						gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis";
-						gio::write( OutputFileDebug, fmta ) << "      ,   !- Maximum Allowable Discomfort Glare Index";
-						gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Minimum Input Power Fraction for Continuous Dimming Control";
-						gio::write( OutputFileDebug, fmta ) << "   0.0,   !- Minimum Light Output Fraction for Continuous Dimming Control";
-						gio::write( OutputFileDebug, fmta ) << "     0,   !- Number of Stepped Control Steps";
-						gio::write( OutputFileDebug, fmta ) << "   0.0;   !- Probability Lighting will be Reset When Needed in Manual Stepped Control";
+						gio::write( OutputFileDebug, fmtA ) << "      ,   !- X-Coordinate of Second Reference Point";
+						gio::write( OutputFileDebug, fmtA ) << "      ,   !- Y-Coordinate of Second Reference Point";
+						gio::write( OutputFileDebug, fmtA ) << "      ,   !- Z-Coordinate of Second Reference Point";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Fraction of Zone Controlled by First Reference Point";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Fraction of Zone Controlled by Second Reference Point";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Illuminance Setpoint at First Reference Point";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Illuminance Setpoint at Second Reference Point";
+						gio::write( OutputFileDebug, fmtA ) << "     3,   !- Lighting Control Type";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Glare Calculation Azimuth Angle of View Direction Clockwise from Zone y-Axis";
+						gio::write( OutputFileDebug, fmtA ) << "      ,   !- Maximum Allowable Discomfort Glare Index";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Minimum Input Power Fraction for Continuous Dimming Control";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0,   !- Minimum Light Output Fraction for Continuous Dimming Control";
+						gio::write( OutputFileDebug, fmtA ) << "     0,   !- Number of Stepped Control Steps";
+						gio::write( OutputFileDebug, fmtA ) << "   0.0;   !- Probability Lighting will be Reset When Needed in Manual Stepped Control";
 
 						CheckTDDZone( Surface( SurfNum ).Zone ) = false;
 					}
@@ -5227,7 +5227,7 @@ namespace DaylightingManager {
 			// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 			// below, which is (0.2936)**0.6
 			GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
-			GTOT2 = BLUM + 0.07 * ( std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ), 0.5 ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
+			GTOT2 = BLUM + 0.07 * ( std::sqrt( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ) ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
 			GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 		}
 
@@ -5306,7 +5306,7 @@ namespace DaylightingManager {
 				// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 				// below, which is (0.2936)**0.6
 				GTOT1 = 0.4794 * ( std::pow( ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop ), 1.6 ) ) * std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPtWtd( IL, loop ), 0.8 );
-				GTOT2 = BacLum + 0.07 * ( std::pow( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ), 0.5 ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
+				GTOT2 = BacLum + 0.07 * ( std::sqrt( ZoneDaylight( ZoneNum ).SolidAngAtRefPt( IL, loop ) ) ) * ZoneDaylight( ZoneNum ).SourceLumFromWinAtRefPt( IL, IS, loop );
 				GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 			}
 
@@ -6051,7 +6051,7 @@ namespace DaylightingManager {
 		}
 
 		if ( SkyClearness > 3.0 ) { // Sky is average of clear and clear turbid
-			SkyWeight = min( 1.0, ( SkyClearness - 3. ) / 3. );
+			SkyWeight = min( 1.0, ( SkyClearness - 3.0 ) / 3.0 );
 			ISky1 = 1;
 			ISky2 = 2;
 		} else if ( SkyClearness > 1.2 ) { // Sky is average of clear turbid and intermediate
@@ -6721,7 +6721,7 @@ namespace DaylightingManager {
 		Real64 SkyWeight; // Weighting factor used to average two different sky types
 
 		if ( SkyClearness > 3.0 ) { // Sky is average of clear and clear turbid
-			SkyWeight = min( 1.0, ( SkyClearness - 3. ) / 3. );
+			SkyWeight = min( 1.0, ( SkyClearness - 3.0 ) / 3.0 );
 			ISky1 = 1;
 			ISky2 = 2;
 		} else if ( SkyClearness > 1.2 ) { // Sky is average of clear turbid and intermediate
@@ -6983,8 +6983,8 @@ namespace DaylightingManager {
 		if ( X < 0.0 || X >= 3.0 ) return DayltgGlarePositionFactor;
 		if ( Y < 0.0 || Y >= 2.0 ) return DayltgGlarePositionFactor;
 
-		IX = 1 + int( 2. * X );
-		IY = 1 + int( 2. * Y );
+		IX = 1 + int( 2.0 * X );
+		IY = 1 + int( 2.0 * Y );
 		X1 = 0.5 * double( IX - 1 );
 		Y1 = 0.5 * double( IY - 1 );
 		FA = PF( IX, IY ) + 2.0 * ( X - X1 ) * ( PF( IX + 1, IY ) - PF( IX, IY ) );
@@ -8601,7 +8601,7 @@ namespace DaylightingManager {
 
 		{ auto const SELECT_CASE_var( ISky );
 		if ( SELECT_CASE_var == 1 ) { // Clear Sky
-			Z1 = 0.910 + 10. * std::exp( -3.0 * G ) + 0.45 * COSG * COSG;
+			Z1 = 0.910 + 10.0 * std::exp( -3.0 * G ) + 0.45 * COSG * COSG;
 			Z2 = 1.0 - std::exp( -0.32 / SPHSKY );
 			Z3 = 0.27385 * ( 0.91 + 10.0 * std::exp( -3.0 * Z ) + 0.45 * SPHSUN * SPHSUN );
 			DayltgSkyLuminance = Z1 * Z2 / Z3;
@@ -8689,7 +8689,7 @@ namespace DaylightingManager {
 		// FLOW:
 		if ( HorOrVert == Horizontal ) { // Profile angle for horizontal structures
 			ElevWin = PiOvr2 - Surface( SurfNum ).Tilt * DegToRadians;
-			AzimWin = ( 90. - Surface( SurfNum ).Azimuth ) * DegToRadians;
+			AzimWin = ( 90.0 - Surface( SurfNum ).Azimuth ) * DegToRadians;
 			ElevSun = std::asin( CosDirSun( 3 ) );
 			AzimSun = std::atan2( CosDirSun( 2 ), CosDirSun( 1 ) );
 			ProfileAng = std::atan( std::sin( ElevSun ) / std::abs( std::cos( ElevSun ) * std::cos( AzimWin - AzimSun ) ) ) - ElevWin;
@@ -8711,7 +8711,7 @@ namespace DaylightingManager {
 				if ( ( AzimWin - AzimSun ) < 0.0 ) ProfileAng = -1.0 * ProfileAng;
 			}
 			// Constrain to 0 to pi
-			if ( ProfileAng > Pi ) ProfileAng = 2. * Pi - ProfileAng;
+			if ( ProfileAng > Pi ) ProfileAng = 2.0 * Pi - ProfileAng;
 		}
 
 	}
@@ -9022,7 +9022,7 @@ namespace DaylightingManager {
 			GLRNDX = 0.0;
 
 			if ( SkyClearness > 3.0 ) { //Sky is average of clear and clear turbid
-				SkyWeight = min( 1.0, ( SkyClearness - 3. ) / 3. );
+				SkyWeight = min( 1.0, ( SkyClearness - 3.0 ) / 3.0 );
 				ISky1 = 1;
 				ISky2 = 2;
 			} else if ( SkyClearness > 1.2 ) { //Sky is average of clear turbid and intermediate
@@ -9251,8 +9251,8 @@ namespace DaylightingManager {
 
 					// Conversion from ft-L to cd/m2, with cd/m2 = 0.2936 ft-L, gives the 0.4794 factor
 					// below, which is (0.2936)**0.6
-					GTOT1 = 0.4794 * ( std::pow( ( VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop ) ), 1.6 ) ) * std::pow( IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( IL, loop ), 0.8 );
-					GTOT2 = BACLUM( IL ) + 0.07 * ( std::pow( IllumMapCalc( MapNum ).SolidAngAtMapPt( IL, loop ), 0.5 ) ) * VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop );
+					GTOT1 = 0.4794 * ( std::pow( VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop ), 1.6 ) ) * std::pow( IllumMapCalc( MapNum ).SolidAngAtMapPtWtd( IL, loop ), 0.8 );
+					GTOT2 = BACLUM( IL ) + 0.07 * ( std::sqrt( IllumMapCalc( MapNum ).SolidAngAtMapPt( IL, loop ) ) ) * VTMULT * IllumMapCalc( MapNum ).SourceLumFromWinAtMapPt( IL, IS, loop );
 					GTOT += GTOT1 / ( GTOT2 + 0.000001 );
 				}
 
@@ -9698,6 +9698,7 @@ Label903: ;
 		static gio::Fmt const Format_701( "('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)" );
 		static gio::Fmt const Format_702( "('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent Zone Names - 1st 100 (max)')" );
 		static gio::Fmt const Format_703( "('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)" );
+		static gio::Fmt const fmtCommaA( "(',',A,$)" );
 
 		// FLOW:
 		// Count number of exterior Windows (use to allocate arrays)
@@ -9995,7 +9996,7 @@ Label903: ;
 			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
 			gio::write( OutputFileInits, Format_703 ) << Zone( ZoneNum ).Name << RoundSigDigits( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones );
 			for( int loop = 1, loop_end = min( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones, 100 ); loop <= loop_end; ++loop ) {
-				gio::write( OutputFileInits, "(',',A,$)" ) << Zone( ZoneDaylight( ZoneNum ).AdjIntWinZoneNums( loop ) ).Name;
+				gio::write( OutputFileInits, fmtCommaA ) << Zone( ZoneDaylight( ZoneNum ).AdjIntWinZoneNums( loop ) ).Name;
 			} gio::write( OutputFileInits );
 		}
 
@@ -10135,7 +10136,7 @@ Label903: ;
 		// FLOW:
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			ZoneDaylight( ZoneNum ).MinIntWinSolidAng = 2. * Pi;
+			ZoneDaylight( ZoneNum ).MinIntWinSolidAng = 2.0 * Pi;
 			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints == 0 ) continue;
 			if ( ZoneDaylight( ZoneNum ).NumOfIntWinAdjZones == 0 ) continue;
 			for ( IWin = Zone( ZoneNum ).SurfaceFirst; IWin <= Zone( ZoneNum ).SurfaceLast; ++IWin ) {
@@ -10194,7 +10195,7 @@ Label903: ;
 							if ( COSB > 0.01765 ) { // 0 <= B < 89 deg
 								// Above test avoids case where ref point cannot receive daylight directly from the
 								// interior window
-								IntWinSolidAng = COSB * Surface( IWin ).Area / ( std::pow( DIS, 2 ) + 0.001 );
+								IntWinSolidAng = COSB * Surface( IWin ).Area / ( pow_2( DIS ) + 0.001 );
 								ZoneDaylight( ZoneNum ).MinIntWinSolidAng = min( ZoneDaylight( ZoneNum ).MinIntWinSolidAng, IntWinSolidAng );
 							}
 						} // End of loop over reference points

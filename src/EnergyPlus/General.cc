@@ -296,7 +296,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const DeltaAngRad( Pi / 36. ); // Profile angle increment (rad)
+		Real64 const DeltaAngRad( Pi / 36.0 ); // Profile angle increment (rad)
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -458,7 +458,6 @@ namespace General {
 
 		// Using/Aliasing
 		using DataGlobals::Pi;
-		using DataGlobals::PiOvr2;
 		using DataSurfaces::MaxSlatAngs;
 
 		// Return value
@@ -468,7 +467,8 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const DeltaAng( Pi / ( double( MaxSlatAngs ) - 1.0 ) );
+		static Real64 const DeltaAng( Pi / ( double( MaxSlatAngs ) - 1.0 ) );
+		static Real64 const DeltaAng_inv( ( double( MaxSlatAngs ) - 1.0 ) / Pi );
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 InterpFac; // Interpolation factor
@@ -485,8 +485,8 @@ namespace General {
 		}
 
 		if ( VarSlats ) { // Variable-angle slats
-			IBeta = 1 + int( SlatAng1 / DeltaAng );
-			InterpFac = ( SlatAng1 - DeltaAng * ( IBeta - 1 ) ) / DeltaAng;
+			IBeta = 1 + int( SlatAng1 * DeltaAng_inv );
+			InterpFac = ( SlatAng1 - DeltaAng * ( IBeta - 1 ) ) * DeltaAng_inv;
 			InterpSlatAng = PropArray( IBeta ) + InterpFac * ( PropArray( min( MaxSlatAngs, IBeta + 1 ) ) - PropArray( IBeta ) );
 		} else { // Fixed-angle slats or shade
 			InterpSlatAng = PropArray( 1 );
@@ -896,7 +896,9 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const NAN_string( "NAN" );
+		static std::string const ZEROOOO( "0.000000000000000000000000000" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -906,13 +908,13 @@ namespace General {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		if ( std::isnan( RealValue ) ) return "NAN";
+		if ( std::isnan( RealValue ) ) return NAN_string;
 
 		std::string String; // Working string
 		if ( RealValue != 0.0 ) {
-			gio::write( String, "*" ) << RealValue;
+			gio::write( String, fmtLD ) << RealValue;
 		} else {
-			String = "0.000000000000000000000000000";
+			String = ZEROOOO;
 		}
 		std::string::size_type const EPos = index( String, 'E' ); // Position of E in original string format xxEyy
 		std::string EString; // E string retained from original string
@@ -969,7 +971,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -980,7 +982,7 @@ namespace General {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string String; // Working string
 
-		gio::write( String, "*" ) << IntegerValue;
+		gio::write( String, fmtLD ) << IntegerValue;
 		return stripped( String );
 	}
 
@@ -1018,6 +1020,9 @@ namespace General {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const DigitChar( "01234567890" );
+		static std::string const NAN_string( "NAN" );
+		static std::string const ZEROOOO( "0.000000000000000000000000000" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1027,13 +1032,13 @@ namespace General {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		if ( std::isnan( RealValue ) ) return "NAN";
+		if ( std::isnan( RealValue ) ) return NAN_string;
 
 		std::string String; // Working string
 		if ( RealValue != 0.0 ) {
-			gio::write( String, "*" ) << RealValue;
+			gio::write( String, fmtLD ) << RealValue;
 		} else {
-			String = "0.000000000000000000000000000";
+			String = ZEROOOO;
 		}
 
 		std::string::size_type const EPos = index( String, 'E' ); // Position of E in original string format xxEyy
@@ -1155,7 +1160,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1166,7 +1171,7 @@ namespace General {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string String; // Working string
 
-		gio::write( String, "*" ) << IntegerValue;
+		gio::write( String, fmtLD ) << IntegerValue;
 		return stripped( String );
 	}
 
@@ -1193,7 +1198,8 @@ namespace General {
 		// na
 
 		// Return value
-		std::string ResultString;
+		static std::string const zero_string( "0." );
+		static std::string const digits( "123456789." );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1213,20 +1219,18 @@ namespace General {
 		if ( Pos == std::string::npos ) {
 			Pos = scan( InputString, '.' );
 			if ( Pos != std::string::npos ) {
-				Pos = scan( InputString, "123456789.", true );
+				Pos = scan( InputString, digits, true );
 				if ( Pos != std::string::npos ) {
-					ResultString = InputString.substr( 0, Pos + 1 );
+					return InputString.substr( 0, Pos + 1 );
 				} else {
-					ResultString = "0.";
+					return zero_string;
 				}
 			} else { // no decimal, an integer.  leave as is
-				ResultString = InputString;
+				return InputString;
 			}
 		} else { // for now, ignore x.xExx
-			ResultString = InputString;
+			return InputString;
 		}
-
-		return ResultString;
 	}
 
 	void
@@ -2101,8 +2105,8 @@ namespace General {
 	Iterate(
 		Real64 & ResultX, // ResultX is the final Iteration result passed back to the calling routine
 		Real64 const Tol, // Tolerance for Convergence
-		Real64 & X0, // Current value of X
-		Real64 & Y0, // Current value of the function Y(X)
+		Real64 const X0, // Current value of X
+		Real64 const Y0, // Current value of the function Y(X)
 		Real64 & X1, // First Previous values of X
 		Real64 & Y1, // First Previous values of Y(X1)
 		int const Iter, // Number of iterations
@@ -3304,8 +3308,8 @@ namespace General {
 			ShowWarningError( calledFrom + CurrentObject + " Combination of ZoneList and Object Name generate a name too long." );
 			ShowContinueError( "Object Name=\"" + ItemName + "\"." );
 			ShowContinueError( "ZoneList/Zone Name=\"" + ZoneName + "\"." );
-			ShowContinueError( "Item length=[" + RoundSigDigits( ItemLength ) + "] > Maximum Length=[" + RoundSigDigits( MaxNameLength ) + "]. You may need to shorten the names." );
-			ShowContinueError( "Shortening the Object Name by [" + RoundSigDigits( ( MaxZoneNameLength + 1 + ItemNameLength ) - MaxNameLength ) + "] characters will assure uniqueness for this ZoneList." );
+			ShowContinueError( "Item length=[" + RoundSigDigits( int( ItemLength ) ) + "] > Maximum Length=[" + RoundSigDigits( MaxNameLength ) + "]. You may need to shorten the names." );
+			ShowContinueError( "Shortening the Object Name by [" + RoundSigDigits( int( MaxZoneNameLength + 1 + ItemNameLength - MaxNameLength ) ) + "] characters will assure uniqueness for this ZoneList." );
 			ShowContinueError( "name that will be used (may be needed in reporting)=\"" + ResultName + "\"." );
 			TooLong = true;
 		}

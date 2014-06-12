@@ -285,7 +285,7 @@ namespace DataHeatBalance {
 	//                           !       Taking the still gas thermal conductivity for air at 0.0267 W/m-K (at 300K), then
 	//                           !       this limit of 1.0 corresponds to a completely still layer of air that is around 0.025 m thick
 	//                           !  5) The previous limit of 0.1 (before ver. 3.1) caused loads initialization problems in test files
-	Real64 HighHConvLimit( 1000. ); // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
+	Real64 HighHConvLimit( 1000.0 ); // upper limit for HConv, mostly used for user input limits in practics. !W/m2-K
 	Real64 MaxAllowedDelTempCondFD( 0.002 ); // Convergence criteria for inside surface temperatures for CondFD
 
 	std::string BuildingName; // Name of building
@@ -1207,7 +1207,7 @@ namespace DataHeatBalance {
 			} else {
 				MinSlatAngGeom = 0.0;
 			}
-			MaxSlatAngGeom = 180. - MinSlatAngGeom;
+			MaxSlatAngGeom = 180.0 - MinSlatAngGeom;
 
 			// Error if maximum slat angle less than minimum
 
@@ -1378,7 +1378,7 @@ namespace DataHeatBalance {
 			NormalAzimuth = SunAzimuthToScreenNormal;
 		} else {
 			SunAzimuth = std::atan2( SOLCOS( 1 ), SOLCOS( 2 ) );
-			if ( SunAzimuth < 0.0 ) SunAzimuth += 2. * Pi;
+			if ( SunAzimuth < 0.0 ) SunAzimuth += 2.0 * Pi;
 			SurfaceAzimuth = Surface( SurfaceNum ).Azimuth * DegToRadians;
 			NormalAzimuth = SunAzimuth - SurfaceAzimuth;
 			//   Calculate the transmittance whether sun is in front of or behind screen, place result in BmBmTrans or BmBmTransBack
@@ -1434,7 +1434,7 @@ namespace DataHeatBalance {
 		if ( Beta > Small ) {
 			if ( std::abs( SunAltitudeToScreenNormal - PiOvr2 ) > Small ) {
 				AlphaDblPrime = std::atan( std::tan( SunAltitudeToScreenNormal ) / std::cos( SunAzimuthToScreenNormal ) );
-				TransYDir = 1.0 - Gamma * ( std::cos( AlphaDblPrime ) + std::sin( AlphaDblPrime ) * std::tan( SunAltitudeToScreenNormal ) * std::sqrt( 1.0 + std::pow( ( 1.0 / std::tan( Beta ) ), 2 ) ) );
+				TransYDir = 1.0 - Gamma * ( std::cos( AlphaDblPrime ) + std::sin( AlphaDblPrime ) * std::tan( SunAltitudeToScreenNormal ) * std::sqrt( 1.0 + pow_2( 1.0 / std::tan( Beta ) ) ) );
 				TransYDir = max( 0.0, TransYDir );
 			} else {
 				TransYDir = 0.0;
@@ -1443,14 +1443,14 @@ namespace DataHeatBalance {
 			TransYDir = 0.0;
 		}
 
-		COSMu = std::sqrt( std::pow( std::cos( SunAltitudeToScreenNormal ), 2 ) * std::pow( std::cos( SunAzimuthToScreenNormal ), 2 ) + std::pow( std::sin( SunAltitudeToScreenNormal ), 2 ) );
+		COSMu = std::sqrt( pow_2( std::cos( SunAltitudeToScreenNormal ) ) * pow_2( std::cos( SunAzimuthToScreenNormal ) ) + pow_2( std::sin( SunAltitudeToScreenNormal ) ) );
 		if ( COSMu > Small ) {
 			Epsilon = std::acos( std::cos( SunAltitudeToScreenNormal ) * std::cos( SunAzimuthToScreenNormal ) / COSMu );
 			Eta = PiOvr2 - Epsilon;
 			if ( std::cos( Epsilon ) != 0.0 ) {
 				MuPrime = std::atan( std::tan( std::acos( COSMu ) ) / std::cos( Epsilon ) );
 				if ( Eta != 0.0 ) {
-					TransXDir = 1.0 - Gamma * ( std::cos( MuPrime ) + std::sin( MuPrime ) * std::tan( std::acos( COSMu ) ) * std::sqrt( 1.0 + std::pow( ( 1.0 / std::tan( Eta ) ), 2 ) ) );
+					TransXDir = 1.0 - Gamma * ( std::cos( MuPrime ) + std::sin( MuPrime ) * std::tan( std::acos( COSMu ) ) * std::sqrt( 1.0 + pow_2( 1.0 / std::tan( Eta ) ) ) );
 					TransXDir = max( 0.0, TransXDir );
 				} else {
 					TransXDir = 0.0;
@@ -1476,15 +1476,15 @@ namespace DataHeatBalance {
 		} else {
 			//   DeltaMax and Delta are in degrees
 			DeltaMax = 89.7 - ( 10.0 * Gamma / 0.16 );
-			Delta = std::sqrt( std::pow( ( SunAzimuthToScreenNormal / DegToRadians ), 2 ) + std::pow( ( SunAltitudeToScreenNormal / DegToRadians ), 2 ) );
+			Delta = std::sqrt( pow_2( SunAzimuthToScreenNormal / DegToRadians ) + pow_2( SunAltitudeToScreenNormal / DegToRadians ) );
 
 			//   Use empirical model to determine maximum (peak) scattering
-			Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * std::pow( Gamma, 2 ) + 0.04763 * std::pow( ReflectCyl, 2 ) - 0.44416 * Gamma * ReflectCyl;
-			TscattermaxVis = 0.0229 * Gamma + 0.2971 * ReflectCylVis - 0.03624 * std::pow( Gamma, 2 ) + 0.04763 * std::pow( ReflectCylVis, 2 ) - 0.44416 * Gamma * ReflectCylVis;
+			Tscattermax = 0.0229 * Gamma + 0.2971 * ReflectCyl - 0.03624 * pow_2( Gamma ) + 0.04763 * pow_2( ReflectCyl ) - 0.44416 * Gamma * ReflectCyl;
+			TscattermaxVis = 0.0229 * Gamma + 0.2971 * ReflectCylVis - 0.03624 * pow_2( Gamma ) + 0.04763 * pow_2( ReflectCylVis ) - 0.44416 * Gamma * ReflectCylVis;
 
 			//   Vary slope of interior and exterior surface of scattering model
-			ExponentInterior = ( -std::pow( ( std::abs( Delta - DeltaMax ) ), 2.0 ) ) / 600.0;
-			ExponentExterior = ( -std::pow( ( std::abs( Delta - DeltaMax ) ), 2.5 ) ) / 600.0;
+			ExponentInterior = -pow_2( Delta - DeltaMax ) / 600.0;
+			ExponentExterior = -std::pow( std::abs( Delta - DeltaMax ), 2.5 ) / 600.0;
 
 			//   Determine ratio of scattering at 0,0 incident angle to maximum (peak) scattering
 			PeakToPlateauRatio = 1.0 / ( 0.2 * ( 1 - Gamma ) * ReflectCyl );

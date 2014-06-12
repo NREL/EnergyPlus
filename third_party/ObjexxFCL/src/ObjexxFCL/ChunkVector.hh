@@ -709,7 +709,7 @@ public: // Inspector
 	back() const
 	{
 		assert( size_ > 0u );
-		return operator()( size_ );
+		return operator ()( size_ );
 	}
 
 	// Length
@@ -759,7 +759,7 @@ public: // Modifier
 	back()
 	{
 		assert( size_ > 0u );
-		return operator()( size_ );
+		return operator ()( size_ );
 	}
 
 	// Append an Element

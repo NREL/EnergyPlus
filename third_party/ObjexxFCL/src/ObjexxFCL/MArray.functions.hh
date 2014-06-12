@@ -509,7 +509,7 @@ count( MArray2< A, bool > const & a, int const dim )
 template< class A, typename T >
 inline
 bool
-is_contiguous( MArray< A, T > const & a )
+is_contiguous( MArray< A, T > const & )
 {
 	return false; // Member arrays are by definition non-contiguous
 }
@@ -519,7 +519,7 @@ is_contiguous( MArray< A, T > const & a )
 template< class A, typename T >
 inline
 FArray1D< int >
-lbound( MArray1< A, T > const & a )
+lbound( MArray1< A, T > const & )
 {
 	return FArray1D< int >( 1, 1 );
 }
@@ -527,7 +527,7 @@ lbound( MArray1< A, T > const & a )
 template< class A, typename T >
 inline
 FArray1D< int >
-lbound( MArray2< A, T > const & a )
+lbound( MArray2< A, T > const & )
 {
 	return FArray1D< int >( 2, 1 );
 }
@@ -535,7 +535,7 @@ lbound( MArray2< A, T > const & a )
 template< class A, typename T >
 inline
 FArray1D< int >
-lbound( MArray3< A, T > const & a )
+lbound( MArray3< A, T > const & )
 {
 	return FArray1D< int >( 3, 1 );
 }
@@ -543,7 +543,7 @@ lbound( MArray3< A, T > const & a )
 template< class A, typename T >
 inline
 FArray1D< int >
-lbound( MArray4< A, T > const & a )
+lbound( MArray4< A, T > const & )
 {
 	return FArray1D< int >( 4, 1 );
 }
@@ -551,7 +551,7 @@ lbound( MArray4< A, T > const & a )
 template< class A, typename T >
 inline
 FArray1D< int >
-lbound( MArray5< A, T > const & a )
+lbound( MArray5< A, T > const & )
 {
 	return FArray1D< int >( 5, 1 );
 }
@@ -559,7 +559,7 @@ lbound( MArray5< A, T > const & a )
 template< class A, typename T >
 inline
 FArray1D< int >
-lbound( MArray6< A, T > const & a )
+lbound( MArray6< A, T > const & )
 {
 	return FArray1D< int >( 6, 1 );
 }
@@ -567,7 +567,7 @@ lbound( MArray6< A, T > const & a )
 template< class A, typename T >
 inline
 int
-lbound( MArray1< A, T > const & a, int const dim )
+lbound( MArray1< A, T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -581,7 +581,7 @@ lbound( MArray1< A, T > const & a, int const dim )
 template< class A, typename T >
 inline
 int
-lbound( MArray2< A, T > const & a, int const dim )
+lbound( MArray2< A, T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -597,7 +597,7 @@ lbound( MArray2< A, T > const & a, int const dim )
 template< class A, typename T >
 inline
 int
-lbound( MArray3< A, T > const & a, int const dim )
+lbound( MArray3< A, T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -615,7 +615,7 @@ lbound( MArray3< A, T > const & a, int const dim )
 template< class A, typename T >
 inline
 int
-lbound( MArray4< A, T > const & a, int const dim )
+lbound( MArray4< A, T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -635,7 +635,7 @@ lbound( MArray4< A, T > const & a, int const dim )
 template< class A, typename T >
 inline
 int
-lbound( MArray5< A, T > const & a, int const dim )
+lbound( MArray5< A, T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -657,7 +657,7 @@ lbound( MArray5< A, T > const & a, int const dim )
 template< class A, typename T >
 inline
 int
-lbound( MArray6< A, T > const & a, int const dim )
+lbound( MArray6< A, T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -1364,6 +1364,9 @@ cshift( MArray1< A, T > const & a, int const shift, int const dim = 1 )
 {
 	assert( a.size_bounded() );
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
@@ -1454,6 +1457,9 @@ eoshift( MArray1< A, T > const & a, int const shift, T const bdy = TypeTraits< T
 {
 	assert( a.size_bounded() );
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a, bdy ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
@@ -1643,6 +1649,9 @@ sum( MArray1< A, T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	T s( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		s += a( i );
@@ -2104,8 +2113,11 @@ inline
 T
 product( MArray1< A, T > const & a, int const dim )
 {
-	assert( dim == 1 );
 	assert( a.size_bounded() );
+	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	T p( 1 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		p *= a( i );

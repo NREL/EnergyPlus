@@ -100,7 +100,7 @@ public: // Assignment
 		if ( this != &a ) {
 			assert( conformable( a ) );
 			for ( int i = 1, e = u(); i <= e; ++i ) {
-				operator()( i ) = a( i ); // Not overlap-safe
+				operator ()( i ) = a( i ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -114,7 +114,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) = a( i ); // Not overlap-safe
+			operator ()( i ) = a( i ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -127,7 +127,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
-			operator()( i ) = a( j ); // Not overlap-safe
+			operator ()( i ) = a( j ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -140,7 +140,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) += a( i ); // Not overlap-safe
+			operator ()( i ) += a( i ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -153,7 +153,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) -= a( i ); // Not overlap-safe
+			operator ()( i ) -= a( i ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -166,7 +166,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) *= a( i ); // Not overlap-safe
+			operator ()( i ) *= a( i ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -180,7 +180,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
 			assert( a( i ) != T( 0 ) );
-			operator()( i ) /= a( i ); // Not overlap-safe
+			operator ()( i ) /= a( i ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -193,7 +193,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
-			operator()( i ) += a( j ); // Not overlap-safe
+			operator ()( i ) += a( j ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -206,7 +206,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
-			operator()( i ) -= a( j ); // Not overlap-safe
+			operator ()( i ) -= a( j ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -219,7 +219,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
-			operator()( i ) *= a( j ); // Not overlap-safe
+			operator ()( i ) *= a( j ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -233,7 +233,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
 			assert( a( j ) != T( 0 ) );
-			operator()( i ) /= a( j ); // Not overlap-safe
+			operator ()( i ) /= a( j ); // Not overlap-safe
 		}
 		return *this;
 	}
@@ -244,7 +244,7 @@ public: // Assignment
 	operator =( T const & t )
 	{
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) = t;
+			operator ()( i ) = t;
 		}
 		return *this;
 	}
@@ -256,7 +256,7 @@ public: // Assignment
 	operator =( U const & t )
 	{
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) = t;
+			operator ()( i ) = t;
 		}
 		return *this;
 	}
@@ -267,7 +267,7 @@ public: // Assignment
 	operator +=( T const & t )
 	{
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) += t;
+			operator ()( i ) += t;
 		}
 		return *this;
 	}
@@ -278,7 +278,7 @@ public: // Assignment
 	operator -=( T const & t )
 	{
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) -= t;
+			operator ()( i ) -= t;
 		}
 		return *this;
 	}
@@ -289,7 +289,7 @@ public: // Assignment
 	operator *=( T const & t )
 	{
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) *= t;
+			operator ()( i ) *= t;
 		}
 		return *this;
 	}
@@ -301,7 +301,7 @@ public: // Assignment
 	{
 		assert( t != T( 0 ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) /= t;
+			operator ()( i ) /= t;
 		}
 		return *this;
 	}
@@ -445,7 +445,7 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			T const length_i( operator()( i ) );
+			T const length_i( operator ()( i ) );
 			length_sq += length_i * length_i;
 		}
 		return std::sqrt( length_sq );
@@ -458,7 +458,7 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			T const length_i( operator()( i ) );
+			T const length_i( operator ()( i ) );
 			length_sq += length_i * length_i;
 		}
 		return length_sq;
@@ -472,7 +472,7 @@ public: // Modifier
 	to_default()
 	{
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator()( i ) = Traits::initial_value();
+			operator ()( i ) = Traits::initial_value();
 		}
 		return *this;
 	}

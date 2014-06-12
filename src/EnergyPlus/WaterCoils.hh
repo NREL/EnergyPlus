@@ -742,8 +742,8 @@ namespace WaterCoils {
 
 	void
 	CalcDryFinEffCoef(
-		Real64 & OutTubeEffFinDiamRatio,
-		FArray1S< Real64 > PolynomCoef
+		Real64 const OutTubeEffFinDiamRatio,
+		FArray1< Real64 > & PolynomCoef
 	);
 
 	void
@@ -764,8 +764,8 @@ namespace WaterCoils {
 
 	void
 	CalcPolynomCoef(
-		FArray2A< Real64 > OrderedPair,
-		FArray1S< Real64 > PolynomCoef
+		FArray2< Real64 > const & OrderedPair,
+		FArray1< Real64 > & PolynomCoef
 	);
 
 	Real64

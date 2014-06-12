@@ -1825,7 +1825,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( ( MSHeatPump( MSHeatPumpNum ).HeatRecActive ) && ( ! MyPlantScantFlag( MSHeatPumpNum ) ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60., PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60.0, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 				MSHeatPump( MSHeatPumpNum ).DesignHeatRecMassFlowRate = MSHeatPump( MSHeatPumpNum ).DesignHeatRecFlowRate * rho;
 

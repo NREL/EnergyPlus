@@ -4,6 +4,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
@@ -422,26 +423,33 @@ namespace MoistureBalanceEMPDManager {
 		MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers ); // Then find the material pointer
 
 		ZoneNum = Surface( SurfNum ).Zone;
-		if ( Material( MatNum ).EMPDVALUE <= 0.0 ) {
+		auto const & material( Material( MatNum ) );
+		if ( material.EMPDVALUE <= 0.0 ) {
 			MoistEMPDNew( SurfNum ) = PsyRhovFnTdbWPb( TempZone, ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			return;
 		}
 
 		Taver = ( TempSurfIn + TempSurfInOld ) / 2.0;
+		Real64 const Taver_237( Taver + 237.7 );
+		Real64 const RHaver_fac( 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / Taver_237 ) );
+		Real64 const BR_fac( ( 4111.0 / pow_2( Taver_237 ) ) - ( 1.0 / ( Taver + KelvinConv ) ) );
 
 		while ( Flag > 0 ) {
 			RVaver = ( MoistEMPDNew( SurfNum ) + MoistEMPDOld( SurfNum ) ) / 2.0;
-			RHaver = RVaver * 461.52 * ( Taver + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ) );
-			if ( RHaver > 1.0 ) RHaver = 1.0;
-			if ( RHaver < 0.0 ) RHaver = 0.00001;
+			RHaver = RVaver * RHaver_fac;
+			if ( RHaver > 1.0 ) {
+				RHaver = 1.0;
+			} else if ( RHaver < 0.0 ) {
+				RHaver = 0.00001;
+			}
 
-			AT = ( Material( MatNum ).MoistACoeff * Material( MatNum ).MoistBCoeff * std::pow( RHaver, Material( MatNum ).MoistBCoeff ) + Material( MatNum ).MoistCCoeff * Material( MatNum ).MoistDCoeff * std::pow( RHaver, Material( MatNum ).MoistDCoeff ) ) / RVaver;
-			BR = ( 4111.0 / std::pow( ( Taver + 237.7 ), 2 ) - ( 1.0 / ( Taver + KelvinConv ) ) ) * AT * RVaver;
-			RHOBULK = Material( MatNum ).Density;
+			AT = ( material.MoistACoeff * material.MoistBCoeff * std::pow( RHaver, material.MoistBCoeff ) + material.MoistCCoeff * material.MoistDCoeff * std::pow( RHaver, material.MoistDCoeff ) ) / RVaver;
+			BR = BR_fac * AT * RVaver;
+			RHOBULK = material.Density;
 			HM = HConvIn( SurfNum ) / ( PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), TempZone ) );
 			ZoneNum = Surface( SurfNum ).Zone;
 			RALPHA = ZoneAirHumRat( ZoneNum ) * OutBaroPress / ( 461.52 * ( TempZone + KelvinConv ) * ( ZoneAirHumRat( ZoneNum ) + 0.62198 ) );
-			BB = HM / ( RHOBULK * Material( MatNum ).EMPDVALUE * AT );
+			BB = HM / ( RHOBULK * material.EMPDVALUE * AT );
 			CC = BB * RALPHA + BR / AT * ( TempSurfIn - TempSurfInOld ) / ( TimeStepZone * SecInHour );
 			SolverMoistureBalanceEMPD( MoistEMPDNew( SurfNum ), MoistEMPDOld( SurfNum ), 1.0, BB, CC );
 
@@ -461,8 +469,8 @@ namespace MoistureBalanceEMPDManager {
 		}
 
 		// Calculate latent load
-		PVsurf = RHaver * std::exp( 23.7093 - 4111.0 / ( Taver + 237.7 ) );
-		Wsurf = 0.62198 * RHaver / ( std::exp( -23.7093 + 4111.0 / ( Taver + 237.7 ) ) * OutBaroPress - RHaver );
+		PVsurf = RHaver * std::exp( 23.7093 - 4111.0 / Taver_237 );
+		Wsurf = 0.62198 * RHaver / ( std::exp( -23.7093 + 4111.0 / Taver_237 ) * OutBaroPress - RHaver );
 		MoistEMPDFlux( SurfNum ) = HM * ( MoistEMPDNew( SurfNum ) - PsyRhoAirFnPbTdbW( OutBaroPress, TempZone, ZoneAirHumRat( ZoneNum ), RoutineName ) * ZoneAirHumRat( ZoneNum ) ) * Lam;
 		// Calculate surface dew point temperature based on surface vapor density
 		TempSat = 4111.0 / ( 23.7093 - std::log( PVsurf ) ) + 35.45 - KelvinConv;
@@ -605,7 +613,7 @@ namespace MoistureBalanceEMPDManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -626,7 +634,7 @@ namespace MoistureBalanceEMPDManager {
 
 		if ( ! DoReport ) return;
 		//   Write Descriptions
-		gio::write( OutputFileInits, "(A)" ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, " "Penetration Depth {m}, a, b, c, d";
+		gio::write( OutputFileInits, fmtA ) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, " "Penetration Depth {m}, a, b, c, d";
 
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
 			if ( Construct( ConstrNum ).TypeIsWindow ) continue;

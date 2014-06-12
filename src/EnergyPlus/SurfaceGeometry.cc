@@ -79,7 +79,9 @@ namespace SurfaceGeometry {
 	int const UnreconciledZoneSurface( -999 ); // interim value between entering surfaces ("Surface") and reconciling
 	// surface names in other zones
 
-	gio::Fmt const fmt3( "(A,3(1x,f18.13))" );
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt const fmt3( "(A,3(1x,f18.13))" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -268,8 +270,8 @@ namespace SurfaceGeometry {
 
 		DetailedWWR = ( GetNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
 		if ( DetailedWWR ) {
-			gio::write( OutputFileDebug, "(A)" ) << "=======User Entered Classification =================";
-			gio::write( OutputFileDebug, "(A)" ) << "Surface,Class,Area,Tilt";
+			gio::write( OutputFileDebug, fmtA ) << "=======User Entered Classification =================";
+			gio::write( OutputFileDebug, fmtA ) << "Surface,Class,Area,Tilt";
 		}
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) { // Loop through all surfaces to find windows...
@@ -290,7 +292,7 @@ namespace SurfaceGeometry {
 						Zone( ZoneNum ).ExtGrossWallArea += Surface( SurfNum ).GrossArea;
 						Zone( ZoneNum ).ExtGrossWallArea_Multiplied += Surface( SurfNum ).GrossArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 						if ( DetailedWWR ) {
-							gio::write( OutputFileDebug, "(A)" ) << Surface( SurfNum ).Name + ",Wall," + RoundSigDigits( Surface( SurfNum ).GrossArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier, 2 ) + ',' + RoundSigDigits( Surface( SurfNum ).Tilt, 1 );
+							gio::write( OutputFileDebug, fmtA ) << Surface( SurfNum ).Name + ",Wall," + RoundSigDigits( Surface( SurfNum ).GrossArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier, 2 ) + ',' + RoundSigDigits( Surface( SurfNum ).Tilt, 1 );
 						}
 					}
 				} else if ( Surface( SurfNum ).ExtBoundCond == Ground || Surface( SurfNum ).ExtBoundCond == GroundFCfactorMethod ) {
@@ -299,7 +301,7 @@ namespace SurfaceGeometry {
 						Zone( ZoneNum ).ExtGrossGroundWallArea += Surface( SurfNum ).GrossArea;
 						Zone( ZoneNum ).ExtGrossGroundWallArea_Multiplied += Surface( SurfNum ).GrossArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 						if ( DetailedWWR ) {
-							gio::write( OutputFileDebug, "(A)" ) << Surface( SurfNum ).Name + ",Wall-GroundContact," + RoundSigDigits( Surface( SurfNum ).GrossArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier, 2 ) + ',' + RoundSigDigits( Surface( SurfNum ).Tilt, 1 );
+							gio::write( OutputFileDebug, fmtA ) << Surface( SurfNum ).Name + ",Wall-GroundContact," + RoundSigDigits( Surface( SurfNum ).GrossArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier, 2 ) + ',' + RoundSigDigits( Surface( SurfNum ).Tilt, 1 );
 						}
 					}
 				}
@@ -315,7 +317,7 @@ namespace SurfaceGeometry {
 						Zone( Surface( SurfNum ).Zone ).ExtWindowArea += Surface( SurfNum ).GrossArea;
 						Zone( Surface( SurfNum ).Zone ).ExtWindowArea_Multiplied = Zone( Surface( SurfNum ).Zone ).ExtWindowArea + Surface( SurfNum ).GrossArea * Surface( SurfNum ).Multiplier * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier;
 						if ( DetailedWWR ) {
-							gio::write( OutputFileDebug, "(A)" ) << Surface( SurfNum ).Name + ",Window," + RoundSigDigits( Surface( SurfNum ).GrossArea * Surface( SurfNum ).Multiplier * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier, 2 ) + ',' + RoundSigDigits( Surface( SurfNum ).Tilt, 1 );
+							gio::write( OutputFileDebug, fmtA ) << Surface( SurfNum ).Name + ",Window," + RoundSigDigits( Surface( SurfNum ).GrossArea * Surface( SurfNum ).Multiplier * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier, 2 ) + ',' + RoundSigDigits( Surface( SurfNum ).Tilt, 1 );
 						}
 					}
 				}
@@ -330,8 +332,8 @@ namespace SurfaceGeometry {
 		//                                  Surface(SurfNum)%Multiplier
 		//  ENDDO
 		if ( DetailedWWR ) {
-			gio::write( OutputFileDebug, "(A)" ) << "========================";
-			gio::write( OutputFileDebug, "(A)" ) << "Zone,ExtWallArea,ExtWindowArea";
+			gio::write( OutputFileDebug, fmtA ) << "========================";
+			gio::write( OutputFileDebug, fmtA ) << "Zone,ExtWallArea,ExtWindowArea";
 		}
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
@@ -344,7 +346,7 @@ namespace SurfaceGeometry {
 			ZMax = -99999.0;
 			ZMin = 99999.0;
 			if ( DetailedWWR ) {
-				gio::write( OutputFileDebug, "(A)" ) << Zone( ZoneNum ).Name + ',' + RoundSigDigits( Zone( ZoneNum ).ExtGrossWallArea, 2 ) + ',' + RoundSigDigits( Zone( ZoneNum ).ExtWindowArea, 2 );
+				gio::write( OutputFileDebug, fmtA ) << Zone( ZoneNum ).Name + ',' + RoundSigDigits( Zone( ZoneNum ).ExtGrossWallArea, 2 ) + ',' + RoundSigDigits( Zone( ZoneNum ).ExtWindowArea, 2 );
 			}
 			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
 				if ( Surface( SurfNum ).Class == SurfaceClass_Roof ) {
@@ -353,7 +355,7 @@ namespace SurfaceGeometry {
 					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
 					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
 					//        ZCeilAvg=ZCeilAvg+(Z1+Z2)/2.d0
-					ZCeilAvg += ( ( Z1 + Z2 ) / 2. ) * ( Surface( SurfNum ).Area / ZoneCeilingArea( ZoneNum ) );
+					ZCeilAvg += ( ( Z1 + Z2 ) / 2.0 ) * ( Surface( SurfNum ).Area / ZoneCeilingArea( ZoneNum ) );
 				}
 				if ( Surface( SurfNum ).Class == SurfaceClass_Floor ) {
 					// Use Average Z for surface, more important for roofs than floors...
@@ -361,7 +363,7 @@ namespace SurfaceGeometry {
 					Z1 = minval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
 					Z2 = maxval( Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} ).z() );
 					//        ZFlrAvg=ZFlrAvg+(Z1+Z2)/2.d0
-					ZFlrAvg += ( ( Z1 + Z2 ) / 2. ) * ( Surface( SurfNum ).Area / Zone( ZoneNum ).FloorArea );
+					ZFlrAvg += ( ( Z1 + Z2 ) / 2.0 ) * ( Surface( SurfNum ).Area / Zone( ZoneNum ).FloorArea );
 				}
 				if ( Surface( SurfNum ).Class == SurfaceClass_Wall ) {
 					// Use Wall calculation in case no roof & floor in zone
@@ -388,7 +390,7 @@ namespace SurfaceGeometry {
 			if ( Zone( ZoneNum ).CeilingHeight > 0.0 ) {
 				ZoneCeilingHeightEntered( ZoneNum ) = true;
 				if ( AverageHeight > 0.0 ) {
-					if ( std::abs( AverageHeight - Zone( ZoneNum ).CeilingHeight ) / Zone( ZoneNum ).CeilingHeight > .05 ) {
+					if ( std::abs( AverageHeight - Zone( ZoneNum ).CeilingHeight ) / Zone( ZoneNum ).CeilingHeight > 0.05 ) {
 						if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
 							ShowWarningError( RoutineName + "Entered Ceiling Height for some zone(s) significantly " "different from calculated Ceiling Height" );
 							ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; " "to show more details on each max iteration exceeded." );
@@ -1147,7 +1149,7 @@ namespace SurfaceGeometry {
 					//          write(outputfiledebug,'(3f7.2)') SurfaceTmp(itmp1)%lcsz
 					//          write(outputfiledebug,'(A,3f7.2)') 'subsurface surfnorm=',SurfaceTmp(itmp1)%NewellSurfaceNormalVector
 					if ( std::abs( SurfaceTmp( iTmp1 ).Azimuth - surfAzimuth ) <= 10.0 ) continue;
-					CompareTwoVectors( SurfaceTmp( SurfNum ).NewellSurfaceNormalVector, SurfaceTmp( iTmp1 ).NewellSurfaceNormalVector, sameSurfNormal, .001 );
+					CompareTwoVectors( SurfaceTmp( SurfNum ).NewellSurfaceNormalVector, SurfaceTmp( iTmp1 ).NewellSurfaceNormalVector, sameSurfNormal, 0.001 );
 					if ( sameSurfNormal ) { // copy lcs vectors
 						SurfaceTmp( iTmp1 ).lcsx = SurfaceTmp( SurfNum ).lcsx;
 						SurfaceTmp( iTmp1 ).lcsy = SurfaceTmp( SurfNum ).lcsy;
@@ -1308,9 +1310,9 @@ namespace SurfaceGeometry {
 		}
 
 		if ( MovedSurfs != TotSurfaces ) {
-			gio::write( ClassMsg, "*" ) << MovedSurfs;
+			gio::write( ClassMsg, fmtLD  ) << MovedSurfs;
 			strip( ClassMsg );
-			gio::write( Msg2, "*" ) << TotSurfaces;
+			gio::write( Msg2, fmtLD  ) << TotSurfaces;
 			strip( Msg2 );
 			ShowSevereError( RoutineName + "Reordered # of Surfaces (" + ClassMsg + ") not = Total # of Surfaces (" + Msg2 + ')' );
 			SurfError = true;
@@ -1357,21 +1359,21 @@ namespace SurfaceGeometry {
 					//          write(outputfiledebug,'(3f7.2)') Surface(SubSurfNum)%lcsz
 					//          write(outputfiledebug,'(A,3f7.2)') 'subsurface surfnorm=',Surface(SubSurfNum)%NewellSurfaceNormalVector
 					if ( std::abs( Surface( SubSurfNum ).Azimuth - Surface( SurfNum ).Azimuth ) <= 30.0 ) continue;
-					CompareTwoVectors( Surface( SurfNum ).NewellSurfaceNormalVector, Surface( SubSurfNum ).NewellSurfaceNormalVector, sameSurfNormal, .001 );
+					CompareTwoVectors( Surface( SurfNum ).NewellSurfaceNormalVector, Surface( SubSurfNum ).NewellSurfaceNormalVector, sameSurfNormal, 0.001 );
 					if ( sameSurfNormal ) { // copy lcs vectors
 						Surface( SubSurfNum ).lcsx = Surface( SurfNum ).lcsx;
 						Surface( SubSurfNum ).lcsy = Surface( SurfNum ).lcsy;
 						Surface( SubSurfNum ).lcsy = Surface( SurfNum ).lcsy;
 						continue;
 					}
-					if ( std::abs( Surface( SubSurfNum ).Azimuth - 360.0 ) < .01 ) {
+					if ( std::abs( Surface( SubSurfNum ).Azimuth - 360.0 ) < 0.01 ) {
 						Surface( SubSurfNum ).Azimuth = 360.0 - Surface( SubSurfNum ).Azimuth;
 					}
-					if ( std::abs( Surface( SurfNum ).Azimuth - 360.0 ) < .01 ) {
+					if ( std::abs( Surface( SurfNum ).Azimuth - 360.0 ) < 0.01 ) {
 						Surface( SurfNum ).Azimuth = 360.0 - Surface( SurfNum ).Azimuth;
 					}
 					if ( std::abs( Surface( SubSurfNum ).Azimuth - Surface( SurfNum ).Azimuth ) > 30.0 ) {
-						if ( std::abs( Surface( SurfNum ).SinTilt ) > .17 ) {
+						if ( std::abs( Surface( SurfNum ).SinTilt ) > 0.17 ) {
 							++ErrCount1;
 							if ( ErrCount1 == 1 && ! DisplayExtraWarnings ) {
 								ShowSevereError( RoutineName + "Some Outward Facing angles of subsurfaces differ " "significantly from base surface." );
@@ -1447,7 +1449,7 @@ namespace SurfaceGeometry {
 							TotLayFound = Construct( ConstrNumFound ).TotLayers;
 							if ( TotLay != TotLayFound ) { // Different number of layers
 								// match on like Uvalues (nominal)
-								if ( std::abs( NominalU( ConstrNum ) - NominalU( ConstrNumFound ) ) > .001 ) {
+								if ( std::abs( NominalU( ConstrNum ) - NominalU( ConstrNumFound ) ) > 0.001 ) {
 									ShowSevereError( RoutineName + "Construction " + Construct( ConstrNum ).Name + " of interzone surface " + Surface( SurfNum ).Name + " does not have the same number of layers as the construction " + Construct( ConstrNumFound ).Name + " of adjacent surface " + Surface( Found ).Name );
 									if ( ! Construct( ConstrNum ).ReverseConstructionNumLayersWarning || ! Construct( ConstrNumFound ).ReverseConstructionNumLayersWarning ) {
 										ShowContinueError( "...this problem for this pair will not be reported again." );
@@ -1466,7 +1468,7 @@ namespace SurfaceGeometry {
 										break; // exit when diff
 									}
 								}
-								if ( izConstDiff && std::abs( NominalU( ConstrNum ) - NominalU( ConstrNumFound ) ) > .001 ) {
+								if ( izConstDiff && std::abs( NominalU( ConstrNum ) - NominalU( ConstrNumFound ) ) > 0.001 ) {
 									ShowSevereError( RoutineName + "Construction " + Construct( ConstrNum ).Name + " of interzone surface " + Surface( SurfNum ).Name + " does not have the same materials in the reverse order as the construction " + Construct( ConstrNumFound ).Name + " of adjacent surface " + Surface( Found ).Name );
 									if ( ! Construct( ConstrNum ).ReverseConstructionLayersOrderWarning || ! Construct( ConstrNumFound ).ReverseConstructionLayersOrderWarning ) {
 										ShowContinueError( "...this problem for this pair will not be reported again." );
@@ -1493,7 +1495,7 @@ namespace SurfaceGeometry {
 							MultFound = Zone( Surface( Found ).Zone ).Multiplier * Zone( Surface( Found ).Zone ).ListMultiplier;
 							MultSurfNum = Zone( Surface( SurfNum ).Zone ).Multiplier * Zone( Surface( SurfNum ).Zone ).ListMultiplier;
 							if ( Surface( Found ).Area > 0.0 ) {
-								if ( std::abs( ( Surface( Found ).Area * MultFound - Surface( SurfNum ).Area * MultSurfNum ) / Surface( Found ).Area * MultFound ) > .02 ) { // 2% difference in areas
+								if ( std::abs( ( Surface( Found ).Area * MultFound - Surface( SurfNum ).Area * MultSurfNum ) / Surface( Found ).Area * MultFound ) > 0.02 ) { // 2% difference in areas
 									++ErrCount4;
 									if ( ErrCount4 == 1 && ! DisplayExtraWarnings ) {
 										ShowWarningError( RoutineName + "" "InterZone Surface Areas do not match as expected and might not satisfy conservation of energy:" );
@@ -1506,10 +1508,10 @@ namespace SurfaceGeometry {
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( SurfNum ).Area, 1 ) + " in Surface=" + Surface( SurfNum ).Name + ", Zone=" + Surface( SurfNum ).ZoneName );
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( Found ).Area, 1 ) + " in Surface=" + Surface( Found ).Name + ", Zone=" + Surface( Found ).ZoneName );
 										} else { // Show multiplier info
-											gio::write( MultString, "*" ) << MultSurfNum;
+											gio::write( MultString, fmtLD  ) << MultSurfNum;
 											strip( MultString );
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( SurfNum ).Area, 1 ) + ", Multipliers=" + MultString + ", Total Area=" + TrimSigDigits( Surface( SurfNum ).Area * MultSurfNum, 1 ) + " in Surface=" + Surface( SurfNum ).Name + " Zone=" + Surface( SurfNum ).ZoneName );
-											gio::write( MultString, "*" ) << MultFound;
+											gio::write( MultString, fmtLD  ) << MultFound;
 											strip( MultString );
 											ShowContinueError( "  Area=" + TrimSigDigits( Surface( Found ).Area, 1 ) + ", Multipliers=" + MultString + ", Total Area=" + TrimSigDigits( Surface( Found ).Area * MultFound, 1 ) + " in Surface=" + Surface( Found ).Name + " Zone=" + Surface( Found ).ZoneName );
 										}
@@ -1518,7 +1520,7 @@ namespace SurfaceGeometry {
 							}
 							// Check opposites Azimuth and Tilt
 							// Tilt
-							if ( std::abs( std::abs( Surface( Found ).Tilt + Surface( SurfNum ).Tilt ) - 180. ) > 1.0 ) {
+							if ( std::abs( std::abs( Surface( Found ).Tilt + Surface( SurfNum ).Tilt ) - 180.0 ) > 1.0 ) {
 								ShowWarningError( RoutineName + "InterZone Surface Tilts do not match as expected." );
 								ShowContinueError( "  Tilt=" + TrimSigDigits( Surface( SurfNum ).Tilt, 1 ) + " in Surface=" + Surface( SurfNum ).Name + ", Zone=" + Surface( SurfNum ).ZoneName );
 								ShowContinueError( "  Tilt=" + TrimSigDigits( Surface( Found ).Tilt, 1 ) + " in Surface=" + Surface( Found ).Name + ", Zone=" + Surface( Found ).ZoneName );
@@ -1742,7 +1744,7 @@ namespace SurfaceGeometry {
 						// produce message if not near calculated
 						if ( Zone( ZoneNum ).CalcFloorArea > 0.0 ) {
 							diffp = std::abs( Zone( ZoneNum ).CalcFloorArea - Zone( ZoneNum ).UserEnteredFloorArea ) / Zone( ZoneNum ).UserEnteredFloorArea;
-							if ( diffp > .05 ) {
+							if ( diffp > 0.05 ) {
 								++ErrCount;
 								if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
 									ShowWarningError( RoutineName + "Entered Zone Floor Areas differ from calculated Zone Floor Area(s)." );
@@ -1769,7 +1771,7 @@ namespace SurfaceGeometry {
 				ShowSevereError( RoutineName + "Zero or negative surface area[" + RoundSigDigits( Surface( SurfNum ).Area, 5 ) + "], Surface=" + Surface( SurfNum ).Name );
 				SurfError = true;
 			}
-			if ( Surface( SurfNum ).Area >= 1.e-06 && Surface( SurfNum ).Area < .001 ) {
+			if ( Surface( SurfNum ).Area >= 1.e-06 && Surface( SurfNum ).Area < 0.001 ) {
 				ShowWarningError( RoutineName + "Very small surface area[" + RoundSigDigits( Surface( SurfNum ).Area, 5 ) + "], Surface=" + Surface( SurfNum ).Name );
 			}
 		}
@@ -5460,15 +5462,15 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).NetAreaShadowCalc = SurfaceTmp( SurfNum ).Area;
 			SurfaceTmp( SurfNum ).Width = SurfaceTmp( SurfNum ).Area;
 			SurfaceTmp( SurfNum ).Height = 1.0;
-			SurfaceTmp( SurfNum ).Tilt = 90.;
-			SurfaceTmp( SurfNum ).CosTilt = std::cos( 90. * DegToRadians );
-			SurfaceTmp( SurfNum ).SinTilt = std::sin( 90. * DegToRadians );
+			SurfaceTmp( SurfNum ).Tilt = 90.0;
+			SurfaceTmp( SurfNum ).CosTilt = 0.0; //Tuned Was std::cos( 90.0 * DegToRadians )
+			SurfaceTmp( SurfNum ).SinTilt = 1.0; // Tuned Was std::sin( 90.0 * DegToRadians )
 			SurfaceTmp( SurfNum ).Azimuth = 0.0;
-			SurfaceTmp( SurfNum ).CosAzim = std::cos( 0.0 );
-			SurfaceTmp( SurfNum ).SinAzim = std::sin( 0.0 );
+			SurfaceTmp( SurfNum ).CosAzim = 1.0; //Tuned Was std::cos( 0.0 )
+			SurfaceTmp( SurfNum ).SinAzim = 0.0; //Tuned Was std::sin( 0.0 )
 			// Outward normal unit vector (pointing away from room)
 			SurfaceTmp( SurfNum ).OutNormVec = SurfaceTmp( SurfNum ).lcsz;
-			SurfaceTmp( SurfNum ).ViewFactorSky = .5;
+			SurfaceTmp( SurfNum ).ViewFactorSky = 0.5;
 			SurfaceTmp( SurfNum ).ExtSolar = false;
 			SurfaceTmp( SurfNum ).ExtWind = false;
 			SurfaceTmp( SurfNum ).BaseSurf = SurfNum;
@@ -5508,7 +5510,6 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
 		// INTERFACE BLOCK SPECIFICATIONS:na
 		// DERIVED TYPE DEFINITIONS:na
 
@@ -5595,9 +5596,9 @@ namespace SurfaceGeometry {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Shading || SurfaceTmp( SurfNum ).Class == SurfaceClass_Detached_F || SurfaceTmp( SurfNum ).Class == SurfaceClass_Detached_B || SurfaceTmp( SurfNum ).Class == SurfaceClass_Overhang || SurfaceTmp( SurfNum ).Class == SurfaceClass_Fin ) ) continue;
 			if ( SurfaceTmp( SurfNum ).ShadowSurfGlazingConstruct != 0 ) {
-				gio::write( OutputFileInits, "(A)" ) << "ShadingProperty Reflectance," + SurfaceTmp( SurfNum ).Name + ',' + cSurfaceClass( SurfaceTmp( SurfNum ).Class ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfGlazingFrac, 2 ) + ',' + Construct( SurfaceTmp( SurfNum ).ShadowSurfGlazingConstruct ).Name;
+				gio::write( OutputFileInits, fmtA ) << "ShadingProperty Reflectance," + SurfaceTmp( SurfNum ).Name + ',' + cSurfaceClass( SurfaceTmp( SurfNum ).Class ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfGlazingFrac, 2 ) + ',' + Construct( SurfaceTmp( SurfNum ).ShadowSurfGlazingConstruct ).Name;
 			} else {
-				gio::write( OutputFileInits, "(A)" ) << "ShadingProperty Reflectance," + SurfaceTmp( SurfNum ).Name + ',' + cSurfaceClass( SurfaceTmp( SurfNum ).Class ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfGlazingFrac, 2 ) + ", N/A";
+				gio::write( OutputFileInits, fmtA ) << "ShadingProperty Reflectance," + SurfaceTmp( SurfNum ).Name + ',' + cSurfaceClass( SurfaceTmp( SurfNum ).Class ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).ShadowSurfGlazingFrac, 2 ) + ", N/A";
 			}
 		}
 
@@ -5778,10 +5779,10 @@ namespace SurfaceGeometry {
 			AvgTilt = sum_product_sub( Surface.Tilt(), Surface.Area(), ExtVentedCavity( Item ).SurfPtrs ) / sum_sub( Surface.Area(), ExtVentedCavity( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
 			for ( ThisSurf = 1; ThisSurf <= ExtVentedCavity( Item ).NumSurfs; ++ThisSurf ) {
 				SurfID = ExtVentedCavity( Item ).SurfPtrs( ThisSurf );
-				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15. ) {
+				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15.0 ) {
 					ShowWarningError( cCurrentModuleObject + "=\"" + ExtVentedCavity( Item ).Name + ", Surface " + Surface( SurfID ).Name + " has Azimuth different from others in " "the associated group." );
 				}
-				if ( std::abs( Surface( SurfID ).Tilt - AvgTilt ) > 10. ) {
+				if ( std::abs( Surface( SurfID ).Tilt - AvgTilt ) > 10.0 ) {
 					ShowWarningError( cCurrentModuleObject + "=\"" + ExtVentedCavity( Item ).Name + ", Surface " + Surface( SurfID ).Name + " has Tilt different from others in " "the associated group." );
 				}
 
@@ -5875,8 +5876,6 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6460,7 +6459,7 @@ namespace SurfaceGeometry {
 
 		if ( NSides > 2 ) {
 			DistanceCheck = distance( SurfaceTmp( SurfNum ).Vertex( SurfaceTmp( SurfNum ).Sides ), SurfaceTmp( SurfNum ).Vertex( 1 ) );
-			if ( DistanceCheck < .01 ) {
+			if ( DistanceCheck < 0.01 ) {
 				if ( DisplayExtraWarnings ) {
 					ShowWarningError( RoutineName + "Distance between two vertices < .01, possibly coincident." " for Surface=" + SurfaceTmp( SurfNum ).Name + ", in Zone=" + SurfaceTmp( SurfNum ).ZoneName );
 					ShowContinueError( "Vertex [" + RoundSigDigits( SurfaceTmp( SurfNum ).Sides ) + "]=(" + RoundSigDigits( SurfaceTmp( SurfNum ).Vertex( SurfaceTmp( SurfNum ).Sides ).x, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).Vertex( SurfaceTmp( SurfNum ).Sides ).y, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).Vertex( SurfaceTmp( SurfNum ).Sides ).z, 2 ) + ')' );
@@ -6486,7 +6485,7 @@ namespace SurfaceGeometry {
 			Vrt = 2;
 			while ( true ) {
 				DistanceCheck = distance( SurfaceTmp( SurfNum ).Vertex( Vrt ), SurfaceTmp( SurfNum ).Vertex( Vrt - 1 ) );
-				if ( DistanceCheck < .01 ) {
+				if ( DistanceCheck < 0.01 ) {
 					if ( DisplayExtraWarnings ) {
 						ShowWarningError( RoutineName + "Distance between two vertices < .01, possibly coincident." " for Surface=" + SurfaceTmp( SurfNum ).Name + ", in Zone=" + SurfaceTmp( SurfNum ).ZoneName );
 						ShowContinueError( "Vertex [" + RoundSigDigits( Vrt ) + "]=(" + RoundSigDigits( SurfaceTmp( SurfNum ).Vertex( Vrt ).x, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).Vertex( Vrt ).y, 2 ) + ',' + RoundSigDigits( SurfaceTmp( SurfNum ).Vertex( Vrt ).z, 2 ) + ')' );
@@ -6667,7 +6666,7 @@ namespace SurfaceGeometry {
 			--RevPtr;
 		}
 
-		gio::write( OutputFileDebug, "*" ) << "Reversing Surface Name=" + SurfaceTmp( SurfNum ).Name;
+		gio::write( OutputFileDebug, fmtLD  ) << "Reversing Surface Name=" + SurfaceTmp( SurfNum ).Name;
 		for ( n = 1; n <= NSides; ++n ) {
 			gio::write( OutputFileDebug, fmt3 ) << "side=" << n << " abs coord vertex=" << SurfaceTmp( SurfNum ).Vertex( n ).x << SurfaceTmp( SurfNum ).Vertex( n ).y << SurfaceTmp( SurfNum ).Vertex( n ).z;
 		}
@@ -7768,10 +7767,10 @@ namespace SurfaceGeometry {
 			}
 			if ( OSC( Loop ).ConstTempScheduleIndex != 0 ) {
 				cAlphaArgs( 2 ) = OSC( Loop ).ConstTempScheduleName;
-				gio::write( OutputFileInits, "(A)" ) << "Other Side Coefficients," + OSC( Loop ).Name + ',' + cAlphaArgs( 1 ) + ",N/A," + RoundSigDigits( OSC( Loop ).ConstTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ExtDryBulbCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).GroundTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).WindSpeedCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ZoneAirTempCoef, 3 ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + RoundSigDigits( OSC( Loop ).SinusoidPeriod, 3 ) + ',' + RoundSigDigits( OSC( Loop ).TPreviousCoef, 3 ) + ',' + cOSCLimitsString;
+				gio::write( OutputFileInits, fmtA ) << "Other Side Coefficients," + OSC( Loop ).Name + ',' + cAlphaArgs( 1 ) + ",N/A," + RoundSigDigits( OSC( Loop ).ConstTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ExtDryBulbCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).GroundTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).WindSpeedCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ZoneAirTempCoef, 3 ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + RoundSigDigits( OSC( Loop ).SinusoidPeriod, 3 ) + ',' + RoundSigDigits( OSC( Loop ).TPreviousCoef, 3 ) + ',' + cOSCLimitsString;
 			} else {
 				cAlphaArgs( 2 ) = "N/A";
-				gio::write( OutputFileInits, "(A)" ) << "Other Side Coefficients," + OSC( Loop ).Name + ',' + cAlphaArgs( 1 ) + ',' + RoundSigDigits( OSC( Loop ).ConstTemp, 2 ) + ',' + RoundSigDigits( OSC( Loop ).ConstTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ExtDryBulbCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).GroundTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).WindSpeedCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ZoneAirTempCoef, 3 ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + RoundSigDigits( OSC( Loop ).SinusoidPeriod, 3 ) + ',' + RoundSigDigits( OSC( Loop ).TPreviousCoef, 3 ) + ',' + cOSCLimitsString;
+				gio::write( OutputFileInits, fmtA ) << "Other Side Coefficients," + OSC( Loop ).Name + ',' + cAlphaArgs( 1 ) + ',' + RoundSigDigits( OSC( Loop ).ConstTemp, 2 ) + ',' + RoundSigDigits( OSC( Loop ).ConstTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ExtDryBulbCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).GroundTempCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).WindSpeedCoef, 3 ) + ',' + RoundSigDigits( OSC( Loop ).ZoneAirTempCoef, 3 ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 ) + ',' + RoundSigDigits( OSC( Loop ).SinusoidPeriod, 3 ) + ',' + RoundSigDigits( OSC( Loop ).TPreviousCoef, 3 ) + ',' + cOSCLimitsString;
 			}
 
 		}
@@ -7875,7 +7874,7 @@ namespace SurfaceGeometry {
 			if ( Loop == 1 ) {
 				gio::write( OutputFileInits, OSCMFormat1 );
 			}
-			gio::write( OutputFileInits, "(A)" ) << "Other Side Conditions Model," + OSCM( Loop ).Name + ',' + OSCM( Loop ).Class;
+			gio::write( OutputFileInits, fmtA ) << "Other Side Conditions Model," + OSCM( Loop ).Name + ',' + OSCM( Loop ).Class;
 		}
 
 	}
@@ -8160,7 +8159,7 @@ namespace SurfaceGeometry {
 				}
 			} else {
 				if ( SurfCount > 0 ) {
-					MinimumVolume = std::pow( std::sqrt( SumAreas / SurfCount ), 3 );
+					MinimumVolume = pow_3( std::sqrt( SumAreas / SurfCount ) );
 				} else {
 					MinimumVolume = 0.0;
 				}
@@ -8173,7 +8172,7 @@ namespace SurfaceGeometry {
 
 			if ( Zone( ZoneNum ).Volume > 0.0 ) { // User entered zone volume, produce message if not near calculated
 				if ( TempVolume > 0.0 ) {
-					if ( std::abs( TempVolume - Zone( ZoneNum ).Volume ) / Zone( ZoneNum ).Volume > .05 ) {
+					if ( std::abs( TempVolume - Zone( ZoneNum ).Volume ) / Zone( ZoneNum ).Volume > 0.05 ) {
 						++ErrCount;
 						if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
 							if ( initmsg ) {
@@ -8211,28 +8210,28 @@ namespace SurfaceGeometry {
 
 			if ( ShowZoneSurfaces ) {
 				if ( ShowZoneSurfaceHeaders ) {
-					gio::write( OutputFileDebug, "*" ) << "===================================";
-					gio::write( OutputFileDebug, "*" ) << "showing zone surfaces used and not used in volume calculation";
-					gio::write( OutputFileDebug, "*" ) << "for volume calculation, only floors, walls and roofs/ceilings are used";
-					gio::write( OutputFileDebug, "*" ) << "surface class, 1=wall, 2=floor, 3=roof/ceiling";
-					gio::write( OutputFileDebug, "*" ) << "unused surface class(es), 5=internal mass, 11=window, 12=glass door";
-					gio::write( OutputFileDebug, "*" ) << "                          13=door, 14=shading, 15=overhang, 16=fin";
-					gio::write( OutputFileDebug, "*" ) << "                          17=TDD Dome, 18=TDD Diffuser";
+					gio::write( OutputFileDebug, fmtLD  ) << "===================================";
+					gio::write( OutputFileDebug, fmtLD  ) << "showing zone surfaces used and not used in volume calculation";
+					gio::write( OutputFileDebug, fmtLD  ) << "for volume calculation, only floors, walls and roofs/ceilings are used";
+					gio::write( OutputFileDebug, fmtLD  ) << "surface class, 1=wall, 2=floor, 3=roof/ceiling";
+					gio::write( OutputFileDebug, fmtLD  ) << "unused surface class(es), 5=internal mass, 11=window, 12=glass door";
+					gio::write( OutputFileDebug, fmtLD  ) << "                          13=door, 14=shading, 15=overhang, 16=fin";
+					gio::write( OutputFileDebug, fmtLD  ) << "                          17=TDD Dome, 18=TDD Diffuser";
 					ShowZoneSurfaceHeaders = false;
 				}
-				gio::write( OutputFileDebug, "*" ) << "===================================";
-				gio::write( OutputFileDebug, "*" ) << "zone=" << Zone( ZoneNum ).Name << " calc volume=" << CalcVolume;
-				gio::write( OutputFileDebug, "*" ) << " nsurfaces=" << NFaces << " nactual=" << NActFaces;
+				gio::write( OutputFileDebug, fmtLD  ) << "===================================";
+				gio::write( OutputFileDebug, fmtLD  ) << "zone=" << Zone( ZoneNum ).Name << " calc volume=" << CalcVolume;
+				gio::write( OutputFileDebug, fmtLD  ) << " nsurfaces=" << NFaces << " nactual=" << NActFaces;
 			}
 			for ( SurfNum = 1; SurfNum <= ZoneStruct.NumSurfaceFaces; ++SurfNum ) {
 				if ( ShowZoneSurfaces ) {
 					if ( SurfNum <= NActFaces ) {
-						gio::write( OutputFileDebug, "*" ) << "surface=" << ZoneStruct.SurfaceFace( SurfNum ).SurfNum << " nsides=" << ZoneStruct.SurfaceFace( SurfNum ).NSides;
-						gio::write( OutputFileDebug, "*" ) << "surface name=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Name << " class=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Class;
-						gio::write( OutputFileDebug, "*" ) << "area=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).GrossArea;
+						gio::write( OutputFileDebug, fmtLD  ) << "surface=" << ZoneStruct.SurfaceFace( SurfNum ).SurfNum << " nsides=" << ZoneStruct.SurfaceFace( SurfNum ).NSides;
+						gio::write( OutputFileDebug, fmtLD  ) << "surface name=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Name << " class=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Class;
+						gio::write( OutputFileDebug, fmtLD  ) << "area=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).GrossArea;
 						for ( iside = 1; iside <= ZoneStruct.SurfaceFace( SurfNum ).NSides; ++iside ) {
 							auto const & FacePoint( ZoneStruct.SurfaceFace( SurfNum ).FacePoints( iside ) );
-							gio::write( OutputFileDebug, "*" ) << FacePoint.x << FacePoint.y << FacePoint.z;
+							gio::write( OutputFileDebug, fmtLD  ) << FacePoint.x << FacePoint.y << FacePoint.z;
 						}
 					}
 				}
@@ -8240,7 +8239,7 @@ namespace SurfaceGeometry {
 			}
 			if ( ShowZoneSurfaces ) {
 				for ( SurfNum = 1; SurfNum <= notused; ++SurfNum ) {
-					gio::write( OutputFileDebug, "*" ) << "notused:surface=" << surfacenotused( SurfNum ) << " name=" << Surface( surfacenotused( SurfNum ) ).Name << " class=" << Surface( surfacenotused( SurfNum ) ).Class;
+					gio::write( OutputFileDebug, fmtLD  ) << "notused:surface=" << surfacenotused( SurfNum ) << " name=" << Surface( surfacenotused( SurfNum ) ).Name << " class=" << Surface( surfacenotused( SurfNum ) ).Class;
 				}
 			}
 
@@ -8412,7 +8411,7 @@ namespace SurfaceGeometry {
 		if ( ! Surface( ThisSurf ).MirroredSurf ) {
 			CalcCoPlanarNess( Surface( ThisSurf ).Vertex, Surface( ThisSurf ).Sides, IsCoPlanar, OutOfLine, LastVertexInError );
 			if ( ! IsCoPlanar ) {
-				if ( OutOfLine > .01 ) {
+				if ( OutOfLine > 0.01 ) {
 					ShowSevereError( RoutineName + "Suspected non-planar surface:\"" + Surface( ThisSurf ).Name + "\"," " Max \"out of line\"=" + TrimSigDigits( OutOfLine, 5 ) + " at Vertex # " + TrimSigDigits( LastVertexInError ) );
 				} else {
 					ShowWarningError( RoutineName + "Possible non-planar surface:\"" + Surface( ThisSurf ).Name + "\"," " Max \"out of line\"=" + TrimSigDigits( OutOfLine, 5 ) + " at Vertex # " + TrimSigDigits( LastVertexInError ) );
@@ -8455,7 +8454,7 @@ namespace SurfaceGeometry {
 			}
 			if ( Surface( ThisSurf ).Sides > 4 ) {
 				Surface( ThisSurf ).Shape = Polygonal;
-				if ( std::abs( ThisHeight * ThisWidth - Surface( ThisSurf ).GrossArea ) > .001 ) {
+				if ( std::abs( ThisHeight * ThisWidth - Surface( ThisSurf ).GrossArea ) > 0.001 ) {
 					Surface( ThisSurf ).Width = std::sqrt( Surface( ThisSurf ).GrossArea );
 					Surface( ThisSurf ).Height = Surface( ThisSurf ).Width;
 					ThisWidth = Surface( ThisSurf ).Width;
@@ -8480,9 +8479,9 @@ namespace SurfaceGeometry {
 
 			} else { //  this is a shadowing subsurface
 
-				if ( std::abs( Surface( Surface( ThisSurf ).BaseSurf ).Tilt - ThisSurfTilt ) <= .01 ) {
+				if ( std::abs( Surface( Surface( ThisSurf ).BaseSurf ).Tilt - ThisSurfTilt ) <= 0.01 ) {
 					// left or right fin
-					if ( ThisSurfAz < 0.0 ) ThisSurfAz += 360.;
+					if ( ThisSurfAz < 0.0 ) ThisSurfAz += 360.0;
 					if ( ThisSurfAz > Surface( Surface( ThisSurf ).BaseSurf ).Azimuth ) {
 						ThisShape = RectangularLeftFin;
 					} else {
@@ -8505,7 +8504,7 @@ namespace SurfaceGeometry {
 					ErrorInSurface = true;
 				}
 				ThisReveal = -Pt2Plane( Surface( ThisSurf ).Vertex( 2 ), BasePlane );
-				if ( std::abs( ThisReveal ) < .0002 ) ThisReveal = 0.0;
+				if ( std::abs( ThisReveal ) < 0.0002 ) ThisReveal = 0.0;
 				Surface( ThisSurf ).Reveal = ThisReveal;
 				Xp = Surface( ThisSurf ).Vertex( 2 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 2 ).y - BaseYLLC;
@@ -8584,7 +8583,7 @@ namespace SurfaceGeometry {
 						} else {
 							SurfaceWindow( ThisSurf ).GlazedFrac = Surface( ThisSurf ).Area / ( Surface( ThisSurf ).Area + SurfaceWindow( ThisSurf ).DividerArea );
 							// Correction factor for portion of divider subject to divider projection correction
-							DivFrac = ( 1.0 - FrameDivider( FrDivNum ).HorDividers * FrameDivider( FrDivNum ).VertDividers * std::pow( DivWidth, 2 ) / DivArea );
+							DivFrac = ( 1.0 - FrameDivider( FrDivNum ).HorDividers * FrameDivider( FrDivNum ).VertDividers * pow_2( DivWidth ) / DivArea );
 							SurfaceWindow( ThisSurf ).ProjCorrDivOut = DivFrac * FrameDivider( FrDivNum ).DividerProjectionOut / DivWidth;
 							SurfaceWindow( ThisSurf ).ProjCorrDivIn = DivFrac * FrameDivider( FrDivNum ).DividerProjectionIn / DivWidth;
 							// Correction factor for portion of frame subject to frame projection correction
@@ -8605,7 +8604,7 @@ namespace SurfaceGeometry {
 					ErrorInSurface = true;
 				}
 				ThisReveal = -Pt2Plane( Surface( ThisSurf ).Vertex( 2 ), BasePlane );
-				if ( std::abs( ThisReveal ) < .0002 ) ThisReveal = 0.0;
+				if ( std::abs( ThisReveal ) < 0.0002 ) ThisReveal = 0.0;
 				Surface( ThisSurf ).Reveal = ThisReveal;
 				Xp = Surface( ThisSurf ).Vertex( 2 ).x - BaseXLLC;
 				Yp = Surface( ThisSurf ).Vertex( 2 ).y - BaseYLLC;
@@ -8621,7 +8620,7 @@ namespace SurfaceGeometry {
 				Surface( ThisSurf ).Height = ThisHeight;
 				// Effective height and width of a triangular window for use in calc of convective air flow
 				// in gap between glass and shading device when shading device is present
-				Surface( ThisSurf ).Height = 4. * Surface( ThisSurf ).Area / ( 3. * Surface( ThisSurf ).Width );
+				Surface( ThisSurf ).Height = 4.0 * Surface( ThisSurf ).Area / ( 3.0 * Surface( ThisSurf ).Width );
 				Surface( ThisSurf ).Width *= 0.75;
 
 				Xp = Surface( ThisSurf ).Vertex( 1 ).x - BaseXLLC;
@@ -9108,7 +9107,7 @@ namespace SurfaceGeometry {
 			ConstrName = Construct( ConstrNum ).Name;
 			StormWinMatNum = StormWindow( StormWinNum ).StormWinMaterialNum;
 			IntDistance = int( 1000 * StormWindow( StormWinNum ).StormWinDistance );
-			gio::write( ChrIntDistance, "*" ) << IntDistance;
+			gio::write( ChrIntDistance, fmtLD  ) << IntDistance;
 			strip( ChrIntDistance );
 			// Set ShAndSt, which is true if the window has a shaded construction to which a storm window
 			// can be added. (A storm window can be added if there is an interior shade or blind and up to three
@@ -9138,7 +9137,7 @@ namespace SurfaceGeometry {
 			// with storm window and air gap added on outside
 			for ( loop = 1; loop <= 2; ++loop ) {
 				if ( loop == 1 ) {
-					gio::write( ChrNum, "*" ) << StormWinNum;
+					gio::write( ChrNum, fmtLD  ) << StormWinNum;
 					strip( ChrNum );
 					ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
 					// If this construction name already exists, set the surface's storm window construction number to it
@@ -10610,8 +10609,8 @@ namespace SurfaceGeometry {
 		SurfCollinearWarning = false;
 		for ( n = 1; n <= NSides; ++n ) { // perform convexity test in the plane determined above.
 			DotProd = ( A( n + 1 ) - A( n ) ) * ( B( n + 2 ) - B( n + 1 ) ) - ( B( n + 1 ) - B( n ) ) * ( A( n + 2 ) - A( n + 1 ) );
-			V1len = std::sqrt( std::pow( ( A( n + 1 ) - A( n ) ), 2 ) + std::pow( ( B( n + 1 ) - B( n ) ), 2 ) );
-			V2len = std::sqrt( std::pow( ( A( n + 2 ) - A( n + 1 ) ), 2 ) + std::pow( ( B( n + 2 ) - B( n + 1 ) ), 2 ) );
+			V1len = std::sqrt( pow_2( A( n + 1 ) - A( n ) ) + pow_2( B( n + 1 ) - B( n ) ) );
+			V2len = std::sqrt( pow_2( A( n + 2 ) - A( n + 1 ) ) + pow_2( B( n + 2 ) - B( n + 1 ) ) );
 			if ( V1len <= 1.e-8 || V2len <= 1.e-8 ) continue;
 			cosarg = DotProd / ( V1len * V2len );
 			if ( cosarg < -1.0 ) {

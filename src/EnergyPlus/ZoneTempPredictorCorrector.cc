@@ -2993,19 +2993,19 @@ namespace ZoneTempPredictorCorrector {
 			//     + -> Heating required to reach setpoint
 
 			//PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
-			{ auto const SELECT_CASE_var1( ZoneAirSolutionAlgo );
-			if ( SELECT_CASE_var1 == Use3rdOrder ) {
+			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 				LoadToHeatingSetPoint = ( TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum ) );
 				// Exact solution
-			} else if ( SELECT_CASE_var1 == UseAnalyticalSolution ) {
+			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( TempDepZnLd( ZoneNum ) == 0.0 ) { // B=0
 					LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
-					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
+					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
+					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
 				}
-			} else if ( SELECT_CASE_var1 == UseEulerMethod ) {
+			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum );
-			}}
+			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToCoolingSetPoint = LoadToHeatingSetPoint;
@@ -3016,18 +3016,18 @@ namespace ZoneTempPredictorCorrector {
 		} else if ( SELECT_CASE_var == SingleCoolingSetPoint ) {
 
 			//PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
-			{ auto const SELECT_CASE_var1( ZoneAirSolutionAlgo );
-			if ( SELECT_CASE_var1 == Use3rdOrder ) {
+			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 				LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
-			} else if ( SELECT_CASE_var1 == UseAnalyticalSolution ) {
+			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( TempDepZnLd( ZoneNum ) == 0.0 ) { // B=0
 					LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
-					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
+					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
+					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
 				}
-			} else if ( SELECT_CASE_var1 == UseEulerMethod ) {
+			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
-			}}
+			}
 			ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 			LoadToHeatingSetPoint = LoadToCoolingSetPoint;
@@ -3039,23 +3039,23 @@ namespace ZoneTempPredictorCorrector {
 
 			//PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
 			//PH 3/2/04      !LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
-			{ auto const SELECT_CASE_var1( ZoneAirSolutionAlgo );
-			if ( SELECT_CASE_var1 == Use3rdOrder ) {
+			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 				LoadToHeatingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
 				LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
 				// Exact solution
-			} else if ( SELECT_CASE_var1 == UseAnalyticalSolution ) {
+			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( TempDepZnLd( ZoneNum ) == 0.0 ) { // B=0
 					LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 					LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
-					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
-					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
+					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
+					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
 				}
-			} else if ( SELECT_CASE_var1 == UseEulerMethod ) {
+			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( TempZoneThermostatSetPoint( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * TempZoneThermostatSetPoint( ZoneNum ) - TempIndZnLd( ZoneNum );
-			}}
+			}
 			ZoneSetPoint = TempZoneThermostatSetPoint( ZoneNum );
 
 			//PH 3/2/04      ZoneSysEnergyDemand(ZoneNum)%TotalOutputRequired = LoadToHeatingSetPoint ! = LoadToCoolingSetPoint
@@ -3104,23 +3104,23 @@ namespace ZoneTempPredictorCorrector {
 
 		} else if ( SELECT_CASE_var == DualSetPointWithDeadBand ) {
 
-			{ auto const SELECT_CASE_var1( ZoneAirSolutionAlgo );
-			if ( SELECT_CASE_var1 == Use3rdOrder ) {
+			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 				LoadToHeatingSetPoint = ( TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
 				LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
 				// Exact solution
-			} else if ( SELECT_CASE_var1 == UseAnalyticalSolution ) {
+			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( TempDepZnLd( ZoneNum ) == 0.0 ) { // B=0
 					LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 					LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 				} else {
-					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
-					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
+					Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
+					LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
+					LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
 				}
-			} else if ( SELECT_CASE_var1 == UseEulerMethod ) {
+			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointLo( ZoneNum ) - TempIndZnLd( ZoneNum );
 				LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointHi( ZoneNum ) - TempIndZnLd( ZoneNum );
-			}}
+			}
 
 			// Possible combinations:
 			// 1/  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
@@ -3183,36 +3183,36 @@ namespace ZoneTempPredictorCorrector {
 					}
 					DeadBandOrSetback( ZoneNum ) = true;
 				} else if ( ZoneSysEnergyDemand( ZoneNum ).StageNum < 0 ) { // Cooling load
-					{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
-					if ( SELECT_CASE_var == Use3rdOrder ) {
+					if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 						LoadToCoolingSetPoint = ( TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) ) - TempIndZnLd( ZoneNum ) );
-					} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
+					} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 						if ( TempDepZnLd( ZoneNum ) == 0.0 ) { // B=0
 							LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 						} else {
-							LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
+							Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
+							LoadToCoolingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
 						}
-					} else if ( SELECT_CASE_var == UseEulerMethod ) {
+					} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 						LoadToCoolingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointHi( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointHi( ZoneNum ) - TempIndZnLd( ZoneNum );
-					}}
+					}
 					ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToCoolingSetPoint;
 					ZoneSetPoint = ZoneThermostatSetPointHi( ZoneNum );
 					LoadToHeatingSetPoint = LoadToCoolingSetPoint;
 					if ( ( ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired ) >= 0.0 ) DeadBandOrSetback( ZoneNum ) = true;
 				} else { // Heating load
-					{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
-					if ( SELECT_CASE_var == Use3rdOrder ) {
+					if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 						LoadToHeatingSetPoint = ( TempDepZnLd( ZoneNum ) * ZoneThermostatSetPointLo( ZoneNum ) - TempIndZnLd( ZoneNum ) );
 						// Exact solution
-					} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
+					} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 						if ( TempDepZnLd( ZoneNum ) == 0.0 ) { // B=0
 							LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) - TempIndZnLd( ZoneNum );
 						} else {
-							LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) * std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) / ( 1.0 - std::exp( min( 700., - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) ) - TempIndZnLd( ZoneNum );
+							Real64 const exp_700_TA( std::exp( min( 700.0, - TempDepZnLd( ZoneNum ) / AIRRAT( ZoneNum ) ) ) );
+							LoadToHeatingSetPoint = TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) * exp_700_TA ) / ( 1.0 - exp_700_TA ) - TempIndZnLd( ZoneNum );
 						}
-					} else if ( SELECT_CASE_var == UseEulerMethod ) {
+					} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 						LoadToHeatingSetPoint = AIRRAT( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) - ZoneT1( ZoneNum ) ) + TempDepZnLd( ZoneNum ) * ( ZoneThermostatSetPointLo( ZoneNum ) ) - TempIndZnLd( ZoneNum );
-					}}
+					}
 					ZoneSysEnergyDemand( ZoneNum ).TotalOutputRequired = LoadToHeatingSetPoint;
 					ZoneSetPoint = ZoneThermostatSetPointLo( ZoneNum );
 					LoadToCoolingSetPoint = LoadToHeatingSetPoint;
@@ -3324,7 +3324,7 @@ namespace ZoneTempPredictorCorrector {
 		// Check all the controlled zones to see if it matches the zone simulated
 		for ( HumidControlledZoneNum = 1; HumidControlledZoneNum <= NumHumidityControlZones; ++HumidControlledZoneNum ) {
 			if ( HumidityControlZone( HumidControlledZoneNum ).ActualZoneNum != ZoneNum ) continue;
-			ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.;
+			ZoneAirRH = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress ) * 100.0;
 			ZoneRHHumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).HumidifyingSchedIndex );
 			ZoneRHDehumidifyingSetPoint = GetCurrentScheduleValue( HumidityControlZone( HumidControlledZoneNum ).DehumidifyingSchedIndex );
 			if ( HumidityControlZone( HumidControlledZoneNum ).EMSOverrideHumidifySetPointOn ) {
@@ -3391,34 +3391,34 @@ namespace ZoneTempPredictorCorrector {
 			// the amount of moisture that must be removed by the system.
 			//MoistLoadHumidSetPoint = massflow * HumRat = kg air/sec  * kg H2O/kg Air = kg H2O/sec
 			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHHumidifyingSetPoint / 100.0 ), OutBaroPress, RoutineName );
-			{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
-			if ( SELECT_CASE_var == Use3rdOrder ) {
+			Real64 exp_700_A_C( 0.0 );
+			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 				LoadToHumidifySetPoint = ( ( 11.0 / 6.0 ) * C + A ) * WZoneSetPoint - ( B + C * ( 3.0 * WZoneTimeMinus1Temp( ZoneNum ) - ( 3.0 / 2.0 ) * WZoneTimeMinus2Temp( ZoneNum ) + ( 1.0 / 3.0 ) * WZoneTimeMinus3Temp( ZoneNum ) ) );
 				// Exact solution
-			} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
+			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( A == 0.0 ) { // B=0
 					LoadToHumidifySetPoint = C * ( WZoneSetPoint - ZoneW1( ZoneNum ) ) - B;
 				} else {
-					LoadToHumidifySetPoint = A * ( WZoneSetPoint - ZoneW1( ZoneNum ) * std::exp( min( 700., - A / C ) ) ) / ( 1.0 - std::exp( min( 700., - A / C ) ) ) - B;
+					exp_700_A_C = std::exp( min( 700.0, - A / C ) ); //Tuned Save expensive value
+					LoadToHumidifySetPoint = A * ( WZoneSetPoint - ZoneW1( ZoneNum ) * exp_700_A_C ) / ( 1.0 - exp_700_A_C ) - B;
 				}
-			} else if ( SELECT_CASE_var == UseEulerMethod ) {
+			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToHumidifySetPoint = C * ( WZoneSetPoint - ZoneW1( ZoneNum ) ) + A * WZoneSetPoint - B;
-			}}
+			}
 			ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToHumidifyingSP = LoadToHumidifySetPoint;
 			WZoneSetPoint = PsyWFnTdbRhPb( ZT( ZoneNum ), ( ZoneRHDehumidifyingSetPoint / 100.0 ), OutBaroPress, RoutineName );
-			{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
-			if ( SELECT_CASE_var == Use3rdOrder ) {
+			if ( ZoneAirSolutionAlgo == Use3rdOrder ) {
 				LoadToDehumidifySetPoint = ( ( 11.0 / 6.0 ) * C + A ) * WZoneSetPoint - ( B + C * ( 3.0 * WZoneTimeMinus1Temp( ZoneNum ) - ( 3.0 / 2.0 ) * WZoneTimeMinus2Temp( ZoneNum ) + ( 1.0 / 3.0 ) * WZoneTimeMinus3Temp( ZoneNum ) ) );
 				// Exact solution
-			} else if ( SELECT_CASE_var == UseAnalyticalSolution ) {
+			} else if ( ZoneAirSolutionAlgo == UseAnalyticalSolution ) {
 				if ( A == 0.0 ) { // B=0
 					LoadToDehumidifySetPoint = C * ( WZoneSetPoint - ZoneW1( ZoneNum ) ) - B;
 				} else {
-					LoadToDehumidifySetPoint = A * ( WZoneSetPoint - ZoneW1( ZoneNum ) * std::exp( min( 700., - A / C ) ) ) / ( 1.0 - std::exp( min( 700., - A / C ) ) ) - B;
+					LoadToDehumidifySetPoint = A * ( WZoneSetPoint - ZoneW1( ZoneNum ) * exp_700_A_C ) / ( 1.0 - exp_700_A_C ) - B; // exp_700_A_C set above
 				}
-			} else if ( SELECT_CASE_var == UseEulerMethod ) {
+			} else if ( ZoneAirSolutionAlgo == UseEulerMethod ) {
 				LoadToDehumidifySetPoint = C * ( WZoneSetPoint - ZoneW1( ZoneNum ) ) + A * WZoneSetPoint - B;
-			}}
+			}
 			ZoneSysMoistureDemand( ZoneNum ).OutputRequiredToDehumidifyingSP = LoadToDehumidifySetPoint;
 
 			// The load is added to the TotalOutputRequired as in the Temperature Predictor.  There is also the remaining
@@ -4247,7 +4247,7 @@ namespace ZoneTempPredictorCorrector {
 			if ( A == 0.0 ) { // B=0
 				ZoneAirHumRatTemp( ZoneNum ) = ZoneW1( ZoneNum ) + B / C;
 			} else {
-				ZoneAirHumRatTemp( ZoneNum ) = ( ZoneW1( ZoneNum ) - B / A ) * std::exp( min( 700., - A / C ) ) + B / A;
+				ZoneAirHumRatTemp( ZoneNum ) = ( ZoneW1( ZoneNum ) - B / A ) * std::exp( min( 700.0, - A / C ) ) + B / A;
 			}
 		} else if ( SELECT_CASE_var == UseEulerMethod ) {
 			ZoneAirHumRatTemp( ZoneNum ) = ( C * ZoneW1( ZoneNum ) + B ) / ( C + A );
@@ -4437,7 +4437,6 @@ namespace ZoneTempPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NodeNum; // System node number
 		Real64 NodeTemp( 0.0 ); // System node temperature //Autodesk:Init Initialization added to elim poss of use uninitialized
 		Real64 MassFlowRate; // System node mass flow rate
 		int ZoneEquipConfigNum;
@@ -4524,27 +4523,33 @@ namespace ZoneTempPredictorCorrector {
 
 		// Plenum and controlled zones have a different set of inlet nodes which must be calculated.
 		if ( ControlledZoneAirFlag ) {
-			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneEquipConfigNum ).NumInletNodes; ++NodeNum ) {
+			auto const & zec( ZoneEquipConfig( ZoneEquipConfigNum ) );
+			for ( int NodeNum = 1, NodeNum_end = zec.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum ) {
 				// Get node conditions
 				//  this next block is of interest to irratic system loads... maybe nodes are not accurate at time of call?
 				//  how can we tell?  predict step must be lagged ?  correct step, systems have run.
-				NodeTemp = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).Temp;
-				MassFlowRate = Node( ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( NodeNum ) ).MassFlowRate;
+				auto const & node( Node( zec.InletNode( NodeNum ) ) );
+				NodeTemp = node.Temp;
+				MassFlowRate = node.MassFlowRate;
 				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
 
-				SumSysMCp += MassFlowRate * CpAir;
-				SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+				Real64 const MassFlowRate_CpAir( MassFlowRate * CpAir );
+				SumSysMCp += MassFlowRate_CpAir;
+				SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
 			} // NodeNum
 
 		} else if ( ZoneRetPlenumAirFlag ) {
-			for ( NodeNum = 1; NodeNum <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumInletNodes; ++NodeNum ) {
+			auto const & zrpc( ZoneRetPlenCond( ZoneRetPlenumNum ) );
+			for ( int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum ) {
 				// Get node conditions
-				NodeTemp = Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).Temp;
-				MassFlowRate = Node( ZoneRetPlenCond( ZoneRetPlenumNum ).InletNode( NodeNum ) ).MassFlowRate;
+				auto const & node( Node( zrpc.InletNode( NodeNum ) ) );
+				NodeTemp = node.Temp;
+				MassFlowRate = node.MassFlowRate;
 				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
 
-				SumSysMCp += MassFlowRate * CpAir;
-				SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+				Real64 const MassFlowRate_CpAir( MassFlowRate * CpAir );
+				SumSysMCp += MassFlowRate_CpAir;
+				SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
 			} // NodeNum
 			// add in the leaks
 			for ( ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumADUs; ++ADUListIndex ) {
@@ -4554,16 +4559,18 @@ namespace ZoneTempPredictorCorrector {
 					NodeTemp = Node( ADUInNode ).Temp;
 					MassFlowRate = AirDistUnit( ADUNum ).MassFlowRateUpStrLk;
 					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
-					SumSysMCp += MassFlowRate * CpAir;
-					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+					Real64 const MassFlowRate_CpAir( MassFlowRate * CpAir );
+					SumSysMCp += MassFlowRate_CpAir;
+					SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
 				}
 				if ( AirDistUnit( ADUNum ).DownStreamLeak ) {
 					ADUOutNode = AirDistUnit( ADUNum ).OutletNodeNum;
 					NodeTemp = Node( ADUOutNode ).Temp;
 					MassFlowRate = AirDistUnit( ADUNum ).MassFlowRateDnStrLk;
 					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
-					SumSysMCp += MassFlowRate * CpAir;
-					SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
+					Real64 const MassFlowRate_CpAir( MassFlowRate * CpAir );
+					SumSysMCp += MassFlowRate_CpAir;
+					SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
 				}
 			}
 
@@ -4990,7 +4997,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// throw warning if seriously out of balance (this may need to be removed if too noisy... )
 			// formulate dynamic threshold value based on 20% of quadrature sum of components
-			Threshold = 0.2 * std::sqrt( std::pow( SumIntGains, 2 ) + std::pow( SumHADTsurfs, 2 ) + std::pow( SumMCpDTzones, 2 ) + std::pow( SumMCpDtInfil, 2 ) + std::pow( SumMCpDTsystem, 2 ) + std::pow( SumNonAirSystem, 2 ) + std::pow( CzdTdt, 2 ) );
+			Threshold = 0.2 * std::sqrt( pow_2( SumIntGains ) + pow_2( SumHADTsurfs ) + pow_2( SumMCpDTzones ) + pow_2( SumMCpDtInfil ) + pow_2( SumMCpDTsystem ) + pow_2( SumNonAirSystem ) + pow_2( CzdTdt ) );
 			if ( ( std::abs( imBalance ) > Threshold ) && ( ! WarmupFlag ) && ( ! DoingSizing ) ) { // air balance is out by more than threshold
 				if ( Zone( ZoneNum ).AirHBimBalanceErrIndex == 0 ) {
 					ShowWarningMessage( "Zone Air Heat Balance is out of balance for zone named " + Zone( ZoneNum ).Name );

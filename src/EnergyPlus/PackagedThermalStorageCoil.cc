@@ -1938,7 +1938,7 @@ namespace PackagedThermalStorageCoil {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "SizeTESCoil " );
 		static std::string const calcTESWaterStorageTank( "CalcTESWaterStorageTank" );
-		Real64 const FluidTankSizingDeltaT( 10. );
+		Real64 const FluidTankSizingDeltaT( 10.0 );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
 

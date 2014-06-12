@@ -1,10 +1,8 @@
 // C++ Headers
-#include <cmath>
 #include <cstdlib>
 #include <iostream>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/bit.hh>
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
@@ -13,7 +11,6 @@
 // EnergyPlus Headers
 #include <Psychrometrics.hh>
 #include <DataEnvironment.hh>
-#include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 #include <General.hh>
 #include <UtilityRoutines.hh>
@@ -106,6 +103,7 @@ namespace Psychrometrics {
 #ifdef EP_cache_PsyPsatFnTemp
 	int const psatcache_size( 1024 * 1024 );
 	int const psatprecision_bits( 24 ); // 28  // 24  // 32
+	Int64 const psatcache_mask( psatcache_size - 1 );
 #endif
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -206,7 +204,8 @@ namespace Psychrometrics {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -224,16 +223,16 @@ namespace Psychrometrics {
 		EchoInputFile = FindUnitNumber( "eplusout.audit" );
 		if ( EchoInputFile == 0 ) return;
 		if ( any_gt( NumTimesCalled, 0 ) ) {
-			gio::write( EchoInputFile, fmta ) << "RoutineName,#times Called,Avg Iterations";
+			gio::write( EchoInputFile, fmtA ) << "RoutineName,#times Called,Avg Iterations";
 			for ( Loop = 1; Loop <= NumPsychMonitors; ++Loop ) {
 				if ( ! PsyReportIt( Loop ) ) continue;
-				gio::write( istring, "*" ) << NumTimesCalled( Loop );
+				gio::write( istring, fmtLD ) << NumTimesCalled( Loop );
 				strip( istring );
 				if ( NumIterations( Loop ) > 0 ) {
 					AverageIterations = double( NumIterations( Loop ) ) / double( NumTimesCalled( Loop ) );
-					gio::write( EchoInputFile, fmta ) << PsyRoutineNames( Loop ) + ',' + istring + ',' + RoundSigDigits( AverageIterations, 2 );
+					gio::write( EchoInputFile, fmtA ) << PsyRoutineNames( Loop ) + ',' + istring + ',' + RoundSigDigits( AverageIterations, 2 );
 				} else {
-					gio::write( EchoInputFile, fmta ) << PsyRoutineNames( Loop ) + ',' + istring;
+					gio::write( EchoInputFile, fmtA ) << PsyRoutineNames( Loop ) + ',' + istring;
 				}
 			}
 		}
@@ -241,56 +240,19 @@ namespace Psychrometrics {
 
 	}
 
-	Real64
-	PsyRhoAirFnPbTdbW(
+#ifdef EP_psych_errors
+	void
+	PsyRhoAirFnPbTdbW_error(
 		Real64 const pb, // barometric pressure (Pascals)
 		Real64 const tdb, // dry bulb temperature (Celsius)
 		Real64 const dw, // humidity ratio (kgWater/kgDryAir)
+		Real64 const rhoair, // density of air
 		std::string const & CalledFrom // routine this function was called from (error messages) !unused1208
 	)
 	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         G. S. Wright
-		//       DATE WRITTEN   June 2, 1994
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides density of air as a function of barometric
-		// pressure, dry bulb temperature, and humidity ratio.
-
-		// METHODOLOGY EMPLOYED:
-		// ideal gas law
-		//    universal gas const for air 287 J/(kg K)
-		//    air/water molecular mass ratio 28.9645/18.01534
-
-		// REFERENCES:
-		// Wylan & Sontag, Fundamentals of Classical Thermodynamics.
-		// ASHRAE handbook 1985 Fundamentals, Ch. 6, eqn. (6),(26)
-
 		// Using/Aliasing
 		using General::RoundSigDigits;
 
-		// Return value
-		Real64 rhoair; // result=> density of air
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		rhoair = pb / ( 287.0 * ( tdb + KelvinConv ) * ( 1.0 + 1.6077687 * max( dw, 1.0e-5 ) ) );
-#ifdef EP_psych_errors
 		if ( rhoair < 0.0 ) {
 			ShowSevereError( "PsyRhoAirFnPbTdbW: RhoAir (Density of Air) is calculated <= 0 [" + RoundSigDigits( rhoair, 5 ) + "]." );
 			ShowContinueError( "pb =[" + RoundSigDigits( pb, 2 ) + "], tdb=[" + RoundSigDigits( tdb, 2 ) + "], w=[" + RoundSigDigits( dw, 7 ) + "]." );
@@ -301,756 +263,51 @@ namespace Psychrometrics {
 			}
 			ShowFatalError( "Program terminates due to preceding condition." );
 		}
+	}
 #endif
 
-		return rhoair;
-	}
-
-	Real64
-	PsyCpAirFnWTdb(
-		Real64 const dw, // humidity ratio {kgWater/kgDryAir}
-		Real64 const T // input temperature {Celsius}
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         J. C. VanderZee
-		//       DATE WRITTEN   Feb. 1994
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the heat capacity of air {J/kg-C} as function of humidity ratio.
-
-		// METHODOLOGY EMPLOYED:
-		// take numerical derivative of PsyHFnTdbW function
-
-		// REFERENCES:
-		// see PsyHFnTdbW ref. to ASHRAE Fundamentals
-		// USAGE:  cpa = PsyCpAirFnWTdb(w,T)
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 cpa; // result => heat capacity of air {J/kg-C}
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 h1; // PsyHFnTdbW result of input parameters
-		Real64 tt; // input temperature (T) + .1
-		Real64 h2; // PsyHFnTdbW result of input humidity ratio and tt
-		Real64 w; // humidity ratio
-
-		static Real64 dwSave( -100.0 );
-		static Real64 Tsave( -100.0 );
-		static Real64 cpaSave( -100.0 );
-
-		//check if last call had the same input and if it did just use the
-		//saved output.
-		if ( Tsave == T ) {
-			if ( dwSave == dw ) {
-				cpa = cpaSave;
-				return cpa;
-			}
-		}
-
-		w = max( dw, 1.0e-5 );
-		h1 = PsyHFnTdbW( T, w );
-		tt = T + 0.1;
-		h2 = PsyHFnTdbW( tt, w );
-		cpa = ( h2 - h1 ) / 0.1;
-
-		//save values for next call
-		dwSave = dw;
-		Tsave = T;
-		cpaSave = cpa;
-		return cpa;
-	}
-
-	Real64
-	PsyTdpFnTdbTwbPb(
-		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const TWB, // wet-bulb temperature {C}
-		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function calculates the dew-point temperature {C} from dry-bulb, wet-bulb and pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// Needs description, as appropriate.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 TDP; // result=> dew-point temperature {C}
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 W; // humidity ratio
-		//                          calculate dew point temperature
-
-		W = PsyWFnTdbTwbPb( TDB, TWB, PB, CalledFrom );
-		W = max( W, 1.0e-5 );
-
-		TDP = PsyTdpFnWPb( W, PB, CalledFrom );
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyTdpFnTdbTwbPb );
-#endif
-
-		//                                      VALIDITY TEST.
-		if ( TDP > TWB ) {
 #ifdef EP_psych_errors
-			if ( TDP > TWB + 0.1 ) {
-				if ( ! WarmupFlag ) { // Display error message
-					if ( iPsyErrIndex( iPsyTdpFnTdbTwbPb ) == 0 ) {
-						ShowWarningMessage( "Calculated Dew Point Temperature being reset (PsyTdpFnTdbTwbPb)" );
-						if ( !CalledFrom.empty() ) {
-							ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-						} else {
-							ShowContinueErrorTimeStamp( " Routine=Unknown," );
-						}
-						String = " Dry-bulb=" + TrimSigDigits( TDB, 2 ) + " Wet-Bulb (WB)= " + TrimSigDigits( TWB, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 ) + " Humidity Ratio=" + TrimSigDigits( W, 3 );
-						ShowContinueError( String );
-						String = " Calculated Dew Point Temperature (DPT)= " + TrimSigDigits( TDP, 2 ) + "; Since DPT > WB, DPT will be set to WB";
-						ShowContinueError( String );
-					}
-					ShowRecurringWarningErrorAtEnd( "Calculated Dew Point Temperature being reset (PsyTdpFnTdbTwbPb)", iPsyErrIndex( iPsyTdpFnTdbTwbPb ), TDP, TDP, _, "C", "C" );
-				}
-
-				TDP = TWB;
-
-			} else {
-				TDP = TWB;
-			}
-#endif
-			TDP = TWB;
-		}
-
-		// TDP is the result
-
-		return TDP;
-
-	}
-
-	Real64
-	PsyTdpFnWPb(
-		Real64 const W, // humidity ratio
-		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function calculates the dew-point temperature {C} from humidity ratio and pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P.99, EQN 22
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 TDP; // result=> dew-point temperature {C}
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 PDEW; // pressure at dew point temperature
-		Real64 W0; // limited humidity ratio
-
-		W0 = max( W, 1.0e-5 );
-		PDEW = PB * W0 / ( 0.62198 + W0 );
-		TDP = PsyTsatFnPb( PDEW, CalledFrom );
-
-		return TDP;
-	}
-
-	Real64
-	PsyHFnTdbRhPb(
-		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const RH, // relative humidity value (0.0 - 1.0)
-		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         J. C. VanderZee
-		//       DATE WRITTEN   Feb. 1994
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides air enthalpy from temperature and relative humidity.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
-		//   by using functions PsyWFnTdbRhPb and PsyHFnTdbW
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 H; // result=> enthalpy {J/kg}
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 W; // humidity ratio
-
-		W = PsyWFnTdbRhPb( TDB, RH, PB, CalledFrom );
-		W = max( W, 1.0e-5 );
-		H = PsyHFnTdbW( TDB, W );
-
-		return H;
-	}
-
-	Real64
-	PsyRhovFnTdbRh(
-		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const RH, // relative humidity value (0.0-1.0)
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         R. J. Liesen
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       Change temperature range applied (determine pws); Aug 2007; LKL
-		//                      Function is continuous over temperature spectrum
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the Vapor Density in air as a
-		// function of dry bulb temperature, and Relative Humidity.
-
-		// METHODOLOGY EMPLOYED:
-		// ideal gas law
-		// Universal gas const for water vapor 461.52 J/(kg K)
-
-		// REFERENCES:
-		// ASHRAE handbook 1993 Fundamentals, ??
-		// Used values from Table 2, HOF 2005, Chapter 6, to verify that these values match (at saturation)
-		// values from PsyRhFnTdbWPb
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 RhoV; // Vapor density in air
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 pws; // saturation pressure for Tdb
-
-		pws = PsyPsatFnTemp( Tdb, CalledFrom );
-
-		RhoV = ( pws * RH ) / ( 461.52 * ( Tdb + KelvinConv ) );
-
-		return RhoV;
-	}
-
-	Real64
-	PsyRhovFnTdbRhLBnd0C(
-		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const RH // relative humidity value (0.0-1.0)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         R. J. Liesen
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       Name change to signify derivation and temperatures were used
-		//                      with 0C as minimum; LKL January 2008
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the Vapor Density in air as a
-		// function of dry bulb temperature, and Relative Humidity.
-
-		// METHODOLOGY EMPLOYED:
-		// ideal gas law
-		// Universal gas const for water vapor 461.52 J/(kg K)
-
-		// REFERENCES:
-		// ASHRAE handbook 1993 Fundamentals,
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 RhoV; // Vapor density in air
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		RhoV = RH / ( 461.52 * ( Tdb + KelvinConv ) ) * std::exp( 23.7093 - 4111.0 / ( ( Tdb + KelvinConv ) - 35.45 ) );
-
-		return RhoV;
-	}
-
-	Real64
-	PsyRhovFnTdbWPb(
-		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const dW, // humidity ratio
-		Real64 const PB // Barometric Pressure {Pascals}
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         R. J. Liesen
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the Vapor Density in air as a
-		// function of dry bulb temperature, Humidity Ratio, and Barometric Pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// ideal gas law
-		// Universal gas const for water vapor 461.52 J/(kg K)
-
-		// REFERENCES:
-		// ASHRAE handbook 1993 Fundamentals,
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 RhoV; // Vapor density in air
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 W; // humidity ratio
-
-		W = max( dW, 1.0e-5 );
-		RhoV = W * PB / ( 461.52 * ( Tdb + KelvinConv ) * ( W + 0.62198 ) );
-
-		return RhoV;
-	}
-
-	Real64
-	PsyRhFnTdbRhov(
+	void
+	PsyRhFnTdbRhovLBnd0C_error(
 		Real64 const Tdb, // dry-bulb temperature {C}
 		Real64 const Rhovapor, // vapor density in air {kg/m3}
+		Real64 const RHValue, // relative humidity value (0.0-1.0)
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
 	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         R. J. Liesen
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       Change temperature range applied (determine pws); Aug 2007; LKL
-		//                      Function is continuous over temperature spectrum
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the Relative Humidity in air as a
-		// function of dry bulb temperature and Vapor Density.
-
-		// METHODOLOGY EMPLOYED:
-		// ideal gas law
-		// Universal gas const for water vapor 461.52 J/(kg K)
-
-		// REFERENCES:
-		// ASHRAE handbook 1993 Fundamentals,
-		// Used values from Table 2, HOF 2005, Chapter 6, to verify that these values match (at saturation)
-		// values from PsyRhFnTdbWPb
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 RHValue; // relative humidity value (0.0-1.0)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		Real64 pws; // saturation pressure for Tdb
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "PsyRhFnTdbRhov" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		if ( Rhovapor <= 0.0 ) {
-			RHValue = 0.0;
-		} else {
-			pws = PsyPsatFnTemp( Tdb, RoutineName );
-			RHValue = Rhovapor * 461.52 * ( Tdb + KelvinConv ) / pws;
+		if ( RHValue > 1.01 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100.0, 2 );
+					ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) " );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					ShowContinueError( "Relative Humidity being reset to 100.0%" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)", iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ), RHValue * 100.0, RHValue * 100.0, _, "%", "%" );
+			}
+		} else if ( RHValue < -0.05 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100.0, 2 );
+					ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) " );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					ShowContinueError( "Relative Humidity being reset to 1%" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)", iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ), RHValue * 100.0, RHValue * 100.0, _, "%", "%" );
+			}
 		}
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyRhFnTdbRhov );
-#endif
-
-		//                   VALIDITY TEST
-		if ( RHValue < 0.0 || RHValue > 1.0 ) {
-			if ( RHValue > 1.0 ) {
-#ifdef EP_psych_errors
-				if ( RHValue > 1.01 ) {
-					if ( ! WarmupFlag ) {
-						if ( iPsyErrIndex( iPsyRhFnTdbRhov ) == 0 ) {
-							String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100., 2 );
-							ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) " );
-							if ( !CalledFrom.empty() ) {
-								ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-							} else {
-								ShowContinueErrorTimeStamp( " Routine=Unknown," );
-							}
-							ShowContinueError( String );
-							ShowContinueError( "Relative Humidity being reset to 100.0 %" );
-						}
-						ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)", iPsyErrIndex( iPsyRhFnTdbRhov ), RHValue * 100., RHValue * 100., _, "%", "%" );
-					}
-				}
-#endif
-				RHValue = 1.0;
-			} else { // RHValue < 0.0
-#ifdef EP_psych_errors
-				if ( RHValue < -0.05 ) {
-					if ( ! WarmupFlag ) {
-						if ( iPsyErrIndex( iPsyRhFnTdbRhov ) == 0 ) {
-							String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100., 2 );
-							ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) " );
-							if ( !CalledFrom.empty() ) {
-								ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-							} else {
-								ShowContinueErrorTimeStamp( " Routine=Unknown," );
-							}
-							ShowContinueError( String );
-							ShowContinueError( "Relative Humidity being reset to 1%" );
-						}
-						ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)", iPsyErrIndex( iPsyRhFnTdbRhov ), RHValue * 100., RHValue * 100., _, "%", "%" );
-					}
-				}
-#endif
-				RHValue = .01;
-			}
-		} // RHValue in proper range
-		return RHValue;
 	}
-
-	Real64
-	PsyRhFnTdbRhovLBnd0C(
-		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const Rhovapor, // vapor density in air {kg/m3}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         R. J. Liesen
-		//       DATE WRITTEN   July 2000
-		//       MODIFIED       Name change to signify derivation and temperatures were used
-		//                      with 0C as minimum; LKL January 2008
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the Relative Humidity in air as a
-		// function of dry bulb temperature and Vapor Density.
-
-		// METHODOLOGY EMPLOYED:
-		// ideal gas law
-		// Universal gas const for water vapor 461.52 J/(kg K)
-
-		// REFERENCES:
-		// ASHRAE handbook 1993 Fundamentals,
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 RHValue; // relative humidity value (0.0-1.0)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		//      integer,save :: b0cerrcount=0
-
-		if ( Rhovapor <= 0.0 ) {
-			RHValue = 0.0;
-		} else {
-			RHValue = Rhovapor * 461.52 * ( Tdb + KelvinConv ) * std::exp( -23.7093 + 4111.0 / ( ( Tdb + KelvinConv ) - 35.45 ) );
-		}
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyRhFnTdbRhovLBnd0C );
 #endif
-
-		//                   VALIDITY TEST
-		if ( RHValue < 0.0 || RHValue > 1.0 ) {
-			if ( RHValue > 1.0 ) {
-#ifdef EP_psych_errors
-				if ( RHValue > 1.01 ) {
-					if ( ! WarmupFlag ) {
-						if ( iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ) == 0 ) {
-							String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100., 2 );
-							ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) " );
-							if ( !CalledFrom.empty() ) {
-								ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-							} else {
-								ShowContinueErrorTimeStamp( " Routine=Unknown," );
-							}
-							ShowContinueError( String );
-							ShowContinueError( "Relative Humidity being reset to 100.0%" );
-						}
-						ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)", iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ), RHValue * 100., RHValue * 100., _, "%", "%" );
-					}
-				}
-#endif
-				RHValue = 1.0;
-			} else { // RHValue < 0.0
-#ifdef EP_psych_errors
-				if ( RHValue < -0.05 ) {
-					if ( ! WarmupFlag ) {
-						if ( iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ) == 0 ) {
-							String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100., 2 );
-							ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C) " );
-							if ( !CalledFrom.empty() ) {
-								ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-							} else {
-								ShowContinueErrorTimeStamp( " Routine=Unknown," );
-							}
-							ShowContinueError( String );
-							ShowContinueError( "Relative Humidity being reset to 1%" );
-						}
-						ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhovLBnd0C)", iPsyErrIndex( iPsyRhFnTdbRhovLBnd0C ), RHValue * 100., RHValue * 100., _, "%", "%" );
-					}
-				}
-#endif
-				RHValue = .01;
-			}
-		} // RHValue in proper range
-		return RHValue;
-	}
-
-	Real64
-	PsyRhFnTdbWPb(
-		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const dW, // humidity ratio
-		Real64 const PB, // barometric pressure {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Richard J. Liesen
-		//       DATE WRITTEN   Nov 1988
-		//       MODIFIED       Aug 1989, Michael J. Witte
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the relative humidity value (0.0-1.0) as a result of
-		// dry-bulb temperature, humidity ratio and barometric pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK FUNDAMENTALS 1985, P6.12, EQN 10,21,23
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 RHValue; // relative humidity value (0.0-1.0)
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "PsyRhFnTdbWPb" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 U; // Degree of Saturation
-		Real64 PWS; // Pressure -- saturated for pure water
-		Real64 W; // humidity ratio
-
-		PWS = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
-
-		//                   Find Degree Of Saturation
-		W = max( dW, 1.0e-5 );
-		U = W / ( 0.62198 * PWS / ( PB - PWS ) );
-		//                   Calculate The Relative Humidity
-		RHValue = U / ( 1.0 - ( 1.0 - U ) * ( PWS / PB ) );
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyRhFnTdbWPb );
-#endif
-
-		//                   VALIDITY TEST
-		if ( RHValue < 0.0 || RHValue > 1.0 ) {
-			if ( RHValue > 1.0 ) {
-#ifdef EP_psych_errors
-				if ( RHValue > 1.01 ) {
-					if ( ! WarmupFlag ) {
-						if ( iPsyErrIndex( iPsyRhFnTdbWPb ) == 0 ) {
-							String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Humidity Ratio= " + TrimSigDigits( W, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100., 2 );
-							ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) " );
-							if ( !CalledFrom.empty() ) {
-								ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-							} else {
-								ShowContinueErrorTimeStamp( " Routine=Unknown," );
-							}
-							ShowContinueError( String );
-							ShowContinueError( "Relative Humidity being reset to 100.0%" );
-						}
-						ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)", iPsyErrIndex( iPsyRhFnTdbWPb ), RHValue * 100., RHValue * 100., _, "%", "%" );
-					}
-				}
-#endif
-				RHValue = 1.0;
-			} else { // RHValue < 0.0
-#ifdef EP_psych_errors
-				if ( RHValue < -0.05 ) {
-					if ( ! WarmupFlag ) {
-						if ( iPsyErrIndex( iPsyRhFnTdbWPb ) == 0 ) {
-							String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Humidity Ratio= " + TrimSigDigits( W, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100., 2 );
-							ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) " );
-							if ( !CalledFrom.empty() ) {
-								ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-							} else {
-								ShowContinueErrorTimeStamp( " Routine=Unknown," );
-							}
-							ShowContinueError( String );
-							ShowContinueError( "Relative Humidity being reset to 1%" );
-						}
-						ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)", iPsyErrIndex( iPsyRhFnTdbWPb ), RHValue * 100., RHValue * 100., _, "%", "%" );
-					}
-				}
-#endif
-				RHValue = .01;
-			}
-		} // RHValue in proper range
-
-		// RHValue is the result
-
-		return RHValue;
-	}
 
 #ifdef EP_cache_PsyTwbFnTdbWPb
 
@@ -1189,6 +446,7 @@ namespace Psychrometrics {
 		int const itmax( 100 ); // Maximum No of Iterations
 		static Real64 convTol( 0.0001 );
 		static std::string const RoutineName( "PsyTwbFnTdbWPb" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1198,8 +456,8 @@ namespace Psychrometrics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 tBoil; // Boiling temperature of water at given pressure
-		static Real64 last_Patm( -99999. ); // barometric pressure {Pascals}  (last)
-		static Real64 last_tBoil( -99999. ); // Boiling temperature of water at given pressure (last)
+		static Real64 last_Patm( -99999.0 ); // barometric pressure {Pascals}  (last)
+		static Real64 last_tBoil( -99999.0 ); // Boiling temperature of water at given pressure (last)
 		Real64 newW; // Humidity ratio calculated with wet bulb guess
 		Real64 W; // Humidity ratio entered and corrected as necessary
 		Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
@@ -1240,7 +498,7 @@ namespace Psychrometrics {
 		W = dW;
 		if ( W < 0.0 ) {
 #ifdef EP_psych_errors
-			if ( W <= -.0001 ) {
+			if ( W <= -0.0001 ) {
 				if ( ! WarmupFlag ) {
 					if ( iPsyErrIndex( iPsyTwbFnTdbWPb2 ) == 0 ) {
 						String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Humidity Ratio= " + TrimSigDigits( W, 3 ) + " Pressure= " + TrimSigDigits( Patm, 2 );
@@ -1258,7 +516,7 @@ namespace Psychrometrics {
 				}
 			}
 #endif
-			W = 1.e-5;
+			W = 1.0e-5;
 		}
 
 		// Initial temperature guess at atmospheric pressure
@@ -1348,523 +606,72 @@ namespace Psychrometrics {
 		}
 
 #ifdef generatetestdata
-		gio::write( OutputFileDebug, "*" ) << TDB << dW << Patm << Twb;
+		gio::write( OutputFileDebug, fmtLD ) << TDB << dW << Patm << Twb;
 #endif
 
 		return TWB;
 	}
 
-	Real64
-	PsyVFnTdbWPb(
+#ifdef EP_psych_errors
+	void
+	PsyVFnTdbWPb_error(
 		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const dW, // humidity ratio
+		Real64 const w, // humidity ratio
 		Real64 const PB, // barometric pressure {Pascals}
+		Real64 const V, // specific volume {m3/kg}
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
 	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the specific volume from dry-bulb temperature,
-		// humidity ratio and barometric pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 28
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 V; // result=> specific volume {m3/kg}
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 w; // humidity ratio
-
-		w = max( dW, 1.0e-5 );
-		V = 1.59473e2 * ( 1.0 + 1.6078 * w ) * ( 1.8 * TDB + 492.0 ) / PB;
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyVFnTdbWPb );
-#endif
-
-		//                                      VALIDITY TEST.
-		if ( V < 0.0 ) {
-#ifdef EP_psych_errors
-			if ( V <= -.01 ) {
-				if ( ! WarmupFlag ) {
-					if ( iPsyErrIndex( iPsyVFnTdbWPb ) == 0 ) {
-						String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Humidity Ratio= " + TrimSigDigits( w, 3 ) + " Pressure= " + TrimSigDigits( PB, 2 );
-						ShowWarningMessage( "Calculated Specific Volume out of range (PsyVFnTdbWPb)" );
-						if ( !CalledFrom.empty() ) {
-							ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-						} else {
-							ShowContinueErrorTimeStamp( " Routine=Unknown," );
-						}
-						ShowContinueError( String );
-						String = "Calculated Volume= " + TrimSigDigits( V, 3 );
-						ShowContinueError( String + " ... Since Calculated Volume < 0.0, it is set to .83" );
-					}
-					ShowRecurringWarningErrorAtEnd( "Calculated Specific Volume out of range (PsyVFnTdbWPb)", iPsyErrIndex( iPsyVFnTdbWPb ), V, V, _, "m3/kg", "m3/kg" );
-				}
-			}
-			V = 0.83;
-#endif
-		}
-
-		// V is the result
-
-		return V;
-	}
-
-	Real64
-	PsyWFnTdpPb(
-		Real64 const TDP, // dew-point temperature {C}
-		Real64 const PB, // barometric pressure {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the humidity ratio from dew-point temperature
-		// and barometric pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
-
-		// USE STATEMENTS:
-
-		// Return value
-		Real64 W; // result=> humidity ratio
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "PsyWFnTdpPb" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 PDEW; // saturation pressure at dew-point temperature {Pascals}
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyWFnTdpPb );
-#endif
-
-		PDEW = PsyPsatFnTemp( TDP, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
-		W = PDEW * 0.62198 / ( PB - PDEW );
-		//                                      VALIDITY TEST.
-		if ( W < 0.0 ) {
-#ifdef EP_psych_errors
-			if ( W <= -.0001 ) {
-				if ( ! WarmupFlag ) {
-					if ( iPsyErrIndex( iPsyWFnTdpPb ) == 0 ) {
-						String = " Dew-Point= " + TrimSigDigits( TDP, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
-						ShowWarningMessage( "Calculated Humidity Ratio invalid (PsyWFnTdpPb)" );
-						if ( !CalledFrom.empty() ) {
-							ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-						} else {
-							ShowContinueErrorTimeStamp( " Routine=Unknown," );
-						}
-						ShowContinueError( String );
-						String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 );
-						ShowContinueError( String + " ... Humidity Ratio set to .00001" );
-					}
-					ShowRecurringWarningErrorAtEnd( "Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex( iPsyWFnTdpPb ), W, W, _, "[]", "[]" );
-				}
-			}
-#endif
-			W = 1.e-5;
-		}
-
-		// W is the result
-
-		return W;
-	}
-
-	Real64
-	PsyWFnTdbH(
-		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const H, // enthalpy {J/kg}
-		std::string const & CalledFrom, // routine this function was called from (error messages)
-		bool const SuppressWarnings // if calling function is calculating an intermediate state
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the humidity ratio from dry-bulb temperature
-		// and enthalpy.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P100, EQN 32
-
-		// USE STATEMENTS:
-
-		// Return value
-		Real64 W; // result=> humidity ratio
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		//CP-------- here is 1.2, 1200., 1.004, or 1004.  --------
-		W = ( H - 1.00484e3 * TDB ) / ( 2.50094e6 + 1.85895e3 * TDB );
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyWFnTdbH );
-#endif
-
-		//                                      VALIDITY TEST.
-		if ( W < 0.0 ) {
-#ifdef EP_psych_errors
-			if ( W < -.0001 ) {
-				if ( ! WarmupFlag && ! SuppressWarnings ) {
-					if ( iPsyErrIndex( iPsyWFnTdbH ) == 0 ) {
-						String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Enthalpy= " + TrimSigDigits( H, 3 );
-						ShowWarningMessage( "Calculated Humidity Ratio invalid (PsyWFnTdbH)" );
-						if ( !CalledFrom.empty() ) {
-							ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-						} else {
-							ShowContinueErrorTimeStamp( " Routine=Unknown," );
-						}
-						ShowContinueError( String );
-						String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 );
-						ShowContinueError( String + " ... Humidity Ratio set to .00001" );
-					}
-					ShowRecurringWarningErrorAtEnd( "Calculated Humidity Ratio invalid (PsyWFnTdbH)", iPsyErrIndex( iPsyWFnTdbH ), W, W, _, "[]", "[]" );
-				}
-			}
-#endif
-			W = 1.e-5;
-		}
-
-		// W is the result
-
-		return W;
-	}
-
-	Real64
-	PsyWFnTdbTwbPb(
-		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const TWBin, // wet-bulb temperature {C}
-		Real64 const PB, // barometric pressure {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the humidity ratio from dry-bulb temperature,
-		// wet-bulb temperature and barometric pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQ 22,35
-
-		// USE STATEMENTS:
-
-		// Return value
-		Real64 W; // result=> humidity ratio
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "PsyWFnTdbTwbPb" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 PWET; // Pressure at wet-bulb temperature {Pascals}
-		Real64 WET; // Humidity ratio at wet-bulb temperature
-		Real64 TWB; // test wet-bulb temperature
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyWFnTdbTwbPb );
-#endif
-
-		//                                      VALIDITY CHECK.
-		TWB = TWBin;
-		if ( TWB > TDB ) {
-#ifdef EP_psych_errors
-			if ( TWB > ( TDB + 0.01 ) ) {
-				if ( ReportErrors && ! WarmupFlag ) {
-					if ( iPsyErrIndex( iPsyWFnTdbTwbPb ) == 0 ) {
-						String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
-						ShowWarningMessage( "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)" );
-						if ( !CalledFrom.empty() ) {
-							ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-						} else {
-							ShowContinueErrorTimeStamp( " Routine=Unknown," );
-						}
-						ShowContinueError( String );
-						String = "Calculated Wet-Bulb= " + TrimSigDigits( TWB, 2 );
-						ShowContinueError( String + " ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb" );
-					}
-					ShowRecurringWarningErrorAtEnd( "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)", iPsyErrIndex( iPsyWFnTdbTwbPb ), TWB, TWB, _, "C", "C" );
-				}
-			}
-#endif
-			TWB = TDB;
-		}
-		//                                      CALCULATION.
-		PWET = PsyPsatFnTemp( TWB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
-		WET = 0.62198 * PWET / ( PB - PWET );
-
-		W = ( ( 2501.0 - 2.381 * TWB ) * WET - ( TDB - TWB ) ) / ( 2501.0 + 1.805 * TDB - 4.186 * TWB );
-		//                                      VALIDITY CHECK.
-		if ( W < 0.0 ) {
-#ifdef EP_psych_errors
-			if ( ReportErrors && ! WarmupFlag ) {
-				if ( iPsyErrIndex( iPsyWFnTdbTwbPb2 ) == 0 ) {
-					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Wet-Bulb= " + TrimSigDigits( TWB, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
-					ShowWarningMessage( "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)" );
+		if ( V <= -0.01 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyVFnTdbWPb ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Humidity Ratio= " + TrimSigDigits( w, 3 ) + " Pressure= " + TrimSigDigits( PB, 2 );
+					ShowWarningMessage( "Calculated Specific Volume out of range (PsyVFnTdbWPb)" );
 					if ( !CalledFrom.empty() ) {
 						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
 					} else {
 						ShowContinueErrorTimeStamp( " Routine=Unknown," );
 					}
 					ShowContinueError( String );
-					String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 ) + ", will recalculate Humidity Ratio";
-					ShowContinueError( String + " using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)" );
+					String = "Calculated Volume= " + TrimSigDigits( V, 3 );
+					ShowContinueError( String + " ... Since Calculated Volume < 0.0, it is set to .83" );
 				}
-				ShowRecurringWarningErrorAtEnd( "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex( iPsyWFnTdbTwbPb2 ), W, W, _, "[]", "[]" );
+				ShowRecurringWarningErrorAtEnd( "Calculated Specific Volume out of range (PsyVFnTdbWPb)", iPsyErrIndex( iPsyVFnTdbWPb ), V, V, _, "m3/kg", "m3/kg" );
 			}
-#endif
-			W = PsyWFnTdbRhPb( TDB, 0.0001, PB, CalledFrom );
 		}
-
-		// W is the result
-
-		return W;
 	}
+#endif
 
-	Real64
-	PsyWFnTdbRhPb(
+#ifdef EP_psych_errors
+	void
+	PsyWFnTdbH_error(
 		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const RH, // relative humidity value (0.0-1.0)
-		Real64 const PB, // barometric pressure {Pascals}
+		Real64 const H, // enthalpy {J/kg}
+		Real64 const W, // humidity ratio
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
 	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the humidity ratio from dry-bulb temperature,
-		// relative humidty (value) and barometric pressure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQN 22
-
-		// USE STATEMENTS:
-
-		// Return value
-		Real64 W; // result=> humidity ratio
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "PsyWFnTdbRhPb" );
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 PDRY; // Pressure at dry-bulb temperature {Pascals}
-		Real64 PDEW; // Pressure at dew-point temperature {Pascals}
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyWFnTdbRhPb );
-#endif
-
-		PDRY = PsyPsatFnTemp( TDB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
-		PDEW = RH * PDRY;
-
-		//Numeric error check when the temperature and RH values cause Pdew to equal or exceed
-		//barometric pressure which is physically impossible. An approach limit of 1000 pascals
-		//was chosen to keep the numerics stable as the denominator approaches 0.
-		if ( ( PB - PDEW ) <= 1000.0 ) {
-			W = PDEW * 0.62198 / 1000.0;
-		} else {
-			W = PDEW * 0.62198 / ( PB - PDEW );
-		}
-
-		//                                      THIS EQUATION IN SI UNIT IS FROM
-		//                                      VALIDITY TEST.
-		//                                      ASHRAE HANDBOOK OF FUNDAMENTALS
-		//                                      PAGE 99  EQUATION 22
-		if ( W < 1.0e-5 ) {
-#ifdef EP_psych_errors
-			if ( W <= -.0001 ) {
-				if ( ! WarmupFlag ) {
-					if ( iPsyErrIndex( iPsyWFnTdbRhPb ) == 0 ) {
-						String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Relative Humidity [%]= " + TrimSigDigits( RH * 100., 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
-						ShowWarningMessage( "Calculated Humidity Ratio is invalid (PsyWFnTdbRhPb)" );
-						if ( !CalledFrom.empty() ) {
-							ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-						} else {
-							ShowContinueErrorTimeStamp( " Routine=Unknown," );
-						}
-						ShowContinueError( String );
-						String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 );
-						ShowContinueError( String + " ... Humidity Ratio set to .00001" );
+		if ( W < -0.0001 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyWFnTdbH ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Enthalpy= " + TrimSigDigits( H, 3 );
+					ShowWarningMessage( "Calculated Humidity Ratio invalid (PsyWFnTdbH)" );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
 					}
-					ShowRecurringWarningErrorAtEnd( "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex( iPsyWFnTdbRhPb ), W, W, _, "[]", "[]" );
+					ShowContinueError( String );
+					String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 );
+					ShowContinueError( String + " ... Humidity Ratio set to .00001" );
 				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Humidity Ratio invalid (PsyWFnTdbH)", iPsyErrIndex( iPsyWFnTdbH ), W, W, _, "[]", "[]" );
 			}
-#endif
-			W = 1.e-5;
 		}
-
-		// W is the result
-
-		return W;
 	}
+#endif
 
 #ifdef EP_cache_PsyPsatFnTemp
-
-	Real64
-	PsyPsatFnTemp(
-		Real64 const T, // dry-bulb temperature {C}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   March 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Provide a "cache" of results for the given argument (T) and pressure (Pascal) output result.
-
-		// METHODOLOGY EMPLOYED:
-		// Use grid shifting and masking to provide hash into the cache. Use Equivalence to
-		// make Fortran ignore "types".
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 Pascal; // result=> saturation pressure {Pascals}
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		Int64 const Grid_Shift( ( 64 - 12 - psatprecision_bits ) );
-		//  integer(i64), parameter :: Grid_Mask=NOT(ISHFT(1_i64, Grid_Shift)-1)
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Int64 Tdb_tag;
-		Int64 hash;
-		Real64 Tdb_tag_r;
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyPsatFnTemp_cache );
-#endif
-
-		Tdb_tag = TRANSFER( T, Tdb_tag );
-
-		Tdb_tag = bit::bit_shift( Tdb_tag, -Grid_Shift );
-		hash = bit::bit_and( Tdb_tag, Int64( psatcache_size - 1 ) );
-
-		if ( cached_Psat( hash ).iTdb != Tdb_tag ) {
-			cached_Psat( hash ).iTdb = Tdb_tag;
-			Tdb_tag_r = TRANSFER( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
-
-			cached_Psat( hash ).Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
-		}
-
-		Pascal = cached_Psat( hash ).Psat;
-
-		return Pascal;
-
-	}
 
 	Real64
 	PsyPsatFnTemp_raw(
@@ -1995,7 +802,7 @@ namespace Psychrometrics {
 			A = phi2 + N1 * phi + N2;
 			B = N3 * phi2 + N4 * phi + N5;
 			C = N6 * phi2 + N7 * phi + N8;
-			Pascal = 1000000. * std::pow( ( ( 2. * C ) / ( -B + std::sqrt( std::pow( B, 2 ) - 4. * A * C ) ) ), 4 );
+			Pascal = 1000000.0 * pow_4( ( 2.0 * C ) / ( -B + std::sqrt( pow_2( B ) - 4.0 * A * C ) ) );
 #endif
 			// If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
 		} else if ( ( Tkel > 473.15 ) ) {
@@ -2018,6 +825,97 @@ namespace Psychrometrics {
 
 		return Pascal;
 	}
+
+#ifdef EP_psych_errors
+	void
+	PsyWFnTdbTwbPb_temperature_error(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const TWB, // wet-bulb temperature {C}
+		Real64 const PB, // barometric pressure {Pascals}
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		if ( TWB > ( TDB + 0.01 ) ) {
+			if ( ReportErrors && ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyWFnTdbTwbPb ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
+					ShowWarningMessage( "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)" );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					String = "Calculated Wet-Bulb= " + TrimSigDigits( TWB, 2 );
+					ShowContinueError( String + " ... Since Dry Bulb < Wet Bulb, Wet Bulb set = to Dry Bulb" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Given Wet Bulb Temperature invalid (PsyWFnTdbTwbPb)", iPsyErrIndex( iPsyWFnTdbTwbPb ), TWB, TWB, _, "C", "C" );
+			}
+		}
+	}
+#endif
+
+#ifdef EP_psych_errors
+	void
+	PsyWFnTdbTwbPb_humidity_error(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const TWB, // wet-bulb temperature {C}
+		Real64 const PB, // barometric pressure {Pascals}
+		Real64 const W, // humidity ratio
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+
+		if ( W < 0.0 ) {
+			if ( ReportErrors && ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyWFnTdbTwbPb2 ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Wet-Bulb= " + TrimSigDigits( TWB, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
+					ShowWarningMessage( "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)" );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 ) + ", will recalculate Humidity Ratio";
+					ShowContinueError( String + " using Relative Humidity .01% (and Dry-Bulb and Pressure as shown)" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex( iPsyWFnTdbTwbPb2 ), W, W, _, "[]", "[]" );
+			}
+		}
+	}
+#endif
+
+#ifdef EP_psych_errors
+	void
+	PsyTdpFnTdbTwbPb_error(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const TWB, // wet-bulb temperature {C}
+		Real64 const PB, // barometric pressure (N/M**2) {Pascals}
+		Real64 const W, // humidity ratio
+		Real64 const TDP,  // dew-point temperature {C}
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		if ( TDP > TWB + 0.1 ) {
+			if ( ! WarmupFlag ) { // Display error message
+				if ( iPsyErrIndex( iPsyTdpFnTdbTwbPb ) == 0 ) {
+					ShowWarningMessage( "Calculated Dew Point Temperature being reset (PsyTdpFnTdbTwbPb)" );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					String = " Dry-bulb=" + TrimSigDigits( TDB, 2 ) + " Wet-Bulb (WB)= " + TrimSigDigits( TWB, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 ) + " Humidity Ratio=" + TrimSigDigits( W, 3 );
+					ShowContinueError( String );
+					String = " Calculated Dew Point Temperature (DPT)= " + TrimSigDigits( TDP, 2 ) + "; Since DPT > WB, DPT will be set to WB";
+					ShowContinueError( String );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Dew Point Temperature being reset (PsyTdpFnTdbTwbPb)", iPsyErrIndex( iPsyTdpFnTdbTwbPb ), TDP, TDP, _, "C", "C" );
+			}
+		}
+	}
+#endif
 
 	Real64
 	PsyTsatFnHPb(
@@ -2079,7 +977,7 @@ namespace Psychrometrics {
 		if ( H >= 0.0 ) {
 			Hloc = max( 0.00001, H );
 		} else if ( H < 0.0 ) {
-			Hloc = min( -.00001, H );
+			Hloc = min( -0.00001, H );
 		}
 
 #ifdef EP_psych_stats
@@ -2210,6 +1108,151 @@ Label170: ;
 
 	}
 
+#ifdef EP_psych_errors
+	void
+	PsyRhFnTdbRhov_error(
+		Real64 const Tdb, // dry-bulb temperature {C}
+		Real64 const Rhovapor, // vapor density in air {kg/m3}
+		Real64 const RHValue, // relative humidity value (0.0-1.0)
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		if ( RHValue > 1.01 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyRhFnTdbRhov ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100.0, 2 );
+					ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) " );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					ShowContinueError( "Relative Humidity being reset to 100.0 %" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)", iPsyErrIndex( iPsyRhFnTdbRhov ), RHValue * 100.0, RHValue * 100.0, _, "%", "%" );
+			}
+		} else if ( RHValue < -0.05 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyRhFnTdbRhov ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( Tdb, 2 ) + " Rhovapor= " + TrimSigDigits( Rhovapor, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100.0, 2 );
+					ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov) " );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					ShowContinueError( "Relative Humidity being reset to 1%" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbRhov)", iPsyErrIndex( iPsyRhFnTdbRhov ), RHValue * 100.0, RHValue * 100.0, _, "%", "%" );
+			}
+		}
+	}
+#endif
+
+#ifdef EP_psych_errors
+	void
+	PsyRhFnTdbWPb_error(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const W, // humidity ratio
+		Real64 const RHValue, // relative humidity (0.0-1.0)
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		if ( RHValue > 1.01 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyRhFnTdbWPb ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Humidity Ratio= " + TrimSigDigits( W, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100.0, 2 );
+					ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) " );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					ShowContinueError( "Relative Humidity being reset to 100.0%" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)", iPsyErrIndex( iPsyRhFnTdbWPb ), RHValue * 100.0, RHValue * 100.0, _, "%", "%" );
+			}
+		} else if ( RHValue < -0.05 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyRhFnTdbWPb ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Humidity Ratio= " + TrimSigDigits( W, 3 ) + " Calculated Relative Humidity [%]= " + TrimSigDigits( RHValue * 100.0, 2 );
+					ShowWarningMessage( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb) " );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					ShowContinueError( "Relative Humidity being reset to 1%" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Relative Humidity out of range (PsyRhFnTdbWPb)", iPsyErrIndex( iPsyRhFnTdbWPb ), RHValue * 100.0, RHValue * 100.0, _, "%", "%" );
+			}
+		}
+	}
+#endif
+
+#ifdef EP_psych_errors
+	void
+	PsyWFnTdpPb_error(
+		Real64 const TDP, // dew-point temperature {C}
+		Real64 const PB, // barometric pressure {Pascals}
+		Real64 const W, // humidity ratio
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		if ( W <= -0.0001 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyWFnTdpPb ) == 0 ) {
+					String = " Dew-Point= " + TrimSigDigits( TDP, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
+					ShowWarningMessage( "Calculated Humidity Ratio invalid (PsyWFnTdpPb)" );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 );
+					ShowContinueError( String + " ... Humidity Ratio set to .00001" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Entered Humidity Ratio invalid (PsyWFnTdpPb)", iPsyErrIndex( iPsyWFnTdpPb ), W, W, _, "[]", "[]" );
+			}
+		}
+	}
+#endif
+
+#ifdef EP_psych_errors
+	void
+	PsyWFnTdbRhPb_error(
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const RH, // relative humidity value (0.0-1.0)
+		Real64 const PB, // barometric pressure {Pascals}
+		Real64 const W, // humidity ratio
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		if ( W <= -0.0001 ) {
+			if ( ! WarmupFlag ) {
+				if ( iPsyErrIndex( iPsyWFnTdbRhPb ) == 0 ) {
+					String = " Dry-Bulb= " + TrimSigDigits( TDB, 2 ) + " Relative Humidity [%]= " + TrimSigDigits( RH * 100.0, 2 ) + " Pressure= " + TrimSigDigits( PB, 2 );
+					ShowWarningMessage( "Calculated Humidity Ratio is invalid (PsyWFnTdbRhPb)" );
+					if ( !CalledFrom.empty() ) {
+						ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
+					} else {
+						ShowContinueErrorTimeStamp( " Routine=Unknown," );
+					}
+					ShowContinueError( String );
+					String = "Calculated Humidity Ratio= " + TrimSigDigits( W, 4 );
+					ShowContinueError( String + " ... Humidity Ratio set to .00001" );
+				}
+				ShowRecurringWarningErrorAtEnd( "Calculated Humidity Ratio Invalid (PsyWFnTdbTwbPb)", iPsyErrIndex( iPsyWFnTdbRhPb ), W, W, _, "[]", "[]" );
+			}
+		}
+	}
+#endif
+
 	Real64
 	PsyTsatFnPb(
 		Real64 const Press, // barometric pressure {Pascals}
@@ -2255,8 +1298,8 @@ Label170: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		bool FlagError; // set when errors should be flagged
-		static Real64 Press_Save( -99999. );
-		static Real64 tSat_Save( -99999. );
+		static Real64 Press_Save( -99999.0 );
+		static Real64 tSat_Save( -99999.0 );
 		Real64 tSat; // Water temperature guess
 		Real64 pSat; // Pressure corresponding to temp. guess
 		Real64 error; // Deviation of dependent variable in iteration
@@ -2273,7 +1316,7 @@ Label170: ;
 		// Check press in range.
 		FlagError = false;
 #ifdef EP_psych_errors
-		if ( Press <= 0.0017 || Press >= 1555000. ) {
+		if ( Press <= 0.0017 || Press >= 1555000.0 ) {
 			if ( ! WarmupFlag ) {
 				if ( iPsyErrIndex( iPsyTsatFnPb ) == 0 ) {
 					ShowWarningMessage( "Pressure out of range (PsyTsatFnPb)" );
@@ -2290,8 +1333,7 @@ Label170: ;
 		}
 #endif
 		if ( Press == Press_Save ) {
-			Temp = tSat_Save;
-			return Temp;
+			return tSat_Save;
 		}
 		Press_Save = Press;
 
@@ -2303,7 +1345,7 @@ Label170: ;
 		iter = 0;
 
 		// If above 1555000,set value of Temp corresponding to Saturation Pressure of 1555000 Pascal.
-		if ( Press >= 1555000. ) {
+		if ( Press >= 1555000.0 ) {
 			tSat = 200.0;
 			// If below 0.0017,set value of Temp corresponding to Saturation Pressure of 0.0017 Pascal.
 		} else if ( Press <= 0.0017 ) {
@@ -2324,11 +1366,11 @@ Label170: ;
 				// Calculate saturation pressure for estimated boiling temperature
 				pSat = PsyPsatFnTemp( tSat, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
 
-				//Compare with specified pressure and update estimate of temperature
+				// Compare with specified pressure and update estimate of temperature
 				error = Press - pSat;
 				Iterate( ResultX, convTol, tSat, error, X1, Y1, iter, icvg );
 				tSat = ResultX;
-				//If converged leave loop iteration
+				// If converged leave loop iteration
 				if ( icvg == 1 ) break;
 
 				// Water temperature not converged, repeat calculations with new
@@ -2364,8 +1406,7 @@ Label170: ;
 #endif
 
 		// Result is SatTemperature
-		Temp = tSat;
-		tSat_Save = tSat;
+		Temp = tSat_Save = tSat;
 
 #ifdef EP_psych_errors
 		if ( FlagError ) {

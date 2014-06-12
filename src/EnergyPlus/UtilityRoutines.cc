@@ -86,6 +86,7 @@ AbortEnergyPlus(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
+	static gio::Fmt const fmtLD( "*" );
 	static gio::Fmt const OutFmt( "('Press ENTER to continue after reading above message>')" );
 	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
@@ -199,7 +200,7 @@ AbortEnergyPlus(
 	epStopTime( "EntireRun=" );
 #endif
 	if ( Elapsed_Time < 0.0 ) Elapsed_Time = 0.0;
-	Hours = Elapsed_Time / 3600.;
+	Hours = Elapsed_Time / 3600.0;
 	Elapsed_Time -= Hours * 3600.0;
 	Minutes = Elapsed_Time / 60.0;
 	Elapsed_Time -= Minutes * 60.0;
@@ -209,14 +210,14 @@ AbortEnergyPlus(
 
 	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
 	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
-	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed );
+	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
 		DisplayString( "AbortEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
 	}
-	gio::write( tempfl, "*" ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed;
+	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
 	gio::close( tempfl );
 #ifdef EP_Detailed_Timings
@@ -384,6 +385,7 @@ EndEnergyPlus()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
+	static gio::Fmt const fmtA( "(A)" );
 	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -442,14 +444,14 @@ EndEnergyPlus()
 
 	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
 	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
-	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed );
+	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
 		DisplayString( "EndEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
 	}
-	gio::write( tempfl, "(A)" ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed;
+	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
@@ -1617,7 +1619,7 @@ ShowErrorMessage(
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
 			ShowFatalError( "ShowErrorMessage: Could not open file \"eplusout.err\" for output (write)." );
 		}
-		gio::write( StandardErrorOutput, "(A)" ) << "Program Version," + VerString + ',' + IDDVerString;
+		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;
 	}
 

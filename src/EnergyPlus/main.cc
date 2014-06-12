@@ -430,7 +430,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
+	gio::Fmt const fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -440,8 +440,6 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	FArray1D_int value( 8 );
-	std::string datestring; // supposedly returns blank when no date available.
-	std::string const BlankString;
 	//value(1)   Current year
 	//value(2)   Current month
 	//value(3)   Current day
@@ -450,10 +448,11 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	//value(6)   Minutes (0-59)
 	//value(7)   Seconds (0-59)
 	//value(8)   Milliseconds (0-999)
+	std::string datestring; // supposedly returns blank when no date available.
 
 	date_and_time_string( datestring, _, _, value );
 	if ( ! datestring.empty() ) {
-		gio::write( CurrentDateTimeString, "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" ) << value( 1 ) << value( 2 ) << value( 3 ) << value( 5 ) << value( 6 );
+		gio::write( CurrentDateTimeString, fmtDate ) << value( 1 ) << value( 2 ) << value( 3 ) << value( 5 ) << value( 6 );
 	} else {
 		CurrentDateTimeString = " unknown date/time";
 	}

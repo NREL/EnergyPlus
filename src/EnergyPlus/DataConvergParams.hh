@@ -60,6 +60,9 @@ namespace DataConvergParams {
 
 	extern int const ConvergLogStackDepth;
 	extern FArray1D< Real64 > const ConvergLogStackARR;
+	extern Real64 const sum_ConvergLogStackARR;
+	extern Real64 const square_sum_ConvergLogStackARR;
+	extern Real64 const sum_square_ConvergLogStackARR;
 
 	extern int const CalledFromAirSystemDemandSide;
 	extern int const CalledFromAirSystemSupplySideDeck1;

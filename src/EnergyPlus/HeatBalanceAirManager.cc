@@ -308,7 +308,7 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		Real64 const VentilTempLimit( 100.0 ); // degrees Celsius
 		Real64 const MixingTempLimit( 100.0 ); // degrees Celsius
 		Real64 const VentilWSLimit( 40.0 ); // m/s
@@ -2372,33 +2372,33 @@ namespace HeatBalanceAirManager {
 			TotInfilVentFlow( ZoneNum ) += Infiltration( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "ZoneInfiltration" << Infiltration( Loop ).Name << GetScheduleName( Infiltration( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).ExteriorTotalSurfArea > 0.0 ) {
 				StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel / Zone( ZoneNum ).ExteriorTotalSurfArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).ConstantTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).TemperatureTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).VelocityTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).VelocitySQTermCoef, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		for ( Loop = 1; Loop <= TotVentilation; ++Loop ) {
@@ -2412,25 +2412,25 @@ namespace HeatBalanceAirManager {
 			TotInfilVentFlow( ZoneNum ) += Ventilation( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "ZoneVentilation" << Ventilation( Loop ).Name << GetScheduleName( Ventilation( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel / ( Zone( ZoneNum ).TotOccupants ), 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).FanType == ExhaustVentilation ) {
 				StringOut = "Exhaust";
 			} else if ( Ventilation( Loop ).FanType == IntakeVentilation ) {
@@ -2440,51 +2440,51 @@ namespace HeatBalanceAirManager {
 			} else if ( Ventilation( Loop ).FanType == BalancedVentilation ) {
 				StringOut = "Balanced";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).FanPressure, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).FanEfficiency, 1 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).ConstantTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).TemperatureTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).VelocityTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).VelocitySQTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MinIndoorTempSchedPtr > 0 ) {
 				StringOut = GetScheduleName( Ventilation( Loop ).MinIndoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MinIndoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MaxIndoorTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).MaxIndoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MaxIndoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).DeltaTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).DeltaTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DelTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MinOutdoorTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).MinOutdoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MinOutdoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MaxOutdoorTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).MaxOutdoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MaxOutdoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).MaxWindSpeed, 2 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		TotMixingFlow.allocate( NumOfZones );
@@ -2500,28 +2500,28 @@ namespace HeatBalanceAirManager {
 			TotMixingFlow( ZoneNum ) += Mixing( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "Mixing" << Mixing( Loop ).Name << GetScheduleName( Mixing( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel / ( Zone( ZoneNum ).TotOccupants ), 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << Zone( Mixing( Loop ).FromZone ).Name + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << Zone( Mixing( Loop ).FromZone ).Name + ','; }
 			StringOut = RoundSigDigits( Mixing( Loop ).DeltaTemperature, 2 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
@@ -2535,28 +2535,28 @@ namespace HeatBalanceAirManager {
 			TotMixingFlow( ZoneNum ) += CrossMixing( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "CrossMixing" << CrossMixing( Loop ).Name << GetScheduleName( CrossMixing( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel / ( Zone( ZoneNum ).TotOccupants ), 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << Zone( CrossMixing( Loop ).FromZone ).Name + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << Zone( CrossMixing( Loop ).FromZone ).Name + ','; }
 			StringOut = RoundSigDigits( CrossMixing( Loop ).DeltaTemperature, 2 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		if ( TotRefDoorMixing > 0 ) {

@@ -98,7 +98,7 @@ namespace SolarShading {
 	// MODULE PARAMETER DEFINITIONS:
 	// General Parameters...
 	Real64 const SmallIncrement( 1.0e-10 ); // Small increment added for shading/sunlit area calculations.
-	Real64 const HCMULT( 100000. ); // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
+	Real64 const HCMULT( 100000.0 ); // Multiplier used to change meters to .01 millimeters for homogeneous coordinates.
 	// Homogeneous Coordinates are represented in integers (64 bit). This changes the surface coordinates from meters
 	// to .01 millimeters -- making that the resolution for shadowing, polygon clipping, etc.
 	Real64 const sqHCMULT( HCMULT * HCMULT ); // Square of HCMult used in Homogeneous coordinates
@@ -200,6 +200,8 @@ namespace SolarShading {
 	FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
 	FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
 	FArray1D< SurfaceErrorTracking > TempSurfErrorTracking;
+
+	static gio::Fmt const fmtLD( "*" );
 
 	// MODULE SUBROUTINES:
 
@@ -435,7 +437,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -474,7 +476,7 @@ namespace SolarShading {
 			ShowContinueError( "Value entered=[" + RoundSigDigits( rNumericArgs( 1 ), 0 ) + "], Shadowing Calculations will be inaccurate." );
 		}
 
-		if ( rNumericArgs( 2 ) > 199. ) {
+		if ( rNumericArgs( 2 ) > 199.0 ) {
 			MaxHCS = rNumericArgs( 2 );
 		} else {
 			MaxHCS = 15000;
@@ -563,8 +565,8 @@ namespace SolarShading {
 			}
 		}
 
-		gio::write( OutputFileInits, fmta ) << "! <Shadowing/Sun Position Calculations> [Annual Simulations], Calculation Method," "Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, " "Sky Diffuse Modeling Algorithm";
-		gio::write( OutputFileInits, fmta ) << "Shadowing/Sun Position Calculations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
+		gio::write( OutputFileInits, fmtA ) << "! <Shadowing/Sun Position Calculations> [Annual Simulations], Calculation Method," "Value {days}, Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, " "Sky Diffuse Modeling Algorithm";
+		gio::write( OutputFileInits, fmtA ) << "Shadowing/Sun Position Calculations," + cAlphaArgs( 1 ) + ',' + RoundSigDigits( ShadowingCalcFrequency ) + ',' + RoundSigDigits( MaxHCS ) + ',' + cAlphaArgs( 2 ) + ',' + cAlphaArgs( 3 );
 
 	}
 
@@ -1312,14 +1314,14 @@ namespace SolarShading {
 
 		//           Relative air mass
 		AirMassH = ( 1.0 - 0.1 * Elevation / 1000.0 );
-		if ( ZenithAngDeg <= 75. ) {
+		if ( ZenithAngDeg <= 75.0 ) {
 			AirMass = AirMassH / CosZenithAng;
 		} else {
-			AirMass = AirMassH / ( CosZenithAng + 0.15 * std::pow( ( 93.9 - ZenithAngDeg ), ( -1.253 ) ) );
+			AirMass = AirMassH / ( CosZenithAng + 0.15 * std::pow( 93.9 - ZenithAngDeg, -1.253 ) );
 		}
-		KappaZ3 = 1.041 * std::pow( ZenithAng, 3 );
+		KappaZ3 = 1.041 * pow_3( ZenithAng );
 		Epsilon = ( ( BeamSolarRad + DifSolarRad ) / DifSolarRad + KappaZ3 ) / ( 1.0 + KappaZ3 );
-		Delta = DifSolarRad * AirMass / 1353.; // 1353 is average extraterrestrial irradiance (W/m2)
+		Delta = DifSolarRad * AirMass / 1353.0; // 1353 is average extraterrestrial irradiance (W/m2)
 		//           Circumsolar (F1) and horizon/zenith (F2) brightening coefficients
 		for ( EpsilonBin = 1; EpsilonBin <= 8; ++EpsilonBin ) {
 			if ( EpsilonBin == 8 ) break;
@@ -1423,7 +1425,7 @@ namespace SolarShading {
 		for ( N = 1; N <= NVBS; ++N ) {
 			DVec = Surface( NBS ).Vertex( N ) - Surface( NRS ).Vertex( 2 );
 			DOTP = dot( CVec, DVec );
-			if ( DOTP > .0009 ) {
+			if ( DOTP > 0.0009 ) {
 				ShowSevereError( "Problem in interior solar distribution calculation (CHKBKS)" );
 				ShowContinueError( "   Solar Distribution = FullInteriorExterior will not work in Zone=" + Surface( NRS ).ZoneName );
 				gio::write( VTString, "(I4)" ) << N;
@@ -3272,7 +3274,7 @@ namespace SolarShading {
 				if ( HCAREA( NS1 ) * HCAREA( NS2 ) > 0.0 ) HCAREA( NS3 ) = -HCAREA( NS3 ); // Determine sign of area of overlap
 				HCT( NS3 ) = HCT( NS2 ) * HCT( NS1 ); // Determine transmission of overlap
 				if ( HCT( NS2 ) != 1.0 && HCT( NS2 ) != 0.0 && HCT( NS1 ) != 1.0 && HCT( NS1 ) != 0.0 ) {
-					if ( HCT( NS2 ) >= .5 && HCT( NS1 ) >= .5 ) {
+					if ( HCT( NS2 ) >= 0.5 && HCT( NS1 ) >= 0.5 ) {
 						HCT( NS3 ) = 1.0 - HCT( NS3 );
 					}
 				}
@@ -3537,7 +3539,7 @@ namespace SolarShading {
 		int const NTheta( 24 ); // Number of azimuth angle steps for sky integration
 		Real64 const Eps( 1.e-10 ); // Small number
 		Real64 const DPhi( PiOvr2 / NPhi ); // Altitude step size, 15 deg for NPhi = 6
-		Real64 const DTheta( 2. * Pi / NTheta ); // Azimuth step size, 15 deg for NTheta = 24
+		Real64 const DTheta( 2.0 * Pi / NTheta ); // Azimuth step size, 15 deg for NTheta = 24
 		Real64 const DThetaDPhi( DTheta * DPhi ); // Product of DTheta and DPhi
 		Real64 const PhiMin( 0.5 * DPhi ); // Minimum altitude
 
@@ -3693,7 +3695,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3956,35 +3958,35 @@ namespace SolarShading {
 		SBS.deallocate();
 		BKS.deallocate();
 
-		gio::write( OutputFileShading, fmta ) << " Shadowing Combinations";
+		gio::write( OutputFileShading, fmtA ) << " Shadowing Combinations";
 		{ auto const SELECT_CASE_var( SolarDistribution );
 		if ( SELECT_CASE_var == MinimalShadowing ) {
-			gio::write( OutputFileShading, fmta ) << " ..Solar Distribution=Minimal Shadowing, Detached Shading will not be used" " in shadowing calculations";
+			gio::write( OutputFileShading, fmtA ) << " ..Solar Distribution=Minimal Shadowing, Detached Shading will not be used" " in shadowing calculations";
 		} else if ( SELECT_CASE_var == FullExterior ) {
 			if ( CalcSolRefl ) {
-				gio::write( OutputFileShading, fmta ) << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces";
+				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces";
 			} else {
-				gio::write( OutputFileShading, fmta ) << "..Solar Distribution=FullExterior";
+				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullExterior";
 			}
 		} else if ( SELECT_CASE_var == FullInteriorExterior ) {
 			if ( CalcSolRefl ) {
-				gio::write( OutputFileShading, fmta ) << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
+				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
 			} else {
-				gio::write( OutputFileShading, fmta ) << "..Solar Distribution=FullInteriorAndExterior";
+				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullInteriorAndExterior";
 			}
 		} else {
 		}}
 
-		gio::write( OutputFileShading, fmta ) << "..In the following, only the first 10 reference surfaces will be shown.";
-		gio::write( OutputFileShading, fmta ) << "..But all surfaces are used in the calculations.";
+		gio::write( OutputFileShading, fmtA ) << "..In the following, only the first 10 reference surfaces will be shown.";
+		gio::write( OutputFileShading, fmtA ) << "..But all surfaces are used in the calculations.";
 
 		for ( HTS = 1; HTS <= TotSurfaces; ++HTS ) {
-			gio::write( OutputFileShading, fmta ) << " ==================================";
+			gio::write( OutputFileShading, fmtA ) << " ==================================";
 			if ( ShadowComb( HTS ).UseThisSurf ) {
 				if ( Surface( HTS ).IsConvex ) {
-					gio::write( OutputFileShading, fmta ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is convex.";
+					gio::write( OutputFileShading, fmtA ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is convex.";
 				} else {
-					gio::write( OutputFileShading, fmta ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is non-convex.";
+					gio::write( OutputFileShading, fmtA ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is non-convex.";
 					if ( ShadowComb( HTS ).NumGenSurf > 0 ) {
 						if ( DisplayExtraWarnings ) {
 							ShowWarningError( "DetermineShadowingCombinations: Surface=\"" + Surface( HTS ).Name + "\" is a receiving surface and is non-convex." );
@@ -3995,20 +3997,20 @@ namespace SolarShading {
 					}
 				}
 			} else {
-				gio::write( OutputFileShading, fmta ) << " Surface=" + Surface( HTS ).Name + " is not used as Receiving Surface in calculations.";
+				gio::write( OutputFileShading, fmtA ) << " Surface=" + Surface( HTS ).Name + " is not used as Receiving Surface in calculations.";
 			}
-			gio::write( OutputFileShading, "*" ) << "Number of general casting surfaces=" << ShadowComb( HTS ).NumGenSurf;
+			gio::write( OutputFileShading, fmtLD ) << "Number of general casting surfaces=" << ShadowComb( HTS ).NumGenSurf;
 			for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumGenSurf; ++NGSS ) {
-				if ( NGSS <= 10 ) gio::write( OutputFileShading, fmta ) << " ..Surface=" + Surface( ShadowComb( HTS ).GenSurf( NGSS ) ).Name;
+				if ( NGSS <= 10 ) gio::write( OutputFileShading, fmtA ) << " ..Surface=" + Surface( ShadowComb( HTS ).GenSurf( NGSS ) ).Name;
 				CastingSurface( ShadowComb( HTS ).GenSurf( NGSS ) ) = true;
 			}
-			gio::write( OutputFileShading, "*" ) << "Number of back surfaces=" << ShadowComb( HTS ).NumBackSurf;
+			gio::write( OutputFileShading, fmtLD ) << "Number of back surfaces=" << ShadowComb( HTS ).NumBackSurf;
 			for ( NGSS = 1; NGSS <= min( 10, ShadowComb( HTS ).NumBackSurf ); ++NGSS ) {
-				gio::write( OutputFileShading, fmta ) << " ...Surface=" + Surface( ShadowComb( HTS ).BackSurf( NGSS ) ).Name;
+				gio::write( OutputFileShading, fmtA ) << " ...Surface=" + Surface( ShadowComb( HTS ).BackSurf( NGSS ) ).Name;
 			}
-			gio::write( OutputFileShading, "*" ) << "Number of receiving sub surfaces=" << ShadowComb( HTS ).NumSubSurf;
+			gio::write( OutputFileShading, fmtLD ) << "Number of receiving sub surfaces=" << ShadowComb( HTS ).NumSubSurf;
 			for ( NGSS = 1; NGSS <= min( 10, ShadowComb( HTS ).NumSubSurf ); ++NGSS ) {
-				gio::write( OutputFileShading, fmta ) << " ....Surface=" + Surface( ShadowComb( HTS ).SubSurf( NGSS ) ).Name;
+				gio::write( OutputFileShading, fmtA ) << " ....Surface=" + Surface( ShadowComb( HTS ).SubSurf( NGSS ) ).Name;
 			}
 		}
 
@@ -7173,11 +7175,11 @@ namespace SolarShading {
 
 				//  Compute Period Values
 				AvgSinSolarDeclin = SumDec / double( ShadowingDaysLeft );
-				AvgCosSolarDeclin = std::sqrt( 1.0 - std::pow( AvgSinSolarDeclin, 2 ) );
+				AvgCosSolarDeclin = std::sqrt( 1.0 - pow_2( AvgSinSolarDeclin ) );
 				AvgEqOfTime = SumET / double( ShadowingDaysLeft );
 			} else {
 				SUN3( DayOfYear, AvgSinSolarDeclin, AvgEqOfTime );
-				AvgCosSolarDeclin = std::sqrt( 1.0 - std::pow( AvgSinSolarDeclin, 2 ) );
+				AvgCosSolarDeclin = std::sqrt( 1.0 - pow_2( AvgSinSolarDeclin ) );
 			}
 
 			CalcPerSolarBeam( AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );
@@ -7621,8 +7623,8 @@ namespace SolarShading {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D< Real64 > const SineSolDeclCoef( 9, { .00561800, .0657911, -.392779, .00064440, -.00618495, -.00010101, -.00007951, -.00011691, .00002096 } ); // Fitted coefficients of Fourier series | SINE OF DECLINATION | COEFFICIENTS
-		static FArray1D< Real64 > const EqOfTimeCoef( 9, { .00021971, -.122649, .00762856, -.156308, -.0530028, -.00388702, -.00123978, -.00270502, -.00167992 } ); // Fitted coefficients of Fourier Series | EQUATION OF TIME | COEFFICIENTS
+		static FArray1D< Real64 > const SineSolDeclCoef( 9, { 0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096 } ); // Fitted coefficients of Fourier series | SINE OF DECLINATION | COEFFICIENTS
+		static FArray1D< Real64 > const EqOfTimeCoef( 9, { 0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992 } ); // Fitted coefficients of Fourier Series | EQUATION OF TIME | COEFFICIENTS
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -7635,15 +7637,15 @@ namespace SolarShading {
 		Real64 CosX; // COS(X)
 		Real64 SineX; // SIN(X)
 
-		X = .017167 * JulianDayOfYear; // Convert julian date to angle X
+		X = 0.017167 * JulianDayOfYear; // Convert julian date to angle X
 
 		// Calculate sines and cosines of X
 		SineX = std::sin( X );
 		CosX = std::cos( X );
 
-		SineOfSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SineX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SineX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + SineSolDeclCoef( 6 ) * ( SineX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + CosX * ( SineX * CosX * 2. ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) - SineX * ( SineX * CosX * 2. ) ) + SineSolDeclCoef( 8 ) * ( 2. * ( SineX * CosX * 2. ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) ) + SineSolDeclCoef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ), 2 ) - std::pow( ( SineX * CosX * 2. ), 2 ) );
+		SineOfSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SineX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SineX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( pow_2( CosX ) - pow_2( SineX ) ) + SineSolDeclCoef( 6 ) * ( SineX * ( pow_2( CosX ) - pow_2( SineX ) ) + CosX * ( SineX * CosX * 2.0 ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( pow_2( CosX ) - pow_2( SineX ) ) - SineX * ( SineX * CosX * 2.0 ) ) + SineSolDeclCoef( 8 ) * ( 2.0 * ( SineX * CosX * 2.0 ) * ( pow_2( CosX ) - pow_2( SineX ) ) ) + SineSolDeclCoef( 9 ) * ( pow_2( pow_2( CosX ) - pow_2( SineX ) ) - pow_2( SineX * CosX * 2.0 ) );
 
-		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SineX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SineX * CosX * 2. ) + EqOfTimeCoef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + EqOfTimeCoef( 6 ) * ( SineX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) + CosX * ( SineX * CosX * 2. ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) - SineX * ( SineX * CosX * 2. ) ) + EqOfTimeCoef( 8 ) * ( 2. * ( SineX * CosX * 2. ) * ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ) ) + EqOfTimeCoef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SineX, 2 ) ), 2 ) - std::pow( ( SineX * CosX * 2. ), 2 ) );
+		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SineX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SineX * CosX * 2.0 ) + EqOfTimeCoef( 5 ) * ( pow_2( CosX ) - pow_2( SineX ) ) + EqOfTimeCoef( 6 ) * ( SineX * ( pow_2( CosX ) - pow_2( SineX ) ) + CosX * ( SineX * CosX * 2.0 ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( pow_2( CosX ) - pow_2( SineX ) ) - SineX * ( SineX * CosX * 2.0 ) ) + EqOfTimeCoef( 8 ) * ( 2.0 * ( SineX * CosX * 2.0 ) * ( pow_2( CosX ) - pow_2( SineX ) ) ) + EqOfTimeCoef( 9 ) * ( pow_2( pow_2( CosX ) - pow_2( SineX ) ) - pow_2( SineX * CosX * 2.0 ) );
 
 	}
 
@@ -7692,7 +7694,7 @@ namespace SolarShading {
 		Real64 HrAngle; // Basic hour angle
 
 		// Compute the hour angle
-		HrAngle = ( 15. * ( 12. - ( CurrentTime + EqOfTime ) ) + ( TimeZoneMeridian - Longitude ) );
+		HrAngle = ( 15.0 * ( 12.0 - ( CurrentTime + EqOfTime ) ) + ( TimeZoneMeridian - Longitude ) );
 		H = HrAngle * DegToRadians;
 
 		// Compute the cosine of the solar zenith angle.
@@ -8394,7 +8396,7 @@ namespace SolarShading {
 		}
 
 		DPhi = PiOvr2 / NPhi; // 15 deg for NPhi = 6
-		DTheta = 2. * Pi / NTheta; // 15 deg for NTheta = 24
+		DTheta = 2.0 * Pi / NTheta; // 15 deg for NTheta = 24
 		DThetaDPhi = DTheta * DPhi;
 		PhiMin = 0.5 * DPhi; // 7.5 deg for DPhi = 15 deg
 
@@ -8581,7 +8583,7 @@ namespace SolarShading {
 			ProfileAngVert = std::abs( std::acos( dot3 ) );
 			//  END IF
 			// Constrain to 0 to pi
-			if ( ProfileAngVert > Pi ) ProfileAngVert = 2. * Pi - ProfileAngVert;
+			if ( ProfileAngVert > Pi ) ProfileAngVert = 2.0 * Pi - ProfileAngVert;
 
 			SurfaceWindow( SurfNum ).ProfileAngHor = ProfileAngHor / DegToRadians;
 			SurfaceWindow( SurfNum ).ProfileAngVert = ProfileAngVert / DegToRadians;
@@ -9060,14 +9062,14 @@ namespace SolarShading {
 
 					if ( d2prime <= d2 ) {
 						if ( d12 * TanAlpha <= L ) {
-							A1sh = 0.5 * TanAlpha * std::pow( d1, 2 );
-							A2sh = d2prime * L + 0.5 * TanAlpha * std::pow( d12, 2 ) - A1sh;
+							A1sh = 0.5 * TanAlpha * pow_2( d1 );
+							A2sh = d2prime * L + 0.5 * TanAlpha * pow_2( d12 ) - A1sh;
 						} else { // d12*TanAlpha > L
 							if ( d1 * TanAlpha <= L ) {
-								A1sh = 0.5 * TanAlpha * std::pow( d1, 2 );
-								A2sh = d2 * L - 0.5 * TanAlpha * std::pow( ( L / TanAlpha - d1 ), 2 );
+								A1sh = 0.5 * TanAlpha * pow_2( d1 );
+								A2sh = d2 * L - 0.5 * TanAlpha * pow_2( L / TanAlpha - d1 );
 							} else { // d1*TanAlpha > L
-								A1sh = d1 * L - ( 0.5 / TanAlpha ) * std::pow( L, 2 );
+								A1sh = d1 * L - ( 0.5 / TanAlpha ) * pow_2( L );
 								A2sh = d2 * L;
 							}
 						}
@@ -9075,9 +9077,9 @@ namespace SolarShading {
 						A2sh = d2 * L;
 						if ( d2prime < d1 + d2 ) {
 							if ( d12 * TanAlpha <= L ) {
-								A1sh = L * ( d2prime - d2 ) + 0.5 * TanAlpha * std::pow( d12, 2 );
+								A1sh = L * ( d2prime - d2 ) + 0.5 * TanAlpha * pow_2( d12 );
 							} else { // d12*TanAlpha > L
-								A1sh = d1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
+								A1sh = d1 * L - 0.5 * pow_2( L ) / TanAlpha;
 							}
 						} else { // d2prime >= d1+d2
 							A1sh = d1 * L;
@@ -9109,10 +9111,10 @@ namespace SolarShading {
 					if ( d2prime <= f2 ) { // Shadow from opposing reveal does not go beyond inside surface of frame
 
 						if ( d12 * TanAlpha <= L ) {
-							A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
-							L1 = f1 * ( f1 * TanAlpha / ( 6. * L ) + 0.5 );
+							A1sh = 0.5 * TanAlpha * pow_2( f1 );
+							L1 = f1 * ( f1 * TanAlpha / ( 6.0 * L ) + 0.5 );
 							if ( d2 - ( d2prime + d2prime2 + P2 ) >= 0.0 ) {
-								A2sh = ( d2prime + d2prime2 ) * L + 0.5 * TanAlpha * ( std::pow( ( d1 + d2 - d2prime ), 2 ) - std::pow( ( d1 + P2 + d2prime2 ), 2 ) );
+								A2sh = ( d2prime + d2prime2 ) * L + 0.5 * TanAlpha * ( pow_2( d1 + d2 - d2prime ) - pow_2( d1 + P2 + d2prime2 ) );
 								L2 = d2prime2 + 0.5 * ( d2 - ( d2prime + d2prime2 + P2 ) );
 							} else { // d2-(d2prime+d2prime2+P2) < 0.  ! Inside reveal is fully shadowed by frame and/or opposing reveal
 								A2sh = f2 * L;
@@ -9120,24 +9122,24 @@ namespace SolarShading {
 							}
 						} else { // d12*TanAlpha >= L
 							if ( ( d1 + P2 ) * TanAlpha <= L ) {
-								A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
-								L1 = f1 * ( ( f1 * TanAlpha ) / ( 6. * L ) + 0.5 );
+								A1sh = 0.5 * TanAlpha * pow_2( f1 );
+								L1 = f1 * ( ( f1 * TanAlpha ) / ( 6.0 * L ) + 0.5 );
 								if ( ( d1 + P2 + d2prime2 ) * TanAlpha >= L ) {
 									A2sh = f2 * L;
 									L2 = f2;
 								} else { // (d1+P2+d2prime2)*TanAlpha < L
-									A2sh = f2 * L - 0.5 * std::pow( ( L - ( d1 + P2 ) * TanAlpha ), 2 ) / TanAlpha + d2prime2 * ( L - ( d1 + P2 + d2prime2 / 2. ) * TanAlpha );
-									L2 = d2prime2 + ( L / TanAlpha - ( d1 + P2 + d2prime2 ) ) / 3.;
+									A2sh = f2 * L - 0.5 * pow_2( L - ( d1 + P2 ) * TanAlpha ) / TanAlpha + d2prime2 * ( L - ( d1 + P2 + d2prime2 / 2.0 ) * TanAlpha );
+									L2 = d2prime2 + ( L / TanAlpha - ( d1 + P2 + d2prime2 ) ) / 3.0;
 								}
 							} else { // (d1+P2)*TanAlpha > L
 								L2 = f2;
 								A2sh = f2 * L;
 								if ( f1 * TanAlpha <= L ) {
-									A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
-									L1 = f1 * ( ( f1 * TanAlpha ) / ( 6. * L ) + 0.5 );
+									A1sh = 0.5 * TanAlpha * pow_2( f1 );
+									L1 = f1 * ( ( f1 * TanAlpha ) / ( 6.0 * L ) + 0.5 );
 								} else { // f1*TanAlpha > L
-									A1sh = f1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
-									L1 = f1 - ( L / TanAlpha ) / 3.;
+									A1sh = f1 * L - 0.5 * pow_2( L ) / TanAlpha;
+									L1 = f1 - ( L / TanAlpha ) / 3.0;
 								}
 							}
 						}
@@ -9152,19 +9154,19 @@ namespace SolarShading {
 						} else { // d2prime < d1+d2
 							if ( d2prime <= d2 + P1 ) {
 								if ( f1 * TanAlpha <= L ) {
-									A1sh = 0.5 * TanAlpha * std::pow( f1, 2 );
-									L1 = f1 * ( ( f1 * TanAlpha ) / ( 6. * L ) + 0.5 );
+									A1sh = 0.5 * TanAlpha * pow_2( f1 );
+									L1 = f1 * ( ( f1 * TanAlpha ) / ( 6.0 * L ) + 0.5 );
 								} else { // f1*TanAlpha > L
-									A1sh = f1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
-									L1 = f1 - ( L / TanAlpha ) / 3.;
+									A1sh = f1 * L - 0.5 * pow_2( L ) / TanAlpha;
+									L1 = f1 - ( L / TanAlpha ) / 3.0;
 								}
 							} else { // d2prime > d2+P1
 								if ( d12 * TanAlpha <= L ) {
-									A1sh = L * ( d2prime - ( d2 + P1 ) ) + 0.5 * TanAlpha * std::pow( d12, 2 );
-									L1 = ( L * ( f1 - d12 / 2. ) - d12 * TanAlpha * ( f1 / 2 - d12 / 3. ) ) / ( L - d12 * TanAlpha / 2. );
+									A1sh = L * ( d2prime - ( d2 + P1 ) ) + 0.5 * TanAlpha * pow_2( d12 );
+									L1 = ( L * ( f1 - d12 / 2.0 ) - d12 * TanAlpha * ( f1 / 2 - d12 / 3.0 ) ) / ( L - d12 * TanAlpha / 2.0 );
 								} else { // d12*TanAlpha > L
-									A1sh = f1 * L - 0.5 * std::pow( L, 2 ) / TanAlpha;
-									L1 = f1 - ( L / TanAlpha ) / 3.;
+									A1sh = f1 * L - 0.5 * pow_2( L ) / TanAlpha;
+									L1 = f1 - ( L / TanAlpha ) / 3.0;
 								}
 							}
 						}
@@ -9428,7 +9430,7 @@ namespace SolarShading {
 						++Count;
 					}
 				}
-				gio::write( CountOut, "*" ) << Count;
+				gio::write( CountOut, fmtLD ) << Count;
 				TotCount += Count;
 				TotalWarningErrors += Count - 1;
 				ShowWarningError( "Base surface does not surround subsurface (CHKSBS), Overlap Status=" + cOverLapStatus( TrackBaseSubSurround( Loop1 ).MiscIndex ) );
@@ -9442,7 +9444,7 @@ namespace SolarShading {
 			}
 			if ( TotCount > 0 ) {
 				ShowMessage( "" );
-				gio::write( CountOut, "*" ) << TotCount;
+				gio::write( CountOut, fmtLD ) << TotCount;
 				ShowContinueError( "  The base surround errors occurred " + stripped( CountOut ) + " times (total)." );
 				ShowMessage( "" );
 			}
@@ -9463,7 +9465,7 @@ namespace SolarShading {
 						++Count;
 					}
 				}
-				gio::write( CountOut, "*" ) << Count;
+				gio::write( CountOut, fmtLD ) << Count;
 				TotCount += Count;
 				TotalWarningErrors += Count - 1;
 				ShowMessage( "" );
@@ -9481,7 +9483,7 @@ namespace SolarShading {
 			}
 			if ( TotCount > 0 ) {
 				ShowMessage( "" );
-				gio::write( CountOut, "*" ) << TotCount;
+				gio::write( CountOut, fmtLD ) << TotCount;
 				ShowContinueError( "  The too many vertices errors occurred " + stripped( CountOut ) + " times (total)." );
 				ShowMessage( "" );
 			}
@@ -9501,7 +9503,7 @@ namespace SolarShading {
 						++Count;
 					}
 				}
-				gio::write( CountOut, "*" ) << Count;
+				gio::write( CountOut, fmtLD ) << Count;
 				TotCount += Count;
 				TotalWarningErrors += Count - 1;
 				ShowMessage( "" );
@@ -9519,7 +9521,7 @@ namespace SolarShading {
 			}
 			if ( TotCount > 0 ) {
 				ShowMessage( "" );
-				gio::write( CountOut, "*" ) << TotCount;
+				gio::write( CountOut, fmtLD ) << TotCount;
 				ShowContinueError( "  The too many figures errors occurred " + stripped( CountOut ) + " times (total)." );
 				ShowMessage( "" );
 			}

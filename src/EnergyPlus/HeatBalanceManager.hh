@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -15,7 +14,6 @@ namespace HeatBalanceManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern gio::Fmt const fmtA;
 
 	extern FArray1D_string const PassFail;
 

@@ -194,8 +194,9 @@ namespace DXFEarClipping {
 		// Subroutine argument definitions:
 
 		// Subroutine parameter definitions:
-		Real64 const point_tolerance( .00001 );
-		Real64 const twopiang( ( 180. / radtodeg ) );
+		Real64 const point_tolerance( 0.00001 );
+		Real64 const twopiang( ( 180.0 / radtodeg ) );
+		static gio::Fmt const fmtLD( "*" );
 
 		// Interface block specifications:
 		// na
@@ -292,14 +293,14 @@ namespace DXFEarClipping {
 					ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual surfaces." );
 				}
 				if ( DisplayExtraWarnings ) {
-					gio::write( line, "*" ) << "surface=" << surfname << " class=" << cSurfaceClass( surfclass );
+					gio::write( line, fmtLD ) << "surface=" << surfname << " class=" << cSurfaceClass( surfclass );
 					ShowMessage( line );
 					for ( j = 1; j <= nsides; ++j ) {
 						//          write(line,"(' side=',i2,' (',2(f6.1,','),f6.1,')')") j,polygon(j)
 						line = " side=" + RoundSigDigits( j ) + " (" + RoundSigDigits( polygon( j ).x, 1 ) + ',' + RoundSigDigits( polygon( j ).y, 1 ) + ',' + RoundSigDigits( polygon( j ).z, 1 ) + ')';
 						ShowMessage( line );
 					}
-					gio::write( line, "*" ) << "number of triangles found=" << ncount;
+					gio::write( line, fmtLD ) << "number of triangles found=" << ncount;
 					ShowMessage( line );
 					for ( j = 1; j <= nrangles; ++j ) {
 						//          write(line,"(' r angle=',i2,' vert=',i2,' deg=',f6.1)") j,r_angles(j),rangles(j)*radtodeg
@@ -467,7 +468,7 @@ namespace DXFEarClipping {
 		// Function argument definitions:
 
 		// Function parameter definitions:
-		Real64 const point_tolerance( .00001 );
+		Real64 const point_tolerance( 0.00001 );
 
 		// Interface block specifications:
 		// na
@@ -551,7 +552,8 @@ namespace DXFEarClipping {
 		// Subroutine argument definitions:
 
 		// Subroutine parameter definitions:
-		Real64 const twopi_rad( ( 180. / radtodeg ) );
+		Real64 const twopi_rad( ( 180.0 / radtodeg ) );
+		static gio::Fmt const fmtLD( "*" );
 
 		// Interface block specifications:
 		// na
@@ -650,7 +652,7 @@ namespace DXFEarClipping {
 					earvert( 3 ) = evert;
 				}
 				if ( trackit ) {
-					gio::write( OutputFileDebug, "*" ) << "ear=" << nears << " triangle=" << svert << mvert << evert;
+					gio::write( OutputFileDebug, fmtLD ) << "ear=" << nears << " triangle=" << svert << mvert << evert;
 				}
 			}
 		}
@@ -716,7 +718,7 @@ namespace DXFEarClipping {
 
 		alpha = surfazimuth;
 
-		alpha180 = 180. - alpha; // amount to rotate
+		alpha180 = 180.0 - alpha; // amount to rotate
 		alphrad = alpha180 / radtodeg;
 
 		for ( i = 1; i <= nsides; ++i ) {

@@ -87,8 +87,8 @@ namespace OutputProcessor {
 	int const ReportVDD_Yes( 1 ); // Report the variable dictionaries in "report format"
 	int const ReportVDD_IDF( 2 ); // Report the variable dictionaries in "IDF format"
 
-	Real64 const MinSetValue( 99999999999999. );
-	Real64 const MaxSetValue( -99999999999999. );
+	Real64 const MinSetValue( 99999999999999.0 );
+	Real64 const MaxSetValue( -99999999999999.0 );
 	int const IMinSetValue( 999999 );
 	int const IMaxSetValue( -999999 );
 
@@ -109,11 +109,12 @@ namespace OutputProcessor {
 	int const MeterType_CustomDec( 2 ); // Type value for custom meters that decrement another meter
 	int const MeterType_CustomDiff( 3 ); // Type value for custom meters that difference another meter
 
-	gio::Fmt const TimeStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',i2,',',f5.2,',',f5.2,',',A)" );
-	gio::Fmt const DailyStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',A)" );
-	gio::Fmt const MonthlyStampFormat( "(A,',',A,',',i2)" );
-	gio::Fmt const RunPeriodStampFormat( "(A,',',A)" );
-	gio::Fmt const fmta( "(A)" );
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt const TimeStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',i2,',',f5.2,',',f5.2,',',A)" );
+	static gio::Fmt const DailyStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',A)" );
+	static gio::Fmt const MonthlyStampFormat( "(A,',',A,',',i2)" );
+	static gio::Fmt const RunPeriodStampFormat( "(A,',',A)" );
 	FArray1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 	static std::string const BlankString;
 	int const UnitsStringLength( 16 );
@@ -403,7 +404,7 @@ namespace OutputProcessor {
 			TimeValue( Index ).CurMinute = 0.0;
 
 		} else {
-			gio::write( cValue, "*" ) << Index;
+			gio::write( cValue, fmtLD ) << Index;
 			ShowSevereError( "Illegal value passed to SetupTimePointers, must be 1 or 2 == " + cValue, OutputFileStandard );
 
 		}}
@@ -2419,7 +2420,7 @@ namespace OutputProcessor {
 			EnergyMeters( NumEnergyMeters ).RptTS = false;
 			EnergyMeters( NumEnergyMeters ).RptTSFO = false;
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).TSRptNum );
-			gio::write( EnergyMeters( NumEnergyMeters ).TSRptNumChr, "*" ) << EnergyMeters( NumEnergyMeters ).TSRptNum;
+			gio::write( EnergyMeters( NumEnergyMeters ).TSRptNumChr, fmtLD ) << EnergyMeters( NumEnergyMeters ).TSRptNum;
 			strip( EnergyMeters( NumEnergyMeters ).TSRptNumChr );
 			EnergyMeters( NumEnergyMeters ).HRValue = 0.0;
 			EnergyMeters( NumEnergyMeters ).HRMaxVal = MaxSetValue;
@@ -2429,7 +2430,7 @@ namespace OutputProcessor {
 			EnergyMeters( NumEnergyMeters ).RptHR = false;
 			EnergyMeters( NumEnergyMeters ).RptHRFO = false;
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).HRRptNum );
-			gio::write( EnergyMeters( NumEnergyMeters ).HRRptNumChr, "*" ) << EnergyMeters( NumEnergyMeters ).HRRptNum;
+			gio::write( EnergyMeters( NumEnergyMeters ).HRRptNumChr, fmtLD ) << EnergyMeters( NumEnergyMeters ).HRRptNum;
 			strip( EnergyMeters( NumEnergyMeters ).HRRptNumChr );
 			EnergyMeters( NumEnergyMeters ).DYValue = 0.0;
 			EnergyMeters( NumEnergyMeters ).DYMaxVal = MaxSetValue;
@@ -2439,7 +2440,7 @@ namespace OutputProcessor {
 			EnergyMeters( NumEnergyMeters ).RptDY = false;
 			EnergyMeters( NumEnergyMeters ).RptDYFO = false;
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).DYRptNum );
-			gio::write( EnergyMeters( NumEnergyMeters ).DYRptNumChr, "*" ) << EnergyMeters( NumEnergyMeters ).DYRptNum;
+			gio::write( EnergyMeters( NumEnergyMeters ).DYRptNumChr, fmtLD ) << EnergyMeters( NumEnergyMeters ).DYRptNum;
 			strip( EnergyMeters( NumEnergyMeters ).DYRptNumChr );
 			EnergyMeters( NumEnergyMeters ).MNValue = 0.0;
 			EnergyMeters( NumEnergyMeters ).MNMaxVal = MaxSetValue;
@@ -2449,7 +2450,7 @@ namespace OutputProcessor {
 			EnergyMeters( NumEnergyMeters ).RptMN = false;
 			EnergyMeters( NumEnergyMeters ).RptMNFO = false;
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).MNRptNum );
-			gio::write( EnergyMeters( NumEnergyMeters ).MNRptNumChr, "*" ) << EnergyMeters( NumEnergyMeters ).MNRptNum;
+			gio::write( EnergyMeters( NumEnergyMeters ).MNRptNumChr, fmtLD ) << EnergyMeters( NumEnergyMeters ).MNRptNum;
 			strip( EnergyMeters( NumEnergyMeters ).MNRptNumChr );
 			EnergyMeters( NumEnergyMeters ).SMValue = 0.0;
 			EnergyMeters( NumEnergyMeters ).SMMaxVal = MaxSetValue;
@@ -2459,7 +2460,7 @@ namespace OutputProcessor {
 			EnergyMeters( NumEnergyMeters ).RptSM = false;
 			EnergyMeters( NumEnergyMeters ).RptSMFO = false;
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).SMRptNum );
-			gio::write( EnergyMeters( NumEnergyMeters ).SMRptNumChr, "*" ) << EnergyMeters( NumEnergyMeters ).SMRptNum;
+			gio::write( EnergyMeters( NumEnergyMeters ).SMRptNumChr, fmtLD ) << EnergyMeters( NumEnergyMeters ).SMRptNum;
 			strip( EnergyMeters( NumEnergyMeters ).SMRptNumChr );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).TSAccRptNum );
 			AssignReportNumber( EnergyMeters( NumEnergyMeters ).HRAccRptNum );
@@ -3333,7 +3334,7 @@ namespace OutputProcessor {
 			}
 
 			if ( EnergyMeters( Loop ).RptAccTS ) {
-				gio::write( cReportID, "*" ) << EnergyMeters( Loop ).TSAccRptNum;
+				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).TSAccRptNum;
 				strip( cReportID );
 				WriteCumulativeReportMeterData( EnergyMeters( Loop ).TSAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccTSFO );
 			}
@@ -3413,7 +3414,7 @@ namespace OutputProcessor {
 			}
 
 			if ( EnergyMeters( Loop ).RptAccHR ) {
-				gio::write( cReportID, "*" ) << EnergyMeters( Loop ).HRAccRptNum;
+				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).HRAccRptNum;
 				strip( cReportID );
 				WriteCumulativeReportMeterData( EnergyMeters( Loop ).HRAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccHRFO );
 			}
@@ -3485,7 +3486,7 @@ namespace OutputProcessor {
 			}
 
 			if ( EnergyMeters( Loop ).RptAccDY ) {
-				gio::write( cReportID, "*" ) << EnergyMeters( Loop ).DYAccRptNum;
+				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).DYAccRptNum;
 				strip( cReportID );
 				WriteCumulativeReportMeterData( EnergyMeters( Loop ).DYAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccDYFO );
 			}
@@ -3552,7 +3553,7 @@ namespace OutputProcessor {
 			}
 
 			if ( EnergyMeters( Loop ).RptAccMN ) {
-				gio::write( cReportID, "*" ) << EnergyMeters( Loop ).MNAccRptNum;
+				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).MNAccRptNum;
 				strip( cReportID );
 				WriteCumulativeReportMeterData( EnergyMeters( Loop ).MNAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccMNFO );
 			}
@@ -3623,7 +3624,7 @@ namespace OutputProcessor {
 			}
 
 			if ( EnergyMeters( Loop ).RptAccSM ) {
-				gio::write( cReportID, "*" ) << EnergyMeters( Loop ).SMAccRptNum;
+				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).SMAccRptNum;
 				strip( cReportID );
 				WriteCumulativeReportMeterData( EnergyMeters( Loop ).SMAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccSMFO );
 			}
@@ -3866,31 +3867,31 @@ namespace OutputProcessor {
 			ZoneListMult = RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ZoneListMult;
 
 			if ( ZoneMult > 1 || ZoneListMult > 1 ) {
-				gio::write( String, "*" ) << ZoneMult * ZoneListMult;
+				gio::write( String, fmtLD ) << ZoneMult * ZoneListMult;
 				Multipliers = " * " + stripped( String );
-				gio::write( String, "*" ) << ZoneMult;
+				gio::write( String, fmtLD ) << ZoneMult;
 				Multipliers += "  (Zone Multiplier = " + stripped( String );
-				gio::write( String, "*" ) << ZoneListMult;
+				gio::write( String, fmtLD ) << ZoneListMult;
 				Multipliers += ", Zone List Multiplier = " + stripped( String ) + ')';
 			}
 
 			gio::write( OutputFileMeterDetails, "(/,A)" ) << " Meters for " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ReportIDChr + ',' + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + " [" + MtrUnits + ']' + Multipliers;
 
 			for ( I = 1; I <= VarMeterArrays( VarMeter ).NumOnMeters; ++I ) {
-				gio::write( OutputFileMeterDetails, fmta ) << "  OnMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnMeters( I ) ).Name + " [" + MtrUnits + ']';
+				gio::write( OutputFileMeterDetails, fmtA ) << "  OnMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnMeters( I ) ).Name + " [" + MtrUnits + ']';
 			}
 
 			for ( I = 1; I <= VarMeterArrays( VarMeter ).NumOnCustomMeters; ++I ) {
-				gio::write( OutputFileMeterDetails, fmta ) << "  OnCustomMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnCustomMeters( I ) ).Name + " [" + MtrUnits + ']';
+				gio::write( OutputFileMeterDetails, fmtA ) << "  OnCustomMeter=" + EnergyMeters( VarMeterArrays( VarMeter ).OnCustomMeters( I ) ).Name + " [" + MtrUnits + ']';
 			}
 		}
 
 		for ( Meter = 1; Meter <= NumEnergyMeters; ++Meter ) {
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, "(/,A)", flags ) << " For Meter=" + EnergyMeters( Meter ).Name + " [" + EnergyMeters( Meter ).Units + ']'; }
-			if ( EnergyMeters( Meter ).ResourceType != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmta, flags ) << ", ResourceType=" + EnergyMeters( Meter ).ResourceType; };
-			if ( EnergyMeters( Meter ).EndUse != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmta, flags ) << ", EndUse=" + EnergyMeters( Meter ).EndUse; };
-			if ( EnergyMeters( Meter ).Group != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmta, flags ) << ", Group=" + EnergyMeters( Meter ).Group; };
-			gio::write( OutputFileMeterDetails, fmta ) << ", contents are:";
+			if ( EnergyMeters( Meter ).ResourceType != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", ResourceType=" + EnergyMeters( Meter ).ResourceType; };
+			if ( EnergyMeters( Meter ).EndUse != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", EndUse=" + EnergyMeters( Meter ).EndUse; };
+			if ( EnergyMeters( Meter ).Group != "" ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileMeterDetails, fmtA, flags ) << ", Group=" + EnergyMeters( Meter ).Group; };
+			gio::write( OutputFileMeterDetails, fmtA ) << ", contents are:";
 
 			CustDecWritten = false;
 
@@ -3905,15 +3906,15 @@ namespace OutputProcessor {
 							ZoneListMult = RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ZoneListMult;
 
 							if ( ZoneMult > 1 || ZoneListMult > 1 ) {
-								gio::write( String, "*" ) << ZoneMult * ZoneListMult;
+								gio::write( String, fmtLD ) << ZoneMult * ZoneListMult;
 								Multipliers = " * " + stripped( String );
-								gio::write( String, "*" ) << ZoneMult;
+								gio::write( String, fmtLD ) << ZoneMult;
 								Multipliers += "  (Zone Multiplier = " + stripped( String );
-								gio::write( String, "*" ) << ZoneListMult;
+								gio::write( String, fmtLD ) << ZoneListMult;
 								Multipliers += ", Zone List Multiplier = " + stripped( String ) + ')';
 							}
 
-							gio::write( OutputFileMeterDetails, fmta ) << "  " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + Multipliers;
+							gio::write( OutputFileMeterDetails, fmtA ) << "  " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + Multipliers;
 						}
 					}
 				}
@@ -3921,7 +3922,7 @@ namespace OutputProcessor {
 					if ( VarMeterArrays( VarMeter ).NumOnCustomMeters > 0 ) {
 						if ( any_eq( VarMeterArrays( VarMeter ).OnCustomMeters, Meter ) ) {
 							if ( ! CustDecWritten && EnergyMeters( Meter ).TypeOfMeter == MeterType_CustomDec ) {
-								gio::write( OutputFileMeterDetails, fmta ) << " Values for this meter will be Source Meter=" + EnergyMeters( EnergyMeters( Meter ).SourceMeter ).Name + "; but will be decremented by:";
+								gio::write( OutputFileMeterDetails, fmtA ) << " Values for this meter will be Source Meter=" + EnergyMeters( EnergyMeters( Meter ).SourceMeter ).Name + "; but will be decremented by:";
 								CustDecWritten = true;
 							}
 							for ( VarMeter1 = 1; VarMeter1 <= VarMeterArrays( VarMeter ).NumOnCustomMeters; ++VarMeter1 ) {
@@ -3932,15 +3933,15 @@ namespace OutputProcessor {
 								ZoneListMult = RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarPtr().ZoneListMult;
 
 								if ( ZoneMult > 1 || ZoneListMult > 1 ) {
-									gio::write( String, "*" ) << ZoneMult * ZoneListMult;
+									gio::write( String, fmtLD ) << ZoneMult * ZoneListMult;
 									Multipliers = " * " + stripped( String );
-									gio::write( String, "*" ) << ZoneMult;
+									gio::write( String, fmtLD ) << ZoneMult;
 									Multipliers += "  (Zone Multiplier = " + stripped( String );
-									gio::write( String, "*" ) << ZoneListMult;
+									gio::write( String, fmtLD ) << ZoneListMult;
 									Multipliers += ", Zone List Multiplier = " + stripped( String ) + ')';
 								}
 
-								gio::write( OutputFileMeterDetails, fmta ) << "  " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + Multipliers;
+								gio::write( OutputFileMeterDetails, fmtA ) << "  " + RVariableTypes( VarMeterArrays( VarMeter ).RepVariable ).VarName + Multipliers;
 							}
 						}
 					}
@@ -4206,23 +4207,23 @@ namespace OutputProcessor {
 		{ auto const SELECT_CASE_var( reportingInterval );
 
 		if ( ( SELECT_CASE_var == ReportEach ) || ( SELECT_CASE_var == ReportTimeStep ) ) {
-			gio::write( OutputFileStandard, fmta ) << reportIDChr + ",1," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
+			gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",1," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
 
 		} else if ( SELECT_CASE_var == ReportHourly ) {
 			TrackingHourlyVariables = true;
-			gio::write( OutputFileStandard, fmta ) << reportIDChr + ",1," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
+			gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",1," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
 
 		} else if ( SELECT_CASE_var == ReportDaily ) {
 			TrackingDailyVariables = true;
-			gio::write( OutputFileStandard, fmta ) << reportIDChr + ",7," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
+			gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",7," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
 
 		} else if ( SELECT_CASE_var == ReportMonthly ) {
 			TrackingMonthlyVariables = true;
-			gio::write( OutputFileStandard, fmta ) << reportIDChr + ",9," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
+			gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",9," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
 
 		} else if ( SELECT_CASE_var == ReportSim ) {
 			TrackingRunPeriodVariables = true;
-			gio::write( OutputFileStandard, fmta ) << reportIDChr + ",11," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
+			gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",11," + keyedValue + ',' + variableName + " [" + UnitsString + ']' + FreqString;
 
 		}}
 
@@ -4297,64 +4298,64 @@ namespace OutputProcessor {
 
 		if ( ( SELECT_CASE_var == ReportEach ) || ( SELECT_CASE_var == ReportTimeStep ) || ( SELECT_CASE_var == ReportHourly ) ) { // -1, 0, 1
 			if ( ! cumulativeMeterFlag ) {
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",1," + meterName + " [" + UnitsString + ']' + FreqString;
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",1," + meterName + " [" + UnitsString + ']' + FreqString;
 			} else {
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString;
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString;
 			}
 
 			if ( ! meterFileOnlyFlag ) {
 				if ( ! cumulativeMeterFlag ) {
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",1," + meterName + " [" + UnitsString + ']' + FreqString;
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",1," + meterName + " [" + UnitsString + ']' + FreqString;
 				} else {
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString;
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString;
 				}
 			}
 
 		} else if ( SELECT_CASE_var == ReportDaily ) { //  2
 			if ( ! cumulativeMeterFlag ) {
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",7," + meterName + " [" + UnitsString + ']' + FreqString;
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",7," + meterName + " [" + UnitsString + ']' + FreqString;
 			} else {
 				lenString = index( FreqString, '[' );
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
 			}
 			if ( ! meterFileOnlyFlag ) {
 				if ( ! cumulativeMeterFlag ) {
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",7," + meterName + " [" + UnitsString + ']' + FreqString;
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",7," + meterName + " [" + UnitsString + ']' + FreqString;
 				} else {
 					lenString = index( FreqString, '[' );
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
 				}
 			}
 
 		} else if ( SELECT_CASE_var == ReportMonthly ) { //  3
 			if ( ! cumulativeMeterFlag ) {
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",9," + meterName + " [" + UnitsString + ']' + FreqString;
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",9," + meterName + " [" + UnitsString + ']' + FreqString;
 			} else {
 				lenString = index( FreqString, '[' );
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
 			}
 			if ( ! meterFileOnlyFlag ) {
 				if ( ! cumulativeMeterFlag ) {
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",9," + meterName + " [" + UnitsString + ']' + FreqString;
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",9," + meterName + " [" + UnitsString + ']' + FreqString;
 				} else {
 					lenString = index( FreqString, '[' );
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
 				}
 			}
 
 		} else if ( SELECT_CASE_var == ReportSim ) { //  4
 			if ( ! cumulativeMeterFlag ) {
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",11," + meterName + " [" + UnitsString + ']' + FreqString;
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",11," + meterName + " [" + UnitsString + ']' + FreqString;
 			} else {
 				lenString = index( FreqString, '[' );
-				gio::write( OutputFileMeters, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
+				gio::write( OutputFileMeters, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
 			}
 			if ( ! meterFileOnlyFlag ) {
 				if ( ! cumulativeMeterFlag ) {
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",11," + meterName + " [" + UnitsString + ']' + FreqString;
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",11," + meterName + " [" + UnitsString + ']' + FreqString;
 				} else {
 					lenString = index( FreqString, '[' );
-					gio::write( OutputFileStandard, fmta ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
+					gio::write( OutputFileStandard, fmtA ) << reportIDChr + ",1,Cumulative " + meterName + " [" + UnitsString + ']' + FreqString.substr( 0, lenString );
 				}
 			}
 
@@ -4476,7 +4477,6 @@ namespace OutputProcessor {
 		using namespace SQLiteProcedures;
 
 		// Locals
-		static gio::Fmt const fmta( "(A)" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4499,7 +4499,7 @@ namespace OutputProcessor {
 		if ( repVal == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, "*" ) << repVal;
+			gio::write( NumberOut, fmtLD ) << repVal;
 			strip( NumberOut );
 			NumberOut = RemoveTrailingZeros( NumberOut );
 		}
@@ -4507,7 +4507,7 @@ namespace OutputProcessor {
 		if ( MaxValue == 0.0 ) {
 			MaxOut = "0.0";
 		} else {
-			gio::write( MaxOut, "*" ) << MaxValue;
+			gio::write( MaxOut, fmtLD ) << MaxValue;
 			strip( MaxOut );
 			MaxOut = RemoveTrailingZeros( MaxOut );
 		}
@@ -4515,7 +4515,7 @@ namespace OutputProcessor {
 		if ( minValue == 0.0 ) {
 			MinOut = "0.0";
 		} else {
-			gio::write( MinOut, "*" ) << minValue;
+			gio::write( MinOut, fmtLD ) << minValue;
 			strip( MinOut );
 			MinOut = RemoveTrailingZeros( MinOut );
 		}
@@ -4531,10 +4531,10 @@ namespace OutputProcessor {
 		{ auto const SELECT_CASE_var( reportingInterval );
 
 		if ( ( SELECT_CASE_var == ReportEach ) || ( SELECT_CASE_var == ReportTimeStep ) || ( SELECT_CASE_var == ReportHourly ) ) { // -1, 0, 1
-			gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut;
+			gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut;
 
 		} else if ( ( SELECT_CASE_var == ReportDaily ) || ( SELECT_CASE_var == ReportMonthly ) || ( SELECT_CASE_var == ReportSim ) ) { //  2, 3, 4
-			gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
+			gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
 
 		}}
 
@@ -4592,7 +4592,7 @@ namespace OutputProcessor {
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, "*" ) << repValue;
+			gio::write( NumberOut, fmtLD ) << repValue;
 			strip( NumberOut );
 			NumberOut = RemoveTrailingZeros( NumberOut );
 		}
@@ -4601,7 +4601,7 @@ namespace OutputProcessor {
 			CreateSQLiteMeterRecord( reportID, timeIndex, repValue );
 		}
 
-		gio::write( OutputFileMeters, fmta ) << creportID + ',' + NumberOut;
+		gio::write( OutputFileMeters, fmtA ) << creportID + ',' + NumberOut;
 		++StdMeterRecordCount;
 
 		if ( ! meterOnlyFlag ) {
@@ -4609,7 +4609,7 @@ namespace OutputProcessor {
 				CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
 			}
 
-			gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut;
+			gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut;
 			++StdOutputRecordCount;
 		}
 
@@ -4656,7 +4656,6 @@ namespace OutputProcessor {
 		using namespace SQLiteProcedures;
 
 		// Locals
-		static gio::Fmt const fmta( "(A)" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4676,7 +4675,7 @@ namespace OutputProcessor {
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, "*" ) << repValue;
+			gio::write( NumberOut, fmtLD ) << repValue;
 			strip( NumberOut );
 			NumberOut = RemoveTrailingZeros( NumberOut );
 		}
@@ -4684,7 +4683,7 @@ namespace OutputProcessor {
 		if ( MaxValue == 0.0 ) {
 			MaxOut = "0.0";
 		} else {
-			gio::write( MaxOut, "*" ) << MaxValue;
+			gio::write( MaxOut, fmtLD ) << MaxValue;
 			strip( MaxOut );
 			MaxOut = RemoveTrailingZeros( MaxOut );
 		}
@@ -4692,7 +4691,7 @@ namespace OutputProcessor {
 		if ( minValue == 0.0 ) {
 			MinOut = "0.0";
 		} else {
-			gio::write( MinOut, "*" ) << minValue;
+			gio::write( MinOut, fmtLD ) << minValue;
 			strip( MinOut );
 			MinOut = RemoveTrailingZeros( MinOut );
 		}
@@ -4710,11 +4709,11 @@ namespace OutputProcessor {
 		{ auto const SELECT_CASE_var( reportingInterval );
 
 		if ( ( SELECT_CASE_var == ReportEach ) || ( SELECT_CASE_var == ReportTimeStep ) || ( SELECT_CASE_var == ReportHourly ) ) { // -1, 0, 1
-			gio::write( OutputFileMeters, fmta ) << creportID + ',' + NumberOut;
+			gio::write( OutputFileMeters, fmtA ) << creportID + ',' + NumberOut;
 			++StdMeterRecordCount;
 
 		} else if ( ( SELECT_CASE_var == ReportDaily ) || ( SELECT_CASE_var == ReportMonthly ) || ( SELECT_CASE_var == ReportSim ) ) { //  2, 3, 4
-			gio::write( OutputFileMeters, fmta ) << creportID + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
+			gio::write( OutputFileMeters, fmtA ) << creportID + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
 			++StdMeterRecordCount;
 
 		}}
@@ -4727,10 +4726,10 @@ namespace OutputProcessor {
 			{ auto const SELECT_CASE_var( reportingInterval );
 
 			if ( ( SELECT_CASE_var == ReportEach ) || ( SELECT_CASE_var == ReportTimeStep ) || ( SELECT_CASE_var == ReportHourly ) ) { // -1, 0, 1
-				gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut;
+				gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut;
 				++StdOutputRecordCount;
 			} else if ( ( SELECT_CASE_var == ReportDaily ) || ( SELECT_CASE_var == ReportMonthly ) || ( SELECT_CASE_var == ReportSim ) ) { //  2, 3, 4
-				gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
+				gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
 				++StdOutputRecordCount;
 			}}
 
@@ -4793,7 +4792,7 @@ namespace OutputProcessor {
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, "*" ) << repValue;
+			gio::write( NumberOut, fmtLD ) << repValue;
 			strip( NumberOut );
 			NumberOut = RemoveTrailingZeros( NumberOut );
 		}
@@ -4802,7 +4801,7 @@ namespace OutputProcessor {
 			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
 		}
 
-		gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut;
+		gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut;
 
 	}
 
@@ -4910,7 +4909,6 @@ namespace OutputProcessor {
 		using namespace SQLiteProcedures;
 
 		// Locals
-		static gio::Fmt const fmta( "(A)" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -4935,14 +4933,14 @@ namespace OutputProcessor {
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, "*" ) << repVal;
+			gio::write( NumberOut, fmtLD ) << repVal;
 			strip( NumberOut );
 			NumberOut = RemoveTrailingZeros( NumberOut );
 		}
 
 		// Append the min and max strings with date information
-		gio::write( MinOut, "*" ) << minValue;
-		gio::write( MaxOut, "*" ) << MaxValue;
+		gio::write( MinOut, fmtLD ) << minValue;
+		gio::write( MaxOut, fmtLD ) << MaxValue;
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
@@ -4955,10 +4953,10 @@ namespace OutputProcessor {
 		{ auto const SELECT_CASE_var( reportingInterval );
 
 		if ( ( SELECT_CASE_var == ReportEach ) || ( SELECT_CASE_var == ReportTimeStep ) || ( SELECT_CASE_var == ReportHourly ) ) { // -1, 0, 1
-			gio::write( OutputFileStandard, fmta ) << reportIDString + ',' + NumberOut;
+			gio::write( OutputFileStandard, fmtA ) << reportIDString + ',' + NumberOut;
 
 		} else if ( ( SELECT_CASE_var == ReportDaily ) || ( SELECT_CASE_var == ReportMonthly ) || ( SELECT_CASE_var == ReportSim ) ) { //  2, 3, 4
-			gio::write( OutputFileStandard, fmta ) << reportIDString + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
+			gio::write( OutputFileStandard, fmtA ) << reportIDString + ',' + NumberOut + ',' + MinOut + ',' + MaxOut;
 
 		}}
 
@@ -5006,7 +5004,7 @@ namespace OutputProcessor {
 		Real64 repValue( 0.0 ); // for SQLite
 
 		if ( present( IntegerValue ) ) {
-			gio::write( NumberOut, "*" ) << IntegerValue;
+			gio::write( NumberOut, fmtLD ) << IntegerValue;
 			strip( NumberOut );
 			repValue = IntegerValue;
 		}
@@ -5015,7 +5013,7 @@ namespace OutputProcessor {
 			if ( RealValue == 0.0 ) {
 				NumberOut = "0.0";
 			} else {
-				gio::write( NumberOut, "*" ) << RealValue;
+				gio::write( NumberOut, fmtLD ) << RealValue;
 				strip( NumberOut );
 				NumberOut = RemoveTrailingZeros( NumberOut );
 			}
@@ -5025,7 +5023,7 @@ namespace OutputProcessor {
 			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
 		}
 
-		gio::write( OutputFileStandard, fmta ) << reportIDString + ',' + NumberOut;
+		gio::write( OutputFileStandard, fmtA ) << reportIDString + ',' + NumberOut;
 
 	}
 
@@ -5422,7 +5420,7 @@ SetupOutputVariable(
 		RVariableTypes( CV ).KeyNameOnlyUC = MakeUPPERCase( KeyedValue );
 		RVariableTypes( CV ).UnitsString = UnitsString;
 		AssignReportNumber( CurrentReportNumber );
-		gio::write( IDOut, "*" ) << CurrentReportNumber;
+		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
 
 		RVariable.allocate();
@@ -5647,7 +5645,7 @@ SetupOutputVariable(
 		IVariableTypes( CV ).VarNameUC = MakeUPPERCase( IVariableTypes( CV ).VarName );
 		IVariableTypes( CV ).UnitsString = UnitsString;
 		AssignReportNumber( CurrentReportNumber );
-		gio::write( IDOut, "*" ) << CurrentReportNumber;
+		gio::write( IDOut, fmtLD ) << CurrentReportNumber;
 		strip( IDOut );
 
 		IVariable.allocate();
@@ -5743,7 +5741,7 @@ SetupOutputVariable(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	// na
+	static gio::Fmt const fmtLD( "*" );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -5756,7 +5754,7 @@ SetupOutputVariable(
 
 	// Not checking for valid number
 
-	gio::write( IDOut, "*" ) << KeyedValue;
+	gio::write( IDOut, fmtLD ) << KeyedValue;
 	strip( IDOut );
 
 	SetupOutputVariable( VariableName, ActualVariable, IndexTypeKey, VariableTypeKey, IDOut, ReportFreq, ResourceTypeKey, EndUseKey, EndUseSubKey, GroupKey, ZoneKey, ZoneMult, ZoneListMult, indexGroupKey );
@@ -5901,7 +5899,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 			if ( RVar().ReportFreq == ReportEach ) {
 				if ( TimePrint ) {
-					if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > .001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > .001 ) {
+					if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 						CurDayType = DayOfWeek;
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
@@ -5964,7 +5962,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 			if ( IVar().ReportFreq == ReportEach ) {
 				if ( TimePrint ) {
-					if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > .001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > .001 ) {
+					if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 						CurDayType = DayOfWeek;
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
@@ -6020,7 +6018,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 				if ( RVar().ReportFreq == ReportTimeStep ) {
 					if ( TimePrint ) {
-						if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > .001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > .001 ) {
+						if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 							CurDayType = DayOfWeek;
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
@@ -6058,7 +6056,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 				if ( IVar().ReportFreq == ReportTimeStep ) {
 					if ( TimePrint ) {
-						if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > .001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > .001 ) {
+						if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 							CurDayType = DayOfWeek;
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
@@ -6155,7 +6153,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 	if ( ! EndHourFlag ) return;
 
-	//!    Day Block
+	// Day Block
 	if ( EndDayFlag ) {
 		if ( TrackingDailyVariables ) {
 			CurDayType = DayOfWeek;
@@ -6188,7 +6186,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Only continue if EndDayFlag is set
 	if ( ! EndDayFlag ) return;
 
-	//!  Month Block
+	// Month Block
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
 			SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
@@ -6216,7 +6214,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		NumHoursInMonth = 0;
 	} // Month Block
 
-	//!  Sim/Environment Block
+	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
 			SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
@@ -8252,30 +8250,30 @@ ProduceRDDMDD()
 		if ( write_stat != 0 ) {
 			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
 		}
-		gio::write( OutputFileRVDD, fmta ) << "Program Version," + VerString + ',' + IDDVerString;
-		gio::write( OutputFileRVDD, fmta ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
+		gio::write( OutputFileRVDD, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
+		gio::write( OutputFileRVDD, fmtA ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
 		OutputFileMVDD = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, "eplusout.mdd", flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
 		}
-		gio::write( OutputFileMVDD, fmta ) << "Program Version," + VerString + ',' + IDDVerString;
-		gio::write( OutputFileMVDD, fmta ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
+		gio::write( OutputFileMVDD, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
+		gio::write( OutputFileMVDD, fmtA ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
 	} else if ( ProduceReportVDD == ReportVDD_IDF ) {
 		OutputFileRVDD = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, "eplusout.rdd", flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
 		}
-		gio::write( OutputFileRVDD, fmta ) << "! Program Version," + VerString + ',' + IDDVerString;
-		gio::write( OutputFileRVDD, fmta ) << "! Output:Variable Objects (applicable to this run)";
+		gio::write( OutputFileRVDD, fmtA ) << "! Program Version," + VerString + ',' + IDDVerString;
+		gio::write( OutputFileRVDD, fmtA ) << "! Output:Variable Objects (applicable to this run)";
 		OutputFileMVDD = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, "eplusout.mdd", flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
 		}
-		gio::write( OutputFileMVDD, fmta ) << "! Program Version," + VerString + ',' + IDDVerString;
-		gio::write( OutputFileMVDD, fmta ) << "! Output:Meter Objects (applicable to this run)";
+		gio::write( OutputFileMVDD, fmtA ) << "! Program Version," + VerString + ',' + IDDVerString;
+		gio::write( OutputFileMVDD, fmtA ) << "! Output:Meter Objects (applicable to this run)";
 	}
 
 	VariableNames.allocate( NumVariablesForOutput );
@@ -8295,7 +8293,7 @@ ProduceRDDMDD()
 		if ( ProduceReportVDD == ReportVDD_Yes ) {
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
-				gio::write( OutputFileRVDD, fmta ) << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ',' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + ',' + VariableNames( Item ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
+				gio::write( OutputFileRVDD, fmtA ) << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ',' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + ',' + VariableNames( Item ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8303,14 +8301,14 @@ ProduceRDDMDD()
 					} else {
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
-					gio::write( OutputFileRVDD, fmta ) << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ',' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + ',' + VariableNames( Item ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
+					gio::write( OutputFileRVDD, fmtA ) << StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ',' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + ',' + VariableNames( Item ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
 		} else if ( ProduceReportVDD == ReportVDD_IDF ) {
 			ItemPtr = iVariableNames( Item );
 			if ( ! DDVariableTypes( ItemPtr ).ReportedOnDDFile ) {
-				gio::write( OutputFileRVDD, fmta ) << "Output:Variable,*," + VariableNames( Item ) + ",hourly; !- " + StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ' ' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
+				gio::write( OutputFileRVDD, fmtA ) << "Output:Variable,*," + VariableNames( Item ) + ",hourly; !- " + StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ' ' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
 				DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				while ( DDVariableTypes( ItemPtr ).Next != 0 ) {
 					if ( SortByName ) {
@@ -8318,7 +8316,7 @@ ProduceRDDMDD()
 					} else {
 						ItemPtr = DDVariableTypes( ItemPtr ).Next;
 					}
-					gio::write( OutputFileRVDD, fmta ) << "Output:Variable,*," + VariableNames( Item ) + ",hourly; !- " + StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ' ' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
+					gio::write( OutputFileRVDD, fmtA ) << "Output:Variable,*," + VariableNames( Item ) + ",hourly; !- " + StandardIndexTypeKey( DDVariableTypes( ItemPtr ).IndexType ) + ' ' + StandardVariableTypeKey( DDVariableTypes( ItemPtr ).StoreType ) + " [" + DDVariableTypes( ItemPtr ).UnitsString + ']';
 					DDVariableTypes( ItemPtr ).ReportedOnDDFile = true;
 				}
 			}
@@ -8351,10 +8349,10 @@ ProduceRDDMDD()
 	for ( Item = 1; Item <= NumEnergyMeters; ++Item ) {
 		ItemPtr = iVariableNames( Item );
 		if ( ProduceReportVDD == ReportVDD_Yes ) {
-			gio::write( OutputFileMVDD, fmta ) << "Zone,Meter," + EnergyMeters( ItemPtr ).Name + " [" + EnergyMeters( ItemPtr ).Units + ']';
+			gio::write( OutputFileMVDD, fmtA ) << "Zone,Meter," + EnergyMeters( ItemPtr ).Name + " [" + EnergyMeters( ItemPtr ).Units + ']';
 		} else if ( ProduceReportVDD == ReportVDD_IDF ) {
-			gio::write( OutputFileMVDD, fmta ) << "Output:Meter," + EnergyMeters( ItemPtr ).Name + ",hourly; !- [" + EnergyMeters( ItemPtr ).Units + ']';
-			gio::write( OutputFileMVDD, fmta ) << "Output:Meter:Cumulative," + EnergyMeters( ItemPtr ).Name + ",hourly; !- [" + EnergyMeters( ItemPtr ).Units + ']';
+			gio::write( OutputFileMVDD, fmtA ) << "Output:Meter," + EnergyMeters( ItemPtr ).Name + ",hourly; !- [" + EnergyMeters( ItemPtr ).Units + ']';
+			gio::write( OutputFileMVDD, fmtA ) << "Output:Meter:Cumulative," + EnergyMeters( ItemPtr ).Name + ",hourly; !- [" + EnergyMeters( ItemPtr ).Units + ']';
 		}
 	}
 

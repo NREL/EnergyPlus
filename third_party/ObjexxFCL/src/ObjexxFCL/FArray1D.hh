@@ -1184,7 +1184,7 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b( std::max( I.l(), l() ) ), e( std::min( I.u(), u() ) );
 				for ( int i = b; i <= e; ++i ) {
-					o( i ) = operator()( i );
+					o( i ) = operator ()( i );
 				}
 			}
 		}
@@ -1201,7 +1201,7 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b( std::max( I.l(), l() ) ), e( std::min( I.u(), u() ) );
 				for ( int i = b; i <= e; ++i ) {
-					o( i ) = operator()( i );
+					o( i ) = operator ()( i );
 				}
 			}
 		}
@@ -1219,7 +1219,7 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b( std::max( a.l(), l() ) ), e( std::min( a.u(), u() ) );
 				for ( int i = b; i <= e; ++i ) {
-					o( i ) = operator()( i );
+					o( i ) = operator ()( i );
 				}
 			}
 		}
@@ -1237,7 +1237,7 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b( std::max( a.l(), l() ) ), e( std::min( a.u(), u() ) );
 				for ( int i = b; i <= e; ++i ) {
-					o( i ) = operator()( i );
+					o( i ) = operator ()( i );
 				}
 			}
 		}
