@@ -16,6 +16,8 @@ if( BUILD_TESTING )
     find_package(PythonInterp REQUIRED)
     set( REGRESSION_SCRIPT_PATH "" CACHE PATH "Path to regression scripts" )
     set( REGRESSION_BASELINE_PATH "" CACHE PATH "Path to energyplus baseline folder to compare against" )
+    set( REGRESSION_BASELINE_SHA "" CACHE "SHA of baseline comparison" )
+    set( COMMIT_SHA "" CACHE "Commit sha of this build" )
   endif()
 endif()
 

@@ -103,6 +103,8 @@ function( ADD_SIMULATION_TEST )
       -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
       -DREGRESSION_SCRIPT_PATH=${REGRESSION_SCRIPT_PATH}
       -DREGRESSION_BASELINE_PATH=${REGRESSION_BASELINE_PATH}
+      -DREGRESSION_BASELINE_SHA=${REGRESSION_BASELINE_SHA}
+      -DCOMMIT_SHA=${COMMIT_SHA}
       -P ${CMAKE_SOURCE_DIR}/cmake/RunRegression.cmake
       )
     # Note, CMake / CTest doesn't seem to validate if this dependent name actually exists,
