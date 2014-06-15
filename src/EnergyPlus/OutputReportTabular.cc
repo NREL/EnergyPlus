@@ -1,5 +1,9 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
+#include <map>
+#include <utility>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -5962,20 +5966,22 @@ namespace OutputReportTabular {
 		verySmall = -1.0E280;
 
 		// set the unit conversion
-		{ auto const SELECT_CASE_var( unitsStyle );
-		if ( SELECT_CASE_var == unitsStyleNone ) {
+		if ( unitsStyle == unitsStyleNone ) {
 			energyUnitsString = "J";
 			energyUnitsConversionFactor = 1.0;
-		} else if ( SELECT_CASE_var == unitsStyleJtoKWH ) {
+		} else if ( unitsStyle == unitsStyleJtoKWH ) {
 			energyUnitsString = "kWh";
 			energyUnitsConversionFactor = 1.0 / 3600000.0;
-		} else if ( SELECT_CASE_var == unitsStyleJtoMJ ) {
+		} else if ( unitsStyle == unitsStyleJtoMJ ) {
 			energyUnitsString = "MJ";
 			energyUnitsConversionFactor = 1.0 / 1000000.0;
-		} else if ( SELECT_CASE_var == unitsStyleJtoGJ ) {
+		} else if ( unitsStyle == unitsStyleJtoGJ ) {
 			energyUnitsString = "GJ";
 			energyUnitsConversionFactor = 1.0 / 1000000000.0;
-		}}
+		} else { // Should never happen but assures compilers of initialization
+			energyUnitsString = "J";
+			energyUnitsConversionFactor = 1.0;
+		}
 
 		// loop through each input to get the name of the tables
 		for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
@@ -9525,7 +9531,7 @@ namespace OutputReportTabular {
 			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
 				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
 				if ( pdiff > 0.019 ) {
-					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: " "Wall area based on [>=60,<=120] degrees (tilt) as walls " );
+					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls" );
 					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. " "Degree calculation based on ASHRAE 90.1 wall definitions." );
 					//      CALL ShowContinueError('Calculated based on degrees=['//  &
 					//         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
@@ -9869,8 +9875,8 @@ namespace OutputReportTabular {
 		int found;
 		int curColTagIndex;
 		int curRowUnqObjIndex;
-		int colCurrent;
-		int rowCurrent;
+		int colCurrent( 0 );
+		int rowCurrent( 0 );
 		int iReportName;
 		int kColumnTag;
 		int lTableEntry;
@@ -10283,7 +10289,7 @@ namespace OutputReportTabular {
 		//       DATE WRITTEN   July 2007
 		//       MODIFIED       January 2010, Kyle Benne
 		//                      Added SQLite output
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  June 2014, Stuart Mentzer, Performance tuning
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   Write out tables based on which surfaces shade subsurfaces.
@@ -10316,8 +10322,8 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
+		FArray1D_string columnHead( 1 );
+		FArray1D_int columnWidth( 1 );
 		FArray1D_string rowHead;
 		FArray2D_string tableBody;
 		//CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
@@ -10334,16 +10340,12 @@ namespace OutputReportTabular {
 		int HTS;
 		int NGSS;
 
-		//displaySurfaceShadowing=.FALSE.  for debugging
+		//displaySurfaceShadowing = false  for debugging
 		if ( displaySurfaceShadowing ) {
 			numreceivingfields = 0;
 			for ( HTS = 1; HTS <= TotSurfaces; ++HTS ) {
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumGenSurf; ++NGSS ) {
-					++numreceivingfields;
-				}
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumSubSurf; ++NGSS ) {
-					++numreceivingfields;
-				}
+				numreceivingfields += ShadowComb( HTS ).NumGenSurf;
+				numreceivingfields += ShadowComb( HTS ).NumSubSurf;
 			}
 
 			ShadowRelate.allocate( numreceivingfields );
@@ -10362,67 +10364,58 @@ namespace OutputReportTabular {
 					ShadowRelate( numShadowRelate ).recKind = recKindSubsurface;
 				}
 			}
+			assert( numreceivingfields == numShadowRelate );
 
 			WriteReportHeaders( "Surface Shadowing Summary", "Entire Facility", isAverage );
 			unique.allocate( numShadowRelate );
-			//do entire process twice, once with surfaces receiving, once with subsurfaces receiving
+			// do entire process twice, once with surfaces receiving, once with subsurfaces receiving
 			for ( iKindRec = recKindSurface; iKindRec <= recKindSubsurface; ++iKindRec ) {
-				numUnique = 0;
-				//first find the number of unique
+
+				// Build map from receiving surface to container of names
+				typedef  std::map< int, std::pair< int, std::vector< std::string const * > > >  ShadowMap;
+				ShadowMap shadow_map;
 				for ( iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel ) {
 					if ( ShadowRelate( iShadRel ).recKind == iKindRec ) {
 						curRecSurf = ShadowRelate( iShadRel ).recSurf;
-						found = 0;
-						for ( jUnique = 1; jUnique <= numUnique; ++jUnique ) {
-							if ( curRecSurf == unique( jUnique ) ) {
-								found = jUnique;
-								break;
-							}
-						}
-						if ( found == 0 ) {
-							++numUnique;
-							unique( numUnique ) = curRecSurf;
-						}
+						std::string const & name( Surface( ShadowRelate( iShadRel ).castSurf ).Name );
+						auto & elem( shadow_map[ curRecSurf ] ); // Creates the entry if not present (and zero-initializes the int in the pair)
+						elem.first += name.length(); // Accumulate total of name lengths
+						elem.second.push_back( &name ); // Add this name
 					}
 				}
+				numUnique = shadow_map.size();
+				if ( numUnique == 0 ) {
+					columnHead( 1 ) = "None";
+				} else {
+					columnHead( 1 ) = "Possible Shadow Receivers";
+				}
+				columnWidth = 14; // array assignment - same for all columns
 				rowHead.allocate( numUnique );
-				columnHead.allocate( 1 );
-				columnWidth.allocate( 1 );
-				columnWidth = 14; //array assignment - same for all columns
 				tableBody.allocate( numUnique, 1 );
-				columnHead( 1 ) = "Possible Shadow Receivers";
-				if ( numUnique == 0 ) columnHead( 1 ) = "None";
-				for ( jUnique = 1; jUnique <= numUnique; ++jUnique ) {
-					curRecSurf = unique( jUnique );
+				jUnique = 0;
+				for ( auto const & elem : shadow_map ) {
+					++jUnique;
+					curRecSurf = elem.first;
 					rowHead( jUnique ) = Surface( curRecSurf ).Name;
-					listOfSurf = "";
-					for ( iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel ) {
-						if ( ShadowRelate( iShadRel ).recKind == iKindRec ) {
-							if ( curRecSurf == ShadowRelate( iShadRel ).recSurf ) {
-								listOfSurf += Surface( ShadowRelate( iShadRel ).castSurf ).Name + " | "; //'<br>'
-							}
-						}
+					listOfSurf.clear();
+					listOfSurf.reserve( elem.second.first + ( 3 * numUnique ) ); // To avoid string allocations during appends
+					for ( auto const * p : elem.second.second ) {
+						listOfSurf += *p;
+						listOfSurf += " | "; //'<br>' // Separate append to avoid string temporary
 					}
 					tableBody( jUnique, 1 ) = listOfSurf;
 				}
-				//write the table
-				{ auto const SELECT_CASE_var( iKindRec );
-				if ( SELECT_CASE_var == recKindSurface ) {
+
+				// write the table
+				if ( iKindRec == recKindSurface ) {
 					WriteSubtitle( "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
 					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
-				} else if ( SELECT_CASE_var == recKindSubsurface ) {
+				} else if ( iKindRec == recKindSubsurface ) {
 					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
 					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
-				}}
+				}
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				//deallocate these arrays since they are used to create the next
-				//table
-				rowHead.deallocate();
-				columnHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
 			}
-			unique.deallocate();
 		}
 	}
 
@@ -12506,11 +12499,11 @@ namespace OutputReportTabular {
 		// create blank string
 		spaces = blank; // REPEAT(' ',1000)
 		// get sizes of arrays
-		rowsBody = size( body, 1 );
-		colsBody = size( body, 2 );
-		rowsRowLabels = size( rowLabels );
-		colsColumnLabels = size( columnLabels );
-		colsWidthColumn = size( widthColumn );
+		rowsBody = isize( body, 1 );
+		colsBody = isize( body, 2 );
+		rowsRowLabels = isize( rowLabels );
+		colsColumnLabels = isize( columnLabels );
+		colsWidthColumn = isize( widthColumn );
 		// check size of arrays for consistancy and if inconsistent use smaller value
 		// and display warning
 		if ( rowsBody != rowsRowLabels ) {

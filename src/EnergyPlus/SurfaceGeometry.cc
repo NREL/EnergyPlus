@@ -991,6 +991,9 @@ namespace SurfaceGeometry {
 		// add the "need to add" surfaces
 		//Debug    write(outputfiledebug,*) ' need to add ',NeedtoAddSurfaces+NeedToAddSubSurfaces
 		if ( NeedToAddSurfaces + NeedToAddSubSurfaces > 0 ) CurNewSurf = FirstTotalSurfaces;
+		auto const Zone_Name( Zone.Name() ); // Member array
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Surface_Name( Surface.Name() ); // Member array
 		for ( SurfNum = 1; SurfNum <= FirstTotalSurfaces; ++SurfNum ) {
 			if ( SurfaceTmp( SurfNum ).ExtBoundCond != UnenteredAdjacentZoneSurface ) continue;
 			// Need to add surface
@@ -998,7 +1001,7 @@ namespace SurfaceGeometry {
 			//Debug    write(outputfiledebug,*) ' adding surface=',curnewsurf
 			SurfaceTmp( CurNewSurf ) = SurfaceTmp( SurfNum );
 			//  Basic parameters are the same for both surfaces.
-			Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone.Name(), NumOfZones );
+			Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone_Name, NumOfZones );
 			if ( Found == 0 ) continue;
 			SurfaceTmp( CurNewSurf ).Zone = Found;
 			SurfaceTmp( CurNewSurf ).ZoneName = Zone( Found ).Name;
@@ -1066,7 +1069,7 @@ namespace SurfaceGeometry {
 				//Debug        write(outputfiledebug,*) ' basesurf, extboundcondname=',TRIM(SurfaceTmp(CurNewSurf)%ExtBoundCondName)
 			} else {
 				// subsurface
-				Found = FindItemInList( "iz-" + SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp.Name(), FirstTotalSurfaces + CurNewSurf - 1 );
+				Found = FindItemInList( "iz-" + SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp_Name, FirstTotalSurfaces + CurNewSurf - 1 );
 				if ( Found > 0 ) {
 					SurfaceTmp( CurNewSurf ).BaseSurfName = "iz-" + SurfaceTmp( SurfNum ).BaseSurfName;
 					SurfaceTmp( CurNewSurf ).BaseSurf = Found;
@@ -1103,7 +1106,7 @@ namespace SurfaceGeometry {
 			if ( SameString( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp( SurfNum ).Name ) ) {
 				Found = SurfNum;
 			} else {
-				Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp.Name(), TotSurfaces );
+				Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp_Name, TotSurfaces );
 			}
 			if ( Found > 0 ) {
 				SurfaceTmp( SurfNum ).BaseSurf = Found;
@@ -1413,7 +1416,7 @@ namespace SurfaceGeometry {
 					if ( Surface( SurfNum ).ExtBoundCondName == Surface( SurfNum ).Name ) {
 						Found = SurfNum;
 					} else {
-						Found = FindItemInList( Surface( SurfNum ).ExtBoundCondName, Surface.Name(), MovedSurfs );
+						Found = FindItemInList( Surface( SurfNum ).ExtBoundCondName, Surface_Name, MovedSurfs );
 					}
 					if ( Found != 0 ) {
 						Surface( SurfNum ).ExtBoundCond = Found;
@@ -2366,6 +2369,8 @@ namespace SurfaceGeometry {
 
 		if ( ( TotDetachedFixed + TotDetachedBldg ) == 0 ) return;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+
 		for ( Item = 1; Item <= 2; ++Item ) {
 
 			cCurrentModuleObject = cModuleObjects( Item );
@@ -2387,7 +2392,7 @@ namespace SurfaceGeometry {
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
@@ -2527,6 +2532,8 @@ namespace SurfaceGeometry {
 
 		if ( TotRectDetachedFixed + TotRectDetachedBldg == 0 ) return;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+
 		for ( Item = 1; Item <= 2; ++Item ) {
 
 			cCurrentModuleObject = cModuleObjects( Item );
@@ -2548,7 +2555,7 @@ namespace SurfaceGeometry {
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
@@ -2759,6 +2766,11 @@ namespace SurfaceGeometry {
 
 		NeedToAddSurfaces = 0;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Construct_Name( Construct.Name() ); // Member array
+		auto const Zone_Name( Zone.Name() ); // Member array
+		auto const OSC_Name( OSC.Name() ); // Member array
+		auto const OSCM_Name( OSCM.Name() ); // Member array
 		for ( Item = 1; Item <= 4; ++Item ) {
 
 			cCurrentModuleObject = cModuleObjects( Item );
@@ -2793,7 +2805,7 @@ namespace SurfaceGeometry {
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
@@ -2817,7 +2829,7 @@ namespace SurfaceGeometry {
 					SurfaceTmp( SurfNum ).Class = BaseSurfIDs( ClassItem );
 				}
 
-				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( ArgPointer ), Construct.Name(), TotConstructs );
+				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( ArgPointer ), Construct_Name, TotConstructs );
 
 				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
@@ -2840,7 +2852,7 @@ namespace SurfaceGeometry {
 
 				++ArgPointer;
 				SurfaceTmp( SurfNum ).ZoneName = cAlphaArgs( ArgPointer );
-				ZoneNum = FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone.Name(), NumOfZones );
+				ZoneNum = FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone_Name, NumOfZones );
 
 				if ( ZoneNum != 0 ) {
 					SurfaceTmp( SurfNum ).Zone = ZoneNum;
@@ -2901,7 +2913,7 @@ namespace SurfaceGeometry {
 					}
 
 				} else if ( SameString( cAlphaArgs( ArgPointer ), "OtherSideCoefficients" ) ) {
-					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSC.Name(), TotOSC );
+					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSC_Name, TotOSC );
 					if ( Found == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer + 1 ) + "=\"" + cAlphaArgs( ArgPointer + 1 ) + "\"." );
 						ShowContinueError( " no OtherSideCoefficients of that name." );
@@ -2933,7 +2945,7 @@ namespace SurfaceGeometry {
 					// will be set up later.
 					SurfaceTmp( SurfNum ).ExtBoundCond = UnenteredAdjacentZoneSurface;
 					// check OutsideFaceEnvironment for legal zone
-					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone.Name(), NumOfZones );
+					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone_Name, NumOfZones );
 					++NeedToAddSurfaces;
 
 					if ( Found == 0 ) {
@@ -2943,7 +2955,7 @@ namespace SurfaceGeometry {
 					}
 
 				} else if ( SameString( cAlphaArgs( ArgPointer ), "OtherSideConditionsModel" ) ) {
-					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM.Name(), TotOSCM );
+					Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, OSCM_Name, TotOSCM );
 					if ( Found == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( ArgPointer ) + "=\"" + cAlphaArgs( ArgPointer ) + "\"." );
 						ErrorsFound = true;
@@ -3125,6 +3137,10 @@ namespace SurfaceGeometry {
 		int ClassItem;
 		int ZoneNum;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Construct_Name( Construct.Name() ); // Member array
+		auto const Zone_Name( Zone.Name() ); // Member array
+
 		for ( Item = 1; Item <= 10; ++Item ) {
 
 			cCurrentModuleObject = cModuleObjects( Item );
@@ -3194,7 +3210,7 @@ namespace SurfaceGeometry {
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
@@ -3210,7 +3226,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 				SurfaceTmp( SurfNum ).Class = BaseSurfIDs( ClassItem ); // Set class number
 
-				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct_Name, TotConstructs );
 
 				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
@@ -3228,7 +3244,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).BaseSurfName = SurfaceTmp( SurfNum ).Name;
 
 				SurfaceTmp( SurfNum ).ZoneName = cAlphaArgs( 3 );
-				ZoneNum = FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone.Name(), NumOfZones );
+				ZoneNum = FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone_Name, NumOfZones );
 
 				if ( ZoneNum != 0 ) {
 					SurfaceTmp( SurfNum ).Zone = ZoneNum;
@@ -3268,7 +3284,7 @@ namespace SurfaceGeometry {
 				} else if ( SurfaceTmp( SurfNum ).ExtBoundCond == UnreconciledZoneSurface ) {
 					if ( GettingIZSurfaces ) {
 						SurfaceTmp( SurfNum ).ExtBoundCondName = cAlphaArgs( OtherSurfaceField );
-						Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone.Name(), NumOfZones );
+						Found = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone_Name, NumOfZones );
 						// see if match to zone, then it's an unentered other surface, else reconciled later
 						if ( Found > 0 ) {
 							++NeedToAddSurfaces;
@@ -3660,6 +3676,11 @@ namespace SurfaceGeometry {
 		int ValidChk;
 		int numSides;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Construct_Name( Construct.Name() ); // Member array
+		auto const OSC_Name( OSC.Name() ); // Member array
+		auto const WindowShadingControl_Name( WindowShadingControl.Name() ); // Member array
+
 		GetWindowShadingControlData( ErrorsFound );
 
 		cCurrentModuleObject = "FenestrationSurface:Detailed";
@@ -3680,7 +3701,7 @@ namespace SurfaceGeometry {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 				ErrorsFound = true;
@@ -3702,7 +3723,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Class = SubSurfIDs( ValidChk ); // Set class number
 			}
 
-			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
+			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 3 ), Construct_Name, TotConstructs );
 
 			if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 				ErrorsFound = true;
@@ -3735,7 +3756,7 @@ namespace SurfaceGeometry {
 			//  The subsurface inherits properties from the base surface
 			//  Exterior conditions, Zone, etc.
 			//  We can figure out the base surface though, because they've all been entered
-			Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp.Name(), TotSurfaces );
+			Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp_Name, TotSurfaces );
 			if ( Found > 0 ) {
 				SurfaceTmp( SurfNum ).BaseSurf = Found;
 				SurfaceTmp( SurfNum ).ExtBoundCond = SurfaceTmp( Found ).ExtBoundCond;
@@ -3786,7 +3807,7 @@ namespace SurfaceGeometry {
 
 			if ( SurfaceTmp( SurfNum ).ExtBoundCond == OtherSideCoefNoCalcExt || SurfaceTmp( SurfNum ).ExtBoundCond == OtherSideCoefCalcExt ) {
 				if ( ! lAlphaFieldBlanks( 5 ) ) { // Otherside Coef special Name
-					Found = FindItemInList( cAlphaArgs( 5 ), OSC.Name(), TotOSC );
+					Found = FindItemInList( cAlphaArgs( 5 ), OSC_Name, TotOSC );
 					if ( Found == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
 						ShowContinueError( "...base surface requires that this subsurface have OtherSideCoefficients -- not found." );
@@ -3862,7 +3883,7 @@ namespace SurfaceGeometry {
 
 				if ( ! cAlphaArgs( 6 ).empty() ) {
 					if ( TotWinShadingControl > 0 ) {
-						SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( 6 ), WindowShadingControl.Name(), TotWinShadingControl );
+						SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( 6 ), WindowShadingControl_Name, TotWinShadingControl );
 					}
 					if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
 						ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\"." );
@@ -3977,6 +3998,11 @@ namespace SurfaceGeometry {
 		int ClassItem;
 		int IZFound;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Construct_Name( Construct.Name() ); // Member array
+		auto const Zone_Name( Zone.Name() ); // Member array
+		auto const WindowShadingControl_Name( WindowShadingControl.Name() ); // Member array
+
 		for ( Item = 1; Item <= 6; ++Item ) {
 
 			cCurrentModuleObject = cModuleObjects( Item );
@@ -4028,7 +4054,7 @@ namespace SurfaceGeometry {
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
@@ -4044,7 +4070,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 				SurfaceTmp( SurfNum ).Class = SubSurfIDs( ClassItem ); // Set class number
 
-				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct_Name, TotConstructs );
 
 				if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 					ErrorsFound = true;
@@ -4076,7 +4102,7 @@ namespace SurfaceGeometry {
 				//  The subsurface inherits properties from the base surface
 				//  Exterior conditions, Zone, etc.
 				//  We can figure out the base surface though, because they've all been entered
-				Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp.Name(), TotSurfaces );
+				Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp_Name, TotSurfaces );
 				if ( Found > 0 ) {
 					SurfaceTmp( SurfNum ).BaseSurf = Found;
 					SurfaceTmp( SurfNum ).ExtBoundCond = SurfaceTmp( Found ).ExtBoundCond;
@@ -4115,7 +4141,7 @@ namespace SurfaceGeometry {
 				if ( SurfaceTmp( SurfNum ).ExtBoundCond == UnreconciledZoneSurface ) { // "Surface" Base Surface
 					if ( GettingIZSurfaces ) {
 						SurfaceTmp( SurfNum ).ExtBoundCondName = cAlphaArgs( OtherSurfaceField );
-						IZFound = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone.Name(), NumOfZones );
+						IZFound = FindItemInList( SurfaceTmp( SurfNum ).ExtBoundCondName, Zone_Name, NumOfZones );
 						if ( IZFound > 0 ) SurfaceTmp( SurfNum ).ExtBoundCond = UnenteredAdjacentZoneSurface;
 					} else { // Interior Window
 						SurfaceTmp( SurfNum ).ExtBoundCondName = SurfaceTmp( SurfNum ).Name;
@@ -4189,7 +4215,7 @@ namespace SurfaceGeometry {
 
 					if ( ! cAlphaArgs( WindowShadingField ).empty() ) {
 						if ( TotWinShadingControl > 0 ) {
-							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl.Name(), TotWinShadingControl );
+							SurfaceTmp( SurfNum ).WindowShadingControlPtr = FindItemInList( cAlphaArgs( WindowShadingField ), WindowShadingControl_Name, TotWinShadingControl );
 						}
 						if ( SurfaceTmp( SurfNum ).WindowShadingControlPtr == 0 ) {
 							ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", invalid " + cAlphaFieldNames( WindowShadingField ) + "=\"" + cAlphaArgs( WindowShadingField ) + "\"." );
@@ -4516,6 +4542,8 @@ namespace SurfaceGeometry {
 		int ConstrNum; // Construction number
 		int Found; // when item is found
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+
 		// Warning if window has multiplier > 1 and SolarDistribution = FullExterior or FullInteriorExterior
 
 		if ( ( SurfaceTmp( SurfNum ).Class == SurfaceClass_Window || SurfaceTmp( SurfNum ).Class == SurfaceClass_GlassDoor ) && SolarDistribution > MinimalShadowing && SurfaceTmp( SurfNum ).Multiplier > 1.0 ) {
@@ -4587,7 +4615,7 @@ namespace SurfaceGeometry {
 
 						// Lookup interzone surface of the base surface
 						// (Interzone surfaces have not been assigned yet, but all base surfaces should already be loaded.)
-						Found = FindItemInList( SurfaceTmp( SurfaceTmp( SurfNum ).BaseSurf ).ExtBoundCondName, SurfaceTmp.Name(), SurfNum );
+						Found = FindItemInList( SurfaceTmp( SurfaceTmp( SurfNum ).BaseSurf ).ExtBoundCondName, SurfaceTmp_Name, SurfNum );
 						if ( Found != 0 ) SurfaceTmp( Found ).Area -= SurfaceTmp( SurfNum ).Area;
 					}
 
@@ -4855,6 +4883,8 @@ namespace SurfaceGeometry {
 		Real64 SchedMinValue;
 		Real64 SchedMaxValue;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+
 		if ( TotShdSubs > 0 && SolarDistribution == MinimalShadowing ) {
 			ShowWarningError( "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing" );
 		}
@@ -4870,7 +4900,7 @@ namespace SurfaceGeometry {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 				ErrorsFound = true;
@@ -4885,7 +4915,7 @@ namespace SurfaceGeometry {
 			//  The subsurface inherits properties from the base surface
 			//  Exterior conditions, Zone, etc.
 			//  We can figure out the base surface though, because they've all been entered
-			Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp.Name(), TotSurfaces );
+			Found = FindItemInList( SurfaceTmp( SurfNum ).BaseSurfName, SurfaceTmp_Name, TotSurfaces );
 			if ( Found > 0 ) {
 				//SurfaceTmp(SurfNum)%BaseSurf=Found
 				SurfaceTmp( SurfNum ).ExtBoundCond = SurfaceTmp( Found ).ExtBoundCond;
@@ -5052,6 +5082,8 @@ namespace SurfaceGeometry {
 		Real64 TiltAngle;
 		bool MakeFin;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+
 		if ( ( TotOverhangs + TotOverhangsProjection + TotFins + TotFinsProjection ) > 0 && SolarDistribution == MinimalShadowing ) {
 			ShowWarningError( "Shading effects of Fins and Overhangs are ignored when Solar Distribution = MinimalShadowing" );
 		}
@@ -5073,7 +5105,7 @@ namespace SurfaceGeometry {
 				GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				ErrorInName = false;
 				IsBlank = false;
-				VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+				VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 				if ( ErrorInName ) {
 					ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 					ErrorsFound = true;
@@ -5085,7 +5117,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Class = SurfaceClass_Shading;
 				SurfaceTmp( SurfNum ).HeatTransSurf = false;
 				// this object references a window or door....
-				Found = FindItemInList( cAlphaArgs( 2 ), SurfaceTmp.Name(), TotSurfaces );
+				Found = FindItemInList( cAlphaArgs( 2 ), SurfaceTmp_Name, TotSurfaces );
 				if ( Found > 0 ) {
 					BaseSurfNum = SurfaceTmp( Found ).BaseSurf;
 					SurfaceTmp( SurfNum ).BaseSurfName = SurfaceTmp( Found ).BaseSurfName;
@@ -5417,12 +5449,16 @@ namespace SurfaceGeometry {
 		bool ErrorInName;
 		bool IsBlank;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Construct_Name( Construct.Name() ); // Member array
+		auto const Zone_Name( Zone.Name() ); // Member array
+
 		cCurrentModuleObject = "InternalMass";
 		for ( Loop = 1; Loop <= TotIntMass; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, SurfaceNumAlpha, rNumericArgs, SurfaceNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), SurfaceTmp.Name(), SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), SurfaceTmp_Name, SurfNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...each surface name must not duplicate other surface names (of any type)" );
 				ErrorsFound = true;
@@ -5433,7 +5469,7 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).Name = cAlphaArgs( 1 ); // Set the Surface Name in the Derived Type
 			SurfaceTmp( SurfNum ).Class = SurfaceClass_IntMass;
 			SurfaceTmp( SurfNum ).HeatTransSurf = true;
-			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 2 ), Construct_Name, TotConstructs );
 
 			if ( SurfaceTmp( SurfNum ).Construction == 0 ) {
 				ErrorsFound = true;
@@ -5446,7 +5482,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).ConstructionStoredInputValue = SurfaceTmp( SurfNum ).Construction;
 			}
 			SurfaceTmp( SurfNum ).ZoneName = cAlphaArgs( 3 );
-			ZoneNum = FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone.Name(), NumOfZones );
+			ZoneNum = FindItemInList( SurfaceTmp( SurfNum ).ZoneName, Zone_Name, NumOfZones );
 
 			if ( ZoneNum != 0 ) {
 				SurfaceTmp( SurfNum ).Zone = ZoneNum;
@@ -5524,6 +5560,9 @@ namespace SurfaceGeometry {
 		int GlConstrNum; // Glazing construction number
 		bool WrongSurfaceType;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Construct_Name( Construct.Name() ); // Member array
+
 		// For shading surfaces, initialize value of reflectance values to default values. These values
 		// may be overridden below for shading surfaces with an associated Shading Surface Reflectance object.
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
@@ -5542,7 +5581,7 @@ namespace SurfaceGeometry {
 		for ( Loop = 1; Loop <= TotShadingSurfaceReflectance; ++Loop ) {
 
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlpha, rNumericArgs, NumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			SurfNum = FindItemInList( cAlphaArgs( 1 ), SurfaceTmp.Name(), TotSurfaces );
+			SurfNum = FindItemInList( cAlphaArgs( 1 ), SurfaceTmp_Name, TotSurfaces );
 			if ( SurfNum == 0 ) {
 				ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid specification" );
 				ShowContinueError( ".. not found " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs( 1 ) + "\"." );
@@ -5566,7 +5605,7 @@ namespace SurfaceGeometry {
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 1 );
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 2 );
 			if ( rNumericArgs( 3 ) > 0.0 ) {
-				GlConstrNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				GlConstrNum = FindItemInList( cAlphaArgs( 2 ), Construct_Name, TotConstructs );
 				if ( GlConstrNum == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + SurfaceTmp( SurfNum ).Name + "\", " + cAlphaFieldNames( 2 ) + " not found=" + cAlphaArgs( 2 ) );
 					ErrorsFound = true;
@@ -5575,13 +5614,13 @@ namespace SurfaceGeometry {
 				}
 				SurfaceTmp( SurfNum ).ShadowSurfGlazingConstruct = GlConstrNum;
 			}
-			SurfNum = FindItemInList( "Mir-" + cAlphaArgs( 1 ), SurfaceTmp.Name(), TotSurfaces );
+			SurfNum = FindItemInList( "Mir-" + cAlphaArgs( 1 ), SurfaceTmp_Name, TotSurfaces );
 			if ( SurfNum == 0 ) continue;
 			SurfaceTmp( SurfNum ).ShadowSurfGlazingFrac = rNumericArgs( 3 );
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseSolRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 1 );
 			SurfaceTmp( SurfNum ).ShadowSurfDiffuseVisRefl = ( 1.0 - rNumericArgs( 3 ) ) * rNumericArgs( 2 );
 			if ( rNumericArgs( 3 ) > 0.0 ) {
-				GlConstrNum = FindItemInList( cAlphaArgs( 2 ), Construct.Name(), TotConstructs );
+				GlConstrNum = FindItemInList( cAlphaArgs( 2 ), Construct_Name, TotConstructs );
 				if ( GlConstrNum != 0 ) {
 					Construct( GlConstrNum ).IsUsed = true;
 				}
@@ -5676,12 +5715,15 @@ namespace SurfaceGeometry {
 
 		ExtVentedCavity.allocate( TotExtVentCav );
 
+		auto const ExtVentedCavity_Name( ExtVentedCavity.Name() ); // Member array
+		auto const OSCM_Name( OSCM.Name() ); // Member array
+		auto const Surface_Name( Surface.Name() ); // Member array
 		for ( Item = 1; Item <= TotExtVentCav; ++Item ) {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// first handle cAlphaArgs
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), ExtVentedCavity.Name(), Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), ExtVentedCavity_Name, Item - 1, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ShowContinueError( "...cannot not duplicate other names" );
 				ErrorsFound = true;
@@ -5691,7 +5733,7 @@ namespace SurfaceGeometry {
 
 			ExtVentedCavity( Item ).OSCMName = cAlphaArgs( 2 );
 			if ( ! lAlphaFieldBlanks( 2 ) ) {
-				Found = FindItemInList( ExtVentedCavity( Item ).OSCMName, OSCM.Name(), TotOSCM );
+				Found = FindItemInList( ExtVentedCavity( Item ).OSCMName, OSCM_Name, TotOSCM );
 				if ( Found == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + ExtVentedCavity( Item ).Name + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
 					ErrorsFound = true;
@@ -5728,7 +5770,7 @@ namespace SurfaceGeometry {
 			ExtVentedCavity( Item ).SurfPtrs.allocate( ExtVentedCavity( Item ).NumSurfs );
 			ExtVentedCavity( Item ).SurfPtrs = 0;
 			for ( ThisSurf = 1; ThisSurf <= ExtVentedCavity( Item ).NumSurfs; ++ThisSurf ) {
-				Found = FindItemInList( cAlphaArgs( ThisSurf + AlphaOffset ), Surface.Name(), TotSurfaces );
+				Found = FindItemInList( cAlphaArgs( ThisSurf + AlphaOffset ), Surface_Name, TotSurfaces );
 				if ( Found == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + ExtVentedCavity( Item ).Name + "\", invalid " + cAlphaFieldNames( ThisSurf + AlphaOffset ) + "=\"" + cAlphaArgs( ThisSurf + AlphaOffset ) );
 					ErrorsFound = true;
@@ -5925,10 +5967,12 @@ namespace SurfaceGeometry {
 		CountHTAlgoObjectsSingleSurf = GetNumObjectsFound( cCurrentModuleObject );
 
 		cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm";
+		auto const Surface_Name( Surface.Name() ); // Member array
+		auto const Construct_Name( Construct.Name() ); // Member array
 		for ( Item = 1; Item <= CountHTAlgoObjectsSingleSurf; ++Item ) {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorsFoundSingleSurf = false;
-			Found = FindItemInList( cAlphaArgs( 1 ), Surface.Name(), TotSurfaces );
+			Found = FindItemInList( cAlphaArgs( 1 ), Surface_Name, TotSurfaces );
 
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
@@ -6133,7 +6177,7 @@ namespace SurfaceGeometry {
 
 			for ( Item1 = 3; Item1 <= NumAlphas; ++Item1 ) {
 
-				Found = FindItemInList( cAlphaArgs( Item1 ), Surface.Name(), TotSurfaces );
+				Found = FindItemInList( cAlphaArgs( Item1 ), Surface_Name, TotSurfaces );
 
 				if ( Found == 0 ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", did not find matching surface." );
@@ -6183,7 +6227,7 @@ namespace SurfaceGeometry {
 			}}
 
 			Found = 0;
-			Found = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
+			Found = FindItemInList( cAlphaArgs( 3 ), Construct_Name, TotConstructs );
 			if ( Found == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
 				ErrorsFoundByConstruct = true;
@@ -6893,13 +6937,16 @@ namespace SurfaceGeometry {
 		WindowShadingControl.allocate( TotWinShadingControl );
 
 		ControlNum = 0;
+		auto const Construct_Name( Construct.Name() ); // Member array
+		auto const Material_Name( Material.Name() ); // Member array
+		auto const WindowShadingControl_Name( WindowShadingControl.Name() ); // Member array
 		for ( Loop = 1; Loop <= TotWinShadingControl; ++Loop ) {
 
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), WindowShadingControl.Name(), ControlNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), WindowShadingControl_Name, ControlNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -6907,8 +6954,8 @@ namespace SurfaceGeometry {
 
 			++ControlNum;
 			WindowShadingControl( ControlNum ).Name = cAlphaArgs( 1 ); // Set the Control Name in the Derived Type
-			WindowShadingControl( ControlNum ).ShadedConstruction = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
-			WindowShadingControl( ControlNum ).ShadingDevice = FindItemInList( cAlphaArgs( 8 ), Material.Name(), TotMaterials );
+			WindowShadingControl( ControlNum ).ShadedConstruction = FindItemInList( cAlphaArgs( 3 ), Construct_Name, TotConstructs );
+			WindowShadingControl( ControlNum ).ShadingDevice = FindItemInList( cAlphaArgs( 8 ), Material_Name, TotMaterials );
 			WindowShadingControl( ControlNum ).Schedule = GetScheduleIndex( cAlphaArgs( 5 ) );
 			WindowShadingControl( ControlNum ).SetPoint = rNumericArgs( 1 );
 			WindowShadingControl( ControlNum ).SetPoint2 = rNumericArgs( 2 );
@@ -7250,12 +7297,14 @@ namespace SurfaceGeometry {
 		StormWindow.allocate( TotStormWin );
 
 		StormWinNum = 0;
+		auto const Surface_Name( Surface.Name() ); // Member array
+		auto const Material_Name( Material.Name() ); // Member array
 		for ( loop = 1; loop <= TotStormWin; ++loop ) {
 
 			GetObjectItem( cCurrentModuleObject, loop, cAlphaArgs, StormWinNumAlpha, rNumericArgs, StormWinNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			++StormWinNum;
-			StormWindow( StormWinNum ).BaseWindowNum = FindItemInList( cAlphaArgs( 1 ), Surface.Name(), TotSurfaces );
-			StormWindow( StormWinNum ).StormWinMaterialNum = FindItemInList( cAlphaArgs( 2 ), Material.Name(), TotMaterials );
+			StormWindow( StormWinNum ).BaseWindowNum = FindItemInList( cAlphaArgs( 1 ), Surface_Name, TotSurfaces );
+			StormWindow( StormWinNum ).StormWinMaterialNum = FindItemInList( cAlphaArgs( 2 ), Material_Name, TotMaterials );
 			StormWindow( StormWinNum ).StormWinDistance = rNumericArgs( 1 );
 			StormWindow( StormWinNum ).MonthOn = rNumericArgs( 2 );
 			StormWindow( StormWinNum ).DayOfMonthOn = rNumericArgs( 3 );
@@ -7422,11 +7471,12 @@ namespace SurfaceGeometry {
 		TotWinAirflowControl = GetNumObjectsFound( cCurrentModuleObject );
 		if ( TotWinAirflowControl == 0 ) return;
 
+		auto const Surface_Name( Surface.Name() ); // Member array
 		for ( Loop = 1; Loop <= TotWinAirflowControl; ++Loop ) { // Loop through all surfaces in the input...
 
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, ControlNumAlpha, rNumericArgs, ControlNumProp, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			SurfNum = FindItemInList( cAlphaArgs( 1 ), Surface.Name(), TotSurfaces );
+			SurfNum = FindItemInList( cAlphaArgs( 1 ), Surface_Name, TotSurfaces );
 			if ( SurfNum == 0 ) {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" not found." );
 				ErrorsFound = true;
@@ -7682,11 +7732,12 @@ namespace SurfaceGeometry {
 		OSC.allocate( TotOSC );
 
 		OSCNum = 0;
+		auto const OSC_Name( OSC.Name() ); // Member array
 		for ( Loop = 1; Loop <= TotOSC; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OSC.Name(), OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), OSC_Name, OSCNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -7842,11 +7893,12 @@ namespace SurfaceGeometry {
 		// OSCM is already initialized in derived type defn.
 
 		OSCMNum = 0;
+		auto const OSCM_Name( OSCM.Name() ); // Member array
 		for ( Loop = 1; Loop <= TotOSCM; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumProps, IOStat );
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), OSCM.Name(), OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), OSCM_Name, OSCMNum, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
@@ -7951,12 +8003,15 @@ namespace SurfaceGeometry {
 		int SchNum;
 		int InslType;
 
+		auto const SurfaceTmp_Name( SurfaceTmp.Name() ); // Member array
+		auto const Material_Name( Material.Name() ); // Member array
+
 		cCurrentModuleObject = "SurfaceControl:MovableInsulation";
 		NMatInsul = GetNumObjectsFound( cCurrentModuleObject );
 		for ( Loop = 1; Loop <= NMatInsul; ++Loop ) {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NAlphas, rNumericArgs, NNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			SurfNum = FindItemInList( cAlphaArgs( 2 ), SurfaceTmp.Name(), TotSurfaces );
-			MaterNum = FindItemInList( cAlphaArgs( 3 ), Material.Name(), TotMaterials );
+			SurfNum = FindItemInList( cAlphaArgs( 2 ), SurfaceTmp_Name, TotSurfaces );
+			MaterNum = FindItemInList( cAlphaArgs( 3 ), Material_Name, TotMaterials );
 			SchNum = GetScheduleIndex( cAlphaArgs( 4 ) );
 			if ( SameString( cAlphaArgs( 1 ), "Outside" ) ) {
 				InslType = 1;
@@ -9094,6 +9149,9 @@ namespace SurfaceGeometry {
 		bool ShAndSt; // True if unshaded and shaded window can have a storm window
 		//  INTEGER :: LenName               ! Name length
 
+		auto const Construct_Name( Construct.Name() ); // Member array
+		auto const Material_Name( Material.Name() ); // Member array
+
 		DisplayString( "Creating Storm Window Constructions" );
 
 		for ( StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum ) {
@@ -9141,13 +9199,13 @@ namespace SurfaceGeometry {
 					strip( ChrNum );
 					ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
 					// If this construction name already exists, set the surface's storm window construction number to it
-					ConstrNewSt = FindItemInList( ConstrNameSt, Construct.Name(), TotConstructs );
+					ConstrNewSt = FindItemInList( ConstrNameSt, Construct_Name, TotConstructs );
 					ConstrNewStSh = 0;
 					if ( ConstrNewSt > 0 ) Surface( SurfNum ).StormWinConstruction = ConstrNewSt;
 				} else {
 					if ( ! ShAndSt ) break;
 					ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + ChrNum;
-					ConstrNewStSh = FindItemInList( ConstrNameStSh, Construct.Name(), TotConstructs );
+					ConstrNewStSh = FindItemInList( ConstrNameStSh, Construct_Name, TotConstructs );
 					if ( ConstrNewStSh > 0 ) Surface( SurfNum ).StormWinShadedConstruction = ConstrNewStSh;
 				}
 
@@ -9155,7 +9213,7 @@ namespace SurfaceGeometry {
 					// If necessary, create new material corresponding to the air layer between the storm winddow
 					// and the rest of the window
 					MatNameStAir = "AIR:STORMWIN:" + ChrIntDistance + "MM";
-					MatNewStAir = FindItemInList( MatNameStAir, Material.Name(), TotMaterials );
+					MatNewStAir = FindItemInList( MatNameStAir, Material_Name, TotMaterials );
 					if ( MatNewStAir == 0 ) {
 						// Create new material
 						MatNewStAir = TotMaterials + 1;

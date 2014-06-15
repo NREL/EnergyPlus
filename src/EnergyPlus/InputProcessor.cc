@@ -13,7 +13,6 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 

@@ -10,6 +10,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -704,8 +705,25 @@ namespace InputProcessor {
 		bool & IsBlank,
 		std::string const & StringToDisplay
 	)
-	{
-		VerifyName( NameToVerify, FArray1D_string( NamesList ), NumOfNames, ErrorFound, IsBlank, StringToDisplay );
+	{ // Overload for member arrays: Implemented here to avoid copy to FArray_string to forward to other VerifyName
+		int Found;
+
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
 	}
 
 	void

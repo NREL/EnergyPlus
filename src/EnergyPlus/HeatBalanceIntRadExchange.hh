@@ -88,16 +88,16 @@ namespace HeatBalanceIntRadExchange {
 	void
 	CalcScriptF(
 		int const N, // Number of surfaces
-		FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		FArray2A< Real64 > const F, // DIRECT VIEW FACTOR MATRIX (N X N)
-		FArray1A< Real64 > EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		FArray2A< Real64 > ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
+		FArray1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		FArray2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
+		FArray1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
+		FArray2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
 	);
 
 	void
 	CalcMatrixInverse(
-		FArray2S< Real64 > Matrix, // Input Matrix
-		FArray2S< Real64 > InvMatrix // Inverse of Matrix
+		FArray2< Real64 > & A, // Matrix: Gets reduced to L\U form
+		FArray2< Real64 > & I // Returned as inverse matrix
 	);
 
 	//     NOTICE
