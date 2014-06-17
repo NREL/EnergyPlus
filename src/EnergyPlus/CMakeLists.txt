@@ -523,7 +523,7 @@ SET( SRC
 
 ADD_EXECUTABLE(EnergyPlus ${SRC})
 
-#TARGET_LINK_LIBRARIES( EnergyPlus sqlite )
+TARGET_LINK_LIBRARIES( EnergyPlus sqlite )
 #TARGET_LINK_LIBRARIES( EnergyPlus bcvtb )
 #TARGET_LINK_LIBRARIES( EnergyPlus epexpat )
 #TARGET_LINK_LIBRARIES( EnergyPlus epfmiimport)

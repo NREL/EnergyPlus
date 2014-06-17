@@ -2,26 +2,28 @@
 #define SQLiteProcedures_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2S.hh>
+#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
-#include <stdio.h>
+#include <fstream>
+
+#include <sqlite3.h>
 
 namespace EnergyPlus {
 
-class SQLiteOutput
+class SQLite
 {
 	public:
 
 	// Open the DB and prepare for writing data
 	// Create all of the tables using the same approach as the legacy CreateSQLiteDatabase function
 	// KSB: Should this throw if the DB cannot be opened?
-	SQLiteOutput();
-	virtual ~SQLiteOutput();
+	SQLite();
+	virtual ~SQLite();
 
 	// Begin a transaction
 	// KSB: consider making this private?
@@ -136,9 +138,6 @@ class SQLiteOutput
 	);
 
 	void
-	SQLiteWriteMessageMacro( std::string const & message );
-
-	void
 	CreateSQLiteDaylightMapTitle(
 		int const mapNum,
 		std::string const & mapName,
@@ -164,9 +163,9 @@ class SQLiteOutput
 
 	void
 	CreateSQLiteTabularDataRecords(
-		FArray2S_string const body, // row,column
-		FArray1S_string const rowLabels,
-		FArray1S_string const columnLabels,
+		FArray2D_string const & body, // row,column
+		FArray1D_string const & rowLabels,
+		FArray1D_string const & columnLabels,
 		std::string const & ReportName,
 		std::string const & ReportForString,
 		std::string const & TableName
@@ -194,17 +193,128 @@ class SQLiteOutput
 
 	private:
 
-	int SQLiteExecuteCommand(const std::string & commandBuffer);
+	int sqliteExecuteCommand(const std::string & commandBuffer);
+	int sqlitePrepareStatement(sqlite3_stmt * stmt, const std::string & stmtBuffer);
 
-	int const m_maxMessageSize;
+	int sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer);
+	int sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
+	int sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
+	int sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex);
+	int sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert);
+
+	int sqliteStepCommand(sqlite3_stmt * stmt);
+	int sqliteResetCommand(sqlite3_stmt * stmt);
+	int sqliteClearBindings(sqlite3_stmt * stmt);
+	int sqliteFinalizeCommand(sqlite3_stmt * stmt);
+	void sqliteWriteMessage(const std::string & message);
+
+	int createSQLiteStringTableRecord(std::string const & stringValue,std::string const & stringType);
+
+	std::string storageType(const int storageTypeIndex) const;
+	std::string timestepTypeName(const int timestepType) const;
+	std::string reportingFreqName(const int reportingFreqIndex) const;
+
+	static void adjustReportingHourAndMinutes(int & hour, int & minutes);
+	// Given combinedString, parse out units and description.
+	// Example: Given combinedString "Total Energy [GJ]", return "Total Energy" 
+	// in description and "GJ" in units.
+	static void parseUnitsAndDescription(const std::string & combinedString, std::string & units, std::string & description);
+
+	static int logicalToInteger(const bool value);
+
+	void initializeReportVariableDataDictionaryTable();
+	void initializeReportVariableDataTables();
+	void initializeReportMeterDataDictionaryTable();
+	void initializeReportMeterDataTables();
+	void initializeTimeIndicesTable();
+	void initializeZoneInfoTable();
+	void initializeNominalPeopleTable();
+	void initializeNominalLightingTable();
+	void initializeNominalElectricEquipmentTable();
+	void initializeNominalGasEquipmentTable();
+	void initializeNominalSteamEquipmentTable();
+	void initializeNominalHotWaterEquipmentTable();
+	void initializeNominalOtherEquipmentTable();
+	void initializeNominalBaseboardHeatTable();
+	void initializeSurfacesTable();
+	void initializeConstructionsTables();
+	void initializeMaterialsTable();
+	void initializeZoneListTable();
+	void initializeZoneGroupTable();
+	void initializeNominalInfiltrationTable();
+	void initializeNominalVentilationTable();
+	void initializeZoneSizingTable();
+	void initializeSystemSizingTable();
+	void initializeComponentSizingTable();
+	void initializeRoomAirModelTable();
+	void initializeSchedulesTable();
+	void initializeDaylightMapTables();
+	void initializeViews();
+	void initializeSimulationsTable();
+	void initializeEnvironmentPeriodsTable();
+	void initializeErrorsTable();
+
 	bool const m_writeOutputToSQLite;
 	bool const m_writeTabularDataToSQLite;
 	int m_sqlDBTimeIndex;
+	std::ofstream m_errorStream;
+	sqlite3 * m_db;
+	std::string m_dbName;
+	sqlite3_stmt * m_reportVariableDataInsertStmt;
+	sqlite3_stmt * m_reportVariableExtendedDataInsertStmt;
+	sqlite3_stmt * m_timeIndexInsertStmt;
+	sqlite3_stmt * m_reportVariableDictionaryInsertStmt;
+	sqlite3_stmt * m_zoneInfoInsertStmt;
+	sqlite3_stmt * m_nominalLightingInsertStmt;
+	sqlite3_stmt * m_nominalElectricEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalGasEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalSteamEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalHotWaterEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalOtherEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalBaseboardHeatInsertStmt;
+	sqlite3_stmt * m_surfaceInsertStmt;
+	sqlite3_stmt * m_constructionInsertStmt;
+	sqlite3_stmt * m_constructionLayerInsertStmt;
+	sqlite3_stmt * m_materialInsertStmt;
+	sqlite3_stmt * m_zoneListInsertStmt;
+	sqlite3_stmt * m_zoneGroupInsertStmt;
+	sqlite3_stmt * m_infiltrationInsertStmt;
+	sqlite3_stmt * m_ventilationInsertStmt;
+	sqlite3_stmt * m_nominalPeopleInsertStmt;
+	sqlite3_stmt * m_zoneSizingInsertStmt;
+	sqlite3_stmt * m_systemSizingInsertStmt;
+	sqlite3_stmt * m_componentSizingInsertStmt;
+	sqlite3_stmt * m_roomAirModelInsertStmt;
+	sqlite3_stmt * m_groundTemperatureInsertStmt;
+	sqlite3_stmt * m_weatherFileInsertStmt;
+	sqlite3_stmt * m_meterDictionaryInsertStmt;
+	sqlite3_stmt * m_reportMeterDataInsertStmt;
+	sqlite3_stmt * m_meterExtendedDataInsertStmt;
+	sqlite3_stmt * m_scheduleInsertStmt;
+	sqlite3_stmt * m_daylightMapTitleInsertStmt;
+	sqlite3_stmt * m_daylightMapHorlyTitleInsertStmt;
+	sqlite3_stmt * m_daylightMapHorlyDataInsertStmt;
+	sqlite3_stmt * m_environmentPeriodInsertStmt;
+	sqlite3_stmt * m_simulationsInsertStmt;
+	sqlite3_stmt * m_tabularDataInsertStmt;
+	sqlite3_stmt * m_stringsInsertStmt;
+	sqlite3_stmt * m_stringsLookUpStmt;
+	sqlite3_stmt * m_errorInsertStmt;
+	sqlite3_stmt * m_errorUpdateStmt;
+	sqlite3_stmt * m_simulationUpdateStmt;
 
-	// KSB: I don't care for bringing in stdio.
-	// Perhaps this class should be impled to keep the includes clean and hide all of this private junk?
-
-	FILE * m_outputFile;
+	static const int LocalReportEach;      //  Write out each time UpdatedataandLocalReport is called
+	static const int LocalReportTimeStep;  //  Write out at 'EndTimeStepFlag'
+	static const int LocalReportHourly;    //  Write out at 'EndHourFlag'
+	static const int LocalReportDaily;     //  Write out at 'EndDayFlag'
+	static const int LocalReportMonthly;   //  Write out at end of month (must be determined)
+	static const int LocalReportSim;       //  Write out once per environment 'EndEnvrnFlag'
+	static const std::string ReportNameId;         // These should be integers.  Why is this?
+	static const std::string ReportForStringId;
+	static const std::string TableNameId;
+	static const std::string RowNameId;
+	static const std::string ColumnNameId;
+	static const std::string UnitsId;
 };
 
 // KSB: These are the old SQLiteProcedures, 
@@ -240,7 +350,7 @@ namespace SQLiteProcedures {
 		int const indexType,
 		std::string const & units,
 		int const reportingFreq,
-		Optional_string_const ScheduleName = _
+		Optional_string_const scheduleName = _
 	);
 
 	void
