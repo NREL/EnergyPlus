@@ -59,17 +59,17 @@ namespace HeatPumpWaterToWaterSimple {
 		Real64 RatedLoadVolFlowCool; // Rated Cooling Load Side Volumetric Flow Rate [m3/s]
 		Real64 RatedSourceVolFlowCool; // Rated Cooling Source Side Volumetric Flow Rate [m3/s]
 		Real64 RatedCapCool; // Rated Cooling Capacity [W]
-		Real64 RatedPowerCool; // Rated Cooling Power Consumption[W]
+		Real64 RatedCOPCool; // Rated Cooling COP
 		Real64 CoolCap1; // 1st coefficient of the Cooling capacity performance curve
 		Real64 CoolCap2; // 2nd coefficient of the Cooling capacity performance curve
 		Real64 CoolCap3; // 3rd coefficient of the Cooling capacity performance curve
 		Real64 CoolCap4; // 4th coefficient of the Cooling capacity performance curve
 		Real64 CoolCap5; // 5th coefficient of the Cooling capacity performance curve
-		Real64 CoolPower1; // 1st coefficient of the Cooling power consumption curve
-		Real64 CoolPower2; // 2nd coefficient of the Cooling power consumption curve
-		Real64 CoolPower3; // 3rd coefficient of the Cooling power consumption curve
-		Real64 CoolPower4; // 4th coefficient of the Cooling power consumption curve
-		Real64 CoolPower5; // 5th coefficient of the Cooling power consumption curve
+//		Real64 CoolPower1; // 1st coefficient of the Cooling power consumption curve
+//		Real64 CoolPower2; // 2nd coefficient of the Cooling power consumption curve
+//		Real64 CoolPower3; // 3rd coefficient of the Cooling power consumption curve
+//		Real64 CoolPower4; // 4th coefficient of the Cooling power consumption curve
+//		Real64 CoolPower5; // 5th coefficient of the Cooling power consumption curve
 		int CoolCapNegativeCounter; // Counter for number of times cooling capacity curve is <= 0.0
 		int CoolCapNegativeIndex; // Index for recurring warning message regarding cooling capacity curve is <= 0.0
 		int CoolPowerNegativeCounter; // Counter for number of times cooling power curve is <= 0.0
@@ -77,17 +77,17 @@ namespace HeatPumpWaterToWaterSimple {
 		Real64 RatedLoadVolFlowHeat; // Rated Heating Load Side Volumetric Flow Rate [m3/s]
 		Real64 RatedSourceVolFlowHeat; // Rated Heating Source Side Volumetric Flow Rate [m3/s]
 		Real64 RatedCapHeat; // Rated Heating Capacity [W]
-		Real64 RatedPowerHeat; // Rated Heating Compressor Power[W]
+		Real64 RatedCOPHeat; // Rated Heating COP 
 		Real64 HeatCap1; // 1st coefficient of the Heating capacity performance curve
 		Real64 HeatCap2; // 2nd coefficient of the Heating capacity performance curve
 		Real64 HeatCap3; // 3rd coefficient of the Heating capacity performance curve
 		Real64 HeatCap4; // 4th coefficient of the Heating capacity performance curve
 		Real64 HeatCap5; // 5th coefficient of the Heating capacity performance curve
-		Real64 HeatPower1; // 1st coefficient of the Heating power consumption curve
-		Real64 HeatPower2; // 2nd coefficient of the Heating power consumption curve
-		Real64 HeatPower3; // 3rd coefficient of the Heating power consumption curve
-		Real64 HeatPower4; // 4th coefficient of the Heating power consumption curve
-		Real64 HeatPower5; // 5th coefficient of the Heating power consumption curve
+//		Real64 HeatPower1; // 1st coefficient of the Heating power consumption curve
+//		Real64 HeatPower2; // 2nd coefficient of the Heating power consumption curve
+//		Real64 HeatPower3; // 3rd coefficient of the Heating power consumption curve
+//		Real64 HeatPower4; // 4th coefficient of the Heating power consumption curve
+//		Real64 HeatPower5; // 5th coefficient of the Heating power consumption curve
 		int LoadSideInletNodeNum; // Load Side Inlet Node
 		int LoadSideOutletNodeNum; // Load Side Outlet Node
 		int SourceSideInletNodeNum; // Source Side Inlet Node
@@ -105,6 +105,7 @@ namespace HeatPumpWaterToWaterSimple {
 		int LoadLoopSideNum; // load side plant loop side index
 		int LoadBranchNum; // load side plant loop branch index
 		int LoadCompNum; // load side plant loop component index
+		bool IsThisSized; // True if sizing is done
 
 		// Default Constructor
 		GshpSpecs() :
@@ -118,17 +119,17 @@ namespace HeatPumpWaterToWaterSimple {
 			RatedLoadVolFlowCool( 0.0 ),
 			RatedSourceVolFlowCool( 0.0 ),
 			RatedCapCool( 0.0 ),
-			RatedPowerCool( 0.0 ),
+			RatedCOPCool( 0.0 ),
 			CoolCap1( 0.0 ),
 			CoolCap2( 0.0 ),
 			CoolCap3( 0.0 ),
 			CoolCap4( 0.0 ),
 			CoolCap5( 0.0 ),
-			CoolPower1( 0.0 ),
-			CoolPower2( 0.0 ),
-			CoolPower3( 0.0 ),
-			CoolPower4( 0.0 ),
-			CoolPower5( 0.0 ),
+//			CoolPower1( 0.0 ),
+//			CoolPower2( 0.0 ),
+//			CoolPower3( 0.0 ),
+//			CoolPower4( 0.0 ),
+//			CoolPower5( 0.0 ),
 			CoolCapNegativeCounter( 0 ),
 			CoolCapNegativeIndex( 0 ),
 			CoolPowerNegativeCounter( 0 ),
@@ -136,17 +137,17 @@ namespace HeatPumpWaterToWaterSimple {
 			RatedLoadVolFlowHeat( 0.0 ),
 			RatedSourceVolFlowHeat( 0.0 ),
 			RatedCapHeat( 0.0 ),
-			RatedPowerHeat( 0.0 ),
+			RatedCOPHeat( 0.0 ),
 			HeatCap1( 0.0 ),
 			HeatCap2( 0.0 ),
 			HeatCap3( 0.0 ),
 			HeatCap4( 0.0 ),
 			HeatCap5( 0.0 ),
-			HeatPower1( 0.0 ),
-			HeatPower2( 0.0 ),
-			HeatPower3( 0.0 ),
-			HeatPower4( 0.0 ),
-			HeatPower5( 0.0 ),
+//			HeatPower1( 0.0 ),
+//			HeatPower2( 0.0 ),
+//			HeatPower3( 0.0 ),
+//			HeatPower4( 0.0 ),
+//			HeatPower5( 0.0 ),
 			LoadSideInletNodeNum( 0 ),
 			LoadSideOutletNodeNum( 0 ),
 			SourceSideInletNodeNum( 0 ),
@@ -162,7 +163,8 @@ namespace HeatPumpWaterToWaterSimple {
 			LoadLoopNum( 0 ),
 			LoadLoopSideNum( 0 ),
 			LoadBranchNum( 0 ),
-			LoadCompNum( 0 )
+			LoadCompNum( 0 ),
+			IsThisSized( IsThisSized )
 		{}
 
 		// Member Constructor
@@ -179,17 +181,17 @@ namespace HeatPumpWaterToWaterSimple {
 			Real64 const RatedLoadVolFlowCool, // Rated Cooling Load Side Volumetric Flow Rate [m3/s]
 			Real64 const RatedSourceVolFlowCool, // Rated Cooling Source Side Volumetric Flow Rate [m3/s]
 			Real64 const RatedCapCool, // Rated Cooling Capacity [W]
-			Real64 const RatedPowerCool, // Rated Cooling Power Consumption[W]
+			Real64 const RatedCOPCool, // Rated Cooling COP
 			Real64 const CoolCap1, // 1st coefficient of the Cooling capacity performance curve
 			Real64 const CoolCap2, // 2nd coefficient of the Cooling capacity performance curve
 			Real64 const CoolCap3, // 3rd coefficient of the Cooling capacity performance curve
 			Real64 const CoolCap4, // 4th coefficient of the Cooling capacity performance curve
 			Real64 const CoolCap5, // 5th coefficient of the Cooling capacity performance curve
-			Real64 const CoolPower1, // 1st coefficient of the Cooling power consumption curve
-			Real64 const CoolPower2, // 2nd coefficient of the Cooling power consumption curve
-			Real64 const CoolPower3, // 3rd coefficient of the Cooling power consumption curve
-			Real64 const CoolPower4, // 4th coefficient of the Cooling power consumption curve
-			Real64 const CoolPower5, // 5th coefficient of the Cooling power consumption curve
+//			Real64 const CoolPower1, // 1st coefficient of the Cooling power consumption curve
+//			Real64 const CoolPower2, // 2nd coefficient of the Cooling power consumption curve
+//			Real64 const CoolPower3, // 3rd coefficient of the Cooling power consumption curve
+//			Real64 const CoolPower4, // 4th coefficient of the Cooling power consumption curve
+//			Real64 const CoolPower5, // 5th coefficient of the Cooling power consumption curve
 			int const CoolCapNegativeCounter, // Counter for number of times cooling capacity curve is <= 0.0
 			int const CoolCapNegativeIndex, // Index for recurring warning message regarding cooling capacity curve is <= 0.0
 			int const CoolPowerNegativeCounter, // Counter for number of times cooling power curve is <= 0.0
@@ -197,17 +199,17 @@ namespace HeatPumpWaterToWaterSimple {
 			Real64 const RatedLoadVolFlowHeat, // Rated Heating Load Side Volumetric Flow Rate [m3/s]
 			Real64 const RatedSourceVolFlowHeat, // Rated Heating Source Side Volumetric Flow Rate [m3/s]
 			Real64 const RatedCapHeat, // Rated Heating Capacity [W]
-			Real64 const RatedPowerHeat, // Rated Heating Compressor Power[W]
+			Real64 const RatedCOPHeat, // Rated Heating COP
 			Real64 const HeatCap1, // 1st coefficient of the Heating capacity performance curve
 			Real64 const HeatCap2, // 2nd coefficient of the Heating capacity performance curve
 			Real64 const HeatCap3, // 3rd coefficient of the Heating capacity performance curve
 			Real64 const HeatCap4, // 4th coefficient of the Heating capacity performance curve
 			Real64 const HeatCap5, // 5th coefficient of the Heating capacity performance curve
-			Real64 const HeatPower1, // 1st coefficient of the Heating power consumption curve
-			Real64 const HeatPower2, // 2nd coefficient of the Heating power consumption curve
-			Real64 const HeatPower3, // 3rd coefficient of the Heating power consumption curve
-			Real64 const HeatPower4, // 4th coefficient of the Heating power consumption curve
-			Real64 const HeatPower5, // 5th coefficient of the Heating power consumption curve
+//			Real64 const HeatPower1, // 1st coefficient of the Heating power consumption curve
+//			Real64 const HeatPower2, // 2nd coefficient of the Heating power consumption curve
+//			Real64 const HeatPower3, // 3rd coefficient of the Heating power consumption curve
+//			Real64 const HeatPower4, // 4th coefficient of the Heating power consumption curve
+//			Real64 const HeatPower5, // 5th coefficient of the Heating power consumption curve
 			int const LoadSideInletNodeNum, // Load Side Inlet Node
 			int const LoadSideOutletNodeNum, // Load Side Outlet Node
 			int const SourceSideInletNodeNum, // Source Side Inlet Node
@@ -223,7 +225,8 @@ namespace HeatPumpWaterToWaterSimple {
 			int const LoadLoopNum, // load side plant loop index number
 			int const LoadLoopSideNum, // load side plant loop side index
 			int const LoadBranchNum, // load side plant loop branch index
-			int const LoadCompNum // load side plant loop component index
+			int const LoadCompNum, // load side plant loop component index
+			bool const IsThisSized // True if sizing is done
 		) :
 			Name( Name ),
 			WatertoWaterHPType( WatertoWaterHPType ),
@@ -237,17 +240,17 @@ namespace HeatPumpWaterToWaterSimple {
 			RatedLoadVolFlowCool( RatedLoadVolFlowCool ),
 			RatedSourceVolFlowCool( RatedSourceVolFlowCool ),
 			RatedCapCool( RatedCapCool ),
-			RatedPowerCool( RatedPowerCool ),
+			RatedCOPCool( RatedCOPCool ),
 			CoolCap1( CoolCap1 ),
 			CoolCap2( CoolCap2 ),
 			CoolCap3( CoolCap3 ),
 			CoolCap4( CoolCap4 ),
 			CoolCap5( CoolCap5 ),
-			CoolPower1( CoolPower1 ),
-			CoolPower2( CoolPower2 ),
-			CoolPower3( CoolPower3 ),
-			CoolPower4( CoolPower4 ),
-			CoolPower5( CoolPower5 ),
+//			CoolPower1( CoolPower1 ),
+//			CoolPower2( CoolPower2 ),
+//			CoolPower3( CoolPower3 ),
+//			CoolPower4( CoolPower4 ),
+//			CoolPower5( CoolPower5 ),
 			CoolCapNegativeCounter( CoolCapNegativeCounter ),
 			CoolCapNegativeIndex( CoolCapNegativeIndex ),
 			CoolPowerNegativeCounter( CoolPowerNegativeCounter ),
@@ -255,17 +258,17 @@ namespace HeatPumpWaterToWaterSimple {
 			RatedLoadVolFlowHeat( RatedLoadVolFlowHeat ),
 			RatedSourceVolFlowHeat( RatedSourceVolFlowHeat ),
 			RatedCapHeat( RatedCapHeat ),
-			RatedPowerHeat( RatedPowerHeat ),
+			RatedCOPHeat( RatedCOPHeat ),
 			HeatCap1( HeatCap1 ),
 			HeatCap2( HeatCap2 ),
 			HeatCap3( HeatCap3 ),
 			HeatCap4( HeatCap4 ),
 			HeatCap5( HeatCap5 ),
-			HeatPower1( HeatPower1 ),
-			HeatPower2( HeatPower2 ),
-			HeatPower3( HeatPower3 ),
-			HeatPower4( HeatPower4 ),
-			HeatPower5( HeatPower5 ),
+//			HeatPower1( HeatPower1 ),
+//			HeatPower2( HeatPower2 ),
+//			HeatPower3( HeatPower3 ),
+//			HeatPower4( HeatPower4 ),
+//			HeatPower5( HeatPower5 ),
 			LoadSideInletNodeNum( LoadSideInletNodeNum ),
 			LoadSideOutletNodeNum( LoadSideOutletNodeNum ),
 			SourceSideInletNodeNum( SourceSideInletNodeNum ),
@@ -281,7 +284,8 @@ namespace HeatPumpWaterToWaterSimple {
 			LoadLoopNum( LoadLoopNum ),
 			LoadLoopSideNum( LoadLoopSideNum ),
 			LoadBranchNum( LoadBranchNum ),
-			LoadCompNum( LoadCompNum )
+			LoadCompNum( LoadCompNum ),
+			IsThisSized( IsThisSized )
 		{}
 
 	};
@@ -380,6 +384,11 @@ namespace HeatPumpWaterToWaterSimple {
 		int const GSHPNum, // GSHP Number
 		bool const FirstHVACIteration,
 		Real64 const MyLoad // Demand Load
+	);
+
+	void
+	SizeWatertoWaterHP(
+		int const GSHPNum  //GSHP Number
 	);
 
 	void
