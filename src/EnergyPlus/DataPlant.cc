@@ -46,6 +46,7 @@ namespace DataPlant {
 	int const OptimalLoading( 1 ); // Optimal Load Distribution Scheme
 	int const SequentialLoading( 2 ); // sequential Distribution Scheme
 	int const UniformLoading( 3 ); // sequential Distribution Scheme
+	int const UniformPLR ( 4 ); // Uniform PLR Distribution Scheme
 
 	// Parameters for scheme types
 	// Used in TYPE(OperationData)%OpSchemeType

@@ -1,5 +1,7 @@
 // C++ Headers
 #include <cmath>
+#include <fstream>
+#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -2058,6 +2060,7 @@ namespace PlantCondLoopOperation {
 		// na
 		// Using/Aliasing
 		using namespace DataLoopNode;
+		using namespace DataGlobals;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2073,12 +2076,19 @@ namespace PlantCondLoopOperation {
 		Real64 DivideLoad;
 		Real64 UniformLoad;
 		Real64 NewLoad;
+		Real64 MaxPlantCapacity;
+		Real64 MinCompPLR;
+		Real64 LargestMinCompPLR;
+		Real64 PlantOppPLR;
+		Real64 UniformPLRCompLoad;
 		int LoadFlag;
 
 		int BranchNum;
 		int CompNum;
 		int CompIndex;
 		int NumCompsOnList;
+
+		std::ofstream static myfile ("Debug.tsv", std::ofstream::out);
 
 		// start with some references
 		auto & this_loop( PlantLoop( LoopNum ) );
@@ -2174,7 +2184,6 @@ namespace PlantCondLoopOperation {
 
 				//SEQUENTIAL DISTRIBUTION SCHEME
 			} else if ( SELECT_CASE_var == SequentialLoading ) { // LoadFlag=2 indicates "sequential" load distribution
-
 				// step 1: Load machines in list order
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2255,6 +2264,110 @@ namespace PlantCondLoopOperation {
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;
 					}
 				}
+
+				// UniformPLR Load Distribution Scheme
+			} else if ( SELECT_CASE_var == UniformPLR ) {
+				// Get total plant capacity and remove last component from list if
+				MaxPlantCapacity = 0.0;
+				PlantOppPLR = 0.0;
+				MinCompPLR = 0.0;
+				LargestMinCompPLR = 0.0;
+
+				if ( WarmupFlag != 1 ){
+					myfile << HourOfDay << "\t" << TimeStep;
+				}
+				
+
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+											
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+					if ( ! this_component.Available ) continue;
+
+					MaxPlantCapacity += this_component.MaxLoad;
+
+					MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+
+					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
+
+					if ( CompIndex == NumCompsOnList ) {
+						if ( NumCompsOnList == 1 ) {
+							continue;
+						} else {
+							// Drop last item on equipment list and recalculate
+							if ( std::abs( RemLoopDemand ) < ( LargestMinCompPLR * MaxPlantCapacity ) ) {
+								CompIndex = 0;
+								NumCompsOnList -= 1;
+								MaxPlantCapacity = 0.0;
+								LargestMinCompPLR = 0.0;
+							}
+						}
+					}
+				}
+
+				//Reset NumCompsOnList back to original if modified.
+				if ( NumCompsOnList != this_equiplist.NumComps ) {
+					NumCompsOnList = this_equiplist.NumComps;
+				}
+				
+				// Determine PLR for uniform PLR loading of all equipment
+				if ( MaxPlantCapacity > 0.0 ) {
+					PlantOppPLR = min( 1.0, std::abs( RemLoopDemand ) / MaxPlantCapacity );
+					PlantOppPLR = max ( LargestMinCompPLR, PlantOppPLR );
+				} else {
+					//Need some error handling here
+				}
+
+				if ( WarmupFlag != 1) {
+					myfile << "\t" << 0 << "\t" << MaxPlantCapacity << "\t" << PlantOppPLR << std::endl;
+				}
+											
+				// Distribute load to each machine
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+					
+					UniformPLRCompLoad = 0.0;
+
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+					if ( ! this_component.Available ) continue;
+
+					UniformPLRCompLoad = PlantOppPLR * this_component.MaxLoad;
+					
+					if ( this_component.MaxLoad > 0.0 ) {
+						ChangeInLoad = min( std::abs( RemLoopDemand ), UniformPLRCompLoad );
+					} else {
+						// this is for some components like cooling towers don't have well defined MaxLoad
+						ChangeInLoad = std::abs( RemLoopDemand );
+					}
+				
+					AdjustChangeInLoadForLastStageUpperRangeLimit( LoopNum, CurSchemePtr, ListPtr, ChangeInLoad );
+
+					AdjustChangeInLoadByEMSControls( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					AdjustChangeInLoadByHowServed( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					ChangeInLoad = max( 0.0, ChangeInLoad );
+
+					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
+
+					if ( WarmupFlag != 1 ) {
+						myfile << "\t" << "\t" << "\t" << "\t" << "\t"; 
+						myfile << CompIndex << "\t" << RemLoopDemand << "\t" << ChangeInLoad << "\t" << this_component.MyLoad << std::endl;
+					}
+					
+					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
+					
+					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
+				}
+
 			}}
 
 		} // load is small check

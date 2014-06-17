@@ -440,6 +440,8 @@ namespace PlantManager {
 				this_loop.LoadDistribution = SequentialLoading;
 			} else if ( SameString( LoadingScheme, "Uniform" ) ) {
 				this_loop.LoadDistribution = UniformLoading;
+			} else if ( SameString( LoadingScheme, "UniformPLR" ) ) {
+				this_loop.LoadDistribution = UniformPLR;
 			} else {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
 				ShowContinueError( "..." + cAlphaFieldNames( 14 ) + "=\"" + Alpha( 14 ) + "\"." );

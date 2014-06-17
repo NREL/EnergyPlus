@@ -819,6 +819,8 @@ namespace PlantChillers {
 		Real64 HeatRecOutletTemp;
 		Real64 HeatRecMassFlow;
 		Real64 ChillerCondAvgTemp; // the effective condenser temperature for chiller performance [C]
+		Real64 PartLoadRat;
+		Real64 AvailChillerCap;
 
 		// Default Constructor
 		ElectricReportVars() :
@@ -828,7 +830,9 @@ namespace PlantChillers {
 			HeatRecInletTemp( 0.0 ),
 			HeatRecOutletTemp( 0.0 ),
 			HeatRecMassFlow( 0.0 ),
-			ChillerCondAvgTemp( 0.0 )
+			ChillerCondAvgTemp( 0.0 ),
+			PartLoadRat ( 0.0 ),
+			AvailChillerCap( 0.0 )
 		{}
 
 		// Member Constructor
@@ -840,7 +844,9 @@ namespace PlantChillers {
 			Real64 const HeatRecInletTemp,
 			Real64 const HeatRecOutletTemp,
 			Real64 const HeatRecMassFlow,
-			Real64 const ChillerCondAvgTemp // the effective condenser temperature for chiller performance [C]
+			Real64 const ChillerCondAvgTemp, // the effective condenser temperature for chiller performance [C]
+			Real64 const PartLoadRat,
+			Real32 const AvailChillerCap
 		) :
 			Base( Base ),
 			ActualCOP( ActualCOP ),
@@ -849,7 +855,9 @@ namespace PlantChillers {
 			HeatRecInletTemp( HeatRecInletTemp ),
 			HeatRecOutletTemp( HeatRecOutletTemp ),
 			HeatRecMassFlow( HeatRecMassFlow ),
-			ChillerCondAvgTemp( ChillerCondAvgTemp )
+			ChillerCondAvgTemp( ChillerCondAvgTemp ),
+			PartLoadRat ( PartLoadRat ),
+			AvailChillerCap( AvailChillerCap )
 		{}
 
 	};
