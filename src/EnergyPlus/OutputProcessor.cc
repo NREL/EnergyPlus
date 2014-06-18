@@ -4110,33 +4110,37 @@ namespace OutputProcessor {
 			gio::write( unitNumber, TimeStampFormat ) << reportIDString << DayOfSimChr << Month << DayOfMonth << DST << Hour << StartMinute << EndMinute << DayType;
 			timeIndex = -1; // Signals that writing to the SQL database is not active
 
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
+			if ( WriteOutputToSQLite ) timeIndex = sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
 
 		} else if ( SELECT_CASE_var == ReportHourly ) {
 			gio::write( unitNumber, TimeStampFormat ) << reportIDString << DayOfSimChr << Month << DayOfMonth << DST << Hour << 0.0 << 60.0 << DayType;
 			timeIndex = -1; // Signals that writing to the SQL database is not active
 
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
+			if ( WriteOutputToSQLite ) timeIndex = sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
 
 		} else if ( SELECT_CASE_var == ReportDaily ) {
 			gio::write( unitNumber, DailyStampFormat ) << reportIDString << DayOfSimChr << Month << DayOfMonth << DST << DayType;
 			timeIndex = -1; // Signals that writing to the SQL database is not active
 
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
+			if ( WriteOutputToSQLite ) timeIndex = sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
 
 		} else if ( SELECT_CASE_var == ReportMonthly ) {
 			gio::write( unitNumber, MonthlyStampFormat ) << reportIDString << DayOfSimChr << Month;
 			timeIndex = -1; // Signals that writing to the SQL database is not active
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
+			if ( WriteOutputToSQLite ) timeIndex = sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
 
 		} else if ( SELECT_CASE_var == ReportSim ) {
 			gio::write( unitNumber, RunPeriodStampFormat ) << reportIDString << DayOfSimChr;
 			timeIndex = -1; // Signals that writing to the SQL database is not active
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
+			if ( WriteOutputToSQLite ) timeIndex = sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
 
 		} else {
-			gio::write( cmessageBuffer, "(A,I5)" ) << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
-			if ( WriteOutputToSQLite ) SQLiteWriteMessageMacro( cmessageBuffer );
+			if ( WriteOutputToSQLite ) 
+			{
+				std::stringstream ss;
+				ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
+				sqlite->sqliteWriteMessage( ss.str() );
+			}
 			timeIndex = -1; // Signals that writing to the SQL database is not active
 
 		}}
@@ -4228,9 +4232,9 @@ namespace OutputProcessor {
 
 		if ( WriteOutputToSQLite ) {
 			if ( ! present( ScheduleName ) ) {
-				CreateSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval );
+				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval );
 			} else {
-				CreateSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, ScheduleName );
+				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, ScheduleName );
 			}
 		}
 
@@ -4366,10 +4370,10 @@ namespace OutputProcessor {
 			} else {
 				keyedValueString = "";
 			}
-			CreateSQLiteMeterDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
+			sqlite->createSQLiteMeterDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
 
 			if ( ! meterFileOnlyFlag ) {
-				CreateSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
+				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
 			}
 
 		}
@@ -4525,7 +4529,7 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
 		if ( WriteOutputToSQLite ) {
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
+			sqlite->createSQLiteReportVariableDataRecord( reportID, timeIndex, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
 		}
 
 		{ auto const SELECT_CASE_var( reportingInterval );
@@ -4598,7 +4602,7 @@ namespace OutputProcessor {
 		}
 
 		if ( WriteOutputToSQLite ) {
-			CreateSQLiteMeterRecord( reportID, timeIndex, repValue );
+			sqlite->createSQLiteMeterRecord( reportID, timeIndex, repValue );
 		}
 
 		gio::write( OutputFileMeters, fmta ) << creportID + ',' + NumberOut;
@@ -4606,7 +4610,7 @@ namespace OutputProcessor {
 
 		if ( ! meterOnlyFlag ) {
 			if ( WriteOutputToSQLite ) {
-				CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
+				sqlite->createSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
 			}
 
 			gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut;
@@ -4698,7 +4702,7 @@ namespace OutputProcessor {
 		}
 
 		if ( WriteOutputToSQLite ) {
-			CreateSQLiteMeterRecord( reportID, timeIndex, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
+			sqlite->createSQLiteMeterRecord( reportID, timeIndex, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 		}
 
 		// Append the min and max strings with date information
@@ -4721,7 +4725,7 @@ namespace OutputProcessor {
 
 		if ( ! meterOnlyFlag ) {
 			if ( WriteOutputToSQLite ) {
-				CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
+				sqlite->createSQLiteReportVariableDataRecord( reportID, timeIndex, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 			}
 
 			{ auto const SELECT_CASE_var( reportingInterval );
@@ -4799,7 +4803,7 @@ namespace OutputProcessor {
 		}
 
 		if ( WriteOutputToSQLite ) {
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
+			sqlite->createSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
 		}
 
 		gio::write( OutputFileStandard, fmta ) << creportID + ',' + NumberOut;
@@ -4949,7 +4953,7 @@ namespace OutputProcessor {
 		if ( WriteOutputToSQLite ) {
 			rminValue = minValue;
 			rmaxValue = MaxValue;
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
+			sqlite->createSQLiteReportVariableDataRecord( reportID, timeIndex, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
 		}
 
 		{ auto const SELECT_CASE_var( reportingInterval );
@@ -5022,7 +5026,7 @@ namespace OutputProcessor {
 		}
 
 		if ( WriteOutputToSQLite ) {
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
+			sqlite->createSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
 		}
 
 		gio::write( OutputFileStandard, fmta ) << reportIDString + ',' + NumberOut;

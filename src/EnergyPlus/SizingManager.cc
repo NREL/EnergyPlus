@@ -2306,7 +2306,7 @@ namespace SizingManager {
 
 		// BSLLC Start
 		if ( WriteOutputToSQLite ) {
-			AddSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
+			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
 		}
 		// BSLLC Finish
 
@@ -2371,7 +2371,7 @@ namespace SizingManager {
 		gio::write( OutputFileInits, Format_991 ) << SysName << VarDesc << RoundSigDigits( VarValue, 5 );
 
 		// BSLLC Start
-		if ( WriteOutputToSQLite ) AddSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
+		if ( WriteOutputToSQLite ) sqlite->addSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
 		// BSLLC Finish
 
 	}

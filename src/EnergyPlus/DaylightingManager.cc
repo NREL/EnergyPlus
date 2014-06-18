@@ -9465,7 +9465,7 @@ namespace DaylightingManager {
 						} // X Loop
 					} // Y Loop
 
-					CreateSQLiteDaylightMap( MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap( MapNum ).Xnum, XValue, IllumMap( MapNum ).Ynum, YValue, IllumValue );
+					sqlite->createSQLiteDaylightMap( MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap( MapNum ).Xnum, XValue, IllumMap( MapNum ).Ynum, YValue, IllumValue );
 
 				} // WriteOutputToSQLite
 			} // end time step
@@ -10329,7 +10329,7 @@ Label903: ;
 		gio::write( unitNo, FmtA ) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
 
 		if ( WriteOutputToSQLite ) {
-			CreateSQLiteDaylightMapTitle( mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord );
+			sqlite->createSQLiteDaylightMapTitle( mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord );
 		}
 
 	}

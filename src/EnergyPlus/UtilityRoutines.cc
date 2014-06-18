@@ -79,7 +79,6 @@ AbortEnergyPlus(
 	using PlantManager::CheckPlantOnAbort;
 	using ExternalInterface::NumExternalInterfaces;
 	using ExternalInterface::CloseSocket;
-	using SQLiteProcedures::UpdateSQLiteSimulationRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -111,7 +110,7 @@ AbortEnergyPlus(
 	int write_stat;
 
 	if ( WriteOutputToSQLite ) {
-		UpdateSQLiteSimulationRecord( true, false );
+		sqlite->updateSQLiteSimulationRecord( true, false );
 	}
 
 	AbortProcessing = true;
@@ -376,7 +375,6 @@ EndEnergyPlus()
 	using ExternalInterface::NumExternalInterfaces;
 	using ExternalInterface::CloseSocket;
 	using ExternalInterface::haveExternalInterfaceBCVTB;
-	using SQLiteProcedures::UpdateSQLiteSimulationRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -406,7 +404,7 @@ EndEnergyPlus()
 	int write_stat;
 
 	if ( WriteOutputToSQLite ) {
-		UpdateSQLiteSimulationRecord( true, true );
+		sqlite->updateSQLiteSimulationRecord( true, true );
 	}
 
 	ReportSurfaceErrors();
@@ -812,7 +810,6 @@ ShowFatalError(
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -838,7 +835,7 @@ ShowFatalError(
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
 	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
+		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
 	AbortEnergyPlus( NoIdf, NoIDD );
 
@@ -874,7 +871,6 @@ ShowSevereError(
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DoingSizing;
 	using DataGlobals::KickOffSimulation;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -904,7 +900,7 @@ ShowSevereError(
 	//  Could set a variable here that gets checked at some point?
 
 	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 1, ErrorMessage, 1 );
+		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 1 );
 	}
 
 }
@@ -938,7 +934,6 @@ ShowSevereMessage(
 	// Using/Aliasing
 	using namespace DataStringGlobals;
 	using namespace DataErrorTracking;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -965,7 +960,7 @@ ShowSevereMessage(
 	//  Could set a variable here that gets checked at some point?
 
 	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
+		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
 	}
 
 }
@@ -994,7 +989,6 @@ ShowContinueError(
 	// na
 
 	// Using/Aliasing
-	using SQLiteProcedures::UpdateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -1013,7 +1007,7 @@ ShowContinueError(
 
 	ShowErrorMessage( " **   ~~~   ** " + Message, OutUnit1, OutUnit2 );
 	if ( WriteOutputToSQLite ) {
-		UpdateSQLiteErrorRecord( Message );
+		sqlite->updateSQLiteErrorRecord( Message );
 	}
 
 }
@@ -1047,7 +1041,6 @@ ShowContinueErrorTimeStamp(
 	using DataEnvironment::CurMnDy;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DoingSizing;
-	using SQLiteProcedures::UpdateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -1081,13 +1074,13 @@ ShowContinueErrorTimeStamp(
 	if ( len( Message ) < 50 ) {
 		ShowErrorMessage( " **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
 		if ( WriteOutputToSQLite ) {
-			UpdateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
+			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	} else {
 		ShowErrorMessage( " **   ~~~   ** " + Message );
 		ShowErrorMessage( " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
 		if ( WriteOutputToSQLite ) {
-			UpdateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
+			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	}
 
@@ -1170,7 +1163,6 @@ ShowWarningError(
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DoingSizing;
 	using DataGlobals::KickOffSimulation;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -1197,7 +1189,7 @@ ShowWarningError(
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
 
 	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 0, ErrorMessage, 1 );
+		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 1 );
 	}
 
 }
@@ -1231,7 +1223,6 @@ ShowWarningMessage(
 	// Using/Aliasing
 	using namespace DataStringGlobals;
 	using namespace DataErrorTracking;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -1254,7 +1245,7 @@ ShowWarningMessage(
 
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
 	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
+		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
 	}
 
 }
@@ -1725,8 +1716,6 @@ ShowRecurringErrors()
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
 	using General::RemoveTrailingZeros;
-	using SQLiteProcedures::UpdateSQLiteErrorRecord;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
@@ -1759,7 +1748,7 @@ ShowRecurringErrors()
 			if ( has_prefix( error.Message, " **   ~~~   ** " ) ) {
 				ShowMessage( error.Message );
 				if ( WriteOutputToSQLite ) {
-					UpdateSQLiteErrorRecord( error.Message );
+					sqlite->updateSQLiteErrorRecord( error.Message );
 				}
 			} else {
 				ShowMessage( "" );
@@ -1769,9 +1758,9 @@ ShowRecurringErrors()
 				ShowMessage( StatMessageStart + "  during Sizing " + RoundSigDigits( error.SizingCount ) + " times." );
 				if ( WriteOutputToSQLite ) {
 					if ( has_prefix( error.Message, " ** Warning ** " ) ) {
-						CreateSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
+						sqlite->createSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
 					} else if ( has_prefix( error.Message, " ** Severe  ** " ) ) {
-						CreateSQLiteErrorRecord( 1, 1, error.Message.substr( 15 ), error.Count );
+						sqlite->createSQLiteErrorRecord( 1, 1, error.Message.substr( 15 ), error.Count );
 					}
 				}
 			}

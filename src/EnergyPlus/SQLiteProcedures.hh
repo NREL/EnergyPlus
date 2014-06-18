@@ -350,127 +350,20 @@ namespace SQLiteProcedures {
 
 	// Functions
 
-	void
-	SQLiteBegin();
+	//void
+	//SQLiteBegin();
 
-	void
-	SQLiteCommit();
+	//void
+	//SQLiteCommit();
 
 	void
 	SQLiteWriteMessageMacro( std::string const & message );
 
 	void
-	CreateZoneExtendedOutput();
-
-	void
-	CreateSQLiteDaylightMapTitle(
-		int const mapNum,
-		std::string const & mapName,
-		std::string const & environmentName,
-		int const zone,
-		std::string const & refPt1,
-		std::string const & refPt2,
-		Real64 const zCoord
-	);
-
-	void
-	CreateSQLiteDaylightMap(
-		int const mapNum,
-		int const month,
-		int const dayOfMonth,
-		int const hourOfDay,
-		int const nX,
-		FArray1S< Real64 > const x,
-		int const nY,
-		FArray1S< Real64 > const y,
-		FArray2S< Real64 > const illuminance
-	);
-
-	void
-	CreateSQLiteTabularDataRecords(
-		FArray2S_string const body, // row,column
-		FArray1S_string const rowLabels,
-		FArray1S_string const columnLabels,
-		std::string const & ReportName,
-		std::string const & ReportForString,
-		std::string const & TableName
-	);
-
-	void
 	InitializeIndexes();
 
 	void
-	InitializeTabularDataTable();
-
-	void
-	InitializeTabularDataView();
-
-	void
-	CreateSQLiteSimulationsRecord( int const ID );
-
-	void
 	CreateSQLiteEnvironmentPeriodRecord();
-
-	void
-	CreateSQLiteErrorRecord(
-		int const simulationIndex,
-		int const errorType,
-		std::string const & errorMessage,
-		int const cnt
-	);
-
-	void
-	UpdateSQLiteErrorRecord( std::string const & errorMessage );
-
-	void
-	UpdateSQLiteSimulationRecord(
-		bool const completed,
-		bool const completedSuccessfully
-	);
-
-	//// Consider making a class and making these private
-	//int SQLiteExecuteCommand (const std::string & commandBuffer)
-	//{
-	//	char *zErrMsg = 0;
-	//	int rc = -1;
-
-	//	if (outputFile == NULL)
-	//		fprintf(stderr, "SQLite3 message, can't open error file: sqlite.err\n");
-	//	else
-	//	{
-	//		rc = sqlite3_exec(db, commandBuffer, callback, 0, &zErrMsg);
-	//		if( rc != SQLITE_OK ){
-	//			fprintf(outputFile, "SQLite3 message, error: %s\n", zErrMsg);
-	//			sqlite3_free(zErrMsg);
-	//		}
-	//	}
-	//	return rc;
-	//}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
-	//     Copyright © 2008 Building Synergies, LLC.  All rights reserved.
 
 } // SQLiteProcedures
 

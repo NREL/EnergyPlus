@@ -214,12 +214,7 @@ namespace SimulationManager {
 		using EconomicLifeCycleCost::GetInputForLifeCycleCost;
 		using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
 		using SQLiteProcedures::WriteOutputToSQLite;
-		using SQLiteProcedures::CreateSQLiteSimulationsRecord;
 		using SQLiteProcedures::InitializeIndexes;
-		using SQLiteProcedures::CreateSQLiteEnvironmentPeriodRecord;
-		using SQLiteProcedures::CreateZoneExtendedOutput;
-		using SQLiteProcedures::SQLiteBegin;
-		using SQLiteProcedures::SQLiteCommit;
 		using DemandManager::InitDemandManagers;
 		using PlantManager::CheckIfAnyPlant;
 		using CurveManager::InitCurveReporting;
@@ -370,9 +365,9 @@ namespace SimulationManager {
 		}
 
 		if ( WriteOutputToSQLite ) {
-			SQLiteBegin();
-			CreateSQLiteSimulationsRecord( 1 );
-			SQLiteCommit();
+			sqlite->sqliteBegin();
+			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->sqliteCommit();
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
@@ -395,9 +390,9 @@ namespace SimulationManager {
 			++EnvCount;
 
 			if ( WriteOutputToSQLite ) {
-				SQLiteBegin();
-				CreateSQLiteEnvironmentPeriodRecord();
-				SQLiteCommit();
+				sqlite->sqliteBegin();
+				SQLiteProcedures::CreateSQLiteEnvironmentPeriodRecord();
+				sqlite->sqliteCommit();
 			}
 
 			ExitDuringSimulations = true;
@@ -416,7 +411,7 @@ namespace SimulationManager {
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
-				if ( WriteOutputToSQLite ) SQLiteBegin(); // setup for one transaction per day
+				if ( WriteOutputToSQLite ) sqlite->sqliteBegin(); // setup for one transaction per day
 
 				++DayOfSim;
 				gio::write( DayOfSimChr, "*" ) << DayOfSim;
@@ -494,7 +489,7 @@ namespace SimulationManager {
 
 				} // ... End hour loop.
 
-				if ( WriteOutputToSQLite ) SQLiteCommit(); // one transaction per day
+				if ( WriteOutputToSQLite ) sqlite->sqliteCommit(); // one transaction per day
 
 			} // ... End day loop.
 
@@ -516,7 +511,7 @@ namespace SimulationManager {
 			}
 		}
 
-		if ( WriteOutputToSQLite ) SQLiteBegin(); // for final data to write
+		if ( WriteOutputToSQLite ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -544,11 +539,11 @@ namespace SimulationManager {
 #endif
 		CloseOutputFiles();
 
-		CreateZoneExtendedOutput();
+		sqlite->createZoneExtendedOutput();
 
 		if ( WriteOutputToSQLite ) {
 			DisplayString( "Writing final SQL reports" );
-			SQLiteCommit(); // final transactions
+			sqlite->sqliteCommit(); // final transactions
 			InitializeIndexes(); // do not create indexes (SQL) until all is done.
 		}
 
@@ -2314,7 +2309,7 @@ namespace SimulationManager {
 		// na
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteDatabase;
+		//using SQLiteProcedures::CreateSQLiteDatabase;
 		using InputProcessor::PreProcessorCheck;
 		using InputProcessor::OverallErrorFlag;
 		using InputProcessor::CompactObjectsCheck;
@@ -2347,7 +2342,8 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		CreateSQLiteDatabase();
+		//CreateSQLiteDatabase();
+		EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
 
 		PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
@@ -2429,8 +2425,6 @@ namespace SimulationManager {
 
 		// Using/Aliasing
 		using SQLiteProcedures::WriteOutputToSQLite;
-		using SQLiteProcedures::CreateSQLiteErrorRecord;
-		using SQLiteProcedures::UpdateSQLiteErrorRecord;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2462,11 +2456,11 @@ namespace SimulationManager {
 				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
 				// automatic sending of error messages to SQLite are turned on.
 				if ( ErrorMessage[ 4 ] == 'S' ) {
-					CreateSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
+					sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
 				} else if ( ErrorMessage[ 4 ] == 'W' ) {
-					CreateSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
+					sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
 				} else if ( ErrorMessage[ 6 ] == '~' ) {
-					UpdateSQLiteErrorRecord( ErrorMessage );
+					sqlite->updateSQLiteErrorRecord( ErrorMessage );
 				}
 			}
 		}
