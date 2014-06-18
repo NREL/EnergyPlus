@@ -1248,7 +1248,6 @@ void SQLite::createSQLiteReportVariableDictionaryRecord(
 void
 SQLite::createSQLiteReportVariableDataRecord(
 	int const recordIndex,
-	int const timeIndex,
 	Real64 const value,
 	Optional_int_const reportingInterval,
 	Optional< Real64 const > minValue,
@@ -1274,7 +1273,7 @@ SQLite::createSQLiteReportVariableDataRecord(
 
 	++oid;
 
-	sqliteBindInteger(m_reportMeterDataInsertStmt, 1, timeIndex);
+	sqliteBindInteger(m_reportMeterDataInsertStmt, 1, m_sqlDBTimeIndex);
 	sqliteBindInteger(m_reportMeterDataInsertStmt, 2, recordIndex);
 	sqliteBindDouble(m_reportMeterDataInsertStmt, 3, value);
 	sqliteBindInteger(m_reportMeterDataInsertStmt, 4, oid);
@@ -1629,7 +1628,6 @@ SQLite::createSQLiteMeterDictionaryRecord(
 void
 SQLite::createSQLiteMeterRecord(
 	int const recordIndex,
-	int const timeIndex,
 	Real64 const value,
 	Optional_int_const reportingInterval,
 	Optional< Real64 const > minValue,
@@ -1644,7 +1642,7 @@ SQLite::createSQLiteMeterRecord(
 
 	++oid;
 
-	sqliteBindInteger(m_reportMeterDataInsertStmt, 1, timeIndex);
+	sqliteBindInteger(m_reportMeterDataInsertStmt, 1, m_sqlDBTimeIndex);
 	sqliteBindInteger(m_reportMeterDataInsertStmt, 2, recordIndex);
 	sqliteBindDouble(m_reportMeterDataInsertStmt, 3, value);
 	sqliteBindInteger(m_reportMeterDataInsertStmt, 4, oid);
@@ -2337,6 +2335,17 @@ void SQLite::createZoneExtendedOutput()
 	createSQLiteZoneGroupTable();
 	createSQLiteRoomAirModelTable();
 	createSQLiteSchedulesTable();
+}
+
+void SQLite::createSQLiteEnvironmentPeriodRecord()
+{
+	sqliteBindInteger(m_environmentPeriodInsertStmt, 1, DataEnvironment::CurEnvirNum);
+	sqliteBindInteger(m_environmentPeriodInsertStmt, 2, 1);
+	sqliteBindText(m_environmentPeriodInsertStmt, 3, DataEnvironment::EnvironmentName);
+	sqliteBindInteger(m_environmentPeriodInsertStmt, 4, DataGlobals::KindOfSim);
+
+	sqliteStepCommand(m_environmentPeriodInsertStmt);
+	sqliteResetCommand(m_environmentPeriodInsertStmt);
 }
 
 namespace SQLiteProcedures {

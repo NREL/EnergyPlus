@@ -50,7 +50,6 @@ class SQLite
 	void
 	createSQLiteReportVariableDataRecord(
 		int const recordIndex,
-		int const timeIndex,
 		Real64 const value,
 		Optional_int_const reportingInterval = _,
 		Optional< Real64 const > minValue = _,
@@ -123,7 +122,6 @@ class SQLite
 	void
 	createSQLiteMeterRecord(
 		int const recordIndex,
-		int const timeIndex,
 		Real64 const value,
 		Optional_int_const reportingInterval = _,
 		Optional< Real64 const > minValue = _,
@@ -186,6 +184,9 @@ class SQLite
 		bool const completed,
 		bool const completedSuccessfully
 	);
+
+	void
+	createSQLiteEnvironmentPeriodRecord();
 
 	void sqliteWriteMessage(const std::string & message);
 
@@ -342,28 +343,12 @@ class SQLite
 namespace SQLiteProcedures {
 
 	// Data
-	extern int const MaxMessageSize;
+	//extern int const MaxMessageSize;
 	extern bool WriteOutputToSQLite;
 	extern bool WriteTabularDataToSQLite;
 
-	extern int SQLdbTimeIndex;
-
-	// Functions
-
-	//void
-	//SQLiteBegin();
-
-	//void
-	//SQLiteCommit();
-
-	void
-	SQLiteWriteMessageMacro( std::string const & message );
-
 	void
 	InitializeIndexes();
-
-	void
-	CreateSQLiteEnvironmentPeriodRecord();
 
 } // SQLiteProcedures
 

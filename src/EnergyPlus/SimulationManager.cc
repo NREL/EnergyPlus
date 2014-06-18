@@ -391,7 +391,7 @@ namespace SimulationManager {
 
 			if ( WriteOutputToSQLite ) {
 				sqlite->sqliteBegin();
-				SQLiteProcedures::CreateSQLiteEnvironmentPeriodRecord();
+				sqlite->createSQLiteEnvironmentPeriodRecord();
 				sqlite->sqliteCommit();
 			}
 
