@@ -65,6 +65,7 @@ namespace HeatRecovery {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
+	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataLoopNode;
 	using DataEnvironment::OutBaroPress;
 	using DataEnvironment::StdBaroPress;
@@ -1068,8 +1069,9 @@ namespace HeatRecovery {
 		Real64 RhoAir; // air density at outside pressure & standard temperature and humidity
 		Real64 CpAir; // heat capacity of air
 		// of humidity ratio and temperature
-		static bool MyEnvrnFlag( true );
+		// static bool MyEnvrnFlag( true );
 		static bool MyOneTimeAllocate( true );
+		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MySetPointTest;
 		static FArray1D_bool MySizeFlag;
 		int ErrStat; // error status returned by CalculateNTUfromEpsAndZ
@@ -1081,8 +1083,10 @@ namespace HeatRecovery {
 		if ( MyOneTimeAllocate ) {
 			MySetPointTest.allocate( NumHeatExchangers );
 			MySizeFlag.allocate( NumHeatExchangers );
+			MyEnvrnFlag.allocate( NumHeatExchangers );
 			MySetPointTest = true;
 			MySizeFlag = true;
+			MyEnvrnFlag = true;
 			MyOneTimeAllocate = false;
 		}
 
@@ -1097,12 +1101,13 @@ namespace HeatRecovery {
 		LocalWarningError = false;
 
 		// Do the Begin Environment initializations
-		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
+		if ( BeginEnvrnFlag && MyEnvrnFlag( ExchNum ) ) {
 			//I believe that all of these initializations should be taking place at the SCFM conditions
 			RhoAir = StdRhoAir;
 			//    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
 			CpAir = PsyCpAirFnWTdb( 0.0, 20.0 );
-			for ( ExIndex = 1; ExIndex <= NumHeatExchangers; ++ExIndex ) {
+//			for ( ExIndex = 1; ExIndex <= NumHeatExchangers; ++ExIndex ) {
+				ExIndex = ExchNum;
 
 				{ auto const SELECT_CASE_var( ExchCond( ExIndex ).ExchTypeNum );
 
@@ -1232,8 +1237,8 @@ namespace HeatRecovery {
 
 				}}
 
-			}
-			MyEnvrnFlag = false;
+//			}  // Daeho Kang: Commented out the loop
+			MyEnvrnFlag( ExchNum ) = false;
 
 		}
 
@@ -1343,7 +1348,7 @@ namespace HeatRecovery {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Richard Raustad
 		//       DATE WRITTEN   October 2007
-		//       MODIFIED       na
+		//       MODIFIED       February 2014 Daeho Kang, enable sizing multiple HX types and add additional sizing fields
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1378,59 +1383,87 @@ namespace HeatRecovery {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		bool IsAutoSize;				// Indicator to autosize
+		Real64 NomSupAirVolFlowDes;		// Autosized supply air flow rate for reproting
+		Real64 NomSupAirVolFlowUser;	// Hard-sized supply air flow rate for reproting
+		Real64 NomSecAirVolFlowDes;		// Autosized secondary air flow rate for reporting
+		Real64 NomSecAirVolFlowUser;	// Hardsized secondary air flow rate for reporting
+
+		IsAutoSize = false;
+		NomSupAirVolFlowDes = 0.0;
+		NomSupAirVolFlowUser = 0.0;
+		NomSecAirVolFlowDes = 0.0;
+		NomSecAirVolFlowUser = 0.0;
+
 
 		if ( ExchCond( ExchNum ).NomSupAirVolFlow == AutoSize ) {
+			IsAutoSize = true;
+		}
 
-			if ( CurZoneEqNum > 0 ) {
-
+		if ( CurZoneEqNum > 0 ) {
+			if ( !IsAutoSize && !ZoneSizingRunDone ) {
+				if ( ExchCond( ExchNum ).NomSupAirVolFlow > 0.0 ) {
+					ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name,
+					"User-Specified Nominal Supply Air Flow Rate [m3/s]", ExchCond( ExchNum ).NomSupAirVolFlow );
+				}
+			} else { // Sizing run done
 				CheckZoneSizing( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name );
-				ExchCond( ExchNum ).NomSupAirVolFlow = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-
+				NomSupAirVolFlowDes = std::max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
 			}
+		}
 
-			if ( CurSysNum > 0 ) {
-
+		if ( CurSysNum > 0 ) {
+			if ( !IsAutoSize && !SysSizingRunDone ) {
+				if ( ExchCond( ExchNum ).NomSupAirVolFlow > 0.0 ) {
+					ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name,
+					"User-Specified Nominal Supply Air Flow Rate [m3/s]", ExchCond( ExchNum ).NomSupAirVolFlow );
+				}
+			} else { // Sizing run done
 				CheckSysSizing( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name );
 
 				if ( CurOASysNum > 0 ) {
 					// size to outdoor air volume flow rate if available
 					if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
-						ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+					NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 					} else {
 						// ELSE size to supply air duct flow rate
 						{ auto const SELECT_CASE_var( CurDuctType );
 						if ( SELECT_CASE_var == Main ) {
-							ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						} else if ( SELECT_CASE_var == Cooling ) {
-							ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+							NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 						} else if ( SELECT_CASE_var == Heating ) {
-							ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+							NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
 						} else if ( SELECT_CASE_var == Other ) {
-							ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						} else {
-							ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 						}}
 					}
 				} else {
 					{ auto const SELECT_CASE_var( CurDuctType );
 					if ( SELECT_CASE_var == Main ) {
-						ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					} else if ( SELECT_CASE_var == Cooling ) {
-						ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+						NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 					} else if ( SELECT_CASE_var == Heating ) {
-						ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+						NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
 					} else if ( SELECT_CASE_var == Other ) {
-						ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					} else {
-						ExchCond( ExchNum ).NomSupAirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						NomSupAirVolFlowDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 					}}
 				}
 
 			}
+		}
 
-			if ( ExchCond( ExchNum ).NomSupAirVolFlow < SmallAirVolFlow ) {
-				ExchCond( ExchNum ).NomSupAirVolFlow = 0.0;
+		if ( IsAutoSize ) {
+			ExchCond( ExchNum ).NomSupAirVolFlow = NomSupAirVolFlowDes;
+			ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name,
+				"Design Size Nominal Supply Air Flow Rate [m3/s]", NomSupAirVolFlowDes );
+			if ( NomSupAirVolFlowDes < SmallAirVolFlow ) {
+				NomSupAirVolFlowDes = 0.0;
 				// Generic HX will be turned off if nominal air flow rate is 0, even if simulated air flow through
 				// HX is greater than 0. Avoids a divide by 0 in Sub CalcAirToAirGenericHeatExch.
 				if ( ExchCond( ExchNum ).ExchTypeNum == HX_AIRTOAIR_GENERIC ) {
@@ -1440,11 +1473,58 @@ namespace HeatRecovery {
 					ShowContinueError( "... To eliminate this warning, check sizing and HX inputs to correct HX sizing issue." );
 				}
 			}
-
-			ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name, "Nominal Supply Air Flow Rate [m3/s]", ExchCond( ExchNum ).NomSupAirVolFlow );
-
+		} else {
+			if ( ExchCond( ExchNum ).NomSupAirVolFlow > 0.0 && NomSupAirVolFlowDes > 0.0 ) {
+				NomSupAirVolFlowUser = ExchCond( ExchNum ).NomSupAirVolFlow;
+				ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name,
+					"Design Size Nominal Supply Air Flow Rate [m3/s]", NomSupAirVolFlowDes,
+					"User-Specified Nominal Supply Air Flow Rate [m3/s]", NomSupAirVolFlowUser );
+				if ( DisplayExtraWarnings ) {
+					if ( ( std::abs( NomSupAirVolFlowDes - NomSupAirVolFlowUser ) / NomSupAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+						ShowMessage( "Size:" + cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + ":Potential issue with equipment sizing for " +
+							ExchCond( ExchNum ).Name );
+						ShowContinueError( "User-Specified Nominal Supply Air Flow Rate of " + 
+							RoundSigDigits( NomSupAirVolFlowUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from Design Size Nominal Supply Air Flow Rate of " +
+							RoundSigDigits( NomSupAirVolFlowDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+					}
+				}
+			}
 		}
 
+		if ( ExchCond( ExchNum ).ExchTypeNum == HX_AIRTOAIR_FLATPLATE ) {
+			IsAutoSize = false;
+
+			if ( ExchCond( ExchNum ).NomSecAirVolFlow == AutoSize ) {
+				IsAutoSize = true;
+			}
+			NomSecAirVolFlowDes = ExchCond( ExchNum ).NomSupAirVolFlow;
+
+			if ( IsAutoSize) {
+				ExchCond( ExchNum ).NomSecAirVolFlow = NomSecAirVolFlowDes;
+				ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name,
+					"Design Size Nominal Secondary Air Flow Rate [m3/s]", NomSecAirVolFlowDes );
+			} else {
+				if ( ExchCond( ExchNum ).NomSecAirVolFlow > 0.0 && NomSecAirVolFlowDes > 0.0 ) {
+					NomSecAirVolFlowUser = ExchCond( ExchNum ).NomSecAirVolFlow;
+					ReportSizingOutput( cHXTypes( ExchCond( ExchNum ).ExchTypeNum ), ExchCond( ExchNum ).Name,
+						"Design Size Nominal Secondary Air Flow Rate [m3/s]", NomSecAirVolFlowDes,
+						"User-Specified Nominal Secondary Air Flow Rate [m3/s]", NomSecAirVolFlowUser );
+					if ( DisplayExtraWarnings ) {
+						if ( ( std::abs( NomSecAirVolFlowDes - NomSecAirVolFlowUser ) / NomSecAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+							ShowMessage( "Size:" + cHXTypes( ExchCond( ExchNum ).ExchTypeNum ) + ":Potential issue with equipment sizing for " +
+								ExchCond( ExchNum ).Name );
+							ShowContinueError( "User-Specified Nominal Secondary Air Flow Rate of " + RoundSigDigits( NomSecAirVolFlowUser, 5 ) + " [m3/s]" );
+							ShowContinueError( "differs from Design Size Nominal Secondary Air Flow Rate of " + RoundSigDigits( NomSecAirVolFlowDes, 5 ) + " [m3/s]" );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+				}
+			}
+		}
 	}
 
 	void
