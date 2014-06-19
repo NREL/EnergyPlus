@@ -46932,6 +46932,7 @@ HeatExchanger:AirToAir:FlatPlate,
       \type real
       \minimum> 0.0
       \units m3/s
+	  \autosizable
   N3, \field Nominal Supply Air Inlet Temperature
       \required-field
       \type real
@@ -46945,6 +46946,7 @@ HeatExchanger:AirToAir:FlatPlate,
       \type real
       \minimum> 0.0
       \units m3/s
+	  \autosizable
   N6, \field Nominal Secondary Air Inlet Temperature
       \required-field
       \type real
@@ -47171,12 +47173,14 @@ HeatExchanger:Desiccant:BalancedFlow:PerformanceDataType1,
        \type real
        \units m3/s
        \minimum> 0.0
+	   \autosizable
   N2 , \field Nominal Air Face Velocity
        \required-field
        \type real
        \units m/s
        \minimum> 0.0
        \maximum 6.0
+	   \default 3.0
   N3 , \field Nominal Electric Power
        \note Parasitic electric power (e.g., desiccant wheel motor)
        \type real
