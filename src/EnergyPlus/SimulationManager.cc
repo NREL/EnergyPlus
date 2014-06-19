@@ -214,7 +214,6 @@ namespace SimulationManager {
 		using EconomicLifeCycleCost::GetInputForLifeCycleCost;
 		using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
 		using SQLiteProcedures::WriteOutputToSQLite;
-		using SQLiteProcedures::InitializeIndexes;
 		using DemandManager::InitDemandManagers;
 		using PlantManager::CheckIfAnyPlant;
 		using CurveManager::InitCurveReporting;
@@ -544,7 +543,7 @@ namespace SimulationManager {
 		if ( WriteOutputToSQLite ) {
 			DisplayString( "Writing final SQL reports" );
 			sqlite->sqliteCommit(); // final transactions
-			InitializeIndexes(); // do not create indexes (SQL) until all is done.
+			sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
 		}
 
 		if ( ErrorsFound ) {

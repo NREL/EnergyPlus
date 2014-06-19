@@ -192,6 +192,8 @@ class SQLite
 
 	void createZoneExtendedOutput();
 
+	void initializeIndexes();
+
 	private:
 
 	void createSQLiteZoneTable();
@@ -346,9 +348,6 @@ namespace SQLiteProcedures {
 	//extern int const MaxMessageSize;
 	extern bool WriteOutputToSQLite;
 	extern bool WriteTabularDataToSQLite;
-
-	void
-	InitializeIndexes();
 
 } // SQLiteProcedures
 
