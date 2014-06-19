@@ -1207,11 +1207,19 @@ void SQLite::adjustReportingHourAndMinutes(int & hour, int & minutes)
 
 void SQLite::parseUnitsAndDescription(const std::string & combinedString, std::string & units, std::string & description)
 {
-  std::size_t leftPos = combinedString.find("[");
-  std::size_t rightPos = combinedString.find("]");
+	std::size_t leftPos = combinedString.find("[");
+	std::size_t rightPos = combinedString.find("]");
 
-  units = combinedString.substr(leftPos + 1,rightPos - leftPos - 1);
-  description = combinedString.substr(leftPos - 1);
+	if( (leftPos < rightPos) && (leftPos != std::string::npos) && (rightPos != std::string::npos) )
+	{
+		units = combinedString.substr(leftPos + 1,rightPos - leftPos - 1);
+		description = combinedString.substr(leftPos - 1);
+	}
+	else
+	{
+		units = "";
+		description = combinedString;
+	}
 }
 
 int SQLite::logicalToInteger(const bool value)
