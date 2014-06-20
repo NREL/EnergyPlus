@@ -3839,6 +3839,7 @@ namespace MixedAir {
 									// "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController not found
 									ZoneOA = ZoneOABZ / ZoneEz;
 								}
+								SysOA = SysOA + ZoneOA;
 							}
 
 							// Get the zone supply air flow rate
@@ -3932,7 +3933,12 @@ namespace MixedAir {
 						if ( SysEv <= 0.0 ) SysEv = 1.0;
 
 						// Calc system outdoor air requirement
-						SysOA = SysOAuc / SysEv;
+						if (VentilationMechanical(VentMechObjectNum).SystemOAMethod == SOAM_ProportionalControl) {
+							SysOA = SysOA / SysEv;
+						}
+						else {
+							SysOA = SysOAuc / SysEv;
+						}
 					}
 
 					// Finally calc the system supply OA mass flow rate
