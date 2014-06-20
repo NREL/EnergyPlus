@@ -120,7 +120,7 @@
   SurfaceConvectionAlgorithm:Outside,DOE-2;
 
   SimulationControl,
-    No,                      !- Do Zone Sizing Calculation
+    Yes,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
@@ -1943,6 +1943,76 @@
     North Zone Radiant Floor,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+
+  ZoneList,
+    All Zones,
+    North Zone,
+    East Zone,
+    West Zone;
+
+  Schedule:Constant,
+    Always Dual Setpoint,
+    Any Number,
+    4;
+
+  Schedule:Constant,
+    HeatingSetpoint,
+    Temperature,
+    21;
+
+  Schedule:Constant,
+    CoolingSetpoint,
+    Temperature,
+    25;
+
+  ThermostatSetpoint:DualSetpoint,
+    DualSetpointControl,     !- Name
+    HeatingSetpoint,         !- Heating Setpoint Temperature Schedule Name
+    CoolingSetpoint;         !- Cooling Setpoint Temperature Schedule Name
+
+  ZoneControl:Thermostat,
+    Thermostat,              !- Name
+    All Zones,               !- Zone or ZoneList Name
+    Always Dual Setpoint,    !- Control Type Schedule Name
+    ThermostatSetpoint:DualSetpoint, !- Control 1 Object Type
+    DualSetpointControl;     !- Control 1 Name
+
+  Sizing:Zone,
+    All Zones,               !- Zone or ZoneList Name
+    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
+    12.778,                  !- Zone Cooling Design Supply Air Temperature
+    ,                        !- Zone Cooling Design Supply Air Temperature Difference
+    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
+    32.222,                  !- Zone Heating Design Supply Air Temperature
+    ,                        !- Zone Heating Design Supply Air Temperature Difference
+    0.008,                   !- Zone Cooling Design Supply Air Humidity Ratio
+    0.008,                   !- Zone Heating Design Supply Air Humidity Ratio
+    ,                        !- Design Specification Outdoor Air Object Name
+    ,                        !- Zone Heating Sizing Factor
+    ,                        !- Zone Cooling Sizing Factor
+    ,                        !- Cooling Design Air Flow Method
+    ,                        !- Cooling Design Air Flow Rate
+    ,                        !- Cooling Minimum Air Flow per Zone Floor Area
+    ,                        !- Cooling Minimum Air Flow
+    ,                        !- Cooling Minimum Air Flow Fraction
+    ,                        !- Heating Design Air Flow Method
+    ,                        !- Heating Design Air Flow Rate
+    ,                        !- Heating Maximum Air Flow per Zone Floor Area
+    ,                        !- Heating Maximum Air Flow
+    ,                        !- Heating Maximum Air Flow Fraction
+    ;                        !- Design Specification Zone Air Distribution Object Name
+
+  Sizing:Plant,
+    Hot Water Loop,          !- Plant or Condenser Loop Name
+    Heating,                 !- Loop Type
+    60,                      !- Design Loop Exit Temperature
+    15;                      !- Loop Design Temperature Difference
+
+  Sizing:Plant,
+    Chilled Water Loop,      !- Plant or Condenser Loop Name
+    Cooling,                 !- Loop Type
+    7,                       !- Design Loop Exit Temperature
+    15;                      !- Loop Design Temperature Difference
 
   ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
     West Zone Radiant Floor, !- Name
