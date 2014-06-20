@@ -205,6 +205,49 @@ SQLite::~SQLite()
 {
 	m_errorStream.close();
 	sqlite3_close(m_db);
+
+	sqlite3_finalize(m_reportVariableDataInsertStmt);
+	sqlite3_finalize(m_reportVariableExtendedDataInsertStmt);
+	sqlite3_finalize(m_timeIndexInsertStmt);
+	sqlite3_finalize(m_reportVariableDictionaryInsertStmt);
+	sqlite3_finalize(m_zoneInfoInsertStmt);
+	sqlite3_finalize(m_nominalLightingInsertStmt);
+	sqlite3_finalize(m_nominalElectricEquipmentInsertStmt);
+	sqlite3_finalize(m_nominalGasEquipmentInsertStmt);
+	sqlite3_finalize(m_nominalSteamEquipmentInsertStmt);
+	sqlite3_finalize(m_nominalHotWaterEquipmentInsertStmt);
+	sqlite3_finalize(m_nominalOtherEquipmentInsertStmt);
+	sqlite3_finalize(m_nominalBaseboardHeatInsertStmt);
+	sqlite3_finalize(m_surfaceInsertStmt);
+	sqlite3_finalize(m_constructionInsertStmt);
+	sqlite3_finalize(m_constructionLayerInsertStmt);
+	sqlite3_finalize(m_materialInsertStmt);
+	sqlite3_finalize(m_zoneListInsertStmt);
+	sqlite3_finalize(m_zoneGroupInsertStmt);
+	sqlite3_finalize(m_infiltrationInsertStmt);
+	sqlite3_finalize(m_ventilationInsertStmt);
+	sqlite3_finalize(m_nominalPeopleInsertStmt);
+	sqlite3_finalize(m_zoneSizingInsertStmt);
+	sqlite3_finalize(m_systemSizingInsertStmt);
+	sqlite3_finalize(m_componentSizingInsertStmt);
+	sqlite3_finalize(m_roomAirModelInsertStmt);
+	sqlite3_finalize(m_groundTemperatureInsertStmt);
+	sqlite3_finalize(m_weatherFileInsertStmt);
+	sqlite3_finalize(m_meterDictionaryInsertStmt);
+	sqlite3_finalize(m_reportMeterDataInsertStmt);
+	sqlite3_finalize(m_meterExtendedDataInsertStmt);
+	sqlite3_finalize(m_scheduleInsertStmt);
+	sqlite3_finalize(m_daylightMapTitleInsertStmt);
+	sqlite3_finalize(m_daylightMapHorlyTitleInsertStmt);
+	sqlite3_finalize(m_daylightMapHorlyDataInsertStmt);
+	sqlite3_finalize(m_environmentPeriodInsertStmt);
+	sqlite3_finalize(m_simulationsInsertStmt);
+	sqlite3_finalize(m_tabularDataInsertStmt);
+	sqlite3_finalize(m_stringsInsertStmt);
+	sqlite3_finalize(m_stringsLookUpStmt);
+	sqlite3_finalize(m_errorInsertStmt);
+	sqlite3_finalize(m_errorUpdateStmt);
+	sqlite3_finalize(m_simulationUpdateStmt);
 }
 
 void SQLite::sqliteBegin()
@@ -232,17 +275,114 @@ int SQLite::sqliteExecuteCommand(const std::string & commandBuffer)
 	return rc;
 }
 
-int SQLite::sqlitePrepareStatement(sqlite3_stmt * stmt, const std::string & stmtBuffer)
+int SQLite::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer)
 {
 	int rc = -1;
 
 	rc = sqlite3_prepare_v2(m_db, stmtBuffer.c_str(), -1, &stmt, nullptr);
 	if( rc != SQLITE_OK )
 	{
-		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << sqlite3_errmsg(m_db) << std::endl;
+		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
 	}
 
 	return rc;
+}
+
+int SQLite::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer)
+{
+	int rc = -1;
+
+	rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
+	if( rc != SQLITE_OK )
+	{
+		m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLite::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
+{
+	int rc = -1;
+
+	rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
+	if( rc != SQLITE_OK )
+	{
+		m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLite::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert)
+{
+	int rc = -1;
+
+	rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
+	if( rc != SQLITE_OK )
+	{
+	    m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLite::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex)
+{
+	int rc = -1;
+
+	rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
+	if( rc != SQLITE_OK )
+	{
+		m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
+	}
+
+	return rc;
+}
+
+int SQLite::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert)
+{
+	return sqliteBindInteger(stmt,stmtInsertLocationIndex,logicalToInteger(valueToInsert));
+}
+
+int SQLite::sqliteStepCommand(sqlite3_stmt * stmt)
+{
+	int rc = -1;
+
+	rc = sqlite3_step(stmt);
+	switch(rc)
+	{
+		case SQLITE_DONE:
+		case SQLITE_OK:
+		case SQLITE_ROW:
+			break;
+
+		default:
+			m_errorStream << "SQLite3 message, sqlite3_step message: " << sqlite3_errmsg(m_db) << std::endl;
+			break;
+	}
+
+	return rc;
+}
+
+int SQLite::sqliteResetCommand(sqlite3_stmt * stmt)
+{
+	return sqlite3_reset(stmt);
+}
+
+int SQLite::sqliteClearBindings(sqlite3_stmt * stmt)
+{
+	return sqlite3_clear_bindings(stmt);
+}
+
+int SQLite::sqliteFinalizeCommand(sqlite3_stmt * stmt)
+{
+	return sqlite3_finalize(stmt);
+}
+
+void SQLite::sqliteWriteMessage(const std::string & message)
+{
+	m_errorStream << "SQLite3 message, " << message << std::endl;
 }
 
 void SQLite::initializeReportVariableDataDictionaryTable()
@@ -626,7 +766,7 @@ void SQLite::initializeNominalBaseboardHeatTable()
 	const std::string nominalBaseboardHeatInsertSQL =
 	"INSERT INTO NominalBaseboardHeaters VALUES(?,?,?,?,?,?,?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_nominalBaseboardHeatInsertStmt,nominalBaseboardHeatersTableSQL);
+	sqlitePrepareStatement(m_nominalBaseboardHeatInsertStmt,nominalBaseboardHeatInsertSQL);
 }
 
 void SQLite::initializeSurfacesTable()
@@ -663,7 +803,7 @@ void SQLite::initializeConstructionsTables()
 	const std::string constructionInsertSQL = 
 	"INSERT INTO Constructions VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_constructionInsertStmt,constructionsTableSQL);
+	sqlitePrepareStatement(m_constructionInsertStmt,constructionInsertSQL);
 
 	const std::string constructionLayersTableSQL =
 	"CREATE TABLE ConstructionLayers (ConstructionIndex INTEGER, "
@@ -674,7 +814,7 @@ void SQLite::initializeConstructionsTables()
 	const std::string constructionLayerInsertSQL = 
   "INSERT INTO ConstructionLayers VALUES(?,?,?);";
 
-	sqlitePrepareStatement(m_constructionLayerInsertStmt,constructionLayersTableSQL);
+	sqlitePrepareStatement(m_constructionLayerInsertStmt,constructionLayerInsertSQL);
 }
 
 void SQLite::initializeMaterialsTable()
@@ -1026,104 +1166,7 @@ void SQLite::initializeIndexes()
 	sqliteExecuteCommand("CREATE INDEX dmhdHRI ON DaylightMapHourlyData (HourlyReportIndex ASC);");
 }
 
-int SQLite::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer)
-{
-	int rc = -1;
-
-	rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
-	if( rc != SQLITE_OK )
-	{
-		m_errorStream << "SQLite3 message, sqlite3_bind_text message: " << sqlite3_errmsg(m_db) << std::endl;
-	}
-
-	return rc;
-}
-
-int SQLite::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
-{
-	int rc = -1;
-
-	rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
-	if( rc != SQLITE_OK )
-	{
-		m_errorStream << "SQLite3 message, sqlite3_bind_int message: " << sqlite3_errmsg(m_db) << std::endl;
-	}
-
-	return rc;
-}
-
-int SQLite::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert)
-{
-	int rc = -1;
-
-	rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
-	if( rc != SQLITE_OK )
-	{
-	    m_errorStream << "SQLite3 message, sqlite3_bind_double message: " << sqlite3_errmsg(m_db) << std::endl;
-	}
-
-	return rc;
-}
-
-int SQLite::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex)
-{
-	int rc = -1;
-
-	rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
-	if( rc != SQLITE_OK )
-	{
-		m_errorStream << "SQLite3 message, sqlite3_bind_null message: " << sqlite3_errmsg(m_db) << std::endl;
-	}
-
-	return rc;
-}
-
-int SQLite::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert)
-{
-	return sqliteBindInteger(stmt,stmtInsertLocationIndex,logicalToInteger(valueToInsert));
-}
-
-int SQLite::sqliteStepCommand(sqlite3_stmt * stmt)
-{
-	int rc = -1;
-
-	rc = sqlite3_step(stmt);
-	switch(rc)
-	{
-		case SQLITE_DONE:
-		case SQLITE_OK:
-		case SQLITE_ROW:
-			break;
-
-		default:
-			m_errorStream << "SQLite3 message, sqlite3_step message: " << sqlite3_errmsg(m_db) << std::endl;
-			break;
-	}
-
-	return rc;
-}
-
-int SQLite::sqliteResetCommand(sqlite3_stmt * stmt)
-{
-	return sqlite3_reset(stmt);
-}
-
-int SQLite::sqliteClearBindings(sqlite3_stmt * stmt)
-{
-	return sqlite3_clear_bindings(stmt);
-}
-
-int SQLite::sqliteFinalizeCommand(sqlite3_stmt * stmt)
-{
-	return sqlite3_finalize(stmt);
-}
-
-void SQLite::sqliteWriteMessage(const std::string & message)
-{
-	m_errorStream << "SQLite3 message, " << message << std::endl;
-}
-
-std::string SQLite::storageType(const int storageTypeIndex) const
+std::string SQLite::storageType(const int storageTypeIndex)
 {
 	std::string result;
 
@@ -1142,7 +1185,7 @@ std::string SQLite::storageType(const int storageTypeIndex) const
 	return result;
 }
 
-std::string SQLite::timestepTypeName(const int timestepType) const
+std::string SQLite::timestepTypeName(const int timestepType)
 {
 	std::string result;
 
@@ -1161,7 +1204,7 @@ std::string SQLite::timestepTypeName(const int timestepType) const
 	return result;
 }
 
-std::string SQLite::reportingFreqName(const int reportingFreqIndex) const
+std::string SQLite::reportingFreqName(const int reportingFreqIndex)
 {
 	std::string result;
 
@@ -1201,7 +1244,7 @@ void SQLite::adjustReportingHourAndMinutes(int & hour, int & minutes)
 			minutes = 0;
 			break;
 		default:
-			hour = hour - 1;
+			--hour;
 	}
 }
 
@@ -1262,8 +1305,7 @@ void SQLite::createSQLiteReportVariableDictionaryRecord(
 	sqliteResetCommand(m_reportVariableDictionaryInsertStmt);
 }
 
-void
-SQLite::createSQLiteReportVariableDataRecord(
+void SQLite::createSQLiteReportVariableDataRecord(
 	int const recordIndex,
 	Real64 const value,
 	Optional_int_const reportingInterval,
@@ -1347,8 +1389,7 @@ SQLite::createSQLiteReportVariableDataRecord(
 	sqliteResetCommand(m_reportMeterDataInsertStmt);
 }
 
-int
-SQLite::createSQLiteTimeIndexRecord(
+int SQLite::createSQLiteTimeIndexRecord(
 	int const reportingInterval,
 	int const recordIndex,
 	int const cumlativeSimulationDays,
@@ -1512,8 +1553,7 @@ SQLite::createSQLiteTimeIndexRecord(
 	return iOut;
 }
 
-void
-SQLite::addSQLiteZoneSizingRecord(
+void SQLite::addSQLiteZoneSizingRecord(
 	std::string const & zoneName, // the name of the zone
 	std::string const & loadType, // the description of the input variable
 	Real64 const calcDesLoad, // the value from the sizing calculation [W]
@@ -1546,8 +1586,7 @@ SQLite::addSQLiteZoneSizingRecord(
 	sqliteResetCommand(m_zoneSizingInsertStmt);
 }
 
-void
-SQLite::addSQLiteSystemSizingRecord(
+void SQLite::addSQLiteSystemSizingRecord(
 	std::string const & sysName, // the name of the system
 	std::string const & varDesc, // the description of the input variable
 	Real64 const varValue // the value from the sizing calculation
@@ -1567,8 +1606,7 @@ SQLite::addSQLiteSystemSizingRecord(
 	sqliteResetCommand(m_systemSizingInsertStmt);
 }
 
-void
-SQLite::addSQLiteComponentSizingRecord(
+void SQLite::addSQLiteComponentSizingRecord(
 	std::string const & compType, // the type of the component
 	std::string const & compName, // the name of the component
 	std::string const & varDesc, // the description of the input variable
@@ -1590,8 +1628,7 @@ SQLite::addSQLiteComponentSizingRecord(
 	sqliteResetCommand(m_componentSizingInsertStmt);
 }
 
-void
-SQLite::createSQLiteRoomAirModelTable()
+void SQLite::createSQLiteRoomAirModelTable()
 {
 	for(int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum)
 	{
@@ -1606,8 +1643,7 @@ SQLite::createSQLiteRoomAirModelTable()
 	}
 }
 
-void
-SQLite::createSQLiteMeterDictionaryRecord(
+void SQLite::createSQLiteMeterDictionaryRecord(
 	int const meterReportID,
 	int const storeTypeIndex,
 	std::string const & indexGroup,
@@ -1642,8 +1678,7 @@ SQLite::createSQLiteMeterDictionaryRecord(
 	sqliteResetCommand(m_meterDictionaryInsertStmt);
 }
 
-void
-SQLite::createSQLiteMeterRecord(
+void SQLite::createSQLiteMeterRecord(
 	int const recordIndex,
 	Real64 const value,
 	Optional_int_const reportingInterval,
@@ -1717,8 +1752,7 @@ SQLite::createSQLiteMeterRecord(
 	sqliteResetCommand(m_reportMeterDataInsertStmt);
 }
 
-void
-SQLite::createSQLiteDaylightMapTitle(
+void SQLite::createSQLiteDaylightMapTitle(
 	int const mapNum,
 	std::string const & mapName,
 	std::string const & environmentName,
@@ -1740,8 +1774,7 @@ SQLite::createSQLiteDaylightMapTitle(
 	sqliteResetCommand(m_daylightMapTitleInsertStmt);
 }
 
-void
-SQLite::createSQLiteDaylightMap(
+void SQLite::createSQLiteDaylightMap(
 	int const mapNum,
 	int const month,
 	int const dayOfMonth,
@@ -1781,8 +1814,7 @@ SQLite::createSQLiteDaylightMap(
 	++hourlyReportIndex;
 }
 
-void
-SQLite::createSQLiteTabularDataRecords(
+void SQLite::createSQLiteTabularDataRecords(
 	FArray2D_string const & body, // row,column
 	FArray1D_string const & rowLabels,
 	FArray1D_string const & columnLabels,
@@ -1796,14 +1828,14 @@ SQLite::createSQLiteTabularDataRecords(
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
 
-		for(size_t iRow = 1, k = body.index(1,1); iRow <= sizeRowLabels; ++iRow)
+		for(size_t iRow = 0, k = body.index(1,1); iRow < sizeRowLabels; ++iRow)
 		{
 			std::string rowLabel = rowLabels[iRow];
 			std::string rowUnits;
 			std::string rowDescription;
 			parseUnitsAndDescription(rowLabel,rowUnits,rowDescription);
 
-			for(size_t iCol = 1; iCol <= sizeColumnLabels; ++iCol)
+			for(size_t iCol = 0; iCol < sizeColumnLabels; ++iCol)
 			{
 				std::string colLabel = columnLabels[iCol];
 				std::string colUnits;
@@ -1884,8 +1916,7 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue,std::s
 	return iOut;
 }
 
-void
-SQLite::createSQLiteSimulationsRecord( int const id )
+void SQLite::createSQLiteSimulationsRecord( int const id )
 {
 	sqliteBindInteger(m_simulationsInsertStmt, 1, id);
 	sqliteBindText(m_simulationsInsertStmt, 2, DataStringGlobals::VerString);
@@ -1896,8 +1927,7 @@ SQLite::createSQLiteSimulationsRecord( int const id )
 	sqliteResetCommand(m_simulationsInsertStmt);
 }
 
-void
-SQLite::createSQLiteErrorRecord(
+void SQLite::createSQLiteErrorRecord(
 	int const simulationIndex,
 	int const errorType,
 	std::string const & errorMessage,
@@ -1918,8 +1948,7 @@ SQLite::createSQLiteErrorRecord(
 	sqliteResetCommand(m_errorInsertStmt);
 }
 
-void
-SQLite::updateSQLiteErrorRecord( std::string const & errorMessage )
+void SQLite::updateSQLiteErrorRecord( std::string const & errorMessage )
 {
 	sqliteBindText(m_errorUpdateStmt, 1, "  " + errorMessage);
 
@@ -1927,8 +1956,7 @@ SQLite::updateSQLiteErrorRecord( std::string const & errorMessage )
 	sqliteResetCommand(m_errorUpdateStmt);
 }
 
-void
-SQLite::updateSQLiteSimulationRecord(
+void SQLite::updateSQLiteSimulationRecord(
 	bool const completed,
 	bool const completedSuccessfully
 )
@@ -2367,595 +2395,9 @@ void SQLite::createSQLiteEnvironmentPeriodRecord()
 
 namespace SQLiteProcedures {
 
-	// Note most of the procedures below are stubs -- they have no function other than to satisfy compiler requirements
-
-	// Using/Aliasing
-	using namespace DataPrecisionGlobals;
-
 	// Data
-	int const MaxMessageSize( 4096 );
 	bool WriteOutputToSQLite( false );
 	bool WriteTabularDataToSQLite( false );
-
-	int SQLdbTimeIndex( 0 );
-
-	// Functions
-
-	void
-	SQLiteBegin()
-	{
-
-		// Locals
-		int result;
-
-	}
-
-	void
-	SQLiteCommit()
-	{
-
-		// Locals
-		int result;
-
-	}
-
-	void
-	CreateSQLiteDatabase()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   September 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine determines if there is a request for SQLite data and fatals if there is.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		if ( GetNumObjectsFound( "Output:SQLite" ) > 0 ) {
-			ShowSevereError( "SQLite is not available in this version" );
-			ShowContinueError( "Request for SQLite output will be ignored" );
-			WriteOutputToSQLite = false;
-		} else {
-			WriteOutputToSQLite = false;
-		}
-
-	}
-
-	void
-	CreateSQLiteReportVariableDictionaryRecord(
-		int const reportVariableReportID,
-		int const storeTypeIndex,
-		std::string const & indexGroup,
-		std::string const & keyedValueString,
-		std::string const & variableName,
-		int const indexType,
-		std::string const & units,
-		int const reportingFreq,
-		Optional_string_const ScheduleName
-	)
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	CreateSQLiteReportVariableDataRecord(
-		int const recordIndex,
-		int const timeIndex,
-		Real64 const value,
-		Optional_int_const reportingInterval,
-		Optional< Real64 const > minValue,
-		Optional_int_const minValueDate,
-		Optional< Real64 const > maxValue,
-		Optional_int_const maxValueDate,
-		Optional_int_const minutesPerTimeStep
-	)
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	int
-	CreateSQLiteTimeIndexRecord(
-		int const reportingInterval,
-		int const recordIndex,
-		int const CumlativeSimulationDays,
-		Optional_int_const Month,
-		Optional_int_const DayOfMonth,
-		Optional_int_const Hour,
-		Optional< Real64 const > EndMinute,
-		Optional< Real64 const > StartMinute,
-		Optional_int_const DST,
-		Optional_string_const DayType
-	)
-	{
-
-		// Return value
-		int CreateSQLiteTimeIndexRecord;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-		// See Module Parameter Definitons for LocalReportEach, LocalReportTimeStep, LocalReportHourly, etc.
-
-		CreateSQLiteTimeIndexRecord = -1;
-
-		return CreateSQLiteTimeIndexRecord;
-	}
-
-	void
-	CreateSQLiteZoneTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalLightingTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalPeopleTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalElectricEquipmentTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalGasEquipmentTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalSteamEquipmentTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalHotWaterEquipmentTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalOtherEquipmentTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteNominalBaseboardHeatTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteSurfacesTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteConstructionsTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteMaterialsTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteZoneListTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteZoneGroupTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteInfiltrationTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteVentilationTable()
-	{
-
-	}
-
-	void
-	AddSQLiteZoneSizingRecord(
-		std::string const & ZoneName, // the name of the zone
-		std::string const & LoadType, // the description of the input variable
-		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
-		Real64 const UserDesLoad, // the value from the sizing calculation modified by user input [W]
-		Real64 const CalcDesFlow, // calculated design air flow rate [m3/s]
-		Real64 const UserDesFlow, // user input or modified design air flow rate [m3/s]
-		std::string const & DesDayName, // the name of the design day that produced the peak
-		std::string const & PeakHrMin, // time stamp of the peak
-		Real64 const PeakTemp, // temperature at peak [C]
-		Real64 const PeakHumRat, // humidity ratio at peak [kg water/kg dry air]
-		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
-	)
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	AddSQLiteSystemSizingRecord(
-		std::string const & SysName, // the name of the system
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
-	)
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	AddSQLiteComponentSizingRecord(
-		std::string const & CompType, // the type of the component
-		std::string const & CompName, // the name of the component
-		std::string const & VarDesc, // the description of the input variable
-		Real64 const VarValue // the value from the sizing calculation
-	)
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	CreateSQLiteRoomAirModelTable()
-	{
-
-	}
-
-	void
-	CreateSQLiteMeterDictionaryRecord(
-		int const meterReportID,
-		int const storeTypeIndex,
-		std::string const & indexGroup,
-		std::string const & keyedValueString,
-		std::string const & variableName,
-		int const indexType,
-		std::string const & units,
-		int const reportingFreq,
-		Optional_string_const ScheduleName
-	)
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	CreateSQLiteMeterRecord(
-		int const recordIndex,
-		int const timeIndex,
-		Real64 const value,
-		Optional_int_const reportingInterval,
-		Optional< Real64 const > minValue,
-		Optional_int_const minValueDate,
-		Optional< Real64 const > maxValue,
-		Optional_int_const maxValueDate,
-		Optional_int_const minutesPerTimeStep
-	)
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	SQLiteWriteMessageMacro( std::string const & message )
-	{
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	CreateZoneExtendedOutput()
-	{
-
-	}
-
-	void
-	CreateSQLiteDaylightMapTitle(
-		int const mapNum,
-		std::string const & mapName,
-		std::string const & environmentName,
-		int const zone,
-		std::string const & refPt1,
-		std::string const & refPt2,
-		Real64 const zCoord
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Greg Stark
-		//       DATE WRITTEN   Sept 2008
-		//       MODIFIED       April 2010, Kyle Benne, Added zCoord
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-		// Standard SQL92 queries and commands via the Fortran SQLite3 API
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	CreateSQLiteDaylightMap(
-		int const mapNum,
-		int const month,
-		int const dayOfMonth,
-		int const hourOfDay,
-		int const nX,
-		FArray1S< Real64 > const x,
-		int const nY,
-		FArray1S< Real64 > const y,
-		FArray2S< Real64 > const illuminance
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Greg Stark
-		//       DATE WRITTEN   Sept 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-
-		// METHODOLOGY EMPLOYED:
-		// Standard SQL92 queries and commands via the Fortran SQLite3 API
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	CreateSQLiteTabularDataRecords(
-		FArray2S_string const body, // row,column
-		FArray1S_string const rowLabels,
-		FArray1S_string const columnLabels,
-		std::string const & ReportName,
-		std::string const & ReportForString,
-		std::string const & TableName
-	)
-	{
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	InitializeIndexes()
-	{
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	}
-
-	void
-	InitializeTabularDataTable()
-	{
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-	}
-
-	void
-	InitializeTabularDataView()
-	{
-
-	}
-
-	void
-	CreateSQLiteSimulationsRecord( int const ID )
-	{
-
-		// Using/Aliasing
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	CreateSQLiteEnvironmentPeriodRecord()
-	{
-
-	}
-
-	void
-	CreateSQLiteErrorRecord(
-		int const simulationIndex,
-		int const errorType,
-		std::string const & errorMessage,
-		int const cnt
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Kyle Benne
-		//       DATE WRITTEN   August 2010
-		//       RE-ENGINEERED  na
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine writes the error data to the Errors table
-		// METHODOLOGY EMPLOYED:
-		// Standard SQL92 queries and commands via the Fortran SQLite3 API
-		// REFERENCES:
-		// na
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	UpdateSQLiteErrorRecord( std::string const & errorMessage )
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Kyle Benne
-		//       DATE WRITTEN   August 2010
-		//       RE-ENGINEERED  na
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine updates error records in the Errors table.
-		// This is used to append text to an error that continues on
-		// to the next line.  The errorMessage is always appended to the
-		// last record inserted into the Errors table.
-		// METHODOLOGY EMPLOYED:
-		// Standard SQL92 queries and commands via the Fortran SQLite3 API
-		// REFERENCES:
-		// na
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	void
-	UpdateSQLiteSimulationRecord(
-		bool const completed,
-		bool const completedSuccessfully
-	)
-	{
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Kyle Benne
-		//       DATE WRITTEN   August 2010
-		//       RE-ENGINEERED  na
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine updates simulation records in the Simulations table.
-		// A simulation record is first inserted as
-		// completed = false and
-		// completedSuccessfully = false
-		// This subroutine updates those records.
-		// METHODOLOGY EMPLOYED:
-		// Standard SQL92 queries and commands via the Fortran SQLite3 API
-		// REFERENCES:
-		// na
-		// USE STATEMENTS:
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	}
-
-	//     NOTICE
-
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
-
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
-
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
-
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
-
-	//     Copyright © 2008 Building Synergies, LLC.  All rights reserved.
 
 } // SQLiteProcedures
 

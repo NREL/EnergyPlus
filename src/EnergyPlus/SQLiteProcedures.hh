@@ -21,21 +21,19 @@ class SQLite
 	public:
 
 	// Open the DB and prepare for writing data
-	// Create all of the tables using the same approach as the legacy CreateSQLiteDatabase function
-	// KSB: Should this throw if the DB cannot be opened?
+	// Create all of the tables on construction
 	SQLite();
+
+  // Close database and free prepared statements
 	virtual ~SQLite();
 
 	// Begin a transaction
-	void
-	sqliteBegin();
+	void sqliteBegin();
 
 	// Commit a transaction
-	void
-	sqliteCommit();
+	void sqliteCommit();
 
-	void
-	createSQLiteReportVariableDictionaryRecord(
+	void createSQLiteReportVariableDictionaryRecord(
 		int const reportVariableReportID,
 		int const storeTypeIndex,
 		std::string const & indexGroup,
@@ -47,8 +45,7 @@ class SQLite
 		Optional_string_const ScheduleName = _
 	);
 
-	void
-	createSQLiteReportVariableDataRecord(
+	void createSQLiteReportVariableDataRecord(
 		int const recordIndex,
 		Real64 const value,
 		Optional_int_const reportingInterval = _,
@@ -59,8 +56,7 @@ class SQLite
 		Optional_int_const minutesPerTimeStep = _
 	);
 
-	int
-	createSQLiteTimeIndexRecord(
+	int createSQLiteTimeIndexRecord(
 		int const reportingInterval,
 		int const recordIndex,
 		int const CumlativeSimulationDays,
@@ -73,8 +69,7 @@ class SQLite
 		Optional_string_const DayType = _
 	);
 
-	void
-	addSQLiteZoneSizingRecord(
+	void addSQLiteZoneSizingRecord(
 		std::string const & ZoneName, // the name of the zone
 		std::string const & LoadType, // the description of the input variable
 		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
@@ -88,26 +83,22 @@ class SQLite
 		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
 	);
 
-	void
-	addSQLiteSystemSizingRecord(
+	void addSQLiteSystemSizingRecord(
 		std::string const & SysName, // the name of the system
 		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	);
 
-	void
-	addSQLiteComponentSizingRecord(
+	void addSQLiteComponentSizingRecord(
 		std::string const & CompType, // the type of the component
 		std::string const & CompName, // the name of the component
 		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	);
 
-	void
-	createSQLiteRoomAirModelTable();
+	void createSQLiteRoomAirModelTable();
 
-	void
-	createSQLiteMeterDictionaryRecord(
+	void createSQLiteMeterDictionaryRecord(
 		int const meterReportID,
 		int const storeTypeIndex,
 		std::string const & indexGroup,
@@ -119,8 +110,7 @@ class SQLite
 		Optional_string_const ScheduleName = _
 	);
 
-	void
-	createSQLiteMeterRecord(
+	void createSQLiteMeterRecord(
 		int const recordIndex,
 		Real64 const value,
 		Optional_int_const reportingInterval = _,
@@ -131,8 +121,7 @@ class SQLite
 		Optional_int_const minutesPerTimeStep = _
 	);
 
-	void
-	createSQLiteDaylightMapTitle(
+	void createSQLiteDaylightMapTitle(
 		int const mapNum,
 		std::string const & mapName,
 		std::string const & environmentName,
@@ -142,8 +131,7 @@ class SQLite
 		Real64 const zCoord
 	);
 
-	void
-	createSQLiteDaylightMap(
+	void createSQLiteDaylightMap(
 		int const mapNum,
 		int const month,
 		int const dayOfMonth,
@@ -155,8 +143,7 @@ class SQLite
 		FArray2S< Real64 > const illuminance
 	);
 
-	void
-	createSQLiteTabularDataRecords(
+	void createSQLiteTabularDataRecords(
 		FArray2D_string const & body, // row,column
 		FArray1D_string const & rowLabels,
 		FArray1D_string const & columnLabels,
@@ -165,28 +152,23 @@ class SQLite
 		std::string const & TableName
 	);
 
-	void
-	createSQLiteSimulationsRecord( int const ID );
+	void createSQLiteSimulationsRecord( int const ID );
 
-	void
-	createSQLiteErrorRecord(
+	void createSQLiteErrorRecord(
 		int const simulationIndex,
 		int const errorType,
 		std::string const & errorMessage,
 		int const cnt
 	);
 
-	void
-	updateSQLiteErrorRecord( std::string const & errorMessage );
+	void updateSQLiteErrorRecord( std::string const & errorMessage );
 
-	void
-	updateSQLiteSimulationRecord(
+	void updateSQLiteSimulationRecord(
 		bool const completed,
 		bool const completedSuccessfully
 	);
 
-	void
-	createSQLiteEnvironmentPeriodRecord();
+	void createSQLiteEnvironmentPeriodRecord();
 
 	void sqliteWriteMessage(const std::string & message);
 
@@ -215,7 +197,7 @@ class SQLite
 	void createSQLiteSchedulesTable();
 
 	int sqliteExecuteCommand(const std::string & commandBuffer);
-	int sqlitePrepareStatement(sqlite3_stmt * stmt, const std::string & stmtBuffer);
+	int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
 
 	int sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer);
 	int sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
@@ -230,9 +212,9 @@ class SQLite
 
 	int createSQLiteStringTableRecord(std::string const & stringValue,std::string const & stringType);
 
-	std::string storageType(const int storageTypeIndex) const;
-	std::string timestepTypeName(const int timestepType) const;
-	std::string reportingFreqName(const int reportingFreqIndex) const;
+	static std::string storageType(const int storageTypeIndex);
+	static std::string timestepTypeName(const int timestepType);
+	static std::string reportingFreqName(const int reportingFreqIndex);
 
 	static void adjustReportingHourAndMinutes(int & hour, int & minutes);
 	// Given combinedString, parse out units and description.

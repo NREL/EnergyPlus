@@ -289,8 +289,6 @@ SET( SRC
   Humidifiers.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
-  ISO_C_FUNCTION_BINDING.cc
-  ISO_C_FUNCTION_BINDING.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
   InputProcessor.cc
@@ -397,8 +395,6 @@ SET( SRC
   RootFinder.hh
   RuntimeLanguageProcessor.cc
   RuntimeLanguageProcessor.hh
-  SQLiteFortranRoutines.cc
-  SQLiteFortranRoutines.hh
   SQLiteProcedures.cc
   SQLiteProcedures.hh
   ScheduleManager.cc
