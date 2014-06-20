@@ -200,6 +200,11 @@ namespace OutsideEnergySources {
 	// *****************************************************************************
 
 	void
+	SizeDistrictEnergy( 
+		int const EnergySourceNum 
+		);
+
+	void
 	SimDistrictEnergy(
 		bool const RunFlag,
 		int const DistrictEqNum,
