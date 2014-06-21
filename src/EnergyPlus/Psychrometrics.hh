@@ -2,6 +2,7 @@
 #define Psychrometrics_hh_INCLUDED
 
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -635,29 +636,29 @@ namespace Psychrometrics {
 		// make Fortran ignore "types".
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static Int64 const Grid_Shift( 64 - 12 - psatprecision_bits );
 		//  integer(i64), parameter :: Grid_Mask=NOT(ISHFT(1_i64, Grid_Shift)-1)
+		Int64 const Grid_Shift( 28 ); //Tuned This is a hot spot
+		assert( Grid_Shift == 64 - 12 - psatprecision_bits ); // Force Grid_Shift updates when precision bits changes
 
 #ifdef EP_psych_stats
 		++NumTimesCalled( iPsyPsatFnTemp_cache );
 #endif
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Int64 Tdb_tag;
-		Real64 Tdb_tag_r;
 
-		Tdb_tag = TRANSFER( T, Tdb_tag );
+		Int64 const Tdb_tag( bit::bit_shift( TRANSFER( T, Grid_Shift ), -Grid_Shift ) ); // Note that 2nd arg to TRANSFER is not used: Only type matters
+//		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
+		Int64 const hash( Tdb_tag & psatcache_mask );
+		auto & cPsat( cached_Psat( hash ) );
 
-		Tdb_tag = bit::bit_shift( Tdb_tag, -Grid_Shift );
-		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) );
-
-		if ( cached_Psat( hash ).iTdb != Tdb_tag ) {
-			cached_Psat( hash ).iTdb = Tdb_tag;
+		if ( cPsat.iTdb != Tdb_tag ) {
+			cPsat.iTdb = Tdb_tag;
+			Real64 Tdb_tag_r;
 			Tdb_tag_r = TRANSFER( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
-			cached_Psat( hash ).Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
+			cPsat.Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
 		}
 
-		return cached_Psat( hash ).Psat; // saturation pressure {Pascals}
+		return cPsat.Psat; // saturation pressure {Pascals}
 	}
 
 #else

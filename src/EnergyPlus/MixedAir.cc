@@ -3432,7 +3432,7 @@ namespace MixedAir {
 		Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
 		Real64 OASignal; // Outside air flow rate fraction (0.0 to 1.0)
 		//unused1208 REAL(r64) :: OADPTemp                   ! Outside air dew point temperature
-		FArray1D< Real64 > Par( 4 ); // Par(1) = mixed air node number
+		static FArray1D< Real64 > Par( 4 ); // Par(1) = mixed air node number //Tuned Made static
 		// Par(2) = return air node number
 		// Par(3) = outside air node number
 		// Par(4) = mixed air mass flow rate

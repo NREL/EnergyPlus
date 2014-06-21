@@ -122,7 +122,7 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth );
+		static FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
 		// FLOW:
 

@@ -714,33 +714,6 @@ namespace Psychrometrics {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const C1( -5674.5359 ); // Coefficient for TKel < KelvinConvK
-		Real64 const C2( 6.3925247 ); // Coefficient for TKel < KelvinConvK
-		Real64 const C3( -0.9677843e-2 ); // Coefficient for TKel < KelvinConvK
-		Real64 const C4( 0.62215701e-6 ); // Coefficient for TKel < KelvinConvK
-		Real64 const C5( 0.20747825e-8 ); // Coefficient for TKel < KelvinConvK
-		Real64 const C6( -0.9484024e-12 ); // Coefficient for TKel < KelvinConvK
-		Real64 const C7( 4.1635019 ); // Coefficient for TKel < KelvinConvK
-
-		Real64 const C8( -5800.2206 ); // Coefficient for TKel >= KelvinConvK
-		Real64 const C9( 1.3914993 ); // Coefficient for TKel >= KelvinConvK
-		Real64 const C10( -0.048640239 ); // Coefficient for TKel >= KelvinConvK
-		Real64 const C11( 0.41764768e-4 ); // Coefficient for TKel >= KelvinConvK
-		Real64 const C12( -0.14452093e-7 ); // Coefficient for TKel >= KelvinConvK
-		Real64 const C13( 6.5459673 ); // Coefficient for TKel >= KelvinConvK
-#ifdef EP_IF97
-		//Table 34 in IF97
-		Real64 const N1( 0.11670521452767e04 );
-		Real64 const N2( -0.72421316703206e06 );
-		Real64 const N3( -0.17073846940092e02 );
-		Real64 const N4( 0.12020824702470e05 );
-		Real64 const N5( -0.32325550322333e07 );
-		Real64 const N6( 0.14915108613530e02 );
-		Real64 const N7( -0.48232657361591e04 );
-		Real64 const N8( 0.40511340542057e06 );
-		Real64 const N9( -0.23855557567849 );
-		Real64 const N10( 0.65017534844798e03 );
-#endif
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -749,14 +722,6 @@ namespace Psychrometrics {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 Tkel; // Dry-bulb in REAL(r64) for function passing
-#ifdef EP_IF97
-		Real64 phi; // IF97 equation 29b
-		Real64 phi2; // phi squared
-		Real64 A; // IF97 equation 30
-		Real64 B; // IF97 equation 30
-		Real64 C; // IF97 equation 30
-#endif
 
 #ifdef EP_psych_stats
 		++NumTimesCalled( iPsyPsatFnTemp );
@@ -764,8 +729,8 @@ namespace Psychrometrics {
 
 		// CHECK T IN RANGE.
 #ifdef EP_psych_errors
-		if ( T <= -100.0 || T >= 200.0 ) {
-			if ( ! WarmupFlag ) {
+		if ( ! WarmupFlag ) {
+			if ( T <= -100.0 || T >= 200.0 ) {
 				if ( iPsyErrIndex( iPsyPsatFnTemp ) == 0 ) {
 					ShowWarningMessage( "Temperature out of range [-100. to 200.] (PsyPsatFnTemp)" );
 					if ( !CalledFrom.empty() ) {
@@ -781,46 +746,56 @@ namespace Psychrometrics {
 #endif
 
 		// Convert temperature from Centigrade to Kelvin.
-		Tkel = T + KelvinConv;
-
-		// If below freezing, calculate saturation pressure over ice.
-		if ( ( Tkel < KelvinConv ) && ( Tkel >= 173.15 ) ) {
-			Pascal = std::exp( C1 / Tkel + C2 + Tkel * ( C3 + Tkel * ( C4 + Tkel * ( C5 + C6 * Tkel ) ) ) + C7 * std::log( Tkel ) );
+		Real64 const Tkel( T + KelvinConv ); // Dry-bulb in REAL(r64) for function passing
 
 			// If below -100C,set value of Pressure corresponding to Saturation Temperature of -100C.
-		} else if ( ( Tkel < 173.15 ) ) {
+		if ( Tkel < 173.15 ) {
 			Pascal = 0.0017;
 
+		// If below freezing, calculate saturation pressure over ice.
+		} else if ( Tkel < KelvinConv ) { // Tkel >= 173.15
+			Real64 const C1( -5674.5359 ); // Coefficient for TKel < KelvinConvK
+			Real64 const C2( 6.3925247 ); // Coefficient for TKel < KelvinConvK
+			Real64 const C3( -0.9677843e-2 ); // Coefficient for TKel < KelvinConvK
+			Real64 const C4( 0.62215701e-6 ); // Coefficient for TKel < KelvinConvK
+			Real64 const C5( 0.20747825e-8 ); // Coefficient for TKel < KelvinConvK
+			Real64 const C6( -0.9484024e-12 ); // Coefficient for TKel < KelvinConvK
+			Real64 const C7( 4.1635019 ); // Coefficient for TKel < KelvinConvK
+			Pascal = std::exp( C1 / Tkel + C2 + Tkel * ( C3 + Tkel * ( C4 + Tkel * ( C5 + C6 * Tkel ) ) ) + C7 * std::log( Tkel ) );
+
 			// If above freezing, calculate saturation pressure over liquid water.
-		} else if ( ( Tkel >= KelvinConv ) && ( Tkel <= 473.15 ) ) {
+		} else if ( Tkel <= 473.15 ) { // Tkel >= 173.15 // Tkel >= KelvinConv
 #ifndef EP_IF97
+			Real64 const C8( -5800.2206 ); // Coefficient for TKel >= KelvinConvK
+			Real64 const C9( 1.3914993 ); // Coefficient for TKel >= KelvinConvK
+			Real64 const C10( -0.048640239 ); // Coefficient for TKel >= KelvinConvK
+			Real64 const C11( 0.41764768e-4 ); // Coefficient for TKel >= KelvinConvK
+			Real64 const C12( -0.14452093e-7 ); // Coefficient for TKel >= KelvinConvK
+			Real64 const C13( 6.5459673 ); // Coefficient for TKel >= KelvinConvK
 			Pascal = std::exp( C8 / Tkel + C9 + Tkel * ( C10 + Tkel * ( C11 + Tkel * C12 ) ) + C13 * std::log( Tkel ) );
 #else
+			//Table 34 in IF97
+			Real64 const N1( 0.11670521452767e04 );
+			Real64 const N2( -0.72421316703206e06 );
+			Real64 const N3( -0.17073846940092e02 );
+			Real64 const N4( 0.12020824702470e05 );
+			Real64 const N5( -0.32325550322333e07 );
+			Real64 const N6( 0.14915108613530e02 );
+			Real64 const N7( -0.48232657361591e04 );
+			Real64 const N8( 0.40511340542057e06 );
+			Real64 const N9( -0.23855557567849 );
+			Real64 const N10( 0.65017534844798e03 );
 			//         !IF97 equations
-			phi = Tkel + N9 / ( Tkel - N10 );
-			phi2 = phi * phi;
-			A = phi2 + N1 * phi + N2;
-			B = N3 * phi2 + N4 * phi + N5;
-			C = N6 * phi2 + N7 * phi + N8;
-			Pascal = 1000000.0 * pow_4( ( 2.0 * C ) / ( -B + std::sqrt( pow_2( B ) - 4.0 * A * C ) ) );
+			Real64 const phi = Tkel + N9 / ( Tkel - N10 ); // IF97 equation 29b
+			Real64 const phi2 = phi * phi; // phi squared
+			Real64 const A = phi2 + N1 * phi + N2;
+			Real64 const B = N3 * phi2 + N4 * phi + N5;
+			Real64 const C = N6 * phi2 + N7 * phi + N8;
+			Pascal = 1000000.0 * pow_4( ( 2.0 * C ) / ( -B + std::sqrt( ( B * B ) - 4.0 * A * C ) ) );
 #endif
 			// If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
-		} else if ( ( Tkel > 473.15 ) ) {
+		} else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
 			Pascal = 1555000.0;
-
-		} else {
-			// bad temperature.  Use 0.0 C
-#ifdef EP_psych_errors
-			ShowSevereError( "PsyPsatFnTemp -- Bad input temperature=" + TrimSigDigits( T, 2 ) );
-			if ( !CalledFrom.empty() ) {
-				ShowContinueErrorTimeStamp( " Routine=" + CalledFrom + ',' );
-			} else {
-				ShowContinueErrorTimeStamp( " Routine=Unknown," );
-			}
-			ShowFatalError( " Program terminates due to preceding conditions." );
-#else
-			std::cerr << "Program terminated with Exit Code " << "PsyPsatFnTemp" << std::endl; std::exit( EXIT_FAILURE );
-#endif
 		}
 
 		return Pascal;
@@ -1280,14 +1255,13 @@ Label170: ;
 		using General::Iterate;
 
 		// Return value
-		Real64 Temp; // result=> saturation temperature {C}
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		int const itmax( 50 ); // Maximum number of iterations
-		static Real64 convTol( 0.0001 );
+		Real64 const convTol( 0.0001 );
 		static std::string const RoutineName( "PsyTsatFnPb" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1301,13 +1275,7 @@ Label170: ;
 		static Real64 Press_Save( -99999.0 );
 		static Real64 tSat_Save( -99999.0 );
 		Real64 tSat; // Water temperature guess
-		Real64 pSat; // Pressure corresponding to temp. guess
-		Real64 error; // Deviation of dependent variable in iteration
-		Real64 X1; // Previous value of independent variable in ITERATE
-		Real64 Y1; // Previous value of dependent variable in ITERATE
-		Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
 		int iter; // Iteration counter
-		int icvg; // Iteration convergence flag
 
 #ifdef EP_psych_stats
 		++NumTimesCalled( iPsyTsatFnPb );
@@ -1316,8 +1284,8 @@ Label170: ;
 		// Check press in range.
 		FlagError = false;
 #ifdef EP_psych_errors
-		if ( Press <= 0.0017 || Press >= 1555000.0 ) {
-			if ( ! WarmupFlag ) {
+		if ( ! WarmupFlag ) {
+			if ( Press <= 0.0017 || Press >= 1555000.0 ) {
 				if ( iPsyErrIndex( iPsyTsatFnPb ) == 0 ) {
 					ShowWarningMessage( "Pressure out of range (PsyTsatFnPb)" );
 					if ( !CalledFrom.empty() ) {
@@ -1361,6 +1329,12 @@ Label170: ;
 
 			// Set iteration loop parameters
 			// make sure these are initialized
+			Real64 pSat; // Pressure corresponding to temp. guess
+			Real64 error; // Deviation of dependent variable in iteration
+			Real64 X1; // Previous value of independent variable in ITERATE
+			Real64 Y1; // Previous value of dependent variable in ITERATE
+			Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
+			int icvg; // Iteration convergence flag
 			for ( iter = 1; iter <= itmax; ++iter ) {
 
 				// Calculate saturation pressure for estimated boiling temperature
@@ -1381,7 +1355,7 @@ Label170: ;
 			// Saturation temperature has not converged after maximum specified
 			// iterations. Print error message, set return error flag, and RETURN
 
-		} //End If for the Pressure Range Checking
+		} // End If for the Pressure Range Checking
 
 #ifdef EP_psych_stats
 		NumIterations( iPsyTsatFnPb ) += iter;
@@ -1406,7 +1380,7 @@ Label170: ;
 #endif
 
 		// Result is SatTemperature
-		Temp = tSat_Save = tSat;
+		Real64 const Temp = tSat_Save = tSat; // result=> saturation temperature {C}
 
 #ifdef EP_psych_errors
 		if ( FlagError ) {

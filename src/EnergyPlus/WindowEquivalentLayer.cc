@@ -4654,15 +4654,15 @@ namespace WindowEquivalentLayer {
 			} // END OF CHECK FOR GAPS IN BETWEEN SLATS
 
 		} else { //VENETIAN BLIND IS OPENED
+			AB = DE;
 			Real64 const cos_PHI( std::cos( PHI ) );
 			Real64 const sin_PHI( std::sin( PHI ) );
 			Real64 const W_cos_PHI_2( pow_2( W * cos_PHI ) );
-			Real64 const DE_cos_PHI_2( pow_2( DE * cos_PHI ) );
-			Real64 const EF_cos_PHI_2( pow_2( EF * cos_PHI ) );
-			AB = DE;
 			AF = std::sqrt( W_cos_PHI_2 + pow_2( S - W * sin_PHI ) );
 			BC = W - AB;
 			EF = BC;
+			Real64 const DE_cos_PHI_2( pow_2( DE * cos_PHI ) );
+			Real64 const EF_cos_PHI_2( pow_2( EF * cos_PHI ) );
 			BD = std::sqrt( DE_cos_PHI_2 + pow_2( S + DE * sin_PHI ) );
 			BF = std::sqrt( EF_cos_PHI_2 + pow_2( S - EF * sin_PHI ) );
 			CD = std::sqrt( W_cos_PHI_2 + pow_2( S + W * sin_PHI ) );

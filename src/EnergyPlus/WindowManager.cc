@@ -4421,19 +4421,20 @@ namespace WindowManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		//Tuned Arrays made static
 		int IMix; // Counters of gases in a mixture
 		int i;
 		int j;
 		int NMix; // Number of gases in a mixture
 		Real64 molmix; // Molecular weight of mixture
-		FArray1D< Real64 > kprime( 10 ); // Monotonic thermal conductivity
-		FArray1D< Real64 > kdblprm( 10 ); // Conductivity term accounting for additional energy moved by
+		static FArray1D< Real64 > kprime( 10 ); // Monotonic thermal conductivity
+		static FArray1D< Real64 > kdblprm( 10 ); // Conductivity term accounting for additional energy moved by
 		//  the diffusional transport of internal energy in polyatomic gases.
 		Real64 kpmix; // Monotonic thermal conductivity of mixture
 		Real64 kdpmix;
-		FArray1D< Real64 > mukpdwn( 10 ); // Denominator term
-		FArray1D< Real64 > kpdown( 10 ); // Denominator terms
-		FArray1D< Real64 > kdpdown( 10 );
+		static FArray1D< Real64 > mukpdwn( 10 ); // Denominator term
+		static FArray1D< Real64 > kpdown( 10 ); // Denominator terms
+		static FArray1D< Real64 > kdpdown( 10 );
 		Real64 kmix; // For accumulating conductance of gas mixture
 		Real64 mumix; // For accumulating viscosity of gas mixture
 		Real64 visc; // Dynamic viscosity of mixture at tmean (g/m-s)
@@ -4446,11 +4447,11 @@ namespace WindowManager {
 		Real64 psiterm; // Factor
 		Real64 phikup; // Numerator factor
 		Real64 rhomix; // Density of gas mixture (kg/m3)
-		FArray1D< Real64 > frct( 10 ); // Fraction of each gas in a mixture
-		FArray1D< Real64 > fvis( 10 ); // Viscosity of each gas in a mixture (g/m-s)
-		FArray1D< Real64 > fcon( 10 ); // Conductance of each gas in a mixture (W/m2-K)
-		FArray1D< Real64 > fdens( 10 ); // Density of each gas in a mixture (kg/m3)
-		FArray1D< Real64 > fcp( 10 ); // Specific heat of each gas in a mixture (J/m3-K)
+		static FArray1D< Real64 > frct( 10 ); // Fraction of each gas in a mixture
+		static FArray1D< Real64 > fvis( 10 ); // Viscosity of each gas in a mixture (g/m-s)
+		static FArray1D< Real64 > fcon( 10 ); // Conductance of each gas in a mixture (W/m2-K)
+		static FArray1D< Real64 > fdens( 10 ); // Density of each gas in a mixture (kg/m3)
+		static FArray1D< Real64 > fcp( 10 ); // Specific heat of each gas in a mixture (J/m3-K)
 
 		NMix = gnmix( IGap ); //Autodesk:Logic Either assert NMix>0 or handle NMix<=0 in logic so that con and locals guar. initialized before use
 
@@ -4700,7 +4701,7 @@ namespace WindowManager {
 
 		int i; // Face counter
 		int ShadeFlag; // Shading flag
-		FArray1D< Real64 > rguess( 11 ); // Combined radiative/convective resistance (m2-K/W) of
+		static FArray1D< Real64 > rguess( 11 ); // Combined radiative/convective resistance (m2-K/W) of //Tuned Made static
 		// inside or outside air film, or gap
 		Real64 restot; // Total window resistance including outside
 		//   and inside air films (m2-K/W)

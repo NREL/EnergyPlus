@@ -142,7 +142,6 @@ namespace HeatBalanceIntRadExchange {
 		int RecZoneSurfNum; // DO loop counter for receiving surface within a zone (local derived type arrays)
 		int SendSurfNum; // Counter within DO loop (refers to main surface derived type index) SENDING SURFACE
 
-		int SendZoneSurfNum; // DO loop counter for sending surfaces within a zone (local derived type arrays)
 		int ZoneNum; // DO loop counter for zones
 		int ConstrNumRec; // Receiving surface construction number
 		int ConstrNumSend; // Sending surface construction number
@@ -223,6 +222,7 @@ namespace HeatBalanceIntRadExchange {
 			auto & zone_info( ZoneInfo( ZoneNum ) );
 			auto & zone_ScriptF( zone_info.ScriptF );
 			auto & zone_SurfacePtr( zone_info.SurfacePtr );
+			int const n_zone_Surfaces( zone_info.NumOfSurfaces );
 
 			// Calculate ScriptF if first time step in environment and surface heat-balance iterations not yet started;
 			// recalculate ScriptF if status of window interior shades or blinds has changed from
@@ -255,7 +255,7 @@ namespace HeatBalanceIntRadExchange {
 				}
 
 				if ( IntShadeOrBlindStatusChanged || BeginEnvrnFlag ) { // Calc inside surface emissivities for this time step
-					for ( ZoneSurfNum = 1; ZoneSurfNum <= zone_info.NumOfSurfaces; ++ZoneSurfNum ) {
+					for ( ZoneSurfNum = 1; ZoneSurfNum <= n_zone_Surfaces; ++ZoneSurfNum ) {
 						SurfNum = zone_SurfacePtr( ZoneSurfNum );
 						ConstrNum = Surface( SurfNum ).Construction;
 						zone_info.Emissivity( ZoneSurfNum ) = Construct( ConstrNum ).InsideAbsorpThermal;
@@ -265,7 +265,7 @@ namespace HeatBalanceIntRadExchange {
 						}
 					}
 
-					CalcScriptF( zone_info.NumOfSurfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, zone_ScriptF );
+					CalcScriptF( n_zone_Surfaces, zone_info.Area, zone_info.F, zone_info.Emissivity, zone_ScriptF );
 					// precalc - multiply by StefanBoltzmannConstant
 					zone_ScriptF *= StefanBoltzmannConst;
 				}
@@ -273,7 +273,7 @@ namespace HeatBalanceIntRadExchange {
 			} // End of check if SurfIterations = 0
 
 			// precalculate the fourth power of surface temperature as part of strategy to reduce calculation time - Glazer 2011-04-22
-			for ( SendZoneSurfNum = 1; SendZoneSurfNum <= zone_info.NumOfSurfaces; ++SendZoneSurfNum ) {
+			for ( int SendZoneSurfNum = 1; SendZoneSurfNum <= n_zone_Surfaces; ++SendZoneSurfNum ) {
 				SendSurfNum = zone_SurfacePtr( SendZoneSurfNum );
 				auto const & surface_window( SurfaceWindow( SendSurfNum ) );
 				ConstrNumSend = Surface( SendSurfNum ).Construction;
@@ -296,7 +296,8 @@ namespace HeatBalanceIntRadExchange {
 			}
 
 			// these are the money do loops.
-			for ( RecZoneSurfNum = 1; RecZoneSurfNum <= zone_info.NumOfSurfaces; ++RecZoneSurfNum ) {
+			auto const sizeR( zone_ScriptF.size1() ); // For linear indexing
+			for ( RecZoneSurfNum = 1; RecZoneSurfNum <= n_zone_Surfaces; ++RecZoneSurfNum ) {
 				RecSurfNum = zone_SurfacePtr( RecZoneSurfNum );
 				ConstrNumRec = Surface( RecSurfNum ).Construction;
 				auto const & construct( Construct( ConstrNumRec ) );
@@ -328,18 +329,20 @@ namespace HeatBalanceIntRadExchange {
 
 				// Calculate net long-wave radiation for opaque surfaces and incident
 				// long-wave radiation for windows.
+				auto lRS( zone_ScriptF.index( RecZoneSurfNum, 1 ) );
 				if ( construct.TypeIsWindow ) { // Window
 					Real64 const RecSurfEmiss_inv( 1.0 / RecSurfEmiss );
-					for ( SendZoneSurfNum = 1; SendZoneSurfNum <= zone_info.NumOfSurfaces; ++SendZoneSurfNum ) {
-						SendSurfNum = zone_SurfacePtr( SendZoneSurfNum );
-						Real64 const scriptF( zone_ScriptF( RecZoneSurfNum, SendZoneSurfNum ) );
+					Real64 netLWRadToRecSurf_acc( 0.0 ); // Local accumulator
+					for ( int SendZoneSurfNum = 1; SendZoneSurfNum <= n_zone_Surfaces; ++SendZoneSurfNum, lRS += sizeR ) {
+						Real64 const scriptF( zone_ScriptF[ lRS ] ); // [ lRS ] == ( RecZoneSurfNum, SendZoneSurfNum )
 #ifdef EP_HBIRE_SEQ
 						Real64 const temp_ink_4th( SendSurfaceTempInKto4thPrecalc( SendZoneSurfNum ) );
 #else
+						SendSurfNum = zone_SurfacePtr( SendZoneSurfNum );
 						Real64 const temp_ink_4th( SendSurfaceTempInKto4thPrecalc( SendSurfNum ) );
 #endif
 						if ( RecZoneSurfNum != SendZoneSurfNum ) {
-							netLWRadToRecSurf += scriptF * ( temp_ink_4th - RecSurfTempInKTo4th );
+							netLWRadToRecSurf_acc += scriptF * ( temp_ink_4th - RecSurfTempInKTo4th );
 						}
 						// Calculate interior LW incident on window rather than net LW for use in window layer heat balance calculation.
 						surface_window.IRfromParentZone += ( scriptF * temp_ink_4th ) * RecSurfEmiss_inv;
@@ -354,17 +357,20 @@ namespace HeatBalanceIntRadExchange {
 						//            SurfaceWindow(RecSurfNum)%IRfromParentZone=0.0
 						//          ENDIF
 					}
+					netLWRadToRecSurf += netLWRadToRecSurf_acc;
 				} else {
-					for ( SendZoneSurfNum = 1; SendZoneSurfNum <= zone_info.NumOfSurfaces; ++SendZoneSurfNum ) {
-						SendSurfNum = zone_SurfacePtr( SendZoneSurfNum );
+					Real64 netLWRadToRecSurf_acc( 0.0 ); // Local accumulator
+					for ( int SendZoneSurfNum = 1; SendZoneSurfNum <= n_zone_Surfaces; ++SendZoneSurfNum, lRS += sizeR ) {
 						if ( RecZoneSurfNum != SendZoneSurfNum ) {
 #ifdef EP_HBIRE_SEQ
-							netLWRadToRecSurf += zone_ScriptF( RecZoneSurfNum, SendZoneSurfNum ) * ( SendSurfaceTempInKto4thPrecalc( SendZoneSurfNum ) - RecSurfTempInKTo4th );
+							netLWRadToRecSurf_acc += zone_ScriptF[ lRS ] * ( SendSurfaceTempInKto4thPrecalc( SendZoneSurfNum ) - RecSurfTempInKTo4th ); // [ lRS ] == ( RecZoneSurfNum, SendZoneSurfNum )
 #else
-							netLWRadToRecSurf += zone_ScriptF( RecZoneSurfNum, SendZoneSurfNum ) * ( SendSurfaceTempInKto4thPrecalc( SendSurfNum ) - RecSurfTempInKTo4th );
+							SendSurfNum = zone_SurfacePtr( SendZoneSurfNum );
+							netLWRadToRecSurf_acc += zone_ScriptF[ lRS ] * ( SendSurfaceTempInKto4thPrecalc( SendSurfNum ) - RecSurfTempInKTo4th ); // [ lRS ] == ( RecZoneSurfNum, SendZoneSurfNum )
 #endif
 						}
 					}
+					netLWRadToRecSurf += netLWRadToRecSurf_acc;
 				}
 			}
 		}

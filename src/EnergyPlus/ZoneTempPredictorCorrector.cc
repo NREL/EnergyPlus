@@ -4451,7 +4451,6 @@ namespace ZoneTempPredictorCorrector {
 		Real64 Area; // Effective surface area
 		Real64 RefAirTemp; // Reference air temperature for surface convection calculations
 		Real64 ZoneMult;
-		int ADUListIndex;
 		int ADUNum;
 		int ADUInNode;
 		int ADUOutNode;
@@ -4540,25 +4539,26 @@ namespace ZoneTempPredictorCorrector {
 
 		} else if ( ZoneRetPlenumAirFlag ) {
 			auto const & zrpc( ZoneRetPlenCond( ZoneRetPlenumNum ) );
+			Real64 const air_hum_rat( ZoneAirHumRat( ZoneNum ) );
 			for ( int NodeNum = 1, NodeNum_end = zrpc.NumInletNodes; NodeNum <= NodeNum_end; ++NodeNum ) {
 				// Get node conditions
 				auto const & node( Node( zrpc.InletNode( NodeNum ) ) );
 				NodeTemp = node.Temp;
 				MassFlowRate = node.MassFlowRate;
-				CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+				CpAir = PsyCpAirFnWTdb( air_hum_rat, NodeTemp );
 
 				Real64 const MassFlowRate_CpAir( MassFlowRate * CpAir );
 				SumSysMCp += MassFlowRate_CpAir;
 				SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
 			} // NodeNum
 			// add in the leaks
-			for ( ADUListIndex = 1; ADUListIndex <= ZoneRetPlenCond( ZoneRetPlenumNum ).NumADUs; ++ADUListIndex ) {
+			for ( int ADUListIndex = 1, ADUListIndex_end = ZoneRetPlenCond( ZoneRetPlenumNum ).NumADUs; ADUListIndex <= ADUListIndex_end; ++ADUListIndex ) {
 				ADUNum = ZoneRetPlenCond( ZoneRetPlenumNum ).ADUIndex( ADUListIndex );
 				if ( AirDistUnit( ADUNum ).UpStreamLeak ) {
 					ADUInNode = AirDistUnit( ADUNum ).InletNodeNum;
 					NodeTemp = Node( ADUInNode ).Temp;
 					MassFlowRate = AirDistUnit( ADUNum ).MassFlowRateUpStrLk;
-					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+					CpAir = PsyCpAirFnWTdb( air_hum_rat, NodeTemp );
 					Real64 const MassFlowRate_CpAir( MassFlowRate * CpAir );
 					SumSysMCp += MassFlowRate_CpAir;
 					SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -4567,7 +4567,7 @@ namespace ZoneTempPredictorCorrector {
 					ADUOutNode = AirDistUnit( ADUNum ).OutletNodeNum;
 					NodeTemp = Node( ADUOutNode ).Temp;
 					MassFlowRate = AirDistUnit( ADUNum ).MassFlowRateDnStrLk;
-					CpAir = PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), NodeTemp );
+					CpAir = PsyCpAirFnWTdb( air_hum_rat, NodeTemp );
 					Real64 const MassFlowRate_CpAir( MassFlowRate * CpAir );
 					SumSysMCp += MassFlowRate_CpAir;
 					SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -4599,9 +4599,10 @@ namespace ZoneTempPredictorCorrector {
 			Area = Surface( SurfNum ).Area; // For windows, this is the glazing area
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
+				auto const shading_flag( SurfaceWindow( SurfNum ).ShadingFlag );
 
 				// Add to the convective internal gains
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
+				if ( shading_flag == IntShadeOn || shading_flag == IntBlindOn ) {
 					// The shade area covers the area of the glazing plus the area of the dividers.
 					Area += SurfaceWindow( SurfNum ).DividerArea;
 					// If interior shade or blind is present it is assumed that both the convective and IR radiative gain
@@ -4615,7 +4616,7 @@ namespace ZoneTempPredictorCorrector {
 				if ( Construct( Surface( SurfNum ).Construction ).WindowTypeEQL ) SumIntGain += SurfaceWindow( SurfNum ).OtherConvHeatGain;
 
 				// Convective heat gain from natural convection in gap between glass and interior shade or blind
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) SumIntGain += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
+				if ( shading_flag == IntShadeOn || shading_flag == IntBlindOn ) SumIntGain += SurfaceWindow( SurfNum ).ConvHeatFlowNatural;
 
 				// Convective heat gain from airflow window
 				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 ) {
@@ -4636,14 +4637,16 @@ namespace ZoneTempPredictorCorrector {
 				// Add to the surface convection sums
 				if ( SurfaceWindow( SurfNum ).FrameArea > 0.0 ) {
 					// Window frame contribution
-					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * SurfaceWindow( SurfNum ).FrameTempSurfIn;
-					HA += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn );
+					Real64 const HA_surf( HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) );
+					SumHATsurf += HA_surf * SurfaceWindow( SurfNum ).FrameTempSurfIn;
+					HA += HA_surf;
 				}
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceWindow( SurfNum ).ShadingFlag != IntShadeOn && SurfaceWindow( SurfNum ).ShadingFlag != IntBlindOn ) {
+				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && shading_flag != IntShadeOn && shading_flag != IntBlindOn ) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
-					HA += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn );
+					Real64 const HA_surf( HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) );
+					SumHATsurf += HA_surf * SurfaceWindow( SurfNum ).DividerTempSurfIn;
+					HA += HA_surf;
 				}
 
 			} // End of check if window
