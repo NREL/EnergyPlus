@@ -27,6 +27,9 @@ class SQLite
   // Close database and free prepared statements
 	virtual ~SQLite();
 
+	bool writeOutputToSQLite() const;
+	bool writeTabularDataToSQLite() const;
+
 	// Begin a transaction
 	void sqliteBegin();
 
@@ -56,7 +59,7 @@ class SQLite
 		Optional_int_const minutesPerTimeStep = _
 	);
 
-	int createSQLiteTimeIndexRecord(
+	void createSQLiteTimeIndexRecord(
 		int const reportingInterval,
 		int const recordIndex,
 		int const CumlativeSimulationDays,
@@ -258,8 +261,8 @@ class SQLite
 	void initializeTabularDataTable();
 	void initializeTabularDataView();
 
-	bool const m_writeOutputToSQLite;
-	bool const m_writeTabularDataToSQLite;
+	bool m_writeOutputToSQLite;
+	bool m_writeTabularDataToSQLite;
 	int m_sqlDBTimeIndex;
 	std::ofstream m_errorStream;
 	sqlite3 * m_db;
@@ -328,8 +331,8 @@ namespace SQLiteProcedures {
 
 	// Data
 	//extern int const MaxMessageSize;
-	extern bool WriteOutputToSQLite;
-	extern bool WriteTabularDataToSQLite;
+	//extern bool WriteOutputToSQLite;
+	//extern bool WriteTabularDataToSQLite;
 
 } // SQLiteProcedures
 

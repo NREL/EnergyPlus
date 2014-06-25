@@ -1399,8 +1399,6 @@ namespace OutputReportTabular {
 		using DataStringGlobals::CharComma;
 		using DataStringGlobals::CharTab;
 		using DataStringGlobals::CharSpace;
-		using SQLiteProcedures::WriteTabularDataToSQLite;
-		using SQLiteProcedures::WriteOutputToSQLite;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
