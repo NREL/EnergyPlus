@@ -9297,9 +9297,6 @@ namespace DaylightingManager {
 		using DataStringGlobals::CharTab;
 		using DataStringGlobals::CharComma;
 		using DataStringGlobals::CharSpace;
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10307,7 +10304,6 @@ Label903: ;
 		// na
 
 		// Using/Aliasing
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

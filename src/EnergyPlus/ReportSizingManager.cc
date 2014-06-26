@@ -93,7 +93,6 @@ namespace ReportSizingManager {
 		using DataGlobals::OutputFileInits;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

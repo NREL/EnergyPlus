@@ -4078,7 +4078,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -4164,7 +4163,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using DataGlobals::OutputFileStandard;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4256,7 +4254,6 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using DataGlobals::OutputFileMeters;
 		using DataGlobals::OutputFileStandard;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4455,7 +4452,6 @@ namespace OutputProcessor {
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileStandard;
 		using General::RemoveTrailingZeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		static gio::Fmt const fmta( "(A)" );
@@ -4553,7 +4549,6 @@ namespace OutputProcessor {
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
 		using General::RemoveTrailingZeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4633,7 +4628,6 @@ namespace OutputProcessor {
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
 		using General::RemoveTrailingZeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		static gio::Fmt const fmta( "(A)" );
@@ -4750,7 +4744,6 @@ namespace OutputProcessor {
 		using General::RemoveTrailingZeros;
 		using DataSystemVariables::ReportDuringWarmup;
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4884,7 +4877,6 @@ namespace OutputProcessor {
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileStandard;
 		using General::RemoveTrailingZeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		static gio::Fmt const fmta( "(A)" );
@@ -4972,7 +4964,6 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using DataGlobals::OutputFileStandard;
 		using General::RemoveTrailingZeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5242,7 +5233,6 @@ SetupOutputVariable(
 	using InputProcessor::MakeUPPERCase;
 	using InputProcessor::SameString;
 	using General::TrimSigDigits;
-	using namespace SQLiteProcedures;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5512,7 +5502,6 @@ SetupOutputVariable(
 	using InputProcessor::SameString;
 	using General::TrimSigDigits;
 	using DataOutputs::FindItemInVariableList;
-	using namespace SQLiteProcedures;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5772,7 +5761,6 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	using DataEnvironment::EndMonthFlag;
 	using General::RemoveTrailingZeros;
 	using General::EncodeMonDayHrMin;
-	using namespace SQLiteProcedures;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:

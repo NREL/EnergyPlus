@@ -323,18 +323,6 @@ private:
 	static const std::string UnitsId;
 };
 
-// KSB: These are the old SQLiteProcedures,
-// the above new class will replace these.
-
-namespace SQLiteProcedures {
-
-// Data
-//extern int const MaxMessageSize;
-//extern bool WriteOutputToSQLite;
-//extern bool WriteTabularDataToSQLite;
-
-} // SQLiteProcedures
-
 extern std::unique_ptr<SQLite> sqlite;
 
 } // EnergyPlus

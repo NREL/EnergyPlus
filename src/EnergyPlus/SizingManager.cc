@@ -2275,10 +2275,6 @@ namespace SizingManager {
 		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2340,10 +2336,6 @@ namespace SizingManager {
 		using DataGlobals::OutputFileInits;
 		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
-
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
