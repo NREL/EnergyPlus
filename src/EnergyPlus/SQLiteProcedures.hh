@@ -16,15 +16,14 @@
 
 namespace EnergyPlus {
 
-class SQLite
-{
-	public:
+class SQLite {
+public:
 
 	// Open the DB and prepare for writing data
 	// Create all of the tables on construction
 	SQLite();
 
-  // Close database and free prepared statements
+	// Close database and free prepared statements
 	virtual ~SQLite();
 
 	bool writeOutputToSQLite() const;
@@ -179,7 +178,7 @@ class SQLite
 
 	void initializeIndexes();
 
-	private:
+private:
 
 	void createSQLiteZoneTable();
 	void createSQLiteNominalLightingTable();
@@ -221,7 +220,7 @@ class SQLite
 
 	static void adjustReportingHourAndMinutes(int & hour, int & minutes);
 	// Given combinedString, parse out units and description.
-	// Example: Given combinedString "Total Energy [GJ]", return "Total Energy" 
+	// Example: Given combinedString "Total Energy [GJ]", return "Total Energy"
 	// in description and "GJ" in units.
 	static void parseUnitsAndDescription(const std::string & combinedString, std::string & units, std::string & description);
 
@@ -324,15 +323,15 @@ class SQLite
 	static const std::string UnitsId;
 };
 
-// KSB: These are the old SQLiteProcedures, 
+// KSB: These are the old SQLiteProcedures,
 // the above new class will replace these.
 
 namespace SQLiteProcedures {
 
-	// Data
-	//extern int const MaxMessageSize;
-	//extern bool WriteOutputToSQLite;
-	//extern bool WriteTabularDataToSQLite;
+// Data
+//extern int const MaxMessageSize;
+//extern bool WriteOutputToSQLite;
+//extern bool WriteTabularDataToSQLite;
 
 } // SQLiteProcedures
 
