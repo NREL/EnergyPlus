@@ -725,7 +725,7 @@ namespace PlantLoopSolver {
 							CompIndex = component.CompNum;
 							{ auto const SELECT_CASE_var( component.TypeOf_Num );
 
-							if (SELECT_CASE_var == TypeOf_PumpConstantSpeed) {
+							if ( SELECT_CASE_var == TypeOf_PumpConstantSpeed ) {
 								if ( CompIndex > 0 ) {
 									auto & this_pump( PumpEquip( CompIndex ) );
 									if ( ParallelBranchIndex >= 1 ) { // branch pump
@@ -741,7 +741,7 @@ namespace PlantLoopSolver {
 										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax );
 									}
 								}
-							} else if (SELECT_CASE_var == TypeOf_PumpBankConstantSpeed ) {
+							} else if ( SELECT_CASE_var == TypeOf_PumpBankConstantSpeed ) {
 								if ( CompIndex > 0 ) {
                                     auto & this_pump( PumpEquip( CompIndex ) );
 									if ( ParallelBranchIndex >= 1 ) { // branch pump
