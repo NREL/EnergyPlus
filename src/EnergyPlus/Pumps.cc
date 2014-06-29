@@ -1139,7 +1139,7 @@ namespace Pumps {
 		PumpOverridableMaxLimit = PumpEquip( PumpNum ).MassFlowRateMax;
 		
 		// override the user specified min to allow pump to turn off when no flow is required.
-		if (PumpEquip( PumpNum ).LoopSolverOverwriteFlag == true) {
+		if ( PumpEquip( PumpNum ).LoopSolverOverwriteFlag == true ) {
 			PumpMassFlowRateMinLimit = 0.0;
 		}
 		else {
