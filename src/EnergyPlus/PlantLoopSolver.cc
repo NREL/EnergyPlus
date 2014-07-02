@@ -760,7 +760,7 @@ namespace PlantLoopSolver {
 							}
 						
 							//overwrite here for branch pumps
-							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) ) {
+							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
 								CompIndex = component.CompNum;
 								if ( CompIndex > 0 ) {
 									auto & this_pump(PumpEquip( CompIndex ) );
@@ -901,7 +901,7 @@ namespace PlantLoopSolver {
 					for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
 						auto & component( branch.Comp( CompCounter ) );
 						auto const SELECT_CASE_var( component.TypeOf_Num );
-						if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) ) {
+						if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
 							CompIndex = component.CompNum;
 							if ( CompIndex > 0 ){
 								auto & this_pump( PumpEquip( CompIndex ) );
