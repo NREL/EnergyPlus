@@ -1357,6 +1357,34 @@ equal_dimensions( MArray1< Aa, Ta > const & a, MArray1< Ab, Tb > const & b )
 	return a.equal_dimensions( b );
 }
 
+// Magnitude
+template< class A, typename T >
+inline
+T
+magnitude( MArray1< A, T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< class A, typename T >
+inline
+T
+magnitude_squared( MArray1< A, T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return mag_sq;
+}
+
 // Distance
 template< class A, typename T >
 inline

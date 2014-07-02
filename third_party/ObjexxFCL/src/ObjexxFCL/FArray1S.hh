@@ -2217,6 +2217,34 @@ conformable( MArray1< A, M > const & a, FArray1S< V > const & b )
 	return b.conformable( a );
 }
 
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( FArray1S< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( FArray1S< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return mag_sq;
+}
+
 // Distance
 template< typename T >
 inline
