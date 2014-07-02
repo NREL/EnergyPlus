@@ -552,6 +552,7 @@ namespace PlantLoopSolver {
 		using DataPlant::GenEquipTypes_Pump;
 		using DataPlant::TypeOf_PumpConstantSpeed;
 		using DataPlant::TypeOf_PumpBankConstantSpeed;
+		using DataPlant::TypeOf_PumpCondensate;
 		using DataPlant::SupplySide;
 		using DataPlant::CommonPipe_TwoWay;
 		using DataPlant::DemandSide;
@@ -760,7 +761,7 @@ namespace PlantLoopSolver {
 							}
 						
 							//overwrite here for branch pumps
-							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
+							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
 								CompIndex = component.CompNum;
 								if ( CompIndex > 0 ) {
 									auto & this_pump(PumpEquip( CompIndex ) );
