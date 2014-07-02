@@ -5929,6 +5929,9 @@ namespace OutputReportTabular {
 		Real64 veryLarge;
 		Real64 verySmall;
 
+		Real64 static const storedMaxVal = std::numeric_limits< Real64 >::max();
+		Real64 static const storedMinVal = -storedMaxVal;
+
 		rowHead( 1 ) = "January";
 		rowHead( 2 ) = "February";
 		rowHead( 3 ) = "March";
@@ -6034,8 +6037,8 @@ namespace OutputReportTabular {
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
 						sumVal = 0.0;
 						sumDuration = 0.0;
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
 								if ( MonthlyColumns( curCol ).duration( lMonth ) != 0 ) {
@@ -6067,10 +6070,10 @@ namespace OutputReportTabular {
 						} else {
 							tableBody( 14, columnRecount ) = RealToStr( sumVal, digitsShown );
 						}
-						if ( minVal != huge( maxVal ) ) {
+						if ( minVal != storedMaxVal ) {
 							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
-						if ( maxVal != -huge( maxVal ) ) {
+						if ( maxVal != storedMinVal ) {
 							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( ( SELECT_CASE_var == aggTypeHoursZero ) || ( SELECT_CASE_var == aggTypeHoursNonZero ) || ( SELECT_CASE_var == aggTypeHoursPositive ) || ( SELECT_CASE_var == aggTypeHoursNonPositive ) || ( SELECT_CASE_var == aggTypeHoursNegative ) || ( SELECT_CASE_var == aggTypeHoursNonNegative ) ) {
@@ -6079,8 +6082,8 @@ namespace OutputReportTabular {
 						// put in the name of the variable for the column
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [HOURS]";
 						sumVal = 0.0;
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							curVal = MonthlyColumns( curCol ).reslt( lMonth );
 							if ( IsMonthGathered( lMonth ) ) {
@@ -6094,10 +6097,10 @@ namespace OutputReportTabular {
 						} //lMonth
 						// add the summary to bottom
 						tableBody( 14, columnRecount ) = RealToStr( sumVal, digitsShown );
-						if ( minVal != huge( maxVal ) ) {
+						if ( minVal != storedMaxVal ) {
 							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
-						if ( maxVal != -huge( maxVal ) ) {
+						if ( maxVal != storedMinVal ) {
 							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( SELECT_CASE_var == aggTypeValueWhenMaxMin ) {
@@ -6134,8 +6137,8 @@ namespace OutputReportTabular {
 							curConversionFactor *= 3600.0;
 						}
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							curVal = MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor + curConversionOffset;
 							if ( IsMonthGathered( lMonth ) ) {
@@ -6147,10 +6150,10 @@ namespace OutputReportTabular {
 							}
 						} //lMonth
 						// add the summary to bottom
-						if ( minVal != huge( maxVal ) ) {
+						if ( minVal != storedMaxVal ) {
 							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
-						if ( maxVal != -huge( maxVal ) ) {
+						if ( maxVal != storedMinVal ) {
 							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( ( SELECT_CASE_var == aggTypeMaximum ) || ( SELECT_CASE_var == aggTypeMinimum ) || ( SELECT_CASE_var == aggTypeMaximumDuringHoursShown ) || ( SELECT_CASE_var == aggTypeMinimumDuringHoursShown ) ) {
@@ -6189,8 +6192,8 @@ namespace OutputReportTabular {
 						}
 						columnHead( columnRecount - 1 ) = MonthlyColumns( curCol ).varName + curAggString + '[' + curUnits + ']';
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + " {TIMESTAMP} ";
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							if ( IsMonthGathered( lMonth ) ) {
 								curVal = MonthlyColumns( curCol ).reslt( lMonth );
