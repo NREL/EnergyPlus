@@ -1267,6 +1267,7 @@ namespace SolarShading {
 
 		// Using/Aliasing
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
+		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -1332,6 +1333,26 @@ namespace SolarShading {
 			if ( ! Surface( SurfNum ).ExtSolar ) continue;
 
 			CosIncAngBeamOnSurface = SOLCOS( 1 ) * Surface( SurfNum ).OutNormVec( 1 ) + SOLCOS( 2 ) * Surface( SurfNum ).OutNormVec( 2 ) + SOLCOS( 3 ) * Surface( SurfNum ).OutNormVec( 3 );
+			
+			// constrain and warn or figure out what to do...DONT LEAVE FATALS AND ERRORS AS-IS!!!
+			if ( CosIncAngBeamOnSurface > 1.0 ) {
+			    if ( CosIncAngBeamOnSurface > 1.00001 ) {
+				ShowSevereError( "Cosine of incident angle of beam solar on surface out of range...too high" );
+				ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
+				ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
+				ShowFatalError( "Anisotropic solar calculation causes fatal error" );
+			    }
+			    CosIncAngBeamOnSurface = 1.0;
+			} else if ( CosIncAngBeamOnSurface < -1.0 ) {
+			    if ( CosIncAngBeamOnSurface < -1.00001 ) {
+				ShowSevereError( "Cosine of incident angle of beam solar on surface out of range...too low" );
+				ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
+				ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
+				ShowFatalError( "Anisotropic solar calculation causes fatal error" );
+			    }
+			    CosIncAngBeamOnSurface = -1.0;
+			}
+			
 			IncAng = std::acos( CosIncAngBeamOnSurface );
 
 			ViewFactorSkyGeom = Surface( SurfNum ).ViewFactorSky;

@@ -5930,7 +5930,7 @@ namespace OutputReportTabular {
 		Real64 verySmall;
 
 		Real64 static const storedMaxVal = std::numeric_limits< Real64 >::max();
-		Real64 static const storedMinVal = -storedMaxVal;
+		Real64 static const storedMinVal = std::numeric_limits< Real64 >::lowest();
 
 		rowHead( 1 ) = "January";
 		rowHead( 2 ) = "February";
