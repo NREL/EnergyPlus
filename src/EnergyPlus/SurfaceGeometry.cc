@@ -8911,7 +8911,7 @@ namespace SurfaceGeometry {
 		x21 = Surface( SurfNum ).Vertex( 2 ) - Surface( SurfNum ).Vertex( 1 );
 		x23 = Surface( SurfNum ).Vertex( 2 ) - Surface( SurfNum ).Vertex( 3 );
 
-		DotSelfX23 = dot( x23, x23 );
+		DotSelfX23 = magnitude_squared( x23 );
 
 		if ( std::abs( DotSelfX23 ) <= .1e-6 ) {
 			ShowSevereError( "CalcCoordinateTransformation: Invalid dot product, surface=\"" + Surface( SurfNum ).Name + "\":" );
@@ -8924,7 +8924,7 @@ namespace SurfaceGeometry {
 			return;
 		}
 
-		Gamma = dot( x21, x23 ) / dot( x23, x23 );
+		Gamma = dot( x21, x23 ) / magnitude_squared( x23 );
 
 		CompCoordTranslVector = Surface( SurfNum ).Vertex( 2 ) + Gamma * ( Surface( SurfNum ).Vertex( 3 ) - Surface( SurfNum ).Vertex( 2 ) );
 

@@ -370,7 +370,7 @@ namespace WindowComplexManager {
 				BaseSurf = Surface( ISurf ).BaseSurf; //ShadowComb is organized by base surface
 				JSurf = ShadowComb( BaseSurf ).BackSurf( KBkSurf ); //these are all proper back surfaces
 				V = Surface( JSurf ).Centroid - Surface( ISurf ).Centroid;
-				VLen = std::sqrt( dot( V, V ) );
+				VLen = magnitude( V );
 				//Define the unit vector from the window center to the back
 				ComplexWind( ISurf ).sWinSurf( KBkSurf ) = V / VLen;
 				//surface center
@@ -1802,7 +1802,7 @@ namespace WindowComplexManager {
 					TmpHSurfNo( NReflSurf, 1 ) = JSurf;
 					TmpHitPt( NReflSurf, 1 ) = HitPt;
 					V = HitPt - Surface( ISurf ).Centroid; //vector array from window ctr to hit pt
-					LeastHitDsq = dot( V, V ); //dist^2 window ctr to hit pt
+					LeastHitDsq = magnitude_squared( V ); //dist^2 window ctr to hit pt
 					TmpHSurfDSq( NReflSurf, 1 ) = LeastHitDsq;
 					if ( ! Surface( JSurf ).HeatTransSurf && Surface( JSurf ).SchedShadowSurfIndex != 0 ) {
 						TransRSurf = 1.0; //If a shadowing surface may have a scheduled transmittance,
@@ -1812,7 +1812,7 @@ namespace WindowComplexManager {
 					}
 				} else {
 					V = HitPt - Surface( ISurf ).Centroid;
-					HitDsq = dot( V, V );
+					HitDsq = magnitude_squared( V );
 					if ( HitDsq >= LeastHitDsq ) {
 						if ( TransRSurf > 0.0 ) { //forget the new hit if the closer hit is opaque
 							J = TotHits + 1;
@@ -1976,7 +1976,7 @@ namespace WindowComplexManager {
 					BSHit.HitSurf = JSurf;
 					BSHit.HitPt = HitPt;
 					V = HitPt - Surface( ISurf ).Centroid;
-					BSHit.HitDsq = dot( V, V );
+					BSHit.HitDsq = magnitude_squared( V );
 				} else if ( BSHit.HitSurf == Surface( JSurf ).BaseSurf ) {
 					//  another hit, check whether this is a subsurface of a previously hit base surface
 					//  (which would be listed first in the Surface array)
@@ -1986,13 +1986,13 @@ namespace WindowComplexManager {
 					BSHit.HitSurf = JSurf;
 					BSHit.HitPt = HitPt;
 					V = HitPt - Surface( ISurf ).Centroid;
-					BSHit.HitDsq = dot( V, V );
+					BSHit.HitDsq = magnitude_squared( V );
 				} else {
 					++TotHits;
 					// is the new hit closer than the previous one (i.e., zone not strictly convex)?
 					// if so, take the closer hit
 					V = HitPt - Surface( ISurf ).Centroid;
-					HitDsq = dot( V, V );
+					HitDsq = magnitude_squared( V );
 					if ( HitDsq < BSHit.HitDsq ) {
 						BSHit.KBkSurf = KBkSurf;
 						BSHit.HitSurf = JSurf;
@@ -4253,10 +4253,10 @@ namespace WindowComplexManager {
 			// 0 < CCC.BBB < BBB.BBB AND 0 < CCC.AAA < AAA.AAA
 			DOTCB = dot( CCC, BBB );
 			if ( DOTCB < 0.0 ) return;
-			if ( DOTCB > dot( BBB, BBB ) ) return;
+			if ( DOTCB > magnitude_squared( BBB ) ) return;
 			DOTCA = dot( CCC, AAA );
 			if ( DOTCA < 0.0 ) return;
-			if ( DOTCA > dot( AAA, AAA ) ) return;
+			if ( DOTCA > magnitude_squared( AAA ) ) return;
 			// Surface is intersected
 			IPIERC = 1;
 		} else {

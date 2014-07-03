@@ -8629,7 +8629,7 @@ namespace SolarShading {
 			WinNormCrossBase( 3 ) = std::cos( ElevWin );
 			SunPrime = SOLCOS - WinNormCrossBase * dot( SOLCOS, WinNormCrossBase );
 			dot1 = dot( WinNorm, SunPrime );
-			dot2 = std::sqrt( dot( SunPrime, SunPrime ) );
+			dot2 = magnitude( SunPrime );
 			dot3 = dot1 / dot2;
 			if ( dot3 > 1.0 ) {
 				dot3 = 1.0;
@@ -8774,7 +8774,7 @@ namespace SolarShading {
 			WinNormCrossBase( 2 ) = std::sin( ElevWin ) * std::sin( ThWin );
 			WinNormCrossBase( 3 ) = std::cos( ElevWin );
 			SunPrime = SUNCOS - WinNormCrossBase * dot( SUNCOS, WinNormCrossBase );
-			ProfileAngVert = std::abs( std::acos( dot( WinNorm, SunPrime ) / std::sqrt( dot( SunPrime, SunPrime ) ) ) );
+			ProfileAngVert = std::abs( std::acos( dot( WinNorm, SunPrime ) / magnitude( SunPrime ) ) );
 		}
 		// Constrain to 0 to pi
 		if ( ProfileAngVert > Pi ) ProfileAngVert = 2 * Pi - ProfileAngVert;
