@@ -4,4 +4,4 @@ results_base_url : https://nrel.github.io/EnergyPlusBuildResults
 regression_repository : NREL/EnergyPlusDevSupport
 notification_recipients:
   - lgentile
-aging_pull_requests_notifications: true
+aging_pull_requests_notification: true
