@@ -160,6 +160,9 @@ namespace General {
 	std::string
 	RemoveTrailingZeros( std::string const & InputString );
 
+	std::string &
+	strip_trailing_zeros( std::string & InputString );
+
 	void
 	MovingAvg(
 		FArray1A< Real64 > const DataIn, // input data that needs smoothing

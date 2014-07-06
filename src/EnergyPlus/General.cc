@@ -1183,7 +1183,7 @@ namespace General {
 		//       AUTHOR         Linda Lawrie
 		//       DATE WRITTEN   September 2005
 		//       MODIFIED       na
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  July 2014, Performance and refinements, Stuart Mentzer
 
 		// PURPOSE OF THIS FUNCTION:
 		// Remove trailing zeroes from output strings.
@@ -1198,14 +1198,14 @@ namespace General {
 		// na
 
 		// Return value
-		static std::string const zero_string( "0." );
-		static std::string const digits( "123456789." );
+		// na
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		static std::string const ED( "ED" );
+		static std::string const zero_string( "0." );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1215,22 +1215,72 @@ namespace General {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		std::string::size_type Pos = scan( InputString, "ED" );
-		if ( Pos == std::string::npos ) {
-			Pos = scan( InputString, '.' );
-			if ( Pos != std::string::npos ) {
-				Pos = scan( InputString, digits, true );
-				if ( Pos != std::string::npos ) {
-					return InputString.substr( 0, Pos + 1 );
-				} else {
+		assert( ! has_any_of( InputString, "ed" ) ); //Pre Not using lowercase exponent letter
+		assert( InputString == stripped( InputString ) ); //Pre Already stripped surrounding spaces
+
+		if ( has( InputString, '.' ) && ( ! has_any_of( InputString, ED ) ) ) { // In +/-<digits>.<digits> format
+			std::string::size_type const pos( InputString.find_last_not_of( '0' ) );
+			if ( pos + 1 < InputString.length() ) {
+				switch ( pos ) { // Handle [+/-].000... format
+				case 0u: // .0*
 					return zero_string;
+				case 1u:
+					if ( InputString[ 1 ] == '.' ) {
+						char const c0( InputString[ 0 ] );
+						if ( ( c0 == '+' ) || ( c0 == '-' ) ) {
+							return zero_string;
+						}
+					}
+				default:
+					return InputString.substr( 0, InputString.find_last_not_of( '0' ) + 1 );
 				}
-			} else { // no decimal, an integer.  leave as is
+			} else { // No trailing zeros
 				return InputString;
 			}
-		} else { // for now, ignore x.xExx
+		} else { // Not in +/-<digits>.<digits> format
 			return InputString;
 		}
+	}
+
+	std::string &
+	strip_trailing_zeros( std::string & InputString )
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Stuart Mentzer (in-place version of RemoveTrailingZeros by Linda Lawrie)
+		//       DATE WRITTEN   July 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Remove trailing fractional zeros from floating point representation strings in place.
+
+		static std::string const ED( "ED" );
+		static std::string const zero_string( "0." );
+
+		assert( ! has_any_of( InputString, "ed" ) ); //Pre Not using lowercase exponent letter
+		assert( InputString == stripped( InputString ) ); //Pre Already stripped surrounding spaces
+
+		if ( has( InputString, '.' ) && ( ! has_any_of( InputString, ED ) ) ) { // Has decimal point and no exponent part
+			std::string::size_type const pos( InputString.find_last_not_of( '0' ) );
+			if ( pos + 1 < InputString.length() ) {
+				switch ( pos ) { // Handle [+/-].000... format
+				case 0u: // .0*
+					InputString = zero_string;
+					break;
+				case 1u:
+					if ( InputString[ 1 ] == '.' ) {
+						char const c0( InputString[ 0 ] );
+						if ( ( c0 == '+' ) || ( c0 == '-' ) ) {
+							InputString = zero_string;
+							break;
+						}
+					}
+				default:
+					InputString.erase( pos + 1 );
+				}
+			}
+		}
+		return InputString; // Allows chaining
 	}
 
 	void
@@ -1715,24 +1765,22 @@ namespace General {
 		static FArray1D_int EndDayofMonth( 12, { 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } );
 		// End day numbers of each month (without Leap Year)
 
-		{ auto const SELECT_CASE_var( Month );
-
-		if ( SELECT_CASE_var == 1 ) {
+		if ( Month == 1 ) {
 			//                                       CASE 1: JANUARY
 			JulianDay = Day;
 
-		} else if ( SELECT_CASE_var == 2 ) {
+		} else if ( Month == 2 ) {
 			//                                       CASE 2: FEBRUARY
 			JulianDay = Day + EndDayofMonth( 1 );
 
-		} else if ( ( SELECT_CASE_var >= 3 ) && ( SELECT_CASE_var <= 12 ) ) {
+		} else if ( ( Month >= 3 ) && ( Month <= 12 ) ) {
 			//                                       CASE 3: REMAINING MONTHS
 			JulianDay = Day + EndDayofMonth( Month - 1 ) + LeapYearValue;
 
 		} else {
 			JulianDay = 0;
 
-		}}
+		}
 
 		return JulianDay;
 

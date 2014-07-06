@@ -1,6 +1,7 @@
 // C++ Headers
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <string>
 
 // ObjexxFCL Headers
@@ -3282,7 +3283,6 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using General::RemoveTrailingZeros;
 		using General::TrimSigDigits;
 		using SQLiteProcedures::SQLdbTimeIndex;
 
@@ -3368,7 +3368,6 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using General::RemoveTrailingZeros;
 		using General::TrimSigDigits;
 		using SQLiteProcedures::SQLdbTimeIndex;
 
@@ -3444,7 +3443,6 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using General::RemoveTrailingZeros;
 		using General::TrimSigDigits;
 		using SQLiteProcedures::SQLdbTimeIndex;
 
@@ -3516,7 +3514,6 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using General::RemoveTrailingZeros;
 		using General::TrimSigDigits;
 		using SQLiteProcedures::SQLdbTimeIndex;
 
@@ -3583,7 +3580,6 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using General::RemoveTrailingZeros;
 		using General::TrimSigDigits;
 		using SQLiteProcedures::SQLdbTimeIndex;
 		//using namespace OutputReportPredefined;
@@ -4474,7 +4470,7 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileStandard;
-		using General::RemoveTrailingZeros;
+		using General::strip_trailing_zeros;
 		using namespace SQLiteProcedures;
 
 		// Locals
@@ -4501,24 +4497,21 @@ namespace OutputProcessor {
 			NumberOut = "0.0";
 		} else {
 			gio::write( NumberOut, fmtLD ) << repVal;
-			strip( NumberOut );
-			NumberOut = RemoveTrailingZeros( NumberOut );
+			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
 		if ( MaxValue == 0.0 ) {
 			MaxOut = "0.0";
 		} else {
 			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip( MaxOut );
-			MaxOut = RemoveTrailingZeros( MaxOut );
+			strip_trailing_zeros( strip( MaxOut ) );
 		}
 
 		if ( minValue == 0.0 ) {
 			MinOut = "0.0";
 		} else {
 			gio::write( MinOut, fmtLD ) << minValue;
-			strip( MinOut );
-			MinOut = RemoveTrailingZeros( MinOut );
+			strip_trailing_zeros( strip( MinOut ) );
 		}
 
 		// Append the min and max strings with date information
@@ -4572,7 +4565,7 @@ namespace OutputProcessor {
 		using DataGlobals::OutputFileStandard;
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
-		using General::RemoveTrailingZeros;
+		using General::strip_trailing_zeros;
 		using namespace SQLiteProcedures;
 
 		// Locals
@@ -4594,8 +4587,7 @@ namespace OutputProcessor {
 			NumberOut = "0.0";
 		} else {
 			gio::write( NumberOut, fmtLD ) << repValue;
-			strip( NumberOut );
-			NumberOut = RemoveTrailingZeros( NumberOut );
+			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
 		if ( WriteOutputToSQLite ) {
@@ -4653,7 +4645,7 @@ namespace OutputProcessor {
 		using DataGlobals::OutputFileMeters;
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
-		using General::RemoveTrailingZeros;
+		using General::strip_trailing_zeros;
 		using namespace SQLiteProcedures;
 
 		// Locals
@@ -4677,24 +4669,21 @@ namespace OutputProcessor {
 			NumberOut = "0.0";
 		} else {
 			gio::write( NumberOut, fmtLD ) << repValue;
-			strip( NumberOut );
-			NumberOut = RemoveTrailingZeros( NumberOut );
+			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
 		if ( MaxValue == 0.0 ) {
 			MaxOut = "0.0";
 		} else {
 			gio::write( MaxOut, fmtLD ) << MaxValue;
-			strip( MaxOut );
-			MaxOut = RemoveTrailingZeros( MaxOut );
+			strip_trailing_zeros( strip( MaxOut ) );
 		}
 
 		if ( minValue == 0.0 ) {
 			MinOut = "0.0";
 		} else {
 			gio::write( MinOut, fmtLD ) << minValue;
-			strip( MinOut );
-			MinOut = RemoveTrailingZeros( MinOut );
+			strip_trailing_zeros( strip( MinOut ) );
 		}
 
 		if ( WriteOutputToSQLite ) {
@@ -4768,7 +4757,7 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using DataGlobals::OutputFileStandard;
-		using General::RemoveTrailingZeros;
+		using General::strip_trailing_zeros;
 		using DataSystemVariables::ReportDuringWarmup;
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
 		using namespace SQLiteProcedures;
@@ -4777,7 +4766,7 @@ namespace OutputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static char s[ 25 ];
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4793,9 +4782,66 @@ namespace OutputProcessor {
 		if ( repValue == 0.0 ) {
 			NumberOut = "0.0";
 		} else {
-			gio::write( NumberOut, fmtLD ) << repValue;
-			strip( NumberOut );
-			NumberOut = RemoveTrailingZeros( NumberOut );
+//			gio::write( NumberOut, fmtLD ) << repValue; //Tuned Replaced by below: This is a hot spot for large output cases: Rounding logic differs so last digits can differ
+//			std::sprintf( s, "%-24.15G", repValue ); // This is simpler and faster but only switches to E format at E-5
+			Real64 const absValue( std::abs( repValue ) );
+			if ( ( 0.1 <= absValue ) && ( absValue <= 1.0e16 ) ) {
+				int const p( static_cast< int >( std::floor( std::log10( absValue ) + 1.0 ) ) );
+				switch ( p ) { // Verbose but fast
+				case 0:
+					std::sprintf( s, "%-19.15f", repValue );
+					break;
+				case 1:
+					std::sprintf( s, "%-19.14f", repValue );
+					break;
+				case 2:
+					std::sprintf( s, "%-19.13f", repValue );
+					break;
+				case 3:
+					std::sprintf( s, "%-19.12f", repValue );
+					break;
+				case 4:
+					std::sprintf( s, "%-19.11f", repValue );
+					break;
+				case 5:
+					std::sprintf( s, "%-19.10f", repValue );
+					break;
+				case 6:
+					std::sprintf( s, "%-19.9f", repValue );
+					break;
+				case 7:
+					std::sprintf( s, "%-19.8f", repValue );
+					break;
+				case 8:
+					std::sprintf( s, "%-19.7f", repValue );
+					break;
+				case 9:
+					std::sprintf( s, "%-19.6f", repValue );
+					break;
+				case 10:
+					std::sprintf( s, "%-19.5f", repValue );
+					break;
+				case 11:
+					std::sprintf( s, "%-19.4f", repValue );
+					break;
+				case 12:
+					std::sprintf( s, "%-19.3f", repValue );
+					break;
+				case 13:
+					std::sprintf( s, "%-19.2f", repValue );
+					break;
+				case 14:
+					std::sprintf( s, "%-19.1f", repValue );
+					break;
+				default:
+					std::sprintf( s, "%-19.0f", repValue );
+					break;
+				}
+			} else {
+				std::sprintf( s, "%-24.15E", repValue );
+			}
+			NumberOut = s;
+			strip_trailing_zeros( rstrip( NumberOut ) );
 		}
 
 		if ( WriteOutputToSQLite ) {
@@ -4906,7 +4952,7 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileStandard;
-		using General::RemoveTrailingZeros;
+		using General::strip_trailing_zeros;
 		using namespace SQLiteProcedures;
 
 		// Locals
@@ -4935,8 +4981,7 @@ namespace OutputProcessor {
 			NumberOut = "0.0";
 		} else {
 			gio::write( NumberOut, fmtLD ) << repVal;
-			strip( NumberOut );
-			NumberOut = RemoveTrailingZeros( NumberOut );
+			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
 		// Append the min and max strings with date information
@@ -4994,7 +5039,7 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using DataGlobals::OutputFileStandard;
-		using General::RemoveTrailingZeros;
+		using General::strip_trailing_zeros;
 		using namespace SQLiteProcedures;
 
 		// Locals
@@ -5015,8 +5060,7 @@ namespace OutputProcessor {
 				NumberOut = "0.0";
 			} else {
 				gio::write( NumberOut, fmtLD ) << RealValue;
-				strip( NumberOut );
-				NumberOut = RemoveTrailingZeros( NumberOut );
+				strip_trailing_zeros( strip( NumberOut ) );
 			}
 		}
 
@@ -5793,7 +5837,6 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	using DataGlobals::EndDayFlag;
 	using DataGlobals::EndEnvrnFlag;
 	using DataEnvironment::EndMonthFlag;
-	using General::RemoveTrailingZeros;
 	using General::EncodeMonDayHrMin;
 	using namespace SQLiteProcedures;
 
@@ -5831,9 +5874,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 		ShowFatalError( "Invalid reporting requested -- UpdateDataAndReport" );
 	}
 
-	{ auto const SELECT_CASE_var( IndexType );
-
-	if ( ( SELECT_CASE_var >= ZoneVar ) && ( SELECT_CASE_var <= HVACVar ) ) {
+	if ( ( IndexType >= ZoneVar ) && ( IndexType <= HVACVar ) ) {
 
 		// Basic record keeping and report out if "detailed"
 
@@ -5859,46 +5900,47 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 			// Act on the RVariables variable using the RVar structure
 			RVar >>= RVariableTypes( Loop ).VarPtr;
-			RVar().Stored = true;
-			if ( RVar().StoreType == AveragedVar ) {
-				CurVal = RVar().Which * rxTime;
+			auto & rVar( RVar() );
+			rVar.Stored = true;
+			if ( rVar.StoreType == AveragedVar ) {
+				CurVal = rVar.Which * rxTime;
 				//        CALL SetMinMax(RVar%Which,MDHM,RVar%MaxValue,RVar%maxValueDate,RVar%MinValue,RVar%minValueDate)
-				if ( RVar().Which > RVar().MaxValue ) {
-					RVar().MaxValue = RVar().Which;
-					RVar().maxValueDate = MDHM;
+				if ( rVar.Which > rVar.MaxValue ) {
+					rVar.MaxValue = rVar.Which;
+					rVar.maxValueDate = MDHM;
 				}
-				if ( RVar().Which < RVar().MinValue ) {
-					RVar().MinValue = RVar().Which;
-					RVar().minValueDate = MDHM;
+				if ( rVar.Which < rVar.MinValue ) {
+					rVar.MinValue = rVar.Which;
+					rVar.minValueDate = MDHM;
 				}
-				RVar().TSValue += CurVal;
-				RVar().EITSValue = RVar().TSValue; //CR - 8481 fix - 09/06/2011
+				rVar.TSValue += CurVal;
+				rVar.EITSValue = rVar.TSValue; //CR - 8481 fix - 09/06/2011
 			} else {
 				//        CurVal=RVar%Which
-				if ( RVar().Which > RVar().MaxValue ) {
-					RVar().MaxValue = RVar().Which;
-					RVar().maxValueDate = MDHM;
+				if ( rVar.Which > rVar.MaxValue ) {
+					rVar.MaxValue = rVar.Which;
+					rVar.maxValueDate = MDHM;
 				}
-				if ( RVar().Which < RVar().MinValue ) {
-					RVar().MinValue = RVar().Which;
-					RVar().minValueDate = MDHM;
+				if ( rVar.Which < rVar.MinValue ) {
+					rVar.MinValue = rVar.Which;
+					rVar.minValueDate = MDHM;
 				}
-				RVar().TSValue += RVar().Which;
-				RVar().EITSValue = RVar().TSValue; //CR - 8481 fix - 09/06/2011
+				rVar.TSValue += rVar.Which;
+				rVar.EITSValue = rVar.TSValue; //CR - 8481 fix - 09/06/2011
 			}
 
 			// End of "record keeping"  Report if applicable
-			if ( ! RVar().Report ) continue;
+			if ( ! rVar.Report ) continue;
 			ReportNow = true;
-			if ( RVar().SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( RVar().SchedPtr ) != 0.0 ); // SetReportNow(RVar%SchedPtr)
+			if ( rVar.SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( rVar.SchedPtr ) != 0.0 ); // SetReportNow(RVar%SchedPtr)
 			if ( ! ReportNow ) continue;
-			RVar().tsStored = true;
-			if ( ! RVar().thisTSStored ) {
-				++RVar().thisTSCount;
-				RVar().thisTSStored = true;
+			rVar.tsStored = true;
+			if ( ! rVar.thisTSStored ) {
+				++rVar.thisTSCount;
+				rVar.thisTSStored = true;
 			}
 
-			if ( RVar().ReportFreq == ReportEach ) {
+			if ( rVar.ReportFreq == ReportEach ) {
 				if ( TimePrint ) {
 					if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 						CurDayType = DayOfWeek;
@@ -5913,7 +5955,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 
-				WriteRealData( RVar().ReportID, RVar().ReportIDChr, SQLdbTimeIndex, RVar().Which );
+				WriteRealData( rVar.ReportID, rVar.ReportIDChr, SQLdbTimeIndex, rVar.Which );
 
 				++StdOutputRecordCount;
 			}
@@ -5924,44 +5966,45 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 
 			// Act on the IVariables variable using the IVar structure
 			IVar >>= IVariableTypes( Loop ).VarPtr;
-			IVar().Stored = true;
+			auto & iVar( IVar() );
+			iVar.Stored = true;
 			//      ICurVal=IVar%Which
-			if ( IVar().StoreType == AveragedVar ) {
-				ICurVal = IVar().Which * rxTime;
-				IVar().TSValue += ICurVal;
-				IVar().EITSValue = IVar().TSValue; //CR - 8481 fix - 09/06/2011
-				if ( nint( ICurVal ) > IVar().MaxValue ) {
-					IVar().MaxValue = nint( ICurVal ); // Record keeping for date and time go here too
-					IVar().maxValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
+			if ( iVar.StoreType == AveragedVar ) {
+				ICurVal = iVar.Which * rxTime;
+				iVar.TSValue += ICurVal;
+				iVar.EITSValue = iVar.TSValue; //CR - 8481 fix - 09/06/2011
+				if ( nint( ICurVal ) > iVar.MaxValue ) {
+					iVar.MaxValue = nint( ICurVal ); // Record keeping for date and time go here too
+					iVar.maxValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
 				}
-				if ( nint( ICurVal ) < IVar().MinValue ) {
-					IVar().MinValue = nint( ICurVal );
-					IVar().minValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
+				if ( nint( ICurVal ) < iVar.MinValue ) {
+					iVar.MinValue = nint( ICurVal );
+					iVar.minValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
 				}
 			} else {
-				if ( IVar().Which > IVar().MaxValue ) {
-					IVar().MaxValue = IVar().Which; // Record keeping for date and time go here too
-					IVar().maxValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
+				if ( iVar.Which > iVar.MaxValue ) {
+					iVar.MaxValue = iVar.Which; // Record keeping for date and time go here too
+					iVar.maxValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
 				}
-				if ( IVar().Which < IVar().MinValue ) {
-					IVar().MinValue = IVar().Which;
-					IVar().minValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
+				if ( iVar.Which < iVar.MinValue ) {
+					iVar.MinValue = iVar.Which;
+					iVar.minValueDate = MDHM; //+ TimeValue(IndexType)%TimeStep
 				}
-				IVar().TSValue += IVar().Which;
-				IVar().EITSValue = IVar().TSValue; //CR - 8481 fix - 09/06/2011
+				iVar.TSValue += iVar.Which;
+				iVar.EITSValue = iVar.TSValue; //CR - 8481 fix - 09/06/2011
 			}
 
-			if ( ! IVar().Report ) continue;
+			if ( ! iVar.Report ) continue;
 			ReportNow = true;
-			if ( IVar().SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( IVar().SchedPtr ) != 0.0 ); //SetReportNow(IVar%SchedPtr)
+			if ( iVar.SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( iVar.SchedPtr ) != 0.0 ); //SetReportNow(IVar%SchedPtr)
 			if ( ! ReportNow ) continue;
-			IVar().tsStored = true;
-			if ( ! IVar().thisTSStored ) {
-				++IVar().thisTSCount;
-				IVar().thisTSStored = true;
+			iVar.tsStored = true;
+			if ( ! iVar.thisTSStored ) {
+				++iVar.thisTSCount;
+				iVar.thisTSStored = true;
 			}
 
-			if ( IVar().ReportFreq == ReportEach ) {
+			if ( iVar.ReportFreq == ReportEach ) {
 				if ( TimePrint ) {
 					if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 						CurDayType = DayOfWeek;
@@ -5976,15 +6019,14 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 				// only time integer vars actual report as integer only is "detailed"
-				WriteIntegerData( IVar().ReportID, IVar().ReportIDChr, SQLdbTimeIndex, IVar().Which, _ );
+				WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, SQLdbTimeIndex, iVar.Which );
 				++StdOutputRecordCount;
 			}
 		}
 
 	} else {
 		ShowSevereError( "Illegal Index passed to Report Variables" );
-
-	}}
+	}
 
 	if ( IndexType == HVACVar ) return; // All other stuff happens at the "zone" time step call to this routine.
 
@@ -5996,28 +6038,29 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType != IndexType ) continue;
 				RVar >>= RVariableTypes( Loop ).VarPtr;
+				auto & rVar( RVar() );
 				// Update meters on the TimeStep  (Zone)
-				if ( RVar().MeterArrayPtr != 0 ) {
-					if ( VarMeterArrays( RVar().MeterArrayPtr ).NumOnCustomMeters <= 0 ) {
-						UpdateMeterValues( RVar().TSValue * RVar().ZoneMult * RVar().ZoneListMult, VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters, VarMeterArrays( RVar().MeterArrayPtr ).OnMeters );
+				if ( rVar.MeterArrayPtr != 0 ) {
+					if ( VarMeterArrays( rVar.MeterArrayPtr ).NumOnCustomMeters <= 0 ) {
+						UpdateMeterValues( rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult, VarMeterArrays( rVar.MeterArrayPtr ).NumOnMeters, VarMeterArrays( rVar.MeterArrayPtr ).OnMeters );
 					} else {
-						UpdateMeterValues( RVar().TSValue * RVar().ZoneMult * RVar().ZoneListMult, VarMeterArrays( RVar().MeterArrayPtr ).NumOnMeters, VarMeterArrays( RVar().MeterArrayPtr ).OnMeters, VarMeterArrays( RVar().MeterArrayPtr ).NumOnCustomMeters, VarMeterArrays( RVar().MeterArrayPtr ).OnCustomMeters );
+						UpdateMeterValues( rVar.TSValue * rVar.ZoneMult * rVar.ZoneListMult, VarMeterArrays( rVar.MeterArrayPtr ).NumOnMeters, VarMeterArrays( rVar.MeterArrayPtr ).OnMeters, VarMeterArrays( rVar.MeterArrayPtr ).NumOnCustomMeters, VarMeterArrays( rVar.MeterArrayPtr ).OnCustomMeters );
 					}
 				}
 				ReportNow = true;
-				if ( RVar().SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( RVar().SchedPtr ) != 0.0 ); //SetReportNow(RVar%SchedPtr)
-				if ( ! ReportNow || ! RVar().Report ) {
-					RVar().TSValue = 0.0;
+				if ( rVar.SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( rVar.SchedPtr ) != 0.0 ); //SetReportNow(RVar%SchedPtr)
+				if ( ! ReportNow || ! rVar.Report ) {
+					rVar.TSValue = 0.0;
 				}
 				//        IF (RVar%StoreType == AveragedVar) THEN
 				//          RVar%Value=RVar%Value+RVar%TSValue/NumOfTimeStepInHour
 				//        ELSE
-				RVar().Value += RVar().TSValue;
+				rVar.Value += rVar.TSValue;
 				//        ENDIF
 
-				if ( ! ReportNow || ! RVar().Report ) continue;
+				if ( ! ReportNow || ! rVar.Report ) continue;
 
-				if ( RVar().ReportFreq == ReportTimeStep ) {
+				if ( rVar.ReportFreq == ReportTimeStep ) {
 					if ( TimePrint ) {
 						if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 							CurDayType = DayOfWeek;
@@ -6032,30 +6075,31 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteRealData( RVar().ReportID, RVar().ReportIDChr, SQLdbTimeIndex, RVar().TSValue );
+					WriteRealData( rVar.ReportID, rVar.ReportIDChr, SQLdbTimeIndex, rVar.TSValue );
 					++StdOutputRecordCount;
 				}
-				RVar().TSValue = 0.0;
-				RVar().thisTSStored = false;
+				rVar.TSValue = 0.0;
+				rVar.thisTSStored = false;
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType != IndexType ) continue;
 				IVar >>= IVariableTypes( Loop ).VarPtr;
+				auto & iVar( IVar() );
 				ReportNow = true;
-				if ( IVar().SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( IVar().SchedPtr ) != 0.0 ); // SetReportNow(IVar%SchedPtr)
+				if ( iVar.SchedPtr > 0 ) ReportNow = ( GetCurrentScheduleValue( iVar.SchedPtr ) != 0.0 ); // SetReportNow(IVar%SchedPtr)
 				if ( ! ReportNow ) {
-					IVar().TSValue = 0.0;
+					iVar.TSValue = 0.0;
 				}
 				//        IF (IVar%StoreType == AveragedVar) THEN
 				//          IVar%Value=IVar%Value+REAL(IVar%TSValue,r64)/REAL(NumOfTimeStepInHour,r64)
 				//        ELSE
-				IVar().Value += IVar().TSValue;
+				iVar.Value += iVar.TSValue;
 				//        ENDIF
 
-				if ( ! ReportNow || ! IVar().Report ) continue;
+				if ( ! ReportNow || ! iVar.Report ) continue;
 
-				if ( IVar().ReportFreq == ReportTimeStep ) {
+				if ( iVar.ReportFreq == ReportTimeStep ) {
 					if ( TimePrint ) {
 						if ( LHourP != HourOfDay || std::abs( LStartMin - StartMinute ) > 0.001 || std::abs( LEndMin - TimeValue( IndexType ).CurMinute ) > 0.001 ) {
 							CurDayType = DayOfWeek;
@@ -6070,11 +6114,11 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteIntegerData( IVar().ReportID, IVar().ReportIDChr, SQLdbTimeIndex, _, IVar().TSValue );
+					WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, SQLdbTimeIndex, _, iVar.TSValue );
 					++StdOutputRecordCount;
 				}
-				IVar().TSValue = 0.0;
-				IVar().thisTSStored = false;
+				iVar.TSValue = 0.0;
+				iVar.thisTSStored = false;
 			} // Number of I Variables
 		} // Index Type (Zone or HVAC)
 
@@ -6099,52 +6143,54 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType != IndexType ) continue;
 				RVar >>= RVariableTypes( Loop ).VarPtr;
+				auto & rVar( RVar() );
 				//        ReportNow=.TRUE.
 				//        IF (RVar%SchedPtr > 0) &
 				//          ReportNow=(GetCurrentScheduleValue(RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
 
 				//        IF (ReportNow) THEN
-				if ( RVar().tsStored ) {
-					if ( RVar().StoreType == AveragedVar ) {
-						RVar().Value /= double( RVar().thisTSCount );
+				if ( rVar.tsStored ) {
+					if ( rVar.StoreType == AveragedVar ) {
+						rVar.Value /= double( rVar.thisTSCount );
 					}
-					if ( RVar().Report && RVar().ReportFreq == ReportHourly && RVar().Stored ) {
-						WriteRealData( RVar().ReportID, RVar().ReportIDChr, SQLdbTimeIndex, RVar().Value );
+					if ( rVar.Report && rVar.ReportFreq == ReportHourly && rVar.Stored ) {
+						WriteRealData( rVar.ReportID, rVar.ReportIDChr, SQLdbTimeIndex, rVar.Value );
 						++StdOutputRecordCount;
-						RVar().Stored = false;
+						rVar.Stored = false;
 					}
-					RVar().StoreValue += RVar().Value;
-					++RVar().NumStored;
+					rVar.StoreValue += rVar.Value;
+					++rVar.NumStored;
 				}
-				RVar().tsStored = false;
-				RVar().thisTSStored = false;
-				RVar().thisTSCount = 0;
-				RVar().Value = 0.0;
+				rVar.tsStored = false;
+				rVar.thisTSStored = false;
+				rVar.thisTSCount = 0;
+				rVar.Value = 0.0;
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType != IndexType ) continue;
 				IVar >>= IVariableTypes( Loop ).VarPtr;
+				auto & iVar( IVar() );
 				//        ReportNow=.TRUE.
 				//        IF (IVar%SchedPtr > 0) &
 				//          ReportNow=(GetCurrentScheduleValue(IVar%SchedPtr) /= 0.0)  !SetReportNow(IVar%SchedPtr)
 				//        IF (ReportNow) THEN
-				if ( IVar().tsStored ) {
-					if ( IVar().StoreType == AveragedVar ) {
-						IVar().Value /= double( IVar().thisTSCount );
+				if ( iVar.tsStored ) {
+					if ( iVar.StoreType == AveragedVar ) {
+						iVar.Value /= double( iVar.thisTSCount );
 					}
-					if ( IVar().Report && IVar().ReportFreq == ReportHourly && IVar().Stored ) {
-						WriteIntegerData( IVar().ReportID, IVar().ReportIDChr, SQLdbTimeIndex, _, IVar().Value );
+					if ( iVar.Report && iVar.ReportFreq == ReportHourly && iVar.Stored ) {
+						WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, SQLdbTimeIndex, _, iVar.Value );
 						++StdOutputRecordCount;
-						IVar().Stored = false;
+						iVar.Stored = false;
 					}
-					IVar().StoreValue += IVar().Value;
-					++IVar().NumStored;
+					iVar.StoreValue += iVar.Value;
+					++iVar.NumStored;
 				}
-				IVar().tsStored = false;
-				IVar().thisTSStored = false;
-				IVar().thisTSCount = 0;
-				IVar().Value = 0.0;
+				iVar.tsStored = false;
+				iVar.thisTSStored = false;
+				iVar.thisTSCount = 0;
+				iVar.Value = 0.0;
 			} // Number of I Variables
 		} // IndexType (Zone or HVAC)
 

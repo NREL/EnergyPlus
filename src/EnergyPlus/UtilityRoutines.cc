@@ -1726,7 +1726,7 @@ ShowRecurringErrors()
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-	using General::RemoveTrailingZeros;
+	using General::strip_trailing_zeros;
 	using SQLiteProcedures::UpdateSQLiteErrorRecord;
 	using SQLiteProcedures::CreateSQLiteErrorRecord;
 	using SQLiteProcedures::WriteOutputToSQLite;
@@ -1780,19 +1780,19 @@ ShowRecurringErrors()
 			StatMessage = "";
 			if ( error.ReportMax ) {
 				MaxOut = RoundSigDigits( error.MaxValue, 6 );
-				MaxOut = RemoveTrailingZeros( MaxOut );
+				strip_trailing_zeros( MaxOut );
 				StatMessage += "  Max=" + MaxOut;
 				if ( ! error.MaxUnits.empty() ) StatMessage += ' ' + error.MaxUnits;
 			}
 			if ( error.ReportMin ) {
 				MinOut = RoundSigDigits( error.MinValue, 6 );
-				MinOut = RemoveTrailingZeros( MinOut );
+				strip_trailing_zeros( MinOut );
 				StatMessage += "  Min=" + MinOut;
 				if ( ! error.MinUnits.empty() ) StatMessage += ' ' + error.MinUnits;
 			}
 			if ( error.ReportSum ) {
 				SumOut = RoundSigDigits( error.SumValue, 6 );
-				SumOut = RemoveTrailingZeros( SumOut );
+				strip_trailing_zeros( SumOut );
 				StatMessage += "  Sum=" + SumOut;
 				if ( ! error.SumUnits.empty() ) StatMessage += ' ' + error.SumUnits;
 			}
