@@ -384,8 +384,8 @@ namespace CoolTower {
 			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Energy [J]", CoolTowerSys( CoolTowerNum ).LatHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Rate [W]", CoolTowerSys( CoolTowerNum ).LatHeatPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTAirVol, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Current Conditions Volumetric Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Standard Conditions Volumetric Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Current Conditions Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Standard Conditions Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Mass [kg]", CoolTowerSys( CoolTowerNum ).CoolTAirMass, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Mass Flow Rate [kg/s]", CoolTowerSys( CoolTowerNum ).AirMassFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Inlet Temperature [C]", CoolTowerSys( CoolTowerNum ).InletDBTemp, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
@@ -702,7 +702,7 @@ namespace CoolTower {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

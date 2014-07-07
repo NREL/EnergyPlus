@@ -1888,8 +1888,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( Mixing( Loop ).ZonePtr ) ) {
 					RepVarSet( Mixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
@@ -3348,7 +3348,7 @@ namespace HeatBalanceAirManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
