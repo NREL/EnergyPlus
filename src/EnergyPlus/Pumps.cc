@@ -1137,7 +1137,15 @@ namespace Pumps {
 
 		//User specified min/max mass flow rates for pump
 		PumpOverridableMaxLimit = PumpEquip( PumpNum ).MassFlowRateMax;
-		PumpMassFlowRateMinLimit = PumpEquip( PumpNum ).MassFlowRateMin;
+		
+		// override the user specified min to allow pump to turn off when no flow is required.
+		if ( PumpEquip( PumpNum ).LoopSolverOverwriteFlag == true ) {
+			PumpMassFlowRateMinLimit = 0.0;
+		}
+		else {
+			PumpMassFlowRateMinLimit = PumpEquip( PumpNum ).MassFlowRateMin;
+		}
+		
 
 		//The pump outlet node Min/MaxAvail
 		PumpMassFlowRateMin = max( InletNodeMin, PumpMassFlowRateMinLimit );
