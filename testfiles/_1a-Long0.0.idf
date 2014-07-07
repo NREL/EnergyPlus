@@ -10,7 +10,7 @@
 ! Plant:    None.
 ! Modified:
 
-  Version,8.1;
+  Version,8.2;
 
   Site:Location,
     UNKNOWN,                 !- Name
@@ -1109,7 +1109,7 @@
 
   OtherEquipment,
     ZONE ONE OthEq 1,        !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or ZoneList Name
     Sch 1,                   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     297.0,                   !- Design Level {W}

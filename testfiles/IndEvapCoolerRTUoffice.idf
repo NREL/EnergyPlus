@@ -29,7 +29,7 @@
 !         Systems are set to Night Cycle during setup/setback.
 !
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -3978,7 +3978,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     0.8,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN1,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN1,  !- Primary Air Outlet Node Name
@@ -4007,7 +4007,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN1,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4285,7 +4285,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN3,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN3,  !- Primary Air Outlet Node Name
@@ -4314,7 +4314,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN3,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4592,7 +4592,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     1.4,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN5,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN5,  !- Primary Air Outlet Node Name
@@ -4621,7 +4621,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN5,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4899,7 +4899,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     0.8,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN7,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN7,  !- Primary Air Outlet Node Name
@@ -4928,7 +4928,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN7,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -5206,7 +5206,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     1.1,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN9,      !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN9,  !- Primary Air Outlet Node Name
@@ -5235,7 +5235,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN9,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -5513,7 +5513,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     0.9,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN11,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN11,  !- Primary Air Outlet Node Name
@@ -5542,7 +5542,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN11,         !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -5820,7 +5820,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     1.2,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN13,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN13,  !- Primary Air Outlet Node Name
@@ -5849,7 +5849,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN13,         !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -6127,7 +6127,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     1.5,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN15,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN15,  !- Primary Air Outlet Node Name
@@ -6156,7 +6156,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN15,         !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -6434,7 +6434,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     0.9,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN17,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN17,  !- Primary Air Outlet Node Name
@@ -6463,7 +6463,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN17,         !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -6741,7 +6741,7 @@
     ,                        !- Cooler Flow Ratio
     30,                      !- Recirculating Water Pump Power Consumption {W}
     1.8,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     250,                     !- Secondary Fan Delta Pressure {Pa}
     Mixed Air Node ZN19,     !- Primary Air Inlet Node Name
     Evap Cooler Outlet Node ZN19,  !- Primary Air Outlet Node Name
@@ -6770,7 +6770,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN19,         !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     750,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency

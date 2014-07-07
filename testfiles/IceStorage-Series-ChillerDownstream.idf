@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2020,7 +2020,7 @@
   Fan:ConstantVolume,
     SPACE1-1 PIU Fan,        !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2142,7 +2142,7 @@
   Fan:ConstantVolume,
     SPACE2-1 PIU Fan,        !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2264,7 +2264,7 @@
   Fan:ConstantVolume,
     SPACE3-1 PIU Fan,        !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2386,7 +2386,7 @@
   Fan:ConstantVolume,
     SPACE4-1 PIU Fan,        !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2673,7 +2673,7 @@
   Fan:VariableVolume,
     VAV Sys 1 Supply Fan,    !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
