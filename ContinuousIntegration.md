@@ -11,6 +11,11 @@ Additionally, EnergyPlus requires that the boto python package be installed to r
 
 `pip install boto`
 
+## Packaging
+
+ * Windows - nsis 2.x (http://nsis.sourceforge.net/Main_Page)
+ * MacOS - packagemaker (hard to find and install, but technically still available)
+
 ## Windows Note
 
 pip may not be installed if you are running Python 2.7. An upgrade to python 3.4 is acceptable from the standpoint
