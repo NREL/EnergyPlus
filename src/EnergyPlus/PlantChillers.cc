@@ -6601,7 +6601,7 @@ namespace PlantChillers {
 			ElectricChillerReport( Num ).Base.CondOutletTemp = Node( CondOutletNode ).Temp;
 			ElectricChillerReport( Num ).Base.EvapOutletTemp = Node( EvapOutletNode ).Temp;
 			ElectricChillerReport( Num ).Base.Evapmdot = EvapMassFlowRate;
-			ElectricChillerReport( Num ).Base.Condmdot = CondMassFlowRate; 
+			ElectricChillerReport( Num ).Base.Condmdot = CondMassFlowRate;
 			if ( ElectricChiller( Num ).Base.CondenserType == EvapCooled ) {
 				ElectricChillerReport( Num ).Base.BasinHeaterPower = BasinHeaterPower;
 				ElectricChillerReport( Num ).Base.BasinHeaterConsumption = BasinHeaterPower * ReportingConstant;

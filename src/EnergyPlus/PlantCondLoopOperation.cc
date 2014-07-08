@@ -2058,7 +2058,6 @@ namespace PlantCondLoopOperation {
 		// na
 		// Using/Aliasing
 		using namespace DataLoopNode;
-		using namespace DataGlobals;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
