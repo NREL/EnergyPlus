@@ -60,4 +60,3 @@ Currently the cmake project is set up to build the Objexx library and EnergyPlus
 Things to work on:
  - Get E+ building against all the libraries
  - Need to add the testing tools into this repo and customize it for the executable structure
- - Evaluate how to interact with the FORTRAN pieces to the E+ experience (EPMacro, ExpandObjects, ReadVars, Transition)

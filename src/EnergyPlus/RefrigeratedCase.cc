@@ -12409,19 +12409,22 @@ namespace RefrigeratedCase {
 				//    later need to do for hottest/coolest in room where Tin /= Tzonemixed
 				//calc RH inlet to coil assuming at middle/mixed point in room
 				//calc coilcap, sens and latent, available as f(inlet T,RH)
-				{ auto const SELECT_CASE_var( warehouse_coil.VerticalLocation );
-				if ( SELECT_CASE_var == Middle ) {
-					CoilInletTemp = ZoneMixedAirDryBulb;
-					CoilInletEnthalpy = ZoneMixedAirEnthalpy;
-					CoilInletRHFrac = ZoneMixedAirRHFrac;
-					CoilInletDensity = ZoneMixedAirDensity;
-					CoilInletCp = ZoneMixedAirCp;
-					CoilInletHumRatio = ZoneMixedAirHumRatio;
-					CoilInletDryAirDensity = ZoneDryAirDensity;
-					CoilInletDryAirCp = PsyCpAirFnWTdb( 0.0, CoilInletTemp );
-				} else if ( SELECT_CASE_var == Floor ) {
-				} else if ( SELECT_CASE_var == Ceiling ) {
-				}}
+				switch( WarehouseCoil( CoilID ).VerticalLocation ) {
+					case Floor:
+						// purposely fall through
+					case Ceiling:
+						// purposely fall through
+					case Middle:
+						CoilInletTemp = ZoneMixedAirDryBulb;
+						CoilInletEnthalpy = ZoneMixedAirEnthalpy;
+						CoilInletRHFrac = ZoneMixedAirRHFrac;
+						CoilInletDensity = ZoneMixedAirDensity;
+						CoilInletCp = ZoneMixedAirCp;
+						CoilInletHumRatio = ZoneMixedAirHumRatio;
+						CoilInletDryAirDensity = ZoneDryAirDensity;
+						CoilInletDryAirCp = PsyCpAirFnWTdb( 0.0, CoilInletTemp );
+						break;
+				}
 				AirVolumeFlowMax = AirVolumeFlowRated * ( 1.0 - DefrostDripDownSchedule ) * CoilSchedule;
 				DryAirMassFlowMax = DryAirMassFlowRated * ( 1.0 - DefrostDripDownSchedule ) * CoilSchedule;
 

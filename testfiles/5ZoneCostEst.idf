@@ -37,7 +37,7 @@
 !
 ! WeatherFilename=USA_IL_Chicago-OHare_TMY2.epw
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,4;
 
@@ -3412,7 +3412,7 @@
   Fan:VariableVolume,
     VAV SYS 1 Supply Fan,    !- Name
     FAN_SCH,                 !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method

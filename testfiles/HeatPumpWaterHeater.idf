@@ -125,7 +125,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2227,7 +2227,7 @@
   Fan:OnOff,
     HPWHFan,                 !- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     100.0,                   !- Pressure Rise {Pa}
     0.2685,                  !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2442,7 +2442,7 @@
   Fan:OnOff,
     Zone4HPWHFan,            !- Name
     HeatPumpWaterHeaterSch,  !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     100.0,                   !- Pressure Rise {Pa}
     0.2685,                  !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2560,7 +2560,7 @@
   Fan:OnOff,
     HPWHOutdoorFan,          !- Name
     PlantHPWHSch,            !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     100.0,                   !- Pressure Rise {Pa}
     0.2685,                  !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2703,7 +2703,7 @@
   Fan:OnOff,
     HPWHScheduledFan,        !- Name
     ScheduledHPWHSch,        !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     100.0,                   !- Pressure Rise {Pa}
     0.2685,                  !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -3275,7 +3275,7 @@
   Coil:Cooling:Water,
     Main Cooling Coil 1,     !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    autosize,                    !- Design Water Flow Rate {m3/s}
+    autosize,                !- Design Water Flow Rate {m3/s}
     autosize,                !- Design Air Flow Rate {m3/s}
     autosize,                !- Design Inlet Water Temperature {C}
     autosize,                !- Design Inlet Air Temperature {C}
@@ -3309,7 +3309,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -3789,7 +3789,7 @@
   Fan:OnOff,
     HPWHPlantFan,            !- Name
     PlantHPWHSch,            !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     100.0,                   !- Pressure Rise {Pa}
     2.6852,                  !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

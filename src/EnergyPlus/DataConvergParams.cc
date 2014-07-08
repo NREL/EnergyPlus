@@ -60,6 +60,8 @@ namespace DataConvergParams {
 	// Energy Tolerance Calculation, used to scale the answer
 	// for a more intuitive answer for comparison
 	Real64 const PlantFlowFlowRateToler( 0.01 ); // Tolerance for mass flow rate convergence (in kg/s)
+	Real64 const PlantLowFlowRateToler(0.000001); // Tolerance for low flow rate used for determining when
+	//plant pumps can be shut down
 
 	int const ConvergLogStackDepth( 10 );
 	FArray1D< Real64 > const ConvergLogStackARR( ConvergLogStackDepth, { 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0 } );

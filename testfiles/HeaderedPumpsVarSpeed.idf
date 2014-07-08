@@ -94,7 +94,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2595,7 +2595,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -3271,7 +3271,7 @@
   Output:Variable,*,Pump Fluid Heat Gain Rate,Timestep;
 
   Output:Variable,*,Pump Mass Flow Rate,Timestep;
-  
+
   Output:Variable,*,Pump Operating Pumps Count,Timestep;
 
   Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,Timestep;

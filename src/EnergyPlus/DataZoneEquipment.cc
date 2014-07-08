@@ -96,6 +96,10 @@ namespace DataZoneEquipment {
 	int NumOfZoneEquipLists( 0 ); // The Number of Zone Equipment List objects
 	FArray1D_int ZoneEquipAvail;
 
+	FArray1D_bool CrossMixingReportFlag;
+	FArray1D_bool MixingReportFlag;
+	FArray1D< Real64 > VentMCP;
+
 	// Utility routines for module
 
 	// Object Data

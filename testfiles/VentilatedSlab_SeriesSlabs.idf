@@ -92,7 +92,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2159,7 +2159,7 @@
   Fan:ConstantVolume,
     Zone1VentSlabFan,        !- Name
     VentSlabAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2170,7 +2170,7 @@
   Fan:ConstantVolume,
     Zone4VentSlabFan,        !- Name
     VentSlabAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

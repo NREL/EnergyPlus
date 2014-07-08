@@ -95,7 +95,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -1948,7 +1948,7 @@
   Fan:ConstantVolume,
     Zone1FanCoilFan,         !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2049,7 +2049,7 @@
   Fan:ConstantVolume,
     Zone2FanCoilFan,         !- Name
     Zone2FanAndCoilAvailSched,  !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2231,7 +2231,7 @@
   Fan:ConstantVolume,
     Zone3FanCoilFan,         !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

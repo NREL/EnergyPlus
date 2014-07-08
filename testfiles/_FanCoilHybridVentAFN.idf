@@ -129,7 +129,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -2416,7 +2416,7 @@
   Fan:ZoneExhaust,
     Zone3 Exhaust Fan,       !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     500,                     !- Pressure Rise {Pa}
     0.01,                    !- Maximum Flow Rate {m3/s}
     Zone3 Exhaust Node,      !- Air Inlet Node Name
@@ -2459,7 +2459,7 @@
   Fan:ConstantVolume,
     Zone1FanCoilFan,         !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -3129,7 +3129,7 @@
     Reheat Coil Zone 2,      !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     1.0,                     !- Gas Burner Efficiency
-    autosize,                    !- Nominal Capacity {W}
+    autosize,                !- Nominal Capacity {W}
     Zone 2 Reheat Air Inlet Node,  !- Air Inlet Node Name
     Zone 2 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
@@ -3152,7 +3152,7 @@
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     1.9,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

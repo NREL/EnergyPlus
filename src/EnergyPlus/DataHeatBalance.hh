@@ -176,6 +176,10 @@ namespace DataHeatBalance {
 	extern int const AirBalanceNone;
 	extern int const AirBalanceQuadrature;
 
+	// Parameter for source zone air flow mass balance infiltration treatment
+	extern int const AddInfiltrationFlow;
+	extern int const AdjustInfiltrationFlow;
+
 	extern int const NumZoneIntGainDeviceTypes;
 	extern FArray1D_string const ZoneIntGainDeviceTypes; // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45
 
@@ -291,6 +295,7 @@ namespace DataHeatBalance {
 
 	extern int ZoneAirSolutionAlgo; // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
 	extern Real64 BuildingRotationAppendixG; // Building Rotation for Appendix G
+	extern bool ZoneAirMassBalanceSimulation; // if true, then enforces zone mass flow conservation
 
 	//END SiteData
 
@@ -2793,6 +2798,8 @@ namespace DataHeatBalance {
 		Real64 EMSAirFlowRateValue; // value EMS is setting for air flow rate
 		bool QuadratureSum; // If quadrature sum of zone air balance method is used
 		int OABalancePtr; // A pointer to ZoneAirBalance If quadrature is true
+		Real64 VolumeFlowRate; // infiltration air volume flow rate
+		Real64 MassFlowRate;   // infiltration air mass flow rate
 
 		// Default Constructor
 		InfiltrationData() :
@@ -2815,7 +2822,9 @@ namespace DataHeatBalance {
 			EMSOverrideOn( false ),
 			EMSAirFlowRateValue( 0.0 ),
 			QuadratureSum( false ),
-			OABalancePtr( 0 )
+			OABalancePtr( 0 ),
+			VolumeFlowRate( 0.0 ),
+			MassFlowRate( 0.0 )
 		{}
 
 		// Member Constructor
@@ -2840,7 +2849,9 @@ namespace DataHeatBalance {
 			bool const EMSOverrideOn, // if true then EMS is requesting to override
 			Real64 const EMSAirFlowRateValue, // value EMS is setting for air flow rate
 			bool const QuadratureSum, // If quadrature sum of zone air balance method is used
-			int const OABalancePtr // A pointer to ZoneAirBalance If quadrature is true
+			int const OABalancePtr, // A pointer to ZoneAirBalance If quadrature is true
+			Real64 const VolumeFlowRate, // infiltration air volume flow rate
+			Real64 const MassFlowRate   // infiltration air mass flow rate
 		) :
 			Name( Name ),
 			ZonePtr( ZonePtr ),
@@ -2862,7 +2873,9 @@ namespace DataHeatBalance {
 			EMSOverrideOn( EMSOverrideOn ),
 			EMSAirFlowRateValue( EMSAirFlowRateValue ),
 			QuadratureSum( QuadratureSum ),
-			OABalancePtr( OABalancePtr )
+			OABalancePtr( OABalancePtr ),
+			VolumeFlowRate( VolumeFlowRate ),
+			MassFlowRate( MassFlowRate )
 		{}
 
 	};
@@ -3135,6 +3148,8 @@ namespace DataHeatBalance {
 		int FromZone;
 		Real64 DeltaTemperature;
 		Real64 DesiredAirFlowRate;
+		Real64 DesiredAirFlowRateSaved;
+		Real64 MixingMassFlowRate;
 		int DeltaTempSchedPtr; // Delta temperature schedule index
 		int MinIndoorTempSchedPtr; // Minimum indoor temperature schedule index
 		int MaxIndoorTempSchedPtr; // Maximum indoor temperature schedule index
@@ -3175,6 +3190,8 @@ namespace DataHeatBalance {
 			FromZone( 0 ),
 			DeltaTemperature( 0.0 ),
 			DesiredAirFlowRate( 0.0 ),
+			DesiredAirFlowRateSaved( 0.0 ),
+			MixingMassFlowRate( 0.0 ),
 			DeltaTempSchedPtr( 0 ),
 			MinIndoorTempSchedPtr( 0 ),
 			MaxIndoorTempSchedPtr( 0 ),
@@ -3205,6 +3222,8 @@ namespace DataHeatBalance {
 			int const FromZone,
 			Real64 const DeltaTemperature,
 			Real64 const DesiredAirFlowRate,
+			Real64 const DesiredAirFlowRateSaved,
+			Real64 const MixingMassFlowRate,
 			int const DeltaTempSchedPtr, // Delta temperature schedule index
 			int const MinIndoorTempSchedPtr, // Minimum indoor temperature schedule index
 			int const MaxIndoorTempSchedPtr, // Maximum indoor temperature schedule index
@@ -3242,6 +3261,8 @@ namespace DataHeatBalance {
 			FromZone( FromZone ),
 			DeltaTemperature( DeltaTemperature ),
 			DesiredAirFlowRate( DesiredAirFlowRate ),
+			DesiredAirFlowRateSaved( DesiredAirFlowRateSaved ),
+			MixingMassFlowRate( MixingMassFlowRate ),
 			DeltaTempSchedPtr( DeltaTempSchedPtr ),
 			MinIndoorTempSchedPtr( MinIndoorTempSchedPtr ),
 			MaxIndoorTempSchedPtr( MaxIndoorTempSchedPtr ),
@@ -3273,6 +3294,105 @@ namespace DataHeatBalance {
 			DoorProtTypeName( DoorProtTypeName )
 		{}
 
+	};
+
+	struct ZoneAirMassFlowConservation
+	{
+		// Members
+		bool EnforceZoneMassBalance;     // flag to enforce zone air mass conservation
+		int InfiltrationTreatment;       // determines how infiltration is treated for zone mass balance
+		//Note, unique global object
+
+		// Default Constructor
+		ZoneAirMassFlowConservation() :
+			EnforceZoneMassBalance( false ),
+			InfiltrationTreatment( 0 )
+		{}
+
+		// Member Constructor
+		ZoneAirMassFlowConservation(
+			bool EnforceZoneMassBalance,
+			int InfiltrationTreatment
+			) :
+			EnforceZoneMassBalance( EnforceZoneMassBalance ),
+			InfiltrationTreatment( InfiltrationTreatment )
+		{}
+	};
+
+
+	struct ZoneMassConservationData
+	{
+		// Members
+		std::string Name;
+		int ZonePtr;             // pointer to the mixing zone
+		Real64 InMassFlowRate;   // zone total supply air mass flow rate, kg/s
+		Real64 ExhMassFlowRate;  // zone exhaust total air mass flow rate, kg/s
+		Real64 RetMassFlowRate;  // zone return air mass flow rate, kg/s
+		Real64 MixingMassFlowRate;        // zone mixing air mass flow rate, kg/s
+		Real64 MixingSourceMassFlowRate;  // Zone source mass flow rate for mixing zone, kg/s
+		int NumSourceZonesMixingObject;   // number of zone mixing object references as a source zone
+		int NumReceivingZonesMixingObject;  // number of zone mixing object references as a receiving zone
+		bool IsOnlySourceZone; // true only if used only as a source zone in zone mixing object 
+		int InfiltrationPtr;             // pointer to infiltration object
+		Real64 InfiltrationMassFlowRate;   // infiltration added to enforced source zone mass balance, kg/s
+		int IncludeInfilToZoneMassBal;     // not self-balanced, include infiltration in zone air mass balance
+		FArray1D_int ZoneMixingSourcesPtr;     // source zones pointer
+		FArray1D_int ZoneMixingReceivingPtr;   // receiving zones pointer
+		FArray1D< Real64 > ZoneMixingReceivingFr; // receiving zones fraction
+		//Note, this type dimensioned by number of zones
+
+		// Default Constructor
+		ZoneMassConservationData() :
+			ZonePtr(0),
+			InMassFlowRate(0.0),
+			ExhMassFlowRate(0.0),
+			RetMassFlowRate(0.0),
+			MixingMassFlowRate(0.0),
+			MixingSourceMassFlowRate(0.0),
+			NumSourceZonesMixingObject(0),
+			NumReceivingZonesMixingObject(0),
+			IsOnlySourceZone(false),
+			InfiltrationPtr(0),
+			InfiltrationMassFlowRate(0.0),
+			IncludeInfilToZoneMassBal(0)
+		{}
+
+		// Member Constructor
+		ZoneMassConservationData(
+			std::string const & Name,
+			int const ZonePtr,
+			Real64 const InMassFlowRate,
+			Real64 const ExhMassFlowRate,
+			Real64 const RetMassFlowRate,
+			Real64 const MixingMassFlowRate,
+			Real64 const MixingSourceMassFlowRate,
+			int const NumSourceZonesMixingObject,
+			int const NumReceivingZonesMixingObject,
+			bool const IsOnlySourceZone,
+			int const InfiltrationPtr,
+			Real64 const InfiltrationMassFlowRate,
+			int const IncludeInfilToZoneMassBal,
+			FArray1_int const & ZoneMixingSourcesPtr,
+			FArray1_int const & ZoneMixingReceivingPtr,
+			FArray1< Real64 > const & ZoneMixingReceivingFr
+			) :
+			Name(Name),
+			ZonePtr(ZonePtr),
+			InMassFlowRate(InMassFlowRate),
+			ExhMassFlowRate(ExhMassFlowRate),
+			RetMassFlowRate(RetMassFlowRate),
+			MixingMassFlowRate(MixingMassFlowRate),
+			MixingSourceMassFlowRate(MixingSourceMassFlowRate),
+			NumSourceZonesMixingObject(NumSourceZonesMixingObject),
+			NumReceivingZonesMixingObject(NumReceivingZonesMixingObject),
+			IsOnlySourceZone(IsOnlySourceZone),
+			InfiltrationPtr(InfiltrationPtr),
+			InfiltrationMassFlowRate(InfiltrationMassFlowRate),
+			IncludeInfilToZoneMassBal(IncludeInfilToZoneMassBal),
+			ZoneMixingSourcesPtr(ZoneMixingSourcesPtr),
+			ZoneMixingReceivingPtr(ZoneMixingReceivingPtr),
+			ZoneMixingReceivingFr(ZoneMixingReceivingFr)
+		{}
 	};
 
 	struct GenericComponentZoneIntGainStruct
@@ -5188,6 +5308,8 @@ namespace DataHeatBalance {
 	extern FArray1D< GlobalInternalGainMiscObject > InfiltrationObjects;
 	extern FArray1D< GlobalInternalGainMiscObject > VentilationObjects;
 	extern FArray1D< ZoneReportVars > ZnRpt;
+	extern FArray1D< ZoneMassConservationData > MassConservation;
+	extern ZoneAirMassFlowConservation ZoneAirMassFlow;
 
 	// Functions
 
