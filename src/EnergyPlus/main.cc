@@ -389,7 +389,7 @@ main()
 	ProcessInput();
 
 	ManageSimulation();
-	
+
 	ShowMessage( "Simulation Error Summary *************" );
 
 	GenOutputVariablesAuditReport();

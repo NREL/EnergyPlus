@@ -810,8 +810,6 @@ namespace PlantChillers {
 			SetupOutputVariable( "Chiller Condenser Heat Transfer Rate [W]", ElectricChillerReport( ChillerNum ).Base.QCond, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
 			SetupOutputVariable( "Chiller Condenser Heat Transfer Energy [J]", ElectricChillerReport( ChillerNum ).Base.CondEnergy, "System", "Sum", ElectricChiller( ChillerNum ).Base.Name, _, "ENERGYTRANSFER", "HEATREJECTION", _, "Plant" );
 			SetupOutputVariable( "Chiller COP [W/W]", ElectricChillerReport( ChillerNum ).ActualCOP, "System", "Average", ElectricChiller( ChillerNum ).Base.Name );
-			SetupOutputVariable("Chiller Part Load Ratio [W/W]", ElectricChillerReport(ChillerNum).PartLoadRat, "System", "Average", ElectricChiller(ChillerNum).Base.Name);
-			SetupOutputVariable("Chiller Available Capacity [W]", ElectricChillerReport(ChillerNum).AvailChillerCap, "System", "Average", ElectricChiller(ChillerNum).Base.Name);
 
 			//Condenser mass flow and outlet temp are valid for water cooled
 			if ( ElectricChiller( ChillerNum ).Base.CondenserType == WaterCooled ) {
@@ -4182,8 +4180,6 @@ namespace PlantChillers {
 		BranchNum = ElectricChiller( ChillNum ).Base.CWBranchNum;
 		CompNum = ElectricChiller( ChillNum ).Base.CWCompNum;
 		EvapInletTemp = Node( EvapInletNode ).Temp;
-		ElectricChillerReport( ChillNum ).PartLoadRat = 0.0;
-		ElectricChillerReport( ChillNum ).AvailChillerCap = 0.0;
 
 		//   calculate end time of current time step
 		CurrentEndTime = CurrentTime + SysTimeElapsed;
@@ -4604,8 +4600,6 @@ namespace PlantChillers {
 			Power = 0.0;
 			Energy = 0.0;
 		}
-		ElectricChillerReport( ChillNum ).PartLoadRat = PartLoadRat;
-		ElectricChillerReport( ChillNum ).AvailChillerCap = AvailChillerCap;
 	}
 
 	void
@@ -6568,7 +6562,6 @@ namespace PlantChillers {
 			ElectricChillerReport( Num ).Base.Evapmdot = EvapMassFlowRate;
 			ElectricChillerReport( Num ).Base.Condmdot = CondMassFlowRate;
 			ElectricChillerReport( Num ).ActualCOP = 0.0;
-			//ElectricChillerReport( Num ).PartLoadRat = 0.0;
 			if ( ElectricChiller( Num ).Base.CondenserType == EvapCooled ) {
 				ElectricChillerReport( Num ).Base.BasinHeaterPower = BasinHeaterPower;
 				ElectricChillerReport( Num ).Base.BasinHeaterConsumption = BasinHeaterPower * ReportingConstant;
@@ -6609,7 +6602,6 @@ namespace PlantChillers {
 			ElectricChillerReport( Num ).Base.EvapOutletTemp = Node( EvapOutletNode ).Temp;
 			ElectricChillerReport( Num ).Base.Evapmdot = EvapMassFlowRate;
 			ElectricChillerReport( Num ).Base.Condmdot = CondMassFlowRate; 
-			//ElectricChillerReport( Num ).PartLoadRat = PartLoadRat;
 			if ( ElectricChiller( Num ).Base.CondenserType == EvapCooled ) {
 				ElectricChillerReport( Num ).Base.BasinHeaterPower = BasinHeaterPower;
 				ElectricChillerReport( Num ).Base.BasinHeaterConsumption = BasinHeaterPower * ReportingConstant;

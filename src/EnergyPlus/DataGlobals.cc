@@ -1,4 +1,3 @@
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
 

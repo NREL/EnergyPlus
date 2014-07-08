@@ -1,7 +1,5 @@
 // C++ Headers
 #include <cmath>
-#include <fstream>
-#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -2088,8 +2086,6 @@ namespace PlantCondLoopOperation {
 		int CompIndex;
 		int NumCompsOnList;
 
-		std::ofstream static myfile ("Debug.tsv", std::ofstream::out);
-
 		// start with some references
 		auto & this_loop( PlantLoop( LoopNum ) );
 		auto & this_loopside( this_loop.LoopSide( LoopSideNum ) );
@@ -2182,7 +2178,7 @@ namespace PlantCondLoopOperation {
 					}
 				}
 
-				//SEQUENTIAL DISTRIBUTION SCHEME
+				//SEQUENTIALLOAD DISTRIBUTION SCHEME
 			} else if ( SELECT_CASE_var == SequentialLoading ) { // LoadFlag=2 indicates "sequential" load distribution
 				// step 1: Load machines in list order
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
@@ -2214,7 +2210,7 @@ namespace PlantCondLoopOperation {
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 				}
 
-				//UNIFORM DISTRIBUTION SCHEME
+				//UNIFORMLOAD DISTRIBUTION SCHEME
 			} else if ( SELECT_CASE_var == UniformLoading ) { // LoadFlag=3 indicates "uniform" load distribution
 
 				// step 1: distribute load equally to all machines
@@ -2265,7 +2261,7 @@ namespace PlantCondLoopOperation {
 					}
 				}
 
-				// AllEquipmentUniformPLR Load Distribution Scheme
+				// UNIFORMPLR LOAD DISTRIBUTION SCHEME
 			} else if ( SELECT_CASE_var == UniformPLRLoading ) {
 				// Get total plant capacity and remove last component from list if load is less
 					// than plant capacity at min PLR
@@ -2273,11 +2269,6 @@ namespace PlantCondLoopOperation {
 				PlantPLR = 0.0;
 				MinCompPLR = 0.0;
 				LargestMinCompPLR = 0.0;
-
-				//For debugging
-				if ( WarmupFlag != 1 ){
-					myfile << HourOfDay << "\t" << TimeStep;
-				}
 				
 				// Determine PlantCapacity and LargestMinCompPLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
@@ -2320,11 +2311,22 @@ namespace PlantCondLoopOperation {
 
 				// Add component back into plant if RemLoopDemand is greater than PlantCapacity
 				if ( std::abs( RemLoopDemand ) > PlantCapacity ){
+
+					PlantCapacity = 0.0;
+					LargestMinCompPLR = 0.0;
+
 					for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-						
-						if ( RemLoopDemand < PlantCapacity ){
+
+						// If there is only one component on the equipment list, we can't do anything. Continue.
+						if ( NumCompsOnList == 1 ){
+							continue;
+						}
+
+						// Exit once PlantCapacity is greater than LoopDemand
+						if ( std::abs( RemLoopDemand ) < PlantCapacity ){
 							continue;
 						} else {
+
 						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
@@ -2340,25 +2342,19 @@ namespace PlantCondLoopOperation {
 						//Set LargestMinCompPLR to largest MinCompPLR
 						if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
 						}
-					}
-				
-				} else {
-					//More error handling here...
+					}				
 				}
-				
+
 				// Determine PLR for uniform PLR loading of all equipment
 				if ( PlantCapacity > 0.0 ) {
 					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
 					PlantPLR = max ( LargestMinCompPLR, PlantPLR );
 				} else {
-					//Maybe need some error handling here...
+					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
 				} 
-
-				//For debugging
-				if ( WarmupFlag != 1) {
-					myfile << "\t" << 0 << "\t" << PlantCapacity << "\t" << PlantPLR << std::endl;
-				}
-											
+					//ShowRecurringWarningErrorAtEnd(PlantLoop( LoopNum ).Name + " Plant supply capcity is zero, potentially \
+					//															becasue componets are unavailable or configuration \
+					//															is invalid. Plant loop temperatures may occur if problem continues", );
 				// Distribute load to each machine
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 					
@@ -2390,18 +2386,13 @@ namespace PlantCondLoopOperation {
 					ChangeInLoad = max( 0.0, ChangeInLoad );
 
 					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
-
-					// For Debugging
-					if ( WarmupFlag != 1 ) {
-						myfile << "\t" << "\t" << "\t" << "\t" << "\t"; 
-						myfile << CompIndex << "\t" << RemLoopDemand << "\t" << ChangeInLoad << "\t" << this_component.MyLoad << std::endl;
-					}
-					
+			
 					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
 					
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
 				}
 
+				// SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
 			} else if ( SELECT_CASE_var == SequentialUniformPLRLoading ) {
 				
 				PlantCapacity = 0.0;
@@ -2438,7 +2429,7 @@ namespace PlantCondLoopOperation {
 					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
 					PlantPLR = max ( LargestMinCompPLR, PlantPLR );
 				} else {
-					//Maybe need some error handling here...
+					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
 				} 
 
 				// Distribute load to each machine
