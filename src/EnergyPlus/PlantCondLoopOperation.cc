@@ -2076,11 +2076,11 @@ namespace PlantCondLoopOperation {
 		Real64 DivideLoad;
 		Real64 UniformLoad;
 		Real64 NewLoad;
-		Real64 MaxPlantCapacity;
+		Real64 PlantCapacity;
 		Real64 MinCompPLR;
 		Real64 LargestMinCompPLR;
-		Real64 PlantOppPLR;
-		Real64 UniformPLRCompLoad;
+		Real64 PlantPLR;
+		Real64 CompLoad;
 		int LoadFlag;
 
 		int BranchNum;
@@ -2265,19 +2265,21 @@ namespace PlantCondLoopOperation {
 					}
 				}
 
-				// UniformPLR Load Distribution Scheme
-			} else if ( SELECT_CASE_var == UniformPLR ) {
-				// Get total plant capacity and remove last component from list if
-				MaxPlantCapacity = 0.0;
-				PlantOppPLR = 0.0;
+				// AllEquipmentUniformPLR Load Distribution Scheme
+			} else if ( SELECT_CASE_var == UniformPLRLoading ) {
+				// Get total plant capacity and remove last component from list if load is less
+					// than plant capacity at min PLR
+				PlantCapacity = 0.0;
+				PlantPLR = 0.0;
 				MinCompPLR = 0.0;
 				LargestMinCompPLR = 0.0;
 
+				//For debugging
 				if ( WarmupFlag != 1 ){
 					myfile << HourOfDay << "\t" << TimeStep;
 				}
 				
-
+				// Determine PlantCapacity and LargestMinCompPLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 											
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
@@ -2288,21 +2290,23 @@ namespace PlantCondLoopOperation {
 
 					if ( ! this_component.Available ) continue;
 
-					MaxPlantCapacity += this_component.MaxLoad;
+					PlantCapacity += this_component.MaxLoad;
 
 					MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
 
+					//Set LargestMinCompPLR to largest MinCompPLR
 					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
 
-					if ( CompIndex == NumCompsOnList ) {
+					if ( CompIndex == NumCompsOnList ) { 
 						if ( NumCompsOnList == 1 ) {
+							// If there's only one comp left on the list, get out.
 							continue;
 						} else {
 							// Drop last item on equipment list and recalculate
-							if ( std::abs( RemLoopDemand ) < ( LargestMinCompPLR * MaxPlantCapacity ) ) {
+							if ( std::abs( RemLoopDemand ) < ( LargestMinCompPLR * PlantCapacity ) ) {
 								CompIndex = 0;
 								NumCompsOnList -= 1;
-								MaxPlantCapacity = 0.0;
+								PlantCapacity = 0.0;
 								LargestMinCompPLR = 0.0;
 							}
 						}
@@ -2313,23 +2317,52 @@ namespace PlantCondLoopOperation {
 				if ( NumCompsOnList != this_equiplist.NumComps ) {
 					NumCompsOnList = this_equiplist.NumComps;
 				}
+
+				// Add component back into plant if RemLoopDemand is greater than PlantCapacity
+				if ( std::abs( RemLoopDemand ) > PlantCapacity ){
+					for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+						
+						if ( RemLoopDemand < PlantCapacity ){
+							continue;
+						} else {
+						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+						// create a reference to the component itself
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+						if ( ! this_component.Available ) continue;
+
+						PlantCapacity += this_component.MaxLoad;
+
+						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+
+						//Set LargestMinCompPLR to largest MinCompPLR
+						if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
+						}
+					}
+				
+				} else {
+					//More error handling here...
+				}
 				
 				// Determine PLR for uniform PLR loading of all equipment
-				if ( MaxPlantCapacity > 0.0 ) {
-					PlantOppPLR = min( 1.0, std::abs( RemLoopDemand ) / MaxPlantCapacity );
-					PlantOppPLR = max ( LargestMinCompPLR, PlantOppPLR );
+				if ( PlantCapacity > 0.0 ) {
+					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
+					PlantPLR = max ( LargestMinCompPLR, PlantPLR );
 				} else {
-					//Need some error handling here
-				}
+					//Maybe need some error handling here...
+				} 
 
+				//For debugging
 				if ( WarmupFlag != 1) {
-					myfile << "\t" << 0 << "\t" << MaxPlantCapacity << "\t" << PlantOppPLR << std::endl;
+					myfile << "\t" << 0 << "\t" << PlantCapacity << "\t" << PlantPLR << std::endl;
 				}
 											
 				// Distribute load to each machine
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 					
-					UniformPLRCompLoad = 0.0;
+					CompLoad = 0.0;
 
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
@@ -2339,10 +2372,10 @@ namespace PlantCondLoopOperation {
 
 					if ( ! this_component.Available ) continue;
 
-					UniformPLRCompLoad = PlantOppPLR * this_component.MaxLoad;
+					CompLoad = PlantPLR * this_component.MaxLoad;
 					
 					if ( this_component.MaxLoad > 0.0 ) {
-						ChangeInLoad = min( std::abs( RemLoopDemand ), UniformPLRCompLoad );
+						ChangeInLoad = min( std::abs( RemLoopDemand ), CompLoad );
 					} else {
 						// this is for some components like cooling towers don't have well defined MaxLoad
 						ChangeInLoad = std::abs( RemLoopDemand );
@@ -2358,10 +2391,87 @@ namespace PlantCondLoopOperation {
 
 					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
 
+					// For Debugging
 					if ( WarmupFlag != 1 ) {
 						myfile << "\t" << "\t" << "\t" << "\t" << "\t"; 
 						myfile << CompIndex << "\t" << RemLoopDemand << "\t" << ChangeInLoad << "\t" << this_component.MyLoad << std::endl;
 					}
+					
+					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
+					
+					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
+				}
+
+			} else if ( SELECT_CASE_var == SequentialUniformPLRLoading ) {
+				
+				PlantCapacity = 0.0;
+				PlantPLR = 0.0;
+				MinCompPLR = 0.0;
+				LargestMinCompPLR = 0.0;
+		
+				// Determine PlantCapacity and LargestMinCompPLR
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+					
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+					if ( ! this_component.Available ) continue;
+
+					PlantCapacity += this_component.MaxLoad;
+
+					MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+
+					//Set LargestMinCompPLR to largest MinCompPLR
+					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
+
+					if ( std::abs( RemLoopDemand ) > ( LargestMinCompPLR * PlantCapacity ) && ( std::abs( RemLoopDemand ) <= PlantCapacity ) ) {
+						break;
+					}
+
+				}
+
+				// Determine PLR for uniform PLR loading of all equipment
+				if ( PlantCapacity > 0.0 ) {
+					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
+					PlantPLR = max ( LargestMinCompPLR, PlantPLR );
+				} else {
+					//Maybe need some error handling here...
+				} 
+
+				// Distribute load to each machine
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+					
+					CompLoad = 0.0;
+
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+
+					if ( ! this_component.Available ) continue;
+
+					CompLoad = PlantPLR * this_component.MaxLoad;
+					
+					if ( this_component.MaxLoad > 0.0 ) {
+						ChangeInLoad = min( std::abs( RemLoopDemand ), CompLoad );
+					} else {
+						// this is for some components like cooling towers don't have well defined MaxLoad
+						ChangeInLoad = std::abs( RemLoopDemand );
+					}
+				
+					AdjustChangeInLoadForLastStageUpperRangeLimit( LoopNum, CurSchemePtr, ListPtr, ChangeInLoad );
+
+					AdjustChangeInLoadByEMSControls( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					AdjustChangeInLoadByHowServed( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					ChangeInLoad = max( 0.0, ChangeInLoad );
+
+					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
 					
 					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
 					

@@ -24,7 +24,8 @@ namespace DataPlant {
 	extern int const OptimalLoading; // Optimal Load Distribution Scheme
 	extern int const SequentialLoading; // sequential Distribution Scheme
 	extern int const UniformLoading; // sequential Distribution Scheme
-	extern int const UniformPLR; // Uniform PLR Distribution Scheme
+	extern int const UniformPLRLoading; // All-Equipment Uniform PLR Distribution Scheme
+	extern int const SequentialUniformPLRLoading; // Sequential Uniform PLR Distribution Scheme
 
 	// Parameters for scheme types
 	// Used in TYPE(OperationData)%OpSchemeType
