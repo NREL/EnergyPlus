@@ -762,8 +762,6 @@ namespace HWBaseboardRadiator {
 		bool CapAutoSize; // Indicator to autosize for capacity
 		Real64 WaterVolFlowRateMaxDes; // Design maximum water volume flow for reproting
 		Real64 WaterVolFlowRateMaxUser; // User hard-sized maximum water volume flow for reproting
-		//REAL(r64)  :: RatedCapacityDes         ! Design rated capacity for reproting
-		//REAL(r64)  :: RatedCapacityUser        ! User hard-sized rated capacity for reproting
 
 		PltSizHeatNum = 0;
 		PltSizNum = 0;
@@ -790,7 +788,11 @@ namespace HWBaseboardRadiator {
 					}
 				} else {
 					CheckZoneSizing( cCMO_BBRadiator_Water, HWBaseboard( BaseboardNum ).EquipID );
-					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+					// To address a CR (GitHub Issue #4347, a constant of 3.1 is approximated to be multiplied to heater capacity in order to meet heating load
+					// A portion of heat is delivered to zone air. 
+					// Based on reference: Dynamic modelling and simulation of a room with hot water baseboard heater by Li Lianzhong and M. Zaheeruddinn
+					// Int. J. Energy Res. 2006; 30:427–445
+					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * 3.1 * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 					if ( DesCoilLoad >= SmallLoad ) {
 						Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, 60.0, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 						rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
@@ -822,7 +824,7 @@ namespace HWBaseboardRadiator {
 					DesCoilLoad = HWBaseboard( BaseboardNum ).RatedCapacity;
 					WaterMassFlowRateStd = HWBaseboard( BaseboardNum ).WaterMassFlowRateStd;
 				} else if ( HWBaseboard( BaseboardNum ).RatedCapacity == AutoSize || HWBaseboard( BaseboardNum ).RatedCapacity == 0.0 ) {
-					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * 3.1 * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 					rho = GetDensityGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineNameFull );
 					WaterMassFlowRateStd = HWBaseboard( BaseboardNum ).WaterVolFlowRateMax * rho;
 				}
@@ -1002,7 +1004,10 @@ namespace HWBaseboardRadiator {
 		if ( QZnReq > SmallLoad && ! CurDeadBandOrSetback( ZoneNum ) && ( GetCurrentScheduleValue( HWBaseboard( BaseboardNum ).SchedPtr ) > 0 ) && ( WaterMassFlowRate > 0.0 ) ) {
 			// Assume the air mass flow rate is twice the water mass flow rate
 			// Calculate air mass flow rate
-			AirMassFlowRate = HWBaseboard( BaseboardNum ).AirMassFlowRateStd * ( WaterMassFlowRate / HWBaseboard( BaseboardNum ).WaterMassFlowRateStd );
+			// A normalized air mass flow rate may cause unrealistic outlet conditions in extreme situations.
+			// To address the issue, the following regression equation determining air mass flow rate is used: m_dot = 0.0062 + 2.75e-05*q
+			// AirMassFlowRate = HWBaseboard( BaseboardNum ).AirMassFlowRateStd * ( WaterMassFlowRate / HWBaseboard( BaseboardNum ).WaterMassFlowRateStd );
+			AirMassFlowRate = Constant + Coeff * HWBaseboard( BaseboardNum ).RatedCapacity;
 			CapacitanceAir = PsyCpAirFnWTdb( HWBaseboard( BaseboardNum ).AirInletHumRat, AirInletTemp ) * AirMassFlowRate;
 			Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 
