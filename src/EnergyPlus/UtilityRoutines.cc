@@ -108,7 +108,7 @@ AbortEnergyPlus(
 	bool TerminalError;
 	int write_stat;
 
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->updateSQLiteSimulationRecord( true, false );
 	}
 
@@ -401,7 +401,7 @@ EndEnergyPlus()
 	Real64 Seconds; // Elapsed Time Second Reporting
 	int write_stat;
 
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->updateSQLiteSimulationRecord( true, true );
 	}
 
@@ -831,7 +831,7 @@ ShowFatalError(
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
 	AbortEnergyPlus( NoIdf, NoIDD );
