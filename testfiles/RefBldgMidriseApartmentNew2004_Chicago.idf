@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 27
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -6671,7 +6671,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:01_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6685,7 +6685,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:02_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6699,7 +6699,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:03_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6713,7 +6713,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:04_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6727,7 +6727,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:05_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6741,7 +6741,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:06_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6755,7 +6755,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:07_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6769,7 +6769,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:08_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6783,7 +6783,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:09_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6797,7 +6797,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:10_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6811,7 +6811,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:11_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6825,7 +6825,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:12_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6839,7 +6839,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:13_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6853,7 +6853,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:14_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6867,7 +6867,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:15_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6881,7 +6881,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:16_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6895,7 +6895,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:17_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6909,7 +6909,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:18_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6923,7 +6923,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:19_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6937,7 +6937,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:20_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6951,7 +6951,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:21_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6965,7 +6965,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:22_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6979,7 +6979,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:23_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6993,7 +6993,7 @@
   Fan:OnOff,
     SPLITSYSTEMAC:24_Unitary_Package_fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -7655,7 +7655,7 @@
   Fan:ConstantVolume,
     G Corridor Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -7667,7 +7667,7 @@
   Fan:ConstantVolume,
     M Corridor Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -7679,7 +7679,7 @@
   Fan:ConstantVolume,
     T Corridor Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency

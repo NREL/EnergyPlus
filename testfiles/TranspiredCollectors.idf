@@ -30,7 +30,7 @@
 !        ZN15_Shop_1 is a floating zone
 !
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,4;
 
@@ -3404,7 +3404,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN1,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -3680,7 +3680,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN2,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -3956,7 +3956,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN3,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4232,7 +4232,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN4,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4508,7 +4508,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN5,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4701,7 +4701,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN11,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency
@@ -4904,7 +4904,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN12,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency
@@ -5094,7 +5094,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN13,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency
@@ -5296,7 +5296,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN14,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency

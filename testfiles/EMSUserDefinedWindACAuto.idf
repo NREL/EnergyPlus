@@ -92,7 +92,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -2411,7 +2411,7 @@
     RatedCap,                !- <none>
     RatedEIR,                !- <none>
     OA_MdotIn,               !- <none>
-    ZoneCoolTstat;           !- Extended Field
+    ZoneCoolTstat;           !- <none>
 
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting

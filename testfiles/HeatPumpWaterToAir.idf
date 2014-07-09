@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -191,7 +191,7 @@
     Yes;                     !- Use Weather File Snow Indicators
 
   SimulationControl,
-    No,                     !- Do Zone Sizing Calculation
+    No,                      !- Do Zone Sizing Calculation
     No,                      !- Do System Sizing Calculation
     No,                      !- Do Plant Sizing Calculation
     Yes,                     !- Run Simulation for Sizing Periods
@@ -2307,7 +2307,7 @@
   Fan:OnOff,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     2.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2609,7 +2609,7 @@
   Fan:OnOff,
     Supply Fan 2,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     2.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
