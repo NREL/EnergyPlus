@@ -1464,8 +1464,8 @@ void SQLite::createSQLiteTimeIndexRecord(
 			intEndMinute = static_cast<int>(endMinute() + 0.5);
 			intStartMinute = static_cast<int>(startMinute() + 0.5);
 			int t_hour = hour();
-			adjustReportingHourAndMinutes(t_hour, intEndMinute);
 			intervalInMinutes = intEndMinute - intStartMinute;
+			adjustReportingHourAndMinutes(t_hour, intEndMinute);
 
 			sqliteBindInteger(m_timeIndexInsertStmt, 1, m_sqlDBTimeIndex);
 			sqliteBindInteger(m_timeIndexInsertStmt, 2, month());
