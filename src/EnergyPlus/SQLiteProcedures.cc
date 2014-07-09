@@ -1266,7 +1266,7 @@ void SQLite::parseUnitsAndDescription(const std::string & combinedString, std::s
 
 	if( (leftPos < rightPos) && (leftPos != std::string::npos) && (rightPos != std::string::npos) ) {
 		units = combinedString.substr(leftPos + 1,rightPos - leftPos - 1);
-		description = combinedString.substr(leftPos - 1);
+		description = combinedString.substr(0,leftPos - 1);
 	} else {
 		units = "";
 		description = combinedString;
@@ -1893,8 +1893,8 @@ void SQLite::createSQLiteTabularDataRecords(
 				int reportNameIndex = createSQLiteStringTableRecord(reportName,ReportNameId);
 				int reportForStringIndex = createSQLiteStringTableRecord(reportForString,ReportForStringId);
 				int tableNameIndex = createSQLiteStringTableRecord(tableName,TableNameId);
-				int rowLabelIndex = createSQLiteStringTableRecord(rowLabel,RowNameId);
-				int columnLabelIndex = createSQLiteStringTableRecord(colLabel,ColumnNameId);
+				int rowLabelIndex = createSQLiteStringTableRecord(rowDescription,RowNameId);
+				int columnLabelIndex = createSQLiteStringTableRecord(colDescription,ColumnNameId);
 				int unitsIndex = createSQLiteStringTableRecord(units,UnitsId);
 
 				sqliteBindInteger(m_tabularDataInsertStmt,1,reportNameIndex);
