@@ -384,8 +384,8 @@ namespace CoolTower {
 			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Energy [J]", CoolTowerSys( CoolTowerNum ).LatHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Rate [W]", CoolTowerSys( CoolTowerNum ).LatHeatPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTAirVol, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Current Conditions Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Standard Conditions Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Current Density Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Standard Density Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Mass [kg]", CoolTowerSys( CoolTowerNum ).CoolTAirMass, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Mass Flow Rate [kg/s]", CoolTowerSys( CoolTowerNum ).AirMassFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Inlet Temperature [C]", CoolTowerSys( CoolTowerNum ).InletDBTemp, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );

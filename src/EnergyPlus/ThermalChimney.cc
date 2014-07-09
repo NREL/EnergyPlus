@@ -324,8 +324,8 @@ namespace ThermalChimney {
 
 		// Set up the output variables for thermal chimneys
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
-			SetupOutputVariable( "Zone Thermal Chimney Current Conditions Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
-			SetupOutputVariable( "Zone Thermal Chimney Standard Conditions Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlowStd, "System", "Average", ThermalChimneySys( Loop ).Name );
+			SetupOutputVariable( "Zone Thermal Chimney Current Density Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
+			SetupOutputVariable( "Zone Thermal Chimney Standard Density Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlowStd, "System", "Average", ThermalChimneySys( Loop ).Name );
 			SetupOutputVariable( "Zone Thermal Chimney Mass Flow Rate [kg/s]", ThermalChimneyReport( Loop ).OverallTCMassFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
 			SetupOutputVariable( "Zone Thermal Chimney Outlet Temperature [C]", ThermalChimneyReport( Loop ).OutletAirTempThermalChim, "System", "Average", ThermalChimneySys( Loop ).Name );
 
