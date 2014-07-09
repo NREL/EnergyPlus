@@ -6,6 +6,8 @@ set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 2 )
 set( CMAKE_VERSION_PATCH 0 ) 
 
+set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
+
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
