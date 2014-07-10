@@ -518,11 +518,17 @@ SET( SRC
 ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
 ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
 
-TARGET_LINK_LIBRARIES( EnergyPlus sqlite )
 #TARGET_LINK_LIBRARIES( EnergyPlus bcvtb )
 #TARGET_LINK_LIBRARIES( EnergyPlus epexpat )
 #TARGET_LINK_LIBRARIES( EnergyPlus epfmiimport)
 #TARGET_LINK_LIBRARIES( EnergyPlus DElight )
-TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx )
+TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite)
+
+if(CMAKE_HOST_UNIX)
+  if(NOT APPLE)
+    TARGET_LINK_LIBRARIES( EnergyPlus dl )
+  endif()
+endif()
+
 
 INSTALL( TARGETS EnergyPlus DESTINATION ./ )
