@@ -6,6 +6,26 @@ set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 2 )
 set( CMAKE_VERSION_PATCH 0 ) 
 
+set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
+find_package(Git)
+if(GIT_FOUND)
+  execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
+                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                  TIMEOUT 10
+                  RESULT_VARIABLE RESULT
+                  OUTPUT_VARIABLE GIT_VERSION
+                  ERROR_QUIET
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(${RESULT} EQUAL 0 AND NOT "${GIT_VERSION}" EQUAL "${CMAKE_VERSION_BUILD}")
+    set(CMAKE_VERSION_BUILD ${GIT_VERSION} CACHE STRING "Build number" FORCE) # git sha
+  endif()
+
+  get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" PATH)
+else()
+  set(GIT_DIR "")
+endif()
+
+
 set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
 option( BUILD_PACKAGE "Build package" OFF )
@@ -52,7 +72,7 @@ install( FILES idd/Energy+.idd DESTINATION ./ )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
-    "${CMAKE_BINARY_DIR};EnergyPLus;ALL;/"
+    "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
   )
 
   if( BUILD_FORTRAN )
