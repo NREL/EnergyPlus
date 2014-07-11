@@ -1007,7 +1007,7 @@ namespace HWBaseboardRadiator {
 			// A normalized air mass flow rate may cause unrealistic outlet conditions in extreme situations.
 			// To address the issue, the following regression equation determining air mass flow rate is used: m_dot = 0.0062 + 2.75e-05*q
 			// AirMassFlowRate = HWBaseboard( BaseboardNum ).AirMassFlowRateStd * ( WaterMassFlowRate / HWBaseboard( BaseboardNum ).WaterMassFlowRateStd );
-			AirMassFlowRate = Constant + Coeff * HWBaseboard( BaseboardNum ).RatedCapacity;
+			AirMassFlowRate = Constant + Coeff * QZnReq;
 			CapacitanceAir = PsyCpAirFnWTdb( HWBaseboard( BaseboardNum ).AirInletHumRat, AirInletTemp ) * AirMassFlowRate;
 			Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 
