@@ -27,7 +27,7 @@ namespace DataPlantPipingSystems {
 	extern int const PartitionType_SlabZSide2;
 	extern int const PartitionType_HorizInsUnderSlab;
 	extern int const PartitionType_HorizInsXSide1;
-	extern int const PartitionType_HorizInsZSide2;
+	extern int const PartitionType_HorizInsXSide2;
 	extern int const PartitionType_HorizInsZSide1;
 	extern int const PartitionType_HorizInsZSide2;
 	extern int const PartitionType_VertInsLowerEdge;

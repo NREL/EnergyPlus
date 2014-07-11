@@ -14,6 +14,7 @@
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalSurface.hh>
+#include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
@@ -68,6 +69,7 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_Circuit( "PipingSystem:Underground:PipeCircuit" );
 	std::string const ObjName_Segment( "PipingSystem:Underground:PipeSegment" );
 	std::string const ObjName_HorizTrench( "GroundHeatExchanger:HorizontalTrench" );
+	std::string const ObjName_ZoneCoupled("Site:GroundDomain");
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -207,6 +209,97 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
+	void
+		InitAndSimGroundDomain()
+	{
+
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Matt Mitchell	
+			//       DATE WRITTEN   Spring 2014
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// <description>
+
+			// METHODOLOGY EMPLOYED:
+			// <description>
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+			using DataHVACGlobals::TimeStepSys;
+			using DataHVACGlobals::SysTimeElapsed;
+			using DataGlobals::BeginSimFlag;
+			using DataGlobals::BeginEnvrnFlag;
+			using DataGlobals::DayOfSim;
+			using DataGlobals::HourOfDay;
+			using DataGlobals::TimeStep;
+			using DataGlobals::TimeStepZone;
+			using DataGlobals::SecInHour;
+			using DataGlobals::InitConvTemp;
+			
+			
+
+			// Locals
+			// SUBROUTINE ARGUMENT DEFINITIONS:
+
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			static std::string const RoutineName("InitAndSimGroundDomain");
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+			static bool GetInputFlag(true); // First time, input is "gotten"
+			int DomainNum;
+
+			//Autodesk:Uninit Initialize variables used uninitialized
+			DomainNum = 0; //Autodesk:Uninit Force default initialization
+
+			//Read input if necessary
+			if (GetInputFlag) {
+				GetPipingSystemsInput();
+				GetInputFlag = false;
+			}
+
+
+			for (DomainNum = 1; DomainNum <= isize(PipingSystemDomains); ++DomainNum) {
+				if (PipingSystemDomains(DomainNum).DomainNeedsToBeMeshed) {
+
+					DevelopMesh(DomainNum);
+				}
+
+				PipingSystemDomains(DomainNum).DomainNeedsToBeMeshed = false;
+
+				// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
+				// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
+				// which would be carried over from the previous environment
+				PipingSystemDomains(DomainNum).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
+				PipingSystemDomains(DomainNum).Cur.CurSimTimeSeconds = ((DayOfSim - 1) * 24 + (HourOfDay - 1) + (TimeStep - 1) * TimeStepZone + SysTimeElapsed) * SecInHour;
+
+				//There are also some inits that are "close to one time" inits...(one-time in standalone, each envrn in E+)
+				if ((BeginSimFlag && PipingSystemDomains(DomainNum).BeginSimInit) || (BeginEnvrnFlag && PipingSystemDomains(DomainNum).BeginSimEnvrn)) {
+
+					DoOneTimeInitializations(DomainNum,_);
+
+					PipingSystemDomains(DomainNum).BeginSimInit = false;
+					PipingSystemDomains(DomainNum).BeginSimEnvrn = false;
+				}
+				if (!BeginSimFlag) PipingSystemDomains(DomainNum).BeginSimInit = true;
+				if (!BeginEnvrnFlag) PipingSystemDomains(DomainNum).BeginSimEnvrn = true;
+
+				//Shift history arrays only if necessary
+				if (std::abs(PipingSystemDomains(DomainNum).Cur.CurSimTimeSeconds - PipingSystemDomains(DomainNum).Cur.PrevSimTimeSeconds) > 1.0e-6) {
+					PipingSystemDomains(DomainNum).Cur.PrevSimTimeSeconds = PipingSystemDomains(DomainNum).Cur.CurSimTimeSeconds;
+					ShiftTemperaturesForNewTimeStep(DomainNum);
+					PipingSystemDomains(DomainNum).DomainNeedsSimulation = true;
+				}
+				PerformIterationLoop(DomainNum,_);
+			}
+		}
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
 
 	void
 	GetPipingSystemsInput()
@@ -249,6 +342,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
 		int NumGeneralizedDomains;
+		int NumZoneCoupledDomains;
 		int PipeCtr;
 		int CircuitCtr;
 		int CircuitIndex;
@@ -269,7 +363,8 @@ namespace PlantPipingSystemsManager {
 		//Read number of objects and allocate main data structures - first domains
 		NumGeneralizedDomains = GetNumObjectsFound( ObjName_ug_GeneralDomain );
 		NumHorizontalTrenches = GetNumObjectsFound( ObjName_HorizTrench );
-		TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches;
+		NumZoneCoupledDomains = GetNumObjectsFound(ObjName_ZoneCoupled);
+		TotalNumDomains = NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains;
 		PipingSystemDomains.allocate( TotalNumDomains );
 
 		// then circuits
@@ -288,7 +383,10 @@ namespace PlantPipingSystemsManager {
 		ReadPipeCircuitInputs( NumPipeCircuits, ErrorsFound );
 		ReadPipeSegmentInputs( NumPipeSegmentsInInput, ErrorsFound );
 		ReadHorizontalTrenchInputs( NumGeneralizedDomains + 1, NumPipeCircuits + 1, NumPipeSegmentsInInput + 1, NumHorizontalTrenches, ErrorsFound );
-
+		
+		// This is heavily dependent on the order of the domains in the main array.
+		ReadZoneCoupledDomainInputs(NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains, ErrorsFound);
+		
 		//Report errors that are purely input problems
 		if ( ErrorsFound ) ShowFatalError( RoutineName + ": Preceding input errors cause program termination." );
 
@@ -703,7 +801,470 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
+	void
+		ReadZoneCoupledDomainInputs(
+		int const StartingDomainNumForZone,
+		int const NumZoneCoupledDomains,
+		bool & ErrorsFound
+		)
+	{
 
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Edwin Lee
+			//       DATE WRITTEN   Summer 2011
+			//       MODIFIED       Spring 2014 by Matt Mitchell and Sushobhit Acharya to accomodate ground coupled calculations
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// <description>
+
+			// METHODOLOGY EMPLOYED:
+			// <description>
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+			using InputProcessor::GetObjectItem;
+			using InputProcessor::FindItemInList;
+			using InputProcessor::SameString;
+			using InputProcessor::VerifyName;
+			using InputProcessor::MakeUPPERCase;
+			using namespace DataIPShortCuts;
+			using DataSurfaces::Surface; // not sure if we need all these...
+			using DataSurfaces::OSCM;
+			using DataSurfaces::TotOSCM;
+			using DataSurfaces::TotSurfaces;
+			using DataSurfaces::OtherSideCondModeledExt;
+			using General::TrimSigDigits;
+			using DataGlobals::SecsInDay;
+			using DataHeatBalance::Material;
+			using DataHeatBalance::TotMaterials;
+			using DataEnvironment::PubGroundTempSurfFlag;
+			using DataEnvironment::PubGroundTempSurface;
+
+
+			// Locals
+			// SUBROUTINE ARGUMENT DEFINITIONS:
+
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			static std::string const RoutineName("ReadZoneCoupledDomainInputs");
+			int const MonthsInYear(12);
+			Real64 const LargeNumber(10000.0);
+			Real64 const AvgDaysInMonth(365.0 / 12.0);
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+			int ZoneCoupledDomainCtr;
+			int DomainCtr;
+			int NumAlphas; // Number of Alphas for each GetObjectItem call
+			int NumNumbers; // Number of Numbers for each GetObjectItem call
+			int IOStatus; // Used in GetObjectItem
+			int CurIndex;
+			int NumSurfacesWithThisOSCM;
+			int MonthIndex;
+			int SurfCtr;
+			bool IsBlank;
+			bool IsNotOK;
+			Real64 ThisArea;
+
+			struct GroundDomainData
+			{
+				// Members
+				std::string ObjName;
+				Real64 Depth;
+				Real64 AspectRatio;
+				Real64 PerimeterOffset;
+				Real64 SoilConductivity;
+				Real64 SoilDensity;
+				Real64 SoilSpecificHeat;
+				Real64 MoistureContent;
+				Real64 SaturationMoistureContent;
+				Real64 KusudaAvgSurfTemp;
+				Real64 KusudaAvgAmplitude;
+				Real64 KusudaPhaseShift;
+				Real64 EvapotranspirationCoeff;
+				bool UseGroundTempDataForKusuda;
+				Real64 MinSurfTemp;
+				int MonthOfMinSurfTemp;
+				Real64 HorizInsWidth;
+				Real64 VertInsDepth;
+				int OSCMIndex;
+				std::string OSCMName;
+				std::string SlabMaterial;
+				std::string HorizInsMaterial;
+				std::string VertInsMaterial;
+
+				// Default Constructor
+				GroundDomainData() :
+					Depth(0.0),
+					AspectRatio(0.0),
+					PerimeterOffset(0.0),
+					SoilConductivity(0.0),
+					SoilDensity(0.0),
+					SoilSpecificHeat(0.0),
+					MoistureContent(0.0),
+					SaturationMoistureContent(0.0),
+					KusudaAvgSurfTemp(0.0),
+					KusudaAvgAmplitude(0.0),
+					KusudaPhaseShift(0.0),
+					EvapotranspirationCoeff(0.0),
+					UseGroundTempDataForKusuda(false),
+					MinSurfTemp(0.0),
+					MonthOfMinSurfTemp(0),
+					HorizInsWidth(0.0),
+					VertInsDepth(0.0),
+					OSCMIndex(0)
+				{}
+				// Member Constructor
+				GroundDomainData(
+					std::string const & ObjName,
+					Real64 const Depth,
+					Real64 const AspectRatio,
+					Real64 const PerimeterOffset,
+					Real64 const SoilConductivity,
+					Real64 const SoilDensity,
+					Real64 const SoilSpecificHeat,
+					Real64 const MoistureContent,
+					Real64 const SaturationMoistureContent,
+					Real64 const KusudaAvgSurfTemp,
+					Real64 const KusudaAvgAmplitude,
+					Real64 const KusudaPhaseShift,
+					Real64 const EvapotranspirationCoeff,
+					bool const UseGroundTempDataForKusuda,
+					Real64 const MinSurfTemp,
+					int const MonthOfMinSurfTemp,
+					Real64 const HorizInsWidth,
+					Real64 const VertInsDepth,
+					int const OSCMIndex,
+					std::string const & OSCMName,
+					std::string const & SlabMaterial,
+					std::string const & HorizInsMaterial,
+					std::string const & VertInsMaterial
+					) :
+				ObjName(ObjName),
+					Depth(Depth),
+					AspectRatio(AspectRatio),
+					PerimeterOffset(PerimeterOffset),
+					SoilConductivity(SoilConductivity),
+					SoilDensity(SoilDensity),
+					SoilSpecificHeat(SoilSpecificHeat),
+					MoistureContent(MoistureContent),
+					SaturationMoistureContent(SaturationMoistureContent),
+					KusudaAvgSurfTemp(KusudaAvgSurfTemp),
+					KusudaAvgAmplitude(KusudaAvgAmplitude),
+					KusudaPhaseShift(KusudaPhaseShift),
+					EvapotranspirationCoeff(EvapotranspirationCoeff),
+					UseGroundTempDataForKusuda(UseGroundTempDataForKusuda),
+					MinSurfTemp(MinSurfTemp),
+					MonthOfMinSurfTemp(MonthOfMinSurfTemp),
+					HorizInsWidth(HorizInsWidth),
+					VertInsDepth(VertInsDepth),
+					OSCMIndex(OSCMIndex),
+					OSCMName(OSCMName),
+					SlabMaterial(SlabMaterial),
+					HorizInsMaterial(HorizInsMaterial),
+					VertInsMaterial(VertInsMaterial)
+				{}
+
+			};
+
+			// Object Data
+			FArray1D< GroundDomainData > Domain(NumZoneCoupledDomains);
+
+			// initialize these counters properly so they can be incremented within the DO loop
+			DomainCtr = StartingDomainNumForZone - 1;
+
+			// For each domain, we need to process the inputs into a local array of derived type, then resolve each one, creating definitions for a zonecoupled domain.
+			// This way, the outer get input routines can handle it as though they were generalized routines
+
+			for (ZoneCoupledDomainCtr = 1; ZoneCoupledDomainCtr <= NumZoneCoupledDomains; ++ZoneCoupledDomainCtr) {
+
+				//Increment the domain counters here
+				++DomainCtr;
+
+				//Read all the inputs for this domain object
+				GetObjectItem(ObjName_ZoneCoupled, ZoneCoupledDomainCtr, cAlphaArgs,
+					NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames);
+
+				//Get the name, validate
+				Domain(ZoneCoupledDomainCtr).ObjName = cAlphaArgs(1);
+				IsNotOK = false;
+				IsBlank = false;
+				VerifyName(cAlphaArgs(1), Domain.ObjName(), ZoneCoupledDomainCtr - 1, IsNotOK, IsBlank, ObjName_ZoneCoupled + " Name");
+				if (IsNotOK) {
+					ErrorsFound = true;
+					cAlphaArgs(1) = "Duplicate name encountered";
+				}
+				else if (IsBlank) {
+					ErrorsFound = true;
+					cAlphaArgs(1) = "Blank name encountered";
+				}
+
+				//Read in the rest of the inputs into the local type for clarity during transition
+				Domain(ZoneCoupledDomainCtr).OSCMName = cAlphaArgs(2);
+				Domain(ZoneCoupledDomainCtr).Depth = rNumericArgs(1);
+				Domain(ZoneCoupledDomainCtr).AspectRatio = rNumericArgs(2);
+				Domain(ZoneCoupledDomainCtr).PerimeterOffset = rNumericArgs(3);
+				Domain(ZoneCoupledDomainCtr).SoilConductivity = rNumericArgs(4);
+				Domain(ZoneCoupledDomainCtr).SoilDensity = rNumericArgs(5);
+				Domain(ZoneCoupledDomainCtr).SoilSpecificHeat = rNumericArgs(6);
+				Domain(ZoneCoupledDomainCtr).MoistureContent = rNumericArgs(7);
+				Domain(ZoneCoupledDomainCtr).SaturationMoistureContent = rNumericArgs(8);
+				Domain(ZoneCoupledDomainCtr).KusudaAvgSurfTemp = rNumericArgs(9);
+				Domain(ZoneCoupledDomainCtr).KusudaAvgAmplitude = rNumericArgs(10);
+				Domain(ZoneCoupledDomainCtr).KusudaPhaseShift = rNumericArgs(11);
+				Domain(ZoneCoupledDomainCtr).EvapotranspirationCoeff = rNumericArgs(12);
+				Domain(ZoneCoupledDomainCtr).UseGroundTempDataForKusuda = lNumericFieldBlanks(10) || lNumericFieldBlanks(11) || lNumericFieldBlanks(12);
+				Domain(ZoneCoupledDomainCtr).HorizInsWidth = rNumericArgs(13);
+				Domain(ZoneCoupledDomainCtr).VertInsDepth = rNumericArgs(14);
+
+				//Set flag for slab in-grade or slab on-grade
+				if (SameString(cAlphaArgs(3), "INGRADE")) {
+					PipingSystemDomains(DomainCtr).SlabInGradeFlag = true;
+				}
+				else if (SameString(cAlphaArgs(3), "ONGRADE")) {
+					PipingSystemDomains(DomainCtr).SlabInGradeFlag = false;
+				}
+				else {
+					ShowContinueError("Slab location not determined.");
+					ShowContinueError("Preceding error causes program termination.");
+				}
+
+				//Get slab material properties
+				Domain(ZoneCoupledDomainCtr).SlabMaterial = cAlphaArgs(4);
+				PipingSystemDomains(DomainCtr).SlabMaterialNum = FindItemInList(cAlphaArgs(4), Material.Name(), TotMaterials);
+				if (PipingSystemDomains(DomainCtr).SlabMaterialNum == 0) {
+					ShowSevereError("Invalid " + cAlphaFieldNames(4) + "=" + cAlphaArgs(4));
+					ShowContinueError("Found in " + PipingSystemDomains(DomainCtr).Name);
+					ErrorsFound = true;
+				}
+				else {
+					//check this
+					PipingSystemDomains(DomainCtr).SlabThickness = Material(PipingSystemDomains(DomainCtr).SlabMaterialNum).Thickness;
+					PipingSystemDomains(DomainCtr).SlabProperties.Density = Material(PipingSystemDomains(DomainCtr).SlabMaterialNum).Density;
+					PipingSystemDomains(DomainCtr).SlabProperties.SpecificHeat = Material(PipingSystemDomains(DomainCtr).SlabMaterialNum).SpecHeat;
+					PipingSystemDomains(DomainCtr).SlabProperties.Conductivity = Material(PipingSystemDomains(DomainCtr).SlabMaterialNum).Conductivity;
+				}
+
+				// set flag for horizontal insulation
+				if (SameString(cAlphaArgs(5), "NO")) {
+					PipingSystemDomains(DomainCtr).HorizInsPresentFlag = false;
+				}
+				else if (SameString(cAlphaArgs(5), "YES")) {
+					PipingSystemDomains(DomainCtr).HorizInsPresentFlag = true;
+				}
+				else {
+					ShowContinueError("Must enter either yes or no for horizontal insulation.");
+					ShowFatalError("Preceding error causes program termination.");
+				}
+
+				// Get horizontal insulation material properties
+				if (PipingSystemDomains(DomainCtr).HorizInsPresentFlag){
+					Domain(ZoneCoupledDomainCtr).HorizInsMaterial = cAlphaArgs(6);
+					PipingSystemDomains(DomainCtr).HorizInsMaterialNum = FindItemInList(cAlphaArgs(6), Material.Name(), TotMaterials);
+					if (PipingSystemDomains(DomainCtr).HorizInsMaterialNum == 0) {
+						ShowSevereError("Invalid " + cAlphaFieldNames(6) + "=" + cAlphaArgs(6));
+						ShowContinueError("Found in " + Domain(ZoneCoupledDomainCtr).HorizInsMaterial);
+						ErrorsFound = true;
+					}
+					else {
+						PipingSystemDomains(DomainCtr).HorizInsThickness = Material(PipingSystemDomains(DomainCtr).HorizInsMaterialNum).Thickness;
+						PipingSystemDomains(DomainCtr).HorizInsProperties.Density = Material(PipingSystemDomains(DomainCtr).HorizInsMaterialNum).Density;
+						PipingSystemDomains(DomainCtr).HorizInsProperties.SpecificHeat = Material(PipingSystemDomains(DomainCtr).HorizInsMaterialNum).SpecHeat;
+						PipingSystemDomains(DomainCtr).HorizInsProperties.Conductivity = Material(PipingSystemDomains(DomainCtr).HorizInsMaterialNum).Conductivity;
+					}
+
+					//Set flag for horizontal insulation extents
+					if (SameString(cAlphaArgs(7), "PERIMETER")) {
+						PipingSystemDomains(DomainCtr).FullHorizInsPresent = false;
+					}
+					else if (SameString(cAlphaArgs(7), "FULL")) {
+						PipingSystemDomains(DomainCtr).FullHorizInsPresent = true;
+					}
+					else {
+						ShowContinueError("Must enter either PERIMETER or FULL for horizontal insulation extents.");
+						ShowFatalError("Preceding error causes program termination.");
+					}
+
+					// Horizontal insualtion perimeter width
+					PipingSystemDomains(DomainCtr).HorizInsWidth = Domain(ZoneCoupledDomainCtr).HorizInsWidth;
+				}
+
+				// set flag for vertical insulation
+				if (SameString(cAlphaArgs(8), "NO")) {
+					PipingSystemDomains(DomainCtr).VertInsPresentFlag = false;
+				}
+				else if (SameString(cAlphaArgs(8), "YES")) {
+					PipingSystemDomains(DomainCtr).VertInsPresentFlag = true;
+				}
+				else {
+					ShowContinueError("Must enter either yes or no for vertical insulation.");
+					ShowFatalError("Preceding error causes program termination.");
+				}
+
+				// Get vertical insulation material properties
+				if (PipingSystemDomains(DomainCtr).VertInsPresentFlag){
+					Domain(ZoneCoupledDomainCtr).VertInsMaterial = cAlphaArgs(9);
+					PipingSystemDomains(DomainCtr).VertInsMaterialNum = FindItemInList(cAlphaArgs(9), Material.Name(), TotMaterials);
+					if (PipingSystemDomains(DomainCtr).VertInsMaterialNum == 0) {
+						ShowSevereError("Invalid " + cAlphaFieldNames(9) + "=" + cAlphaArgs(9));
+						ShowContinueError("Found in " + Domain(ZoneCoupledDomainCtr).VertInsMaterial);
+						ErrorsFound = true;
+					}
+					else {
+						PipingSystemDomains(DomainCtr).VertInsThickness = Material(PipingSystemDomains(DomainCtr).VertInsMaterialNum).Thickness;
+						PipingSystemDomains(DomainCtr).VertInsProperties.Density = Material(PipingSystemDomains(DomainCtr).VertInsMaterialNum).Density;
+						PipingSystemDomains(DomainCtr).VertInsProperties.SpecificHeat = Material(PipingSystemDomains(DomainCtr).VertInsMaterialNum).SpecHeat;
+						PipingSystemDomains(DomainCtr).VertInsProperties.Conductivity = Material(PipingSystemDomains(DomainCtr).VertInsMaterialNum).Conductivity;
+					}
+
+					//vertical insulation depth
+					PipingSystemDomains(DomainCtr).VertInsDepth = Domain(ZoneCoupledDomainCtr).VertInsDepth;
+				}
+
+				//Domain perimeter offset
+				PipingSystemDomains(DomainCtr).PerimeterOffset = Domain(ZoneCoupledDomainCtr).PerimeterOffset;
+
+				// Set flag for slab simulation
+				if (SameString(cAlphaArgs(10), "YES")) {
+					PipingSystemDomains(DomainCtr).SimSlabFlag = true;
+				}
+				else if (SameString(cAlphaArgs(10), "NO")) {
+					PipingSystemDomains(DomainCtr).SimSlabFlag = false;
+				}
+				else {
+					ShowContinueError("Could not determine if slab is included in ground simulation. Check input.'");
+					ShowFatalError("Preceding error causes program termination.");
+				}
+
+
+				//******* We'll first set up the domain ********
+				PipingSystemDomains(DomainCtr).IsActuallyPartOfAHorizontalTrench = false;
+				PipingSystemDomains(DomainCtr).HasAPipeCircuit = false;
+				PipingSystemDomains(DomainCtr).IsZoneCoupled = true;
+
+				// Domain name
+				PipingSystemDomains(DomainCtr).Name = Domain(ZoneCoupledDomainCtr).ObjName;
+
+				//get boundary condition model names and indices -- error check
+				PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex = FindItemInList(Domain(ZoneCoupledDomainCtr).OSCMName, OSCM.Name(), TotOSCM);
+				if (PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex <= 0) {
+					IssueSevereInputFieldError(RoutineName, ObjName_ZoneCoupled, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2), "Could not match with an Other Side Conditions Model input object.", ErrorsFound);
+				}
+				else {
+					NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM(PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex);
+					if (NumSurfacesWithThisOSCM <= 0) {
+						IssueSevereInputFieldError(RoutineName, ObjName_ZoneCoupled, cAlphaArgs(1), cAlphaFieldNames(2), cAlphaArgs(2), "Entry matched an Other Side Conditions Model, but no surfaces were found" " to be using this Other Side Conditions Model.", ErrorsFound);
+					}
+					else {
+						//PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces.allocate(NumSurfacesWithThisOSCM);
+						 //Create GetSurfaceDataForOSCM function
+						//PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces = GetSurfaceIndecesForOSCM(PipingSystemDomains(DomainCtr).ZoneCoupledOSCMIndex, NumSurfacesWithThisOSCM);
+					}
+				}
+
+				// Total surface area
+				ThisArea = 0.0;
+
+				//for (SurfCtr = 1; SurfCtr <= isize(PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces); ++SurfCtr) {
+				//	ThisArea += PipingSystemDomains(DomainCtr).ZoneCoupledSurfaces(SurfCtr).SurfaceArea;
+				//}
+
+				// Surface dimensions
+				PipingSystemDomains(DomainCtr).SlabWidth = sqrt(ThisArea / Domain(ZoneCoupledDomainCtr).AspectRatio);
+				PipingSystemDomains(DomainCtr).SlabLength = PipingSystemDomains(DomainCtr).SlabWidth * Domain(ZoneCoupledDomainCtr).AspectRatio;
+
+				// Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical partition thickness.
+				if (2 * PipingSystemDomains(DomainCtr).HorizInsWidth + PipingSystemDomains(DomainCtr).VertInsThickness > PipingSystemDomains(DomainCtr).SlabWidth || 2 * PipingSystemDomains(DomainCtr).HorizInsWidth + PipingSystemDomains(DomainCtr).VertInsThickness > PipingSystemDomains(DomainCtr).SlabLength){
+					ShowSevereError("PipingSystems:" + RoutineName + ": Perimeter Insulation Width is too high");
+					ShowFatalError("Preceding error(s) cause program termination.");
+				}
+
+				// Set ground domain dimensions
+				PipingSystemDomains(DomainCtr).Extents.Xmax = (2 * Domain(ZoneCoupledDomainCtr).PerimeterOffset) + PipingSystemDomains(DomainCtr).SlabWidth;
+				PipingSystemDomains(DomainCtr).Extents.Ymax = Domain(ZoneCoupledDomainCtr).Depth;
+				PipingSystemDomains(DomainCtr).Extents.Zmax = (2 * Domain(ZoneCoupledDomainCtr).PerimeterOffset) + PipingSystemDomains(DomainCtr).SlabLength;
+
+				// Set up the mesh with some default parameters
+
+				PipingSystemDomains(DomainCtr).Mesh.X.RegionMeshCount = 2;
+				PipingSystemDomains(DomainCtr).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
+				PipingSystemDomains(DomainCtr).Mesh.Y.RegionMeshCount = 2;
+				PipingSystemDomains(DomainCtr).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
+				PipingSystemDomains(DomainCtr).Mesh.Z.RegionMeshCount = 2;
+				PipingSystemDomains(DomainCtr).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
+
+				//Soil properties
+				PipingSystemDomains(DomainCtr).GroundProperties.Conductivity = Domain(ZoneCoupledDomainCtr).SoilConductivity;
+				PipingSystemDomains(DomainCtr).GroundProperties.Density = Domain(ZoneCoupledDomainCtr).SoilDensity;
+				PipingSystemDomains(DomainCtr).GroundProperties.SpecificHeat = Domain(ZoneCoupledDomainCtr).SoilSpecificHeat;
+
+				//Moisture properties
+				PipingSystemDomains(DomainCtr).Moisture.Theta_liq = Domain(ZoneCoupledDomainCtr).MoistureContent / 100.0;
+				PipingSystemDomains(DomainCtr).Moisture.Theta_sat = Domain(ZoneCoupledDomainCtr).SaturationMoistureContent / 100.0;
+
+				//Farfield model parameters
+				if (!Domain(ZoneCoupledDomainCtr).UseGroundTempDataForKusuda) {
+					PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperature = Domain(ZoneCoupledDomainCtr).KusudaAvgSurfTemp;
+					PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperatureAmplitude = Domain(ZoneCoupledDomainCtr).KusudaAvgAmplitude;
+					PipingSystemDomains(DomainCtr).Farfield.PhaseShiftOfMinGroundTempDays = Domain(ZoneCoupledDomainCtr).KusudaPhaseShift;
+				}
+				else {
+					//If ground temp data was not brought in manually in GETINPUT,
+					// then we must get it from the surface ground temperatures
+
+					if (!PubGroundTempSurfFlag) {
+						ShowSevereError("Input problem for " + ObjName_ZoneCoupled + '=' + Domain(ZoneCoupledDomainCtr).ObjName);
+						ShowContinueError("No Site:GroundTemperature:Shallow object found in the input file");
+						ShowContinueError("This is required for the ground domain if farfield parameters are");
+						ShowContinueError(" not directly entered into the input object.");
+						ErrorsFound = true;
+					}
+
+					//Calculate Average Ground Temperature for all 12 months of the year:
+					PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperature = 0.0;
+					for (MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex) {
+						PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperature += PubGroundTempSurface(MonthIndex);
+					}
+					PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperature /= MonthsInYear;
+
+					//Calculate Average Amplitude from Average:
+					PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperatureAmplitude = 0.0;
+					for (MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex) {
+						PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperatureAmplitude += std::abs(PubGroundTempSurface(MonthIndex) - PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperature);
+					}
+					PipingSystemDomains(DomainCtr).Farfield.AverageGroundTemperatureAmplitude /= MonthsInYear;
+
+					//Also need to get the month of minimum surface temperature to set phase shift for Kusuda and Achenbach:
+					Domain(ZoneCoupledDomainCtr).MonthOfMinSurfTemp = 0;
+					Domain(ZoneCoupledDomainCtr).MinSurfTemp = LargeNumber; //Set high month 1 temp will be lower and actually get updated
+					for (MonthIndex = 1; MonthIndex <= MonthsInYear; ++MonthIndex) {
+						if (PubGroundTempSurface(MonthIndex) <= Domain(ZoneCoupledDomainCtr).MinSurfTemp) {
+							Domain(ZoneCoupledDomainCtr).MonthOfMinSurfTemp = MonthIndex;
+							Domain(ZoneCoupledDomainCtr).MinSurfTemp = PubGroundTempSurface(MonthIndex);
+						}
+					}
+					PipingSystemDomains(DomainCtr).Farfield.PhaseShiftOfMinGroundTempDays = Domain(ZoneCoupledDomainCtr).MonthOfMinSurfTemp * AvgDaysInMonth;
+				}
+
+				//Unit conversion
+				PipingSystemDomains(DomainCtr).Farfield.PhaseShiftOfMinGroundTemp = PipingSystemDomains(DomainCtr).Farfield.PhaseShiftOfMinGroundTempDays * SecsInDay;
+
+				//Other parameters
+				PipingSystemDomains(DomainCtr).SimControls.Convergence_CurrentToPrevIteration = 0.001;
+				PipingSystemDomains(DomainCtr).SimControls.MaxIterationsPerTS = 250;
+
+				//additional evapotranspiration parameter, min/max validated by IP
+				PipingSystemDomains(DomainCtr).Moisture.GroundCoverCoefficient = Domain(ZoneCoupledDomainCtr).EvapotranspirationCoeff;
+
+
+			}
+
+		}
+
+	//*********************************************************************************************!
+
+	//************************
 	void
 	ReadPipeCircuitInputs(
 		int const NumPipeCircuits,
@@ -3358,6 +3919,17 @@ namespace PlantPipingSystemsManager {
 		int PreviousUbound;
 		Real64 PipeCellWidth;
 		Real64 SurfCellWidth; // Basement surface...
+		Real64 SideX1Location;
+		Real64 SideX2Location;
+		Real64 SideX1InsulationLocation;
+		Real64 SideX2InsulationLocation;
+		Real64 SideZ1Location;
+		Real64 SideZ2Location;
+		Real64 SideZ1InsulationLocation;
+		Real64 SideZ2InsulationLocation;
+		Real64 SlabDistFromBottom;
+		Real64 YInsulationLocation;
+		Real64 CellWidth;
 
 		// Object Data
 		FArray1D< MeshPartition > PreviousEntries;
@@ -3449,9 +4021,252 @@ namespace PlantPipingSystemsManager {
 			}
 		}
 
+		if (PipingSystemDomains(DomainNum).IsZoneCoupled) {
+			// NOTE: the slab depth is still a depth from the ground surface, need to correct for this here.
+			// Create partition at slab edges in the X direction
+			if (PipingSystemDomains(DomainNum).SlabWidth > 0) {
+				CellWidth = PipingSystemDomains(DomainNum).VertInsThickness;
+				if (!allocated(PipingSystemDomains(DomainNum).Partitions.X)) {
+					//Partition at insulation edges in the X direction, if horizontal insulation present
+					if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+						if (!PipingSystemDomains(DomainNum).FullHorizInsPresent){
+							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 3 });
+							//Side 1 in X direction
+							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_SlabXSide1, CellWidth);
+							//Side 2 in X direction
+							SideX2Location = SideX1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(1) = MeshPartition(SideX2Location, PartitionType_SlabXSide2, CellWidth);
+							//Insulation Edge 1 in X direction
+							SideX1InsulationLocation = SideX1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(2) = MeshPartition(SideX1InsulationLocation, PartitionType_HorizInsXSide1, CellWidth);
+							//Insulation Edge 2 in X direction
+							SideX2InsulationLocation = SideX2Location - PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(3) = MeshPartition(SideX2InsulationLocation, PartitionType_HorizInsXSide2, CellWidth);
+						}
+						else {
+							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 1 });
+							//Side 1 in X direction
+							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_SlabXSide1, CellWidth);
+							//Side 2 in X direction
+							SideX2Location = SideX1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(1) = MeshPartition(SideX2Location, PartitionType_SlabXSide2, CellWidth);
+						}
+					}
+					else {
+						PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 1 });
+						//Side 1 in X direction
+						SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+						PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_SlabXSide1, CellWidth);
+						//Side 2 in X direction
+						SideX2Location = SideX1Location + PipingSystemDomains(DomainNum).SlabWidth;
+						PipingSystemDomains(DomainNum).Partitions.X(1) = MeshPartition(SideX2Location, PartitionType_SlabXSide2, CellWidth);
+					}
+				}
+				else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.X, PipingSystemDomains(DomainNum).SlabWidth)) {
+					PreviousUbound = ubound(PipingSystemDomains(DomainNum).Partitions.X, 1);
+					if (allocated(PreviousEntries)) PreviousEntries.deallocate();
+					PreviousEntries.allocate({ 0, PreviousUbound });
+					PreviousEntries = PipingSystemDomains(DomainNum).Partitions.X;
+					PipingSystemDomains(DomainNum).Partitions.X.deallocate();
+
+					//Partition at insulation edges in the X direction, if horizontal insulation present
+					if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+						if (!PipingSystemDomains(DomainNum).FullHorizInsPresent){
+							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, PreviousUbound + 4 });
+							PipingSystemDomains(DomainNum).Partitions.X({ 0, PreviousUbound }) = PreviousEntries;
+							//Side 1 in X direction
+							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 1) = MeshPartition(SideX1Location, PartitionType_SlabXSide1, CellWidth);
+							//Side 2 in X direction
+							SideX2Location = SideX1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 2) = MeshPartition(SideX2Location, PartitionType_SlabXSide2, CellWidth);
+							//Insulation Edge 1 in X direction
+							SideX1InsulationLocation = SideX1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 3) = MeshPartition(SideX1InsulationLocation, PartitionType_HorizInsXSide1, CellWidth);
+							//Insulation Edge 2 in X direction
+							SideX2InsulationLocation = SideX2Location - PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 4) = MeshPartition(SideX2InsulationLocation, PartitionType_HorizInsXSide2, CellWidth);
+						}
+						else {
+							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, PreviousUbound + 2 });
+							PipingSystemDomains(DomainNum).Partitions.X({ 0, PreviousUbound }) = PreviousEntries;
+							//Side 1 in X direction
+							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 1) = MeshPartition(SideX1Location, PartitionType_SlabXSide1, CellWidth);
+							//Side 2 in X direction
+							SideX2Location = SideX1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 2) = MeshPartition(SideX2Location, PartitionType_SlabXSide2, CellWidth);
+						}
+					}
+					else {
+						PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, PreviousUbound + 2 });
+						PipingSystemDomains(DomainNum).Partitions.X({ 0, PreviousUbound }) = PreviousEntries;
+						//Side 1 in X direction
+						SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+						PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 1) = MeshPartition(SideX1Location, PartitionType_SlabXSide1, CellWidth);
+						//Side 2 in X direction
+						SideX2Location = SideX1Location + PipingSystemDomains(DomainNum).SlabWidth;
+						PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 2) = MeshPartition(SideX2Location, PartitionType_SlabXSide2, CellWidth);
+					}
+				}
+			}
+
+			if (PipingSystemDomains(DomainNum).SlabThickness > 0) {
+				CellWidth = PipingSystemDomains(DomainNum).HorizInsThickness;
+
+				if (PipingSystemDomains(DomainNum).SlabInGradeFlag){
+					SlabDistFromBottom = PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemDomains(DomainNum).SlabThickness;
+				}
+				else{
+					//Create underslab partition such that interface cell thickness is constant and consistent with other slab configurations regardless of the mesh count.
+					SlabDistFromBottom = PipingSystemDomains(DomainNum).Extents.Ymax - (PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount * CellWidth + CellWidth / 2);
+				}
+
+				//Partition at bottom edge of vertical insulation, if vertical insulation present
+				if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+					YInsulationLocation = PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemDomains(DomainNum).VertInsDepth;
+				}
+
+				if (!allocated(PipingSystemDomains(DomainNum).Partitions.Y)) {
+					if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+						PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, 1 });
+						// Underslab partition
+						PipingSystemDomains(DomainNum).Partitions.Y(0) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnderSlab, SurfCellWidth);
+						//Vertical-Insulation edge partition
+						PipingSystemDomains(DomainNum).Partitions.Y(1) = MeshPartition(YInsulationLocation, PartitionType_VertInsLowerEdge, SurfCellWidth);
+					}
+					else{
+						PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, 0 });
+						// Underslab partition
+						PipingSystemDomains(DomainNum).Partitions.Y(0) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnderSlab, SurfCellWidth);
+					}
+				}
+				else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.Y, SlabDistFromBottom)) {
+					PreviousUbound = ubound(PipingSystemDomains(DomainNum).Partitions.Y, 1);
+					if (allocated(PreviousEntries)) PreviousEntries.deallocate();
+					PreviousEntries.allocate({ 0, PreviousUbound });
+					PreviousEntries = PipingSystemDomains(DomainNum).Partitions.Y;
+					PipingSystemDomains(DomainNum).Partitions.Y.deallocate();
+
+					// Partition at bottom edge of vertical insulation, if vertical insulation present
+					if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+						PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, PreviousUbound + 2 });
+						PipingSystemDomains(DomainNum).Partitions.Y({ 0, PreviousUbound }) = PreviousEntries;
+
+						// Underslab partition
+						PipingSystemDomains(DomainNum).Partitions.Y(PreviousUbound + 1) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnderSlab, SurfCellWidth);
+						//Vertical-Insulation edge partition
+						PipingSystemDomains(DomainNum).Partitions.Y(PreviousUbound + 2) = MeshPartition(YInsulationLocation, PartitionType_VertInsLowerEdge, SurfCellWidth);
+					}
+					else {
+						PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, PreviousUbound + 1 });
+						PipingSystemDomains(DomainNum).Partitions.Y({ 0, PreviousUbound }) = PreviousEntries;
+						// Underslab partition
+						PipingSystemDomains(DomainNum).Partitions.Y(PreviousUbound + 1) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnderSlab, SurfCellWidth);
+					}
+
+				}
+			}
+
+
+			if (PipingSystemDomains(DomainNum).SlabWidth > 0) {
+				CellWidth = PipingSystemDomains(DomainNum).VertInsThickness;
+				if (!allocated(PipingSystemDomains(DomainNum).Partitions.Z)) {
+					//Partition at insulation edges in the Z direction, if horizontal insulation present
+					if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+						if (!PipingSystemDomains(DomainNum).FullHorizInsPresent){
+							PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, 3 });
+							//Side 1 in Z direction
+							SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.Z(0) = MeshPartition(SideZ1Location, PartitionType_SlabZSide1, CellWidth);
+							//Side 2 in Z direction
+							SideZ2Location = SideZ1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(1) = MeshPartition(SideZ2Location, PartitionType_SlabZSide2, CellWidth);
+							//Insulation Edge 1 in Z direction
+							SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(2) = MeshPartition(SideZ1InsulationLocation, PartitionType_HorizInsZSide1, CellWidth);
+							//Insulation Edge 2 in Z direction
+							SideZ2InsulationLocation = SideZ2Location - PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(3) = MeshPartition(SideZ2InsulationLocation, PartitionType_HorizInsZSide2, CellWidth);
+						}
+						else {
+							PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, 1 });
+							//Side 1 in Z direction
+							SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.Z(0) = MeshPartition(SideZ1Location, PartitionType_SlabZSide1, CellWidth);
+							//Side 2 in Z direction
+							SideZ2Location = SideZ1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(1) = MeshPartition(SideZ2Location, PartitionType_SlabZSide2, CellWidth);
+						}
+					}
+					else {
+						PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, 1 });
+						//Side 1 in Z direction
+						SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+						PipingSystemDomains(DomainNum).Partitions.Z(0) = MeshPartition(SideZ1Location, PartitionType_SlabZSide1, CellWidth);
+						//Side 2 in Z direction
+						SideZ2Location = SideZ1Location + PipingSystemDomains(DomainNum).SlabWidth;
+						PipingSystemDomains(DomainNum).Partitions.Z(1) = MeshPartition(SideZ2Location, PartitionType_SlabZSide2, CellWidth);
+					}
+				}
+				else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.Z, PipingSystemDomains(DomainNum).SlabWidth)) {
+					PreviousUbound = ubound(PipingSystemDomains(DomainNum).Partitions.Z, 1);
+					if (allocated(PreviousEntries)) PreviousEntries.deallocate();
+					PreviousEntries.allocate({ 0, PreviousUbound });
+					PreviousEntries = PipingSystemDomains(DomainNum).Partitions.Z;
+					PipingSystemDomains(DomainNum).Partitions.Z.deallocate();
+
+					//Partition at insulation edges in the Z direction, if horizontal insulation present
+					if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+						if (!PipingSystemDomains(DomainNum).FullHorizInsPresent){
+							PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, PreviousUbound + 4 });
+							PipingSystemDomains(DomainNum).Partitions.Z({ 0, PreviousUbound }) = PreviousEntries;
+							//Side 1 in Z direction
+							SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 1) = MeshPartition(SideZ1Location, PartitionType_SlabZSide1, CellWidth);
+							//Side 2 in Z direction
+							SideZ2Location = SideZ1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 2) = MeshPartition(SideZ2Location, PartitionType_SlabZSide2, CellWidth);
+							//Insulation Edge 1 in Z direction
+							SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 3) = MeshPartition(SideZ1InsulationLocation, PartitionType_HorizInsZSide1, CellWidth);
+							//Insulation Edge 2 in Z direction
+							SideZ2InsulationLocation = SideZ2Location - PipingSystemDomains(DomainNum).HorizInsWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 4) = MeshPartition(SideZ2InsulationLocation, PartitionType_HorizInsZSide2, CellWidth);
+						}
+						else {
+							PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, PreviousUbound + 2 });
+							PipingSystemDomains(DomainNum).Partitions.Z({ 0, PreviousUbound }) = PreviousEntries;
+							//Side 1 in Z direction
+							SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 1) = MeshPartition(SideZ1Location, PartitionType_SlabZSide1, CellWidth);
+							//Side 2 in Z direction
+							SideZ2Location = SideZ1Location + PipingSystemDomains(DomainNum).SlabWidth;
+							PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 2) = MeshPartition(SideZ2Location, PartitionType_SlabZSide2, CellWidth);
+						}
+					}
+					else {
+						PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, PreviousUbound + 2 });
+						PipingSystemDomains(DomainNum).Partitions.Z({ 0, PreviousUbound }) = PreviousEntries;
+						//Side 1 in Z direction
+						SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+						PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 1) = MeshPartition(SideZ1Location, PartitionType_SlabZSide1, CellWidth);
+						//Side 2 in Z direction
+						SideZ2Location = SideZ1Location + PipingSystemDomains(DomainNum).SlabWidth;
+						PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 2) = MeshPartition(SideZ2Location, PartitionType_SlabZSide2, CellWidth);
+					}
+				}
+			}
+		}
+
+
 		MeshPartition_SelectionSort( PipingSystemDomains( DomainNum ).Partitions.X );
 		MeshPartition_SelectionSort( PipingSystemDomains( DomainNum ).Partitions.Y );
+		MeshPartition_SelectionSort( PipingSystemDomains( DomainNum ).Partitions.Z);
 
+	
 	}
 
 	//*********************************************************************************************!
@@ -3552,8 +4367,39 @@ namespace PlantPipingSystemsManager {
 				ThesePartitionRegions( Index ).RegionType = RegionType_BasementWall;
 			} else if ( SELECT_CASE_var == PartitionType_BasementFloor ) {
 				ThesePartitionRegions( Index ).RegionType = RegionType_BasementFloor;
-			} else if ( SELECT_CASE_var == PartitionType_Pipe ) {
-				ThesePartitionRegions( Index ).RegionType = RegionType_Pipe;
+			}
+			else if (SELECT_CASE_var == PartitionType_Pipe) {
+				ThesePartitionRegions(Index).RegionType = RegionType_Pipe;
+			}
+			else if (SELECT_CASE_var == PartitionType_SlabXSide1) {
+				ThesePartitionRegions(Index).RegionType = RegionType_SlabXSide1;
+			}
+			else if (SELECT_CASE_var == PartitionType_SlabXSide2) {
+				ThesePartitionRegions(Index).RegionType = RegionType_SlabXSide2;
+			}
+			else if (SELECT_CASE_var == PartitionType_HorizInsXSide1) {
+				ThesePartitionRegions(Index).RegionType = RegionType_HorizInsXSide1;
+			}
+			else if (SELECT_CASE_var == PartitionType_HorizInsXSide2) {
+				ThesePartitionRegions(Index).RegionType = RegionType_HorizInsXSide2;
+			}
+			else if (SELECT_CASE_var == PartitionType_SlabZSide1) {
+				ThesePartitionRegions(Index).RegionType = RegionType_SlabZSide1;
+			}
+			else if (SELECT_CASE_var == PartitionType_SlabZSide2) {
+				ThesePartitionRegions(Index).RegionType = RegionType_SlabZSide2;
+			}
+			else if (SELECT_CASE_var == PartitionType_HorizInsZSide1) {
+				ThesePartitionRegions(Index).RegionType = RegionType_HorizInsZSide1;
+			}
+			else if (SELECT_CASE_var == PartitionType_HorizInsZSide2) {
+				ThesePartitionRegions(Index).RegionType = RegionType_HorizInsZSide2;
+			}
+			else if (SELECT_CASE_var == PartitionType_HorizInsUnderSlab) {
+				ThesePartitionRegions(Index).RegionType = RegionType_HorizInsUnderSlab;
+			}
+			else if (SELECT_CASE_var == PartitionType_VertInsLowerEdge) {
+				ThesePartitionRegions(Index).RegionType = RegionType_VertInsLowerEdge;
 			} else {
 				//diagnostic error
 			}}
@@ -3641,7 +4487,17 @@ namespace PlantPipingSystemsManager {
 		int const RetValUBound,
 		bool const PartitionsExist,
 		Optional_int BasementWallXIndex,
-		Optional_int BasementFloorYIndex
+		Optional_int BasementFloorYIndex,
+		Optional_int SlabXIndex1,
+		Optional_int SlabXIndex2,
+		Optional_int SlabYIndex,
+		Optional_int SlabZIndex1,
+		Optional_int SlabZIndex2,
+		Optional_int InsulationXIndex1,
+		Optional_int InsulationXIndex2,
+		Optional_int InsulationZIndex1,
+		Optional_int InsulationZIndex2,
+		Optional_int InsulationYIndex
 	)
 	{
 
@@ -3708,7 +4564,9 @@ namespace PlantPipingSystemsManager {
 					PreviousRegion = TempRegions( SubIndex );
 
 					{ auto const SELECT_CASE_var( PreviousRegion.RegionType );
-					if ( ( SELECT_CASE_var == RegionType_Pipe ) || ( SELECT_CASE_var == RegionType_BasementFloor ) || ( SELECT_CASE_var == RegionType_BasementWall ) ) {
+					if ((SELECT_CASE_var == RegionType_Pipe) || (SELECT_CASE_var == RegionType_BasementFloor) || (SELECT_CASE_var == RegionType_BasementWall) || (SELECT_CASE_var == RegionType_SlabXSide1)	|| (SELECT_CASE_var == RegionType_SlabXSide2) 
+						|| (SELECT_CASE_var == RegionType_SlabZSide1) || (SELECT_CASE_var == RegionType_SlabZSide2) || (SELECT_CASE_var == RegionType_HorizInsXSide1)  || (SELECT_CASE_var == RegionType_HorizInsXSide2) 
+						|| (SELECT_CASE_var == RegionType_HorizInsZSide1) || (SELECT_CASE_var == RegionType_HorizInsZSide2) || (SELECT_CASE_var == RegionType_HorizInsUnderSlab) || (SELECT_CASE_var == RegionType_VertInsLowerEdge)) {
 						++CellCountUpToNow;
 					} else {
 						CellCountUpToNow += GetCellWidthsCount( DomainNum, DirDirection );
@@ -3720,6 +4578,36 @@ namespace PlantPipingSystemsManager {
 					if ( present( BasementWallXIndex ) ) BasementWallXIndex = CellCountUpToNow;
 				} else if ( ThisRegion.RegionType == RegionType_BasementFloor ) {
 					if ( present( BasementFloorYIndex ) ) BasementFloorYIndex = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_SlabXSide1) {
+					if (present(SlabXIndex1)) SlabXIndex1 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_SlabXSide2) {
+					if (present(SlabXIndex2)) SlabXIndex2 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_SlabZSide1) {
+					if (present(SlabZIndex1)) SlabZIndex1 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_SlabZSide2) {
+					if (present(SlabZIndex2)) SlabZIndex2 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_HorizInsXSide1) {
+					if (present(InsulationXIndex1)) InsulationXIndex1 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_HorizInsXSide2) {
+					if (present(InsulationXIndex2)) InsulationXIndex2 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_HorizInsZSide1) {
+					if (present(InsulationZIndex1)) InsulationZIndex1 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_HorizInsZSide2) {
+					if (present(InsulationZIndex2)) InsulationZIndex2 = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_HorizInsUnderSlab) {
+					if (present(SlabYIndex)) SlabYIndex = CellCountUpToNow;
+				}
+				else if (ThisRegion.RegionType == RegionType_VertInsLowerEdge) {
+					if (present(InsulationYIndex)) InsulationYIndex = CellCountUpToNow;
 				}
 
 				//'then add the pipe node itself
@@ -3812,7 +4700,9 @@ namespace PlantPipingSystemsManager {
 
 		for ( Index = lbound( RegionList, 1 ); Index <= ubound( RegionList, 1 ); ++Index ) {
 			{ auto const SELECT_CASE_var( RegionList( Index ).RegionType );
-			if ( ( SELECT_CASE_var == RegionType_Pipe ) || ( SELECT_CASE_var == RegionType_BasementFloor ) || ( SELECT_CASE_var == RegionType_BasementWall ) ) {
+			if ((SELECT_CASE_var == RegionType_Pipe) || (SELECT_CASE_var == RegionType_BasementFloor) || (SELECT_CASE_var == RegionType_BasementWall) || (SELECT_CASE_var == RegionType_SlabXSide1) || (SELECT_CASE_var == RegionType_SlabXSide2)
+				|| (SELECT_CASE_var == RegionType_SlabZSide1) || (SELECT_CASE_var == RegionType_SlabZSide2) || (SELECT_CASE_var == RegionType_HorizInsXSide1) || (SELECT_CASE_var == RegionType_HorizInsXSide2)
+				|| (SELECT_CASE_var == RegionType_HorizInsZSide1) || (SELECT_CASE_var == RegionType_HorizInsZSide2) || (SELECT_CASE_var == RegionType_HorizInsUnderSlab) || (SELECT_CASE_var == RegionType_VertInsLowerEdge)) {
 				++RetVal;
 			} else {
 				if ( RegionList( Index ).RegionType == DirDirection ) {
@@ -3879,7 +4769,9 @@ namespace PlantPipingSystemsManager {
 		Counter = -1;
 		for ( Index = lbound( RegionList, 1 ); Index <= ubound( RegionList, 1 ); ++Index ) {
 			{ auto const SELECT_CASE_var( RegionList( Index ).RegionType );
-			if ( ( SELECT_CASE_var == RegionType_Pipe ) || ( SELECT_CASE_var == RegionType_BasementFloor ) || ( SELECT_CASE_var == RegionType_BasementWall ) ) {
+			if ((SELECT_CASE_var == RegionType_Pipe) || (SELECT_CASE_var == RegionType_BasementFloor) || (SELECT_CASE_var == RegionType_BasementWall) || (SELECT_CASE_var == RegionType_SlabXSide1) || (SELECT_CASE_var == RegionType_SlabXSide2)
+				|| (SELECT_CASE_var == RegionType_SlabZSide1) || (SELECT_CASE_var == RegionType_SlabZSide2) || (SELECT_CASE_var == RegionType_HorizInsXSide1) || (SELECT_CASE_var == RegionType_HorizInsXSide2)
+				|| (SELECT_CASE_var == RegionType_HorizInsZSide1) || (SELECT_CASE_var == RegionType_HorizInsZSide2) || (SELECT_CASE_var == RegionType_HorizInsUnderSlab) || (SELECT_CASE_var == RegionType_VertInsLowerEdge)) {
 				++Counter;
 				RetVal( Counter ) = RegionList( Index ).Min;
 			} else {
@@ -4628,7 +5520,7 @@ namespace PlantPipingSystemsManager {
 	void
 	PerformIterationLoop(
 		int const DomainNum,
-		int const CircuitNum
+		Optional < int const > CircuitNum
 	)
 	{
 
@@ -4682,7 +5574,11 @@ namespace PlantPipingSystemsManager {
 		if ( PipingSystemDomains( DomainNum ).HasBasement ) {
 			UpdateBasementSurfaceTemperatures( DomainNum );
 		}
-
+		
+		// Update the slab surface temperatures, if any
+		if (PipingSystemDomains(DomainNum).IsZoneCoupled) {
+			UpdateZoneSurfaceTemperatures(DomainNum);
+		}
 	}
 
 	//*********************************************************************************************!
@@ -5510,6 +6406,51 @@ namespace PlantPipingSystemsManager {
 		OSCM( OSCMIndex ).HRad = 0.0;
 
 	}
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+	void
+	UpdateZoneSurfaceTemperatures(int const DomainNum)
+	{
+
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         
+			//       DATE WRITTEN   
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// <description>
+
+			// METHODOLOGY EMPLOYED:
+			// <description>
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+			using DataSurfaces::OSCM;
+
+			// Locals
+			// SUBROUTINE ARGUMENT DEFINITIONS:
+
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			Real64 const BigNumber(10000.0);
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+			Real64 AvgTemp;
+			int OSCMIndex;
+
+			
+			AvgTemp = GetAverageTempByType(DomainNum, CellType_ZoneGroundInterface);
+			OSCMIndex = PipingSystemDomains(DomainNum).ZoneCoupledOSCMIndex;
+			OSCM(OSCMIndex).TConv = AvgTemp;
+			OSCM(OSCMIndex).HConv = BigNumber;
+			OSCM(OSCMIndex).TRad = AvgTemp;
+			OSCM(OSCMIndex).HRad = 0.0;
+
+		}
 
 	//*********************************************************************************************!
 
@@ -6763,7 +7704,7 @@ namespace PlantPipingSystemsManager {
 	void
 	DoOneTimeInitializations(
 		int const DomainNum,
-		int const CircuitNum
+		Optional < int const > CircuitNum
 	)
 	{
 
@@ -6796,6 +7737,9 @@ namespace PlantPipingSystemsManager {
 		int NX;
 		int NY;
 		int NZ;
+		int CellXIndex;
+		int CellYIndex;
+		int CellZIndex;
 		int SegIndex;
 		int StartingZ;
 		int EndingZ;
@@ -6817,6 +7761,10 @@ namespace PlantPipingSystemsManager {
 			for ( Y = lbound( PipingSystemDomains( DomainNum ).Cells, 2 ); Y <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ); ++Y ) {
 				for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
 
+					CellXIndex = X;
+					CellYIndex = Y;
+					CellZIndex = Z;
+
 					{ auto const SELECT_CASE_var( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType );
 					if ( SELECT_CASE_var == CellType_Pipe ) {
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
@@ -6830,7 +7778,58 @@ namespace PlantPipingSystemsManager {
 					} else if ( ( SELECT_CASE_var == CellType_GeneralField ) || ( SELECT_CASE_var == CellType_GroundSurface ) || ( SELECT_CASE_var == CellType_AdiabaticWall ) || ( SELECT_CASE_var == CellType_FarfieldBoundary ) || ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementFloor ) || ( SELECT_CASE_var == CellType_BasementCorner ) ) {
 						//basement cells are partially ground, give them some props
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
-					}}
+					} else if (SELECT_CASE_var == CellType_Slab){
+						// Slab in-grade; slab not included in simulation
+						if (PipingSystemDomains(DomainNum).SlabInGradeFlag && PipingSystemDomains(DomainNum).SimSlabFlag){
+							//Assign dummy properties to slab cells
+							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						} else{
+							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).SlabProperties;
+						}
+					} else if (SELECT_CASE_var == CellType_HorizInsulation){
+						PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+					} else if (SELECT_CASE_var == CellType_VertInsulation){
+						PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).VertInsProperties;
+					} else if (SELECT_CASE_var == CellType_ZoneGroundInterface){
+						// Slab On-Grade
+						if (!PipingSystemDomains(DomainNum).SlabInGradeFlag){
+						//Insulation present
+							if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+								//Entire underslab insulated
+								if (PipingSystemDomains(DomainNum).FullHorizInsFlag){
+									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+								}
+								else if (CellXIndex <= PipingSystemDomains(DomainNum).InsulationXIndex1 || CellXIndex >= PipingSystemDomains(DomainNum).InsulationXIndex2 || CellZIndex <= PipingSystemDomains(DomainNum).InsulationZIndex1 || CellZIndex >= PipingSystemDomains(DomainNum).InsulationZIndex2){
+									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+								}
+								else {
+									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+								}
+							}
+							// Slab In-Grade; slab not included in simulation
+							else if (PipingSystemDomains(DomainNum).SlabInGradeFlag && !PipingSystemDomains(DomainNum).SimSlabFlag){
+								//Insulation present
+								if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+								}
+								else if (CellXIndex <= PipingSystemDomains(DomainNum).InsulationXIndex1 || CellXIndex >= PipingSystemDomains(DomainNum).InsulationXIndex2 || CellZIndex <= PipingSystemDomains(DomainNum).InsulationZIndex1 || CellZIndex >= PipingSystemDomains(DomainNum).InsulationZIndex2){
+									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+								}
+								else {
+									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+								}
+							}
+						}
+						else{
+							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						}
+						//Slab In-Grade; slab included in simulation
+						if (PipingSystemDomains(DomainNum).SlabInGradeFlag && PipingSystemDomains(DomainNum).SimSlabFlag){
+							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).SlabProperties;
+						}
+					}
+
+					}
 
 				}
 			}
@@ -6853,6 +7852,7 @@ namespace PlantPipingSystemsManager {
 		//'create circuit array for convenience
 
 		if ( ! allocated( PipingSystemCircuits( CircuitNum ).ListOfCircuitPoints ) ) {
+
 
 			SegCtr2 = -1;
 
@@ -6928,14 +7928,14 @@ namespace PlantPipingSystemsManager {
 
 	}
 
+	
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-
 	void
 	DoStartOfTimeStepInitializations(
 		int const DomainNum,
-		int const CircuitNum
+		Optional < int const > CircuitNum
 	)
 	{
 
@@ -7022,6 +8022,11 @@ namespace PlantPipingSystemsManager {
 						//'these are basic cartesian calculation cells
 						Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.Density * Volume( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) ) * PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.SpecificHeat );
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Beta = Beta;
+
+					} else if ( ( SELECT_CASE_var == CellType_ZoneGroundInterface ) || ( SELECT_CASE_var == CellType_HorizInsulation ) || ( SELECT_CASE_var == CellType_VertInsulation ) || ( SELECT_CASE_var == CellType_Slab ) ) {
+						
+						Beta = PipingSystemDomains(DomainNum).Cur.CurSimTimeStepSize / (PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Density * Volume(PipingSystemDomains(DomainNum).Cells(X, Y, Z)) * PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.SpecificHeat);
+						PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Beta = Beta;
 
 					} else if ( SELECT_CASE_var == CellType_Pipe ) {
 

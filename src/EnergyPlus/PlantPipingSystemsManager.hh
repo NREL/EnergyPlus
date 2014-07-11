@@ -37,6 +37,7 @@ namespace PlantPipingSystemsManager {
 	extern std::string const ObjName_Circuit;
 	extern std::string const ObjName_Segment;
 	extern std::string const ObjName_HorizTrench;
+	extern std::string const ObjName_ZoneCoupled;
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -92,7 +93,20 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
+	
+	void
+	InitAndSimGroundDomains();
 
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+	
+	void
+	CheckIfAnySlabs();
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
 	void
 	GetPipingSystemsInput();
 
@@ -117,7 +131,17 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
+	
+	void
+		ReadZoneCoupledDomainInputs(
+		int const StartingDomainNumForZone,
+		int const NumZoneCoupledDomains,
+		bool & ErrorsFound
+		);
 
+	//*********************************************************************************************!
+
+	//*********************
 	void
 	ReadPipeCircuitInputs(
 		int const NumPipeCircuits,
@@ -692,7 +716,7 @@ namespace PlantPipingSystemsManager {
 	void
 	PerformIterationLoop(
 		int const DomainNum,
-		int const CircuitNum
+		Optional < int const > CircuitNum
 	);
 
 	//*********************************************************************************************!
@@ -762,6 +786,12 @@ namespace PlantPipingSystemsManager {
 
 	void
 	UpdateBasementSurfaceTemperatures( int const DomainNum );
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+	void
+	UpdateZoneSurfaceTemperatures(int const DomainNum);
 
 	//*********************************************************************************************!
 
@@ -916,7 +946,7 @@ namespace PlantPipingSystemsManager {
 	void
 	DoOneTimeInitializations(
 		int const DomainNum,
-		int const CircuitNum
+		Optional < int const > CircuitNum
 	);
 
 	//*********************************************************************************************!
@@ -926,7 +956,7 @@ namespace PlantPipingSystemsManager {
 	void
 	DoStartOfTimeStepInitializations(
 		int const DomainNum,
-		int const CircuitNum
+		Optional < int const > CircuitNum
 	);
 
 	//*********************************************************************************************!

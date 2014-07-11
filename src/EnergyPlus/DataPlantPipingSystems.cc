@@ -39,13 +39,34 @@ namespace DataPlantPipingSystems {
 	int const PartitionType_BasementWall( -1 );
 	int const PartitionType_BasementFloor( -2 );
 	int const PartitionType_Pipe( -3 );
-
+	int const PartitionType_Slab( -4 );
+	int const PartitionType_SlabXSide1( -5 );
+	int const PartitionType_SlabXSide2( -6 );
+	int const PartitionType_SlabZSide1( -7 );
+	int const PartitionType_SlabZSide2( -8 );
+	int const PartitionType_HorizInsUnderSlab( -9 );
+	int const PartitionType_HorizInsXSide1( -10 );
+	int const PartitionType_HorizInsXSide2( -11 );
+	int const PartitionType_VertInsLowerEdge( -13 );
+	int const PartitionType_HorizInsZSide1( -14 );
+	int const PartitionType_HorizInsZSide2( -15 );
+	
 	int const RegionType_Pipe( -1 );
 	int const RegionType_BasementWall( -2 );
 	int const RegionType_BasementFloor( -3 );
 	int const RegionType_XDirection( -4 );
 	int const RegionType_YDirection( -5 );
 	int const RegionType_ZDirection( -6 );
+	int const RegionType_SlabXSide1(-7 );
+	int const RegionType_SlabXSide2( -8 );
+	int const RegionType_SlabZSide1( -9 );
+	int const RegionType_SlabZSide2( -10 );
+	int const RegionType_HorizInsUnderSlab( -11 );
+	int const RegionType_HorizInsXSide1( -12 );
+	int const RegionType_HorizInsXSide2( -13 );
+	int const RegionType_HorizInsZSide1( -14 );
+	int const RegionType_HorizInsZSide2( -15 );
+	int const RegionType_VertInsLowerEdge( -16 );
 
 	int const MeshDistribution_Uniform( -1 );
 	int const MeshDistribution_SymmetricGeometric( -2 );
@@ -70,6 +91,10 @@ namespace DataPlantPipingSystems {
 	int const CellType_BasementFloor( -8 );
 	int const CellType_BasementCorner( -9 );
 	int const CellType_BasementCutaway( -10 );
+	int const CellType_Slab( -11 );
+	int const CellType_HorizInsulation( -12 );
+	int const CellType_VertInsulation( -13 );
+	int const CellType_ZoneGroundInterface( -14 );
 
 	// DERIVED TYPE DEFINITIONS:
 
