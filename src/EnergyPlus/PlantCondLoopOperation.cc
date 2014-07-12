@@ -2078,6 +2078,7 @@ namespace PlantCondLoopOperation {
 		Real64 LargestMinCompPLR;
 		Real64 PlantPLR;
 		Real64 CompLoad;
+		bool AddCompBackInFlag = false;
 		int LoadFlag;
 
 		int BranchNum;
@@ -2323,6 +2324,7 @@ namespace PlantCondLoopOperation {
 
 						// Exit once PlantCapacity is greater than LoopDemand
 						if ( std::abs( RemLoopDemand ) < PlantCapacity ){
+							AddCompBackInFlag = true;
 							continue;
 						} else {
 
@@ -2347,7 +2349,9 @@ namespace PlantCondLoopOperation {
 				// Determine PLR for uniform PLR loading of all equipment
 				if ( PlantCapacity > 0.0 ) {
 					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
-					PlantPLR = max ( LargestMinCompPLR, PlantPLR );
+					if ( ! AddCompBackInFlag ){
+						PlantPLR = max ( LargestMinCompPLR, PlantPLR );
+					}					
 				} else {
 					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
 				} 
@@ -2417,7 +2421,7 @@ namespace PlantCondLoopOperation {
 					//Set LargestMinCompPLR to largest MinCompPLR
 					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
 
-					if ( std::abs( RemLoopDemand ) > ( LargestMinCompPLR * PlantCapacity ) && ( std::abs( RemLoopDemand ) <= PlantCapacity ) ) {
+					if ( std::abs( RemLoopDemand ) <= PlantCapacity ) {
 						break;
 					}
 
@@ -2426,7 +2430,6 @@ namespace PlantCondLoopOperation {
 				// Determine PLR for uniform PLR loading of all equipment
 				if ( PlantCapacity > 0.0 ) {
 					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
-					PlantPLR = max ( LargestMinCompPLR, PlantPLR );
 				} else {
 					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
 				} 
