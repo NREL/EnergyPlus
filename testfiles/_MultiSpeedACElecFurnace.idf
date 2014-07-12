@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -1676,7 +1676,7 @@
     HAPCCoolWHFT Speed 2,    !- Speed 2 Waste Heat Function of Temperature Curve Name
     0.9,                     !- Speed 2 Evaporative Condenser Effectiveness {dimensionless}
     2.0,                     !- Speed 2 Evaporative Condenser Air Flow Rate {m3/s}
-    75.0,                      !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}
+    75.0,                    !- Speed 2 Rated Evaporative Condenser Pump Power Consumption {W}
     25500,                   !- Speed 3 Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 3 Gross Rated Sensible Heat Ratio
     3.0,                     !- Speed 3 Gross Rated Cooling COP {W/W}
@@ -1695,7 +1695,7 @@
     HAPCCoolWHFT Speed 3,    !- Speed 3 Waste Heat Function of Temperature Curve Name
     0.9,                     !- Speed 3 Evaporative Condenser Effectiveness {dimensionless}
     3.0,                     !- Speed 3 Evaporative Condenser Air Flow Rate {m3/s}
-    110,                      !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}
+    110,                     !- Speed 3 Rated Evaporative Condenser Pump Power Consumption {W}
     35500,                   !- Speed 4 Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Speed 4 Gross Rated Sensible Heat Ratio
     3.0,                     !- Speed 4 Gross Rated Cooling COP {W/W}
@@ -2067,7 +2067,7 @@
   Fan:OnOff,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.7,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

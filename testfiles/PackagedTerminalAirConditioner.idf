@@ -127,7 +127,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1455,7 +1455,7 @@
     0.4,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
     ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     0.028,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.028,                  !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0.028,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}
     0.0186,                  !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone1PTACFan,            !- Supply Air Fan Name
@@ -1564,7 +1564,7 @@
   Fan:ConstantVolume,
     Zone1PTACFan,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.4,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1577,7 +1577,7 @@
   Fan:OnOff,
     Zone2PTACFan,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1588,7 +1588,7 @@
   Fan:OnOff,
     Zone3PTACFan,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

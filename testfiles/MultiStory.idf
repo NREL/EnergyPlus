@@ -81,7 +81,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Multistory Example,      !- Name
@@ -876,7 +876,7 @@
   Fan:OnOff,
     Gnd West OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1133,7 +1133,7 @@
   Fan:OnOff,
     Gnd Center OA Fan,       !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1406,7 +1406,7 @@
   Fan:OnOff,
     Gnd East OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1690,7 +1690,7 @@
   Fan:OnOff,
     Mid West OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1947,7 +1947,7 @@
   Fan:OnOff,
     Mid Center OA Fan,       !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2220,7 +2220,7 @@
   Fan:OnOff,
     Mid East OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2504,7 +2504,7 @@
   Fan:OnOff,
     Top West OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2761,7 +2761,7 @@
   Fan:OnOff,
     Top Center OA Fan,       !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -3034,7 +3034,7 @@
   Fan:OnOff,
     Top East OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
