@@ -2417,7 +2417,7 @@ namespace PlantCondLoopOperation {
 					//Set LargestMinCompPLR to largest MinCompPLR
 					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
 
-					if ( std::abs( RemLoopDemand ) > ( LargestMinCompPLR * PlantCapacity ) && ( std::abs( RemLoopDemand ) <= PlantCapacity ) ) {
+					if ( std::abs( RemLoopDemand ) <= PlantCapacity ) {
 						break;
 					}
 
@@ -2426,7 +2426,7 @@ namespace PlantCondLoopOperation {
 				// Determine PLR for uniform PLR loading of all equipment
 				if ( PlantCapacity > 0.0 ) {
 					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
-					PlantPLR = max ( LargestMinCompPLR, PlantPLR );
+					//PlantPLR = max ( LargestMinCompPLR, PlantPLR );
 				} else {
 					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
 				} 
