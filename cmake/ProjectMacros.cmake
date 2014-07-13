@@ -111,7 +111,7 @@ function( ADD_SIMULATION_TEST )
     # Note, CMake / CTest doesn't seem to validate if this dependent name actually exists,
     # but it does seem to honor the requirement
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES DEPENDS "integration.${IDF_NAME}")
-    set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+    set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
 
