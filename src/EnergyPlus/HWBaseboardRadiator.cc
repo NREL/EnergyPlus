@@ -791,7 +791,7 @@ namespace HWBaseboardRadiator {
 					// To address a CR (GitHub Issue #4347, a constant of 3.1 is approximated to be multiplied to heater capacity in order to meet heating load
 					// A portion of heat is delivered to zone air. 
 					// Based on reference: Dynamic modelling and simulation of a room with hot water baseboard heater by Li Lianzhong and M. Zaheeruddinn
-					// Int. J. Energy Res. 2006; 30:427–445
+					// Int. J. Energy Res. 2006; 30:427-445
 					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * 3.1 * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 					if ( DesCoilLoad >= SmallLoad ) {
 						Cp = GetSpecificHeatGlycol( PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidName, 60.0, PlantLoop( HWBaseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
