@@ -7,7 +7,6 @@
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -56,11 +55,6 @@ namespace OutputProcessor {
 	extern int const MeterType_CustomDec; // Type value for custom meters that decrement another meter
 	extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
 
-	extern gio::Fmt const TimeStampFormat;
-	extern gio::Fmt const DailyStampFormat;
-	extern gio::Fmt const MonthlyStampFormat;
-	extern gio::Fmt const RunPeriodStampFormat;
-	extern gio::Fmt const fmta;
 	extern FArray1D_string const DayTypes;
 	extern int const UnitsStringLength;
 
@@ -212,9 +206,9 @@ namespace OutputProcessor {
 			thisTSStored( false ),
 			thisTSCount( 0 ),
 			ReportFreq( 0 ),
-			MaxValue( -9999. ),
+			MaxValue( -9999.0 ),
 			maxValueDate( 0 ),
-			MinValue( 9999. ),
+			MinValue( 9999.0 ),
 			minValueDate( 0 ),
 			ReportID( 0 ),
 			SchedPtr( 0 ),
@@ -659,39 +653,39 @@ namespace OutputProcessor {
 			HRValue( 0.0 ),
 			RptHR( false ),
 			RptHRFO( false ),
-			HRMaxVal( -99999. ),
+			HRMaxVal( -99999.0 ),
 			HRMaxValDate( 0 ),
-			HRMinVal( 99999. ),
+			HRMinVal( 99999.0 ),
 			HRMinValDate( 0 ),
 			HRRptNum( 0 ),
 			DYValue( 0.0 ),
 			RptDY( false ),
 			RptDYFO( false ),
-			DYMaxVal( -99999. ),
+			DYMaxVal( -99999.0 ),
 			DYMaxValDate( 0 ),
-			DYMinVal( 99999. ),
+			DYMinVal( 99999.0 ),
 			DYMinValDate( 0 ),
 			DYRptNum( 0 ),
 			MNValue( 0.0 ),
 			RptMN( false ),
 			RptMNFO( false ),
-			MNMaxVal( -99999. ),
+			MNMaxVal( -99999.0 ),
 			MNMaxValDate( 0 ),
-			MNMinVal( 99999. ),
+			MNMinVal( 99999.0 ),
 			MNMinValDate( 0 ),
 			MNRptNum( 0 ),
 			SMValue( 0.0 ),
 			RptSM( false ),
 			RptSMFO( false ),
-			SMMaxVal( -99999. ),
+			SMMaxVal( -99999.0 ),
 			SMMaxValDate( 0 ),
-			SMMinVal( 99999. ),
+			SMMinVal( 99999.0 ),
 			SMMinValDate( 0 ),
 			SMRptNum( 0 ),
 			LastSMValue( 0.0 ),
-			LastSMMaxVal( -99999. ),
+			LastSMMaxVal( -99999.0 ),
 			LastSMMaxValDate( 0 ),
-			LastSMMinVal( 99999. ),
+			LastSMMinVal( 99999.0 ),
 			LastSMMinValDate( 0 ),
 			RptAccTS( false ),
 			RptAccTSFO( false ),

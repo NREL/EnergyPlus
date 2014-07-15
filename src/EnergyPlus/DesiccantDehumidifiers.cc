@@ -2015,7 +2015,7 @@ namespace DesiccantDehumidifiers {
 			QRegen = SpecRegenEnergy * DesicDehum( DesicDehumNum ).WaterRemoveRate;
 
 			// Above curves are based on a 90deg regen angle and 245deg process air angle
-			RegenAirMassFlowRate = ProcAirMassFlowRate * 90. / 245. * RegenAirVel / ProcAirVel;
+			RegenAirMassFlowRate = ProcAirMassFlowRate * 90.0 / 245.0 * RegenAirVel / ProcAirVel;
 
 			ElecUseRate = DesicDehum( DesicDehumNum ).NomRotorPower;
 
@@ -2124,6 +2124,7 @@ namespace DesiccantDehumidifiers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MinVolFlowPerRatedTotQ( 0.00002684 ); // m3/s per W = 200 cfm/ton,
 		// min vol flow per rated evaporator capacity
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2450,12 +2451,12 @@ namespace DesiccantDehumidifiers {
 		if ( DDPartLoadRatio > 0.0 && DesicDehum( DesicDehumNum ).ExhaustFanMaxVolFlowRate > 0.0 ) {
 			VolFlowPerRatedTotQ = ( Node( DesicDehum( DesicDehumNum ).RegenAirInNode ).MassFlowRate + ExhaustFanMassFlowRate ) / max( 0.00001, ( DesicDehum( DesicDehumNum ).CompanionCoilCapacity * DDPartLoadRatio * RhoAirStdInit ) );
 			if ( ! WarmupFlag && ( VolFlowPerRatedTotQ < MinVolFlowPerRatedTotQ ) ) {
-				gio::write( VolFlowChar, "*" ) << VolFlowPerRatedTotQ;
+				gio::write( VolFlowChar, fmtLD ) << VolFlowPerRatedTotQ;
 				++DesicDehum( DesicDehumNum ).ErrCount;
 				if ( DesicDehum( DesicDehumNum ).ErrCount < 2 ) {
 					ShowWarningError( DesicDehum( DesicDehumNum ).DehumType + " \"" + DesicDehum( DesicDehumNum ).Name + "\" - Air volume flow rate per watt of total condenser waste heat is below the minimum recommended at " + VolFlowChar + " m3/s/W." );
 					ShowContinueErrorTimeStamp( "" );
-					gio::write( MinVol, "*" ) << MinVolFlowPerRatedTotQ;
+					gio::write( MinVol, fmtLD ) << MinVolFlowPerRatedTotQ;
 					ShowContinueError( "Expected minimum for VolumeFlowperRatedTotalCondenserWasteHeat = [" + MinVol + ']' );
 					ShowContinueError( "Possible causes include inconsistent air flow rates in system components " );
 					ShowContinueError( "on the regeneration side of the desiccant dehumidifier." );

@@ -660,6 +660,24 @@ pow_9( T const x )
 	return t * t * t;
 }
 
+// root_4( x ) == x^(1/4)
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+root_4( T const x )
+{
+	return std::sqrt( std::sqrt( x ) );
+}
+
+// root_8( x ) == x^(1/8)
+template< typename T >
+inline
+typename std::enable_if< std::is_arithmetic< T >::value, T >::type
+root_8( T const x )
+{
+	return std::sqrt( std::sqrt( std::sqrt( x ) ) );
+}
+
 // square( x ) == x^2
 template< typename T >
 inline

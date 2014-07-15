@@ -783,6 +783,7 @@ namespace WaterCoils {
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const RoutineName( "InitWaterCoil" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -825,7 +826,7 @@ namespace WaterCoils {
 		static FArray1D_bool MyCoilReportFlag;
 		static FArray1D_bool PlantLoopScanFlag;
 
-		FArray1D< Real64 > CoefSeries( 5 );
+		static FArray1D< Real64 > CoefSeries( 5 ); //Tuned Changed to static: High call count: Set before use
 		Real64 FinDiamVar;
 		Real64 TubeToFinDiamRatio;
 
@@ -835,7 +836,7 @@ namespace WaterCoils {
 		Real64 UA0; // lower bound for UA
 		Real64 UA1; // upper bound for UA
 		Real64 UA;
-		FArray1D< Real64 > Par( 4 );
+		static FArray1D< Real64 > Par( 4 ); //Tuned Changed to static: High call count: Set before use
 
 		static bool NoSatCurveIntersect( false ); // TRUE if failed to find appatatus dew-point
 		static bool BelowInletWaterTemp( false ); // TRUE if apparatus dew-point below design inlet water temperature
@@ -982,7 +983,7 @@ namespace WaterCoils {
 							WaterCoil( CoilNum ).InletAirMassFlowRate = WaterCoil( CoilNum ).DesTotWaterCoilLoad / ( CpAirStd * ( WaterCoil( CoilNum ).DesOutletAirTemp - WaterCoil( CoilNum ).DesInletAirTemp ) );
 							WaterCoil( CoilNum ).DesAirVolFlowRate = WaterCoil( CoilNum ).InletAirMassFlowRate / RhoAirStd;
 							// set the lower and upper limits on the UA
-							UA0 = .001 * WaterCoil( CoilNum ).DesTotWaterCoilLoad;
+							UA0 = 0.001 * WaterCoil( CoilNum ).DesTotWaterCoilLoad;
 							UA1 = WaterCoil( CoilNum ).DesTotWaterCoilLoad;
 							// Invert the simple heating coil model: given the design inlet conditions and the design load, fins the design UA
 							SolveRegulaFalsi( Acc, MaxIte, SolFla, UA, SimpleHeatingCoilUAResidual, UA0, UA1, Par );
@@ -1018,24 +1019,24 @@ namespace WaterCoils {
 
 			// effective fin diameter for detailed flat fin coil
 			if ( WaterCoil( CoilNum ).WaterCoilModel == CoilModel_Detailed ) { // 'DETAILED FLAT FIN'
-				WaterCoil( CoilNum ).EffectiveFinDiam = std::sqrt( 4. * WaterCoil( CoilNum ).FinDiam * WaterCoil( CoilNum ).CoilDepth / ( Pi * WaterCoil( CoilNum ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow ) );
+				WaterCoil( CoilNum ).EffectiveFinDiam = std::sqrt( 4.0 * WaterCoil( CoilNum ).FinDiam * WaterCoil( CoilNum ).CoilDepth / ( Pi * WaterCoil( CoilNum ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow ) );
 
 				//   calculate fixed geometric parameters of the coil:
 				//   Total Area
 				WaterCoil( CoilNum ).TotCoilOutsideSurfArea = WaterCoil( CoilNum ).TubeOutsideSurfArea + WaterCoil( CoilNum ).FinSurfArea;
 				//   Effective Tube Inside Diameter - the model assumes that the coil
 				//   can be simulated as a tube with an equivalent hydraulic diameter.
-				WaterCoil( CoilNum ).CoilEffectiveInsideDiam = 4. * WaterCoil( CoilNum ).MinAirFlowArea * WaterCoil( CoilNum ).CoilDepth / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
+				WaterCoil( CoilNum ).CoilEffectiveInsideDiam = 4.0 * WaterCoil( CoilNum ).MinAirFlowArea * WaterCoil( CoilNum ).CoilDepth / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 				//   Ratio of tube outside diameter to effective fin diameter should always
 				//   be less than 1
 				TubeToFinDiamRatio = WaterCoil( CoilNum ).TubeOutsideDiam / WaterCoil( CoilNum ).EffectiveFinDiam;
 				if ( TubeToFinDiamRatio > 1.0 ) {
 					ShowWarningError( "InitWaterCoil: Detailed Flat Fin Coil, TubetoFinDiamRatio > 1.0, [" + RoundSigDigits( TubeToFinDiamRatio, 4 ) + ']' );
 					// reset tube depth spacing and recalc dependent parameters
-					WaterCoil( CoilNum ).TubeDepthSpacing *= ( std::pow( TubeToFinDiamRatio, 2 ) + 0.1 );
+					WaterCoil( CoilNum ).TubeDepthSpacing *= ( pow_2( TubeToFinDiamRatio ) + 0.1 );
 					WaterCoil( CoilNum ).CoilDepth = WaterCoil( CoilNum ).TubeDepthSpacing * WaterCoil( CoilNum ).NumOfTubeRows;
-					WaterCoil( CoilNum ).EffectiveFinDiam = std::sqrt( 4. * WaterCoil( CoilNum ).FinDiam * WaterCoil( CoilNum ).CoilDepth / ( Pi * WaterCoil( CoilNum ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow ) );
-					WaterCoil( CoilNum ).CoilEffectiveInsideDiam = 4. * WaterCoil( CoilNum ).MinAirFlowArea * WaterCoil( CoilNum ).CoilDepth / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
+					WaterCoil( CoilNum ).EffectiveFinDiam = std::sqrt( 4.0 * WaterCoil( CoilNum ).FinDiam * WaterCoil( CoilNum ).CoilDepth / ( Pi * WaterCoil( CoilNum ).NumOfTubeRows * WaterCoil( CoilNum ).NumOfTubesPerRow ) );
+					WaterCoil( CoilNum ).CoilEffectiveInsideDiam = 4.0 * WaterCoil( CoilNum ).MinAirFlowArea * WaterCoil( CoilNum ).CoilDepth / WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 					TubeToFinDiamRatio = WaterCoil( CoilNum ).TubeOutsideDiam / WaterCoil( CoilNum ).EffectiveFinDiam;
 					ShowContinueError( "  Resetting tube depth spacing to " + RoundSigDigits( WaterCoil( CoilNum ).TubeDepthSpacing, 4 ) + " meters" );
 					ShowContinueError( "  Resetting coil depth to " + RoundSigDigits( WaterCoil( CoilNum ).CoilDepth, 4 ) + " meters" );
@@ -1047,8 +1048,8 @@ namespace WaterCoils {
 
 				FinDiamVar = 0.5 * ( WaterCoil( CoilNum ).EffectiveFinDiam - WaterCoil( CoilNum ).TubeOutsideDiam );
 
-				WaterCoil( CoilNum ).GeometryCoef1 = 0.159 * std::pow( ( WaterCoil( CoilNum ).FinThickness / WaterCoil( CoilNum ).CoilEffectiveInsideDiam ), ( -0.065 ) ) * std::pow( ( WaterCoil( CoilNum ).FinThickness / FinDiamVar ), 0.141 );
-				WaterCoil( CoilNum ).GeometryCoef2 = -0.323 * std::pow( ( WaterCoil( CoilNum ).FinSpacing / FinDiamVar ), 0.049 ) * std::pow( ( WaterCoil( CoilNum ).EffectiveFinDiam / WaterCoil( CoilNum ).TubeDepthSpacing ), 0.549 ) * std::pow( ( WaterCoil( CoilNum ).FinThickness / WaterCoil( CoilNum ).FinSpacing ), ( -0.028 ) );
+				WaterCoil( CoilNum ).GeometryCoef1 = 0.159 * std::pow( WaterCoil( CoilNum ).FinThickness / WaterCoil( CoilNum ).CoilEffectiveInsideDiam, -0.065 ) * std::pow( WaterCoil( CoilNum ).FinThickness / FinDiamVar, 0.141 );
+				WaterCoil( CoilNum ).GeometryCoef2 = -0.323 * std::pow( WaterCoil( CoilNum ).FinSpacing / FinDiamVar, 0.049 ) * std::pow( WaterCoil( CoilNum ).EffectiveFinDiam / WaterCoil( CoilNum ).TubeDepthSpacing, 0.549 ) * std::pow( WaterCoil( CoilNum ).FinThickness / WaterCoil( CoilNum ).FinSpacing, -0.028 );
 
 				// Set some initial values for simulation
 				WaterCoil( CoilNum ).SatEnthlCurveConstCoef = -10.57;
@@ -1412,7 +1413,7 @@ namespace WaterCoils {
 				{ auto const SELECT_CASE_var( WaterCoil( CoilNum ).WaterCoilType_Num );
 				if ( SELECT_CASE_var == WaterCoil_SimpleHeating ) {
 					if ( RptCoilHeaderFlag( 1 ) ) {
-						gio::write( OutputFileInits, "(A)" ) << "! <Water Heating Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W}";
+						gio::write( OutputFileInits, fmtA ) << "! <Water Heating Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W}";
 						RptCoilHeaderFlag( 1 ) = false;
 					}
 					PreDefTableEntry( pdchHeatCoilType, WaterCoil( CoilNum ).Name, "Coil:Heating:Water" );
@@ -1420,10 +1421,10 @@ namespace WaterCoils {
 					PreDefTableEntry( pdchHeatCoilNomCap, WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).TotWaterHeatingCoilRate );
 					PreDefTableEntry( pdchHeatCoilNomEff, WaterCoil( CoilNum ).Name, "-" );
 					addFootNoteSubTable( pdstHeatCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan" " heat and electric power NOT accounted for." );
-					gio::write( OutputFileInits, "(A)" ) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 2 );
+					gio::write( OutputFileInits, fmtA ) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterHeatingCoilRate, 2 );
 				} else if ( SELECT_CASE_var == WaterCoil_DetFlatFinCooling ) {
 					if ( RptCoilHeaderFlag( 2 ) ) {
-						gio::write( OutputFileInits, "(A)" ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W}," "Nominal Sensible Heat Ratio";
+						gio::write( OutputFileInits, fmtA ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W}," "Nominal Sensible Heat Ratio";
 						RptCoilHeaderFlag( 2 ) = false;
 					}
 					RatedLatentCapacity = WaterCoil( CoilNum ).TotWaterCoolingCoilRate - WaterCoil( CoilNum ).SenWaterCoolingCoilRate;
@@ -1436,10 +1437,10 @@ namespace WaterCoils {
 					PreDefTableEntry( pdchCoolCoilSHR, WaterCoil( CoilNum ).Name, RatedSHR );
 					PreDefTableEntry( pdchCoolCoilNomEff, WaterCoil( CoilNum ).Name, "-" );
 					addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan" " heat and electric power NOT accounted for." );
-					gio::write( OutputFileInits, "(A)" ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 );
+					gio::write( OutputFileInits, fmtA ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 );
 				} else if ( SELECT_CASE_var == WaterCoil_Cooling ) {
 					if ( RptCoilHeaderFlag( 2 ) ) {
-						gio::write( OutputFileInits, "(A)" ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W}," "Nominal Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}";
+						gio::write( OutputFileInits, fmtA ) << "! <Water Cooling Coil Capacity Information>,Component Type,Name," "Nominal Total Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W}," "Nominal Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}";
 						RptCoilHeaderFlag( 2 ) = false;
 					}
 					RatedLatentCapacity = WaterCoil( CoilNum ).TotWaterCoolingCoilRate - WaterCoil( CoilNum ).SenWaterCoolingCoilRate;
@@ -1454,7 +1455,7 @@ namespace WaterCoils {
 					PreDefTableEntry( pdchCoolCoilUATotal, WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).UACoilTotal );
 					PreDefTableEntry( pdchCoolCoilArea, WaterCoil( CoilNum ).Name, WaterCoil( CoilNum ).TotCoilOutsideSurfArea );
 					addFootNoteSubTable( pdstCoolCoil, "Nominal values are gross at rated conditions, i.e., the supply air fan" " heat and electric power NOT accounted for." );
-					gio::write( OutputFileInits, "(A)" ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 ) + ',' + RoundSigDigits( UATotal, 2 ) + ',' + RoundSigDigits( SurfaceArea, 2 );
+					gio::write( OutputFileInits, fmtA ) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil( CoilNum ).Name + ',' + RoundSigDigits( WaterCoil( CoilNum ).TotWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( WaterCoil( CoilNum ).SenWaterCoolingCoilRate, 2 ) + ',' + RoundSigDigits( RatedLatentCapacity, 2 ) + ',' + RoundSigDigits( RatedSHR, 2 ) + ',' + RoundSigDigits( UATotal, 2 ) + ',' + RoundSigDigits( SurfaceArea, 2 );
 				}}
 				if ( WaterCoil( CoilNum ).DesWaterCoolingCoilRate <= 0.0 ) WaterCoil( CoilNum ).DesWaterCoolingCoilRate = WaterCoil( CoilNum ).TotWaterCoolingCoilRate;
 				if ( WaterCoil( CoilNum ).DesWaterHeatingCoilRate <= 0.0 ) WaterCoil( CoilNum ).DesWaterHeatingCoilRate = WaterCoil( CoilNum ).TotWaterHeatingCoilRate;
@@ -1515,17 +1516,17 @@ namespace WaterCoils {
 			}
 		}
 
-		if ( ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) && ( ! ( MyUAAndFlowCalcFlag( CoilNum ) ) ) ) { //update Coil UA based on inlet mass flows and temps
+		if ( ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_SimpleHeating ) && ( ! ( MyUAAndFlowCalcFlag( CoilNum ) ) ) ) { // update Coil UA based on inlet mass flows and temps
 			x_a = 1.0 + 4.769E-3 * ( WaterCoil( CoilNum ).InletAirTemp - WaterCoil( CoilNum ).DesInletAirTemp );
 			if ( WaterCoil( CoilNum ).DesAirMassFlowRate > 0.0 ) {
-				AirConvectTerm = x_a * ( std::pow( ( WaterCoil( CoilNum ).InletAirMassFlowRate / WaterCoil( CoilNum ).DesAirMassFlowRate ), 0.8 ) ) * WaterCoil( CoilNum ).AirSideNominalConvect;
+				AirConvectTerm = x_a * std::pow( WaterCoil( CoilNum ).InletAirMassFlowRate / WaterCoil( CoilNum ).DesAirMassFlowRate, 0.8 ) * WaterCoil( CoilNum ).AirSideNominalConvect;
 			} else {
 				AirConvectTerm = 0.0;
 			}
 			WaterConvSensitivity = 0.014 / ( 1.0 + 0.014 * WaterCoil( CoilNum ).DesInletWaterTemp );
 			x_w = 1.0 + WaterConvSensitivity * ( WaterCoil( CoilNum ).InletWaterTemp - WaterCoil( CoilNum ).DesInletWaterTemp );
 			if ( WaterCoil( CoilNum ).MaxWaterMassFlowRate > 0.0 ) {
-				WaterConvectTerm = x_w * ( std::pow( ( WaterCoil( CoilNum ).InletWaterMassFlowRate / WaterCoil( CoilNum ).MaxWaterMassFlowRate ), 0.85 ) ) * WaterCoil( CoilNum ).LiquidSideNominalConvect;
+				WaterConvectTerm = x_w * std::pow( WaterCoil( CoilNum ).InletWaterMassFlowRate / WaterCoil( CoilNum ).MaxWaterMassFlowRate, 0.85 ) * WaterCoil( CoilNum ).LiquidSideNominalConvect;
 			} else {
 				WaterConvectTerm = 0.0;
 			}
@@ -1537,18 +1538,18 @@ namespace WaterCoils {
 			}
 		}
 
-		//update Coil UA based on inlet mass flows and temps
+		// update Coil UA based on inlet mass flows and temps
 		if ( WaterCoil( CoilNum ).WaterCoilType_Num == WaterCoil_Cooling && ( ! MyCoilDesignFlag( CoilNum ) ) ) {
 			x_a = 1.0 + 4.769E-3 * ( WaterCoil( CoilNum ).InletAirTemp - WaterCoil( CoilNum ).DesInletAirTemp );
 			if ( WaterCoil( CoilNum ).DesAirMassFlowRate > 0.0 ) {
-				WaterCoil( CoilNum ).UACoilExternal = x_a * ( std::pow( ( WaterCoil( CoilNum ).InletAirMassFlowRate / WaterCoil( CoilNum ).DesAirMassFlowRate ), 0.8 ) ) * WaterCoil( CoilNum ).UACoilExternalDes;
+				WaterCoil( CoilNum ).UACoilExternal = x_a * std::pow( WaterCoil( CoilNum ).InletAirMassFlowRate / WaterCoil( CoilNum ).DesAirMassFlowRate, 0.8 ) * WaterCoil( CoilNum ).UACoilExternalDes;
 			} else {
 				WaterCoil( CoilNum ).UACoilExternal = WaterCoil( CoilNum ).UACoilExternalDes;
 			}
 			WaterConvSensitivity = 0.014 / ( 1.0 + 0.014 * WaterCoil( CoilNum ).DesInletWaterTemp );
 			x_w = 1.0 + WaterConvSensitivity * ( WaterCoil( CoilNum ).InletWaterTemp - WaterCoil( CoilNum ).DesInletWaterTemp );
 			if ( WaterCoil( CoilNum ).MaxWaterMassFlowRate > 0.0 ) {
-				WaterCoil( CoilNum ).UACoilInternal = x_w * ( std::pow( ( WaterCoil( CoilNum ).InletWaterMassFlowRate / WaterCoil( CoilNum ).MaxWaterMassFlowRate ), 0.85 ) ) * WaterCoil( CoilNum ).UACoilInternalDes;
+				WaterCoil( CoilNum ).UACoilInternal = x_w * std::pow( WaterCoil( CoilNum ).InletWaterMassFlowRate / WaterCoil( CoilNum ).MaxWaterMassFlowRate, 0.85 ) * WaterCoil( CoilNum ).UACoilInternalDes;
 			} else {
 				WaterCoil( CoilNum ).UACoilInternal = WaterCoil( CoilNum ).UACoilInternalDes;
 			}
@@ -2149,7 +2150,7 @@ namespace WaterCoils {
 								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 								ShowContinueError( "    Wair,in =  " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
 								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
-								if ( WaterCoil( CoilNum ).DesInletAirHumRat > .016 ) {
+								if ( WaterCoil( CoilNum ).DesInletAirHumRat > 0.016 ) {
 									DesOutletAirHumRatDes = 0.5 * WaterCoil( CoilNum ).DesInletAirHumRat;
 								} else {
 									DesOutletAirHumRatDes = WaterCoil( CoilNum ).DesInletAirHumRat;
@@ -2195,8 +2196,8 @@ namespace WaterCoils {
 						if ( WaterCoil( CoilNum ).NumOfTubesPerRow == AutoSize && WaterCoil( CoilNum ).WaterCoilModel == CoilModel_Detailed ) {
 							IsAutoSize = true;
 						}
-						NumofTubesperRowDes = int( 13750. * WaterCoil( CoilNum ).MaxWaterVolFlowRate ) + 1;
-						NumofTubesperRowDes = max( 3., NumofTubesperRowDes );
+						NumofTubesperRowDes = int( 13750.0 * WaterCoil( CoilNum ).MaxWaterVolFlowRate ) + 1;
+						NumofTubesperRowDes = max( 3.0, NumofTubesperRowDes );
 						if ( IsAutoSize ) {
 							WaterCoil( CoilNum ).NumOfTubesPerRow = NumofTubesperRowDes;
 							ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Number of Tubes per Row", NumofTubesperRowDes );
@@ -2738,7 +2739,7 @@ namespace WaterCoils {
 								ShowWarningError( "SizeWaterCoil: Coil=\"" + WaterCoil( CoilNum ).Name + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 								ShowContinueError( "    Wair,in =  " + RoundSigDigits( WaterCoil( CoilNum ).DesInletAirHumRat, 6 ) );
 								ShowContinueError( "    Wair,out = " + RoundSigDigits( DesOutletAirHumRatDes, 6 ) );
-								if ( DesInletAirHumRatDes > .016 ) {
+								if ( DesInletAirHumRatDes > 0.016 ) {
 									DesOutletAirHumRatDes = 0.5 * WaterCoil( CoilNum ).DesInletAirHumRat;
 								} else {
 									DesOutletAirHumRatDes = WaterCoil( CoilNum ).DesInletAirHumRat;
@@ -2781,8 +2782,8 @@ namespace WaterCoils {
 						if ( WaterCoil( CoilNum ).NumOfTubesPerRow == AutoSize && WaterCoil( CoilNum ).WaterCoilModel == CoilModel_Detailed ) {
 							IsAutoSize = true;
 						}
-						NumofTubesperRowDes = int( 13750. * WaterCoil( CoilNum ).MaxWaterVolFlowRate ) + 1;
-						NumofTubesperRowDes = max( 3., NumofTubesperRowDes );
+						NumofTubesperRowDes = int( 13750.0 * WaterCoil( CoilNum ).MaxWaterVolFlowRate ) + 1;
+						NumofTubesperRowDes = max( 3.0, NumofTubesperRowDes );
 						if ( IsAutoSize ) {
 							WaterCoil( CoilNum ).NumOfTubesPerRow = NumofTubesperRowDes;
 							ReportSizingOutput( "Coil:Cooling:Water:DetailedGeometry", WaterCoil( CoilNum ).Name, "Design Size Number of Tubes per Row", NumofTubesperRowDes );
@@ -3167,7 +3168,7 @@ namespace WaterCoils {
 							WaterCoil( CoilNum ).InletWaterMassFlowRate = rho * WaterCoil( CoilNum ).MaxWaterVolFlowRate;
 							WaterCoil( CoilNum ).InletAirMassFlowRate = DesMassFlow;
 							// set the lower and upper limits on the UA
-							UA0 = .001 * DesCoilLoad;
+							UA0 = 0.001 * DesCoilLoad;
 							UA1 = DesCoilLoad;
 							// Invert the simple heating coil model: given the design inlet conditions and the design load,
 							// find the design UA.
@@ -3406,7 +3407,7 @@ namespace WaterCoils {
 							rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, InitConvTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 							WaterCoil( CoilNum ).InletWaterMassFlowRate = rho * DesWaterVolFlow;
 							// set the lower and upper limits on the UA
-							UA0 = .001 * DesCoilLoad;
+							UA0 = 0.001 * DesCoilLoad;
 							UA1 = DesCoilLoad;
 							// Invert the simple heating coil model: given the design inlet conditions and the design load,
 							// find the design UA.
@@ -3554,7 +3555,7 @@ namespace WaterCoils {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "SizeWaterCoil" );
+		static std::string const RoutineName( "CalcSimpleHeatingCoil" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3592,7 +3593,7 @@ namespace WaterCoils {
 		Control = WaterCoil( CoilNum ).Control;
 		TempWaterIn = WaterCoil( CoilNum ).InletWaterTemp;
 
-		//  adjust mass flow rates for cycling fan cycling coil operation
+		// adjust mass flow rates for cycling fan cycling coil operation
 		if ( FanOpMode == CycFanCycCoil ) {
 			if ( PartLoadRatio > 0.0 ) {
 				AirMassFlow = WaterCoil( CoilNum ).InletAirMassFlowRate / PartLoadRatio;
@@ -3620,7 +3621,7 @@ namespace WaterCoils {
 		// If the coil is operating there should be some heating capacitance
 		//  across the coil, so do the simulation. If not set outlet to inlet and no load.
 		//  Also the coil has to be scheduled to be available
-		if ( ( ( CapacitanceAir > 0.0 ) && ( CapacitanceWater > 0.0 ) ) && ( GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ) > 0.0 || MySizeFlag( CoilNum ) || MyUAAndFlowCalcFlag( CoilNum ) || CalcMode == DesignCalc ) ) {
+		if ( ( ( CapacitanceAir > 0.0 ) && ( CapacitanceWater > 0.0 ) ) && ( CalcMode == DesignCalc || MySizeFlag( CoilNum ) || MyUAAndFlowCalcFlag( CoilNum ) || GetCurrentScheduleValue( WaterCoil( CoilNum ).SchedPtr ) > 0.0 ) ) {
 
 			if ( UA <= 0.0 ) {
 				ShowFatalError( "UA is zero for COIL:Heating:Water " + WaterCoil( CoilNum ).Name );
@@ -3637,7 +3638,7 @@ namespace WaterCoils {
 				A = ETA * ( 1.0 - E1 ) / CapRatio;
 			}
 
-			if ( A > 20. ) {
+			if ( A > 20.0 ) {
 				Effec = 1.0;
 			} else {
 				E2 = std::exp( -A );
@@ -3722,10 +3723,12 @@ namespace WaterCoils {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		static std::string const RoutineName( "CalcDetailFlatFinCoolingCoil" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxCoolCoilErrs( 5 );
+		static Real64 const exp_47( std::exp( -0.41718 ) );
+		static Real64 const exp_35( std::exp( -0.3574 ) );
+		static std::string const RoutineName( "CalcDetailFlatFinCoolingCoil" );
 
 		Real64 const AirViscosity( 1.846e-5 ); // Dynamic Viscosity of Air in kg/(m.s)
 		Real64 const ConvK( 1.0e-3 ); // Unit conversion factor
@@ -3891,7 +3894,7 @@ namespace WaterCoils {
 			//      known water and air flow parameters:
 			rho = GetDensityGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, TempWaterIn, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
 			//      water flow velocity - assuming number of water circuits = NumOfTubesPerRow
-			TubeWaterVel = WaterMassFlowRate * 4. / ( WaterCoil( CoilNum ).NumOfTubesPerRow * rho * Pi * WaterCoil( CoilNum ).TubeInsideDiam * WaterCoil( CoilNum ).TubeInsideDiam );
+			TubeWaterVel = WaterMassFlowRate * 4.0 / ( WaterCoil( CoilNum ).NumOfTubesPerRow * rho * Pi * WaterCoil( CoilNum ).TubeInsideDiam * WaterCoil( CoilNum ).TubeInsideDiam );
 			//      air mass flow rate per unit area
 			ScaledAirMassFlowRate = ( 1.0 + InletAirHumRat ) * AirMassFlow / WaterCoil( CoilNum ).MinAirFlowArea;
 			//      air flow Reynold's Number
@@ -3922,7 +3925,7 @@ namespace WaterCoils {
 				RaisedInletWaterTemp = TempWaterIn + 0.3;
 			}
 			if ( TempAirIn < RaisedInletWaterTemp ) {
-				RaisedInletWaterTemp = TempAirIn - .3;
+				RaisedInletWaterTemp = TempAirIn - 0.3;
 			}
 
 			RsdInletWaterTempSatAirHumRat = PsyWFnTdbRhPb( RaisedInletWaterTemp, unity, OutBaroPress, RoutineName );
@@ -3931,23 +3934,29 @@ namespace WaterCoils {
 			SensToTotEnthDiffRatio = DryAirSpecHeat * ( TempAirIn - RaisedInletWaterTemp ) / ( InletAirEnthalpy - AirEnthAtRsdInletWaterTemp );
 
 			EnterAirHumRatDiff = InletAirHumRat - RsdInletWaterTempSatAirHumRat;
-			DryFinEfficncy = 0.5 * ( WaterCoil( CoilNum ).EffectiveFinDiam - WaterCoil( CoilNum ).TubeOutsideDiam ) * std::sqrt( 2. * AirSideWetSurfFilmCoef / ( ConvK * WaterCoil( CoilNum ).FinThermConductivity * WaterCoil( CoilNum ).FinThickness ) );
+			DryFinEfficncy = 0.5 * ( WaterCoil( CoilNum ).EffectiveFinDiam - WaterCoil( CoilNum ).TubeOutsideDiam ) * std::sqrt( 2.0 * AirSideWetSurfFilmCoef / ( ConvK * WaterCoil( CoilNum ).FinThermConductivity * WaterCoil( CoilNum ).FinThickness ) );
 			if ( EnterAirHumRatDiff < 0 ) {
 				//       note that this condition indicates dry coil
 				EnterAirHumRatDiff = -EnterAirHumRatDiff;
 				SensToTotEnthDiffRatio = std::abs( SensToTotEnthDiffRatio );
 			}
 
-			if ( EnterAirHumRatDiff > 1.0 ) EnterAirHumRatDiff = 1.0;
-			if ( EnterAirHumRatDiff < 0.00001 ) EnterAirHumRatDiff = 0.00001;
+			if ( EnterAirHumRatDiff > 1.0 ) {
+				EnterAirHumRatDiff = 1.0;
+			} else if ( EnterAirHumRatDiff < 0.00001 ) {
+				EnterAirHumRatDiff = 0.00001;
+			}
 
-			if ( DryFinEfficncy > 1.0 ) DryFinEfficncy = 1.0;
-			if ( DryFinEfficncy < 0.00001 ) DryFinEfficncy = 0.00001;
+			if ( DryFinEfficncy > 1.0 ) {
+				DryFinEfficncy = 1.0;
+			} else if ( DryFinEfficncy < 0.00001 ) {
+				DryFinEfficncy = 0.00001;
+			}
 
-			if ( TempAirIn > 48. / 1.8 ) {
-				WetFinEfficncy = std::exp( -0.41718 ) * std::pow( SensToTotEnthDiffRatio, ( 0.09471 ) ) * std::pow( EnterAirHumRatDiff, ( 0.0108 ) ) * std::pow( DryFinEfficncy, ( -0.50303 ) );
+			if ( TempAirIn > 48.0 / 1.8 ) {
+				WetFinEfficncy = exp_47 * std::pow( SensToTotEnthDiffRatio, 0.09471 ) * std::pow( EnterAirHumRatDiff, 0.0108 ) * std::pow( DryFinEfficncy, -0.50303 );
 			} else {
-				WetFinEfficncy = std::exp( -0.3574 ) * std::pow( SensToTotEnthDiffRatio, ( 0.16081 ) ) * std::pow( EnterAirHumRatDiff, ( 0.01995 ) ) * std::pow( DryFinEfficncy, ( -0.52951 ) );
+				WetFinEfficncy = exp_35 * std::pow( SensToTotEnthDiffRatio, 0.16081 ) * std::pow( EnterAirHumRatDiff, 0.01995 ) * std::pow( DryFinEfficncy, -0.52951 );
 			}
 
 			if ( WetFinEfficncy > 1.0 ) WetFinEfficncy = 0.99;
@@ -3958,7 +3967,7 @@ namespace WaterCoils {
 			//       wet coil outside thermal resistance = [1/UA] (wet coil)
 			CoilToAirThermResistWetSurf = MoistAirSpecificHeat / ( WaterCoil( CoilNum ).TotCoilOutsideSurfArea * AirSideWetSurfFilmCoef * WetCoilFinEfficncy );
 			//--                     and dry fin efficiency
-			DryFinEfficncy = 0.5 * ( WaterCoil( CoilNum ).EffectiveFinDiam - WaterCoil( CoilNum ).TubeOutsideDiam ) * std::sqrt( 2. * AirSideDrySurfFilmCoef / ( ConvK * WaterCoil( CoilNum ).FinThermConductivity * WaterCoil( CoilNum ).FinThickness ) );
+			DryFinEfficncy = 0.5 * ( WaterCoil( CoilNum ).EffectiveFinDiam - WaterCoil( CoilNum ).TubeOutsideDiam ) * std::sqrt( 2.0 * AirSideDrySurfFilmCoef / ( ConvK * WaterCoil( CoilNum ).FinThermConductivity * WaterCoil( CoilNum ).FinThickness ) );
 			//      NOTE: The same caveats on the validity of the FilmCoefReynldsCorrelatnFact equation
 			//            hold for the DryFinEfficncy equation.  Values of DryFinEfficncy outside the
 			//            specified range of validity are not guaranteed to
@@ -3966,9 +3975,16 @@ namespace WaterCoils {
 			//             Deleted code by J.C. Vanderzee
 			//       dry coil fin efficiency
 			DryCoilEfficiency = 0.0;
-			for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
-				DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow( DryFinEfficncy, ( CoefPointer - 1 ) );
-			} // CoefPointer
+//Tuned Replaced by below for faster pow calls
+//			for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
+//				DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow( DryFinEfficncy, CoefPointer - 1 );
+//			} // CoefPointer
+			auto const & dry_fin_eff_coef( WaterCoil( CoilNum ).DryFinEfficncyCoef );
+			DryCoilEfficiency += dry_fin_eff_coef( 1 );
+			DryCoilEfficiency += dry_fin_eff_coef( 2 ) * DryFinEfficncy;
+			DryCoilEfficiency += dry_fin_eff_coef( 3 ) * pow_2( DryFinEfficncy );
+			DryCoilEfficiency += dry_fin_eff_coef( 4 ) * pow_3( DryFinEfficncy );
+			DryCoilEfficiency += dry_fin_eff_coef( 5 ) * pow_4( DryFinEfficncy );
 			DryCoilEfficiency = 1.0 + FinToTotSurfAreaRatio * ( DryCoilEfficiency - 1.0 );
 			//       dry coil outside thermal resistance = [1/UA] (dry coil)
 			CoilToAirThermResistDrySurf = 1.0 / ( WaterCoil( CoilNum ).TotCoilOutsideSurfArea * AirSideDrySurfFilmCoef * DryCoilEfficiency );
@@ -3991,7 +4007,7 @@ namespace WaterCoils {
 				//       prevents floating point error when taking exponential
 				//       of a very large number
 				expon = UACoilAllWet * ( 1.0 / AirMassFlow - WaterCoil( CoilNum ).SatEnthlCurveSlope / ( WaterMassFlowRate * Cp * ConvK ) );
-				if ( expon < 20 ) { //CR7189 changed from ABS(expon) < 20
+				if ( expon < 20.0 ) { //CR7189 changed from ABS(expon) < 20
 					//       negative expon can happen, but lead to tiny WetCoilCoef that aren't a problem
 					WetCoilCoeff = std::exp( expon );
 					// following appears similar to eq. 320 in Eng Ref but neglects K1 term
@@ -4083,7 +4099,7 @@ namespace WaterCoils {
 				UADryCoil = ( WaterCoil( CoilNum ).TotCoilOutsideSurfArea - SurfAreaWet ) / ( WaterCoil( CoilNum ).TotCoilOutsideSurfArea * ( TubeFoulThermResist + DryCoilInThermResist + CoilToAirThermResistDrySurf ) );
 
 				// This is a numerical trap for a very small number in the EXP function that is approaching zero
-				if ( ( UADryCoil * DryCoilCoeff1 ) < -60.0 ) {
+				if ( UADryCoil * DryCoilCoeff1 < -60.0 ) {
 					DryCoilCoeff = 0.0;
 				} else {
 					DryCoilCoeff = std::exp( UADryCoil * DryCoilCoeff1 );
@@ -4103,7 +4119,7 @@ namespace WaterCoils {
 					expon = UACoilPartWet * ( 1.0 / AirMassFlow - WaterCoil( CoilNum ).EnthVsTempCurveAppxSlope / ( WaterMassFlowRate * Cp * ConvK ) );
 					//        prevents floating point error when taking exponential
 					//        of a very large number
-					if ( expon < 20 ) {
+					if ( expon < 20.0 ) {
 						WetCoilCoeff = std::exp( expon );
 						//          write(outputfiledebug,*) ' wcc=',wetcoilcoeff
 						denom = ( WaterCoil( CoilNum ).EnthVsTempCurveAppxSlope - WetCoilCoeff * ScaledWaterSpecHeat - ( 1.0 - WetCoilCoeff ) * K1 * MoistAirSpecificHeat );
@@ -4152,10 +4168,10 @@ namespace WaterCoils {
 					MeanWaterTemp = 0.5 * ( TempWaterOut + WetDryInterfcWaterTemp );
 					if ( EnterAirDewPoint > WetDryInterfcSurfTemp ) {
 						SurfAreaWet = 0.5 * WetAreaLast;
-					} else if ( std::abs( MeanWaterTemp - DrySideEffectiveWaterTemp ) <= .00002 ) {
+					} else if ( std::abs( MeanWaterTemp - DrySideEffectiveWaterTemp ) <= 0.00002 ) {
 						CoilPartWetConvg = true;
 					}
-				} else if ( std::abs( WetDryInterSurfTempError ) > .00002 || std::abs( SurfAreaWet - WetAreaLast ) / WaterCoil( CoilNum ).TotCoilOutsideSurfArea > .00001 ) {
+				} else if ( std::abs( WetDryInterSurfTempError ) > 0.00002 || std::abs( SurfAreaWet - WetAreaLast ) / WaterCoil( CoilNum ).TotCoilOutsideSurfArea > 0.00001 ) {
 					if ( WetAreaLast == 0 ) {
 						WetAreaLast = SurfAreaWet;
 						SurfAreaWet += 0.4 * WaterCoil( CoilNum ).TotCoilOutsideSurfArea * WetDryInterSurfTempError / ( OutCoilSurfTemp - InCoilSurfTemp );
@@ -4167,7 +4183,7 @@ namespace WaterCoils {
 					if ( SurfAreaWet >= WaterCoil( CoilNum ).TotCoilOutsideSurfArea ) {
 						SurfAreaWet = WaterCoil( CoilNum ).TotCoilOutsideSurfArea;
 						MeanWaterTemp = 0.5 * ( TempWaterIn + WetDryInterfcWaterTemp );
-						if ( WetAreaLast == WaterCoil( CoilNum ).TotCoilOutsideSurfArea && std::abs( MeanWaterTemp - WetSideEffctvWaterTemp ) <= .00002 ) {
+						if ( WetAreaLast == WaterCoil( CoilNum ).TotCoilOutsideSurfArea && std::abs( MeanWaterTemp - WetSideEffctvWaterTemp ) <= 0.00002 ) {
 							CoilPartWetConvg = true;
 						}
 					}
@@ -4177,7 +4193,7 @@ namespace WaterCoils {
 						WetDryInterfcWaterTemp = TempWaterIn;
 					}
 					InSurfTempSatAirEnthl = PsyHFnTdbRhPb( InCoilSurfTemp, unity, OutBaroPress, RoutineName ) * ConvK;
-					if ( ( EnterAirDewPoint - InCoilSurfTemp ) >= .0001 ) {
+					if ( ( EnterAirDewPoint - InCoilSurfTemp ) >= 0.0001 ) {
 						AirEnthAtWetDryIntrfcSurfTemp = PsyHFnTdbRhPb( EnterAirDewPoint, unity, OutBaroPress, RoutineName ) * ConvK;
 						WaterCoil( CoilNum ).EnthVsTempCurveAppxSlope = ( AirEnthAtWetDryIntrfcSurfTemp - InSurfTempSatAirEnthl ) / ( EnterAirDewPoint - InCoilSurfTemp );
 					} else {
@@ -4211,13 +4227,13 @@ namespace WaterCoils {
 				//       coil effectiveness
 				expon = WaterCoil( CoilNum ).SurfAreaWetFraction / ( CoilToAirThermResistWetSurf * AirMassFlow );
 				y = 0.0;
-				if ( expon < 20. ) y = std::exp( -expon );
+				if ( expon < 20.0 ) y = std::exp( -expon );
 				AirExitEnthlAtCoilSurfTemp = WetDryInterfcAirEnthl - ( WetDryInterfcAirEnthl - OutletAirEnthalpy ) / ( 1.0 - y );
 				AirExitCoilSurfTemp = AirExitEnthlAtCoilSurfTemp / ConvK; // TEmporary calc
 				AirExitCoilSurfTemp = PsyTsatFnHPb( AirExitCoilSurfTemp, OutBaroPress );
 				//       Implementation of epsilon*NTU method
 				TempAirOut = AirExitCoilSurfTemp + ( AirWetDryInterfcTemp - AirExitCoilSurfTemp ) * y;
-				OutletAirHumRat = PsyWFnTdbH( TempAirOut, 1000. * OutletAirEnthalpy, RoutineName );
+				OutletAirHumRat = PsyWFnTdbH( TempAirOut, 1000.0 * OutletAirEnthalpy, RoutineName );
 				SenWaterCoilLoad = AirMassFlow * ( PsyCpAirFnWTdb( InletAirHumRat, TempAirIn ) * TempAirIn - PsyCpAirFnWTdb( OutletAirHumRat, TempAirOut ) * TempAirOut ) * ConvK;
 			}
 
@@ -5102,7 +5118,7 @@ Label999: ;
 		} else if ( RatioStreamCapacity < SmallNo ) {
 			// MinimumCapacityStream/MaximumCapacityStream = 0 and effectiveness is independent of configuration
 			// 20 is the Limit Chosen for Exponential Function, beyond which there is float point error.
-			if ( NTU > 20. ) {
+			if ( NTU > 20.0 ) {
 				effectiveness = 1.0;
 			} else {
 				effectiveness = 1.0 - std::exp( -NTU );
@@ -5124,10 +5140,10 @@ Label999: ;
 
 		} else if ( WaterCoil( CoilNum ).HeatExchType == CrossFlow ) {
 			// Cross flow, both streams unmixed
-			eta = std::pow( NTU, ( -0.22 ) );
-			if ( ( NTU * RatioStreamCapacity * eta ) > 20. ) {
+			eta = std::pow( NTU, -0.22 );
+			if ( ( NTU * RatioStreamCapacity * eta ) > 20.0 ) {
 				b = 1.0 / ( RatioStreamCapacity * eta );
-				if ( b > 20. ) {
+				if ( b > 20.0 ) {
 					effectiveness = 1.0;
 				} else {
 					effectiveness = 1.0 - std::exp( -b );
@@ -5416,8 +5432,8 @@ Label999: ;
 
 	void
 	CalcDryFinEffCoef(
-		Real64 & OutTubeEffFinDiamRatio,
-		FArray1S< Real64 > PolynomCoef
+		Real64 const OutTubeEffFinDiamRatio,
+		FArray1< Real64 > & PolynomCoef
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -5454,7 +5470,7 @@ Label999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > OrderedPair( 2, MaxOrderedPairs );
+		static FArray2D< Real64 > OrderedPair( 2, MaxOrderedPairs ); //Tuned Changed to static: Set before use
 		Real64 FAI;
 		Real64 FED;
 		Real64 FEDnumerator;
@@ -5476,7 +5492,7 @@ Label999: ;
 		Real64 RO;
 
 		FAI = 0.02;
-		for ( I = 1; I <= 60; ++I ) {
+		for ( I = 1; I <= MaxOrderedPairs; ++I ) {
 			FAI += 0.035;
 			R1 = FAI / ( 1.0 - OutTubeEffFinDiamRatio );
 			R2 = R1 * OutTubeEffFinDiamRatio;
@@ -5562,20 +5578,20 @@ Label999: ;
 		} else if ( BessFuncArg < 0.0 ) {
 			ErrorCode = 2;
 			return;
-		} else if ( BessFuncArg > 12. && BessFuncArg > BessFuncOrd ) {
-			if ( BessFuncArg > 90. ) {
+		} else if ( BessFuncArg > 12.0 && BessFuncArg > BessFuncOrd ) {
+			if ( BessFuncArg > 90.0 ) {
 				ErrorCode = 4;
-				IBessFunc = std::pow( 10., 30 );
+				IBessFunc = 1.0e30;
 				return;
 			}
 			TERM = 1.0;
 			IBessFunc = 1.0;
 			for ( LoopCount = 1; LoopCount <= 30; ++LoopCount ) { //Start of 1st LoopCount Loop
 				if ( std::abs( TERM ) <= std::abs( ErrorTol * IBessFunc ) ) {
-					IBessFunc *= std::exp( BessFuncArg ) / std::sqrt( 2. * Pi * BessFuncArg );
+					IBessFunc *= std::exp( BessFuncArg ) / std::sqrt( 2.0 * Pi * BessFuncArg );
 					return;
 				}
-				TERM *= 0.125 / BessFuncArg * ( std::pow( ( 2 * LoopCount - 1 ), 2 ) - 4 * BessFuncOrd * BessFuncOrd ) / double( LoopCount );
+				TERM *= 0.125 / BessFuncArg * ( pow_2( 2 * LoopCount - 1 ) - 4 * BessFuncOrd * BessFuncOrd ) / double( LoopCount );
 				IBessFunc += TERM;
 			} // End of 1st LoopCount loop
 		}
@@ -5584,12 +5600,12 @@ Label999: ;
 		if ( BessFuncOrd > 0 ) {
 			for ( LoopCount = 1; LoopCount <= BessFuncOrd; ++LoopCount ) { //Start of 2nd LoopCount Loop
 				FI = LoopCount;
-				if ( std::abs( TERM ) < 1.e-30 * FI / ( BessFuncArg * 2.0 ) ) {
+				if ( std::abs( TERM ) < 1.0e-30 * FI / ( BessFuncArg * 2.0 ) ) {
 					ErrorCode = 3;
 					IBessFunc = 0.0;
 					return;
 				}
-				TERM *= BessFuncArg / ( 2. * FI );
+				TERM *= BessFuncArg / ( 2.0 * FI );
 			} //End of 2nd LoopCount loop
 		}
 
@@ -5597,7 +5613,7 @@ Label999: ;
 		for ( LoopCount = 1; LoopCount <= 1000; ++LoopCount ) { //Start of 3rd LoopCount Loop
 			if ( std::abs( TERM ) <= std::abs( IBessFunc * ErrorTol ) ) return;
 			FK = LoopCount * ( BessFuncOrd + LoopCount );
-			TERM *= ( std::pow( BessFuncArg, 2 ) / ( 4. * FK ) );
+			TERM *= pow_2( BessFuncArg ) / ( 4.0 * FK );
 			IBessFunc += TERM;
 		} //End of  3rd LoopCount loop
 
@@ -5679,7 +5695,7 @@ Label999: ;
 		} else if ( BessFuncArg <= 0.0 ) {
 			ErrorCode = 2;
 			return;
-		} else if ( BessFuncArg > 85. ) {
+		} else if ( BessFuncArg > 85.0 ) {
 			ErrorCode = 3;
 			KBessFunc = 0.0;
 			return;
@@ -5725,8 +5741,8 @@ Label999: ;
 				FACT = 1.0;
 				HJ = 0.0;
 				for ( LoopCount = 1; LoopCount <= 6; ++LoopCount ) {
-					X2J *= std::pow( BessFuncArg, 2 ) / 4.0;
-					FACT *= std::pow( ( 1.0 / double( LoopCount ) ), 2 );
+					X2J *= pow_2( BessFuncArg ) / 4.0;
+					FACT *= pow_2( 1.0 / double( LoopCount ) );
 					HJ += 1.0 / double( LoopCount );
 					G0 += X2J * FACT * ( HJ - ( 0.5772157 + std::log( BessFuncArg / 2.0 ) ) );
 				} //End of LoopCount Loop
@@ -5743,8 +5759,8 @@ Label999: ;
 			HJ = 1.0;
 			G1 = 1.0 / BessFuncArg + X2J * ( 0.5 + ( 0.5772157 + std::log( BessFuncArg / 2.0 ) ) - HJ );
 			for ( LoopCount = 2; LoopCount <= 8; ++LoopCount ) {
-				X2J *= std::pow( BessFuncArg, 2 ) / 4.0;
-				FACT *= std::pow( ( 1.0 / double( LoopCount ) ), 2 );
+				X2J *= pow_2( BessFuncArg ) / 4.0;
+				FACT *= pow_2( 1.0 / double( LoopCount ) );
 				HJ += 1.0 / double( LoopCount );
 				G1 += X2J * FACT * ( 0.5 + ( ( 0.5772157 + std::log( BessFuncArg / 2.0 ) ) - HJ ) * double( LoopCount ) );
 			} //End of LoopCount Loop
@@ -5759,7 +5775,7 @@ Label999: ;
 		LoopCount = 2;
 		StopLoop = false;
 		while ( LoopCount <= BessFuncOrd && ! StopLoop ) {
-			GJ = 2. * ( double( LoopCount ) - 1.0 ) * G1 / BessFuncArg + G0;
+			GJ = 2.0 * ( double( LoopCount ) - 1.0 ) * G1 / BessFuncArg + G0;
 			if ( GJ - GJMAX > 0.0 ) {
 				ErrorCode = 4;
 				GJ = GJMAX;
@@ -5776,8 +5792,8 @@ Label999: ;
 
 	void
 	CalcPolynomCoef(
-		FArray2A< Real64 > OrderedPair,
-		FArray1S< Real64 > PolynomCoef
+		FArray2< Real64 > const & OrderedPair,
+		FArray1< Real64 > & PolynomCoef
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -5794,9 +5810,6 @@ Label999: ;
 		// USE STATEMENTS:
 		// na
 
-		// Argument array dimensioning
-		OrderedPair.dim( 2, MaxOrderedPairs );
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -5811,8 +5824,8 @@ Label999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool Converged;
-		FArray2D< Real64 > OrdPairSum( 2, 10 );
-		FArray2D< Real64 > OrdPairSumMatrix( 10, 10 );
+		static FArray2D< Real64 > OrdPairSum( 2, 10 ); //Tuned Changed to static and whole array zero-initialized
+		static FArray2D< Real64 > OrdPairSumMatrix( 10, 10 ); //Tuned Changed to static
 		Real64 B;
 		int I;
 		int II;
@@ -5823,9 +5836,8 @@ Label999: ;
 		Real64 S1;
 		Real64 S2;
 
+		OrdPairSum = 0.0;
 		OrdPairSum( 1, 1 ) = MaxOrderedPairs;
-		OrdPairSum( 1, {2,3} ) = 0.0;
-		OrdPairSum( 2, _ ) = 0.0;
 		PolynomCoef = 0.0;
 		for ( CurrentOrdPair = 1; CurrentOrdPair <= MaxOrderedPairs; ++CurrentOrdPair ) {
 			OrdPairSum( 1, 2 ) += OrderedPair( 1, CurrentOrdPair );
@@ -5840,22 +5852,22 @@ Label999: ;
 				for ( J = 1; J <= PolynomOrder + 1; ++J ) {
 					OrdPairSumMatrix( CurrentOrder, J ) = OrdPairSum( 1, J - 1 + CurrentOrder );
 				} //End of J loop
-				OrdPairSumMatrix( CurrentOrder, ( PolynomOrder + 2 ) ) = OrdPairSum( 2, CurrentOrder );
+				OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 ) = OrdPairSum( 2, CurrentOrder );
 			} //End of CurrentOrder loop
 
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
-				OrdPairSumMatrix( ( PolynomOrder + 2 ), CurrentOrder ) = -1.0;
-				for ( J = CurrentOrder + 1; J <= ( PolynomOrder + 2 ); ++J ) {
-					OrdPairSumMatrix( ( PolynomOrder + 2 ), J ) = 0.0;
+				OrdPairSumMatrix( PolynomOrder + 2, CurrentOrder ) = -1.0;
+				for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
+					OrdPairSumMatrix( PolynomOrder + 2, J ) = 0.0;
 				} //End of J loop
 
-				for ( II = 2; II <= ( PolynomOrder + 2 ); ++II ) {
-					for ( J = CurrentOrder + 1; J <= ( PolynomOrder + 2 ); ++J ) {
+				for ( II = 2; II <= PolynomOrder + 2; ++II ) {
+					for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
 						OrdPairSumMatrix( II, J ) -= OrdPairSumMatrix( 1, J ) * OrdPairSumMatrix( II, CurrentOrder ) / OrdPairSumMatrix( 1, CurrentOrder );
 					} //End of J loop
 				} //End of II loop
 				for ( II = 1; II <= PolynomOrder + 1; ++II ) {
-					for ( J = CurrentOrder + 1; J <= ( PolynomOrder + 2 ); ++J ) {
+					for ( J = CurrentOrder + 1; J <= PolynomOrder + 2; ++J ) {
 						OrdPairSumMatrix( II, J ) = OrdPairSumMatrix( II + 1, J );
 					} //End of J loop
 				} //End of II loop
@@ -5863,25 +5875,25 @@ Label999: ;
 
 			S2 = 0.0;
 			for ( CurrentOrdPair = 1; CurrentOrdPair <= MaxOrderedPairs; ++CurrentOrdPair ) {
-				S1 = OrdPairSumMatrix( 1, ( PolynomOrder + 2 ) );
+				S1 = OrdPairSumMatrix( 1, PolynomOrder + 2 );
 				for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder ) {
-					S1 += OrdPairSumMatrix( CurrentOrder + 1, ( PolynomOrder + 2 ) ) * std::pow( OrderedPair( 1, CurrentOrdPair ), CurrentOrder );
+					S1 += OrdPairSumMatrix( CurrentOrder + 1, PolynomOrder + 2 ) * std::pow( OrderedPair( 1, CurrentOrdPair ), CurrentOrder );
 				} //End of CurrentOrder loop
 				S2 += ( S1 - OrderedPair( 2, CurrentOrdPair ) ) * ( S1 - OrderedPair( 2, CurrentOrdPair ) );
 			} //End of CurrentOrdPair loop
 			B = MaxOrderedPairs - ( PolynomOrder + 1 );
 			if ( S2 > 0.0001 ) S2 = std::sqrt( S2 / B );
 			for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder + 1; ++CurrentOrder ) {
-				PolynomCoef( CurrentOrder ) = OrdPairSumMatrix( CurrentOrder, ( PolynomOrder + 2 ) );
+				PolynomCoef( CurrentOrder ) = OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 );
 			} //End of CurrentOrder loop
 
-			if ( ( ( PolynomOrder - MaxPolynomOrder ) < 0.0 ) && ( ( S2 - PolyConvgTol ) > 0.0 ) ) {
+			if ( ( PolynomOrder - MaxPolynomOrder < 0.0 ) && ( S2 - PolyConvgTol > 0.0 ) ) {
 				++PolynomOrder;
 				J = 2 * PolynomOrder;
 				OrdPairSum( 1, {J,J + 1} ) = 0.0;
 				OrdPairSum( 2, PolynomOrder + 1 ) = 0.0;
 				for ( I = 1; I <= MaxOrderedPairs; ++I ) {
-					OrdPairSum( 1, J ) += std::pow( OrderedPair( 1, I ), ( J - 1 ) );
+					OrdPairSum( 1, J ) += std::pow( OrderedPair( 1, I ), J - 1 );
 					OrdPairSum( 1, J + 1 ) += std::pow( OrderedPair( 1, I ), J );
 					OrdPairSum( 2, PolynomOrder + 1 ) += OrderedPair( 2, I ) * std::pow( OrderedPair( 1, I ), PolynomOrder );
 				}
@@ -6166,7 +6178,7 @@ Label10: ;
 			}
 
 			// Validity Check for Imaginary roots, In this case go back to linear fit.
-			check = std::pow( QuadCoefTwo, 2 ) - 4.0 * QuadCoefOne * QuadCoefThree;
+			check = pow_2( QuadCoefTwo ) - 4.0 * QuadCoefOne * QuadCoefThree;
 			// Imaginary Root Exist
 			if ( check < 0 ) {
 				mode = 2;
@@ -6356,7 +6368,7 @@ Label10: ;
 			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ShowContinueError( "... Max Water Flow rate returned as -1000." );
 			ErrorsFound = true;
-			MaxWaterFlowRate = -1000.;
+			MaxWaterFlowRate = -1000.0;
 		}
 
 		return MaxWaterFlowRate;
@@ -7078,16 +7090,29 @@ Label10: ;
 		// USE STATEMENTS:
 
 		// Return value
-		Real64 SurfaceArea; // Heat exchanger surface area, [m2]
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const OverallFinEfficiency( 0.92 ); // Assumes aluminum fins, 12 fins per inch, fins
+		static Real64 const OverallFinEfficiency( 0.92 ); // Assumes aluminum fins, 12 fins per inch, fins
 		// area of about 90% of external surface area Ao.
-		Real64 const AreaRatio( 0.07 ); // Heat exchanger Inside to Outside surface area ratio
+
+		static Real64 const AreaRatio( 0.07 ); // Heat exchanger Inside to Outside surface area ratio
 		// design values range from (Ai/Ao) = 0.06 to 0.08
+
+		// Constant value air side heat transfer coefficient is assumed. This coefficient has sensible
+		// (58.d0 [W/m2C]) and latent (82.d0 [W/m2C]) heat transfer coefficient components.
+		static Real64 const hAirTubeOutside( 58.0 + 82.0 ); // Air side heat transfer coefficient [W/m2C]
+
+		// Tube side water convection heat transfer coefficient of the cooling coil is calculated for
+		// inside tube diameter of 0.0122m (~0.5 inch nominal diameter) and water velocity 2.0 m/s:
+		static Real64 const hWaterTubeInside( 1429.0 * std::pow( 2.0, 0.8 ) * std::pow( 0.0122, -0.2 ) ); // water (tube) side heat transfer coefficient [W/m2C]
+
+		// Estimate the overall heat transfer coefficient, UOverallHeatTransferCoef in [W/(m2C)].
+		// Neglecting tube wall and fouling resistance, the overall U value can be estimated as:
+		// 1/UOverallHeatTransferCoef = 1/(hi*AreaRatio) + 1/(ho*OverallFinEfficiency)
+		static Real64 const UOverallHeatTransferCoef_inv( 1.0 / ( hWaterTubeInside * AreaRatio ) + 1.0 / ( hAirTubeOutside * OverallFinEfficiency ) ); // Inverse of overall heat transfer coefficient for coil [W/m2C]
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -7096,30 +7121,11 @@ Label10: ;
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 UOverallHeatTransferCoef; // over all heat transfer coefficient for coil [W/m2C]
-		Real64 hAirTubeOutside; // Air side heat transfer coefficient [W/m2C]
-		Real64 hWaterTubeInside; // water (tube) side heat transfer coefficient [W/m2C]
 
 		WaterCoil( CoilNum ).UACoilTotal = 1.0 / ( 1.0 / WaterCoil( CoilNum ).UACoilExternal + 1.0 / WaterCoil( CoilNum ).UACoilInternal );
 
-		// Tube side water convection heat transfer coefficient of the cooling coil is calculated for
-		// inside tube diameter of 0.0122m (~0.5 inch nominal diameter) and water velocity 2.0 m/s:
-		hWaterTubeInside = 1429. * ( std::pow( 2., 0.8 ) ) * ( std::pow( 0.0122, ( -0.2 ) ) );
-
-		// Constant value air side heat transfer coefficient is assumed. This coefficient has sensible
-		// (58.d0 [W/m2C]) and latent (82.d0 [W/m2C]) heat transfer coefficient components.
-		hAirTubeOutside = 58. + 82.;
-
-		// Estimate the overall heat transfer coefficient, UOverallHeatTransferCoef in [W/(m2C)].
-		// Neglecting tube wall and fouling resistance, the overall U value can be estimated as:
-		// 1/UOverallHeatTransferCoef = 1/(hi*AreaRatio) + 1/(ho*OverallFinEfficiency)
-
-		UOverallHeatTransferCoef = 1.0 / ( 1.0 / ( hWaterTubeInside * AreaRatio ) + 1.0 / ( hAirTubeOutside * OverallFinEfficiency ) );
-
 		// the heat exchanger surface area is calculated as follows:
-		SurfaceArea = WaterCoil( CoilNum ).UACoilTotal / UOverallHeatTransferCoef;
-
-		return SurfaceArea;
+		return WaterCoil( CoilNum ).UACoilTotal * UOverallHeatTransferCoef_inv; // Heat exchanger surface area [m2]
 	}
 
 	int

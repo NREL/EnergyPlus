@@ -266,13 +266,9 @@ namespace WaterUse {
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 			MaxIterationsErrorCount = 0;
 			if ( NumWaterEquipment > 0 ) {
-				WaterEquipment.SensibleRate() = 0.0;
-				WaterEquipment.SensibleEnergy() = 0.0;
-				WaterEquipment.LatentRate() = 0.0;
-				WaterEquipment.LatentEnergy() = 0.0;
-				WaterEquipment.MixedTemp() = 0.0;
-				WaterEquipment.TotalMassFlowRate() = 0.0;
-				WaterEquipment.DrainTemp() = 0.0;
+				for ( int i = WaterEquipment.l(), e = WaterEquipment.u(); i <= e; ++i ) {
+					WaterEquipment( i ).reset();
+				}
 			}
 
 			if ( NumWaterConnections > 0 ) {

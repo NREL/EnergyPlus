@@ -232,6 +232,7 @@ namespace HVACManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt const EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
 		static gio::Fmt const EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -525,10 +526,10 @@ namespace HVACManager {
 					DebugNamesReported = true;
 				}
 				if ( size( Node ) > 0 ) {
-					gio::write( OutputFileDebug, "*" );
-					gio::write( OutputFileDebug, "*" );
-					gio::write( OutputFileDebug, "*" ) << "Day of Sim     Hour of Day    Time";
-					gio::write( OutputFileDebug, "*" ) << DayOfSim << HourOfDay << TimeStep * TimeStepZone;
+					gio::write( OutputFileDebug, fmtLD );
+					gio::write( OutputFileDebug, fmtLD );
+					gio::write( OutputFileDebug, fmtLD ) << "Day of Sim     Hour of Day    Time";
+					gio::write( OutputFileDebug, fmtLD ) << DayOfSim << HourOfDay << TimeStep * TimeStepZone;
 					gio::write( OutputFileDebug, Format_10 );
 				}
 				for ( NodeNum = 1; NodeNum <= isize( Node ); ++NodeNum ) {
@@ -593,6 +594,9 @@ namespace HVACManager {
 		using DataPlant::PlantLoop;
 		using DataPlant::NumConvergenceHistoryTerms;
 		using DataPlant::ConvergenceHistoryARR;
+		using DataPlant::sum_ConvergenceHistoryARR;
+		using DataPlant::square_sum_ConvergenceHistoryARR;
+		using DataPlant::sum_square_ConvergenceHistoryARR;
 		using PlantUtilities::CheckPlantMixerSplitterConsistency;
 		using PlantUtilities::CheckForRunawayPlantTemps;
 		using PlantUtilities::AnyPlantSplitterMixerLacksContinuity;
@@ -961,7 +965,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeHumRat = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) ) ) / ( std::pow( sum( ConvergLogStackARR ), 2 ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
+									SlopeHumRat = ( sum_ConvergLogStackARR * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).HumidityRatio ) ) ) / ( square_sum_ConvergLogStackARR - double( ConvergLogStackDepth ) * sum_square_ConvergLogStackARR );
 									if ( std::abs( SlopeHumRat ) > HVACHumRatSlopeToler ) {
 
 										if ( SlopeHumRat < 0.0 ) { // check for monotic decrease
@@ -1017,7 +1021,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeMdot = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) ) ) / ( std::pow( sum( ConvergLogStackARR ), 2 ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
+									SlopeMdot = ( sum_ConvergLogStackARR * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).MassFlowRate ) ) ) / ( square_sum_ConvergLogStackARR - double( ConvergLogStackDepth ) * sum_square_ConvergLogStackARR );
 									if ( std::abs( SlopeMdot ) > HVACFlowRateSlopeToler ) {
 										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedMassFlow = true;
 										if ( SlopeMdot < 0.0 ) { // check for monotic decrease
@@ -1073,7 +1077,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeTemps = ( sum( ConvergLogStackARR ) * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) ) ) / ( std::pow( sum( ConvergLogStackARR ), 2 ) - double( ConvergLogStackDepth ) * sum( pow( ConvergLogStackARR, 2 ) ) );
+									SlopeTemps = ( sum_ConvergLogStackARR * sum( ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) - double( ConvergLogStackDepth ) * sum( ( ConvergLogStackARR * ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).Temperature ) ) ) / ( square_sum_ConvergLogStackARR - double( ConvergLogStackDepth ) * sum_square_ConvergLogStackARR );
 									if ( std::abs( SlopeTemps ) > HVACTemperatureSlopeToler ) {
 										ZoneInletConvergence( ZoneNum ).InletNode( NodeIndex ).NotConvergedTemp = true;
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
@@ -1149,7 +1153,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeMdot = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) ) ) / ( std::pow( sum( ConvergenceHistoryARR ), 2 ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeMdot = ( sum_ConvergenceHistoryARR * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.MassFlowRateHistory ) ) ) / ( square_sum_ConvergenceHistoryARR - double( NumConvergenceHistoryTerms ) * sum_square_ConvergenceHistoryARR );
 									if ( std::abs( SlopeMdot ) > PlantFlowRateSlopeToler ) {
 										if ( SlopeMdot < 0.0 ) { // check for monotonic decrease
 											MonotonicDecreaseFound = true;
@@ -1202,7 +1206,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeMdot = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) ) ) / ( std::pow( sum( ConvergenceHistoryARR ), 2 ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeMdot = ( sum_ConvergenceHistoryARR * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.MassFlowRateHistory ) ) ) / ( square_sum_ConvergenceHistoryARR - double( NumConvergenceHistoryTerms ) * sum_square_ConvergenceHistoryARR );
 									if ( std::abs( SlopeMdot ) > PlantFlowRateSlopeToler ) {
 										if ( SlopeMdot < 0.0 ) { // check for monotonic decrease
 											MonotonicDecreaseFound = true;
@@ -1275,7 +1279,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeTemps = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) ) ) / ( std::pow( sum( ConvergenceHistoryARR ), 2 ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeTemps = ( sum_ConvergenceHistoryARR * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).InletNode.TemperatureHistory ) ) ) / ( square_sum_ConvergenceHistoryARR - double( NumConvergenceHistoryTerms ) * sum_square_ConvergenceHistoryARR );
 									if ( std::abs( SlopeTemps ) > PlantTemperatureSlopeToler ) {
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;
@@ -1328,7 +1332,7 @@ namespace HVACManager {
 									}
 								}
 								if ( ! FoundOscillationByDuplicate ) {
-									SlopeTemps = ( sum( ConvergenceHistoryARR ) * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) ) ) / ( std::pow( sum( ConvergenceHistoryARR ), 2 ) - double( NumConvergenceHistoryTerms ) * sum( pow( ConvergenceHistoryARR, 2 ) ) );
+									SlopeTemps = ( sum_ConvergenceHistoryARR * sum( PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) - double( NumConvergenceHistoryTerms ) * sum( ( ConvergenceHistoryARR * PlantLoop( LoopNum ).LoopSide( ThisLoopSide ).OutletNode.TemperatureHistory ) ) ) / ( square_sum_ConvergenceHistoryARR - double( NumConvergenceHistoryTerms ) * sum_square_ConvergenceHistoryARR );
 									if ( std::abs( SlopeTemps ) > PlantFlowRateSlopeToler ) {
 										if ( SlopeTemps < 0.0 ) { // check for monotic decrease
 											MonotonicDecreaseFound = true;

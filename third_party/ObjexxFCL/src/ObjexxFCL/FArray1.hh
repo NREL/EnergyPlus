@@ -2540,38 +2540,6 @@ public: // Comparison: Count: MArray
 		return count_le( b, a );
 	}
 
-public: // Friend
-
-	// Distance
-	inline
-	friend
-	T
-	distance( FArray1 const & a, FArray1 const & b )
-	{
-		assert( a.size() == b.size() );
-		T distance_sq( T( 0 ) );
-		for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
-			T const distance_i( a( i ) - b( j ) );
-			distance_sq += distance_i * distance_i;
-		}
-		return std::sqrt( distance_sq );
-	}
-
-	// Distance Squared
-	inline
-	friend
-	T
-	distance_squared( FArray1 const & a, FArray1 const & b )
-	{
-		assert( a.size() == b.size() );
-		T distance_sq( T( 0 ) );
-		for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
-			T const distance_i( a( i ) - b( j ) );
-			distance_sq += distance_i * distance_i;
-		}
-		return distance_sq;
-	}
-
 protected: // Functions
 
 	// Dimension by IndexRange
@@ -2643,15 +2611,63 @@ equal_dimensions( FArray1< U > const & a, FArray1< V > const & b )
 	return a.equal_dimensions( b );
 }
 
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( FArray1< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = a.l(), e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( FArray1< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = a.l(), e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return mag_sq;
+}
+
 // Distance
 template< typename T >
+inline
 T
-distance( FArray1< T > const & a, FArray1< T > const & b );
+distance( FArray1< T > const & a, FArray1< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
 
 // Distance Squared
 template< typename T >
+inline
 T
-distance_squared( FArray1< T > const & a, FArray1< T > const & b );
+distance_squared( FArray1< T > const & a, FArray1< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( int i = a.l(), j = b.l(), e = a.u(); i <= e; ++i, ++j ) {
+		T const distance_i( a( i ) - b( j ) );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
 
 // Dot Product
 template< typename T >

@@ -455,7 +455,7 @@ namespace PackagedThermalStorageCoil {
 			IceStorageCapacity( 0.0 ),
 			StorageCapacitySizingFactor( 0.0 ),
 			MinimumFluidTankTempLimit( 0.0 ),
-			MaximumFluidTankTempLimit( 100. ),
+			MaximumFluidTankTempLimit( 100.0 ),
 			RatedFluidTankTemp( 0.0 ),
 			StorageAmbientNodeNum( 0 ),
 			StorageUA( 0.0 ),

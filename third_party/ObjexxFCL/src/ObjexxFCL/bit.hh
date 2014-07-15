@@ -198,7 +198,7 @@ inline
 T
 bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
-	static auto const x_bits( std::numeric_limits< T >::digits );
+	auto const x_bits( std::numeric_limits< T >::digits );
 	return ( shift >= S( 0 ) ? ( shift < x_bits ? x << shift : T( 0 ) ) : ( -shift < x_bits ? x >> -shift : T( 0 ) ) );
 }
 
@@ -208,7 +208,7 @@ inline
 T
 bit_shift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFT: We do a logical shift like Intel Fortran and GFortran
 {
-	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
 	return ( shift >= S( 0 ) ? ( shift < x_bits ? u << shift : T( 0 ) ) : ( -shift < x_bits ? u >> -shift : T( 0 ) ) );
 }
@@ -220,7 +220,7 @@ T
 bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
 	assert( shift >= S( 0 ) );
-	static auto const x_bits( std::numeric_limits< T >::digits );
+	auto const x_bits( std::numeric_limits< T >::digits );
 	return ( shift < x_bits ? x << shift : T( 0 ) );
 }
 
@@ -231,7 +231,7 @@ T
 bit_lshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran LSHFT/LSHIFT: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( shift >= S( 0 ) );
-	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	return ( shift < x_bits ? *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) << shift : T( 0 ) );
 }
 
@@ -242,7 +242,7 @@ T
 bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
 	assert( shift >= S( 0 ) );
-	static auto const x_bits( std::numeric_limits< T >::digits );
+	auto const x_bits( std::numeric_limits< T >::digits );
 	return ( shift < x_bits ? x >> shift : T( 0 ) );
 }
 
@@ -253,7 +253,7 @@ T
 bit_rshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran RSHFT/RSHIFT: We do a logical shift like Intel Fortran and GFortran
 {
 	assert( shift >= S( 0 ) );
-	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	return ( shift < x_bits ? *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) >> shift : T( 0 ) );
 }
 
@@ -263,7 +263,7 @@ inline
 T
 bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_unsigned< T >::value >::type * = 0 )
 {
-	static auto const x_bits( std::numeric_limits< T >::digits );
+	auto const x_bits( std::numeric_limits< T >::digits );
 	if ( shift >= S( 0 ) ) {
 		S const s( shift % x_bits );
 		return ( s > S( 0 ) ? x << s | x >> ( x_bits - s ) : x );
@@ -279,7 +279,7 @@ inline
 T
 bit_cshift( T const & x, S const & shift, typename std::enable_if< std::is_signed< T >::value >::type * = 0 ) // x<0 behavior varies in Fortran ISHFTC: We do a logical shift like Intel Fortran and GFortran
 {
-	static auto const x_bits( std::numeric_limits< T >::digits + 1 );
+	auto const x_bits( std::numeric_limits< T >::digits + 1 );
 	auto const & u( *reinterpret_cast< typename std::make_unsigned< T const >::type * >( &x ) );
 	if ( shift >= S( 0 ) ) {
 		S const s( shift % x_bits );

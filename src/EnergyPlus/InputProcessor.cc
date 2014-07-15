@@ -13,7 +13,6 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -82,9 +81,10 @@ namespace InputProcessor {
 	std::string const Blank;
 	static std::string const BlankString;
 	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
-	gio::Fmt const fmta( "(A)" );
 	Real64 const DefAutoSizeValue( AutoSize );
 	Real64 const DefAutoCalculateValue( AutoCalculate );
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -267,7 +267,7 @@ namespace InputProcessor {
 			DisplayString( "Could not open (read) Energy+.idd." );
 			ShowFatalError( "ProcessInput: Could not open file \"Energy+.idd\" for input (read)." );
 		}
-		gio::read( IDDFile, fmta ) >> InputLine;
+		gio::read( IDDFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
@@ -280,7 +280,7 @@ namespace InputProcessor {
 		NumLines = 0;
 
 		DoingInputProcessing = true;
-		gio::write( EchoInputFile, "*" ) << " Processing Data Dictionary (Energy+.idd) File -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
 
@@ -310,17 +310,17 @@ namespace InputProcessor {
 		}
 
 		ProcessingIDD = false;
-		gio::write( EchoInputFile, "*" ) << " Processing Data Dictionary (Energy+.idd) File -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Complete";
 
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Number of Object Definitions=" << NumObjectDefs;
-		gio::write( EchoInputFile, "*" ) << " Number of Section Definitions=" << NumSectionDefs;
-		gio::write( EchoInputFile, "*" ) << " Total Number of Alpha Fields=" << NumAlphaArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Object Definitions=" << NumObjectDefs;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Section Definitions=" << NumSectionDefs;
+		gio::write( EchoInputFile, fmtLD ) << " Total Number of Alpha Fields=" << NumAlphaArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
-		gio::write( EchoInputFile, "*" ) << " Processing Input Data File (in.idf) -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
 
 		{ IOFlags flags; gio::inquire( "in.idf", flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
@@ -334,7 +334,7 @@ namespace InputProcessor {
 			DisplayString( "Could not open (read) in.idf." );
 			ShowFatalError( "ProcessInput: Could not open file \"in.idf\" for input (read)." );
 		}
-		gio::read( IDFFile, fmta ) >> InputLine;
+		gio::read( IDFFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
@@ -371,18 +371,18 @@ namespace InputProcessor {
 		IDFRecordsGotten.allocate( NumIDFRecords );
 		IDFRecordsGotten = false;
 
-		gio::write( EchoInputFile, "*" ) << " Processing Input Data File (in.idf) -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Complete";
 		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;
 		GetIDFRecordsStats( iNumberOfRecords, iNumberOfDefaultedFields, iTotalFieldsWithDefaults, iNumberOfAutoSizedFields, iTotalAutoSizableFields, iNumberOfAutoCalcedFields, iTotalAutoCalculatableFields );
-		gio::write( EchoInputFile, "*" ) << " Number of IDF \"Lines\"=" << iNumberOfRecords;
-		gio::write( EchoInputFile, "*" ) << " Number of Defaulted Fields=" << iNumberOfDefaultedFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Fields with Defaults=" << iTotalFieldsWithDefaults;
-		gio::write( EchoInputFile, "*" ) << " Number of Autosized Fields=" << iNumberOfAutoSizedFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Autosizable Fields =" << iTotalAutoSizableFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Autocalculated Fields=" << iNumberOfAutoCalcedFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Autocalculatable Fields =" << iTotalAutoCalculatableFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of IDF \"Lines\"=" << iNumberOfRecords;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Defaulted Fields=" << iNumberOfDefaultedFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Fields with Defaults=" << iTotalFieldsWithDefaults;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autosized Fields=" << iNumberOfAutoSizedFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autosizable Fields =" << iTotalAutoSizableFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autocalculated Fields=" << iNumberOfAutoCalcedFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autocalculatable Fields =" << iTotalAutoCalculatableFields;
 
 		CountErr = 0;
 		for ( Loop = 1; Loop <= NumIDFSections; ++Loop ) {
@@ -390,7 +390,7 @@ namespace InputProcessor {
 			if ( equali( SectionsOnFile( Loop ).Name, "REPORT VARIABLE DICTIONARY" ) ) continue;
 			if ( CountErr == 0 ) {
 				ShowSevereError( "IP: Potential errors in IDF processing -- see .audit file for details." );
-				gio::write( EchoInputFile, fmta ) << " Potential errors in IDF processing:";
+				gio::write( EchoInputFile, fmtA ) << " Potential errors in IDF processing:";
 			}
 			++CountErr;
 			Which = SectionsOnFile( Loop ).FirstRecord;
@@ -402,12 +402,12 @@ namespace InputProcessor {
 					Num1 = FindItemInList( IDFRecords( Which ).Name, ListOfObjects, NumObjectDefs );
 				}
 				if ( ObjectDef( Num1 ).NameAlpha1 && IDFRecords( Which ).NumAlphas > 0 ) {
-					gio::write( EchoInputFile, fmta ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Object Name=" + IDFRecords( Which ).Alphas( 1 );
+					gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Object Name=" + IDFRecords( Which ).Alphas( 1 );
 				} else {
-					gio::write( EchoInputFile, fmta ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Name field not recorded for Object.";
+					gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Name field not recorded for Object.";
 				}
 			} else {
-				gio::write( EchoInputFile, fmta ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], No prior Objects.";
+				gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], No prior Objects.";
 			}
 		}
 
@@ -1845,7 +1845,7 @@ namespace InputProcessor {
 							if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefaultChk ) {
 								if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
 									LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
-									gio::write( String, "*" ) << ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
+									gio::write( String, fmtLD ) << ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
 									strip( String );
 									ShowAuditErrorMessage( " **   Add   ** ", String + "   ! field=>" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName );
 								} else if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize ) {
@@ -1954,7 +1954,7 @@ namespace InputProcessor {
 
 		for ( int Count = 1; Count <= NumIDFSections; ++Count ) {
 			if ( SectionsOnFile( Count ).FirstRecord > SectionsOnFile( Count ).LastRecord ) {
-				gio::write( EchoInputFile, "*" ) << " Section " << Count << " " << SectionsOnFile( Count ).Name << " had no object records";
+				gio::write( EchoInputFile, fmtLD ) << " Section " << Count << " " << SectionsOnFile( Count ).Name << " had no object records";
 				SectionsOnFile( Count ).FirstRecord = -1;
 				SectionsOnFile( Count ).LastRecord = -1;
 			}
@@ -2346,7 +2346,7 @@ namespace InputProcessor {
 		}
 
 		if ( ObjectGotCount( Found ) == 0 ) {
-			gio::write( EchoInputFile, "*" ) << "Getting object=" << UCObject;
+			gio::write( EchoInputFile, fmtLD ) << "Getting object=" << UCObject;
 		}
 		++ObjectGotCount( Found );
 
@@ -2674,7 +2674,7 @@ namespace InputProcessor {
 				}
 			}
 		} else {
-			gio::write( EchoInputFile, "*" ) << " Requested Record" << Which << " not in range, 1 -- " << NumIDFRecords;
+			gio::write( EchoInputFile, fmtLD ) << " Requested Record" << Which << " not in range, 1 -- " << NumIDFRecords;
 		}
 
 	}
@@ -3190,7 +3190,7 @@ namespace InputProcessor {
 		// Object Data
 		FArray1D< RangeCheckDef > TempChecks;
 
-		gio::write( EchoInputFile, "(A)" ) << "Attempting to auto-extend object=" + ObjectDef( ObjectNum ).Name;
+		gio::write( EchoInputFile, fmtA ) << "Attempting to auto-extend object=" + ObjectDef( ObjectNum ).Name;
 		if ( CurObject != ObjectDef( ObjectNum ).Name ) {
 			DisplayString( "Auto-extending object=\"" + ObjectDef( ObjectNum ).Name + "\", input processing may be slow." );
 			CurObject = ObjectDef( ObjectNum ).Name;
@@ -3398,7 +3398,7 @@ namespace InputProcessor {
 		int IoStatus( 0 );
 		if ( PString.find_first_not_of( ValidNumerics ) == std::string::npos ) {
 			Real64 Temp;
-			{ IOFlags flags; gio::read( PString, "*", flags ) >> rProcessNumber; IoStatus = flags.ios(); }
+			{ IOFlags flags; gio::read( PString, fmtLD, flags ) >> rProcessNumber; IoStatus = flags.ios(); }
 			ErrorFlag = false;
 		} else {
 			rProcessNumber = 0.0;
@@ -4566,12 +4566,12 @@ namespace InputProcessor {
 		}
 
 		if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
-			gio::write( EchoInputFile, "*" ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
+			gio::write( EchoInputFile, fmtLD ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
 				if ( ! OrphanNames( Count ).empty() ) {
-					gio::write( EchoInputFile, fmta ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
+					gio::write( EchoInputFile, fmtA ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
 				} else {
-					gio::write( EchoInputFile, "*" ) << OrphanObjectNames( Count );
+					gio::write( EchoInputFile, fmtLD ) << OrphanObjectNames( Count );
 				}
 			}
 			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the idf" );
@@ -4880,7 +4880,7 @@ namespace InputProcessor {
 						if ( ObjectDef( Which ).NumRangeChks( NumNumeric ).DefaultChk ) {
 							if ( ! ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoSize && ! ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
 								LineItem.Numbers( NumNumeric ) = ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
-								gio::write( String, "*" ) << ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
+								gio::write( String, fmtLD ) << ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
 								strip( String );
 								ShowAuditErrorMessage( " **   Add   ** ", String + "   ! field=>" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName );
 							} else if ( ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoSize ) {
@@ -6022,7 +6022,7 @@ namespace InputProcessor {
 		if ( StartLine <= 99999 ) {
 			gio::write( TextLine, "(1X,I5,1X,A)" ) << StartLine << cStartLine;
 		} else {
-			gio::write( cLineNo, "*" ) << StartLine;
+			gio::write( cLineNo, fmtLD ) << StartLine;
 			strip( cLineNo );
 			gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << cStartLine;
 		}
@@ -6042,7 +6042,7 @@ namespace InputProcessor {
 			if ( SLine <= 99999 ) {
 				gio::write( TextLine, "(1X,I5,1X,A)" ) << SLine << LineBuf( CurPos );
 			} else {
-				gio::write( cLineNo, "*" ) << SLine;
+				gio::write( cLineNo, fmtLD ) << SLine;
 				strip( cLineNo );
 				gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << LineBuf( CurPos );
 			}
@@ -6146,7 +6146,7 @@ namespace InputProcessor {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string String; // Working string
 
-		gio::write( String, "*" ) << IntegerValue;
+		gio::write( String, fmtLD ) << IntegerValue;
 		return stripped( String );
 
 	}

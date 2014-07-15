@@ -139,6 +139,7 @@ namespace NodeInputManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetNodeNums: " );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -160,7 +161,7 @@ namespace NodeInputManager {
 		}
 
 		if ( NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric && NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown ) {
-			gio::write( cNodeFluidType, "*" ) << NodeFluidType;
+			gio::write( cNodeFluidType, fmtLD ) << NodeFluidType;
 			strip( cNodeFluidType );
 			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type." );
 			ShowContinueError( "..Invalid FluidType=" + cNodeFluidType );
@@ -349,6 +350,7 @@ namespace NodeInputManager {
 		static gio::Fmt const Format_701( "(A)" );
 		static gio::Fmt const Format_702( "('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
 		static gio::Fmt const Format_703( "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
+		static gio::Fmt const fmtLD( "*" );
 
 		if ( ! NodeVarsSetup ) {
 			if ( ! AbortProcessing ) {
@@ -410,16 +412,16 @@ namespace NodeInputManager {
 			gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 			// Show the node names on the Branch-Node Details file
 			gio::write( OutputFileBNDetails, Format_700 );
-			gio::write( ChrOut, "*" ) << NumOfUniqueNodeNames;
+			gio::write( ChrOut, fmtLD ) << NumOfUniqueNodeNames;
 			gio::write( OutputFileBNDetails, Format_701 ) << " #Nodes," + stripped( ChrOut );
 			if ( NumOfUniqueNodeNames > 0 ) {
 				gio::write( OutputFileBNDetails, Format_702 );
 			}
 			Count0 = 0;
 			for ( NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode ) {
-				gio::write( ChrOut, "*" ) << NumNode;
+				gio::write( ChrOut, fmtLD ) << NumNode;
 				strip( ChrOut );
-				gio::write( ChrOut1, "*" ) << NodeRef( NumNode );
+				gio::write( ChrOut1, fmtLD ) << NodeRef( NumNode );
 				strip( ChrOut1 );
 				ChrOut2 = ValidNodeFluidTypes( Node( NumNode ).FluidType );
 				gio::write( OutputFileBNDetails, Format_701 ) << " Node," + ChrOut + ',' + NodeID( NumNode ) + ',' + ChrOut2 + ',' + ChrOut1;
@@ -433,9 +435,9 @@ namespace NodeInputManager {
 				gio::write( OutputFileBNDetails, Format_703 );
 				for ( NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode ) {
 					if ( NodeRef( NumNode ) > 0 ) continue;
-					gio::write( ChrOut, "*" ) << NumNode;
+					gio::write( ChrOut, fmtLD ) << NumNode;
 					strip( ChrOut );
-					gio::write( ChrOut1, "*" ) << NodeRef( NumNode );
+					gio::write( ChrOut1, fmtLD ) << NodeRef( NumNode );
 					strip( ChrOut1 );
 					ChrOut2 = ValidNodeFluidTypes( Node( NumNode ).FluidType );
 					gio::write( OutputFileBNDetails, Format_701 ) << " Suspicious Node," + ChrOut + ',' + NodeID( NumNode ) + ',' + ChrOut2 + ',' + ChrOut1;
@@ -624,7 +626,7 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -637,7 +639,7 @@ namespace NodeInputManager {
 		static std::string cNodeFluidType;
 
 		if ( NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric && NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown ) {
-			gio::write( cNodeFluidType, "*" ) << NodeFluidType;
+			gio::write( cNodeFluidType, fmtLD ) << NodeFluidType;
 			strip( cNodeFluidType );
 			ShowSevereError( "AssignNodeNumber: Invalid FluidType=" + cNodeFluidType );
 			ErrorsFound = true;

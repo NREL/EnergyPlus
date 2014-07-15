@@ -4,13 +4,13 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -35,7 +35,6 @@ namespace InputProcessor {
 	extern std::string::size_type const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
 	extern std::string::size_type const MaxFieldNameLength; // Maximum number of characters in a field name string
 	extern std::string const Blank;
-	extern gio::Fmt const fmta;
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
 
@@ -706,8 +705,25 @@ namespace InputProcessor {
 		bool & IsBlank,
 		std::string const & StringToDisplay
 	)
-	{
-		VerifyName( NameToVerify, FArray1D_string( NamesList ), NumOfNames, ErrorFound, IsBlank, StringToDisplay );
+	{ // Overload for member arrays: Implemented here to avoid copy to FArray_string to forward to other VerifyName
+		int Found;
+
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
 	}
 
 	void
