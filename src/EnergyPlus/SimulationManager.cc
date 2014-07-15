@@ -68,6 +68,7 @@
 #include <OutputReports.hh>
 #include <PlantManager.hh>
 #include <PollutionModule.hh>
+#include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
 #include <SetPointManager.hh>
@@ -230,6 +231,9 @@ namespace SimulationManager {
 		using SetPointManager::CheckIfAnyIdealCondEntSetPoint;
 		using Psychrometrics::InitializePsychRoutines;
 		using namespace FaultsManager;
+		using PlantPipingSystemsManager::InitAndSimGroundDomains;
+		using PlantPipingSystemsManager::CheckIfAnySlabs;
+		
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -448,7 +452,10 @@ namespace SimulationManager {
 					EndHourFlag = false;
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
-
+						if (AnySlabsInModel){
+							InitAndSimGroundDomains();
+						}
+						
 						BeginTimeStepFlag = true;
 						ExternalInterfaceExchangeVariables();
 

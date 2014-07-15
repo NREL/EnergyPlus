@@ -1316,7 +1316,7 @@ namespace DataPlantPipingSystems {
 		ReportingInformation Reporting;
 		bool HasBasement;
 		// Zone coupled variables
-		ZoneCoupledSurfaceData ZoneCoupledSurfaces;
+		FArray1D <ZoneCoupledSurfaceData> ZoneCoupledSurfaces;
 		int ZoneCoupledOSCMIndex;
 		Real64 PerimeterOffset;
 		bool SlabInGradeFlag;
@@ -1338,6 +1338,7 @@ namespace DataPlantPipingSystems {
 		Real64 HorizInsThickness;
 		Real64 HorizInsWidth;
 		Real64 HeatFlux;
+		Real64 Prev_HeatFlux;
 		Real64 FloorOuterTemp;
 		Real64 ConvectionTemp;
 		Real64 ConvCoeff;
@@ -1391,6 +1392,7 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( 0.0254 ),
 			HorizInsWidth( 0.0 ),
 			HeatFlux( 0.0 ),
+			Prev_HeatFlux( 0.0),
 			FloorOuterTemp( 0.0 ),
 			ConvectionTemp( 0.0 ),
 			ConvCoeff( 0.0 ),
@@ -1437,7 +1439,7 @@ namespace DataPlantPipingSystems {
 			CurSimConditionsInfo const & Cur,
 			ReportingInformation const & Reporting,
 			bool const HasBasement,
-			ZoneCoupledSurfaceData const & ZoneCoupledSurfaces,
+		    FArray1 <ZoneCoupledSurfaceData> const & ZoneCoupledSurfaces,
 			int const ZoneCoupledOSCMIndex,
 			Real64 const PerimeterOffset,
 			bool const SlabInGradeFlag,
@@ -1459,6 +1461,7 @@ namespace DataPlantPipingSystems {
 			Real64 const HorizInsThickness,
 			Real64 const HorizInsWidth,
 			Real64 const HeatFlux,
+			Real64 const Prev_HeatFlux,
 			Real64 const FloorOuterTemp,
 			Real64 const ConvectionTemp,
 			Real64 const ConvCoeff,
@@ -1526,6 +1529,7 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( HorizInsThickness ),
 			HorizInsWidth( HorizInsWidth ),
 			HeatFlux( HeatFlux ),
+			Prev_HeatFlux( Prev_HeatFlux ),
 			FloorOuterTemp( FloorOuterTemp ),
 			ConvectionTemp( ConvectionTemp ),
 			ConvCoeff( ConvCoeff ),

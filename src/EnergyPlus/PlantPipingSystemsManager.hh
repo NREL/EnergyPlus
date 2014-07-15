@@ -30,6 +30,7 @@ namespace PlantPipingSystemsManager {
 	using DataPlantPipingSystems::RadialCellInformation;
 	using DataPlantPipingSystems::RadialSizing;
 	using DataPlantPipingSystems::RectangleF;
+	using DataPlantPipingSystems::ZoneCoupledSurfaceData;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -81,6 +82,14 @@ namespace PlantPipingSystemsManager {
 	// ***************************************** !
 
 	// Functions
+
+	void
+		CheckIfAnySlabs(
+		);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
 
 	void
 	SimPipingSystemCircuit(
@@ -245,6 +254,16 @@ namespace PlantPipingSystemsManager {
 		int const OSCMIndex,
 		int const SurfCount
 	);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
+	FArray1D <ZoneCoupledSurfaceData>
+		GetSurfaceDataForOSCM(
+		int const OSCMIndex,
+		int const SurfCount
+		);
 
 	//*********************************************************************************************!
 
@@ -618,7 +637,18 @@ namespace PlantPipingSystemsManager {
 		int const RetValUBound,
 		bool const PartitionsExist,
 		Optional_int BasementWallXIndex = _,
-		Optional_int BasementFloorYIndex = _
+		Optional_int BasementFloorYIndex = _,
+		Optional_int SlabXIndex1 = _,
+		Optional_int SlabXIndex2 = _,
+		Optional_int InsulationXIndex1 = _,
+		Optional_int InsulationXIndex2 = _,
+		Optional_int SlabYIndex = _,
+		Optional_int InsulationYIndex = _,
+		Optional_int SlabZIndex1 = _,
+		Optional_int SlabZIndex2 = _,
+		Optional_int InsulationZIndex1 = _,
+		Optional_int InsulationZIndex2 = _
+		
 	);
 
 	//*********************************************************************************************!
@@ -653,9 +683,7 @@ namespace PlantPipingSystemsManager {
 		int const DomainNum,
 		FArray1D< Real64 > const & XBoundaryPoints,
 		FArray1D< Real64 > const & YBoundaryPoints,
-		FArray1D< Real64 > const & ZBoundaryPoints,
-		int const MaxBasementXNodeIndex,
-		int const MinBasementYNodeIndex
+		FArray1D< Real64 > const & ZBoundaryPoints		
 	);
 
 	//*********************************************************************************************!
@@ -790,6 +818,23 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
+	Real64
+		EvaluateZoneInterfaceTemperature(
+		int const DomainNum,
+		CartesianCell const & cell
+		);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+	
+	Real64
+		GetZoneInterfaceHeatFlux(int const DomainNum);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+
 	void
 	UpdateZoneSurfaceTemperatures(int const DomainNum);
 
