@@ -1348,7 +1348,7 @@ namespace SolarShading {
 			} else if ( CosIncAngBeamOnSurface < -1.0 ) {
 			    if ( CosIncAngBeamOnSurface < ( -1.0 - cosine_tolerance ) ) {
 				ShowSevereError( "Cosine of incident angle of beam solar on surface out of range...too low" );
-				ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
+                ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
                 ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
 				ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
 				ShowFatalError( "Anisotropic solar calculation causes fatal error" );
