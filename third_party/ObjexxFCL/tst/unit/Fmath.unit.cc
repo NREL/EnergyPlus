@@ -187,6 +187,12 @@ TEST( FmathTest, Pow )
 	EXPECT_EQ( 512, pow_9( 2.0 ) );
 }
 
+TEST( FmathTest, Root )
+{
+	EXPECT_EQ( 3, root_4( 81 ) );
+	EXPECT_EQ( 3, root_8( 6561 ) );
+}
+
 TEST( FmathTest, Sign )
 {
 	EXPECT_EQ( 1, sign( 11 ) );

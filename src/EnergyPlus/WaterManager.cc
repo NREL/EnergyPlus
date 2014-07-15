@@ -741,11 +741,11 @@ namespace WaterManager {
 				// would be assigned here... as with the Rainfall...
 				Irrigation.IrrigationThreshold = 0.4;
 				if ( Irrigation.ModeID == IrrSmartSched && NumNumbers > 0 ) {
-					if ( rNumericArgs( 1 ) > 100. || rNumericArgs( 1 ) < 0.0 ) {
+					if ( rNumericArgs( 1 ) > 100.0 || rNumericArgs( 1 ) < 0.0 ) {
 						ShowSevereError( "Irrigation threshold for " + cCurrentModuleObject + " object has values > 100 or < 0." );
 						ErrorsFound = true;
 					} else {
-						Irrigation.IrrigationThreshold = rNumericArgs( 1 ) / 100.;
+						Irrigation.IrrigationThreshold = rNumericArgs( 1 ) / 100.0;
 					}
 				}
 

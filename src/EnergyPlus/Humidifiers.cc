@@ -678,7 +678,7 @@ namespace Humidifiers {
 		HumRatSatIn = PsyWFnTdbRhPb( Humidifier( HumNum ).AirInTemp, 1.0, OutBaroPress, RoutineName );
 		HumRatSatOut = 0.0;
 		HumRatSatApp = 0.0;
-		WaterInEnthalpy = 2676125.; // At 100 C
+		WaterInEnthalpy = 2676125.0; // At 100 C
 		WaterDens = RhoH2O( InitConvTemp );
 		WaterAddNeededMax = min( WaterAddNeeded, Humidifier( HumNum ).NomCap );
 		if ( WaterAddNeededMax > 0.0 ) {

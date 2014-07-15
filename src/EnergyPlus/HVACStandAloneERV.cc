@@ -696,7 +696,7 @@ namespace HVACStandAloneERV {
 			} else {
 				ShowSevereError( "GetERVController: Could not find ZoneHVAC:EnergyRecoveryVentilator with " + cAlphaFields( 1 ) + " = \"" + Alphas( 1 ) + "\"" );
 				ErrorsFound = true;
-				AirFlowRate = -1000.;
+				AirFlowRate = -1000.0;
 			}
 			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
 			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, AirFlowRate );

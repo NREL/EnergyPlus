@@ -281,7 +281,7 @@ namespace SolarReflectionManager {
 		for ( RecSurfNum = 1; RecSurfNum <= TotSolReflRecSurf; ++RecSurfNum ) {
 			SurfNum = SolReflRecSurf( RecSurfNum ).SurfNum;
 			// Outward norm to receiving surface
-			SolReflRecSurf( RecSurfNum ).NormVec = Surface( SurfNum ).OutNormVec( {1,3} );
+			SolReflRecSurf( RecSurfNum ).NormVec = Surface( SurfNum ).OutNormVec;
 			RecVec = Surface( SurfNum ).Vertex( 1 );
 			// Loop over all surfaces and find those that can be obstructing surfaces for this receiving surf
 			SolReflRecSurf( RecSurfNum ).NumPossibleObs = 0;
@@ -468,7 +468,7 @@ namespace SolarReflectionManager {
 							} else {
 								++TotObstructionsHit;
 								// Distance from receiving point to hit point
-								HitDistance = std::sqrt( dot( HitPt - RecPt, HitPt - RecPt ) );
+								HitDistance = distance( HitPt, RecPt );
 								// Reset NearestHitSurfNum and NearestHitDistance if this hit point is closer than previous closest
 								if ( HitDistance < NearestHitDistance ) {
 									NearestHitDistance = HitDistance;
@@ -494,7 +494,7 @@ namespace SolarReflectionManager {
 						Vec1 = Surface( NearestHitSurfNum ).Vertex( 1 ) - Surface( NearestHitSurfNum ).Vertex( 3 );
 						Vec2 = Surface( NearestHitSurfNum ).Vertex( 2 ) - Surface( NearestHitSurfNum ).Vertex( 3 );
 						CrossProduct( Vec1, Vec2, VNorm );
-						VNorm /= std::sqrt( dot( VNorm, VNorm ) );
+						VNorm /= magnitude( VNorm );
 						if ( dot( VNorm, -RayVec ) < 0.0 ) VNorm = -VNorm;
 						SolReflRecSurf( RecSurfNum ).HitPtNormVec( {1,3}, RecPtNum, RayNum ) = VNorm;
 						// Get solar and visible beam-to-diffuse reflectance at nearest hit point
@@ -973,7 +973,7 @@ namespace SolarReflectionManager {
 						// Skip if window and not sunlit
 						if ( Surface( ReflSurfNum ).Class == SurfaceClass_Window && SunlitFrac( ReflSurfNum, iHour, 1 ) < 0.01 ) continue;
 						// Check if sun is in front of this reflecting surface.
-						ReflNorm = Surface( ReflSurfNum ).OutNormVec( {1,3} );
+						ReflNorm = Surface( ReflSurfNum ).OutNormVec;
 						CosIncAngRefl = dot( SunVec, ReflNorm );
 						if ( CosIncAngRefl < 0.0 ) continue;
 
@@ -988,7 +988,7 @@ namespace SolarReflectionManager {
 							PierceSurface( ReflSurfNum, RecPt, SunVecMir, IHitRefl, HitPtRefl );
 							if ( IHitRefl > 0 ) {
 								// Reflecting surface was hit
-								ReflDistance = std::sqrt( dot( HitPtRefl - RecPt, HitPtRefl - RecPt ) );
+								ReflDistance = distance( HitPtRefl, RecPt );
 								// Determine if ray from receiving point to hit point is obstructed
 								IHitObsRefl = 0;
 								for ( loop2 = 1; loop2 <= SolReflRecSurf( RecSurfNum ).NumPossibleObs; ++loop2 ) {
@@ -996,7 +996,7 @@ namespace SolarReflectionManager {
 									if ( ObsSurfNum == ReflSurfNum || ObsSurfNum == Surface( ReflSurfNum ).BaseSurf ) continue;
 									PierceSurface( ObsSurfNum, RecPt, SunVecMir, IHitObs, HitPtObs );
 									if ( IHitObs > 0 ) {
-										ObsDistance = std::sqrt( dot( HitPtObs - RecPt, HitPtObs - RecPt ) );
+										ObsDistance = distance( HitPtObs, RecPt );
 										if ( ObsDistance < ReflDistance ) {
 											IHitObsRefl = 1;
 											break;
@@ -1202,7 +1202,7 @@ namespace SolarReflectionManager {
 						// Divide hemisphere centered at ground hit point into elements of altitude Phi and
 						// azimuth Theta and create upward-going ray unit vector at each Phi,Theta pair.
 						// Phi = 0 at the horizon; Phi = Pi/2 at the zenith.
-						DPhi = PiOvr2 / ( AltAngStepsForSolReflCalc / 2. );
+						DPhi = PiOvr2 / ( AltAngStepsForSolReflCalc / 2.0 );
 						dReflSkyGnd = 0.0;
 						// Altitude loop
 						for ( IPhi = 1; IPhi <= ( AltAngStepsForSolReflCalc / 2 ); ++IPhi ) {
@@ -1211,7 +1211,7 @@ namespace SolarReflectionManager {
 							CPhi = std::cos( Phi );
 							// Third component of ray unit vector in (Theta,Phi) direction
 							URay( 3 ) = SPhi;
-							DTheta = 2. * Pi / ( 2. * AzimAngStepsForSolReflCalc );
+							DTheta = 2.0 * Pi / ( 2.0 * AzimAngStepsForSolReflCalc );
 							dOmega = CPhi * DTheta * DPhi;
 							// Cosine of angle of incidence of ray on ground
 							CosIncAngRayToSky = SPhi;
@@ -1431,7 +1431,7 @@ namespace SolarReflectionManager {
 
 			DOTCB = dot( CCC, BBB );
 			if ( DOTCB < 0.0 ) return;
-			if ( DOTCB > dot( BBB, BBB ) ) return;
+			if ( DOTCB > magnitude_squared( BBB ) ) return;
 
 			//AAA = V1 - V2
 			AAA( 1 ) = V( 1, 1 ) - V( 2, 1 );
@@ -1440,7 +1440,7 @@ namespace SolarReflectionManager {
 
 			DOTCA = dot( CCC, AAA );
 			if ( DOTCA < 0.0 ) return;
-			if ( DOTCA > dot( AAA, AAA ) ) return;
+			if ( DOTCA > magnitude_squared( AAA ) ) return;
 			// Surface is intersected
 			IPIERC = 1;
 

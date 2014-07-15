@@ -571,7 +571,7 @@ namespace EconomicTariff {
 				tariff( iInObj ).demWinTime = 24.00;
 			} else if ( SameString( cAlphaArgs( 7 ), "Week" ) ) {
 				tariff( iInObj ).demandWindow = demandWindowWeek;
-				tariff( iInObj ).demWinTime = 24. * 7.;
+				tariff( iInObj ).demWinTime = 24.0 * 7.0;
 			} else {
 				// if not entered default to the same logic as quarter of an hour
 				{ auto const SELECT_CASE_var( NumOfTimeStepInHour );

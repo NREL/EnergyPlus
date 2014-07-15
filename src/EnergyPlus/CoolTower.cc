@@ -495,20 +495,21 @@ namespace CoolTower {
 				// Unit is on and simulate this component
 				// Determine the temperature and air flow rate at the cooltower outlet
 				if ( CoolTowerSys( CoolTowerNum ).FlowCtrlType == WindDrivenFlow ) {
-					CoolTowerSys( CoolTowerNum ).OutletVelocity = 0.7 * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 ) + 0.47 * ( WindSpeed - 1.0 );
+					Real64 const height_sqrt( std::sqrt( CoolTowerSys( CoolTowerNum ).TowerHeight ) );
+					CoolTowerSys( CoolTowerNum ).OutletVelocity = 0.7 * height_sqrt + 0.47 * ( WindSpeed - 1.0 );
 					AirVolFlowRate = CoolTowerSys( CoolTowerNum ).OutletArea * CoolTowerSys( CoolTowerNum ).OutletVelocity;
 					AirVolFlowRate = min( AirVolFlowRate, CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate );
-					WaterFlowRate = ( AirVolFlowRate / ( 0.0125 * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 ) ) );
+					WaterFlowRate = ( AirVolFlowRate / ( 0.0125 * height_sqrt ) );
 					if ( WaterFlowRate > CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor ) {
 						WaterFlowRate = CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor;
-						AirVolFlowRate = 0.0125 * WaterFlowRate * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 );
+						AirVolFlowRate = 0.0125 * WaterFlowRate * height_sqrt;
 						AirVolFlowRate = min( AirVolFlowRate, CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate );
 					}
 					WaterFlowRate = min( WaterFlowRate, ( CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor ) );
 					OutletTemp = OutDryBulbTemp - ( OutDryBulbTemp - OutWetBulbTemp ) * ( 1.0 - std::exp( -0.8 * CoolTowerSys( CoolTowerNum ).TowerHeight ) ) * ( 1.0 - std::exp( -0.15 * WaterFlowRate ) );
 				} else if ( CoolTowerSys( CoolTowerNum ).FlowCtrlType == WaterFlowSchedule ) {
 					WaterFlowRate = CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor;
-					AirVolFlowRate = 0.0125 * WaterFlowRate * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 );
+					AirVolFlowRate = 0.0125 * WaterFlowRate * std::sqrt( CoolTowerSys( CoolTowerNum ).TowerHeight );
 					AirVolFlowRate = min( AirVolFlowRate, CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate );
 					OutletTemp = OutDryBulbTemp - ( OutDryBulbTemp - OutWetBulbTemp ) * ( 1.0 - std::exp( -0.8 * CoolTowerSys( CoolTowerNum ).TowerHeight ) ) * ( 1.0 - std::exp( -0.15 * WaterFlowRate ) );
 				}

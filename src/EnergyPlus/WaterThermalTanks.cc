@@ -203,6 +203,8 @@ namespace WaterThermalTanks {
 	FArray1D< HeatPumpWaterHeaterData > HPWaterHeater;
 	FArray1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
 
+	static gio::Fmt const fmtLD( "*" );
+
 	// MODULE SUBROUTINES:
 
 	// Functions
@@ -4433,7 +4435,7 @@ namespace WaterThermalTanks {
 
 					if ( MaxSideVolFlow > 0.0 ) { // protect div by zero
 						TankChangeRateScale = WaterThermalTank( WaterThermalTankNum ).Volume / MaxSideVolFlow;
-						if ( TankChangeRateScale < 60. ) { // nominal change over in less than one minute
+						if ( TankChangeRateScale < 60.0 ) { // nominal change over in less than one minute
 							ShowSevereError( "InitWaterThermalTank: Detected problem for stratified tank model.  Model cannot be applied." );
 							ShowContinueError( "Occurs for stratified tank name = " + WaterThermalTank( WaterThermalTankNum ).Name );
 							ShowContinueError( "Tank volume = " + RoundSigDigits( WaterThermalTank( WaterThermalTankNum ).Volume, 4 ) + " [m3]" );
@@ -6496,7 +6498,7 @@ namespace WaterThermalTanks {
 					Par( 5 ) = MdotWater;
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 					if ( SolFla == -1 ) {
-						gio::write( IterNum, "*" ) << MaxIte;
+						gio::write( IterNum, fmtLD ) << MaxIte;
 						strip( IterNum );
 						if ( ! WarmupFlag ) {
 							++WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum1;
@@ -6576,7 +6578,7 @@ namespace WaterThermalTanks {
 						Par( 5 ) = MdotWater;
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, PartLoadRatio, PLRResidualMixedTank, 0.0, WaterHeaterDesuperheater( DesuperheaterNum ).DXSysPLR, Par );
 						if ( SolFla == -1 ) {
-							gio::write( IterNum, "*" ) << MaxIte;
+							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
 							if ( ! WarmupFlag ) {
 								++WaterHeaterDesuperheater( DesuperheaterNum ).IterLimitExceededNum2;
@@ -6812,7 +6814,7 @@ namespace WaterThermalTanks {
 			if ( ! WarmupFlag && ! DoingSizing && ! KickOffSimulation ) {
 				if ( ( SetPointTemp - DeadBandTempDiff ) <= WaterThermalTank( WaterThermalTankNum ).SetPointTemp ) {
 					HPMinTemp = SetPointTemp - DeadBandTempDiff;
-					gio::write( HPMinTempChar, "*" ) << HPMinTemp;
+					gio::write( HPMinTempChar, fmtLD ) << HPMinTemp;
 					++HPWaterHeater( HPNum ).HPSetPointError;
 					//!add logic for warmup, kickoffsimulation and doing sizing here
 					if ( HPWaterHeater( HPNum ).HPSetPointError == 1 ) {
@@ -6898,7 +6900,7 @@ namespace WaterThermalTanks {
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par );
 				}}
 				if ( SolFla == -1 ) {
-					gio::write( IterNum, "*" ) << MaxIte;
+					gio::write( IterNum, fmtLD ) << MaxIte;
 					strip( IterNum );
 					if ( ! WarmupFlag ) {
 						++HPWaterHeater( HPNum ).IterLimitExceededNum1;
@@ -7039,7 +7041,7 @@ namespace WaterThermalTanks {
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par );
 					}}
 					if ( SolFla == -1 ) {
-						gio::write( IterNum, "*" ) << MaxIte;
+						gio::write( IterNum, fmtLD ) << MaxIte;
 						strip( IterNum );
 						if ( ! WarmupFlag ) {
 							++HPWaterHeater( HPNum ).IterLimitExceededNum2;
@@ -8185,7 +8187,7 @@ namespace WaterThermalTanks {
 		// if stratified, might set height.
 		if ( ( SizeVolume ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantSizesOkayToFinalize ) { // might set height
 			if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) ) {
-				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * ( std::pow( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio, 2 ) ) ) / Pi ), 0.33333333333333 );
+				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * pow_2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) / Pi, 0.3333333333333333 );
 				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 				// check if autocalculate Use outlet and source inlet are still set to autosize by earlier
 				if ( WaterThermalTank( WaterThermalTankNum ).UseOutletHeight == AutoSize ) {
@@ -8313,7 +8315,7 @@ namespace WaterThermalTanks {
 
 		if ( ( SizeVolume ) && ( WaterThermalTank( WaterThermalTankNum ).TypeNum == StratifiedWaterHeater ) && PlantSizesOkayToFinalize ) { // might set height
 			if ( ( WaterThermalTank( WaterThermalTankNum ).Height == AutoSize ) && ( WaterThermalTank( WaterThermalTankNum ).Volume != AutoSize ) ) {
-				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * ( std::pow( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio, 2 ) ) ) / Pi ), 0.33333333333333 );
+				WaterThermalTank( WaterThermalTankNum ).Height = std::pow( ( 4.0 * WaterThermalTank( WaterThermalTankNum ).Volume * pow_2( WaterThermalTank( WaterThermalTankNum ).Sizing.HeightAspectRatio ) ) / Pi, 0.3333333333333333 );
 				ReportSizingOutput( WaterThermalTank( WaterThermalTankNum ).Type, WaterThermalTank( WaterThermalTankNum ).Name, "Tank Height [m]", WaterThermalTank( WaterThermalTankNum ).Height );
 			}
 		}

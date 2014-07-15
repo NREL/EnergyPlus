@@ -3,6 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <EarthTube.hh>
@@ -281,7 +282,7 @@ namespace EarthTube {
 				ErrorsFound = true;
 			}
 
-			EarthTubeSys( Loop ).r3 = 2. * EarthTubeSys( Loop ).r1;
+			EarthTubeSys( Loop ).r3 = 2.0 * EarthTubeSys( Loop ).r1;
 
 			EarthTubeSys( Loop ).PipeLength = rNumericArgs( 9 );
 			if ( EarthTubeSys( Loop ).PipeLength <= 0.0 ) {
@@ -470,7 +471,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).FanPower = EAMFL( NZ ) * EarthTubeSys( Loop ).FanPressure / ( EarthTubeSys( Loop ).FanEfficiency * AirDensity );
 			}
 
-			AverPipeAirVel = EVF( NZ ) / Pi / ( std::pow( EarthTubeSys( Loop ).r1, 2 ) );
+			AverPipeAirVel = EVF( NZ ) / Pi / pow_2( EarthTubeSys( Loop ).r1 );
 			AirMassFlowRate = EVF( NZ ) * AirDensity;
 
 			// Calculation of Average Ground Temperature between Depth z1 and z2 at time t
@@ -478,27 +479,27 @@ namespace EarthTube {
 			EarthTubeSys( Loop ).GroundTempz1z2t = GroundTempz1z2t;
 
 			// Calculation of Convective Heat Transfer Coefficient at Inner Pipe Surface
-			AirThermCond = 0.02442 + 0.6992 * OutDryBulbTemp / 10000.;
-			AirKinemVisco = ( 0.1335 + 0.000925 * OutDryBulbTemp ) / 10000.;
-			AirThermDiffus = ( 0.0014 * OutDryBulbTemp + 0.1872 ) / 10000.;
-			Re = 2. * EarthTubeSys( Loop ).r1 * AverPipeAirVel / AirKinemVisco;
+			AirThermCond = 0.02442 + 0.6992 * OutDryBulbTemp / 10000.0;
+			AirKinemVisco = ( 0.1335 + 0.000925 * OutDryBulbTemp ) / 10000.0;
+			AirThermDiffus = ( 0.0014 * OutDryBulbTemp + 0.1872 ) / 10000.0;
+			Re = 2.0 * EarthTubeSys( Loop ).r1 * AverPipeAirVel / AirKinemVisco;
 			Pr = AirKinemVisco / AirThermDiffus;
-			if ( Re <= 2300. ) {
+			if ( Re <= 2300.0 ) {
 				Nu = 3.66;
-			} else if ( Re <= 4000. ) {
-				fa = std::pow( ( 1.58 * std::log( Re ) - 3.28 ), ( -2. ) );
-				Process1 = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( std::pow( ( fa / 2.0 ), 0.5 ) ) * ( std::pow( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
-				Nu = ( Process1 - 3.66 ) / ( 1700. ) * Re + ( 4000. * 3.66 - 2300. * Process1 ) / 1700.;
+			} else if ( Re <= 4000.0 ) {
+				fa = std::pow( 1.58 * std::log( Re ) - 3.28, -2 );
+				Process1 = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * std::sqrt( fa / 2.0 ) * ( std::pow( Pr, 2.0 / 3.0 ) - 1.0 ) );
+				Nu = ( Process1 - 3.66 ) / ( 1700.0 ) * Re + ( 4000.0 * 3.66 - 2300.0 * Process1 ) / 1700.0;
 			} else {
-				fa = std::pow( ( 1.58 * std::log( Re ) - 3.28 ), ( -2. ) );
-				Nu = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( std::pow( ( fa / 2.0 ), 0.5 ) ) * ( std::pow( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
+				fa = std::pow( 1.58 * std::log( Re ) - 3.28, -2 );
+				Nu = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * std::sqrt( fa / 2.0 ) * ( std::pow( Pr, 2.0 / 3.0 ) - 1.0 ) );
 			}
-			PipeHeatTransCoef = Nu * AirThermCond / 2. / EarthTubeSys( Loop ).r1;
+			PipeHeatTransCoef = Nu * AirThermCond / 2.0 / EarthTubeSys( Loop ).r1;
 
 			// Claculation of Thermal Resistance and Overall Heat Transger Coefficient
 			Rc = 1.0 / 2.0 / Pi / EarthTubeSys( Loop ).r1 / PipeHeatTransCoef;
-			Rp = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) / EarthTubeSys( Loop ).r1 ) / 2. / Pi / EarthTubeSys( Loop ).PipeThermCond;
-			Rs = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 + EarthTubeSys( Loop ).r3 ) / ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) ) / 2. / Pi / EarthTubeSys( Loop ).SoilThermCond;
+			Rp = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) / EarthTubeSys( Loop ).r1 ) / 2.0 / Pi / EarthTubeSys( Loop ).PipeThermCond;
+			Rs = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 + EarthTubeSys( Loop ).r3 ) / ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) ) / 2.0 / Pi / EarthTubeSys( Loop ).SoilThermCond;
 			Rt = Rc + Rp + Rs;
 			OverallHeatTransCoef = 1.0 / Rt;
 

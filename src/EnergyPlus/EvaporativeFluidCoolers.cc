@@ -1287,7 +1287,7 @@ namespace EvaporativeFluidCoolers {
 		if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate == AutoSize ) {
 			// Plant Sizing Object is not required to AUTOSIZE this field since its simply a multiple of another field.
 
-			tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * ( 101325. / StdBaroPress ) / 190.;
+			tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * ( 101325.0 / StdBaroPress ) / 190.0;
 			if ( PlantSizesOkayToFinalize ) SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
 			if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_SingleSpeed ) {
@@ -1321,7 +1321,7 @@ namespace EvaporativeFluidCoolers {
 					UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
 					UA1 = DesEvapFluidCoolerLoad; // Assume deltaT = 1K
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp = PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.;
+					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.0;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 					SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
@@ -1381,7 +1381,7 @@ namespace EvaporativeFluidCoolers {
 				// Standard Design Capacity doesn't include compressor heat;
 				// predefined factor was 1.25 W heat rejection per W of delivered cooling, now a user input with 1.25 default
 				rho = GetDensityGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
-				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, 35., PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
+				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidName, 35.0, PlantLoop( SimpleEvapFluidCooler( EvapFluidCoolerNum ).LoopNum ).FluidIndex, CalledFrom );
 				DesEvapFluidCoolerLoad = SimpleEvapFluidCooler( EvapFluidCoolerNum ).HighSpeedStandardDesignCapacity * SimpleEvapFluidCooler( EvapFluidCoolerNum ).HeatRejectCapNomCapSizingRatio;
 				Par( 1 ) = DesEvapFluidCoolerLoad;
 				Par( 2 ) = double( EvapFluidCoolerNum );
@@ -1390,8 +1390,8 @@ namespace EvaporativeFluidCoolers {
 				Par( 5 ) = Cp;
 				UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesEvapFluidCoolerLoad; // Assume deltaT = 1K
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp = 35.; // 95F design inlet water temperature
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp = 35.0; // 95F design inlet water temperature
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.0; // 95F design inlet air dry-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );
@@ -1507,8 +1507,8 @@ namespace EvaporativeFluidCoolers {
 				Par( 5 ) = Cp;
 				UA0 = 0.0001 * DesEvapFluidCoolerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesEvapFluidCoolerLoad; // Assume deltaT = 1K
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp = 35.; // 95F design inlet water temperature
-				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).WaterTemp = 35.0; // 95F design inlet water temperature
+				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp = 35.0; // 95F design inlet air dry-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress = StdBaroPress;
 				SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirTemp, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirWetBulb, SimpleEvapFluidCoolerInlet( EvapFluidCoolerNum ).AirPress );

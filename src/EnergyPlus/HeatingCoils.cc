@@ -1737,7 +1737,7 @@ namespace HeatingCoils {
 				}
 				// Modify the Gas Coil Consumption and parasitic loads based on PLF curve
 				HeatingCoil( CoilNum ).RTF = PartLoadRat / PLF;
-				if ( HeatingCoil( CoilNum ).RTF > 1.0 && std::abs( HeatingCoil( CoilNum ).RTF - 1.0 ) > .001 ) {
+				if ( HeatingCoil( CoilNum ).RTF > 1.0 && std::abs( HeatingCoil( CoilNum ).RTF - 1.0 ) > 0.001 ) {
 					if ( HeatingCoil( CoilNum ).RTFErrorCount < 1 ) {
 						++HeatingCoil( CoilNum ).RTFErrorCount;
 						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );
@@ -2023,7 +2023,7 @@ namespace HeatingCoils {
 				}
 				// Modify the Gas Coil Consumption and parasitic loads based on PLF curve
 				HeatingCoil( CoilNum ).RTF = PartLoadRat / PLF;
-				if ( HeatingCoil( CoilNum ).RTF > 1.0 && std::abs( HeatingCoil( CoilNum ).RTF - 1.0 ) > .001 ) {
+				if ( HeatingCoil( CoilNum ).RTF > 1.0 && std::abs( HeatingCoil( CoilNum ).RTF - 1.0 ) > 0.001 ) {
 					if ( HeatingCoil( CoilNum ).RTFErrorCount < 1 ) {
 						++HeatingCoil( CoilNum ).RTFErrorCount;
 						ShowWarningError( "CalcGasHeatingCoil: " + cAllCoilTypes( HeatingCoil( CoilNum ).HCoilType_Num ) + "=\"" + HeatingCoil( CoilNum ).Name + "\", runtime fraction" );

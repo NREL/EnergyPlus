@@ -97,6 +97,29 @@ TEST( FArraySTest, FArray2SSingleIndexSlice )
 	EXPECT_EQ( 22, S( 1, 2 ) );
 }
 
+TEST( FArraySTest, FArray2D1SSlice )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1S_int S( A( _, 2 ) );
+	EXPECT_EQ( 2u, S.size() );
+	EXPECT_EQ( 1, S.l() );
+	EXPECT_EQ( 2, S.u() );
+	EXPECT_EQ( 1, S.l1() );
+	EXPECT_EQ( 2, S.u1() );
+	EXPECT_EQ( 12, S( 1 ) );
+	EXPECT_EQ( 22, S( 2 ) );
+}
+
+TEST( FArraySTest, FArray2D1DOTFSlice )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1D_int B( A( {1,2}, 2 ) ); // Make a real 1D array out of slice on the fly
+	EXPECT_EQ( 1, B.l() );
+	EXPECT_EQ( 2, B.u() );
+	EXPECT_EQ( 12, B( 1 ) );
+	EXPECT_EQ( 22, B( 2 ) );
+}
+
 TEST( FArraySTest, FArray1SWholeArraySlice )
 {
 	FArray1D_int a( {-2,2}, {1,2,3,4,5} );
@@ -260,6 +283,17 @@ TEST( FArraySTest, CountOp2D )
 	EXPECT_EQ( 1u, count_ge( S, 9 ) );
 	EXPECT_EQ( 9u, count_lt( S, 11 ) );
 	EXPECT_EQ( 3u, count_gt( S, 3 ) );
+}
+
+TEST( FArraySTest, Functions1D )
+{
+	FArray1D_int U{ 1, 2, 3 };
+	FArray1D_int V{ 2, 3, 4 };
+	FArray1S_int u( U );
+	FArray1S_int v( V );
+	EXPECT_EQ( 14, magnitude_squared( u ) );
+	EXPECT_EQ( 3, distance_squared( u, v ) );
+	EXPECT_EQ( 20, dot( u, v ) );
 }
 
 TEST( FArraySTest, StreamOut )

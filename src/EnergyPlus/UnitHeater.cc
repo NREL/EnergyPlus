@@ -699,7 +699,7 @@ namespace UnitHeater {
 			Node( InNode ).MassFlowRateMin = 0.0;
 
 			if ( UnitHeat( UnitHeatNum ).HCoilType == WaterCoil ) {
-				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				UnitHeat( UnitHeatNum ).MaxHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MaxVolHotWaterFlow;
 				UnitHeat( UnitHeatNum ).MinHotWaterFlow = rho * UnitHeat( UnitHeatNum ).MinVolHotWaterFlow;
@@ -916,8 +916,8 @@ namespace UnitHeater {
 							DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							if ( DesCoilLoad >= SmallLoad ) {
 
-								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {

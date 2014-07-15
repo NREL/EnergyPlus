@@ -251,7 +251,7 @@ public: // Assignment
 	operator =( std::initializer_list< U > const lu )
 	{
 		size_type const n( lu.size() );
-		assert(  n <= 2 );
+		assert( n <= 2 );
 		auto i( lu.begin() );
 		switch ( n ) {
 		case 0: // {}
@@ -277,7 +277,7 @@ public: // Assignment
 	operator =( std::initializer_list< Index > const lu )
 	{
 		size_type const n( lu.size() );
-		assert(  n <= 2 );
+		assert( n <= 2 );
 		auto i( lu.begin() );
 		switch ( n ) {
 		case 0: // {}
