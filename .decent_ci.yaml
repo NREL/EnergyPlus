@@ -2,7 +2,7 @@ results_repository : NREL/EnergyPlusBuildResults
 results_path : _posts
 results_base_url : https://nrel.github.io/EnergyPlusBuildResults
 regression_repository : NREL/EnergyPlusDevSupport
-regression_branch : 74815836-RegressionSuiteUpgrades
+regression_branch : master
 notification_recipients:
   - lgentile
 aging_pull_requests_notification: true
