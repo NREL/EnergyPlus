@@ -60,7 +60,7 @@ namespace DataHeatBalance {
 	// Parameters for the definition and limitation of arrays:
 	int const MaxLayersInConstruct( 11 ); // Maximum number of layers allowed in a single construction
 	int const MaxCTFTerms( 19 ); // Maximum number of CTF terms allowed to still allow stability
-	int const MaxSolidWinLayers( 5 ); // Maximum number of solid layers in a window construction
+	int const MaxSolidWinLayers( 8 ); // Maximum number of solid layers in a window construction
 	int const MaxSpectralDataElements( 800 ); // Maximum number in Spectral Data arrays.
 
 	// Parameters to indicate material group type for use with the Material
