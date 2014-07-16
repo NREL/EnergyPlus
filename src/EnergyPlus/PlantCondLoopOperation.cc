@@ -2355,9 +2355,7 @@ namespace PlantCondLoopOperation {
 				} else {
 					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
 				} 
-					//ShowRecurringWarningErrorAtEnd(PlantLoop( LoopNum ).Name + " Plant supply capcity is zero, potentially \
-					//															becasue componets are unavailable or configuration \
-					//															is invalid. Plant loop temperatures may occur if problem continues", );
+
 				// Distribute load to each machine
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 					
@@ -2424,7 +2422,6 @@ namespace PlantCondLoopOperation {
 					if ( std::abs( RemLoopDemand ) <= PlantCapacity ) {
 						break;
 					}
-
 				}
 
 				// Determine PLR for uniform PLR loading of all equipment
