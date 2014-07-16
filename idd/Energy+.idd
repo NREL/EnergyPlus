@@ -62115,9 +62115,11 @@ PlantLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key Sequential
-        \key Uniform
-        \default Sequential
+        \key SequentialLoad
+        \key UniformLoad
+		\key UniformPLR
+		\key SequentialUniformPLR
+        \default SequentialLoad
   A15, \field Availability Manager List Name
         \type object-list
         \object-list SystemAvailabilityManagerLists
