@@ -106,6 +106,7 @@ function( ADD_SIMULATION_TEST )
       -DREGRESSION_BASELINE_PATH=${REGRESSION_BASELINE_PATH}
       -DREGRESSION_BASELINE_SHA=${REGRESSION_BASELINE_SHA}
       -DCOMMIT_SHA=${COMMIT_SHA}
+      -DDEVICE_ID=${DEVICE_ID}
       -P ${CMAKE_SOURCE_DIR}/cmake/RunRegression.cmake
       )
     # Note, CMake / CTest doesn't seem to validate if this dependent name actually exists,

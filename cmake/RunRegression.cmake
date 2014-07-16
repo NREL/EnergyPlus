@@ -7,10 +7,11 @@
 # REGRESSION_BASELINE_PATH
 # REGRESSION_BASELINE_SHA
 # COMMIT_SHA
+# DEVICE_ID
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 
-execute_process(COMMAND ${PYTHON_EXECUTABLE} "${REGRESSION_SCRIPT_PATH}/Testing/RegressionSuite/Scripts/RunComparison.py" "${IDF_NAME}" "${REGRESSION_BASELINE_PATH}/testfiles/${IDF_NAME}" "${BINARY_DIR}/testfiles/${IDF_NAME}" ${REGRESSION_BASELINE_SHA} ${COMMIT_SHA} false)
+execute_process(COMMAND ${PYTHON_EXECUTABLE} "${REGRESSION_SCRIPT_PATH}/Testing/RegressionSuite/Scripts/RunComparison.py" "${IDF_NAME}" "${REGRESSION_BASELINE_PATH}/testfiles/${IDF_NAME}" "${BINARY_DIR}/testfiles/${IDF_NAME}" ${REGRESSION_BASELINE_SHA} ${COMMIT_SHA} false "${DEVICE_ID}")
 
 
 
