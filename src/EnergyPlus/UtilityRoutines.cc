@@ -897,7 +897,7 @@ ShowSevereError(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 1 );
 	}
 
@@ -956,7 +956,7 @@ ShowSevereMessage(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
 	}
 
@@ -1002,7 +1002,7 @@ ShowContinueError(
 	// na
 
 	ShowErrorMessage( " **   ~~~   ** " + Message, OutUnit1, OutUnit2 );
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->updateSQLiteErrorRecord( Message );
 	}
 
@@ -1068,13 +1068,13 @@ ShowContinueErrorTimeStamp(
 
 	if ( len( Message ) < 50 ) {
 		ShowErrorMessage( " **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite && sqlite->writeOutputToSQLite() ) {
 			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	} else {
 		ShowErrorMessage( " **   ~~~   ** " + Message );
 		ShowErrorMessage( " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( sqlite->writeOutputToSQLite() ) {
+		if ( sqlite && sqlite->writeOutputToSQLite() ) {
 			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	}
@@ -1182,7 +1182,7 @@ ShowWarningError(
 	if ( DoingSizing ) ++TotalWarningErrorsDuringSizing;
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
 
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 1 );
 	}
 
@@ -1237,7 +1237,7 @@ ShowWarningMessage(
 	}
 
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
-	if ( sqlite->writeOutputToSQLite() ) {
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
 	}
 
@@ -1739,7 +1739,7 @@ ShowRecurringErrors()
 			// Suppress reporting the count if it is a continue error
 			if ( has_prefix( error.Message, " **   ~~~   ** " ) ) {
 				ShowMessage( error.Message );
-				if ( sqlite->writeOutputToSQLite() ) {
+				if ( sqlite && sqlite->writeOutputToSQLite() ) {
 					sqlite->updateSQLiteErrorRecord( error.Message );
 				}
 			} else {
@@ -1748,7 +1748,7 @@ ShowRecurringErrors()
 				ShowMessage( StatMessageStart + "  This error occurred " + RoundSigDigits( error.Count ) + " total times;" );
 				ShowMessage( StatMessageStart + "  during Warmup " + RoundSigDigits( error.WarmupCount ) + " times;" );
 				ShowMessage( StatMessageStart + "  during Sizing " + RoundSigDigits( error.SizingCount ) + " times." );
-				if ( sqlite->writeOutputToSQLite() ) {
+				if ( sqlite && sqlite->writeOutputToSQLite() ) {
 					if ( has_prefix( error.Message, " ** Warning ** " ) ) {
 						sqlite->createSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
 					} else if ( has_prefix( error.Message, " ** Severe  ** " ) ) {
