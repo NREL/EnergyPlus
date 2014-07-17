@@ -1053,10 +1053,7 @@ namespace ManageElectricPower {
 	void
 	shift(
 		FArray1A< Real64 > A,
-		int const m,
-		int const n,
-		FArray1A< Real64 > B,
-		int const dim // end dimension of arrays
+		int const index_to_remove
 	);
 
 	//******************************************************************************************************

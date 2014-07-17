@@ -3602,8 +3602,8 @@ namespace ManageElectricPower {
 			//  upper-level subroutine. However, it does not hurt to leave it here.
 			if ( X( count ) * X( count - 1 ) >= 0 ) {
 				X( count - 1 ) = B1( count ) - B1( count - 2 );
-				shift( B1, count - 1, count, B1, MaxRainflowArrayBounds + 1 ); // Get rid of (count-1) row in B1
-				shift( X, count, count, X, MaxRainflowArrayBounds + 1 );
+				shift( B1, count - 1 );
+				shift( X, count );
 				--count; // If the value keep increasing or decreasing, get rid of the middle point.
 			} // Only valley and peak will be stored in the matrix, B1
 
@@ -3629,11 +3629,11 @@ namespace ManageElectricPower {
 				//     X(count-2) = ABS(X(count))-ABS(X(count-1))+ABS(X(count-2))
 				X( count - 2 ) = B1( count ) - B1( count - 3 ); // Updating X needs to be done before shift operation below
 
-				shift( B1, count - 1, count, B1, MaxRainflowArrayBounds + 1 ); // Get rid of two data points one by one
-				shift( B1, count - 2, count, B1, MaxRainflowArrayBounds + 1 ); // Delete one point
+				shift( B1, count - 1 );
+				shift( B1, count - 2 );
 
-				shift( X, count, count, X, MaxRainflowArrayBounds ); // Get rid of two data points one by one
-				shift( X, count - 1, count, X, MaxRainflowArrayBounds ); // Delete one point
+				shift( X, count );
+				shift( X, count );
 
 				count -= 2; // If one cycle is counted, two data points are deleted.
 				if ( count < 4 ) break; // When only three data points exists, one cycle cannot be counted.
@@ -3653,65 +3653,21 @@ namespace ManageElectricPower {
 		//     OneNmb(num) = OneNmb(num)+0.5d0
 		//   ENDDO
 	}
-
-	void
-	shift(
-		FArray1A< Real64 > A,
-		int const m,
-		int const n,
-		FArray1A< Real64 > B,
-		int const dim // end dimension of arrays
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Y. KyungTae & W. Wang
-		//       DATE WRITTEN   July-August, 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// Utility subroutine for rainflow cycle counting
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-        int static debug_hit_count = 0;
-
-        debug_hit_count += 1;
-		// Argument array dimensioning
-		A.dim( {0,dim} );
-		B.dim( {0,dim} );
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int ShiftNum; // Loop variable
-
-		for ( ShiftNum = 1; ShiftNum <= m - 1; ++ShiftNum ) {
-			B( ShiftNum ) = A( ShiftNum );
-		}
-
-		for ( ShiftNum = m; ShiftNum <= n; ++ShiftNum ) {
-			B( ShiftNum ) = A( ShiftNum + 1 );
-		}
-	}
+    
+    void
+    shift(
+        FArray1A< Real64 > A,
+        int const index_to_remove
+    )
+    {
+        int lower( A.l1() );
+        int upper( A.u1() );
+        for ( int i = index_to_remove; i < upper; i++ )
+        {
+            A( i ) == A( i + 1 );
+        }
+        A.dim( {lower,upper-1} );
+    }
 
 	//******************************************************************************************************
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
