@@ -384,7 +384,7 @@ namespace PlantComponentTemperatureSources {
 		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
 
 		// Calculate deltaT
-		Real64 delta_temp = WaterSource( SourceNum ).BoundaryTemp - WaterSource( SourceNum ).InletTemp 
+		Real64 delta_temp = WaterSource( SourceNum ).BoundaryTemp - WaterSource( SourceNum ).InletTemp;
 
 		// If deltaT is zero then we cannot calculate a flow request, but we may still want one
 		//   If myload is greater than zero, then lets request full flow at the current temperature as it may still be meeting load
@@ -398,10 +398,10 @@ namespace PlantComponentTemperatureSources {
 		//     mdot = MyLoad / [cp * (Tbnd - Tin)]
 		//  If there is a deltaT, but no load, the mass flow request will go to zero anyway
 		if ( abs( delta_temp ) < 0.001 ) {
-			if ( abs( MyLoad ) ) < 0.001 ) {
-				WaterSource( SourceNum ).MassFlowRate = 0.0
+			if ( abs( MyLoad ) < 0.001 ) {
+				WaterSource( SourceNum ).MassFlowRate = 0.0;
 			} else {
-				WaterSource( SourceNum ).MassFlowRate = WaterSource( SourceNum ).MassFlowRateMax
+				WaterSource( SourceNum ).MassFlowRate = WaterSource( SourceNum ).MassFlowRateMax;
 			}
 		} else {
 			WaterSource( SourceNum ).MassFlowRate = MyLoad / ( cp * delta_temp );
