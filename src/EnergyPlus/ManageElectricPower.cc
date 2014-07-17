@@ -3682,6 +3682,9 @@ namespace ManageElectricPower {
 		// USE STATEMENTS:
 		// na
 
+        int static debug_hit_count = 0;
+
+        debug_hit_count += 1;
 		// Argument array dimensioning
 		A.dim( {0,dim} );
 		B.dim( {0,dim} );
