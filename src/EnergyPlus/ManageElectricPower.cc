@@ -3664,9 +3664,8 @@ namespace ManageElectricPower {
         int upper( A.u1() );
         for ( int i = index_to_remove; i < upper; i++ )
         {
-            A( i ) == A( i + 1 );
+            A( i ) = A( i + 1 );
         }
-        A.dim( {lower,upper-1} );
     }
 
 	//******************************************************************************************************
