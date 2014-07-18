@@ -41,7 +41,7 @@ template< typename T, typename std::enable_if< std::is_unsigned< T >::value, int
 inline
 static
 void
-negate_value( T & v )
+negate_value( T & )
 {}
 
 // Signed Discriminator Template
@@ -188,7 +188,7 @@ struct Exponent_num_put : std::num_put< char >
 	// Constructor
 	inline
 	explicit
-	Exponent_num_put( Size const d, Size const e = 2ul, int const k = 0, char const E = 'E' ) :
+	Exponent_num_put( Size const d = 0ul, Size const e = 2ul, int const k = 0, char const E = 'E' ) :
 		d_( d ),
 		e_( e ),
 		k_( k ),
@@ -249,6 +249,18 @@ struct Exponent_num_put : std::num_put< char >
 	do_put( iter_type out, std::ios_base & str, char_type fill, long double v ) const
 	{
 		return exponent_do_put( out, str, fill, v );
+	}
+
+public: // Custom methods
+
+	inline
+	void
+	set( Size const d, Size const e = 2ul, int const k = 0, char const E = 'E' )
+	{
+		d_ = d;
+		e_ = e;
+		k_ = k;
+		E_ = E;
 	}
 
 private: // Static Methods
@@ -362,7 +374,7 @@ struct Engineering_num_put : std::num_put< char >
 	// Constructor
 	inline
 	explicit
-	Engineering_num_put( Size const d, Size const e = 2ul ) :
+	Engineering_num_put( Size const d = 0ul, Size const e = 2ul ) :
 		d_( d ),
 		e_( e )
 	{}
@@ -421,6 +433,16 @@ struct Engineering_num_put : std::num_put< char >
 	do_put( iter_type out, std::ios_base & str, char_type fill, long double v ) const
 	{
 		return engineering_do_put( out, str, fill, v );
+	}
+
+public: // Custom methods
+
+	inline
+	void
+	set( Size const d, Size const e = 2ul )
+	{
+		d_ = d;
+		e_ = e;
 	}
 
 private: // Static Methods
@@ -506,7 +528,7 @@ struct Scientific_num_put : std::num_put< char >
 	// Constructor
 	inline
 	explicit
-	Scientific_num_put( Size const d, Size const e = 2ul ) :
+	Scientific_num_put( Size const d = 0ul, Size const e = 2ul ) :
 		d_( d ),
 		e_( e )
 	{}
@@ -565,6 +587,16 @@ struct Scientific_num_put : std::num_put< char >
 	do_put( iter_type out, std::ios_base & str, char_type fill, long double v ) const
 	{
 		return scientific_do_put( out, str, fill, v );
+	}
+
+public: // Custom methods
+
+	inline
+	void
+	set( Size const d, Size const e = 2ul )
+	{
+		d_ = d;
+		e_ = e;
 	}
 
 private: // Static Methods

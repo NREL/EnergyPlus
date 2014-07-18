@@ -76,7 +76,6 @@ namespace ChillerIndirectAbsorption {
 	static std::string const fluidNameSteam( "STEAM" );
 	static std::string const fluidNameWater( "WATER" );
 	static std::string const calcChillerAbsorptionIndirect( "CALC Chiller:Absorption:Indirect " );
-	
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -376,7 +375,7 @@ namespace ChillerIndirectAbsorption {
 				if ( SameString( cAlphaArgs( 16 ), "HotWater" ) || SameString( cAlphaArgs( 16 ), "HotWater" ) ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
 					//       Default to Steam if left blank
-				} else if ( SameString( cAlphaArgs( 16 ), "Steam" ) || SameString( cAlphaArgs( 16 ), BlankString ) ) {
+				} else if ( SameString( cAlphaArgs( 16 ), "Steam" ) || cAlphaArgs( 16 ).empty() ) {
 					IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
@@ -389,7 +388,7 @@ namespace ChillerIndirectAbsorption {
 				IndirectAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 			}
 
-			if ( ! SameString( cAlphaArgs( 9 ), BlankString ) && ! SameString( cAlphaArgs( 10 ), BlankString ) ) {
+			if ( ( ! cAlphaArgs( 9 ).empty() ) && ( ! cAlphaArgs( 10 ).empty() ) ) {
 				GenInputOutputNodesUsed( AbsorberNum ) = true;
 				if ( IndirectAbsorber( AbsorberNum ).GenHeatSourceType == NodeType_Water ) {
 					IndirectAbsorber( AbsorberNum ).GeneratorInletNodeNum = GetOnlySingleNode( cAlphaArgs( 9 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Inlet, 3, ObjectIsNotParent );
@@ -401,7 +400,7 @@ namespace ChillerIndirectAbsorption {
 					IndirectAbsorber( AbsorberNum ).GeneratorOutletNodeNum = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Steam, NodeConnectionType_Outlet, 3, ObjectIsNotParent );
 					TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 9 ), cAlphaArgs( 10 ), "Steam Nodes" );
 				}
-			} else if ( ( SameString( cAlphaArgs( 9 ), BlankString ) && ! SameString( cAlphaArgs( 10 ), BlankString ) ) || ( ! SameString( cAlphaArgs( 9 ), BlankString ) && SameString( cAlphaArgs( 10 ), BlankString ) ) ) {
+			} else if ( ! ( cAlphaArgs( 9 ).empty() == cAlphaArgs( 10 ).empty() ) ) {
 				ShowWarningError( cCurrentModuleObject + ", Name=" + cAlphaArgs( 1 ) );
 				ShowContinueError( "...Generator fluid nodes must both be entered (or both left blank)." );
 				ShowContinueError( "...Generator fluid inlet node  = " + cAlphaArgs( 9 ) );
@@ -485,7 +484,7 @@ namespace ChillerIndirectAbsorption {
 				if ( ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + IndirectAbsorber( AbsorberNum ).Name + "\"" );
-					ShowContinueError( "...illegal Generator Heat Input Correction function of condenser temperature curve type for " "this object." );
+					ShowContinueError( "...illegal Generator Heat Input Correction function of condenser temperature curve type for this object." );
 					ShowContinueError( "...Curve type = " + GetCurveType( IndirectAbsorber( AbsorberNum ).HeatInputFCondTempPtr ) );
 					ErrorsFound = true;
 				}}
@@ -498,7 +497,7 @@ namespace ChillerIndirectAbsorption {
 				if ( ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + IndirectAbsorber( AbsorberNum ).Name + "\"" );
-					ShowContinueError( "...illegal Generator Heat Input Correction function of evaporator temperature curve type for " "this object." );
+					ShowContinueError( "...illegal Generator Heat Input Correction function of evaporator temperature curve type for this object." );
 					ShowContinueError( "...Curve type = " + GetCurveType( IndirectAbsorber( AbsorberNum ).HeatInputFEvapTempPtr ) );
 					ErrorsFound = true;
 				}}
@@ -725,7 +724,7 @@ namespace ChillerIndirectAbsorption {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! IndirectAbsorber( ChillNum ).ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + IndirectAbsorber( ChillNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							IndirectAbsorber( ChillNum ).ModulatedFlowErrDone = true;
 						}
@@ -736,7 +735,7 @@ namespace ChillerIndirectAbsorption {
 						if ( FatalError ) {
 							if ( ! IndirectAbsorber( ChillNum ).ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + IndirectAbsorber( ChillNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );

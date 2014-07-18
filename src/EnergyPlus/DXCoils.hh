@@ -1092,8 +1092,45 @@ namespace DXCoils {
 
 	};
 
+	struct PerfModeData
+	{
+		// Members
+		FArray1D< std::string > FieldNames;
+
+		// Default Constructor
+		PerfModeData ():
+			FieldNames( )  
+		{}
+
+		// Member Constructor
+		PerfModeData(
+			FArray1D< std::string > const & FieldNames // Name of the HeatingCoil numeric field descriptions
+	) :
+	    FieldNames( FieldNames )
+		{}
+	};
+
+	struct DXCoilNumericFieldData
+	{
+		// Members
+		FArray1D < PerfModeData > PerfMode; // Coil Performance object type
+
+		// Default Constructor
+		DXCoilNumericFieldData ():
+			PerfMode( 0 )
+		{}
+
+		// Member Constructor
+		DXCoilNumericFieldData(
+			FArray1_int const & PerfMode // Name of the HeatingCoil numeric field descriptions
+	) :
+		PerfMode( 0 )
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< DXCoilData > DXCoil;
+	extern FArray1D< DXCoilNumericFieldData > DXCoilNumericFields;
 
 	// Functions
 

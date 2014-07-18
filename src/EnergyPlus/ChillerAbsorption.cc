@@ -352,7 +352,7 @@ namespace ChillerAbsorption {
 			if ( NumAlphas > 8 ) {
 				if ( SameString( cAlphaArgs( 9 ), "HotWater" ) || SameString( cAlphaArgs( 9 ), "HotWater" ) ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Water;
-				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || SameString( cAlphaArgs( 9 ), BlankString ) ) {
+				} else if ( SameString( cAlphaArgs( 9 ), "Steam" ) || cAlphaArgs( 9 ).empty() ) {
 					BLASTAbsorber( AbsorberNum ).GenHeatSourceType = NodeType_Steam;
 				} else {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + cAlphaArgs( 9 ) );
@@ -1483,7 +1483,7 @@ namespace ChillerAbsorption {
 		SteamInputRat = SteamLoadFactor( 1 ) / PartLoadRat + SteamLoadFactor( 2 ) + SteamLoadFactor( 3 ) * PartLoadRat;
 
 		//Calculate electric input ratio
-		ElectricInputRat = ElectricLoadFactor( 1 ) + ElectricLoadFactor( 2 ) * PartLoadRat + ElectricLoadFactor( 3 ) * std::pow( PartLoadRat, 2 );
+		ElectricInputRat = ElectricLoadFactor( 1 ) + ElectricLoadFactor( 2 ) * PartLoadRat + ElectricLoadFactor( 3 ) * pow_2( PartLoadRat );
 
 		//Calculate electric energy input
 		PumpingPower = ElectricInputRat * NomPumpPower * FRAC;

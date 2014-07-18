@@ -1252,9 +1252,9 @@ namespace EconomicLifeCycleCost {
 			// to allocate an interest rate (in this case inflation) cannot just use 1/12
 			// for the monthly value since it will be slightly wrong. Instead use inverse of
 			// formula from Newnan (4-32) which is r = m x (ia + 1)^(1/m) - 1)
-			inflationPerMonth = ( std::pow( ( inflation + 1.0 ), ( 1.0 / 12.0 ) ) ) - 1;
+			inflationPerMonth = std::pow( inflation + 1.0, 1.0 / 12.0 ) - 1;
 			for ( jMonth = 1; jMonth <= lengthStudyTotalMonths; ++jMonth ) {
-				monthlyInflationFactor( jMonth ) = std::pow( ( 1.0 + inflationPerMonth ), ( jMonth - 1 ) );
+				monthlyInflationFactor( jMonth ) = std::pow( 1.0 + inflationPerMonth, jMonth - 1 );
 			}
 		}
 
@@ -1488,7 +1488,7 @@ namespace EconomicLifeCycleCost {
 				effectiveYear = double( jYear );
 			} else {
 			}}
-			SPV( jYear ) = 1.0 / ( std::pow( ( 1.0 + curDiscountRate ), effectiveYear ) );
+			SPV( jYear ) = 1.0 / std::pow( 1.0 + curDiscountRate, effectiveYear );
 		}
 		//use SPV as default values for all energy types
 		for ( jYear = 1; jYear <= lengthStudyYears; ++jYear ) {
@@ -1511,7 +1511,7 @@ namespace EconomicLifeCycleCost {
 						effectiveYear = double( jYear );
 					} else {
 					}}
-					energySPV( curResource, jYear ) = UsePriceEscalation( nUsePriceEsc ).Escalation( jYear ) / ( std::pow( ( 1.0 + curDiscountRate ), effectiveYear ) );
+					energySPV( curResource, jYear ) = UsePriceEscalation( nUsePriceEsc ).Escalation( jYear ) / std::pow( 1.0 + curDiscountRate, effectiveYear );
 				}
 			}
 		}
@@ -1895,7 +1895,6 @@ namespace EconomicLifeCycleCost {
 		using OutputReportTabular::WriteTable;
 		using OutputReportTabular::RealToStr;
 		using OutputReportTabular::IntToStr;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2011,7 +2010,7 @@ namespace EconomicLifeCycleCost {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Life-Cycle Cost Parameters" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Life-Cycle Cost Parameters" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2042,7 +2041,7 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Use Price Escalation" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Price Escalation" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2073,7 +2072,7 @@ namespace EconomicLifeCycleCost {
 				}
 				WriteSubtitle( "Use Adjustment" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Use Adjustment" );
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -2106,7 +2105,7 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Cash Flow for Recurring and Nonrecurring Costs (Without Escalation)" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2131,7 +2130,7 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Energy Cost Cash Flows (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy Cost Cash Flows (Without Escalation)" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Energy Cost Cash Flows (Without Escalation)" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2156,7 +2155,7 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Capital Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Capital Cash Flow by Category (Without Escalation)" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2194,7 +2193,7 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Operating Cash Flow by Category (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Operating Cash Flow by Category (Without Escalation)" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2266,7 +2265,7 @@ namespace EconomicLifeCycleCost {
 			}
 			WriteSubtitle( "Monthly Total Cash Flow (Without Escalation)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Monthly Total Cash Flow (Without Escalation)" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2339,7 +2338,7 @@ namespace EconomicLifeCycleCost {
 			tableBody( numRows + 1, 4 ) = RealToStr( totalPV, 2 );
 			WriteSubtitle( "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value for Recurring, Nonrecurring and Energy Costs (Before Tax)" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2388,7 +2387,7 @@ namespace EconomicLifeCycleCost {
 
 			WriteSubtitle( "Present Value by Category" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Category" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2416,7 +2415,7 @@ namespace EconomicLifeCycleCost {
 
 			WriteSubtitle( "Present Value by Year" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "Present Value by Year" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -2451,7 +2450,7 @@ namespace EconomicLifeCycleCost {
 
 				WriteSubtitle( "After Tax Estimate" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Life-Cycle Cost Report", "Entire Facility", "After Tax Estimate" );
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();

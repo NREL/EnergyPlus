@@ -628,7 +628,8 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			length_sq += square( data_[ i ] );
+			T const data_i( data_[ i ] );
+			length_sq += data_i * data_i;
 		}
 		return std::sqrt( length_sq );
 	}
@@ -640,7 +641,8 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			length_sq += square( data_[ i ] );
+			T const data_i( data_[ i ] );
+			length_sq += data_i * data_i;
 		}
 		return length_sq;
 	}
@@ -897,17 +899,6 @@ private: // Functions
 
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
-private: // Static Functions
-
-	// square( x ) == x^2
-	inline
-	static
-	T
-	square( T const & x )
-	{
-		return x * x;
-	}
-
 private: // Data
 
 	size_type size_; // Number of array elements
@@ -923,6 +914,64 @@ private: // Data
 }; // CArrayP
 
 // Functions
+
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( CArrayP< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( CArrayP< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return mag_sq;
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( CArrayP< T > const & a, CArrayP< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( CArrayP< T > const & a, CArrayP< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
 
 // Dot Product
 template< typename T >
@@ -950,34 +999,6 @@ dot_product( CArrayP< T > const & a, CArrayP< T > const & b )
 		sum += a[ i ] * b[ i ];
 	}
 	return sum;
-}
-
-// Distance
-template< typename T >
-inline
-T
-distance( CArrayP< T > const & a, CArrayP< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return std::sqrt( distance_sq );
-}
-
-// Distance Squared
-template< typename T >
-inline
-T
-distance_squared( CArrayP< T > const & a, CArrayP< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename CArrayP< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return distance_sq;
 }
 
 // Swap

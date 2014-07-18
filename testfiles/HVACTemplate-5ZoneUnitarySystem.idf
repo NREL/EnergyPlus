@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -1728,20 +1728,20 @@
     For: WinterDesignDay,    !- Field 15
     Until: 24:00,1.0;        !- Field 16
 
-Schedule:Compact,
+  Schedule:Compact,
     Min OA Sched,            !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2,  !- Field 2
-    Until: 8:00, 0.0,        !- Field 4
-    Until: 21:00, 1.0,       !- Field 6
-    Until: 24:00, 0.0,       !- Field 8
+    For: WeekDays CustomDay1 CustomDay2, !- Field 2
+    Until: 8:00,0.0,         !- Field 3
+    Until: 21:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
     For: Weekends Holiday,   !- Field 9
-    Until: 24:00, 0.0,       !- Field 11
+    Until: 24:00,0.0,        !- Field 10
     For: SummerDesignDay,    !- Field 12
-    Until: 24:00, 1.0,       !- Field 14
+    Until: 24:00,1.0,        !- Field 13
     For: WinterDesignDay,    !- Field 15
-    Until: 24:00, 1.0;       !- Field 17
+    Until: 24:00,1.0;        !- Field 16
 
   Sizing:Parameters,
     1.2,                     !- Heating Sizing Factor

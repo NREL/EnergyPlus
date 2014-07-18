@@ -81,7 +81,7 @@
 !                                 and chilled water cooling coils. Spaces 1-4 are served by AHU 1 and
 !                                 have hot water reheat coils. Space 5 is served by AHU 2 which is
 !                                 controlled by the Space 5 thermostat with no reheat coil.
-!                                 Central Plant is single hot water boiler, electric compression 
+!                                 Central Plant is single hot water boiler, electric compression
 !                                 chiller with water cooled condenser. All equipment is autosized.
 !
 ! Zonal Equipment:                No
@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2149,27 +2149,27 @@
   Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
 
   Output:Variable,AHU 1 Spaces 1-4 Mixed Air Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,AHU 1 Spaces 1-4 Supply Fan Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,AHU 1 Spaces 1-4 Cooling Coil Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,AHU 1 Spaces 1-4 Cooling Coil Outlet,System Node Setpoint Temperature,hourly;
 
   Output:Variable,AHU 1 Spaces 1-4 Heating Coil Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,AHU 1 Spaces 1-4 Heating Coil Outlet,System Node Setpoint Temperature,hourly;
 
   Output:Variable,AHU 2 Space 5 Supply Fan Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,AHU 2 Space 5 Supply Fan Outlet,System Node Temperature,hourly;
 
   Output:Variable,AHU 2 Space 5 Cooling Coil Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,AHU 2 Space 5 Cooling Coil Outlet,System Node Setpoint Temperature,hourly;
 
   Output:Variable,AHU 2 Space 5 Heating Coil Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,AHU 2 Space 5 Heating Coil Outlet,System Node Setpoint Temperature,hourly;
 
   Output:VariableDictionary,IDF;

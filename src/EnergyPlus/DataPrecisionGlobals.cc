@@ -44,10 +44,10 @@ namespace DataPrecisionGlobals {
 	Real64 const constant_one( 1.0 );
 	Real64 const constant_minusone( -1.0 );
 	Real64 const constant_twenty( 20.0 );
-	Real64 const constant_pointfive( .5 );
-	Real64 const EXP_LowerLimit( -20. ); // In IVF=2.061153622438558d-009 - used 20
+	Real64 const constant_pointfive( 0.5 );
+	Real64 const EXP_LowerLimit( -20.0 ); // In IVF=2.061153622438558d-009 - used 20
 	// because it's already used in other parts of the code
-	Real64 const EXP_UpperLimit( 40. ); // In IVF=2.353852668370200d+017
+	Real64 const EXP_UpperLimit( 40.0 ); // In IVF=2.353852668370200d+017
 
 	// DERIVED TYPE DEFINITIONS:
 	// na

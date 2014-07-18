@@ -150,11 +150,11 @@ public: // Assignment
 					c( i ) = a( i );
 				}
 				for ( int i = 1, e = u_; i <= e; ++i ) {
-					operator()( i ) = c( i );
+					operator ()( i ) = c( i );
 				}
 			} else { // Not overlap-safe
 				for ( int i = 1, e = u_; i <= e; ++i ) {
-					operator()( i ) = a( i );
+					operator ()( i ) = a( i );
 				}
 			}
 		}
@@ -169,7 +169,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, e = u_; i <= e; ++i ) {
-			operator()( i ) = a( i );
+			operator ()( i ) = a( i );
 		}
 		return *this;
 	}
@@ -183,7 +183,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) = a( i );
+				operator ()( i ) = a( i );
 			}
 		}
 		return *this;
@@ -202,11 +202,11 @@ public: // Assignment
 				c( i ) = a( j );
 			}
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) = c( i );
+				operator ()( i ) = c( i );
 			}
 		} else { // Not overlap-safe
 			for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-				operator()( i ) = a( j );
+				operator ()( i ) = a( j );
 			}
 		}
 		return *this;
@@ -220,7 +220,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-			operator()( i ) = a( j );
+			operator ()( i ) = a( j );
 		}
 		return *this;
 	}
@@ -234,7 +234,7 @@ public: // Assignment
 		assert( size_ == l.size() );
 		auto il( l.begin() );
 		for ( int i = 1, e = u_; i <= e; ++i, ++il ) {
-			operator()( i ) = *il;
+			operator ()( i ) = *il;
 		}
 		return *this;
 	}
@@ -248,7 +248,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) += a( i );
+				operator ()( i ) += a( i );
 			}
 		}
 		return *this;
@@ -263,7 +263,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) -= a( i );
+				operator ()( i ) -= a( i );
 			}
 		}
 		return *this;
@@ -278,7 +278,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) *= a( i );
+				operator ()( i ) *= a( i );
 			}
 		}
 		return *this;
@@ -294,7 +294,7 @@ public: // Assignment
 		if ( a.dimensions_initialized() ) {
 			for ( int i = 1, e = u_; i <= e; ++i ) {
 				assert( T( a( i ) ) != T( 0 ) );
-				operator()( i ) /= a( i );
+				operator ()( i ) /= a( i );
 			}
 		}
 		return *this;
@@ -313,11 +313,11 @@ public: // Assignment
 				c( i ) = a( j );
 			}
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) += c( i );
+				operator ()( i ) += c( i );
 			}
 		} else { // Not overlap-safe
 			for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-				operator()( i ) += a( j );
+				operator ()( i ) += a( j );
 			}
 		}
 		return *this;
@@ -336,11 +336,11 @@ public: // Assignment
 				c( i ) = a( j );
 			}
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) -= c( i );
+				operator ()( i ) -= c( i );
 			}
 		} else { // Not overlap-safe
 			for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-				operator()( i ) -= a( j );
+				operator ()( i ) -= a( j );
 			}
 		}
 		return *this;
@@ -359,11 +359,11 @@ public: // Assignment
 				c( i ) = a( j );
 			}
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) *= c( i );
+				operator ()( i ) *= c( i );
 			}
 		} else { // Not overlap-safe
 			for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-				operator()( i ) *= a( j );
+				operator ()( i ) *= a( j );
 			}
 		}
 		return *this;
@@ -383,12 +383,12 @@ public: // Assignment
 				c( i ) = a( j );
 			}
 			for ( int i = 1, e = u_; i <= e; ++i ) {
-				operator()( i ) /= c( i );
+				operator ()( i ) /= c( i );
 			}
 		} else { // Not overlap-safe
 			for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
 				assert( a( j ) != T( 0 ) );
-				operator()( i ) /= a( j );
+				operator ()( i ) /= a( j );
 			}
 		}
 		return *this;
@@ -402,7 +402,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-			operator()( i ) += a( j );
+			operator ()( i ) += a( j );
 		}
 		return *this;
 	}
@@ -415,7 +415,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-			operator()( i ) -= a( j );
+			operator ()( i ) -= a( j );
 		}
 		return *this;
 	}
@@ -428,7 +428,7 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
-			operator()( i ) *= a( j );
+			operator ()( i ) *= a( j );
 		}
 		return *this;
 	}
@@ -442,7 +442,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i = 1, j = a.l(), e = u_; i <= e; ++i, ++j ) {
 			assert( T( a( j ) ) != T( 0 ) );
-			operator()( i ) /= a( j );
+			operator ()( i ) /= a( j );
 		}
 		return *this;
 	}
@@ -453,7 +453,7 @@ public: // Assignment
 	operator =( T const & t )
 	{
 		for ( int i = 1, e = u_; i <= e; ++i ) {
-			operator()( i ) = t;
+			operator ()( i ) = t;
 		}
 		return *this;
 	}
@@ -464,7 +464,7 @@ public: // Assignment
 	operator +=( T const & t )
 	{
 		for ( int i = 1, e = u_; i <= e; ++i ) {
-			operator()( i ) += t;
+			operator ()( i ) += t;
 		}
 		return *this;
 	}
@@ -475,7 +475,7 @@ public: // Assignment
 	operator -=( T const & t )
 	{
 		for ( int i = 1, e = u_; i <= e; ++i ) {
-			operator()( i ) -= t;
+			operator ()( i ) -= t;
 		}
 		return *this;
 	}
@@ -486,7 +486,7 @@ public: // Assignment
 	operator *=( T const & t )
 	{
 		for ( int i = 1, e = u_; i <= e; ++i ) {
-			operator()( i ) *= t;
+			operator ()( i ) *= t;
 		}
 		return *this;
 	}
@@ -498,7 +498,7 @@ public: // Assignment
 	{
 		assert( t != T( 0 ) );
 		for ( int i = 1, e = u_; i <= e; ++i ) {
-			operator()( i ) /= t;
+			operator ()( i ) /= t;
 		}
 		return *this;
 	}
@@ -650,20 +650,6 @@ public: // Inspector
 		default:
 			assert( false );
 			return I1();
-		}
-	}
-
-	// Lower Index of a Dimension
-	inline
-	int
-	l( int const d ) const
-	{
-		switch ( d ) {
-		case 1:
-			return 1;
-		default:
-			assert( false );
-			return 1;
 		}
 	}
 
@@ -2229,6 +2215,34 @@ bool
 conformable( MArray1< A, M > const & a, FArray1S< V > const & b )
 {
 	return b.conformable( a );
+}
+
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( FArray1S< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( FArray1S< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( int i = 1, e = a.u(); i <= e; ++i ) {
+		T const mag_i( a( i ) );
+		mag_sq += mag_i * mag_i;
+	}
+	return mag_sq;
 }
 
 // Distance

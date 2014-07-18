@@ -653,9 +653,9 @@ namespace ChillerElectricEIR {
 					ShowContinueError( "EIR as a function of PLR curve output at various part-load ratios shown below:" );
 					ShowContinueError( "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
 					gio::write( StringVar, "'Curve Output = '" );
+					gio::Fmt const fmtF72( "((F7.2),$)" );
 					for ( CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr ) {
-						gio::write( StringVar, "((F7.2),$)" )
-						    << CurveValArray( CurveValPtr );
+						gio::write( StringVar, fmtF72 ) << CurveValArray( CurveValPtr );
 					}
 					gio::write( StringVar );
 					ShowContinueError( StringVar );
@@ -1501,7 +1501,7 @@ namespace ChillerElectricEIR {
 			//    Node(CondInletNode)%Temp = OutWetBulbTemp
 			Node( CondInletNode ).Temp = Node( CondInletNode ).OutAirWetBulb;
 			//  line above assumes evaporation pushes condenser inlet air humidity ratio to saturation
-			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press, BlankString );
+			CondOutletHumRat = PsyWFnTdbTwbPb( Node( CondInletNode ).Temp, Node( CondInletNode ).Temp, Node( CondInletNode ).Press );
 
 			// Warn user if evap condenser wet-bulb temperature falls below 10 C
 			if ( Node( CondInletNode ).Temp < 10.0 && std::abs( MyLoad ) > 0 && RunFlag && ! WarmupFlag ) {

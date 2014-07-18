@@ -1258,6 +1258,7 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ZeroTol( 0.0000001 ); // Smallest non-zero value allowed
 		static std::string const RoutineName( "InitLowTempRadiantSystem" );
+		static gio::Fmt const fmtF102( "(F10.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1351,13 +1352,13 @@ namespace LowTempRadiantSystem {
 					TotalEffic = CFloRadSys( RadNum ).WaterVolFlowMax * CFloRadSys( RadNum ).NomPumpHead / CFloRadSys( RadNum ).NomPowerUse;
 					CFloRadSys( RadNum ).PumpEffic = TotalEffic / CFloRadSys( RadNum ).MotorEffic;
 					if ( CFloRadSys( RadNum ).PumpEffic < 0.50 ) {
-						gio::write( Errout, "(F10.2)" ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
+						gio::write( Errout, fmtF102 ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
 						ShowWarningError( "Check input. Calc Pump Efficiency=" + stripped( Errout ) + "% which is less than 50%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 					} else if ( ( CFloRadSys( RadNum ).PumpEffic > 0.95 ) && ( CFloRadSys( RadNum ).PumpEffic <= 1.0 ) ) {
-						gio::write( Errout, "(F10.2)" ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
+						gio::write( Errout, fmtF102 ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
 						ShowWarningError( "Check input.  Calc Pump Efficiency=" + stripped( Errout ) + "% is approaching 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 					} else if ( CFloRadSys( RadNum ).PumpEffic > 1.0 ) {
-						gio::write( Errout, "(F10.2)" ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
+						gio::write( Errout, fmtF102 ) << CFloRadSys( RadNum ).PumpEffic * 100.0;
 						ShowSevereError( "Check input.  Calc Pump Efficiency=" + stripped( Errout ) + "% which is bigger than 100%, for pump in radiant system " + CFloRadSys( RadNum ).Name );
 						ErrorsFound = true;
 					}
@@ -1451,7 +1452,7 @@ namespace LowTempRadiantSystem {
 
 				//set design mass flow rates
 				if ( HydrRadSys( RadSysNum ).HotWaterInNode > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60., PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 					HydrRadSys( RadSysNum ).WaterFlowMaxHeat = rho * HydrRadSys( RadSysNum ).WaterVolFlowMaxHeat;
 					InitComponentNodes( 0.0, HydrRadSys( RadSysNum ).WaterFlowMaxHeat, HydrRadSys( RadSysNum ).HotWaterInNode, HydrRadSys( RadSysNum ).HotWaterOutNode, HydrRadSys( RadSysNum ).HWLoopNum, HydrRadSys( RadSysNum ).HWLoopSide, HydrRadSys( RadSysNum ).HWBranchNum, HydrRadSys( RadSysNum ).HWCompNum );
 				}
@@ -1470,7 +1471,7 @@ namespace LowTempRadiantSystem {
 
 				//set design mass flow rates
 				if ( CFloRadSys( RadSysNum ).HotWaterInNode > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName, 60., PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 					CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate = rho * CFloRadSys( RadSysNum ).WaterVolFlowMax;
 					InitComponentNodes( 0.0, CFloRadSys( RadSysNum ).HotDesignWaterMassFlowRate, CFloRadSys( RadSysNum ).HotWaterInNode, CFloRadSys( RadSysNum ).HotWaterOutNode, CFloRadSys( RadSysNum ).HWLoopNum, CFloRadSys( RadSysNum ).HWLoopSide, CFloRadSys( RadSysNum ).HWBranchNum, CFloRadSys( RadSysNum ).HWCompNum );
 				}
@@ -1492,11 +1493,11 @@ namespace LowTempRadiantSystem {
 		}
 
 		if ( BeginEnvrnFlag && MyEnvrnFlagGeneral ) {
-			ZeroSourceSumHATsurf = 0.;
-			QRadSysSrcAvg = 0.;
-			LastQRadSysSrc = 0.;
-			LastSysTimeElapsed = 0.;
-			LastTimeStepSys = 0.;
+			ZeroSourceSumHATsurf = 0.0;
+			QRadSysSrcAvg = 0.0;
+			LastQRadSysSrc = 0.0;
+			LastSysTimeElapsed = 0.0;
+			LastTimeStepSys = 0.0;
 			MyEnvrnFlagGeneral = false;
 		}
 		if ( ! BeginEnvrnFlag ) MyEnvrnFlagGeneral = true;
@@ -1818,9 +1819,9 @@ namespace LowTempRadiantSystem {
 						PltSizHeatNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).HotWaterInNode, HydrRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
 						if ( PltSizHeatNum > 0 ) {
 							if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60., PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
-								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60., PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								WaterVolFlowMaxHeatDes = ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
@@ -1868,9 +1869,9 @@ namespace LowTempRadiantSystem {
 						PltSizCoolNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).ColdWaterInNode, HydrRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
 						if ( PltSizCoolNum > 0 ) {
 							if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5., PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5., PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 								WaterVolFlowMaxCoolDes = ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 							} else {
@@ -2423,7 +2424,7 @@ namespace LowTempRadiantSystem {
 			// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
 			// conditions.
 			HydrRadSys( RadSysNum ).CondCausedShutDown = false;
-			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( ZoneNum ), OutBaroPress );
 
 			if ( ( OperatingMode == CoolingMode ) && ( HydrRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 
@@ -2657,7 +2658,7 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const LowCpFluidValue( 100. ); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
+		Real64 const LowCpFluidValue( 100.0 ); // lowest allowed Cp fluid value (to avoid dividing by zero) [J/kg-K]
 		static std::string const RoutineName( "CalcLowTempCFloRadiantSystem" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -3469,7 +3470,7 @@ namespace LowTempRadiantSystem {
 			// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
 			// conditions.
 			CFloRadSys( RadSysNum ).CondCausedShutDown = false;
-			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( CFloRadSys( RadSysNum ).ZonePtr ), OutBaroPress, BlankString );
+			DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( CFloRadSys( RadSysNum ).ZonePtr ), OutBaroPress );
 
 			if ( ( OperatingMode == CoolingMode ) && ( CFloRadSys( RadSysNum ).CondCtrlType == CondCtrlSimpleOff ) ) {
 
@@ -4002,8 +4003,8 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const UpperRangeLimit( 500. ); // high error trigger limit for when model is not working
-		Real64 const LowerRangeLimit( -300. ); // Low error trigger limit for when model is not working
+		Real64 const UpperRangeLimit( 500.0 ); // high error trigger limit for when model is not working
+		Real64 const LowerRangeLimit( -300.0 ); // Low error trigger limit for when model is not working
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4141,8 +4142,8 @@ namespace LowTempRadiantSystem {
 		int const NumOfPropDivisions( 13 );
 		Real64 const MaxExpPower( 50.0 ); // Maximum power after which EXP argument would be zero for DP variables
 		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { .001652, .001422, .001225, .00108, .000959, .000855, .000769, .000695, .000631, .000577, .000528, .000489, .000453 } ); // Viscosity, in Ns/m2
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { .574, .582, .590, .598, .606, .613, .620, .628, .634, .640, .645, .650, .656 } ); // Conductivity, in W/mK
+		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453 } ); // Viscosity, in Ns/m2
+		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
 		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
 		static std::string const RoutineName( "CalcRadSysHXEffectTerm" );
 
@@ -4193,7 +4194,7 @@ namespace LowTempRadiantSystem {
 		if ( SELECT_CASE_var == HydronicSystem ) {
 			{ auto const SELECT_CASE_var1( OperatingMode );
 			if ( SELECT_CASE_var1 == HeatingMode ) {
-				CpWater = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60., PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
+				CpWater = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else if ( SELECT_CASE_var1 == CoolingMode ) {
 				CpWater = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, Temperature, PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
 			}}
@@ -4213,7 +4214,7 @@ namespace LowTempRadiantSystem {
 		// Calculate the Nusselt number based on what flow regime one is in
 		if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
 
-			NuD = 0.023 * ( std::pow( ReD, ( 0.8 ) ) ) * ( std::pow( PRactual, ( 1.0 / 3.0 ) ) );
+			NuD = 0.023 * std::pow( ReD, 0.8 ) * std::pow( PRactual, 1.0 / 3.0 );
 
 		} else { // Laminar flow --> use constant surface temperature relation
 
@@ -4232,8 +4233,8 @@ namespace LowTempRadiantSystem {
 			Eff = 1.0;
 			CalcRadSysHXEffectTerm = FlowFraction * WaterMassFlow * CpWater;
 		} else {
-			Eff = ( 1.0 - std::exp( -NTU ) );
-			CalcRadSysHXEffectTerm = ( 1.0 - std::exp( -NTU ) ) * FlowFraction * WaterMassFlow * CpWater;
+			Eff = 1.0 - std::exp( -NTU );
+			CalcRadSysHXEffectTerm = Eff * FlowFraction * WaterMassFlow * CpWater;
 		}
 
 		return CalcRadSysHXEffectTerm;
@@ -4505,7 +4506,7 @@ namespace LowTempRadiantSystem {
 				CpFluid = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName, Node( CFloRadSys( RadSysNum ).HotWaterInNode ).Temp, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				CFloRadSys( RadSysNum ).HeatPower = TotalRadSysPower;
-				if ( CFloRadSys( RadSysNum ).PumpMassFlowRate > 0. ) {
+				if ( CFloRadSys( RadSysNum ).PumpMassFlowRate > 0.0 ) {
 					CFloRadSys( RadSysNum ).PumpInletTemp = CFloRadSys( RadSysNum ).WaterInletTemp - ( CFloRadSys( RadSysNum ).PumpHeattoFluid / ( CFloRadSys( RadSysNum ).PumpMassFlowRate * CpFluid ) );
 				} else {
 					CFloRadSys( RadSysNum ).PumpInletTemp = CFloRadSys( RadSysNum ).WaterInletTemp;

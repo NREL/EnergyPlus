@@ -139,6 +139,7 @@ namespace NodeInputManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetNodeNums: " );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -160,7 +161,7 @@ namespace NodeInputManager {
 		}
 
 		if ( NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric && NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown ) {
-			gio::write( cNodeFluidType, "*" ) << NodeFluidType;
+			gio::write( cNodeFluidType, fmtLD ) << NodeFluidType;
 			strip( cNodeFluidType );
 			ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid fluid type." );
 			ShowContinueError( "..Invalid FluidType=" + cNodeFluidType );
@@ -289,7 +290,7 @@ namespace NodeInputManager {
 			GetNodeNums( Name, NumNodes, NodeNumbers, errFlag, NodeFluidType, NodeObjectType, NodeObjectName, NodeConnectionType, NodeFluidStream, ObjectIsParent, _, InputFieldName );
 		} else {
 			// only valid "error" here is when the Node List is blank
-			if ( Name != BlankString ) {
+			if ( ! Name.empty() ) {
 				ShowSevereError( RoutineName + NodeObjectType + "=\"" + NodeObjectName + "\", invalid data." );
 				if ( present( InputFieldName ) ) ShowContinueError( "...Ref field=" + InputFieldName );
 				ShowContinueError( "NodeList not found=\"" + Name + "\"." );
@@ -349,6 +350,7 @@ namespace NodeInputManager {
 		static gio::Fmt const Format_701( "(A)" );
 		static gio::Fmt const Format_702( "('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
 		static gio::Fmt const Format_703( "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
+		static gio::Fmt const fmtLD( "*" );
 
 		if ( ! NodeVarsSetup ) {
 			if ( ! AbortProcessing ) {
@@ -410,16 +412,16 @@ namespace NodeInputManager {
 			gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 			// Show the node names on the Branch-Node Details file
 			gio::write( OutputFileBNDetails, Format_700 );
-			gio::write( ChrOut, "*" ) << NumOfUniqueNodeNames;
+			gio::write( ChrOut, fmtLD ) << NumOfUniqueNodeNames;
 			gio::write( OutputFileBNDetails, Format_701 ) << " #Nodes," + stripped( ChrOut );
 			if ( NumOfUniqueNodeNames > 0 ) {
 				gio::write( OutputFileBNDetails, Format_702 );
 			}
 			Count0 = 0;
 			for ( NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode ) {
-				gio::write( ChrOut, "*" ) << NumNode;
+				gio::write( ChrOut, fmtLD ) << NumNode;
 				strip( ChrOut );
-				gio::write( ChrOut1, "*" ) << NodeRef( NumNode );
+				gio::write( ChrOut1, fmtLD ) << NodeRef( NumNode );
 				strip( ChrOut1 );
 				ChrOut2 = ValidNodeFluidTypes( Node( NumNode ).FluidType );
 				gio::write( OutputFileBNDetails, Format_701 ) << " Node," + ChrOut + ',' + NodeID( NumNode ) + ',' + ChrOut2 + ',' + ChrOut1;
@@ -433,9 +435,9 @@ namespace NodeInputManager {
 				gio::write( OutputFileBNDetails, Format_703 );
 				for ( NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode ) {
 					if ( NodeRef( NumNode ) > 0 ) continue;
-					gio::write( ChrOut, "*" ) << NumNode;
+					gio::write( ChrOut, fmtLD ) << NumNode;
 					strip( ChrOut );
-					gio::write( ChrOut1, "*" ) << NodeRef( NumNode );
+					gio::write( ChrOut1, fmtLD ) << NodeRef( NumNode );
 					strip( ChrOut1 );
 					ChrOut2 = ValidNodeFluidTypes( Node( NumNode ).FluidType );
 					gio::write( OutputFileBNDetails, Format_701 ) << " Suspicious Node," + ChrOut + ',' + NodeID( NumNode ) + ',' + ChrOut2 + ',' + ChrOut1;
@@ -535,7 +537,7 @@ namespace NodeInputManager {
 			//  Put all in, then determine unique
 			for ( Loop1 = 1; Loop1 <= NumAlphas - 1; ++Loop1 ) {
 				NodeLists( NCount ).NodeNames( Loop1 ) = cAlphas( Loop1 + 1 );
-				if ( cAlphas( Loop1 + 1 ) == BlankString ) {
+				if ( cAlphas( Loop1 + 1 ).empty() ) {
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + cAlphas( 1 ) + "\", blank node name in list." );
 					--NodeLists( NCount ).NumOfNodesInList;
 					if ( NodeLists( NCount ).NumOfNodesInList <= 0 ) {
@@ -624,7 +626,7 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -637,7 +639,7 @@ namespace NodeInputManager {
 		static std::string cNodeFluidType;
 
 		if ( NodeFluidType != NodeType_Air && NodeFluidType != NodeType_Water && NodeFluidType != NodeType_Electric && NodeFluidType != NodeType_Steam && NodeFluidType != NodeType_Unknown ) {
-			gio::write( cNodeFluidType, "*" ) << NodeFluidType;
+			gio::write( cNodeFluidType, fmtLD ) << NodeFluidType;
 			strip( cNodeFluidType );
 			ShowSevereError( "AssignNodeNumber: Invalid FluidType=" + cNodeFluidType );
 			ErrorsFound = true;
@@ -857,7 +859,7 @@ namespace NodeInputManager {
 			GetNodeInputFlag = false;
 		}
 
-		if ( CurCheckContextName != BlankString ) {
+		if ( ! CurCheckContextName.empty() ) {
 			ShowFatalError( "Init Uniqueness called for \"" + ContextName + ", but checks for \"" + CurCheckContextName + "\" was already in progress." );
 		}
 		if ( ContextName == BlankString ) {
@@ -929,11 +931,11 @@ namespace NodeInputManager {
 
 		{ auto const nodeType( CheckType );
 
-		if ( SameString(nodeType, "NODENAME") || SameString(nodeType, "NODENAMES") || SameString(nodeType, "NODE NAME") || SameString(nodeType, "NODE NAMES") ) {
+		if ( nodeType == "NodeName" ) {
 			if ( ! present( CheckName ) ) {
-				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, " "but did not include CheckName argument." );
+				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeName, but did not include CheckName argument." );
 			}
-			if ( CheckName != BlankString ) {
+			if ( ! CheckName().empty() ) {
 				Found = FindItemInList( CheckName, UniqueNodeNames, NumCheckNodes );
 				if ( Found != 0 ) {
 					ShowSevereError( CurCheckContextName + "=\"" + ObjectName + "\", duplicate node names found." );
@@ -958,9 +960,9 @@ namespace NodeInputManager {
 				}
 			}
 
-		} else if (  SameString(nodeType, "NODENUMBER") ||  SameString(nodeType, "NODENUMBERS") ||  SameString(nodeType, "NODE NUMBER") ||  SameString(nodeType, "NODE NUMBERS") ) {
+		} else if ( nodeType == "NodeNumber" ) {
 			if ( ! present( CheckNumber ) ) {
-				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, " "but did not include CheckNumber argument." );
+				ShowFatalError( "Routine CheckUniqueNodes called with Nodetypes=NodeNumber, but did not include CheckNumber argument." );
 			}
 			if ( CheckNumber != 0 ) {
 				Found = FindItemInList( NodeID( CheckNumber ), UniqueNodeNames, NumCheckNodes );
@@ -1149,7 +1151,7 @@ namespace NodeInputManager {
 				nodeReportingStrings.push_back( std::string( NodeReportingCalc + NodeID( iNode ) ) );
 				nodeFluidNames.push_back( GetGlycolNameByIndex( Node( iNode ).FluidIndex ) );
 				for ( iReq = 1; iReq <= NumOfReqVariables; ++iReq ) {
-					if( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || SameString( ReqRepVars( iReq ).Key, BlankString ) ) {
+					if( SameString( ReqRepVars( iReq ).Key, NodeID( iNode ) ) || ReqRepVars( iReq ).Key.empty() ) {
 						if( SameString( ReqRepVars( iReq ).VarName, "System Node Wetbulb Temperature" ) ) {
 							NodeWetBulbRepReq( iNode ) = true;
 							NodeWetBulbSchedPtr( iNode ) = ReqRepVars( iReq ).SchedPtr;
@@ -1193,7 +1195,7 @@ namespace NodeInputManager {
 			if ( Node( iNode ).FluidType == NodeType_Air ) {
 				MoreNodeInfo( iNode ).VolFlowRateStdRho = Node( iNode ).MassFlowRate / RhoAirStdInit;
 				// if Node%Press was reliable could be used here.
-				RhoAirCurrent = PsyRhoAirFnPbTdbW( OutBaroPress, Node( iNode ).Temp, Node( iNode ).HumRat, BlankString );
+				RhoAirCurrent = PsyRhoAirFnPbTdbW( OutBaroPress, Node( iNode ).Temp, Node( iNode ).HumRat );
 				MoreNodeInfo( iNode ).Density = RhoAirCurrent;
 				if ( RhoAirCurrent != 0.0 ) MoreNodeInfo( iNode ).VolFlowRateCrntRho = Node( iNode ).MassFlowRate / RhoAirCurrent;
 				MoreNodeInfo( iNode ).ReportEnthalpy = PsyHFnTdbW( Node( iNode ).Temp, Node( iNode ).HumRat );
@@ -1204,7 +1206,7 @@ namespace NodeInputManager {
 					MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 				}
 				if ( ReportDewPoint ) {
-					MoreNodeInfo( iNode ).AirDewPointTemp = PsyTdpFnWPb( Node( iNode ).HumRat, OutBaroPress, BlankString );
+					MoreNodeInfo( iNode ).AirDewPointTemp = PsyTdpFnWPb( Node( iNode ).HumRat, OutBaroPress );
 				} else {
 					MoreNodeInfo( iNode ).AirDewPointTemp = 0.0;
 				}
@@ -1261,7 +1263,7 @@ namespace NodeInputManager {
 				if ( Node( iNode ).HumRat > 0.0 ) {
 					MoreNodeInfo( iNode ).ReportEnthalpy = PsyHFnTdbW( Node( iNode ).Temp, Node( iNode ).HumRat );
 					if ( ReportWetBulb ) {
-						MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, StdBaroPress, BlankString );
+						MoreNodeInfo( iNode ).WetBulbTemp = PsyTwbFnTdbWPb( Node( iNode ).Temp, Node( iNode ).HumRat, StdBaroPress );
 					} else {
 						MoreNodeInfo( iNode ).WetBulbTemp = 0.0;
 					}

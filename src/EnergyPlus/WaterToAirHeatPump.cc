@@ -183,7 +183,7 @@ namespace WaterToAirHeatPump {
 				ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
 			}
 			if ( CheckEquipName( HPNum ) ) {
-				if ( CompName != BlankString && CompName != WatertoAirHP( HPNum ).Name ) {
+				if ( ! CompName.empty() && CompName != WatertoAirHP( HPNum ).Name ) {
 					ShowFatalError( "SimWatertoAirHP: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + WatertoAirHP( HPNum ).Name );
 				}
 				CheckEquipName( HPNum ) = false;
@@ -890,10 +890,10 @@ namespace WaterToAirHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const CpWater( 4210. ); // Specific heat of water J/kg_C
-		Real64 const DegreeofSuperheat( 80. ); // Initial guess of degree of superheat
+		Real64 const CpWater( 4210.0 ); // Specific heat of water J/kg_C
+		Real64 const DegreeofSuperheat( 80.0 ); // Initial guess of degree of superheat
 		Real64 const gamma( 1.114 ); // Expansion Coefficient
-		Real64 const RelaxParam( .5 ); // Relaxation Parameter
+		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
 		Real64 const ERR1( 0.001 ); // Error Value
 		Real64 const PB( 1.013e5 ); // Barometric Pressure (Pa)
@@ -982,7 +982,6 @@ namespace WaterToAirHeatPump {
 		//      REAL(r64)        :: EvapSatEnth1             ! Guess of the Saturated Enthalpy of Air Corresponding to the
 		//                                                   ! Evaporating Temperature [J/kg]
 		Real64 SourceSideEffect; // Source Side Heat Exchanger Effectiveness
-		Real64 LoadSideEffec; // Load Side Effectiveness based on Outside Heat Transfer Coefficient
 		Real64 SourceSideTemp; // Source Side Saturated Refrigerant Temperature [C]
 		Real64 LoadSideTemp; // Load Side Saturated Refrigerant Temperature [C]
 		Real64 SourceSidePressure; // Source Side Saturated Refrigerant Pressure [Pa]
@@ -1113,6 +1112,13 @@ namespace WaterToAirHeatPump {
 			NumIteration4 = 0;
 		}
 
+		//Tuned Hoisted quantities out of nested loop that don't change
+		Real64 const LoadSideMassFlowRate_CpAir_inv( 1.0 / ( LoadSideMassFlowRate * CpAir ) );
+		Real64 const LoadSideEffec( 1.0 - std::exp( -LoadSideoutsideUA * LoadSideMassFlowRate_CpAir_inv ) ); // Load Side Effectiveness based on Outside Heat Transfer Coefficient
+		Real64 const LoadSideEffec_MassFlowRate_inv( 1.0 / ( LoadSideEffec * LoadSideMassFlowRate ) );
+		ANTUWET = LoadSideTotalUA * LoadSideMassFlowRate_CpAir_inv;
+		EffectWET = 1.0 - std::exp( -ANTUWET );
+
 		LOOPLatentDegradationModel: while ( true ) {
 			++NumIteration4;
 			if ( NumIteration4 == 1 ) {
@@ -1160,15 +1166,14 @@ namespace WaterToAirHeatPump {
 						SourceSideEffect = 1.0 - std::exp( -SourceSideUA / ( CpFluid * SourceSideMassFlowRate ) );
 					} else {
 						DegradFactor = DegradF( SourceSideFluidName, SourceSideInletTemp, SourceSideFluidIndex );
-						SourceSideEffect = 1.0 / ( ( SourceSideHTRes1 * std::pow( SourceSideVolFlowRate, ( -0.8 ) ) ) / DegradFactor + SourceSideHTRes2 );
+						SourceSideEffect = 1.0 / ( ( SourceSideHTRes1 * std::pow( SourceSideVolFlowRate, -0.8 ) ) / DegradFactor + SourceSideHTRes2 );
 					}
 
 					// Determine Source Side Tempertaure (Condensing Temp in this case)
 					SourceSideTemp = SourceSideInletTemp + initialQSource / ( SourceSideEffect * CpFluid * SourceSideMassFlowRate );
 
 					// Compute the Effective Surface Temperature
-					LoadSideEffec = 1.0 - std::exp( -LoadSideoutsideUA / ( LoadSideMassFlowRate * CpAir ) );
-					EffectiveSatEnth = LoadSideAirInletEnth - initialQLoadTotal / ( LoadSideEffec * LoadSideMassFlowRate );
+					EffectiveSatEnth = LoadSideAirInletEnth - initialQLoadTotal * LoadSideEffec_MassFlowRate_inv;
 
 					//      ! Set up the Initial Range of Effective Surface Temperature
 					//      IF(.NOT. Converged)THEN
@@ -1196,11 +1201,9 @@ namespace WaterToAirHeatPump {
 					//        END IF
 					//      END DO LOOP1
 
-					EffectiveSurfaceTemp = PsyTsatFnHPb( EffectiveSatEnth, PB, BlankString );
+					EffectiveSurfaceTemp = PsyTsatFnHPb( EffectiveSatEnth, PB );
 
 					QSensible = LoadSideMassFlowRate * CpAir * ( LoadSideInletDBTemp - EffectiveSurfaceTemp ) * LoadSideEffec;
-					ANTUWET = LoadSideTotalUA / ( LoadSideMassFlowRate * CpAir );
-					EffectWET = 1.0 - std::exp( -ANTUWET );
 					EvapSatEnth = LoadSideAirInletEnth - initialQLoadTotal / ( EffectWET * LoadSideMassFlowRate );
 
 					//      ! Iterate to compute Evaporating Temperature
@@ -1227,7 +1230,7 @@ namespace WaterToAirHeatPump {
 					//        END IF
 					//      END DO LOOP2
 
-					EvapTemp = PsyTsatFnHPb( EvapSatEnth, PB, BlankString );
+					EvapTemp = PsyTsatFnHPb( EvapSatEnth, PB );
 
 					// Load Side Saturated Temperature (Evaporating Temp in this case)
 					LoadSideTemp = EvapTemp;
@@ -1253,17 +1256,16 @@ namespace WaterToAirHeatPump {
 					}
 
 					// Determine Suction Pressure & Discharge Pressure at Compressor Exit
-					{ auto const SELECT_CASE_var( CompressorType );
-					if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
+					if ( CompressorType == CompressorType_Reciprocating ) { // RECIPROCATING
 						SuctionPr = LoadSidePressure - PressureDrop;
 						DischargePr = SourceSidePressure + PressureDrop;
-					} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
+					} else if ( CompressorType == CompressorType_Rotary ) { // ROTARY
 						SuctionPr = LoadSidePressure;
 						DischargePr = SourceSidePressure + PressureDrop;
-					} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
+					} else if ( CompressorType == CompressorType_Scroll ) { // SCROLL
 						SuctionPr = LoadSidePressure;
 						DischargePr = SourceSidePressure;
-					}}
+					}
 
 					// Determine the Load Side Outlet Enthalpy (Saturated Gas)
 					Quality = 1.0;
@@ -1326,7 +1328,7 @@ namespace WaterToAirHeatPump {
 					// Find Refrigerant Flow Rate
 					{ auto const SELECT_CASE_var( CompressorType );
 					if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-						MassRef = PistonDisp * CompSuctionDensity * ( 1.0 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1.0 / gamma ) ) ) );
+						MassRef = PistonDisp * CompSuctionDensity * ( 1.0 + ClearanceFactor - ClearanceFactor * std::pow( DischargePr / SuctionPr, 1.0 / gamma ) );
 					} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
 						MassRef = PistonDisp * CompSuctionDensity;
 					} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
@@ -1349,11 +1351,11 @@ namespace WaterToAirHeatPump {
 				// Determine the Power Consumption
 				{ auto const SELECT_CASE_var( CompressorType );
 				if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1.0 ) / gamma ) ) ) - 1.0 ) );
+					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( std::pow( DischargePr / SuctionPr, ( gamma - 1.0 ) / gamma ) - 1.0 ) );
 				} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
-					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1.0 ) / gamma ) ) ) - 1.0 ) );
+					Power = PowerLos + ( 1.0 / LosFac ) * ( MassRef * gamma / ( gamma - 1.0 ) * SuctionPr / CompSuctionDensity * ( std::pow( DischargePr / SuctionPr, ( gamma - 1.0 ) / gamma ) - 1.0 ) );
 				} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
-					Power = PowerLos + ( 1.0 / LosFac ) * ( gamma / ( gamma - 1.0 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1.0 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1.0 / gamma ) * std::pow( VolumeRatio, ( gamma - 1.0 ) ) ) - 1.0 );
+					Power = PowerLos + ( 1.0 / LosFac ) * ( gamma / ( gamma - 1.0 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1.0 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1.0 / gamma ) * std::pow( VolumeRatio, gamma - 1.0 ) ) - 1.0 );
 				}}
 
 				// Determine the Sourceside Heat Rate
@@ -1392,7 +1394,7 @@ namespace WaterToAirHeatPump {
 				} else if ( NumIteration4 == 2 ) {
 					QLatActual = QLoadTotal - QSensible;
 					SHRss = QSensible / QLoadTotal;
-					LoadSideInletWBTemp = PsyTwbFnTdbWPb( LoadSideInletDBTemp, LoadSideInletHumRat, PB, BlankString );
+					LoadSideInletWBTemp = PsyTwbFnTdbWPb( LoadSideInletDBTemp, LoadSideInletHumRat, PB );
 					SHReff = CalcEffectiveSHR( HPNum, SHRss, CyclingScheme, RuntimeFrac, QLatRated, QLatActual, LoadSideInletDBTemp, LoadSideInletWBTemp );
 					//   Update sensible capacity based on effective SHR
 					QSensible = QLoadTotal * SHReff;
@@ -1409,8 +1411,8 @@ namespace WaterToAirHeatPump {
 
 		//calculate coil outlet state variables
 		LoadSideAirOutletEnth = LoadSideAirInletEnth - QLoadTotal / LoadSideMassFlowRate;
-		LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible / ( LoadSideMassFlowRate * CpAir );
-		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth, BlankString );
+		LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible * LoadSideMassFlowRate_CpAir_inv;
+		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth );
 		SourceSideOutletTemp = SourceSideInletTemp + QSource / ( SourceSideMassFlowRate * CpWater );
 
 		// Actual outlet conditions are "average" for time step
@@ -1558,10 +1560,10 @@ namespace WaterToAirHeatPump {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const CpWater( 4210. ); // Specific heat of water J/kg_C
-		Real64 const DegreeofSuperheat( 80. ); // Initial guess of degree of superheat
+		Real64 const CpWater( 4210.0 ); // Specific heat of water J/kg_C
+		Real64 const DegreeofSuperheat( 80.0 ); // Initial guess of degree of superheat
 		Real64 const gamma( 1.114 ); // Expnasion Coefficient
-		Real64 const RelaxParam( .5 ); // Relaxation Parameter
+		Real64 const RelaxParam( 0.5 ); // Relaxation Parameter
 		Real64 const ERR( 0.01 ); // Error Value
 		Real64 const ERR1( 0.01 ); // Error Value
 		Real64 const PB( 1.013e5 ); // Barometric Pressure (Pa)
@@ -1631,7 +1633,6 @@ namespace WaterToAirHeatPump {
 		Real64 Power; // Power Consumption [W]
 
 		Real64 SourceSideEffect; // Source Side Heat Exchanger Effectiveness
-		Real64 LoadSideEffect; // Load Side Effectiveness based on Outside Heat Transfer Coefficient
 		Real64 SourceSideTemp; // Source Side Saturated Refrigerant Temperature [C]
 		Real64 LoadSideTemp; // Load Side Saturated Refrigerant Temperature [C]
 		Real64 SourceSidePressure; // Source Side Saturated Refrigerant Pressure [Pa]
@@ -1716,6 +1717,11 @@ namespace WaterToAirHeatPump {
 		if ( initialQLoad == 0.0 ) initialQLoad = NominalHeatingCapacity;
 		if ( initialQSource == 0.0 ) initialQSource = NominalHeatingCapacity;
 
+		//Tuned Hoisted quantities out of nested loop that don't change
+		Real64 const LoadSideMassFlowRate_CpAir_inv( 1.0 / ( LoadSideMassFlowRate * CpAir ) );
+		Real64 const LoadSideEffect( 1.0 - std::exp( -LoadSideUA * LoadSideMassFlowRate_CpAir_inv ) ); // Load Side Effectiveness based on Outside Heat Transfer Coefficient
+		Real64 const LoadSideEffect_CpAir_MassFlowRate_inv( 1.0 / ( LoadSideEffect * CpAir * LoadSideMassFlowRate ) );
+
 		//Outerloop: calculate load side heat transfer
 		NumIteration3 = 0;
 		Converged = false;
@@ -1749,17 +1755,14 @@ namespace WaterToAirHeatPump {
 					SourceSideEffect = 1.0 - std::exp( -SourceSideUA / ( CpFluid * SourceSideMassFlowRate ) ); // SourceSideFluidName=='Water'
 				} else {
 					DegradFactor = DegradF( SourceSideFluidName, SourceSideInletTemp, SourceSideFluidIndex );
-					SourceSideEffect = 1 / ( ( SourceSideHTRes1 * std::pow( SourceSideVolFlowRate, ( -0.8 ) ) ) / DegradFactor + SourceSideHTRes2 );
+					SourceSideEffect = 1.0 / ( ( SourceSideHTRes1 * std::pow( SourceSideVolFlowRate, -0.8 ) ) / DegradFactor + SourceSideHTRes2 );
 				}
-
-				// Determine Load Side Effectiveness
-				LoadSideEffect = 1.0 - std::exp( -LoadSideUA / ( CpAir * LoadSideMassFlowRate ) );
 
 				// Determine Source Side Tempertaure (Evap. Temp for this mode)
 				SourceSideTemp = SourceSideInletTemp - initialQSource / ( SourceSideEffect * CpFluid * SourceSideMassFlowRate );
 
 				// Determine Load Side Tempertaure (Condensing Temp for this mode)
-				LoadSideTemp = LoadSideInletDBTemp + initialQLoad / ( LoadSideEffect * CpAir * LoadSideMassFlowRate );
+				LoadSideTemp = LoadSideInletDBTemp + initialQLoad * LoadSideEffect_CpAir_MassFlowRate_inv;
 
 				// Determine the Load Side and Source Side Saturated Temp (evaporating and condensing pressures)
 				SourceSidePressure = GetSatPressureRefrig( Refrigerant, SourceSideTemp, RefrigIndex, RoutineNameSourceSideTemp );
@@ -1864,7 +1867,7 @@ namespace WaterToAirHeatPump {
 				// Find Refrigerant Flow Rate
 				{ auto const SELECT_CASE_var( CompressorType );
 				if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-					MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1 / gamma ) ) ) );
+					MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * std::pow( DischargePr / SuctionPr, 1 / gamma ) );
 				} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
 					MassRef = PistonDisp * CompSuctionDensity;
 				} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
@@ -1887,11 +1890,11 @@ namespace WaterToAirHeatPump {
 			// Determine the Power Consumption
 			{ auto const SELECT_CASE_var( CompressorType );
 			if ( SELECT_CASE_var == CompressorType_Reciprocating ) { // RECIPROCATING
-				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) ) - 1 ) );
+				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( std::pow( DischargePr / SuctionPr, ( gamma - 1 ) / gamma ) - 1 ) );
 			} else if ( SELECT_CASE_var == CompressorType_Rotary ) { // ROTARY
-				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) ) - 1 ) );
+				Power = PowerLos + ( 1 / LosFac ) * ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity * ( std::pow( DischargePr / SuctionPr, ( gamma - 1 ) / gamma ) - 1 ) );
 			} else if ( SELECT_CASE_var == CompressorType_Scroll ) { // SCROLL
-				Power = PowerLos + ( 1 / LosFac ) * ( gamma / ( gamma - 1 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1 / gamma ) * std::pow( VolumeRatio, ( gamma - 1 ) ) ) - 1 );
+				Power = PowerLos + ( 1 / LosFac ) * ( gamma / ( gamma - 1 ) ) * SuctionPr * RefVolFlowRate * ( ( ( gamma - 1 ) / gamma ) * ( ( DischargePr / SuctionPr ) / VolumeRatio ) + ( ( 1 / gamma ) * std::pow( VolumeRatio, gamma - 1 ) ) - 1 );
 			}}
 
 			// Determine the Load Side Heat Rate
@@ -1923,7 +1926,7 @@ namespace WaterToAirHeatPump {
 		//calculate coil outlet state variables
 		LoadSideAirOutletEnth = LoadSideAirInletEnth + QLoadTotal / LoadSideMassFlowRate;
 		LoadSideOutletDBTemp = LoadSideInletDBTemp + QLoadTotal / ( LoadSideMassFlowRate * CpAir );
-		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth, BlankString );
+		LoadSideOutletHumRat = PsyWFnTdbH( LoadSideOutletDBTemp, LoadSideAirOutletEnth );
 		SourceSideOutletTemp = SourceSideInletTemp - QSource / ( SourceSideMassFlowRate * CpWater );
 
 		// Calculate actual outlet conditions for the run time fraction
@@ -2194,18 +2197,18 @@ namespace WaterToAirHeatPump {
 		} else {
 			//  For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
 			//  for the entire heat pump off-cycle.
-			Toff = 3600. / ( 4. * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
+			Toff = 3600.0 / ( 4.0 * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
 		}
 
 		//  Cap Toff to meet the equation restriction
 		if ( Gamma > 0.0 ) {
-			Toffa = min( Toff, 2. * Twet / Gamma );
+			Toffa = min( Toff, 2.0 * Twet / Gamma );
 		} else {
 			Toffa = Toff;
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( std::pow( Gamma, 2 ) ) * ( std::pow( Toffa, 2 ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * pow_2( Gamma ) * pow_2( Toffa );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;
@@ -2292,7 +2295,7 @@ namespace WaterToAirHeatPump {
 		CpCoolant = GetSpecificHeatGlycol( FluidName, Temp, FluidIndex, CalledFrom );
 		CondCoolant = GetConductivityGlycol( FluidName, Temp, FluidIndex, CalledFrom );
 
-		DegradF = std::pow( ( VisCoolant / VisWater ), ( -0.47 ) ) * std::pow( ( DensityCoolant / DensityWater ), 0.8 ) * std::pow( ( CpCoolant / CpWater ), 0.33 ) * std::pow( ( CondCoolant / CondWater ), 0.67 );
+		DegradF = std::pow( VisCoolant / VisWater, -0.47 ) * std::pow( DensityCoolant / DensityWater, 0.8 ) * std::pow( CpCoolant / CpWater, 0.33 ) * std::pow( CondCoolant / CondWater, 0.67 );
 
 		return DegradF;
 	}

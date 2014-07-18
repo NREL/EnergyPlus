@@ -118,7 +118,7 @@ namespace HeatBalanceHAMTManager {
 			rh( 0.1 ),
 			rhp1( 0.1 ),
 			rhp2( 0.1 ),
-			rhp( 10. ),
+			rhp( 10.0 ),
 			dwdphi( -1.0 ),
 			dw( -1.0 ),
 			origin( 3, 0.0 ),

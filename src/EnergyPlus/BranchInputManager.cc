@@ -1873,7 +1873,7 @@ namespace BranchInputManager {
 					if ( NumOfBranches == 0 ) {
 						GetBranchInput();
 					}
-					if ( BranchList( BCount ).BranchNames( Loop ) != BlankString ) {
+					if ( ! BranchList( BCount ).BranchNames( Loop ).empty() ) {
 						Found = FindItemInList( BranchList( BCount ).BranchNames( Loop ), Branch.Name(), NumOfBranches );
 						if ( Found == 0 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + BranchList( BCount ).Name + "\", invalid data." );
@@ -2336,7 +2336,7 @@ namespace BranchInputManager {
 				}
 			}
 
-			if ( BranchListName != BlankString ) {
+			if ( ! BranchListName.empty() ) {
 				FoundSupplyDemandAir = BlankString;
 				FoundLoop = BlankString;
 				MatchedLoop = false;
@@ -2367,7 +2367,7 @@ namespace BranchInputManager {
 					}
 				}
 
-				if ( BranchListName != BlankString ) {
+				if ( ! BranchListName.empty() ) {
 					FoundSupplyDemandAir = BlankString;
 					FoundLoop = BlankString;
 					MatchedLoop = false;
@@ -2577,7 +2577,7 @@ namespace BranchInputManager {
 				}
 			}
 
-			if ( BranchListName != BlankString ) {
+			if ( ! BranchListName.empty() ) {
 				FoundSupplyDemandAir = BlankString;
 				FoundLoop = BlankString;
 				MatchedLoop = false;
@@ -2608,7 +2608,7 @@ namespace BranchInputManager {
 					}
 				}
 
-				if ( BranchListName != BlankString ) {
+				if ( ! BranchListName.empty() ) {
 					FoundSupplyDemandAir = BlankString;
 					FoundLoop = BlankString;
 					MatchedLoop = false;
@@ -3092,7 +3092,7 @@ namespace BranchInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3174,15 +3174,15 @@ namespace BranchInputManager {
 
 		gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_700 );
-		gio::write( ChrOut, "*" ) << NumOfBranchLists;
+		gio::write( ChrOut, fmtLD  ) << NumOfBranchLists;
 		gio::write( OutputFileBNDetails, Format_701 ) << " #Branch Lists," + stripped( ChrOut );
 		gio::write( OutputFileBNDetails, Format_702 );
 		gio::write( OutputFileBNDetails, Format_704 );
 
 		for ( BCount = 1; BCount <= NumOfBranchLists; ++BCount ) {
 
-			gio::write( ChrOut, "*" ) << BCount;
-			gio::write( ChrOut1, "*" ) << BranchList( BCount ).NumOfBranchNames;
+			gio::write( ChrOut, fmtLD  ) << BCount;
+			gio::write( ChrOut1, fmtLD  ) << BranchList( BCount ).NumOfBranchNames;
 			gio::write( OutputFileBNDetails, Format_701 ) << " Branch List," + stripped( ChrOut ) + ',' + BranchList( BCount ).Name + ',' + BranchList( BCount ).LoopName + ',' + BranchList( BCount ).LoopType + ',' + stripped( ChrOut1 );
 
 			IsAirBranch = false;

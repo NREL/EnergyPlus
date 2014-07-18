@@ -1634,12 +1634,12 @@ namespace CurveManager {
 			}}
 
 			if ( lNumericFieldBlanks( 1 ) ) {
-				PerfCurve( CurveNum ).Var1Min = 99999999999.;
+				PerfCurve( CurveNum ).Var1Min = 99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
 			}
 			if ( lNumericFieldBlanks( 2 ) ) {
-				PerfCurve( CurveNum ).Var1Max = -99999999999.;
+				PerfCurve( CurveNum ).Var1Max = -99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
 			}
@@ -2456,6 +2456,7 @@ namespace CurveManager {
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2536,7 +2537,7 @@ namespace CurveManager {
 
 			gio::rewind( FileNum );
 
-			{ IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars; ReadStat = flags.ios(); }
+			{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars; ReadStat = flags.ios(); }
 			if ( NumIVars > 5 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables found in external file = " + FileName );
@@ -2545,11 +2546,11 @@ namespace CurveManager {
 
 			gio::rewind( FileNum );
 
-			if ( NumIVars == 1 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 2 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 3 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 4 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 5 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars >> TableLookup( TableNum ).NumX5Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 1 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 2 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 3 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 4 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 5 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars >> TableLookup( TableNum ).NumX5Vars; ReadStat = flags.ios(); };
 
 			if ( ReadStat < GoodIOStatValue ) goto Label1000; //Autodesk:Uninit TotalDataSets was uninitialized after goto jump
 
@@ -2616,14 +2617,14 @@ namespace CurveManager {
 				{
 					IOFlags flags;
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X1Var( I );
+						gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X1Var( I );
 					}
 					ReadStat = flags.ios();
 				}
 
 				if ( EchoTableDataToEio ) {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X1Var( I );
+						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X1Var( I );
 					} gio::write( OutputFileInits );
 				}
 
@@ -2638,7 +2639,7 @@ namespace CurveManager {
 
 					if ( EchoTableDataToEio ) {
 						for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-							gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X1Var( I );
+							gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X1Var( I );
 						} gio::write( OutputFileInits );
 					}
 
@@ -2665,14 +2666,14 @@ namespace CurveManager {
 					{
 						IOFlags flags;
 						for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
-							gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X2Var( I );
+							gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X2Var( I );
 						}
 						ReadStat = flags.ios();
 					}
 
 					if ( EchoTableDataToEio ) {
 						for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
-							gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X2Var( I );
+							gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X2Var( I );
 						} gio::write( OutputFileInits );
 					}
 
@@ -2686,7 +2687,7 @@ namespace CurveManager {
 
 						if ( EchoTableDataToEio ) {
 							for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
-								gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X2Var( I );
+								gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X2Var( I );
 							} gio::write( OutputFileInits );
 						}
 
@@ -2713,14 +2714,14 @@ namespace CurveManager {
 						{
 							IOFlags flags;
 							for ( I = 1; I <= TableLookup( TableNum ).NumX3Vars; ++I ) {
-								gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X3Var( I );
+								gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X3Var( I );
 							}
 							ReadStat = flags.ios();
 						}
 
 						if ( EchoTableDataToEio ) {
 							for ( I = 1; I <= TableLookup( TableNum ).NumX3Vars; ++I ) {
-								gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X3Var( I );
+								gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X3Var( I );
 							} gio::write( OutputFileInits );
 						}
 
@@ -2735,7 +2736,7 @@ namespace CurveManager {
 
 							if ( EchoTableDataToEio ) {
 								for ( I = 1; I <= TableLookup( TableNum ).NumX3Vars; ++I ) {
-									gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X3Var( I );
+									gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X3Var( I );
 								} gio::write( OutputFileInits );
 							}
 
@@ -2764,7 +2765,7 @@ namespace CurveManager {
 								IOFlags flags;
 
 								for ( I = 1; I <= TableLookup( TableNum ).NumX4Vars; ++I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X4Var( I );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X4Var( I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -2772,7 +2773,7 @@ namespace CurveManager {
 							if ( EchoTableDataToEio ) {
 								TableLookup( TableNum ).X4Var( I );
 								for ( I = 1; I <= TableLookup( TableNum ).NumX4Vars; ++I ) {
-									gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X4Var( I );
+									gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X4Var( I );
 								} gio::write( OutputFileInits );
 							}
 
@@ -2787,7 +2788,7 @@ namespace CurveManager {
 
 								if ( EchoTableDataToEio ) {
 									for ( I = 1; I <= TableLookup( TableNum ).NumX4Vars; ++I ) {
-										gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X4Var( I );
+										gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X4Var( I );
 									} gio::write( OutputFileInits );
 								}
 
@@ -2815,14 +2816,14 @@ namespace CurveManager {
 									IOFlags flags;
 									for ( I = 1; I <= TableLookup( TableNum ).NumX5Vars; ++I )
 									{
-										gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X5Var( I );
+										gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X5Var( I );
 									}
 									ReadStat = flags.ios();
 								}
 
 								if ( EchoTableDataToEio ) {
 									for ( I = 1; I <= TableLookup( TableNum ).NumX5Vars; ++I ) {
-										gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X5Var( I );
+										gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X5Var( I );
 									} gio::write( OutputFileInits );
 								}
 
@@ -2837,7 +2838,7 @@ namespace CurveManager {
 
 									if ( EchoTableDataToEio ) {
 										for ( I = 1; I <= TableLookup( TableNum ).NumX5Vars; ++I ) {
-											gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X5Var( I );
+											gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X5Var( I );
 										} gio::write( OutputFileInits );
 									}
 
@@ -2889,10 +2890,10 @@ namespace CurveManager {
 			if ( NumIVars == 3 ) {
 				if ( ReadFromFile ) {
 
-					{ IOFlags flags; gio::read( FileNum, "*", flags ) >> Var3; ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> Var3; ReadStat = flags.ios(); }
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3;
+						gio::write( CharTableData, fmtLD ) << Var3;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2903,7 +2904,7 @@ namespace CurveManager {
 					++NumbersOffset;
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3;
+						gio::write( CharTableData, fmtLD ) << Var3;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2911,10 +2912,10 @@ namespace CurveManager {
 			} else if ( NumIVars == 4 ) {
 				if ( ReadFromFile ) {
 
-					{ IOFlags flags; gio::read( FileNum, "*", flags ) >> Var3 >> Var4; ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> Var3 >> Var4; ReadStat = flags.ios(); }
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2926,7 +2927,7 @@ namespace CurveManager {
 					NumbersOffset += 2;
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2934,10 +2935,10 @@ namespace CurveManager {
 			} else if ( NumIVars == 5 ) {
 				if ( ReadFromFile ) {
 
-					{ IOFlags flags; gio::read( FileNum, "*", flags ) >> Var3 >> Var4 >> Var5; ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> Var3 >> Var4 >> Var5; ReadStat = flags.ios(); }
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4 << "  " << Var5;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4 << "  " << Var5;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2950,7 +2951,7 @@ namespace CurveManager {
 					NumbersOffset += 3;
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4 << "  " << Var5;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4 << "  " << Var5;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -3056,7 +3057,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3081,7 +3082,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3108,7 +3109,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3132,7 +3133,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3156,7 +3157,7 @@ namespace CurveManager {
 				// write data to eio file in ascending order
 				if ( EchoTableDataToEio ) {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 					} gio::write( OutputFileInits );
 				}
 
@@ -3268,8 +3269,6 @@ Label999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:!
-		bool QUITX;
-		bool QUITY;
 		int I;
 		int ISXPT( 0 );
 		int IEXPT( 0 );
@@ -3277,23 +3276,15 @@ Label999: ;
 		int ISYPT( 0 );
 		int IEYPT( 0 );
 		int K;
-		int L;
 		int M1;
 		Real64 MIDX;
 		Real64 MIDY;
-		FArray1D< Real64 > XLAG;
-		FArray1D< Real64 > YLAG;
 
 		//       INITIALIZE
-		L = size( Z( _, 1 ) );
-		L = max( L, isize( Z( 1, _ ) ) ) + 1;
-		XLAG.allocate( L );
-		YLAG.allocate( L );
-		QUITX = false;
-		QUITY = false;
+		bool QUITX = false;
+		bool QUITY = false;
 		IEXTX = 0;
 		IEXTY = 0;
-		L = 0;
 		//       The following code has been upgraded to current Fortran standards
 		//       See Starteam Revision 33, August 17, 2010 for legacy code if comparison is needed
 		//       FIND THE RANGE OF INTERPOLATION ALONG X
@@ -3363,21 +3354,20 @@ Label999: ;
 		if ( QUITX && QUITY ) {
 			DLAG = Z( I, J ); // found exact X and Y point in Z array
 		} else if ( QUITX && ! QUITY ) { // only interpolate in Y direction
-			for ( L = ISYPT; L <= IEYPT; ++L ) {
-				XLAG( L ) = Z( I, L ); // store X's at each Y (I = midpoint of array from above)
+			FArray1D< Real64 > XLAG( IEYPT );
+			for ( int l = ISYPT; l <= IEYPT; ++l ) {
+				XLAG( l ) = Z( I, l ); // store X's at each Y (I = midpoint of array from above)
 			}
 			Interpolate_Lagrange( YY, XLAG, Y, ISYPT, IEYPT, DLAG ); // now interpolate these X's
 		} else if ( ! QUITX && QUITY ) { // only interpolate in X direction
 			Interpolate_Lagrange( XX, Z( _, J ), X, ISXPT, IEXPT, DLAG ); // (:,J) interpolate X array at fixed Y (J here)
 		} else { // else interpolate in X and Y directions
+			FArray1D< Real64 > XLAG( IEYPT );
 			for ( K = ISYPT; K <= IEYPT; ++K ) {
 				Interpolate_Lagrange( XX, Z( _, K ), X, ISXPT, IEXPT, XLAG( K ) ); // (:,K) interpolate X array at all Y's (K here)
 			}
 			Interpolate_Lagrange( YY, XLAG, Y, ISYPT, IEYPT, DLAG ); // final interpolation of X array
 		}
-
-		XLAG.deallocate();
-		YLAG.deallocate();
 
 		return DLAG;
 	}
@@ -3432,6 +3422,8 @@ Label999: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
+		static Real64 const sqrt_2_inv( 1.0 / std::sqrt( 2.0 ) );
+
 		Real64 CoeffZ1; // cpw22Aug2010 Coefficient Z1 in exponential skew normal curve
 		Real64 CoeffZ2; // cpw22Aug2010 Coefficient Z2 in exponential skew normal curve
 		Real64 CoeffZ3; // cpw22Aug2010 Coefficient Z3 in exponential skew normal curve
@@ -3478,12 +3470,12 @@ Label999: ;
 			CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
 			//    CurveValueNumer = EXP(-0.5d0 * CoeffZ1**2) * (1.0d0 + SIGN(1.0d0,CoeffZ2) * ErfFunction(ABS(CoeffZ2)/SQRT(2.0d0)))
 			//    CurveValueDenom = EXP(-0.5d0 * CoeffZ3**2) * (1.0d0 + SIGN(1.0d0,CoeffZ3) * ErfFunction(ABS(CoeffZ3)/SQRT(2.0d0)))
-			CurveValueNumer = std::exp( -0.5 * ( CoeffZ1 * CoeffZ1 ) ) * ( 1.0 + sign( 1.0, CoeffZ2 ) * std::erf( std::abs( CoeffZ2 ) / std::sqrt( 2.0 ) ) );
-			CurveValueDenom = std::exp( -0.5 * ( CoeffZ3 * CoeffZ3 ) ) * ( 1.0 + sign( 1.0, CoeffZ3 ) * std::erf( std::abs( CoeffZ3 ) / std::sqrt( 2.0 ) ) );
+			CurveValueNumer = std::exp( -0.5 * ( CoeffZ1 * CoeffZ1 ) ) * ( 1.0 + sign( 1.0, CoeffZ2 ) * std::erf( std::abs( CoeffZ2 ) * sqrt_2_inv ) );
+			CurveValueDenom = std::exp( -0.5 * ( CoeffZ3 * CoeffZ3 ) ) * ( 1.0 + sign( 1.0, CoeffZ3 ) * std::erf( std::abs( CoeffZ3 ) * sqrt_2_inv ) );
 			CurveValue = CurveValueNumer / CurveValueDenom;
 		} else if ( SELECT_CASE_var == Sigmoid ) { //cpw22Aug2010 Added Sigmoid curve
 			CurveValueExp = std::exp( ( Curve.Coeff3 - V1 ) / Curve.Coeff4 );
-			CurveValue = Curve.Coeff1 + Curve.Coeff2 / ( std::pow( ( 1.0 + CurveValueExp ), Curve.Coeff5 ) );
+			CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow( 1.0 + CurveValueExp, Curve.Coeff5 );
 		} else if ( SELECT_CASE_var == RectangularHyperbola1 ) { //cpw22Aug2010 Added Rectangular Hyperbola Type 1 curve
 			CurveValueNumer = Curve.Coeff1 * V1;
 			CurveValueDenom = Curve.Coeff2 + V1;
@@ -4622,15 +4614,14 @@ Label999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Lagrange; // intermediate variable
-		int J; // loop coungters
-		int K;
 
 		ALAG = 0.0;
-		for ( J = ISPT; J <= IEPT; ++J ) {
+		for ( int J = ISPT; J <= IEPT; ++J ) {
 			Lagrange = 1.0;
-			for ( K = ISPT; K <= IEPT; ++K ) {
+			Real64 const Ordinate_J( Ordinate( J ) );
+			for ( int K = ISPT; K <= IEPT; ++K ) {
 				if ( K != J ) {
-					Lagrange *= ( ( DataPoint - Ordinate( K ) ) / ( Ordinate( J ) - Ordinate( K ) ) );
+					Lagrange *= ( ( DataPoint - Ordinate( K ) ) / ( Ordinate_J - Ordinate( K ) ) );
 				}
 			}
 			ALAG += Lagrange * FunctionArray( J );
@@ -5395,7 +5386,7 @@ Label999: ;
 		ConstantF = PressureCurve( PressureCurveIndex ).ConstantF;
 
 		//Intermediate calculations
-		CrossSectArea = ( Pi / 4.0 ) * std::pow( Diameter, 2 );
+		CrossSectArea = ( Pi / 4.0 ) * pow_2( Diameter );
 		Velocity = MassFlow / ( Density * CrossSectArea );
 		ReynoldsNumber = Density * Diameter * Velocity / Viscosity; //assuming mu here
 		RoughnessRatio = Roughness / Diameter;
@@ -5418,7 +5409,7 @@ Label999: ;
 		}
 
 		//Pressure drop calculation
-		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * std::pow( Velocity, 2 ) ) / 2.0;
+		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * pow_2( Velocity ) ) / 2.0;
 
 		if ( PressureCurve( PressureCurveIndex ).EMSOverrideOn ) PressureCurveValue = PressureCurve( PressureCurveIndex ).EMSOverrideCurveValue;
 
@@ -5492,11 +5483,11 @@ Label999: ;
 		}
 
 		//Calculate the friction factor
-		Term1 = std::pow( ( RoughnessRatio / 3.7 ), ( 1.11 ) );
+		Term1 = std::pow( RoughnessRatio / 3.7, 1.11 );
 		Term2 = 6.9 / ReynoldsNumber;
 		Term3 = -1.8 * std::log10( Term1 + Term2 );
 		if ( Term3 != 0.0 ) {
-			CalculateMoodyFrictionFactor = std::pow( Term3, ( -2.0 ) );
+			CalculateMoodyFrictionFactor = std::pow( Term3, -2.0 );
 		} else {
 			if ( ! FrictionFactorErrorHasOccurred ) {
 				RR = RoundSigDigits( RoughnessRatio, 7 );

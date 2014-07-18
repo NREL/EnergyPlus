@@ -230,7 +230,7 @@ namespace VariableSpeedCoils {
 			if ( DXCoilNum > NumWatertoAirHPs || DXCoilNum < 1 ) {
 				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
 			}
-			if ( CompName != BlankString && CompName != VarSpeedCoil( DXCoilNum ).Name ) {
+			if ( ! CompName.empty() && CompName != VarSpeedCoil( DXCoilNum ).Name ) {
 				ShowFatalError( "SimVariableSpeedCoils: Invalid CompIndex passed=" + TrimSigDigits( DXCoilNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + VarSpeedCoil( DXCoilNum ).Name );
 			}
 		}
@@ -2228,8 +2228,8 @@ namespace VariableSpeedCoils {
 				//    VarSpeedCoil(DXCoilNum)%AirMassFlowRate   = VarSpeedCoil(DXCoilNum)%DesignAirVolFlowRate*  &
 				//             PsyRhoAirFnPbTdbW(OutBaroPress,Node(AirInletNode)%Temp,Node(AirInletNode)%HumRat)
 				//If air flow is less than 25% rated flow. Then set air flow to the 25% of rated conditions
-				if ( VarSpeedCoil( DXCoilNum ).AirMassFlowRate < 0.25 * VarSpeedCoil( DXCoilNum ).DesignAirVolFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString ) ) {
-					VarSpeedCoil( DXCoilNum ).AirMassFlowRate = 0.25 * VarSpeedCoil( DXCoilNum ).DesignAirVolFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString );
+				if ( VarSpeedCoil( DXCoilNum ).AirMassFlowRate < 0.25 * VarSpeedCoil( DXCoilNum ).DesignAirVolFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat ) ) {
+					VarSpeedCoil( DXCoilNum ).AirMassFlowRate = 0.25 * VarSpeedCoil( DXCoilNum ).DesignAirVolFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
 				}
 			} else { //CYCLIC FAN, NOT CORRECTION, WILL BE PROCESSED IN THE FOLLOWING SUBROUTINES
 				VarSpeedCoil( DXCoilNum ).AirMassFlowRate = Node( AirInletNode ).MassFlowRate;
@@ -3305,7 +3305,7 @@ namespace VariableSpeedCoils {
 				OutdoorWetBulb = OutWetBulbTemp;
 			}
 
-			RhoSourceAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, BlankString );
+			RhoSourceAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
 
 			if ( ( SpeedNum == 1 ) || ( SpeedNum > MaxSpeed ) || ( SpeedRatio == 1.0 ) ) {
 				CondAirMassFlow = RhoSourceAir * VarSpeedCoil( DXCoilNum ).EvapCondAirFlow( SpeedCal );
@@ -3322,7 +3322,7 @@ namespace VariableSpeedCoils {
 				}
 				// (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 				CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - EvapCondEffectSped );
-				CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, BlankString );
+				CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
 				CompAmbTemp = CondInletTemp;
 			} else { //AIR COOLED CONDENSER
 				CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
@@ -4003,7 +4003,7 @@ namespace VariableSpeedCoils {
 			// Calculating adjustment factors for defrost
 			// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
 			OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
-			OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure, BlankString ) ) );
+			OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure ) ) );
 
 			// Initializing defrost adjustment factors
 			LoadDueToDefrost = 0.0;
@@ -4960,18 +4960,18 @@ namespace VariableSpeedCoils {
 		} else {
 			// For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
 			// for the entire heat pump off-cycle.
-			Toff = 3600. / ( 4. * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
+			Toff = 3600.0 / ( 4.0 * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
 		}
 
 		//  Cap Toff to meet the equation restriction
 		if ( Gamma > 0.0 ) {
-			Toffa = min( Toff, 2. * Twet / Gamma );
+			Toffa = min( Toff, 2.0 * Twet / Gamma );
 		} else {
 			Toffa = Toff;
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( std::pow( Gamma, 2 ) ) * ( std::pow( Toffa, 2 ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * pow_2( Gamma ) * pow_2( Toffa );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;
@@ -5149,8 +5149,8 @@ namespace VariableSpeedCoils {
 			//   Calculate apparatus dew point conditions using TotCap and CBF
 			hDelta = TotCapCalc / AirMassFlow;
 			hADP = InletEnthalpy - hDelta / ( 1.0 - CBF );
-			tADP = PsyTsatFnHPb( hADP, Pressure, BlankString );
-			wADP = PsyWFnTdbH( tADP, hADP, BlankString );
+			tADP = PsyTsatFnHPb( hADP, Pressure );
+			wADP = PsyWFnTdbH( tADP, hADP );
 			hTinwADP = PsyHFnTdbW( InletDryBulb, wADP );
 			SHRCalc = min( ( hTinwADP - hADP ) / ( InletEnthalpy - hADP ), 1.0 );
 			//   Check for dry evaporator conditions (win < wadp)
@@ -5161,7 +5161,7 @@ namespace VariableSpeedCoils {
 				//     capacity at the dry-out point to determine exiting conditions from coil. This is required
 				//     since the TotCapTempModFac doesn't work properly with dry-coil conditions.
 				InletHumRatCalc = RF * wADP + ( 1.0 - RF ) * InletHumRatCalc;
-				InletWetBulbCalc = PsyTwbFnTdbWPb( InletDryBulb, InletHumRatCalc, Pressure, BlankString );
+				InletWetBulbCalc = PsyTwbFnTdbWPb( InletDryBulb, InletHumRatCalc, Pressure );
 				++Counter;
 				if ( std::abs( werror ) > Tolerance ) {
 					LoopOn = true; //go to 50   ! Recalculate with modified inlet conditions
@@ -5338,7 +5338,7 @@ namespace VariableSpeedCoils {
 		DeltaH = TotCap / AirMassFlowRate;
 		InletAirEnthalpy = PsyHFnTdbW( InletAirTemp, InletAirHumRat );
 		HTinHumRatOut = InletAirEnthalpy - ( 1.0 - SHR ) * DeltaH;
-		OutletAirHumRat = PsyWFnTdbH( InletAirTemp, HTinHumRatOut, BlankString );
+		OutletAirHumRat = PsyWFnTdbH( InletAirTemp, HTinHumRatOut );
 		DeltaHumRat = InletAirHumRat - OutletAirHumRat;
 		OutletAirEnthalpy = InletAirEnthalpy - DeltaH;
 		OutletAirTemp = PsyTdbFnHW( OutletAirEnthalpy, OutletAirHumRat );
@@ -5422,7 +5422,7 @@ namespace VariableSpeedCoils {
 			//   First guess for Tadp is outlet air dew point
 			//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 			//  Pressure will have to be pass into this subroutine to fix this one
-			ADPTemp = PsyTdpFnWPb( OutletAirHumRat, StdBaroPress, BlankString );
+			ADPTemp = PsyTdpFnWPb( OutletAirHumRat, StdBaroPress );
 
 			Tolerance = 1.0; // initial conditions for iteration
 			ErrorLast = 100.0;
@@ -5437,7 +5437,7 @@ namespace VariableSpeedCoils {
 
 				//  Eventually inlet air conditions will be used in DX Coil, these lines are commented out and marked with this comment line
 				//  Pressure will have to be pass into this subroutine to fix this one
-				ADPHumRat = PsyWFnTdpPb( ADPTemp, StdBaroPress, BlankString );
+				ADPHumRat = PsyWFnTdpPb( ADPTemp, StdBaroPress );
 				Slope = ( InletAirHumRat - ADPHumRat ) / ( InletAirTemp - ADPTemp );
 
 				//     check for convergence (slopes are equal to within error tolerance)

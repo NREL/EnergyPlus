@@ -327,9 +327,9 @@ namespace MixedAir {
 		//INTEGER :: CtrlNum
 		int OAMixerNum;
 		int OAControllerNum;
-		std::string CompType;
-		std::string CompName;
-		std::string CtrlName;
+		static std::string CompType; //Tuned Made static
+		static std::string CompName; //Tuned Made static
+		static std::string CtrlName; //Tuned Made static
 		bool FatalErrorFlag;
 		bool Sim;
 		bool OAHeatCoil;
@@ -1224,6 +1224,7 @@ namespace MixedAir {
 
 		// Formats
 		static gio::Fmt const Format_700( "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation {Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA Name,DSZAD Name')" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		//First, call other get input routines in this module to make sure data is filled during this routine.
 		if ( GetOASysInputFlag ) { // Gets input for object  first time Sim routine is called
@@ -1576,7 +1577,7 @@ namespace MixedAir {
 												if ( SameString( PrimaryAirSystem( AirLoopNumber ).Branch( BranchNum ).Comp( CompNum ).Name, OutsideAirSys( SysNum ).Name ) ) {
 													if ( SameString( OutsideAirSys( SysNum ).ControllerListName, ControllerLists( ControllerListNum ).Name ) ) {
 														if ( SameString( OAController( OutAirNum ).Name, ControllerLists( ControllerListNum ).ControllerName( Num ) ) ) {
-															if ( ( OAController( OutAirNum ).MinOA - DesSupplyVolFlowRate ) > .0001 ) {
+															if ( ( OAController( OutAirNum ).MinOA - DesSupplyVolFlowRate ) > 0.0001 ) {
 																ShowWarningError( "Minimum outside air flow rate for OA Controller \"" + OAController( OutAirNum ).Name + "\" is greater than maximum supply flow rate for Air Loop \"" + PrimaryAirSystem( AirLoopNumber ).Name + "\"" );
 																ShowContinueError( "...Min for OA Controller=[" + RoundSigDigits( OAController( OutAirNum ).MinOA, 6 ) + "], Max Supply Flow Rate=[" + RoundSigDigits( DesSupplyVolFlowRate, 6 ) + "]." );
 																ShowContinueError( "...Minimum outside air flow " "rate will be reset to equal maximum supply flow rate" );
@@ -2021,7 +2022,7 @@ namespace MixedAir {
 							++MechVentZoneCount;
 							VentilationMechanical( VentMechNum ).Zone( MechVentZoneCount ) = ZoneNum;
 							// Populating new temp array to hold design spec OA object for each zone
-							if ( DesignSpecOAObjName( groupNum ) != BlankString ) {
+							if ( ! DesignSpecOAObjName( groupNum ).empty() ) {
 								VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
 								VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 								VentilationMechanical( VentMechNum ).ZoneOAAreaRate( MechVentZoneCount ) = VentMechZoneOAAreaRate( groupNum );
@@ -2053,8 +2054,8 @@ namespace MixedAir {
 									}
 								}
 							}
-							//!!! Zone Air Distribution inputs.
-							if ( DesignSpecZoneADObjName( groupNum ) != BlankString ) {
+							// Zone Air Distribution inputs
+							if ( ! DesignSpecZoneADObjName( groupNum ).empty() ) {
 								// new DCV inputs
 								VentilationMechanical( VentMechNum ).ZoneADEffCooling( MechVentZoneCount ) = VentMechZoneADEffCooling( groupNum );
 								VentilationMechanical( VentMechNum ).ZoneADEffHeating( MechVentZoneCount ) = VentMechZoneADEffHeating( groupNum );
@@ -2095,7 +2096,7 @@ namespace MixedAir {
 									++MechVentZoneCount;
 									VentilationMechanical( VentMechNum ).Zone( MechVentZoneCount ) = ZoneNum;
 									// Populating new temp array to hold design spec OA object for each zone
-									if ( DesignSpecOAObjName( groupNum ) != BlankString ) {
+									if ( ! DesignSpecOAObjName( groupNum ).empty() ) {
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( MechVentZoneCount ) = DesignSpecOAObjName( groupNum );
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount ) = DesignSpecOAObjIndex( groupNum );
 										ObjIndex = VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex( MechVentZoneCount );
@@ -2133,7 +2134,7 @@ namespace MixedAir {
 										//              ErrorsFound = .TRUE.
 									}
 
-									if ( VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) != BlankString ) {
+									if ( ! VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ).empty() ) {
 										// new DCV inputs
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( MechVentZoneCount ) = DesignSpecZoneADObjName( groupNum );
 										VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex( MechVentZoneCount ) = DesignSpecZoneADObjIndex( groupNum );
@@ -2243,7 +2244,7 @@ namespace MixedAir {
 							}
 						}
 					}
-					if ( VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) == BlankString ) {
+					if ( VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ).empty() ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + VentilationMechanical( VentMechNum ).Name + "\", Design Specification Outdoor Air Object Name blank" );
 						ShowContinueError( "For Zone=\"" + Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + "\"." );
 						ShowContinueError( "This field either needs to be filled in in this object or Sizing:Zone object." );
@@ -2281,7 +2282,7 @@ namespace MixedAir {
 			// Link OA controller object with mechanical ventilation object
 			for ( OAControllerNum = 1; OAControllerNum <= NumOAControllers; ++OAControllerNum ) {
 				OAController( OAControllerNum ).VentMechObjectNum = FindItemInList( OAController( OAControllerNum ).VentilationMechanicalName, VentilationMechanical.Name(), NumVentMechControllers );
-				if ( OAController( OAControllerNum ).VentMechObjectNum == 0 && OAController( OAControllerNum ).VentilationMechanicalName != BlankString ) {
+				if ( OAController( OAControllerNum ).VentMechObjectNum == 0 && ! OAController( OAControllerNum ).VentilationMechanicalName.empty() ) {
 					ShowSevereError( CurrentModuleObject + "=\"" + OAController( OAControllerNum ).VentilationMechanicalName + "\", non-match to Controller:OutdoorAir" );
 					ShowContinueError( "Invalid specified in Controller:OutdoorAir object = " + OAController( OAControllerNum ).Name );
 					ShowContinueError( CurrentModuleObject + " object name must match the " + CurrentModuleObject + " object name specified in Controller:OutdoorAir." );
@@ -2292,34 +2293,34 @@ namespace MixedAir {
 			// write to .eio file
 			gio::write( OutputFileInits, Format_700 );
 			for ( VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum ) {
-				{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << " Controller:MechanicalVentilation," + VentilationMechanical( VentMechNum ).Name + ',' + VentilationMechanical( VentMechNum ).SchName + ','; }
+				{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << " Controller:MechanicalVentilation," + VentilationMechanical( VentMechNum ).Name + ',' + VentilationMechanical( VentMechNum ).SchName + ','; }
 				if ( VentilationMechanical( VentMechNum ).DCVFlag ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "Yes,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "Yes,"; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "No,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "No,"; }
 				}
 				if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ZoneSum ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "ZoneSum,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ZoneSum,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_VRP ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "VentilationRateProcedure,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "VentilationRateProcedure,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQP ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "IndoorAirQualityProcedure,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "IndoorAirQualityProcedure,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_ProportionalControl ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "ProportionalControl,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "ProportionalControl,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPGC ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "IndoorAirQualityGenericContaminant,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "IndoorAirQualityGenericContaminant,"; }
 				} else if ( VentilationMechanical( VentMechNum ).SystemOAMethod == SOAM_IAQPCOM ) {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "IndoorAirQualityProcedureCombined,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "IndoorAirQualityProcedureCombined,"; }
 				} else {
-					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << "Invalid/Unknown,"; }
+					{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << "Invalid/Unknown,"; }
 				}
-				{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << RoundSigDigits( VentilationMechanical( VentMechNum ).ZoneMaxOAFraction, 2 ) + ','; }
-				{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << RoundSigDigits( VentilationMechanical( VentMechNum ).NumofVentMechZones ) + ','; }
+				{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( VentilationMechanical( VentMechNum ).ZoneMaxOAFraction, 2 ) + ','; }
+				{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( VentilationMechanical( VentMechNum ).NumofVentMechZones ) + ','; }
 				for ( jZone = 1; jZone <= VentilationMechanical( VentMechNum ).NumofVentMechZones; ++jZone ) {
 					if ( jZone < VentilationMechanical( VentMechNum ).NumofVentMechZones ) {
-						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, "(A)", flags ) << Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( jZone ) + ','; }
+						{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutputFileInits, fmtA, flags ) << Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( jZone ) + ','; }
 					} else {
-						gio::write( OutputFileInits, "(A)" ) << Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( jZone );
+						gio::write( OutputFileInits, fmtA ) << Zone( VentilationMechanical( VentMechNum ).Zone( jZone ) ).Name + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName( jZone ) + ',' + VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName( jZone );
 					}
 				}
 			}
@@ -2892,7 +2893,7 @@ namespace MixedAir {
 							//       Sum outside air per unit floor area for each mechanical ventilation object only once per simulation
 							VentilationMechanical( VentMechObjectNum ).TotAreaOAFlow += Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( NumMechVentZone );
 							VentilationMechanical( VentMechObjectNum ).TotZoneOAFlow += Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( NumMechVentZone );
-							VentilationMechanical( VentMechObjectNum ).TotZoneOAACH += Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( NumMechVentZone ) * Zone( ZoneNum ).Volume / 3600. );
+							VentilationMechanical( VentMechObjectNum ).TotZoneOAACH += Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( NumMechVentZone ) * Zone( ZoneNum ).Volume / 3600.0 );
 							break;
 						}
 					}
@@ -3431,7 +3432,7 @@ namespace MixedAir {
 		Real64 EconomizerAirFlowScheduleValue; // value of economizer operation schedule (push-button type control schedule)
 		Real64 OASignal; // Outside air flow rate fraction (0.0 to 1.0)
 		//unused1208 REAL(r64) :: OADPTemp                   ! Outside air dew point temperature
-		FArray1D< Real64 > Par( 4 ); // Par(1) = mixed air node number
+		static FArray1D< Real64 > Par( 4 ); // Par(1) = mixed air node number //Tuned Made static
 		// Par(2) = return air node number
 		// Par(3) = outside air node number
 		// Par(4) = mixed air mass flow rate
@@ -3634,7 +3635,7 @@ namespace MixedAir {
 						// Calc the zone OA flow rate based on the floor area component
 						ZoneOAArea = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( ZoneIndex );
 						ZoneOAFlow = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( ZoneIndex );
-						ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.;
+						ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
 
 						// Calc the breathing-zone OA flow rate
 						OAIndex = VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex( ZoneIndex );
@@ -3713,7 +3714,7 @@ namespace MixedAir {
 							// Calc the zone OA flow rate based on the floor area component
 							ZoneOAArea = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( ZoneIndex );
 							ZoneOAFlow = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( ZoneIndex );
-							ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.;
+							ZoneOAACH = Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( ZoneIndex ) * Zone( ZoneIndex ).Volume ) / 3600.0;
 
 							// Calc the breathing-zone OA flow rate
 							OAIndex = VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex( ZoneIndex );
@@ -3839,6 +3840,7 @@ namespace MixedAir {
 									// "Carbon Dioxide Control Availability Schedule" for ZoneControl:ContaminantController not found
 									ZoneOA = ZoneOABZ / ZoneEz;
 								}
+								SysOA = SysOA + ZoneOA;
 							}
 
 							// Get the zone supply air flow rate
@@ -3857,7 +3859,7 @@ namespace MixedAir {
 										MassFlowRate = 0.0;
 									}
 									// total primary air to terminal units of the zone
-									if ( MassFlowRate > 0.0 ) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat, BlankString );
+									if ( MassFlowRate > 0.0 ) ZonePA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
 
 									// or InletNode = ZoneEquipConfig(ZoneEquipConfigNum)%AirDistUnitCool(InNodeIndex)%OutNode
 									InletNode = ZoneEquipConfig( ZoneEquipConfigNum ).InletNode( InNodeIndex );
@@ -3869,7 +3871,7 @@ namespace MixedAir {
 										MassFlowRate = 0.0;
 									}
 									// total supply air to the zone
-									if ( MassFlowRate > 0.0 ) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat, BlankString );
+									if ( MassFlowRate > 0.0 ) ZoneSA += MassFlowRate / PsyRhoAirFnPbTdbW( OutBaroPress, NodeTemp, NodeHumRat );
 								}
 
 								// calc zone primary air fraction
@@ -3932,7 +3934,12 @@ namespace MixedAir {
 						if ( SysEv <= 0.0 ) SysEv = 1.0;
 
 						// Calc system outdoor air requirement
-						SysOA = SysOAuc / SysEv;
+						if (VentilationMechanical(VentMechObjectNum).SystemOAMethod == SOAM_ProportionalControl) {
+							SysOA = SysOA / SysEv;
+						}
+						else {
+							SysOA = SysOAuc / SysEv;
+						}
 					}
 
 					// Finally calc the system supply OA mass flow rate
@@ -6125,7 +6132,7 @@ namespace MixedAir {
 		}
 
 		if ( OAController( OAControllerNum ).DPTempLim != BlankNumeric ) {
-			OADPTemp = PsyTdpFnWPb( OAController( OAControllerNum ).OAHumRat, OAController( OAControllerNum ).OAPress, BlankString );
+			OADPTemp = PsyTdpFnWPb( OAController( OAControllerNum ).OAHumRat, OAController( OAControllerNum ).OAPress );
 			if ( OADPTemp > OAController( OAControllerNum ).DPTempLim ) {
 				OutAirSignal = OutAirMinFrac;
 				EconomizerOperationFlag = false;

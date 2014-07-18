@@ -162,7 +162,7 @@ TEST( FArray1Test, ConstructionVector )
 	EXPECT_EQ( 3, v.u() );
 	EXPECT_EQ( 3, v.u1() );
 	EXPECT_EQ( FArray1D_int::IR( 1, 3 ), v.I() );
-	EXPECT_EQ( FArray1D_int::IR( 1, 3), v.I1() );
+	EXPECT_EQ( FArray1D_int::IR( 1, 3 ), v.I1() );
 	EXPECT_EQ( 11, v( 1 ) );
 	EXPECT_EQ( 22, v( 2 ) );
 	EXPECT_EQ( 33, v( 3 ) );
@@ -189,22 +189,22 @@ TEST( FArray1Test, ConstructionInitializerFunction )
 {
 	FArray1D_string r( 4, { "This", "is", "a", "stub" } );
 	initializer_function( r );
-	EXPECT_EQ( "This", r( 1 ));
-	EXPECT_EQ( "is", r( 2 ));
-	EXPECT_EQ( "a", r( 3 ));
-	EXPECT_EQ( "string", r( 4 ));
+	EXPECT_EQ( "This", r( 1 ) );
+	EXPECT_EQ( "is", r( 2 ) );
+	EXPECT_EQ( "a", r( 3 ) );
+	EXPECT_EQ( "string", r( 4 ) );
 
 	FArray1D_string const cr( 4, initializer_function );
-	EXPECT_EQ( "This", cr( 1 ));
-	EXPECT_EQ( "is", cr( 2 ));
-	EXPECT_EQ( "a", cr( 3 ));
-	EXPECT_EQ( "string", cr( 4 ));
+	EXPECT_EQ( "This", cr( 1 ) );
+	EXPECT_EQ( "is", cr( 2 ) );
+	EXPECT_EQ( "a", cr( 3 ) );
+	EXPECT_EQ( "string", cr( 4 ) );
 
 	FArray1D_double const tr( 4, initializer_function_template< double > );
-	EXPECT_EQ( 1.0, tr( 1 ));
-	EXPECT_EQ( 2.0, tr( 2 ));
-	EXPECT_EQ( 3.0, tr( 3 ));
-	EXPECT_EQ( 4.0, tr( 4 ));
+	EXPECT_EQ( 1.0, tr( 1 ) );
+	EXPECT_EQ( 2.0, tr( 2 ) );
+	EXPECT_EQ( 3.0, tr( 3 ) );
+	EXPECT_EQ( 4.0, tr( 4 ) );
 }
 
 TEST( FArray1Test, ConstructionIndexRange )
@@ -823,6 +823,15 @@ TEST( FArray1Test, Swap )
 	EXPECT_TRUE( eq( P, P2 ) );
 }
 
+TEST( FArray1Test, Functions )
+{
+	FArray1D_int u{ 1, 2, 3 };
+	FArray1D_int v{ 2, 3, 4 };
+	EXPECT_EQ( 14, magnitude_squared( u ) );
+	EXPECT_EQ( 3, distance_squared( u, v ) );
+	EXPECT_EQ( 20, dot( u, v ) );
+}
+
 TEST( FArray1Test, Dot )
 {
 	FArray1D_int A( 3 );
@@ -876,18 +885,18 @@ TEST( FArray1Test, ProxyConstCorrectness )
 	FArray1D_int const v( 3, 33 );
 	FArray1P_int p( v ); // Proxy for const array
 #ifndef OBJEXXFCL_PROXY_CONST_CHECKS
-	EXPECT_EQ( 33, p(1) ); // Lookup triggers assert fail with const proxy checks because non-const subscript op used: OK if p is declared const
-	p(2) *= 2;
-	EXPECT_EQ( 66, p(2) );
+	EXPECT_EQ( 33, p( 1 ) ); // Lookup triggers assert fail with const proxy checks because non-const subscript op used: OK if p is declared const
+	p( 2 ) *= 2;
+	EXPECT_EQ( 66, p( 2 ) );
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	EXPECT_TRUE( eq( v, p ) );
 	FArray1A_int s( v.a( 2 ) ); // Proxy for const array from section of elements (2,3)
 	FArray1A_int const & sc( s ); // Const proxy for const array from section of elements (2,3)
-	EXPECT_EQ( 33, sc(2) ); // OK because const subscript op used
+	EXPECT_EQ( 33, sc( 2 ) ); // OK because const subscript op used
 #ifndef OBJEXXFCL_PROXY_CONST_CHECKS
-	EXPECT_EQ( 33, s(2) ); // Lookup triggers assert fail with const proxy checks because non-const subscript op used: OK if p is declared const
-	++s(2);
-	EXPECT_EQ( 34, s(2) ); // Lookup triggers assert fail with const proxy checks because non-const subscript op used: OK if p is declared const
+	EXPECT_EQ( 33, s( 2 ) ); // Lookup triggers assert fail with const proxy checks because non-const subscript op used: OK if p is declared const
+	++s( 2 );
+	EXPECT_EQ( 34, s( 2 ) ); // Lookup triggers assert fail with const proxy checks because non-const subscript op used: OK if p is declared const
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	EXPECT_EQ( 2u, s.size() ); // Lookup triggers assert fail with const proxy checks because non-const subscript op used: OK if p is declared const
 }
@@ -998,7 +1007,6 @@ TEST( FArray1FunctionsTest, Reshape )
 {
 	FArray1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
 	EXPECT_EQ( 5u, A.size() );
-	// EXPECT_TRUE( eq( A, reshape( A ) ) );
 	FArray1D_double E( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
 	EXPECT_TRUE( eq( E, reshape( A, std::array< int, 1 >{ { 5 } } ) ) );
 	EXPECT_TRUE( eq( E, reshape( { 1.0, 2.0, 3.0, 4.0, 5.0 }, std::array< int, 1 >{ { 5 } } ) ) );

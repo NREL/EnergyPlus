@@ -245,7 +245,6 @@ namespace WeatherManager {
 	FArray1D_string SPSiteScheduleUnits; // SP Site Schedule Units
 	int NumSPSiteScheduleNamePtrs( 0 ); // Number of SP Site Schedules (DesignDay only)
 	int NumMissing( 0 ); // Number of hours of missing data
-	bool StripCR( false ); // If true, strip last character (<cr> off each EPW line)
 	FArray1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
 	FArray1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
 	//      Number of Time Steps in Hour
@@ -278,6 +277,9 @@ namespace WeatherManager {
 	FArray1D< WeatherProperties > WPSkyTemperature;
 	FArray1D< SpecialDayData > SpecialDays;
 	FArray1D< DataPeriodData > DataPeriods;
+
+	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt const fmtAN( "(A,$)" );
 
 	// MODULE SUBROUTINES:
 
@@ -574,7 +576,7 @@ namespace WeatherManager {
 					MaxNumberSimYears = max( MaxNumberSimYears, Environment( Loop ).NumSimYears );
 				}
 			}
-			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays );
+//			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); // Doesn't do anything!
 		}
 
 		CloseWeatherFile(); // will only close if opened.
@@ -1621,8 +1623,8 @@ namespace WeatherManager {
 			NumMissing = 0; // Only used in Weather file environments
 			// Start over missing values with each environment
 			Missing.StnPres = StdBaroPress; // Initial "missing" value
-			Missing.DryBulb = 6.; // Initial "missing" value
-			Missing.DewPoint = 3.; // Initial "missing" value
+			Missing.DryBulb = 6.0; // Initial "missing" value
+			Missing.DewPoint = 3.0; // Initial "missing" value
 			Missing.RelHumid = 50.0; // Initial "missing" value
 			Missing.WindSpd = 2.5; // Initial "missing" value
 			Missing.WindDir = 180; // Initial "missing" value
@@ -2022,19 +2024,19 @@ namespace WeatherManager {
 		OutDewPointTemp = TodayOutDewPointTemp( HourOfDay, TimeStep );
 		if ( EMSOutDewPointTempOverrideOn ) OutDewPointTemp = EMSOutDewPointTempOverrideValue;
 		OutRelHum = TodayOutRelHum( HourOfDay, TimeStep );
-		OutRelHumValue = OutRelHum / 100.;
+		OutRelHumValue = OutRelHum / 100.0;
 		if ( EMSOutRelHumOverrideOn ) {
-			OutRelHumValue = EMSOutRelHumOverrideValue / 100.;
+			OutRelHumValue = EMSOutRelHumOverrideValue / 100.0;
 			OutRelHum = EMSOutRelHumOverrideValue;
 		}
 
 		// Humidity Ratio and Wet Bulb are derived
 		OutHumRat = PsyWFnTdbRhPb( OutDryBulbTemp, OutRelHumValue, OutBaroPress, RoutineName );
-		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress, BlankString );
+		OutWetBulbTemp = PsyTwbFnTdbWPb( OutDryBulbTemp, OutHumRat, OutBaroPress );
 		if ( OutDryBulbTemp < OutWetBulbTemp ) {
 			OutWetBulbTemp = OutDryBulbTemp;
-			TempVal = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress, BlankString );
-			TempDPVal = PsyTdpFnWPb( TempVal, OutBaroPress, BlankString );
+			TempVal = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress );
+			TempDPVal = PsyTdpFnWPb( TempVal, OutBaroPress );
 			OutDewPointTemp = TempDPVal;
 		}
 
@@ -2083,7 +2085,7 @@ namespace WeatherManager {
 		if ( EMSDifSolarRadOverrideOn ) DifSolarRad = EMSDifSolarRadOverrideValue;
 		BeamSolarRad = TodayBeamSolarRad( HourOfDay, TimeStep );
 		if ( EMSBeamSolarRadOverrideOn ) BeamSolarRad = EMSBeamSolarRadOverrideValue;
-		LiquidPrecipitation = TodayLiquidPrecip( HourOfDay, TimeStep ) / 1000.; // convert from mm to m
+		LiquidPrecipitation = TodayLiquidPrecip( HourOfDay, TimeStep ) / 1000.0; // convert from mm to m
 
 		if ( UseRainValues ) {
 			IsRain = TodayIsRain( HourOfDay, TimeStep ); //.or. LiquidPrecipitation >= .8d0)  ! > .8 mm
@@ -2111,7 +2113,7 @@ namespace WeatherManager {
 
 		// Calc some values
 		OutEnthalpy = PsyHFnTdbW( OutDryBulbTemp, OutHumRat );
-		OutAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, BlankString );
+		OutAirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat );
 
 		// Make sure outwetbulbtemp is valid.  And that no error occurs here.
 		if ( OutDryBulbTemp < OutWetBulbTemp ) OutWetBulbTemp = OutDryBulbTemp;
@@ -2218,9 +2220,9 @@ namespace WeatherManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static gio::Fmt const fmtLD( "*" );
 		static gio::Fmt const YMDHFmt( "(I4.4,2('/',I2.2),1X,I2.2,':',I2.2)" );
 		static gio::Fmt const YMDHFmt1( "(I4.4,2('/',I2.2),1X,'hour=',I2.2,' - expected hour=',I2.2)" );
-		static gio::Fmt const DataFmt( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2408,7 +2410,7 @@ namespace WeatherManager {
 			WMinute = 0;
 			LastHourSet = false;
 			while ( ! Ready ) {
-				{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+				{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 				if ( ReadStatus == 0 ) {
 					// Reduce ugly code
 					InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
@@ -2419,14 +2421,14 @@ namespace WeatherManager {
 						gio::rewind( WeatherFileUnitNumber );
 						++NumRewinds;
 						SkipEPlusWFHeader();
-						{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+						{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 						InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
 
 					}
 				}
 				if ( ReadStatus != 0 ) {
 					BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
-					gio::write( ErrOut, "*" ) << ReadStatus;
+					gio::write( ErrOut, fmtLD ) << ReadStatus;
 					strip( ErrOut );
 					ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 				}
@@ -2450,29 +2452,29 @@ namespace WeatherManager {
 					ErrorsFound = false;
 					if ( DryBulb >= 99.9 ) RangeCheck( ErrorsFound, "DryBulb Temperature", "WeatherFile", "Severe", ">= -90", ( DryBulb >= -90.0 ), "<= 70", ( DryBulb <= 70.0 ), RoundSigDigits( DryBulb, 2 ), WeatherFileLocationTitle );
 					if ( DewPoint < 99.9 ) RangeCheck( ErrorsFound, "DewPoint Temperature", "WeatherFile", "Severe", ">= -90", ( DewPoint >= -90.0 ), "<= 70", ( DewPoint <= 70.0 ), RoundSigDigits( DewPoint, 2 ), WeatherFileLocationTitle );
-					if ( RelHum < 999. ) RangeCheck( ErrorsFound, "Relative Humidity", "WeatherFile", "Severe", "> 0", ( RelHum >= 0.0 ), "<= 110", ( RelHum <= 110.0 ), RoundSigDigits( RelHum, 0 ), WeatherFileLocationTitle );
-					if ( AtmPress < 999999. ) RangeCheck( ErrorsFound, "Atmospheric Pressure", "WeatherFile", "Severe", "> 31000", ( AtmPress > 31000.0 ), "<=120000", ( AtmPress <= 120000.0 ), RoundSigDigits( AtmPress, 0 ), WeatherFileLocationTitle );
-					if ( DirectRad < 9999. ) RangeCheck( ErrorsFound, "Direct Radiation", "WeatherFile", "Severe", ">= 0", ( DirectRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
-					if ( DiffuseRad < 9999. ) RangeCheck( ErrorsFound, "Diffuse Radiation", "WeatherFile", "Severe", ">= 0", ( DiffuseRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
-					if ( WindDir < 999. ) RangeCheck( ErrorsFound, "Wind Direction", "WeatherFile", "Severe", ">=0", ( WindDir >= 0.0 ), "<=360", ( WindDir <= 360.0 ), RoundSigDigits( WindDir, 0 ), WeatherFileLocationTitle );
-					if ( WindSpeed < 999. ) RangeCheck( ErrorsFound, "Wind Speed", "WeatherFile", "Severe", ">=0", ( WindSpeed >= 0.0 ), "<=40", ( WindSpeed <= 40.0 ), RoundSigDigits( WindSpeed, 2 ), WeatherFileLocationTitle );
+					if ( RelHum < 999.0 ) RangeCheck( ErrorsFound, "Relative Humidity", "WeatherFile", "Severe", "> 0", ( RelHum >= 0.0 ), "<= 110", ( RelHum <= 110.0 ), RoundSigDigits( RelHum, 0 ), WeatherFileLocationTitle );
+					if ( AtmPress < 999999.0 ) RangeCheck( ErrorsFound, "Atmospheric Pressure", "WeatherFile", "Severe", "> 31000", ( AtmPress > 31000.0 ), "<=120000", ( AtmPress <= 120000.0 ), RoundSigDigits( AtmPress, 0 ), WeatherFileLocationTitle );
+					if ( DirectRad < 9999.0 ) RangeCheck( ErrorsFound, "Direct Radiation", "WeatherFile", "Severe", ">= 0", ( DirectRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
+					if ( DiffuseRad < 9999.0 ) RangeCheck( ErrorsFound, "Diffuse Radiation", "WeatherFile", "Severe", ">= 0", ( DiffuseRad >= 0.0 ), _, _, _, WeatherFileLocationTitle );
+					if ( WindDir < 999.0 ) RangeCheck( ErrorsFound, "Wind Direction", "WeatherFile", "Severe", ">=0", ( WindDir >= 0.0 ), "<=360", ( WindDir <= 360.0 ), RoundSigDigits( WindDir, 0 ), WeatherFileLocationTitle );
+					if ( WindSpeed < 999.0 ) RangeCheck( ErrorsFound, "Wind Speed", "WeatherFile", "Severe", ">=0", ( WindSpeed >= 0.0 ), "<=40", ( WindSpeed <= 40.0 ), RoundSigDigits( WindSpeed, 2 ), WeatherFileLocationTitle );
 					if ( ErrorsFound ) {
 						ShowSevereError( "Out of Range errors found with initial day of WeatherFile" );
 					}
 				} else {
 					//  Must skip this day
 					for ( Item = 2; Item <= NumIntervalsPerHour; ++Item ) {
-						{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+						{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 						if ( ReadStatus != 0 ) {
-							gio::read( WeatherDataLine, "*" ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
 					}
 					for ( Item = 1; Item <= 23 * NumIntervalsPerHour; ++Item ) {
-						{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+						{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 						if ( ReadStatus != 0 ) {
-							gio::read( WeatherDataLine, "*" ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
+							gio::read( WeatherDataLine, fmtLD ) >> WYear >> WMonth >> WDay >> WHour >> WMinute;
 							BadRecord = RoundSigDigits( WYear ) + '/' + RoundSigDigits( WMonth ) + '/' + RoundSigDigits( WDay ) + BlankString + RoundSigDigits( WHour ) + ':' + RoundSigDigits( WMinute );
 							ShowFatalError( "Error occured on EPW while searching for first day, stopped at " + BadRecord + " IO Error=" + RoundSigDigits( ReadStatus ), OutputFileStandard );
 						}
@@ -2529,7 +2531,7 @@ namespace WeatherManager {
 			for ( Hour = 1; Hour <= 24; ++Hour ) {
 				for ( CurTimeStep = 1; CurTimeStep <= NumIntervalsPerHour; ++CurTimeStep ) {
 					HourRep = double( Hour - 1 ) + ( CurTime * double( CurTimeStep ) );
-					{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+					{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 					if ( ReadStatus != 0 ) WeatherDataLine = BlankString;
 					if ( WeatherDataLine == BlankString ) {
 						if ( Hour == 1 ) {
@@ -2545,7 +2547,7 @@ namespace WeatherManager {
 							if ( DataPeriods( 1 ).NumDays >= NumDaysInYear ) {
 								gio::rewind( WeatherFileUnitNumber );
 								SkipEPlusWFHeader();
-								{ IOFlags flags; gio::read( WeatherFileUnitNumber, DataFmt, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
+								{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> WeatherDataLine; ReadStatus = flags.ios(); }
 
 								InterpretWeatherDataLine( WeatherDataLine, ErrorFound, WYear, WMonth, WDay, WHour, WMinute, DryBulb, DewPoint, RelHum, AtmPress, ETHoriz, ETDirect, IRHoriz, GLBHoriz, DirectRad, DiffuseRad, GLBHorizIllum, DirectNrmIllum, DiffuseHorizIllum, ZenLum, WindDir, WindSpeed, TotalSkyCover, OpaqueSkyCover, Visibility, CeilHeight, PresWeathObs, PresWeathConds, PrecipWater, AerosolOptDepth, SnowDepth, DaysSinceLastSnow, Albedo, LiquidPrecip );
 							} else {
@@ -2564,45 +2566,45 @@ namespace WeatherManager {
 					}
 
 					//         Set possible missing values
-					if ( ETHoriz < 0.0 ) ETHoriz = 9999.;
-					if ( ETDirect < 0.0 ) ETDirect = 9999.;
-					if ( IRHoriz <= 0.0 ) IRHoriz = 9999.;
-					if ( GLBHoriz < 0.0 ) GLBHoriz = 9999.;
+					if ( ETHoriz < 0.0 ) ETHoriz = 9999.0;
+					if ( ETDirect < 0.0 ) ETDirect = 9999.0;
+					if ( IRHoriz <= 0.0 ) IRHoriz = 9999.0;
+					if ( GLBHoriz < 0.0 ) GLBHoriz = 9999.0;
 					if ( DisplayWeatherMissingDataWarnings ) {
-						if ( DirectRad >= 9999. ) {
+						if ( DirectRad >= 9999.0 ) {
 							++Missed.DirectRad;
 						}
-						if ( DiffuseRad >= 9999. ) {
+						if ( DiffuseRad >= 9999.0 ) {
 							Missed.DiffuseRad = Missed.DirectRad + 1;
 						}
 						if ( DirectRad < 0.0 ) {
-							DirectRad = 9999.;
+							DirectRad = 9999.0;
 							++OutOfRange.DirectRad;
 						}
 						if ( DiffuseRad < 0.0 ) {
-							DiffuseRad = 9999.;
+							DiffuseRad = 9999.0;
 							++OutOfRange.DiffuseRad;
 						}
 					}
-					if ( GLBHorizIllum < 0.0 ) GLBHorizIllum = 999999.;
-					if ( DirectNrmIllum < 0.0 ) DirectNrmIllum = 999999.;
-					if ( DiffuseHorizIllum < 0.0 ) DiffuseHorizIllum = 999999.;
-					if ( ZenLum < 0.0 ) ZenLum = 99999.;
-					if ( AtmPress < 0.0 ) AtmPress = 999999.;
-					if ( WindSpeed < 0.0 ) WindSpeed = 999.;
-					if ( WindDir < -360. || WindDir > 360. ) WindDir = 999.;
-					if ( TotalSkyCover < 0.0 ) TotalSkyCover = 99.;
-					if ( RelHum < 0.0 ) RelHum = 999.;
-					if ( OpaqueSkyCover < 0.0 ) OpaqueSkyCover = 99.;
-					if ( Visibility < 0.0 ) Visibility = 9999.;
-					if ( CeilHeight < 0.0 ) CeilHeight = 9999.;
+					if ( GLBHorizIllum < 0.0 ) GLBHorizIllum = 999999.0;
+					if ( DirectNrmIllum < 0.0 ) DirectNrmIllum = 999999.0;
+					if ( DiffuseHorizIllum < 0.0 ) DiffuseHorizIllum = 999999.0;
+					if ( ZenLum < 0.0 ) ZenLum = 99999.0;
+					if ( AtmPress < 0.0 ) AtmPress = 999999.0;
+					if ( WindSpeed < 0.0 ) WindSpeed = 999.0;
+					if ( WindDir < -360.0 || WindDir > 360.0 ) WindDir = 999.0;
+					if ( TotalSkyCover < 0.0 ) TotalSkyCover = 99.0;
+					if ( RelHum < 0.0 ) RelHum = 999.0;
+					if ( OpaqueSkyCover < 0.0 ) OpaqueSkyCover = 99.0;
+					if ( Visibility < 0.0 ) Visibility = 9999.0;
+					if ( CeilHeight < 0.0 ) CeilHeight = 9999.0;
 					if ( PresWeathObs < 0 ) PresWeathObs = 9.0;
-					if ( PrecipWater < 0.0 ) PrecipWater = 999.;
-					if ( AerosolOptDepth < 0.0 ) AerosolOptDepth = 999.;
-					if ( SnowDepth < 0.0 ) SnowDepth = 999.;
-					if ( DaysSinceLastSnow < 0.0 ) DaysSinceLastSnow = 99.;
-					if ( Albedo < 0.0 ) Albedo = 999.;
-					if ( LiquidPrecip < 0.0 ) LiquidPrecip = 999.;
+					if ( PrecipWater < 0.0 ) PrecipWater = 999.0;
+					if ( AerosolOptDepth < 0.0 ) AerosolOptDepth = 999.0;
+					if ( SnowDepth < 0.0 ) SnowDepth = 999.0;
+					if ( DaysSinceLastSnow < 0.0 ) DaysSinceLastSnow = 99.0;
+					if ( Albedo < 0.0 ) Albedo = 999.0;
+					if ( LiquidPrecip < 0.0 ) LiquidPrecip = 999.0;
 
 					if ( Hour == 1 && CurTimeStep == 1 ) {
 						if ( WMonth == 2 && WDay == 29 && ( ! CurrentYearIsLeapYear || ! WFAllowsLeapYears ) ) {
@@ -2757,10 +2759,10 @@ namespace WeatherManager {
 							// Missing, use sky cover
 							OSky = OpaqueSkyCover;
 							TDewK = min( DryBulb, DewPoint ) + TKelvin;
-							ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + .0224 * OSky - 0.0035 * ( std::pow( OSky, 2 ) ) + 0.00028 * ( std::pow( OSky, 3 ) ) );
-							SkyTemp = ( DryBulb + TKelvin ) * ( std::pow( ESky, 0.25 ) ) - TKelvin;
+							ESky = ( 0.787 + 0.764 * std::log( TDewK / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
+							SkyTemp = ( DryBulb + TKelvin ) * root_4( ESky ) - TKelvin;
 						} else { // Valid IR from Sky
-							SkyTemp = std::pow( ( IRHoriz / Sigma ), .25 ) - TKelvin;
+							SkyTemp = root_4( IRHoriz / Sigma ) - TKelvin;
 						}
 					} else {
 						SkyTemp = 0.0; // dealt with later
@@ -2768,15 +2770,15 @@ namespace WeatherManager {
 
 					TomorrowSkyTemp( Hour, CurTimeStep ) = SkyTemp;
 
-					if ( ETHoriz >= 9999. ) ETHoriz = 0.0;
-					if ( ETDirect >= 9999. ) ETDirect = 0.0;
-					if ( GLBHoriz >= 9999. ) GLBHoriz = 0.0;
-					if ( DirectRad >= 9999. ) DirectRad = 0.0;
-					if ( DiffuseRad >= 9999. ) DiffuseRad = 0.0;
-					if ( GLBHorizIllum >= 999900. ) GLBHorizIllum = 0.0;
-					if ( DirectNrmIllum >= 999900. ) DirectNrmIllum = 0.0;
-					if ( DiffuseHorizIllum >= 999900. ) DiffuseHorizIllum = 0.0;
-					if ( ZenLum >= 99990. ) ZenLum = 0.0;
+					if ( ETHoriz >= 9999.0 ) ETHoriz = 0.0;
+					if ( ETDirect >= 9999.0 ) ETDirect = 0.0;
+					if ( GLBHoriz >= 9999.0 ) GLBHoriz = 0.0;
+					if ( DirectRad >= 9999.0 ) DirectRad = 0.0;
+					if ( DiffuseRad >= 9999.0 ) DiffuseRad = 0.0;
+					if ( GLBHorizIllum >= 999900.0 ) GLBHorizIllum = 0.0;
+					if ( DirectNrmIllum >= 999900.0 ) DirectNrmIllum = 0.0;
+					if ( DiffuseHorizIllum >= 999900.0 ) DiffuseHorizIllum = 0.0;
+					if ( ZenLum >= 99990.0 ) ZenLum = 0.0;
 					if ( IgnoreSolarRadiation ) {
 						GLBHoriz = 0.0;
 						DirectRad = 0.0;
@@ -2895,7 +2897,7 @@ namespace WeatherManager {
 							//  It's at the half hour
 							WgtNextHour = 0.0;
 							WgtPrevHour = 0.0;
-						} else if ( TS * TimeStepFraction < .5 ) {
+						} else if ( TS * TimeStepFraction < 0.5 ) {
 							WgtNextHour = 0.0;
 							WgtPrevHour = 1.0 - WgtHourNow;
 						} else { // After the half hour
@@ -3100,6 +3102,9 @@ namespace WeatherManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const ValidDigits( "0123456789" );
+		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt const fmt9I1( "(9I1)" );
+
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
 
@@ -3121,15 +3126,11 @@ namespace WeatherManager {
 		bool DateInError;
 
 		++LCount;
-		if ( StripCR ) {
-			Pos = len( Line );
-			if ( ( Pos > 0 ) && ( int( Line[ Pos - 1 ] ) == iASCII_CR ) ) Line.erase( Pos - 1 );
-		}
 		ErrorFound = false;
 		std::string const SaveLine = Line; // in case of errors
 
 		// Do the first five.  (To get to the DataSource field)
-		{ IOFlags flags; gio::read( Line, "*", flags ) >> RYear >> RMonth >> RDay >> RHour >> RMinute; if ( flags.err() ) goto Label900; }
+		{ IOFlags flags; gio::read( Line, fmtLD, flags ) >> RYear >> RMonth >> RDay >> RHour >> RMinute; if ( flags.err() ) goto Label900; }
 		WYear = nint( RYear );
 		WMonth = nint( RMonth );
 		WDay = nint( RDay );
@@ -3172,7 +3173,7 @@ namespace WeatherManager {
 		Line.erase( 0, Pos + 1 );
 
 		// Now read more numerics with List Directed I/O (note there is another "character" field lurking)
-		{ IOFlags flags; gio::read( Line, "*", flags ) >> RField1 >> RField2 >> RField3 >> RField4 >> RField5 >> RField6 >> RField7 >> RField8 >> RField9 >> RField10 >> RField11 >> RField12 >> RField13 >> RField14 >> RField15 >> RField16 >> RField17 >> RField18 >> RField19 >> RField20 >> RField21; if ( flags.err() ) goto Label901; }
+		{ IOFlags flags; gio::read( Line, fmtLD, flags ) >> RField1 >> RField2 >> RField3 >> RField4 >> RField5 >> RField6 >> RField7 >> RField8 >> RField9 >> RField10 >> RField11 >> RField12 >> RField13 >> RField14 >> RField15 >> RField16 >> RField17 >> RField18 >> RField19 >> RField20 >> RField21; if ( flags.err() ) goto Label901; }
 		for ( Count = 1; Count <= 21; ++Count ) {
 			Pos = index( Line, ',' );
 			Line.erase( 0, Pos + 1 );
@@ -3187,7 +3188,7 @@ namespace WeatherManager {
 		Pos = index( Line, ',' );
 		if ( Pos != std::string::npos ) {
 			if ( Pos != 0 ) {
-				{ IOFlags flags; gio::read( Line.substr( 0, Pos ), "*", flags ) >> RField22; if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; gio::read( Line.substr( 0, Pos ), fmtLD, flags ) >> RField22; if ( flags.err() ) goto Label901; }
 			} else {
 				RField22 = 999.0;
 			}
@@ -3195,7 +3196,7 @@ namespace WeatherManager {
 			Pos = index( Line, ',' );
 			if ( Pos != std::string::npos ) {
 				if ( Pos != 0 ) {
-					{ IOFlags flags; gio::read( Line.substr( 0, Pos ), "*", flags ) >> RField23; if ( flags.err() ) goto Label901; }
+					{ IOFlags flags; gio::read( Line.substr( 0, Pos ), fmtLD, flags ) >> RField23; if ( flags.err() ) goto Label901; }
 				} else {
 					RField23 = 999.0;
 				}
@@ -3203,7 +3204,7 @@ namespace WeatherManager {
 				Pos = index( Line, ',' );
 				if ( Pos != std::string::npos ) {
 					if ( Pos != 0 ) {
-						{ IOFlags flags; gio::read( Line.substr( 0, Pos ), "*", flags ) >> RField24; if ( flags.err() ) goto Label901; }
+						{ IOFlags flags; gio::read( Line.substr( 0, Pos ), fmtLD, flags ) >> RField24; if ( flags.err() ) goto Label901; }
 					} else {
 						RField24 = 999.0;
 					}
@@ -3211,7 +3212,7 @@ namespace WeatherManager {
 					Pos = index( Line, ',' );
 					if ( Pos != std::string::npos ) {
 						if ( Pos != 0 ) {
-							{ IOFlags flags; gio::read( Line.substr( 0, Pos ), "*", flags ) >> RField25; if ( flags.err() ) goto Label901; }
+							{ IOFlags flags; gio::read( Line.substr( 0, Pos ), fmtLD, flags ) >> RField25; if ( flags.err() ) goto Label901; }
 						} else {
 							RField25 = 999.0;
 						}
@@ -3219,7 +3220,7 @@ namespace WeatherManager {
 						Pos = index( Line, ',' );
 						if ( Pos != std::string::npos ) {
 							if ( Pos != 0 ) {
-								{ IOFlags flags; gio::read( Line.substr( 0, Pos ), "*", flags ) >> RField26; if ( flags.err() ) goto Label901; }
+								{ IOFlags flags; gio::read( Line.substr( 0, Pos ), fmtLD, flags ) >> RField26; if ( flags.err() ) goto Label901; }
 							} else {
 								RField26 = 999.0;
 							}
@@ -3227,7 +3228,7 @@ namespace WeatherManager {
 							Pos = index( Line, ',' );
 							if ( Pos != std::string::npos ) {
 								if ( Pos != 0 ) {
-									{ IOFlags flags; gio::read( Line.substr( 0, Pos ), "*", flags ) >> RField27; if ( flags.err() ) goto Label901; }
+									{ IOFlags flags; gio::read( Line.substr( 0, Pos ), fmtLD, flags ) >> RField27; if ( flags.err() ) goto Label901; }
 								} else {
 									RField27 = 999.0;
 								}
@@ -3241,25 +3242,25 @@ namespace WeatherManager {
 							RField27 = 999.0;
 						}
 					} else {
-						{ IOFlags flags; gio::read( Line, "*", flags ) >> RField25; if ( flags.err() ) goto Label901; }
+						{ IOFlags flags; gio::read( Line, fmtLD, flags ) >> RField25; if ( flags.err() ) goto Label901; }
 						RField26 = 999.0;
 						RField27 = 999.0;
 					}
 				} else {
-					{ IOFlags flags; gio::read( Line, "*", flags ) >> RField24; if ( flags.err() ) goto Label901; }
+					{ IOFlags flags; gio::read( Line, fmtLD, flags ) >> RField24; if ( flags.err() ) goto Label901; }
 					RField25 = 999.0;
 					RField26 = 999.0;
 					RField27 = 999.0;
 				}
 			} else {
-				{ IOFlags flags; gio::read( Line, "*", flags ) >> RField23; if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; gio::read( Line, fmtLD, flags ) >> RField23; if ( flags.err() ) goto Label901; }
 				RField24 = 999.0;
 				RField25 = 999.0;
 				RField26 = 999.0;
 				RField27 = 999.0;
 			}
 		} else {
-			{ IOFlags flags; gio::read( Line, "*", flags ) >> RField22; if ( flags.err() ) goto Label901; }
+			{ IOFlags flags; gio::read( Line, fmtLD, flags ) >> RField22; if ( flags.err() ) goto Label901; }
 			RField23 = 999.0;
 			RField24 = 999.0;
 			RField25 = 999.0;
@@ -3286,7 +3287,7 @@ namespace WeatherManager {
 				for ( Pos = 0; Pos < 9; ++Pos ) {
 					if ( ! has( ValidDigits, PresWeathCodes[ Pos ] ) ) PresWeathCodes[ Pos ] = '9';
 				}
-				gio::read( PresWeathCodes, "(9I1)" ) >> WCodesArr;
+				gio::read( PresWeathCodes, fmt9I1 ) >> WCodesArr;
 			} else {
 				++Missed.WeathCodes;
 				WCodesArr = 9;
@@ -3364,7 +3365,6 @@ Label903: ;
 		static gio::Fmt const EnvDDayFormat( "('Environment:Design Day Data,')" );
 		static gio::Fmt const DDayMiscHdFormat( "('! <Environment:Design_Day_Misc>,DayOfYear,ASHRAE A Coeff,',   'ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,',   'Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model')" );
 		static gio::Fmt const DDayMiscFormat( "('Environment:Design_Day_Misc,',I3,',')" );
-		static gio::Fmt const fmta( "(A)" );
 		static gio::Fmt const MnDyFmt( "(I2.2,'/',I2.2)" );
 		Real64 const ZhangHuangModCoeff_C0( 0.5598 ); // 37.6865d0
 		Real64 const ZhangHuangModCoeff_C1( 0.4982 ); // 13.9263d0
@@ -3485,7 +3485,7 @@ Label903: ;
 
 		// Check that barometric pressure is within range
 		if ( DesDayInput( EnvrnNum ).PressureEntered ) {
-			if ( std::abs( ( DesDayInput( EnvrnNum ).PressBarom - StdBaroPress ) / StdBaroPress ) > .1 ) { // 10% off
+			if ( std::abs( ( DesDayInput( EnvrnNum ).PressBarom - StdBaroPress ) / StdBaroPress ) > 0.1 ) { // 10% off
 				ShowWarningError( "SetUpDesignDay: Entered DesignDay Barometric Pressure=" + RoundSigDigits( DesDayInput( EnvrnNum ).PressBarom, 0 ) + " differs by more than 10% from Standard Barometric Pressure=" + RoundSigDigits( StdBaroPress, 0 ) + '.' );
 				ShowContinueError( "...occurs in DesignDay=" + EnvironmentName + ", Standard Pressure (based on elevation) will be used." );
 				DesDayInput( EnvrnNum ).PressBarom = StdBaroPress;
@@ -3497,8 +3497,8 @@ Label903: ;
 		// verify that design WB or DP <= design DB
 		if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_DewPoint && DesDayInput( EnvrnNum ).DewPointNeedsSet ) {
 			// dew-point
-			testval = PsyWFnTdbRhPb( DesDayInput( EnvrnNum ).MaxDryBulb, 1.0, DesDayInput( EnvrnNum ).PressBarom, BlankString );
-			DesDayInput( EnvrnNum ).HumIndValue = PsyTdpFnWPb( testval, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+			testval = PsyWFnTdbRhPb( DesDayInput( EnvrnNum ).MaxDryBulb, 1.0, DesDayInput( EnvrnNum ).PressBarom );
+			DesDayInput( EnvrnNum ).HumIndValue = PsyTdpFnWPb( testval, DesDayInput( EnvrnNum ).PressBarom );
 		}
 
 		// Day of week defaults to Monday, if day type specified, then that is used.
@@ -3532,9 +3532,9 @@ Label903: ;
 			}
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, EnvDDayFormat, flags ); }
 			StringOut = RoundSigDigits( DesDayInput( Envrn ).MaxDryBulb, 2 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( DesDayInput( Envrn ).DailyDBRange, 2 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = ",";
 			if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Default ) {
 				StringOut = "DefaultMultipliers,";
@@ -3545,7 +3545,7 @@ Label903: ;
 			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Difference ) {
 				StringOut = "DifferenceSchedule,";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut; }
 			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WetBulb ) {
 				StringOut = "Wetbulb," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
 			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_DewPoint ) {
@@ -3564,28 +3564,28 @@ Label903: ;
 				StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
 			}
 			StringOut = RoundSigDigits( DesDayInput( Envrn ).PressBarom, 0 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindDir, 0 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindSpeed, 1 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( DesDayInput( Envrn ).SkyClear, 2 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			gio::write( OutputFileInits, fmta ) << AlpUseRain + ',' + AlpUseSnow;
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			gio::write( OutputFileInits, fmtA ) << AlpUseRain + ',' + AlpUseSnow;
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, DDayMiscFormat, flags ) << DesignDay( EnvrnNum ).DayOfYear; }
 			StringOut = RoundSigDigits( A, 1 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( B, 4 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( C, 4 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( AVSC, 1 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( DesignDay( EnvrnNum ).EquationOfTime * 60.0, 2 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( std::asin( DesignDay( EnvrnNum ).SinSolarDeclinAngle ) / DegToRadians, 1 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( DesDayInput( EnvrnNum ).SolarModel == ASHRAE_ClearSky ) {
 				StringOut = "ASHRAEClearSky";
 			} else if ( DesDayInput( EnvrnNum ).SolarModel == Zhang_Huang ) {
@@ -3597,7 +3597,7 @@ Label903: ;
 			} else {
 				StringOut = "unknown";
 			}
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		// Must set up weather values for Design Day.  User can specify the "humidity indicator" as
@@ -3651,10 +3651,10 @@ Label903: ;
 
 		if ( DesDayInput( EnvrnNum ).SnowInd == 0 ) {
 			TomorrowIsSnow( _, _ ) = false;
-			GndReflet = .2;
+			GndReflet = 0.2;
 		} else { // Snow
 			TomorrowIsSnow( _, _ ) = true;
-			GndReflet = .7;
+			GndReflet = 0.7;
 		}
 
 		// Some values are constant
@@ -3692,26 +3692,26 @@ Label903: ;
 				if ( DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( EnvrnNum ).HumIndType == DDHumIndType_WBProfMul ) {
 					WetBulb = DesDayInput( EnvrnNum ).HumIndValue - DDHumIndModifier( EnvrnNum, Hour, TS ) * WBRange;
 					WetBulb = min( WetBulb, TomorrowOutDryBulbTemp( Hour, TS ) ); // WB must be <= DB
-					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom, BlankString );
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
 					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else if ( ConstantHumidityRatio ) {
 					//  Need Dew Point Temperature.  Use Relative Humidity to get Humidity Ratio, unless Humidity Ratio is constant
 					//BG 9-26-07  moved following inside this IF statment; when HumIndType is 'Schedule' HumidityRatio wasn't being initialized
 					WetBulb = PsyTwbFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, RoutineNameLong );
 
-					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					OutHumRat = PsyWFnTdpPb( TomorrowOutDryBulbTemp( Hour, TS ), DesDayInput( EnvrnNum ).PressBarom );
 					if ( HumidityRatio > OutHumRat ) {
 						WetBulb = TomorrowOutDryBulbTemp( Hour, TS );
 					} else {
-						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+						OutHumRat = PsyWFnTdbTwbPb( TomorrowOutDryBulbTemp( Hour, TS ), WetBulb, DesDayInput( EnvrnNum ).PressBarom );
 					}
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( OutHumRat, DesDayInput( EnvrnNum ).PressBarom );
 					TomorrowOutRelHum( Hour, TS ) = PsyRhFnTdbWPb( TomorrowOutDryBulbTemp( Hour, TS ), OutHumRat, DesDayInput( EnvrnNum ).PressBarom, WeatherManager ) * 100.0;
 				} else {
-					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					HumidityRatio = PsyWFnTdbRhPb( TomorrowOutDryBulbTemp( Hour, TS ), DDHumIndModifier( EnvrnNum, Hour, TS ) / 100.0, DesDayInput( EnvrnNum ).PressBarom );
 					// TomorrowOutRelHum values set earlier
-					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom, BlankString );
+					TomorrowOutDewPointTemp( Hour, TS ) = PsyTdpFnWPb( HumidityRatio, DesDayInput( EnvrnNum ).PressBarom );
 				}
 
 				// Determine Sky Temp ==>
@@ -3740,13 +3740,13 @@ Label903: ;
 
 				if ( Environment( EnvrnNum ).WP_Type1 == 0 ) {
 					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
-					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( std::pow( OSky, 2 ) ) + 0.00028 * ( std::pow( OSky, 3 ) ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * std::pow( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ), 4 );
-					TomorrowSkyTemp( Hour, TS ) = ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) * ( std::pow( ESky, .25 ) ) - TKelvin;
+					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
+					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin );
+					TomorrowSkyTemp( Hour, TS ) = ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ) * root_4( ESky ) - TKelvin;
 				} else {
 					TDewK = min( TomorrowOutDryBulbTemp( Hour, TS ), TomorrowOutDewPointTemp( Hour, TS ) ) + TKelvin;
-					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * ( std::pow( OSky, 2 ) ) + 0.00028 * ( std::pow( OSky, 3 ) ) );
-					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * std::pow( ( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin ), 4 );
+					ESky = ( 0.787 + 0.764 * std::log( ( TDewK ) / TKelvin ) ) * ( 1.0 + 0.0224 * OSky - 0.0035 * pow_2( OSky ) + 0.00028 * pow_3( OSky ) );
+					TomorrowHorizIRSky( Hour, TS ) = ESky * Sigma * pow_4( TomorrowOutDryBulbTemp( Hour, TS ) + TKelvin );
 				}
 
 				// Generate solar values for timestep
@@ -3779,8 +3779,8 @@ Label903: ;
 							TotHoriz = DesDayInput( EnvrnNum ).SkyClear * A * ( C + CosZenith ) * std::exp( -B / CosZenith );
 							HO = GlobalSolarConstant * AVSC * CosZenith;
 							KT = TotHoriz / HO;
-							KT = min( KT, .75 );
-							DiffRad = TotHoriz * ( 1.0045 + KT * ( .04349 + KT * ( -3.5227 + 2.6313 * KT ) ) );
+							KT = min( KT, 0.75 );
+							DiffRad = TotHoriz * ( 1.0045 + KT * ( 0.04349 + KT * ( -3.5227 + 2.6313 * KT ) ) );
 							if ( DesDayInput( EnvrnNum ).SkyClear > 0.70 ) DiffRad = TotHoriz * C / ( C + CosZenith );
 							BeamRad = ( TotHoriz - DiffRad ) / CosZenith;
 							DiffRad = max( 0.0, DiffRad );
@@ -3793,15 +3793,15 @@ Label903: ;
 						} else if ( SELECT_CASE_var == Zhang_Huang ) {
 							Hour3Ago = mod( Hour + 20, 24 ) + 1; // hour 3 hours before
 							TotSkyCover = max( 1.0 - DesDayInput( EnvrnNum ).SkyClear, 0.0 );
-							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * std::pow( ( TotSkyCover ), 2 ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowOutDryBulbTemp( Hour3Ago, TS ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( Hour, TS ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( Hour, TS ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
+							GloHorzRad = ( ZHGlobalSolarConstant * SinSolarAltitude * ( ZhangHuangModCoeff_C0 + ZhangHuangModCoeff_C1 * TotSkyCover + ZhangHuangModCoeff_C2 * pow_2( TotSkyCover ) + ZhangHuangModCoeff_C3 * ( TomorrowOutDryBulbTemp( Hour, TS ) - TomorrowOutDryBulbTemp( Hour3Ago, TS ) ) + ZhangHuangModCoeff_C4 * TomorrowOutRelHum( Hour, TS ) + ZhangHuangModCoeff_C5 * TomorrowWindSpeed( Hour, TS ) ) + ZhangHuangModCoeff_D ) / ZhangHuangModCoeff_K;
 							GloHorzRad = max( GloHorzRad, 0.0 );
 							ClearnessIndex_kt = GloHorzRad / ( GlobalSolarConstant * SinSolarAltitude );
 							//          ClearnessIndex_kt=DesDayInput(EnvrnNum)%SkyClear
 							ClearnessIndex_ktc = 0.4268 + 0.1934 * SinSolarAltitude;
 							if ( ClearnessIndex_kt < ClearnessIndex_ktc ) {
-								ClearnessIndex_kds = ( 3.996 - 3.862 * SinSolarAltitude + 1.54 * std::pow( SinSolarAltitude, 2 ) ) * std::pow( ClearnessIndex_kt, 3 );
+								ClearnessIndex_kds = ( 3.996 - 3.862 * SinSolarAltitude + 1.54 * pow_2( SinSolarAltitude ) ) * pow_3( ClearnessIndex_kt );
 							} else {
-								ClearnessIndex_kds = ClearnessIndex_kt - ( 1.107 + 0.03569 * SinSolarAltitude + 1.681 * std::pow( SinSolarAltitude, 2 ) ) * std::pow( ( 1.0 - ClearnessIndex_kt ), 3 );
+								ClearnessIndex_kds = ClearnessIndex_kt - ( 1.107 + 0.03569 * SinSolarAltitude + 1.681 * pow_2( SinSolarAltitude ) ) * pow_3( 1.0 - ClearnessIndex_kt );
 							}
 							// Calculate direct normal radiation, W/m2
 							BeamRad = ZHGlobalSolarConstant * SinSolarAltitude * ClearnessIndex_kds * ( ( 1.0 - ClearnessIndex_kt ) / ( 1.0 - ClearnessIndex_kds ) );
@@ -3925,7 +3925,7 @@ Label903: ;
 		} else {
 			// note: COS( Zen) = SIN( Alt)
 			SunAltD = std::asin( CosZen ) / DegToRadians; // altitude, degrees
-			AirMass = 1.0 / ( CosZen + 0.50572 * std::pow( ( 6.07995 + SunAltD ), ( -1.6364 ) ) );
+			AirMass = 1.0 / ( CosZen + 0.50572 * std::pow( 6.07995 + SunAltD, -1.6364 ) );
 		}
 		return AirMass;
 	}
@@ -4142,16 +4142,16 @@ Label903: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const DayCorrection( Pi * 2. / 366. );
-		static FArray1D< Real64 > const SineSolDeclCoef( 9, { .00561800, .0657911, -.392779, .00064440, -.00618495, -.00010101, -.00007951, -.00011691, .00002096 } ); // Fitted coefficients of Fourier series | Sine of declination coefficients
-		static FArray1D< Real64 > const EqOfTimeCoef( 9, { .00021971, -.122649, .00762856, -.156308, -.0530028, -.00388702, -.00123978, -.00270502, -.00167992 } ); // Fitted coefficients of Fourier Series | Equation of Time coefficients
+		Real64 const DayCorrection( Pi * 2.0 / 366.0 );
+		static FArray1D< Real64 > const SineSolDeclCoef( 9, { 0.00561800, 0.0657911, -0.392779, 0.00064440, -0.00618495, -0.00010101, -0.00007951, -0.00011691, 0.00002096 } ); // Fitted coefficients of Fourier series | Sine of declination coefficients
+		static FArray1D< Real64 > const EqOfTimeCoef( 9, { 0.00021971, -0.122649, 0.00762856, -0.156308, -0.0530028, -0.00388702, -0.00123978, -0.00270502, -0.00167992 } ); // Fitted coefficients of Fourier Series | Equation of Time coefficients
 		static FArray1D< Real64 > const ASHRAE_A_Coef( 9, { 1161.6685, 1.1554, 77.3575, -0.5359, -3.7622, 0.9875, -3.3924, -1.7445, 1.1198 } ); // Fitted coefficients of Fourier Series | ASHRAE A Factor coefficients
 		// English (original) units:
 		//              368.49341,.366502,24.538624,-.169983,-1.193417,            &
 		//              .313261,-1.076093,-.543376,.355197 ,                       &
 
-		static FArray1D< Real64 > const ASHRAE_B_Coef( 9, { .171631, -.00400448, -.0344923, .00000209, .00325428, -.00085429, .00229562, .0009034, -.0011867 } ); // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
-		static FArray1D< Real64 > const ASHRAE_C_Coef( 9, { .0905151, -.00322522, -.0407966, .000104164, .00745899, -.00086461, .0013111, .000808275, -.00170515 } ); // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
+		static FArray1D< Real64 > const ASHRAE_B_Coef( 9, { 0.171631, -0.00400448, -0.0344923, 0.00000209, 0.00325428, -0.00085429, 0.00229562, 0.0009034, -0.0011867 } ); // Fitted coefficients of Fourier Series | ASHRAE B Factor coefficients
+		static FArray1D< Real64 > const ASHRAE_C_Coef( 9, { 0.0905151, -0.00322522, -0.0407966, 0.000104164, 0.00745899, -0.00086461, 0.0013111, 0.000808275, -0.00170515 } ); // Fitted coefficients of Fourier Series | ASHRAE C Factor coefficients
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4170,14 +4170,14 @@ Label903: ;
 		SinX = std::sin( X );
 		CosX = std::cos( X );
 
-		SineSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SinX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SinX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + SineSolDeclCoef( 6 ) * ( SinX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) ) + SineSolDeclCoef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ), 2 ) - std::pow( ( SinX * CosX * 2.0 ), 2 ) );
-		CosineSolarDeclination = std::sqrt( 1.0 - std::pow( SineSolarDeclination, 2 ) );
+		SineSolarDeclination = SineSolDeclCoef( 1 ) + SineSolDeclCoef( 2 ) * SinX + SineSolDeclCoef( 3 ) * CosX + SineSolDeclCoef( 4 ) * ( SinX * CosX * 2.0 ) + SineSolDeclCoef( 5 ) * ( pow_2( CosX ) - pow_2( SinX ) ) + SineSolDeclCoef( 6 ) * ( SinX * ( pow_2( CosX ) - pow_2( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 7 ) * ( CosX * ( pow_2( CosX ) - pow_2( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + SineSolDeclCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( pow_2( CosX ) - pow_2( SinX ) ) ) + SineSolDeclCoef( 9 ) * ( pow_2( pow_2( CosX ) - pow_2( SinX ) ) - pow_2( SinX * CosX * 2.0 ) );
+		CosineSolarDeclination = std::sqrt( 1.0 - pow_2( SineSolarDeclination ) );
 
-		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SinX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SinX * CosX * 2.0 ) + EqOfTimeCoef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + EqOfTimeCoef( 6 ) * ( SinX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) ) + EqOfTimeCoef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ), 2 ) - std::pow( ( SinX * CosX * 2.0 ), 2 ) );
+		EquationOfTime = EqOfTimeCoef( 1 ) + EqOfTimeCoef( 2 ) * SinX + EqOfTimeCoef( 3 ) * CosX + EqOfTimeCoef( 4 ) * ( SinX * CosX * 2.0 ) + EqOfTimeCoef( 5 ) * ( pow_2( CosX ) - pow_2( SinX ) ) + EqOfTimeCoef( 6 ) * ( SinX * ( pow_2( CosX ) - pow_2( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 7 ) * ( CosX * ( pow_2( CosX ) - pow_2( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + EqOfTimeCoef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( pow_2( CosX ) - pow_2( SinX ) ) ) + EqOfTimeCoef( 9 ) * ( pow_2( pow_2( CosX ) - pow_2( SinX ) ) - pow_2( SinX * CosX * 2.0 ) );
 
-		AnnVarSolConstant = 1.000047 + .000352615 * SinX + .0334454 * CosX;
+		AnnVarSolConstant = 1.000047 + 0.000352615 * SinX + 0.0334454 * CosX;
 
-		A = ASHRAE_A_Coef( 1 ) + ASHRAE_A_Coef( 2 ) * SinX + ASHRAE_A_Coef( 3 ) * CosX + ASHRAE_A_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_A_Coef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + ASHRAE_A_Coef( 6 ) * ( SinX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) ) + ASHRAE_A_Coef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ), 2 ) - std::pow( ( SinX * CosX * 2.0 ), 2 ) );
+		A = ASHRAE_A_Coef( 1 ) + ASHRAE_A_Coef( 2 ) * SinX + ASHRAE_A_Coef( 3 ) * CosX + ASHRAE_A_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_A_Coef( 5 ) * ( pow_2( CosX ) - pow_2( SinX ) ) + ASHRAE_A_Coef( 6 ) * ( SinX * ( pow_2( CosX ) - pow_2( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 7 ) * ( CosX * ( pow_2( CosX ) - pow_2( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_A_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( pow_2( CosX ) - pow_2( SinX ) ) ) + ASHRAE_A_Coef( 9 ) * ( pow_2( pow_2( CosX ) - pow_2( SinX ) ) - pow_2( SinX * CosX * 2.0 ) );
 
 		//                        Compute B and C coefficients
 
@@ -4188,9 +4188,9 @@ Label903: ;
 			CosX = std::cos( X );
 		}
 
-		B = ASHRAE_B_Coef( 1 ) + ASHRAE_B_Coef( 2 ) * SinX + ASHRAE_B_Coef( 3 ) * CosX + ASHRAE_B_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_B_Coef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + ASHRAE_B_Coef( 6 ) * ( SinX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) ) + ASHRAE_B_Coef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ), 2 ) - std::pow( ( SinX * CosX * 2.0 ), 2 ) );
+		B = ASHRAE_B_Coef( 1 ) + ASHRAE_B_Coef( 2 ) * SinX + ASHRAE_B_Coef( 3 ) * CosX + ASHRAE_B_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_B_Coef( 5 ) * ( pow_2( CosX ) - pow_2( SinX ) ) + ASHRAE_B_Coef( 6 ) * ( SinX * ( pow_2( CosX ) - pow_2( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 7 ) * ( CosX * ( pow_2( CosX ) - pow_2( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_B_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( pow_2( CosX ) - pow_2( SinX ) ) ) + ASHRAE_B_Coef( 9 ) * ( pow_2( pow_2( CosX ) - pow_2( SinX ) ) - pow_2( SinX * CosX * 2.0 ) );
 
-		C = ASHRAE_C_Coef( 1 ) + ASHRAE_C_Coef( 2 ) * SinX + ASHRAE_C_Coef( 3 ) * CosX + ASHRAE_C_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_C_Coef( 5 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + ASHRAE_C_Coef( 6 ) * ( SinX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 7 ) * ( CosX * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ) ) + ASHRAE_C_Coef( 9 ) * ( std::pow( ( std::pow( CosX, 2 ) - std::pow( SinX, 2 ) ), 2 ) - std::pow( ( SinX * CosX * 2.0 ), 2 ) );
+		C = ASHRAE_C_Coef( 1 ) + ASHRAE_C_Coef( 2 ) * SinX + ASHRAE_C_Coef( 3 ) * CosX + ASHRAE_C_Coef( 4 ) * ( SinX * CosX * 2.0 ) + ASHRAE_C_Coef( 5 ) * ( pow_2( CosX ) - pow_2( SinX ) ) + ASHRAE_C_Coef( 6 ) * ( SinX * ( pow_2( CosX ) - pow_2( SinX ) ) + CosX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 7 ) * ( CosX * ( pow_2( CosX ) - pow_2( SinX ) ) - SinX * ( SinX * CosX * 2.0 ) ) + ASHRAE_C_Coef( 8 ) * ( 2.0 * ( SinX * CosX * 2.0 ) * ( pow_2( CosX ) - pow_2( SinX ) ) ) + ASHRAE_C_Coef( 9 ) * ( pow_2( pow_2( CosX ) - pow_2( SinX ) ) - pow_2( SinX * CosX * 2.0 ) );
 
 	}
 
@@ -4243,7 +4243,7 @@ Label903: ;
 		Real64 H; // Hour angle (before noon = +)
 
 		//                                      COMPUTE THE HOUR ANGLE
-		H = ( 15. * ( 12. - ( TimeValue + EqOfTime ) ) + ( TimeZoneMeridian - Longitude ) ) * DegToRadians;
+		H = ( 15.0 * ( 12.0 - ( TimeValue + EqOfTime ) ) + ( TimeZoneMeridian - Longitude ) ) * DegToRadians;
 		COSH = std::cos( H );
 		//                                      COMPUTE THE COSINE OF THE
 		//                                      SOLAR ZENITH ANGLE.
@@ -4312,9 +4312,9 @@ Label903: ;
 		// COMPUTE THE HOUR ANGLE
 
 		if ( NumOfTimeStepInHour != 1 ) {
-			HrAngle = ( 15. * ( 12. - ( CurrentTime + TodayVariables.EquationOfTime ) ) + ( TimeZoneMeridian - Longitude ) );
+			HrAngle = ( 15.0 * ( 12.0 - ( CurrentTime + TodayVariables.EquationOfTime ) ) + ( TimeZoneMeridian - Longitude ) );
 		} else {
-			HrAngle = ( 15. * ( 12. - ( ( CurrentTime + TS1TimeOffset ) + TodayVariables.EquationOfTime ) ) + ( TimeZoneMeridian - Longitude ) );
+			HrAngle = ( 15.0 * ( 12.0 - ( ( CurrentTime + TS1TimeOffset ) + TodayVariables.EquationOfTime ) ) + ( TimeZoneMeridian - Longitude ) );
 		}
 		H = HrAngle * DegToRadians;
 
@@ -4333,7 +4333,7 @@ Label903: ;
 		SolarAltitudeAngle = SolarAltitude / DegToRadians;
 		SolarAzimuthAngle = SolarAzimuth / DegToRadians;
 		if ( HrAngle < 0.0 ) {
-			SolarAzimuthAngle = 360. - SolarAzimuthAngle;
+			SolarAzimuthAngle = 360.0 - SolarAzimuthAngle;
 		}
 
 		SunDirectionCosines( 3 ) = CosZenith;
@@ -4426,7 +4426,6 @@ Label903: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const AFormat( "(A)" );
 		static FArray1D_string const Header( 8, { "LOCATION", "DESIGN CONDITIONS", "TYPICAL/EXTREME PERIODS", "GROUND TEMPERATURES", "HOLIDAYS/DAYLIGHT SAVING", "COMMENTS 1", "COMMENTS 2", "DATA PERIODS" } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -4456,13 +4455,9 @@ Label903: ;
 			HdLine = 1; // Look for first Header
 			StillLooking = true;
 			while ( StillLooking ) {
-				{ IOFlags flags; gio::read( WeatherFileUnitNumber, AFormat, flags ) >> Line; if ( flags.end() ) goto Label9998; }
+				{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> Line; if ( flags.end() ) goto Label9998; }
 				endcol = len( Line );
 				if ( endcol > 0 ) {
-					if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) {
-						StripCR = true;
-						Line.erase( endcol - 1 );
-					}
 					if ( int( Line[ endcol - 1 ] ) == iUnicode_end ) {
 						goto Label9997;
 					}
@@ -4607,9 +4602,9 @@ Label9999: ;
 		}
 
 		if ( ! ErrorsFound ) {
-			StdBaroPress = 101.325 * std::pow( ( 1.0 - 2.25577e-05 * Elevation ), 5.2559 );
-			StdBaroPress *= 1000.;
-			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero, BlankString );
+			StdBaroPress = 101.325 * std::pow( 1.0 - 2.25577e-05 * Elevation, 5.2559 );
+			StdBaroPress *= 1000.0;
+			StdRhoAir = PsyRhoAirFnPbTdbW( StdBaroPress, constant_twenty, constant_zero );
 			// Write Final Location Information to the initialization output file
 			gio::write( OutputFileInits, LocHdFormat );
 			gio::write( OutputFileInits, LocFormat ) << LocationTitle << RoundSigDigits( Latitude, 2 ) << RoundSigDigits( Longitude, 2 ) << RoundSigDigits( TimeZoneNumber, 2 ) << RoundSigDigits( Elevation, 2 ) << RoundSigDigits( StdBaroPress, 0 ) << RoundSigDigits( StdRhoAir, 4 );
@@ -4665,17 +4660,17 @@ Label9999: ;
 
 		LocationError = false;
 
-		if ( ( Latitude == -999. ) && ( Longitude == -999. ) && ( TimeZoneNumber != -999. ) ) {
+		if ( ( Latitude == -999.0 ) && ( Longitude == -999.0 ) && ( TimeZoneNumber != -999.0 ) ) {
 			ShowSevereError( "No location specified" );
 			LocationError = true;
 		}
 
-		if ( ( Latitude < -90. ) || ( Latitude > 90. ) ) {
+		if ( ( Latitude < -90.0 ) || ( Latitude > 90.0 ) ) {
 			ShowSevereError( "Latitude must be between -90 and 90; Entered=" + RoundSigDigits( Latitude, 2 ) );
 			LocationError = true;
 		}
 
-		if ( ( Longitude < -180. ) || ( Longitude > 180. ) ) {
+		if ( ( Longitude < -180.0 ) || ( Longitude > 180.0 ) ) {
 			ShowSevereError( "Longitude must be between -180 and 180; Entered=" + RoundSigDigits( Longitude, 2 ) );
 			LocationError = true;
 		}
@@ -4702,7 +4697,7 @@ Label9999: ;
 			if ( TimeZoneNumber != StdTimeMerid ) {
 				DiffCalc = std::abs( TimeZoneNumber - StdTimeMerid );
 				if ( DiffCalc > 1.0 && DiffCalc < 24.0 ) {
-					if ( DiffCalc < 3. ) {
+					if ( DiffCalc < 3.0 ) {
 						ShowWarningError( "Standard Time Meridian and Time Zone differ by more than 1, " "Difference=\"" + RoundSigDigits( DiffCalc, 1 ) + "\"" );
 						ShowContinueError( "Solar Positions may be incorrect" );
 					} else {
@@ -4725,9 +4720,9 @@ Label9999: ;
 		}
 
 		if ( TimeZoneNumber <= 12.00 ) {
-			TimeZoneMeridian = TimeZoneNumber * 15.;
+			TimeZoneMeridian = TimeZoneNumber * 15.0;
 		} else {
-			TimeZoneMeridian = TimeZoneNumber * 15. - 360.;
+			TimeZoneMeridian = TimeZoneNumber * 15.0 - 360.0;
 		}
 		SinLatitude = std::sin( DegToRadians * Latitude );
 		CosLatitude = std::cos( DegToRadians * Latitude );
@@ -6173,7 +6168,7 @@ Label9999: ;
 		//  REAL(r64), PARAMETER, DIMENSION(24) :: DefaultTempRangeMult=(/ .87d0,.92d0,.96d0,.99d0,1.0d0,.98d0,.93d0,  &
 		//                   .84d0,.71d0,.56d0,.39d0,.23d0, .11d0,.03d0,.00d0,.03d0,.10d0,.21d0,.34d0,.47d0,.58d0,.68d0,.76d0,.82d0 /)
 		// Below are the 2009 fractions, HOF, Chap 14, Table 6
-		static FArray1D< Real64 > const DefaultTempRangeMult( 24, { .88, .92, .95, .98, 1.0, .98, .91, .74, .55, .38, .23, .13, .05, 0.00, 0.00, .06, .14, .24, .39, .50, .59, .68, .75, .82 } );
+		static FArray1D< Real64 > const DefaultTempRangeMult( 24, { 0.88, 0.92, 0.95, 0.98, 1.0, 0.98, 0.91, 0.74, 0.55, 0.38, 0.23, 0.13, 0.05, 0.00, 0.00, 0.06, 0.14, 0.24, 0.39, 0.50, 0.59, 0.68, 0.75, 0.82 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6274,7 +6269,7 @@ Label9999: ;
 			if ( ! lNumericFieldBlanks( 9 ) ) PressureEntered = true;
 			DesDayInput( EnvrnNum ).PressureEntered = PressureEntered;
 			DesDayInput( EnvrnNum ).WindSpeed = rNumericArgs( 10 ); // Wind Speed (m/s)
-			DesDayInput( EnvrnNum ).WindDir = mod( rNumericArgs( 11 ), 360. ); // Wind Direction
+			DesDayInput( EnvrnNum ).WindDir = mod( rNumericArgs( 11 ), 360.0 ); // Wind Direction
 			// (degrees clockwise from North, N=0, E=90, S=180, W=270)
 			//   N1,  \field Month
 			//   N2,  \field Day of Month
@@ -6974,7 +6969,7 @@ Label9999: ;
 					if ( Environment( Count ).KindOfEnvrn != ksRunPeriodWeather ) continue;
 					if ( Environment( Count ).WP_Type1 != 0 ) {
 						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", indicated Environment Name already assigned." );
-						if ( Environment( Count ).Title != BlankString ) {
+						if ( ! Environment( Count ).Title.empty() ) {
 							ShowContinueError( "...Environment=\"" + Environment( Count ).Title + "\", already using " + cCurrentModuleObject + "=\"" + WPSkyTemperature( Environment( Count ).WP_Type1 ).Name + "\"." );
 						} else {
 							ShowContinueError( "... Runperiod Environment, already using " + cCurrentModuleObject + "=\"" + WPSkyTemperature( Environment( Count ).WP_Type1 ).Name + "\"." );
@@ -7150,7 +7145,7 @@ Label9999: ;
 			//Assign the ground temps to the variable
 			for ( I = 1; I <= 12; ++I ) {
 				GroundTemps( I ) = GndProps( I );
-				if ( GroundTemps( I ) < 15. || GroundTemps( I ) > 25. ) GenErrorMessage = true;
+				if ( GroundTemps( I ) < 15.0 || GroundTemps( I ) > 25.0 ) GenErrorMessage = true;
 			}
 
 			GroundTempObjInput = true;
@@ -7159,7 +7154,7 @@ Label9999: ;
 			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
 			ErrorsFound = true;
 		} else {
-			GroundTemps = 18.;
+			GroundTemps = 18.0;
 		}
 
 		if ( GenErrorMessage ) {
@@ -7168,8 +7163,8 @@ Label9999: ;
 		}
 
 		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundTemperature:BuildingSurface>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, "(A,$)" ) << " Site:GroundTemperature:BuildingSurface";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:BuildingSurface>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:BuildingSurface";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << GroundTemps( I ); gio::write( OutputFileInits );
 
 		//Added for ground temperatures for F and C factor defined surfaces
@@ -7198,8 +7193,8 @@ Label9999: ;
 		}
 
 		if ( FCGroundTemps ) { // Write Ground Temp Information to the initialization output file
-			gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundTemperature:FCfactorMethod>, Months From Jan to Dec {C}";
-			gio::write( OutputFileInits, "(A,$)" ) << " Site:GroundTemperature:FCfactorMethod";
+			gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:FCfactorMethod>, Months From Jan to Dec {C}";
+			gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:FCfactorMethod";
 			for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << GroundTempsFC( I ); gio::write( OutputFileInits );
 		}
 
@@ -7226,12 +7221,12 @@ Label9999: ;
 			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
 			ErrorsFound = true;
 		} else {
-			SurfaceGroundTemps = 13.;
+			SurfaceGroundTemps = 13.0;
 		}
 
 		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundTemperature:Shallow>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, "(A,$)" ) << " Site:GroundTemperature:Shallow";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Shallow>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Shallow";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << SurfaceGroundTemps( I ); gio::write( OutputFileInits );
 
 		cCurrentModuleObject = "Site:GroundTemperature:Deep";
@@ -7256,12 +7251,12 @@ Label9999: ;
 			ShowSevereError( cCurrentModuleObject + ": Too many objects entered. Only one allowed." );
 			ErrorsFound = true;
 		} else {
-			DeepGroundTemps = 16.;
+			DeepGroundTemps = 16.0;
 		}
 
 		// Write Final Ground Temp Information to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundTemperature:Deep>, Months From Jan to Dec {C}";
-		gio::write( OutputFileInits, "(A,$)" ) << " Site:GroundTemperature:Deep";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundTemperature:Deep>, Months From Jan to Dec {C}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundTemperature:Deep";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F6.2,$)" ) << DeepGroundTemps( I ); gio::write( OutputFileInits );
 
 		//Assigning the ground temperature array to a public array for use in other subroutines
@@ -7352,7 +7347,7 @@ Label9999: ;
 		}
 
 		// Write Final Ground Reflectance Information to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundReflectance>, Months From Jan to Dec {dimensionless}";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance>, Months From Jan to Dec {dimensionless}";
 		gio::write( OutputFileInits, "(' ',A,$)" ) << "Site:GroundReflectance";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << GroundReflectances( I ); gio::write( OutputFileInits );
 
@@ -7431,14 +7426,14 @@ Label9999: ;
 		}
 
 		// Write Final Ground Reflectance Modifier Information to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundReflectance:SnowModifier>, Normal, Daylighting {dimensionless}";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:SnowModifier>, Normal, Daylighting {dimensionless}";
 		gio::write( OutputFileInits, Format_720 ) << SnowGndRefModifier << SnowGndRefModifierForDayltg;
 
-		gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundReflectance:Snow>, Months From Jan to Dec {dimensionless}";
-		gio::write( OutputFileInits, "(A,$)" ) << " Site:GroundReflectance:Snow";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow>, Months From Jan to Dec {dimensionless}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifier, 1.0 ), 0.0 ); gio::write( OutputFileInits );
-		gio::write( OutputFileInits, "(A)" ) << "! <Site:GroundReflectance:Snow:Daylighting>, Months From Jan to Dec {dimensionless}";
-		gio::write( OutputFileInits, "(A,$)" ) << " Site:GroundReflectance:Snow:Daylighting";
+		gio::write( OutputFileInits, fmtA ) << "! <Site:GroundReflectance:Snow:Daylighting>, Months From Jan to Dec {dimensionless}";
+		gio::write( OutputFileInits, fmtAN ) << " Site:GroundReflectance:Snow:Daylighting";
 		for ( I = 1; I <= 12; ++I ) gio::write( OutputFileInits, "(', ',F5.2,$)" ) << max( min( GroundReflectances( I ) * SnowGndRefModifierForDayltg, 1.0 ), 0.0 ); gio::write( OutputFileInits );
 
 	}
@@ -7649,11 +7644,11 @@ Label9999: ;
 			ErrorsFound = true;
 		}
 
-		WeatherFileWindModCoeff = std::pow( ( WeatherFileWindBLHeight / WeatherFileWindSensorHeight ), WeatherFileWindExp );
+		WeatherFileWindModCoeff = std::pow( WeatherFileWindBLHeight / WeatherFileWindSensorHeight, WeatherFileWindExp );
 		WeatherFileTempModCoeff = AtmosphericTempGradient * EarthRadius * WeatherFileTempSensorHeight / ( EarthRadius + WeatherFileTempSensorHeight );
 
 		// Write to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m}," "Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m}," "Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal]," "Temperature Modifier Coefficient [Internal]";
+		gio::write( OutputFileInits, fmtA ) << "! <Environment:Weather Station>,Wind Sensor Height Above Ground {m}," "Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m}," "Air Temperature Sensor Height Above Ground {m},Wind Speed Modifier Coefficient [Internal]," "Temperature Modifier Coefficient [Internal]";
 
 		gio::write( OutputFileInits, Format_720 ) << RoundSigDigits( WeatherFileWindSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindExp, 3 ) << RoundSigDigits( WeatherFileWindBLHeight, 3 ) << RoundSigDigits( WeatherFileTempSensorHeight, 3 ) << RoundSigDigits( WeatherFileWindModCoeff, 3 ) << RoundSigDigits( WeatherFileTempModCoeff, 3 );
 
@@ -7710,7 +7705,7 @@ Label9999: ;
 			SDIRH = BeamSolarRad * SOLCOS( 3 );
 			SDIFH = DifSolarRad;
 			//              Fraction of sky covered by clouds
-			CloudFraction = std::pow( ( SDIFH / ( SDIRH + SDIFH + 0.0001 ) ), 2 );
+			CloudFraction = pow_2( SDIFH / ( SDIRH + SDIFH + 0.0001 ) );
 			//              Luminous efficacy of sky diffuse solar and beam solar (lumens/W);
 			//              Horizontal illuminance from sky and horizontal beam illuminance (lux)
 			//              obtained from solar quantities on weather file and luminous efficacy.
@@ -7775,7 +7770,7 @@ Label9999: ;
 		static FArray1D< Real64 > const BDirLumEff( 8, { -4.55, -3.46, -4.90, -5.84, -3.97, -1.25, 0.77, 1.58 } );
 		static FArray1D< Real64 > const CDirLumEff( 8, { -2.98, -1.21, -1.71, -1.99, -1.75, -1.51, -1.26, -1.10 } );
 		static FArray1D< Real64 > const DDirLumEff( 8, { 117.12, 12.38, -8.81, -4.56, -6.16, -26.73, -34.44, -8.29 } );
-		static FArray1D< Real64 > const ExtraDirNormIll( 12, { 131153., 130613., 128992., 126816., 124731., 123240., 122652., 123120., 124576., 126658., 128814., 130471. } ); // Monthly exterrestrial direct normal illuminance (lum/m2)
+		static FArray1D< Real64 > const ExtraDirNormIll( 12, { 131153.0, 130613.0, 128992.0, 126816.0, 124731.0, 123240.0, 122652.0, 123120.0, 124576.0, 126658.0, 128814.0, 130471.0 } ); // Monthly exterrestrial direct normal illuminance (lum/m2)
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7801,9 +7796,9 @@ Label9999: ;
 		//              SkyClearness > 6 is a clear sky.
 		//              DifSolarRad is the diffuse horizontal irradiance.
 		//              BeamSolarRad is the direct normal irradiance.
-		Zeta = 1.041 * std::pow( SunZenith, 3 );
+		Zeta = 1.041 * pow_3( SunZenith );
 		SkyClearness = ( ( DifSolarRad + BeamSolarRad ) / ( DifSolarRad + 0.0001 ) + Zeta ) / ( 1.0 + Zeta );
-		AirMass = ( 1.0 - 0.1 * Elevation / 1000.0 ) / ( SinSunAltitude + 0.15 / std::pow( ( SunAltitude / DegToRadians + 3.885 ), 1.253 ) );
+		AirMass = ( 1.0 - 0.1 * Elevation / 1000.0 ) / ( SinSunAltitude + 0.15 / std::pow( SunAltitude / DegToRadians + 3.885, 1.253 ) );
 		//              In the following, 93.73 is the extraterrestrial luminous efficacy
 		SkyBrightness = ( DifSolarRad * 93.73 ) * AirMass / ExtraDirNormIll( Month );
 		if ( SkyClearness <= 1.065 ) {
@@ -7890,21 +7885,21 @@ Label9999: ;
 		longl( 0 ) = -7.5;
 		longh( 0 ) = 7.5;
 		for ( i = 1; i <= 12; ++i ) {
-			longl( i ) = longl( i - 1 ) + 15.;
-			longh( i ) = longh( i - 1 ) + 15.;
+			longl( i ) = longl( i - 1 ) + 15.0;
+			longh( i ) = longh( i - 1 ) + 15.0;
 		}
 		for ( i = 1; i <= 12; ++i ) {
-			longl( -i ) = longl( -i + 1 ) - 15.;
-			longh( -i ) = longh( -i + 1 ) - 15.;
+			longl( -i ) = longl( -i + 1 ) - 15.0;
+			longh( -i ) = longh( -i + 1 ) - 15.0;
 		}
 		temp = Longitude;
-		temp = mod( temp, 360. );
+		temp = mod( temp, 360.0 );
 
-		if ( temp > 180. ) temp -= 180.;
+		if ( temp > 180.0 ) temp -= 180.0;
 		for ( i = -12; i <= 12; ++i ) {
 			if ( temp > longl( i ) && temp <= longh( i ) ) {
 				tz = i;
-				tz = mod( tz, 24. );
+				tz = mod( tz, 24.0 );
 				GetSTM = tz;
 				break;
 			}
@@ -7949,7 +7944,7 @@ Label9999: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const AFormat( "(A)" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -8006,14 +8001,8 @@ Label9999: ;
 				if ( Pos == std::string::npos ) {
 					if ( len( Line ) == 0 ) {
 						while ( Pos == std::string::npos ) {
-							gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
+							gio::read( WeatherFileUnitNumber, fmtA ) >> Line;
 							strip( Line );
-							if ( StripCR ) {
-								endcol = len( Line );
-								if ( endcol > 0 ) {
-									if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-								}
-							}
 							uppercase( Line );
 							Pos = index( Line, ',' );
 						}
@@ -8067,7 +8056,7 @@ Label9999: ;
 			if ( Pos == std::string::npos ) {
 				if ( len( Line ) == 0 ) {
 					while ( Pos == std::string::npos && len( Line ) == 0 ) {
-						gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
+						gio::read( WeatherFileUnitNumber, fmtA ) >> Line;
 						strip( Line );
 						Pos = index( Line, ',' );
 					}
@@ -8347,13 +8336,7 @@ Label9999: ;
 				if ( Pos == std::string::npos ) {
 					if ( len( Line ) == 0 ) {
 						while ( Pos == std::string::npos ) {
-							gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
-							if ( StripCR ) {
-								endcol = len( Line );
-								if ( endcol > 0 ) {
-									if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-								}
-							}
+							gio::read( WeatherFileUnitNumber, fmtA ) >> Line;
 							strip( Line );
 							uppercase( Line );
 							Pos = index( Line, ',' );
@@ -8500,13 +8483,7 @@ Label9999: ;
 				if ( Pos == std::string::npos ) {
 					if ( len( Line ) == 0 ) {
 						while ( Pos == std::string::npos ) {
-							gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
-							if ( StripCR ) {
-								endcol = len( Line );
-								if ( endcol > 0 ) {
-									if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-								}
-							}
+							gio::read( WeatherFileUnitNumber, fmtA ) >> Line;
 							strip( Line );
 							uppercase( Line );
 							Pos = index( Line, ',' );
@@ -8555,7 +8532,7 @@ Label9999: ;
 							DataPeriods( CurCount ).DayOfWeek = Line.substr( 0, Pos );
 							DataPeriods( CurCount ).WeekDay = FindItemInList( DataPeriods( CurCount ).DayOfWeek, DaysOfWeek, 7 );
 							if ( DataPeriods( CurCount ).WeekDay == 0 ) {
-								gio::write( ErrNum, "*" ) << CurCount;
+								gio::write( ErrNum, fmtLD ) << CurCount;
 								strip( ErrNum );
 								ShowSevereError( "Weather File -- Invalid Start Day of Week for Data Period #" + ErrNum + ", Invalid day=" + DataPeriods( CurCount ).DayOfWeek );
 								ErrorsFound = true;
@@ -8653,7 +8630,6 @@ Label9999: ;
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const AFormat( "(A)" );
 		static std::string const Header( "DATA PERIODS" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -8678,7 +8654,7 @@ Label9999: ;
 		// Headers should come in order
 		StillLooking = true;
 		while ( StillLooking ) {
-			{ IOFlags flags; gio::read( WeatherFileUnitNumber, AFormat, flags ) >> Line; if ( flags.end() ) goto Label9998; }
+			{ IOFlags flags; gio::read( WeatherFileUnitNumber, fmtA, flags ) >> Line; if ( flags.end() ) goto Label9998; }
 			uppercase( Line );
 			if ( has( Line, Header ) ) break;
 		}
@@ -8707,13 +8683,7 @@ Label9999: ;
 			if ( Pos == std::string::npos ) {
 				if ( len( Line ) == 0 ) {
 					while ( Pos == std::string::npos ) {
-						gio::read( WeatherFileUnitNumber, AFormat ) >> Line;
-						if ( StripCR ) {
-							std::string::size_type const endcol = len( Line );
-							if ( endcol > 0 ) {
-								if ( int( Line[ endcol - 1 ] ) == iASCII_CR ) Line.erase( endcol - 1 );
-							}
-						}
+						gio::read( WeatherFileUnitNumber, fmtA ) >> Line;
 						strip( Line );
 						uppercase( Line );
 						Pos = index( Line, ',' );

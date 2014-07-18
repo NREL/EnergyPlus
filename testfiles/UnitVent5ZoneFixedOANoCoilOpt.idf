@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2374,7 +2374,8 @@
     Zone4UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone4UnitVentFan,        !- Supply Air Fan Name
-    NONE;                    !- Coil Option
+    NONE,                    !- Coil Option
+    ;                        !- Supply Air Fan Operating Mode Schedule Name
 
   OutdoorAir:Node,
     Zone4UnitVentOAInNode,   !- Name
@@ -2396,7 +2397,8 @@
     Zone5UnitVentOAMixerOutletNode,  !- Mixed Air Node Name
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone5UnitVentFan,        !- Supply Air Fan Name
-    NONE;                    !- Coil Option
+    NONE,                    !- Coil Option
+    ;                        !- Supply Air Fan Operating Mode Schedule Name
 
   OutdoorAir:Node,
     Zone5UnitVentOAInNode,   !- Name
@@ -2570,7 +2572,7 @@
   Fan:ConstantVolume,
     Zone1UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2581,7 +2583,7 @@
   Fan:ConstantVolume,
     Zone2UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2592,7 +2594,7 @@
   Fan:ConstantVolume,
     Zone3UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2603,7 +2605,7 @@
   Fan:ConstantVolume,
     Zone4UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2614,7 +2616,7 @@
   Fan:ConstantVolume,
     Zone5UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

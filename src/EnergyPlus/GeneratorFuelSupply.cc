@@ -230,7 +230,7 @@ namespace GeneratorFuelSupply {
 					}
 
 					// check for molar fractions summing to 1.0.
-					if ( std::abs( sum( FuelSupply( FuelSupNum ).ConstitMolalFract ) - 1.0 ) > .0001 ) {
+					if ( std::abs( sum( FuelSupply( FuelSupNum ).ConstitMolalFract ) - 1.0 ) > 0.0001 ) {
 						ShowSevereError( cCurrentModuleObject + " molar fractions do not sum to 1.0" );
 						ShowContinueError( "Sum was=" + RoundSigDigits( sum( FuelSupply( FuelSupNum ).ConstitMolalFract ), 5 ) );
 						ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + AlphArray( 1 ) );
@@ -318,6 +318,7 @@ namespace GeneratorFuelSupply {
 		//unused  REAL(r64) :: LHV
 
 		// Formats
+		static gio::Fmt const fmtA( "(A)" );
 		static gio::Fmt const Format_501( "(' Fuel Supply, ',A,',',G13.6E2,',',G13.6E2,',',G13.6E2,',',G13.6E2)" );
 
 		NumHardCodedConstituents = 14;
@@ -465,7 +466,7 @@ namespace GeneratorFuelSupply {
 		GasPhaseThermoChemistryData( 8 ).ShomateD = 11.0348;
 		GasPhaseThermoChemistryData( 8 ).ShomateE = 0.30348;
 		GasPhaseThermoChemistryData( 8 ).ShomateF = -90.0633;
-		GasPhaseThermoChemistryData( 8 ).ShomateG = -999.;
+		GasPhaseThermoChemistryData( 8 ).ShomateG = -999.0;
 		GasPhaseThermoChemistryData( 8 ).ShomateH = -83.8605;
 		GasPhaseThermoChemistryData( 8 ).NumCarbons = 2.0;
 		GasPhaseThermoChemistryData( 8 ).NumHydrogens = 6.0;
@@ -490,7 +491,7 @@ namespace GeneratorFuelSupply {
 		GasPhaseThermoChemistryData( 9 ).ShomateD = 56.253;
 		GasPhaseThermoChemistryData( 9 ).ShomateE = 0.61164;
 		GasPhaseThermoChemistryData( 9 ).ShomateF = -109.206;
-		GasPhaseThermoChemistryData( 9 ).ShomateG = -999.;
+		GasPhaseThermoChemistryData( 9 ).ShomateG = -999.0;
 		GasPhaseThermoChemistryData( 9 ).ShomateH = -103.855;
 		GasPhaseThermoChemistryData( 9 ).NumCarbons = 3.0;
 		GasPhaseThermoChemistryData( 9 ).NumHydrogens = 8.0;
@@ -515,7 +516,7 @@ namespace GeneratorFuelSupply {
 		GasPhaseThermoChemistryData( 10 ).ShomateD = 66.535;
 		GasPhaseThermoChemistryData( 10 ).ShomateE = -0.26994;
 		GasPhaseThermoChemistryData( 10 ).ShomateF = -149.365;
-		GasPhaseThermoChemistryData( 10 ).ShomateG = -999.;
+		GasPhaseThermoChemistryData( 10 ).ShomateG = -999.0;
 		GasPhaseThermoChemistryData( 10 ).ShomateH = -133.218;
 		GasPhaseThermoChemistryData( 10 ).NumCarbons = 4.0;
 		GasPhaseThermoChemistryData( 10 ).NumHydrogens = 10.0;
@@ -540,7 +541,7 @@ namespace GeneratorFuelSupply {
 		GasPhaseThermoChemistryData( 11 ).ShomateD = 76.8232;
 		GasPhaseThermoChemistryData( 11 ).ShomateE = 1.00948;
 		GasPhaseThermoChemistryData( 11 ).ShomateF = -155.348;
-		GasPhaseThermoChemistryData( 11 ).ShomateG = -999.;
+		GasPhaseThermoChemistryData( 11 ).ShomateG = -999.0;
 		GasPhaseThermoChemistryData( 11 ).ShomateH = -146.348;
 		GasPhaseThermoChemistryData( 11 ).NumCarbons = 5.0;
 		GasPhaseThermoChemistryData( 11 ).NumHydrogens = 12.0;
@@ -565,7 +566,7 @@ namespace GeneratorFuelSupply {
 		GasPhaseThermoChemistryData( 12 ).ShomateD = 103.784;
 		GasPhaseThermoChemistryData( 12 ).ShomateE = 1.23887;
 		GasPhaseThermoChemistryData( 12 ).ShomateF = -176.813;
-		GasPhaseThermoChemistryData( 12 ).ShomateG = -999.;
+		GasPhaseThermoChemistryData( 12 ).ShomateG = -999.0;
 		GasPhaseThermoChemistryData( 12 ).ShomateH = -166.966;
 		GasPhaseThermoChemistryData( 12 ).NumCarbons = 6.0;
 		GasPhaseThermoChemistryData( 12 ).NumHydrogens = 14.0;
@@ -591,7 +592,7 @@ namespace GeneratorFuelSupply {
 		GasPhaseThermoChemistryData( 13 ).ShomateD = -12.8461;
 		GasPhaseThermoChemistryData( 13 ).ShomateE = 0.15819;
 		GasPhaseThermoChemistryData( 13 ).ShomateF = -209.037;
-		GasPhaseThermoChemistryData( 13 ).ShomateG = -999.;
+		GasPhaseThermoChemistryData( 13 ).ShomateG = -999.0;
 		GasPhaseThermoChemistryData( 13 ).ShomateH = -201.102;
 		GasPhaseThermoChemistryData( 13 ).NumCarbons = 1.0;
 		GasPhaseThermoChemistryData( 13 ).NumHydrogens = 4.0;
@@ -617,7 +618,7 @@ namespace GeneratorFuelSupply {
 		GasPhaseThermoChemistryData( 14 ).ShomateD = 46.3528;
 		GasPhaseThermoChemistryData( 14 ).ShomateE = 0.48364;
 		GasPhaseThermoChemistryData( 14 ).ShomateF = -241.239;
-		GasPhaseThermoChemistryData( 14 ).ShomateG = -999.;
+		GasPhaseThermoChemistryData( 14 ).ShomateG = -999.0;
 		GasPhaseThermoChemistryData( 14 ).ShomateH = -234.441;
 		GasPhaseThermoChemistryData( 14 ).NumCarbons = 2.0;
 		GasPhaseThermoChemistryData( 14 ).NumHydrogens = 6.0;
@@ -709,7 +710,7 @@ namespace GeneratorFuelSupply {
 		}
 
 		// report Heating Values in EIO.
-		gio::write( OutputFileInits, "(A)" ) << "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], " "Higher Heating Value [KJ/kg],  Molecular Weight [g/mol] ";
+		gio::write( OutputFileInits, fmtA ) << "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher Heating Value [KJ/kg],  Molecular Weight [g/mol] ";
 		gio::write( OutputFileInits, Format_501 ) << FuelSupply( FuelSupplyNum ).Name << FuelSupply( FuelSupplyNum ).LHV * 1000000.0 << FuelSupply( FuelSupplyNum ).LHVJperkg / 1000.0 << FuelSupply( FuelSupplyNum ).HHV / 1000.0 << FuelSupply( FuelSupplyNum ).MW;
 
 	}
