@@ -1343,6 +1343,7 @@ namespace PlantManager {
 					// Map the inlet node to the splitter to a branch number
 					if ( TempLoop.Splitter( SplitNum - 1 ).Exists ) {
 						// Map the inlet node to the splitter to a branch number
+						SplitInBranch = false;
 						for ( BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum ) {
 							CompNum = TempLoop.Branch( BranchNum ).TotalComponents;
 							if ( TempLoop.Splitter( SplitNum - 1 ).NodeNumIn == TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumOut ) {
