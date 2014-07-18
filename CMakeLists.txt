@@ -18,7 +18,6 @@ if (MSVC)
   set(gtest_force_shared_crt ON)
 endif()
 
-
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
@@ -55,6 +54,10 @@ if( BUILD_PACKAGE )
     "${CMAKE_BINARY_DIR};EnergyPLus;ALL;/"
   )
 
+  set(EPLUS_BUILDSUPPORT_REPO 
+    "RootOfEnergyPlusBuildSupportRepo" CACHE PATH "Enter the root of the EnergyPlusBuildSupport repo"
+  )
+  
   if( BUILD_FORTRAN )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
