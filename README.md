@@ -9,7 +9,7 @@ The build process is setup by Cmake.  On all platforms, you will want to clone t
 
 ## Windows
 
-0. This needs to be updated since we are supporting MSVC
+0. This needs to be updated since we are supporting MSVC as well.
 1. First install MinGW. Devs have had issues with a 32-bit build of MinGW, it is recommended to use the version linked here if possible.
   - Use this link: [http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/4.8.2/threads-win32/seh/]
   - Download the version you want (64 bit)
