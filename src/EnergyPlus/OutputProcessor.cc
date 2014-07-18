@@ -3284,7 +3284,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using SQLiteProcedures::SQLdbTimeIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3317,7 +3316,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileMeters, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( OutputFileMeters, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
@@ -3326,18 +3325,18 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintESOTimeStamp = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptTS ) {
-				WriteReportMeterData( EnergyMeters( Loop ).TSRptNum, EnergyMeters( Loop ).TSRptNumChr, SQLdbTimeIndex, EnergyMeters( Loop ).TSValue, ReportTimeStep, rDummy1, iDummy1, rDummy2, iDummy2, EnergyMeters( Loop ).RptTSFO );
+				WriteReportMeterData( EnergyMeters( Loop ).TSRptNum, EnergyMeters( Loop ).TSRptNumChr, EnergyMeters( Loop ).TSValue, ReportTimeStep, rDummy1, iDummy1, rDummy2, iDummy2, EnergyMeters( Loop ).RptTSFO );
 			}
 
 			if ( EnergyMeters( Loop ).RptAccTS ) {
 				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).TSAccRptNum;
 				strip( cReportID );
-				WriteCumulativeReportMeterData( EnergyMeters( Loop ).TSAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccTSFO );
+				WriteCumulativeReportMeterData( EnergyMeters( Loop ).TSAccRptNum, cReportID, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccTSFO );
 			}
 		}
 
@@ -3369,7 +3368,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using SQLiteProcedures::SQLdbTimeIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3402,12 +3400,12 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileMeters, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( OutputFileMeters, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptHR ) {
-				WriteReportMeterData( EnergyMeters( Loop ).HRRptNum, EnergyMeters( Loop ).HRRptNumChr, SQLdbTimeIndex, EnergyMeters( Loop ).HRValue, ReportHourly, rDummy1, iDummy1, rDummy2, iDummy2, EnergyMeters( Loop ).RptHRFO ); //EnergyMeters(Loop)%HRMinVal, EnergyMeters(Loop)%HRMinValDate, & | EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
+				WriteReportMeterData( EnergyMeters( Loop ).HRRptNum, EnergyMeters( Loop ).HRRptNumChr, EnergyMeters( Loop ).HRValue, ReportHourly, rDummy1, iDummy1, rDummy2, iDummy2, EnergyMeters( Loop ).RptHRFO ); //EnergyMeters(Loop)%HRMinVal, EnergyMeters(Loop)%HRMinValDate, & | EnergyMeters(Loop)%HRMaxVal, EnergyMeters(Loop)%HRMaxValDate, &
 				EnergyMeters( Loop ).HRValue = 0.0;
 				EnergyMeters( Loop ).HRMinVal = MinSetValue;
 				EnergyMeters( Loop ).HRMaxVal = MaxSetValue;
@@ -3416,7 +3414,7 @@ namespace OutputProcessor {
 			if ( EnergyMeters( Loop ).RptAccHR ) {
 				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).HRAccRptNum;
 				strip( cReportID );
-				WriteCumulativeReportMeterData( EnergyMeters( Loop ).HRAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccHRFO );
+				WriteCumulativeReportMeterData( EnergyMeters( Loop ).HRAccRptNum, cReportID, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccHRFO );
 			}
 		}
 
@@ -3444,7 +3442,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using SQLiteProcedures::SQLdbTimeIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3473,12 +3470,12 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileMeters, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( OutputFileMeters, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptDY ) {
-				WriteReportMeterData( EnergyMeters( Loop ).DYRptNum, EnergyMeters( Loop ).DYRptNumChr, SQLdbTimeIndex, EnergyMeters( Loop ).DYValue, ReportDaily, EnergyMeters( Loop ).DYMinVal, EnergyMeters( Loop ).DYMinValDate, EnergyMeters( Loop ).DYMaxVal, EnergyMeters( Loop ).DYMaxValDate, EnergyMeters( Loop ).RptDYFO );
+				WriteReportMeterData( EnergyMeters( Loop ).DYRptNum, EnergyMeters( Loop ).DYRptNumChr, EnergyMeters( Loop ).DYValue, ReportDaily, EnergyMeters( Loop ).DYMinVal, EnergyMeters( Loop ).DYMinValDate, EnergyMeters( Loop ).DYMaxVal, EnergyMeters( Loop ).DYMaxValDate, EnergyMeters( Loop ).RptDYFO );
 				EnergyMeters( Loop ).DYValue = 0.0;
 				EnergyMeters( Loop ).DYMinVal = MinSetValue;
 				EnergyMeters( Loop ).DYMaxVal = MaxSetValue;
@@ -3487,7 +3484,7 @@ namespace OutputProcessor {
 			if ( EnergyMeters( Loop ).RptAccDY ) {
 				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).DYAccRptNum;
 				strip( cReportID );
-				WriteCumulativeReportMeterData( EnergyMeters( Loop ).DYAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccDYFO );
+				WriteCumulativeReportMeterData( EnergyMeters( Loop ).DYAccRptNum, cReportID, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccDYFO );
 			}
 		}
 
@@ -3515,7 +3512,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using SQLiteProcedures::SQLdbTimeIndex;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3539,12 +3535,12 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptMN && ! EnergyMeters( Loop ).RptAccMN ) continue;
 			if ( PrintTimeStamp ) {
-				SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileMeters, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
+				WriteTimeStampFormatData( OutputFileMeters, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
 				PrintTimeStamp = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptMN ) {
-				WriteReportMeterData( EnergyMeters( Loop ).MNRptNum, EnergyMeters( Loop ).MNRptNumChr, SQLdbTimeIndex, EnergyMeters( Loop ).MNValue, ReportMonthly, EnergyMeters( Loop ).MNMinVal, EnergyMeters( Loop ).MNMinValDate, EnergyMeters( Loop ).MNMaxVal, EnergyMeters( Loop ).MNMaxValDate, EnergyMeters( Loop ).RptMNFO );
+				WriteReportMeterData( EnergyMeters( Loop ).MNRptNum, EnergyMeters( Loop ).MNRptNumChr, EnergyMeters( Loop ).MNValue, ReportMonthly, EnergyMeters( Loop ).MNMinVal, EnergyMeters( Loop ).MNMinValDate, EnergyMeters( Loop ).MNMaxVal, EnergyMeters( Loop ).MNMaxValDate, EnergyMeters( Loop ).RptMNFO );
 				EnergyMeters( Loop ).MNValue = 0.0;
 				EnergyMeters( Loop ).MNMinVal = MinSetValue;
 				EnergyMeters( Loop ).MNMaxVal = MaxSetValue;
@@ -3553,7 +3549,7 @@ namespace OutputProcessor {
 			if ( EnergyMeters( Loop ).RptAccMN ) {
 				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).MNAccRptNum;
 				strip( cReportID );
-				WriteCumulativeReportMeterData( EnergyMeters( Loop ).MNAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccMNFO );
+				WriteCumulativeReportMeterData( EnergyMeters( Loop ).MNAccRptNum, cReportID, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccMNFO );
 			}
 		}
 
@@ -3581,7 +3577,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using General::TrimSigDigits;
-		using SQLiteProcedures::SQLdbTimeIndex;
 		//using namespace OutputReportPredefined;
 		using DataGlobals::OutputFileDebug; // ,DoingPredefinedAndTabularReporting
 
@@ -3612,18 +3607,18 @@ namespace OutputProcessor {
 			EnergyMeters( Loop ).LastSMMaxValDate = EnergyMeters( Loop ).SMMaxValDate;
 			if ( ! EnergyMeters( Loop ).RptSM && ! EnergyMeters( Loop ).RptAccSM ) continue;
 			if ( PrintTimeStamp ) {
-				SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileMeters, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
+				WriteTimeStampFormatData( OutputFileMeters, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
 				PrintTimeStamp = false;
 			}
 
 			if ( EnergyMeters( Loop ).RptSM ) {
-				WriteReportMeterData( EnergyMeters( Loop ).SMRptNum, EnergyMeters( Loop ).SMRptNumChr, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, ReportSim, EnergyMeters( Loop ).SMMinVal, EnergyMeters( Loop ).SMMinValDate, EnergyMeters( Loop ).SMMaxVal, EnergyMeters( Loop ).SMMaxValDate, EnergyMeters( Loop ).RptSMFO );
+				WriteReportMeterData( EnergyMeters( Loop ).SMRptNum, EnergyMeters( Loop ).SMRptNumChr, EnergyMeters( Loop ).SMValue, ReportSim, EnergyMeters( Loop ).SMMinVal, EnergyMeters( Loop ).SMMinValDate, EnergyMeters( Loop ).SMMaxVal, EnergyMeters( Loop ).SMMaxValDate, EnergyMeters( Loop ).RptSMFO );
 			}
 
 			if ( EnergyMeters( Loop ).RptAccSM ) {
 				gio::write( cReportID, fmtLD ) << EnergyMeters( Loop ).SMAccRptNum;
 				strip( cReportID );
-				WriteCumulativeReportMeterData( EnergyMeters( Loop ).SMAccRptNum, cReportID, SQLdbTimeIndex, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccSMFO );
+				WriteCumulativeReportMeterData( EnergyMeters( Loop ).SMAccRptNum, cReportID, EnergyMeters( Loop ).SMValue, EnergyMeters( Loop ).RptAccSMFO );
 			}
 		}
 
@@ -4043,7 +4038,7 @@ namespace OutputProcessor {
 
 	}
 
-	int
+	void
 	WriteTimeStampFormatData(
 		int const unitNumber, // the Fortran output unit number
 		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
@@ -4081,10 +4076,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using namespace DataPrecisionGlobals;
-		using namespace SQLiteProcedures;
-
-		// Return value
-		int WriteTimeStampFormatData;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -4100,49 +4091,41 @@ namespace OutputProcessor {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string cmessageBuffer;
-		int timeIndex;
 
 		{ auto const SELECT_CASE_var( reportingInterval );
 
 		if ( ( SELECT_CASE_var == ReportEach ) || ( SELECT_CASE_var == ReportTimeStep ) ) {
 			gio::write( unitNumber, TimeStampFormat ) << reportIDString << DayOfSimChr << Month << DayOfMonth << DST << Hour << StartMinute << EndMinute << DayType;
-			timeIndex = -1; // Signals that writing to the SQL database is not active
 
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
+			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
 
 		} else if ( SELECT_CASE_var == ReportHourly ) {
 			gio::write( unitNumber, TimeStampFormat ) << reportIDString << DayOfSimChr << Month << DayOfMonth << DST << Hour << 0.0 << 60.0 << DayType;
-			timeIndex = -1; // Signals that writing to the SQL database is not active
 
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
+			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
 
 		} else if ( SELECT_CASE_var == ReportDaily ) {
 			gio::write( unitNumber, DailyStampFormat ) << reportIDString << DayOfSimChr << Month << DayOfMonth << DST << DayType;
-			timeIndex = -1; // Signals that writing to the SQL database is not active
 
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
+			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
 
 		} else if ( SELECT_CASE_var == ReportMonthly ) {
 			gio::write( unitNumber, MonthlyStampFormat ) << reportIDString << DayOfSimChr << Month;
-			timeIndex = -1; // Signals that writing to the SQL database is not active
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
+			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
 
 		} else if ( SELECT_CASE_var == ReportSim ) {
 			gio::write( unitNumber, RunPeriodStampFormat ) << reportIDString << DayOfSimChr;
-			timeIndex = -1; // Signals that writing to the SQL database is not active
-			if ( WriteOutputToSQLite ) timeIndex = CreateSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
+			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
 
 		} else {
-			gio::write( cmessageBuffer, "(A,I5)" ) << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
-			if ( WriteOutputToSQLite ) SQLiteWriteMessageMacro( cmessageBuffer );
-			timeIndex = -1; // Signals that writing to the SQL database is not active
+			if ( sqlite->writeOutputToSQLite() ) 
+			{
+				std::stringstream ss;
+				ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
+				sqlite->sqliteWriteMessage( ss.str() );
+			}
 
 		}}
-
-		WriteTimeStampFormatData = timeIndex;
-
-		return WriteTimeStampFormatData;
-
 	}
 
 	void
@@ -4178,7 +4161,6 @@ namespace OutputProcessor {
 
 		// Using/Aliasing
 		using DataGlobals::OutputFileStandard;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4224,11 +4206,11 @@ namespace OutputProcessor {
 
 		}}
 
-		if ( WriteOutputToSQLite ) {
+		if ( sqlite->writeOutputToSQLite() ) {
 			if ( ! present( ScheduleName ) ) {
-				CreateSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval );
+				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval );
 			} else {
-				CreateSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, ScheduleName );
+				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, ScheduleName );
 			}
 		}
 
@@ -4270,7 +4252,6 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using DataGlobals::OutputFileMeters;
 		using DataGlobals::OutputFileStandard;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4358,16 +4339,16 @@ namespace OutputProcessor {
 
 		}}
 
-		if ( WriteOutputToSQLite ) {
+		if ( sqlite->writeOutputToSQLite() ) {
 			if ( cumulativeMeterFlag ) {
 				keyedValueString = "Cumulative ";
 			} else {
 				keyedValueString = "";
 			}
-			CreateSQLiteMeterDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
+			sqlite->createSQLiteMeterDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
 
 			if ( ! meterFileOnlyFlag ) {
-				CreateSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
+				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
 			}
 
 		}
@@ -4376,8 +4357,7 @@ namespace OutputProcessor {
 
 	void
 	WriteRealVariableOutput(
-		int const reportType, // The report type or interval (e.g., hourly)
-		int const timeIndex // An index that points to the timestamp
+		int const reportType // The report type or interval (e.g., hourly)
 	)
 	{
 
@@ -4418,7 +4398,7 @@ namespace OutputProcessor {
 
 		if ( RVar().Report && RVar().ReportFreq == reportType && RVar().Stored ) {
 			if ( RVar().NumStored > 0.0 ) {
-				WriteReportRealData( RVar().ReportID, RVar().ReportIDChr, timeIndex, RVar().StoreValue, RVar().StoreType, RVar().NumStored, RVar().ReportFreq, RVar().MinValue, RVar().minValueDate, RVar().MaxValue, RVar().maxValueDate );
+				WriteReportRealData( RVar().ReportID, RVar().ReportIDChr, RVar().StoreValue, RVar().StoreType, RVar().NumStored, RVar().ReportFreq, RVar().MinValue, RVar().minValueDate, RVar().MaxValue, RVar().maxValueDate );
 				++StdOutputRecordCount;
 			}
 
@@ -4436,7 +4416,6 @@ namespace OutputProcessor {
 	WriteReportRealData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const storeType, // Averaged or Sum
 		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
@@ -4471,7 +4450,6 @@ namespace OutputProcessor {
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileStandard;
 		using General::strip_trailing_zeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 
@@ -4518,8 +4496,8 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
-		if ( WriteOutputToSQLite ) {
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
 		}
 
 		{ auto const SELECT_CASE_var( reportingInterval );
@@ -4538,7 +4516,6 @@ namespace OutputProcessor {
 	WriteCumulativeReportMeterData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		bool const meterOnlyFlag // A flag that indicates if the data should be written to standard output
 	)
@@ -4566,7 +4543,6 @@ namespace OutputProcessor {
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
 		using General::strip_trailing_zeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4590,16 +4566,16 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
-		if ( WriteOutputToSQLite ) {
-			CreateSQLiteMeterRecord( reportID, timeIndex, repValue );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->createSQLiteMeterRecord( reportID, repValue );
 		}
 
 		gio::write( OutputFileMeters, fmtA ) << creportID + ',' + NumberOut;
 		++StdMeterRecordCount;
 
 		if ( ! meterOnlyFlag ) {
-			if ( WriteOutputToSQLite ) {
-				CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
+			if ( sqlite->writeOutputToSQLite() ) {
+				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
 			}
 
 			gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut;
@@ -4612,7 +4588,6 @@ namespace OutputProcessor {
 	WriteReportMeterData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const reportingInterval, // The variable's reporting interval (e.g., hourly)
 		Real64 const minValue, // The variable's minimum value during the reporting interval
@@ -4646,7 +4621,6 @@ namespace OutputProcessor {
 		using DataGlobals::StdOutputRecordCount;
 		using DataGlobals::StdMeterRecordCount;
 		using General::strip_trailing_zeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 
@@ -4686,8 +4660,8 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( MinOut ) );
 		}
 
-		if ( WriteOutputToSQLite ) {
-			CreateSQLiteMeterRecord( reportID, timeIndex, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->createSQLiteMeterRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 		}
 
 		// Append the min and max strings with date information
@@ -4709,8 +4683,8 @@ namespace OutputProcessor {
 		}}
 
 		if ( ! meterOnlyFlag ) {
-			if ( WriteOutputToSQLite ) {
-				CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
+			if ( sqlite->writeOutputToSQLite() ) {
+				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 			}
 
 			{ auto const SELECT_CASE_var( reportingInterval );
@@ -4731,7 +4705,6 @@ namespace OutputProcessor {
 	WriteRealData(
 		int const reportID, // The variable's reporting ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp for the variable
 		Real64 const repValue // The variable's value
 	)
 	{
@@ -4760,7 +4733,6 @@ namespace OutputProcessor {
 		using General::strip_trailing_zeros;
 		using DataSystemVariables::ReportDuringWarmup;
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4844,8 +4816,8 @@ namespace OutputProcessor {
 			strip_trailing_zeros( rstrip( NumberOut ) );
 		}
 
-		if ( WriteOutputToSQLite ) {
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
 		}
 
 		gio::write( OutputFileStandard, fmtA ) << creportID + ',' + NumberOut;
@@ -4854,8 +4826,7 @@ namespace OutputProcessor {
 
 	void
 	WriteIntegerVariableOutput(
-		int const reportType, // The report type (i.e., the reporting interval)
-		int const timeIndex // An index that points to the timestamp for this data
+		int const reportType // The report type (i.e., the reporting interval)
 	)
 	{
 
@@ -4900,7 +4871,7 @@ namespace OutputProcessor {
 
 		if ( IVar().Report && IVar().ReportFreq == reportType && IVar().Stored ) {
 			if ( IVar().NumStored > 0.0 ) {
-				WriteReportIntegerData( IVar().ReportID, IVar().ReportIDChr, timeIndex, IVar().StoreValue, IVar().StoreType, IVar().NumStored, IVar().ReportFreq, IVar().MinValue, IVar().minValueDate, IVar().MaxValue, IVar().maxValueDate );
+				WriteReportIntegerData( IVar().ReportID, IVar().ReportIDChr, IVar().StoreValue, IVar().StoreType, IVar().NumStored, IVar().ReportFreq, IVar().MinValue, IVar().minValueDate, IVar().MaxValue, IVar().maxValueDate );
 				++StdOutputRecordCount;
 			}
 
@@ -4918,7 +4889,6 @@ namespace OutputProcessor {
 	WriteReportIntegerData(
 		int const reportID, // The variable's reporting ID
 		std::string const & reportIDString, // The variable's reporting ID (character)
-		int const timeIndex, // An index that points to this timestamp for this data
 		Real64 const repValue, // The variable's value
 		int const storeType, // Type of item (averaged or summed)
 		Optional< Real64 const > numOfItemsStored, // The number of items (hours or timesteps) of data stored //Autodesk:OPTIONAL Used without PRESENT check
@@ -4953,7 +4923,6 @@ namespace OutputProcessor {
 		using namespace DataPrecisionGlobals;
 		using DataGlobals::OutputFileStandard;
 		using General::strip_trailing_zeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 
@@ -4990,10 +4959,10 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
-		if ( WriteOutputToSQLite ) {
+		if ( sqlite->writeOutputToSQLite() ) {
 			rminValue = minValue;
 			rmaxValue = MaxValue;
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
+			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
 		}
 
 		{ auto const SELECT_CASE_var( reportingInterval );
@@ -5012,7 +4981,6 @@ namespace OutputProcessor {
 	WriteIntegerData(
 		int const reportID, // the reporting ID of the data
 		std::string const & reportIDString, // the reporting ID of the data (character)
-		int const timeIndex, // an index that points to the data's timestamp
 		Optional_int_const IntegerValue, // the value of the data
 		Optional< Real64 const > RealValue // the value of the data
 	)
@@ -5040,7 +5008,6 @@ namespace OutputProcessor {
 		// Using/Aliasing
 		using DataGlobals::OutputFileStandard;
 		using General::strip_trailing_zeros;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5064,8 +5031,8 @@ namespace OutputProcessor {
 			}
 		}
 
-		if ( WriteOutputToSQLite ) {
-			CreateSQLiteReportVariableDataRecord( reportID, timeIndex, repValue );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
 		}
 
 		gio::write( OutputFileStandard, fmtA ) << reportIDString + ',' + NumberOut;
@@ -5309,7 +5276,6 @@ SetupOutputVariable(
 	using InputProcessor::MakeUPPERCase;
 	using InputProcessor::SameString;
 	using General::TrimSigDigits;
-	using namespace SQLiteProcedures;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5579,7 +5545,6 @@ SetupOutputVariable(
 	using InputProcessor::SameString;
 	using General::TrimSigDigits;
 	using DataOutputs::FindItemInVariableList;
-	using namespace SQLiteProcedures;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5838,7 +5803,6 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	using DataGlobals::EndEnvrnFlag;
 	using DataEnvironment::EndMonthFlag;
 	using General::EncodeMonDayHrMin;
-	using namespace SQLiteProcedures;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5947,7 +5911,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
 						}
-						SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+						WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 						LHourP = HourOfDay;
 						LStartMin = StartMinute;
 						LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5955,7 +5919,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 
-				WriteRealData( rVar.ReportID, rVar.ReportIDChr, SQLdbTimeIndex, rVar.Which );
+				WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.Which );
 
 				++StdOutputRecordCount;
 			}
@@ -6011,7 +5975,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
 						}
-						SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+						WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 						LHourP = HourOfDay;
 						LStartMin = StartMinute;
 						LEndMin = TimeValue( IndexType ).CurMinute;
@@ -6019,7 +5983,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 					TimePrint = false;
 				}
 				// only time integer vars actual report as integer only is "detailed"
-				WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, SQLdbTimeIndex, iVar.Which );
+				WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, iVar.Which );
 				++StdOutputRecordCount;
 			}
 		}
@@ -6067,7 +6031,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
 							}
-							SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+							WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 							LHourP = HourOfDay;
 							LStartMin = StartMinute;
 							LEndMin = TimeValue( IndexType ).CurMinute;
@@ -6075,7 +6039,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteRealData( rVar.ReportID, rVar.ReportIDChr, SQLdbTimeIndex, rVar.TSValue );
+					WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.TSValue );
 					++StdOutputRecordCount;
 				}
 				rVar.TSValue = 0.0;
@@ -6106,7 +6070,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
 							}
-							SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+							WriteTimeStampFormatData( OutputFileStandard, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 							LHourP = HourOfDay;
 							LStartMin = StartMinute;
 							LEndMin = TimeValue( IndexType ).CurMinute;
@@ -6114,7 +6078,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						TimePrint = false;
 					}
 
-					WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, SQLdbTimeIndex, _, iVar.TSValue );
+					WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.TSValue );
 					++StdOutputRecordCount;
 				}
 				iVar.TSValue = 0.0;
@@ -6135,7 +6099,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			if ( HolidayIndex > 0 ) {
 				CurDayType = 7 + HolidayIndex;
 			}
-			SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			WriteTimeStampFormatData( OutputFileStandard, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 		}
 
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
@@ -6154,7 +6118,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						rVar.Value /= double( rVar.thisTSCount );
 					}
 					if ( rVar.Report && rVar.ReportFreq == ReportHourly && rVar.Stored ) {
-						WriteRealData( rVar.ReportID, rVar.ReportIDChr, SQLdbTimeIndex, rVar.Value );
+						WriteRealData( rVar.ReportID, rVar.ReportIDChr, rVar.Value );
 						++StdOutputRecordCount;
 						rVar.Stored = false;
 					}
@@ -6180,7 +6144,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						iVar.Value /= double( iVar.thisTSCount );
 					}
 					if ( iVar.Report && iVar.ReportFreq == ReportHourly && iVar.Stored ) {
-						WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, SQLdbTimeIndex, _, iVar.Value );
+						WriteIntegerData( iVar.ReportID, iVar.ReportIDChr, _, iVar.Value );
 						++StdOutputRecordCount;
 						iVar.Stored = false;
 					}
@@ -6207,21 +6171,21 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			if ( HolidayIndex > 0 ) {
 				CurDayType = 7 + HolidayIndex;
 			}
-			SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			WriteTimeStampFormatData( OutputFileStandard, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 		}
 		NumHoursInMonth += 24;
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) {
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
 					RVar >>= RVariableTypes( Loop ).VarPtr;
-					WriteRealVariableOutput( ReportDaily, SQLdbTimeIndex );
+					WriteRealVariableOutput( ReportDaily );
 				}
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
 					IVar >>= IVariableTypes( Loop ).VarPtr;
-					WriteIntegerVariableOutput( ReportDaily, SQLdbTimeIndex );
+					WriteIntegerVariableOutput( ReportDaily );
 				}
 			} // Number of I Variables
 		} // Index type (Zone or HVAC)
@@ -6236,7 +6200,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Month Block
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
-			SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
+			WriteTimeStampFormatData( OutputFileStandard, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
 		}
 		NumHoursInSim += NumHoursInMonth;
 		EndMonthFlag = false;
@@ -6244,14 +6208,14 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
 					RVar >>= RVariableTypes( Loop ).VarPtr;
-					WriteRealVariableOutput( ReportMonthly, SQLdbTimeIndex );
+					WriteRealVariableOutput( ReportMonthly );
 				}
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
 					IVar >>= IVariableTypes( Loop ).VarPtr;
-					WriteIntegerVariableOutput( ReportMonthly, SQLdbTimeIndex );
+					WriteIntegerVariableOutput( ReportMonthly );
 				}
 			} // Number of I Variables
 		} // IndexType (Zone, HVAC)
@@ -6264,20 +6228,20 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
-			SQLdbTimeIndex = WriteTimeStampFormatData( OutputFileStandard, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
+			WriteTimeStampFormatData( OutputFileStandard, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
 		}
 		for ( IndexType = 1; IndexType <= 2; ++IndexType ) { // Zone, HVAC
 			for ( Loop = 1; Loop <= NumOfRVariable; ++Loop ) {
 				if ( RVariableTypes( Loop ).IndexType == IndexType ) {
 					RVar >>= RVariableTypes( Loop ).VarPtr;
-					WriteRealVariableOutput( ReportSim, SQLdbTimeIndex );
+					WriteRealVariableOutput( ReportSim );
 				}
 			} // Number of R Variables
 
 			for ( Loop = 1; Loop <= NumOfIVariable; ++Loop ) {
 				if ( IVariableTypes( Loop ).IndexType == IndexType ) {
 					IVar >>= IVariableTypes( Loop ).VarPtr;
-					WriteIntegerVariableOutput( ReportSim, SQLdbTimeIndex );
+					WriteIntegerVariableOutput( ReportSim );
 				}
 			} // Number of I Variables
 		} // Index Type (Zone, HVAC)

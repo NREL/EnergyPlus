@@ -9262,9 +9262,6 @@ namespace DaylightingManager {
 		using DataStringGlobals::CharTab;
 		using DataStringGlobals::CharComma;
 		using DataStringGlobals::CharSpace;
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9407,7 +9404,7 @@ namespace DaylightingManager {
 					RefPt += IllumMap( MapNum ).Xnum;
 				} // X
 
-				if ( WriteOutputToSQLite ) {
+				if ( sqlite->writeOutputToSQLite() ) {
 					if ( SQFirstTime ) {
 						XValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Xnum() ) );
 						YValue.allocate( maxval( IllumMap( {1,TotIllumMaps} ).Ynum() ) );
@@ -9430,7 +9427,7 @@ namespace DaylightingManager {
 						} // X Loop
 					} // Y Loop
 
-					CreateSQLiteDaylightMap( MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap( MapNum ).Xnum, XValue, IllumMap( MapNum ).Ynum, YValue, IllumValue );
+					sqlite->createSQLiteDaylightMap( MapNum, SQMonth, SQDayOfMonth, HourOfDay, IllumMap( MapNum ).Xnum, XValue, IllumMap( MapNum ).Ynum, YValue, IllumValue );
 
 				} // WriteOutputToSQLite
 			} // end time step
@@ -10273,7 +10270,6 @@ Label903: ;
 		// na
 
 		// Using/Aliasing
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10294,8 +10290,8 @@ Label903: ;
 		fullmapName = Zone( ZoneNum ).Name + ':' + environmentName + ':' + mapName + " Illuminance [lux] (Hourly)";
 		gio::write( unitNo, FmtA ) << "Date/Time," + fullmapName + MapColSep + refPt1 + MapColSep + refPt2 + MapColSep + MapColSep;
 
-		if ( WriteOutputToSQLite ) {
-			CreateSQLiteDaylightMapTitle( mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->createSQLiteDaylightMapTitle( mapNum, fullmapName, environmentName, ZoneNum, refPt1, refPt2, zcoord );
 		}
 
 	}

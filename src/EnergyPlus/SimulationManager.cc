@@ -215,13 +215,6 @@ namespace SimulationManager {
 		using EMSManager::ManageEMS;
 		using EconomicLifeCycleCost::GetInputForLifeCycleCost;
 		using EconomicLifeCycleCost::ComputeLifeCycleCostAndReport;
-		using SQLiteProcedures::WriteOutputToSQLite;
-		using SQLiteProcedures::CreateSQLiteSimulationsRecord;
-		using SQLiteProcedures::InitializeIndexes;
-		using SQLiteProcedures::CreateSQLiteEnvironmentPeriodRecord;
-		using SQLiteProcedures::CreateZoneExtendedOutput;
-		using SQLiteProcedures::SQLiteBegin;
-		using SQLiteProcedures::SQLiteCommit;
 		using DemandManager::InitDemandManagers;
 		using PlantManager::CheckIfAnyPlant;
 		using CurveManager::InitCurveReporting;
@@ -371,10 +364,10 @@ namespace SimulationManager {
 			}
 		}
 
-		if ( WriteOutputToSQLite ) {
-			SQLiteBegin();
-			CreateSQLiteSimulationsRecord( 1 );
-			SQLiteCommit();
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->sqliteBegin();
+			sqlite->createSQLiteSimulationsRecord( 1 );
+			sqlite->sqliteCommit();
 		}
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
@@ -396,10 +389,10 @@ namespace SimulationManager {
 
 			++EnvCount;
 
-			if ( WriteOutputToSQLite ) {
-				SQLiteBegin();
-				CreateSQLiteEnvironmentPeriodRecord();
-				SQLiteCommit();
+			if ( sqlite->writeOutputToSQLite() ) {
+				sqlite->sqliteBegin();
+				sqlite->createSQLiteEnvironmentPeriodRecord();
+				sqlite->sqliteCommit();
 			}
 
 			ExitDuringSimulations = true;
@@ -418,7 +411,7 @@ namespace SimulationManager {
 
 			while ( ( DayOfSim < NumOfDayInEnvrn ) || ( WarmupFlag ) ) { // Begin day loop ...
 
-				if ( WriteOutputToSQLite ) SQLiteBegin(); // setup for one transaction per day
+				if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteBegin(); // setup for one transaction per day
 
 				++DayOfSim;
 				gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
@@ -496,7 +489,7 @@ namespace SimulationManager {
 
 				} // ... End hour loop.
 
-				if ( WriteOutputToSQLite ) SQLiteCommit(); // one transaction per day
+				if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteCommit(); // one transaction per day
 
 			} // ... End day loop.
 
@@ -518,7 +511,7 @@ namespace SimulationManager {
 			}
 		}
 
-		if ( WriteOutputToSQLite ) SQLiteBegin(); // for final data to write
+		if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteBegin(); // for final data to write
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -546,12 +539,12 @@ namespace SimulationManager {
 #endif
 		CloseOutputFiles();
 
-		CreateZoneExtendedOutput();
+		sqlite->createZoneExtendedOutput();
 
-		if ( WriteOutputToSQLite ) {
+		if ( sqlite->writeOutputToSQLite() ) {
 			DisplayString( "Writing final SQL reports" );
-			SQLiteCommit(); // final transactions
-			InitializeIndexes(); // do not create indexes (SQL) until all is done.
+			sqlite->sqliteCommit(); // final transactions
+			sqlite->initializeIndexes(); // do not create indexes (SQL) until all is done.
 		}
 
 		if ( ErrorsFound ) {
@@ -2314,7 +2307,7 @@ namespace SimulationManager {
 		// na
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteDatabase;
+		//using SQLiteProcedures::CreateSQLiteDatabase;
 		using InputProcessor::PreProcessorCheck;
 		using InputProcessor::OverallErrorFlag;
 		using InputProcessor::CompactObjectsCheck;
@@ -2347,7 +2340,13 @@ namespace SimulationManager {
 
 		DoingInputProcessing = false;
 
-		CreateSQLiteDatabase();
+		//CreateSQLiteDatabase();
+		try {
+			EnergyPlus::sqlite = std::unique_ptr<SQLite>(new SQLite());
+		} catch(const std::runtime_error& error) {
+			// Maybe this could be higher in the call stack, and then handle all runtime exceptions this way.
+			ShowFatalError(error.what());
+		}
 
 		PreProcessorCheck( PreP_Fatal ); // Check Preprocessor objects for warning, severe, etc errors.
 
@@ -2428,9 +2427,6 @@ namespace SimulationManager {
 		// na
 
 		// Using/Aliasing
-		using SQLiteProcedures::WriteOutputToSQLite;
-		using SQLiteProcedures::CreateSQLiteErrorRecord;
-		using SQLiteProcedures::UpdateSQLiteErrorRecord;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2456,16 +2452,16 @@ namespace SimulationManager {
 			if ( iostatus != 0 ) break;
 			if ( is_blank( ErrorMessage ) ) continue;
 			ShowErrorMessage( ErrorMessage );
-			if ( WriteOutputToSQLite ) {
+			if ( sqlite->writeOutputToSQLite() ) {
 				// Following code relies on specific formatting of Severes, Warnings, and continues
 				// that occur in the IP processing.  Later ones -- i.e. Fatals occur after the
 				// automatic sending of error messages to SQLite are turned on.
 				if ( ErrorMessage[ 4 ] == 'S' ) {
-					CreateSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
+					sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
 				} else if ( ErrorMessage[ 4 ] == 'W' ) {
-					CreateSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
+					sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
 				} else if ( ErrorMessage[ 6 ] == '~' ) {
-					UpdateSQLiteErrorRecord( ErrorMessage );
+					sqlite->updateSQLiteErrorRecord( ErrorMessage );
 				}
 			}
 		}

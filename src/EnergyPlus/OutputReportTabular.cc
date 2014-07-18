@@ -1406,8 +1406,6 @@ namespace OutputReportTabular {
 		using DataStringGlobals::CharComma;
 		using DataStringGlobals::CharTab;
 		using DataStringGlobals::CharSpace;
-		using SQLiteProcedures::WriteTabularDataToSQLite;
-		using SQLiteProcedures::WriteOutputToSQLite;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5885,7 +5883,6 @@ namespace OutputReportTabular {
 		//   converted prior to calling WriteTable.
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6237,7 +6234,7 @@ namespace OutputReportTabular {
 				WriteReportHeaders( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, isAverage );
 				WriteSubtitle( "Custom Monthly Report" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose monthly XML tables.
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
 				columnHead.deallocate();
 				columnWidth.deallocate();
 				tableBody.deallocate();
@@ -6263,7 +6260,6 @@ namespace OutputReportTabular {
 		//   routine.  All arrays are strings so numbers need to be
 		//   converted prior to calling WriteTable.
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6451,7 +6447,7 @@ namespace OutputReportTabular {
 				WriteTextLine( "" );
 				WriteSubtitle( "Time Bin Results" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose XML tables
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
 				//create statistics table
 				rowHeadStat( 1 ) = "Minimum";
 				rowHeadStat( 2 ) = "Mean minus two standard deviations";
@@ -6491,7 +6487,7 @@ namespace OutputReportTabular {
 				}
 				WriteSubtitle( "Statistics" );
 				WriteTable( tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true ); //transpose XML table
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
 			}
 			columnHead.deallocate();
 			columnWidth.deallocate();
@@ -6530,7 +6526,6 @@ namespace OutputReportTabular {
 		using DataWater::WaterStorage;
 		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
 		using ScheduleManager::GetScheduleName;
@@ -6942,7 +6937,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Site and Source Energy" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
 			}
 
 			columnHead.deallocate();
@@ -7079,7 +7074,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Site to Source Energy Conversion Factors" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
 			}
 
 			columnHead.deallocate();
@@ -7117,7 +7112,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Building Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
 			}
 
 			columnHead.deallocate();
@@ -7387,7 +7382,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "End Uses" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -7515,7 +7510,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "End Uses By Subcategory" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -7588,7 +7583,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Utility Use Per Conditioned Floor Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Conditioned Floor Area" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Conditioned Floor Area" );
 			}
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -7603,7 +7598,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Utility Use Per Total Floor Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
 			}
 
 			columnHead.deallocate();
@@ -7679,7 +7674,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Electric Loads Satisfied" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
 			}
 
 			columnHead.deallocate();
@@ -7750,7 +7745,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "On-Site Thermal Sources" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
 			}
 
 			columnHead.deallocate();
@@ -7841,7 +7836,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Water Source Summary" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
 			}
 
 			columnHead.deallocate();
@@ -7878,7 +7873,7 @@ namespace OutputReportTabular {
 				}
 
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -7911,7 +7906,7 @@ namespace OutputReportTabular {
 
 			if ( displayTabularBEPS ) {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
 			}
 
 			columnHead.deallocate();
@@ -7952,7 +7947,6 @@ namespace OutputReportTabular {
 		// Using/Aliasing
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8125,7 +8119,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Summary" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Summary" );
 
 			//---- Normalized by Conditioned Area Sub-Table
 
@@ -8165,7 +8159,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Per Conditioned Floor Area" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area" );
 
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -8181,7 +8175,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Per Total Floor Area" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8218,7 +8212,6 @@ namespace OutputReportTabular {
 		using DataWater::WaterStorage;
 		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8597,7 +8590,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "End Uses" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8719,7 +8712,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "End Uses By Subcategory" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8749,7 +8742,6 @@ namespace OutputReportTabular {
 
 		// Using/Aliasing
 		using namespace DataCostEstimate;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8904,7 +8896,7 @@ namespace OutputReportTabular {
 
 		WriteSubtitle( "Construction Cost Estimate Summary" );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
+		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
 
 		columnHead.deallocate();
 		rowHead.deallocate();
@@ -8960,7 +8952,7 @@ namespace OutputReportTabular {
 		tableBody( NumRows, 6 ) = RealToStr( CurntBldg.LineItemTot, 2 );
 		WriteSubtitle( "Cost Line Item Details" ); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
+		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();
@@ -9036,7 +9028,6 @@ namespace OutputReportTabular {
 		using ExteriorEnergyUse::AstroClockOverride;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9217,7 +9208,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "General" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9423,7 +9414,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9489,7 +9480,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Conditioned Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9521,7 +9512,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Skylight-Roof Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9711,7 +9702,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Zone Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9742,7 +9733,6 @@ namespace OutputReportTabular {
 		// Using/Aliasing
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9808,7 +9798,7 @@ namespace OutputReportTabular {
 			}
 
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary" );
 		}
 
 	}
@@ -9839,7 +9829,6 @@ namespace OutputReportTabular {
 		// na
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10036,7 +10025,7 @@ namespace OutputReportTabular {
 						//create the actual output table
 						WriteSubtitle( subTable( jSubTable ).name );
 						WriteTable( tableBody, rowHead, columnHead, columnWidth, false, subTable( jSubTable ).footnote );
-						CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
 						//clean up the temporary arrays used
 						columnHead.deallocate();
 						rowHead.deallocate();
@@ -10080,7 +10069,6 @@ namespace OutputReportTabular {
 		// na
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10266,7 +10254,7 @@ namespace OutputReportTabular {
 				//write the table
 				WriteSubtitle( CompSizeTableEntry( foundEntry ).typeField );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, "User-Specified values were used. " "Design Size values were used if no User-Specified values were provided." );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
 				//deallocate these arrays since they are used to create the next
 				//table
 				rowHead.deallocate();
@@ -10305,7 +10293,6 @@ namespace OutputReportTabular {
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using namespace DataShadowingCombinations;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10409,10 +10396,10 @@ namespace OutputReportTabular {
 				// write the table
 				if ( iKindRec == recKindSurface ) {
 					WriteSubtitle( "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
 				} else if ( iKindRec == recKindSubsurface ) {
 					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
 				}
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
 			}
@@ -11127,7 +11114,6 @@ namespace OutputReportTabular {
 
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
@@ -11591,7 +11577,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Estimated Cooling Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -11673,7 +11659,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Cooling Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -12070,7 +12056,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Estimated Heating Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -12151,7 +12137,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Heating Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();

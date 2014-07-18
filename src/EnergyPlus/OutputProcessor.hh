@@ -1116,7 +1116,7 @@ namespace OutputProcessor {
 		std::string const & EndUseSubName
 	);
 
-	int
+	void
 	WriteTimeStampFormatData(
 		int const unitNumber, // the Fortran output unit number
 		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
@@ -1164,15 +1164,13 @@ namespace OutputProcessor {
 
 	void
 	WriteRealVariableOutput(
-		int const reportType, // The report type or interval (e.g., hourly)
-		int const timeIndex // An index that points to the timestamp
+		int const reportType // The report type or interval (e.g., hourly)
 	);
 
 	void
 	WriteReportRealData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const storeType, // Averaged or Sum
 		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
@@ -1187,7 +1185,6 @@ namespace OutputProcessor {
 	WriteCumulativeReportMeterData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		bool const meterOnlyFlag // A flag that indicates if the data should be written to standard output
 	);
@@ -1196,7 +1193,6 @@ namespace OutputProcessor {
 	WriteReportMeterData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const reportingInterval, // The variable's reporting interval (e.g., hourly)
 		Real64 const minValue, // The variable's minimum value during the reporting interval
@@ -1210,21 +1206,18 @@ namespace OutputProcessor {
 	WriteRealData(
 		int const reportID, // The variable's reporting ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp for the variable
 		Real64 const repValue // The variable's value
 	);
 
 	void
 	WriteIntegerVariableOutput(
-		int const reportType, // The report type (i.e., the reporting interval)
-		int const timeIndex // An index that points to the timestamp for this data
+		int const reportType // The report type (i.e., the reporting interval)
 	);
 
 	void
 	WriteReportIntegerData(
 		int const reportID, // The variable's reporting ID
 		std::string const & reportIDString, // The variable's reporting ID (character)
-		int const timeIndex, // An index that points to this timestamp for this data
 		Real64 const repValue, // The variable's value
 		int const storeType, // Type of item (averaged or summed)
 		Optional< Real64 const > numOfItemsStored = _, // The number of items (hours or timesteps) of data stored //Autodesk:OPTIONAL Used without PRESENT check
@@ -1239,7 +1232,6 @@ namespace OutputProcessor {
 	WriteIntegerData(
 		int const reportID, // the reporting ID of the data
 		std::string const & reportIDString, // the reporting ID of the data (character)
-		int const timeIndex, // an index that points to the data's timestamp
 		Optional_int_const IntegerValue = _, // the value of the data
 		Optional< Real64 const > RealValue = _ // the value of the data
 	);

@@ -28,6 +28,7 @@ include(cmake/CompilerFlags.cmake)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
@@ -37,6 +38,7 @@ if( BUILD_TESTING )
   ADD_SUBDIRECTORY(testfiles)
 endif()
 
+ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
