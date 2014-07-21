@@ -178,7 +178,7 @@ namespace PlantManager {
 				LoopSide = PlantCallingOrderInfo( HalfLoopNum ).LoopSide;
 				OtherSide = 3 - LoopSide; //will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
 
-				auto & this_loop( PlantLoop( LoopNum) );
+				auto & this_loop( PlantLoop( LoopNum ) );
 				auto & this_loop_side( this_loop.LoopSide( LoopSide ) );
 				auto & other_loop_side( this_loop.LoopSide( OtherSide ) );
 

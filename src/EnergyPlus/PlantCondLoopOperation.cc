@@ -2284,7 +2284,13 @@ namespace PlantCondLoopOperation {
 
 					PlantCapacity += this_component.MaxLoad;
 
-					MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+					if ( this_component.MaxLoad < SmallLoad ){
+						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
+						MinCompPLR = 0.0;
+					} else {
+						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+					}
+						
 
 					//Set LargestMinCompPLR to largest MinCompPLR
 					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
@@ -2339,7 +2345,12 @@ namespace PlantCondLoopOperation {
 
 						PlantCapacity += this_component.MaxLoad;
 
-						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+						if ( this_component.MaxLoad < SmallLoad ){
+							ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
+							MinCompPLR = 0.0;
+						} else {
+							MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+						}
 
 						//Set LargestMinCompPLR to largest MinCompPLR
 						if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
@@ -2415,7 +2426,12 @@ namespace PlantCondLoopOperation {
 
 					PlantCapacity += this_component.MaxLoad;
 
-					MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+					if ( this_component.MaxLoad < SmallLoad ){
+						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
+						MinCompPLR = 0.0;
+					} else {
+						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+					}
 
 					//Set LargestMinCompPLR to largest MinCompPLR
 					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
