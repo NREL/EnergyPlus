@@ -160,6 +160,13 @@ TEST( GioTest, InquireByName )
 	std::remove( name1.c_str() );
 }
 
+TEST( GioTest, InquireByNameNotExist )
+{
+	IOFlags flags;
+	inquire( "GioTestInquireByNameNotExist.txt", flags );
+	EXPECT_FALSE( flags.exists() );
+}
+
 TEST( GioTest, AsIsOn )
 {
 	IOFlags flags;

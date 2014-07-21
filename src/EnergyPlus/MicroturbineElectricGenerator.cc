@@ -407,7 +407,7 @@ namespace MicroturbineElectricGenerator {
 				ErrorsFound = true;
 			} else {
 				//      Barometric pressure adjusted for elevation
-				RefBaroPressure = 101325.0 * std::pow( ( 1.0 - 2.25577e-05 * MTGenerator( GeneratorNum ).RefElevation ), 5.2559 );
+				RefBaroPressure = 101325.0 * std::pow( 1.0 - 2.25577e-05 * MTGenerator( GeneratorNum ).RefElevation, 5.2559 );
 				MTGenerator( GeneratorNum ).RefCombustAirInletDensity = PsyRhoAirFnPbTdbW( RefBaroPressure, MTGenerator( GeneratorNum ).RefCombustAirInletTemp, MTGenerator( GeneratorNum ).RefCombustAirInletHumRat );
 			}
 

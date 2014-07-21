@@ -145,8 +145,8 @@ namespace DataPlant {
 	int const None( 3 );
 
 	// Parameters for tolerance
-	Real64 const LoopDemandTol( .1 ); // minimum significant loop cooling or heating demand
-	Real64 const DeltaTempTol( .0001 ); // minimum significant loop temperature difference
+	Real64 const LoopDemandTol( 0.1 ); // minimum significant loop cooling or heating demand
+	Real64 const DeltaTempTol( 0.0001 ); // minimum significant loop temperature difference
 
 	// Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
 	int const LoopType_NoLoop( 0 );
@@ -326,6 +326,9 @@ namespace DataPlant {
 
 	int const NumConvergenceHistoryTerms( 5 );
 	FArray1D< Real64 > const ConvergenceHistoryARR( NumConvergenceHistoryTerms, { 0.0, -1.0, -2.0, -3.0, -4.0 } );
+	Real64 const sum_ConvergenceHistoryARR( sum( ConvergenceHistoryARR ) );
+	Real64 const square_sum_ConvergenceHistoryARR( pow_2( sum_ConvergenceHistoryARR ) );
+	Real64 const sum_square_ConvergenceHistoryARR( sum( pow( ConvergenceHistoryARR, 2 ) ) );
 
 	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.f90.  A common definition would be nicer.
 

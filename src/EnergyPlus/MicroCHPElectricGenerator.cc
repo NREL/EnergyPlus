@@ -608,11 +608,11 @@ namespace MicroCHPElectricGenerator {
 				} else if ( PlantLoop( MicroCHP( GeneratorNum ).CWLoopNum ).PlantSizNum > 0 ) {
 					MicroCHP( GeneratorNum ).PlantMassFlowRateMax = PlantSizData( MicroCHP( GeneratorNum ).CWLoopNum ).DesVolFlowRate * rho;
 				} else {
-					MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.;
+					MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.0;
 				}
 
 			} else if ( MicroCHP( GeneratorNum ).CWLoopSideNum == DemandSide ) {
-				MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.; // would like to use plant loop max but not ready yet
+				MicroCHP( GeneratorNum ).PlantMassFlowRateMax = 2.0; // would like to use plant loop max but not ready yet
 			}
 
 			RegisterPlantCompDesignFlow( MicroCHP( GeneratorNum ).PlantInletNodeID, MicroCHP( GeneratorNum ).PlantMassFlowRateMax / rho );
@@ -631,8 +631,8 @@ namespace MicroCHPElectricGenerator {
 
 		if ( BeginEnvrnFlag && MyEnvrnFlag( GeneratorNum ) ) {
 			//reset to starting condition for different environment runperiods, design days
-			MicroCHP( GeneratorNum ).A42Model.TengLast = 20.;
-			MicroCHP( GeneratorNum ).A42Model.TempCWOutLast = 20.;
+			MicroCHP( GeneratorNum ).A42Model.TengLast = 20.0;
+			MicroCHP( GeneratorNum ).A42Model.TempCWOutLast = 20.0;
 			MicroCHP( GeneratorNum ).A42Model.TimeElapsed = 0.0;
 			MicroCHP( GeneratorNum ).A42Model.OpMode = 0;
 			MicroCHP( GeneratorNum ).A42Model.OffModeTime = 0.0;
@@ -647,9 +647,9 @@ namespace MicroCHPElectricGenerator {
 			MicroCHP( GeneratorNum ).A42Model.Qgenss = 0.0;
 			MicroCHP( GeneratorNum ).A42Model.NdotFuel = 0.0;
 			MicroCHP( GeneratorNum ).A42Model.MdotFuel = 0.0;
-			MicroCHP( GeneratorNum ).A42Model.Teng = 20.;
-			MicroCHP( GeneratorNum ).A42Model.TcwIn = 20.;
-			MicroCHP( GeneratorNum ).A42Model.TcwOut = 20.;
+			MicroCHP( GeneratorNum ).A42Model.Teng = 20.0;
+			MicroCHP( GeneratorNum ).A42Model.TcwIn = 20.0;
+			MicroCHP( GeneratorNum ).A42Model.TcwOut = 20.0;
 			MicroCHP( GeneratorNum ).A42Model.MdotAir = 0.0;
 			MicroCHP( GeneratorNum ).A42Model.QdotSkin = 0.0;
 			MicroCHP( GeneratorNum ).A42Model.QdotConvZone = 0.0;

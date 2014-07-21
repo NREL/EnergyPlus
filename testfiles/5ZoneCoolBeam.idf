@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2583,7 +2583,7 @@
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.65,                    !- Fan Efficiency
+    0.65,                    !- Fan Total Efficiency
     2000.0,                  !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

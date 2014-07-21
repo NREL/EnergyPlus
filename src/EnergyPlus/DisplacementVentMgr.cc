@@ -561,7 +561,8 @@ namespace DisplacementVentMgr {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const OneThird( ( 1.0 / 3.0 ) );
+		static Real64 const OneThird( 1.0 / 3.0 );
+		static Real64 const MinFlow_pow_fac( std::pow( 1.0 / 24.55 * 1.0, 1.0 / 0.6 ) );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -766,10 +767,11 @@ namespace DisplacementVentMgr {
 			// The system will mix
 			HeightFrac = 0.0;
 		} else {
-			HeightFrac = min( 24.55 * std::pow( ( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, ( 1.0 / 3.0 ) ) ) ), 0.6 ) / CeilingHeight, 1.0 );
+			Real64 const plume_fac( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) );
+			HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / plume_fac, 0.6 ) / CeilingHeight, 1.0 );
 			for ( Ctd = 1; Ctd <= 4; ++Ctd ) {
 				HcUCSDDV( ZoneNum, HeightFrac );
-				HeightFrac = min( 24.55 * std::pow( ( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, ( 1.0 / 3.0 ) ) ) ), 0.6 ) / CeilingHeight, 1.0 );
+				//HeightFrac = min( 24.55 * std::pow( MCp_Total * 0.000833 / ( NumberOfPlumes * std::pow( PowerPerPlume, OneThird ) ), 0.6 ) / CeilingHeight, 1.0 ); //Tuned This does not vary in loop
 				//EPTeam-replaces above (cause diffs)      HeightFrac = MIN(24.55d0*(MCp_Total*0.000833d0/(NumberOfPlumes*PowerPerPlume**(1.0d0/3.d0)))**0.6 / CeilingHeight , 1.0d0)
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
 				AIRRATFloor( ZoneNum ) = Zone( ZoneNum ).Volume * min( HeightTransition( ZoneNum ), HeightFloorSubzoneTop ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATFloor( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATFloor( ZoneNum ) ) / ( TimeStepSys * SecInHour );
@@ -807,7 +809,7 @@ namespace DisplacementVentMgr {
 				}
 
 				AirCap = AIRRATFloor( ZoneNum );
-				TempHistTerm = AirCap * ( 3.0 * ZTM1Floor( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2Floor( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3Floor( ZoneNum ) );
+				TempHistTerm = AirCap * ( 3.0 * ZTM1Floor( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2Floor( ZoneNum ) + OneThird * ZTM3Floor( ZoneNum ) );
 				TempDepCoef = HA_FLOOR + MCp_Total;
 				TempIndCoef = HAT_FLOOR + MCpT_Total + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
@@ -817,13 +819,13 @@ namespace DisplacementVentMgr {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTFloor( ZoneNum ) = Zone1Floor( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTFloor( ZoneNum ) = ( Zone1Floor( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTFloor( ZoneNum ) = ( Zone1Floor( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTFloor( ZoneNum ) = ( AirCap * Zone1Floor( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
 				}}
 				AirCap = AIRRATOC( ZoneNum );
-				TempHistTerm = AirCap * ( 3.0 * ZTM1OC( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2OC( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3OC( ZoneNum ) );
+				TempHistTerm = AirCap * ( 3.0 * ZTM1OC( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2OC( ZoneNum ) + OneThird * ZTM3OC( ZoneNum ) );
 				TempDepCoef = HA_OC + MCp_Total;
 				TempIndCoef = ConvGainsOccupiedSubzone * GainsFrac + HAT_OC + ZTFloor( ZoneNum ) * MCp_Total;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
@@ -836,14 +838,14 @@ namespace DisplacementVentMgr {
 						if ( AirCap == 0.0 ) {
 							ZTOC( ZoneNum ) = TempIndCoef / TempDepCoef;
 						} else {
-							ZTOC( ZoneNum ) = ( Zone1OC( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+							ZTOC( ZoneNum ) = ( Zone1OC( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 						}
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTOC( ZoneNum ) = ( AirCap * Zone1OC( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
 				}}
 				AirCap = AIRRATMX( ZoneNum );
-				TempHistTerm = AirCap * ( 3.0 * ZTM1MX( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2MX( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3MX( ZoneNum ) );
+				TempHistTerm = AirCap * ( 3.0 * ZTM1MX( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2MX( ZoneNum ) + OneThird * ZTM3MX( ZoneNum ) );
 				TempDepCoef = HA_MX + MCp_Total;
 				TempIndCoef = ConvGainsOccupiedSubzone * ( 1.0 - GainsFrac ) + ConvGainsMixedSubzone + HAT_MX + ZTOC( ZoneNum ) * MCp_Total;
 				{ auto const SELECT_CASE_var( ZoneAirSolutionAlgo );
@@ -856,7 +858,7 @@ namespace DisplacementVentMgr {
 						if ( AirCap == 0.0 ) {
 							ZTMX( ZoneNum ) = TempIndCoef / TempDepCoef;
 						} else {
-							ZTMX( ZoneNum ) = ( Zone1MX( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+							ZTMX( ZoneNum ) = ( Zone1MX( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 						}
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
@@ -865,7 +867,7 @@ namespace DisplacementVentMgr {
 			}
 
 			// MinFlow for interface layer at z = 1.0
-			MinFlow = std::pow( ( 1.0 / 24.55 * 1.0 ), ( 1.0 / 0.6 ) ) * NumberOfPlumes * std::pow( PowerPerPlume, ( 1.0 / 3.0 ) );
+			MinFlow = MinFlow_pow_fac * plume_fac;
 			//EPTeam above replaces (cause diffs?)   MinFlow = (1.0d0/24.55d0*1.0d0)**(1.0d0/0.6d0)*NumberOfPlumes*PowerPerPlume**(1.0/3.0)
 			if ( MinFlow != 0.0 ) {
 				FracMinFlow( ZoneNum ) = MCp_Total * 0.000833 / MinFlow;
@@ -883,7 +885,7 @@ namespace DisplacementVentMgr {
 			MaxTempGrad( ZoneNum ) = 0.0;
 			AirModel( ZoneNum ).SimAirModel = false;
 			AirCap = AIRRAT( ZoneNum );
-			TempHistTerm = AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + ( 1.0 / 3.0 ) * ZTM3( ZoneNum ) );
+			TempHistTerm = AirCap * ( 3.0 * ZTM1( ZoneNum ) - ( 3.0 / 2.0 ) * ZTM2( ZoneNum ) + OneThird * ZTM3( ZoneNum ) );
 
 			for ( Ctd = 1; Ctd <= 3; ++Ctd ) {
 				TempDepCoef = HA_MX + HA_OC + HA_FLOOR + MCp_Total;
@@ -895,7 +897,7 @@ namespace DisplacementVentMgr {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTAveraged = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTAveraged = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -913,7 +915,7 @@ namespace DisplacementVentMgr {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTAveraged = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, -TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTAveraged = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -929,9 +931,9 @@ namespace DisplacementVentMgr {
 		// Comfort temperature and temperature at the thermostat/temperature control sensor
 
 		HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-		HeightMixedSubzoneAve = ( CeilingHeight + HeightTransition( ZoneNum ) ) / 2.;
-		HeightOccupiedSubzoneAve = ( HeightFloorSubzoneTop + HeightTransition( ZoneNum ) ) / 2.;
-		HeightFloorSubzoneAve = HeightFloorSubzoneTop / 2.;
+		HeightMixedSubzoneAve = ( CeilingHeight + HeightTransition( ZoneNum ) ) / 2.0;
+		HeightOccupiedSubzoneAve = ( HeightFloorSubzoneTop + HeightTransition( ZoneNum ) ) / 2.0;
+		HeightFloorSubzoneAve = HeightFloorSubzoneTop / 2.0;
 
 		// Comfort temperature
 

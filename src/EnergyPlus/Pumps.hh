@@ -185,6 +185,7 @@ namespace Pumps {
 		bool HeatLossesToZone; // if true then pump losses added to surrounding zone
 		int ZoneNum; // index for zone surrounding pump
 		Real64 SkinLossRadFraction; // radiative split for skin losses to zone
+		bool LoopSolverOverwriteFlag; // loop solver overwrite for determining pump minimum flow rate
 
 		// Default Constructor
 		PumpSpecs() :
@@ -236,7 +237,8 @@ namespace Pumps {
 			OneTimePressureWarning( true ),
 			HeatLossesToZone( false ),
 			ZoneNum( 0 ),
-			SkinLossRadFraction( 0.0 )
+			SkinLossRadFraction( 0.0 ),
+			LoopSolverOverwriteFlag( false )
 		{}
 
 		// Member Constructor
@@ -293,7 +295,8 @@ namespace Pumps {
 			bool const OneTimePressureWarning,
 			bool const HeatLossesToZone, // if true then pump losses added to surrounding zone
 			int const ZoneNum, // index for zone surrounding pump
-			Real64 const SkinLossRadFraction // radiative split for skin losses to zone
+			Real64 const SkinLossRadFraction, // radiative split for skin losses to zone
+			bool const LoopSolverOverwriteFlag
 		) :
 			Name( Name ),
 			PumpSchedule( PumpSchedule ),
@@ -347,7 +350,8 @@ namespace Pumps {
 			OneTimePressureWarning( OneTimePressureWarning ),
 			HeatLossesToZone( HeatLossesToZone ),
 			ZoneNum( ZoneNum ),
-			SkinLossRadFraction( SkinLossRadFraction )
+			SkinLossRadFraction( SkinLossRadFraction ),
+			LoopSolverOverwriteFlag( LoopSolverOverwriteFlag )
 		{}
 
 	};

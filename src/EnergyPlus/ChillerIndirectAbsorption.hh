@@ -131,7 +131,7 @@ namespace ChillerIndirectAbsorption {
 			GeneratorVolFlowRate( 0.0 ),
 			GeneratorSubcool( 0.0 ),
 			LoopSubcool( 0.0 ),
-			GeneratorDeltaTemp( -99999. ),
+			GeneratorDeltaTemp( -99999.0 ),
 			SizFac( 0.0 ),
 			EvapInletNodeNum( 0 ),
 			EvapOutletNodeNum( 0 ),

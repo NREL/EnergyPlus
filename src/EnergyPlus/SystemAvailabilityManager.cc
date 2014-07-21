@@ -2327,7 +2327,7 @@ namespace SystemAvailabilityManager {
 						DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 					}
 					PreStartTime = FanStartTime - DeltaTime;
-					if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+					if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 					PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 					if ( PreStartTimeTmr < 0.0 ) {
 						PreStartTimeTmr += 24.0;
@@ -2402,7 +2402,7 @@ namespace SystemAvailabilityManager {
 								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
-							if ( PreStartTime < 0 ) PreStartTime = -.1;
+							if ( PreStartTime < 0 ) PreStartTime = -0.1;
 							PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 							if ( PreStartTimeTmr < 0 ) {
 								PreStartTimeTmr += 24.0;
@@ -2481,7 +2481,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;
@@ -2581,7 +2581,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;
@@ -2662,7 +2662,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;
@@ -2794,7 +2794,7 @@ namespace SystemAvailabilityManager {
 								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
-							if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+							if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 							PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 							if ( PreStartTimeTmr < 0.0 ) {
 								PreStartTimeTmr += 24.0;
@@ -2916,7 +2916,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0.0 ) {
 							PreStartTimeTmr += 24.0;
@@ -3098,7 +3098,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0.0 ) {
 							PreStartTimeTmr += 24.0;
@@ -3221,7 +3221,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;

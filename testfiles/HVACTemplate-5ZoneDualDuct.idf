@@ -78,8 +78,8 @@
 ! Compact Schedules:              Yes
 !
 ! HVAC:                           Dual-duct constant volume system with outside air, hot water heating coil,
-!                                 and chilled water cooling coil. 
-!                                 Central Plant is single hot water boiler, electric compression 
+!                                 and chilled water cooling coil.
+!                                 Central Plant is single hot water boiler, electric compression
 !                                 chiller with water cooled condenser. All equipment is autosized.
 !
 ! Zonal Equipment:                No
@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -1907,7 +1907,7 @@
     BlowThrough,             !- Hot Duct Supply Fan Placement
     ChilledWater,            !- Cooling Coil Type
     ,                        !- Cooling Coil Availability Schedule Name
-    OutdoorAirTemperatureReset,                 !- Cooling Coil Setpoint Control Type
+    OutdoorAirTemperatureReset,  !- Cooling Coil Setpoint Control Type
     12.8,                    !- Cooling Coil Design Setpoint Temperature {C}
     ,                        !- Cooling Coil Setpoint Schedule Name
     15.6,                    !- Cooling Coil Setpoint at Outdoor Dry-Bulb Low {C}
@@ -1916,7 +1916,7 @@
     23.3,                    !- Cooling Coil Reset Outdoor Dry-Bulb High {C}
     HotWater,                !- Heating Coil Type
     ,                        !- Heating Coil Availability Schedule Name
-    OutdoorAirTemperatureReset, !- Heating Coil Setpoint Control Type
+    OutdoorAirTemperatureReset,  !- Heating Coil Setpoint Control Type
     50,                      !- Heating Coil Design Setpoint {C}
     ,                        !- Heating Coil Setpoint Schedule Name
     50,                      !- Heating Coil Setpoint at Outdoor Dry-Bulb Low {C}
@@ -2098,23 +2098,23 @@
   Output:Variable,*,Fan Electric Power,hourly;
 
   Output:Variable,SYS 1 Mixed Air Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,SYS 1 Mixed Air Outlet,System Node Standard Density Volume Flow Rate,hourly;
 
   Output:Variable,SYS 1 Hot Supply Path Inlet,System Node Temperature,hourly;
-  
+
   Output:Variable,SYS 1 Hot Supply Path Inlet,System Node Standard Density Volume Flow Rate,hourly;
 
   Output:Variable,SYS 1 Cold Supply Path Inlet,System Node Temperature,hourly;
-  
+
   Output:Variable,SYS 1 Cold Supply Path Inlet,System Node Standard Density Volume Flow Rate,hourly;
 
   Output:Variable,SYS 1 Cooling Coil Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,SYS 1 Cooling Coil Outlet,System Node Setpoint Temperature,hourly;
 
   Output:Variable,SYS 1 Heating Coil Outlet,System Node Temperature,hourly;
-  
+
   Output:Variable,SYS 1 Heating Coil Outlet,System Node Setpoint Temperature,hourly;
 
   Output:Variable,*,Zone Air Terminal Cold Supply Duct Damper Position,hourly;

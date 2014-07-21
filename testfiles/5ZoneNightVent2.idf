@@ -108,7 +108,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -3864,7 +3864,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -3895,7 +3895,7 @@
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
 
   Output:Variable,*,Zone Air Terminal VAV Damper Position,hourly;
-  
+
   Output:Variable,*,Zone Zone Mixing Mass Flow Rate,hourly;
   
   Output:Variable,*,Zone Zone Mixing Current Density Air Volume Flow Rate,hourly;

@@ -26,7 +26,7 @@
 !           Overhang depth also design parameter (for West and East window separately)
 !           Solar, visible, and thermal transmittance of shading device also design parameter
 
-  Version,8.1;
+  Version,8.2;
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 
@@ -1108,7 +1108,7 @@
 
   OtherEquipment,
     OthEquSen_ZoneOne,       !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or ZoneList Name
     FMU_OthEquSen_ZoneOne,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1,                       !- Design Level {W}
@@ -1122,7 +1122,7 @@
 
   OtherEquipment,
     OthEquLat_ZoneOne,       !- Name
-    ZONE ONE,                !- Zone Name
+    ZONE ONE,                !- Zone or ZoneList Name
     FMU_OthEquLat_ZoneOne,   !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     1,                       !- Design Level {W}

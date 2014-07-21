@@ -653,9 +653,9 @@ namespace ChillerElectricEIR {
 					ShowContinueError( "EIR as a function of PLR curve output at various part-load ratios shown below:" );
 					ShowContinueError( "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
 					gio::write( StringVar, "'Curve Output = '" );
+					gio::Fmt const fmtF72( "((F7.2),$)" );
 					for ( CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr ) {
-						gio::write( StringVar, "((F7.2),$)" )
-						    << CurveValArray( CurveValPtr );
+						gio::write( StringVar, fmtF72 ) << CurveValArray( CurveValPtr );
 					}
 					gio::write( StringVar );
 					ShowContinueError( StringVar );

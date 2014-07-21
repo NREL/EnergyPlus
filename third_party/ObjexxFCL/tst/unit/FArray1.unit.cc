@@ -823,6 +823,15 @@ TEST( FArray1Test, Swap )
 	EXPECT_TRUE( eq( P, P2 ) );
 }
 
+TEST( FArray1Test, Functions )
+{
+	FArray1D_int u{ 1, 2, 3 };
+	FArray1D_int v{ 2, 3, 4 };
+	EXPECT_EQ( 14, magnitude_squared( u ) );
+	EXPECT_EQ( 3, distance_squared( u, v ) );
+	EXPECT_EQ( 20, dot( u, v ) );
+}
+
 TEST( FArray1Test, Dot )
 {
 	FArray1D_int A( 3 );

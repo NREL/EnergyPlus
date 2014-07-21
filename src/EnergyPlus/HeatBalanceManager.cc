@@ -128,7 +128,7 @@ namespace HeatBalanceManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
-	gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt const fmtA( "(A)" );
 
 	FArray1D_string const PassFail( 2, { "Fail", "Pass" } );
 
@@ -609,32 +609,32 @@ namespace HeatBalanceManager {
 				TMP = index( BuildingName, CHAR( 3 ) );
 			}
 			// Building Azimuth (no validation)
-			BuildingAzimuth = mod( BuildingNumbers( 1 ), 360. );
+			BuildingAzimuth = mod( BuildingNumbers( 1 ), 360.0 );
 			// Terrain
 			if ( AlphaName( 2 ) == "COUNTRY" || AlphaName( 2 ) == "1" ) {
 				SiteWindExp = 0.14;
-				SiteWindBLHeight = 270.;
+				SiteWindBLHeight = 270.0;
 				AlphaName( 2 ) = "Country";
 			} else if ( AlphaName( 2 ) == "SUBURBS" || AlphaName( 2 ) == "2" || AlphaName( 2 ) == "SUBURB" ) {
 				SiteWindExp = 0.22;
-				SiteWindBLHeight = 370.;
+				SiteWindBLHeight = 370.0;
 				AlphaName( 2 ) = "Suburbs";
 			} else if ( AlphaName( 2 ) == "CITY" || AlphaName( 2 ) == "3" ) {
 				SiteWindExp = 0.33;
-				SiteWindBLHeight = 460.;
+				SiteWindBLHeight = 460.0;
 				AlphaName( 2 ) = "City";
 			} else if ( AlphaName( 2 ) == "OCEAN" ) {
 				SiteWindExp = 0.10;
-				SiteWindBLHeight = 210.;
+				SiteWindBLHeight = 210.0;
 				AlphaName( 2 ) = "Ocean";
 			} else if ( AlphaName( 2 ) == "URBAN" ) {
 				SiteWindExp = 0.22;
-				SiteWindBLHeight = 370.;
+				SiteWindBLHeight = 370.0;
 				AlphaName( 2 ) = "Urban";
 			} else {
 				ShowSevereError( RoutineName + CurrentModuleObject + ": " + cAlphaFieldNames( 2 ) + " invalid=" + AlphaName( 2 ) );
 				SiteWindExp = 0.14;
-				SiteWindBLHeight = 270.;
+				SiteWindBLHeight = 270.0;
 				AlphaName( 2 ) = AlphaName( 2 ) + "-invalid";
 				ErrorsFound = true;
 			}
@@ -895,7 +895,7 @@ namespace HeatBalanceManager {
 		if ( NumObjects > 0 ) {
 			GetObjectItem( CurrentModuleObject, 1, AlphaName, NumAlpha, BuildingNumbers, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			// Building Rotation for Appendix G
-			BuildingRotationAppendixG = mod( BuildingNumbers( 1 ), 360. );
+			BuildingRotationAppendixG = mod( BuildingNumbers( 1 ), 360.0 );
 		}
 
 		// A new object is added by L. Gu, 12/09
@@ -1127,7 +1127,7 @@ namespace HeatBalanceManager {
 		}
 
 		// Write to the initialization output file
-		gio::write( OutputFileInits, "(A)" ) << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
+		gio::write( OutputFileInits, fmtA ) << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
 
 		gio::write( OutputFileInits, Format_720 ) << RoundSigDigits( SiteWindExp, 3 ) << RoundSigDigits( SiteWindBLHeight, 3 ) << RoundSigDigits( SiteTempGradient, 6 );
 
@@ -1303,22 +1303,22 @@ namespace HeatBalanceManager {
 				Material( MaterNum ).AbsorpThermal = MaterialProps( 5 );
 				Material( MaterNum ).AbsorpThermalInput = MaterialProps( 5 );
 			} else {
-				Material( MaterNum ).AbsorpThermal = .9;
-				Material( MaterNum ).AbsorpThermalInput = .9;
+				Material( MaterNum ).AbsorpThermal = 0.9;
+				Material( MaterNum ).AbsorpThermalInput = 0.9;
 			}
 			if ( MaterialNumProp >= 6 ) {
 				Material( MaterNum ).AbsorpSolar = MaterialProps( 6 );
 				Material( MaterNum ).AbsorpSolarInput = MaterialProps( 6 );
 			} else {
-				Material( MaterNum ).AbsorpSolar = .7;
-				Material( MaterNum ).AbsorpSolarInput = .7;
+				Material( MaterNum ).AbsorpSolar = 0.7;
+				Material( MaterNum ).AbsorpSolarInput = 0.7;
 			}
 			if ( MaterialNumProp >= 7 ) {
 				Material( MaterNum ).AbsorpVisible = MaterialProps( 7 );
 				Material( MaterNum ).AbsorpVisibleInput = MaterialProps( 7 );
 			} else {
-				Material( MaterNum ).AbsorpVisible = .7;
-				Material( MaterNum ).AbsorpVisibleInput = .7;
+				Material( MaterNum ).AbsorpVisible = 0.7;
+				Material( MaterNum ).AbsorpVisibleInput = 0.7;
 			}
 
 			if ( Material( MaterNum ).Conductivity > 0.0 ) {
@@ -1379,22 +1379,22 @@ namespace HeatBalanceManager {
 				Material( MaterNum ).AbsorpThermal = MaterialProps( 2 );
 				Material( MaterNum ).AbsorpThermalInput = MaterialProps( 2 );
 			} else {
-				Material( MaterNum ).AbsorpThermal = .9;
-				Material( MaterNum ).AbsorpThermalInput = .9;
+				Material( MaterNum ).AbsorpThermal = 0.9;
+				Material( MaterNum ).AbsorpThermalInput = 0.9;
 			}
 			if ( MaterialNumProp >= 3 ) {
 				Material( MaterNum ).AbsorpSolar = MaterialProps( 3 );
 				Material( MaterNum ).AbsorpSolarInput = MaterialProps( 3 );
 			} else {
-				Material( MaterNum ).AbsorpSolar = .7;
-				Material( MaterNum ).AbsorpSolarInput = .7;
+				Material( MaterNum ).AbsorpSolar = 0.7;
+				Material( MaterNum ).AbsorpSolarInput = 0.7;
 			}
 			if ( MaterialNumProp >= 4 ) {
 				Material( MaterNum ).AbsorpVisible = MaterialProps( 4 );
 				Material( MaterNum ).AbsorpVisibleInput = MaterialProps( 4 );
 			} else {
-				Material( MaterNum ).AbsorpVisible = .7;
-				Material( MaterNum ).AbsorpVisibleInput = .7;
+				Material( MaterNum ).AbsorpVisible = 0.7;
+				Material( MaterNum ).AbsorpVisibleInput = 0.7;
 			}
 
 			NominalR( MaterNum ) = Material( MaterNum ).Resistance;
@@ -1742,16 +1742,16 @@ namespace HeatBalanceManager {
 			// index of refraction and extinction coefficient. With the alternative input the front and back
 			// properties are assumed to be the same.
 
-			ReflectivitySol = std::pow( ( ( MaterialProps( 2 ) - 1.0 ) / ( MaterialProps( 2 ) + 1.0 ) ), 2 );
-			ReflectivityVis = std::pow( ( ( MaterialProps( 4 ) - 1.0 ) / ( MaterialProps( 4 ) + 1.0 ) ), 2 );
+			ReflectivitySol = pow_2( ( MaterialProps( 2 ) - 1.0 ) / ( MaterialProps( 2 ) + 1.0 ) );
+			ReflectivityVis = pow_2( ( MaterialProps( 4 ) - 1.0 ) / ( MaterialProps( 4 ) + 1.0 ) );
 			TransmittivitySol = std::exp( -MaterialProps( 3 ) * MaterialProps( 1 ) );
 			TransmittivityVis = std::exp( -MaterialProps( 5 ) * MaterialProps( 1 ) );
-			Material( MaterNum ).Trans = TransmittivitySol * ( std::pow( ( 1.0 - ReflectivitySol ), 2 ) ) / ( 1.0 - std::pow( ( ReflectivitySol * TransmittivitySol ), 2 ) );
-			Material( MaterNum ).ReflectSolBeamFront = ReflectivitySol * ( 1.0 + ( std::pow( ( 1.0 - ReflectivitySol ), 2 ) ) * ( std::pow( TransmittivitySol, 2 ) ) / ( 1.0 - std::pow( ( ReflectivitySol * TransmittivitySol ), 2 ) ) );
+			Material( MaterNum ).Trans = TransmittivitySol * pow_2( 1.0 - ReflectivitySol ) / ( 1.0 - pow_2( ReflectivitySol * TransmittivitySol ) );
+			Material( MaterNum ).ReflectSolBeamFront = ReflectivitySol * ( 1.0 + pow_2( 1.0 - ReflectivitySol ) * pow_2( TransmittivitySol ) / ( 1.0 - pow_2( ReflectivitySol * TransmittivitySol ) ) );
 			Material( MaterNum ).ReflectSolBeamBack = Material( MaterNum ).ReflectSolBeamFront;
-			Material( MaterNum ).TransVis = TransmittivityVis * ( std::pow( ( 1.0 - ReflectivityVis ), 2 ) ) / ( 1.0 - std::pow( ( ReflectivityVis * TransmittivityVis ), 2 ) );
+			Material( MaterNum ).TransVis = TransmittivityVis * pow_2( 1.0 - ReflectivityVis ) / ( 1.0 - pow_2( ReflectivityVis * TransmittivityVis ) );
 
-			Material( MaterNum ).ReflectVisBeamFront = ReflectivityVis * ( 1.0 + ( std::pow( ( 1.0 - ReflectivityVis ), 2 ) ) * ( std::pow( TransmittivityVis, 2 ) ) / ( 1.0 - std::pow( ( ReflectivityVis * TransmittivityVis ), 2 ) ) );
+			Material( MaterNum ).ReflectVisBeamFront = ReflectivityVis * ( 1.0 + pow_2( 1.0 - ReflectivityVis ) * pow_2( TransmittivityVis ) / ( 1.0 - pow_2( ReflectivityVis * TransmittivityVis ) ) );
 			Material( MaterNum ).ReflectVisBeamBack = Material( MaterNum ).ReflectSolBeamFront;
 			Material( MaterNum ).TransThermal = MaterialProps( 6 );
 			Material( MaterNum ).AbsorpThermalFront = MaterialProps( 7 );
@@ -2424,7 +2424,7 @@ namespace HeatBalanceManager {
 					ShowContinueError( cNumericFieldNames( 6 ) + " must be less than " + cNumericFieldNames( 5 ) );
 				} else {
 					//       Calculate direct normal transmittance (open area fraction)
-					Material( MaterNum ).Trans = std::pow( ( 1.0 - MaterialProps( 6 ) / MaterialProps( 5 ) ), 2 );
+					Material( MaterNum ).Trans = pow_2( 1.0 - MaterialProps( 6 ) / MaterialProps( 5 ) );
 				}
 			} else {
 				ErrorsFound = true;
@@ -2609,7 +2609,7 @@ namespace HeatBalanceManager {
 					ShowContinueError( cNumericFieldNames( 10 ) + " must be less than " + cNumericFieldNames( 9 ) );
 				} else {
 					//  Calculate direct normal transmittance (open area fraction)
-					Openness = std::pow( ( 1.0 - Material( MaterNum ).ScreenWireDiameter / Material( MaterNum ).ScreenWireSpacing ), 2 );
+					Openness = pow_2( 1.0 - Material( MaterNum ).ScreenWireDiameter / Material( MaterNum ).ScreenWireSpacing );
 					if ( ( Material( MaterNum ).TausFrontBeamBeam - Openness ) / Openness > 0.01 ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + MaterialNames( 1 ) + "\", screen openness specified." );
 						ShowContinueError( cNumericFieldNames( 1 ) + " is > 1.0% of the value calculated from input fields:" );
@@ -2838,7 +2838,7 @@ namespace HeatBalanceManager {
 			} else {
 				MinSlatAngGeom = 0.0;
 			}
-			MaxSlatAngGeom = 180. - MinSlatAngGeom;
+			MaxSlatAngGeom = 180.0 - MinSlatAngGeom;
 
 			// Error if input slat angle not in range allowed by slat geometry
 			if ( ( Blind( Loop ).SlatSeparation + Blind( Loop ).SlatThickness ) < Blind( Loop ).SlatWidth ) {
@@ -3208,9 +3208,9 @@ namespace HeatBalanceManager {
 
 		if ( DoReport ) {
 
-			gio::write( OutputFileInits, "(A)" ) << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity {w/m-K},Density {kg/m3},Specific Heat {J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
+			gio::write( OutputFileInits, fmtA ) << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity {w/m-K},Density {kg/m3},Specific Heat {J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
 
-			gio::write( OutputFileInits, "(A)" ) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
+			gio::write( OutputFileInits, fmtA ) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
 
 			for ( MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum ) {
 
@@ -4320,16 +4320,16 @@ namespace HeatBalanceManager {
 			MaxCoolLoadPrevDay = 0.0;
 			MaxTempPrevDay = 0.0;
 			MinTempPrevDay = 0.0;
-			MaxHeatLoadZone = -9999.;
-			MaxCoolLoadZone = -9999.;
-			MaxTempZone = -9999.;
-			MinTempZone = 1000.;
-			TempZone = -9999.;
-			LoadZone = -9999.;
-			TempZonePrevDay = 1000.;
-			LoadZonePrevDay = -9999.;
-			TempZoneSecPrevDay = 1000.;
-			TempZoneSecPrevDay = -9999.;
+			MaxHeatLoadZone = -9999.0;
+			MaxCoolLoadZone = -9999.0;
+			MaxTempZone = -9999.0;
+			MinTempZone = 1000.0;
+			TempZone = -9999.0;
+			LoadZone = -9999.0;
+			TempZonePrevDay = 1000.0;
+			LoadZonePrevDay = -9999.0;
+			TempZoneSecPrevDay = 1000.0;
+			TempZoneSecPrevDay = -9999.0;
 			WarmupTempDiff = 0.0;
 			WarmupLoadDiff = 0.0;
 			TempZoneRpt = 0.0;
@@ -4338,7 +4338,7 @@ namespace HeatBalanceManager {
 			CountWarmupDayPoints = 0;
 
 			SurfaceWindow.ThetaFace() = 296.15;
-			SurfaceWindow.EffInsSurfTemp() = 23.;
+			SurfaceWindow.EffInsSurfTemp() = 23.0;
 
 		}
 
@@ -4359,10 +4359,10 @@ namespace HeatBalanceManager {
 		if ( BeginDayFlag ) {
 			if ( ! WarmupFlag ) {
 				if ( DayOfSim == 1 ) {
-					MaxHeatLoadZone = -9999.;
-					MaxCoolLoadZone = -9999.;
-					MaxTempZone = -9999.;
-					MinTempZone = 1000.;
+					MaxHeatLoadZone = -9999.0;
+					MaxCoolLoadZone = -9999.0;
+					MaxTempZone = -9999.0;
+					MinTempZone = 1000.0;
 				}
 			}
 			if ( ! DetailedSolarTimestepIntegration ) {
@@ -4550,13 +4550,13 @@ namespace HeatBalanceManager {
 		MaxCoolLoadPrevDay.allocate( NumOfZones );
 		MaxCoolLoadPrevDay = 0.0;
 		MaxHeatLoadZone.allocate( NumOfZones );
-		MaxHeatLoadZone = -9999.;
+		MaxHeatLoadZone = -9999.0;
 		MaxCoolLoadZone.allocate( NumOfZones );
-		MaxCoolLoadZone = -9999.;
+		MaxCoolLoadZone = -9999.0;
 		MaxTempZone.allocate( NumOfZones );
-		MaxTempZone = -9999.;
+		MaxTempZone = -9999.0;
 		MinTempZone.allocate( NumOfZones );
-		MinTempZone = 1000.;
+		MinTempZone = 1000.0;
 		TempZonePrevDay.allocate( NumOfZones );
 		TempZonePrevDay = 0.0;
 		LoadZonePrevDay.allocate( NumOfZones );
@@ -4726,7 +4726,7 @@ namespace HeatBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const MinLoad( 100. ); // Minimum laods for convergence check
+		Real64 const MinLoad( 100.0 ); // Minimum laods for convergence check
 		// To avoid big percentage difference in low load situations
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -4826,10 +4826,10 @@ namespace HeatBalanceManager {
 				MaxTempPrevDay( ZoneNum ) = MaxTempZone( ZoneNum );
 				MinTempPrevDay( ZoneNum ) = MinTempZone( ZoneNum );
 
-				MaxHeatLoadZone( ZoneNum ) = -9999.;
-				MaxCoolLoadZone( ZoneNum ) = -9999.;
-				MaxTempZone( ZoneNum ) = -9999.;
-				MinTempZone( ZoneNum ) = 1000.;
+				MaxHeatLoadZone( ZoneNum ) = -9999.0;
+				MaxCoolLoadZone( ZoneNum ) = -9999.0;
+				MaxTempZone( ZoneNum ) = -9999.0;
+				MinTempZone( ZoneNum ) = 1000.0;
 
 			}
 
@@ -4941,8 +4941,8 @@ namespace HeatBalanceManager {
 				StdDevZoneTemp = 0.0;
 				StdDevZoneLoad = 0.0;
 				for ( Num = 1; Num <= CountWarmupDayPoints; ++Num ) {
-					TempZoneRptStdDev( Num ) = std::pow( ( TempZoneRpt( Num, ZoneNum ) - AverageZoneTemp ), 2 );
-					LoadZoneRptStdDev( Num ) = std::pow( ( LoadZoneRpt( Num, ZoneNum ) - AverageZoneLoad ), 2 );
+					TempZoneRptStdDev( Num ) = pow_2( TempZoneRpt( Num, ZoneNum ) - AverageZoneTemp );
+					LoadZoneRptStdDev( Num ) = pow_2( LoadZoneRpt( Num, ZoneNum ) - AverageZoneLoad );
 				}
 				StdDevZoneTemp = std::sqrt( sum( TempZoneRptStdDev( {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints ) );
 				StdDevZoneLoad = std::sqrt( sum( LoadZoneRptStdDev( {1,CountWarmupDayPoints} ) ) / double( CountWarmupDayPoints ) );
@@ -5382,7 +5382,7 @@ namespace HeatBalanceManager {
 
 Label10: ;
 		for ( LineNum = 2; LineNum <= 5; ++LineNum ) {
-			{ IOFlags flags; gio::read( W5DataFileNum, "(A)", flags ) >> DataLine( LineNum ); ReadStat = flags.ios(); }
+			{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> DataLine( LineNum ); ReadStat = flags.ios(); }
 			if ( ReadStat < GoodIOStatValue ) goto Label1000;
 			++FileLineCount;
 		}
@@ -5673,7 +5673,7 @@ Label20: ;
 					++MaterNum;
 					MaterNumSysGlass( IGlSys, IGlass ) = MaterNum;
 					Material( MaterNum ).Group = WindowGlass;
-					{ IOFlags flags; gio::read( W5DataFileNum, "(A)", flags ) >> NextLine; ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 					++FileLineCount;
 					gio::read( NextLine.substr( 25 ), "*" ) >> Material( MaterNum ).Thickness >> Material( MaterNum ).Conductivity >> Material( MaterNum ).Trans >> Material( MaterNum ).ReflectSolBeamFront >> Material( MaterNum ).ReflectSolBeamBack >> Material( MaterNum ).TransVis >> Material( MaterNum ).ReflectVisBeamFront >> Material( MaterNum ).ReflectVisBeamBack >> Material( MaterNum ).TransThermal >> Material( MaterNum ).AbsorpThermalFront >> Material( MaterNum ).AbsorpThermalBack >> LayerName;
 					Material( MaterNum ).Thickness *= 0.001;
@@ -5726,7 +5726,7 @@ Label20: ;
 					Material( MaterNum ).Group = WindowGas;
 					if ( NumGases( IGlSys, IGap ) > 1 ) Material( MaterNum ).Group = WindowGasMixture;
 					for ( IGas = 1; IGas <= NumGases( IGlSys, IGap ); ++IGas ) {
-						{ IOFlags flags; gio::read( W5DataFileNum, "(A)", flags ) >> NextLine; ReadStat = flags.ios(); }
+						{ IOFlags flags; gio::read( W5DataFileNum, fmtA, flags ) >> NextLine; ReadStat = flags.ios(); }
 						++FileLineCount;
 						gio::read( NextLine.substr( 19 ), "*" ) >> GasName( IGas ) >> Material( MaterNum ).GasFract( IGas ) >> Material( MaterNum ).GasWght( IGas ) >> Material( MaterNum ).GasCon( IGas, _ ) >> Material( MaterNum ).GasVis( IGas, _ ) >> Material( MaterNum ).GasCp( IGas, _ );
 						// Nominal resistance of gap at room temperature (based on first gas in mixture)
@@ -5960,9 +5960,9 @@ Label20: ;
 
 				// For comparing fitted vs. input distribution in incidence angle
 				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
-					Phi = double( IPhi - 1 ) * 10.;
+					Phi = double( IPhi - 1 ) * 10.0;
 					CosPhi = std::cos( Phi * DegToRadians );
-					if ( std::abs( CosPhi ) < .0001 ) CosPhi = 0.0;
+					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
 					tsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransSolBeamCoef( {1,6} ) );
 					tvisFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).TransVisBeamCoef( {1,6} ) );
 					rfsolFit( IPhi ) = POLYF( CosPhi, Construct( ConstrNum ).ReflSolBeamFrontCoef( {1,6} ) );
@@ -6900,7 +6900,7 @@ Label1000: ;
 
 			if ( Material( MaterNum ).SimpleWindowSHGC < 0.7206 ) {
 
-				Material( MaterNum ).Trans = 0.939998 * std::pow( Material( MaterNum ).SimpleWindowSHGC, 2 ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
+				Material( MaterNum ).Trans = 0.939998 * pow_2( Material( MaterNum ).SimpleWindowSHGC ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // >= 0.7206
 
 				Material( MaterNum ).Trans = 1.30415 * Material( MaterNum ).SimpleWindowSHGC - 0.30515;
@@ -6912,12 +6912,12 @@ Label1000: ;
 			if ( Material( MaterNum ).SimpleWindowSHGC <= 0.15 ) {
 				Material( MaterNum ).Trans = 0.41040 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // > 0.15
-				Material( MaterNum ).Trans = 0.085775 * ( std::pow( Material( MaterNum ).SimpleWindowSHGC, 2 ) ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
+				Material( MaterNum ).Trans = 0.085775 * pow_2( Material( MaterNum ).SimpleWindowSHGC ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
 			}
 		} else { // interpolate. 3.4 <= Ufactor <= 4.5
 
 			if ( Material( MaterNum ).SimpleWindowSHGC < 0.7206 ) {
-				TsolHiSide = 0.939998 * std::pow( Material( MaterNum ).SimpleWindowSHGC, 2 ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
+				TsolHiSide = 0.939998 * pow_2( Material( MaterNum ).SimpleWindowSHGC ) + 0.20332 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // >= 0.7206
 				TsolHiSide = 1.30415 * Material( MaterNum ).SimpleWindowSHGC - 0.30515;
 			}
@@ -6925,7 +6925,7 @@ Label1000: ;
 			if ( Material( MaterNum ).SimpleWindowSHGC <= 0.15 ) {
 				TsolLowSide = 0.41040 * Material( MaterNum ).SimpleWindowSHGC;
 			} else { // > 0.15
-				TsolLowSide = 0.085775 * ( std::pow( Material( MaterNum ).SimpleWindowSHGC, 2 ) ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
+				TsolLowSide = 0.085775 * pow_2( Material( MaterNum ).SimpleWindowSHGC ) + 0.963954 * Material( MaterNum ).SimpleWindowSHGC - 0.084958;
 			}
 
 			Material( MaterNum ).Trans = ( ( Material( MaterNum ).SimpleWindowUfactor - 3.4 ) / ( 4.5 - 3.4 ) ) * ( TsolHiSide - TsolLowSide ) + TsolLowSide;
@@ -6939,16 +6939,16 @@ Label1000: ;
 
 		if ( Material( MaterNum ).SimpleWindowUfactor > 4.5 ) {
 
-			Ris = 1.0 / ( 29.436546 * std::pow( DeltaSHGCandTsol, 3.0 ) - 21.943415 * std::pow( DeltaSHGCandTsol, 2 ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
+			Ris = 1.0 / ( 29.436546 * pow_3( DeltaSHGCandTsol ) - 21.943415 * pow_2( DeltaSHGCandTsol ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
 			Ros = 1.0 / ( 2.225824 * DeltaSHGCandTsol + 20.577080 );
 		} else if ( Material( MaterNum ).SimpleWindowUfactor < 3.4 ) {
 
-			Ris = 1.0 / ( 199.8208128 * std::pow( DeltaSHGCandTsol, 3.0 ) - 90.639733 * std::pow( DeltaSHGCandTsol, 2 ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
+			Ris = 1.0 / ( 199.8208128 * pow_3( DeltaSHGCandTsol ) - 90.639733 * pow_2( DeltaSHGCandTsol ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
 			Ros = 1.0 / ( 5.763355 * DeltaSHGCandTsol + 20.541528 );
 		} else { // interpolate. 3.4 <= Ufactor <= 4.5
 			//inside first
-			RLowSide = 1.0 / ( 199.8208128 * std::pow( DeltaSHGCandTsol, 3.0 ) - 90.639733 * std::pow( DeltaSHGCandTsol, 2 ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
-			RHiSide = 1.0 / ( 29.436546 * std::pow( DeltaSHGCandTsol, 3 ) - 21.943415 * std::pow( DeltaSHGCandTsol, 2 ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
+			RLowSide = 1.0 / ( 199.8208128 * pow_3( DeltaSHGCandTsol ) - 90.639733 * pow_2( DeltaSHGCandTsol ) + 19.737055 * DeltaSHGCandTsol + 6.766575 );
+			RHiSide = 1.0 / ( 29.436546 * pow_3( DeltaSHGCandTsol ) - 21.943415 * pow_2( DeltaSHGCandTsol ) + 9.945872 * DeltaSHGCandTsol + 7.426151 );
 			Ris = ( ( Material( MaterNum ).SimpleWindowUfactor - 3.4 ) / ( 4.5 - 3.4 ) ) * ( RLowSide - RHiSide ) + RLowSide;
 			// then outside
 			RLowSide = 1.0 / ( 5.763355 * DeltaSHGCandTsol + 20.541528 );
@@ -6966,12 +6966,12 @@ Label1000: ;
 		//step 6. determine visible properties.
 		if ( Material( MaterNum ).SimpleWindowVTinputByUser ) {
 			Material( MaterNum ).TransVis = Material( MaterNum ).SimpleWindowVisTran;
-			Material( MaterNum ).ReflectVisBeamBack = -0.7409 * std::pow( Material( MaterNum ).TransVis, 3 ) + 1.6531 * std::pow( Material( MaterNum ).TransVis, 2 ) - 1.2299 * Material( MaterNum ).TransVis + 0.4545;
+			Material( MaterNum ).ReflectVisBeamBack = -0.7409 * pow_3( Material( MaterNum ).TransVis ) + 1.6531 * pow_2( Material( MaterNum ).TransVis ) - 1.2299 * Material( MaterNum ).TransVis + 0.4545;
 			if ( Material( MaterNum ).TransVis + Material( MaterNum ).ReflectVisBeamBack >= 1.0 ) {
 				Material( MaterNum ).ReflectVisBeamBack = 0.999 - Material( MaterNum ).TransVis;
 			}
 
-			Material( MaterNum ).ReflectVisBeamFront = -0.0622 * std::pow( Material( MaterNum ).TransVis, 3 ) + 0.4277 * std::pow( Material( MaterNum ).TransVis, 2 ) - 0.4169 * Material( MaterNum ).TransVis + 0.2399;
+			Material( MaterNum ).ReflectVisBeamFront = -0.0622 * pow_3( Material( MaterNum ).TransVis ) + 0.4277 * pow_2( Material( MaterNum ).TransVis ) - 0.4169 * Material( MaterNum ).TransVis + 0.2399;
 			if ( Material( MaterNum ).TransVis + Material( MaterNum ).ReflectVisBeamFront >= 1.0 ) {
 				Material( MaterNum ).ReflectVisBeamFront = 0.999 - Material( MaterNum ).TransVis;
 			}
@@ -7849,7 +7849,7 @@ Label1000: ;
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.SolFrtTransIndex, BSDFTempMtrx );
 
-					Construct( ConstrNum ).BSDFInput.SolFrtTrans = 0.;
+					Construct( ConstrNum ).BSDFInput.SolFrtTrans = 0.0;
 					for ( I = 1; I <= NBasis; ++I ) {
 						Construct( ConstrNum ).BSDFInput.SolFrtTrans( I, I ) = BSDFTempMtrx( 1, I );
 					}
@@ -7882,7 +7882,7 @@ Label1000: ;
 					ShowContinueError( "Solar back reflectance Matrix:TwoDimension = \"" + locAlphaArgs( 7 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.SolBkReflIndex, BSDFTempMtrx );
-					Construct( ConstrNum ).BSDFInput.SolBkRefl = 0.;
+					Construct( ConstrNum ).BSDFInput.SolBkRefl = 0.0;
 					for ( I = 1; I <= NBasis; ++I ) {
 						Construct( ConstrNum ).BSDFInput.SolBkRefl( I, I ) = BSDFTempMtrx( 1, I );
 					}
@@ -7915,7 +7915,7 @@ Label1000: ;
 					ShowContinueError( "Visible front transmittance Matrix:TwoDimension = \"" + locAlphaArgs( 8 ) + "\" is missing from the input file." );
 				} else {
 					Get2DMatrix( Construct( ConstrNum ).BSDFInput.VisFrtTransIndex, BSDFTempMtrx );
-					Construct( ConstrNum ).BSDFInput.VisFrtTrans = 0.;
+					Construct( ConstrNum ).BSDFInput.VisFrtTrans = 0.0;
 					for ( I = 1; I <= NBasis; ++I ) {
 						Construct( ConstrNum ).BSDFInput.VisFrtTrans( I, I ) = BSDFTempMtrx( 1, I );
 					}

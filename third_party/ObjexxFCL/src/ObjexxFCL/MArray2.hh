@@ -99,7 +99,7 @@ public: // Assignment
 			assert( conformable( a ) );
 			for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-					operator()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
+					operator ()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
 				}
 			}
 		}
@@ -115,7 +115,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -130,7 +130,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) = a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) = a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -145,7 +145,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) += a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) += a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -160,7 +160,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) -= a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) -= a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -175,7 +175,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) *= a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) *= a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -191,7 +191,7 @@ public: // Assignment
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
 				assert( a( i1, i2 ) != T( 0 ) );
-				operator()( i1, i2 ) /= a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) /= a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -206,7 +206,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) += a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) += a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -221,7 +221,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) -= a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) -= a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -236,7 +236,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) *= a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) *= a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -252,7 +252,7 @@ public: // Assignment
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
 				assert( a( j1, j2 ) != T( 0 ) );
-				operator()( i1, i2 ) /= a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) /= a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -265,7 +265,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = t;
+				operator ()( i1, i2 ) = t;
 			}
 		}
 		return *this;
@@ -279,7 +279,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = t;
+				operator ()( i1, i2 ) = t;
 			}
 		}
 		return *this;
@@ -292,7 +292,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) += t;
+				operator ()( i1, i2 ) += t;
 			}
 		}
 		return *this;
@@ -305,7 +305,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) -= t;
+				operator ()( i1, i2 ) -= t;
 			}
 		}
 		return *this;
@@ -318,7 +318,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) *= t;
+				operator ()( i1, i2 ) *= t;
 			}
 		}
 		return *this;
@@ -332,7 +332,7 @@ public: // Assignment
 		assert( t != T( 0 ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) /= t;
+				operator ()( i1, i2 ) /= t;
 			}
 		}
 		return *this;
@@ -497,7 +497,7 @@ public: // Modifier
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = Traits::initial_value();
+				operator ()( i1, i2 ) = Traits::initial_value();
 			}
 		}
 		return *this;

@@ -484,7 +484,7 @@ namespace ChillerIndirectAbsorption {
 				if ( ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + IndirectAbsorber( AbsorberNum ).Name + "\"" );
-					ShowContinueError( "...illegal Generator Heat Input Correction function of condenser temperature curve type for " "this object." );
+					ShowContinueError( "...illegal Generator Heat Input Correction function of condenser temperature curve type for this object." );
 					ShowContinueError( "...Curve type = " + GetCurveType( IndirectAbsorber( AbsorberNum ).HeatInputFCondTempPtr ) );
 					ErrorsFound = true;
 				}}
@@ -497,7 +497,7 @@ namespace ChillerIndirectAbsorption {
 				if ( ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + IndirectAbsorber( AbsorberNum ).Name + "\"" );
-					ShowContinueError( "...illegal Generator Heat Input Correction function of evaporator temperature curve type for " "this object." );
+					ShowContinueError( "...illegal Generator Heat Input Correction function of evaporator temperature curve type for this object." );
 					ShowContinueError( "...Curve type = " + GetCurveType( IndirectAbsorber( AbsorberNum ).HeatInputFEvapTempPtr ) );
 					ErrorsFound = true;
 				}}
@@ -724,7 +724,7 @@ namespace ChillerIndirectAbsorption {
 					if ( ! AnyEnergyManagementSystemInModel ) {
 						if ( ! IndirectAbsorber( ChillNum ).ModulatedFlowErrDone ) {
 							ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + IndirectAbsorber( ChillNum ).Name );
-							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller " "in variable flow mode, use a SetpointManager" );
+							ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller in variable flow mode, use a SetpointManager" );
 							ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
 							IndirectAbsorber( ChillNum ).ModulatedFlowErrDone = true;
 						}
@@ -735,7 +735,7 @@ namespace ChillerIndirectAbsorption {
 						if ( FatalError ) {
 							if ( ! IndirectAbsorber( ChillNum ).ModulatedFlowErrDone ) {
 								ShowWarningError( "Missing temperature setpoint for LeavingSetpointModulated mode chiller named " + IndirectAbsorber( ChillNum ).Name );
-								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator " "in variable flow mode" );
+								ShowContinueError( "  A temperature setpoint is needed at the outlet node of a chiller evaporator in variable flow mode" );
 								ShowContinueError( "  use a Setpoint Manager to establish a setpoint at the chiller evaporator outlet node " );
 								ShowContinueError( "  or use an EMS actuator to establish a setpoint at the outlet node " );
 								ShowContinueError( "  The overall loop setpoint will be assumed for chiller. The simulation continues ... " );
