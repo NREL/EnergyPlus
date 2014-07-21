@@ -1338,20 +1338,20 @@ namespace SolarShading {
 			// So I believe this should only be a diagnostic error...the calcs should always be within -1,+1; it's just round-off that we need to trap for
 			if ( CosIncAngBeamOnSurface > 1.0 ) {
 				if ( CosIncAngBeamOnSurface > ( 1.0 + cosine_tolerance ) ) {
-				ShowSevereError( "Cosine of incident angle of beam solar on surface out of range...too high" );
-				ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
-				ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
-				ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
-				ShowFatalError( "Anisotropic solar calculation causes fatal error" );
+					ShowSevereError( "Cosine of incident angle of beam solar on surface out of range...too high" );
+					ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
+					ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
+					ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
+					ShowFatalError( "Anisotropic solar calculation causes fatal error" );
 				}
 				CosIncAngBeamOnSurface = 1.0;
 			} else if ( CosIncAngBeamOnSurface < -1.0 ) {
 				if ( CosIncAngBeamOnSurface < ( -1.0 - cosine_tolerance ) ) {
-				ShowSevereError( "Cosine of incident angle of beam solar on surface out of range...too low" );
-				ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
-				ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
-				ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
-				ShowFatalError( "Anisotropic solar calculation causes fatal error" );
+					ShowSevereError( "Cosine of incident angle of beam solar on surface out of range...too low" );
+					ShowContinueError("This is a diagnostic error that should not be encountered under normal circumstances");
+					ShowContinueError( "Occurs on surface: " + Surface ( SurfNum ).Name );
+					ShowContinueError( "Current value = " + TrimSigDigits( CosIncAngBeamOnSurface ) + " ... should be within [-1, +1]" );
+					ShowFatalError( "Anisotropic solar calculation causes fatal error" );
 				}
 				CosIncAngBeamOnSurface = -1.0;
 			}
@@ -2040,7 +2040,7 @@ namespace SolarShading {
 				Zone( ZoneNum ).FloorArea = HorizAreaSum;
 				ShowWarningError( "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains " "on the zone floor," );
 				ShowContinueError( "...Zone=\"" + Zone( ZoneNum ).Name + "\" has no floor, but has approximate horizontal surfaces." );
-				ShowContinueError( "...these Tilt > 120°, (area=[" + RoundSigDigits( HorizAreaSum, 2 ) + "] m2) will be used." );
+				ShowContinueError( "...these Tilt > 120ï¿½, (area=[" + RoundSigDigits( HorizAreaSum, 2 ) + "] m2) will be used." );
 			}
 
 			// Compute ISABSF
@@ -10931,7 +10931,7 @@ namespace SolarShading {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
