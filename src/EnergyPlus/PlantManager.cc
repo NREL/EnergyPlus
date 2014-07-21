@@ -447,7 +447,7 @@ namespace PlantManager {
 			} else {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
 				ShowContinueError( "..." + cAlphaFieldNames( 14 ) + "=\"" + Alpha( 14 ) + "\"." );
-				ShowContinueError( "Will default to SequentialLoading." ); // TODO rename point
+				ShowContinueError( "Will default to SequentialLoad." ); // TODO rename point
 				this_loop.LoadDistribution = SequentialLoading;
 			}
 

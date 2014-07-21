@@ -440,7 +440,6 @@ namespace ChillerIndirectAbsorption {
 			if ( IndirectAbsorber( AbsorberNum ).CapFCondenserTempPtr > 0 ) {
 				// Verify Curve Object, only legal types are Quadratic or Cubic
 				{ auto const SELECT_CASE_var( GetCurveType( IndirectAbsorber( AbsorberNum ).CapFCondenserTempPtr ) );
-
 				if ( ( SELECT_CASE_var == "QUADRATIC" ) || ( SELECT_CASE_var == "CUBIC" ) ) {
 				} else {
 					ShowSevereError( cCurrentModuleObject + " \"" + IndirectAbsorber( AbsorberNum ).Name + "\"" );

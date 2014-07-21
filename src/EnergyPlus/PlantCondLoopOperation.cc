@@ -2113,7 +2113,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 					// create a reference to the component itself
-					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2146,7 +2146,7 @@ namespace PlantCondLoopOperation {
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
                         // create a reference to the component itself
-                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 
@@ -2167,7 +2167,7 @@ namespace PlantCondLoopOperation {
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 						// create a reference to the component itself
-						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 						DivideLoad = this_component.MaxLoad - std::abs( this_component.MyLoad );
@@ -2180,6 +2180,7 @@ namespace PlantCondLoopOperation {
 
 				//SEQUENTIALLOAD DISTRIBUTION SCHEME
 			} else if ( SELECT_CASE_var == SequentialLoading ) { // LoadFlag=2 indicates "sequential" load distribution
+				
 				// step 1: Load machines in list order
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2187,7 +2188,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 					// create a reference to the component itself
-					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2221,7 +2222,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 					// create a reference to the component itself
-					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 					if ( this_component.MaxLoad > 0.0 ) {
@@ -2250,7 +2251,7 @@ namespace PlantCondLoopOperation {
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 						// create a reference to the component itself
-						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 						ChangeInLoad = min( this_component.MaxLoad - std::abs( this_component.MyLoad ), std::abs( RemLoopDemand ) );
@@ -2264,7 +2265,7 @@ namespace PlantCondLoopOperation {
 				// UNIFORMPLR LOAD DISTRIBUTION SCHEME
 			} else if ( SELECT_CASE_var == UniformPLRLoading ) {
 				// Get total plant capacity and remove last component from list if load is less
-					// than plant capacity at min PLR
+				// than plant capacity at min PLR
 				PlantCapacity = 0.0;
 				PlantPLR = 0.0;
 				MinCompPLR = 0.0;
@@ -2276,8 +2277,8 @@ namespace PlantCondLoopOperation {
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                    // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2332,7 +2333,7 @@ namespace PlantCondLoopOperation {
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 						// create a reference to the component itself
-						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 
@@ -2364,8 +2365,8 @@ namespace PlantCondLoopOperation {
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-                    // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2408,7 +2409,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
                     // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2440,7 +2441,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
                     // create a reference to the component itself
-                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2479,7 +2480,7 @@ namespace PlantCondLoopOperation {
 			CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 			// create a reference to the component itself
-			auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+			auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 			if ( std::abs( this_component.MyLoad ) < SmallLoad ) {
 				this_component.ON = false;
