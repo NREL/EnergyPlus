@@ -3,8 +3,8 @@ Project(EnergyPlus)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 set( CMAKE_VERSION_MAJOR 8 )
-set( CMAKE_VERSION_MINOR 2 )
-set( CMAKE_VERSION_PATCH 0 ) 
+set( CMAKE_VERSION_MINOR 1 )
+set( CMAKE_VERSION_PATCH 1 ) 
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
