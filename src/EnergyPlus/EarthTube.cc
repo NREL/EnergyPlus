@@ -347,8 +347,8 @@ namespace EarthTube {
 					SetupOutputVariable( "Earth Tube Zone Sensible Heating Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGain, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Zone Sensible Heating Rate [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGainRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Flow Volume [m3]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolume, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Current Density Volumetric Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Standard Density Volumetric Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRateStd, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Current Density Air Volume Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Standard Density Air Volume Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRateStd, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Flow Mass [kg]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMass, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Mass Flow Rate [kg/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Fan Electric Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElec, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name, _, "Electricity", _, _, "Building" );
@@ -655,7 +655,7 @@ namespace EarthTube {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -325,8 +325,8 @@ namespace ThermalChimney {
 
 		// Set up the output variables for thermal chimneys
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
-			SetupOutputVariable( "Zone Thermal Chimney Current Conditions Volumetric Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
-			SetupOutputVariable( "Zone Thermal Chimney Standard Conditions Volumetric Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlowStd, "System", "Average", ThermalChimneySys( Loop ).Name );
+			SetupOutputVariable( "Zone Thermal Chimney Current Density Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
+			SetupOutputVariable( "Zone Thermal Chimney Standard Density Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlowStd, "System", "Average", ThermalChimneySys( Loop ).Name );
 			SetupOutputVariable( "Zone Thermal Chimney Mass Flow Rate [kg/s]", ThermalChimneyReport( Loop ).OverallTCMassFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
 			SetupOutputVariable( "Zone Thermal Chimney Outlet Temperature [C]", ThermalChimneyReport( Loop ).OutletAirTempThermalChim, "System", "Average", ThermalChimneySys( Loop ).Name );
 
@@ -874,7 +874,7 @@ namespace ThermalChimney {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

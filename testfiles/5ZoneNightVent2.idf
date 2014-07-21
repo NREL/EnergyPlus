@@ -3898,9 +3898,9 @@
 
   Output:Variable,*,Zone Zone Mixing Mass Flow Rate,hourly;
   
-  Output:Variable,*,Zone Zone Mixing Current Density Volumetric Flow Rate,hourly;
+  Output:Variable,*,Zone Zone Mixing Current Density Air Volume Flow Rate,hourly;
   
-  Output:Variable,*,Zone Zone Mixing Standard Density Volumetric Flow Rate,hourly;
+  Output:Variable,*,Zone Zone Mixing Standard Density Air Volume Flow Rate,hourly;
 
   Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
 
