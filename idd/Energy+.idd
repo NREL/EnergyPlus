@@ -8296,7 +8296,7 @@ Construction:ComplexFenestrationState,
   A28, \field Layer 4 Name
        \type object-list
        \object-list CFSGlazingName
-	   \object-list WindowComplexShades
+       \object-list WindowComplexShades
   A29, \field Layer 4 Directional Front Absoptance Matrix Name
        \type object-list
        \object-list DataMatrices
@@ -8317,7 +8317,7 @@ Construction:ComplexFenestrationState,
   A34, \field Layer 5 Name
        \type object-list
        \object-list CFSGlazingName
-	   \object-list WindowComplexShades
+       \object-list WindowComplexShades
   A35, \field Layer 5 Directional Front Absoptance Matrix Name
        \type object-list
        \object-list DataMatrices
@@ -16997,12 +16997,12 @@ SurfaceProperty:ExteriorNaturalVentedCavity,
 
 SurfaceProperty:SolarIncidentInside,
        \memo Used to provide incident solar radiation on the inside of the surface. Reference surface-construction pair
-	   \memo and if that pair is used in a simulation, then program will use value provided in schedule instead of calculating it.
+       \memo and if that pair is used in a simulation, then program will use value provided in schedule instead of calculating it.
   A1,  \field Name
        \required-field
   A2,  \field Surface Name
        \required-field
-	   \type object-list
+       \type object-list
        \object-list SurfaceNames
   A3,  \field Construction Name
        \required-field
@@ -17011,43 +17011,43 @@ SurfaceProperty:SolarIncidentInside,
   A4;  \field Inside Surface Incident Sun Solar Radiation Schedule Name
        \memo Values in schedule are expected to be in W/m2
        \required-field
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
 
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
-	   \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
+       \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
   A1,  \field Name
        \required-field
   A2,  \field Fenestration Surface
        \required-field
-	   \type object-list
+       \type object-list
        \object-list SubSurfNames
   A3,  \field Construction Name
        \required-field
        \type object-list
-	   \object-list ComplexFenestrationStates
+       \object-list ComplexFenestrationStates
   A4,  \field Layer 1 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
        \required-field
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A5,  \field Layer 2 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A6,  \field Layer 3 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A7,  \field Layer 4 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A8;  \field Layer 5 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
 
 ZoneProperty:UserViewFactors:bySurfaceName,
        \memo View factors for Surface to Surface in a zone.
@@ -21797,19 +21797,18 @@ AirflowNetwork:MultiZone:Zone,
       \note Not used if Ventilation Control Mode = NoVent.
   A5, \field Single Sided Wind Pressure Coefficient Algorithm
       \type choice
-	    \key Advanced
-	    \key Standard
-	    \default Standard
-	    \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
-	    \note to account for wind direction and turbulence effects on single sided ventilation rates.
-	    \note Model is only valid for zones with 2 openings, both of which are on a single facade.
+      \key Advanced
+      \key Standard
+      \default Standard
+      \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
+      \note to account for wind direction and turbulence effects on single sided ventilation rates.
+      \note Model is only valid for zones with 2 openings, both of which are on a single facade.
   N6; \field Facade Width
       \type real
-	    \units m
-	    \minimum 0.0
-	    \default 10.0
-	    \note This is the whole building width along the direction of the facade of this zone.
-	  
+      \units m
+      \minimum 0.0
+      \default 10.0
+      \note This is the whole building width along the direction of the facade of this zone.
 
 AirflowNetwork:MultiZone:Surface,
       \min-fields 4
@@ -62117,8 +62116,8 @@ PlantLoop,
         \key Optimal
         \key SequentialLoad
         \key UniformLoad
-		\key UniformPLR
-		\key SequentialUniformPLR
+        \key UniformPLR
+        \key SequentialUniformPLR
         \default SequentialLoad
   A15, \field Availability Manager List Name
         \type object-list
@@ -72756,7 +72755,7 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
-	   
+   
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
    A1, \field Name
@@ -72779,32 +72778,32 @@ FaultModel:Fouling:Coil,
        \default FouledUARated
    N1, \field UAFouled
        \note Fouling coil UA value under rating conditions
-	     \note For Fouling Input Method: FouledUARated
+       \note For Fouling Input Method: FouledUARated
        \units W/K
        \type real       
        \minimum> 0.0
    N2, \field Water Side Fouling Factor       
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units m2-K/W  
-       \type real	   
+       \type real  
        \minimum 0.0
        \default 0.0
    N3, \field Air Side Fouling Factor       
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units m2-K/W 
        \type real
-       \minimum 0.0	   
+       \minimum 0.0   
        \default 0.0
    N4, \field Outside Coil Surface Area       
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units m2 
-       \type real	   
-       \minimum> 0.0	   
+       \type real   
+       \minimum> 0.0   
    N5; \field Inside to Outside Coil Surface Area Ratio      
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units dimensionless
        \type real       
-	     \minimum> 0.0
+       \minimum> 0.0
        \default 0.07
        
 \group General Data Entry
