@@ -931,22 +931,22 @@ namespace EvaporativeCoolers {
 		if ( SizingDesRunThisAirSys ) {
 			HardSizeNoDesRun = false; // Check if design infomation is available
 		}
-			if ( CurSysNum > 0 ) { //central system
-				//where is this cooler located, is it on OA system or main loop?
-				// search for this component in Air loop branches.
-				for ( AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem( CurSysNum ).NumBranches; ++AirSysBranchLoop ) {
-					for ( BranchComp = 1; BranchComp <= PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).TotalComponents; ++BranchComp ) {
+		if ( CurSysNum > 0 ) { //central system
+			//where is this cooler located, is it on OA system or main loop?
+			// search for this component in Air loop branches.
+			for ( AirSysBranchLoop = 1; AirSysBranchLoop <= PrimaryAirSystem( CurSysNum ).NumBranches; ++AirSysBranchLoop ) {
+				for ( BranchComp = 1; BranchComp <= PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).TotalComponents; ++BranchComp ) {
 
-						if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name, EvapCond( EvapCoolNum ).EvapCoolerName ) ) {
-							CoolerOnMainAirLoop = true;
-						}
-
+					if ( SameString( PrimaryAirSystem( CurSysNum ).Branch( AirSysBranchLoop ).Comp( BranchComp ).Name, EvapCond( EvapCoolNum ).EvapCoolerName ) ) {
+						CoolerOnMainAirLoop = true;
 					}
-				}
 
-				// would like search for this componenent in some OutsideAirSys structure
-				// but thats not so easy becuase of circular USE with MixedAir.f90
-				//  So assume if its not on main air path, its on OA path (for now)
+				}
+			}
+
+			// would like search for this componenent in some OutsideAirSys structure
+			// but thats not so easy becuase of circular USE with MixedAir.f90
+			//  So assume if its not on main air path, its on OA path (for now)
 			if ( !IsAutoSize && !SizingDesRunThisAirSys ) {
 				HardSizeNoDesRun = true;
 				if ( EvapCond( EvapCoolNum ).IndirectVolFlowRate > 0.0 ) {
