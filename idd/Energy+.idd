@@ -15772,11 +15772,14 @@ SurfaceProperty:OtherSideConditionsModel,
       \type choice
       \key GapConvectionRadiation
       \key UndergroundPipingSystemSurface
+	  \key GroundCoupledSurface
       \note GapConvectionRadiation provides boundary conditions for convection
       \note  and linearized thermal radiation across a gap or cavity
       \note  on the other side of the surface that are modeled sperately.
       \note UndergroundPipingSystemSurface provides boundary conditions for
       \note  surfaces in contact with PipingSystem:Underground domains
+	  \note GroundCoupledSurface provides boundary conditions for surfaces
+	  \note  in contact with GroundDomain objects
       \default GapConvectionRadiation
 
 
@@ -53951,6 +53954,101 @@ Pipe:Underground,
         \type real
         \minimum 0
         \default 0
+		
+
+  Site:GroundDomain,
+   A1,	\field Name
+		\required-field
+   N1,	\field Ground Domain Depth
+   		\required-field
+		\type real
+		\minimum> 0
+		\units m
+   N2,	\field Aspect Ratio
+   		\required-field
+		\type real
+   N3,	\field Perimeter Offset
+   		\required-field
+		\type real
+		\units m
+		\minimum>0
+   N4, 	\field Soil Thermal Conductivity {W/m-K}
+   		\required-field
+		\type real
+		\units W/m-K
+		\minimum> 0
+   N5, 	\field Soil Density {kg/m3}
+   		\required-field
+		\type real
+   N6, 	\field Soil Specific Heat {J/kg-K}
+   		\required-field
+		\type real
+   N7,	\field Soil Moisture Content Volume Fraction {percent}
+		\type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8,	\field Soil Moisture Content Volume Fraction at Saturation {percent}
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9,	\field Kusuda-Achenbach Average Surface Temperature {C}
+ 		\required-field
+		\type real
+		\units C
+   N10,	\field Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+		\required-field
+		\type real
+		\units C
+   N11,	\field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+		\required-field
+		\type real
+		\units days
+   N12,	\field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  The value roughly represents the following cases:
+        \note  = 0   : concrete or other solid, non-permeable ground surface material
+        \note  = 0.5 : short grass, much like a manicured lawn
+        \note  = 1   : standard reference state (12 cm grass)
+        \note  = 1.5 : wild growth
+   A2,	\field Name of  Slab Boundary Condition Model
+		\required-field
+   A3,	\field Slab Location
+		\required-field
+		\note This field specifies whether the slab is located "in-grade" or "on-grade"
+   A4, 	\field Name of slab material
+		\field-required
+   A5,	\field Horizontal Insulation
+		\required-field
+		\note This field specifies the presence of insulation beneath the slab.
+   A6,	\field Insulation Material
+		\note optional
+		\note This field specifies the horizontal insulation material.
+   A7,  \field Horizontal Insulation Extents
+        \field-optional
+		\note This field specifies whether the horizontal insulation fully insulates the surface or is perimeter only insulation
+   N13, \field Perimeter Insulation Width
+		\field-optional
+		\note This field specifies the width of the perimeter insulation
+   A8,	\field Vertical Insulation
+		\required-field
+		\note This field specifies the presence of vertical insulation at the slab edge.
+   A9,	\field Insulation Material
+		\note optional
+		\note This field specifies the vertical insulation material.
+   N14, \field Vertical Insulation Depth
+		\field-optional
+		\note This field specifies the depth of the vertical insulation		
+   A10;	\field Slab Included in Ground Simulation
+		\required-field
+		\note This field whether the slab is included in the ground domain simulation.
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
