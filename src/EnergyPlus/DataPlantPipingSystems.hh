@@ -769,10 +769,7 @@ namespace DataPlantPipingSystems {
 		FArray1D_int FloorSurfacePointers;
 		int BasementWallXIndex;
 		int BasementFloorYIndex;
-		int SlabSideInsulationXIndex;
-		int SlabSideInsulationYIndex;
-		int SlabSideInsulationZIndex;
-
+		
 		// Default Constructor
 		BasementZoneInfo() :
 			Depth( 0.0 ),
@@ -781,10 +778,7 @@ namespace DataPlantPipingSystems {
 			WallBoundaryOSCMIndex( 0 ),
 			FloorBoundaryOSCMIndex( 0 ),
 			BasementWallXIndex( -1 ),
-			BasementFloorYIndex( -1 ),
-			SlabSideInsulationXIndex( -1 ),
-			SlabSideInsulationYIndex( -1 ),
-			SlabSideInsulationZIndex( -1 )
+			BasementFloorYIndex( -1 )
 		{}
 
 		// Member Constructor
@@ -1385,8 +1379,8 @@ namespace DataPlantPipingSystems {
 			SlabXIndex1( 0 ),
 			SlabXIndex2( 0 ),
 			SlabYIndex( 0 ),
-			SlabZIndex1( 1 ),
-			SlabZIndex2( 2 ),
+			SlabZIndex1( 0 ),
+			SlabZIndex2( 0 ),
 			HorizInsPresentFlag( false ),
 			HorizInsMaterialNum( 0 ),
 			HorizInsThickness( 0.0254 ),
@@ -1402,8 +1396,8 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( 0 ),
 			VertInsThickness( 0.0254 ),
 			VertInsDepth( 0.0 ),
-			FullHorizInsFlag( true ),
-			PartialHorizInsFlag( true ),
+			FullHorizInsFlag( false ),
+			PartialHorizInsFlag( false ),
 			InsulationXIndex1( 0 ),
 			InsulationXIndex2( 0 ),
 			InsulationYIndex( 0 ),
