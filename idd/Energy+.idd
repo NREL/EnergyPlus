@@ -62228,8 +62228,11 @@ CondenserLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key Sequential
-        \default Sequential
+        \key SequentialLoad
+        \key UniformLoad
+        \key UniformPLR
+        \key SequentialUniformPLR
+        \default SequentialLoad
   A15; \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection

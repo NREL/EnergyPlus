@@ -2047,11 +2047,15 @@ namespace PlantCondLoopOperation {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  July 2010
 		//                      Sept 2010 B. Griffith, retain actual sign of load values
+		//						July 2014 M. Mitchell, added SequentialUniformPLR and UniformPLR schemes
 
 		// PURPOSE OF THIS SUBROUTINE: This subroutine distributes the load
 		// to plant equipment according to one of two distribution schemes:
 		//     OPTIMAL    = 1
-		//     SEQUENTIAL = 2
+		//     SEQUENTIALLOAD = 2
+		//     UNIFORMLOAD  = 3
+		//     UNIFORMPLR = 4
+		//     SEQUENTIALUNIFORMPLR = 5
 		// METHODOLOGY EMPLOYED:
 		// na
 		// REFERENCES:
@@ -2335,25 +2339,25 @@ namespace PlantCondLoopOperation {
 							continue;
 						} else {
 
-						BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
-						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+							BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+							CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
-						// create a reference to the component itself
-						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+							// create a reference to the component itself
+							auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
-						if ( ! this_component.Available ) continue;
+							if ( ! this_component.Available ) continue;
 
-						PlantCapacity += this_component.MaxLoad;
+							PlantCapacity += this_component.MaxLoad;
 
-						if ( this_component.MaxLoad < SmallLoad ){
-							ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
-							MinCompPLR = 0.0;
-						} else {
-							MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
-						}
+							if ( this_component.MaxLoad < SmallLoad ){
+								ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
+								MinCompPLR = 0.0;
+							} else {
+								MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+							}
 
-						//Set LargestMinCompPLR to largest MinCompPLR
-						if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
+							//Set LargestMinCompPLR to largest MinCompPLR
+							if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
 						}
 					}				
 				}
