@@ -1,9 +1,9 @@
-set( target_name EnergyPlus_unit )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
 
 if(MSVC)
   ADD_DEFINITIONS(/Za) # Disables MS language extensions
 endif()
-
 
 set( test_src
   DataPlant.unit.cc
@@ -12,6 +12,13 @@ set( test_src
   Vector.unit.cc
 )
 
-ADD_EXECUTABLE( ${target_name} main.unit.cc ${tst_src} )
+set( test_dependencies
+  EnergyPlusLib
+  objexx
+  sqlite
+)
 
-CREATE_TEST_TARGETS( ${target_name} "${test_src}" "" )
+# Executable name will be EnergyPlus_tests
+# Execute EnergyPlus_tests --help for options using gtest runner
+# Execute EnergyPlus_tests with no arguments to run all tests
+CREATE_TEST_TARGETS( EnergyPlus "${test_src}" "${test_dependencies}" )
