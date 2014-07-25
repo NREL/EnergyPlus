@@ -2922,7 +2922,7 @@ namespace HeatRecovery {
 				Temp = ( 1.0 + Z );
 				Eps = ( 1.0 - std::exp( -NTU * Temp ) ) / Temp;
 			} else if ( SELECT_CASE_var == Cross_Flow_Both_Unmixed ) { // CROSS FLOW BOTH UNMIXED
-				Temp = Z * std::pow( NTU, ( -0.22 ) );
+				Temp = Z * std::pow( NTU, -0.22 );
 				Eps = 1.0 - std::exp( ( std::exp( -NTU * Temp ) - 1.0 ) / Temp );
 			} else if ( SELECT_CASE_var == Cross_Flow_Other ) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
 				Eps = ( 1.0 - std::exp( -Z * ( 1.0 - std::exp( -NTU ) ) ) ) / Z;
@@ -3093,7 +3093,7 @@ namespace HeatRecovery {
 
 		int SolFla; // Flag of solver
 		static Real64 NTU0( 0.0 ); // lower bound for NTU
-		static Real64 NTU1( 50. ); // upper bound for NTU
+		static Real64 NTU1( 50.0 ); // upper bound for NTU
 		FArray1D< Real64 > Par( 2 );
 
 		Par( 1 ) = Eps;

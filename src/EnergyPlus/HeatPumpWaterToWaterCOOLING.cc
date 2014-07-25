@@ -594,6 +594,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		static std::string const RoutineNameCompressInletTemp( "CalcGSHPModel:CompressInletTemp" );
 		static std::string const RoutineNameSuctionPr( "CalcGSHPModel:SuctionPr" );
 		static std::string const RoutineNameCompSuctionTemp( "CalcGSHPModel:CompSuctionTemp" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -824,14 +825,14 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 			T110 = CompSuctionSatTemp;
 			//            Shoot into the super heated region
-			T111 = CompSuctionSatTemp + 100.;
+			T111 = CompSuctionSatTemp + 100.0;
 			// Iterate to find the Suction State
 			LOOP: while ( true ) {
 				CompSuctionTemp = 0.5 * ( T110 + T111 );
 
 				CompSuctionEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
 
-				if ( std::abs( CompSuctionEnth - SuperHeatEnth ) / SuperHeatEnth < .0001 ) {
+				if ( std::abs( CompSuctionEnth - SuperHeatEnth ) / SuperHeatEnth < 0.0001 ) {
 					goto LOOP_exit;
 				}
 
@@ -846,14 +847,14 @@ namespace HeatPumpWaterToWaterCOOLING {
 
 			// Determine the Mass flow rate of refrigerant
 			CompSuctionDensity = GetSupHeatDensityRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
-			MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1 / gamma ) ) ) );
+			MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * std::pow( DischargePr / SuctionPr, 1 / gamma ) );
 
 			// Find the Source Side Heat Transfer
 
 			QLoad = MassRef * ( LoadSideOutletEnth - SourceSideOutletEnth );
 
 			// Determine the theoretical power
-			Power = PowerLosses + ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity / LosFac * ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) - 1 ) );
+			Power = PowerLosses + ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity / LosFac * ( std::pow( DischargePr / SuctionPr, ( gamma - 1 ) / gamma ) - 1 ) );
 
 			// Determine the Loadside HeatRate (QLoad)
 			QSource = Power + QLoad;
@@ -863,19 +864,19 @@ namespace HeatPumpWaterToWaterCOOLING {
 					ShowWarningError( "HeatPump:WaterToWater:ParameterEstimation, Cooling did not converge" );
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Heatpump Name = " + GSHP( GSHPNum ).Name );
-					gio::write( ErrString, "*" ) << std::abs( 100.0 * ( QSource - initialQSource ) / ( initialQSource + SmallNum ) );
+					gio::write( ErrString, fmtLD ) << std::abs( 100.0 * ( QSource - initialQSource ) / ( initialQSource + SmallNum ) );
 					ShowContinueError( "Heat Inbalance (%)             = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << QLoad;
+					gio::write( ErrString, fmtLD ) << QLoad;
 					ShowContinueError( "Load-side heat transfer rate   = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << QSource;
+					gio::write( ErrString, fmtLD ) << QSource;
 					ShowContinueError( "Source-side heat transfer rate = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << SourceSideWaterMassFlowRate;
+					gio::write( ErrString, fmtLD ) << SourceSideWaterMassFlowRate;
 					ShowContinueError( "Source-side mass flow rate     = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << LoadSideWaterMassFlowRate;
+					gio::write( ErrString, fmtLD ) << LoadSideWaterMassFlowRate;
 					ShowContinueError( "Load-side mass flow rate       = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << SourceSideWaterInletTemp;
+					gio::write( ErrString, fmtLD ) << SourceSideWaterInletTemp;
 					ShowContinueError( "Source-side inlet temperature  = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << LoadSideWaterInletTemp;
+					gio::write( ErrString, fmtLD ) << LoadSideWaterInletTemp;
 					ShowContinueError( "Load-side inlet temperature    = " + stripped( ErrString ) );
 
 				}

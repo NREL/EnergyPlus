@@ -93,7 +93,6 @@ namespace ReportSizingManager {
 		using DataGlobals::OutputFileInits;
 		using namespace OutputReportPredefined;
 		using General::RoundSigDigits;
-		using namespace SQLiteProcedures;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -131,7 +130,7 @@ namespace ReportSizingManager {
 		}
 
 		// add to SQL output
-		if ( WriteOutputToSQLite ) AddSQLiteComponentSizingRecord( CompType, CompName, VarDesc, VarValue );
+		if ( sqlite->writeOutputToSQLite() ) sqlite->addSQLiteComponentSizingRecord( CompType, CompName, VarDesc, VarValue );
 
 	}
 

@@ -151,8 +151,6 @@ namespace PlantCondLoopOperation {
 		int ListPtr; // !set by PL()%LoopSide()%Branch()%Comp()%OpScheme(CurCompLevelOpNum)%EquipList(CurListNum)ListPtr
 		//used to locate data in PL()%OpScheme(CurSchemePtr)%EquipList(ListPtr)
 		//Local values from the PlantLoop()%OpScheme() data structure
-		std::string CurSchemeTypeName; // current operation scheme type
-		std::string CurSchemeName; // current operation scheme name
 		int CurSchemeType; // identifier set in PlantData
 		Real64 RangeVariable; // holds the 'loop demand', wetbulb temp, etc.
 		Real64 TestRangeVariable; // abs of RangeVariable for logic tests etc.
@@ -181,7 +179,8 @@ namespace PlantCondLoopOperation {
 		if ( ! any( PlantLoop( LoopNum ).OpScheme.Available() ) ) return;
 
 		// set up references
-		auto & this_component( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ) );
+		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & this_component( loop_side.Branch( BranchNum ).Comp( CompNum ) );
 
 		//Implement EMS control commands
 		ActivateEMSControls( LoopNum, LoopSideNum, BranchNum, CompNum, LoopShutDownFlag );
@@ -195,20 +194,17 @@ namespace PlantCondLoopOperation {
 		NumEquipLists = this_component.OpScheme( CurCompLevelOpNum ).NumEquipLists;
 		CurSchemePtr = this_component.OpScheme( CurCompLevelOpNum ).OpSchemePtr;
 		CurSchemeType = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).OpSchemeType;
-		CurSchemeTypeName = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).TypeOf;
-		CurSchemeName = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).Name;
 
 		// another reference
 		auto & this_op_scheme( PlantLoop( LoopNum ).OpScheme( CurSchemePtr ) );
 
 		//Load the 'range variable' according to the type of control scheme specified
-		{ auto const SELECT_CASE_var( CurSchemeType );
-		if ( ( SELECT_CASE_var == UncontrolledOpSchemeType ) || ( SELECT_CASE_var == CompSetPtBasedSchemeType ) ) {
+		if ( ( CurSchemeType == UncontrolledOpSchemeType ) || ( CurSchemeType == CompSetPtBasedSchemeType ) ) {
 			//No RangeVariable specified for these types
-		} else if ( SELECT_CASE_var == EMSOpSchemeType ) {
+		} else if ( CurSchemeType == EMSOpSchemeType ) {
 			InitLoadDistribution( FirstHVACIteration );
 			//No RangeVariable specified for these types
-		} else if ( SELECT_CASE_var == HeatingRBOpSchemeType ) {
+		} else if ( CurSchemeType == HeatingRBOpSchemeType ) {
 			// For zero demand, we need to clean things out before we leave
 			if ( LoopDemand < SmallLoad ) {
 				InitLoadDistribution( FirstHVACIteration );
@@ -217,7 +213,7 @@ namespace PlantCondLoopOperation {
 				return;
 			}
 			RangeVariable = LoopDemand;
-		} else if ( SELECT_CASE_var == CoolingRBOpSchemeType ) {
+		} else if ( CurSchemeType == CoolingRBOpSchemeType ) {
 			// For zero demand, we need to clean things out before we leave
 			if ( LoopDemand > ( -1.0 * SmallLoad ) ) {
 				InitLoadDistribution( FirstHVACIteration );
@@ -226,20 +222,20 @@ namespace PlantCondLoopOperation {
 				return;
 			}
 			RangeVariable = LoopDemand;
-		} else if ( SELECT_CASE_var == DryBulbRBOpSchemeType ) {
+		} else if ( CurSchemeType == DryBulbRBOpSchemeType ) {
 			RangeVariable = OutDryBulbTemp;
-		} else if ( SELECT_CASE_var == WetBulbRBOpSchemeType ) {
+		} else if ( CurSchemeType == WetBulbRBOpSchemeType ) {
 			RangeVariable = OutWetBulbTemp;
-		} else if ( SELECT_CASE_var == RelHumRBOpSchemeType ) {
+		} else if ( CurSchemeType == RelHumRBOpSchemeType ) {
 			RangeVariable = OutRelHum;
-		} else if ( SELECT_CASE_var == DewPointRBOpSchemeType ) {
+		} else if ( CurSchemeType == DewPointRBOpSchemeType ) {
 			RangeVariable = OutDewPointTemp;
-		} else if ( ( SELECT_CASE_var == DryBulbTDBOpSchemeType ) || ( SELECT_CASE_var == WetBulbTDBOpSchemeType ) || ( SELECT_CASE_var == DewPointTDBOpSchemeType ) ) {
+		} else if ( ( CurSchemeType == DryBulbTDBOpSchemeType ) || ( CurSchemeType == WetBulbTDBOpSchemeType ) || ( CurSchemeType == DewPointTDBOpSchemeType ) ) {
 			RangeVariable = FindRangeVariable( LoopNum, CurSchemePtr, CurSchemeType );
 		} else {
 			// No controls specified.  This is a fatal error
-			ShowFatalError( "Invalid Operation Scheme Type Requested=" + CurSchemeTypeName + ", in ManagePlantLoadDistribution" );
-		}}
+			ShowFatalError( "Invalid Operation Scheme Type Requested=" + PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).TypeOf + ", in ManagePlantLoadDistribution" );
+		}
 
 		//Find the proper list within the specified scheme
 		foundlist = false;
@@ -268,7 +264,7 @@ namespace PlantCondLoopOperation {
 				//trying to do something where the last stage still runs the equipment but at the hi limit.
 
 				if ( TestRangeVariable < RangeLoLimit || TestRangeVariable > RangeHiLimit ) {
-					if ( ( TestRangeVariable > RangeHiLimit ) && ListPtr == ( this_op_scheme.EquipListNumForLastStage ) ) {
+					if ( ( TestRangeVariable > RangeHiLimit ) && ( ListPtr == this_op_scheme.EquipListNumForLastStage ) ) {
 						// let this go thru, later AdjustChangeInLoadForLastStageUpperRangeLimit will cap dispatch to RangeHiLimit
 						CurListNum = ListNum;
 						break;
@@ -289,7 +285,7 @@ namespace PlantCondLoopOperation {
 					for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 						EquipBranchNum = this_op_scheme.EquipList( ListNum ).Comp( CompIndex ).BranchNumPtr;
 						EquipCompNum = this_op_scheme.EquipList( ListNum ).Comp( CompIndex ).CompNumPtr;
-						PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( EquipBranchNum ).Comp( EquipCompNum ).MyLoad = 0.0;
+						loop_side.Branch( EquipBranchNum ).Comp( EquipCompNum ).MyLoad = 0.0;
 					}
 				}
 				if ( this_op_scheme.EquipList( ListPtr ).NumComps > 0 ) {
@@ -299,7 +295,7 @@ namespace PlantCondLoopOperation {
 				}
 			}
 
-		} //End of range based schemes
+		} // End of range based schemes
 
 	}
 
@@ -896,7 +892,7 @@ namespace PlantCondLoopOperation {
 								}
 							} else {
 								// others should not be less than -70
-								if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).RangeLowerLimit < -70. ) {
+								if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( ListNum ).RangeLowerLimit < -70.0 ) {
 									ShowSevereError( LoopOpSchemeObj + " = \"" + PlantLoop( LoopNum ).OperationScheme + "\", found too low of a value for a lower limit in " + CurrentModuleObject + " = \"" + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\"." );
 									ErrorsFound = true;
 								}
@@ -1313,6 +1309,7 @@ namespace PlantCondLoopOperation {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1374,7 +1371,7 @@ namespace PlantCondLoopOperation {
 									//call error...Demand node must be component inlet node for autosizing
 								}
 							}
-							gio::write( EquipNum, "*" ) << Num;
+							gio::write( EquipNum, fmtLD ) << Num;
 							ReportSizingOutput( CurrentModuleObject, PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name, "Design Water Flow Rate [m3/s] Equipment # " + stripped( EquipNum ), CompFlowRate );
 						}
 
@@ -1573,7 +1570,7 @@ namespace PlantCondLoopOperation {
 		bool SchemeNameFound; // Set to FALSE if a match of OpScheme object and OpScheme name is not found
 		std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
 		int StackMngrNum; // local temporary for Erl program calling manager index
-		bool lDummy;
+		static bool lDummy; //Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
 		SchemeNameFound = true;
 
@@ -2653,7 +2650,7 @@ namespace PlantCondLoopOperation {
 				if ( ControlNodeNum > 0 ) {
 					Tsensor = Node( ControlNodeNum ).TempLastTimestep; // use lagged value for stability
 				} else {
-					Tsensor = 23.;
+					Tsensor = 23.0;
 				}
 			}}
 
@@ -2680,7 +2677,7 @@ namespace PlantCondLoopOperation {
 				if ( ControlNodeNum > 0 ) {
 					Tsensor = Node( ControlNodeNum ).TempLastTimestep; // use lagged value for stability
 				} else {
-					Tsensor = 23.;
+					Tsensor = 23.0;
 				}
 			}}
 

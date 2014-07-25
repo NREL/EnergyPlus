@@ -4158,6 +4158,16 @@ namespace DataHeatBalance {
 			LatCaseCreditToHVAC( LatCaseCreditToHVAC )
 		{}
 
+		// Reset to Zeros
+		void
+		reset()
+		{
+			SenCaseCreditToZone = 0.0;
+			LatCaseCreditToZone = 0.0;
+			SenCaseCreditToHVAC = 0.0;
+			LatCaseCreditToHVAC = 0.0;
+		}
+
 	};
 
 	struct HeatReclaimRefrigeratedRackData

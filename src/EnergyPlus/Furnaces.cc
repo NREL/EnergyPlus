@@ -7814,7 +7814,7 @@ namespace Furnaces {
 
 			} else {
 				// Calculate PLF
-				A = 4. * tau * ( Nmax / 3600. ) * ( 1 - PLR / PLF1 );
+				A = 4.0 * tau * ( Nmax / 3600.0 ) * ( 1 - PLR / PLF1 );
 				if ( A < 1.5e-3 ) {
 					// A safety check to prevent PLF2 = 1 - A * (1 - Exp(-1 / A))
 					// from "float underflow error". Occurs when PLR is very close to 1.0,

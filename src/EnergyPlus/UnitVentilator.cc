@@ -1026,7 +1026,7 @@ namespace UnitVentilator {
 
 				if ( UnitVent( UnitVentNum ).HCoilType == Heating_WaterCoilType ) {
 
-					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 					UnitVent( UnitVentNum ).MaxHotWaterFlow = rho * UnitVent( UnitVentNum ).MaxVolHotWaterFlow;
 					UnitVent( UnitVentNum ).MinHotWaterFlow = rho * UnitVent( UnitVentNum ).MinVolHotWaterFlow;
@@ -1045,7 +1045,7 @@ namespace UnitVentilator {
 			} //(UnitVent(UnitVentNum)%HCoilPresent)
 
 			if ( UnitVent( UnitVentNum ).CCoilPresent ) { // Only initialize these if a cooling coil is actually present
-				rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5., PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				UnitVent( UnitVentNum ).MaxColdWaterFlow = rho * UnitVent( UnitVentNum ).MaxVolColdWaterFlow;
 				UnitVent( UnitVentNum ).MinColdWaterFlow = rho * UnitVent( UnitVentNum ).MinVolColdWaterFlow;
@@ -1381,8 +1381,8 @@ namespace UnitVentilator {
 								CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
 
-								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60., PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitVent( UnitVentNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
@@ -1515,8 +1515,8 @@ namespace UnitVentilator {
 								CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 								CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
 								DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
-								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5., PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5., PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( UnitVent( UnitVentNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolColdWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 								if ( MaxVolColdWaterFlowDes < 0.0 ) {

@@ -306,6 +306,9 @@ namespace DataPlant {
 
 	extern int const NumConvergenceHistoryTerms;
 	extern FArray1D< Real64 > const ConvergenceHistoryARR;
+	extern Real64 const sum_ConvergenceHistoryARR;
+	extern Real64 const square_sum_ConvergenceHistoryARR;
+	extern Real64 const sum_square_ConvergenceHistoryARR;
 
 	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.f90.  A common definition would be nicer.
 
@@ -647,7 +650,7 @@ namespace DataPlant {
 			MinOutletTemp( 0.0 ),
 			MaxOutletTemp( 0.0 ),
 			FreeCoolCntrlShutDown( false ),
-			FreeCoolCntrlMinCntrlTemp( 0. ),
+			FreeCoolCntrlMinCntrlTemp( 0.0 ),
 			FreeCoolCntrlMode( 0 ),
 			FreeCoolCntrlNodeNum( 0 ),
 			IndexInLoopSidePumps( 0 ),

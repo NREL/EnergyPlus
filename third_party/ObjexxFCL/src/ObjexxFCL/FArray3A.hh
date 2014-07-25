@@ -581,7 +581,7 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray3A &
-	operator -=(  MArray3< A, M > const & a )
+	operator -=( MArray3< A, M > const & a )
 	{
 		Super::operator -=( a );
 		return *this;
@@ -591,7 +591,7 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray3A &
-	operator *=(  MArray3< A, M > const & a )
+	operator *=( MArray3< A, M > const & a )
 	{
 		Super::operator *=( a );
 		return *this;
@@ -601,7 +601,7 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray3A &
-	operator /=(  MArray3< A, M > const & a )
+	operator /=( MArray3< A, M > const & a )
 	{
 		Super::operator /=( a );
 		return *this;
