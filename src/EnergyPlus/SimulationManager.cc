@@ -454,7 +454,6 @@ namespace SimulationManager {
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
 						if (AnySlabsInModel){
 							InitAndSimGroundDomains();
-							gio::write(112, "*");
 						}
 						
 						BeginTimeStepFlag = true;
