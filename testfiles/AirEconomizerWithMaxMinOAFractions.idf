@@ -2780,7 +2780,7 @@
     Hot Water Loop HW Demand Outlet,  !- Demand Side Outlet Node Name
     Hot Water Loop HW Demand Side Branches,  !- Demand Side Branch List Name
     Hot Water Loop HW Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     ,                        !- Availability Manager List Name
     SingleSetpoint;          !- Plant Loop Demand Calculation Scheme
 
@@ -3161,7 +3161,7 @@
     Chilled Water Loop ChW Demand Outlet,  !- Demand Side Outlet Node Name
     Chilled Water Loop ChW Demand Side Branches,  !- Demand Side Branch List Name
     Chilled Water Loop ChW Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     ,                        !- Availability Manager List Name
     SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
     None;                    !- Common Pipe Simulation
@@ -3370,7 +3370,7 @@
     Chilled Water Loop CndW Demand Outlet,  !- Demand Side Outlet Node Name
     Chilled Water Loop CndW Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Chilled Water Loop CndW Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   CondenserEquipmentOperationSchemes,
     Chilled Water Loop Condenser Operation,  !- Name

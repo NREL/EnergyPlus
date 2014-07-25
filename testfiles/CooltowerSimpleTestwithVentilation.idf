@@ -2238,8 +2238,6 @@
 
   Output:Variable,*,Zone Ventilation Air Inlet Temperature,hourly;
 
-  Output:Variable,*,Zone Ventilation Mass Flow Rate,hourly;
-
   Output:Variable,*,Zone Cooltower Sensible Heat Loss Energy,hourly;
 
   Output:Variable,*,Zone Cooltower Sensible Heat Loss Rate,hourly;
@@ -2250,7 +2248,7 @@
 
   Output:Variable,*,Zone Cooltower Air Volume,hourly;
 
-  Output:Variable,*,Zone Cooltower Current Density Volumetric Flow Rate,hourly;
+  Output:Variable,*,Zone Cooltower Current Density Air Volume Flow Rate,hourly;
 
   Output:Variable,*,Zone Cooltower Air Mass,hourly;
 
