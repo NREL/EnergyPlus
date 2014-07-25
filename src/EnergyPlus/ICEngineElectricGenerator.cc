@@ -566,7 +566,7 @@ namespace ICEngineElectricGenerator {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat (J/kg-K)
-		Real64 const KJtoJ( 1000. ); // convert Kjoules to joules
+		Real64 const KJtoJ( 1000.0 ); // convert Kjoules to joules
 		static std::string const RoutineName( "CalcICEngineGeneratorModel" );
 
 		// DERIVED TYPE DEFINITIONS

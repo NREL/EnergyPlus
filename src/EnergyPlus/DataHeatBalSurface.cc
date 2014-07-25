@@ -30,9 +30,9 @@ namespace DataHeatBalSurface {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	Real64 const MinSurfaceTempLimit( -100. ); // Lowest inside surface temperature allowed in Celsius
-	Real64 const MinSurfaceTempLimitBeforeFatal( -250. ); // 2.5 times MinSurfaceTempLimit
-	Real64 const DefaultSurfaceTempLimit( 200. ); // Highest inside surface temperature allowed in Celsius
+	Real64 const MinSurfaceTempLimit( -100.0 ); // Lowest inside surface temperature allowed in Celsius
+	Real64 const MinSurfaceTempLimitBeforeFatal( -250.0 ); // 2.5 times MinSurfaceTempLimit
+	Real64 const DefaultSurfaceTempLimit( 200.0 ); // Highest inside surface temperature allowed in Celsius
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -43,8 +43,8 @@ namespace DataHeatBalSurface {
 	FArray1D_int SUMH; // From Old Bldctf.inc
 
 	//Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
-	Real64 MaxSurfaceTempLimit( 200. ); // Highest inside surface temperature allowed in Celsius
-	Real64 MaxSurfaceTempLimitBeforeFatal( 500. ); // 2.5 times MaxSurfaceTempLimit
+	Real64 MaxSurfaceTempLimit( 200.0 ); // Highest inside surface temperature allowed in Celsius
+	Real64 MaxSurfaceTempLimitBeforeFatal( 500.0 ); // 2.5 times MaxSurfaceTempLimit
 	FArray1D< Real64 > CTFConstInPart; // Constant Inside Portion of the CTF calculation
 	FArray1D< Real64 > CTFConstOutPart; // Constant Outside Portion of the CTF calculation
 	FArray1D< Real64 > TempSurfIn; // Temperature of the Inside Surface for each heat transfer surface

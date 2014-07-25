@@ -39,6 +39,7 @@ namespace DataHVACGlobals {
 	extern int const SystemCapacitySizing; // request sizing for system capacity
 	extern int const CoolingSHRSizing; // request sizing for cooling SHR
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
+	extern int const AutoCalculateSizing; // identifies an autocalulate input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
@@ -286,6 +287,7 @@ namespace DataHVACGlobals {
 	extern bool SimPlantLoopsFlag; // True when the main plant loops need to be (re)simulated
 	extern bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	extern bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
+	extern bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
 
 	// Types
 

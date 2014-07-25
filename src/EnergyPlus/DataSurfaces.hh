@@ -2147,7 +2147,7 @@ namespace DataSurfaces {
 			EMSOverrideTConvValue( 0.0 ),
 			HConv( 4.0 ),
 			EMSOverrideOnHConv( false ),
-			EMSOverrideHConvValue( 0. ),
+			EMSOverrideHConvValue( 0.0 ),
 			TRad( 20.0 ),
 			EMSOverrideOnTRad( false ),
 			EMSOverrideTRadValue( 0.0 ),

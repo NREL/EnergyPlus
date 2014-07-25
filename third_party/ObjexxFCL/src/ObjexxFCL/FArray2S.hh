@@ -166,13 +166,13 @@ public: // Assignment
 				l = 0;
 				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-						operator()( i1, i2 ) = c[ l ];
+						operator ()( i1, i2 ) = c[ l ];
 					}
 				}
 			} else { // Not overlap-safe
 				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator()( i1, i2 ) = a( i1, i2 );
+						operator ()( i1, i2 ) = a( i1, i2 );
 					}
 				}
 			}
@@ -189,7 +189,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = a( i1, i2 );
+				operator ()( i1, i2 ) = a( i1, i2 );
 			}
 		}
 		return *this;
@@ -205,7 +205,7 @@ public: // Assignment
 		if ( a.dimensions_initialized() ) {
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-					operator() ( i1, i2 ) = a( i1, i2 );
+					operator () ( i1, i2 ) = a( i1, i2 );
 				}
 			}
 		}
@@ -230,13 +230,13 @@ public: // Assignment
 			l = 0;
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-					operator()( i1, i2 ) = c[ l ];
+					operator ()( i1, i2 ) = c[ l ];
 				}
 			}
 		} else { // Not overlap-safe
 			for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-					operator()( i1, i2 ) = a( j1, j2 );
+					operator ()( i1, i2 ) = a( j1, j2 );
 				}
 			}
 		}
@@ -252,7 +252,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) = a( j1, j2 );
+				operator ()( i1, i2 ) = a( j1, j2 );
 			}
 		}
 		return *this;
@@ -268,7 +268,7 @@ public: // Assignment
 		auto il( l.begin() );
 		for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++il ) {
-				operator()( i1, i2 ) = *il;
+				operator ()( i1, i2 ) = *il;
 			}
 		}
 		return *this;
@@ -284,7 +284,7 @@ public: // Assignment
 		if ( a.dimensions_initialized() ) {
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-					operator() ( i1, i2 ) += a( i1, i2 );
+					operator () ( i1, i2 ) += a( i1, i2 );
 				}
 			}
 		}
@@ -301,7 +301,7 @@ public: // Assignment
 		if ( a.dimensions_initialized() ) {
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-					operator() ( i1, i2 ) -= a( i1, i2 );
+					operator () ( i1, i2 ) -= a( i1, i2 );
 				}
 			}
 		}
@@ -318,7 +318,7 @@ public: // Assignment
 		if ( a.dimensions_initialized() ) {
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-					operator() ( i1, i2 ) *= a( i1, i2 );
+					operator () ( i1, i2 ) *= a( i1, i2 );
 				}
 			}
 		}
@@ -336,7 +336,7 @@ public: // Assignment
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
 					assert( T( a( i1, i2 ) ) != T( 0 ) );
-					operator() ( i1, i2 ) /= a( i1, i2 );
+					operator () ( i1, i2 ) /= a( i1, i2 );
 				}
 			}
 		}
@@ -361,13 +361,13 @@ public: // Assignment
 			l = 0;
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-					operator()( i1, i2 ) += c[ l ];
+					operator ()( i1, i2 ) += c[ l ];
 				}
 			}
 		} else { // Not overlap-safe
 			for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-					operator()( i1, i2 ) += a( j1, j2 );
+					operator ()( i1, i2 ) += a( j1, j2 );
 				}
 			}
 		}
@@ -392,13 +392,13 @@ public: // Assignment
 			l = 0;
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-					operator()( i1, i2 ) -= c[ l ];
+					operator ()( i1, i2 ) -= c[ l ];
 				}
 			}
 		} else { // Not overlap-safe
 			for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-					operator()( i1, i2 ) -= a( j1, j2 );
+					operator ()( i1, i2 ) -= a( j1, j2 );
 				}
 			}
 		}
@@ -423,13 +423,13 @@ public: // Assignment
 			l = 0;
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-					operator()( i1, i2 ) *= c[ l ];
+					operator ()( i1, i2 ) *= c[ l ];
 				}
 			}
 		} else { // Not overlap-safe
 			for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-					operator()( i1, i2 ) *= a( j1, j2 );
+					operator ()( i1, i2 ) *= a( j1, j2 );
 				}
 			}
 		}
@@ -455,14 +455,14 @@ public: // Assignment
 			l = 0;
 			for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-					operator()( i1, i2 ) /= c[ l ];
+					operator ()( i1, i2 ) /= c[ l ];
 				}
 			}
 		} else { // Not overlap-safe
 			for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
 					assert( T( a( j1, j2 ) ) != T( 0 ) );
-					operator()( i1, i2 ) /= a( j1, j2 );
+					operator ()( i1, i2 ) /= a( j1, j2 );
 				}
 			}
 		}
@@ -478,7 +478,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) += a( j1, j2 );
+				operator ()( i1, i2 ) += a( j1, j2 );
 			}
 		}
 		return *this;
@@ -493,7 +493,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) -= a( j1, j2 );
+				operator ()( i1, i2 ) -= a( j1, j2 );
 			}
 		}
 		return *this;
@@ -508,7 +508,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) *= a( j1, j2 );
+				operator ()( i1, i2 ) *= a( j1, j2 );
 			}
 		}
 		return *this;
@@ -524,7 +524,7 @@ public: // Assignment
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
 				assert( T( a( j1, j2 ) ) != T( 0 ) );
-				operator()( i1, i2 ) /= a( j1, j2 );
+				operator ()( i1, i2 ) /= a( j1, j2 );
 			}
 		}
 		return *this;
@@ -537,7 +537,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = t;
+				operator ()( i1, i2 ) = t;
 			}
 		}
 		return *this;
@@ -550,7 +550,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) += t;
+				operator ()( i1, i2 ) += t;
 			}
 		}
 		return *this;
@@ -563,7 +563,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) -= t;
+				operator ()( i1, i2 ) -= t;
 			}
 		}
 		return *this;
@@ -576,7 +576,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) *= t;
+				operator ()( i1, i2 ) *= t;
 			}
 		}
 		return *this;
@@ -590,7 +590,7 @@ public: // Assignment
 		assert( t != T( 0 ) );
 		for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) /= t;
+				operator ()( i1, i2 ) /= t;
 			}
 		}
 		return *this;
@@ -771,22 +771,6 @@ public: // Inspector
 		default:
 			assert( false );
 			return I1();
-		}
-	}
-
-	// Lower Index of a Dimension
-	inline
-	int
-	l( int const d ) const
-	{
-		switch ( d ) {
-		case 1:
-			return 1;
-		case 2:
-			return 1;
-		default:
-			assert( false );
-			return 1;
 		}
 	}
 

@@ -384,8 +384,8 @@ namespace CoolTower {
 			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Energy [J]", CoolTowerSys( CoolTowerNum ).LatHeatLoss, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Latent Heat Loss Rate [W]", CoolTowerSys( CoolTowerNum ).LatHeatPower, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Volume [m3]", CoolTowerSys( CoolTowerNum ).CoolTAirVol, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Current Conditions Volumetric Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
-			SetupOutputVariable( "Zone Cooltower Standard Conditions Volumetric Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Current Density Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
+			SetupOutputVariable( "Zone Cooltower Standard Density Air Volume Flow Rate [m3/s]", CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Mass [kg]", CoolTowerSys( CoolTowerNum ).CoolTAirMass, "System", "Sum", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Mass Flow Rate [kg/s]", CoolTowerSys( CoolTowerNum ).AirMassFlowRate, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
 			SetupOutputVariable( "Zone Cooltower Air Inlet Temperature [C]", CoolTowerSys( CoolTowerNum ).InletDBTemp, "System", "Average", Zone( CoolTowerSys( CoolTowerNum ).ZonePtr ).Name );
@@ -495,20 +495,21 @@ namespace CoolTower {
 				// Unit is on and simulate this component
 				// Determine the temperature and air flow rate at the cooltower outlet
 				if ( CoolTowerSys( CoolTowerNum ).FlowCtrlType == WindDrivenFlow ) {
-					CoolTowerSys( CoolTowerNum ).OutletVelocity = 0.7 * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 ) + 0.47 * ( WindSpeed - 1.0 );
+					Real64 const height_sqrt( std::sqrt( CoolTowerSys( CoolTowerNum ).TowerHeight ) );
+					CoolTowerSys( CoolTowerNum ).OutletVelocity = 0.7 * height_sqrt + 0.47 * ( WindSpeed - 1.0 );
 					AirVolFlowRate = CoolTowerSys( CoolTowerNum ).OutletArea * CoolTowerSys( CoolTowerNum ).OutletVelocity;
 					AirVolFlowRate = min( AirVolFlowRate, CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate );
-					WaterFlowRate = ( AirVolFlowRate / ( 0.0125 * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 ) ) );
+					WaterFlowRate = ( AirVolFlowRate / ( 0.0125 * height_sqrt ) );
 					if ( WaterFlowRate > CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor ) {
 						WaterFlowRate = CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor;
-						AirVolFlowRate = 0.0125 * WaterFlowRate * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 );
+						AirVolFlowRate = 0.0125 * WaterFlowRate * height_sqrt;
 						AirVolFlowRate = min( AirVolFlowRate, CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate );
 					}
 					WaterFlowRate = min( WaterFlowRate, ( CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor ) );
 					OutletTemp = OutDryBulbTemp - ( OutDryBulbTemp - OutWetBulbTemp ) * ( 1.0 - std::exp( -0.8 * CoolTowerSys( CoolTowerNum ).TowerHeight ) ) * ( 1.0 - std::exp( -0.15 * WaterFlowRate ) );
 				} else if ( CoolTowerSys( CoolTowerNum ).FlowCtrlType == WaterFlowSchedule ) {
 					WaterFlowRate = CoolTowerSys( CoolTowerNum ).MaxWaterFlowRate * UCFactor;
-					AirVolFlowRate = 0.0125 * WaterFlowRate * std::pow( ( CoolTowerSys( CoolTowerNum ).TowerHeight ), 0.5 );
+					AirVolFlowRate = 0.0125 * WaterFlowRate * std::sqrt( CoolTowerSys( CoolTowerNum ).TowerHeight );
 					AirVolFlowRate = min( AirVolFlowRate, CoolTowerSys( CoolTowerNum ).MaxAirVolFlowRate );
 					OutletTemp = OutDryBulbTemp - ( OutDryBulbTemp - OutWetBulbTemp ) * ( 1.0 - std::exp( -0.8 * CoolTowerSys( CoolTowerNum ).TowerHeight ) ) * ( 1.0 - std::exp( -0.15 * WaterFlowRate ) );
 				}
@@ -541,16 +542,16 @@ namespace CoolTower {
 				}
 
 				// Determine air mass flow rate and volume flow rate
-				InletHumRat = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress, BlankString );
+				InletHumRat = PsyWFnTdbTwbPb( OutDryBulbTemp, OutWetBulbTemp, OutBaroPress );
 				// Assume no pressure drops and no changes in enthalpy between inlet and outlet air
-				IntHumRat = PsyWFnTdbH( OutletTemp, OutEnthalpy, BlankString ); // Initialized humidity ratio
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, IntHumRat, BlankString );
+				IntHumRat = PsyWFnTdbH( OutletTemp, OutEnthalpy ); // Initialized humidity ratio
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, IntHumRat );
 				AirMassFlowRate = AirDensity * CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate;
 				// From the mass balance W_in*(m_air + m_water) = W_out*m_air
 				RhoWater = RhoH2O( OutletTemp ); // Assume T_water = T_outlet
 				OutletHumRat = ( InletHumRat * ( AirMassFlowRate + ( CoolTowerSys( CoolTowerNum ).ActualWaterFlowRate * RhoWater ) ) ) / AirMassFlowRate;
 				AirSpecHeat = PsyCpAirFnWTdb( OutletHumRat, OutletTemp );
-				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, OutletHumRat, BlankString ); // Outlet air density
+				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, OutletHumRat ); // Outlet air density
 				CVF( ZoneNum ) = CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate * GetCurrentScheduleValue( CoolTowerSys( CoolTowerNum ).SchedPtr );
 				MCPC( ZoneNum ) = CVF( ZoneNum ) * AirDensity * AirSpecHeat;
 				MCPTC( ZoneNum ) = MCPC( ZoneNum ) * OutletTemp;
@@ -702,7 +703,7 @@ namespace CoolTower {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

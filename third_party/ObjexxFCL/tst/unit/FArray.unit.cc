@@ -591,3 +591,12 @@ TEST( FArrayTest, CountOp2D )
 	EXPECT_EQ( 9u, count_lt( A, 11 ) );
 	EXPECT_EQ( 3u, count_gt( A, 3 ) );
 }
+
+TEST( FArrayTest, Functions1D )
+{
+	FArray1D_int u{ 1, 2, 3 };
+	FArray1D_int v{ 2, 3, 4 };
+	EXPECT_EQ( 14, magnitude_squared( u ) );
+	EXPECT_EQ( 3, distance_squared( u, v ) );
+	EXPECT_EQ( 20, dot( u, v ) );
+}

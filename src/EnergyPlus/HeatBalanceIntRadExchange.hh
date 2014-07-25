@@ -10,7 +10,6 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2A.hh>
 #include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -30,8 +29,6 @@ namespace HeatBalanceIntRadExchange {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern gio::Fmt const fmtx;
-	extern gio::Fmt const fmty;
 
 	// DERIVED TYPE DEFINITIONS
 	// na

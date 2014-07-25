@@ -1444,7 +1444,7 @@ namespace OutputReportPredefined {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtI1( "(I1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1471,7 +1471,7 @@ namespace OutputReportPredefined {
 			sigDigitCount = 2;
 		}
 		// convert the integer to a string for the number of digits
-		gio::write( digitString, "(I1)" ) << sigDigitCount;
+		gio::write( digitString, fmtI1 ) << sigDigitCount;
 		// build up the format string
 		if ( tableEntryReal < 1e10 ) {
 			formatConvert = "(F12." + digitString + ')';
@@ -1562,7 +1562,7 @@ namespace OutputReportPredefined {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1575,7 +1575,7 @@ namespace OutputReportPredefined {
 
 		incrementTableEntry();
 		// convert the integer to a string
-		gio::write( stringEntry, "*" ) << tableEntryInt;
+		gio::write( stringEntry, fmtLD ) << tableEntryInt;
 		tableEntry( numTableEntry ).charEntry = stringEntry;
 		tableEntry( numTableEntry ).objectName = objName;
 		tableEntry( numTableEntry ).indexColumn = columnIndex;

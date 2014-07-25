@@ -77,7 +77,7 @@ namespace TranspiredCollector {
 	int const Layout_Triangle( 2 );
 	int const Correlation_Kutscher1994( 1 );
 	int const Correlation_VanDeckerHollandsBrunger2001( 2 );
-	
+
 	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
@@ -508,10 +508,10 @@ namespace TranspiredCollector {
 			AvgTilt = sum_product_sub( Surface.Tilt(), Surface.Area(), UTSC( Item ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( Item ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
 			for ( ThisSurf = 1; ThisSurf <= UTSC( Item ).NumSurfs; ++ThisSurf ) {
 				SurfID = UTSC( Item ).SurfPtrs( ThisSurf );
-				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15. ) {
+				if ( std::abs( Surface( SurfID ).Azimuth - AvgAzimuth ) > 15.0 ) {
 					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Azimuth different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
-				if ( std::abs( Surface( SurfID ).Tilt - AvgTilt ) > 10. ) {
+				if ( std::abs( Surface( SurfID ).Tilt - AvgTilt ) > 10.0 ) {
 					ShowWarningError( "Surface " + Surface( SurfID ).Name + " has Tilt different from others in " "the group associated with " + CurrentModuleObject + " =" + UTSC( Item ).Name );
 				}
 
@@ -562,9 +562,9 @@ namespace TranspiredCollector {
 			//  need to update this for slots as well as holes
 			{ auto const SELECT_CASE_var( UTSC( Item ).Layout );
 			if ( SELECT_CASE_var == Layout_Triangle ) { // 'TRIANGLE'
-				UTSC( Item ).Porosity = 0.907 * std::pow( ( UTSC( Item ).HoleDia / UTSC( Item ).Pitch ), 2.0 ); //Kutscher equation, Triangle layout
+				UTSC( Item ).Porosity = 0.907 * pow_2( UTSC( Item ).HoleDia / UTSC( Item ).Pitch ); //Kutscher equation, Triangle layout
 			} else if ( SELECT_CASE_var == Layout_Square ) { // 'SQUARE'
-				UTSC( Item ).Porosity = ( Pi / 4. ) * ( std::pow( UTSC( Item ).HoleDia, 2.0 ) ) / ( std::pow( UTSC( Item ).Pitch, 2.0 ) ); //Waterloo equation, square layout
+				UTSC( Item ).Porosity = ( Pi / 4.0 ) * pow_2( UTSC( Item ).HoleDia ) / pow_2( UTSC( Item ).Pitch ); //Waterloo equation, square layout
 			}}
 			TiltRads = std::abs( AvgTilt ) * DegToRadians;
 			tempHdeltaNPL = std::sin( TiltRads ) * UTSC( Item ).Height / 4.0;
@@ -860,7 +860,7 @@ namespace TranspiredCollector {
 			Tamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
 		}
 
-		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat, BlankString );
+		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRat );
 
 		CpAir = PsyCpAirFnWTdb( OutHumRat, Tamb );
 
@@ -936,7 +936,7 @@ namespace TranspiredCollector {
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 			TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
 			TscollK = UTSC( UTSCNum ).TcollLast + KelvinConv;
-			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( std::pow( TscollK, 4 ) - std::pow( TsoK, 4 ) ) / ( TscollK - TsoK );
+			HPlenARR( ThisSurf ) = Sigma * AbsExt * AbsThermSurf * ( pow_4( TscollK ) - pow_4( TsoK ) ) / ( TscollK - TsoK );
 		}
 //		AreaSum = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 		auto Area( array_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) ); //Autodesk:F2C++ Copy of subscripted Area array for use below: This makes a copy so review wrt performance
@@ -979,7 +979,7 @@ namespace TranspiredCollector {
 
 			AlessHoles = A - holeArea;
 
-			NuD = 2.75 * ( ( ( std::pow( ( P / D ), ( -1.2 ) ) ) * ( std::pow( ReD, 0.43 ) ) ) + ( 0.011 * Por * ReD * ( std::pow( ( Vwind / Vsuction ), 0.48 ) ) ) );
+			NuD = 2.75 * ( ( std::pow( P / D, -1.2 ) * std::pow( ReD, 0.43 ) ) + ( 0.011 * Por * ReD * std::pow( Vwind / Vsuction, 0.48 ) ) );
 			U = k * NuD / D;
 			HXeff = 1.0 - std::exp( -1.0 * ( ( U * AlessHoles ) / ( Mdot * CpAir ) ) );
 
@@ -991,9 +991,9 @@ namespace TranspiredCollector {
 			ReH = ( Vsuction * D ) / ( nu * Por );
 			if ( ReD > 0.0 ) {
 				if ( ReW > 0.0 ) {
-					HXeff = ( 1.0 - std::pow( ( 1.0 + ReS * max( 1.733 * std::pow( ReW, ( -0.5 ) ), 0.02136 ) ), ( -1.0 ) ) ) * ( 1.0 - std::pow( ( 1.0 + 0.2273 * ( std::pow( ReB, 0.5 ) ) ), ( -1.0 ) ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
+					HXeff = ( 1.0 - std::pow( 1.0 + ReS * max( 1.733 * std::pow( ReW, -0.5 ), 0.02136 ), -1.0 ) ) * ( 1.0 - std::pow( 1.0 + 0.2273 * std::sqrt( ReB ), -1.0 ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
 				} else {
-					HXeff = ( 1.0 - std::pow( ( 1.0 + ReS * 0.02136 ), ( -1.0 ) ) ) * ( 1.0 - std::pow( ( 1.0 + 0.2273 * std::pow( ReB, 0.5 ) ), ( -1.0 ) ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
+					HXeff = ( 1.0 - std::pow( 1.0 + ReS * 0.02136, -1.0 ) ) * ( 1.0 - std::pow( 1.0 + 0.2273 * std::sqrt( ReB ), -1.0 ) ) * std::exp( -0.01895 * ( P / D ) - ( 20.62 / ReH ) * ( t / D ) );
 				}
 			} else {
 				HXeff = 0.0;
@@ -1116,9 +1116,9 @@ namespace TranspiredCollector {
 		Tamb = sum_product_sub( Surface.OutDryBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
 //		Twbamb = sum( Surface( UTSC( UTSCNum ).SurfPtrs ).OutWetBulbTemp * Surface( UTSC( UTSCNum ).SurfPtrs ).Area ) / sum( Surface( UTSC( UTSCNum ).SurfPtrs ).Area ); //Autodesk:F2C++ Array subscript usage: Replaced by below
 		Twbamb = sum_product_sub( Surface.OutWetBulbTemp(), Surface.Area(), UTSC( UTSCNum ).SurfPtrs ) / sum_sub( Surface.Area(), UTSC( UTSCNum ).SurfPtrs ); //Autodesk:F2C++ Functions handle array subscript usage
-		OutHumRatAmb = PsyWFnTdbTwbPb( Tamb, Twbamb, OutBaroPress, BlankString );
+		OutHumRatAmb = PsyWFnTdbTwbPb( Tamb, Twbamb, OutBaroPress );
 
-		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRatAmb, BlankString );
+		RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Tamb, OutHumRatAmb );
 		holeArea = UTSC( UTSCNum ).ActualArea * UTSC( UTSCNum ).Porosity;
 
 		AspRat = UTSC( UTSCNum ).Height / UTSC( UTSCNum ).PlenGapThick;

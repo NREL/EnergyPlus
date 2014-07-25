@@ -2,37 +2,40 @@
 #define SQLiteProcedures_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/FArray2S.hh>
+#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
+#include <sqlite3.h>
+
+#include <fstream>
+#include <memory>
+
 namespace EnergyPlus {
 
-namespace SQLiteProcedures {
+class SQLite {
+public:
 
-	// Data
-	extern int const MaxMessageSize;
-	extern bool WriteOutputToSQLite;
-	extern bool WriteTabularDataToSQLite;
+	// Open the DB and prepare for writing data
+	// Create all of the tables on construction
+	SQLite();
 
-	extern int SQLdbTimeIndex;
+	// Close database and free prepared statements
+	virtual ~SQLite();
 
-	// Functions
+	bool writeOutputToSQLite() const;
+	bool writeTabularDataToSQLite() const;
 
-	void
-	SQLiteBegin();
+	// Begin a transaction
+	void sqliteBegin();
 
-	void
-	SQLiteCommit();
+	// Commit a transaction
+	void sqliteCommit();
 
-	void
-	CreateSQLiteDatabase();
-
-	void
-	CreateSQLiteReportVariableDictionaryRecord(
+	void createSQLiteReportVariableDictionaryRecord(
 		int const reportVariableReportID,
 		int const storeTypeIndex,
 		std::string const & indexGroup,
@@ -44,10 +47,8 @@ namespace SQLiteProcedures {
 		Optional_string_const ScheduleName = _
 	);
 
-	void
-	CreateSQLiteReportVariableDataRecord(
+	void createSQLiteReportVariableDataRecord(
 		int const recordIndex,
-		int const timeIndex,
 		Real64 const value,
 		Optional_int_const reportingInterval = _,
 		Optional< Real64 const > minValue = _,
@@ -57,8 +58,7 @@ namespace SQLiteProcedures {
 		Optional_int_const minutesPerTimeStep = _
 	);
 
-	int
-	CreateSQLiteTimeIndexRecord(
+	void createSQLiteTimeIndexRecord(
 		int const reportingInterval,
 		int const recordIndex,
 		int const CumlativeSimulationDays,
@@ -71,56 +71,7 @@ namespace SQLiteProcedures {
 		Optional_string_const DayType = _
 	);
 
-	void
-	CreateSQLiteZoneTable();
-
-	void
-	CreateSQLiteNominalLightingTable();
-
-	void
-	CreateSQLiteNominalPeopleTable();
-
-	void
-	CreateSQLiteNominalElectricEquipmentTable();
-
-	void
-	CreateSQLiteNominalGasEquipmentTable();
-
-	void
-	CreateSQLiteNominalSteamEquipmentTable();
-
-	void
-	CreateSQLiteNominalHotWaterEquipmentTable();
-
-	void
-	CreateSQLiteNominalOtherEquipmentTable();
-
-	void
-	CreateSQLiteNominalBaseboardHeatTable();
-
-	void
-	CreateSQLiteSurfacesTable();
-
-	void
-	CreateSQLiteConstructionsTable();
-
-	void
-	CreateSQLiteMaterialsTable();
-
-	void
-	CreateSQLiteZoneListTable();
-
-	void
-	CreateSQLiteZoneGroupTable();
-
-	void
-	CreateSQLiteInfiltrationTable();
-
-	void
-	CreateSQLiteVentilationTable();
-
-	void
-	AddSQLiteZoneSizingRecord(
+	void addSQLiteZoneSizingRecord(
 		std::string const & ZoneName, // the name of the zone
 		std::string const & LoadType, // the description of the input variable
 		Real64 const CalcDesLoad, // the value from the sizing calculation [W]
@@ -134,26 +85,22 @@ namespace SQLiteProcedures {
 		Real64 const MinOAVolFlow // zone design minimum outside air flow rate [m3/s]
 	);
 
-	void
-	AddSQLiteSystemSizingRecord(
+	void addSQLiteSystemSizingRecord(
 		std::string const & SysName, // the name of the system
 		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	);
 
-	void
-	AddSQLiteComponentSizingRecord(
+	void addSQLiteComponentSizingRecord(
 		std::string const & CompType, // the type of the component
 		std::string const & CompName, // the name of the component
 		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue // the value from the sizing calculation
 	);
 
-	void
-	CreateSQLiteRoomAirModelTable();
+	void createSQLiteRoomAirModelTable();
 
-	void
-	CreateSQLiteMeterDictionaryRecord(
+	void createSQLiteMeterDictionaryRecord(
 		int const meterReportID,
 		int const storeTypeIndex,
 		std::string const & indexGroup,
@@ -165,10 +112,8 @@ namespace SQLiteProcedures {
 		Optional_string_const ScheduleName = _
 	);
 
-	void
-	CreateSQLiteMeterRecord(
+	void createSQLiteMeterRecord(
 		int const recordIndex,
-		int const timeIndex,
 		Real64 const value,
 		Optional_int_const reportingInterval = _,
 		Optional< Real64 const > minValue = _,
@@ -178,14 +123,7 @@ namespace SQLiteProcedures {
 		Optional_int_const minutesPerTimeStep = _
 	);
 
-	void
-	SQLiteWriteMessageMacro( std::string const & message );
-
-	void
-	CreateZoneExtendedOutput();
-
-	void
-	CreateSQLiteDaylightMapTitle(
+	void createSQLiteDaylightMapTitle(
 		int const mapNum,
 		std::string const & mapName,
 		std::string const & environmentName,
@@ -195,8 +133,7 @@ namespace SQLiteProcedures {
 		Real64 const zCoord
 	);
 
-	void
-	CreateSQLiteDaylightMap(
+	void createSQLiteDaylightMap(
 		int const mapNum,
 		int const month,
 		int const dayOfMonth,
@@ -208,74 +145,185 @@ namespace SQLiteProcedures {
 		FArray2S< Real64 > const illuminance
 	);
 
-	void
-	CreateSQLiteTabularDataRecords(
-		FArray2S_string const body, // row,column
-		FArray1S_string const rowLabels,
-		FArray1S_string const columnLabels,
+	void createSQLiteTabularDataRecords(
+		FArray2D_string const & body, // row,column
+		FArray1D_string const & rowLabels,
+		FArray1D_string const & columnLabels,
 		std::string const & ReportName,
 		std::string const & ReportForString,
 		std::string const & TableName
 	);
 
-	void
-	InitializeIndexes();
+	void createSQLiteSimulationsRecord( int const ID );
 
-	void
-	InitializeTabularDataTable();
-
-	void
-	InitializeTabularDataView();
-
-	void
-	CreateSQLiteSimulationsRecord( int const ID );
-
-	void
-	CreateSQLiteEnvironmentPeriodRecord();
-
-	void
-	CreateSQLiteErrorRecord(
+	void createSQLiteErrorRecord(
 		int const simulationIndex,
 		int const errorType,
 		std::string const & errorMessage,
 		int const cnt
 	);
 
-	void
-	UpdateSQLiteErrorRecord( std::string const & errorMessage );
+	void updateSQLiteErrorRecord( std::string const & errorMessage );
 
-	void
-	UpdateSQLiteSimulationRecord(
+	void updateSQLiteSimulationRecord(
 		bool const completed,
 		bool const completedSuccessfully
 	);
 
-	//     NOTICE
+	void createSQLiteEnvironmentPeriodRecord();
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
+	void sqliteWriteMessage(const std::string & message);
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	void createZoneExtendedOutput();
 
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
+	void initializeIndexes();
 
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+private:
 
-	//     Copyright © 2008 Building Synergies, LLC.  All rights reserved.
+	void createSQLiteZoneTable();
+	void createSQLiteNominalLightingTable();
+	void createSQLiteNominalPeopleTable();
+	void createSQLiteNominalElectricEquipmentTable();
+	void createSQLiteNominalGasEquipmentTable();
+	void createSQLiteNominalSteamEquipmentTable();
+	void createSQLiteNominalHotWaterEquipmentTable();
+	void createSQLiteNominalOtherEquipmentTable();
+	void createSQLiteNominalBaseboardHeatTable();
+	void createSQLiteInfiltrationTable();
+	void createSQLiteVentilationTable();
+	void createSQLiteSurfacesTable();
+	void createSQLiteConstructionsTable();
+	void createSQLiteMaterialsTable();
+	void createSQLiteZoneListTable();
+	void createSQLiteZoneGroupTable();
+	void createSQLiteSchedulesTable();
 
-} // SQLiteProcedures
+	int sqliteExecuteCommand(const std::string & commandBuffer);
+	int sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer);
+
+	int sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer);
+	int sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
+	int sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
+	int sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex);
+	int sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert);
+
+	int sqliteStepCommand(sqlite3_stmt * stmt);
+	int sqliteResetCommand(sqlite3_stmt * stmt);
+	int sqliteClearBindings(sqlite3_stmt * stmt);
+	int sqliteFinalizeCommand(sqlite3_stmt * stmt);
+
+	int createSQLiteStringTableRecord(std::string const & stringValue,std::string const & stringType);
+
+	static std::string storageType(const int storageTypeIndex);
+	static std::string timestepTypeName(const int timestepType);
+	static std::string reportingFreqName(const int reportingFreqIndex);
+
+	static void adjustReportingHourAndMinutes(int & hour, int & minutes);
+	// Given combinedString, parse out units and description.
+	// Example: Given combinedString "Total Energy [GJ]", return "Total Energy"
+	// in description and "GJ" in units.
+	static void parseUnitsAndDescription(const std::string & combinedString, std::string & units, std::string & description);
+
+	static int logicalToInteger(const bool value);
+
+	void initializeReportVariableDataDictionaryTable();
+	void initializeReportVariableDataTables();
+	void initializeReportMeterDataDictionaryTable();
+	void initializeReportMeterDataTables();
+	void initializeTimeIndicesTable();
+	void initializeZoneInfoTable();
+	void initializeNominalPeopleTable();
+	void initializeNominalLightingTable();
+	void initializeNominalElectricEquipmentTable();
+	void initializeNominalGasEquipmentTable();
+	void initializeNominalSteamEquipmentTable();
+	void initializeNominalHotWaterEquipmentTable();
+	void initializeNominalOtherEquipmentTable();
+	void initializeNominalBaseboardHeatTable();
+	void initializeSurfacesTable();
+	void initializeConstructionsTables();
+	void initializeMaterialsTable();
+	void initializeZoneListTable();
+	void initializeZoneGroupTable();
+	void initializeNominalInfiltrationTable();
+	void initializeNominalVentilationTable();
+	void initializeZoneSizingTable();
+	void initializeSystemSizingTable();
+	void initializeComponentSizingTable();
+	void initializeRoomAirModelTable();
+	void initializeSchedulesTable();
+	void initializeDaylightMapTables();
+	void initializeViews();
+	void initializeSimulationsTable();
+	void initializeEnvironmentPeriodsTable();
+	void initializeErrorsTable();
+	void initializeTabularDataTable();
+	void initializeTabularDataView();
+
+	bool m_writeOutputToSQLite;
+	bool m_writeTabularDataToSQLite;
+	int m_sqlDBTimeIndex;
+	std::ofstream m_errorStream;
+	sqlite3 * m_db;
+	std::string m_dbName;
+	sqlite3_stmt * m_reportVariableDataInsertStmt;
+	sqlite3_stmt * m_reportVariableExtendedDataInsertStmt;
+	sqlite3_stmt * m_timeIndexInsertStmt;
+	sqlite3_stmt * m_reportVariableDictionaryInsertStmt;
+	sqlite3_stmt * m_zoneInfoInsertStmt;
+	sqlite3_stmt * m_nominalLightingInsertStmt;
+	sqlite3_stmt * m_nominalElectricEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalGasEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalSteamEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalHotWaterEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalOtherEquipmentInsertStmt;
+	sqlite3_stmt * m_nominalBaseboardHeatInsertStmt;
+	sqlite3_stmt * m_surfaceInsertStmt;
+	sqlite3_stmt * m_constructionInsertStmt;
+	sqlite3_stmt * m_constructionLayerInsertStmt;
+	sqlite3_stmt * m_materialInsertStmt;
+	sqlite3_stmt * m_zoneListInsertStmt;
+	sqlite3_stmt * m_zoneGroupInsertStmt;
+	sqlite3_stmt * m_infiltrationInsertStmt;
+	sqlite3_stmt * m_ventilationInsertStmt;
+	sqlite3_stmt * m_nominalPeopleInsertStmt;
+	sqlite3_stmt * m_zoneSizingInsertStmt;
+	sqlite3_stmt * m_systemSizingInsertStmt;
+	sqlite3_stmt * m_componentSizingInsertStmt;
+	sqlite3_stmt * m_roomAirModelInsertStmt;
+	sqlite3_stmt * m_groundTemperatureInsertStmt;
+	sqlite3_stmt * m_weatherFileInsertStmt;
+	sqlite3_stmt * m_meterDictionaryInsertStmt;
+	sqlite3_stmt * m_reportMeterDataInsertStmt;
+	sqlite3_stmt * m_meterExtendedDataInsertStmt;
+	sqlite3_stmt * m_scheduleInsertStmt;
+	sqlite3_stmt * m_daylightMapTitleInsertStmt;
+	sqlite3_stmt * m_daylightMapHorlyTitleInsertStmt;
+	sqlite3_stmt * m_daylightMapHorlyDataInsertStmt;
+	sqlite3_stmt * m_environmentPeriodInsertStmt;
+	sqlite3_stmt * m_simulationsInsertStmt;
+	sqlite3_stmt * m_tabularDataInsertStmt;
+	sqlite3_stmt * m_stringsInsertStmt;
+	sqlite3_stmt * m_stringsLookUpStmt;
+	sqlite3_stmt * m_errorInsertStmt;
+	sqlite3_stmt * m_errorUpdateStmt;
+	sqlite3_stmt * m_simulationUpdateStmt;
+
+	static const int LocalReportEach;      //  Write out each time UpdatedataandLocalReport is called
+	static const int LocalReportTimeStep;  //  Write out at 'EndTimeStepFlag'
+	static const int LocalReportHourly;    //  Write out at 'EndHourFlag'
+	static const int LocalReportDaily;     //  Write out at 'EndDayFlag'
+	static const int LocalReportMonthly;   //  Write out at end of month (must be determined)
+	static const int LocalReportSim;       //  Write out once per environment 'EndEnvrnFlag'
+	static const std::string ReportNameId;         // These should be integers.  Why is this?
+	static const std::string ReportForStringId;
+	static const std::string TableNameId;
+	static const std::string RowNameId;
+	static const std::string ColumnNameId;
+	static const std::string UnitsId;
+};
+
+extern std::unique_ptr<SQLite> sqlite;
 
 } // EnergyPlus
 

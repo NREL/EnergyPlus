@@ -72,7 +72,7 @@ namespace IceThermalStorage {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
-	
+
 	std::string const cIceStorageSimple( "ThermalStorage:Ice:Simple" );
 	std::string const cIceStorageDetailed( "ThermalStorage:Ice:Detailed" );
 
@@ -99,9 +99,9 @@ namespace IceThermalStorage {
 	Real64 const Pa( 0.088065 );
 	Real64 const Pb( 1.137742 );
 	Real64 const Pc( -0.225806 );
-	Real64 const Tref( 85. ); // F
+	Real64 const Tref( 85.0 ); // F
 	Real64 const Tcharge( 1.0 ); // F
-	Real64 const Tdischarge( 5. ); // F
+	Real64 const Tdischarge( 5.0 ); // F
 
 	// Parameter used by the Detailed Ice Storage Model
 	Real64 const DeltaTofMin( 0.5 ); // Minimum allowed outlet side temperature difference [C]
@@ -1016,7 +1016,7 @@ namespace IceThermalStorage {
 			DetIceStor( IceNum ).ThawProcessIndicator = cAlphaArgs( 9 );
 			if ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt;
-			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, BlankString ) ) ) {
+			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
 				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );
@@ -2031,15 +2031,15 @@ namespace IceThermalStorage {
 		{ auto const SELECT_CASE_var( IceStorage( IceNum ).ITSType_Num );
 		if ( SELECT_CASE_var == ITSType_IceOnCoilInternal ) {
 			y = XCurIceFrac;
-			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * std::pow( y, 2 ) - 47.6084 * std::pow( y, 3 ) + 41.8498 * std::pow( y, 4 ) - 14.2948 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * pow_2( y ) - 47.6084 * pow_3( y ) + 41.8498 * pow_4( y ) - 14.2948 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			y = 1.0 - XCurIceFrac;
-			UAIceDisCh = ( 1.3879 - 7.6333 * y + 26.3423 * std::pow( y, 2 ) - 47.6084 * std::pow( y, 3 ) + 41.8498 * std::pow( y, 4 ) - 14.2948 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceDisCh = ( 1.3879 - 7.6333 * y + 26.3423 * pow_2( y ) - 47.6084 * pow_3( y ) + 41.8498 * pow_4( y ) - 14.2948 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			HLoss = 0.0;
 		} else if ( SELECT_CASE_var == ITSType_IceOnCoilExternal ) {
 			y = XCurIceFrac;
-			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * std::pow( y, 2 ) - 47.6084 * std::pow( y, 3 ) + 41.8498 * std::pow( y, 4 ) - 14.2948 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * pow_2( y ) - 47.6084 * pow_3( y ) + 41.8498 * pow_4( y ) - 14.2948 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			y = 1.0 - XCurIceFrac;
-			UAIceDisCh = ( 1.1756 - 5.3689 * y + 17.3602 * std::pow( y, 2 ) - 30.1077 * std::pow( y, 3 ) + 25.6387 * std::pow( y, 4 ) - 8.5102 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceDisCh = ( 1.1756 - 5.3689 * y + 17.3602 * pow_2( y ) - 30.1077 * pow_3( y ) + 25.6387 * pow_4( y ) - 8.5102 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			HLoss = 0.0;
 
 		}}

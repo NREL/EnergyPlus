@@ -65,7 +65,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1112,9 +1112,9 @@
 
   Output:Variable,*,Zone Thermal Chimney Mass,hourly;
 
-  Output:Variable,*,Zone Thermal Chimney Current Density Volumetric Flow Rate,hourly;
+  Output:Variable,*,Zone Thermal Chimney Current Density Air Volume Flow Rate,hourly;
 
-  Output:Variable,*,Zone Thermal Chimney Standard Density Volumetric Flow Rate,hourly;
+  Output:Variable,*,Zone Thermal Chimney Standard Density Air Volume Flow Rate,hourly;
 
   Output:Variable,*,Zone Thermal Chimney Mass Flow Rate,hourly;
 

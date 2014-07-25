@@ -3,6 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <Photovoltaics.hh>
@@ -1299,8 +1300,9 @@ namespace Photovoltaics {
 
 				//  temperature depencence
 				IL = PVarray( PVnum ).TRNSYSPVcalc.Insolation / PVarray( PVnum ).TRNSYSPVModule.RefInsolation * ( ILRef + PVarray( PVnum ).TRNSYSPVModule.TempCoefIsc * ( CellTemp - PVarray( PVnum ).TRNSYSPVModule.RefTemperature ) );
-				AA = AARef * CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature;
-				IO = IORef * std::pow( ( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature ), 3 ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
+				Real64 const cell_temp_ratio( CellTemp / PVarray( PVnum ).TRNSYSPVModule.RefTemperature );
+				AA = AARef * cell_temp_ratio;
+				IO = IORef * pow_3( cell_temp_ratio ) * std::exp( PVarray( PVnum ).TRNSYSPVModule.SemiConductorBandgap * PVarray( PVnum ).TRNSYSPVModule.CellsInSeries / AARef * ( 1.0 - PVarray( PVnum ).TRNSYSPVModule.RefTemperature / CellTemp ) );
 
 				//  compute short curcuit current and open circuit voltage
 
@@ -1551,6 +1553,8 @@ namespace Photovoltaics {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DELTA( 1.e-3 );
 		Real64 const EPSILON( 1.e-3 );
+		static Real64 const RONE( ( std::sqrt( 5.0 ) - 1.0 ) / 2.0 );
+		static Real64 const RTWO( RONE * RONE );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1562,8 +1566,6 @@ namespace Photovoltaics {
 		Real64 C;
 		Real64 D;
 		Real64 H;
-		Real64 RONE;
-		Real64 RTWO;
 		Real64 YP;
 		Real64 YA;
 		Real64 YB;
@@ -1572,8 +1574,6 @@ namespace Photovoltaics {
 		Real64 IM;
 		Real64 PM;
 
-		RONE = ( std::sqrt( 5.0 ) - 1.0 ) / 2.0;
-		RTWO = RONE * RONE;
 		H = B - A;
 		POWER( IO, IL, RSER, AA, EPS, IM, A, PM );
 		YA = -1.0 * PM;
@@ -2090,14 +2090,12 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
-		Real64 AM; // air mass working variable
 
 		if ( SolZen < 89.9 ) {
-			AM = std::pow( ( std::cos( SolZen * DegToRadians ) + 0.5057 * std::pow( ( 96.08 - SolZen ), ( -1.634 ) ) ), ( -1.0 ) );
-
+			Real64 const AM( 1.0 / ( std::cos( SolZen * DegToRadians ) + 0.5057 * std::pow( 96.08 - SolZen, -1.634 ) ) );
 			AbsoluteAirMass = std::exp( -0.0001184 * Altitude ) * AM;
 		} else {
-			AbsoluteAirMass = 999.;
+			AbsoluteAirMass = 999.0;
 			// should maybe add a show warning msg.
 		}
 
@@ -2155,9 +2153,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		Real64 F1; // working variable for function result
-
-		F1 = a0 + a1 * AMa + a2 * std::pow( AMa, 2 ) + a3 * std::pow( AMa, 3 ) + a4 * std::pow( AMa, 4 );
+		Real64 const F1( a0 + a1 * AMa + a2 * pow_2( AMa ) + a3 * pow_3( AMa ) + a4 * pow_4( AMa ) );
 
 		if ( F1 > 0.0 ) {
 			SandiaF1 = F1;
@@ -2220,7 +2216,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		Real64 F2; // working variable for function result
 
-		F2 = b0 + b1 * IncAng + b2 * std::pow( IncAng, 2 ) + b3 * std::pow( IncAng, 3 ) + b4 * std::pow( IncAng, 4 ) + b5 * std::pow( IncAng, 5 );
+		F2 = b0 + b1 * IncAng + b2 * pow_2( IncAng ) + b3 * pow_3( IncAng ) + b4 * pow_4( IncAng ) + b5 * pow_5( IncAng );
 
 		if ( F2 > 0.0 ) {
 			SandiaF2 = F2;
@@ -2281,7 +2277,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaImp = Imp0 * ( C0 * Ee + C1 * std::pow( Ee, 2 ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
+		SandiaImp = Imp0 * ( C0 * Ee + C1 * pow_2( Ee ) ) * ( 1.0 + aImp * ( Tc - 25 ) );
 		// why hardwire T0 at 25.0?  can this change? seems okay, fewer args
 		return SandiaImp;
 	}
@@ -2396,7 +2392,7 @@ namespace Photovoltaics {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-		SandiaIx = Ix0 * ( C4 * Ee + C5 * std::pow( Ee, 2 ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
+		SandiaIx = Ix0 * ( C4 * Ee + C5 * pow_2( Ee ) ) * ( 1.0 + ( ( aIsc + aImp ) / 2.0 * ( Tc - 25.0 ) ) );
 
 		return SandiaIx;
 	}
@@ -2449,7 +2445,7 @@ namespace Photovoltaics {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * std::pow( Ee, 2 ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
+		SandiaIxx = Ixx0 * ( C6 * Ee + C7 * pow_2( Ee ) ) * ( 1.0 + aImp * ( Tc - 25.0 ) );
 
 		return SandiaIxx;
 	}
@@ -2513,7 +2509,7 @@ namespace Photovoltaics {
 
 			BVmpEe = BVmp0 + mBVmp * ( 1.0 - Ee );
 
-			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * std::pow( ( dTc * std::log( Ee ) ), 2 ) + BVmpEe * ( Tc - 25.0 );
+			SandiaVmp = Vmp0 + C2 * NcellSer * dTc * std::log( Ee ) + C3 * NcellSer * pow_2( dTc * std::log( Ee ) ) + BVmpEe * ( Tc - 25.0 );
 		} else {
 			SandiaVmp = 0.0;
 		}

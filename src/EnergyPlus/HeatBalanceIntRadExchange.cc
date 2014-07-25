@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <cassert>
 #include <numeric>
@@ -88,8 +89,10 @@ namespace HeatBalanceIntRadExchange {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	gio::Fmt const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
-	gio::Fmt const fmty( "(A,1x,6f16.8)" );
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
+	static gio::Fmt const fmty( "(A,1x,6f16.8)" );
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -388,7 +391,7 @@ namespace HeatBalanceIntRadExchange {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const AFormat( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -432,11 +435,11 @@ namespace HeatBalanceIntRadExchange {
 		ScanForReports( "ViewFactorInfo", ViewFactorReport, _, Option1 );
 
 		if ( ViewFactorReport ) { // Print heading
-			gio::write( OutputFileInits, "(A)" ) << "! <Surface View Factor and Grey Interchange Information>";
-			gio::write( OutputFileInits, "(A)" ) << "! <View Factor - Zone Information>,Zone Name,Number of Surfaces";
-			gio::write( OutputFileInits, "(A)" ) << "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth," "Tilt,Thermal Emissivity,#Sides,Vertices";
-			gio::write( OutputFileInits, "(A)" ) << "! <View Factor / Grey Interchange Type>,Surface Name(s)";
-			gio::write( OutputFileInits, "(A)" ) << "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface";
+			gio::write( OutputFileInits, fmtA ) << "! <Surface View Factor and Grey Interchange Information>";
+			gio::write( OutputFileInits, fmtA ) << "! <View Factor - Zone Information>,Zone Name,Number of Surfaces";
+			gio::write( OutputFileInits, fmtA ) << "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth," "Tilt,Thermal Emissivity,#Sides,Vertices";
+			gio::write( OutputFileInits, fmtA ) << "! <View Factor / Grey Interchange Type>,Surface Name(s)";
+			gio::write( OutputFileInits, fmtA ) << "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface";
 		}
 
 		cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
@@ -449,7 +452,7 @@ namespace HeatBalanceIntRadExchange {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			if ( ZoneNum == 1 ) {
-				if ( DisplayAdvancedReportVariables ) gio::write( OutputFileInits, "(A)" ) << "! <Surface View Factor Check Values>,Zone Name,Original Check Value," "Calculated Fixed Check Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence," "Used RowSum Convergence";
+				if ( DisplayAdvancedReportVariables ) gio::write( OutputFileInits, fmtA ) << "! <Surface View Factor Check Values>,Zone Name,Original Check Value," "Calculated Fixed Check Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence," "Used RowSum Convergence";
 			}
 
 			ZoneInfo[ ZoneNum - 1 ].Name = Zone( ZoneNum ).Name;
@@ -620,7 +623,7 @@ namespace HeatBalanceIntRadExchange {
 							}
 						}
 					}
-					gio::write( OutputFileDebug, "(A)" ) << "!============= end of data ======================";
+					gio::write( OutputFileDebug, fmtA ) << "!============= end of data ======================";
 
 					gio::write( OutputFileDebug, "(A)" ) << "!============ final view factors =======================";
 					gio::write( OutputFileDebug, "(A)" ) << "ZoneProperty:UserViewFactors:bySurfaceName," + ZoneInfo[ ZoneNum - 1 ].Name + ",";
@@ -635,7 +638,7 @@ namespace HeatBalanceIntRadExchange {
 							}
 						}
 					}
-					gio::write( OutputFileDebug, "(A)" ) << "!============= end of data ======================";
+					gio::write( OutputFileDebug, fmtA ) << "!============= end of data ======================";
 				}
 
 			}
@@ -848,9 +851,9 @@ namespace HeatBalanceIntRadExchange {
 
 			GetObjectItem( "ZoneProperty:UserViewFactors", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			if ( NumNums < 3 * std::pow( ( N ), 2 ) ) {
+			if ( NumNums < 3 * pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
-				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( 3 * std::pow( ( N ), 2 ) ) + "]." );
+				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( 3 * pow_2( N ) ) + "]." );
 				ErrorsFound = true;
 				NumNums = 0;
 			}
@@ -936,9 +939,9 @@ namespace HeatBalanceIntRadExchange {
 
 			GetObjectItem( "ZoneProperty:UserViewFactors:bySurfaceName", UserFZoneIndex, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
-			if ( NumNums < std::pow( N, 2 ) ) {
+			if ( NumNums < pow_2( N ) ) {
 				ShowSevereError( "GetInputViewFactors: " + cCurrentModuleObject + "=\"" + ZoneName + "\", not enough values." );
-				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( std::pow( N, 2 ) ) + "]." );
+				ShowContinueError( "...Number of input values [" + TrimSigDigits( NumNums ) + "] is less than the required number=[" + TrimSigDigits( pow_2( N ) ) + "]." );
 				ErrorsFound = true;
 				NumNums = 0; // cancel getting any coordinates
 			}
@@ -1294,7 +1297,7 @@ namespace HeatBalanceIntRadExchange {
 					}
 				}
 				CheckConvergeTolerance = std::abs( sum( FixedF ) - N );
-				if ( CheckConvergeTolerance > .005 ) {
+				if ( CheckConvergeTolerance > 0.005 ) {
 					ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
 					ShowContinueError( "Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits( CheckConvergeTolerance, 6 ) + "], Row Sum (ideal is " + RoundSigDigits( N ) + ")=[" + RoundSigDigits( RowSum, 2 ) + "]." );
 					ShowContinueError( "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK." );
@@ -1341,246 +1344,6 @@ namespace HeatBalanceIntRadExchange {
 
 	}
 
-	// 	void
-	// 	CalcScriptF(
-	// 		int const N, // Number of surfaces
-	// 		FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-	// 		FArray2A< Real64 > const F, // DIRECT VIEW FACTOR MATRIX (N X N)
-	// 		FArray1A< Real64 > EMISS, // VECTOR OF SURFACE EMISSIVITIES
-	// 		FArray2A< Real64 > ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
-	// 	)
-	// 	{
-
-	// 		// SUBROUTINE INFORMATION:
-	// 		//       AUTHOR         Curt Pedersen
-	// 		//       DATE WRITTEN   1980
-	// 		//       MODIFIED       July 2000 (COP for the ASHRAE Loads Toolkit)
-	// 		//       RE-ENGINEERED  September 2000 (RKS for EnergyPlus)
-
-	// 		// PURPOSE OF THIS SUBROUTINE:
-	// 		// Determines Hottel's ScriptF coefficients which account for the total
-	// 		// grey interchange between surfaces in an enclosure.
-
-	// 		// METHODOLOGY EMPLOYED:
-	// 		// See reference
-
-	// 		// REFERENCES:
-	// 		// Hottel, H. C. and A. F. Sarofim, Radiative Transfer, Ch 3, McGraw Hill, 1967.
-
-	// 		// USE STATEMENTS:
-	// 		// na
-
-	// 	        using EppPerformance::Timer;
-	// 	        static Timer timer(__PRETTY_FUNCTION__);
-
-	// 		// Argument array dimensioning
-	// 		timer.startTimer();
-	// 		A.dim( N );
-	// 		F.dim( N, N );
-	// 		EMISS.dim( N );
-	// 		ScriptF.dim( N, N );
-
-	// 		// Locals
-	// 		// SUBROUTINE ARGUMENTS:
-	// 		// --Must satisfy reciprocity and completeness:
-	// 		//  A(i)*F(i,j)=A(j)*F(j,i); F(i,i)=0.; SUM(F(i,j)=1.0, j=1,N)
-
-	// 		// SUBROUTINE PARAMETER DEFINITIONS:
-	// 		Real64 const MaxEmissLimit( 0.99999 ); // Limit the emissivity internally/avoid a divide by zero error
-
-	// 		// INTERFACE BLOCK SPECIFICATIONS
-	// 		// na
-
-	// 		// DERIVED TYPE DEFINITIONS
-	// 		// na
-
-	// 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	// 		int i; // DO loop counters (for rows and columns of matrices)
-	// 		int j;
-	// 		int K;
-	// 		FArray2D< Real64 > AF; // = (AREA * DIRECT VIEW FACTOR) MATRIX
-	// 		FArray2D< Real64 > Cinverse; // Inverse of Cmatrix
-	// 		FArray2D< Real64 > Cmatrix; // = (AF- EMISS/REFLECTANCE) MATRIX
-	// 		FArray2D< Real64 > ExciteMatrix; // EXCITATION VECTOR = A*EMISS/REFLECTANCE
-	// 		FArray2D< Real64 > Jmatrix; // MATRIX OF PARTIAL RADIOSITIES
-
-	// 		// FLOW:
-	// 		// Allocate and zero arrays
-
-	// #ifdef EP_Count_Calls
-	// 		++NumCalcScriptF_Calls;
-	// #endif
-	// 		AF.allocate( N, N );
-	// 		Cinverse.allocate( N, N );
-	// 		Cmatrix.allocate( N, N );
-	// 		ExciteMatrix.allocate( N, N );
-
-	// 		AF = 0.0;
-	// 		Cmatrix = 0.0;
-	// 		Cinverse = 0.0;
-	// 		ExciteMatrix = 0.0;
-	// 		ScriptF = 0.0;
-
-	// 		// Set up AF matrix.
-	// 		for ( i = 1; i <= N; ++i ) {
-	// 			for ( j = 1; j <= N; ++j ) {
-	// 				AF( i, j ) = F( i, j ) * A( i );
-	// 			}
-	// 		}
-
-	// 		Cmatrix = AF; //  Cmatrix is now same as AF
-
-	// 		// Limit EMISS for any individual surface.  This is to avoid
-	// 		// an obvious divide by zero error in the next section
-	// 		for ( i = 1; i <= N; ++i ) {
-	// 			if ( EMISS( i ) > MaxEmissLimit ) {
-	// 				EMISS( i ) = MaxEmissLimit;
-	// 				ShowWarningError( "A thermal emissivity above 0.99999 was detected. This is not allowed. Value was reset to 0.99999" );
-	// 			}
-	// 		}
-
-	// 		for ( i = 1; i <= N; ++i ) {
-	// 			ExciteMatrix( i, i ) = -A( i ) * EMISS( i ) / ( 1. - EMISS( i ) ); // Set up matrix columns for partial radiosity calculation
-	// 			Cmatrix( i, i ) = AF( i, i ) - A( i ) / ( 1. - EMISS( i ) ); // Coefficient matrix for partial radiosity calculation
-	// 		}
-
-	// 		AF.deallocate();
-
-	// 		CalcMatrixInverse( Cmatrix, Cinverse ); // SOLVE THE LINEAR SYSTEM
-
-	// 		Cmatrix.deallocate();
-
-	// 		Jmatrix.allocate( N, N );
-	// 		//  Jmatrix      = 0.0
-	// 		Jmatrix = matmul( Cinverse, ExciteMatrix ); // Jmatrix columns contain partial radiosities
-	// 		//  DO i=1,N
-	// 		//    DO j=1,N
-	// 		//      DO k=1,N
-	// 		//        Jmatrix(i,j) = Jmatrix(i,j) + Cinverse(i,k) * Excitematrix(k,j)
-	// 		//      END DO
-	// 		//    END DO
-	// 		//  END DO
-
-	// 		// Form Script F matrix
-	// 		for ( i = 1; i <= N; ++i ) {
-	// 			for ( j = 1; j <= N; ++j ) {
-	// 				if ( i == j ) {
-	// 					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=1
-	// 					ScriptF( i, j ) = EMISS( i ) / ( 1. - EMISS( i ) ) * ( Jmatrix( i, j ) - EMISS( i ) );
-	// 				} else {
-	// 					//        ScriptF(I,J) = EMISS(I)/(1.0d0-EMISS(I))*(Jmatrix(I,J)-Delta*EMISS(I)), where Delta=0
-	// 					ScriptF( i, j ) = EMISS( i ) / ( 1. - EMISS( i ) ) * ( Jmatrix( i, j ) );
-	// 				}
-	// 			}
-	// 		}
-
-	// 		Cinverse.deallocate();
-	// 		ExciteMatrix.deallocate();
-	// 		Jmatrix.deallocate();
-	// 		timer.stopTimer();
-		
-	// 	}
-
-	// 	void
-	// 	CalcMatrixInverse(
-	// 		FArray2S< Real64 > Matrix, // Input Matrix
-	// 		FArray2S< Real64 > InvMatrix // Inverse of Matrix
-	// 	)
-	// 	{
-
-	// 		// SUBROUTINE INFORMATION:
-	// 		//       AUTHOR         Jakob Asmundsson
-	// 		//       DATE WRITTEN   January 1999
-	// 		//       MODIFIED       September 2000 (RKS for EnergyPlus)
-	// 		//       RE-ENGINEERED  na
-
-	// 		// PURPOSE OF THIS SUBROUTINE:
-	// 		// To find the inverse of Matrix, using partial pivoting.
-
-	// 		// METHODOLOGY EMPLOYED:
-	// 		// Inverse is found using partial pivoting and Gauss elimination
-
-	// 		// REFERENCES:
-	// 		// Any Linear Algebra book
-
-	// 		// USE STATEMENTS:
-	// 		// na
-
-	// 		// Argument array dimensioning
-
-	// 		// Locals
-	// 		// SUBROUTINE ARGUMENTS:
-
-	// 		// SUBROUTINE PARAMETER DEFINITIONS:
-	// 		// na
-
-	// 		// INTERFACE BLOCK SPECIFICATIONS
-	// 		// na
-
-	// 		// DERIVED TYPE DEFINITIONS
-	// 		// na
-
-	// 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	// 		int DimOfMatrix; // Matrix dimension
-	// 		FArray2D< Real64 > Identity; // Identity matrix
-	// 		FArray1D_int p; // Vector containing the
-	// 		// pivot order
-	// 		int temp; // Temporary variable
-	// 		Real64 mm; // Multiplier
-	// 		Real64 pivot; // Pivot value
-	// 		int piv; // Pivot index
-	// 		int i; // Loop counter
-	// 		int j; // Loop counter
-	// 		int k; // Loop counter
-
-	// 		// FLOW:
-	// 		DimOfMatrix = size( Matrix, 1 );
-	// 		Identity.allocate( DimOfMatrix, DimOfMatrix );
-	// 		p.allocate( DimOfMatrix );
-
-	// 		Identity = 0.0;
-	// 		InvMatrix = 0.0;
-
-	// 		for ( i = 1; i <= DimOfMatrix; ++i ) {
-	// 			Identity( i, i ) = 1.0;
-	// 			p( i ) = i;
-	// 		}
-
-	// 		for ( j = 1; j <= DimOfMatrix - 1; ++j ) {
-	// 			pivot = std::abs( Matrix( p( j ), j ) );
-	// 			piv = j;
-	// 			temp = p( j );
-	// 			for ( i = j + 1; i <= DimOfMatrix; ++i ) {
-	// 				if ( std::abs( Matrix( p( i ), j ) ) > pivot ) {
-	// 					pivot = std::abs( Matrix( p( i ), j ) );
-	// 					piv = i;
-	// 				}
-	// 			}
-
-	// 			p( j ) = p( piv );
-	// 			p( piv ) = temp;
-	// 			for ( i = j + 1; i <= DimOfMatrix; ++i ) {
-	// 				mm = Matrix( p( i ), j ) / Matrix( p( j ), j );
-	// 				Matrix( p( i ), j ) = 0.0;
-	// 				Identity( p( i ), _ ) -= mm * Identity( p( j ), _ );
-	// 				for ( k = j + 1; k <= DimOfMatrix; ++k ) {
-	// 					Matrix( p( i ), k ) -= mm * Matrix( p( j ), k );
-	// 				}
-	// 			}
-	// 		}
-
-	// 		for ( i = DimOfMatrix; i >= 1; --i ) {
-	// 			InvMatrix( i, _ ) = Identity( p( i ), _ );
-	// 			for ( j = i + 1; j <= DimOfMatrix; ++j ) {
-	// 				InvMatrix( i, _ ) -= Matrix( p( i ), j ) * InvMatrix( j, _ );
-	// 			}
-	// 			InvMatrix( i, _ ) /= Matrix( p( i ), i );
-	// 		}
-
-	// 		p.deallocate();
-	// 		Identity.deallocate();
-
-	// 	}
 
 	//     NOTICE
 

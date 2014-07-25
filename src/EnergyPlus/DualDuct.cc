@@ -1702,7 +1702,7 @@ namespace DualDuct {
 			// Calculate outdoor air flow rate, zone multipliers are applied in GetInput
 			if ( AirLoopOAFrac > 0.0 ) {
 				OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, AirLoopControlInfo( AirLoopNum ).AirLoopDCVFlag, UseMinOASchFlag );
-				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, BlankString );
+				RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat );
 				OAMassFlow = OAVolumeFlowRate * RhoAir;
 
 				// convert OA mass flow rate to supply air flow rate based on air loop OA fraction
@@ -1991,13 +1991,14 @@ namespace DualDuct {
 		static gio::Fmt const Format_100( "('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')" );
 		static gio::Fmt const Format_101( "(A)" );
 		static gio::Fmt const Format_102( "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet Node Type>,<AirLoopHVAC Name>')" );
+		static gio::Fmt const fmtLD( "*" );
 
 		if ( ! allocated( Damper ) ) return; //Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDampers either set >0 or uninitialized
 
 		//Report Dual Duct Dampers to BND File
 		gio::write( OutputFileBNDetails, Format_101 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_100 );
-		gio::write( ChrOut, "*" ) << NumDampers * 2;
+		gio::write( ChrOut, fmtLD ) << NumDampers * 2;
 		gio::write( OutputFileBNDetails, Format_101 ) << " #Dual Duct Damper Connections," + stripped( ChrOut );
 		gio::write( OutputFileBNDetails, Format_102 );
 
@@ -2037,7 +2038,7 @@ namespace DualDuct {
 			}
 			if ( Found == 0 ) ChrName = "**Unknown**";
 
-			gio::write( ChrOut, "*" ) << Count1;
+			gio::write( ChrOut, fmtLD ) << Count1;
 			if ( Damper( Count1 ).DamperType == DualDuct_ConstantVolume ) {
 				DamperType = cCMO_DDConstantVolume;
 			} else if ( Damper( Count1 ).DamperType == DualDuct_VariableVolume ) {

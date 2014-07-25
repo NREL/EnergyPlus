@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -23,8 +22,6 @@ namespace ConvectionCoefficients {
 	// MODULE PARAMETER DEFINITIONS:
 	extern Real64 const AdaptiveHcInsideLowLimit; // W/m2-K
 	extern Real64 const AdaptiveHcOutsideLowLimit; // W/m2-K
-	extern gio::Fmt const fmtx;
-	extern gio::Fmt const fmty;
 
 	extern Real64 const MinFlow; // Minimum mass flow rate
 	extern Real64 const MaxACH; // Maximum ceiling diffuser correlation limit

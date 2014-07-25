@@ -43,6 +43,8 @@ namespace DataConvergParams {
 
 	extern Real64 const PlantEnthalpyToler; // Tolerance for enthalpy comparisons (in kJ/kgK)
 	extern Real64 const PlantFlowRateToler; // Tolerance for mass flow rate convergence (in kg/s) [~2 CFM]
+	extern Real64 const PlantLowFlowRateToler; // // Tolerance for low flow rate used for determining when
+	//plant pumps can be shut down
 	extern Real64 const PlantFlowRateOscillationToler;
 	extern Real64 const PlantFlowRateSlopeToler; // Slope tolerance for mass flow, kg/s/iteration
 
@@ -60,6 +62,9 @@ namespace DataConvergParams {
 
 	extern int const ConvergLogStackDepth;
 	extern FArray1D< Real64 > const ConvergLogStackARR;
+	extern Real64 const sum_ConvergLogStackARR;
+	extern Real64 const square_sum_ConvergLogStackARR;
+	extern Real64 const sum_square_ConvergLogStackARR;
 
 	extern int const CalledFromAirSystemDemandSide;
 	extern int const CalledFromAirSystemSupplySideDeck1;

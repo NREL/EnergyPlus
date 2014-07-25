@@ -290,8 +290,6 @@ SET( SRC
   Humidifiers.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
-  ISO_C_FUNCTION_BINDING.cc
-  ISO_C_FUNCTION_BINDING.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
   InputProcessor.cc
@@ -400,8 +398,6 @@ SET( SRC
   RootFinder.hh
   RuntimeLanguageProcessor.cc
   RuntimeLanguageProcessor.hh
-  SQLiteFortranRoutines.cc
-  SQLiteFortranRoutines.hh
   SQLiteProcedures.cc
   SQLiteProcedures.hh
   ScheduleManager.cc
@@ -524,21 +520,24 @@ SET( SRC
   ZonePlenum.hh
   ZoneTempPredictorCorrector.cc
   ZoneTempPredictorCorrector.hh
-  main.cc
-  main.hh
 )
 
-ADD_EXECUTABLE(EnergyPlus ${SRC})
+ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
+ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
 
-#TARGET_LINK_LIBRARIES( EnergyPlus sqlite )
 #TARGET_LINK_LIBRARIES( EnergyPlus bcvtb )
 #TARGET_LINK_LIBRARIES( EnergyPlus epexpat )
 #TARGET_LINK_LIBRARIES( EnergyPlus epfmiimport)
 #TARGET_LINK_LIBRARIES( EnergyPlus DElight )
-TARGET_LINK_LIBRARIES( EnergyPlus objexx )
 LINK_DIRECTORIES( /usr/lib/atlas-base/ )
 LINK_DIRECTORIES( /usr/lib/x86_64-linux-gnu/ )
-TARGET_LINK_LIBRARIES( EnergyPlus lapack_atlas )
-TARGET_LINK_LIBRARIES( EnergyPlus rt )
+TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite lapack_atlas rt)
+
+if(CMAKE_HOST_UNIX)
+  if(NOT APPLE)
+    TARGET_LINK_LIBRARIES( EnergyPlus dl )
+  endif()
+endif()
+
 
 INSTALL( TARGETS EnergyPlus DESTINATION ./ )

@@ -696,7 +696,7 @@ namespace HVACStandAloneERV {
 			} else {
 				ShowSevereError( "GetERVController: Could not find ZoneHVAC:EnergyRecoveryVentilator with " + cAlphaFields( 1 ) + " = \"" + Alphas( 1 ) + "\"" );
 				ErrorsFound = true;
-				AirFlowRate = -1000.;
+				AirFlowRate = -1000.0;
 			}
 			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
 			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
@@ -1525,6 +1525,7 @@ namespace HVACStandAloneERV {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using General::RoundSigDigits;
 		using DataAirLoop::OAControllerInfo;
+		using DataHeatBalance::ZoneAirMassFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1654,7 +1655,7 @@ namespace HVACStandAloneERV {
 			//      END DO
 			TotalExhaustMassFlow = Node( ExhaustInletNode ).MassFlowRate;
 			TotalSupplyMassFlow = Node( SupInletNode ).MassFlowRate;
-			if ( TotalExhaustMassFlow > TotalSupplyMassFlow ) {
+			if ( TotalExhaustMassFlow > TotalSupplyMassFlow && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
 				ShowWarningError( "For " + StandAloneERV( StandAloneERVNum ).UnitType + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\" there is unbalanced exhaust air flow." );
 				ShowContinueError( "... The exhaust air mass flow rate = " + RoundSigDigits( Node( ExhaustInletNode ).MassFlowRate, 6 ) );
 				ShowContinueError( "... The  supply air mass flow rate = " + RoundSigDigits( Node( SupInletNode ).MassFlowRate, 6 ) );

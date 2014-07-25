@@ -17,6 +17,7 @@
 #include <ObjexxFCL/GlobalStreams.hh>
 #include <ObjexxFCL/IOFlags.hh>
 #include <ObjexxFCL/Stream.hh>
+#include <ObjexxFCL/stream.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // C++ Headers
@@ -328,6 +329,36 @@ Read
 read( gio::Fmt const & fmt )
 {
 	return Read( std::cin, fmt );
+}
+
+// Read Line from Unit
+void
+read_line( Unit const unit, IOFlags & flags, std::string & line )
+{
+	flags.clear_status();
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
+		if ( stream_p ) {
+			cross_platform_get_line( *stream_p, line );
+			flags.set_status( *stream_p );
+		}
+	} else {
+		flags.err( true ).ios( 11 );
+	}
+}
+
+// Read Line from Unit
+void
+read_line( Unit const unit, std::string & line )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
+		if ( stream_p ) cross_platform_get_line( *stream_p, line );
+	}
 }
 
 // Write /////

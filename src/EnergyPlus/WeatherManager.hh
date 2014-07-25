@@ -195,7 +195,6 @@ namespace WeatherManager {
 	extern FArray1D_string SPSiteScheduleUnits; // SP Site Schedule Units
 	extern int NumSPSiteScheduleNamePtrs; // Number of SP Site Schedules (DesignDay only)
 	extern int NumMissing; // Number of hours of missing data
-	extern bool StripCR; // If true, strip last character (<cr> off each EPW line)
 	extern FArray1D< Real64 > Interpolation; // Interpolation values based on Number of Time Steps in Hour
 	extern FArray1D< Real64 > SolarInterpolation; // Solar Interpolation values based on
 	//      Number of Time Steps in Hour

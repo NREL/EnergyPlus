@@ -299,6 +299,7 @@ set(src
 )
 
 set( test_src
+  tst/unit/Backspace.unit.cc
   tst/unit/bit.unit.cc
   tst/unit/byte.unit.cc
   tst/unit/CArray.unit.cc

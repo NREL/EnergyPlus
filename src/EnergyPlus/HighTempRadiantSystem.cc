@@ -1285,7 +1285,7 @@ namespace HighTempRadiantSystem {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const NotOperating( -9999. ); // Some unreasonable value that should clue the user in that this is not running
+		Real64 const NotOperating( -9999.0 ); // Some unreasonable value that should clue the user in that this is not running
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

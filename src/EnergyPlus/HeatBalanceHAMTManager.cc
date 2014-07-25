@@ -91,11 +91,11 @@ namespace HeatBalanceHAMTManager {
 	int const ittermax( 150 ); // Maximum Number of itterations
 	int const adjmax( 6 ); // Maximum Number of Adjacent Cells
 
-	Real64 const wdensity( 1000. ); // Density of water kg.m-3
-	Real64 const wspech( 4180. ); // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
-	Real64 const whv( 2489000. ); // Evaporation enthalpy of water J.kg-1
+	Real64 const wdensity( 1000.0 ); // Density of water kg.m-3
+	Real64 const wspech( 4180.0 ); // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
+	Real64 const whv( 2489000.0 ); // Evaporation enthalpy of water J.kg-1
 	Real64 const convt( 0.002 ); // Temperature convergence limit
-	Real64 const qvplim( 100000. ); // Maximum latent heat W
+	Real64 const qvplim( 100000.0 ); // Maximum latent heat W
 	Real64 const rhmax( 1.01 ); // Maximum RH value
 
 	static std::string const BlankString;
@@ -1141,7 +1141,7 @@ namespace HeatBalanceHAMTManager {
 			cells( ExtConcell( sid ) ).vtc = extvtc( sid );
 		} else {
 			if ( cells( ExtConcell( sid ) ).rh > 0 ) {
-				cells( ExtConcell( sid ) ).vtc = HMassConvExtFD( sid ) * RhoOut / ( PsyPsatFnTemp( TempOutsideAirFD( sid ), BlankString ) * cells( ExtConcell( sid ) ).rh );
+				cells( ExtConcell( sid ) ).vtc = HMassConvExtFD( sid ) * RhoOut / ( PsyPsatFnTemp( TempOutsideAirFD( sid ) ) * cells( ExtConcell( sid ) ).rh );
 			} else {
 				cells( ExtConcell( sid ) ).vtc = 10000.0;
 			}
@@ -1149,10 +1149,10 @@ namespace HeatBalanceHAMTManager {
 
 		if ( intvtcflag( sid ) ) {
 			cells( IntConcell( sid ) ).vtc = intvtc( sid );
-			HMassConvInFD( sid ) = cells( IntConcell( sid ) ).vtc * PsyPsatFnTemp( MAT( Surface( sid ).Zone ), BlankString ) * cells( IntConcell( sid ) ).rh / RhoIn;
+			HMassConvInFD( sid ) = cells( IntConcell( sid ) ).vtc * PsyPsatFnTemp( MAT( Surface( sid ).Zone ) ) * cells( IntConcell( sid ) ).rh / RhoIn;
 		} else {
 			if ( cells( IntConcell( sid ) ).rh > 0 ) {
-				cells( IntConcell( sid ) ).vtc = HMassConvInFD( sid ) * RhoIn / ( PsyPsatFnTemp( MAT( Surface( sid ).Zone ), BlankString ) * cells( IntConcell( sid ) ).rh );
+				cells( IntConcell( sid ) ).vtc = HMassConvInFD( sid ) * RhoIn / ( PsyPsatFnTemp( MAT( Surface( sid ).Zone ) ) * cells( IntConcell( sid ) ).rh );
 			} else {
 				cells( IntConcell( sid ) ).vtc = 10000.0;
 			}
@@ -1182,7 +1182,7 @@ namespace HeatBalanceHAMTManager {
 				matid = cells( cid ).matid;
 				cells( cid ).vp = RHtoVP( cells( cid ).rh, cells( cid ).temp );
 				cells( cid ).vpp1 = RHtoVP( cells( cid ).rhp1, cells( cid ).tempp1 );
-				cells( cid ).vpsat = PsyPsatFnTemp( cells( cid ).tempp1, BlankString );
+				cells( cid ).vpsat = PsyPsatFnTemp( cells( cid ).tempp1 );
 				if ( matid > 0 ) {
 					interp( Material( matid ).niso, Material( matid ).isorh, Material( matid ).isodata, cells( cid ).rhp1, cells( cid ).water, cells( cid ).dwdphi );
 					if ( IsRain && rainswitch ) {
@@ -1403,7 +1403,7 @@ namespace HeatBalanceHAMTManager {
 		TempSurfOutTmp = cells( Extcell( sid ) ).tempp1;
 		TempSurfInTmp = cells( Intcell( sid ) ).tempp1;
 
-		TempSurfInP = cells( Intcell( sid ) ).rhp1 * PsyPsatFnTemp( cells( Intcell( sid ) ).tempp1, BlankString );
+		TempSurfInP = cells( Intcell( sid ) ).rhp1 * PsyPsatFnTemp( cells( Intcell( sid ) ).tempp1 );
 
 		RhoVaporSurfIn( sid ) = TempSurfInP / ( 461.52 * ( MAT( Surface( sid ).Zone ) + KelvinConv ) );
 
@@ -1458,7 +1458,7 @@ namespace HeatBalanceHAMTManager {
 			// fix HAMT values for this surface
 			cells( cid ).temp = cells( cid ).tempp1;
 			cells( cid ).rh = cells( cid ).rhp1;
-			cells( cid ).rhp = cells( cid ).rh * 100.;
+			cells( cid ).rhp = cells( cid ).rh * 100.0;
 			if ( cells( cid ).density > 0.0 ) {
 				cells( cid ).wreport = cells( cid ).water / cells( cid ).density;
 				watermass += ( cells( cid ).water * cells( cid ).volume );
@@ -1603,7 +1603,7 @@ namespace HeatBalanceHAMTManager {
 
 		Real64 VPSat;
 
-		VPSat = PsyPsatFnTemp( Temperature, BlankString );
+		VPSat = PsyPsatFnTemp( Temperature );
 
 		RHtoVP = RH * VPSat;
 
@@ -1654,7 +1654,7 @@ namespace HeatBalanceHAMTManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		WVDC = ( 2.e-7 * std::pow( ( Temperature + KelvinConv ), 0.81 ) ) / ambp;
+		WVDC = ( 2.e-7 * std::pow( Temperature + KelvinConv, 0.81 ) ) / ambp;
 
 		return WVDC;
 	}

@@ -218,7 +218,7 @@ namespace WaterToAirHeatPumpSimple {
 			if ( HPNum > NumWatertoAirHPs || HPNum < 1 ) {
 				ShowFatalError( "SimWatertoAirHPSimple: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", Number of Water to Air HPs=" + TrimSigDigits( NumWatertoAirHPs ) + ", WaterToAir HP name=" + CompName );
 			}
-			if ( CompName != BlankString && CompName != SimpleWatertoAirHP( HPNum ).Name ) {
+			if ( ! CompName.empty() && CompName != SimpleWatertoAirHP( HPNum ).Name ) {
 				ShowFatalError( "SimWatertoAirHPSimple: Invalid CompIndex passed=" + TrimSigDigits( HPNum ) + ", WaterToAir HP name=" + CompName + ", stored WaterToAir HP Name for that index=" + SimpleWatertoAirHP( HPNum ).Name );
 			}
 		}
@@ -787,10 +787,10 @@ namespace WaterToAirHeatPumpSimple {
 			// So always start the calculations by setting the air flow rate to design flow rate.
 
 			//    SimpleWatertoAirHP(HPNum)%AirMassFlowRate   = Node(AirInletNode)%MassFlowRate
-			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString );
+			SimpleWatertoAirHP( HPNum ).AirMassFlowRate = SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
 			//If air flow is less than 25% rated flow. Then set air flow to the 25% of rated conditions
-			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString ) ) {
-				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat, BlankString );
+			if ( SimpleWatertoAirHP( HPNum ).AirMassFlowRate < 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat ) ) {
+				SimpleWatertoAirHP( HPNum ).AirMassFlowRate = 0.25 * SimpleWatertoAirHP( HPNum ).RatedAirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, Node( AirInletNode ).Temp, Node( AirInletNode ).HumRat );
 			}
 			SimpleWatertoAirHP( HPNum ).WaterFlowMode = true;
 		} else { //heat pump is off
@@ -1810,7 +1810,7 @@ namespace WaterToAirHeatPumpSimple {
 			ratioTDB = ( ( LoadSideInletDBTemp + CelsiustoKelvin ) / Tref );
 			ratioTWB = ( ( LoadSideInletWBTemp + CelsiustoKelvin ) / Tref );
 			ratioTS = ( ( SourceSideInletTemp + CelsiustoKelvin ) / Tref );
-			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat, BlankString ) ) );
+			ratioVL = ( LoadSideMassFlowRate / ( AirVolFlowRateRated * PsyRhoAirFnPbTdbW( StdBaroPress, LoadSideInletDBTemp, LoadSideInletHumRat ) ) );
 
 			if ( WaterPartLoad > 0.0 && SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate > 0.0 ) {
 				ratioVS = ( SourceSideMassFlowRate ) / ( SimpleWatertoAirHP( HPNum ).DesignWaterMassFlowRate * WaterPartLoad );
@@ -2325,18 +2325,18 @@ namespace WaterToAirHeatPumpSimple {
 		} else {
 			// For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
 			// for the entire heat pump off-cycle.
-			Toff = 3600. / ( 4. * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
+			Toff = 3600.0 / ( 4.0 * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
 		}
 
 		//  Cap Toff to meet the equation restriction
 		if ( Gamma > 0.0 ) {
-			Toffa = min( Toff, 2. * Twet / Gamma );
+			Toffa = min( Toff, 2.0 * Twet / Gamma );
 		} else {
 			Toffa = Toff;
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( std::pow( Gamma, 2 ) ) * ( std::pow( Toffa, 2 ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * pow_2( Gamma ) * pow_2( Toffa );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;

@@ -186,6 +186,8 @@ namespace DaylightingDevices {
 
 		// DERIVED TYPE DEFINITIONS:
 
+		static gio::Fmt const fmtA( "(A)" );
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PipeNum; // TDD pipe object number
 		int StoredNum; // Stored TDD pipe object number
@@ -364,10 +366,10 @@ namespace DaylightingDevices {
 
 				// Report calculated view factor so that user knows what to make the view factor to ground
 				if ( ! ShelfReported ) {
-					gio::write( OutputFileInits, "(A)" ) << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
+					gio::write( OutputFileInits, fmtA ) << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
 					ShelfReported = true;
 				}
-				gio::write( OutputFileInits, "(A)" ) << Shelf( ShelfNum ).Name + ',' + RoundSigDigits( Shelf( ShelfNum ).ViewFactor, 2 ) + ',' + Surface( WinSurf ).Name + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorSky, 2 ) + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorGround, 2 );
+				gio::write( OutputFileInits, fmtA ) << Shelf( ShelfNum ).Name + ',' + RoundSigDigits( Shelf( ShelfNum ).ViewFactor, 2 ) + ',' + Surface( WinSurf ).Name + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorSky, 2 ) + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorGround, 2 );
 				//      CALL SetupOutputVariable('View Factor To Outside Shelf []', &
 				//        Shelf(ShelfNum)%ViewFactor,'Zone','Average',Shelf(ShelfNum)%Name)
 			}
@@ -525,7 +527,7 @@ namespace DaylightingDevices {
 					}
 
 					if ( TDDPipe( PipeNum ).Dome > 0 && std::abs( Surface( SurfNum ).Area - Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) {
-						if ( SafeDivide( std::abs( Surface( SurfNum ).Area - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > .1 ) { // greater than 10%
+						if ( SafeDivide( std::abs( Surface( SurfNum ).Area - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) { // greater than 10%
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome and diffuser areas are significantly different (>10%)." );
 							ShowContinueError( "...Diffuser Area=[" + RoundSigDigits( Surface( SurfNum ).Area, 4 ) + "]; Dome Area=[" + RoundSigDigits( Surface( TDDPipe( PipeNum ).Dome ).Area, 4 ) + "]." );
 							ErrorsFound = true;
@@ -572,9 +574,9 @@ namespace DaylightingDevices {
 					ErrorsFound = true;
 				}
 
-				PipeArea = 0.25 * Pi * std::pow( TDDPipe( PipeNum ).Diameter, 2 );
+				PipeArea = 0.25 * Pi * pow_2( TDDPipe( PipeNum ).Diameter );
 				if ( TDDPipe( PipeNum ).Dome > 0 && std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) {
-					if ( SafeDivide( std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > .1 ) { // greater than 10%
+					if ( SafeDivide( std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) { // greater than 10%
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe and dome/diffuser areas are significantly different (>10%)." );
 						ShowContinueError( "...Pipe Area=[" + RoundSigDigits( PipeArea, 4 ) + "]; Dome/Diffuser Area=[" + RoundSigDigits( Surface( TDDPipe( PipeNum ).Dome ).Area, 4 ) + "]." );
 						ErrorsFound = true;
@@ -897,7 +899,7 @@ namespace DaylightingDevices {
 		T = 0.0;
 		i = 1.0 / N;
 
-		xLimit = ( std::log( std::pow( N, 2.0 ) * myLocalTiny ) / std::log( R ) ) / xTol;
+		xLimit = ( std::log( pow_2( N ) * myLocalTiny ) / std::log( R ) ) / xTol;
 
 		c1 = A * std::tan( Theta );
 		c2 = 4.0 / Pi;
@@ -907,7 +909,7 @@ namespace DaylightingDevices {
 			x = c1 / s;
 
 			if ( x < xLimit ) {
-				dT = c2 * ( std::pow( R, int( x ) ) ) * ( 1.0 - ( 1.0 - R ) * ( x - int( x ) ) ) * ( std::pow( s, 2 ) ) / std::sqrt( 1.0 - std::pow( s, 2 ) );
+				dT = c2 * std::pow( R, int( x ) ) * ( 1.0 - ( 1.0 - R ) * ( x - int( x ) ) ) * pow_2( s ) / std::sqrt( 1.0 - pow_2( s ) );
 				T += dT;
 			}
 
@@ -1493,10 +1495,10 @@ namespace DaylightingDevices {
 		M = H / W;
 		N = L / W;
 
-		E1 = M * std::atan( ( 1.0 / M ) ) + N * std::atan( ( 1.0 / N ) ) - ( std::sqrt( std::pow( N, 2 ) + std::pow( M, 2 ) ) ) * std::atan( std::pow( ( ( std::pow( N, 2 ) + std::pow( M, 2 ) ) ), ( -0.5 ) ) );
-		E2 = ( ( 1.0 + std::pow( M, 2 ) ) * ( 1.0 + std::pow( N, 2 ) ) ) / ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) );
-		E3 = std::pow( ( ( std::pow( M, 2 ) ) * ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) ) / ( ( 1.0 + std::pow( M, 2 ) ) * ( std::pow( M, 2 ) + std::pow( N, 2 ) ) ) ), ( std::pow( M, 2 ) ) );
-		E4 = std::pow( ( ( std::pow( N, 2 ) ) * ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) ) / ( ( 1.0 + std::pow( N, 2 ) ) * ( std::pow( M, 2 ) + std::pow( N, 2 ) ) ) ), ( std::pow( N, 2 ) ) );
+		E1 = M * std::atan( 1.0 / M ) + N * std::atan( 1.0 / N ) - std::sqrt( pow_2( N ) + pow_2( M ) ) * std::atan( std::pow( pow_2( N ) + pow_2( M ), -0.5 ) );
+		E2 = ( ( 1.0 + pow_2( M ) ) * ( 1.0 + pow_2( N ) ) ) / ( 1.0 + pow_2( M ) + pow_2( N ) );
+		E3 = std::pow( pow_2( M ) * ( 1.0 + pow_2( M ) + pow_2( N ) ) / ( ( 1.0 + pow_2( M ) ) * ( pow_2( M ) + pow_2( N ) ) ), pow_2( M ) );
+		E4 = std::pow( pow_2( N ) * ( 1.0 + pow_2( M ) + pow_2( N ) ) / ( ( 1.0 + pow_2( N ) ) * ( pow_2( M ) + pow_2( N ) ) ), pow_2( N ) );
 
 		Shelf( ShelfNum ).ViewFactor = ( 1.0 / ( Pi * M ) ) * ( E1 + 0.25 * std::log( E2 * E3 * E4 ) );
 

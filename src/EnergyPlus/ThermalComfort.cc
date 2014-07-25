@@ -523,9 +523,9 @@ namespace ThermalComfort {
 			RadTemp = CalcRadTemp( PeopleNum );
 			// Use mean air temp for calculating RH when thermal comfort control is used
 			if ( present( PNum ) ) {
-				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+				RelHum = PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			} else {
-				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress, BlankString );
+				RelHum = PsyRhFnTdbWPb( ZTAVComf( ZoneNum ), ZoneAirHumRatAvgComf( ZoneNum ), OutBaroPress );
 			}
 			People( PeopleNum ).TemperatureInZone = AirTemp;
 			People( PeopleNum ).RelativeHumidityInZone = RelHum * 100.0;
@@ -585,7 +585,7 @@ namespace ThermalComfort {
 			// VapPress    = CalcSatVapPressFromTemp(AirTemp)  !original
 			// VapPress    = RelHum*VapPress                   !original might be in torrs
 
-			VapPress = PsyPsatFnTemp( AirTemp, BlankString ); // use psych routines inside E+ , returns Pa
+			VapPress = PsyPsatFnTemp( AirTemp ); // use psych routines inside E+ , returns Pa
 
 			VapPress *= RelHum; // in units of [Pa]
 
@@ -603,29 +603,29 @@ namespace ThermalComfort {
 			CloInsul = CloUnit * CloBodyRat * 0.155; // Thermal resistance of the clothing
 
 			P2 = CloInsul * 3.96;
-			P3 = CloInsul * 100.;
+			P3 = CloInsul * 100.0;
 			P1 = CloInsul * AbsAirTemp;
-			P4 = 308.7 - 0.028 * IntHeatProd + P2 * std::pow( ( AbsRadTemp / 100. ), 4 );
+			P4 = 308.7 - 0.028 * IntHeatProd + P2 * pow_4( AbsRadTemp / 100.0 );
 
 			// First guess for clothed surface tempeature
 			AbsCloSurfTemp = AbsAirTemp + ( 35.5 - AirTemp ) / ( 3.5 * ( CloUnit + 0.1 ) );
-			XN = AbsCloSurfTemp / 100.;
+			XN = AbsCloSurfTemp / 100.0;
 			HcFor = 12.1 * std::sqrt( AirVel ); // Heat transfer coefficient by forced convection
 			IterNum = 0;
 			XF = XN;
 
 			// COMPUTE SURFACE TEMPERATURE OF CLOTHING BY ITERATIONS
 			while ( ( ( std::abs( XN - XF ) > StopIterCrit ) || ( IterNum == 0 ) ) && ( IterNum < MaxIter ) ) {
-				XF = ( XF + XN ) / 2.;
-				HcNat = 2.38 * std::pow( std::abs( 100. * XF - AbsAirTemp ), 0.25 ); // Heat transfer coefficient by natural convection
+				XF = ( XF + XN ) / 2.0;
+				HcNat = 2.38 * root_4( std::abs( 100.0 * XF - AbsAirTemp ) ); // Heat transfer coefficient by natural convection
 				Hc = max( HcFor, HcNat ); // Determination of convective heat transfer coefficient
-				XN = ( P4 + P1 * Hc - P2 * std::pow( XF, 4 ) ) / ( 100. + P3 * Hc );
+				XN = ( P4 + P1 * Hc - P2 * pow_4( XF ) ) / ( 100.0 + P3 * Hc );
 				++IterNum;
 				if ( IterNum > MaxIter ) {
 					ShowWarningError( "Max iteration exceeded in CalcThermalFanger" );
 				}
 			}
-			AbsCloSurfTemp = 100. * XN;
+			AbsCloSurfTemp = 100.0 * XN;
 			CloSurfTemp = AbsCloSurfTemp - TAbsConv;
 
 			// COMPUTE PREDICTED MEAN VOTE
@@ -634,7 +634,7 @@ namespace ThermalComfort {
 			//                            (AbsCloSurfTemp**4 - AbsRadTemp**4) ! Heat loss by radiation
 
 			// following line is ln 480 in ASHRAE 55 append. D
-			RadHeatLoss = 3.96 * CloBodyRat * ( std::pow( ( AbsCloSurfTemp / 100. ), 4.0 ) - std::pow( ( AbsRadTemp / 100. ), 4.0 ) );
+			RadHeatLoss = 3.96 * CloBodyRat * ( pow_4( AbsCloSurfTemp * 0.01 ) - pow_4( AbsRadTemp * 0.01 ) );
 
 			ConvHeatLoss = CloBodyRat * Hc * ( CloSurfTemp - AirTemp ); // Heat loss by convection
 
@@ -650,18 +650,18 @@ namespace ThermalComfort {
 			// SatSkinVapPress = 1.92*SkinTempComf - 25.3 ! Water vapor pressure at required skin temperature
 			// Heat loss by diffusion
 			// EvapHeatLossDiff = 0.4148*(SatSkinVapPress - VapPress) !original
-			EvapHeatLossDiff = 3.05 * 0.001 * ( 5733. - 6.99 * IntHeatProd - VapPress ); // ln 440 in ASHRAE 55 Append. D
+			EvapHeatLossDiff = 3.05 * 0.001 * ( 5733.0 - 6.99 * IntHeatProd - VapPress ); // ln 440 in ASHRAE 55 Append. D
 
 			EvapHeatLoss = EvapHeatLossRegComf + EvapHeatLossDiff;
 			// Heat loss by respiration
 			// original: LatRespHeatLoss = 0.0023*ActLevel*(44. - VapPress) ! Heat loss by latent respiration
-			LatRespHeatLoss = 1.7 * 0.00001 * ActLevel * ( 5867. - VapPress ); //ln 460 in ASHRAE 55 Append. D
+			LatRespHeatLoss = 1.7 * 0.00001 * ActLevel * ( 5867.0 - VapPress ); //ln 460 in ASHRAE 55 Append. D
 
 			// LatRespHeatLoss = 0.017251*ActLevel*(5.8662 - VapPress)
 			// V-1.2.2 'fix' BG 3/2005 5th term in LHS Eq (58)  in 2001 HOF Ch. 8
 			// this was wrong because VapPress needed to be kPa
 
-			DryRespHeatLoss = 0.0014 * ActLevel * ( 34. - AirTemp ); // Heat loss by dry respiration.
+			DryRespHeatLoss = 0.0014 * ActLevel * ( 34.0 - AirTemp ); // Heat loss by dry respiration.
 
 			RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss;
 
@@ -680,9 +680,12 @@ namespace ThermalComfort {
 			ThermalComfortData( PeopleNum ).CloSurfTemp = CloSurfTemp;
 
 			// Calculate the Fanger PPD (Predicted Percentage of Dissatisfied), as a %
-			PPD = 100.0 - 95.0 * std::exp( -0.03353 * std::pow( PMV, 4 ) - 0.2179 * std::pow( PMV, 2 ) );
-			if ( PPD < 0.0 ) PPD = 0.0;
-			if ( PPD > 100.0 ) PPD = 100.0;
+			PPD = 100.0 - 95.0 * std::exp( -0.03353 * pow_4( PMV ) - 0.2179 * pow_2( PMV ) );
+			if ( PPD < 0.0 ) {
+				PPD = 0.0;
+			} else if ( PPD > 100.0 ) {
+				PPD = 100.0;
+			}
 
 			ThermalComfortData( PeopleNum ).FangerPPD = PPD;
 		}
@@ -721,12 +724,12 @@ namespace ThermalComfort {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const CloFac( 0.25 ); // Clothing factor determined experimentally
 		Real64 const EvapEff( 0.9 ); // Evaporative efficiency
-		Real64 const MaxSkinBloodFlow( 90. ); // Max. value of skin blood flow
-		Real64 const RegSweatMax( 670. ); // Max. value of regulatory sweating; w/m2
-		Real64 const SkinBloodFlowConst( 200. ); // Skin blood flow coefficient for average person; l/m2.hr.k
+		Real64 const MaxSkinBloodFlow( 90.0 ); // Max. value of skin blood flow
+		Real64 const RegSweatMax( 670.0 ); // Max. value of regulatory sweating; w/m2
+		Real64 const SkinBloodFlowConst( 200.0 ); // Skin blood flow coefficient for average person; l/m2.hr.k
 		Real64 const StdAtm( 1.0 ); // Standard Atmospheres
 		Real64 const Str( 0.1 ); // Constriction constant of skin blood flow for average person
-		Real64 const SweatContConst( 170. ); // Proportionality constant for sweat control; g/m2.hr
+		Real64 const SweatContConst( 170.0 ); // Proportionality constant for sweat control; g/m2.hr
 		Real64 const VapPressConv( 0.1333227 ); // Vapor pressure converter from torr to Kpa
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -805,7 +808,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			// Metabolic rate of body (W/m2)
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			// Energy consumption by external work (W/m2)
@@ -847,16 +850,16 @@ namespace ThermalComfort {
 			// CALCULATE VARIABLESS THAT REMAIN CONSTANT FOR AN HOUR
 			CloBodyRat = 1.0 + CloFac * CloUnit;
 
-			if ( CloUnit < .01 ) CloUnit = .01;
+			if ( CloUnit < 0.01 ) CloUnit = 0.01;
 
 			CloCond = 1.0 / ( CloUnit * 0.155 );
 
 			// INITIALIZE THE POLLOWING VARIABLES
-			if ( AirVel < .137 ) AirVel = .137;
+			if ( AirVel < 0.137 ) AirVel = 0.137;
 
 			Hc = 8.6 * std::pow( AirVel, 0.53 );
-			if ( ActMet > .9 ) {
-				HcAct = 5.66 * std::pow( ( ActMet - 0.85 ), 0.39 );
+			if ( ActMet > 0.9 ) {
+				HcAct = 5.66 * std::pow( ActMet - 0.85, 0.39 );
 				Hc = max( HcAct, Hc );
 			}
 
@@ -881,7 +884,7 @@ namespace ThermalComfort {
 			SkinMassRat = 0.0417737 + 0.7451832 / ( SkinBloodFlow + 0.585417 );
 
 			// GUESS CloSurfTemp TO START
-			CloSurfTemp = ( SkinTemp + AirTemp ) / 2.;
+			CloSurfTemp = ( SkinTemp + AirTemp ) / 2.0;
 
 			// SIMULATION OF TEMPERATURE REGULATION.
 			// This SECTION simulates the temperature regulation over 1 minute.
@@ -900,7 +903,7 @@ namespace ThermalComfort {
 				while ( ( std::abs( CloSurfTemp - CloSurfTempOld ) > 0.01 ) || FirstMinIter ) {
 					FirstMinIter = false;
 					CloSurfTempOld = CloSurfTemp;
-					Hr = 4. * RadSurfEff * StefanBoltz * std::pow( ( ( CloSurfTemp + RadTemp ) / 2. + TAbsConv ), 3 );
+					Hr = 4.0 * RadSurfEff * StefanBoltz * pow_3( ( CloSurfTemp + RadTemp ) / 2.0 + TAbsConv );
 					CloSurfTemp = ( CloCond * SkinTemp + CloBodyRat * ( Hc * AirTemp + Hr * RadTemp ) ) / ( CloCond + CloBodyRat * ( Hc + Hr ) );
 				}
 
@@ -910,7 +913,7 @@ namespace ThermalComfort {
 				DryHeatLoss = CloBodyRat * ( Hc * ( CloSurfTemp - AirTemp ) + Hr * ( CloSurfTemp - RadTemp ) );
 				// dry and latent respiratory heat losses
 				LatRespHeatLoss = 0.017251 * ActLevel * ( 5.8662 - VapPress );
-				DryRespHeatLoss = 0.0014 * ActLevel * ( 34. - AirTemp ) * StdAtm;
+				DryRespHeatLoss = 0.0014 * ActLevel * ( 34.0 - AirTemp ) * StdAtm;
 				RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss;
 				// Heat flows to skin and core:
 				HeatFlow = ( CoreTemp - SkinTemp ) * ( 5.28 + 1.163 * SkinBloodFlow );
@@ -920,8 +923,8 @@ namespace ThermalComfort {
 				CoreHeatStorage = ActLevel - ( CoreTemp - SkinTemp ) * ( 5.28 + 1.163 * SkinBloodFlow ) - RespHeatLoss - WorkEff;
 
 				// Thermal capacities (average man: 70 kg, 1.8 square meter).
-				CoreThermCap = ActLevelConv * ( 1.0 - SkinMassRat ) * 70.;
-				SkinThermCap = ActLevelConv * SkinMassRat * 70.;
+				CoreThermCap = ActLevelConv * ( 1.0 - SkinMassRat ) * 70.0;
+				SkinThermCap = ActLevelConv * SkinMassRat * 70.0;
 
 				// Temperature changes in 1 minute
 				SkinTempChange = ( SkinHeatStorage * 1.8 ) / SkinThermCap;
@@ -968,7 +971,11 @@ namespace ThermalComfort {
 				SkinMassRat = 0.0417737 + 0.7451832 / ( SkinBloodFlow + 0.585417 );
 
 				// control of regulatory sweating
-				RegSweat = SweatContConst * BodyThermSigWarm * std::exp( SkinThermSigWarm / 10.7 );
+				if ( SkinThermSigWarm == 0.0 ) {
+					RegSweat = SweatContConst * BodyThermSigWarm;
+				} else {
+					RegSweat = SweatContConst * BodyThermSigWarm * std::exp( SkinThermSigWarm / 10.7 );
+				}
 
 				if ( RegSweat > RegSweatMax ) RegSweat = RegSweatMax;
 
@@ -1001,7 +1008,7 @@ namespace ThermalComfort {
 				SkinWetSweat = EvapHeatLossRegSweat / EvapHeatLossMax;
 
 				// 0.06 if SkinWetDiff for nonsweating skin --- Kerslake
-				SkinWetDiff = ( 1.0 - SkinWetSweat ) * .06;
+				SkinWetDiff = ( 1.0 - SkinWetSweat ) * 0.06;
 				EvapHeatLossDiff = SkinWetDiff * EvapHeatLossMax;
 				EvapHeatLoss = EvapHeatLossRegSweat + EvapHeatLossDiff;
 				SkinWetTot = EvapHeatLoss / EvapHeatLossMax;
@@ -1009,9 +1016,9 @@ namespace ThermalComfort {
 				// Beginning of dripping (Sweat not evaporated on skin surface)
 				if ( ( SkinWetTot >= EvapEff ) && ( EvapHeatLossMax >= 0 ) ) {
 					SkinWetTot = EvapEff;
-					SkinWetSweat = ( EvapEff - 0.06 ) / .94;
+					SkinWetSweat = ( EvapEff - 0.06 ) / 0.94;
 					EvapHeatLossRegSweat = SkinWetSweat * EvapHeatLossMax;
-					SkinWetDiff = ( 1.0 - SkinWetSweat ) * .06;
+					SkinWetDiff = ( 1.0 - SkinWetSweat ) * 0.06;
 					EvapHeatLossDiff = SkinWetDiff * EvapHeatLossMax;
 					EvapHeatLoss = EvapHeatLossRegSweat + EvapHeatLossDiff;
 				}
@@ -1027,7 +1034,7 @@ namespace ThermalComfort {
 				}
 
 				// UnevapSweat = unevaporated sweat in grams/sq.m/hr
-				UnevapSweat = ( RegSweat * .68 - SkinWetSweat * EvapHeatLossMax ) / 0.68;
+				UnevapSweat = ( RegSweat * 0.68 - SkinWetSweat * EvapHeatLossMax ) / 0.68;
 				if ( UnevapSweat <= 0.0 ) UnevapSweat = 0.0;
 
 				// Vapor pressure at skin (as measured by dewpoint sensors)
@@ -1072,10 +1079,10 @@ namespace ThermalComfort {
 			HrStd = Hr;
 			// HcStd = standard conv. heat tr. coeff. (level walking/still air)
 			if ( ActMet <= 0.86 ) ActMet = 0.86;
-			HcStd = 5.66 * std::pow( ( ActMet - 0.85 ), 0.39 );
+			HcStd = 5.66 * std::pow( ActMet - 0.85, 0.39 );
 
 			// minimum value of Hc at sea leAirVel = 3.0 (AirVel = .137 m/s)
-			if ( HcStd <= 3. ) HcStd = 3.;
+			if ( HcStd <= 3.0 ) HcStd = 3.0;
 
 			// standard MET - StdCloUnit relation gives SET* = 24 C when PMV = 0
 			StdCloUnit = 1.3264 / ( ( ActLevel - WorkEff ) / ActLevelConv + 0.7383 ) - 0.0953;
@@ -1118,7 +1125,7 @@ namespace ThermalComfort {
 			// EvapHeatLossMax is readjusted for EvapEff
 			EvapHeatLossMax *= EvapEff;
 			// DISC (discomfort) varies with relative thermoregulatory strain
-			ThermalComfortData( PeopleNum ).PierceDISC = 5. * ( EvapHeatLossRegSweat - EvapHeatLossRegComf ) / ( EvapHeatLossMax - EvapHeatLossRegComf - EvapHeatLossDiff );
+			ThermalComfortData( PeopleNum ).PierceDISC = 5.0 * ( EvapHeatLossRegSweat - EvapHeatLossRegComf ) / ( EvapHeatLossMax - EvapHeatLossRegComf - EvapHeatLossDiff );
 
 			// Part VI:  Thermal sensation TSENS as function of mean body temp.-
 			// AvgBodyTempLow is AvgBodyTemp when DISC is 0. (lower limit of zone of evap. regul.)
@@ -1132,7 +1139,7 @@ namespace ThermalComfort {
 				ThermalComfortData( PeopleNum ).PierceTSENS = 4.7 * ( AvgBodyTemp - AvgBodyTempLow ) / ( AvgBodyTempHigh - AvgBodyTempLow );
 
 			} else {
-				ThermalComfortData( PeopleNum ).PierceTSENS = .68175 * ( AvgBodyTemp - AvgBodyTempLow );
+				ThermalComfortData( PeopleNum ).PierceTSENS = 0.68175 * ( AvgBodyTemp - AvgBodyTempLow );
 				ThermalComfortData( PeopleNum ).PierceDISC = ThermalComfortData( PeopleNum ).PierceTSENS;
 			}
 
@@ -1214,7 +1221,7 @@ namespace ThermalComfort {
 		// NEXT GROUP OF VARIABLE ARE FIXED FOR BLAST PROGRAM - UNACCLIMATED MAN
 		// THE TSV MODEL CAN BE APPLIED TO UNACCLIMATED MAN ONLY.
 		TimeInterval = 1.0;
-		TSVMax = 4.;
+		TSVMax = 4.0;
 		StartDayNum = 1;
 		LastDayNum = 1;
 		IncreDayNum = 1;
@@ -1232,7 +1239,7 @@ namespace ThermalComfort {
 				AirTemp = ZTAV( ZoneNum );
 			}
 			RadTemp = CalcRadTemp( PeopleNum );
-			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress, BlankString );
+			RelHum = PsyRhFnTdbWPb( ZTAV( ZoneNum ), ZoneAirHumRat( ZoneNum ), OutBaroPress );
 			ActLevel = GetCurrentScheduleValue( People( PeopleNum ).ActivityLevelPtr ) / BodySurfArea;
 			WorkEff = GetCurrentScheduleValue( People( PeopleNum ).WorkEffPtr ) * ActLevel;
 			{ auto const SELECT_CASE_var( People( PeopleNum ).ClothingType );
@@ -1265,9 +1272,9 @@ namespace ThermalComfort {
 			IntHeatProd = ActLevel - WorkEff;
 			// THE FOLLOWING ARE TYPICAL VALUES SET FOR BLAST RUNS
 			// STANDARD MAN: 70. KG WEIGHT, 1.8 M2 SURFACE AREA
-			BodyWt = 70.;
-			CoreTemp = 37.;
-			SkinTemp = 31.;
+			BodyWt = 70.0;
+			CoreTemp = 37.0;
+			SkinTemp = 31.0;
 
 			//   CALCULATIONS NEEDED FOR THE PASSIVE STATE EQUATIONS
 			CoreThermCap = 0.9 * BodyWt * 0.97 / BodySurfArea;
@@ -1285,6 +1292,14 @@ namespace ThermalComfort {
 			CloBodyRat = 1.0 + 0.2 * CloUnit;
 			CloThermEff = 1.0 / ( 1.0 + 0.155 * H * CloBodyRat * CloUnit );
 			CloPermeatEff = 1.0 / ( 1.0 + 0.143 * Hc * CloUnit );
+			//  BASIC INFORMATION FOR THERMAL SENSATION.
+			IntHeatProdMet = IntHeatProd / ActLevelConv;
+			IntHeatProdMetMax = max( 1.0, IntHeatProdMet );
+			ThermCndctNeut = 12.05 * std::exp( 0.2266 * ( IntHeatProdMetMax - 1.0 ) );
+			SkinWetNeut = 0.02 + 0.4 * ( 1.0 - std::exp( -0.6 * ( IntHeatProdMetMax - 1.0 ) ) );
+			ThermCndctMin = ( ThermCndctNeut - 5.3 ) * 0.26074074 + 5.3;
+			Real64 const ThemCndct_75_fac( 1.0 / ( 75.0 - ThermCndctNeut ) );
+			Real64 const ThemCndct_fac( 1.0 / ( ThermCndctNeut - ThermCndctMin ) );
 			//  CALCULATE THE PHYSIOLOGICAL REACTIONS OF AN UNACCLIMATED
 			//  MAN (LastDayNum = 1), OR AN ACCLIMATED MAN (LastDayNum = 14, IncreDayNum = 13),
 			assert( IncreDayNum > 0 ); //Autodesk:F2C++ Loop setup assumption
@@ -1292,7 +1307,7 @@ namespace ThermalComfort {
 				//  INITIAL CONDITIONS IN AN EXPOSURE
 				DayNum = double( NumDay );
 				Time = 0.0;
-				TimeChange = .01;
+				TimeChange = 0.01;
 				SweatSuppFac = 1.0;
 				Temp( 1 ) = CoreTemp;
 				Temp( 2 ) = SkinTemp;
@@ -1303,27 +1318,22 @@ namespace ThermalComfort {
 				CoreTempNeut = 36.9 - 0.6 * AcclPattern;
 				SkinTempNeut = 33.8 - 1.6 * AcclPattern;
 				ActLevel -= 0.07 * ActLevel * AcclPattern;
-				//  BASIC INFORMATION FOR THERMAL SENSATION.
-				IntHeatProdMet = IntHeatProd / ActLevelConv;
-				IntHeatProdMetMax = max( 1.0, IntHeatProdMet );
-				ThermCndctNeut = 12.05 * std::exp( 0.2266 * ( IntHeatProdMetMax - 1.0 ) );
-				SkinWetNeut = 0.02 + 0.4 * ( 1.0 - std::exp( -0.6 * ( IntHeatProdMetMax - 1.0 ) ) );
-				ThermCndctMin = ( ThermCndctNeut - 5.3 ) * 0.26074074 + 5.3;
+				Real64 const SkinTempNeut_fac( 1.0 / ( 1.0 - SkinWetNeut ) );
 				//  CALCULATION OF CoreTempChange/TempChange & SkinTempChange/TempChange
 				DERIV( TempIndiceNum, Temp, TempChange );
 				while ( true ) {
 					//  CALCULATION OF THERMAL SENSATION VOTE (TSV).
 					//  THE TSV MODEL CAN BE APPLIED TO UNACCLIMATED MAN ONLY.
-					SkinWetFac = ( SkinWetSweat - SkinWetNeut ) / ( 1.0 - SkinWetNeut );
-					VasodilationFac = ( ThermCndct - ThermCndctNeut ) / ( 75. - ThermCndctNeut );
-					VasoconstrictFac = ( ThermCndctNeut - ThermCndct ) / ( ThermCndctNeut - ThermCndctMin );
+					SkinWetFac = ( SkinWetSweat - SkinWetNeut ) * SkinTempNeut_fac;
+					VasodilationFac = ( ThermCndct - ThermCndctNeut ) * ThemCndct_75_fac;
+					VasoconstrictFac = ( ThermCndctNeut - ThermCndct ) * ThemCndct_fac;
 					//  IF VasodilationFac < 0.0, VASOCONSTRICTION OCCURS AND RESULTS IN COLD SENSATION.
 					//  OTHERWISE NORMAL BLOOD FLOW OR VASODILATION OCCURS AND RESULTS IN
 					//  THERMAL NEUTRALITY OR WARM SENSATION.
 					if ( VasodilationFac < 0 ) {
-						ThermalComfortData( PeopleNum ).KsuTSV = -1.46153 * VasoconstrictFac + 3.74721 * std::pow( VasoconstrictFac, 2 ) - 6.168856 * std::pow( VasoconstrictFac, 3 );
+						ThermalComfortData( PeopleNum ).KsuTSV = -1.46153 * VasoconstrictFac + 3.74721 * pow_2( VasoconstrictFac ) - 6.168856 * pow_3( VasoconstrictFac );
 					} else {
-						ThermalComfortData( PeopleNum ).KsuTSV = ( 5. - 6.56 * ( RelHum - 0.50 ) ) * SkinWetFac;
+						ThermalComfortData( PeopleNum ).KsuTSV = ( 5.0 - 6.56 * ( RelHum - 0.50 ) ) * SkinWetFac;
 						if ( ThermalComfortData( PeopleNum ).KsuTSV > TSVMax ) ThermalComfortData( PeopleNum ).KsuTSV = TSVMax;
 					}
 
@@ -1459,11 +1469,11 @@ namespace ThermalComfort {
 
 		// CONTROLLING FUNCTIONS :
 		// SHIVERING RESPONSE IN W/M**2.
-		ShivResponse = 20. * CoreSignalShivMax * SkinSignalShivMax + 5. * SkinSignalShivMax;
+		ShivResponse = 20.0 * CoreSignalShivMax * SkinSignalShivMax + 5.0 * SkinSignalShivMax;
 		if ( CoreTemp >= 37.1 ) ShivResponse = 0.0;
 
 		// SWEAT FUNCTION IN W/M**2.
-		WeighFac = 260. + 70. * AcclPattern;
+		WeighFac = 260.0 + 70.0 * AcclPattern;
 		SweatCtrlFac = 1.0 + 0.05 * std::pow( SkinSignalSweatColdMax, 2.4 );
 
 		// EvapHeatLossDrySweat = SWEAT WHEN SkinWetTot < 0.4.
@@ -1537,7 +1547,7 @@ namespace ThermalComfort {
 		SkinCndctConstriction = 1.0 + 0.4 * SkinSignalColdMax;
 		// ThermCndct IS EQUIVALENT TO KS
 		ThermCndct = 5.3 + ( 6.75 + SkinCndctDilation ) / SkinCndctConstriction;
-		SkinCndctMax = 75. + 10. * AcclPattern;
+		SkinCndctMax = 75.0 + 10.0 * AcclPattern;
 		if ( ThermCndct > SkinCndctMax ) ThermCndct = SkinCndctMax;
 
 		// PASSIVE ENERGY BALANCE EQUATIONS.
@@ -1545,8 +1555,8 @@ namespace ThermalComfort {
 		ActLevelTot = ActLevel + ShivResponse;
 		IntHeatProdTot = ActLevelTot - WorkEff;
 		// RESPIRATION HEAT LOSS, RespHeatLoss, IN W/M**0.
-		LatRespHeatLoss = 0.0023 * ActLevelTot * ( 44. - VapPress );
-		DryRespHeatLoss = 0.0014 * ActLevelTot * ( 34. - AirTemp );
+		LatRespHeatLoss = 0.0023 * ActLevelTot * ( 44.0 - VapPress );
+		DryRespHeatLoss = 0.0014 * ActLevelTot * ( 34.0 - AirTemp );
 		RespHeatLoss = LatRespHeatLoss + DryRespHeatLoss;
 		// HEAT FLOW FROM CORE TO SKIN, HeatFlow, IN W/M**2.
 		HeatFlow = ThermCndct * ( CoreTemp - SkinTemp );
@@ -1619,13 +1629,13 @@ namespace ThermalComfort {
 
 		A( 1 ) = 0.29289321881345;
 		A( 2 ) = 1.70710678118654;
-		H2 = .5 * H;
+		H2 = 0.5 * H;
 
 		DERIV( NEQ, Y, DY );
 		for ( I = 1; I <= NEQ; ++I ) {
 			B = H2 * DY( I ) - C( I );
 			Y( I ) += B;
-			C( I ) += 3. * B - H2 * DY( I );
+			C( I ) += 3.0 * B - H2 * DY( I );
 		}
 
 		X += H2;
@@ -1635,7 +1645,7 @@ namespace ThermalComfort {
 			for ( I = 1; I <= NEQ; ++I ) {
 				B = A( J ) * ( H * DY( I ) - C( I ) );
 				Y( I ) += B;
-				C( I ) += 3. * B - A( J ) * H * DY( I );
+				C( I ) += 3.0 * B - A( J ) * H * DY( I );
 			}
 		}
 
@@ -1643,9 +1653,9 @@ namespace ThermalComfort {
 		DERIV( NEQ, Y, DY );
 
 		for ( I = 1; I <= NEQ; ++I ) {
-			B = ( H * DY( I ) - 2. * C( I ) ) / 6.0;
+			B = ( H * DY( I ) - 2.0 * C( I ) ) / 6.0;
 			Y( I ) += B;
-			C( I ) += 3. * B - H2 * DY( I );
+			C( I ) += 3.0 * B - H2 * DY( I );
 		}
 
 		DERIV( NEQ, Y, DY );
@@ -1875,7 +1885,6 @@ namespace ThermalComfort {
 		// na
 
 		// Return value
-		Real64 CalcSatVapPressFromTemp;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1891,14 +1900,11 @@ namespace ThermalComfort {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 XT;
 
 		// FLOW
 
-		XT = Temp / 100.;
-		CalcSatVapPressFromTemp = 6.16796 + 358.1855 * std::pow( XT, 2 ) - 550.3543 * std::pow( XT, 3 ) + 1048.8115 * std::pow( XT, 4 );
-
-		return CalcSatVapPressFromTemp;
+		Real64 const XT( Temp / 100.0 );
+		return 6.16796 + 358.1855 * pow_2( XT ) - 550.3543 * pow_3( XT ) + 1048.8115 * pow_4( XT );
 
 	}
 
@@ -1986,7 +1992,7 @@ namespace ThermalComfort {
 		// If high temperature radiant heater present and on, then must account for this in MRT calculation
 		if ( QHTRadSysToPerson( ZoneNum ) > 0.0 || QHWBaseboardToPerson( ZoneNum ) > 0.0 || QSteamBaseboardToPerson( ZoneNum ) > 0.0 || QElecBaseboardToPerson( ZoneNum ) > 0.0 ) {
 			RadTemp += KelvinConv; // Convert to Kelvin
-			RadTemp = std::pow( ( ( std::pow( RadTemp, 4 ) ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) ), ( 1.0 / 4.0 ) );
+			RadTemp = root_4( pow_4( RadTemp ) + ( ( QHTRadSysToPerson( ZoneNum ) + QHWBaseboardToPerson( ZoneNum ) + QSteamBaseboardToPerson( ZoneNum ) + QElecBaseboardToPerson( ZoneNum ) ) / AreaEff / StefanBoltzmannConst ) );
 			RadTemp -= KelvinConv; // Convert back to Celsius
 		}
 
@@ -2407,7 +2413,7 @@ namespace ThermalComfort {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2470,12 +2476,12 @@ namespace ThermalComfort {
 					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file \"in.stat\" for input (read)." );
 				}
 				while ( readStat == 0 ) {
-					{ IOFlags flags; gio::read( statFile, "(A)", flags ) >> lineIn; readStat = flags.ios(); }
+					{ IOFlags flags; gio::read( statFile, fmtA, flags ) >> lineIn; readStat = flags.ios(); }
 					if ( has( lineIn, "Monthly Statistics for Dry Bulb temperatures" ) ) {
 						for ( i = 1; i <= 7; ++i ) {
-							{ IOFlags flags; gio::read( statFile, "(A)", flags ); readStat = flags.ios(); }
+							{ IOFlags flags; gio::read( statFile, fmtA, flags ); readStat = flags.ios(); }
 						}
-						{ IOFlags flags; gio::read( statFile, "(A)", flags ) >> lineAvg; readStat = flags.ios(); }
+						{ IOFlags flags; gio::read( statFile, fmtA, flags ) >> lineAvg; readStat = flags.ios(); }
 						break;
 					}
 				}
@@ -2491,19 +2497,19 @@ namespace ThermalComfort {
 					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file \"in.epw\" for input (read)." );
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
-					{ IOFlags flags; gio::read( epwFile, "(A)", flags ); readStat = flags.ios(); }
+					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
 				}
 				jStartDay = DayOfYear - 1;
 				calcStartDay = jStartDay - 30;
 				if ( calcStartDay > 0 ) {
 					calcStartHr = 24 * ( calcStartDay - 1 ) + 1;
 					for ( i = 1; i <= calcStartHr - 1; ++i ) {
-						{ IOFlags flags; gio::read( epwFile, "(A)", flags ); readStat = flags.ios(); }
+						{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
 					}
 					for ( i = 1; i <= 30; ++i ) {
 						avgDryBulbASH = 0.0;
 						for ( j = 1; j <= 24; ++j ) {
-							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
+							{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
 								pos = index( epwLine, ',' );
 								epwLine.erase( 0, pos + 1 );
@@ -2522,7 +2528,7 @@ namespace ThermalComfort {
 					for ( i = 1; i <= calcEndDay; ++i ) {
 						avgDryBulbASH = 0.0;
 						for ( j = 1; j <= 24; ++j ) {
-							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
+							{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
 								pos = index( epwLine, ',' );
 								epwLine.erase( 0, pos + 1 );
@@ -2534,12 +2540,12 @@ namespace ThermalComfort {
 						runningAverageASH = ( 29.0 * runningAverageASH + avgDryBulbASH ) / 30.0;
 					}
 					for ( i = calcEndHr + 1; i <= calcStartHr - 1; ++i ) {
-						{ IOFlags flags; gio::read( epwFile, "(A)", flags ); readStat = flags.ios(); }
+						{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
 					}
 					for ( i = 1; i <= 30 - calcEndDay; ++i ) {
 						avgDryBulbASH = 0.0;
 						for ( j = 1; j <= 24; ++j ) {
-							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
+							{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
 								pos = index( epwLine, ',' );
 								epwLine.erase( 0, pos + 1 );
@@ -2665,7 +2671,9 @@ namespace ThermalComfort {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const alpha( 0.8 );
+		static Real64 const alpha( 0.8 );
+		static FArray1D< Real64 > const alpha_pow( { pow_6( alpha ), pow_5( alpha ), pow_4( alpha ), pow_3( alpha ), pow_2( alpha ), alpha, 1.0 } ); // alpha^(7-i)
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2719,20 +2727,20 @@ namespace ThermalComfort {
 					ShowFatalError( "CalcThermalComfortAdaptiveCEN15251: Could not open file \"in.epw\" for input (read)." );
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
-					{ IOFlags flags; gio::read( epwFile, "(A)", flags ); readStat = flags.ios(); }
+					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
 				}
 				jStartDay = DayOfYear - 1;
 				calcStartDay = jStartDay - 7;
 				if ( calcStartDay > 0 ) {
 					calcStartHr = 24 * ( calcStartDay - 1 ) + 1;
 					for ( i = 1; i <= calcStartHr - 1; ++i ) {
-						{ IOFlags flags; gio::read( epwFile, "(A)", flags ); readStat = flags.ios(); }
+						{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
 					}
 					runningAverageCEN = 0.0;
 					for ( i = 1; i <= 7; ++i ) {
 						avgDryBulbCEN = 0.0;
 						for ( j = 1; j <= 24; ++j ) {
-							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
+							{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
 								pos = index( epwLine, ',' );
 								epwLine.erase( 0, pos + 1 );
@@ -2741,7 +2749,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
-						runningAverageCEN += std::pow( alpha, ( 7 - i ) ) * avgDryBulbCEN;
+						runningAverageCEN += alpha_pow( i ) * avgDryBulbCEN;
 					}
 				} else { // Do special things for wrapping the epw
 					calcEndDay = jStartDay;
@@ -2751,7 +2759,7 @@ namespace ThermalComfort {
 					for ( i = 1; i <= calcEndDay; ++i ) {
 						avgDryBulbCEN = 0.0;
 						for ( j = 1; j <= 24; ++j ) {
-							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
+							{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
 								pos = index( epwLine, ',' );
 								epwLine.erase( 0, pos + 1 );
@@ -2760,15 +2768,15 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
-						runningAverageCEN += std::pow( alpha, ( calcEndDay - i ) ) * avgDryBulbCEN;
+						runningAverageCEN += std::pow( alpha, calcEndDay - i ) * avgDryBulbCEN;
 					}
 					for ( i = calcEndHr + 1; i <= calcStartHr - 1; ++i ) {
-						{ IOFlags flags; gio::read( epwFile, "(A)", flags ); readStat = flags.ios(); }
+						{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
 					}
 					for ( i = 1; i <= 7 - calcEndDay; ++i ) {
 						avgDryBulbCEN = 0.0;
 						for ( j = 1; j <= 24; ++j ) {
-							{ IOFlags flags; gio::read( epwFile, "(A)", flags ) >> epwLine; readStat = flags.ios(); }
+							{ IOFlags flags; gio::read( epwFile, fmtA, flags ) >> epwLine; readStat = flags.ios(); }
 							for ( ind = 1; ind <= 6; ++ind ) {
 								pos = index( epwLine, ',' );
 								epwLine.erase( 0, pos + 1 );
@@ -2777,7 +2785,7 @@ namespace ThermalComfort {
 							dryBulb = StrToReal( epwLine.substr( 0, pos ) );
 							avgDryBulbCEN += ( dryBulb / 24.0 );
 						}
-						runningAverageCEN += std::pow( alpha, ( 7 - i ) ) * avgDryBulbCEN;
+						runningAverageCEN +=  alpha_pow( i ) * avgDryBulbCEN;
 					}
 				}
 				runningAverageCEN *= ( 1.0 - alpha );
@@ -2911,7 +2919,7 @@ namespace ThermalComfort {
 			ThermalComfortData( PeopleNum ).ClothingValue = 0.818 - 0.0364 * TemporarySixAMTemperature;
 		} else if ( ( TemporarySixAMTemperature >= 5.0 ) && ( TemporarySixAMTemperature < 26.0 ) ) {
 			TemporaryVariable = -0.1635 - 0.0066 * TemporarySixAMTemperature;
-			ThermalComfortData( PeopleNum ).ClothingValue = std::pow( 10.0, ( TemporaryVariable ) );
+			ThermalComfortData( PeopleNum ).ClothingValue = std::pow( 10.0, TemporaryVariable );
 		} else if ( TemporarySixAMTemperature >= 26.0 ) {
 			ThermalComfortData( PeopleNum ).ClothingValue = 0.46;
 		}

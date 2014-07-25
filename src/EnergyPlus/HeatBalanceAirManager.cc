@@ -196,6 +196,8 @@ namespace HeatBalanceAirManager {
 		CrossMixingFlag = false;
 		GetAirFlowFlag( ErrorsFound );
 
+		SetZoneMassConservationFlag();
+
 		// get input parameters for modeling of room air flow
 		GetRoomAirModelParameters( ErrorsFound );
 
@@ -257,6 +259,62 @@ namespace HeatBalanceAirManager {
 
 	}
 
+
+	void
+		SetZoneMassConservationFlag()
+	{
+
+			// SUBROUTINE INFORMATION :
+			// AUTHOR         Bereket Nigusse, FSEC
+			// DATE WRITTEN   February 2014
+			// MODIFIED
+
+			// RE - ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE :
+			// This subroutine sets the zone mass conservation flag to true.
+
+			// METHODOLOGY EMPLOYED :
+			// na
+
+			// REFERENCES :
+			// na
+
+			// Using/Aliasing
+			using DataHeatBalance::TotMixing;
+			using DataHeatBalance::Mixing;
+			using DataHeatBalance::ZoneAirMassFlow;
+			using DataHeatBalFanSys::MixingMassFlowZone;
+			using DataHeatBalFanSys::ZoneMassBalanceFlag;
+
+
+			// locals
+			// SUBROUTINE ARGUMENT DEFINITIONS :
+			// na
+
+			// SUBROUTINE PARAMETER DEFINITIONS :
+			// na
+
+			// INTERFACE BLOCK SPECIFICATIONS :
+			// na
+
+			// DERIVED TYPE DEFINITIONS :
+			// na
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS :
+			int Loop;
+
+			// flow
+
+			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+				for (Loop = 1; Loop <= TotMixing; ++Loop) {
+					ZoneMassBalanceFlag(Mixing(Loop).ZonePtr) = true;
+					ZoneMassBalanceFlag(Mixing(Loop).FromZone) = true;
+				}
+			}
+
+		}
+
 	void
 	GetSimpleAirModelInputs( bool & ErrorsFound ) // IF errors found in input
 	{
@@ -303,12 +361,12 @@ namespace HeatBalanceAirManager {
 		using General::CheckCreatedZoneItemName;
 		//  USE DataIPShortCuts
 		using SystemAvailabilityManager::GetHybridVentilationControlStatus;
-
+		using DataGlobals::NumOfZones;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		Real64 const VentilTempLimit( 100.0 ); // degrees Celsius
 		Real64 const MixingTempLimit( 100.0 ); // degrees Celsius
 		Real64 const VentilWSLimit( 40.0 ); // m/s
@@ -362,6 +420,7 @@ namespace HeatBalanceAirManager {
 		int ZLItem;
 		FArray1D< Real64 > TotInfilVentFlow;
 		FArray1D< Real64 > TotMixingFlow;
+		FArray1D< Real64 > ZoneMixingNum;
 		int ConnectTest;
 		int ConnectionNumber;
 		int NumbNum;
@@ -370,6 +429,10 @@ namespace HeatBalanceAirManager {
 		int Zone2Num;
 		int ZoneNumA;
 		int ZoneNumB;
+		int MixingNum;
+		int SourceCount;
+		int ReceivingCount;
+		int IsSourceZone;
 
 		// Formats
 		static gio::Fmt const Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
@@ -1151,7 +1214,7 @@ namespace HeatBalanceAirManager {
 						}
 					}
 					// Check Minimum indoor temperature value and schedule fields
-					if ( ! lNumericFieldBlanks( 11 ) && ( cAlphaArgs( 6 ) != BlankString && Ventilation( Loop ).MinIndoorTempSchedPtr == 0 ) ) {
+					if ( ! lNumericFieldBlanks( 11 ) && ( ! cAlphaArgs( 6 ).empty() && Ventilation( Loop ).MinIndoorTempSchedPtr == 0 ) ) {
 						if ( Item1 == 1 ) {
 							ShowWarningError( RoutineName + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 11 ), 1 ) + " degrees C " );
 							ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
@@ -1442,7 +1505,7 @@ namespace HeatBalanceAirManager {
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
 			// Check Minimum indoor temperature value and schedule fields
-			if ( ! lNumericFieldBlanks( 6 ) && ( cAlphaArgs( 4 ) != BlankString && Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 ) ) {
+			if ( ! lNumericFieldBlanks( 6 ) && ( ! cAlphaArgs( 4 ).empty() && Ventilation( VentiCount ).MinIndoorTempSchedPtr == 0 ) ) {
 				ShowWarningError( RoutineName + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) + " is invalid. The constant value will be used at " + RoundSigDigits( rNumericArgs( 11 ), 1 ) + " degrees C " );
 				ShowContinueError( "in the " + cCurrentModuleObject + " object = " + cAlphaArgs( 1 ) + " and the simulation continues..." );
 			}
@@ -1825,8 +1888,8 @@ namespace HeatBalanceAirManager {
 				if ( RepVarSet( Mixing( Loop ).ZonePtr ) ) {
 					RepVarSet( Mixing( Loop ).ZonePtr ) = false;
 					SetupOutputVariable( "Zone Mixing Volume [m3]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVolume, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Current Density Volumetric Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Zone Mixing Standard Density Volumetric Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Current Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotCurDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Zone Mixing Standard Density Air Volume Flow Rate [m3/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixVdotStdDensity, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass [kg]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMass, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Mass Flow Rate [kg/s]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixMdot, "System", "Average", Zone( Mixing( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Zone Mixing Sensible Heat Loss Energy [J]", ZnAirRpt( Mixing( Loop ).ZonePtr ).MixHeatLoss, "System", "Sum", Zone( Mixing( Loop ).ZonePtr ).Name );
@@ -1842,6 +1905,110 @@ namespace HeatBalanceAirManager {
 			}
 
 		}
+
+		//allocate MassConservation
+		MassConservation.allocate( NumOfZones );
+
+		// added by BAN, 02/14
+		if ( TotMixing > 0 ) {
+		   ZoneMixingNum.allocate( TotMixing );
+		   // get source zones mixing objects index
+		   for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			   SourceCount = 0;
+			   for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+				   if ( ZoneNum == Mixing( Loop ).FromZone ) {
+					  SourceCount += 1;
+					  ZoneMixingNum( SourceCount ) = Loop;
+					}
+				}
+				// save mixing objects index for zones which serve as a source zone
+				MassConservation( ZoneNum ).NumSourceZonesMixingObject = SourceCount;
+				if ( SourceCount > 0 ) {
+				   MassConservation( ZoneNum ).ZoneMixingSourcesPtr.allocate( SourceCount );
+				   for ( Loop = 1; Loop <= SourceCount; ++Loop ) {
+					   MassConservation( ZoneNum ).ZoneMixingSourcesPtr( Loop ) = ZoneMixingNum( Loop );
+					}
+				}
+			}
+
+			// check zones which are used only as a source zones      
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				IsSourceZone = false;
+				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+				    if (ZoneNum != Mixing( Loop ).FromZone ) continue;
+					MassConservation( ZoneNum ).IsOnlySourceZone = true;
+					for ( Loop1 = 1; Loop1 <= TotMixing; ++Loop1 ) {
+					    if ( ZoneNum == Mixing(Loop1).ZonePtr ) {
+						   MassConservation( ZoneNum ).IsOnlySourceZone = false;
+						   break;
+						}
+					}
+				}
+			}
+			// get receiving zones mixing objects index
+			ZoneMixingNum = 0;
+			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+				ReceivingCount = 0;
+				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+				    if ( ZoneNum == Mixing( Loop ).ZonePtr ) {
+						 ReceivingCount += 1;
+						 ZoneMixingNum( ReceivingCount ) = Loop;
+					}
+				}
+				// save mixing objects index for zones which serve as a receiving zone
+				MassConservation( ZoneNum ).NumReceivingZonesMixingObject = ReceivingCount;
+				if ( ReceivingCount > 0 ) {
+					 MassConservation( ZoneNum ).ZoneMixingReceivingPtr.allocate( ReceivingCount );
+					 MassConservation( ZoneNum ).ZoneMixingReceivingFr.allocate( ReceivingCount );
+					 for ( Loop = 1; Loop <= ReceivingCount; ++Loop ) {
+						 MassConservation( ZoneNum ).ZoneMixingReceivingPtr( Loop ) = ZoneMixingNum( Loop );
+					}
+				}
+			}
+			if ( allocated( ZoneMixingNum ) ) ZoneMixingNum.deallocate();
+		}
+
+		// zone mass conservation calculation order starts with receiving zones
+		// and then proceeds to source zones 
+		Loop = 0;
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( ! MassConservation( ZoneNum ).IsOnlySourceZone ) {
+				Loop += 1;
+				ZoneReOrder( Loop ) = ZoneNum;
+			}
+		}
+		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+			if ( MassConservation( ZoneNum ).IsOnlySourceZone ) {
+			   Loop += 1;
+			   ZoneReOrder( Loop ) = ZoneNum;
+			}
+		}
+		if ( TotMixing > 0 ) {
+			for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
+
+				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) ) {
+					ZoneMassBalanceRepVarFlag( Mixing( Loop ).ZonePtr ) = false;
+					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).ZonePtr).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).ZonePtr).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).ZonePtr).Name);
+				}
+
+				if (ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) ) {
+					ZoneMassBalanceRepVarFlag( Mixing( Loop ).FromZone ) = false;
+					SetupOutputVariable("Zone Supply Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).InMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Exhaust Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).ExhMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Return Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).RetMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Mixing Receiving Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Mixing Source Air Mass Flow Rate [kg/s]", MassConservation(Mixing(Loop).FromZone).MixingSourceMassFlowRate, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+					SetupOutputVariable("Zone Infiltration Air Mass Flow Balance Status []", MassConservation(Mixing(Loop).FromZone).IncludeInfilToZoneMassBal, "System", "Average", Zone(Mixing(Loop).FromZone).Name);
+				}
+			}
+		}
+		if (allocated( ZoneMassBalanceRepVarFlag ) ) ZoneMassBalanceRepVarFlag.deallocate();
+
 
 		cCurrentModuleObject = "ZoneCrossMixing";
 		TotCrossMixing = GetNumObjectsFound( cCurrentModuleObject );
@@ -2372,33 +2539,39 @@ namespace HeatBalanceAirManager {
 			TotInfilVentFlow( ZoneNum ) += Infiltration( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "ZoneInfiltration" << Infiltration( Loop ).Name << GetScheduleName( Infiltration( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).ExteriorTotalSurfArea > 0.0 ) {
 				StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel / Zone( ZoneNum ).ExteriorTotalSurfArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( Infiltration( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).ConstantTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).TemperatureTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).VelocityTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Infiltration( Loop ).VelocitySQTermCoef, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
+		}
+
+		for (Loop = 1; Loop <= TotInfiltration; ++Loop) {
+			ZoneNum = Infiltration(Loop).ZonePtr;
+			MassConservation(ZoneNum).InfiltrationPtr = Loop;
+			SetupOutputVariable("Zone Mass Balance Infiltration Air Mass Flow Rate [kg/s]", MassConservation(Infiltration(Loop).ZonePtr).InfiltrationMassFlowRate, "System", "Average", Zone(Infiltration(Loop).ZonePtr).Name);
 		}
 
 		for ( Loop = 1; Loop <= TotVentilation; ++Loop ) {
@@ -2412,25 +2585,25 @@ namespace HeatBalanceAirManager {
 			TotInfilVentFlow( ZoneNum ) += Ventilation( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "ZoneVentilation" << Ventilation( Loop ).Name << GetScheduleName( Ventilation( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel / ( Zone( ZoneNum ).TotOccupants ), 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).FanType == ExhaustVentilation ) {
 				StringOut = "Exhaust";
 			} else if ( Ventilation( Loop ).FanType == IntakeVentilation ) {
@@ -2440,51 +2613,51 @@ namespace HeatBalanceAirManager {
 			} else if ( Ventilation( Loop ).FanType == BalancedVentilation ) {
 				StringOut = "Balanced";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).FanPressure, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).FanEfficiency, 1 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).ConstantTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).TemperatureTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).VelocityTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).VelocitySQTermCoef, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MinIndoorTempSchedPtr > 0 ) {
 				StringOut = GetScheduleName( Ventilation( Loop ).MinIndoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MinIndoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MaxIndoorTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).MaxIndoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MaxIndoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).DeltaTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).DeltaTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).DelTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MinOutdoorTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).MinOutdoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MinOutdoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Ventilation( Loop ).MaxOutdoorTempSchedPtr > 0 ) {
 				StringOut = "Schedule: " + GetScheduleName( Ventilation( Loop ).MaxOutdoorTempSchedPtr );
 			} else {
 				StringOut = RoundSigDigits( Ventilation( Loop ).MaxOutdoorTemperature, 2 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Ventilation( Loop ).MaxWindSpeed, 2 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		TotMixingFlow.allocate( NumOfZones );
@@ -2500,28 +2673,28 @@ namespace HeatBalanceAirManager {
 			TotMixingFlow( ZoneNum ) += Mixing( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "Mixing" << Mixing( Loop ).Name << GetScheduleName( Mixing( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel / ( Zone( ZoneNum ).TotOccupants ), 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( Mixing( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << Zone( Mixing( Loop ).FromZone ).Name + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << Zone( Mixing( Loop ).FromZone ).Name + ','; }
 			StringOut = RoundSigDigits( Mixing( Loop ).DeltaTemperature, 2 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
@@ -2535,28 +2708,28 @@ namespace HeatBalanceAirManager {
 			TotMixingFlow( ZoneNum ) += CrossMixing( Loop ).DesignLevel;
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << "CrossMixing" << CrossMixing( Loop ).Name << GetScheduleName( CrossMixing( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 			StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel / ( Zone( ZoneNum ).TotOccupants ), 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).Volume > 0.0 ) {
 				StringOut = RoundSigDigits( CrossMixing( Loop ).DesignLevel * SecInHour / Zone( ZoneNum ).Volume, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << Zone( CrossMixing( Loop ).FromZone ).Name + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << Zone( CrossMixing( Loop ).FromZone ).Name + ','; }
 			StringOut = RoundSigDigits( CrossMixing( Loop ).DeltaTemperature, 2 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		if ( TotRefDoorMixing > 0 ) {
@@ -2574,6 +2747,17 @@ namespace HeatBalanceAirManager {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			Zone( ZoneNum ).NominalInfilVent = TotInfilVentFlow( ZoneNum );
 			Zone( ZoneNum ).NominalMixing = TotMixingFlow( ZoneNum );
+		}
+
+		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+			for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+				if (MassConservation(ZoneNum).IsOnlySourceZone) {
+					if (MassConservation(ZoneNum).InfiltrationPtr == 0) {
+						ShowSevereError(RoutineName + ": Infiltration object is not defined for zone = " + Zone(ZoneNum).Name);
+						ShowContinueError("Zone air mass flow balance requires infiltration object for source zones of mixing objects");
+					}
+				}
+			}
 		}
 
 		TotInfilVentFlow.deallocate();
@@ -2670,7 +2854,7 @@ namespace HeatBalanceAirManager {
 			GetObjectItem( cCurrentModuleObject, AirModelNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, Status, _, _, cAlphaFieldNames, cNumericFieldNames );
 			ZoneNum = FindItemInList( cAlphaArgs( 2 ), Zone.Name(), NumOfZones );
 			if ( ZoneNum != 0 ) {
-				if ( AirModel( ZoneNum ).AirModelName != BlankString ) {
+				if ( ! AirModel( ZoneNum ).AirModelName.empty() ) {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 2 ) + " = " + cAlphaArgs( 2 ) );
 					ShowContinueError( "Entered in " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 					ShowContinueError( "Duplicate zone name, only one type of roomair model is allowed per zone" );
@@ -2961,6 +3145,10 @@ namespace HeatBalanceAirManager {
 		int NZ; // local index for zone number
 		int J; // local index for second zone in refrig door pair
 
+		int ZoneNum;               // zone counter
+		Real64 ZoneMixingFlowSum;  // sum of zone mixing flows for a zone
+		int NumOfMixingObjects;    // number of mixing objects for a receiving zone
+
 		//  Zero out time step variables
 		MTC = 0.0;
 		MVFC = 0.0;
@@ -2975,6 +3163,24 @@ namespace HeatBalanceAirManager {
 				NZ = Mixing( Loop ).ZonePtr;
 				Mixing( Loop ).DesiredAirFlowRate = Mixing( Loop ).DesignLevel * GetCurrentScheduleValue( Mixing( Loop ).SchedPtr );
 				if ( Mixing( Loop ).EMSSimpleMixingOn ) Mixing( Loop ).DesiredAirFlowRate = Mixing( Loop ).EMSimpleMixingFlowRate;
+				Mixing(Loop).DesiredAirFlowRateSaved = Mixing(Loop).DesiredAirFlowRate;
+			}
+
+			// if zone air mass flow balance enforced calculate the fraction of
+			// contribution of each mixing object to a zone mixed flow rate, BAN Feb 2014
+			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+				for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+					ZoneMixingFlowSum = 0.0;
+					NumOfMixingObjects = MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+					for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
+						ZoneMixingFlowSum = ZoneMixingFlowSum + Mixing(Loop).DesignLevel;
+					}
+					if (ZoneMixingFlowSum > 0.0) {
+						for (Loop = 1; Loop <= NumOfMixingObjects; ++Loop) {
+							MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) = Mixing(Loop).DesignLevel / ZoneMixingFlowSum;
+						}
+					}
+				}
 			}
 
 			// Process the scheduled CrossMixing for air heat balance
@@ -3115,7 +3321,7 @@ namespace HeatBalanceAirManager {
 			ZnAirRpt( ZoneLoop ).MeanAirTemp = ZTAV( ZoneLoop );
 			ZnAirRpt( ZoneLoop ).MeanAirHumRat = ZoneAirHumRatAvg( ZoneLoop );
 			ZnAirRpt( ZoneLoop ).OperativeTemp = 0.5 * ( ZTAV( ZoneLoop ) + MRT( ZoneLoop ) );
-			ZnAirRpt( ZoneLoop ).MeanAirDewPointTemp = PsyTdpFnWPb( ZnAirRpt( ZoneLoop ).MeanAirHumRat, OutBaroPress, BlankString );
+			ZnAirRpt( ZoneLoop ).MeanAirDewPointTemp = PsyTdpFnWPb( ZnAirRpt( ZoneLoop ).MeanAirHumRat, OutBaroPress );
 
 			// if operative temperature control is being used, then radiative fraction/weighting
 			//  might be defined by user to be something different than 0.5, even scheduled over simulation period
@@ -3142,7 +3348,7 @@ namespace HeatBalanceAirManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

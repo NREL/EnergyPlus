@@ -30,6 +30,10 @@ std::istream &
 cross_platform_get_line( std::istream & stream, std::string & line )
 {
 #ifdef _MSC_VER // Fast algorithm for Visual C++ and Intel C++ on Windows
+	if ( stream.eof() ) {
+		stream.setstate( std::ios::failbit );
+		return stream;
+	}
 	std::istream::sentry local_sentry( stream, true );
 	std::streambuf * stream_buffer( stream.rdbuf() );
 	int c;
@@ -55,10 +59,14 @@ cross_platform_get_line( std::istream & stream, std::string & line )
 		}
 	}
 #else // Fast algorithm for GCC and Clang
-	std::string::size_type len;
-	if ( std::getline( stream, line ) && ! line.empty() ) {
-		len = line.length() - 1;
-		if ( line[ len ] == '\r' ) line.erase( len );
+	if ( std::getline( stream, line ) && ( ! line.empty() ) ) {
+		std::string::size_type const len( line.length() - 1 );
+		if ( line[ len ] == '\r' ) {
+			line.erase( len );
+			if ( ! line.empty() ) stream.clear( stream.rdstate() & ~std::ios::eofbit ); // Clear eof bit since we read something
+		} else {
+			stream.clear( stream.rdstate() & ~std::ios::eofbit ); // Clear eof bit since we read something
+		}
 	}
 	return stream;
 #endif

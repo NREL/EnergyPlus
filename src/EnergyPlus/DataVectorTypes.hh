@@ -328,14 +328,40 @@ namespace DataVectorTypes {
 			return r;
 		}
 
+		// Magnitude
+		inline
+		friend
+		Real64
+		magnitude( Vector const & a )
+		{
+			return std::sqrt( square( a.x ) + square( a.y ) + square( a.z ) );
+		}
+
+		// Magnitude Squared
+		inline
+		friend
+		Real64
+		magnitude_squared( Vector const & a )
+		{
+			return square( a.x ) + square( a.y ) + square( a.z );
+		}
+
 		// Distance
 		inline
 		friend
 		Real64
 		distance( Vector const & a, Vector const & b )
 		{
-			Vector const d( a - b );
-			return std::sqrt( dot( d, d ) );
+			return std::sqrt( square( a.x - b.x ) + square( a.y - b.y ) + square( a.z - b.z ) );
+		}
+
+		// Distance Squared
+		inline
+		friend
+		Real64
+		distance_squared( Vector const & a, Vector const & b )
+		{
+			return square( a.x - b.x ) + square( a.y - b.y ) + square( a.z - b.z );
 		}
 
 		// Dot Product
@@ -366,6 +392,17 @@ namespace DataVectorTypes {
 		FArray() const
 		{
 			return FArray1D< Real64 >( 3, { x, y, z } );
+		}
+
+	private: // Static Functions
+
+		// Square
+		inline
+		static
+		Real64
+		square( Real64 const x )
+		{
+			return x * x;
 		}
 
 	};

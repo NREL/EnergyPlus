@@ -105,7 +105,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     NONE,                    !- Name
@@ -1395,7 +1395,7 @@
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     1.3,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1420,7 +1420,7 @@
     0.2,                     !- Direct Pad Depth {m}
     225.,                    !- Recirculating Water Pump Power Consumption {W}
     1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     200.0,                   !- Secondary Fan Delta Pressure {Pa}
     0.67,                    !- Indirect Heat Exchanger Effectiveness
     EvapCoolerIndirectInletAirNode,  !- Primary Air Inlet Node Name

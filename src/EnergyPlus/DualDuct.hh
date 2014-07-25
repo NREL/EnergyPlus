@@ -124,7 +124,7 @@ namespace DualDuct {
 			NoOAFlowInputFromUser( true ),
 			OARequirementsPtr( 0 ),
 			OAPerPersonMode( PerPersonModeNotSet ),
-			OAPerPersonByDesignLevel( 0. ),
+			OAPerPersonByDesignLevel( 0.0 ),
 			AirLoopNum( 0 )
 		{}
 

@@ -292,7 +292,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 		using OutputReportTabular::IntToStr;
-		using FluidProperties::FindArrayIndex; // routine should be moved to a general module rather than FluidProperties
 		using General::FindNumberInList;
 
 		// Locals
@@ -816,7 +815,7 @@ namespace RoomAirModelUserTempPattern {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const TolValue( .0001 );
+		Real64 const TolValue( 0.0001 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1046,7 +1045,7 @@ namespace RoomAirModelUserTempPattern {
 
 			for ( SurfNum = ZoneSpecs[ ZoneNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum - 1].SurfaceLast; ++SurfNum ) {
 				if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
-					FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat, BlankString ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
+					FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
 					WinGapFlowToRA += FlowThisTS;
 					WinGapFlowTtoRA += FlowThisTS * SurfaceWindow( SurfNum ).TAirflowGapOutlet;
 				}
@@ -1096,7 +1095,7 @@ namespace RoomAirModelUserTempPattern {
 			Node( ReturnNode ).Press = Node( ZoneNode ).Press;
 
 			H2OHtOfVap = PsyHgAirFnWTdb( Node( ZoneNode ).HumRat, Node( ReturnNode ).Temp );
-			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat, BlankString );
+			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, Node( ReturnNode ).Temp, Node( ZoneNode ).HumRat );
 
 			// Include impact of under case returns for refrigerated display cases when updateing return node
 			// humidity ratio

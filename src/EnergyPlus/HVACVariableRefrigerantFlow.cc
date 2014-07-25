@@ -272,7 +272,7 @@ namespace HVACVariableRefrigerantFlow {
 				ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", Number of VRF Terminal Units = " + TrimSigDigits( NumVRFTU ) + ", VRF Terminal Unit name = " + CompName );
 			}
 			if ( CheckEquipName( VRFTUNum ) ) {
-				if ( CompName != BlankString && CompName != VRFTU( VRFTUNum ).Name ) {
+				if ( ! CompName.empty() && CompName != VRFTU( VRFTUNum ).Name ) {
 					ShowFatalError( "SimulateVRF: Invalid CompIndex passed=" + TrimSigDigits( VRFTUNum ) + ", VRF Terminal Unit name=" + CompName + ", stored VRF TU Name for that index=" + VRFTU( VRFTUNum ).Name );
 				}
 				CheckEquipName( VRFTUNum ) = false;
@@ -630,11 +630,11 @@ namespace HVACVariableRefrigerantFlow {
 		if ( VRF( VRFCond ).CondenserType == AirCooled ) {
 			CondInletTemp = OutdoorDryBulb; // Outdoor dry-bulb temp
 		} else if ( VRF( VRFCond ).CondenserType == EvapCooled ) {
-			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat, BlankString );
+			RhoAir = PsyRhoAirFnPbTdbW( OutdoorPressure, OutdoorDryBulb, OutdoorHumRat );
 			CondAirMassFlow = RhoAir * VRF( VRFCond ).EvapCondAirVolFlowRate;
 			// (Outdoor wet-bulb temp from DataEnvironment) + (1.0-EvapCondEffectiveness) * (drybulb - wetbulb)
 			CondInletTemp = OutdoorWetBulb + ( OutdoorDryBulb - OutdoorWetBulb ) * ( 1.0 - VRF( VRFCond ).EvapCondEffectiveness );
-			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure, BlankString );
+			CondInletHumRat = PsyWFnTdbTwbPb( CondInletTemp, OutdoorWetBulb, OutdoorPressure );
 		} else if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
 			CondInletTemp = OutdoorDryBulb; // node inlet temp from above
 			CondWaterMassFlow = VRF( VRFCond ).WaterCondenserDesignMassFlow;
@@ -737,7 +737,7 @@ namespace HVACVariableRefrigerantFlow {
 				// Calculating adjustment factors for defrost
 				// Calculate delta w through outdoor coil by assuming a coil temp of 0.82*DBT-9.7(F) per DOE2.1E
 				OutdoorCoilT = 0.82 * OutdoorDryBulb - 8.589;
-				OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure, BlankString ) ) );
+				OutdoorCoildw = max( 1.0e-6, ( OutdoorHumRat - PsyWFnTdpPb( OutdoorCoilT, OutdoorPressure ) ) );
 
 				// Calculate defrost adjustment factors depending on defrost control type
 				if ( VRF( VRFCond ).DefrostControl == Timed ) {
@@ -941,7 +941,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			VRF( VRFCond ).HRTime = max( 0.0, CurrentEndTime - VRF( VRFCond ).HRTimer );
-			if ( VRF( VRFCond ).HRTime < ( HRCapTC * 5. ) ) {
+			if ( VRF( VRFCond ).HRTime < ( HRCapTC * 5.0 ) ) {
 				if ( HRCapTC > 0.0 ) {
 					SUMultiplier = min( 1.0, 1.0 - std::exp( -VRF( VRFCond ).HRTime / HRCapTC ) );
 				} else {
@@ -1101,7 +1101,7 @@ namespace HVACVariableRefrigerantFlow {
 				// this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond)%TUCoolingLoad
 				VRF( VRFCond ).OperatingCoolingCOP = ( VRF( VRFCond ).TotalCoolingCapacity ) / ( VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
 			} else {
-				VRF( VRFCond ).OperatingCoolingCOP = 0.;
+				VRF( VRFCond ).OperatingCoolingCOP = 0.0;
 			}
 		}
 		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
@@ -1109,7 +1109,7 @@ namespace HVACVariableRefrigerantFlow {
 				// this calc should use deleivered capacity, not condenser capacity, use VRF(VRFCond)%TUHeatingLoad
 				VRF( VRFCond ).OperatingHeatingCOP = ( VRF( VRFCond ).TotalHeatingCapacity ) / ( VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
 			} else {
-				VRF( VRFCond ).OperatingHeatingCOP = 0.;
+				VRF( VRFCond ).OperatingHeatingCOP = 0.0;
 			}
 		}
 
@@ -3123,7 +3123,7 @@ namespace HVACVariableRefrigerantFlow {
 		// providing more capacity than allowed. Example: TU loads are 1-ton, 2-ton, 3-ton, and 4-ton connected
 		// to a condenser having only 9-tons available. This variable will be set to 3-tons and the 4-ton
 		// terminal unit will be limited to 3-tons (see SimVRFCondenser where this variable is calculated).
-		if ( CurrentEndTime > CurrentEndTimeLast || TimeStepSysLast > TimeStepSys || ( FirstHVACIteration && MyBeginTimeStepFlag( VRFCond ) ) ) { 
+		if ( CurrentEndTime > CurrentEndTimeLast || TimeStepSysLast > TimeStepSys || ( FirstHVACIteration && MyBeginTimeStepFlag( VRFCond ) ) ) {
 			MaxCoolingCapacity( VRFCond ) = MaxCap;
 			MaxHeatingCapacity( VRFCond ) = MaxCap;
 			MyBeginTimeStepFlag( VRFCond ) = false;
@@ -3560,7 +3560,7 @@ namespace HVACVariableRefrigerantFlow {
 					TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) = false;
 					TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) = true;
 				}
-			} else if ( VRF( VRFCond ).EMSValueForHPOperatingMode == 2. ) { // Heating
+			} else if ( VRF( VRFCond ).EMSValueForHPOperatingMode == 2.0 ) { // Heating
 				HeatingLoad( VRFCond ) = true;
 				CoolingLoad( VRFCond ) = false;
 				QZnReq = LoadToHeatingSP;
@@ -4538,6 +4538,7 @@ namespace HVACVariableRefrigerantFlow {
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 		Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4673,7 +4674,7 @@ namespace HVACVariableRefrigerantFlow {
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						if ( VRFTU( VRFTUNum ).IterLimitExceeded == 0 ) {
-							gio::write( IterNum, "*" ) << MaxIte;
+							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
 							ShowWarningMessage( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 							ShowContinueError( " Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum );
@@ -5021,9 +5022,9 @@ namespace HVACVariableRefrigerantFlow {
 				VRFTU( VRFTUNum ).ParasiticElecCoolConsumption = VRFTU( VRFTUNum ).ParasiticCoolElecPower * ReportingConstant;
 			} else {
 				// split parasitic between both reporting variables
-				VRFTU( VRFTUNum ).ParasiticCoolElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.;
+				VRFTU( VRFTUNum ).ParasiticCoolElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.0;
 				VRFTU( VRFTUNum ).ParasiticElecCoolConsumption = VRFTU( VRFTUNum ).ParasiticCoolElecPower * ReportingConstant;
-				VRFTU( VRFTUNum ).ParasiticHeatElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.;
+				VRFTU( VRFTUNum ).ParasiticHeatElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.0;
 				VRFTU( VRFTUNum ).ParasiticElecHeatConsumption = VRFTU( VRFTUNum ).ParasiticHeatElecPower * ReportingConstant;
 			}
 		}

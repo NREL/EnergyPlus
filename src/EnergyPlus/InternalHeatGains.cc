@@ -192,7 +192,7 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		static std::string const RoutineName( "GetInternalHeatGains: " );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -423,13 +423,13 @@ namespace InternalHeatGains {
 
 					// Number of people calculation method.
 					{ auto const peopleMethod( AlphaName( 4 ) );
-					if ( SameString(peopleMethod, "PEOPLE") ) {
+					if ( peopleMethod == "PEOPLE" ) {
 						People( Loop ).NumberOfPeople = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + People( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 People will result." );
 						}
 
-					} else if ( SameString(peopleMethod, "PEOPLE/AREA") ) {
+					} else if ( peopleMethod == "PEOPLE/AREA" ) {
 						if ( People( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								People( Loop ).NumberOfPeople = IHGNumbers( 2 ) * Zone( People( Loop ).ZonePtr ).FloorArea;
@@ -445,7 +445,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + People( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 People will result." );
 						}
 
-					} else if ( SameString(peopleMethod, "AREA/PERSON") ) {
+					} else if ( peopleMethod == "AREA/PERSON" ) {
 						if ( People( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) > 0.0 ) {
 								People( Loop ).NumberOfPeople = Zone( People( Loop ).ZonePtr ).FloorArea / IHGNumbers( 3 );
@@ -562,34 +562,34 @@ namespace InternalHeatGains {
 
 							{ auto const thermalComfortType( AlphaName( OptionNum ) );
 
-							if ( SameString(thermalComfortType, "FANGER") ) {
+							if ( thermalComfortType == "FANGER" ) {
 								People( Loop ).Fanger = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "PIERCE") ) {
+							} else if ( thermalComfortType == "PIERCE" ) {
 								People( Loop ).Pierce = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "KSU") ) {
+							} else if ( thermalComfortType == "KSU" ) {
 								People( Loop ).KSU = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "ADAPTIVEASH55") ) {
+							} else if ( thermalComfortType == "ADAPTIVEASH55" ) {
 								People( Loop ).AdaptiveASH55 = true;
 								AdaptiveComfortRequested_ASH55 = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "ADAPTIVECEN15251") ) {
+							} else if ( thermalComfortType == "ADAPTIVECEN15251" ) {
 								People( Loop ).AdaptiveCEN15251 = true;
 								AdaptiveComfortRequested_CEN15251 = true;
 								MustInpSch = true;
 								UsingThermalComfort = true;
 
-							} else if ( SameString(thermalComfortType, "") ) { // Blank input field--just ignore this
+							} else if ( thermalComfortType == "" ) { // Blank input field--just ignore this
 
 							} else { // An invalid keyword was entered--warn but ignore
 								if ( Item1 == 1 ) {
@@ -608,10 +608,10 @@ namespace InternalHeatGains {
 							// MRT Calculation Type and Surface Name
 							{ auto const mrtType( AlphaName( 7 ) );
 
-							if ( SameString(mrtType, "ZONEAVERAGED") ) {
+							if ( mrtType == "ZONEAVERAGED" ) {
 								People( Loop ).MRTCalcType = ZoneAveraged;
 
-							} else if ( SameString(mrtType, "SURFACEWEIGHTED") ) {
+							} else if ( mrtType == "SURFACEWEIGHTED" ) {
 								People( Loop ).MRTCalcType = SurfaceWeighted;
 								People( Loop ).SurfacePtr = FindItemInList( AlphaName( 8 ), Surface.Name(), TotSurfaces );
 								if ( People( Loop ).SurfacePtr == 0 ) {
@@ -625,11 +625,11 @@ namespace InternalHeatGains {
 									ErrorsFound = true;
 								}
 
-							} else if ( SameString(mrtType, "ANGLEFACTOR") ) {
+							} else if ( mrtType == "ANGLEFACTOR" ) {
 								People( Loop ).MRTCalcType = AngleFactor;
 								People( Loop ).AngleFactorListName = AlphaName( 8 );
 
-							} else if ( SameString(mrtType, "") ) { // Blank input field--just ignore this
+							} else if ( mrtType == "" ) { // Blank input field--just ignore this
 								if ( MustInpSch && Item1 == 1 ) ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", blank " + cAlphaFieldNames( 7 ) );
 
 							} else { // An invalid keyword was entered--warn but ignore
@@ -681,7 +681,7 @@ namespace InternalHeatGains {
 
 							if ( ! lAlphaFieldBlanks( 10 ) || AlphaName( 10 ) != "" ) {
 								{ auto const clothingType( AlphaName( 10 ) );
-								if ( SameString(clothingType, "CLOTHINGINSULATIONSCHEDULE") ) {
+								if ( clothingType == "CLOTHINGINSULATIONSCHEDULE" ) {
 									People( Loop ).ClothingType = 1;
 									People( Loop ).ClothingPtr = GetScheduleIndex( AlphaName( 12 ) );
 									if ( People( Loop ).ClothingPtr == 0 ) {
@@ -716,10 +716,10 @@ namespace InternalHeatGains {
 										}
 									}
 
-								} else if ( SameString(clothingType, "DYNAMICCLOTHINGMODELASHRAE55") ) {
+								} else if ( clothingType == "DYNAMICCLOTHINGMODELASHRAE55" ) {
 									People( Loop ).ClothingType = 2;
 
-								} else if ( SameString(clothingType, "CALCULATIONMETHODSCHEDULE") ) {
+								} else if ( clothingType == "CALCULATIONMETHODSCHEDULE" ) {
 									People( Loop ).ClothingType = 3;
 									People( Loop ).ClothingMethodPtr = GetScheduleIndex( AlphaName( 11 ) );
 									if ( People( Loop ).ClothingMethodPtr == 0 ) {
@@ -831,7 +831,7 @@ namespace InternalHeatGains {
 		//transfer the nominal number of people in a zone to the tabular reporting
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
 			if ( Zone( Loop ).TotOccupants > 0.0 ) {
-				if ( Zone( Loop ).FloorArea > 0.0 && Zone( Loop ).FloorArea / Zone( Loop ).TotOccupants < .1 ) {
+				if ( Zone( Loop ).FloorArea > 0.0 && Zone( Loop ).FloorArea / Zone( Loop ).TotOccupants < 0.1 ) {
 					ShowWarningError( RoutineName + "Zone=\"" + Zone( Loop ).Name + "\" occupant density is extremely high." );
 					if ( Zone( Loop ).FloorArea > 0.0 ) {
 						ShowContinueError( "Occupant Density=[" + RoundSigDigits( Zone( Loop ).TotOccupants / Zone( Loop ).FloorArea, 0 ) + "] person/m2." );
@@ -848,7 +848,7 @@ namespace InternalHeatGains {
 					}
 				}
 				if ( maxOccupLoad > Zone( Loop ).TotOccupants ) {
-					if ( Zone( Loop ).FloorArea > 0.0 && Zone( Loop ).FloorArea / maxOccupLoad < .1 ) {
+					if ( Zone( Loop ).FloorArea > 0.0 && Zone( Loop ).FloorArea / maxOccupLoad < 0.1 ) {
 						ShowWarningError( RoutineName + "Zone=\"" + Zone( Loop ).Name + "\" occupant density at a maximum schedule value is extremely high." );
 						if ( Zone( Loop ).FloorArea > 0.0 ) {
 							ShowContinueError( "Occupant Density=[" + RoundSigDigits( maxOccupLoad / Zone( Loop ).FloorArea, 0 ) + "] person/m2." );
@@ -971,13 +971,13 @@ namespace InternalHeatGains {
 
 					// Lights Design Level calculation method.
 					{ auto const lightingLevel( AlphaName( 4 ) );
-					if ( SameString(lightingLevel, "LIGHTINGLEVEL") ) {
+					if ( lightingLevel == "LIGHTINGLEVEL" ) {
 						Lights( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Lights will result." );
 						}
 
-					} else if ( SameString(lightingLevel, "WATTS/AREA") ) {
+					} else if ( lightingLevel == "WATTS/AREA" ) {
 						if ( Lights( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								Lights( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( Lights( Loop ).ZonePtr ).FloorArea;
@@ -993,7 +993,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Lights( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Lights will result." );
 						}
 
-					} else if ( SameString(lightingLevel, "WATTS/PERSON") ) {
+					} else if ( lightingLevel == "WATTS/PERSON" ) {
 						if ( Lights( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								Lights( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( Lights( Loop ).ZonePtr ).TotOccupants;
@@ -1029,7 +1029,7 @@ namespace InternalHeatGains {
 					Lights( Loop ).FractionReturnAirPlenTempCoeff2 = IHGNumbers( 9 );
 
 					Lights( Loop ).FractionConvected = 1.0 - ( Lights( Loop ).FractionReturnAir + Lights( Loop ).FractionRadiant + Lights( Loop ).FractionShortWave );
-					if ( std::abs( Lights( Loop ).FractionConvected ) <= .001 ) Lights( Loop ).FractionConvected = 0.0;
+					if ( std::abs( Lights( Loop ).FractionConvected ) <= 0.001 ) Lights( Loop ).FractionConvected = 0.0;
 					if ( Lights( Loop ).FractionConvected < 0.0 ) {
 						if ( Item1 == 1 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Sum of Fractions > 1.0" );
@@ -1232,13 +1232,13 @@ namespace InternalHeatGains {
 
 					// Electric equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneElectric( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Electric Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" ) {
 						if ( ZoneElectric( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneElectric( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneElectric( Loop ).ZonePtr ).FloorArea;
@@ -1254,7 +1254,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Electric Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" ) {
 						if ( ZoneElectric( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneElectric( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneElectric( Loop ).ZonePtr ).TotOccupants;
@@ -1287,7 +1287,7 @@ namespace InternalHeatGains {
 					ZoneElectric( Loop ).FractionLost = IHGNumbers( 6 );
 					// FractionConvected is a calculated field
 					ZoneElectric( Loop ).FractionConvected = 1.0 - ( ZoneElectric( Loop ).FractionLatent + ZoneElectric( Loop ).FractionRadiant + ZoneElectric( Loop ).FractionLost );
-					if ( std::abs( ZoneElectric( Loop ).FractionConvected ) <= .001 ) ZoneElectric( Loop ).FractionConvected = 0.0;
+					if ( std::abs( ZoneElectric( Loop ).FractionConvected ) <= 0.001 ) ZoneElectric( Loop ).FractionConvected = 0.0;
 					if ( ZoneElectric( Loop ).FractionConvected < 0.0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Sum of Fractions > 1.0" );
 						ErrorsFound = true;
@@ -1448,13 +1448,13 @@ namespace InternalHeatGains {
 
 					// equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneGas( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneGas( Loop ).Name + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Gas Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneGas( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneGas( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneGas( Loop ).ZonePtr ).FloorArea;
@@ -1470,7 +1470,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + ZoneGas( Loop ).Name + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Gas Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneGas( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneGas( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneGas( Loop ).ZonePtr ).TotOccupants;
@@ -1515,7 +1515,7 @@ namespace InternalHeatGains {
 					}
 					// FractionConvected is a calculated field
 					ZoneGas( Loop ).FractionConvected = 1.0 - ( ZoneGas( Loop ).FractionLatent + ZoneGas( Loop ).FractionRadiant + ZoneGas( Loop ).FractionLost );
-					if ( std::abs( ZoneGas( Loop ).FractionConvected ) <= .001 ) ZoneGas( Loop ).FractionConvected = 0.0;
+					if ( std::abs( ZoneGas( Loop ).FractionConvected ) <= 0.001 ) ZoneGas( Loop ).FractionConvected = 0.0;
 					if ( ZoneGas( Loop ).FractionConvected < 0.0 ) {
 						if ( Item1 == 1 ) {
 							ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Sum of Fractions > 1.0" );
@@ -1673,13 +1673,13 @@ namespace InternalHeatGains {
 
 					// Hot Water equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneHWEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneHWEq( Loop ).ZonePtr ).FloorArea;
@@ -1695,7 +1695,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneHWEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneHWEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneHWEq( Loop ).ZonePtr ).TotOccupants;
@@ -1728,7 +1728,7 @@ namespace InternalHeatGains {
 					ZoneHWEq( Loop ).FractionLost = IHGNumbers( 6 );
 					// FractionConvected is a calculated field
 					ZoneHWEq( Loop ).FractionConvected = 1.0 - ( ZoneHWEq( Loop ).FractionLatent + ZoneHWEq( Loop ).FractionRadiant + ZoneHWEq( Loop ).FractionLost );
-					if ( std::abs( ZoneHWEq( Loop ).FractionConvected ) <= .001 ) ZoneHWEq( Loop ).FractionConvected = 0.0;
+					if ( std::abs( ZoneHWEq( Loop ).FractionConvected ) <= 0.001 ) ZoneHWEq( Loop ).FractionConvected = 0.0;
 					if ( ZoneHWEq( Loop ).FractionConvected < 0.0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Sum of Fractions > 1.0" );
 						ErrorsFound = true;
@@ -1883,13 +1883,13 @@ namespace InternalHeatGains {
 
 					// Hot Water equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneSteamEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 2 ) >= 0.0 ) {
 								ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneSteamEq( Loop ).ZonePtr ).FloorArea;
@@ -1905,7 +1905,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneSteamEq( Loop ).ZonePtr != 0 ) {
 							if ( IHGNumbers( 3 ) >= 0.0 ) {
 								ZoneSteamEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneSteamEq( Loop ).ZonePtr ).TotOccupants;
@@ -1938,7 +1938,7 @@ namespace InternalHeatGains {
 					ZoneSteamEq( Loop ).FractionLost = IHGNumbers( 6 );
 					// FractionConvected is a calculated field
 					ZoneSteamEq( Loop ).FractionConvected = 1.0 - ( ZoneSteamEq( Loop ).FractionLatent + ZoneSteamEq( Loop ).FractionRadiant + ZoneSteamEq( Loop ).FractionLost );
-					if ( std::abs( ZoneSteamEq( Loop ).FractionConvected ) <= .001 ) ZoneSteamEq( Loop ).FractionConvected = 0.0;
+					if ( std::abs( ZoneSteamEq( Loop ).FractionConvected ) <= 0.001 ) ZoneSteamEq( Loop ).FractionConvected = 0.0;
 					if ( ZoneSteamEq( Loop ).FractionConvected < 0.0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Sum of Fractions > 1.0" );
 						ErrorsFound = true;
@@ -2081,13 +2081,13 @@ namespace InternalHeatGains {
 
 					// Hot Water equipment design level calculation method.
 					{ auto const equipmentLevel( AlphaName( 4 ) );
-					if ( SameString(equipmentLevel, "EQUIPMENTLEVEL") ) {
+					if ( equipmentLevel == "EQUIPMENTLEVEL" ) {
 						ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 1 );
 						if ( lNumericFieldBlanks( 1 ) ) {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 1 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/AREA") || SameString(equipmentLevel, "POWER/AREA") ) {
+					} else if ( equipmentLevel == "WATTS/AREA" || equipmentLevel == "POWER/AREA" ) {
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 2 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).FloorArea <= 0.0 ) {
@@ -2098,7 +2098,7 @@ namespace InternalHeatGains {
 							ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", specifies " + cNumericFieldNames( 2 ) + ", but that field is blank.  0 Hot Water Equipment will result." );
 						}
 
-					} else if ( SameString(equipmentLevel, "WATTS/PERSON") || SameString(equipmentLevel, "POWER/PERSON") ) {
+					} else if ( equipmentLevel == "WATTS/PERSON" || equipmentLevel == "POWER/PERSON" ) {
 						if ( ZoneOtherEq( Loop ).ZonePtr != 0 ) {
 							ZoneOtherEq( Loop ).DesignLevel = IHGNumbers( 3 ) * Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants;
 							if ( Zone( ZoneOtherEq( Loop ).ZonePtr ).TotOccupants <= 0.0 ) {
@@ -2126,7 +2126,7 @@ namespace InternalHeatGains {
 					ZoneOtherEq( Loop ).FractionLost = IHGNumbers( 6 );
 					// FractionConvected is a calculated field
 					ZoneOtherEq( Loop ).FractionConvected = 1.0 - ( ZoneOtherEq( Loop ).FractionLatent + ZoneOtherEq( Loop ).FractionRadiant + ZoneOtherEq( Loop ).FractionLost );
-					if ( std::abs( ZoneOtherEq( Loop ).FractionConvected ) <= .001 ) ZoneOtherEq( Loop ).FractionConvected = 0.0;
+					if ( std::abs( ZoneOtherEq( Loop ).FractionConvected ) <= 0.001 ) ZoneOtherEq( Loop ).FractionConvected = 0.0;
 					if ( ZoneOtherEq( Loop ).FractionConvected < 0.0 ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "\", Sum of Fractions > 1.0" );
 						ErrorsFound = true;
@@ -2403,33 +2403,33 @@ namespace InternalHeatGains {
 				} else {
 					StringOut = "N/A";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( Zone( Loop ).TotOccupants / Zone( Loop ).FloorArea, 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( LightTot / Zone( Loop ).FloorArea, 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( ElecTot / Zone( Loop ).FloorArea, 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( GasTot / Zone( Loop ).FloorArea, 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( OthTot / Zone( Loop ).FloorArea, 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( HWETot / Zone( Loop ).FloorArea, 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( StmTot / Zone( Loop ).FloorArea, 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				StringOut = RoundSigDigits( Zone( Loop ).InternalHeatGains / Zone( Loop ).FloorArea, 3 );
-				gio::write( OutputFileInits, fmta ) << StringOut + ',' + BBHeatInd;
+				gio::write( OutputFileInits, fmtA ) << StringOut + ',' + BBHeatInd;
 			} else {
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_720, flags ) << Zone( Loop ).Name << RoundSigDigits( Zone( Loop ).FloorArea, 2 ) << RoundSigDigits( Zone( Loop ).TotOccupants, 1 ); }
-				gio::write( OutputFileInits, fmta ) << "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A" + BBHeatInd;
+				gio::write( OutputFileInits, fmtA ) << "0.0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A" + BBHeatInd;
 			}
 		}
 		for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
 			if ( Loop == 1 ) { IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_723, flags ) << "People" << "Number of People {}," "People/Floor Area {person/m2},Floor Area per person {m2/person}," "Fraction Radiant,Fraction Convected,Sensible Fraction Calculation,Activity level," "ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum Number of People,Nominal Maximum Number of People"; };
 			if ( Loop == 1 ) {
 				if ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) {
-					gio::write( OutputFileInits, fmta ) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method," "Clothing Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce Calculation," "KSU Calculation";
+					gio::write( OutputFileInits, fmtA ) << ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method," "Clothing Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce Calculation," "KSU Calculation";
 				} else {
 					gio::write( OutputFileInits );
 				}
@@ -2443,13 +2443,13 @@ namespace InternalHeatGains {
 			}
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "People" << People( Loop ).Name << GetScheduleName( People( Loop ).NumberOfPeoplePtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << RoundSigDigits( People( Loop ).NumberOfPeople, 1 ) + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( People( Loop ).NumberOfPeople, 1 ) + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( People( Loop ).NumberOfPeople / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( People( Loop ).NumberOfPeople > 0.0 ) {
 				if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 					StringOut = RoundSigDigits( Zone( ZoneNum ).FloorArea / People( Loop ).NumberOfPeople, 3 );
@@ -2459,32 +2459,32 @@ namespace InternalHeatGains {
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( People( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( People( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( People( Loop ).UserSpecSensFrac == AutoCalculate ) {
 				StringOut = "AutoCalculate";
 			} else {
 				StringOut = RoundSigDigits( People( Loop ).UserSpecSensFrac, 3 );
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = GetScheduleName( People( Loop ).ActivityLevelPtr );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( People( Loop ).Show55Warning ) {
 				StringOut = "Yes";
 			} else {
 				StringOut = "No";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( People( Loop ).CO2RateFactor, 4 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( People( Loop ).NomMinNumberPeople, 0 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( People( Loop ).NomMaxNumberPeople, 0 );
 			if ( People( Loop ).Fanger || People( Loop ).Pierce || People( Loop ).KSU ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				if ( People( Loop ).MRTCalcType == ZoneAveraged ) {
 					StringOut = "Zone Averaged";
 				} else if ( People( Loop ).MRTCalcType == SurfaceWeighted ) {
@@ -2494,8 +2494,8 @@ namespace InternalHeatGains {
 				} else {
 					StringOut = "N/A";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << GetScheduleName( People( Loop ).WorkEffPtr ) + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << GetScheduleName( People( Loop ).WorkEffPtr ) + ','; }
 
 				if ( People( Loop ).ClothingType == 1 ) {
 					StringOut = "Clothing Insulation Schedule";
@@ -2506,37 +2506,37 @@ namespace InternalHeatGains {
 				} else {
 					StringOut = "N/A";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 
 				if ( People( Loop ).ClothingType == 3 ) {
 					StringOut = GetScheduleName( People( Loop ).ClothingMethodPtr );
 				} else {
 					StringOut = "N/A";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << GetScheduleName( People( Loop ).ClothingPtr ) + ','; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << GetScheduleName( People( Loop ).AirVelocityPtr ) + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << GetScheduleName( People( Loop ).ClothingPtr ) + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << GetScheduleName( People( Loop ).AirVelocityPtr ) + ','; }
 				if ( People( Loop ).Fanger ) {
 					StringOut = "Yes";
 				} else {
 					StringOut = "No";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				if ( People( Loop ).Pierce ) {
 					StringOut = "Yes";
 				} else {
 					StringOut = "No";
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				if ( People( Loop ).KSU ) {
 					StringOut = "Yes";
 				} else {
 					StringOut = "No";
 				}
-				gio::write( OutputFileInits, fmta ) << StringOut;
+				gio::write( OutputFileInits, fmtA ) << StringOut;
 			} else {
-				gio::write( OutputFileInits, fmta ) << StringOut;
+				gio::write( OutputFileInits, fmtA ) << StringOut;
 			}
 		}
 		for ( Loop = 1; Loop <= TotLights; ++Loop ) {
@@ -2551,34 +2551,34 @@ namespace InternalHeatGains {
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "Lights" << Lights( Loop ).Name << GetScheduleName( Lights( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << RoundSigDigits( Lights( Loop ).DesignLevel, 3 ) + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( Lights( Loop ).DesignLevel, 3 ) + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( Lights( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( Lights( Loop ).DesignLevel / Zone( ZoneNum ).TotOccupants, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Lights( Loop ).FractionReturnAir, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Lights( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Lights( Loop ).FractionShortWave, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Lights( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Lights( Loop ).FractionReplaceable, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << Lights( Loop ).EndUseSubcategory + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << Lights( Loop ).EndUseSubcategory + ','; }
 			StringOut = RoundSigDigits( Lights( Loop ).NomMinDesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( Lights( Loop ).NomMaxDesignLevel, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 		for ( Loop = 1; Loop <= TotElecEquip; ++Loop ) {
 			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "ElectricEquipment" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
@@ -2592,32 +2592,32 @@ namespace InternalHeatGains {
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "ElectricEquipment" << ZoneElectric( Loop ).Name << GetScheduleName( ZoneElectric( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << RoundSigDigits( ZoneElectric( Loop ).DesignLevel, 3 ) + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( ZoneElectric( Loop ).DesignLevel, 3 ) + ','; }
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneElectric( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneElectric( Loop ).DesignLevel / Zone( ZoneNum ).TotOccupants, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneElectric( Loop ).FractionLatent, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneElectric( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneElectric( Loop ).FractionLost, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneElectric( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << ZoneElectric( Loop ).EndUseSubcategory + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << ZoneElectric( Loop ).EndUseSubcategory + ','; }
 			StringOut = RoundSigDigits( ZoneElectric( Loop ).NomMinDesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneElectric( Loop ).NomMaxDesignLevel, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 		for ( Loop = 1; Loop <= TotGasEquip; ++Loop ) {
 			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "GasEquipment" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Latent,Fraction Radiant,Fraction Lost,Fraction Convected,End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
@@ -2631,33 +2631,33 @@ namespace InternalHeatGains {
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "GasEquipment" << ZoneGas( Loop ).Name << GetScheduleName( ZoneGas( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << RoundSigDigits( ZoneGas( Loop ).DesignLevel, 3 ) + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( ZoneGas( Loop ).DesignLevel, 3 ) + ','; }
 
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneGas( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneGas( Loop ).DesignLevel / Zone( ZoneNum ).TotOccupants, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneGas( Loop ).FractionLatent, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneGas( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneGas( Loop ).FractionLost, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneGas( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << ZoneGas( Loop ).EndUseSubcategory + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << ZoneGas( Loop ).EndUseSubcategory + ','; }
 			StringOut = RoundSigDigits( ZoneGas( Loop ).NomMinDesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneGas( Loop ).NomMaxDesignLevel, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		for ( Loop = 1; Loop <= TotHWEquip; ++Loop ) {
@@ -2672,33 +2672,33 @@ namespace InternalHeatGains {
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "HotWaterEquipment" << ZoneHWEq( Loop ).Name << GetScheduleName( ZoneHWEq( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << RoundSigDigits( ZoneHWEq( Loop ).DesignLevel, 3 ) + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( ZoneHWEq( Loop ).DesignLevel, 3 ) + ','; }
 
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneHWEq( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneHWEq( Loop ).DesignLevel / Zone( ZoneNum ).TotOccupants, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneHWEq( Loop ).FractionLatent, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneHWEq( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneHWEq( Loop ).FractionLost, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneHWEq( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << ZoneHWEq( Loop ).EndUseSubcategory + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << ZoneHWEq( Loop ).EndUseSubcategory + ','; }
 			StringOut = RoundSigDigits( ZoneHWEq( Loop ).NomMinDesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneHWEq( Loop ).NomMaxDesignLevel, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		for ( Loop = 1; Loop <= TotStmEquip; ++Loop ) {
@@ -2713,33 +2713,33 @@ namespace InternalHeatGains {
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "SteamEquipment" << ZoneSteamEq( Loop ).Name << GetScheduleName( ZoneSteamEq( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << RoundSigDigits( ZoneSteamEq( Loop ).DesignLevel, 3 ) + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( ZoneSteamEq( Loop ).DesignLevel, 3 ) + ','; }
 
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneSteamEq( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneSteamEq( Loop ).DesignLevel / Zone( ZoneNum ).TotOccupants, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneSteamEq( Loop ).FractionLatent, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneSteamEq( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneSteamEq( Loop ).FractionLost, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneSteamEq( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << ZoneSteamEq( Loop ).EndUseSubcategory + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << ZoneSteamEq( Loop ).EndUseSubcategory + ','; }
 			StringOut = RoundSigDigits( ZoneSteamEq( Loop ).NomMinDesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneSteamEq( Loop ).NomMaxDesignLevel, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		for ( Loop = 1; Loop <= TotOthEquip; ++Loop ) {
@@ -2753,32 +2753,32 @@ namespace InternalHeatGains {
 
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "OtherEquipment" << ZoneOtherEq( Loop ).Name << GetScheduleName( ZoneOtherEq( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << RoundSigDigits( ZoneOtherEq( Loop ).DesignLevel, 3 ) + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( ZoneOtherEq( Loop ).DesignLevel, 3 ) + ','; }
 
 			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneOtherEq( Loop ).DesignLevel / Zone( ZoneNum ).FloorArea, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
 				StringOut = RoundSigDigits( ZoneOtherEq( Loop ).DesignLevel / Zone( ZoneNum ).TotOccupants, 3 );
 			} else {
 				StringOut = "N/A";
 			}
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneOtherEq( Loop ).FractionLatent, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneOtherEq( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneOtherEq( Loop ).FractionLost, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneOtherEq( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneOtherEq( Loop ).NomMinDesignLevel, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneOtherEq( Loop ).NomMaxDesignLevel, 3 );
-			gio::write( OutputFileInits, fmta ) << StringOut;
+			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
 		for ( Loop = 1; Loop <= TotBBHeat; ++Loop ) {
@@ -2794,18 +2794,18 @@ namespace InternalHeatGains {
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "Outdoor Controlled Baseboard Heat" << ZoneBBHeat( Loop ).Name << GetScheduleName( ZoneBBHeat( Loop ).SchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
 
 			StringOut = RoundSigDigits( ZoneBBHeat( Loop ).CapatLowTemperature, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneBBHeat( Loop ).LowTemperature, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneBBHeat( Loop ).CapatHighTemperature, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneBBHeat( Loop ).HighTemperature, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneBBHeat( Loop ).FractionRadiant, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneBBHeat( Loop ).FractionConvected, 3 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
-			gio::write( OutputFileInits, fmta ) << ZoneBBHeat( Loop ).EndUseSubcategory;
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			gio::write( OutputFileInits, fmtA ) << ZoneBBHeat( Loop ).EndUseSubcategory;
 		}
 
 	}
@@ -2868,7 +2868,7 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static FArray1D< Real64 > const C( 9, { 6.4611027, .946892, .0000255737, 7.139322, -.0627909, .0000589271, -.198550, .000940018, -.00000149532 } );
+		static FArray1D< Real64 > const C( 9, { 6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532 } );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3603,8 +3603,8 @@ namespace InternalHeatGains {
 			ShowFatalError( "CheckLightsReplaceableMinMaxForZone: Function called prior to Getting Lights Input." );
 		}
 
-		LightsRepMin = 99999.;
-		LightsRepMax = -99999.;
+		LightsRepMin = 99999.0;
+		LightsRepMax = -99999.0;
 		NumLights = 0;
 
 		for ( Loop = 1; Loop <= TotLights; ++Loop ) {

@@ -90,8 +90,8 @@ namespace WindowEquivalentLayer {
 	using General::TrimSigDigits;
 
 	// Data
-	Real64 const RadiansToDeg( 180. / Pi ); // Conversion for Radians to Degrees
-	Real64 const PAtmSeaLevel( 101325. ); // Standard atmospheric pressure at sea level (Pa)
+	Real64 const RadiansToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
+	Real64 const PAtmSeaLevel( 101325.0 ); // Standard atmospheric pressure at sea level (Pa)
 	int const hipRHO( 1 ); // return reflectance
 	int const hipTAU( 2 ); // return transmittance
 	Real64 const SMALL_ERROR( 0.000001 ); // small number
@@ -472,8 +472,8 @@ namespace WindowEquivalentLayer {
 		for ( I = 1; I <= 10; ++I ) {
 			TGO = TOUT + U * DT / HXO; // update glazing surface temps
 			TGI = TIN - U * DT / HXI;
-			HRO = StefanBoltzmann * EO * ( std::pow( ( TGO + KelvinConv ), 2 ) + std::pow( ( TOUT + KelvinConv ), 2 ) ) * ( ( TGO + KelvinConv ) + ( TOUT + KelvinConv ) );
-			HRI = StefanBoltzmann * EI * ( std::pow( ( TGI + KelvinConv ), 2 ) + std::pow( ( TIN + KelvinConv ), 2 ) ) * ( ( TGI + KelvinConv ) + ( TIN + KelvinConv ) );
+			HRO = StefanBoltzmann * EO * ( pow_2( TGO + KelvinConv ) + pow_2( TOUT + KelvinConv ) ) * ( ( TGO + KelvinConv ) + ( TOUT + KelvinConv ) );
+			HRI = StefanBoltzmann * EI * ( pow_2( TGI + KelvinConv ) + pow_2( TIN + KelvinConv ) ) * ( ( TGI + KelvinConv ) + ( TIN + KelvinConv ) );
 			//HCI = HIC_ASHRAE( Height, TGI, TI)  ! BAN June 2103 Raplaced with ISO Std 15099
 			TGIK = TGI + KelvinConv;
 			TIK = TIN + KelvinConv;
@@ -911,13 +911,13 @@ namespace WindowEquivalentLayer {
 					Tout = Surface( SurfNum ).OutDryBulbTemp + KelvinConv;
 				}
 				tsky = SkyTempKelvin;
-				Ebout = StefanBoltzmann * std::pow( Tout, 4 );
+				Ebout = StefanBoltzmann * pow_4( Tout );
 				// ASHWAT model may be slightly different
-				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * std::pow( tsky, 4 ) + ( 1. - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
+				outir = Surface( SurfNum ).ViewFactorSkyIR * ( AirSkyRadSplit( SurfNum ) * StefanBoltzmann * pow_4( tsky ) + ( 1.0 - AirSkyRadSplit( SurfNum ) ) * Ebout ) + Surface( SurfNum ).ViewFactorGroundIR * Ebout;
 			}
 		}
 		// Outdoor conditions
-		TRMOUT = std::pow( ( outir / StefanBoltzmann ), 0.25 ); // it is in Kelvin scale
+		TRMOUT = root_4( outir / StefanBoltzmann ); // it is in Kelvin scale
 		// indoor conditions
 		LWAbsIn = EffectiveEPSLB( CFS( EQLNum ) ); // windows inside face effective thermal emissivity
 		LWAbsOut = EffectiveEPSLF( CFS( EQLNum ) ); // windows outside face effective thermal emissivity
@@ -925,7 +925,7 @@ namespace WindowEquivalentLayer {
 		// Indoor mean radiant temperature.
 		// IR incident on window from zone surfaces and high-temp radiant sources
 		rmir = IRfromParentZone[ SurfNum - 1 ] + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + QRadThermInAbs( SurfNum );
-		TRMIN = std::pow( ( rmir / StefanBoltzmann ), 0.25 ); // TODO check model equation.
+		TRMIN = root_4( rmir / StefanBoltzmann ); // TODO check model equation.
 
 		NL = CFS( EQLNum ).NL;
 		QAllSWwinAbs( {1,NL + 1} ) = QRadSWwinAbs( SurfNum, {1,NL + 1} );
@@ -952,7 +952,7 @@ namespace WindowEquivalentLayer {
 			ConvHeatFlowNatural = Surface( SurfNum ).Area * QOCFRoom;
 		}
 		SurfaceRadiantWin[ SurfNum - 1 ].EffInsSurfTemp = SurfInsideTemp;
-		NetIRHeatGainWindow = Surface( SurfNum ).Area * LWAbsIn * ( StefanBoltzmann * std::pow( ( SurfInsideTemp + KelvinConv ), 4 ) - rmir );
+		NetIRHeatGainWindow = Surface( SurfNum ).Area * LWAbsIn * ( StefanBoltzmann * pow_4( SurfInsideTemp + KelvinConv ) - rmir );
 		ConvHeatGainWindow = Surface( SurfNum ).Area * HcIn * ( SurfInsideTemp - TaIn );
 		// Window heat gain (or loss) is calculated here
 		WinHeatGain( SurfNum ) = WinTransSolar( SurfNum ) + ConvHeatGainWindow + NetIRHeatGainWindow + ConvHeatFlowNatural;
@@ -1104,7 +1104,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 HEMINT;
 
 		// Argument array dimensioning
 		F_P.dim( hipDIM );
@@ -1113,9 +1112,11 @@ namespace WindowEquivalentLayer {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		int const KMAX( 8 ); // max steps
-		int const NPANMAX( std::pow( 2, KMAX ) );
+		static int const KMAX( 8 ); // max steps
+		static int const NPANMAX( std::pow( 2, KMAX ) );
 		Real64 const TOL( 0.0005 ); // convergence tolerance
+		static std::string const RoutineName( "HEMINT" );
+
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
 
@@ -1161,7 +1162,8 @@ namespace WindowEquivalentLayer {
 			// Now complete the row
 			if ( K > 1 ) {
 				for ( L = 2; L <= K; ++L ) {
-					T( L, K ) = ( ( std::pow( 4.0, ( L - 1 ) ) ) * T( L - 1, K ) - T( L - 1, K - 1 ) ) / ( std::pow( 4.0, ( L - 1 ) ) - 1.0 );
+					Real64 const pow_4_L_1( std::pow( 4.0, L - 1 ) );
+					T( L, K ) = ( pow_4_L_1 * T( L - 1, K ) - T( L - 1, K - 1 ) ) / ( pow_4_L_1 - 1.0 );
 				}
 				//    check for convergence
 				//    do 8 panels minimum, else can miss F() features
@@ -1175,8 +1177,7 @@ namespace WindowEquivalentLayer {
 		if ( K > KMAX ) {
 			K = KMAX;
 		}
-		HEMINT = P01( T( K, K ), "HEMINT" );
-		return HEMINT;
+		return P01( T( K, K ), RoutineName );
 	}
 
 	void
@@ -1263,7 +1264,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 RB_F;
 
 		// Argument array dimensioning
 		P.dim( hipDIM );
@@ -1287,8 +1287,7 @@ namespace WindowEquivalentLayer {
 
 		RB_BEAM( THETA, P( hipRHO_BT0 ), P( hipTAU_BT0 ), P( hipTAU_BB0 ), RHO_BD, TAU_BB, TAU_BD );
 
-		RB_F = TAU_BB + TAU_BD;
-		return RB_F;
+		return TAU_BB + TAU_BD;
 	}
 
 	void
@@ -1324,7 +1323,7 @@ namespace WindowEquivalentLayer {
 		//   TAU_BT0 = TAU_BB0 + TAU_BD0
 		//   (openness)
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const ContextName( "RB_BEAM TauBD" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1350,17 +1349,18 @@ namespace WindowEquivalentLayer {
 			// beam total
 			TAUM0 = min( 1.0, ( TAU_BT0 - TAU_BB0 ) / ( 1.0 - TAU_BB0 ) );
 			if ( TAUM0 <= 0.33 ) {
-				TAUBT_EXPO = 0.133 * std::pow( ( TAUM0 + 0.003 ), ( -0.467 ) );
+				TAUBT_EXPO = 0.133 * std::pow( TAUM0 + 0.003, -0.467 );
 			} else {
 				TAUBT_EXPO = 0.33 * ( 1.0 - TAUM0 );
 			}
 			TAU_BT = TAU_BT0 * std::pow( std::cos( THETA ), TAUBT_EXPO ); // always 0 - 1
 
-			THETA_CUTOFF = DegToRadians * ( 90. - 25. * std::cos( TAU_BB0 * PiOvr2 ) );
+			Real64 const cos_TAU_BB0( std::cos( TAU_BB0 * PiOvr2 ) );
+			THETA_CUTOFF = DegToRadians * ( 90.0 - 25.0 * cos_TAU_BB0 );
 			if ( THETA >= THETA_CUTOFF ) {
 				TAU_BB = 0.0;
 			} else {
-				TAUBB_EXPO = 0.6 * std::pow( std::cos( TAU_BB0 * PiOvr2 ), 0.3 );
+				TAUBB_EXPO = 0.6 * std::pow( cos_TAU_BB0, 0.3 );
 				TAU_BB = TAU_BB0 * std::pow( std::cos( PiOvr2 * THETA / THETA_CUTOFF ), TAUBB_EXPO );
 				// BB correlation can produce results slightly larger than BT
 				// Enforce consistency
@@ -1369,7 +1369,7 @@ namespace WindowEquivalentLayer {
 		}
 
 		RHO_BD = RHO_BT0;
-		TAU_BD = P01( TAU_BT - TAU_BB, "RB_BEAM TauBD" );
+		TAU_BD = P01( TAU_BT - TAU_BB, ContextName );
 	}
 
 	void
@@ -1523,7 +1523,10 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		//   TAU_BTO = TAU_BB0 + TAU_BD0
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RhoBD_Name( "IS_BEAM RhoBD" );
+		static std::string const TauBB_Name( "IS_BEAM TauBB" );
+		static std::string const TauBT_Name( "IS_BEAM TauBT" );
+		static std::string const TauBD_Name( "IS_BEAM TauBD" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1532,8 +1535,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 THETA; // working incident angle, radians
-		Real64 COSTHETA; // cosine( theta)
 		Real64 THETA_CUTOFF; // cutoff angle, radians (beyond which TAU_BB = 0)
 		Real64 B; // working temp
 		Real64 RHO_W; // apparent wire reflectance
@@ -1541,15 +1542,15 @@ namespace WindowEquivalentLayer {
 		Real64 TAU_BT; // beam-total transmittance
 		// Flow
 
-		THETA = min( 89.99 * DegToRadians, xTHETA );
-		COSTHETA = std::cos( THETA );
+		Real64 const THETA(  min( 89.99 * DegToRadians, xTHETA ) ); // working incident angle, radians
+		Real64 const COSTHETA( std::cos( THETA ) );
 
 		RHO_W = RHO_BT0 / max( 0.00001, 1.0 - TAU_BB0 );
-		B = - 0.45 * std::log( max( RHO_W, 0.01 ) );
+		B = -0.45 * std::log( max( RHO_W, 0.01 ) );
 
 		RHO_BT90 = RHO_BT0 + ( 1.0 - RHO_BT0 ) * ( 0.35 * RHO_W );
 
-		RHO_BD = P01( RHO_BT0 + ( RHO_BT90 - RHO_BT0 ) * ( 1.0 - std::pow( COSTHETA, B ) ), "IS_BEAM RhoBD" );
+		RHO_BD = P01( RHO_BT0 + ( RHO_BT90 - RHO_BT0 ) * ( 1.0 - std::pow( COSTHETA, B ) ), RhoBD_Name );
 
 		if ( TAU_BT0 < 0.00001 ) {
 			TAU_BB = 0.0;
@@ -1560,15 +1561,15 @@ namespace WindowEquivalentLayer {
 			if ( THETA >= THETA_CUTOFF ) {
 				TAU_BB = 0.0;
 			} else {
-				B = - 0.45 * std::log( max( TAU_BB0, 0.01 ) ) + 0.1;
-				TAU_BB = P01( TAU_BB0 * std::pow( std::cos( PiOvr2 * THETA / THETA_CUTOFF ), B ), "IS_BEAM TauBB" );
+				B = -0.45 * std::log( max( TAU_BB0, 0.01 ) ) + 0.1;
+				TAU_BB = P01( TAU_BB0 * std::pow( std::cos( PiOvr2 * THETA / THETA_CUTOFF ), B ), TauBB_Name );
 			}
 
-			B = - 0.65 * std::log( max( TAU_BT0, 0.01 ) ) + 0.1;
-			TAU_BT = P01( TAU_BT0 * std::pow( COSTHETA, B ), "IS_BEAM TauBT" );
+			B = -0.65 * std::log( max( TAU_BT0, 0.01 ) ) + 0.1;
+			TAU_BT = P01( TAU_BT0 * std::pow( COSTHETA, B ), TauBT_Name );
 		}
 
-		TAU_BD = P01( TAU_BT - TAU_BB, "IS_BEAM TauBD" );
+		TAU_BD = P01( TAU_BT - TAU_BB, TauBD_Name );
 	}
 
 	Real64
@@ -1592,7 +1593,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 IS_OPENNESS;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1611,11 +1611,10 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		if ( S > 0.0 ) {
-			IS_OPENNESS = std::pow( ( max( S - D, 0.0 ) / S ), 2 );
+			return pow_2( max( S - D, 0.0 ) / S );
 		} else {
-			IS_OPENNESS = 0.0;
+			return 0.0;
 		}
-		return IS_OPENNESS;
 	}
 
 	Real64
@@ -1636,7 +1635,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 IS_DSRATIO;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1655,11 +1653,10 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		if ( OPENNESS > 0.0 ) {
-			IS_DSRATIO = 1.0 - min( std::sqrt( OPENNESS ), 1.0 );
+			return 1.0 - min( std::sqrt( OPENNESS ), 1.0 );
 		} else {
-			IS_DSRATIO = 0.0;
+			return 0.0;
 		}
-		return IS_DSRATIO;
 	}
 
 	void
@@ -1829,7 +1826,6 @@ namespace WindowEquivalentLayer {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 THETA; // working incident angle, radians
-		Real64 COSTHETA; // cosine( theta)
 		Real64 R; // working temps
 		Real64 B;
 		Real64 RHO_Y; // apparent yarn reflectance
@@ -1840,7 +1836,7 @@ namespace WindowEquivalentLayer {
 		THETA = std::abs( max( -89.99 * DegToRadians, min( 89.99 * DegToRadians, xTHETA ) ) );
 		// limit -89.99 - +89.99
 		// by symmetry, optical properties same at +/- theta
-		COSTHETA = std::cos( THETA );
+		Real64 const COSTHETA( std::cos( THETA ) );
 
 		RHO_Y = RHO_BT0 / max( 0.00001, 1.0 - TAU_BB0 );
 		R = 0.7 * std::pow( RHO_Y, 0.7 );
@@ -1898,7 +1894,9 @@ namespace WindowEquivalentLayer {
 		//    typical (default) = 0.92
 		//    nearly always 0
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RhoLWF_Name( "PD_LW RhoLWF" );
+		static std::string const RhoLWB_Name( "PD_LW RhoLWB" );
+		static std::string const EpsLWF_Name( "PD_LW EpsLWF" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1919,12 +1917,12 @@ namespace WindowEquivalentLayer {
 		OPENNESS_LW( OPENNESS_FABRIC, EPSLWF0_FABRIC, TAULW0_FABRIC, EPSLWF_FABRIC, TAULW_FABRIC );
 		OPENNESS_LW( OPENNESS_FABRIC, EPSLWB0_FABRIC, TAULW0_FABRIC, EPSLWB_FABRIC, TAULX );
 
-		RHOLWF_FABRIC = P01( 1.0 - EPSLWF_FABRIC - TAULW_FABRIC, "PD_LW RhoLWF" );
-		RHOLWB_FABRIC = P01( 1.0 - EPSLWB_FABRIC - TAULW_FABRIC, "PD_LW RhoLWB" );
+		RHOLWF_FABRIC = P01( 1.0 - EPSLWF_FABRIC - TAULW_FABRIC, RhoLWF_Name );
+		RHOLWB_FABRIC = P01( 1.0 - EPSLWB_FABRIC - TAULW_FABRIC, RhoLWB_Name );
 
 		PD_DIFF( S, W, RHOLWF_FABRIC, RHOLWB_FABRIC, TAULW_FABRIC, RHOLWF_PD, TAULW_PD );
 
-		EPSLWF_PD = P01( 1.0 - TAULW_PD - RHOLWF_PD, "PD_LW EpsLWF" );
+		EPSLWF_PD = P01( 1.0 - TAULW_PD - RHOLWF_PD, EpsLWF_Name );
 	}
 
 	void
@@ -1961,6 +1959,8 @@ namespace WindowEquivalentLayer {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const N( 6 );
+		static std::string const TauDD_Name( "PD_DIFF TauDD" );
+		static std::string const RhoDD_Name( "PD_DIFF RhoDD" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2017,14 +2017,14 @@ namespace WindowEquivalentLayer {
 
 		AK = std::sqrt( S * S + W * W );
 		CG = AK;
-		F12 = ( S + W - AK ) / ( 2. * S );
-		F14 = ( S + W - CG ) / ( 2. * S );
+		F12 = ( S + W - AK ) / ( 2.0 * S );
+		F14 = ( S + W - CG ) / ( 2.0 * S );
 		F32 = F14;
-		F31 = ( AK + CG - 2. * W ) / ( 2. * S );
+		F31 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
 		F34 = F12;
-		F21 = ( S + W - AK ) / ( 2. * W );
-		F24 = ( AK + CG - 2. * S ) / ( 2. * W );
-		F41 = ( S + W - CG ) / ( 2. * W );
+		F21 = ( S + W - AK ) / ( 2.0 * W );
+		F24 = ( AK + CG - 2.0 * S ) / ( 2.0 * W );
+		F41 = ( S + W - CG ) / ( 2.0 * W );
 		F42 = F24;
 		F57 = F31;
 		F56 = F12;
@@ -2045,45 +2045,45 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - RHOBF_DD * F12;
-		A( 1, 3 ) = - RHOBF_DD * F14;
+		A( 1, 2 ) = -RHOBF_DD * F12;
+		A( 1, 3 ) = -RHOBF_DD * F14;
 		A( 1, 4 ) = 0.0;
 		A( 1, 5 ) = 0.0;
 		A( 1, 6 ) = 0.0;
 		A( 1, 7 ) = TAUF_DD;
-		A( 2, 1 ) = - RHOBF_DD * F21;
+		A( 2, 1 ) = -RHOBF_DD * F21;
 		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = - RHOBF_DD * F24;
-		A( 2, 4 ) = - TAUF_DD * F87;
-		A( 2, 5 ) = - TAUF_DD * F86;
+		A( 2, 3 ) = -RHOBF_DD * F24;
+		A( 2, 4 ) = -TAUF_DD * F87;
+		A( 2, 5 ) = -TAUF_DD * F86;
 		A( 2, 6 ) = 0.0;
 		A( 2, 7 ) = TAUF_DD * F85;
-		A( 3, 1 ) = - RHOBF_DD * F41;
-		A( 3, 2 ) = - RHOBF_DD * F42;
+		A( 3, 1 ) = -RHOBF_DD * F41;
+		A( 3, 2 ) = -RHOBF_DD * F42;
 		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = - TAUF_DD * F67;
+		A( 3, 4 ) = -TAUF_DD * F67;
 		A( 3, 5 ) = 0.0;
-		A( 3, 6 ) = - TAUF_DD * F68;
+		A( 3, 6 ) = -TAUF_DD * F68;
 		A( 3, 7 ) = TAUF_DD * F65;
 		A( 4, 1 ) = 0.0;
 		A( 4, 2 ) = 0.0;
 		A( 4, 3 ) = 0.0;
 		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = - RHOFF_DD * F76;
-		A( 4, 6 ) = - RHOFF_DD * F78;
+		A( 4, 5 ) = -RHOFF_DD * F76;
+		A( 4, 6 ) = -RHOFF_DD * F78;
 		A( 4, 7 ) = RHOFF_DD * F75;
-		A( 5, 1 ) = - TAUF_DD * F41;
-		A( 5, 2 ) = - TAUF_DD * F42;
+		A( 5, 1 ) = -TAUF_DD * F41;
+		A( 5, 2 ) = -TAUF_DD * F42;
 		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = - RHOFF_DD * F67;
+		A( 5, 4 ) = -RHOFF_DD * F67;
 		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = - RHOFF_DD * F68;
+		A( 5, 6 ) = -RHOFF_DD * F68;
 		A( 5, 7 ) = RHOFF_DD * F65;
-		A( 6, 1 ) = - TAUF_DD * F21;
+		A( 6, 1 ) = -TAUF_DD * F21;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = - TAUF_DD * F24;
-		A( 6, 4 ) = - RHOFF_DD * F87;
-		A( 6, 5 ) = - RHOFF_DD * F86;
+		A( 6, 3 ) = -TAUF_DD * F24;
+		A( 6, 4 ) = -RHOFF_DD * F87;
+		A( 6, 5 ) = -RHOFF_DD * F86;
 		A( 6, 6 ) = 1.0;
 		A( 6, 7 ) = RHOFF_DD * F85;
 
@@ -2101,8 +2101,8 @@ namespace WindowEquivalentLayer {
 		G5 = F57 * J7 + F56 * J6 + F58 * J8;
 		G7 = F75 + F76 * J6 + F78 * J8;
 
-		TAUFDD = P01( ( G3 + TAUF_DD * G7 ) / 2.0, "PD_DIFF TauDD" );
-		RHOFDD = P01( ( RHOFF_DD + TAUF_DD * G1 + G5 ) / 2.0, "PD_DIFF RhoDD" );
+		TAUFDD = P01( ( G3 + TAUF_DD * G7 ) / 2.0, TauDD_Name );
+		RHOFDD = P01( ( RHOFF_DD + TAUF_DD * G1 + G5 ) / 2.0, RhoDD_Name );
 	}
 
 	void
@@ -2185,8 +2185,11 @@ namespace WindowEquivalentLayer {
 		// by symmetry, properties same for +/- profile angle
 
 		// incidence angles on pleat front/back (_PARL) and sides (_PERP)
-		THETA_PARL = std::acos( std::abs( std::cos( std::atan( std::tan( OMEGA_V ) * std::cos( OMEGA_H ) ) ) * std::cos( OMEGA_H ) ) );
-		THETA_PERP = std::acos( std::abs( std::cos( std::atan( std::tan( OMEGA_V ) * std::sin( OMEGA_H ) ) ) * std::sin( OMEGA_H ) ) );
+		Real64 const tan_OMEGA_V( std::tan( OMEGA_V ) );
+		Real64 const cos_OMEGA_H( std::cos( OMEGA_H ) );
+		Real64 const sin_OMEGA_H( std::sin( OMEGA_H ) );
+		THETA_PARL = std::acos( std::abs( std::cos( std::atan( tan_OMEGA_V * cos_OMEGA_H ) ) * cos_OMEGA_H ) );
+		THETA_PERP = std::acos( std::abs( std::cos( std::atan( tan_OMEGA_V * sin_OMEGA_H ) ) * sin_OMEGA_H ) );
 
 		// off-normal fabric properties, front surface
 		TAUFF_BT0 = TAUFF_BB0 + TAUFF_BD0;
@@ -2206,7 +2209,7 @@ namespace WindowEquivalentLayer {
 		FM_BEAM( THETA_PARL, RHOBF_BT0, TAUBF_BT0, TAUBF_BB0, RHOBF_BT_PARL, TAUBF_BB_PARL, TAUBF_BD_PARL );
 		FM_BEAM( THETA_PERP, RHOBF_BT0, TAUBF_BT0, TAUBF_BB0, RHOBF_BT_PERP, TAUBF_BB_PERP, TAUBF_BD_PERP );
 
-		DE = S * std::abs( std::cos( OMEGA_H ) / max( .000001, std::sin( OMEGA_H ) ) );
+		DE = S * std::abs( cos_OMEGA_H / max( 0.000001, sin_OMEGA_H ) );
 		EF = W - DE;
 
 		// select geometric case
@@ -2225,7 +2228,7 @@ namespace WindowEquivalentLayer {
 		} else if ( DE <= W + SMALL_ERROR ) {
 			// illum length same as pleat depth
 			PD_BEAM_CASE_IV( S, W, OMEGA_H, DE, RHOFF_BT_PARL, TAUFF_BB_PARL, TAUFF_BD_PARL, RHOBF_BT_PARL, TAUBF_BB_PARL, TAUBF_BD_PARL, RHOFF_BT_PERP, TAUFF_BB_PERP, TAUFF_BD_PERP, RHOBF_BT_PERP, TAUBF_BB_PERP, TAUBF_BD_PERP, RHOBF_DD, RHOFF_DD, TAUFF_DD, TAUBF_DD, RHO_BD, TAU_BD, TAU_BB );
-		} else if ( DE < 9000. * S ) {
+		} else if ( DE < 9000.0 * S ) {
 			// some direct illum on pleat back
 			PD_BEAM_CASE_V( S, W, OMEGA_H, DE, RHOFF_BT_PARL, TAUFF_BB_PARL, TAUFF_BD_PARL, RHOBF_BT_PARL, TAUBF_BB_PARL, TAUBF_BD_PARL, RHOFF_BT_PERP, TAUFF_BB_PERP, TAUFF_BD_PERP, RHOBF_BT_PERP, TAUBF_BB_PERP, TAUBF_BD_PERP, RHOBF_DD, RHOFF_DD, TAUFF_DD, TAUBF_DD, RHO_BD, TAU_BD, TAU_BB );
 		} else {
@@ -2430,37 +2433,37 @@ namespace WindowEquivalentLayer {
 		Z13_BD = Z7_BB * TAUBF_BT_PERP;
 		Z14_BD = Z1_BB * TAUBF_BT_PERP * S / GN;
 
-		F12 = ( S + GN - AN ) / ( 2. * S );
-		F13 = ( AN + GP - ( GN + AP ) ) / ( 2. * S );
-		F14 = ( AP + W - ( GP + AK ) ) / ( 2. * S );
-		F16 = ( W + BG - ( AB + CG ) ) / ( 2. * S );
-		F17 = ( S + AB - BG ) / ( 2. * S );
-		F21 = ( S + GN - AN ) / ( 2. * GN );
-		F25 = ( W + CN - ( CG + NK ) ) / ( 2. * GN );
-		F26 = ( CG + S - ( BG + CN ) ) / ( 2. * GN );
-		F27 = ( AN + BG - 2. * S ) / ( 2. * GN );
-		F31 = ( AN + GP - ( GN + AP ) ) / ( 2. * NP );
-		F35 = ( NK + CP - ( CN + PK ) ) / ( 2. * NP );
-		F36 = ( CN + BP - ( S + CP ) ) / ( 2. * NP );
-		F37 = ( S + AP - ( AN + BP ) ) / ( 2. * NP );
-		F41 = ( W + AP - ( GP + AK ) ) / ( 2. * PK );
-		F45 = ( S + PK - CP ) / ( 2. * PK );
-		F46 = ( CP + BK - ( S + BP ) ) / ( 2. * PK );
-		F47 = ( BP + AK - ( AP + BK ) ) / ( 2. * PK );
-		F51 = ( AK + CG - 2. * W ) / ( 2. * S );
-		F52 = ( W + CN - ( CG + NK ) ) / ( 2. * S );
-		F53 = ( NK + CP - ( CN + PK ) ) / ( 2. * S );
-		F54 = ( S + PK - CP ) / ( 2. * S );
-		F56 = ( S + BC - BK ) / ( 2. * S );
-		F57 = ( W + BK - ( BC + AK ) ) / ( 2. * S );
-		F61 = ( W + BG - ( AB + CG ) ) / ( 2. * BC );
-		F62 = ( S + CG - ( BG + CN ) ) / ( 2. * BC );
-		F63 = ( CN + BP - ( S + CP ) ) / ( 2. * BC );
-		F64 = ( BK + CP - ( S + BP ) ) / ( 2. * BC );
+		F12 = ( S + GN - AN ) / ( 2.0 * S );
+		F13 = ( AN + GP - ( GN + AP ) ) / ( 2.0 * S );
+		F14 = ( AP + W - ( GP + AK ) ) / ( 2.0 * S );
+		F16 = ( W + BG - ( AB + CG ) ) / ( 2.0 * S );
+		F17 = ( S + AB - BG ) / ( 2.0 * S );
+		F21 = ( S + GN - AN ) / ( 2.0 * GN );
+		F25 = ( W + CN - ( CG + NK ) ) / ( 2.0 * GN );
+		F26 = ( CG + S - ( BG + CN ) ) / ( 2.0 * GN );
+		F27 = ( AN + BG - 2.0 * S ) / ( 2.0 * GN );
+		F31 = ( AN + GP - ( GN + AP ) ) / ( 2.0 * NP );
+		F35 = ( NK + CP - ( CN + PK ) ) / ( 2.0 * NP );
+		F36 = ( CN + BP - ( S + CP ) ) / ( 2.0 * NP );
+		F37 = ( S + AP - ( AN + BP ) ) / ( 2.0 * NP );
+		F41 = ( W + AP - ( GP + AK ) ) / ( 2.0 * PK );
+		F45 = ( S + PK - CP ) / ( 2.0 * PK );
+		F46 = ( CP + BK - ( S + BP ) ) / ( 2.0 * PK );
+		F47 = ( BP + AK - ( AP + BK ) ) / ( 2.0 * PK );
+		F51 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
+		F52 = ( W + CN - ( CG + NK ) ) / ( 2.0 * S );
+		F53 = ( NK + CP - ( CN + PK ) ) / ( 2.0 * S );
+		F54 = ( S + PK - CP ) / ( 2.0 * S );
+		F56 = ( S + BC - BK ) / ( 2.0 * S );
+		F57 = ( W + BK - ( BC + AK ) ) / ( 2.0 * S );
+		F61 = ( W + BG - ( AB + CG ) ) / ( 2.0 * BC );
+		F62 = ( S + CG - ( BG + CN ) ) / ( 2.0 * BC );
+		F63 = ( CN + BP - ( S + CP ) ) / ( 2.0 * BC );
+		F64 = ( BK + CP - ( S + BP ) ) / ( 2.0 * BC );
 		F71 = F21;
 		F72 = F27;
 		F73 = F37;
-		F74 = ( BP + AK - ( BK + AP ) ) / ( 2. * AB );
+		F74 = ( BP + AK - ( BK + AP ) ) / ( 2.0 * AB );
 		F89 = F12;
 		F810 = F16;
 		F811 = F51;
@@ -2471,7 +2474,7 @@ namespace WindowEquivalentLayer {
 		F912 = F74;
 		F913 = F73;
 		F914 = F27;
-		F1011 = ( BC + S - BK ) / ( 2. * BC );
+		F1011 = ( BC + S - BK ) / ( 2.0 * BC );
 		F1012 = F64;
 		F1013 = F63;
 		F1014 = F62;
@@ -2496,11 +2499,11 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - RHOBF_DD * F12;
-		A( 1, 3 ) = - RHOBF_DD * F13;
-		A( 1, 4 ) = - RHOBF_DD * F14;
-		A( 1, 5 ) = - RHOBF_DD * F16;
-		A( 1, 6 ) = - RHOBF_DD * F17;
+		A( 1, 2 ) = -RHOBF_DD * F12;
+		A( 1, 3 ) = -RHOBF_DD * F13;
+		A( 1, 4 ) = -RHOBF_DD * F14;
+		A( 1, 5 ) = -RHOBF_DD * F16;
+		A( 1, 6 ) = -RHOBF_DD * F17;
 		A( 1, 7 ) = 0.0;
 		A( 1, 8 ) = 0.0;
 		A( 1, 9 ) = 0.0;
@@ -2508,96 +2511,96 @@ namespace WindowEquivalentLayer {
 		A( 1, 11 ) = 0.0;
 		A( 1, 12 ) = 0.0;
 		A( 1, 13 ) = Z1_BD;
-		A( 2, 1 ) = - RHOBF_DD * F21;
+		A( 2, 1 ) = -RHOBF_DD * F21;
 		A( 2, 2 ) = 1.0;
 		A( 2, 3 ) = 0.0;
 		A( 2, 4 ) = 0.0;
-		A( 2, 5 ) = - RHOBF_DD * F26;
-		A( 2, 6 ) = - RHOBF_DD * F27;
-		A( 2, 7 ) = - TAUFF_DD * F149;
-		A( 2, 8 ) = - TAUFF_DD * F1410;
-		A( 2, 9 ) = - TAUFF_DD * F1411;
+		A( 2, 5 ) = -RHOBF_DD * F26;
+		A( 2, 6 ) = -RHOBF_DD * F27;
+		A( 2, 7 ) = -TAUFF_DD * F149;
+		A( 2, 8 ) = -TAUFF_DD * F1410;
+		A( 2, 9 ) = -TAUFF_DD * F1411;
 		A( 2, 10 ) = 0.0;
 		A( 2, 11 ) = 0.0;
 		A( 2, 12 ) = 0.0;
 		A( 2, 13 ) = Z2_BD;
-		A( 3, 1 ) = - RHOBF_DD * F31;
+		A( 3, 1 ) = -RHOBF_DD * F31;
 		A( 3, 2 ) = 0.0;
 		A( 3, 3 ) = 1.0;
 		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = - RHOBF_DD * F36;
-		A( 3, 6 ) = - RHOBF_DD * F37;
-		A( 3, 7 ) = - TAUFF_DD * F139;
-		A( 3, 8 ) = - TAUFF_DD * F1310;
-		A( 3, 9 ) = - TAUFF_DD * F1311;
+		A( 3, 5 ) = -RHOBF_DD * F36;
+		A( 3, 6 ) = -RHOBF_DD * F37;
+		A( 3, 7 ) = -TAUFF_DD * F139;
+		A( 3, 8 ) = -TAUFF_DD * F1310;
+		A( 3, 9 ) = -TAUFF_DD * F1311;
 		A( 3, 10 ) = 0.0;
 		A( 3, 11 ) = 0.0;
 		A( 3, 12 ) = 0.0;
 		A( 3, 13 ) = Z3_BD;
-		A( 4, 1 ) = - RHOBF_DD * F41;
+		A( 4, 1 ) = -RHOBF_DD * F41;
 		A( 4, 2 ) = 0.0;
 		A( 4, 3 ) = 0.0;
 		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = - RHOBF_DD * F46;
-		A( 4, 6 ) = - RHOBF_DD * F47;
-		A( 4, 7 ) = - TAUFF_DD * F129;
-		A( 4, 8 ) = - TAUFF_DD * F1210;
-		A( 4, 9 ) = - TAUFF_DD * F1211;
+		A( 4, 5 ) = -RHOBF_DD * F46;
+		A( 4, 6 ) = -RHOBF_DD * F47;
+		A( 4, 7 ) = -TAUFF_DD * F129;
+		A( 4, 8 ) = -TAUFF_DD * F1210;
+		A( 4, 9 ) = -TAUFF_DD * F1211;
 		A( 4, 10 ) = 0.0;
 		A( 4, 11 ) = 0.0;
 		A( 4, 12 ) = 0.0;
 		A( 4, 13 ) = 0.0;
-		A( 5, 1 ) = - RHOBF_DD * F61;
-		A( 5, 2 ) = - RHOBF_DD * F62;
-		A( 5, 3 ) = - RHOBF_DD * F63;
-		A( 5, 4 ) = - RHOBF_DD * F64;
+		A( 5, 1 ) = -RHOBF_DD * F61;
+		A( 5, 2 ) = -RHOBF_DD * F62;
+		A( 5, 3 ) = -RHOBF_DD * F63;
+		A( 5, 4 ) = -RHOBF_DD * F64;
 		A( 5, 5 ) = 1.0;
 		A( 5, 6 ) = 0.0;
 		A( 5, 7 ) = 0.0;
 		A( 5, 8 ) = 0.0;
-		A( 5, 9 ) = - TAUFF_DD * F1011;
-		A( 5, 10 ) = - TAUFF_DD * F1012;
-		A( 5, 11 ) = - TAUFF_DD * F1013;
-		A( 5, 12 ) = - TAUFF_DD * F1014;
+		A( 5, 9 ) = -TAUFF_DD * F1011;
+		A( 5, 10 ) = -TAUFF_DD * F1012;
+		A( 5, 11 ) = -TAUFF_DD * F1013;
+		A( 5, 12 ) = -TAUFF_DD * F1014;
 		A( 5, 13 ) = 0.0;
-		A( 6, 1 ) = - RHOBF_DD * F71;
-		A( 6, 2 ) = - RHOBF_DD * F72;
-		A( 6, 3 ) = - RHOBF_DD * F73;
-		A( 6, 4 ) = - RHOBF_DD * F74;
+		A( 6, 1 ) = -RHOBF_DD * F71;
+		A( 6, 2 ) = -RHOBF_DD * F72;
+		A( 6, 3 ) = -RHOBF_DD * F73;
+		A( 6, 4 ) = -RHOBF_DD * F74;
 		A( 6, 5 ) = 0.0;
 		A( 6, 6 ) = 1.0;
 		A( 6, 7 ) = 0.0;
 		A( 6, 8 ) = 0.0;
-		A( 6, 9 ) = - TAUFF_DD * F911;
-		A( 6, 10 ) = - TAUFF_DD * F912;
-		A( 6, 11 ) = - TAUFF_DD * F913;
-		A( 6, 12 ) = - TAUFF_DD * F914;
+		A( 6, 9 ) = -TAUFF_DD * F911;
+		A( 6, 10 ) = -TAUFF_DD * F912;
+		A( 6, 11 ) = -TAUFF_DD * F913;
+		A( 6, 12 ) = -TAUFF_DD * F914;
 		A( 6, 13 ) = Z7_BD;
-		A( 7, 1 ) = - TAUBF_DD * F71;
-		A( 7, 2 ) = - TAUBF_DD * F72;
-		A( 7, 3 ) = - TAUBF_DD * F73;
-		A( 7, 4 ) = - TAUBF_DD * F74;
+		A( 7, 1 ) = -TAUBF_DD * F71;
+		A( 7, 2 ) = -TAUBF_DD * F72;
+		A( 7, 3 ) = -TAUBF_DD * F73;
+		A( 7, 4 ) = -TAUBF_DD * F74;
 		A( 7, 5 ) = 0.0;
 		A( 7, 6 ) = 0.0;
 		A( 7, 7 ) = 1.0;
 		A( 7, 8 ) = 0.0;
-		A( 7, 9 ) = - RHOFF_DD * F911;
-		A( 7, 10 ) = - RHOFF_DD * F912;
-		A( 7, 11 ) = - RHOFF_DD * F913;
-		A( 7, 12 ) = - RHOFF_DD * F914;
+		A( 7, 9 ) = -RHOFF_DD * F911;
+		A( 7, 10 ) = -RHOFF_DD * F912;
+		A( 7, 11 ) = -RHOFF_DD * F913;
+		A( 7, 12 ) = -RHOFF_DD * F914;
 		A( 7, 13 ) = Z9_BD;
-		A( 8, 1 ) = - TAUBF_DD * F61;
-		A( 8, 2 ) = - TAUBF_DD * F62;
-		A( 8, 3 ) = - TAUBF_DD * F63;
-		A( 8, 4 ) = - TAUBF_DD * F64;
+		A( 8, 1 ) = -TAUBF_DD * F61;
+		A( 8, 2 ) = -TAUBF_DD * F62;
+		A( 8, 3 ) = -TAUBF_DD * F63;
+		A( 8, 4 ) = -TAUBF_DD * F64;
 		A( 8, 5 ) = 0.0;
 		A( 8, 6 ) = 0.0;
 		A( 8, 7 ) = 0.0;
 		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = - RHOFF_DD * F1011;
-		A( 8, 10 ) = - RHOFF_DD * F1012;
-		A( 8, 11 ) = - RHOFF_DD * F1013;
-		A( 8, 12 ) = - RHOFF_DD * F1014;
+		A( 8, 9 ) = -RHOFF_DD * F1011;
+		A( 8, 10 ) = -RHOFF_DD * F1012;
+		A( 8, 11 ) = -RHOFF_DD * F1013;
+		A( 8, 12 ) = -RHOFF_DD * F1014;
 		A( 8, 13 ) = 0.0;
 		A( 9, 1 ) = 0.0;
 		A( 9, 2 ) = 0.0;
@@ -2605,48 +2608,48 @@ namespace WindowEquivalentLayer {
 		A( 9, 4 ) = 0.0;
 		A( 9, 5 ) = 0.0;
 		A( 9, 6 ) = 0.0;
-		A( 9, 7 ) = - RHOFF_DD * F119;
-		A( 9, 8 ) = - RHOFF_DD * F1110;
+		A( 9, 7 ) = -RHOFF_DD * F119;
+		A( 9, 8 ) = -RHOFF_DD * F1110;
 		A( 9, 9 ) = 1.0;
-		A( 9, 10 ) = - RHOFF_DD * F1112;
-		A( 9, 11 ) = - RHOFF_DD * F1113;
-		A( 9, 12 ) = - RHOFF_DD * F1114;
+		A( 9, 10 ) = -RHOFF_DD * F1112;
+		A( 9, 11 ) = -RHOFF_DD * F1113;
+		A( 9, 12 ) = -RHOFF_DD * F1114;
 		A( 9, 13 ) = 0.0;
-		A( 10, 1 ) = - TAUBF_DD * F41;
+		A( 10, 1 ) = -TAUBF_DD * F41;
 		A( 10, 2 ) = 0.0;
 		A( 10, 3 ) = 0.0;
 		A( 10, 4 ) = 0.0;
-		A( 10, 5 ) = - TAUBF_DD * F46;
-		A( 10, 6 ) = - TAUBF_DD * F47;
-		A( 10, 7 ) = - RHOFF_DD * F129;
-		A( 10, 8 ) = - RHOFF_DD * F1210;
-		A( 10, 9 ) = - RHOFF_DD * F1211;
+		A( 10, 5 ) = -TAUBF_DD * F46;
+		A( 10, 6 ) = -TAUBF_DD * F47;
+		A( 10, 7 ) = -RHOFF_DD * F129;
+		A( 10, 8 ) = -RHOFF_DD * F1210;
+		A( 10, 9 ) = -RHOFF_DD * F1211;
 		A( 10, 10 ) = 1.0;
 		A( 10, 11 ) = 0.0;
 		A( 10, 12 ) = 0.0;
 		A( 10, 13 ) = 0.0;
-		A( 11, 1 ) = - TAUBF_DD * F31;
+		A( 11, 1 ) = -TAUBF_DD * F31;
 		A( 11, 2 ) = 0.0;
 		A( 11, 3 ) = 0.0;
 		A( 11, 4 ) = 0.0;
-		A( 11, 5 ) = - TAUBF_DD * F36;
-		A( 11, 6 ) = - TAUBF_DD * F37;
-		A( 11, 7 ) = - RHOFF_DD * F139;
-		A( 11, 8 ) = - RHOFF_DD * F1310;
-		A( 11, 9 ) = - RHOFF_DD * F1311;
+		A( 11, 5 ) = -TAUBF_DD * F36;
+		A( 11, 6 ) = -TAUBF_DD * F37;
+		A( 11, 7 ) = -RHOFF_DD * F139;
+		A( 11, 8 ) = -RHOFF_DD * F1310;
+		A( 11, 9 ) = -RHOFF_DD * F1311;
 		A( 11, 10 ) = 0.0;
 		A( 11, 11 ) = 1.0;
 		A( 11, 12 ) = 0.0;
 		A( 11, 13 ) = Z13_BD;
-		A( 12, 1 ) = - TAUBF_DD * F21;
+		A( 12, 1 ) = -TAUBF_DD * F21;
 		A( 12, 2 ) = 0.0;
 		A( 12, 3 ) = 0.0;
 		A( 12, 4 ) = 0.0;
-		A( 12, 5 ) = - TAUBF_DD * F26;
-		A( 12, 6 ) = - TAUBF_DD * F27;
-		A( 12, 7 ) = - RHOFF_DD * F149;
-		A( 12, 8 ) = - RHOFF_DD * F1410;
-		A( 12, 9 ) = - RHOFF_DD * F1411;
+		A( 12, 5 ) = -TAUBF_DD * F26;
+		A( 12, 6 ) = -TAUBF_DD * F27;
+		A( 12, 7 ) = -RHOFF_DD * F149;
+		A( 12, 8 ) = -RHOFF_DD * F1410;
+		A( 12, 9 ) = -RHOFF_DD * F1411;
 		A( 12, 10 ) = 0.0;
 		A( 12, 11 ) = 0.0;
 		A( 12, 12 ) = 1.0;
@@ -2673,8 +2676,8 @@ namespace WindowEquivalentLayer {
 		G11 = F1112 * J12 + F1113 * J13 + F1114 * J14 + F119 * J9 + F1110 * J10;
 
 		TAU_BB = 0.0;
-		TAU_BD = ( G5 + TAUFF_DD * G11 ) / 2.;
-		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G8 ) / 2.;
+		TAU_BD = ( G5 + TAUFF_DD * G11 ) / 2.0;
+		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G8 ) / 2.0;
 	}
 
 	void
@@ -2845,37 +2848,37 @@ namespace WindowEquivalentLayer {
 		Z11_BD = Z6_BB * TAUBF_BT_PERP;
 		Z12_BD = Z1_BB * TAUBF_BT_PERP * S / GN;
 
-		F12 = ( S + GN - AN ) / ( 2. * S );
-		F13 = ( W + AN - ( GN + AK ) ) / ( 2. * S );
-		F15 = ( W + BG - ( AB + CG ) ) / ( 2. * S );
-		F16 = ( S + AB - BG ) / ( 2. * S );
-		F21 = ( S + GN - AN ) / ( 2. * GN );
-		F25 = ( S + CG - ( BG + CN ) ) / ( 2. * GN );
-		F26 = ( AN + BG - 2. * S ) / ( 2. * GN );
-		F31 = ( W + AN - ( GN + AK ) ) / ( 2. * NK );
-		F35 = ( BK + CN - 2. * S ) / ( 2. * NK );
-		F36 = ( S + AK - ( AN + BK ) ) / ( 2. * NK );
-		F41 = ( AK + CG - 2. * W ) / ( 2. * S );
-		F42 = ( W + CN - ( CG + NK ) ) / ( 2. * S );
-		F43 = ( S + NK - CN ) / ( 2. * S );
-		F45 = ( S + BC - BK ) / ( 2. * S );
-		F46 = ( W + BK - ( AK + BC ) ) / ( 2. * S );
-		F51 = ( W + BG - ( AB + CG ) ) / ( 2. * BC );
-		F52 = ( S + CG - ( BG + CN ) ) / ( 2. * BC );
-		F53 = ( BK + CN - 2. * S ) / ( 2. * BC );
-		F54 = ( S + BC - BK ) / ( 2. * BC );
-		F61 = ( S + AB - BG ) / ( 2. * AB );
-		F62 = ( AN + BG - 2. * S ) / ( 2. * AB );
-		F63 = ( S + AK - ( AN + BK ) ) / ( 2. * AB );
+		F12 = ( S + GN - AN ) / ( 2.0 * S );
+		F13 = ( W + AN - ( GN + AK ) ) / ( 2.0 * S );
+		F15 = ( W + BG - ( AB + CG ) ) / ( 2.0 * S );
+		F16 = ( S + AB - BG ) / ( 2.0 * S );
+		F21 = ( S + GN - AN ) / ( 2.0 * GN );
+		F25 = ( S + CG - ( BG + CN ) ) / ( 2.0 * GN );
+		F26 = ( AN + BG - 2.0 * S ) / ( 2.0 * GN );
+		F31 = ( W + AN - ( GN + AK ) ) / ( 2.0 * NK );
+		F35 = ( BK + CN - 2.0 * S ) / ( 2.0 * NK );
+		F36 = ( S + AK - ( AN + BK ) ) / ( 2.0 * NK );
+		F41 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
+		F42 = ( W + CN - ( CG + NK ) ) / ( 2.0 * S );
+		F43 = ( S + NK - CN ) / ( 2.0 * S );
+		F45 = ( S + BC - BK ) / ( 2.0 * S );
+		F46 = ( W + BK - ( AK + BC ) ) / ( 2.0 * S );
+		F51 = ( W + BG - ( AB + CG ) ) / ( 2.0 * BC );
+		F52 = ( S + CG - ( BG + CN ) ) / ( 2.0 * BC );
+		F53 = ( BK + CN - 2.0 * S ) / ( 2.0 * BC );
+		F54 = ( S + BC - BK ) / ( 2.0 * BC );
+		F61 = ( S + AB - BG ) / ( 2.0 * AB );
+		F62 = ( AN + BG - 2.0 * S ) / ( 2.0 * AB );
+		F63 = ( S + AK - ( AN + BK ) ) / ( 2.0 * AB );
 		F78 = F12;
 		F79 = F13;
-		F710 = ( AK + CG - 2. * W ) / ( 2. * S );
+		F710 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
 		F711 = F15;
 		F712 = F16;
-		F810 = ( W + CN - ( CG + NK ) ) / ( 2. * S );
+		F810 = ( W + CN - ( CG + NK ) ) / ( 2.0 * S );
 		F811 = F25;
 		F812 = F26;
-		F910 = ( S + NK - CN ) / ( 2. * NK );
+		F910 = ( S + NK - CN ) / ( 2.0 * NK );
 		F911 = F35;
 		F912 = F36;
 		F108 = F42;
@@ -2884,10 +2887,10 @@ namespace WindowEquivalentLayer {
 		F1012 = F46;
 		F118 = F52;
 		F119 = F53;
-		F1110 = ( S + BC - BK ) / ( 2. * NK );
+		F1110 = ( S + BC - BK ) / ( 2.0 * NK );
 		F128 = F62;
 		F129 = F63;
-		F1210 = ( W + BK - ( AK + BC ) ) / ( 2. * GN );
+		F1210 = ( W + BK - ( AK + BC ) ) / ( 2.0 * GN );
 
 		A = 0.0; // INITIALIZE RADIOSITY MATRIX COEFFICIENTS
 		XSOL = 0.0; // INITIALIZE SOLUTION VECTOR COEFFICIENTS
@@ -2895,112 +2898,112 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - RHOBF_DD * F12;
-		A( 1, 3 ) = - RHOBF_DD * F13;
-		A( 1, 4 ) = - RHOBF_DD * F15;
-		A( 1, 5 ) = - RHOBF_DD * F16;
+		A( 1, 2 ) = -RHOBF_DD * F12;
+		A( 1, 3 ) = -RHOBF_DD * F13;
+		A( 1, 4 ) = -RHOBF_DD * F15;
+		A( 1, 5 ) = -RHOBF_DD * F16;
 		A( 1, 6 ) = 0.0;
 		A( 1, 7 ) = 0.0;
 		A( 1, 8 ) = 0.0;
 		A( 1, 9 ) = 0.0;
 		A( 1, 10 ) = 0.0;
 		A( 1, 11 ) = Z1_BD;
-		A( 2, 1 ) = - RHOBF_DD * F21;
+		A( 2, 1 ) = -RHOBF_DD * F21;
 		A( 2, 2 ) = 1.0;
 		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = - RHOBF_DD * F25;
-		A( 2, 5 ) = - RHOBF_DD * F26;
-		A( 2, 6 ) = - TAUFF_DD * F128;
-		A( 2, 7 ) = - TAUFF_DD * F129;
-		A( 2, 8 ) = - TAUFF_DD * F1210;
+		A( 2, 4 ) = -RHOBF_DD * F25;
+		A( 2, 5 ) = -RHOBF_DD * F26;
+		A( 2, 6 ) = -TAUFF_DD * F128;
+		A( 2, 7 ) = -TAUFF_DD * F129;
+		A( 2, 8 ) = -TAUFF_DD * F1210;
 		A( 2, 9 ) = 0.0;
 		A( 2, 10 ) = 0.0;
 		A( 2, 11 ) = Z2_BD;
-		A( 3, 1 ) = - RHOBF_DD * F31;
+		A( 3, 1 ) = -RHOBF_DD * F31;
 		A( 3, 2 ) = 0.0;
 		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = - RHOBF_DD * F35;
-		A( 3, 5 ) = - RHOBF_DD * F36;
-		A( 3, 6 ) = - TAUFF_DD * F118;
-		A( 3, 7 ) = - TAUFF_DD * F119;
-		A( 3, 8 ) = - TAUFF_DD * F1110;
+		A( 3, 4 ) = -RHOBF_DD * F35;
+		A( 3, 5 ) = -RHOBF_DD * F36;
+		A( 3, 6 ) = -TAUFF_DD * F118;
+		A( 3, 7 ) = -TAUFF_DD * F119;
+		A( 3, 8 ) = -TAUFF_DD * F1110;
 		A( 3, 9 ) = 0.0;
 		A( 3, 10 ) = 0.0;
 		A( 3, 11 ) = Z3_BD;
-		A( 4, 1 ) = - RHOBF_DD * F51;
-		A( 4, 2 ) = - RHOBF_DD * F52;
-		A( 4, 3 ) = - RHOBF_DD * F53;
+		A( 4, 1 ) = -RHOBF_DD * F51;
+		A( 4, 2 ) = -RHOBF_DD * F52;
+		A( 4, 3 ) = -RHOBF_DD * F53;
 		A( 4, 4 ) = 1.0;
 		A( 4, 5 ) = 0.0;
 		A( 4, 6 ) = 0.0;
 		A( 4, 7 ) = 0.0;
-		A( 4, 8 ) = - TAUFF_DD * F910;
-		A( 4, 9 ) = - TAUFF_DD * F911;
-		A( 4, 10 ) = - TAUFF_DD * F912;
+		A( 4, 8 ) = -TAUFF_DD * F910;
+		A( 4, 9 ) = -TAUFF_DD * F911;
+		A( 4, 10 ) = -TAUFF_DD * F912;
 		A( 4, 11 ) = 0.0;
-		A( 5, 1 ) = - RHOBF_DD * F61;
-		A( 5, 2 ) = - RHOBF_DD * F62;
-		A( 5, 3 ) = - RHOBF_DD * F63;
+		A( 5, 1 ) = -RHOBF_DD * F61;
+		A( 5, 2 ) = -RHOBF_DD * F62;
+		A( 5, 3 ) = -RHOBF_DD * F63;
 		A( 5, 4 ) = 0.0;
 		A( 5, 5 ) = 1.0;
 		A( 5, 6 ) = 0.0;
 		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = - TAUFF_DD * F810;
-		A( 5, 9 ) = - TAUFF_DD * F811;
-		A( 5, 10 ) = - TAUFF_DD * F812;
+		A( 5, 8 ) = -TAUFF_DD * F810;
+		A( 5, 9 ) = -TAUFF_DD * F811;
+		A( 5, 10 ) = -TAUFF_DD * F812;
 		A( 5, 11 ) = Z6_BD;
-		A( 6, 1 ) = - TAUBF_DD * F61;
-		A( 6, 2 ) = - TAUBF_DD * F62;
-		A( 6, 3 ) = - TAUBF_DD * F63;
+		A( 6, 1 ) = -TAUBF_DD * F61;
+		A( 6, 2 ) = -TAUBF_DD * F62;
+		A( 6, 3 ) = -TAUBF_DD * F63;
 		A( 6, 4 ) = 0.0;
 		A( 6, 5 ) = 0.0;
 		A( 6, 6 ) = 1.0;
 		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = - RHOFF_DD * F810;
-		A( 6, 9 ) = - RHOFF_DD * F811;
-		A( 6, 10 ) = - RHOFF_DD * F812;
+		A( 6, 8 ) = -RHOFF_DD * F810;
+		A( 6, 9 ) = -RHOFF_DD * F811;
+		A( 6, 10 ) = -RHOFF_DD * F812;
 		A( 6, 11 ) = Z8_BD;
-		A( 7, 1 ) = - TAUBF_DD * F51;
-		A( 7, 2 ) = - TAUBF_DD * F52;
-		A( 7, 3 ) = - TAUBF_DD * F53;
+		A( 7, 1 ) = -TAUBF_DD * F51;
+		A( 7, 2 ) = -TAUBF_DD * F52;
+		A( 7, 3 ) = -TAUBF_DD * F53;
 		A( 7, 4 ) = 0.0;
 		A( 7, 5 ) = 0.0;
 		A( 7, 6 ) = 0.0;
 		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = - RHOFF_DD * F910;
-		A( 7, 9 ) = - RHOFF_DD * F911;
-		A( 7, 10 ) = - RHOFF_DD * F912;
+		A( 7, 8 ) = -RHOFF_DD * F910;
+		A( 7, 9 ) = -RHOFF_DD * F911;
+		A( 7, 10 ) = -RHOFF_DD * F912;
 		A( 7, 11 ) = 0.0;
 		A( 8, 1 ) = 0.0;
 		A( 8, 2 ) = 0.0;
 		A( 8, 3 ) = 0.0;
 		A( 8, 4 ) = 0.0;
 		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = - RHOFF_DD * F108;
-		A( 8, 7 ) = - RHOFF_DD * F109;
+		A( 8, 6 ) = -RHOFF_DD * F108;
+		A( 8, 7 ) = -RHOFF_DD * F109;
 		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = - RHOFF_DD * F1011;
-		A( 8, 10 ) = - RHOFF_DD * F1012;
+		A( 8, 9 ) = -RHOFF_DD * F1011;
+		A( 8, 10 ) = -RHOFF_DD * F1012;
 		A( 8, 11 ) = 0.0;
-		A( 9, 1 ) = - TAUBF_DD * F31;
+		A( 9, 1 ) = -TAUBF_DD * F31;
 		A( 9, 2 ) = 0.0;
 		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = - TAUBF_DD * F35;
-		A( 9, 5 ) = - TAUBF_DD * F36;
-		A( 9, 6 ) = - RHOFF_DD * F118;
-		A( 9, 7 ) = - RHOFF_DD * F119;
-		A( 9, 8 ) = - RHOFF_DD * F1110;
+		A( 9, 4 ) = -TAUBF_DD * F35;
+		A( 9, 5 ) = -TAUBF_DD * F36;
+		A( 9, 6 ) = -RHOFF_DD * F118;
+		A( 9, 7 ) = -RHOFF_DD * F119;
+		A( 9, 8 ) = -RHOFF_DD * F1110;
 		A( 9, 9 ) = 1.0;
 		A( 9, 10 ) = 0.0;
 		A( 9, 11 ) = Z11_BD;
-		A( 10, 1 ) = - TAUBF_DD * F21;
+		A( 10, 1 ) = -TAUBF_DD * F21;
 		A( 10, 2 ) = 0.0;
 		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = - TAUBF_DD * F25;
-		A( 10, 5 ) = - TAUBF_DD * F26;
-		A( 10, 6 ) = - RHOFF_DD * F128;
-		A( 10, 7 ) = - RHOFF_DD * F129;
-		A( 10, 8 ) = - RHOFF_DD * F1210;
+		A( 10, 4 ) = -TAUBF_DD * F25;
+		A( 10, 5 ) = -TAUBF_DD * F26;
+		A( 10, 6 ) = -RHOFF_DD * F128;
+		A( 10, 7 ) = -RHOFF_DD * F129;
+		A( 10, 8 ) = -RHOFF_DD * F1210;
 		A( 10, 9 ) = 0.0;
 		A( 10, 10 ) = 1.0;
 		A( 10, 11 ) = Z12_BD;
@@ -3024,8 +3027,8 @@ namespace WindowEquivalentLayer {
 		G10 = F108 * J8 + F109 * J9 + F1011 * J11 + F1012 * J12;
 
 		TAU_BB = 0.0;
-		TAU_BD = ( G4 + TAUFF_DD * G10 ) / 2.;
-		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G7 ) / 2.;
+		TAU_BD = ( G4 + TAUFF_DD * G10 ) / 2.0;
+		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G7 ) / 2.0;
 	}
 
 	void
@@ -3196,37 +3199,37 @@ namespace WindowEquivalentLayer {
 		Z11_BD = Z6_BB * TAUBF_BT_PERP;
 		Z12_BD = Z1_BB * TAUBF_BT_PERP * S / GN;
 
-		F12 = ( S + GN - AN ) / ( 2. * S );
-		F13 = ( W + AN - ( GN + AK ) ) / ( 2. * S );
-		F15 = ( W + BG - ( AB + CG ) ) / ( 2. * S );
-		F16 = ( S + AB - BG ) / ( 2. * S );
-		F21 = ( S + GN - AN ) / ( 2. * GN );
-		F25 = ( S + CG - ( BG + CN ) ) / ( 2. * GN );
-		F26 = ( AN + BG - 2. * S ) / ( 2. * GN );
-		F31 = ( W + AN - ( GN + AK ) ) / ( 2. * NK );
-		F35 = ( BK + CN - 2. * S ) / ( 2. * NK );
-		F36 = ( S + AK - ( AN + BK ) ) / ( 2. * NK );
-		F41 = ( AK + CG - 2. * W ) / ( 2. * S );
-		F42 = ( W + CN - ( CG + NK ) ) / ( 2. * S );
-		F43 = ( S + NK - CN ) / ( 2. * S );
-		F45 = ( S + BC - BK ) / ( 2. * S );
-		F46 = ( W + BK - ( AK + BC ) ) / ( 2. * S );
-		F51 = ( W + BG - ( AB + CG ) ) / ( 2. * BC );
-		F52 = ( S + CG - ( BG + CN ) ) / ( 2. * BC );
-		F53 = ( BK + CN - 2. * S ) / ( 2. * BC );
-		F54 = ( S + BC - BK ) / ( 2. * BC );
-		F61 = ( S + AB - BG ) / ( 2. * AB );
-		F62 = ( AN + BG - 2. * S ) / ( 2. * AB );
-		F63 = ( S + AK - ( AN + BK ) ) / ( 2. * AB );
+		F12 = ( S + GN - AN ) / ( 2.0 * S );
+		F13 = ( W + AN - ( GN + AK ) ) / ( 2.0 * S );
+		F15 = ( W + BG - ( AB + CG ) ) / ( 2.0 * S );
+		F16 = ( S + AB - BG ) / ( 2.0 * S );
+		F21 = ( S + GN - AN ) / ( 2.0 * GN );
+		F25 = ( S + CG - ( BG + CN ) ) / ( 2.0 * GN );
+		F26 = ( AN + BG - 2.0 * S ) / ( 2.0 * GN );
+		F31 = ( W + AN - ( GN + AK ) ) / ( 2.0 * NK );
+		F35 = ( BK + CN - 2.0 * S ) / ( 2.0 * NK );
+		F36 = ( S + AK - ( AN + BK ) ) / ( 2.0 * NK );
+		F41 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
+		F42 = ( W + CN - ( CG + NK ) ) / ( 2.0 * S );
+		F43 = ( S + NK - CN ) / ( 2.0 * S );
+		F45 = ( S + BC - BK ) / ( 2.0 * S );
+		F46 = ( W + BK - ( AK + BC ) ) / ( 2.0 * S );
+		F51 = ( W + BG - ( AB + CG ) ) / ( 2.0 * BC );
+		F52 = ( S + CG - ( BG + CN ) ) / ( 2.0 * BC );
+		F53 = ( BK + CN - 2.0 * S ) / ( 2.0 * BC );
+		F54 = ( S + BC - BK ) / ( 2.0 * BC );
+		F61 = ( S + AB - BG ) / ( 2.0 * AB );
+		F62 = ( AN + BG - 2.0 * S ) / ( 2.0 * AB );
+		F63 = ( S + AK - ( AN + BK ) ) / ( 2.0 * AB );
 		F78 = F12;
 		F79 = F13;
-		F710 = ( AK + CG - 2. * W ) / ( 2. * S );
+		F710 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
 		F711 = F15;
 		F712 = F16;
-		F810 = ( W + CN - ( CG + NK ) ) / ( 2. * S );
+		F810 = ( W + CN - ( CG + NK ) ) / ( 2.0 * S );
 		F811 = F25;
 		F812 = F26;
-		F910 = ( S + NK - CN ) / ( 2. * NK );
+		F910 = ( S + NK - CN ) / ( 2.0 * NK );
 		F911 = F35;
 		F912 = F36;
 		F108 = F42;
@@ -3235,10 +3238,10 @@ namespace WindowEquivalentLayer {
 		F1012 = F46;
 		F118 = F52;
 		F119 = F53;
-		F1110 = ( S + BC - BK ) / ( 2. * NK );
+		F1110 = ( S + BC - BK ) / ( 2.0 * NK );
 		F128 = F62;
 		F129 = F63;
-		F1210 = ( W + BK - ( AK + BC ) ) / ( 2. * GN );
+		F1210 = ( W + BK - ( AK + BC ) ) / ( 2.0 * GN );
 
 		A = 0.0; // INITIALIZE RADIOSITY MATRIX COEFFICIENTS
 		XSOL = 0.0; // INITIALIZE SOLUTION VECTOR COEFFICIENTS
@@ -3246,112 +3249,112 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - RHOBF_DD * F12;
-		A( 1, 3 ) = - RHOBF_DD * F13;
-		A( 1, 4 ) = - RHOBF_DD * F15;
-		A( 1, 5 ) = - RHOBF_DD * F16;
+		A( 1, 2 ) = -RHOBF_DD * F12;
+		A( 1, 3 ) = -RHOBF_DD * F13;
+		A( 1, 4 ) = -RHOBF_DD * F15;
+		A( 1, 5 ) = -RHOBF_DD * F16;
 		A( 1, 6 ) = 0.0;
 		A( 1, 7 ) = 0.0;
 		A( 1, 8 ) = 0.0;
 		A( 1, 9 ) = 0.0;
 		A( 1, 10 ) = 0.0;
 		A( 1, 11 ) = Z1_BD;
-		A( 2, 1 ) = - RHOBF_DD * F21;
+		A( 2, 1 ) = -RHOBF_DD * F21;
 		A( 2, 2 ) = 1.0;
 		A( 2, 3 ) = 0.0;
-		A( 2, 4 ) = - RHOBF_DD * F25;
-		A( 2, 5 ) = - RHOBF_DD * F26;
-		A( 2, 6 ) = - TAUFF_DD * F128;
-		A( 2, 7 ) = - TAUFF_DD * F129;
-		A( 2, 8 ) = - TAUFF_DD * F1210;
+		A( 2, 4 ) = -RHOBF_DD * F25;
+		A( 2, 5 ) = -RHOBF_DD * F26;
+		A( 2, 6 ) = -TAUFF_DD * F128;
+		A( 2, 7 ) = -TAUFF_DD * F129;
+		A( 2, 8 ) = -TAUFF_DD * F1210;
 		A( 2, 9 ) = 0.0;
 		A( 2, 10 ) = 0.0;
 		A( 2, 11 ) = Z2_BD;
-		A( 3, 1 ) = - RHOBF_DD * F31;
+		A( 3, 1 ) = -RHOBF_DD * F31;
 		A( 3, 2 ) = 0.0;
 		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = - RHOBF_DD * F35;
-		A( 3, 5 ) = - RHOBF_DD * F36;
-		A( 3, 6 ) = - TAUFF_DD * F118;
-		A( 3, 7 ) = - TAUFF_DD * F119;
-		A( 3, 8 ) = - TAUFF_DD * F1110;
+		A( 3, 4 ) = -RHOBF_DD * F35;
+		A( 3, 5 ) = -RHOBF_DD * F36;
+		A( 3, 6 ) = -TAUFF_DD * F118;
+		A( 3, 7 ) = -TAUFF_DD * F119;
+		A( 3, 8 ) = -TAUFF_DD * F1110;
 		A( 3, 9 ) = 0.0;
 		A( 3, 10 ) = 0.0;
 		A( 3, 11 ) = Z3_BD;
-		A( 4, 1 ) = - RHOBF_DD * F51;
-		A( 4, 2 ) = - RHOBF_DD * F52;
-		A( 4, 3 ) = - RHOBF_DD * F53;
+		A( 4, 1 ) = -RHOBF_DD * F51;
+		A( 4, 2 ) = -RHOBF_DD * F52;
+		A( 4, 3 ) = -RHOBF_DD * F53;
 		A( 4, 4 ) = 1.0;
 		A( 4, 5 ) = 0.0;
 		A( 4, 6 ) = 0.0;
 		A( 4, 7 ) = 0.0;
-		A( 4, 8 ) = - TAUFF_DD * F910;
-		A( 4, 9 ) = - TAUFF_DD * F911;
-		A( 4, 10 ) = - TAUFF_DD * F912;
+		A( 4, 8 ) = -TAUFF_DD * F910;
+		A( 4, 9 ) = -TAUFF_DD * F911;
+		A( 4, 10 ) = -TAUFF_DD * F912;
 		A( 4, 11 ) = 0.0;
-		A( 5, 1 ) = - RHOBF_DD * F61;
-		A( 5, 2 ) = - RHOBF_DD * F62;
-		A( 5, 3 ) = - RHOBF_DD * F63;
+		A( 5, 1 ) = -RHOBF_DD * F61;
+		A( 5, 2 ) = -RHOBF_DD * F62;
+		A( 5, 3 ) = -RHOBF_DD * F63;
 		A( 5, 4 ) = 0.0;
 		A( 5, 5 ) = 1.0;
 		A( 5, 6 ) = 0.0;
 		A( 5, 7 ) = 0.0;
-		A( 5, 8 ) = - TAUFF_DD * F810;
-		A( 5, 9 ) = - TAUFF_DD * F811;
-		A( 5, 10 ) = - TAUFF_DD * F812;
+		A( 5, 8 ) = -TAUFF_DD * F810;
+		A( 5, 9 ) = -TAUFF_DD * F811;
+		A( 5, 10 ) = -TAUFF_DD * F812;
 		A( 5, 11 ) = Z6_BD;
-		A( 6, 1 ) = - TAUBF_DD * F61;
-		A( 6, 2 ) = - TAUBF_DD * F62;
-		A( 6, 3 ) = - TAUBF_DD * F63;
+		A( 6, 1 ) = -TAUBF_DD * F61;
+		A( 6, 2 ) = -TAUBF_DD * F62;
+		A( 6, 3 ) = -TAUBF_DD * F63;
 		A( 6, 4 ) = 0.0;
 		A( 6, 5 ) = 0.0;
 		A( 6, 6 ) = 1.0;
 		A( 6, 7 ) = 0.0;
-		A( 6, 8 ) = - RHOFF_DD * F810;
-		A( 6, 9 ) = - RHOFF_DD * F811;
-		A( 6, 10 ) = - RHOFF_DD * F812;
+		A( 6, 8 ) = -RHOFF_DD * F810;
+		A( 6, 9 ) = -RHOFF_DD * F811;
+		A( 6, 10 ) = -RHOFF_DD * F812;
 		A( 6, 11 ) = Z8_BD;
-		A( 7, 1 ) = - TAUBF_DD * F51;
-		A( 7, 2 ) = - TAUBF_DD * F52;
-		A( 7, 3 ) = - TAUBF_DD * F53;
+		A( 7, 1 ) = -TAUBF_DD * F51;
+		A( 7, 2 ) = -TAUBF_DD * F52;
+		A( 7, 3 ) = -TAUBF_DD * F53;
 		A( 7, 4 ) = 0.0;
 		A( 7, 5 ) = 0.0;
 		A( 7, 6 ) = 0.0;
 		A( 7, 7 ) = 1.0;
-		A( 7, 8 ) = - RHOFF_DD * F910;
-		A( 7, 9 ) = - RHOFF_DD * F911;
-		A( 7, 10 ) = - RHOFF_DD * F912;
+		A( 7, 8 ) = -RHOFF_DD * F910;
+		A( 7, 9 ) = -RHOFF_DD * F911;
+		A( 7, 10 ) = -RHOFF_DD * F912;
 		A( 7, 11 ) = 0.0;
 		A( 8, 1 ) = 0.0;
 		A( 8, 2 ) = 0.0;
 		A( 8, 3 ) = 0.0;
 		A( 8, 4 ) = 0.0;
 		A( 8, 5 ) = 0.0;
-		A( 8, 6 ) = - RHOFF_DD * F108;
-		A( 8, 7 ) = - RHOFF_DD * F109;
+		A( 8, 6 ) = -RHOFF_DD * F108;
+		A( 8, 7 ) = -RHOFF_DD * F109;
 		A( 8, 8 ) = 1.0;
-		A( 8, 9 ) = - RHOFF_DD * F1011;
-		A( 8, 10 ) = - RHOFF_DD * F1012;
+		A( 8, 9 ) = -RHOFF_DD * F1011;
+		A( 8, 10 ) = -RHOFF_DD * F1012;
 		A( 8, 11 ) = 0.0;
-		A( 9, 1 ) = - TAUBF_DD * F31;
+		A( 9, 1 ) = -TAUBF_DD * F31;
 		A( 9, 2 ) = 0.0;
 		A( 9, 3 ) = 0.0;
-		A( 9, 4 ) = - TAUBF_DD * F35;
-		A( 9, 5 ) = - TAUBF_DD * F36;
-		A( 9, 6 ) = - RHOFF_DD * F118;
-		A( 9, 7 ) = - RHOFF_DD * F119;
-		A( 9, 8 ) = - RHOFF_DD * F1110;
+		A( 9, 4 ) = -TAUBF_DD * F35;
+		A( 9, 5 ) = -TAUBF_DD * F36;
+		A( 9, 6 ) = -RHOFF_DD * F118;
+		A( 9, 7 ) = -RHOFF_DD * F119;
+		A( 9, 8 ) = -RHOFF_DD * F1110;
 		A( 9, 9 ) = 1.0;
 		A( 9, 10 ) = 0.0;
 		A( 9, 11 ) = Z11_BD;
-		A( 10, 1 ) = - TAUBF_DD * F21;
+		A( 10, 1 ) = -TAUBF_DD * F21;
 		A( 10, 2 ) = 0.0;
 		A( 10, 3 ) = 0.0;
-		A( 10, 4 ) = - TAUBF_DD * F25;
-		A( 10, 5 ) = - TAUBF_DD * F26;
-		A( 10, 6 ) = - RHOFF_DD * F128;
-		A( 10, 7 ) = - RHOFF_DD * F129;
-		A( 10, 8 ) = - RHOFF_DD * F1210;
+		A( 10, 4 ) = -TAUBF_DD * F25;
+		A( 10, 5 ) = -TAUBF_DD * F26;
+		A( 10, 6 ) = -RHOFF_DD * F128;
+		A( 10, 7 ) = -RHOFF_DD * F129;
+		A( 10, 8 ) = -RHOFF_DD * F1210;
 		A( 10, 9 ) = 0.0;
 		A( 10, 10 ) = 1.0;
 		A( 10, 11 ) = Z12_BD;
@@ -3374,9 +3377,9 @@ namespace WindowEquivalentLayer {
 		G7 = F78 * J8 + F79 * J9 + F710 * J10 + F711 * J11 + F712 * J12;
 		G10 = F108 * J8 + F109 * J9 + F1011 * J11 + F1012 * J12;
 
-		TAU_BB = ( TAUFF_BB_PERP * ( AB - NK ) * std::abs( std::sin( OMEGA_H ) ) ) / ( 2. * S * std::abs( std::cos( OMEGA_H ) ) );
-		TAU_BD = ( G4 + TAUFF_DD * G10 ) / 2.;
-		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G7 ) / 2.;
+		TAU_BB = ( TAUFF_BB_PERP * ( AB - NK ) * std::abs( std::sin( OMEGA_H ) ) ) / ( 2.0 * S * std::abs( std::cos( OMEGA_H ) ) );
+		TAU_BD = ( G4 + TAUFF_DD * G10 ) / 2.0;
+		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G7 ) / 2.0;
 	}
 
 	void
@@ -3493,11 +3496,11 @@ namespace WindowEquivalentLayer {
 		Z6_BD = RHOFF_BT_PERP * S / W;
 		Z8_BD = Z1_BB * TAUBF_BT_PERP * S / W;
 
-		F12 = ( S + W - AK ) / ( 2. * S );
-		F14 = ( S + W - CG ) / ( 2. * S );
-		F21 = ( S + W - AK ) / ( 2. * W );
-		F24 = ( AK + CG - 2. * S ) / ( 2. * W );
-		F31 = ( AK + CG - 2. * W ) / ( 2. * S );
+		F12 = ( S + W - AK ) / ( 2.0 * S );
+		F14 = ( S + W - CG ) / ( 2.0 * S );
+		F21 = ( S + W - AK ) / ( 2.0 * W );
+		F24 = ( AK + CG - 2.0 * S ) / ( 2.0 * W );
+		F31 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
 		F32 = F12;
 		F34 = F12;
 		F41 = F21;
@@ -3518,45 +3521,45 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - RHOBF_DD * F12;
-		A( 1, 3 ) = - RHOBF_DD * F14;
+		A( 1, 2 ) = -RHOBF_DD * F12;
+		A( 1, 3 ) = -RHOBF_DD * F14;
 		A( 1, 4 ) = 0.0;
 		A( 1, 5 ) = 0.0;
 		A( 1, 6 ) = 0.0;
 		A( 1, 7 ) = Z1_BD;
-		A( 2, 1 ) = - RHOBF_DD * F21;
+		A( 2, 1 ) = -RHOBF_DD * F21;
 		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = - RHOBF_DD * F24;
-		A( 2, 4 ) = - TAUFF_DD * F86;
-		A( 2, 5 ) = - TAUFF_DD * F87;
+		A( 2, 3 ) = -RHOBF_DD * F24;
+		A( 2, 4 ) = -TAUFF_DD * F86;
+		A( 2, 5 ) = -TAUFF_DD * F87;
 		A( 2, 6 ) = 0.0;
 		A( 2, 7 ) = Z2_BD;
-		A( 3, 1 ) = - RHOBF_DD * F41;
-		A( 3, 2 ) = - RHOBF_DD * F42;
+		A( 3, 1 ) = -RHOBF_DD * F41;
+		A( 3, 2 ) = -RHOBF_DD * F42;
 		A( 3, 3 ) = 1.0;
 		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = - TAUFF_DD * F67;
-		A( 3, 6 ) = - TAUFF_DD * F68;
+		A( 3, 5 ) = -TAUFF_DD * F67;
+		A( 3, 6 ) = -TAUFF_DD * F68;
 		A( 3, 7 ) = Z4_BD;
-		A( 4, 1 ) = - TAUBF_DD * F41;
-		A( 4, 2 ) = - TAUBF_DD * F42;
+		A( 4, 1 ) = -TAUBF_DD * F41;
+		A( 4, 2 ) = -TAUBF_DD * F42;
 		A( 4, 3 ) = 0.0;
 		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = - RHOFF_DD * F67;
-		A( 4, 6 ) = - RHOFF_DD * F68;
+		A( 4, 5 ) = -RHOFF_DD * F67;
+		A( 4, 6 ) = -RHOFF_DD * F68;
 		A( 4, 7 ) = Z6_BD;
 		A( 5, 1 ) = 0.0;
 		A( 5, 2 ) = 0.0;
 		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = - RHOFF_DD * F76;
+		A( 5, 4 ) = -RHOFF_DD * F76;
 		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = - RHOFF_DD * F78;
+		A( 5, 6 ) = -RHOFF_DD * F78;
 		A( 5, 7 ) = 0.0;
-		A( 6, 1 ) = - TAUBF_DD * F21;
+		A( 6, 1 ) = -TAUBF_DD * F21;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = - TAUBF_DD * F24;
-		A( 6, 4 ) = - RHOFF_DD * F86;
-		A( 6, 5 ) = - RHOFF_DD * F87;
+		A( 6, 3 ) = -TAUBF_DD * F24;
+		A( 6, 4 ) = -RHOFF_DD * F86;
+		A( 6, 5 ) = -RHOFF_DD * F87;
 		A( 6, 6 ) = 1.0;
 		A( 6, 7 ) = Z8_BD;
 
@@ -3574,9 +3577,9 @@ namespace WindowEquivalentLayer {
 		G5 = F56 * J6 + F57 * J7 + F58 * J8;
 		G7 = F76 * J6 + F78 * J8;
 
-		TAU_BB = TAUFF_BB_PERP / 2.;
-		TAU_BD = ( G3 + TAUFF_DD * G7 ) / 2.;
-		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G5 ) / 2.;
+		TAU_BB = TAUFF_BB_PERP / 2.0;
+		TAU_BD = ( G3 + TAUFF_DD * G7 ) / 2.0;
+		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G5 ) / 2.0;
 	}
 
 	void
@@ -3701,7 +3704,9 @@ namespace WindowEquivalentLayer {
 
 		AK = std::sqrt( W * W + S * S );
 		CG = AK;
-		MK = ( W * std::abs( std::sin( OMEGA_H ) ) ) / std::abs( std::cos( OMEGA_H ) );
+		Real64 const cos_OMEGA_H( std::abs( std::cos( OMEGA_H ) ) );
+		Real64 const sin_OMEGA_H( std::abs( std::sin( OMEGA_H ) ) );
+		MK = ( W * sin_OMEGA_H ) / cos_OMEGA_H;
 		DK = AK;
 		MF = S - MK;
 		DM = std::sqrt( W * W + MF * MF );
@@ -3716,29 +3721,29 @@ namespace WindowEquivalentLayer {
 		Z7_BD = RHOFF_BT_PARL;
 		Z9_BD = Z1_BB * TAUBF_BT_PERP * S / DE;
 
-		F12 = ( S + W - AK ) / ( 2. * S );
-		F14 = ( S + W - CG ) / ( 2. * S );
-		F21 = ( S + W - AK ) / ( 2. * W );
-		F24 = ( AK + CG - 2. * S ) / ( 2. * W );
-		F31 = ( AK + CG - 2. * W ) / ( 2. * S );
+		F12 = ( S + W - AK ) / ( 2.0 * S );
+		F14 = ( S + W - CG ) / ( 2.0 * S );
+		F21 = ( S + W - AK ) / ( 2.0 * W );
+		F24 = ( AK + CG - 2.0 * S ) / ( 2.0 * W );
+		F31 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
 		F32 = F14;
 		F34 = F12;
 		F41 = F21;
 		F42 = F24;
 		F56 = F12;
-		F57 = ( DM + GF - ( GM + W ) ) / ( 2. * S );
-		F58 = ( DK + GM - ( DM + W ) ) / ( 2. * S );
+		F57 = ( DM + GF - ( GM + W ) ) / ( 2.0 * S );
+		F58 = ( DK + GM - ( DM + W ) ) / ( 2.0 * S );
 		F59 = F14;
-		F67 = ( W + MF - DM ) / ( 2. * W );
-		F68 = ( DM + S - ( DK + MF ) ) / ( 2. * W );
+		F67 = ( W + MF - DM ) / ( 2.0 * W );
+		F68 = ( DM + S - ( DK + MF ) ) / ( 2.0 * W );
 		F69 = F24;
-		F76 = ( W + MF - DM ) / ( 2. * MF );
-		F79 = ( GM + S - ( GF + MK ) ) / ( 2. * MF );
-		F86 = ( DM + S - ( DK + MF ) ) / ( 2. * MK );
-		F89 = ( W + MK - GM ) / ( 2. * MK );
+		F76 = ( W + MF - DM ) / ( 2.0 * MF );
+		F79 = ( GM + S - ( GF + MK ) ) / ( 2.0 * MF );
+		F86 = ( DM + S - ( DK + MF ) ) / ( 2.0 * MK );
+		F89 = ( W + MK - GM ) / ( 2.0 * MK );
 		F96 = F42;
-		F97 = ( GM + S - ( GF + MK ) ) / ( 2. * W );
-		F98 = ( W + MK - GM ) / ( 2. * W );
+		F97 = ( GM + S - ( GF + MK ) ) / ( 2.0 * W );
+		F98 = ( W + MK - GM ) / ( 2.0 * W );
 
 		A = 0.0; // INITIALIZE RADIOSITY MATRIX COEFFICIENTS
 		XSOL = 0.0; // INITIALIZE SOLUTION VECTOR COEFFICIENTS
@@ -3746,59 +3751,59 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - RHOBF_DD * F12;
-		A( 1, 3 ) = - RHOBF_DD * F14;
+		A( 1, 2 ) = -RHOBF_DD * F12;
+		A( 1, 3 ) = -RHOBF_DD * F14;
 		A( 1, 4 ) = 0.0;
 		A( 1, 5 ) = 0.0;
 		A( 1, 6 ) = 0.0;
 		A( 1, 7 ) = 0.0;
 		A( 1, 8 ) = Z1_BD;
-		A( 2, 1 ) = - RHOBF_DD * F21;
+		A( 2, 1 ) = -RHOBF_DD * F21;
 		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = - RHOBF_DD * F24;
-		A( 2, 4 ) = - TAUFF_DD * F96;
-		A( 2, 5 ) = - TAUFF_DD * F97;
-		A( 2, 6 ) = - TAUFF_DD * F98;
+		A( 2, 3 ) = -RHOBF_DD * F24;
+		A( 2, 4 ) = -TAUFF_DD * F96;
+		A( 2, 5 ) = -TAUFF_DD * F97;
+		A( 2, 6 ) = -TAUFF_DD * F98;
 		A( 2, 7 ) = 0.0;
 		A( 2, 8 ) = Z2_BD;
-		A( 3, 1 ) = - RHOBF_DD * F41;
-		A( 3, 2 ) = - RHOBF_DD * F42;
+		A( 3, 1 ) = -RHOBF_DD * F41;
+		A( 3, 2 ) = -RHOBF_DD * F42;
 		A( 3, 3 ) = 1.0;
 		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = - TAUFF_DD * F67;
-		A( 3, 6 ) = - TAUFF_DD * F68;
-		A( 3, 7 ) = - TAUFF_DD * F69;
+		A( 3, 5 ) = -TAUFF_DD * F67;
+		A( 3, 6 ) = -TAUFF_DD * F68;
+		A( 3, 7 ) = -TAUFF_DD * F69;
 		A( 3, 8 ) = Z4_BD;
-		A( 4, 1 ) = - TAUBF_DD * F41;
-		A( 4, 2 ) = - TAUBF_DD * F42;
+		A( 4, 1 ) = -TAUBF_DD * F41;
+		A( 4, 2 ) = -TAUBF_DD * F42;
 		A( 4, 3 ) = 0.0;
 		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = - RHOFF_DD * F67;
-		A( 4, 6 ) = - RHOFF_DD * F68;
-		A( 4, 7 ) = - RHOFF_DD * F69;
+		A( 4, 5 ) = -RHOFF_DD * F67;
+		A( 4, 6 ) = -RHOFF_DD * F68;
+		A( 4, 7 ) = -RHOFF_DD * F69;
 		A( 4, 8 ) = Z6_BD;
 		A( 5, 1 ) = 0.0;
 		A( 5, 2 ) = 0.0;
 		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = - RHOFF_DD * F76;
+		A( 5, 4 ) = -RHOFF_DD * F76;
 		A( 5, 5 ) = 1.0;
 		A( 5, 6 ) = 0.0;
-		A( 5, 7 ) = - RHOFF_DD * F79;
+		A( 5, 7 ) = -RHOFF_DD * F79;
 		A( 5, 8 ) = Z7_BD;
 		A( 6, 1 ) = 0.0;
 		A( 6, 2 ) = 0.0;
 		A( 6, 3 ) = 0.0;
-		A( 6, 4 ) = - RHOFF_DD * F86;
+		A( 6, 4 ) = -RHOFF_DD * F86;
 		A( 6, 5 ) = 0.0;
 		A( 6, 6 ) = 1.0;
-		A( 6, 7 ) = - RHOFF_DD * F89;
+		A( 6, 7 ) = -RHOFF_DD * F89;
 		A( 6, 8 ) = 0.0;
-		A( 7, 1 ) = - TAUBF_DD * F21;
+		A( 7, 1 ) = -TAUBF_DD * F21;
 		A( 7, 2 ) = 0.0;
-		A( 7, 3 ) = - TAUBF_DD * F24;
-		A( 7, 4 ) = - RHOFF_DD * F96;
-		A( 7, 5 ) = - RHOFF_DD * F97;
-		A( 7, 6 ) = - RHOFF_DD * F98;
+		A( 7, 3 ) = -TAUBF_DD * F24;
+		A( 7, 4 ) = -RHOFF_DD * F96;
+		A( 7, 5 ) = -RHOFF_DD * F97;
+		A( 7, 6 ) = -RHOFF_DD * F98;
 		A( 7, 7 ) = 1.0;
 		A( 7, 8 ) = Z9_BD;
 
@@ -3818,9 +3823,9 @@ namespace WindowEquivalentLayer {
 		G7 = F76 * J6 + F79 * J9;
 		G8 = F86 * J6 + F89 * J9;
 
-		TAU_BB = ( 2. * ( DE - W ) * std::abs( std::sin( OMEGA_H ) ) * TAUFF_BB_PARL + ( S * std::abs( std::cos( OMEGA_H ) ) - ( DE - W ) * std::abs( std::sin( OMEGA_H ) ) ) * TAUFF_BB_PERP ) / ( 2. * S * std::abs( std::cos( OMEGA_H ) ) );
-		TAU_BD = ( S * G3 + TAUFF_DD * ( MK * G8 + MF * G7 ) + MF * TAUFF_BD_PARL ) / ( 2. * S );
-		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G5 ) / 2.;
+		TAU_BB = ( 2.0 * ( DE - W ) * sin_OMEGA_H * TAUFF_BB_PARL + ( S * cos_OMEGA_H - ( DE - W ) * sin_OMEGA_H ) * TAUFF_BB_PERP ) / ( 2.0 * S * cos_OMEGA_H );
+		TAU_BD = ( S * G3 + TAUFF_DD * ( MK * G8 + MF * G7 ) + MF * TAUFF_BD_PARL ) / ( 2.0 * S );
+		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G5 ) / 2.0;
 	}
 
 	void
@@ -3927,11 +3932,11 @@ namespace WindowEquivalentLayer {
 		Z1_BD = TAUFF_BD_PARL;
 		Z7_BD = RHOFF_BT_PARL;
 
-		F12 = ( S + W - AK ) / ( 2. * S );
-		F14 = ( S + W - CG ) / ( 2. * S );
-		F21 = ( S + W - AK ) / ( 2. * W );
-		F24 = ( AK + CG - 2. * S ) / ( 2. * W );
-		F31 = ( AK + CG - 2. * W ) / ( 2. * S );
+		F12 = ( S + W - AK ) / ( 2.0 * S );
+		F14 = ( S + W - CG ) / ( 2.0 * S );
+		F21 = ( S + W - AK ) / ( 2.0 * W );
+		F24 = ( AK + CG - 2.0 * S ) / ( 2.0 * W );
+		F31 = ( AK + CG - 2.0 * W ) / ( 2.0 * S );
 		F32 = F12;
 		F34 = F14;
 		F41 = F21;
@@ -3952,45 +3957,45 @@ namespace WindowEquivalentLayer {
 		// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - RHOBF_DD * F12;
-		A( 1, 3 ) = - RHOBF_DD * F14;
+		A( 1, 2 ) = -RHOBF_DD * F12;
+		A( 1, 3 ) = -RHOBF_DD * F14;
 		A( 1, 4 ) = 0.0;
 		A( 1, 5 ) = 0.0;
 		A( 1, 6 ) = 0.0;
 		A( 1, 7 ) = Z1_BD;
-		A( 2, 1 ) = - RHOBF_DD * F21;
+		A( 2, 1 ) = -RHOBF_DD * F21;
 		A( 2, 2 ) = 1.0;
-		A( 2, 3 ) = - RHOBF_DD * F24;
-		A( 2, 4 ) = - TAUFF_DD * F86;
-		A( 2, 5 ) = - TAUFF_DD * F87;
+		A( 2, 3 ) = -RHOBF_DD * F24;
+		A( 2, 4 ) = -TAUFF_DD * F86;
+		A( 2, 5 ) = -TAUFF_DD * F87;
 		A( 2, 6 ) = 0.0;
 		A( 2, 7 ) = 0.0;
-		A( 3, 1 ) = - RHOBF_DD * F41;
-		A( 3, 2 ) = - RHOBF_DD * F42;
+		A( 3, 1 ) = -RHOBF_DD * F41;
+		A( 3, 2 ) = -RHOBF_DD * F42;
 		A( 3, 3 ) = 1.0;
 		A( 3, 4 ) = 0.0;
-		A( 3, 5 ) = - TAUFF_DD * F67;
-		A( 3, 6 ) = - TAUFF_DD * F68;
+		A( 3, 5 ) = -TAUFF_DD * F67;
+		A( 3, 6 ) = -TAUFF_DD * F68;
 		A( 3, 7 ) = 0.0;
-		A( 4, 1 ) = - TAUBF_DD * F41;
-		A( 4, 2 ) = - TAUBF_DD * F42;
+		A( 4, 1 ) = -TAUBF_DD * F41;
+		A( 4, 2 ) = -TAUBF_DD * F42;
 		A( 4, 3 ) = 0.0;
 		A( 4, 4 ) = 1.0;
-		A( 4, 5 ) = - RHOFF_DD * F67;
-		A( 4, 6 ) = - RHOFF_DD * F68;
+		A( 4, 5 ) = -RHOFF_DD * F67;
+		A( 4, 6 ) = -RHOFF_DD * F68;
 		A( 4, 7 ) = 0.0;
 		A( 5, 1 ) = 0.0;
 		A( 5, 2 ) = 0.0;
 		A( 5, 3 ) = 0.0;
-		A( 5, 4 ) = - RHOFF_DD * F76;
+		A( 5, 4 ) = -RHOFF_DD * F76;
 		A( 5, 5 ) = 1.0;
-		A( 5, 6 ) = - RHOFF_DD * F78;
+		A( 5, 6 ) = -RHOFF_DD * F78;
 		A( 5, 7 ) = Z7_BD;
-		A( 6, 1 ) = - TAUBF_DD * F21;
+		A( 6, 1 ) = -TAUBF_DD * F21;
 		A( 6, 2 ) = 0.0;
-		A( 6, 3 ) = - TAUBF_DD * F24;
-		A( 6, 4 ) = - RHOFF_DD * F86;
-		A( 6, 5 ) = - RHOFF_DD * F87;
+		A( 6, 3 ) = -TAUBF_DD * F24;
+		A( 6, 4 ) = -RHOFF_DD * F86;
+		A( 6, 5 ) = -RHOFF_DD * F87;
 		A( 6, 6 ) = 1.0;
 		A( 6, 7 ) = 0.0;
 
@@ -4009,8 +4014,8 @@ namespace WindowEquivalentLayer {
 		G7 = F76 * J6 + F78 * J8;
 
 		TAU_BB = TAUFF_BB_PARL;
-		TAU_BD = ( G3 + TAUFF_DD * G7 + TAUFF_BD_PARL ) / 2.;
-		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G5 ) / 2.;
+		TAU_BD = ( G3 + TAUFF_DD * G7 + TAUFF_BD_PARL ) / 2.0;
+		RHO_BD = ( RHOFF_BT_PARL + TAUBF_DD * G1 + G5 ) / 2.0;
 	}
 
 	void
@@ -4050,7 +4055,8 @@ namespace WindowEquivalentLayer {
 		//   ltyVBVER: + = front-side slat tip is counter-
 		//                 clockwise from normal (viewed from above)
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const Tau_Name( "VB_DIFF Tau" );
+		static std::string const RhoF_Name( "VB_DIFF RhoF" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4076,11 +4082,13 @@ namespace WindowEquivalentLayer {
 		Real64 DEN;
 		// flow
 
-		CD = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S + W * std::sin( PHI ) ), 2 ) );
-		AF = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S - W * std::sin( PHI ) ), 2 ) );
+		Real64 const W_cos_PHI_2( pow_2( W * std::cos( PHI ) ) );
+		Real64 const W_sin_PHI( W * std::sin( PHI ) );
+		CD = std::sqrt( W_cos_PHI_2 + pow_2( S + W_sin_PHI ) );
+		AF = std::sqrt( W_cos_PHI_2 + pow_2( S - W_sin_PHI ) );
 
-		F13 = ( W + S - CD ) / ( 2. * S ); // SHAPE FACTOR FRONT OPENING TO TOP SLAT
-		F14 = ( W + S - AF ) / ( 2. * S ); // SHAPE FACTOR FRONT OPENING TO BOTTOM SLAT
+		F13 = ( W + S - CD ) / ( 2.0 * S ); // SHAPE FACTOR FRONT OPENING TO TOP SLAT
+		F14 = ( W + S - AF ) / ( 2.0 * S ); // SHAPE FACTOR FRONT OPENING TO BOTTOM SLAT
 		FSS = 1.0 - ( S / W ) * ( F13 + F14 ); // SLAT-TO-SLAT SHAPE FACTOR
 		F31 = ( S / W ) * F13; // SHAPE FACTOR - TOP TO FRONT
 		F41 = ( S / W ) * F14; // SHAPE FACTOR - BOTTOM TO FRONT
@@ -4094,9 +4102,9 @@ namespace WindowEquivalentLayer {
 		K3 = ( C3 + ( B3 * C4 ) ) / ( 1.0 - ( B3 * B4 ) );
 		K4 = ( C4 + ( B4 * C3 ) ) / ( 1.0 - ( B3 * B4 ) );
 		// transmittance of VB (equal front/back)
-		TAUVB = P01( F12 + ( F14 * K3 ) + ( F13 * K4 ), "VB_DIFF Tau" );
+		TAUVB = P01( F12 + ( F14 * K3 ) + ( F13 * K4 ), Tau_Name );
 		// diffuse reflectance of VB front-side
-		RHOFVB = P01( ( F13 * K3 ) + ( F14 * K4 ), "VB_DIFF RhoF" );
+		RHOFVB = P01( ( F13 * K3 ) + ( F14 * K4 ), RhoF_Name );
 	}
 
 	Real64
@@ -4238,20 +4246,20 @@ namespace WindowEquivalentLayer {
 		OMEGA = max( -DegToRadians * 89.5, min( DegToRadians * 89.5, OMEGAx ) );
 
 		SL_RAD = W / max( SL_WR, 0.0000001 );
-		SL_THETA = 2. * std::asin( 0.5 * SL_WR );
+		SL_THETA = 2.0 * std::asin( 0.5 * SL_WR );
 
 		if ( CORR > 0 ) { // CORRECT FOR SLAT CURVATURE BY SETTING CORR = 1
 
 			//  DETERMINE BOUNDS FOR CURVATURE CORRECTION AND APPLY CORRECTION TO BEAM-BEAM TRANSMITTANCE
-			if ( std::abs( PHI + OMEGA ) < SL_THETA / 2. ) {
+			if ( std::abs( PHI + OMEGA ) < SL_THETA / 2.0 ) {
 				//  CALCULATE BEAM TRANSMISSION
 				XA = SL_RAD * std::sin( -SL_THETA / 2.0 ); //Glass-side end coordinate
 				YA = SL_RAD * std::cos( -SL_THETA / 2.0 );
 				XB = -XA; //Indoor-side end coordinate
 				YB = YA;
 				YC = SL_RAD * std::cos( PHI + OMEGA ); //Tangent to slat in irradiance direction
-				XC = std::sqrt( std::pow( SL_RAD, 2 ) - std::pow( YC, 2 ) );
-				Slope = - XC / YC;
+				XC = std::sqrt( pow_2( SL_RAD ) - pow_2( YC ) );
+				Slope = -XC / YC;
 				if ( std::abs( Slope ) < SMALL_ERROR ) {
 					XD = 0.0;
 					YD = YA;
@@ -4263,19 +4271,19 @@ namespace WindowEquivalentLayer {
 						Slope = -Slope;
 						XD = ( YB - Slope * XB ) / ( -1.0 / Slope - Slope );
 						XF = ( YA - Slope * XA ) / ( -1.0 / Slope - Slope );
-						XE = XA + 2. * std::abs( XA - XF );
+						XE = XA + 2.0 * std::abs( XA - XF );
 					} else {
 						XD = ( YA - Slope * XA ) / ( -1.0 / Slope - Slope );
 						XF = ( YB - Slope * XB ) / ( -1.0 / Slope - Slope );
-						XE = XB - 2. * std::abs( XB - XF );
+						XE = XB - 2.0 * std::abs( XB - XF );
 					}
-					YD = - XD / Slope;
-					YE = - XE / Slope;
-					YF = - XF / Slope;
+					YD = -XD / Slope;
+					YE = -XE / Slope;
+					YF = -XF / Slope;
 				}
 
-				T_CORR_D = std::sqrt( std::pow( ( XC - XD ), 2 ) + std::pow( ( YC - YD ), 2 ) ); //Slat thickness perpendicular to light direction
-				T_CORR_F = std::sqrt( std::pow( ( XC - XF ), 2 ) + std::pow( ( YC - YF ), 2 ) );
+				T_CORR_D = std::sqrt( pow_2( XC - XD ) + pow_2( YC - YD ) ); //Slat thickness perpendicular to light direction
+				T_CORR_F = std::sqrt( pow_2( XC - XF ) + pow_2( YC - YF ) );
 
 				TAU_BB = 1.0 - T_CORR_D / ( S * std::cos( OMEGA ) );
 
@@ -4316,15 +4324,15 @@ namespace WindowEquivalentLayer {
 
 			} else { // NO, THERE IS NO DOUBLE BLOCKAGE
 
-				if ( std::abs( PHI + OMEGA ) < ( SL_THETA / 2. ) ) { // YES, APPLY CURVATURE CORRECTION
+				if ( std::abs( PHI + OMEGA ) < ( SL_THETA / 2.0 ) ) { // YES, APPLY CURVATURE CORRECTION
 
 					XA = SL_RAD * std::sin( -SL_THETA / 2.0 ); //Glass-side end coordinate
 					YA = SL_RAD * std::cos( -SL_THETA / 2.0 );
 					XB = -XA; //Indoor-side end coordinate
 					YB = YA;
 					YC = SL_RAD * std::cos( PHI + OMEGA ); //Tangent to slat in irradiance direction
-					XC = std::sqrt( std::pow( SL_RAD, 2 ) - std::pow( YC, 2 ) );
-					Slope = - XC / YC;
+					XC = std::sqrt( pow_2( SL_RAD ) - pow_2( YC ) );
+					Slope = -XC / YC;
 					if ( std::abs( Slope ) < SMALL_ERROR ) {
 						XD = 0.0;
 						YD = YA;
@@ -4340,31 +4348,31 @@ namespace WindowEquivalentLayer {
 						} else {
 							XD = ( YA - Slope * XA ) / ( -1.0 / Slope - Slope );
 							XF = ( YB - Slope * XB ) / ( -1.0 / Slope - Slope );
-							XE = XB - 2. * std::abs( XB - XF );
+							XE = XB - 2.0 * std::abs( XB - XF );
 						}
-						YD = - XD / Slope;
-						YE = - XE / Slope;
-						YF = - XF / Slope;
+						YD = -XD / Slope;
+						YE = -XE / Slope;
+						YF = -XF / Slope;
 					}
-					T_CORR_D = std::sqrt( std::pow( ( XC - XD ), 2 ) + std::pow( ( YC - YD ), 2 ) ); // Slat thickness perpendicular to light direction
-					T_CORR_F = std::sqrt( std::pow( ( XC - XF ), 2 ) + std::pow( ( YC - YF ), 2 ) );
+					T_CORR_D = std::sqrt( pow_2( XC - XD ) + pow_2( YC - YD ) ); // Slat thickness perpendicular to light direction
+					T_CORR_F = std::sqrt( pow_2( XC - XF ) + pow_2( YC - YF ) );
 
 					if ( ( PHI + OMEGA ) >= 0.0 ) { // Slat is lit from above
 						DE = XC - XA;
 						VB_SOL6( S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD );
-						RHO_BD *= T_CORR_D / ( S * std::cos( OMEGA ) );
-						TAU_BD *= T_CORR_D / ( S * std::cos( OMEGA ) );
-
+						Real64 const S_cos_OMEGA_inv( 1.0 / ( S * std::cos( OMEGA ) ) );
+						RHO_BD *= T_CORR_D * S_cos_OMEGA_inv;
+						TAU_BD *= T_CORR_D * S_cos_OMEGA_inv;
 					} else { // Slat is lit from below
 						DE = XC - XA;
 						VB_SOL6( S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD );
-						RHO_TEMP = RHO_BD * T_CORR_F / ( S * std::cos( OMEGA ) );
-						TAU_TEMP = TAU_BD * T_CORR_F / ( S * std::cos( OMEGA ) );
+						Real64 const S_cos_OMEGA_inv( 1.0 / ( S * std::cos( OMEGA ) ) );
+						RHO_TEMP = RHO_BD * T_CORR_F * S_cos_OMEGA_inv;
+						TAU_TEMP = TAU_BD * T_CORR_F * S_cos_OMEGA_inv;
 						DE = std::abs( XB - XF );
 						VB_SOL6( S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD );
-						RHO_BD = RHO_BD * ( T_CORR_D - T_CORR_F ) / ( S * std::cos( OMEGA ) ) + RHO_TEMP;
-						TAU_BD = TAU_BD * ( T_CORR_D - T_CORR_F ) / ( S * std::cos( OMEGA ) ) + TAU_TEMP;
-
+						RHO_BD = RHO_BD * ( T_CORR_D - T_CORR_F ) * S_cos_OMEGA_inv + RHO_TEMP;
+						TAU_BD = TAU_BD * ( T_CORR_D - T_CORR_F ) * S_cos_OMEGA_inv + TAU_TEMP;
 					}
 
 				} else { // NO, DO NOT APPLY CURVATURE CORRECTION
@@ -4373,7 +4381,7 @@ namespace WindowEquivalentLayer {
 					} else {
 						DE = S * std::abs( std::cos( OMEGA ) / std::sin( OMEGA + PHI ) );
 					}
-					if ( ( DE / W ) > ( 1.0 - SMALL_ERROR ) ) { // YES
+					if ( DE / W > 1.0 - SMALL_ERROR ) { // YES
 						VB_SOL4( S, W, OMEGA, DE, PHI, RHODFS_SLAT, RHOUFS_SLAT, TAU_SLAT, RHO_BD, TAU_BD );
 
 					} else { // NO
@@ -4481,10 +4489,12 @@ namespace WindowEquivalentLayer {
 		Real64 C4;
 		// flow
 
-		AF = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S - W * std::sin( PHI ) ), 2 ) );
-		CD = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S + W * std::sin( PHI ) ), 2 ) );
+		Real64 const W_cos_PHI_2( pow_2( W * std::cos( PHI ) ) );
+		Real64 const W_sin_PHI( W * std::sin( PHI ) );
+		AF = std::sqrt( W_cos_PHI_2 + pow_2( S - W_sin_PHI ) );
+		CD = std::sqrt( W_cos_PHI_2 + pow_2( S + W_sin_PHI ) );
 		//  CHECK TO SEE WHICH SIDE OF SLAT IS SUNLIT
-		if ( ( PHI + OMEGA ) >= 0.0 ) { // SUN SHINES ON TOP OF SLAT
+		if ( PHI + OMEGA >= 0.0 ) { // SUN SHINES ON TOP OF SLAT
 
 			Z3 = TAU_SLAT * S / DE;
 			Z4 = RHOUFS_SLAT * S / DE;
@@ -4509,12 +4519,12 @@ namespace WindowEquivalentLayer {
 
 		} else { // VENETIAN BLIND IS OPENED
 
-			F13 = ( S + W - CD ) / ( 2. * S );
-			F14 = ( S + W - AF ) / ( 2. * S );
-			F23 = ( S + W - AF ) / ( 2. * S );
-			F24 = ( S + W - CD ) / ( 2. * S );
-			F34 = ( CD + AF - 2. * S ) / ( 2. * W );
-			F43 = ( CD + AF - 2. * S ) / ( 2. * W );
+			F13 = ( S + W - CD ) / ( 2.0 * S );
+			F14 = ( S + W - AF ) / ( 2.0 * S );
+			F23 = ( S + W - AF ) / ( 2.0 * S );
+			F24 = ( S + W - CD ) / ( 2.0 * S );
+			F34 = ( CD + AF - 2.0 * S ) / ( 2.0 * W );
+			F43 = ( CD + AF - 2.0 * S ) / ( 2.0 * W );
 
 			C3 = 1.0 / ( 1.0 - TAU_SLAT * F43 );
 			B3 = ( RHODFS_SLAT * F34 ) / ( 1.0 - TAU_SLAT * F43 );
@@ -4645,52 +4655,57 @@ namespace WindowEquivalentLayer {
 
 		} else { //VENETIAN BLIND IS OPENED
 			AB = DE;
-			AF = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S - W * std::sin( PHI ) ), 2 ) );
+			Real64 const cos_PHI( std::cos( PHI ) );
+			Real64 const sin_PHI( std::sin( PHI ) );
+			Real64 const W_cos_PHI_2( pow_2( W * cos_PHI ) );
+			AF = std::sqrt( W_cos_PHI_2 + pow_2( S - W * sin_PHI ) );
 			BC = W - AB;
 			EF = BC;
-			BD = std::sqrt( std::pow( ( DE * std::cos( PHI ) ), 2 ) + std::pow( ( S + DE * std::sin( PHI ) ), 2 ) );
-			BF = std::sqrt( std::pow( ( EF * std::cos( PHI ) ), 2 ) + std::pow( ( S - EF * std::sin( PHI ) ), 2 ) );
-			CD = std::sqrt( std::pow( ( W * std::cos( PHI ) ), 2 ) + std::pow( ( S + W * std::sin( PHI ) ), 2 ) );
-			CE = std::sqrt( std::pow( ( EF * std::cos( PHI ) ), 2 ) + std::pow( ( S + EF * std::sin( PHI ) ), 2 ) );
-			AE = std::sqrt( std::pow( ( DE * std::cos( PHI ) ), 2 ) + std::pow( ( S - DE * std::sin( PHI ) ), 2 ) );
+			Real64 const DE_cos_PHI_2( pow_2( DE * cos_PHI ) );
+			Real64 const EF_cos_PHI_2( pow_2( EF * cos_PHI ) );
+			BD = std::sqrt( DE_cos_PHI_2 + pow_2( S + DE * sin_PHI ) );
+			BF = std::sqrt( EF_cos_PHI_2 + pow_2( S - EF * sin_PHI ) );
+			CD = std::sqrt( W_cos_PHI_2 + pow_2( S + W * sin_PHI ) );
+			CE = std::sqrt( EF_cos_PHI_2 + pow_2( S + EF * sin_PHI ) );
+			AE = std::sqrt( DE_cos_PHI_2 + pow_2( S - DE * sin_PHI ) );
 
-			F13 = ( S + AB - BD ) / ( 2. * S );
-			F14 = ( S + DE - AE ) / ( 2. * S );
-			F15 = ( W + BD - ( AB + CD ) ) / ( 2. * S );
-			F16 = ( W + AE - ( AF + DE ) ) / ( 2. * S );
-			F23 = ( W + BF - ( BC + AF ) ) / ( 2. * S );
-			F24 = ( W + CE - ( CD + EF ) ) / ( 2. * S );
-			F25 = ( S + BC - BF ) / ( 2. * S );
-			F26 = ( S + EF - CE ) / ( 2. * S );
-			F34 = ( AE + BD - 2. * S ) / ( 2. * AB );
-			F36 = ( AF + S - ( AE + BF ) ) / ( 2. * AB );
-			F43 = ( AE + BD - 2. * S ) / ( 2. * DE );
-			F45 = ( CD + S - ( BD + CE ) ) / ( 2. * DE );
-			F54 = ( CD + S - ( BD + CE ) ) / ( 2. * BC );
-			F56 = ( CE + BF - 2. * S ) / ( 2. * BC );
-			F63 = ( AF + S - ( AE + BF ) ) / ( 2. * EF );
-			F65 = ( BF + CE - 2. * S ) / ( 2. * EF );
+			F13 = ( S + AB - BD ) / ( 2.0 * S );
+			F14 = ( S + DE - AE ) / ( 2.0 * S );
+			F15 = ( W + BD - ( AB + CD ) ) / ( 2.0 * S );
+			F16 = ( W + AE - ( AF + DE ) ) / ( 2.0 * S );
+			F23 = ( W + BF - ( BC + AF ) ) / ( 2.0 * S );
+			F24 = ( W + CE - ( CD + EF ) ) / ( 2.0 * S );
+			F25 = ( S + BC - BF ) / ( 2.0 * S );
+			F26 = ( S + EF - CE ) / ( 2.0 * S );
+			F34 = ( AE + BD - 2.0 * S ) / ( 2.0 * AB );
+			F36 = ( AF + S - ( AE + BF ) ) / ( 2.0 * AB );
+			F43 = ( AE + BD - 2.0 * S ) / ( 2.0 * DE );
+			F45 = ( CD + S - ( BD + CE ) ) / ( 2.0 * DE );
+			F54 = ( CD + S - ( BD + CE ) ) / ( 2.0 * BC );
+			F56 = ( CE + BF - 2.0 * S ) / ( 2.0 * BC );
+			F63 = ( AF + S - ( AE + BF ) ) / ( 2.0 * EF );
+			F65 = ( BF + CE - 2.0 * S ) / ( 2.0 * EF );
 
 			// POPULATE THE COEFFICIENTS OF THE RADIOSITY MATRIX
 
 			A( 1, 1 ) = 1.0 - TAU_SLAT * F43;
-			A( 1, 2 ) = - RHODFS_SLAT * F34;
-			A( 1, 3 ) = - TAU_SLAT * F45;
-			A( 1, 4 ) = - RHODFS_SLAT * F36;
+			A( 1, 2 ) = -RHODFS_SLAT * F34;
+			A( 1, 3 ) = -TAU_SLAT * F45;
+			A( 1, 4 ) = -RHODFS_SLAT * F36;
 			A( 1, 5 ) = Z3;
-			A( 2, 1 ) = - RHOUFS_SLAT * F43;
+			A( 2, 1 ) = -RHOUFS_SLAT * F43;
 			A( 2, 2 ) = 1.0 - TAU_SLAT * F34;
-			A( 2, 3 ) = - RHOUFS_SLAT * F45;
-			A( 2, 4 ) = - TAU_SLAT * F36;
+			A( 2, 3 ) = -RHOUFS_SLAT * F45;
+			A( 2, 4 ) = -TAU_SLAT * F36;
 			A( 2, 5 ) = Z4;
-			A( 3, 1 ) = - TAU_SLAT * F63;
-			A( 3, 2 ) = - RHODFS_SLAT * F54;
+			A( 3, 1 ) = -TAU_SLAT * F63;
+			A( 3, 2 ) = -RHODFS_SLAT * F54;
 			A( 3, 3 ) = 1.0 - TAU_SLAT * F65;
-			A( 3, 4 ) = - RHODFS_SLAT * F56;
+			A( 3, 4 ) = -RHODFS_SLAT * F56;
 			A( 3, 5 ) = 0.0;
-			A( 4, 1 ) = - RHOUFS_SLAT * F63;
-			A( 4, 2 ) = - TAU_SLAT * F54;
-			A( 4, 3 ) = - RHOUFS_SLAT * F65;
+			A( 4, 1 ) = -RHOUFS_SLAT * F63;
+			A( 4, 2 ) = -TAU_SLAT * F54;
+			A( 4, 3 ) = -RHOUFS_SLAT * F65;
 			A( 4, 4 ) = 1.0 - TAU_SLAT * F56;
 			A( 4, 5 ) = 0.0;
 
@@ -4800,7 +4815,7 @@ namespace WindowEquivalentLayer {
 
 			for ( I = LP; I <= N; ++I ) {
 				C = 0.0;
-				Y = - A( I, L ) / A( L, L );
+				Y = -A( I, L ) / A( L, L );
 				for ( J = L; J <= NP2; ++J ) {
 					A( I, J ) += Y * A( L, J );
 				}
@@ -5027,8 +5042,8 @@ namespace WindowEquivalentLayer {
 
 		ITRY = 0;
 
-		EB( 0 ) = StefanBoltzmann * std::pow( TOUT, 4 );
-		EB( NL + 1 ) = StefanBoltzmann * std::pow( TIN, 4 );
+		EB( 0 ) = StefanBoltzmann * pow_4( TOUT );
+		EB( NL + 1 ) = StefanBoltzmann * pow_4( TIN );
 
 		ADIM = 3 * NL + 2; // DIMENSION OF A-MATRIX
 
@@ -5068,13 +5083,18 @@ namespace WindowEquivalentLayer {
 		//   FIRST ESTIMATE OF GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
 		for ( I = 1; I <= NL; ++I ) {
 			T( I ) = TOUT + double( I ) / double( NL + 1 ) * ( TIN - TOUT );
-			EB( I ) = StefanBoltzmann * std::pow( T( I ), 4 );
+			EB( I ) = StefanBoltzmann * pow_4( T( I ) );
 		}
 
 		CONVRG = 0;
 
 		//  Start the solver
 		//  ITERATION RE-ENTRY
+
+		Real64 const TIN_2( pow_2( TIN ) );
+		Real64 const TOUT_2( pow_2( TOUT ) );
+		Real64 const TRMOUT_4( pow_4( TRMOUT ) );
+		Real64 const TRMIN_4( pow_4( TRMIN ) );
 
 		for ( ITRY = 1; ITRY <= 100; ++ITRY ) {
 
@@ -5115,7 +5135,7 @@ namespace WindowEquivalentLayer {
 
 						//TOC_EFF = FS%G( I)%TAS_EFF / 1000.    ! effective thickness of OC gap, m
 						TOC_EFF = FS.G( I ).TAS_EFF; // effective thickness of OC gap, m Modified by BAN May 9, 2013
-						HFS = 1.; // nominal height of system (m)
+						HFS = 1.0; // nominal height of system (m)
 
 						// convection - glass to air
 						GLtoAMB( TOC_EFF, HFS, T( NL - 1 ), TIN, HCIN, HC_GA, hin_scheme );
@@ -5163,13 +5183,16 @@ namespace WindowEquivalentLayer {
 			//  CONVERT TEMPERATURE POTENTIAL CONVECTIVE COEFFICIENTS to
 			//  BLACK EMISSIVE POWER POTENTIAL CONVECTIVE COEFFICIENTS
 
-			HHAT( 0 ) = HC( 0 ) * ( 1.0 / StefanBoltzmann ) / ( ( ( std::pow( TOUT, 2 ) + std::pow( T( 1 ), 2 ) ) ) * ( ( TOUT + T( 1 ) ) ) );
+			HHAT( 0 ) = HC( 0 ) * ( 1.0 / StefanBoltzmann ) / ( ( TOUT_2 + pow_2( T( 1 ) ) ) * ( TOUT + T( 1 ) ) );
 
+			Real64 T_I_2( pow_2( T( 1 ) ) ), T_IP_2;
 			for ( I = 1; I <= NL - 1; ++I ) { // Scan the cavities
-				HHAT( I ) = HC( I ) * ( 1.0 / StefanBoltzmann ) / ( ( ( std::pow( T( I ), 2 ) + std::pow( T( I + 1 ), 2 ) ) ) * ( ( T( I ) + T( I + 1 ) ) ) );
+				T_IP_2 = pow_2( T( I + 1 ) );
+				HHAT( I ) = HC( I ) * ( 1.0 / StefanBoltzmann ) / ( ( T_I_2 + T_IP_2 ) * ( T( I ) + T( I + 1 ) ) );
+				T_I_2 = T_IP_2;
 			}
 
-			HHAT( NL ) = HC( NL ) * ( 1.0 / StefanBoltzmann ) / ( ( ( std::pow( T( NL ), 2 ) + std::pow( TIN, 2 ) ) ) * ( ( T( NL ) + TIN ) ) );
+			HHAT( NL ) = HC( NL ) * ( 1.0 / StefanBoltzmann ) / ( ( pow_2( T( NL ) ) + TIN_2 ) * ( T( NL ) + TIN ) );
 
 			//  SET UP MATRIX
 			XSOL = 0.0;
@@ -5177,8 +5200,8 @@ namespace WindowEquivalentLayer {
 
 			L = 1;
 			A( L, 1 ) = 1.0;
-			A( L, 2 ) = - 1.0 * RHOB( 0 ); //  -1.0 * RHOB_OUT
-			A( L, ADIM + 1 ) = EPSB_OUT * StefanBoltzmann * std::pow( TRMOUT, 4 );
+			A( L, 2 ) = -1.0 * RHOB( 0 ); //  -1.0 * RHOB_OUT
+			A( L, ADIM + 1 ) = EPSB_OUT * StefanBoltzmann * TRMOUT_4;
 
 			for ( I = 1; I <= NL; ++I ) {
 				L = 3 * I - 1;
@@ -5192,35 +5215,35 @@ namespace WindowEquivalentLayer {
 				if ( NL == 1 ) {
 					A( L, 1 ) = 1.0; // Single layer
 					A( L, 2 ) = -1.0;
-					A( L, 3 ) = - 1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
+					A( L, 3 ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
 					A( L, 4 ) = -1.0;
 					A( L, 5 ) = 1.0;
-					A( L, ADIM + 1 ) = - 1.0 * ( HHAT( 0 ) * EB( 0 ) + HHAT( 1 ) * EB( 2 ) + SOURCE( 1 ) + QOCF( 1 ) );
+					A( L, ADIM + 1 ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + HHAT( 1 ) * EB( 2 ) + SOURCE( 1 ) + QOCF( 1 ) );
 				} else if ( I == 1 ) {
 					A( L, 1 ) = 1.0; //  Outdoor layer
 					A( L, 2 ) = -1.0;
-					A( L, 3 ) = - 1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
+					A( L, 3 ) = -1.0 * ( HHAT( 0 ) + HHAT( 1 ) );
 					A( L, 4 ) = -1.0;
 					A( L, 5 ) = 1.0;
 					A( L, 6 ) = HHAT( 1 );
-					A( L, ADIM + 1 ) = - 1.0 * ( HHAT( 0 ) * EB( 0 ) + SOURCE( 1 ) + QOCF( 1 ) );
+					A( L, ADIM + 1 ) = -1.0 * ( HHAT( 0 ) * EB( 0 ) + SOURCE( 1 ) + QOCF( 1 ) );
 				} else if ( I == NL ) {
 					A( L, 3 * NL - 3 ) = HHAT( NL - 1 ); // Indoor layer
 					A( L, 3 * NL - 2 ) = 1.0;
 					A( L, 3 * NL - 1 ) = -1.0;
-					A( L, 3 * NL ) = - 1.0 * ( HHAT( NL ) + HHAT( NL - 1 ) );
+					A( L, 3 * NL ) = -1.0 * ( HHAT( NL ) + HHAT( NL - 1 ) );
 					A( L, 3 * NL + 1 ) = -1.0;
 					A( L, 3 * NL + 2 ) = 1.0;
-					A( L, ADIM + 1 ) = - 1.0 * ( HHAT( NL ) * EB( NL + 1 ) + SOURCE( NL ) + QOCF( NL ) );
+					A( L, ADIM + 1 ) = -1.0 * ( HHAT( NL ) * EB( NL + 1 ) + SOURCE( NL ) + QOCF( NL ) );
 				} else {
 					A( L, 3 * I - 3 ) = HHAT( I - 1 );
 					A( L, 3 * I - 2 ) = 1.0;
 					A( L, 3 * I - 1 ) = -1.0;
-					A( L, 3 * I ) = - 1.0 * ( HHAT( I ) + HHAT( I - 1 ) );
+					A( L, 3 * I ) = -1.0 * ( HHAT( I ) + HHAT( I - 1 ) );
 					A( L, 3 * I + 1 ) = -1.0;
 					A( L, 3 * I + 2 ) = 1.0;
 					A( L, 3 * I + 3 ) = HHAT( I );
-					A( L, ADIM + 1 ) = - 1.0 * ( SOURCE( I ) + QOCF( I ) );
+					A( L, ADIM + 1 ) = -1.0 * ( SOURCE( I ) + QOCF( I ) );
 				}
 				L = 3 * I + 1;
 				A( L, 3 * I - 2 ) = TAU( I ); //   LWP( I)%TAUL
@@ -5231,9 +5254,9 @@ namespace WindowEquivalentLayer {
 			}
 
 			L = 3 * NL + 2;
-			A( L, 3 * NL + 1 ) = - 1.0 * RHOF( NL + 1 ); //   - 1.0 * RHOF_ROOM
+			A( L, 3 * NL + 1 ) = -1.0 * RHOF( NL + 1 ); //   - 1.0 * RHOF_ROOM
 			A( L, 3 * NL + 2 ) = 1.0;
-			A( L, ADIM + 1 ) = EPSF_ROOM * StefanBoltzmann * std::pow( TRMIN, 4 );
+			A( L, ADIM + 1 ) = EPSF_ROOM * StefanBoltzmann * TRMIN_4;
 
 			//  SOLVE MATRIX
 
@@ -5249,7 +5272,7 @@ namespace WindowEquivalentLayer {
 				JF( I ) = XSOL( J );
 				++J;
 				EB( I ) = max( 1.0, XSOL( J ) ); // prevent impossible temps
-				TNEW( I ) = ( std::pow( ( EB( I ) / StefanBoltzmann ), 0.25 ) );
+				TNEW( I ) = root_4( EB( I ) / StefanBoltzmann );
 				++J;
 				JB( I ) = XSOL( J );
 				MAXERR = max( MAXERR, std::abs( TNEW( I ) - T( I ) ) / TNEW( I ) );
@@ -5271,7 +5294,7 @@ namespace WindowEquivalentLayer {
 			//  UPDATE GLAZING TEMPERATURES AND BLACK EMISSIVE POWERS
 			for ( I = 1; I <= NL; ++I ) {
 				T( I ) += ALPHA * ( TNEW( I ) - T( I ) );
-				EB( I ) = StefanBoltzmann * std::pow( T( I ), 4 );
+				EB( I ) = StefanBoltzmann * pow_4( T( I ) );
 			}
 
 			//  CHECK FOR CONVERGENCE
@@ -5550,7 +5573,7 @@ namespace WindowEquivalentLayer {
 				for ( J = 1; J <= NL; ++J ) {
 					if ( J != I ) {
 						A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-						A( I, J ) = - 1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+						A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
 					}
 				}
 			}
@@ -5587,7 +5610,7 @@ namespace WindowEquivalentLayer {
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
 					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = - 1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
 				}
 			}
 
@@ -5633,7 +5656,7 @@ namespace WindowEquivalentLayer {
 				for ( J = 1; J <= NL; ++J ) {
 					if ( J != I ) {
 						A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-						A( I, J ) = - 1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+						A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
 					}
 				}
 			}
@@ -5675,7 +5698,7 @@ namespace WindowEquivalentLayer {
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
 					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = - 1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
 				}
 			}
 		}
@@ -5717,7 +5740,7 @@ namespace WindowEquivalentLayer {
 			for ( J = 1; J <= NL; ++J ) {
 				if ( J != I ) {
 					A( I, I ) += HC2D( I, J ) + HR2D( I, J );
-					A( I, J ) = - 1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
+					A( I, J ) = -1.0 * ( HC2D( I, J ) + HR2D( I, J ) );
 				}
 			}
 		}
@@ -5897,10 +5920,12 @@ namespace WindowEquivalentLayer {
 		//         then q_xy will also be zero
 		//  Note:  This code has no problem with temperatures being equal
 
-		hr_gm = Epsg * Epsm * FSg_m * StefanBoltzmann * ( Tg + Tm ) * ( std::pow( Tg, 2 ) + std::pow( Tm, 2 ) );
-		hr_gd = Epsg * Epsdf * FSg_df * StefanBoltzmann * ( Td + Tg ) * ( std::pow( Td, 2 ) + std::pow( Tg, 2 ) ) + Epsg * Epsdb * FSg_db * StefanBoltzmann * ( Td + Tg ) * ( std::pow( Td, 2 ) + std::pow( Tg, 2 ) );
-
-		hr_md = Epsm * Epsdf * FSm_df * StefanBoltzmann * ( Td + Tm ) * ( std::pow( Td, 2 ) + std::pow( Tm, 2 ) ) + Epsm * Epsdb * FSm_db * StefanBoltzmann * ( Td + Tm ) * ( std::pow( Td, 2 ) + std::pow( Tm, 2 ) );
+		Real64 const Td_2( pow_2( Td ) );
+		Real64 const Tg_2( pow_2( Tg ) );
+		Real64 const Tm_2( pow_2( Tm ) );
+		hr_gm = Epsg * Epsm * FSg_m * StefanBoltzmann * ( Tg + Tm ) * ( Tg_2 + Tm_2 );
+		hr_gd = Epsg * Epsdf * FSg_df * StefanBoltzmann * ( Td + Tg ) * ( Td_2 + Tg_2 ) + Epsg * Epsdb * FSg_db * StefanBoltzmann * ( Td + Tg ) * ( Td_2 + Tg_2 );
+		hr_md = Epsm * Epsdf * FSm_df * StefanBoltzmann * ( Td + Tm ) * ( Td_2 + Tm_2 ) + Epsm * Epsdb * FSm_db * StefanBoltzmann * ( Td + Tm ) * ( Td_2 + Tm_2 );
 	}
 
 	void
@@ -5952,14 +5977,14 @@ namespace WindowEquivalentLayer {
 
 		A = 0.0;
 		A( 1, 1 ) = 1.0;
-		A( 1, 2 ) = - 1.0 * rhog;
-		A( 2, 1 ) = - 1.0 * rhodf;
+		A( 1, 2 ) = -1.0 * rhog;
+		A( 2, 1 ) = -1.0 * rhodf;
 		A( 2, 2 ) = 1.0;
-		A( 2, 4 ) = - 1.0 * taud;
-		A( 3, 1 ) = - 1.0 * taud;
+		A( 2, 4 ) = -1.0 * taud;
+		A( 3, 1 ) = -1.0 * taud;
 		A( 3, 3 ) = 1.0;
-		A( 3, 4 ) = - 1.0 * rhodb;
-		A( 4, 3 ) = - 1.0 * rhom;
+		A( 3, 4 ) = -1.0 * rhodb;
+		A( 4, 3 ) = -1.0 * rhom;
 		A( 4, 4 ) = 1.0;
 
 	}
@@ -6066,15 +6091,14 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 ARA;
 
-		ARA = std::abs( RA );
+		Real64 const ARA( std::abs( RA ) );
 		if ( ARA <= 10000.0 ) {
-			FNU = 1.0 + 1.75967e-10 * ( std::pow( ARA, 2.2984755 ) );
+			FNU = 1.0 + 1.75967e-10 * std::pow( ARA, 2.2984755 );
 		} else if ( ARA <= 50000.0 ) {
-			FNU = 0.028154 * ( std::pow( ARA, 0.413993 ) );
+			FNU = 0.028154 * std::pow( ARA, 0.413993 );
 		} else {
-			FNU = 0.0673838 * ( std::pow( ARA, ( 1.0 / 3.0 ) ) );
+			FNU = 0.0673838 * std::pow( ARA, 1.0 / 3.0 );
 		}
 		return FNU;
 	}
@@ -6125,7 +6149,7 @@ namespace WindowEquivalentLayer {
 		// Flow
 
 		T = G.TAS_EFF;
-		TM = ( T1 + T2 ) / 2.;
+		TM = ( T1 + T2 ) / 2.0;
 		DT = T1 - T2;
 		RA = FRA( TM, T, DT, G.FG.AK, G.FG.BK, G.FG.CK, G.FG.ACP, G.FG.BCP, G.FG.CCP, G.FG.AVISC, G.FG.BVISC, G.FG.CVISC, G.RHOGAS );
 		NU = FNU( RA );
@@ -6182,7 +6206,7 @@ namespace WindowEquivalentLayer {
 		HRadPar = 0.0;
 		if ( ( E1 > 0.001 ) && ( E2 > 0.001 ) ) {
 			DV = ( 1.0 / E1 ) + ( 1.0 / E2 ) - 1.0;
-			HRadPar = ( StefanBoltzmann / DV ) * ( T1 + T2 ) * ( std::pow( T1, 2 ) + std::pow( T2, 2 ) );
+			HRadPar = ( StefanBoltzmann / DV ) * ( T1 + T2 ) * ( pow_2( T1 ) + pow_2( T2 ) );
 		}
 		return HRadPar;
 	}
@@ -6226,7 +6250,7 @@ namespace WindowEquivalentLayer {
 
 		// Flow
 
-		HIC_ASHRAE = 1.46 * std::pow( ( std::abs( TG - TI ) / max( L, 0.001 ) ), 0.25 );
+		HIC_ASHRAE = 1.46 * root_4( std::abs( TG - TI ) / max( L, 0.001 ) );
 		return HIC_ASHRAE;
 	}
 
@@ -6288,8 +6312,8 @@ namespace WindowEquivalentLayer {
 			if ( b < 0.00001 ) b = 0.00001; // avoid division by zero in
 			// calculation of this scheme
 
-			Tavg = ( Ts + Tg ) / 2.; // T for properties calculations
-			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
+			Tavg = ( Ts + Tg ) / 2.0; // T for properties calculations
+			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 			hsg = k / b;
 
 		} else if ( scheme == 2 ) { // similar to Nu=1 but small penalty at
@@ -6298,18 +6322,18 @@ namespace WindowEquivalentLayer {
 			if ( b < 0.00001 ) b = 0.00001; // avoid division by zero in
 			// calculation of this scheme
 
-			Tavg = ( Ts + Tg ) / 2.; // T for properties calculations
+			Tavg = ( Ts + Tg ) / 2.0; // T for properties calculations
 
 			// properties of AIR
 			rho = PAtmSeaLevel / ( 287.097 * Tavg ); // density (kg/m3) <- temperature in (K)
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
-			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
+			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2( Tavg ) - 0.00000027034 * pow_3( Tavg );
 			//  specific heat at constant pressure (J/kg.K)
-			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
+			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabsg = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Ts - Tg ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
+			Rabsg = ( 9.81 * beta * pow_3( b ) * std::abs( Ts - Tg ) * pow_2( rho ) * Cp ) / ( dvisc * k );
 			Nubsg = 1.0 + 0.2 * ( 1.0 - std::exp( -0.005 * Rabsg ) );
 
 			hsg = Nubsg * k / b;
@@ -6372,21 +6396,21 @@ namespace WindowEquivalentLayer {
 		Real64 hfp;
 		// Flow
 
-		SLtoAMB = 2. * hc_in; //    DEFAULT - convection from both sides
+		SLtoAMB = 2.0 * hc_in; //    DEFAULT - convection from both sides
 		//    of shading layer - large spacing, b
 
 		if ( scheme == 1 ) {
 			// properties of AIR
-			Tavg = ( Ts + Tamb ) / 2.;
+			Tavg = ( Ts + Tamb ) / 2.0;
 			rho = PAtmSeaLevel / ( 287.097 * Tavg ); // density (kg/m3) <- temperature in (K)
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
-			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
+			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2( Tavg ) - 0.00000027034 * pow_3( Tavg );
 			//  specific heat at constant pressure (J/kg.K)
-			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
+			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabsa = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Ts - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
+			Rabsa = ( 9.81 * beta * pow_3( b ) * std::abs( Ts - Tamb ) * pow_2( rho ) * Cp ) / ( dvisc * k );
 			if ( Rabsa <= 1.0 ) {
 				Rabsa = 1.0;
 			}
@@ -6411,11 +6435,11 @@ namespace WindowEquivalentLayer {
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2( Tavg ) - 0.00000027034 * pow_3( Tavg );
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabsa = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Ts - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
+			Rabsa = ( 9.81 * beta * pow_3( b ) * std::abs( Ts - Tamb ) * pow_2( rho ) * Cp ) / ( dvisc * k );
 			if ( Rabsa <= 1.0 ) {
 				Rabsa = 1.0;
 			}
@@ -6503,18 +6527,18 @@ namespace WindowEquivalentLayer {
 
 		if ( scheme == 1 ) { //  Collins
 
-			Tavg = ( Tg + Tamb ) / 2.; //T for properties calculations
+			Tavg = ( Tg + Tamb ) / 2.0; //T for properties calculations
 
 			// properties of AIR
 			rho = PAtmSeaLevel / ( 287.097 * Tavg ); // density (kg/m3) <- temperature in (K)
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
-			dvisc = ( 18.05 + ( ( Tavg - 290. ) / 10. ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
+			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2( Tavg ) - 0.00000027034 * pow_3( Tavg );
 			//  specific heat at constant pressure (J/kg.K)
-			k = 0.02538 + ( ( Tavg - 290. ) / 10. ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
+			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabga = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Tg - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
+			Rabga = ( 9.81 * beta * pow_3( b ) * std::abs( Tg - Tamb ) * pow_2( rho ) * Cp ) / ( dvisc * k );
 			if ( Rabga <= 1.0 ) {
 				Rabga = 1.0;
 			}
@@ -6528,18 +6552,18 @@ namespace WindowEquivalentLayer {
 
 		} else if ( scheme == 2 ) {
 
-			Tavg = ( Tg + Tamb ) / 2.; //T for properties calculations
+			Tavg = ( Tg + Tamb ) / 2.0; //T for properties calculations
 
 			// properties of AIR
 			rho = PAtmSeaLevel / ( 287.097 * Tavg ); // density (kg/m3) <- temperature in (K)
 			beta = 1.0 / Tavg; // thermal expansion coef(/K)
 			dvisc = ( 18.05 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 18.53 - 18.05 ) ) * 1.0e-6;
 			//  dynamic viscosity (kg/m.sec) or (N.sec/m2)
-			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * std::pow( Tavg, 2 ) - 0.00000027034 * std::pow( Tavg, 3 );
+			Cp = 1044.66 - 0.31597 * Tavg + 0.000707908 * pow_2( Tavg ) - 0.00000027034 * pow_3( Tavg );
 			//  specific heat at constant pressure (J/kg.K)
 			k = 0.02538 + ( ( Tavg - 290.0 ) / 10.0 ) * ( 0.02614 - 0.02538 ); // conductivity (W/m.K)
 
-			Rabga = ( 9.81 * beta * ( std::pow( b, 3 ) ) * std::abs( Tg - Tamb ) * ( std::pow( rho, 2 ) ) * Cp ) / ( dvisc * k );
+			Rabga = ( 9.81 * beta * pow_3( b ) * std::abs( Tg - Tamb ) * pow_2( rho ) * Cp ) / ( dvisc * k );
 			if ( Rabga <= 1.0 ) {
 				Rabga = 1.0;
 			}
@@ -6802,22 +6826,22 @@ namespace WindowEquivalentLayer {
 			AP( LINE ) = LSWP_ON( I ).RHOSBDD;
 			AE( LINE ) = 1.0;
 			if ( LINE != 1 ) { // default
-				AW( LINE ) = - 1.0 * LSWP_ON( I ).TAUS_DD;
-				BP( LINE ) = - 1.0 * CMINUS( I );
+				AW( LINE ) = -1.0 * LSWP_ON( I ).TAUS_DD;
+				BP( LINE ) = -1.0 * CMINUS( I );
 			} else { //  special case at west-most node
 				AW( 1 ) = 0.0;
-				BP( 1 ) = - 1.0 * LSWP_ON( 1 ).TAUS_DD * IDIFF - CMINUS( 1 );
+				BP( 1 ) = -1.0 * LSWP_ON( 1 ).TAUS_DD * IDIFF - CMINUS( 1 );
 			}
 
 			LINE = ( 2 * I );
 			AW( LINE ) = 1.0;
 			if ( LINE != N_TDMA ) { // default
 				AP( LINE ) = LSWP_ON( I + 1 ).RHOSFDD;
-				AE( LINE ) = - 1.0 * LSWP_ON( I + 1 ).TAUS_DD;
-				BP( LINE ) = - 1.0 * CPLUS( I );
+				AE( LINE ) = -1.0 * LSWP_ON( I + 1 ).TAUS_DD;
+				BP( LINE ) = -1.0 * CPLUS( I );
 			} else { //  special case at east-most node
 				AP( LINE ) = SWP_ROOM.RHOSFDD;
-				BP( N_TDMA ) = - 1.0 * ( CPLUS( NL ) + ILIGHTS );
+				BP( N_TDMA ) = -1.0 * ( CPLUS( NL ) + ILIGHTS );
 				AE( N_TDMA ) = 0.0;
 			}
 
@@ -7048,7 +7072,7 @@ namespace WindowEquivalentLayer {
 
 		for ( J = 2; J <= N; ++J ) {
 			D = AP( J ) - ( ALPHA( J - 1 ) * AW( J ) );
-			if ( std::abs( D ) < .0001 ) {
+			if ( std::abs( D ) < 0.0001 ) {
 				ALPHA( J ) = 0.0;
 				BETA( J ) = 0.0;
 			} else {
@@ -7268,21 +7292,21 @@ namespace WindowEquivalentLayer {
 		} else if ( THETA1 >= DegToRadians ) {
 			// theta >= 1 deg
 			N2 = 1.526;
-			KL = 55. * 0.006;
+			KL = 55.0 * 0.006;
 			TAU_A = std::exp( -1.0 * KL );
-			RPERP = std::pow( ( ( N2 - 1.0 ) / ( N2 + 1.0 ) ), 2 );
+			RPERP = pow_2( ( N2 - 1.0 ) / ( N2 + 1.0 ) );
 			TAU0 = TAU_A * ( 1.0 - RPERP ) * ( 1.0 - RPERP ) / ( 1.0 - ( RPERP * RPERP * TAU_A * TAU_A ) );
 			RHO0 = RPERP * ( 1.0 + ( TAU_A * TAU0 ) );
 			THETA2 = std::asin( ( std::sin( THETA1 ) ) / N2 );
 			TAU_A = std::exp( -1.0 * KL / std::cos( THETA2 ) );
-			RPERP = std::pow( ( ( std::sin( THETA2 - THETA1 ) ) / ( std::sin( THETA2 + THETA1 ) ) ), 2 );
-			RPARL = std::pow( ( ( std::tan( THETA2 - THETA1 ) ) / ( std::tan( THETA2 + THETA1 ) ) ), 2 );
+			RPERP = pow_2( std::sin( THETA2 - THETA1 ) / std::sin( THETA2 + THETA1 ) );
+			RPARL = pow_2( std::tan( THETA2 - THETA1 ) / std::tan( THETA2 + THETA1 ) );
 			TAUPERP = TAU_A * ( 1.0 - RPERP ) * ( 1.0 - RPERP ) / ( 1.0 - ( RPERP * RPERP * TAU_A * TAU_A ) );
 			TAUPARL = TAU_A * ( 1.0 - RPARL ) * ( 1.0 - RPARL ) / ( 1.0 - ( RPARL * RPARL * TAU_A * TAU_A ) );
 			RHOPERP = RPERP * ( 1.0 + ( TAU_A * TAUPERP ) );
 			RHOPARL = RPARL * ( 1.0 + ( TAU_A * TAUPARL ) );
-			TAU_ON = ( TAUPERP + TAUPARL ) / 2.;
-			RHO_ON = ( RHOPERP + RHOPARL ) / 2.;
+			TAU_ON = ( TAUPERP + TAUPARL ) / 2.0;
+			RHO_ON = ( RHOPERP + RHOPARL ) / 2.0;
 			RAT_TAU = TAU_ON / TAU0;
 			RAT_1MR = ( 1.0 - RHO_ON ) / ( 1.0 - RHO0 );
 		} else {
@@ -8012,15 +8036,15 @@ namespace WindowEquivalentLayer {
 		if ( ! IsVBLayer( L ) ) return VB_LWP;
 
 		// slat reflectances
-		RHODFS_SLAT = 1. - L.LWP_MAT.EPSLB - L.LWP_MAT.TAUL; // downward surface
-		RHOUFS_SLAT = 1. - L.LWP_MAT.EPSLF - L.LWP_MAT.TAUL; // upward surface
+		RHODFS_SLAT = 1.0 - L.LWP_MAT.EPSLB - L.LWP_MAT.TAUL; // downward surface
+		RHOUFS_SLAT = 1.0 - L.LWP_MAT.EPSLF - L.LWP_MAT.TAUL; // upward surface
 
 		// TODO: are there cases where 2 calls not needed (RHODFS_SLAT == RHOUFS_SLAT??)
 		VB_DIFF( L.S, L.W, DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLF, LLWP.TAUL );
-		LLWP.EPSLF = 1. - RHOLF - LLWP.TAUL;
+		LLWP.EPSLF = 1.0 - RHOLF - LLWP.TAUL;
 
 		VB_DIFF( L.S, L.W, - DegToRadians * L.PHI_DEG, RHODFS_SLAT, RHOUFS_SLAT, L.LWP_MAT.TAUL, RHOLB, TAULX );
-		LLWP.EPSLB = 1. - RHOLB - LLWP.TAUL;
+		LLWP.EPSLB = 1.0 - RHOLB - LLWP.TAUL;
 
 		VB_LWP = true;
 		return VB_LWP;
@@ -8257,7 +8281,7 @@ namespace WindowEquivalentLayer {
 		// must be consistent with IsControlledShade()
 		if ( IsVBLayer( L ) && L.CNTRL != lscNONE ) {
 			if ( THETA < 0.0 || THETA >= PiOvr2 ) {
-				OMEGA_DEG = -1.; // diffuse only
+				OMEGA_DEG = -1.0; // diffuse only
 			} else if ( L.LTYPE == ltyVBHOR ) {
 				// horiz VB
 				OMEGA_DEG = RadiansToDeg * OMEGA_V;
@@ -8625,7 +8649,7 @@ namespace WindowEquivalentLayer {
 		if ( ! IsVBLayer( L ) ) return; // insurance
 
 		VBTHICK = L.W * std::cos( L.PHI_DEG ); // VB layer thickness at slat angle
-		G.TAS_EFF = G.TAS + ( L.W - 0.7 * VBTHICK ) / 2.;
+		G.TAS_EFF = G.TAS + ( L.W - 0.7 * VBTHICK ) / 2.0;
 
 	}
 
@@ -9106,7 +9130,7 @@ namespace WindowEquivalentLayer {
 		if ( d < tolAbsX ) {
 			FEQX = true;
 		} else {
-			FEQX = ( 2. * d / ( std::abs( a ) + std::abs( b ) ) ) < tolF;
+			FEQX = ( 2.0 * d / ( std::abs( a ) + std::abs( b ) ) ) < tolF;
 		}
 		return FEQX;
 	}
@@ -9133,7 +9157,6 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Return value
-		Real64 TRadC;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9149,8 +9172,7 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// Flow
-		TRadC = ( std::pow( ( J / ( StefanBoltzmann * max( Emiss, 0.001 ) ) ), 0.25 ) ) - KelvinConv;
-		return TRadC;
+		return root_4( J / ( StefanBoltzmann * max( Emiss, 0.001 ) ) ) - KelvinConv;
 	}
 
 	void
@@ -9358,13 +9380,9 @@ namespace WindowEquivalentLayer {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int EQLNum; // EQL Window object number
 
 		// FLOW:
-		EQLNum = Construct( ConstrNum ).EQLConsPtr;
-		InsideLWEmiss = EffectiveEPSLB( CFS( EQLNum ) );
-
-		return InsideLWEmiss;
+		return EffectiveEPSLB( CFS( Construct( ConstrNum ).EQLConsPtr ) );
 	}
 
 	Real64
@@ -9476,10 +9494,10 @@ namespace WindowEquivalentLayer {
 		mu = 3.723E-6 + 4.94E-8 * TmeanFilmKelvin; // Table B.2 in ISO 15099
 		Cp = 1002.737 + 1.2324E-2 * TmeanFilmKelvin; // Table B.3 in ISO 15099
 
-		RaH = ( std::pow( rho, 2 ) * std::pow( Height, 3 ) * GravityConstant * Cp * ( std::abs( TSurfIn - TAirIn ) ) ) / ( TmeanFilmKelvin * mu * lambda ); // eq 132 in ISO 15099
+		RaH = ( pow_2( rho ) * pow_3( Height ) * GravityConstant * Cp * std::abs( TSurfIn - TAirIn ) ) / ( TmeanFilmKelvin * mu * lambda ); // eq 132 in ISO 15099
 
 		// eq. 135 in ISO 15099 (only need this one because tilt is 90 deg)
-		Nuint = 0.56 * std::pow( ( RaH * sineTilt ), 0.25 );
+		Nuint = 0.56 * root_4( RaH * sineTilt );
 		hcin = Nuint * lambda / Height;
 
 		return hcin;

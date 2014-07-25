@@ -15,7 +15,7 @@
 ! Both the supply and the demand side will be modelled in this section of the template
 ! ******************************VERSION IDENTIFIER********************************************
 
-  Version,8.1;
+  Version,8.2;
 
 ! ********************************DEFINE THE CHILLED WATER(CW) LOOP***************************
 
@@ -321,86 +321,86 @@
 
   Schedule:Compact,
     Load Profile Load Schedule,  !- Name
-    CW Loop Any Number,        !- Schedule Type Limits Name
-    Through: 04/30,            !- Field 1
-    For: AllDays,              !- Field 2
-    Until: 01:00,-21652.9723,  !- <none>
-    Until: 02:00,-18598.11837, !- <none>
-    Until: 03:00,-16177.62277, !- <none>
-    Until: 04:00,-15197.61381, !- <none>
-    Until: 05:00,-16624.78126, !- <none>
-    Until: 06:00,-31699.6101,  !- <none>
-    Until: 07:00,-44452.50237, !- <none>
-    Until: 08:00,-38124.24401, !- <none>
-    Until: 09:00,-47241.8608,  !- <none>
-    Until: 10:00,-43946.29524, !- <none>
-    Until: 11:00,-46386.16618, !- <none>
-    Until: 12:00,-48550.0582,  !- <none>
-    Until: 13:00,-51507.49486, !- <none>
-    Until: 14:00,-52831.65247, !- <none>
-    Until: 15:00,-52675.34672, !- <none>
-    Until: 16:00,-49358.45631, !- <none>
-    Until: 17:00,-47538.37037, !- <none>
-    Until: 18:00,-48931.3786,  !- <none>
-    Until: 19:00,-51601.12227, !- <none>
-    Until: 20:00,-56680.15228, !- <none>
-    Until: 21:00,-56703.57127, !- <none>
-    Until: 22:00,-43909.99069, !- <none>
-    Until: 23:00,-31856.94046, !- <none>
-    Until: 24:00,-26217.40723, !- <none>
-    Through: 09/30,            !- <none>
-    For: AllDays,              !- <none>
-    Until: 01:00,-37815.65528, !- Extended Field
-    Until: 02:00,-34222.88759, !- Extended Field
-    Until: 03:00,-31791.60136, !- Extended Field
-    Until: 04:00,-30085.09174, !- Extended Field
-    Until: 05:00,-31018.79267, !- Extended Field
-    Until: 06:00,-47315.075,   !- Extended Field
-    Until: 07:00,-60809.0483,  !- Extended Field
-    Until: 08:00,-58353.28712, !- Extended Field
-    Until: 09:00,-73057.32391, !- Extended Field
-    Until: 10:00,-73595.01927, !- Extended Field
-    Until: 11:00,-75811.38809, !- Extended Field
-    Until: 12:00,-79872.01249, !- Extended Field
-    Until: 13:00,-83892.87593, !- Extended Field
-    Until: 14:00,-86869.36757, !- Extended Field
-    Until: 15:00,-89138.49598, !- Extended Field
-    Until: 16:00,-86282.98713, !- Extended Field
-    Until: 17:00,-83215.03028, !- Extended Field
-    Until: 18:00,-82178.11665, !- Extended Field
-    Until: 19:00,-85325.87149, !- Extended Field
-    Until: 20:00,-86953.77696, !- Extended Field
-    Until: 21:00,-85795.67382, !- Extended Field
-    Until: 22:00,-70176.77639, !- Extended Field
-    Until: 23:00,-55495.79516, !- Extended Field
-    Until: 24:00,-47851.942,   !- Extended Field
-    Through: 12/31,            !- Extended Field
-    For: AllDays,              !- Extended Field
-    Until: 01:00,-22352.35101, !- Extended Field
-    Until: 02:00,-19202.04594, !- Extended Field
-    Until: 03:00,-17113.77564, !- Extended Field
-    Until: 04:00,-15593.56201, !- Extended Field
-    Until: 05:00,-15482.2666,  !- Extended Field
-    Until: 06:00,-20749.41583, !- Extended Field
-    Until: 07:00,-32413.96668, !- Extended Field
-    Until: 08:00,-53607.28306, !- Extended Field
-    Until: 09:00,-56220.09392, !- Extended Field
-    Until: 10:00,-48395.82376, !- Extended Field
-    Until: 11:00,-44829.77071, !- Extended Field
-    Until: 12:00,-46547.56608, !- Extended Field
-    Until: 13:00,-51398.25863, !- Extended Field
-    Until: 14:00,-53608.45398, !- Extended Field
-    Until: 15:00,-53486.89645, !- Extended Field
-    Until: 16:00,-48168.90142, !- Extended Field
-    Until: 17:00,-43408.52746, !- Extended Field
-    Until: 18:00,-48978.48307, !- Extended Field
-    Until: 19:00,-53400.35772, !- Extended Field
-    Until: 20:00,-57996.78659, !- Extended Field
-    Until: 21:00,-56053.17856, !- Extended Field
-    Until: 22:00,-43900.3144,  !- Extended Field
-    Until: 23:00,-32686.46507, !- Extended Field
-    Until: 24:00,-27794.9808;  !- Extended Field
-    
+    CW Loop Any Number,      !- Schedule Type Limits Name
+    Through: 04/30,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 01:00,-21652.9723,!- Field 3
+    Until: 02:00,-18598.11837, !- Field 5
+    Until: 03:00,-16177.62277, !- Field 7
+    Until: 04:00,-15197.61381, !- Field 9
+    Until: 05:00,-16624.78126, !- Field 11
+    Until: 06:00,-31699.6101,!- Field 13
+    Until: 07:00,-44452.50237, !- Field 15
+    Until: 08:00,-38124.24401, !- Field 17
+    Until: 09:00,-47241.8608,!- Field 19
+    Until: 10:00,-43946.29524, !- Field 21
+    Until: 11:00,-46386.16618, !- Field 23
+    Until: 12:00,-48550.0582,!- Field 25
+    Until: 13:00,-51507.49486, !- Field 27
+    Until: 14:00,-52831.65247, !- Field 29
+    Until: 15:00,-52675.34672, !- Field 31
+    Until: 16:00,-49358.45631, !- Field 33
+    Until: 17:00,-47538.37037, !- Field 35
+    Until: 18:00,-48931.3786,!- Field 37
+    Until: 19:00,-51601.12227, !- Field 39
+    Until: 20:00,-56680.15228, !- Field 41
+    Until: 21:00,-56703.57127, !- Field 43
+    Until: 22:00,-43909.99069, !- Field 45
+    Until: 23:00,-31856.94046, !- Field 47
+    Until: 24:00,-26217.40723, !- Field 49
+    Through: 09/30,          !- Field 51
+    For: AllDays,            !- Field 52
+    Until: 01:00,-37815.65528, !- Field 53
+    Until: 02:00,-34222.88759, !- Field 55
+    Until: 03:00,-31791.60136, !- Field 57
+    Until: 04:00,-30085.09174, !- Field 59
+    Until: 05:00,-31018.79267, !- Field 61
+    Until: 06:00,-47315.075, !- Field 63
+    Until: 07:00,-60809.0483,!- Field 65
+    Until: 08:00,-58353.28712, !- Field 67
+    Until: 09:00,-73057.32391, !- Field 69
+    Until: 10:00,-73595.01927, !- Field 71
+    Until: 11:00,-75811.38809, !- Field 73
+    Until: 12:00,-79872.01249, !- Field 75
+    Until: 13:00,-83892.87593, !- Field 77
+    Until: 14:00,-86869.36757, !- Field 79
+    Until: 15:00,-89138.49598, !- Field 81
+    Until: 16:00,-86282.98713, !- Field 83
+    Until: 17:00,-83215.03028, !- Field 85
+    Until: 18:00,-82178.11665, !- Field 87
+    Until: 19:00,-85325.87149, !- Field 89
+    Until: 20:00,-86953.77696, !- Field 91
+    Until: 21:00,-85795.67382, !- Field 93
+    Until: 22:00,-70176.77639, !- Field 95
+    Until: 23:00,-55495.79516, !- Field 97
+    Until: 24:00,-47851.942, !- Field 99
+    Through: 12/31,          !- Field 101
+    For: AllDays,            !- Field 102
+    Until: 01:00,-22352.35101, !- Field 103
+    Until: 02:00,-19202.04594, !- Field 105
+    Until: 03:00,-17113.77564, !- Field 107
+    Until: 04:00,-15593.56201, !- Field 109
+    Until: 05:00,-15482.2666,!- Field 111
+    Until: 06:00,-20749.41583, !- Field 113
+    Until: 07:00,-32413.96668, !- Field 115
+    Until: 08:00,-53607.28306, !- Field 117
+    Until: 09:00,-56220.09392, !- Field 119
+    Until: 10:00,-48395.82376, !- Field 121
+    Until: 11:00,-44829.77071, !- Field 123
+    Until: 12:00,-46547.56608, !- Field 125
+    Until: 13:00,-51398.25863, !- Field 127
+    Until: 14:00,-53608.45398, !- Field 129
+    Until: 15:00,-53486.89645, !- Field 131
+    Until: 16:00,-48168.90142, !- Field 133
+    Until: 17:00,-43408.52746, !- Field 135
+    Until: 18:00,-48978.48307, !- Field 137
+    Until: 19:00,-53400.35772, !- Field 139
+    Until: 20:00,-57996.78659, !- Field 141
+    Until: 21:00,-56053.17856, !- Field 143
+    Until: 22:00,-43900.3144,!- Field 145
+    Until: 23:00,-32686.46507, !- Field 147
+    Until: 24:00,-27794.9808;!- Field 149
+
   LoadProfile:Plant,
     Load Profile,            !- Name
     Cooling Demand Load Profile Inlet Node,  !- Inlet Node Name
