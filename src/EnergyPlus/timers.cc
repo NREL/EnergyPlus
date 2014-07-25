@@ -1,4 +1,5 @@
 #include "timers.hh"
+#include <sstream>
 
 namespace EppPerformance{
 
@@ -70,17 +71,24 @@ namespace EppPerformance{
 
   const string Timer::outFile("speedup_timers.txt");
 
+	string
+	Timer::getTimerData()
+	{
+		std::stringstream results;
+    for (auto t: Timers){
+		     results << t.second->_label << ",\t" << t.second->getSumElapsedSeconds() 
+			     << " seconds" << std::endl;
+		     results << "\t" << "Hits on timer: " << t.second->_hits << std::endl;
+    }		
+		return results.str();
+	}
+
   void
   Timer::printTimerData()
   {
     std::ofstream thefile;
     thefile.open(outFile);
-    
-    for (auto t: Timers){
-		     thefile << t.second->_label << ",\t" << t.second->getSumElapsedSeconds() 
-			     << " seconds" << std::endl;
-		     thefile << "\t" << "Hits on timer: " << t.second->_hits << std::endl;
-    }
+		thefile << getTimerData();
     thefile.close();
   }
 }

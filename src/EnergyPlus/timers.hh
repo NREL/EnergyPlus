@@ -36,7 +36,7 @@ namespace EppPerformance {
     Timer(string label);
     ~Timer();
     static void printTimerData();
-    
+    static string getTimerData();
     double getSumElapsedSeconds();
     double getLastElapsedSeconds();
     struct timespec getElapsedTime();
@@ -59,5 +59,19 @@ namespace EppPerformance {
       _sum.tv_sec += _stop.tv_sec - _start.tv_sec;
       ++_hits;
     }
+	public:
+		class InlineTimer
+		{
+		public:
+			InlineTimer(string label):t(new Timer(label)){
+				t->startTimer();
+			}
+			~InlineTimer(){
+				t->stopTimer();
+			}
+		private:
+			Timer *t;
+		};
   };
+
 }

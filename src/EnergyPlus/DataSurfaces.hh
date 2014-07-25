@@ -421,7 +421,7 @@ namespace DataSurfaces {
 	{
 		// Members
 		std::string Name; // User supplied name of the surface (must be unique)
-		int Construction; // Pointer to the construction in the Construct derived type
+		//		int Construction; // Pointer to the construction in the Construct derived type
 		bool EMSConstructionOverrideON; // if true, EMS is calling to override the construction value
 		int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
 		int ConstructionStoredInputValue; // holds the original value for Construction per surface input
