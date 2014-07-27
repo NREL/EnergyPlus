@@ -2517,7 +2517,7 @@ namespace WindowManager {
 
 			if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn ) {
 				SurfInsideTemp = thetas( 2 * ngllayer + 2 ) - TKelvin;
-				EffShBlEmiss = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss ;
+				EffShBlEmiss = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss );
 				EffGlEmiss = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum  - 1 ].MovableSlats, SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss );
 				SurfaceRadiantWin[ SurfNum - 1 ].EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( thetas( 2 * ngllayer ) - TKelvin ) ) / ( EffShBlEmiss + EffGlEmiss );
 			} else {

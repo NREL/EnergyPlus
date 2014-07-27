@@ -3962,7 +3962,7 @@ namespace HeatBalanceSurfaceManager {
 
 			if ( ( surface.HeatTransferAlgorithm != HeatTransferModel_CTF ) && ( surface.HeatTransferAlgorithm != HeatTransferModel_EMPD ) ) continue;
 
-			ConstrNum = Construction[ SurfNum  - 1 ];
+			int ConstrNum = Construction[ SurfNum  - 1 ];
 			auto const & construct( Construct( ConstrNum ) );
 
 			if ( construct.NumCTFTerms == 0 ) continue; // Skip surfaces with no history terms
@@ -4034,7 +4034,7 @@ namespace HeatBalanceSurfaceManager {
 			if ( surface.Class == SurfaceClass_Window || surface.Class == SurfaceClass_TDD_Dome || ! surface.HeatTransSurf ) continue;
 			if ( ( surface.HeatTransferAlgorithm != HeatTransferModel_CTF ) && ( surface.HeatTransferAlgorithm != HeatTransferModel_EMPD ) && ( surface.HeatTransferAlgorithm != HeatTransferModel_TDD ) ) continue;
 
-			ConstrNum = Construction[ SurfNum  - 1 ];
+			int ConstrNum = Construction[ SurfNum  - 1 ];
 			auto const & construct( Construct( ConstrNum ) );
 
 			++SUMH( SurfNum );
@@ -5190,7 +5190,10 @@ CalcHeatBalanceInsideSurf( int ZoneToResimulate ) // if passed in, then only cal
 	FArray1D_bool any_surface_ConFD_or_HAMT( NumOfZones, false );
 	for ( int iZone = 1; iZone <= NumOfZones; ++iZone ) {
 		auto const & zone( Zone( iZone ) );
-		for ( int iSurf = zone.SurfaceFirst, eSurf = zone.SurfaceLast; iSurf <= eSurf; ++iSurf ) { //Tuned Replaced any_eq and array slicing and member array usage
+			int FirstZoneSurf = ZoneSpecs[ iZone - 1 ].SurfaceFirst;
+			int LastZoneSurf = ZoneSpecs[ iZone - 1 ].SurfaceLast;
+			int iSurf, eSurf;
+		for ( iSurf = FirstZoneSurf, eSurf = LastZoneSurf; iSurf <= eSurf; ++iSurf ) { //Tuned Replaced any_eq and array slicing and member array usage
 			auto const alg( Surface( iSurf ).HeatTransferAlgorithm );
 			if ( ( alg == HeatTransferModel_CondFD ) || ( alg == HeatTransferModel_HAMT ) ) {
 				any_surface_ConFD_or_HAMT( iZone ) = true;
@@ -5711,7 +5714,7 @@ CalcHeatBalanceInsideSurf( int ZoneToResimulate ) // if passed in, then only cal
 		// inside surface heat balance for the other side.
 		auto l11( TH.index( 1, 1, 1 ) );
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum, ++l11 ) {
-			if ( present( ZoneToResimulate ) ) {
+			if ( ZoneToResimulate != -1 ) {
 				if ( ( Surface( SurfNum ).Zone != ZoneToResimulate ) && ( AdjacentZoneToSurface( SurfNum ) != ZoneToResimulate ) ) {
 					continue; // skip surfaces that are not associated with this zone
 				}

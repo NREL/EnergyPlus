@@ -9792,26 +9792,13 @@ namespace SolarShading {
 			ZoneDifSolarDistTransmittedTotl = 0.0;
 
 			// Loop over all diffuse solar transmitting surfaces (i.e., exterior windows and TDDs) in the current zone
-<<<<<<< HEAD
 			FirstZoneSurf = ZoneSpecs[ZoneNum - 1].SurfaceFirst;
 			LastZoneSurf = ZoneSpecs[ZoneNum - 1].SurfaceLast;
 			for ( DifTransSurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; DifTransSurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++DifTransSurfNum ) {
-=======
-			FirstZoneSurf = Zone( ZoneNum ).SurfaceFirst;
-			LastZoneSurf = Zone( ZoneNum ).SurfaceLast;
-			for ( DifTransSurfNum = FirstZoneSurf; DifTransSurfNum <= LastZoneSurf; ++DifTransSurfNum ) {
->>>>>>> f14e14ca0bcf869700eaf3f83e20a37284e0a7e3
 				// Skip surfaces that are not exterior, except for TDD_Diffusers
 				if ( ( ( Surface( DifTransSurfNum ).ExtBoundCond != ExternalEnvironment ) && ( Surface( DifTransSurfNum ).ExtBoundCond != OtherSideCondModeledExt ) ) && SurfaceRadiantWin[ DifTransSurfNum  - 1].OriginalClass != SurfaceClass_TDD_Diffuser ) continue;
 
 				// Do I need to do anything special for TDDs?
-<<<<<<< HEAD
-				if ( SurfaceRadiantWin[ DifTransSurfNum  - 1].OriginalClass == SurfaceClass_TDD_Diffuser ) {
-				}
-=======
-//				if ( SurfaceWindow( DifTransSurfNum ).OriginalClass == SurfaceClass_TDD_Diffuser ) {
-//				}
->>>>>>> f14e14ca0bcf869700eaf3f83e20a37284e0a7e3
 
 				// Skip surfaces that are not exterior windows or TDD diffusers
 				if ( Surface( DifTransSurfNum ).Class != SurfaceClass_Window && SurfaceRadiantWin[ DifTransSurfNum  - 1].OriginalClass != SurfaceClass_TDD_Diffuser ) continue;
@@ -9831,11 +9818,7 @@ namespace SolarShading {
 				WinDifSolarDistTransmittedTotl = 0.0;
 
 				// Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
-<<<<<<< HEAD
 				for ( HeatTransSurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; HeatTransSurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++HeatTransSurfNum ) {
-=======
-				for ( HeatTransSurfNum = FirstZoneSurf; HeatTransSurfNum <= LastZoneSurf; ++HeatTransSurfNum ) {
->>>>>>> f14e14ca0bcf869700eaf3f83e20a37284e0a7e3
 					// Skip surfaces that are not heat transfer surfaces
 					if ( ! Surface( HeatTransSurfNum ).HeatTransSurf ) continue;
 					// Skip tubular daylighting device domes
@@ -9852,8 +9835,8 @@ namespace SolarShading {
 					Real64 const WinDifSolarTrans_Factor( WinDifSolarTrans * ViewFactor );
 					Real64 const win_SwitchingFactor( SurfaceWindow( HeatTransSurfNum ).SwitchingFactor );
 					Real64 const per_HTSurfaceArea( 1.0 / Surface( HeatTransSurfNum ).Area );
-					Real64 const HTsurf_slat_ang( SurfaceWindow( HeatTransSurfNum ).SlatAngThisTS );
-					bool const HTsurf_movable_slats( SurfaceWindow( HeatTransSurfNum ).MovableSlats );
+					Real64 const HTsurf_slat_ang( SurfaceRadiantWin[  HeatTransSurfNum - 1 ].SlatAngThisTS );
+					bool const HTsurf_movable_slats( SurfaceRadiantWin[ HeatTransSurfNum - 1 ].MovableSlats );
 
 					// Calculate diffuse solar from current exterior window absorbed and reflected by current heat transfer surface
 					// And calculate transmitted diffuse solar to adjacent zones through interior windows
@@ -10028,11 +10011,7 @@ namespace SolarShading {
 									}
 
 									if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-<<<<<<< HEAD
 										BlAbsDiffBk = InterpSlatAng( SurfaceRadiantWin[ HeatTransSurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ HeatTransSurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( IGlass, {1,MaxSlatAngs} ) );
-=======
-										BlAbsDiffBk = InterpSlatAng( HTsurf_slat_ang, HTsurf_movable_slats, construct_sh_BlAbsDiffBack( IGlass, _ ) );
->>>>>>> f14e14ca0bcf869700eaf3f83e20a37284e0a7e3
 										// Calc diffuse solar absorbed in each window glass layer and shade
 										WinDifSolLayAbsW = WinDifSolarTrans_Factor * BlAbsDiffBk;
 									}
@@ -10053,11 +10032,7 @@ namespace SolarShading {
 								InsideDifReflectance = Construct( ConstrNum ).ReflectSolDiffBack;
 								if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ) {
 									// Diffuse back solar reflectance, blind present, vs. slat angle
-<<<<<<< HEAD
 									InsideDifReflectance = InterpSlatAng( SurfaceRadiantWin[ HeatTransSurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ HeatTransSurfNum - 1 ].MovableSlats, Construct( ConstrNum ).BlReflectSolDiffBack );
-=======
-									InsideDifReflectance = InterpSlatAng( HTsurf_slat_ang, HTsurf_movable_slats, Construct( ConstrNum ).BlReflectSolDiffBack );
->>>>>>> f14e14ca0bcf869700eaf3f83e20a37284e0a7e3
 								}
 								DifSolarReflW = WinDifSolarTrans_Factor * InsideDifReflectance;
 
@@ -10076,13 +10051,8 @@ namespace SolarShading {
 								}
 								if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
 									// Calc diffuse solar absorbed by blind [W]
-<<<<<<< HEAD
-									AbsDiffBkBl = InterpSlatAng( SurfaceRadiantWin[ HeatTransSurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ HeatTransSurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
-									ShBlDifSolarAbsW = WinDifSolar( DifTransSurfNum ) * ViewFactor * AbsDiffBkBl;
-=======
 									AbsDiffBkBl = InterpSlatAng( HTsurf_slat_ang, HTsurf_movable_slats, construct_sh.AbsDiffBackBlind );
 									ShBlDifSolarAbsW = WinDifSolarTrans_Factor * AbsDiffBkBl;
->>>>>>> f14e14ca0bcf869700eaf3f83e20a37284e0a7e3
 								}
 								// Correct for divider shadowing
 								if ( ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn ) ShBlDifSolarAbsW *= SurfaceWindow( HeatTransSurfNum ).GlazedFrac;
@@ -10592,11 +10562,7 @@ namespace SolarShading {
 						}
 
 						if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
-<<<<<<< HEAD
 						  BlAbsDiffBk = InterpSlatAng( SurfaceRadiantWin[ HeatTransSurfNum - 1].SlatAngThisTS, SurfaceRadiantWin[ HeatTransSurfNum  - 1].MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( IGlass, {1,MaxSlatAngs} ) );
-=======
-							BlAbsDiffBk = InterpSlatAng( SurfaceWindow( HeatTransSurfNum ).SlatAngThisTS, SurfaceWindow( HeatTransSurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( IGlass, _ ) );
->>>>>>> f14e14ca0bcf869700eaf3f83e20a37284e0a7e3
 							// Calc diffuse solar absorbed in each window glass layer and shade
 							WinDifSolLayAbsW = IntWinDifSolarTransW * ViewFactor * BlAbsDiffBk;
 						}

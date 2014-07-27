@@ -4599,7 +4599,7 @@ namespace ZoneTempPredictorCorrector {
 			Area = Surface( SurfNum ).Area; // For windows, this is the glazing area
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
-				auto const shading_flag( SurfaceRadiantWi[ SurfNum - 1 ].ShadingFlag );
+				auto const shading_flag( SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag() );
 
 				// Add to the convective internal gains
 				if ( shading_flag == IntShadeOn || shading_flag == IntBlindOn ) {

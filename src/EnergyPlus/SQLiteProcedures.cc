@@ -2252,7 +2252,7 @@ void SQLite::createSQLiteSurfacesTable()
 	for(int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
 		sqliteBindInteger(m_surfaceInsertStmt, 1, surfaceNumber);
 		sqliteBindText(m_surfaceInsertStmt, 2, DataSurfaces::Surface(surfaceNumber).Name);
-		sqliteBindInteger(m_surfaceInsertStmt, 3, DataSurfaces::Surface(surfaceNumber).Construction);
+		sqliteBindInteger(m_surfaceInsertStmt, 3, DataSurfaces::Construction[ surfaceNumber - 1 ]);
 		sqliteBindText(m_surfaceInsertStmt, 4, DataSurfaces::cSurfaceClass(DataSurfaces::Surface(surfaceNumber).Class));
 		sqliteBindDouble(m_surfaceInsertStmt, 5, DataSurfaces::Surface(surfaceNumber).Area);
 		sqliteBindDouble(m_surfaceInsertStmt, 6, DataSurfaces::Surface(surfaceNumber).GrossArea);

@@ -253,9 +253,10 @@ namespace HeatBalanceIntRadExchange {
 	void
 	CalcScriptF(ZoneViewFactorInformation& Zone){
 		using EppPerformance::Timer;
-    
-		thread_local static Timer timer(__PRETTY_FUNCTION__);
-		timer.startTimer();
+		// This thread_local static isn't working out -- actually,
+		// when you think about it, it doesn't make sense
+		//		thread_local static Timer timer(__PRETTY_FUNCTION__);
+		//timer.startTimer();
 
 		CalcSurfaceEmiss(Zone);
 		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
@@ -289,7 +290,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 		}
 
-		int ipiv[surfCount];
+		int *ipiv = new int[surfCount];
 // #ifdef DEBUG_CI
 // 		std::cout << "Dumping prelims in CalcScriptF Zone:" << Zone() << std::endl;
 // 		std::cout << "jMatrix first." << std::endl;
@@ -313,6 +314,7 @@ namespace HeatBalanceIntRadExchange {
 															 ipiv, jMatrix, surfCount);
 		delete[] cMatrix; //made this as early as possible -- it appears that having 8 threads allocate NxN all at once for large zones 
 		//is having an acute impact on system memory
+		delete[] ipiv;
 
 		if( result == 0){ //success
 // #ifdef DEBUG_CI
@@ -355,7 +357,7 @@ namespace HeatBalanceIntRadExchange {
 // 			std::cout << std::endl; 
 // 		}
 // #endif
-		timer.stopTimer();
+//		timer.stopTimer();
 	}
 	void
 	InitInteriorRadExchange()

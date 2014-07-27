@@ -3742,7 +3742,7 @@ namespace SurfaceGeometry {
 				SurfaceTmp( SurfNum ).Class = SubSurfIDs( ValidChk ); // Set class number
 			}
 
-			TmpConstruction[ SurfNum  - 1] = FindItemInList( cAlphaArgs( 3 ), Construct.Name, TotConstructs );
+			TmpConstruction[ SurfNum  - 1] = FindItemInList( cAlphaArgs( 3 ), Construct_Name, TotConstructs );
 			//			SurfaceTmp( SurfNum ).Construction = FindItemInList( cAlphaArgs( 3 ), Construct.Name(), TotConstructs );
 
 			if ( TmpConstruction[ SurfNum  - 1] == 0 ) {
@@ -9047,6 +9047,7 @@ namespace SurfaceGeometry {
 			Construct.allocate( TotConstructs );
 			ConstrWin.resize( TotConstructs );
 			NominalU.allocate( TotConstructs );
+			NominalRforNominalUCalculation.allocate( TotConstructs );
 			NominalRforNominalUCalculation = 0.0;
 			NominalU = 0.0;
 			Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );

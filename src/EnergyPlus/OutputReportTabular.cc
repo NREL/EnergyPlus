@@ -10360,13 +10360,13 @@ namespace OutputReportTabular {
 		    if (iKindRec == recKindSurface)
 		      {
 			WriteSubtitle("Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
 							"SurfaceShadowingSummary", "Entire Facility", 
 							"Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces " );
 		      }else{
 		        WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
 		      
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, 
 							"SurfaceShadowingSummary", "Entire Facility", 
 							"Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
 		    }
