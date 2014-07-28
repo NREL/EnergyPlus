@@ -21,11 +21,17 @@ namespace DataPlant {
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
 	// Parameters for use in Load Distribution Schemes
-	extern int const OptimalLoading; // Optimal Load Distribution Scheme
-	extern int const SequentialLoading; // Seqential Load Distribution Scheme
-	extern int const UniformLoading; // Uniform Load Distribution Scheme
-	extern int const UniformPLRLoading; // Uniform PLR Load Distribution Scheme
-	extern int const SequentialUniformPLRLoading; // Sequential Uniform PLR Load Distribution Scheme
+	//extern int const OptimalLoading; // Optimal Load Distribution Scheme
+	//extern int const SequentialLoading; // Seqential Load Distribution Scheme
+	//extern int const UniformLoading; // Uniform Load Distribution Scheme
+	//extern int const UniformPLRLoading; // Uniform PLR Load Distribution Scheme
+	//extern int const SequentialUniformPLRLoading; // Sequential Uniform PLR Load Distribution Scheme
+
+	int const OptimalLoading( 1 ); // Optimal Load Distribution Scheme
+	int const SequentialLoading( 2 ); // Sequential Load Distribution Scheme
+	int const UniformLoading( 3 ); // Uniform Load Distribution Scheme
+	int const UniformPLRLoading( 4 ); // Uniform PLR Load Distribution Scheme
+	int const SequentialUniformPLRLoading( 5 ); // Sequential Uniform PLR Load Distribution Scheme
 
 	// Parameters for scheme types
 	// Used in TYPE(OperationData)%OpSchemeType
