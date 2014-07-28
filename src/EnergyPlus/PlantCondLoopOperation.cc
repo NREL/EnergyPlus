@@ -2103,9 +2103,9 @@ namespace PlantCondLoopOperation {
 			//no load to distribute
 		} else {
 
-			{ auto const SELECT_CASE_var( LoadFlag );
-			if ( SELECT_CASE_var == OptimalLoading ) { // LoadFlag=1 indicates "optimal" load distribution
-				//OPTIMAL DISTRIBUTION SCHEME
+			//OPTIMAL DISTRIBUTION SCHEME
+			switch ( LoadFlag ) {
+			case OptimalLoading: 
 				//step 1: load all machines to optimal PLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2178,9 +2178,11 @@ namespace PlantCondLoopOperation {
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 					}
 				}
-
-				//SEQUENTIALLOAD DISTRIBUTION SCHEME
-			} else if ( SELECT_CASE_var == SequentialLoading ) { // LoadFlag=2 indicates "sequential" load distribution
+				
+				break;
+			
+			//SEQUENTIALLOAD DISTRIBUTION SCHEME
+			case SequentialLoading: 
 				
 				// step 1: Load machines in list order
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
@@ -2212,8 +2214,10 @@ namespace PlantCondLoopOperation {
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 				}
 
-				//UNIFORMLOAD DISTRIBUTION SCHEME
-			} else if ( SELECT_CASE_var == UniformLoading ) { // LoadFlag=3 indicates "uniform" load distribution
+				break;
+
+			//UNIFORMLOAD DISTRIBUTION SCHEME
+			case UniformLoading: 
 
 				// step 1: distribute load equally to all machines
 				UniformLoad = std::abs( RemLoopDemand ) / NumCompsOnList;
@@ -2263,8 +2267,10 @@ namespace PlantCondLoopOperation {
 					}
 				}
 
-				// UNIFORMPLR LOAD DISTRIBUTION SCHEME
-			} else if ( SELECT_CASE_var == UniformPLRLoading ) {
+				break;
+
+			// UNIFORMPLR LOAD DISTRIBUTION SCHEME
+			case UniformPLRLoading:
 				// Get total plant capacity and remove last component from list if load is less
 				// than plant capacity at min PLR
 				PlantCapacity = 0.0;
@@ -2406,8 +2412,10 @@ namespace PlantCondLoopOperation {
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
 				}
 
-				// SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
-			} else if ( SELECT_CASE_var == SequentialUniformPLRLoading ) {
+				break;
+
+			// SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
+			case SequentialUniformPLRLoading:
 				
 				PlantCapacity = 0.0;
 				PlantPLR = 0.0;
@@ -2486,7 +2494,7 @@ namespace PlantCondLoopOperation {
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
 				}
 
-			}}
+			}
 
 		} // load is small check
 
