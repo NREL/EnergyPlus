@@ -1,5 +1,6 @@
 // C++ Headers
 #include <cmath>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -2091,7 +2092,17 @@ namespace PlantCondLoopOperation {
 		auto & this_loop( PlantLoop( LoopNum ) );
 		auto & this_loopside( this_loop.LoopSide( LoopSideNum ) );
 		auto & this_equiplist( this_loop.OpScheme( CurSchemePtr ).EquipList( ListPtr ) );
-
+		
+		struct LoadPLRPoint {
+			Real64 plant_capacity_to_this_point;
+			Real64 largest_min_plr_to_this_point;
+			LoadPLRPoint( Real64 capacity, Real64 plr ) {
+				plant_capacity_to_this_point = capacity;
+				largest_min_plr_to_this_point = plr;
+			}
+		};
+		std::vector< LoadPLRPoint > accrued_load_plr_values;
+				
 		// load local variables
 		NumCompsOnList = this_equiplist.NumComps;
 		RemLoopDemand = LoopDemand;
@@ -2280,7 +2291,7 @@ namespace PlantCondLoopOperation {
 				
 				// Determine PlantCapacity and LargestMinCompPLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-											
+
 					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
@@ -2298,71 +2309,33 @@ namespace PlantCondLoopOperation {
 						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
 					}
 						
-
 					//Set LargestMinCompPLR to largest MinCompPLR
-					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
+					LargestMinCompPLR = max( LargestMinCompPLR, MinCompPLR );
 
-					if ( CompIndex == NumCompsOnList ) { 
-						if ( NumCompsOnList == 1 ) {
-							// If there's only one comp left on the list, get out.
-							continue;
-						} else {
-							// Drop last item on equipment list and recalculate
-							if ( std::abs( RemLoopDemand ) < ( LargestMinCompPLR * PlantCapacity ) ) {
-								CompIndex = 0;
-								NumCompsOnList -= 1;
-								PlantCapacity = 0.0;
-								LargestMinCompPLR = 0.0;
-							}
-						}
+					//Update the array
+					accrued_load_plr_values.push_back( LoadPLRPoint( PlantCapacity, LargestMinCompPLR ) );
+				}
+
+				// work backwards from full capacity down to 1 unit on
+				for ( int i = accrued_load_plr_values.size() - 1; i >= 0; --i ) {
+					
+					// if i == 0 then we need to take that as the resulting value
+					if ( i == 0 ) {
+						PlantCapacity = accrued_load_plr_values[i].plant_capacity_to_this_point;
+						LargestMinCompPLR = accrued_load_plr_values[i].largest_min_plr_to_this_point;
+						break;
+					
+					// if the capacity is greater than the demand, just store the latest values and continue
+					} else if ( std::abs( RemLoopDemand ) < ( accrued_load_plr_values[i].largest_min_plr_to_this_point * accrued_load_plr_values[i].plant_capacity_to_this_point ) ) {
+						PlantCapacity = accrued_load_plr_values[i].plant_capacity_to_this_point;
+						LargestMinCompPLR = accrued_load_plr_values[i].largest_min_plr_to_this_point;
+						continue;
+					
+					// if the capacity is less than the demand, accept the last values from the previous iteration and exit
+					} else {
+						break;
+						
 					}
-				}
-
-				//Reset NumCompsOnList back to original if modified.
-				if ( NumCompsOnList != this_equiplist.NumComps ) {
-					NumCompsOnList = this_equiplist.NumComps;
-				}
-
-				// Add component back into plant if RemLoopDemand is greater than PlantCapacity
-				if ( std::abs( RemLoopDemand ) > PlantCapacity ){
-
-					PlantCapacity = 0.0;
-					LargestMinCompPLR = 0.0;
-
-					for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
-
-						// If there is only one component on the equipment list, we can't do anything. Continue.
-						if ( NumCompsOnList == 1 ){
-							continue;
-						}
-
-						// Exit once PlantCapacity is greater than LoopDemand
-						if ( std::abs( RemLoopDemand ) < PlantCapacity ){
-							AddCompBackInFlag = true;
-							continue;
-						} else {
-
-							BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
-							CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
-
-							// create a reference to the component itself
-							auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
-
-							if ( ! this_component.Available ) continue;
-
-							PlantCapacity += this_component.MaxLoad;
-
-							if ( this_component.MaxLoad < SmallLoad ){
-								ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
-								MinCompPLR = 0.0;
-							} else {
-								MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
-							}
-
-							//Set LargestMinCompPLR to largest MinCompPLR
-							if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
-						}
-					}				
 				}
 
 				// Determine PLR for uniform PLR loading of all equipment
