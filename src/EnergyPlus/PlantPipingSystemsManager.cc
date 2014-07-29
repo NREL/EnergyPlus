@@ -6102,27 +6102,27 @@ namespace PlantPipingSystemsManager {
 					Ycentroid = ( PipingSystemDomains(DomainNum).Cells(8, 10, 8).Centroid.Y - PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.Y );
 
 					if ( ( X == 8 ) && ( Y == 0 ) && ( Z == 8 ) ) {
-						myfile << CurMnDyHr << "," << TimeStep << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << CurMnDyHr << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 1 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 2 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 3 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 4 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 5 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 6 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 7 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 8 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 9 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					} else if ( ( X == 8 ) && ( Y == 10 ) && ( Z == 8 ) ) {
-						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+						myfile << "," << TimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
 					}
 			
 				}
@@ -6175,6 +6175,19 @@ namespace PlantPipingSystemsManager {
 		int DirectionCounter;
 		int CurDirection; // From Enum: Direction
 
+		Real64 Vol;
+		Real64 density;
+		Real64 mass;
+		Real64 cp;
+		Real64 HeatStored;
+		Real64 NeighborHeatTransfer = 0.0;
+		Real64 HeatInbalance;
+		Real64 stop;
+		Real64 TimeDiff;
+		Real64 SimTime;
+
+		std::ofstream static myfile("FieldCellHeatInbalance.csv", std::ofstream::out);
+
 		//Set up once-per-cell items
 		Numerator = 0.0;
 		Denominator = 0.0;
@@ -6198,10 +6211,43 @@ namespace PlantPipingSystemsManager {
 			Denominator += Beta / Resistance;
 
 		}
-
+		
 		//'now that we have passed all directions, update the temperature
 		RetVal = Numerator / Denominator;
 
+		TimeDiff = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+
+		SimTime = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
+		
+		if ( ( ThisCell.X_index == 1 ) && ( ThisCell.Y_index == 9 ) && ( ThisCell.Z_index == 1 ) ) {
+			stop = 0;
+		}
+
+		Vol = Volume( ThisCell ) ;
+		density = ThisCell.MyBase.Properties.Density;
+		
+		mass = density * Vol;
+
+		cp = ThisCell.MyBase.Properties.SpecificHeat;
+
+		HeatStored = mass * cp * ( RetVal - ThisCell.MyBase.Temperature_PrevTimeStep ) / TimeDiff;
+
+		for ( DirectionCounter = lbound( NeighborFieldCells, 1 ); DirectionCounter <= ubound( NeighborFieldCells, 1 ); ++DirectionCounter ) {
+			
+			CurDirection = NeighborFieldCells( DirectionCounter );
+
+			EvaluateNeighborCharacteristics( DomainNum, ThisCell, CurDirection, NeighborTemp, Resistance );
+			
+			NeighborHeatTransfer  += ( RetVal - NeighborTemp ) / Resistance;
+
+		}
+
+		HeatInbalance = ( HeatStored + NeighborHeatTransfer );
+
+		if ( std::abs( HeatInbalance ) > 0.000000001) {
+			myfile << HeatInbalance << "," << ThisCell.X_index << "," << ThisCell.Y_index << "," << ThisCell.Z_index << "," << SimTime << std::endl;
+		}
+		
 		return RetVal;
 	}
 
@@ -7238,6 +7284,7 @@ namespace PlantPipingSystemsManager {
 		//Then all farfield boundaries
 		for ( DirectionCounter = lbound( NeighborBoundaryCells, 1 ); DirectionCounter <= ubound( NeighborBoundaryCells, 1 ); ++DirectionCounter ) {
 			CurDirection = NeighborBoundaryCells( DirectionCounter );
+
 			EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 			Numerator += ( Beta / Resistance ) * NeighborTemp;
 			Denominator += ( Beta / Resistance );
