@@ -6094,41 +6094,37 @@ namespace PlantPipingSystemsManager {
 					Ymax = PipingSystemDomains(DomainNum).Cells(X, Y, Z).Y_max;
 					Ylength = Ymax - Ymin;
 					
-					if ( !WarmupFlag ){
 					
-						Ycentroid = ( PipingSystemDomains(DomainNum).Cells(8, 10, 8).Centroid.Y - PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.Y );
-
-						if ( Y == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+					if ( Y == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature = 20;
-						}
-
-						if ( ( X == 8 ) && ( Y == 0 ) && ( Z == 8 ) ) {
-							myfile << CurMnDyHr << "," << TimeStep << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 1 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 2 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 3 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 4 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 5 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 6 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 7 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 8 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 9 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						} else if ( ( X == 8 ) && ( Y == 10 ) && ( Z == 8 ) ) {
-							myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
-						}
-
 					}
 
-					
+					Ycentroid = ( PipingSystemDomains(DomainNum).Cells(8, 10, 8).Centroid.Y - PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.Y );
+
+					if ( ( X == 8 ) && ( Y == 0 ) && ( Z == 8 ) ) {
+						myfile << CurMnDyHr << "," << TimeStep << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 1 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 2 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 3 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 4 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 5 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 6 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 7 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 8 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 9 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					} else if ( ( X == 8 ) && ( Y == 10 ) && ( Z == 8 ) ) {
+						myfile << "," << TimeStep << "," <<PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << Ycentroid << "," << std::endl;
+					}
+			
 				}
 			}
 		}
