@@ -6095,9 +6095,9 @@ namespace PlantPipingSystemsManager {
 					Ylength = Ymax - Ymin;
 					
 					
-					if ( Y == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
-							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature = 20;
-					}
+					//if ( Y == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+					//		PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature = 20;
+					//}
 
 					Ycentroid = ( PipingSystemDomains(DomainNum).Cells(8, 10, 8).Centroid.Y - PipingSystemDomains(DomainNum).Cells(X, Y, Z).Centroid.Y );
 
@@ -6181,12 +6181,12 @@ namespace PlantPipingSystemsManager {
 		Real64 cp;
 		Real64 HeatStored;
 		Real64 NeighborHeatTransfer = 0.0;
-		Real64 HeatInbalance;
+		Real64 HeatImbalance;
 		Real64 stop;
 		Real64 TimeDiff;
 		Real64 SimTime;
 
-		std::ofstream static myfile("FieldCellHeatInbalance.csv", std::ofstream::out);
+		std::ofstream static myfile("FieldCellHeatImbalance.csv", std::ofstream::out);
 
 		//Set up once-per-cell items
 		Numerator = 0.0;
@@ -6242,10 +6242,10 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-		HeatInbalance = ( HeatStored + NeighborHeatTransfer );
+		HeatImbalance = ( HeatStored + NeighborHeatTransfer );
 
-		if ( std::abs( HeatInbalance ) > 0.000000001) {
-			myfile << HeatInbalance << "," << ThisCell.X_index << "," << ThisCell.Y_index << "," << ThisCell.Z_index << "," << SimTime << std::endl;
+		if ( std::abs( HeatImbalance ) > 0.000000001) {
+			myfile << HeatImbalance << "," << ThisCell.X_index << "," << ThisCell.Y_index << "," << ThisCell.Z_index << "," << SimTime << std::endl;
 		}
 		
 		return RetVal;
@@ -6992,9 +6992,17 @@ namespace PlantPipingSystemsManager {
 			Real64 Curr_HeatFlux;
 			int DirectionCounter;
 			int CurDirection; // From Enum: Direction
-			Real64 Num;
+			Real64 TimeDiff;
+			Real64 SimTime;
+			Real64 Vol;
+			Real64 cp;
+			Real64 density;
+			Real64 mass;
+			Real64 HeatStored;
+			Real64 NeighborHeatTransfer;
+			Real64 HeatImbalance;
 			
-			std::ofstream static myfile("DebugCellTemps.csv", std::ofstream::out);
+			std::ofstream static myfile("InterfaceCellsHeatImbalance.csv", std::ofstream::out);
 
 			
 			//Initialize
@@ -7011,7 +7019,6 @@ namespace PlantPipingSystemsManager {
 			Curr_HeatFlux = GetZoneInterfaceHeatFlux( DomainNum );
 			HeatFlux = ( Curr_HeatFlux + PipingSystemDomains( DomainNum ).Prev_HeatFlux ) / 2;
 			Numerator += Beta * HeatFlux * Width( cell )* Depth( cell );
-			Num = Width(cell)* Depth(cell);
 			//determine the neighbor types based on cell location
 			EvaluateCellNeighborDirections( DomainNum, cell );
 
@@ -7030,7 +7037,37 @@ namespace PlantPipingSystemsManager {
 			
 			RetVal = Numerator / Denominator;
 
-			myfile << CurMnDyHr << "," << TimeStep << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << cell.MyBase.Properties.Conductivity << "," << Beta << "," << HeatFlux << "," << Num << "," << RetVal << std::endl;
+			TimeDiff = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize;
+
+			SimTime = PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds;
+		
+			Vol = Volume( cell ) ;
+
+			density = cell.MyBase.Properties.Density;
+		
+			mass = density * Vol;
+
+			cp = cell.MyBase.Properties.SpecificHeat;
+
+			HeatStored = mass * cp * ( RetVal - cell.MyBase.Temperature_PrevTimeStep ) / TimeDiff;
+
+			NeighborHeatTransfer = HeatFlux * Width( cell )* Depth( cell );
+
+			for ( DirectionCounter = lbound( NeighborFieldCells, 1 ); DirectionCounter <= ubound( NeighborFieldCells, 1 ); ++DirectionCounter ) {
+			
+				CurDirection = NeighborFieldCells( DirectionCounter );
+
+				EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
+			
+				NeighborHeatTransfer  += ( RetVal - NeighborTemp ) / Resistance;
+
+			}
+
+			HeatImbalance = ( HeatStored + NeighborHeatTransfer );
+
+			if ( std::abs( HeatImbalance ) > 0.000000001) {
+				myfile << HeatImbalance << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << SimTime << std::endl;
+			}
 
 			return RetVal;
 
