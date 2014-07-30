@@ -57,7 +57,7 @@ namespace DataPlantPipingSystems {
 	int const RegionType_XDirection( -4 );
 	int const RegionType_YDirection( -5 );
 	int const RegionType_ZDirection( -6 );
-	int const RegionType_SlabXSide1(-7 );
+	int const RegionType_SlabXSide1( -7 );
 	int const RegionType_SlabXSide2( -8 );
 	int const RegionType_SlabZSide1( -9 );
 	int const RegionType_SlabZSide2( -10 );

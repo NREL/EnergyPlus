@@ -1387,7 +1387,7 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( 0.0254 ),
 			HorizInsWidth( 0.0 ),
 			HeatFlux( 0.0 ),
-			Prev_HeatFlux( 0.0),
+			Prev_HeatFlux( 0.0 ),
 			FloorOuterTemp( 0.0 ),
 			ConvectionTemp( 0.0 ),
 			ConvCoeff( 0.0 ),

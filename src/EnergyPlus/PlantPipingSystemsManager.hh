@@ -722,7 +722,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	//FUNCTION GetCellWidths(DomainNum, g) RESULT(RetVal)
+	//FUNCTION GetCellWidths( DomainNum, g ) RESULT( RetVal )
 
 	void
 	GetCellWidths(
@@ -831,14 +831,14 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 	
 	Real64
-		GetZoneInterfaceHeatFlux(int const DomainNum);
+		GetZoneInterfaceHeatFlux( int const DomainNum );
 
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
 
 	void
-	UpdateZoneSurfaceTemperatures(int const DomainNum);
+	UpdateZoneSurfaceTemperatures( int const DomainNum );
 
 	//*********************************************************************************************!
 
