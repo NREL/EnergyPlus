@@ -340,7 +340,7 @@ namespace PlantPipingSystemsManager {
 					ShiftTemperaturesForNewTimeStep( DomainNum );
 					PipingSystemDomains( DomainNum ).DomainNeedsSimulation = true;
 				}
-				PerformIterationLoop( DomainNum );
+				PerformIterationLoop( DomainNum, _ );
 			}
 		}
 
@@ -5962,7 +5962,8 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 	void
 		PerformIterationLoop(
-		int const DomainNum
+		int const DomainNum,
+		int const CircuitNum
 		)
 	{
 
@@ -5995,15 +5996,20 @@ namespace PlantPipingSystemsManager {
 			DoStartOfTimeStepInitializations( DomainNum, _ );
 
 			// Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
-			//PreparePipeCircuitSimulation( DomainNum, CircuitNum );
+			if ( PipingSystemDomains( DomainNum ).HasAPipeCircuit ) {
+				PreparePipeCircuitSimulation( DomainNum, CircuitNum );
+			}
+			
 
 			// Begin iterating for this time step
 			for ( IterationIndex = 1; IterationIndex <= PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS; ++IterationIndex ) {
 
 				ShiftTemperaturesForNewIteration( DomainNum );
 
-			//	PerformPipeCircuitSimulation( DomainNum, CircuitNum );
-
+				if ( PipingSystemDomains( DomainNum ).HasAPipeCircuit ) {
+					PerformPipeCircuitSimulation( DomainNum, CircuitNum );
+				}
+				
 				if ( PipingSystemDomains( DomainNum ).DomainNeedsSimulation ) PerformTemperatureFieldUpdate( DomainNum );
 				FinishedIterationLoop = false;
 				DoEndOfIterationOperations( DomainNum, FinishedIterationLoop );
@@ -6011,9 +6017,9 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Update the basement surface temperatures, if any
-			//if ( PipingSystemDomains( DomainNum ).HasBasement ) {
-				//UpdateBasementSurfaceTemperatures( DomainNum );
-			//}
+			if ( PipingSystemDomains( DomainNum ).HasBasement ) {
+				UpdateBasementSurfaceTemperatures( DomainNum );
+			}
 
 			// Update the slab surface temperatures, if any
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ) {
