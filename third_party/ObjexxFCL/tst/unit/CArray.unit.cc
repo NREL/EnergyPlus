@@ -95,6 +95,15 @@ TEST( CArrayTest, Subscripting )
 	EXPECT_EQ( 44, v( 5 ) );
 }
 
+TEST( CArrayTest, Functions )
+{
+	CArray_int u{ 1, 2, 3 };
+	CArray_int v{ 2, 3, 4 };
+	EXPECT_EQ( 14, magnitude_squared( u ) );
+	EXPECT_EQ( 3, distance_squared( u, v ) );
+	EXPECT_EQ( 20, dot( u, v ) );
+}
+
 TEST( CArrayTest, Swap )
 {
 	CArray_int a( 10u, 22 ), A( a );

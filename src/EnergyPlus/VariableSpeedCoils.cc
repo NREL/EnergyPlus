@@ -4960,18 +4960,18 @@ namespace VariableSpeedCoils {
 		} else {
 			// For ContFanCycCoil, moisture is evaporated from the cooling coil back to the air stream
 			// for the entire heat pump off-cycle.
-			Toff = 3600. / ( 4. * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
+			Toff = 3600.0 / ( 4.0 * MaxONOFFCyclesperHour * RTF ); // duration of cooling coil off-cycle (sec)
 		}
 
 		//  Cap Toff to meet the equation restriction
 		if ( Gamma > 0.0 ) {
-			Toffa = min( Toff, 2. * Twet / Gamma );
+			Toffa = min( Toff, 2.0 * Twet / Gamma );
 		} else {
 			Toffa = Toff;
 		}
 
 		//  Use sucessive substitution to solve for To
-		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * ( std::pow( Gamma, 2 ) ) * ( std::pow( Toffa, 2 ) );
+		aa = ( Gamma * Toffa ) - ( 0.25 / Twet ) * pow_2( Gamma ) * pow_2( Toffa );
 
 		To1 = aa + HPTimeConstant;
 		Error = 1.0;

@@ -1397,7 +1397,7 @@ namespace ZoneContaminantPredictorCorrector {
 					Pi = AirflowNetworkNodeSimu( MultizoneSurfaceData( SurfNum ).NodeNums( 1 ) ).PZ;
 					Pj = AirflowNetworkNodeSimu( MultizoneSurfaceData( SurfNum ).NodeNums( 2 ) ).PZ;
 					if ( Pj >= Pi ) {
-						GCGain = ZoneContamGenericPDriven( Loop ).GCGenRateCoef * GetCurrentScheduleValue( ZoneContamGenericPDriven( Loop ).GCGenRateCoefSchedPtr ) * std::pow( ( Pj - Pi ), ZoneContamGenericPDriven( Loop ).GCExpo );
+						GCGain = ZoneContamGenericPDriven( Loop ).GCGenRateCoef * GetCurrentScheduleValue( ZoneContamGenericPDriven( Loop ).GCGenRateCoefSchedPtr ) * std::pow( Pj - Pi, ZoneContamGenericPDriven( Loop ).GCExpo );
 					} else {
 						GCGain = 0.0;
 					}
@@ -1668,7 +1668,7 @@ namespace ZoneContaminantPredictorCorrector {
 						if ( A == 0.0 ) { // B=0
 							LoadToCO2SetPoint = C * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) ) - B;
 						} else {
-							LoadToCO2SetPoint = A * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) * std::exp( min( 700., - A / C ) ) ) / ( 1.0 - std::exp( min( 700., - A / C ) ) ) - B;
+							LoadToCO2SetPoint = A * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) * std::exp( min( 700.0, - A / C ) ) ) / ( 1.0 - std::exp( min( 700.0, - A / C ) ) ) - B;
 						}
 					} else if ( SELECT_CASE_var == UseEulerMethod ) {
 						LoadToCO2SetPoint = C * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) ) + A * ZoneAirCO2SetPoint - B;
@@ -1750,7 +1750,7 @@ namespace ZoneContaminantPredictorCorrector {
 						if ( A == 0.0 ) { // B=0
 							LoadToGCSetPoint = C * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) ) - B;
 						} else {
-							LoadToGCSetPoint = A * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) * std::exp( min( 700., - A / C ) ) ) / ( 1.0 - std::exp( min( 700., - A / C ) ) ) - B;
+							LoadToGCSetPoint = A * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) * std::exp( min( 700.0, - A / C ) ) ) / ( 1.0 - std::exp( min( 700.0, - A / C ) ) ) - B;
 						}
 					} else if ( SELECT_CASE_var == UseEulerMethod ) {
 						LoadToGCSetPoint = C * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) ) + A * ZoneAirGCSetPoint - B;
@@ -2264,7 +2264,7 @@ namespace ZoneContaminantPredictorCorrector {
 					if ( A == 0.0 ) { // B=0
 						ZoneAirCO2Temp( ZoneNum ) = ZoneCO21( ZoneNum ) + B / C;
 					} else {
-						ZoneAirCO2Temp( ZoneNum ) = ( ZoneCO21( ZoneNum ) - B / A ) * std::exp( min( 700., - A / C ) ) + B / A;
+						ZoneAirCO2Temp( ZoneNum ) = ( ZoneCO21( ZoneNum ) - B / A ) * std::exp( min( 700.0, - A / C ) ) + B / A;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZoneAirCO2Temp( ZoneNum ) = ( C * ZoneCO21( ZoneNum ) + B ) / ( C + A );
@@ -2325,7 +2325,7 @@ namespace ZoneContaminantPredictorCorrector {
 					if ( A == 0.0 ) { // B=0
 						ZoneAirGCTemp( ZoneNum ) = ZoneGC1( ZoneNum ) + B / C;
 					} else {
-						ZoneAirGCTemp( ZoneNum ) = ( ZoneGC1( ZoneNum ) - B / A ) * std::exp( min( 700., - A / C ) ) + B / A;
+						ZoneAirGCTemp( ZoneNum ) = ( ZoneGC1( ZoneNum ) - B / A ) * std::exp( min( 700.0, - A / C ) ) + B / A;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZoneAirGCTemp( ZoneNum ) = ( C * ZoneGC1( ZoneNum ) + B ) / ( C + A );

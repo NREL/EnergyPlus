@@ -102,6 +102,9 @@ namespace ScheduleManager {
 	FArray1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
 	FArray1D< ScheduleData > Schedule; // Schedule Storage
 
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
+
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
@@ -470,7 +473,7 @@ namespace ScheduleManager {
 		Schedule( 0 ).WeekSchedulePointer = 0;
 
 		UnitNumber = FindUnitNumber( "eplusout.audit" );
-		gio::write( UnitNumber, "*" ) << " Processing Schedule Input -- Start";
+		gio::write( UnitNumber, fmtLD ) << " Processing Schedule Input -- Start";
 
 		//!! Get Schedule Types
 
@@ -1052,7 +1055,7 @@ namespace ScheduleManager {
 				}
 				++WkCount;
 				++AddWeekSch;
-				gio::write( ExtraField, "*" ) << WkCount;
+				gio::write( ExtraField, fmtLD ) << WkCount;
 				strip( ExtraField );
 				WeekSchedule( AddWeekSch ).Name = Alphas( 1 ) + "_wk_" + ExtraField;
 				WeekSchedule( AddWeekSch ).Used = true;
@@ -1070,7 +1073,7 @@ namespace ScheduleManager {
 					if ( has_prefix( Alphas( NumField ), "FOR" ) ) {
 						++DyCount;
 						++AddDaySch;
-						gio::write( ExtraField, "*" ) << DyCount;
+						gio::write( ExtraField, fmtLD ) << DyCount;
 						strip( ExtraField );
 						DaySchedule( AddDaySch ).Name = Alphas( 1 ) + "_dy_" + ExtraField;
 						DaySchedule( AddDaySch ).ScheduleTypePtr = Schedule( SchNum ).ScheduleTypePtr;
@@ -1409,7 +1412,7 @@ namespace ScheduleManager {
 					ShowFatalError( "Program terminates due to previous condition." );
 				}
 				// check for stripping
-				{ IOFlags flags; gio::read( SchdFile, "(A)", flags ) >> LineIn; read_stat = flags.ios(); }
+				{ IOFlags flags; gio::read( SchdFile, fmtA, flags ) >> LineIn; read_stat = flags.ios(); }
 				endLine = len( LineIn );
 				if ( endLine > 0 ) {
 					if ( int( LineIn[ endLine - 1 ] ) == iUnicode_end ) {
@@ -1427,7 +1430,7 @@ namespace ScheduleManager {
 				read_stat = 0;
 				if ( skiprowCount > 0 ) { // Numbers(2) has number of rows to skip
 					while ( read_stat == 0 ) { //end of file
-						{ IOFlags flags; gio::read( SchdFile, "(A)", flags ) >> LineIn; read_stat = flags.ios(); }
+						{ IOFlags flags; gio::read( SchdFile, fmtA, flags ) >> LineIn; read_stat = flags.ios(); }
 						++rowCnt;
 						if ( rowCnt == skiprowCount ) {
 							break;
@@ -1440,7 +1443,7 @@ namespace ScheduleManager {
 				rowCnt = 0;
 				firstLine = true;
 				while ( read_stat == 0 ) { //end of file
-					{ IOFlags flags; gio::read( SchdFile, "(A)", flags ) >> LineIn; read_stat = flags.ios(); }
+					{ IOFlags flags; gio::read( SchdFile, fmtA, flags ) >> LineIn; read_stat = flags.ios(); }
 					++rowCnt;
 					colCnt = 0;
 					wordStart = 0;
@@ -1850,7 +1853,7 @@ namespace ScheduleManager {
 		lAlphaBlanks.deallocate();
 		lNumericBlanks.deallocate();
 
-		gio::write( UnitNumber, "*" ) << " Processing Schedule Input -- Complete";
+		gio::write( UnitNumber, fmtLD ) << " Processing Schedule Input -- Complete";
 
 	}
 
@@ -1889,7 +1892,6 @@ namespace ScheduleManager {
 		static gio::Fmt const SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
 		static gio::Fmt const SchTFmtdata( "('ScheduleTypeLimits',5(',',A))" );
 		static gio::Fmt const SchWFmtdata( "('Schedule:Week:Daily',',',A,$)" );
-		static gio::Fmt const fmta( "(A)" );
 		static gio::Fmt const CMinFmt( "(I2.2)" );
 		static gio::Fmt const ThruFmt( "(',Through ',A,1X,I2.2,',',A)" );
 		static gio::Fmt const SchDFmt0( "('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)" );
@@ -1961,7 +1963,7 @@ namespace ScheduleManager {
 				SchDFmtdata = "(',',A,$)";
 			} else {
 				gio::write( OutputFileInits, SchTFmt0 ) << "Timestep";
-				gio::write( Num1, "*" ) << NumOfTimeStepInHour * 24;
+				gio::write( Num1, fmtLD ) << NumOfTimeStepInHour * 24;
 				strip( Num1 );
 				SchDFmt = "(" + Num1 + ",',',A,$)";
 				SchDFmtdata = "(" + Num1 + ",',',A,$)";
@@ -1997,9 +1999,9 @@ namespace ScheduleManager {
 						YesNo2 = "Yes";
 					} else {
 						YesNo2 = "No";
-						gio::write( Num1, "*" ) << int( ScheduleType( Count ).Minimum );
+						gio::write( Num1, fmtLD ) << int( ScheduleType( Count ).Minimum );
 						strip( Num1 );
-						gio::write( Num2, "*" ) << int( ScheduleType( Count ).Maximum );
+						gio::write( Num2, fmtLD ) << int( ScheduleType( Count ).Maximum );
 						strip( Num2 );
 					}
 				} else {
@@ -2083,52 +2085,52 @@ namespace ScheduleManager {
 		} else if ( SELECT_CASE_var == 3 ) {
 			for ( Count = 1; Count <= NumSchedules; ++Count ) {
 				gio::write( OutputFileDebug );
-				gio::write( OutputFileDebug, "(A)" ) << "  Schedule:Compact,";
-				gio::write( OutputFileDebug, "(A)" ) << "    " + Schedule( Count ).Name + ",           !- Name";
-				gio::write( OutputFileDebug, "(A)" ) << "    " + ScheduleType( Schedule( Count ).ScheduleTypePtr ).Name + ",          !- ScheduleTypeLimits";
+				gio::write( OutputFileDebug, fmtA ) << "  Schedule:Compact,";
+				gio::write( OutputFileDebug, fmtA ) << "    " + Schedule( Count ).Name + ",           !- Name";
+				gio::write( OutputFileDebug, fmtA ) << "    " + ScheduleType( Schedule( Count ).ScheduleTypePtr ).Name + ",          !- ScheduleTypeLimits";
 				NumF = 1;
 				while ( NumF <= 366 ) {
 					TS = Schedule( Count ).WeekSchedulePointer( NumF );
 					while ( Schedule( Count ).WeekSchedulePointer( NumF ) == TS && NumF <= 366 ) {
 						if ( NumF == 366 ) {
 							InvJulianDay( NumF, PMon, PDay, 1 );
-							gio::write( OutputFileDebug, "(A)" ) << "    Through: " + RoundSigDigits( PMon ) + '/' + RoundSigDigits( PDay ) + ',';
+							gio::write( OutputFileDebug, fmtA ) << "    Through: " + RoundSigDigits( PMon ) + '/' + RoundSigDigits( PDay ) + ',';
 							iDayP = 0;
 							for ( DT = 2; DT <= 6; ++DT ) {
-								gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
+								gio::write( OutputFileDebug, fmtA ) << "    For: " + ValidDayTypes( DT ) + ',';
 								iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 								iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 								if ( iDay != iDayP ) {
 									for ( Hr = 1; Hr <= 24; ++Hr ) {
-										gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
+										gio::write( OutputFileDebug, fmtA ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 									}
 								} else {
-									gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
+									gio::write( OutputFileDebug, fmtA ) << "    Same as previous";
 								}
 								iDayP = iDay;
 							}
 							DT = 1;
-							gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
+							gio::write( OutputFileDebug, fmtA ) << "    For: " + ValidDayTypes( DT ) + ',';
 							iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 							iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 							if ( iDay != iDayP ) {
 								for ( Hr = 1; Hr <= 24; ++Hr ) {
-									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
+									gio::write( OutputFileDebug, fmtA ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 								}
 							} else {
-								gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
+								gio::write( OutputFileDebug, fmtA ) << "    Same as previous";
 							}
 							iDayP = iDay;
 							for ( DT = 7; DT <= MaxDayTypes; ++DT ) {
-								gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
+								gio::write( OutputFileDebug, fmtA ) << "    For: " + ValidDayTypes( DT ) + ',';
 								iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 								iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 								if ( iDay != iDayP ) {
 									for ( Hr = 1; Hr <= 24; ++Hr ) {
-										gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
+										gio::write( OutputFileDebug, fmtA ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 									}
 								} else {
-									gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
+									gio::write( OutputFileDebug, fmtA ) << "    Same as previous";
 								}
 								iDayP = iDay;
 							}
@@ -2138,43 +2140,43 @@ namespace ScheduleManager {
 					}
 					if ( NumF <= 366 ) {
 						InvJulianDay( NumF - 1, PMon, PDay, 1 );
-						gio::write( OutputFileDebug, "(A)" ) << "    Through: " + RoundSigDigits( PMon ) + '/' + RoundSigDigits( PDay ) + ',';
+						gio::write( OutputFileDebug, fmtA ) << "    Through: " + RoundSigDigits( PMon ) + '/' + RoundSigDigits( PDay ) + ',';
 						iDayP = 0;
 						for ( DT = 2; DT <= 6; ++DT ) {
-							gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
+							gio::write( OutputFileDebug, fmtA ) << "    For: " + ValidDayTypes( DT ) + ',';
 							iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 							iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 							if ( iDay != iDayP ) {
 								for ( Hr = 1; Hr <= 24; ++Hr ) {
-									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
+									gio::write( OutputFileDebug, fmtA ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 								}
 							} else {
-								gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
+								gio::write( OutputFileDebug, fmtA ) << "    Same as previous";
 							}
 							iDayP = iDay;
 						}
 						DT = 1;
-						gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
+						gio::write( OutputFileDebug, fmtA ) << "    For: " + ValidDayTypes( DT ) + ',';
 						iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 						iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 						if ( iDay != iDayP ) {
 							for ( Hr = 1; Hr <= 24; ++Hr ) {
-								gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
+								gio::write( OutputFileDebug, fmtA ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 							}
 						} else {
-							gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
+							gio::write( OutputFileDebug, fmtA ) << "    Same as previous";
 						}
 						iDayP = iDay;
 						for ( DT = 7; DT <= MaxDayTypes; ++DT ) {
-							gio::write( OutputFileDebug, "(A)" ) << "    For: " + ValidDayTypes( DT ) + ',';
+							gio::write( OutputFileDebug, fmtA ) << "    For: " + ValidDayTypes( DT ) + ',';
 							iWeek = Schedule( Count ).WeekSchedulePointer( NumF - 1 );
 							iDay = WeekSchedule( iWeek ).DaySchedulePointer( DT );
 							if ( iDay != iDayP ) {
 								for ( Hr = 1; Hr <= 24; ++Hr ) {
-									gio::write( OutputFileDebug, "(A)" ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
+									gio::write( OutputFileDebug, fmtA ) << "    Until: " + RoundSigDigits( Hr ) + ':' + ShowMinute( NumOfTimeStepInHour ) + ',' + RoundSigDigits( DaySchedule( iDay ).TSValue( Hr, NumOfTimeStepInHour ), 2 ) + ',';
 								}
 							} else {
-								gio::write( OutputFileDebug, "(A)" ) << "    Same as previous";
+								gio::write( OutputFileDebug, fmtA ) << "    Same as previous";
 							}
 							iDayP = iDay;
 						}
@@ -2216,7 +2218,6 @@ namespace ScheduleManager {
 		// na
 
 		// Return value
-		Real64 GetCurrentScheduleValue;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -2248,21 +2249,14 @@ namespace ScheduleManager {
 		}
 
 		if ( ScheduleIndex == -1 ) {
-			GetCurrentScheduleValue = 1.0;
-			return GetCurrentScheduleValue;
+			return 1.0;
 		} else if ( ScheduleIndex == 0 ) {
-			GetCurrentScheduleValue = 0.0;
-			return GetCurrentScheduleValue;
-		}
-
-		if ( ! Schedule( ScheduleIndex ).EMSActuatedOn ) {
-			GetCurrentScheduleValue = Schedule( ScheduleIndex ).CurrentValue;
+			return 0.0;
+		} else if ( ! Schedule( ScheduleIndex ).EMSActuatedOn ) {
+			return Schedule( ScheduleIndex ).CurrentValue;
 		} else {
-			GetCurrentScheduleValue = Schedule( ScheduleIndex ).EMSValue;
+			return Schedule( ScheduleIndex ).EMSValue;
 		}
-
-		return GetCurrentScheduleValue;
-
 	}
 
 	void
@@ -3088,7 +3082,7 @@ namespace ScheduleManager {
 		} else if ( Pos == 0 ) {
 			RetHH = 0;
 		} else {
-			{ IOFlags flags; gio::read( String.substr( 0, Pos ), "*", flags ) >> rRetHH; IOS = flags.ios(); }
+			{ IOFlags flags; gio::read( String.substr( 0, Pos ), fmtLD, flags ) >> rRetHH; IOS = flags.ios(); }
 			RetHH = int( rRetHH );
 			if ( double( RetHH ) != rRetHH || IOS != 0 || rRetHH < 0.0 ) {
 				if ( double( RetHH ) != rRetHH && rRetHH >= 0.0 ) {
@@ -3105,7 +3099,7 @@ namespace ScheduleManager {
 		}
 
 		String.erase( 0, Pos + 1 );
-		{ IOFlags flags; gio::read( String, "*", flags ) >> rRetMM; IOS = flags.ios(); }
+		{ IOFlags flags; gio::read( String, fmtLD, flags ) >> rRetMM; IOS = flags.ios(); }
 		RetMM = int( rRetMM );
 		if ( double( RetMM ) != rRetMM || IOS != 0 || rRetMM < 0.0 ) {
 			if ( double( RetMM ) != rRetMM && rRetMM >= 0.0 ) {
@@ -4685,10 +4679,10 @@ namespace ScheduleManager {
 
 		if ( isItLeapYear ) {
 			DaysInYear = 366;
-			WeeksInYear = 366. / 7.;
+			WeeksInYear = 366.0 / 7.0;
 		} else {
 			DaysInYear = 365;
-			WeeksInYear = 365. / 7.;
+			WeeksInYear = 365.0 / 7.0;
 		}
 
 		if ( ScheduleIndex < -1 || ScheduleIndex > NumSchedules ) {

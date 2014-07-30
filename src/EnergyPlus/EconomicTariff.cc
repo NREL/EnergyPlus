@@ -571,7 +571,7 @@ namespace EconomicTariff {
 				tariff( iInObj ).demWinTime = 24.00;
 			} else if ( SameString( cAlphaArgs( 7 ), "Week" ) ) {
 				tariff( iInObj ).demandWindow = demandWindowWeek;
-				tariff( iInObj ).demWinTime = 24. * 7.;
+				tariff( iInObj ).demWinTime = 24.0 * 7.0;
 			} else {
 				// if not entered default to the same logic as quarter of an hour
 				{ auto const SELECT_CASE_var( NumOfTimeStepInHour );
@@ -4771,7 +4771,6 @@ namespace EconomicTariff {
 		using OutputReportTabular::ConvertIP;
 		using OutputReportTabular::unitsStyle;
 		using OutputReportTabular::unitsStyleInchPound;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 
@@ -4887,7 +4886,7 @@ namespace EconomicTariff {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Annual Cost" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Annual Cost" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -4935,7 +4934,7 @@ namespace EconomicTariff {
 			columnWidth = 14; //array assignment - same for all columns
 			WriteSubtitle( "Tariff Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Economics Results Summary Report", "Entire Facility", "Tariff Summary" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -5005,7 +5004,7 @@ namespace EconomicTariff {
 				columnWidth = 14; //array assignment - same for all columns
 				WriteSubtitle( "General" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", tariff( iTariff ).tariffName, "General" );
 				columnHead.deallocate();
 				rowHead.deallocate();
 				columnWidth.deallocate();
@@ -5303,7 +5302,6 @@ namespace EconomicTariff {
 		using OutputReportTabular::WriteSubtitle;
 		using OutputReportTabular::WriteTable;
 		using OutputReportTabular::RealToStr;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5446,7 +5444,7 @@ namespace EconomicTariff {
 		columnWidth = 14; //array assignment - same for all columns
 		WriteSubtitle( titleString );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
+		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Tariff Report", forString, titleString );
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();

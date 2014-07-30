@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
@@ -3328,7 +3328,7 @@
 
   OtherEquipment,
     BASE-1 OthEq 1,          !- Name
-    BASE-1,                  !- Zone Name
+    BASE-1,                  !- Zone or ZoneList Name
     ALWAYSON,                !- Schedule Name
     EquipmentLevel,          !- Design Level Calculation Method
     6766.,                   !- Design Level {W}
@@ -5864,7 +5864,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     AirSysAvailSched,        !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method

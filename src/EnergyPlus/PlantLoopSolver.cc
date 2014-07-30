@@ -11,6 +11,7 @@
 // EnergyPlus Headers
 #include <PlantLoopSolver.hh>
 #include <DataBranchAirLoopPlant.hh>
+#include <DataConvergParams.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -551,6 +552,7 @@ namespace PlantLoopSolver {
 		using DataPlant::GenEquipTypes_Pump;
 		using DataPlant::TypeOf_PumpConstantSpeed;
 		using DataPlant::TypeOf_PumpBankConstantSpeed;
+		using DataPlant::TypeOf_PumpCondensate;
 		using DataPlant::SupplySide;
 		using DataPlant::CommonPipe_TwoWay;
 		using DataPlant::DemandSide;
@@ -562,6 +564,7 @@ namespace PlantLoopSolver {
 		using Pumps::PumpEquip;
 		using PlantUtilities::IntegerIsWithinTwoValues;
 		using DataHVACGlobals::SmallLoad;
+		using DataConvergParams::PlantLowFlowRateToler;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -593,10 +596,12 @@ namespace PlantLoopSolver {
 		bool ThisSideHasPumps;
 		bool OtherSideHasPumps;
 		bool ThisLoopHasCommonPipe;
-		FArray1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
-		FArray1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
-		FArray1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
-		FArray1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
+
+		//Tuned Made static: Set before use
+		static FArray1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
+		static FArray1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
+		static FArray1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
+		static FArray1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
 
 		static bool AllocatedParallelArray( false );
 		int MaxParallelBranchCount;
@@ -644,33 +649,33 @@ namespace PlantLoopSolver {
 			OutletBranchRequestNeedIfOn = 0.0;
 			EachSideFlowRequestNeedAndTurnOn( LoopSideCounter ) = 0.0;
 			EachSideFlowRequestNeedIfOn( LoopSideCounter ) = 0.0;
-            
+
             // reference
             auto & loop_side( loop.LoopSide( LoopSideCounter ) );
-            
+
 			// Now loop through all the branches on this LoopSide and get flow requests
 			NumBranchesOnThisLoopSide = loop_side.TotalBranches;
 			ParallelBranchIndex = 0;
 			for ( BranchCounter = 1; BranchCounter <= NumBranchesOnThisLoopSide; ++BranchCounter ) {
 				ThisBranchFlowRequestNeedAndTurnOn = 0.0;
 				ThisBranchFlowRequestNeedIfOn = 0.0;
-                
+
                 // reference
                 auto & branch( loop_side.Branch( BranchCounter ) );
-                
+
 				if ( BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide ) ++ParallelBranchIndex;
 				NumCompsOnThisBranch = branch.TotalComponents;
 				for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
-                    
+
                     // reference
                     auto & component( branch.Comp( CompCounter ) );
-                    
+
 					NodeToCheckRequest = component.NodeNumIn;
 					FlowPriorityStatus = component.FlowPriority;
-                    
+
                     // reference
                     auto & node_with_request( Node( NodeToCheckRequest ) );
-                    
+
 					if ( component.GeneralEquipType != GenEquipTypes_Pump ) {
 
 						{ auto const SELECT_CASE_var( FlowPriorityStatus );
@@ -755,8 +760,20 @@ namespace PlantLoopSolver {
 										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank );
 									}
 								}
+							}
+						
+							//overwrite here for branch pumps
+							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
+								CompIndex = component.CompNum;
+								if ( CompIndex > 0 ) {
+									auto & this_pump(PumpEquip( CompIndex ) );
+									this_pump.LoopSolverOverwriteFlag = false;
+								}
+								
+
 							}}
 						}
+						
 					}
 
 				}
@@ -872,6 +889,33 @@ namespace PlantLoopSolver {
 			LoopFlow = EachSideFlowRequestFinal( ThisSide );
 			ThisLoopHasCommonPipe = true;
 		}
+
+		
+		
+		//overrides the loop solver flow request to allow loop pump to turn off when not in use
+		if ( PlantLoop( LoopNum ).LoopSide( ThisSide ).TotalPumps == 1) {
+			if ( LoopFlow < PlantLowFlowRateToler ) {  //Update from dataconvergetols...
+				auto & loop_side( PlantLoop( LoopNum ).LoopSide( ThisSide ) );
+				NumBranchesOnThisLoopSide = loop_side.TotalBranches;
+				for ( BranchCounter = 1; BranchCounter <= NumBranchesOnThisLoopSide; ++BranchCounter ) {
+					// reference
+					auto & branch( loop_side.Branch( BranchCounter ) );
+					NumCompsOnThisBranch = branch.TotalComponents;
+					for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
+						auto & component( branch.Comp( CompCounter ) );
+						auto const SELECT_CASE_var( component.TypeOf_Num );
+						if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
+							CompIndex = component.CompNum;
+							if ( CompIndex > 0 ){
+								auto & this_pump( PumpEquip( CompIndex ) );
+								this_pump.LoopSolverOverwriteFlag = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
 
 		// do some diagnostic that are easy and fast at this point, the rest of this routine could be moved
 		//?  should be caught previously in input~ Check erroneous conditions first before we do the logic below
@@ -1952,7 +1996,7 @@ namespace PlantLoopSolver {
 			ParallelBranchMaxAvail = 0.0;
 			ParallelBranchMinAvail = 0.0;
 			for ( iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch ) {
-			    
+
 				BranchNum = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
 				auto & this_branch( this_loopside.Branch( BranchNum ) );
 				SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
@@ -2011,7 +2055,7 @@ namespace PlantLoopSolver {
 
 			auto & first_branch_inlet_node( Node( FirstNodeOnBranchIn ) );
 			auto & last_branch_inlet_node( Node( FirstNodeOnBranchOut ) );
-			
+
 			//Reset branch inlet node flow rates for the first and last branch on loop
 			first_branch_inlet_node.MassFlowRate = ThisLoopSideFlow;
 			last_branch_inlet_node.MassFlowRate = ThisLoopSideFlow;
@@ -2558,7 +2602,7 @@ namespace PlantLoopSolver {
 		// store node data in plant
 		auto & this_supplyside( PlantLoop( LoopNum ).LoopSide( SupplySide ) );
 		auto & this_loop_report( PlantReport( LoopNum ) );
-		
+
 		if ( LoopSide == SupplySide ) {
 			this_loop_report.InletNodeFlowrate = Node( this_supplyside.NodeNumIn ).MassFlowRate;
 			this_loop_report.InletNodeTemperature = Node( this_supplyside.NodeNumIn ).Temp;
@@ -2863,7 +2907,7 @@ namespace PlantLoopSolver {
 		auto & this_loopside( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
 		auto & this_branch( this_loopside.Branch( BranchNum ) );
 		auto & this_comp( this_branch.Comp( CompNum ) );
-		
+
 		if ( ( this_loopside.EMSCtrl ) && ( this_loopside.EMSValue <= 0.0 ) ) {
 			FlowToRequest = 0.0;
 			return;

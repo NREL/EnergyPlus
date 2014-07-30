@@ -118,7 +118,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,4;
 

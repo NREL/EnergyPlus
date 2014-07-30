@@ -189,6 +189,15 @@ TEST( ChunkVectorTest, Subscripting )
 	EXPECT_EQ( 44, v[ 4 ] );
 }
 
+TEST( ChunkVectorTest, Functions )
+{
+	ChunkVector_int u( std::vector< int >{ 1, 2, 3 }, 2u );
+	ChunkVector_int v( std::vector< int >{ 2, 3, 4 }, 2u );
+	EXPECT_EQ( 14, magnitude_squared( u ) );
+	EXPECT_EQ( 3, distance_squared( u, v ) );
+	EXPECT_EQ( 20, dot( u, v ) );
+}
+
 TEST( ChunkVectorTest, Swap )
 {
 	ChunkVector_int a( 10, 2u, 22 ), A( a );

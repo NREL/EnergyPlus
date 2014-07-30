@@ -6,7 +6,6 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/FArray2A.hh>
 #include <ObjexxFCL/FArray2S.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -20,8 +19,6 @@ namespace HeatBalanceIntRadExchange {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	extern gio::Fmt const fmtx;
-	extern gio::Fmt const fmty;
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -37,7 +34,7 @@ namespace HeatBalanceIntRadExchange {
 	CalcInteriorRadExchange(
 		FArray1S< Real64 > const SurfaceTemp, // Current surface temperatures
 		int const SurfIterations, // Number of iterations in calling subroutine
-		FArray1S< Real64 > NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
+		FArray1< Real64 > & NetLWRadToSurf, // Net long wavelength radiant exchange from other surfaces
 		Optional_int_const ZoneToResimulate = _, // if passed in, then only calculate for this zone
 		std::string const & CalledFrom = ""
 	);
@@ -91,16 +88,16 @@ namespace HeatBalanceIntRadExchange {
 	void
 	CalcScriptF(
 		int const N, // Number of surfaces
-		FArray1A< Real64 > const A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-		FArray2A< Real64 > const F, // DIRECT VIEW FACTOR MATRIX (N X N)
-		FArray1A< Real64 > EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		FArray2A< Real64 > ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
+		FArray1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+		FArray2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
+		FArray1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
+		FArray2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
 	);
 
 	void
 	CalcMatrixInverse(
-		FArray2S< Real64 > Matrix, // Input Matrix
-		FArray2S< Real64 > InvMatrix // Inverse of Matrix
+		FArray2< Real64 > & A, // Matrix: Gets reduced to L\U form
+		FArray2< Real64 > & I // Returned as inverse matrix
 	);
 
 	//     NOTICE

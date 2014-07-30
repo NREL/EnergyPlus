@@ -420,40 +420,44 @@ namespace PlantUtilities {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CompNum;
 		int NodeNum;
 		Real64 MdotOldRequest;
 
 		// FLOW:
+
+		auto & a_node( Node( ActuatedNode ) );
+		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+
 		// store original flow
-		MdotOldRequest = Node( ActuatedNode ).MassFlowRateRequest;
-		Node( ActuatedNode ).MassFlowRateRequest = CompFlow;
+		MdotOldRequest = a_node.MassFlowRateRequest;
+		a_node.MassFlowRateRequest = CompFlow;
 		if ( LoopNum > 0 && LoopSideNum > 0 && ( ! ResetMode ) ) {
 			if ( ( MdotOldRequest > 0.0 ) && ( CompFlow > 0.0 ) ) { // sure that not coming back from a no flow reset
-				if ( ( std::abs( MdotOldRequest - Node( ActuatedNode ).MassFlowRateRequest ) > MassFlowTolerance ) && ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowUnlocked ) ) {
-					PlantLoop( LoopNum ).LoopSide( LoopSideNum ).SimLoopSideNeeded = true;
+				if ( ( std::abs( MdotOldRequest - a_node.MassFlowRateRequest ) > MassFlowTolerance ) && ( loop_side.FlowLock == FlowUnlocked ) ) {
+					loop_side.SimLoopSideNeeded = true;
 				}
 			}
 		}
 		//Set loop flow rate
 
 		if ( LoopNum > 0 && LoopSideNum > 0 ) {
-			if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowUnlocked ) {
+			auto const & branch( loop_side.Branch( BranchNum ) );
+			if ( loop_side.FlowLock == FlowUnlocked ) {
 				if ( PlantLoop( LoopNum ).MaxVolFlowRate == AutoSize ) { //still haven't sized the plant loop
-					Node( ActuatedNode ).MassFlowRate = CompFlow;
+					a_node.MassFlowRate = CompFlow;
 				} else { //bound the flow by Min/Max available across entire branch
 
-					Node( ActuatedNode ).MassFlowRate = max( Node( ActuatedNode ).MassFlowRateMinAvail, CompFlow );
-					Node( ActuatedNode ).MassFlowRate = max( Node( ActuatedNode ).MassFlowRateMin, Node( ActuatedNode ).MassFlowRate );
+					a_node.MassFlowRate = max( a_node.MassFlowRateMinAvail, CompFlow );
+					a_node.MassFlowRate = max( a_node.MassFlowRateMin, a_node.MassFlowRate );
 					// add MassFlowRateMin hardware constraints
-					Node( ActuatedNode ).MassFlowRate = min( Node( ActuatedNode ).MassFlowRateMaxAvail, Node( ActuatedNode ).MassFlowRate );
-					Node( ActuatedNode ).MassFlowRate = min( Node( ActuatedNode ).MassFlowRateMax, Node( ActuatedNode ).MassFlowRate );
-					if ( Node( ActuatedNode ).MassFlowRate < MassFlowTolerance ) Node( ActuatedNode ).MassFlowRate = 0.0;
-					CompFlow = Node( ActuatedNode ).MassFlowRate;
-					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-						if ( ActuatedNode == PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn ) {
+					a_node.MassFlowRate = min( a_node.MassFlowRateMaxAvail, a_node.MassFlowRate );
+					a_node.MassFlowRate = min( a_node.MassFlowRateMax, a_node.MassFlowRate );
+					if ( a_node.MassFlowRate < MassFlowTolerance ) a_node.MassFlowRate = 0.0;
+					for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+						auto const & comp( branch.Comp( CompNum ) );
+						if ( ActuatedNode == comp.NodeNumIn ) {
 							//            ! found controller set to inlet of a component.  now set that component's outlet
-							NodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
+							NodeNum = comp.NodeNumOut;
 							//            Node(ActuatedNode)%MassFlowRate = MAX( Node(ActuatedNode)%MassFlowRate , Node(NodeNum)%MassFlowRateMinAvail)
 							//            Node(ActuatedNode)%MassFlowRate = MAX( Node(ActuatedNode)%MassFlowRate , Node(ActuatedNode)%MassFlowRateMin)
 							//            Node(ActuatedNode)%MassFlowRate = MIN( Node(ActuatedNode)%MassFlowRate , Node(NodeNum)%MassFlowRateMaxAvail)
@@ -462,44 +466,47 @@ namespace PlantUtilities {
 							//virtual 2-way valve
 							//     Node(NodeNum)%MassFlowRateMinAvail = MAX(Node(ActuatedNode)%MassFlowRateMinAvail ,Node(ActuatedNode)%MassFlowRateMin)
 							//     Node(NodeNum)%MassFlowRateMinAvail = MAX(Node(ActuatedNode)%MassFlowRateMinAvail , CompFlow)
-							Node( NodeNum ).MassFlowRateMinAvail = max( Node( ActuatedNode ).MassFlowRateMinAvail, Node( ActuatedNode ).MassFlowRateMin );
+							Node( NodeNum ).MassFlowRateMinAvail = max( a_node.MassFlowRateMinAvail, a_node.MassFlowRateMin );
 							//      Node(NodeNum)%MassFlowRateMaxAvail = MIN(Node(ActuatedNode)%MassFlowRateMaxAvail,Node(ActuatedNode)%MassFlowRateMax)
 							//      Node(NodeNum)%MassFlowRateMaxAvail = MIN(Node(ActuatedNode)%MassFlowRateMaxAvail , CompFlow)
-							Node( NodeNum ).MassFlowRateMaxAvail = min( Node( ActuatedNode ).MassFlowRateMaxAvail, Node( ActuatedNode ).MassFlowRateMax );
-							Node( NodeNum ).MassFlowRate = Node( ActuatedNode ).MassFlowRate;
+							Node( NodeNum ).MassFlowRateMaxAvail = min( a_node.MassFlowRateMaxAvail, a_node.MassFlowRateMax );
+							Node( NodeNum ).MassFlowRate = a_node.MassFlowRate;
 
 						}
 					}
 				}
 
-			} else if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == FlowLocked ) {
+			} else if ( loop_side.FlowLock == FlowLocked ) {
 
-				CompFlow = Node( ActuatedNode ).MassFlowRate;
+				CompFlow = a_node.MassFlowRate;
 				// do not change requested flow rate either
-				Node( ActuatedNode ).MassFlowRateRequest = MdotOldRequest;
-				if ( ( ( CompFlow - Node( ActuatedNode ).MassFlowRateMaxAvail ) > MassFlowTolerance ) || ( ( Node( ActuatedNode ).MassFlowRateMinAvail - CompFlow ) > MassFlowTolerance ) ) {
+				a_node.MassFlowRateRequest = MdotOldRequest;
+				if ( ( CompFlow - a_node.MassFlowRateMaxAvail > MassFlowTolerance ) || ( a_node.MassFlowRateMinAvail - CompFlow > MassFlowTolerance ) ) {
 					ShowSevereError( "SetActuatedBranchFlowRate: Flow rate is out of range" ); //DEBUG error...should never get here
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Component flow rate [kg/s] = " + RoundSigDigits( CompFlow, 8 ) );
-					ShowContinueError( "Node maximum flow rate available [kg/s] = " + RoundSigDigits( Node( ActuatedNode ).MassFlowRateMaxAvail, 8 ) );
-					ShowContinueError( "Node minimum flow rate available [kg/s] = " + RoundSigDigits( Node( ActuatedNode ).MassFlowRateMinAvail, 8 ) );
+					ShowContinueError( "Node maximum flow rate available [kg/s] = " + RoundSigDigits( a_node.MassFlowRateMaxAvail, 8 ) );
+					ShowContinueError( "Node minimum flow rate available [kg/s] = " + RoundSigDigits( a_node.MassFlowRateMinAvail, 8 ) );
 				}
 			} else {
-				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + RoundSigDigits( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock ) ); //DEBUG error...should never get here
+				ShowFatalError( "SetActuatedBranchFlowRate: Flowlock out of range, value=" + RoundSigDigits( loop_side.FlowLock ) ); //DEBUG error...should never get here
 			}
 
-			for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).TotalComponents; ++CompNum ) {
-				NodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumIn;
-				Node( NodeNum ).MassFlowRate = Node( ActuatedNode ).MassFlowRate;
-				Node( NodeNum ).MassFlowRateRequest = Node( ActuatedNode ).MassFlowRateRequest;
-				NodeNum = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).Comp( CompNum ).NodeNumOut;
-				Node( NodeNum ).MassFlowRate = Node( ActuatedNode ).MassFlowRate;
-				Node( NodeNum ).MassFlowRateRequest = Node( ActuatedNode ).MassFlowRateRequest;
+			Real64 const a_node_MasFlowRate( a_node.MassFlowRate );
+			Real64 const a_node_MasFlowRateRequest( a_node.MassFlowRateRequest );
+			for ( int CompNum = 1, CompNum_end = branch.TotalComponents; CompNum <= CompNum_end; ++CompNum ) {
+				auto const & comp( branch.Comp( CompNum ) );
+				NodeNum = comp.NodeNumIn;
+				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
+				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
+				NodeNum = comp.NodeNumOut;
+				Node( NodeNum ).MassFlowRate = a_node_MasFlowRate;
+				Node( NodeNum ).MassFlowRateRequest = a_node_MasFlowRateRequest;
 			}
 
 		} else {
 			// early in simulation before plant loops are setup and found
-			Node( ActuatedNode ).MassFlowRate = CompFlow;
+			a_node.MassFlowRate = CompFlow;
 		}
 
 	}
@@ -973,10 +980,10 @@ namespace PlantUtilities {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const OverShootOffset( 5. );
-		Real64 const UnderShootOffset( 5. );
-		Real64 const FatalOverShootOffset( 200. );
-		Real64 const FatalUnderShootOffset( 100. );
+		Real64 const OverShootOffset( 5.0 );
+		Real64 const UnderShootOffset( 5.0 );
+		Real64 const FatalOverShootOffset( 200.0 );
+		Real64 const FatalUnderShootOffset( 100.0 );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
 

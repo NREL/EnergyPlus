@@ -5,7 +5,7 @@
 ! HVACTemplate-5ZoneVRF.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and plenum
 !                          illustrates the use of HVACTemplate objects to define zone thermostats and
-!                          and variable refrigerant flow (VRF) systems, one air-cooled, and one 
+!                          and variable refrigerant flow (VRF) systems, one air-cooled, and one
 !                          water-cooled served by a condenser loop with a boiler and cooling tower.
 ! Highlights:              HVACTemplate thermostats, VRF, chiller, condenser loop with boiler and tower
 !
@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -599,16 +599,16 @@
     FanAvailSched,           !- Name
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
-    For: WeekDays CustomDay1 CustomDay2,  !- Field 2
-    Until: 7:00, 0.0,        !- Field 4
-    Until: 21:00, 1.0,       !- Field 6
-    Until: 24:00, 0.0,       !- Field 8
+    For: WeekDays CustomDay1 CustomDay2, !- Field 2
+    Until: 7:00,0.0,         !- Field 3
+    Until: 21:00,1.0,        !- Field 5
+    Until: 24:00,0.0,        !- Field 7
     For: Weekends Holiday,   !- Field 9
-    Until: 24:00, 0.0,       !- Field 11
+    Until: 24:00,0.0,        !- Field 10
     For: SummerDesignDay,    !- Field 12
-    Until: 24:00, 1.0,       !- Field 14
+    Until: 24:00,1.0,        !- Field 13
     For: WinterDesignDay,    !- Field 15
-    Until: 24:00, 1.0;       !- Field 17
+    Until: 24:00,1.0;        !- Field 16
 
   Zone,
     PLENUM-1,                !- Name
@@ -1968,7 +1968,7 @@
     ,                        !- Baseboard Heating Availability Schedule Name
     autosize;                !- Baseboard Heating Capacity {W}
 
-HVACTemplate:System:VRF,
+  HVACTemplate:System:VRF,
     VRF Sys 1 Water Source,  !- Name
     ,                        !- System Availability Schedule Name
     autosize,                !- Gross Rated Total Cooling Capacity {W}
@@ -2009,7 +2009,7 @@ HVACTemplate:System:VRF,
     -15,                     !- Minimum Outdoor Temperature in Heat Recovery Mode {C}
     45;                      !- Maximum Outdoor Temperature in Heat Recovery Mode {C}
 
-HVACTemplate:System:VRF,
+  HVACTemplate:System:VRF,
     VRF Sys 2 Air Source,    !- Name
     ,                        !- System Availability Schedule Name
     autosize,                !- Gross Rated Total Cooling Capacity {W}
@@ -2023,7 +2023,7 @@ HVACTemplate:System:VRF,
     25,                      !- Maximum Outdoor Temperature in Heating Mode {C}
     0.15,                    !- Minimum Heat Pump Part-Load Ratio {dimensionless}
     SPACE5-1,                !- Zone Name for Master Thermostat Location
-    MasterThermostatPriority, !- Master Thermostat Priority Control Type
+    MasterThermostatPriority,!- Master Thermostat Priority Control Type
     ,                        !- Thermostat Priority Schedule Name
     No,                      !- Heat Pump Waste Heat Recovery
     30,                      !- Equivalent Piping Length used for Piping Correction Factor in Cooling Mode {m}

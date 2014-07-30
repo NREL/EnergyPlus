@@ -69,7 +69,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 18
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4359,7 +4359,7 @@
   Fan:VariableVolume,
     VAV_1_Fan,               !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.5915,                  !- Fan Efficiency
+    0.5915,                  !- Fan Total Efficiency
     1109.648,                !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
@@ -4379,7 +4379,7 @@
   Fan:VariableVolume,
     VAV_2_Fan,               !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.5915,                  !- Fan Efficiency
+    0.5915,                  !- Fan Total Efficiency
     1109.648,                !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
@@ -4399,7 +4399,7 @@
   Fan:VariableVolume,
     VAV_3_Fan,               !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.5915,                  !- Fan Efficiency
+    0.5915,                  !- Fan Total Efficiency
     1109.648,                !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method

@@ -2243,8 +2243,8 @@ namespace CondenserLoopTowers {
 				DesTowerLoad = rho * Cp * SimpleTower( TowerNum ).DesignWaterFlowRate * PlantSizData( PltSizCondNum ).DeltaT;
 				SimpleTower( TowerNum ).TowerNominalCapacity = DesTowerLoad / SimpleTower( TowerNum ).HeatRejectCapNomCapSizingRatio;
 			} else {
-				AssumedDeltaT = 11.;
-				AssumedExitTemp = 21.;
+				AssumedDeltaT = 11.0;
+				AssumedExitTemp = 21.0;
 				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, AssumedExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 				Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, AssumedExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
@@ -2312,7 +2312,7 @@ namespace CondenserLoopTowers {
 
 		if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
 			// Plant Sizing Object is not required to AUTOSIZE this field since its simply a multiple of another field.
-			tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * ( 101325. / StdBaroPress ) / 190.;
+			tmpHighSpeedAirFlowRate = tmpHighSpeedFanPower * 0.5 * ( 101325.0 / StdBaroPress ) / 190.0;
 			if ( PlantSizesOkayToFinalize ) SimpleTower( TowerNum ).HighSpeedAirFlowRate = tmpHighSpeedAirFlowRate;
 
 			if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_SingleSpeed || SimpleTower( TowerNum ).TowerType_Num == CoolingTower_VariableSpeed ) {
@@ -2347,7 +2347,7 @@ namespace CondenserLoopTowers {
 					UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 					UA1 = DesTowerLoad; // Assume deltaT = 1K
 					SimpleTowerInlet( TowerNum ).WaterTemp = PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
+					SimpleTowerInlet( TowerNum ).AirTemp = 35.0;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -2399,8 +2399,8 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = 35.; // 95F design inlet water temperature
-				SimpleTowerInlet( TowerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
+				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).AirTemp = 35.0; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -2475,8 +2475,8 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = 35.; // 95F design inlet water temperature
-				SimpleTowerInlet( TowerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
+				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).AirTemp = 35.0; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -2522,8 +2522,8 @@ namespace CondenserLoopTowers {
 				Par( 5 ) = Cp; // 85F design exiting water temp
 				UA0 = 0.0001 * DesTowerLoad; // Assume deltaT = 10000K (limit)
 				UA1 = DesTowerLoad; // Assume deltaT = 1K
-				SimpleTowerInlet( TowerNum ).WaterTemp = 35.; // 95F design inlet water temperature
-				SimpleTowerInlet( TowerNum ).AirTemp = 35.; // 95F design inlet air dry-bulb temp
+				SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // 95F design inlet water temperature
+				SimpleTowerInlet( TowerNum ).AirTemp = 35.0; // 95F design inlet air dry-bulb temp
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6; // 78F design inlet air wet-bulb temp
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -2793,7 +2793,7 @@ namespace CondenserLoopTowers {
 
 			if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
 				if ( SimpleTower( TowerNum ).DefaultedDesignAirFlowScalingFactor ) {
-					tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap * ( 101325. / StdBaroPress );
+					tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap * ( 101325.0 / StdBaroPress );
 				} else {
 					tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap;
 				}
@@ -2818,7 +2818,7 @@ namespace CondenserLoopTowers {
 					SimpleTowerInlet( TowerNum ).WaterTemp = PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
 				} else { // probably no plant sizing object
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
-					SimpleTowerInlet( TowerNum ).WaterTemp = 35.; // design condition
+					SimpleTowerInlet( TowerNum ).WaterTemp = 35.0; // design condition
 				}
 				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
@@ -2831,7 +2831,7 @@ namespace CondenserLoopTowers {
 				UA0 = 0.0001 * Par( 1 ); // Assume deltaT = 10000K (limit)
 				UA1 = Par( 1 ); // Assume deltaT = 1K
 
-				SimpleTowerInlet( TowerNum ).AirTemp = 35.;
+				SimpleTowerInlet( TowerNum ).AirTemp = 35.0;
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -2857,7 +2857,7 @@ namespace CondenserLoopTowers {
 				UA0 = max( UA0, 1.0 ); // limit to 1.0
 				UA1 = Par( 1 ); // Assume deltaT = 1K
 
-				SimpleTowerInlet( TowerNum ).AirTemp = 35.;
+				SimpleTowerInlet( TowerNum ).AirTemp = 35.0;
 				SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 				SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 				SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -2930,7 +2930,7 @@ namespace CondenserLoopTowers {
 				}
 				if ( SimpleTower( TowerNum ).HighSpeedAirFlowRate == AutoSize ) {
 					if ( SimpleTower( TowerNum ).DefaultedDesignAirFlowScalingFactor ) {
-						tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap * ( 101325. / StdBaroPress );
+						tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap * ( 101325.0 / StdBaroPress );
 					} else {
 						tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap;
 					}
@@ -2959,7 +2959,7 @@ namespace CondenserLoopTowers {
 					UA0 = 0.0001 * Par( 1 ); // Assume deltaT = 10000K (limit)
 					UA1 = Par( 1 ); // Assume deltaT = 1K
 					SimpleTowerInlet( TowerNum ).WaterTemp = PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
+					SimpleTowerInlet( TowerNum ).AirTemp = 35.0;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -2982,7 +2982,7 @@ namespace CondenserLoopTowers {
 					UA0 = 0.0001 * Par( 1 ); // Assume deltaT = 10000K (limit)
 					UA1 = Par( 1 ); // Assume deltaT = 1K
 					SimpleTowerInlet( TowerNum ).WaterTemp = PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
+					SimpleTowerInlet( TowerNum ).AirTemp = 35.0;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -3034,7 +3034,7 @@ namespace CondenserLoopTowers {
 					}
 
 					if ( SimpleTower( TowerNum ).DefaultedDesignAirFlowScalingFactor ) {
-						tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap * ( 101325. / StdBaroPress );
+						tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap * ( 101325.0 / StdBaroPress );
 					} else {
 						tmpDesignAirFlowRate = tmpNomTowerCap * SimpleTower( TowerNum ).DesignAirFlowPerUnitNomCap;
 					}
@@ -3049,7 +3049,7 @@ namespace CondenserLoopTowers {
 					Cp = GetSpecificHeatGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, PlantSizData( PltSizCondNum ).ExitTemp, PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
 					SimpleTowerInlet( TowerNum ).WaterTemp = PlantSizData( PltSizCondNum ).ExitTemp + PlantSizData( PltSizCondNum ).DeltaT;
-					SimpleTowerInlet( TowerNum ).AirTemp = 35.;
+					SimpleTowerInlet( TowerNum ).AirTemp = 35.0;
 					SimpleTowerInlet( TowerNum ).AirWetBulb = 25.6;
 					SimpleTowerInlet( TowerNum ).AirPress = StdBaroPress;
 					SimpleTowerInlet( TowerNum ).AirHumRat = PsyWFnTdbTwbPb( SimpleTowerInlet( TowerNum ).AirTemp, SimpleTowerInlet( TowerNum ).AirWetBulb, SimpleTowerInlet( TowerNum ).AirPress );
@@ -3255,8 +3255,8 @@ namespace CondenserLoopTowers {
 			WaterMassFlowRatePerCellMax = SimpleTower( TowerNum ).DesWaterMassFlowRate * SimpleTower( TowerNum ).MaxFracFlowRate / SimpleTower( TowerNum ).NumCell;
 
 			//round it up to the nearest integer
-			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + .9999 ), SimpleTower( TowerNum ).NumCell );
-			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + .9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
 		}
 
 		// cap min at 1
@@ -3569,8 +3569,8 @@ namespace CondenserLoopTowers {
 			WaterMassFlowRatePerCellMax = SimpleTower( TowerNum ).DesWaterMassFlowRate * SimpleTower( TowerNum ).MaxFracFlowRate / SimpleTower( TowerNum ).NumCell;
 
 			//round it up to the nearest integer
-			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + .9999 ), SimpleTower( TowerNum ).NumCell );
-			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + .9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
 		}
 
 		// cap min at 1
@@ -3768,8 +3768,8 @@ namespace CondenserLoopTowers {
 			WaterMassFlowRatePerCellMax = SimpleTower( TowerNum ).DesWaterMassFlowRate * SimpleTower( TowerNum ).MaxFracFlowRate / SimpleTower( TowerNum ).NumCell;
 
 			//round it up to the nearest integer
-			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + .9999 ), SimpleTower( TowerNum ).NumCell );
-			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + .9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
 		}
 
 		// cap min at 1
@@ -4135,8 +4135,8 @@ namespace CondenserLoopTowers {
 			WaterMassFlowRatePerCellMax = SimpleTower( TowerNum ).DesWaterMassFlowRate * SimpleTower( TowerNum ).MaxFracFlowRate / SimpleTower( TowerNum ).NumCell;
 
 			//round it up to the nearest integer
-			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + .9999 ), SimpleTower( TowerNum ).NumCell );
-			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + .9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMin = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMax ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
+			NumCellMax = min( int( ( WaterMassFlowRate / WaterMassFlowRatePerCellMin ) + 0.9999 ), SimpleTower( TowerNum ).NumCell );
 		}
 
 		// cap min at 1
@@ -4242,7 +4242,7 @@ namespace CondenserLoopTowers {
 				if ( OutletWaterTempMIN < TempSetPoint ) {
 					//         if setpoint was exceeded, cycle the fan at minimum air flow to meet the setpoint temperature
 					if ( SimpleTower( TowerNum ).FanPowerfAirFlowCurve == 0 ) {
-						CTFanPower = std::pow( AirFlowRateRatio, 3 ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
+						CTFanPower = pow_3( AirFlowRateRatio ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
 					} else {
 						FanCurveValue = CurveValue( SimpleTower( TowerNum ).FanPowerfAirFlowCurve, AirFlowRateRatio );
 						CTFanPower = max( 0.0, ( SimpleTower( TowerNum ).HighSpeedFanPower * FanCurveValue ) ) * NumCellOn / SimpleTower( TowerNum ).NumCell;
@@ -4298,7 +4298,7 @@ namespace CondenserLoopTowers {
 
 					//         Use theoretical cubic for deterination of fan power if user has not specified a fan power ratio curve
 					if ( SimpleTower( TowerNum ).FanPowerfAirFlowCurve == 0 ) {
-						CTFanPower = std::pow( AirFlowRateRatio, 3 ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
+						CTFanPower = pow_3( AirFlowRateRatio ) * SimpleTower( TowerNum ).HighSpeedFanPower * NumCellOn / SimpleTower( TowerNum ).NumCell;
 					} else {
 						FanCurveValue = CurveValue( SimpleTower( TowerNum ).FanPowerfAirFlowCurve, AirFlowRateRatio );
 						CTFanPower = max( 0.0, ( SimpleTower( TowerNum ).HighSpeedFanPower * FanCurveValue ) ) * NumCellOn / SimpleTower( TowerNum ).NumCell;
@@ -4661,7 +4661,7 @@ namespace CondenserLoopTowers {
 		} else { // empirical model is CoolTools format
 
 			//     the CoolTools model actually uses PctFanPower = AirFlowRatio^3 as an input to the model
-			PctAirFlow = std::pow( AirFlowRatio, 3 );
+			PctAirFlow = pow_3( AirFlowRatio );
 			Approach = VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 1 ) + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 2 ) * PctAirFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 3 ) * PctAirFlow * PctAirFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 4 ) * PctAirFlow * PctAirFlow * PctAirFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 5 ) * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 6 ) * PctAirFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 7 ) * PctAirFlow * PctAirFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 8 ) * PctWaterFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 9 ) * PctAirFlow * PctWaterFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 10 ) * PctWaterFlow * PctWaterFlow * PctWaterFlow + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 11 ) * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 12 ) * PctAirFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 13 ) * PctAirFlow * PctAirFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 14 ) * PctWaterFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 15 ) * PctAirFlow * PctWaterFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 16 ) * PctWaterFlow * PctWaterFlow * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 17 ) * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 18 ) * PctAirFlow * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 19 ) * PctWaterFlow * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 20 ) * Twb * Twb * Twb + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 21 ) * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 22 ) * PctAirFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 23 ) * PctAirFlow * PctAirFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 24 ) * PctWaterFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 25 ) * PctAirFlow * PctWaterFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 26 ) * PctWaterFlow * PctWaterFlow * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 27 ) * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 28 ) * PctAirFlow * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 29 ) * PctWaterFlow * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 30 ) * Twb * Twb * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 31 ) * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 32 ) * PctAirFlow * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 33 ) * PctWaterFlow * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 34 ) * Twb * Tr * Tr + VSTower( SimpleTower( TowerNum ).VSTower ).Coeff( 35 ) * Tr * Tr * Tr;
 		}
 		//    capping approach to 0 results in failure of RegulaFalsi routine
@@ -5202,7 +5202,7 @@ namespace CondenserLoopTowers {
 				TairAvg = ( SimpleTowerInlet( TowerNum ).AirTemp + OutletAirTSat ) / 2.0;
 
 				// Amount of water evaporated, get density water at air temp or 4 C if too cold
-				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, max( TairAvg, 4. ), PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidName, max( TairAvg, 4.0 ), PlantLoop( SimpleTower( TowerNum ).LoopNum ).FluidIndex, RoutineName );
 
 				EvapVdot = ( AirMassFlowRate * ( OutSpecificHumRat - InSpecificHumRat ) ) / rho; // [m3/s]
 				if ( EvapVdot < 0.0 ) EvapVdot = 0.0;

@@ -1343,6 +1343,7 @@ namespace PlantManager {
 					// Map the inlet node to the splitter to a branch number
 					if ( TempLoop.Splitter( SplitNum - 1 ).Exists ) {
 						// Map the inlet node to the splitter to a branch number
+						SplitInBranch = false;
 						for ( BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum ) {
 							CompNum = TempLoop.Branch( BranchNum ).TotalComponents;
 							if ( TempLoop.Splitter( SplitNum - 1 ).NodeNumIn == TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumOut ) {
@@ -1745,7 +1746,7 @@ namespace PlantManager {
 		for ( LoopNum = 1; LoopNum <= NumCondLoops; ++LoopNum ) {
 
 			LoopNumInArray = LoopNum + NumPlantLoops;
-            
+
 			// set up references for this loop
 			auto & this_cond_loop( PlantLoop( LoopNumInArray ) );
 			auto & this_cond_supply ( this_cond_loop.LoopSide( SupplySide ) );
@@ -2327,7 +2328,7 @@ namespace PlantManager {
 						// Get the range of setpoints
 						LoopSetPointTemperatureHi = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointHi;
 						LoopSetPointTemperatureLo = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointLo;
-						LoopSetPointTemp = ( LoopSetPointTemperatureLo + LoopSetPointTemperatureHi ) / 2.;
+						LoopSetPointTemp = ( LoopSetPointTemperatureLo + LoopSetPointTemperatureHi ) / 2.0;
 					}}
 
 					if ( ( PlantLoop( LoopNum ).CommonPipeType == CommonPipe_TwoWay ) && ( LoopSideNum == DemandSide ) && ( PlantLoop( LoopNum ).LoopSide( DemandSide ).InletNodeSetPt ) ) { // get a second setpoint for secondaryLoop
@@ -2342,7 +2343,7 @@ namespace PlantManager {
 
 					// trap for -999 and set to average of limits if so
 					if ( LoopSetPointTemp == SensedNodeFlagValue ) {
-						LoopSetPointTemp = ( LoopMinTemp + LoopMaxTemp ) / 2.;
+						LoopSetPointTemp = ( LoopMinTemp + LoopMaxTemp ) / 2.0;
 					}
 					// Check it against the loop temperature limits
 					LoopSetPointTemp = min( LoopMaxTemp, LoopSetPointTemp );

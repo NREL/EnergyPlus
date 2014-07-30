@@ -160,6 +160,9 @@ namespace General {
 	std::string
 	RemoveTrailingZeros( std::string const & InputString );
 
+	std::string &
+	strip_trailing_zeros( std::string & InputString );
+
 	void
 	MovingAvg(
 		FArray1A< Real64 > const DataIn, // input data that needs smoothing
@@ -240,8 +243,8 @@ namespace General {
 	Iterate(
 		Real64 & ResultX, // ResultX is the final Iteration result passed back to the calling routine
 		Real64 const Tol, // Tolerance for Convergence
-		Real64 & X0, // Current value of X
-		Real64 & Y0, // Current value of the function Y(X)
+		Real64 const X0, // Current value of X
+		Real64 const Y0, // Current value of the function Y(X)
 		Real64 & X1, // First Previous values of X
 		Real64 & Y1, // First Previous values of Y(X1)
 		int const Iter, // Number of iterations

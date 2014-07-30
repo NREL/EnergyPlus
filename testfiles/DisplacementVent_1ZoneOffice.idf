@@ -74,7 +74,7 @@
 ! HVAC:                       single duct VAV with hot water reheat, single boiler, chiller and
 !                             cooling tower, supply air temperature = 19C
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2310,7 +2310,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     AirSysAvailSched,        !- Availability Schedule Name
-    0.68,                    !- Fan Efficiency
+    0.68,                    !- Fan Total Efficiency
     747,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -2329,7 +2329,7 @@
   Fan:VariableVolume,
     Return Fan 1,            !- Name
     AirSysAvailSched,        !- Availability Schedule Name
-    0.68,                    !- Fan Efficiency
+    0.68,                    !- Fan Total Efficiency
     249,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method

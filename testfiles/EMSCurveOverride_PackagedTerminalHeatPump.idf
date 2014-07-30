@@ -257,7 +257,7 @@
 
   Output:Variable,West Zone,Zone Air Temperature,Hourly;
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1551,11 +1551,11 @@
     Zone1PTHPAirOutletNode,  !- Air Outlet Node Name
     OutdoorAir:Mixer,        !- Outdoor Air Mixer Object Type
     Zone1PTHPOAMixer,        !- Outdoor Air Mixer Name
-    0.32,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
-    0.32,                     !- Supply Air Flow Rate During Heating Operation {m3/s}
+    0.32,                    !- Supply Air Flow Rate During Cooling Operation {m3/s}
+    0.32,                    !- Supply Air Flow Rate During Heating Operation {m3/s}
     ,                        !- Supply Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     0.028,                   !- Outdoor Air Flow Rate During Cooling Operation {m3/s}
-    0.028,                  !- Outdoor Air Flow Rate During Heating Operation {m3/s}
+    0.028,                   !- Outdoor Air Flow Rate During Heating Operation {m3/s}
     0.0186,                  !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone1PTHPFan,            !- Supply Air Fan Name
@@ -1685,7 +1685,7 @@
   Fan:ConstantVolume,
     Zone3PTHPFan,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1698,9 +1698,9 @@
   Fan:OnOff,
     Zone1PTHPFan,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
-    0.32,                     !- Maximum Flow Rate {m3/s}
+    0.32,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
     1.0,                     !- Motor In Airstream Fraction
     Zone1PTHPOAMixerOutletNode,  !- Air Inlet Node Name
@@ -1711,7 +1711,7 @@
   Fan:OnOff,
     Zone2PTHPFan,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1727,7 +1727,7 @@
     6000.0,                  !- Gross Rated Total Cooling Capacity {W}
     0.75,                    !- Gross Rated Sensible Heat Ratio
     3.0,                     !- Gross Rated Cooling COP {W/W}
-    0.32,                     !- Rated Air Flow Rate {m3/s}
+    0.32,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
     Zone1PTHPFanOutletNode,  !- Air Inlet Node Name
     Zone1PTHPDXCoolCoilOutletNode,  !- Air Outlet Node Name
@@ -1800,9 +1800,9 @@
   Coil:Heating:DX:SingleSpeed,
     Zone1PTHPDXHeatCoil,     !- Name
     HeatingCoilAvailSched,   !- Availability Schedule Name
-    5300.0,                 !- Gross Rated Heating Capacity {W}
+    5300.0,                  !- Gross Rated Heating Capacity {W}
     2.75,                    !- Gross Rated Heating COP {W/W}
-    0.32,                     !- Rated Air Flow Rate {m3/s}
+    0.32,                    !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Supply Fan Power Per Volume Flow Rate {W/(m3/s)}
     Zone1PTHPDXCoolCoilOutletNode,  !- Air Inlet Node Name
     Zone1PTHPDXHeatCoilOutletNode,  !- Air Outlet Node Name
@@ -1845,7 +1845,7 @@
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
-    4400;                   !- Resistive Defrost Heater Capacity {W}
+    4400;                    !- Resistive Defrost Heater Capacity {W}
 
   Coil:Heating:DX:SingleSpeed,
     Zone3PTHPDXHeatCoil,     !- Name
@@ -1870,7 +1870,7 @@
     Resistive,               !- Defrost Strategy
     TIMED,                   !- Defrost Control
     0.166667,                !- Defrost Time Period Fraction
-    6700;                   !- Resistive Defrost Heater Capacity {W}
+    6700;                    !- Resistive Defrost Heater Capacity {W}
 
 !-   ===========  ALL OBJECTS IN CLASS: OUTDOORAIR:MIXER ===========
 

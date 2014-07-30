@@ -196,6 +196,19 @@ namespace WaterUse {
 			Energy( Energy )
 		{}
 
+		// Reset Some Values to Zeros
+		void
+		reset()
+		{
+			SensibleRate = 0.0;
+			SensibleEnergy = 0.0;
+			LatentRate = 0.0;
+			LatentEnergy = 0.0;
+			MixedTemp = 0.0;
+			TotalMassFlowRate = 0.0;
+			DrainTemp = 0.0;
+		}
+
 	};
 
 	struct WaterConnectionsType

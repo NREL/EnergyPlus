@@ -383,14 +383,29 @@ namespace PlantComponentTemperatureSources {
 		// Calculate specific heat
 		cp = GetSpecificHeatGlycol( PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidName, WaterSource( SourceNum ).BoundaryTemp, PlantLoop( WaterSource( SourceNum ).Location.LoopNum ).FluidIndex, RoutineName );
 
-		// if MyLoad is > 0 then we want to heat the loop
-		// if MyLoad is < 0 then we want to cool the loop
-		// thus, given a fixed outlet temperature (the boundary temp, Tbnd), the eq is:
-		//  MyLoad = mdot * cp * (Tbnd - Tin)
-		// re-arranging:
-		//  mdot = MyLoad / [cp * (Tbnd - Tin)]
-		// if mdot
-		WaterSource( SourceNum ).MassFlowRate = MyLoad / ( cp * ( WaterSource( SourceNum ).BoundaryTemp - WaterSource( SourceNum ).InletTemp ) );
+		// Calculate deltaT
+		Real64 delta_temp = WaterSource( SourceNum ).BoundaryTemp - WaterSource( SourceNum ).InletTemp;
+
+		// If deltaT is zero then we cannot calculate a flow request, but we may still want one
+		//   If myload is greater than zero, then lets request full flow at the current temperature as it may still be meeting load
+		//   If myload is zero, we'll then request zero flow
+		// If deltaT is non-zero then we can use the current load and deltaT to calculate a flow request:
+		//   If MyLoad is > 0 then we want to heat the loop
+		//   If MyLoad is < 0 then we want to cool the loop
+		//   Thus, given a fixed outlet temperature (the boundary temp, Tbnd), the eq is:
+		//     MyLoad = mdot * cp * (Tbnd - Tin)
+		//   re-arranging:
+		//     mdot = MyLoad / [cp * (Tbnd - Tin)]
+		//  If there is a deltaT, but no load, the mass flow request will go to zero anyway
+		if ( abs( delta_temp ) < 0.001 ) {
+			if ( abs( MyLoad ) < 0.001 ) {
+				WaterSource( SourceNum ).MassFlowRate = 0.0;
+			} else {
+				WaterSource( SourceNum ).MassFlowRate = WaterSource( SourceNum ).MassFlowRateMax;
+			}
+		} else {
+			WaterSource( SourceNum ).MassFlowRate = MyLoad / ( cp * delta_temp );
+		}
 
 		// If the mdot is negative it means we can't help the load so we will want to just go to zero.
 		// If the mdot is already zero, then well, we still want to go to zero

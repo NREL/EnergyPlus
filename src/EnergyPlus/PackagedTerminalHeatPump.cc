@@ -3822,6 +3822,7 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3945,7 +3946,7 @@ namespace PackagedTerminalHeatPump {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 						if ( PTUnit( PTUnitNum ).IterErrIndex == 0 ) {
-							gio::write( IterNum, "*" ) << MaxIte;
+							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
 							ShowWarningError( PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 							ShowContinueError( " Iteration limit exceeded calculating packaged terminal unit part-load ratio, " "maximum iterations = " + IterNum );
@@ -4439,7 +4440,7 @@ namespace PackagedTerminalHeatPump {
 
 			} else {
 				// Calculate PLF
-				A = 4. * tau * ( Nmax / 3600. ) * ( 1 - PLR / PLF1 );
+				A = 4.0 * tau * ( Nmax / 3600.0 ) * ( 1 - PLR / PLF1 );
 				if ( A < 1.5e-3 ) {
 					// A safety check to prevent PLF2 = 1 - A * (1 - Exp(-1 / A))
 					// from "float underflow error". Occurs when PLR is very close to 1.0,
@@ -4683,7 +4684,7 @@ namespace PackagedTerminalHeatPump {
 		OpMode = int( Par()( 4 ) );
 		QZnReq = Par()( 5 );
 		QZnReqTemp = QZnReq;
-		if ( std::abs( QZnReq ) < 100. ) QZnReqTemp = sign( 100., QZnReq );
+		if ( std::abs( QZnReq ) < 100.0 ) QZnReqTemp = sign( 100.0, QZnReq );
 		OnOffAirFlowRatio = Par()( 6 );
 		SupHeaterLoad = Par()( 7 ) * PartLoadFrac;
 		if ( Par()( 8 ) == 1.0 ) {

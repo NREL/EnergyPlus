@@ -21,7 +21,7 @@
 
 using namespace ObjexxFCL;
 
-TEST( WriteTest, WriteCharToStream )
+TEST( WriteTest, WriteCharLDToStream )
 {
 	std::ostringstream stream;
 	char c( 'X' );
@@ -29,7 +29,7 @@ TEST( WriteTest, WriteCharToStream )
 	EXPECT_EQ( " X\n", stream.str() );
 }
 
-TEST( WriteTest, WriteStringToStream )
+TEST( WriteTest, WriteStringLDToStream )
 {
 	std::ostringstream stream;
 	std::string s( "ABC" );
@@ -37,7 +37,23 @@ TEST( WriteTest, WriteStringToStream )
 	EXPECT_EQ( " ABC\n", stream.str() );
 }
 
-TEST( WriteTest, NonAdvancingListDirected )
+TEST( WriteTest, WriteFloatLDToStream )
+{
+	std::ostringstream stream;
+	float f( 2.5 );
+	Write( stream, "*" ) << f;
+	EXPECT_EQ( "   2.500000    \n", stream.str() );
+}
+
+TEST( WriteTest, WriteDoubleLDToStream )
+{
+	std::ostringstream stream;
+	double d( 2.5 );
+	Write( stream, "*" ) << d;
+	EXPECT_EQ( "   2.50000000000000     \n", stream.str() );
+}
+
+TEST( WriteTest, NonAdvancingLDToStream )
 {
 	std::ostringstream stream;
 	std::string s( "ABC" );
@@ -139,4 +155,145 @@ TEST( WriteTest, WriteFloatEToStream )
 		Write( stream, "(F7.0$)" ) << f;
 		EXPECT_EQ( "  1125.", stream.str() );
 	}
+}
+
+TEST( WriteTest, WriteExponentToStream )
+{
+	std::ostringstream stream;
+	float f( 1.125 );
+	Write( stream, "(1PE15.6$)" ) << f;
+	EXPECT_EQ( "   1.125000E+00", stream.str() );
+}
+
+TEST( WriteTest, WriteCharLDToString )
+{
+	std::string o;
+	char c( 'X' );
+	Write( o, "*" ) << c;
+	EXPECT_EQ( " X", o );
+}
+
+TEST( WriteTest, WriteStringLDToString )
+{
+	std::string o;
+	std::string s( "ABC" );
+	Write( o, "*" ) << s;
+	EXPECT_EQ( " ABC", o );
+}
+
+TEST( WriteTest, WriteFloatLDToString )
+{
+	std::string o;
+	float f( 2.5 );
+	Write( o, "*" ) << f;
+	EXPECT_EQ( "   2.500000    ", o );
+}
+
+TEST( WriteTest, WriteDoubleLDToString )
+{
+	std::string o;
+	double d( 2.5 );
+	Write( o, "*" ) << d;
+	EXPECT_EQ( "   2.50000000000000     ", o );
+}
+
+TEST( WriteTest, WriteMultilineStringToString )
+{
+	std::string o;
+	std::string s( "ABC\nXYZ" );
+	Write( o, "(2A3)" ) << s;
+	EXPECT_EQ( "ABC\nXYZ", o );
+}
+
+TEST( WriteTest, WriteStringLiteralToString )
+{
+	std::string o;
+	std::string s( "ABC" );
+	Write( o, "(A3,\"A big fish\"$)" ) << s;
+	EXPECT_EQ( "ABCA big fish", o );
+}
+
+TEST( WriteTest, WriteStringLiteralNestedToString )
+{
+	std::string o;
+	Write( o, "(\"A \\\"big\\\" fish\"$)" ); // Also tests that Write does the output with no << arg
+	EXPECT_EQ( "A \"big\" fish", o );
+}
+
+TEST( WriteTest, WriteStringLiteralNestedWithBackslashesToString )
+{
+	{
+		std::string o;
+		Write( o, "(\"A ++big++ fish\"$)" );
+		EXPECT_EQ( "A ++big++ fish", o );
+	}
+	{
+		std::string o;
+		Write( o, "(\"A \\\\\\\\big\\\\\\\\ fish\"$)" ); // Nested string so we have to quadruple the backslashes
+		EXPECT_EQ( "A \\\\big\\\\ fish", o ); // Want \\big\\ so we double the backslashes here
+	}
+}
+
+TEST( WriteTest, WriteSingleQuoteStringLiteralToString )
+{
+	std::string o;
+	std::string s( "ABC" );
+	Write( o, "(A3,'A big fish'$)" ) << s;
+	EXPECT_EQ( "ABCA big fish", o );
+}
+
+TEST( WriteTest, WriteSingleQuoteStringLiteralNestedToString )
+{
+	std::string o;
+	std::string s( "ABC" );
+	Write( o, "(A3,'A \"big\" fish'$)" ) << s;
+	EXPECT_EQ( "ABCA \"big\" fish", o );
+}
+
+TEST( WriteTest, WriteSingleQuoteStringLiteralNestedToString2 )
+{
+	std::string o;
+	std::string s( "ABC" );
+	Write( o, "(A3,'A \"big\" \\\'fish\\\\'$)" ) << s;
+	EXPECT_EQ( "ABCA \"big\" 'fish\\", o );
+}
+
+TEST( WriteTest, WriteFloatToString )
+{
+	std::string o;
+	float f( 1.125 );
+	Write( o, "(F5.0$)" ) << f;
+	EXPECT_EQ( "   1.", o );
+}
+
+TEST( WriteTest, WriteFloatDToString )
+{
+	std::string o;
+	float f( 1125 );
+	Write( o, "(F6.1$)" ) << f; // Precision specified
+	EXPECT_EQ( "1125.0", o );
+}
+
+TEST( WriteTest, WriteFloatEToString )
+{
+	{
+		std::string o;
+		float f( 1.125E3 );
+		Write( o, "(F7$)" ) << f;
+		EXPECT_EQ( "  1125.", o );
+	}
+	{
+		std::string o;
+		float f( 1.125E3 );
+		Write( o, "(F7.0$)" ) << f;
+		EXPECT_EQ( "  1125.", o );
+	}
+}
+
+TEST( WriteTest, WriteExponentToString )
+{
+	std::string o;
+	float f( 1.125 );
+	Write( o, "(1PE15.6$)" ) << f;
+	EXPECT_EQ( "   1.125000E+00", o );
 }
