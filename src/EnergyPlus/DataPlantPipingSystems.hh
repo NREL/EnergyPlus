@@ -101,7 +101,7 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		BaseThermalPropertySet() :
-			Conductivity( 0.0 ),
+			Conductivity( 0.0001 ),
 			Density( 0.0 ),
 			SpecificHeat( 0.0 )
 		{}
@@ -1298,6 +1298,7 @@ namespace DataPlantPipingSystems {
 		MeshProperties Mesh;
 		BaseThermalPropertySet GroundProperties;
 		BaseThermalPropertySet SlabProperties;
+		BaseThermalPropertySet DummyProperties;
 		BaseThermalPropertySet HorizInsProperties;
 		BaseThermalPropertySet VertInsProperties;
 		SimulationControl SimControls;
@@ -1423,6 +1424,7 @@ namespace DataPlantPipingSystems {
 			MeshProperties const & Mesh,
 			BaseThermalPropertySet const & GroundProperties,
 			BaseThermalPropertySet const & SlabProperties,
+			BaseThermalPropertySet const & DummyProperties,
 			BaseThermalPropertySet const & HorizInsProperties,
 			BaseThermalPropertySet const & VertInsProperties,
 			SimulationControl const & SimControls,
@@ -1491,6 +1493,7 @@ namespace DataPlantPipingSystems {
 			Mesh( Mesh ),
 			GroundProperties( GroundProperties ),
 			SlabProperties( SlabProperties ),
+			DummyProperties( DummyProperties ),
 			HorizInsProperties( HorizInsProperties ),
 			VertInsProperties( VertInsProperties ),
 			SimControls( SimControls ),
