@@ -635,15 +635,12 @@ namespace PlantPipingSystemsManager {
 		Optional_int BasementWallXIndex = _,
 		Optional_int BasementFloorYIndex = _,
 		Optional_int SlabXIndex1 = _,
-		Optional_int SlabXIndex2 = _,
 		Optional_int InsulationXIndex1 = _,
-		Optional_int InsulationXIndex2 = _,
 		Optional_int SlabYIndex = _,
 		Optional_int InsulationYIndex = _,
 		Optional_int SlabZIndex1 = _,
-		Optional_int SlabZIndex2 = _,
-		Optional_int InsulationZIndex1 = _,
-		Optional_int InsulationZIndex2 = _
+		Optional_int InsulationZIndex1 = _
+		
 		
 	);
 
