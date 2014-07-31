@@ -387,9 +387,9 @@ main()
 	// Get input routines in the rest of the simulation
 
 	ProcessInput();
-	gio::open(112, "GroundTemps.csv");
+
 	ManageSimulation();
-	gio::close(112);
+
 	ShowMessage( "Simulation Error Summary *************" );
 
 	GenOutputVariablesAuditReport();

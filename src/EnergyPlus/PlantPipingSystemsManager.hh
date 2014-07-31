@@ -147,6 +147,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************
+
 	void
 	ReadPipeCircuitInputs(
 		int const NumPipeCircuits,
@@ -634,12 +635,12 @@ namespace PlantPipingSystemsManager {
 		bool const PartitionsExist,
 		Optional_int BasementWallXIndex = _,
 		Optional_int BasementFloorYIndex = _,
-		Optional_int SlabXIndex1 = _,
-		Optional_int InsulationXIndex1 = _,
+		Optional_int SlabXIndex = _,
+		Optional_int InsulationXIndex = _,
 		Optional_int SlabYIndex = _,
 		Optional_int InsulationYIndex = _,
-		Optional_int SlabZIndex1 = _,
-		Optional_int InsulationZIndex1 = _
+		Optional_int SlabZIndex = _,
+		Optional_int InsulationZIndex = _
 		
 		
 	);
@@ -722,7 +723,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	//FUNCTION GetCellWidths( DomainNum, g ) RESULT( RetVal )
+	//FUNCTION GetCellWidths(DomainNum, g) RESULT(RetVal)
 
 	void
 	GetCellWidths(
@@ -739,15 +740,6 @@ namespace PlantPipingSystemsManager {
 		int const DomainNum,
 		Optional < int const > CircuitNum
 	);
-
-	//*********************************************************************************************!
-
-	//*********************************************************************************************!
-
-	void
-		PerformIterationLoop(
-		int const DomainNum
-		);
 
 	//*********************************************************************************************!
 
@@ -820,6 +812,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
+
 	Real64
 		EvaluateZoneInterfaceTemperature(
 		int const DomainNum,

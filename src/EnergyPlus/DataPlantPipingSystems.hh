@@ -21,15 +21,11 @@ namespace DataPlantPipingSystems {
 	extern int const PartitionType_BasementFloor;
 	extern int const PartitionType_Pipe;
 	extern int const PartitionType_Slab;
-	extern int const PartitionType_SlabXSide1;
-	extern int const PartitionType_SlabXSide2;
-	extern int const PartitionType_SlabZSide1;
-	extern int const PartitionType_SlabZSide2;
+	extern int const PartitionType_SlabXSide;
+	extern int const PartitionType_SlabZSide;
 	extern int const PartitionType_HorizInsUnderSlab;
-	extern int const PartitionType_HorizInsXSide1;
-	extern int const PartitionType_HorizInsXSide2;
-	extern int const PartitionType_HorizInsZSide1;
-	extern int const PartitionType_HorizInsZSide2;
+	extern int const PartitionType_HorizInsXSide;
+	extern int const PartitionType_HorizInsZSide;
 	extern int const PartitionType_VertInsLowerEdge;
 
 
@@ -39,15 +35,11 @@ namespace DataPlantPipingSystems {
 	extern int const RegionType_XDirection;
 	extern int const RegionType_YDirection;
 	extern int const RegionType_ZDirection;
-	extern int const RegionType_SlabXSide1;
-	extern int const RegionType_SlabXSide2;
-	extern int const RegionType_SlabZSide1;
-	extern int const RegionType_SlabZSide2;
+	extern int const RegionType_SlabXSide;
+	extern int const RegionType_SlabZSide;
 	extern int const RegionType_HorizInsUnderSlab;
-	extern int const RegionType_HorizInsXSide1;
-	extern int const RegionType_HorizInsXSide2;
-	extern int const RegionType_HorizInsZSide1;
-	extern int const RegionType_HorizInsZSide2;
+	extern int const RegionType_HorizInsXSide;
+	extern int const RegionType_HorizInsZSide;
 	extern int const RegionType_VertInsLowerEdge;
 
 	extern int const MeshDistribution_Uniform;
@@ -101,7 +93,7 @@ namespace DataPlantPipingSystems {
 
 		// Default Constructor
 		BaseThermalPropertySet() :
-			Conductivity( 0.0001 ),
+			Conductivity( 0.0 ),
 			Density( 0.0 ),
 			SpecificHeat( 0.0 )
 		{}
@@ -769,7 +761,7 @@ namespace DataPlantPipingSystems {
 		FArray1D_int FloorSurfacePointers;
 		int BasementWallXIndex;
 		int BasementFloorYIndex;
-		
+
 		// Default Constructor
 		BasementZoneInfo() :
 			Depth( 0.0 ),
@@ -1323,11 +1315,9 @@ namespace DataPlantPipingSystems {
 		Real64 SlabWidth;
 		Real64 SlabLength;
 		Real64 SlabThickness;
-		Real64 SlabXIndex1;
-		Real64 SlabXIndex2;
+		Real64 SlabXIndex;
 		Real64 SlabYIndex;
-		Real64 SlabZIndex1;
-		Real64 SlabZIndex2;
+		Real64 SlabZIndex;
 		bool HorizInsPresentFlag;
 		int HorizInsMaterialNum;
 		Real64 HorizInsThickness;
@@ -1345,11 +1335,9 @@ namespace DataPlantPipingSystems {
 		Real64 VertInsDepth;
 		bool FullHorizInsFlag;
 		bool PartialHorizInsFlag;
-		int InsulationXIndex1;
-		int InsulationXIndex2;
+		int InsulationXIndex;
 		int InsulationYIndex;
-		int InsulationZIndex1;
-		int InsulationZIndex2;
+		int InsulationZIndex;
 
 		// Main 3D cells array
 		FArray3D< CartesianCell > Cells;
@@ -1377,11 +1365,9 @@ namespace DataPlantPipingSystems {
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
 			SlabThickness( 0.0 ),
-			SlabXIndex1( 0 ),
-			SlabXIndex2( 0 ),
+			SlabXIndex( 0 ),
 			SlabYIndex( 0 ),
-			SlabZIndex1( 0 ),
-			SlabZIndex2( 0 ),
+			SlabZIndex( 0 ),
 			HorizInsPresentFlag( false ),
 			HorizInsMaterialNum( 0 ),
 			HorizInsThickness( 0.0254 ),
@@ -1399,11 +1385,9 @@ namespace DataPlantPipingSystems {
 			VertInsDepth( 0.0 ),
 			FullHorizInsFlag( false ),
 			PartialHorizInsFlag( false ),
-			InsulationXIndex1( 0 ),
-			InsulationXIndex2( 0 ),
+			InsulationXIndex( 0 ),
 			InsulationYIndex( 0 ),
-			InsulationZIndex1( 0 ),
-			InsulationZIndex2( 0 )
+			InsulationZIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -1447,11 +1431,9 @@ namespace DataPlantPipingSystems {
 			Real64 const SlabWidth,
 			Real64 const SlabLength,
 			Real64 const SlabThickness,
-			Real64 const SlabXIndex1,
-			Real64 const SlabXIndex2,
+			Real64 const SlabXIndex,
 			Real64 const SlabYIndex,
-			Real64 const SlabZIndex1,
-			Real64 const SalbZIndex2,
+			Real64 const SlabZIndex,
 			bool const HorizInsPresentFlag,
 			int const HorizInsMaterialNum,
 			Real64 const HorizInsThickness,
@@ -1469,11 +1451,9 @@ namespace DataPlantPipingSystems {
 			Real64 const VertInsDepth,
 			bool const FullHorizInsFlag,
 			bool const PartialHorizInsFlag,
-			int const InsulationXIndex1,
-			int const InsulationXIndex2,
+			int const InsulationXIndex,
 			int const InsulationYIndex,
-			int const InsulationZIndex1,
-			int const InsulationZIndex2,
+			int const InsulationZIndex,
 
 			FArray3< CartesianCell > const & Cells			
 		) :
@@ -1516,11 +1496,9 @@ namespace DataPlantPipingSystems {
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),
 			SlabThickness( SlabThickness ),
-			SlabXIndex1( SlabXIndex1 ),
-			SlabXIndex2( SlabXIndex2 ),
+			SlabXIndex( SlabXIndex ),
 			SlabYIndex( SlabYIndex ),
-			SlabZIndex1( SlabZIndex1 ),
-			SlabZIndex2( SlabZIndex2 ),
+			SlabZIndex( SlabZIndex ),
 			HorizInsPresentFlag( HorizInsPresentFlag ),
 			HorizInsMaterialNum( HorizInsMaterialNum ),
 			HorizInsThickness( HorizInsThickness ),
@@ -1538,11 +1516,9 @@ namespace DataPlantPipingSystems {
 			VertInsDepth( VertInsDepth ),
 			FullHorizInsFlag( FullHorizInsFlag ),
 			PartialHorizInsFlag( PartialHorizInsFlag ),
-			InsulationXIndex1( InsulationXIndex1 ),
-			InsulationXIndex2( InsulationXIndex2 ),
+			InsulationXIndex( InsulationXIndex ),
 			InsulationYIndex( InsulationYIndex ),
-			InsulationZIndex1( InsulationZIndex1 ),
-			InsulationZIndex2( InsulationZIndex2 ),
+			InsulationZIndex( InsulationZIndex ),
 			Cells( Cells )
 		{}
 
