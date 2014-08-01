@@ -1236,11 +1236,11 @@ namespace PlantPipingSystemsManager {
 
 				// Set up the mesh with some default parameters
 
-				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = 5;
+				PipingSystemDomains( DomainCtr ).Mesh.X.RegionMeshCount = 1;
 				PipingSystemDomains( DomainCtr ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = 5;
+				PipingSystemDomains( DomainCtr ).Mesh.Y.RegionMeshCount = 1;
 				PipingSystemDomains( DomainCtr ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-				PipingSystemDomains( DomainCtr ).Mesh.Z.RegionMeshCount = 5;
+				PipingSystemDomains( DomainCtr ).Mesh.Z.RegionMeshCount = 1;
 				PipingSystemDomains( DomainCtr ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
 
 				//Soil properties
@@ -4058,13 +4058,9 @@ namespace PlantPipingSystemsManager {
 		Real64 PipeCellWidth;
 		Real64 SurfCellWidth; // Basement surface...
 		Real64 SideX1Location;
-		Real64 SideX2Location;
 		Real64 SideX1InsulationLocation;
-		Real64 SideX2InsulationLocation;
 		Real64 SideZ1Location;
-		Real64 SideZ2Location;
 		Real64 SideZ1InsulationLocation;
-		Real64 SideZ2InsulationLocation;
 		Real64 SlabDistFromBottom;
 		Real64 YInsulationLocation;
 		Real64 CellWidth( 0.0 );
@@ -5901,7 +5897,7 @@ namespace PlantPipingSystemsManager {
 		bool FinishedIterationLoop;
 
 			// Always do start of time step inits
-			DoStartOfTimeStepInitializations( DomainNum, _ );
+			DoStartOfTimeStepInitializations(DomainNum, CircuitNum);
 
 			// Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
 			if ( PipingSystemDomains( DomainNum ).HasAPipeCircuit ) {
@@ -6089,6 +6085,8 @@ namespace PlantPipingSystemsManager {
 		int CurDirection; // From Enum: Direction
 		Real64 AdiabaticMultiplier;
 
+		std::ofstream static myfile("DebugTemps.csv", std::ofstream::out);
+
 		//Set up once-per-cell items
 		Numerator = 0.0;
 		Denominator = 0.0;
@@ -6109,10 +6107,10 @@ namespace PlantPipingSystemsManager {
 			//Zone-coupled slab configuration
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ){
 				//There are a few cases for cells adjacent to adiabatic x- and z- walls to be handled here. Check if the cell is next to one.
-				if ( ( CurDirection == Direction_PositiveZ ) && ( ThisCell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
+				if ( ( CurDirection == Direction_NegativeZ ) && ( ThisCell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
 					AdiabaticMultiplier = 2.0;
 				}
-				else if ( ( CurDirection == Direction_PositiveX ) && ( ThisCell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
+				else if ( ( CurDirection == Direction_NegativeX ) && ( ThisCell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
 					AdiabaticMultiplier = 2.0;
 				}
 				else {
@@ -6122,6 +6120,8 @@ namespace PlantPipingSystemsManager {
 				EvaluateNeighborCharacteristics( DomainNum, ThisCell, CurDirection, NeighborTemp, Resistance );
 				Numerator = AdiabaticMultiplier * Numerator + ( Beta / Resistance ) * NeighborTemp;
 				Denominator = AdiabaticMultiplier * Denominator + ( Beta / Resistance );
+
+				myfile << ThisCell.X_index << "," << ThisCell.Y_index << "," << ThisCell.Z_index << "," << CurDirection << "," << AdiabaticMultiplier << std::endl;
 			}
 			else{
 				//'evaluate the transient expression terms
@@ -6283,10 +6283,10 @@ namespace PlantPipingSystemsManager {
 			//For Zone-Coupled slab configuration
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ){
 				//We have adiabatic z- and x-faces, check if the cell is adjacent to one
-				if ( ( CurDirection == Direction_PositiveZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
+				if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
 					AdiabaticMultiplier = 2.0;
 				}
-				else if ( ( CurDirection == Direction_PositiveX ) && ( cell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
+				else if ( ( CurDirection == Direction_NegativeX ) && ( cell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
 					AdiabaticMultiplier = 2.0;
 				}
 				else {
@@ -6956,10 +6956,10 @@ namespace PlantPipingSystemsManager {
 				CurDirection = NeighborFieldCells( DirectionCounter );
 
 				//There are a few cases for cells adjacent to adiabatic x- and z- walls to be handled here. Check if the cell is next to one.
-				if ( ( CurDirection == Direction_PositiveZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
+				if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
 					AdiabaticMultiplier = 2.0;
 				}
-				else if ( ( CurDirection == Direction_PositiveX ) && ( cell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
+				else if ( ( CurDirection == Direction_NegativeX ) && ( cell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
 					AdiabaticMultiplier = 2.0;
 				}
 				else {
