@@ -959,11 +959,6 @@ namespace HVACMultiSpeedHeatPump {
 			}
 
 			MSHeatPump( MSHPNum ).MinOATCompressor = Numbers( 1 );
-			if ( Numbers( 1 ) < -20.0 ) {
-				ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", " + cNumericFields( 1 ) + " is -20.0" );
-				ShowContinueError( "The input value is " + RoundSigDigits( Numbers( 4 ), 2 ) );
-				ErrorsFound = true;
-			}
 
 			if ( SameString( Alphas( 12 ), "Coil:Cooling:DX:MultiSpeed" ) ) {
 				MSHeatPump( MSHPNum ).CoolCoilType = MultiSpeedCoolingCoil;
