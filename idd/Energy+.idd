@@ -48940,7 +48940,6 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \object-list HeatingCoilsGasMultiStage
    N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
         \type real
-        \minimum -20.0
         \default -8.0
         \units C
         \note Needs to match the corresponding minimum outdoor temperature defined
