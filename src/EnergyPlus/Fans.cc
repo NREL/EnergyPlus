@@ -3070,8 +3070,70 @@ namespace Fans {
 		}
 
 	}
+	
+    Real64
+	FanDesDT(
+        int const FanNum, // index of fan in Fan array
+        Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+    )
+    
+    {
+    
+        // FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   August 2014
+		//       MODIFIED       
+		//       RE-ENGINEERED  na
 
-	// lets make another comment FB
+		// PURPOSE OF THIS FUNCTION:
+		// This function calculates and returns the design fan delta T from the fan input data
+
+        // METHODOLOGY EMPLOYED:
+		// Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
+		//              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
+		//              Qdot,air = cp,air*rho,air*Vdot*deltaT
+
+		// REFERENCES: EnergyPlus Engineering Reference
+		
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 RhoAir; // density of air [kg/m3]
+		Real64 CpAir;  // specific heat of air [J/kg-K]
+		Real64 DeltaP; // fan design pressure rise [N/m2]
+		Real64 TotEff; // fan design total efficiency
+		Real64 MotEff; // fan design motor efficiency
+		Real64 MotInAirFrac; // fraction of motor in the air stream
+		Real64 PowerLossToAir; // fan and motor loss to air stream (W)
+		// 
+        DeltaP = Fan( FanNum ).DeltaPress;
+        TotEff = Fan( FanNum ).FanEff;
+        MotEff = Fan( FanNum ).MotEff;
+        MotInAirFrac = Fan( FanNum ).MotInAirFrac;
+        RhoAir = StdRhoAir;
+        CpAir = PsyCpAirFnWTdb(constant_zero,constant_twenty);
+    
+        DesignDeltaT = (DeltaP/(RhoAir*CpAir*TotEff)) * (MotEff + MotInAirFrac*(1.0-MotEff));
+    
+        return DesignDeltaT;
+    
+    }
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************

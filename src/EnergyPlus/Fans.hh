@@ -691,6 +691,12 @@ namespace Fans {
 		Optional< Real64 const > MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
 		Optional< Real64 const > MinAirVolFlow = _ // Fan air volumetric flow rate    [m3/s]
 	);
+	
+	Real64
+	FanDesDT(
+    int const FanNum, // index of fan in Fan array
+    Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+    );
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
