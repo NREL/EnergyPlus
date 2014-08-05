@@ -3121,19 +3121,23 @@ namespace Fans {
 		Real64 MotEff; // fan design motor efficiency
 		Real64 MotInAirFrac; // fraction of motor in the air stream
 		Real64 PowerLossToAir; // fan and motor loss to air stream (W)
-		// 
-        DeltaP = Fan( FanNum ).DeltaPress;
-        TotEff = Fan( FanNum ).FanEff;
-        MotEff = Fan( FanNum ).MotEff;
-        MotInAirFrac = Fan( FanNum ).MotInAirFrac;
-        RhoAir = StdRhoAir;
-        CpAir = PsyCpAirFnWTdb(constant_zero,constant_twenty);
-    
-        DesignDeltaT = (DeltaP/(RhoAir*CpAir*TotEff)) * (MotEff + MotInAirFrac*(1.0-MotEff));
+		//
+		if ( !(Fan(FanNum).FanType_Num == FanType_ComponentModel) ) {
+			DeltaP = Fan(FanNum).DeltaPress;
+			TotEff = Fan(FanNum).FanEff;
+			MotEff = Fan(FanNum).MotEff;
+			MotInAirFrac = Fan(FanNum).MotInAirFrac;
+			RhoAir = StdRhoAir;
+			CpAir = PsyCpAirFnWTdb(constant_zero, constant_twenty);
+			DesignDeltaT = (DeltaP / (RhoAir*CpAir*TotEff)) * (MotEff + MotInAirFrac*(1.0 - MotEff));
+		}
+		else {
+			DesignDeltaT = 0.0;
+		}
     
         return DesignDeltaT;
     
-    }
+    } // FanDesDT
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
