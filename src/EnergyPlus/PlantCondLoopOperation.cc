@@ -2101,9 +2101,12 @@ namespace PlantCondLoopOperation {
 			}
 		};
 		std::vector< LoadPLRPoint > accrued_load_plr_values;
-				
+						
 		// load local variables
 		NumCompsOnList = this_equiplist.NumComps;
+
+		//Allocate array once
+		accrued_load_plr_values.reserve( NumCompsOnList );
 		RemLoopDemand = LoopDemand;
 		if ( NumCompsOnList <= 0 ) return;
 		//set flag to specify optimal or sequential loading of equipment
