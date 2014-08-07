@@ -1309,9 +1309,6 @@ namespace DataPlantPipingSystems {
 		bool SlabInGradeFlag;
 		bool SimSlabFlag;
 		int SlabMaterialNum;
-		Real64 SlabDensity;
-		Real64 SlabCp;
-		Real64 SlabConductivity;
 		Real64 SlabWidth;
 		Real64 SlabLength;
 		Real64 SlabThickness;
@@ -1324,8 +1321,6 @@ namespace DataPlantPipingSystems {
 		Real64 HorizInsWidth;
 		Real64 HeatFlux;
 		int NumHeatFlux;
-		Real64 FloorOuterTemp;
-		Real64 ConvectionTemp;
 		Real64 ConvCoeff;
 		bool FullHorizInsPresent;
 		bool VertInsPresentFlag;
@@ -1361,9 +1356,6 @@ namespace DataPlantPipingSystems {
 			SlabInGradeFlag( false ),
 			SimSlabFlag( false ),
 			SlabMaterialNum( 0 ),
-			SlabDensity( 0.0 ),
-			SlabCp( 0.0 ),
-			SlabConductivity( 0.0 ),
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
 			SlabThickness( 0.0 ),
@@ -1376,8 +1368,6 @@ namespace DataPlantPipingSystems {
 			HorizInsWidth( 0.0 ),
 			HeatFlux( 0.0 ),
 			NumHeatFlux ( 0 ),
-			FloorOuterTemp( 0.0 ),
-			ConvectionTemp( 0.0 ),
 			ConvCoeff( 0.0 ),
 			FullHorizInsPresent( false ),
 			VertInsPresentFlag( false ),
@@ -1430,9 +1420,6 @@ namespace DataPlantPipingSystems {
 			bool const SlabInGradeFlag,
 			bool const SimSlabFlag,
 			int const SlabMaterialNum,
-			Real64 const SlabDensity,
-			Real64 const SlabCp,
-			Real64 const SlabConductivity,
 			Real64 const SlabWidth,
 			Real64 const SlabLength,
 			Real64 const SlabThickness,
@@ -1445,8 +1432,6 @@ namespace DataPlantPipingSystems {
 			Real64 const HorizInsWidth,
 			Real64 const HeatFlux,
 			int const NumHeatFlux,
-			Real64 const FloorOuterTemp,
-			Real64 const ConvectionTemp,
 			Real64 const ConvCoeff,
 			bool const FullHorizInsPresent,
 			bool const VertInsPresentFlag,
@@ -1497,9 +1482,6 @@ namespace DataPlantPipingSystems {
 			SlabInGradeFlag( SlabInGradeFlag ),
 			SimSlabFlag( SimSlabFlag ),
 			SlabMaterialNum( SlabMaterialNum ),
-			SlabDensity( SlabDensity ),
-			SlabCp( SlabCp ),
-			SlabConductivity( SlabConductivity ),
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),
 			SlabThickness( SlabThickness ),
@@ -1512,8 +1494,6 @@ namespace DataPlantPipingSystems {
 			HorizInsWidth( HorizInsWidth ),
 			HeatFlux( HeatFlux ),
 			NumHeatFlux( NumHeatFlux ),
-			FloorOuterTemp( FloorOuterTemp ),
-			ConvectionTemp( ConvectionTemp ),
 			ConvCoeff( ConvCoeff ),
 			FullHorizInsPresent( FullHorizInsPresent ),
 			VertInsPresentFlag( VertInsPresentFlag ),
