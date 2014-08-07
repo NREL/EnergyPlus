@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip
+END
+miniunz.c
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/miniunz.c
+END
+iowin32.c
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/iowin32.c
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/Makefile
+END
+make_vms.com
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/make_vms.com
+END
+iowin32.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/iowin32.h
+END
+ioapi.c
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/ioapi.c
+END
+MiniZip64_info.txt
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/MiniZip64_info.txt
+END
+zip.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/zip.c
+END
+unzip.c
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/unzip.c
+END
+ioapi.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/ioapi.h
+END
+crypt.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/crypt.h
+END
+mztools.c
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/mztools.c
+END
+zip.h
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/zip.h
+END
+unzip.h
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/unzip.h
+END
+mztools.h
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/mztools.h
+END
+MiniZip64_Changes.txt
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/MiniZip64_Changes.txt
+END
+minizip.c
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/EnergyPlus/svn/!svn/ver/642/trunk/SourceCode/zlib/contrib/minizip/minizip.c
+END

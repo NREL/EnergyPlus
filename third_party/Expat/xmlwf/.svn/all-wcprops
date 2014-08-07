@@ -1,0 +1,101 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf
+END
+xmlurl.h
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlurl.h
+END
+xmlwf.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlwf.c
+END
+xmlfile.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlfile.c
+END
+win32filemap.c
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/win32filemap.c
+END
+xmlwf.dsp
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlwf.dsp
+END
+xmlfile.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlfile.h
+END
+ct.c
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/ct.c
+END
+codepage.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/codepage.c
+END
+xmlmime.c
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlmime.c
+END
+readfilemap.c
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/readfilemap.c
+END
+codepage.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/codepage.h
+END
+xmlmime.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlmime.h
+END
+unixfilemap.c
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/unixfilemap.c
+END
+filemap.h
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/filemap.h
+END
+xmlwin32url.cxx
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmlwin32url.cxx
+END
+xmltchar.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/xmlwf/xmltchar.h
+END

@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/EnergyPlus/svn/!svn/ver/1158/trunk/SourceCode/BCVTB
+END
+Readme.txt
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/EnergyPlus/svn/!svn/ver/666/trunk/SourceCode/BCVTB/Readme.txt
+END
+utilSocket.h
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/EnergyPlus/svn/!svn/ver/1001/trunk/SourceCode/BCVTB/utilSocket.h
+END
+CMakeLists.txt
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/EnergyPlus/svn/!svn/ver/1158/trunk/SourceCode/BCVTB/CMakeLists.txt
+END
+bcvtb.def
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/EnergyPlus/svn/!svn/ver/1001/trunk/SourceCode/BCVTB/bcvtb.def
+END
+utilXml.c
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/EnergyPlus/svn/!svn/ver/964/trunk/SourceCode/BCVTB/utilXml.c
+END
+defines.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/EnergyPlus/svn/!svn/ver/725/trunk/SourceCode/BCVTB/defines.h
+END
+utilXml.h
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/EnergyPlus/svn/!svn/ver/964/trunk/SourceCode/BCVTB/utilXml.h
+END
+utilSocket.c
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/EnergyPlus/svn/!svn/ver/1001/trunk/SourceCode/BCVTB/utilSocket.c
+END

@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests
+END
+minicheck.h
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/minicheck.h
+END
+chardata.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/chardata.c
+END
+runtests.c
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/runtests.c
+END
+runtestspp.cpp
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/runtestspp.cpp
+END
+xmltest.sh
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/xmltest.sh
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/README.txt
+END
+minicheck.c
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/minicheck.c
+END
+chardata.h
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/EnergyPlus/svn/!svn/ver/551/trunk/SourceCode/Expat/tests/chardata.h
+END
