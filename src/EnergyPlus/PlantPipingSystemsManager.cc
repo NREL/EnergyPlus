@@ -120,8 +120,7 @@ namespace PlantPipingSystemsManager {
 	// Functions
 
 	void
-		CheckIfAnySlabs(
-		)
+	CheckIfAnySlabs()
 	{
 			
 			// SUBROUTINE INFORMATION:
@@ -255,7 +254,7 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	void
-		InitAndSimGroundDomains()
+	InitAndSimGroundDomains()
 	{
 
 			// SUBROUTINE INFORMATION:
@@ -274,6 +273,8 @@ namespace PlantPipingSystemsManager {
 			// na
 
 			// Using/Aliasing
+			using DataEnvironment::DayOfMonth;
+			using DataEnvironment::DayOfWeek;
 			using DataHVACGlobals::TimeStepSys;
 			using DataHVACGlobals::SysTimeElapsed;
 			using DataGlobals::BeginSimFlag;
@@ -284,8 +285,7 @@ namespace PlantPipingSystemsManager {
 			using DataGlobals::TimeStepZone;
 			using DataGlobals::SecInHour;
 			using DataGlobals::InitConvTemp;
-			
-			
+			using DataGlobals::WarmupFlag;
 
 			// Locals
 			// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -295,17 +295,13 @@ namespace PlantPipingSystemsManager {
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			static bool GetInputFlag( true ); // First time, input is "gotten"
-			int DomainNum;
-
-			//Autodesk:Uninit Initialize variables used uninitialized
-			DomainNum = 0; //Autodesk:Uninit Force default initialization
+			int DomainNum = 0;
 
 			//Read input if necessary
 			if ( GetInputFlag ) {
 				GetPipingSystemsInput();
 				GetInputFlag = false;
 			}
-
 
 			for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
 				if ( PipingSystemDomains( DomainNum ).DomainNeedsToBeMeshed ) {
@@ -318,7 +314,7 @@ namespace PlantPipingSystemsManager {
 				// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
 				// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
 				// which would be carried over from the previous environment
-				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
+				
 				PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
 
 				//There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
@@ -331,6 +327,25 @@ namespace PlantPipingSystemsManager {
 				}
 				if ( !BeginSimFlag ) PipingSystemDomains( DomainNum ).BeginSimInit = true;
 				if ( !BeginEnvrnFlag ) PipingSystemDomains( DomainNum ).BeginSimEnvrn = true;
+
+				// Aggregate the heat flux
+				PipingSystemDomains( DomainNum ).HeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+
+				// Select run interval
+				if ( !WarmupFlag ) {
+					if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
+						// Keep on going!
+						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
+					} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
+						if ( TimeStep != 1 ) continue;
+						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
+					} else if ( PipingSystemDomains( DomainNum ).SimDailyFlag ) {
+						if ( ( HourOfDay != 1 ) || ( TimeStep != 1 ) ) continue;
+						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour * 24;
+					}
+				}
+
 
 				//Shift history arrays only if necessary
 				if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
@@ -888,7 +903,6 @@ namespace PlantPipingSystemsManager {
 			using DataEnvironment::PubGroundTempSurfFlag;
 			using DataEnvironment::PubGroundTempSurface;
 
-
 			// Locals
 			// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1039,8 +1053,7 @@ namespace PlantPipingSystemsManager {
 				if ( IsNotOK ) {
 					ErrorsFound = true;
 					cAlphaArgs( 1 ) = "Duplicate name encountered";
-				}
-				else if ( IsBlank ) {
+				} else if ( IsBlank ) {
 					ErrorsFound = true;
 					cAlphaArgs( 1 ) = "Blank name encountered";
 				}
@@ -1066,11 +1079,9 @@ namespace PlantPipingSystemsManager {
 				//Set flag for slab in-grade or slab on-grade
 				if ( SameString( cAlphaArgs( 3 ), "INGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = true;
-				}
-				else if ( SameString( cAlphaArgs( 3 ), "ONGRADE" ) ) {
+				} else if ( SameString( cAlphaArgs( 3 ), "ONGRADE" ) ) {
 					PipingSystemDomains( DomainCtr ).SlabInGradeFlag = false;
-				}
-				else {
+				} else {
 					ShowContinueError( "Slab location not determined." );
 					ShowContinueError( "Preceding error causes program termination." );
 				}
@@ -1082,8 +1093,7 @@ namespace PlantPipingSystemsManager {
 					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
 					ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
 					ErrorsFound = true;
-				}
-				else {
+				} else {
 					//check this
 					PipingSystemDomains( DomainCtr ).SlabThickness = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Thickness;
 					PipingSystemDomains( DomainCtr ).SlabProperties.Density = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Density;
@@ -1094,11 +1104,9 @@ namespace PlantPipingSystemsManager {
 				// set flag for horizontal insulation
 				if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
 					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
-				}
-				else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
+				} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
 					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
-				}
-				else {
+				} else {
 					ShowContinueError( "Must enter either yes or no for horizontal insulation." );
 					ShowFatalError( "Preceding error causes program termination." );
 				}
@@ -1111,8 +1119,7 @@ namespace PlantPipingSystemsManager {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 6 ) + "=" + cAlphaArgs( 6 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).HorizInsMaterial );
 						ErrorsFound = true;
-					}
-					else {
+					} else {
 						PipingSystemDomains( DomainCtr ).HorizInsThickness = Material( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum ).Thickness;
 						PipingSystemDomains( DomainCtr ).HorizInsProperties.Density = Material( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum ).Density;
 						PipingSystemDomains( DomainCtr ).HorizInsProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).HorizInsMaterialNum ).SpecHeat;
@@ -1123,12 +1130,10 @@ namespace PlantPipingSystemsManager {
 					if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = false;
 						PipingSystemDomains( DomainCtr ).PartialHorizInsFlag = true;
-					}
-					else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
+					} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
 						PipingSystemDomains( DomainCtr ).PartialHorizInsFlag = false;
-					}
-					else {
+					} else {
 						ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
 						ShowFatalError( "Preceding error causes program termination." );
 					}
@@ -1140,11 +1145,9 @@ namespace PlantPipingSystemsManager {
 				// set flag for vertical insulation
 				if ( SameString( cAlphaArgs( 8 ), "NO" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = false;
-				}
-				else if ( SameString( cAlphaArgs( 8 ), "YES" ) ) {
+				} else if ( SameString( cAlphaArgs( 8 ), "YES" ) ) {
 					PipingSystemDomains( DomainCtr ).VertInsPresentFlag = true;
-				}
-				else {
+				} else {
 					ShowContinueError( "Must enter either yes or no for vertical insulation." );
 					ShowFatalError( "Preceding error causes program termination." );
 				}
@@ -1157,8 +1160,7 @@ namespace PlantPipingSystemsManager {
 						ShowSevereError( "Invalid " + cAlphaFieldNames( 9 ) + "=" + cAlphaArgs( 9 ) );
 						ShowContinueError( "Found in " + Domain( ZoneCoupledDomainCtr ).VertInsMaterial );
 						ErrorsFound = true;
-					}
-					else {
+					} else {
 						PipingSystemDomains( DomainCtr ).VertInsThickness = Material( PipingSystemDomains( DomainCtr ).VertInsMaterialNum ).Thickness;
 						PipingSystemDomains( DomainCtr ).VertInsProperties.Density = Material( PipingSystemDomains( DomainCtr ).VertInsMaterialNum ).Density;
 						PipingSystemDomains( DomainCtr ).VertInsProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).VertInsMaterialNum ).SpecHeat;
@@ -1175,12 +1177,22 @@ namespace PlantPipingSystemsManager {
 				// Set flag for slab simulation
 				if ( SameString( cAlphaArgs( 10 ), "YES" ) ) {
 					PipingSystemDomains( DomainCtr ).SimSlabFlag = true;
-				}
-				else if ( SameString( cAlphaArgs( 10 ), "NO" ) ) {
+				} else if ( SameString( cAlphaArgs( 10 ), "NO" ) ) {
 					PipingSystemDomains( DomainCtr ).SimSlabFlag = false;
+				} else {
+					ShowContinueError( "Could not determine if slab is included in ground simulation. Check input." );
+					ShowFatalError( "Preceding error causes program termination." );
 				}
-				else {
-					ShowContinueError( "Could not determine if slab is included in ground simulation. Check input.'" );
+
+				// Set simulation interval flag
+				if ( SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
+					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
+				} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
+					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
+				} else if ( SameString( cAlphaArgs( 11 ), "DAILY" ) ) {
+					PipingSystemDomains( DomainCtr ).SimDailyFlag = true;
+				} else {
+					ShowContinueError( "Could not determine slab simulation interval. Check input." );
 					ShowFatalError( "Preceding error causes program termination." );
 				}
 
@@ -1197,13 +1209,11 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex = FindItemInList( Domain( ZoneCoupledDomainCtr ).OSCMName, OSCM.Name(), TotOSCM );
 				if ( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex <= 0 ) {
 					IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled, cAlphaArgs( 1 ), cAlphaFieldNames( 2 ), cAlphaArgs( 2 ), "Could not match with an Other Side Conditions Model input object.", ErrorsFound );
-				}
-				else {
+				} else {
 					NumSurfacesWithThisOSCM = GetSurfaceCountForOSCM( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex );
 					if ( NumSurfacesWithThisOSCM <= 0 ) {
 						IssueSevereInputFieldError( RoutineName, ObjName_ZoneCoupled, cAlphaArgs( 1 ), cAlphaFieldNames( 2 ), cAlphaArgs( 2 ), "Entry matched an Other Side Conditions Model, but no surfaces were found" " to be using this Other Side Conditions Model.", ErrorsFound );
-					}
-					else {
+					} else {
 						PipingSystemDomains( DomainCtr ).ZoneCoupledSurfaces.allocate( NumSurfacesWithThisOSCM );
 						//Create GetSurfaceDataForOSCM function
 						PipingSystemDomains( DomainCtr ).ZoneCoupledSurfaces = GetSurfaceDataForOSCM( PipingSystemDomains( DomainCtr ).ZoneCoupledOSCMIndex, NumSurfacesWithThisOSCM );
@@ -1255,8 +1265,7 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperature = Domain( ZoneCoupledDomainCtr ).KusudaAvgSurfTemp;
 					PipingSystemDomains( DomainCtr ).Farfield.AverageGroundTemperatureAmplitude = Domain( ZoneCoupledDomainCtr ).KusudaAvgAmplitude;
 					PipingSystemDomains( DomainCtr ).Farfield.PhaseShiftOfMinGroundTempDays = Domain( ZoneCoupledDomainCtr ).KusudaPhaseShift;
-				}
-				else {
+				} else {
 					//If ground temp data was not brought in manually in GETINPUT,
 					// then we must get it from the surface ground temperatures
 
@@ -5753,80 +5762,13 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 
-	//*********************************************************************************************!
-
-	//void
-	//PerformIterationLoop(
-	//	int const DomainNum,
-	//	Optional < int const > CircuitNum
-	//)
-	//{
-
-	//	// SUBROUTINE INFORMATION:
-	//	//       AUTHOR         Edwin Lee
-	//	//       DATE WRITTEN   Summer 2011
-	//	//       MODIFIED       na
-	//	//       RE-ENGINEERED  na
-
-	//	// PURPOSE OF THIS SUBROUTINE:
-	//	// <description>
-
-	//	// METHODOLOGY EMPLOYED:
-	//	// <description>
-
-	//	// REFERENCES:
-	//	// na
-
-	//	// USE STATEMENTS:
-	//	// na
-
-	//	// Locals
-	//	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	//	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	//	int IterationIndex;
-	//	bool FinishedIterationLoop;
-
-	//	// Always do start of time step inits
-	//	DoStartOfTimeStepInitializations( DomainNum, CircuitNum );
-
-	//	// Prepare the pipe circuit for calculations, but we'll actually do calcs at the iteration level
-	//	PreparePipeCircuitSimulation( DomainNum, CircuitNum );
-
-	//	// Begin iterating for this time step
-	//	for ( IterationIndex = 1; IterationIndex <= PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS; ++IterationIndex ) {
-
-	//		ShiftTemperaturesForNewIteration( DomainNum );
-
-	//		PerformPipeCircuitSimulation( DomainNum, CircuitNum );
-
-	//		if ( PipingSystemDomains( DomainNum ).DomainNeedsSimulation ) PerformTemperatureFieldUpdate( DomainNum );
-
-	//		FinishedIterationLoop = false;
-	//		DoEndOfIterationOperations( DomainNum, FinishedIterationLoop );
-	//		if ( FinishedIterationLoop ) break;
-
-	//	}
-
-	//	// Update the basement surface temperatures, if any
-	//	if ( PipingSystemDomains( DomainNum ).HasBasement ) {
-	//		UpdateBasementSurfaceTemperatures( DomainNum );
-	//	}
-	//	
-	//	// Update the slab surface temperatures, if any
-	//	if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ) {
-	//		UpdateZoneSurfaceTemperatures( DomainNum );
-	//	}
-	//}
-
-	//*********************************************************************************************!
 
 	//*********************************************************************************************!
 	void
-		PerformIterationLoop(
+	PerformIterationLoop(
 		int const DomainNum,
 		Optional < int const > CircuitNum
-		)
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -6839,7 +6781,6 @@ namespace PlantPipingSystemsManager {
 			Real64 Resistance;
 			Real64 NeighborTemp;
 			Real64 HeatFlux;
-			Real64 Curr_HeatFlux;
 			int DirectionCounter;
 			int CurDirection; // From Enum: Direction
 			Real64 AdiabaticMultiplier;
@@ -6854,10 +6795,9 @@ namespace PlantPipingSystemsManager {
 			Numerator += cell.MyBase.Temperature_PrevTimeStep;
 			++Denominator;
 
-			//get the average slab heat flux and add it to the tally
-			Curr_HeatFlux = GetZoneInterfaceHeatFlux( DomainNum );
-			HeatFlux = ( Curr_HeatFlux + PipingSystemDomains( DomainNum ).Prev_HeatFlux ) / 2;
-			Numerator += Beta * HeatFlux * Width( cell )* Depth( cell );
+			// Get the average slab heat flux and add it to the tally
+			HeatFlux = PipingSystemDomains( DomainNum ).HeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+			Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 
 			//determine the neighbor types based on cell location
 			EvaluateCellNeighborDirections( DomainNum, cell );
@@ -6982,8 +6922,6 @@ namespace PlantPipingSystemsManager {
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 			Real64 AvgTemp;
 			int OSCMIndex;
-			Real64 Prev_HeatFlux;
-			Real64 Curr_HeatFlux;
 			
 			AvgTemp = GetAverageTempByType( DomainNum, CellType_ZoneGroundInterface );
 			OSCMIndex = PipingSystemDomains( DomainNum ).ZoneCoupledOSCMIndex;
@@ -6992,10 +6930,9 @@ namespace PlantPipingSystemsManager {
 			OSCM( OSCMIndex ).TRad = AvgTemp;
 			OSCM( OSCMIndex ).HRad = 0.0;
 
-			Prev_HeatFlux = PipingSystemDomains( DomainNum ).Prev_HeatFlux;
-			Curr_HeatFlux = GetZoneInterfaceHeatFlux( DomainNum );
-
-			PipingSystemDomains( DomainNum ).Prev_HeatFlux = ( Curr_HeatFlux + Prev_HeatFlux ) / 2;
+			//Reset the interface heat flux after iteration
+			PipingSystemDomains( DomainNum ).HeatFlux = 0.0;
+			PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
 
 		}
 

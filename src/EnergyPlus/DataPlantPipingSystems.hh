@@ -1323,11 +1323,10 @@ namespace DataPlantPipingSystems {
 		Real64 HorizInsThickness;
 		Real64 HorizInsWidth;
 		Real64 HeatFlux;
-		Real64 Prev_HeatFlux;
+		int NumHeatFlux;
 		Real64 FloorOuterTemp;
 		Real64 ConvectionTemp;
 		Real64 ConvCoeff;
-		Real64 FloorInsideTemp;
 		bool FullHorizInsPresent;
 		bool VertInsPresentFlag;
 		int VertInsMaterialNum;
@@ -1338,6 +1337,9 @@ namespace DataPlantPipingSystems {
 		int InsulationXIndex;
 		int InsulationYIndex;
 		int InsulationZIndex;
+		bool SimTimestepFlag;
+		bool SimHourlyFlag;
+		bool SimDailyFlag;
 
 		// Main 3D cells array
 		FArray3D< CartesianCell > Cells;
@@ -1373,11 +1375,10 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( 0.0254 ),
 			HorizInsWidth( 0.0 ),
 			HeatFlux( 0.0 ),
-			Prev_HeatFlux( 0.0 ),
+			NumHeatFlux ( 0 ),
 			FloorOuterTemp( 0.0 ),
 			ConvectionTemp( 0.0 ),
 			ConvCoeff( 0.0 ),
-			FloorInsideTemp( 0.0 ),
 			FullHorizInsPresent( false ),
 			VertInsPresentFlag( false ),
 			VertInsMaterialNum( 0 ),
@@ -1387,7 +1388,11 @@ namespace DataPlantPipingSystems {
 			PartialHorizInsFlag( false ),
 			InsulationXIndex( 0 ),
 			InsulationYIndex( 0 ),
-			InsulationZIndex( 0 )
+			InsulationZIndex( 0 ),
+			SimTimestepFlag( false ),
+			SimHourlyFlag( false ),
+			SimDailyFlag( false )
+
 		{}
 
 		// Member Constructor
@@ -1439,11 +1444,10 @@ namespace DataPlantPipingSystems {
 			Real64 const HorizInsThickness,
 			Real64 const HorizInsWidth,
 			Real64 const HeatFlux,
-			Real64 const Prev_HeatFlux,
+			int const NumHeatFlux,
 			Real64 const FloorOuterTemp,
 			Real64 const ConvectionTemp,
 			Real64 const ConvCoeff,
-			Real64 const FloorInsideTemp,
 			bool const FullHorizInsPresent,
 			bool const VertInsPresentFlag,
 			int const VertInsMaterialNum,
@@ -1454,6 +1458,9 @@ namespace DataPlantPipingSystems {
 			int const InsulationXIndex,
 			int const InsulationYIndex,
 			int const InsulationZIndex,
+			bool const SimTimestepFlag,
+			bool const SimHourlyFlag,
+			bool const SimDailyFlag,
 
 			FArray3< CartesianCell > const & Cells			
 		) :
@@ -1504,11 +1511,10 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( HorizInsThickness ),
 			HorizInsWidth( HorizInsWidth ),
 			HeatFlux( HeatFlux ),
-			Prev_HeatFlux( Prev_HeatFlux ),
+			NumHeatFlux( NumHeatFlux ),
 			FloorOuterTemp( FloorOuterTemp ),
 			ConvectionTemp( ConvectionTemp ),
 			ConvCoeff( ConvCoeff ),
-			FloorInsideTemp( FloorInsideTemp ),
 			FullHorizInsPresent( FullHorizInsPresent ),
 			VertInsPresentFlag( VertInsPresentFlag ),
 			VertInsMaterialNum( VertInsMaterialNum ),
@@ -1519,6 +1525,9 @@ namespace DataPlantPipingSystems {
 			InsulationXIndex( InsulationXIndex ),
 			InsulationYIndex( InsulationYIndex ),
 			InsulationZIndex( InsulationZIndex ),
+			SimTimestepFlag( SimTimestepFlag ),
+			SimHourlyFlag( SimHourlyFlag ),
+			SimDailyFlag( SimDailyFlag ),
 			Cells( Cells )
 		{}
 

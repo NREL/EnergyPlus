@@ -54044,11 +54044,15 @@ Pipe:Underground,
 		\note optional
 		\note This field specifies the vertical insulation material.
    N14, \field Vertical Insulation Depth
-		\field-optional
-		\note This field specifies the depth of the vertical insulation		
-   A10;	\field Slab Included in Ground Simulation
-		\required-field
-		\note This field whether the slab is included in the ground domain simulation.
+        \field-optional
+        \note This field specifies the depth of the vertical insulation		
+   A10, \field Slab Included in Ground Simulation
+        \required-field
+        \note This field specifies whether the slab is included in the ground domain simulation.
+   A11; \field Simulation Timestep
+        \required-field
+        \note This field specifies the domain simulation timestep.
+	
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
