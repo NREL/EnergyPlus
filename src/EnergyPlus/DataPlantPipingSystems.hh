@@ -1414,7 +1414,7 @@ namespace DataPlantPipingSystems {
 			CurSimConditionsInfo const & Cur,
 			ReportingInformation const & Reporting,
 			bool const HasBasement,
-		    FArray1 <ZoneCoupledSurfaceData> const & ZoneCoupledSurfaces,
+			FArray1 <ZoneCoupledSurfaceData> const & ZoneCoupledSurfaces,
 			int const ZoneCoupledOSCMIndex,
 			Real64 const PerimeterOffset,
 			bool const SlabInGradeFlag,
