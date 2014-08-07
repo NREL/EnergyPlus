@@ -7622,7 +7622,7 @@
     CoolSys1 Demand Outlet Node,  !- Demand Side Outlet Node Name
     CoolSys1 Demand Branches,!- Demand Side Branch List Name
     CoolSys1 Demand Connectors,  !- Demand Side Connector List Name
-    Uniform;                 !- Load Distribution Scheme
+    UniformLoad;             !- Load Distribution Scheme
 
   PlantLoop,
     HeatSys1,                !- Name
@@ -7664,7 +7664,7 @@
     TowerWaterSys Demand Outlet Node,  !- Demand Side Outlet Node Name
     TowerWaterSys Demand Branches,  !- Condenser Demand Side Branch List Name
     TowerWaterSys Demand Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name
