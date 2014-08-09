@@ -4,7 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 2 )
-set( CMAKE_VERSION_PATCH 0 ) 
+set( CMAKE_VERSION_PATCH 0 )
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -32,10 +32,6 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 
-# Not yet released by CMake, but is being developed
-# This will help us set the proper options for c++11 across various configurations
-#FIND_PACKAGE( CXXFeatures ) 
-
 if (MSVC)
   set(gtest_force_shared_crt ON)
 endif()
@@ -52,17 +48,18 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 
-if( BUILD_TESTING )
-  option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
-  enable_testing()
-  include(CTest) 
-  ADD_SUBDIRECTORY(third_party/gtest)
-  ADD_SUBDIRECTORY(testfiles)
-endif()
-
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(src/EnergyPlus)
+
+if( BUILD_TESTING )
+  option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
+  enable_testing()
+  include(CTest)
+  ADD_SUBDIRECTORY(third_party/gtest)
+  ADD_SUBDIRECTORY(testfiles)
+  ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
+endif()
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
