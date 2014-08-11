@@ -1864,7 +1864,7 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name

@@ -3387,7 +3387,7 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   PlantLoop,
     Chilled Water Loop,      !- Name
@@ -3408,7 +3408,7 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    SEQUENTIAL,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     CW Avail List;           !- Availability Manager List Name
 
 !-   ===========  ALL OBJECTS IN CLASS: PLANTEQUIPMENTLIST ===========
