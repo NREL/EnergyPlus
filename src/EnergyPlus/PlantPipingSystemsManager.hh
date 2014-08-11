@@ -180,9 +180,16 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	SetupAllOutputVariables(
+	SetupPipingSystemOutputVariables(
 		int const TotalNumSegments,
 		int const TotalNumCircuits
+	);
+
+	//*********************************************************************************************!
+
+	void
+	SetupZoneCoupledOutputVariables(
+		int const DomainNum
 	);
 
 	//*********************************************************************************************!

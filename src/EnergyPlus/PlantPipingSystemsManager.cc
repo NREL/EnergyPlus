@@ -59,10 +59,8 @@ namespace PlantPipingSystemsManager {
 	// na
 
 	// Using/Aliasing
-	using DataGlobals::OutputFileDebug;
 	using DataGlobals::Pi;
 	using namespace DataPlantPipingSystems;
-	using DataGlobals::OutputFileDebug;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -123,44 +121,44 @@ namespace PlantPipingSystemsManager {
 	CheckIfAnySlabs()
 	{
 			
-			// SUBROUTINE INFORMATION:
-			//       AUTHOR         Matt Mitchell
-			//       DATE WRITTEN   May 2014
-			//       MODIFIED       na
-			//       RE-ENGINEERED  na
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   May 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
 
-			// PURPOSE OF THIS SUBROUTINE:
-			// <description>
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
 
-			// METHODOLOGY EMPLOYED:
-			// <description>
+		// METHODOLOGY EMPLOYED:
+		// <description>
 
-			// REFERENCES:
-			// na
+		// REFERENCES:
+		// na
 
-			// Using/Aliasing
-			using namespace DataIPShortCuts;
-			using InputProcessor::GetNumObjectsFound;
-			using DataGlobals::AnySlabsInModel;
+		// Using/Aliasing
+		using namespace DataIPShortCuts;
+		using InputProcessor::GetNumObjectsFound;
+		using DataGlobals::AnySlabsInModel;
 
-			// Locals
-			// SUBROUTINE ARGUMENT DEFINITIONS:
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-			// SUBROUTINE PARAMETER DEFINITIONS:
+		// SUBROUTINE PARAMETER DEFINITIONS:
 			
-			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-			int numSlabsCheck;
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int numSlabsCheck;
 
-			numSlabsCheck = GetNumObjectsFound( ObjName_ZoneCoupled );
+		numSlabsCheck = GetNumObjectsFound( ObjName_ZoneCoupled );
 
-			if ( numSlabsCheck > 0 ){
-				AnySlabsInModel = true;
-			}
-			else {
-				AnySlabsInModel = false;
-			}
-
+		if ( numSlabsCheck > 0 ){
+			AnySlabsInModel = true;
 		}
+		else {
+			AnySlabsInModel = false;
+		}
+
+	}
 
 	void
 	SimPipingSystemCircuit(
@@ -329,8 +327,9 @@ namespace PlantPipingSystemsManager {
 				if ( !BeginEnvrnFlag ) PipingSystemDomains( DomainNum ).BeginSimEnvrn = true;
 
 				// Aggregate the heat flux
-				PipingSystemDomains( DomainNum ).HeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
+				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
 				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
+				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 
 				// Select run interval
 				if ( !WarmupFlag ) {
@@ -451,7 +450,7 @@ namespace PlantPipingSystemsManager {
 		if ( ErrorsFound ) ShowFatalError( RoutineName + ": Preceding input errors cause program termination." );
 
 		//Setup output variables
-		SetupAllOutputVariables( TotalNumSegments, TotalNumCircuits );
+		SetupPipingSystemOutputVariables( TotalNumSegments, TotalNumCircuits );
 
 		//Validate CIRCUIT-SEGMENT cross references
 		for ( CircuitCtr = lbound( PipingSystemCircuits, 1 ); CircuitCtr <= ubound( PipingSystemCircuits, 1 ); ++CircuitCtr ) {
@@ -1313,6 +1312,8 @@ namespace PlantPipingSystemsManager {
 				//additional evapotranspiration parameter, min/max validated by IP
 				PipingSystemDomains( DomainCtr ).Moisture.GroundCoverCoefficient = Domain( ZoneCoupledDomainCtr ).EvapotranspirationCoeff;
 
+				// setup output variables
+				SetupZoneCoupledOutputVariables( ZoneCoupledDomainCtr );
 
 			}
 
@@ -1933,7 +1934,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	void
-	SetupAllOutputVariables(
+	SetupPipingSystemOutputVariables(
 		int const TotalNumSegments,
 		int const TotalNumCircuits
 	)
@@ -2009,11 +2010,53 @@ namespace PlantPipingSystemsManager {
 
 		}
 
-		// Need to setup output variables here, if any.
-
 	}
 
 	//*********************************************************************************************!
+
+	void
+	SetupZoneCoupledOutputVariables(
+		int const DomainNum
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Matt Mitchell
+		//       DATE WRITTEN   August 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// <description>
+
+		// METHODOLOGY EMPLOYED:
+		// <description>
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+
+		SetupOutputVariable( "Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+
+		SetupOutputVariable( "Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+
+	}
 
 	void
 	InitPipingSystems(
@@ -6796,7 +6839,7 @@ namespace PlantPipingSystemsManager {
 			++Denominator;
 
 			// Get the average slab heat flux and add it to the tally
-			HeatFlux = PipingSystemDomains( DomainNum ).HeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
+			HeatFlux = PipingSystemDomains( DomainNum ).HeatFlux;
 			Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
 
 			//determine the neighbor types based on cell location
@@ -6920,18 +6963,18 @@ namespace PlantPipingSystemsManager {
 			Real64 const BigNumber( 10000.0 );
 
 			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-			Real64 AvgTemp;
 			int OSCMIndex;
 			
-			AvgTemp = GetAverageTempByType( DomainNum, CellType_ZoneGroundInterface );
+			PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp = GetAverageTempByType( DomainNum, CellType_ZoneGroundInterface );
 			OSCMIndex = PipingSystemDomains( DomainNum ).ZoneCoupledOSCMIndex;
-			OSCM( OSCMIndex ).TConv = AvgTemp;
+			OSCM( OSCMIndex ).TConv = PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp;
 			OSCM( OSCMIndex ).HConv = BigNumber;
-			OSCM( OSCMIndex ).TRad = AvgTemp;
+			OSCM( OSCMIndex ).TRad = PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp;
 			OSCM( OSCMIndex ).HRad = 0.0;
 
 			//Reset the interface heat flux after iteration
 			PipingSystemDomains( DomainNum ).HeatFlux = 0.0;
+			PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0.0;
 			PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
 
 		}

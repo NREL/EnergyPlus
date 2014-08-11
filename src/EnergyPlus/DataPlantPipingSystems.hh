@@ -1320,6 +1320,7 @@ namespace DataPlantPipingSystems {
 		Real64 HorizInsThickness;
 		Real64 HorizInsWidth;
 		Real64 HeatFlux;
+		Real64 AggregateHeatFlux;
 		int NumHeatFlux;
 		Real64 ConvCoeff;
 		bool FullHorizInsPresent;
@@ -1335,6 +1336,7 @@ namespace DataPlantPipingSystems {
 		bool SimTimestepFlag;
 		bool SimHourlyFlag;
 		bool SimDailyFlag;
+		Real64 ZoneCoupledSurfaceTemp;
 
 		// Main 3D cells array
 		FArray3D< CartesianCell > Cells;
@@ -1367,6 +1369,7 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( 0.0254 ),
 			HorizInsWidth( 0.0 ),
 			HeatFlux( 0.0 ),
+			AggregateHeatFlux( 0.0 ),
 			NumHeatFlux ( 0 ),
 			ConvCoeff( 0.0 ),
 			FullHorizInsPresent( false ),
@@ -1381,7 +1384,8 @@ namespace DataPlantPipingSystems {
 			InsulationZIndex( 0 ),
 			SimTimestepFlag( false ),
 			SimHourlyFlag( false ),
-			SimDailyFlag( false )
+			SimDailyFlag( false ),
+			ZoneCoupledSurfaceTemp ( 0.0 )
 
 		{}
 
@@ -1431,6 +1435,7 @@ namespace DataPlantPipingSystems {
 			Real64 const HorizInsThickness,
 			Real64 const HorizInsWidth,
 			Real64 const HeatFlux,
+			Real64 const AggregateHeatFlux,
 			int const NumHeatFlux,
 			Real64 const ConvCoeff,
 			bool const FullHorizInsPresent,
@@ -1446,6 +1451,7 @@ namespace DataPlantPipingSystems {
 			bool const SimTimestepFlag,
 			bool const SimHourlyFlag,
 			bool const SimDailyFlag,
+			Real64 ZoneCoupledSurfaceTemp,
 
 			FArray3< CartesianCell > const & Cells			
 		) :
@@ -1493,6 +1499,7 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( HorizInsThickness ),
 			HorizInsWidth( HorizInsWidth ),
 			HeatFlux( HeatFlux ),
+			AggregateHeatFlux( AggregateHeatFlux ),
 			NumHeatFlux( NumHeatFlux ),
 			ConvCoeff( ConvCoeff ),
 			FullHorizInsPresent( FullHorizInsPresent ),
@@ -1508,6 +1515,7 @@ namespace DataPlantPipingSystems {
 			SimTimestepFlag( SimTimestepFlag ),
 			SimHourlyFlag( SimHourlyFlag ),
 			SimDailyFlag( SimDailyFlag ),
+			ZoneCoupledSurfaceTemp( ZoneCoupledSurfaceTemp ),
 			Cells( Cells )
 		{}
 
