@@ -501,7 +501,7 @@ namespace OutsideEnergySources {
 		// REFERENCES:
 		//  na
 
-        // USE STATEMENTS:
+        	// USE STATEMENTS:
 
 		using DataSizing::AutoSize;
 		using DataSizing::PlantSizData;
@@ -535,16 +535,17 @@ namespace OutsideEnergySources {
 		PltSizCoolNum = 0;
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
-		IsAutoSize = false;
 		NomCapDes = 0.0;
 		NomCapUser = 0.0;
 
+		IsAutoSize = false;
+		if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
+			IsAutoSize = true;
+		}
+				
 		if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {  // District cooling
 			PltSizCoolNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
 			if ( PltSizCoolNum > 0 ) {
-				if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
-					IsAutoSize = true;
-				}
 				rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, 
 					PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrictCooling" );
 				Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, 
@@ -801,7 +802,7 @@ namespace OutsideEnergySources {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
