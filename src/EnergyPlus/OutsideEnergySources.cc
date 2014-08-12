@@ -484,7 +484,7 @@ namespace OutsideEnergySources {
 	void
 	SizeDistrictEnergy( 
 		int const EnergySourceNum 
-		)
+	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Daeho Kang
@@ -634,6 +634,11 @@ namespace OutsideEnergySources {
 				}
 			}
 		}
+		
+		if ( ErrorsFound ) {
+			ShowFatalError( "Previous errors cause program termination" );
+		}
+		
 	}
 
 	void
