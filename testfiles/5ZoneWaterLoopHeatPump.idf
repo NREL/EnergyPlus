@@ -3173,7 +3173,7 @@
     Plant Demand Outlet Node,!- Demand Side Outlet Node Name
     Plant Demand Side Branches,  !- Demand Side Branch List Name
     Plant Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     ,                        !- Availability Manager List Name
     DualSetPointDeadband;    !- Plant Loop Demand Calculation Scheme
 
