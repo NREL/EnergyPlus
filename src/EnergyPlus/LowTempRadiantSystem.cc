@@ -2003,7 +2003,7 @@ namespace LowTempRadiantSystem {
 							Cp = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName, 
 								60.0, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
 							WaterVolFlowMaxHeatDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatAirDesMethod  / 
-                                                        ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+								( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 						} else {
 							WaterVolFlowMaxHeatDes = 0.0;
 						}
@@ -2023,7 +2023,7 @@ namespace LowTempRadiantSystem {
 					if ( PltSizCoolNum > 0 ) {
 						if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) >= SmallLoad ) {
 							rho = GetDensityGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, 
-                             PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
+								PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
 							Cp  = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, 
 								PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, "SizeLowTempRadiantSystem" );
 							WaterVolFlowMaxCoolDes = CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor / 
@@ -2112,7 +2112,7 @@ namespace LowTempRadiantSystem {
 					}
 				}
 			}
- 
+
 			for ( SurfNum = 1; SurfNum <= CFloRadSys( RadSysNum ).NumOfSurfaces; ++SurfNum ) {
 				if ( CFloRadSys( RadSysNum ).NumCircCalcMethod == CalculateFromLength ) {
 					CFloRadSys( RadSysNum ).NumCircuits( SurfNum ) = ( CFloRadSys( RadSysNum ).SurfaceFlowFrac( SurfNum ) * CFloRadSys( RadSysNum ).TubeLength ) / CFloRadSys( RadSysNum ).CircLength;
