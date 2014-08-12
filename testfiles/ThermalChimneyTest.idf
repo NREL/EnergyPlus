@@ -1114,15 +1114,11 @@
 
   Output:Variable,*,Zone Thermal Chimney Current Density Air Volume Flow Rate,hourly;
 
-  Output:Variable,*,Zone Thermal Chimney Standard Density Air Volume Flow Rate,hourly;
-
   Output:Variable,*,Zone Thermal Chimney Mass Flow Rate,hourly;
 
   Output:Variable,*,Zone Thermal Chimney Outlet Temperature,hourly;
 
   Output:Variable,*,Zone Infiltration Current Density Volume,hourly;
- 
-  Output:Variable,*,Zone Infiltration Mass Flow Rate,hourly;
 
   Output:Variable,*,Zone Infiltration Mass,hourly;
 

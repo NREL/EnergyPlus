@@ -65276,7 +65276,7 @@
     CoolSys1 Chiller TowerSys Demand Outlet Node,  !- Demand Side Outlet Node Name
     CoolSys1 Chiller TowerSys Demand Branches,  !- Condenser Demand Side Branch List Name
     CoolSys1 Chiller TowerSys Demand Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name
