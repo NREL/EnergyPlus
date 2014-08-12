@@ -953,6 +953,7 @@ namespace Fans {
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MySizeFlag;
 		int Loop;
+		Real64 FanDeltaT;
 
 		// FLOW:
 
@@ -980,6 +981,9 @@ namespace Fans {
 		if ( ! SysSizingCalc && MySizeFlag( FanNum ) ) {
 
 			SizeFan( FanNum );
+			// FBTest
+			FanDeltaT = FanDesDT(FanNum, Fan(FanNum).MaxAirFlowRate);
+			// FBTest
 			// Set the loop cycling flag
 			if ( Fan( FanNum ).FanType_Num == FanType_SimpleOnOff ) {
 				if ( CurSysNum > 0 ) {
