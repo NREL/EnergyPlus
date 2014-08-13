@@ -118,23 +118,20 @@ namespace DataSizing {
 	extern int CurDuctType; // Duct type of current branch
 	extern int CurLoopNum; // the current plant loop index
 	extern int CurCondLoopNum; // the current condenser loop number
-	extern int CurEnvirNumSimDay;
-	extern int CurOverallSimDay;
+	extern int CurEnvirNumSimDay; // current environment number for day simulated
+	extern int CurOverallSimDay; // current day of simulation
 	extern int NumTimeStepsInAvg; // number of time steps in the averaging window for the design flow and load sequences
 	extern int SaveNumPlantComps; // Number of components using water as an energy source or sink (e.g. water coils)
+	extern int DataTotCapCurveIndex; // index to total capacity as a function of temperature curve
+	extern int DataPltSizCoolNum; // index to cooling plant sizing data
+	extern int DataPltSizHeatNum; // index to heating plant sizing data
+	extern int DataWaterLoopNum; // index to plant water loop
+	extern int DataCoilNum; // index to coil object
+	extern int DataFanOpMode; // fan operating mode (ContFanCycCoil or CycFanCycCoil)
 	extern bool DataCoilIsSuppHeater; // TRUE if heating coil used as supplemental heater
 	extern bool DataIsDXCoil; // TRUE if direct-expansion coil
 	extern bool DataAutosizable; // TRUE if component is autosizable
-	extern int DataTotCapCurveIndex; // index to total capacity as a function of temperature curve
-	extern Real64 DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
-	extern Real64 DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
-	extern Real64 DataCapacityUsedForSizing; // capacity used for sizing with scalable inputs [W]
-	extern Real64 DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
-	extern Real64 DataEMSOverride; // value of EMS variable used to override autosizing
-	extern Real64 DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
 	extern bool DataEMSOverrideON; // boolean determines if user relies on EMS to override autosizing
-	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
-	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit
@@ -144,6 +141,23 @@ namespace DataSizing {
 	extern bool ZoneHeatingOnlyFan; // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
 	extern bool SysSizingRunDone; // True if a system sizing run is successfully completed.
 	extern bool ZoneSizingRunDone; // True if a zone sizing run has been successfully completed.
+	extern bool DataErrorsFound; // used for simulation termination when errors are found
+	extern Real64 DataDesInletWaterTemp; // coil inlet water temperture used for warning messages
+	extern Real64 DataDesInletAirHumRat; // coil inlet air humidity ratio used for warning messages
+	extern Real64 DataDesInletAirTemp; // coil inlet air temperature used for warning messages
+	extern Real64 DataDesOutletAirTemp; // coil outlet air temperature used for sizing
+	extern Real64 DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
+	extern Real64 DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
+	extern Real64 DataAirFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
+	extern Real64 DataWaterFlowUsedForSizing; // water flow rate used for sizing with scalable inputs [m3/s]
+	extern Real64 DataCapacityUsedForSizing; // capacity used for sizing with scalable inputs [W]
+	extern Real64 DataDesignCoilCapacity; // calculated capacity of coil at end of UA calculation
+//	extern Real64 DataSysAirMinFlowRat; // minimum system air flow ratio for terminal units []
+	extern Real64 DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
+	extern Real64 DataEMSOverride; // value of EMS variable used to override autosizing
+	extern Real64 DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
+	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
+	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
 	extern Real64 AutoVsHardSizingThreshold; // criteria threshold used to determine if user hard size and autosize disagree 10%
 	extern Real64 AutoVsHardSizingDeltaTempThreshold; // temperature criteria threshold for autosize versus hard size [C]
 	extern Real64 DXCoolCap; // The ARI cooling capacity of a DX unit.
@@ -153,8 +167,8 @@ namespace DataSizing {
 	extern Real64 GlobalCoolSizingFactor; // the global cooling sizing ratio
 	extern FArray1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
 	extern FArray1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
-	extern FArray1D_string CoolPeakDateHrMin;
-	extern FArray1D_string HeatPeakDateHrMin;
+	extern FArray1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
+	extern FArray1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	extern char SizingFileColSep; // Character to separate columns in sizing outputs
 
 	// Types
