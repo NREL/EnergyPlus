@@ -3960,35 +3960,8 @@
     LGstore1 Indirect Evaporative Cooler,  !- First Evaporative Cooler Object Name
     EvaporativeCooler:Direct:ResearchSpecial,  !- Second Evaporative Cooler Object Type
     LGstore1 Direct Evaporative Cooler; !- Second Evaporative Cooler Name
-    !;      !- Design Specification ZoneHVAC Sizing Object Name
 
-	DesignSpecification:ZoneHVAC:Sizing,
-    LGstore1DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}	
-	
-  OutdoorAir:Node,
+   OutdoorAir:Node,
     LGstore1 Cooler Unit OA Inlet;  !- Name
 
   Fan:ComponentModel,
@@ -4218,34 +4191,7 @@
     LGstore2 Evaporative Cooler,  !- First Evaporative Cooler Object Name
     ,                        !- Second Evaporative Cooler Object Type
     ;                        !- Second Evaporative Cooler Name
-    !;      !- Design Specification ZoneHVAC Sizing Object Name
 
-    DesignSpecification:ZoneHVAC:Sizing,
-    LGstore2DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    1.0,                     !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-	
   OutdoorAir:Node,
     LGstore2 Cooler Unit OA Inlet;  !- Name
 
@@ -4331,35 +4277,7 @@
     SMstore2 Evaporative Cooler,  !- First Evaporative Cooler Object Name
     ,                        !- Second Evaporative Cooler Object Type
     ;                        !- Second Evaporative Cooler Name
-    !SMstore2DesignSpec;      !- Design Specification ZoneHVAC Sizing Object Name
 
-    DesignSpecification:ZoneHVAC:Sizing,
-    SMstore2DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-	
-	
   OutdoorAir:Node,
     SMstore2 Cooler Unit OA Inlet;  !- Name
 
@@ -4402,34 +4320,7 @@
     SMstore3 Evaporative Cooler,  !- First Evaporative Cooler Object Name
     ,                        !- Second Evaporative Cooler Object Type
     ;                        !- Second Evaporative Cooler Name
-    !;      !- Design Specification ZoneHVAC Sizing Object Name
 
-	DesignSpecification:ZoneHVAC:Sizing,
-    SMstore3DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-	
   OutdoorAir:Node,
     SMstore3 Cooler Unit OA Inlet;  !- Name
 
@@ -4480,34 +4371,7 @@
     SMstore4 Evaporative Cooler,  !- First Evaporative Cooler Object Name
     ,                        !- Second Evaporative Cooler Object Type
     ;                        !- Second Evaporative Cooler Name
-	!;      !- Design Specification ZoneHVAC Sizing Object Name
 
-	DesignSpecification:ZoneHVAC:Sizing,
-    SMstore4DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-	
   OutdoorAir:Node,
     SMstore4 Cooler Unit OA Inlet;  !- Name
 
@@ -4560,34 +4424,7 @@
     SMstore5 Evaporative Cooler,  !- First Evaporative Cooler Object Name
     ,                        !- Second Evaporative Cooler Object Type
     ;                        !- Second Evaporative Cooler Name
-    !;      !- Design Specification ZoneHVAC Sizing Object Name
 
-	DesignSpecification:ZoneHVAC:Sizing,
-    SMstore5DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-	
   OutdoorAir:Node,
     SMstore5 Cooler Unit OA Inlet;  !- Name
 
@@ -4651,33 +4488,6 @@
     SMstore6 Evaporative Cooler,  !- First Evaporative Cooler Object Name
     ,                        !- Second Evaporative Cooler Object Type
     ;                        !- Second Evaporative Cooler Name
-    !;      !- Design Specification ZoneHVAC Sizing Object Name
-
-    DesignSpecification:ZoneHVAC:Sizing,
-    SMstore6DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    0.65,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
 
   OutdoorAir:Node,
     SMstore6 Cooler Unit OA Inlet;  !- Name
@@ -4729,34 +4539,7 @@
     SMstore7 Indirect Evaporative Cooler,  !- First Evaporative Cooler Object Name
     EvaporativeCooler:Direct:CelDekPad,  !- Second Evaporative Cooler Object Type
     SMstore7 Direct Evaporative Cooler;  !- Second Evaporative Cooler Name
-    !;      !- Design Specification ZoneHVAC Sizing Object Name
 
-	DesignSpecification:ZoneHVAC:Sizing,
-    SMstore7DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    0.65,                    !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-	
   OutdoorAir:Node,
     SMstore7 Cooler Unit OA Inlet;  !- Name
 
@@ -4817,34 +4600,7 @@
     SMstore8 Indirect Evaporative Cooler,  !- First Evaporative Cooler Object Name
     EvaporativeCooler:Direct:ResearchSpecial,  !- Second Evaporative Cooler Object Type
     SMstore8 Direct Evaporative Cooler;  !- Second Evaporative Cooler Name
-    !;      !- Design Specification ZoneHVAC Sizing Object Name
 
-	DesignSpecification:ZoneHVAC:Sizing,
-    SMstore8DesignSpec,      !- Name
-    SupplyAirFlowRate,       !- Cooling Design Air Flow Method
-    autosize,                !- Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Cooling Design Supply Air Flow Rate
-    ,                        !- Cooling Design Supply Air Flow Rate Per Unit of Capacity {m3/s-W}
-    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
-    autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required
-    ,                        !- Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate When No Clg or Htg
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate When No Clg or Htg
-    SupplyAirFlowRate,       !- Heating Design Air Flow Method
-    autosize,                !- Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Supply Air Flow Rate
-    ,                        !- Heating Design Supply Air Flow Rate Per Unit of Heating Capacity
-    CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity {W}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
-    ;                        !- Fraction of Autosized Cooling Design Capacity {-}
-	
   OutdoorAir:Node,
     SMstore8 Cooler Unit OA Inlet;  !- Name
 
