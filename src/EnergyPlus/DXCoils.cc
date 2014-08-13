@@ -8118,7 +8118,7 @@ Label50: ;
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
+					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 						DXCoil( DXCoilNum ).DefrostPower = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 ) * FractionalDefrostTime;

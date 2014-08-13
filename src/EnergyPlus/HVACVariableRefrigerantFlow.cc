@@ -754,7 +754,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle ) {
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle  && VRF( VRFCond ).DefrostControl == OnDemand ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 
@@ -1799,13 +1799,13 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					}}
 				} else {
-					if ( SameString( cAlphaArgs( 31 ), "ReverseCycle" ) ) {
+					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
 						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				if ( SameString( cAlphaArgs( 31 ), "ReverseCycle" ) ) {
+				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 					ErrorsFound = true;
 				}
