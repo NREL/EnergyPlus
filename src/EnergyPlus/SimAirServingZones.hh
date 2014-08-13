@@ -172,6 +172,12 @@ namespace SimAirServingZones {
 	void
 	UpdateSysSizing( int const CallIndicator );
 
+	//void
+	//UpdateScalableSysSizing( int const AirLoopNum );
+
+	void
+	UpdateSysSizingFlowForScalableInputs( int const AirLoopNum );
+
 	// End Algorithm Section of the Module
 	// *****************************************************************************
 

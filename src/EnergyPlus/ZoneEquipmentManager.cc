@@ -300,7 +300,7 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		int NumOfSizingTypes = 7; // number of zone HVAC equipment supply air flow and capacity sizing types (Cooling, Heating and no-Cooling-No Heating, heating and cooling capacity)
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -341,6 +341,9 @@ namespace ZoneEquipmentManager {
 				ZoneSysMoistureDemand( ControlledZoneNum ).SequencedOutputRequired.allocate( ZoneEquipCount );
 				ZoneSysMoistureDemand( ControlledZoneNum ).SequencedOutputRequiredToHumidSP.allocate( ZoneEquipCount );
 				ZoneSysMoistureDemand( ControlledZoneNum ).SequencedOutputRequiredToDehumidSP.allocate( ZoneEquipCount );
+				ZoneEqSizing( ControlledZoneNum ).SizingMethod.allocate( NumOfSizingTypes );
+				ZoneEqSizing( ControlledZoneNum ).SizingMethod = 0;
+
 			}
 		}
 
@@ -430,6 +433,8 @@ namespace ZoneEquipmentManager {
 						Node( ZoneReturnAirNode ).GenContam = OutdoorGC;
 					}
 				}
+			
+			
 			}
 
 			MyEnvrnFlag = false;

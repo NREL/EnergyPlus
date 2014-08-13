@@ -66,6 +66,8 @@ namespace ElectricBaseboardRadiator {
 		Real64 ConvEnergy;
 		Real64 RadEnergy;
 		FArray1D< Real64 > FracDistribToSurf;
+		int HeatingCapMethod;   // - Method for electric baseboard heating capacity scalable sizing calculation
+		Real64 ScaledHeatingCapacity;   // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
 
 		// Default Constructor
 		ElecBaseboardParams() :
@@ -90,7 +92,9 @@ namespace ElectricBaseboardRadiator {
 			TotEnergy( 0.0 ),
 			Energy( 0.0 ),
 			ConvEnergy( 0.0 ),
-			RadEnergy( 0.0 )
+			RadEnergy( 0.0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -121,7 +125,9 @@ namespace ElectricBaseboardRadiator {
 			Real64 const Energy,
 			Real64 const ConvEnergy,
 			Real64 const RadEnergy,
-			FArray1< Real64 > const & FracDistribToSurf
+			FArray1< Real64 > const & FracDistribToSurf,
+			int const HeatingCapMethod,    
+			Real64 const ScaledHeatingCapacity
 		) :
 			EquipName( EquipName ),
 			EquipType( EquipType ),
@@ -149,13 +155,33 @@ namespace ElectricBaseboardRadiator {
 			Energy( Energy ),
 			ConvEnergy( ConvEnergy ),
 			RadEnergy( RadEnergy ),
-			FracDistribToSurf( FracDistribToSurf )
+			FracDistribToSurf( FracDistribToSurf ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
 
 	};
 
+	struct ElecBaseboardNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		ElecBaseboardNumericFieldData()
+		{}
+
+		// Member Constructor
+		ElecBaseboardNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< ElecBaseboardParams > ElecBaseboard;
+	extern FArray1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
 
 	// Functions
 

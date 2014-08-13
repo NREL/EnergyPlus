@@ -3626,6 +3626,14 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).SystemOAMethod = SysSizInput( SysSizNum ).SystemOAMethod;
 				FinalSysSizing( AirLoopNum ).MaxZoneOAFraction = SysSizInput( SysSizNum ).MaxZoneOAFraction;
 				FinalSysSizing( AirLoopNum ).OAAutoSized = SysSizInput( SysSizNum ).OAAutoSized;
+
+				FinalSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(SysSizNum).FlowPerFloorAreaCooled;
+				FinalSysSizing(AirLoopNum).FlowPerFloorAreaHeated = SysSizInput(SysSizNum).FlowPerFloorAreaHeated;
+				FinalSysSizing(AirLoopNum).FracOfAutosizedCoolingAirflow = SysSizInput(SysSizNum).FracOfAutosizedCoolingAirflow;
+				FinalSysSizing(AirLoopNum).FracOfAutosizedHeatingAirflow = SysSizInput(SysSizNum).FracOfAutosizedHeatingAirflow;
+				FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = SysSizInput(SysSizNum).FlowPerCoolingCapacity;
+				FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = SysSizInput(SysSizNum).FlowPerHeatingCapacity;
+
 				CalcSysSizing( AirLoopNum ).LoadSizeType = SysSizInput( SysSizNum ).LoadSizeType;
 				CalcSysSizing( AirLoopNum ).DesOutAirVolFlow = SysSizInput( SysSizNum ).DesOutAirVolFlow;
 				CalcSysSizing( AirLoopNum ).SysAirMinFlowRat = SysSizInput( SysSizNum ).SysAirMinFlowRat;
@@ -3647,6 +3655,15 @@ namespace SimAirServingZones {
 				CalcSysSizing( AirLoopNum ).SystemOAMethod = SysSizInput( SysSizNum ).SystemOAMethod;
 				CalcSysSizing( AirLoopNum ).MaxZoneOAFraction = SysSizInput( SysSizNum ).MaxZoneOAFraction;
 				CalcSysSizing( AirLoopNum ).OAAutoSized = SysSizInput( SysSizNum ).OAAutoSized;
+
+				CalcSysSizing( AirLoopNum ).FlowPerFloorAreaCooled = SysSizInput( SysSizNum ).FlowPerFloorAreaCooled;
+				CalcSysSizing( AirLoopNum ).FlowPerFloorAreaHeated = SysSizInput( SysSizNum ).FlowPerFloorAreaHeated;
+				CalcSysSizing( AirLoopNum ).FracOfAutosizedCoolingAirflow = SysSizInput( SysSizNum ).FracOfAutosizedCoolingAirflow;
+				CalcSysSizing( AirLoopNum ).FracOfAutosizedHeatingAirflow = SysSizInput( SysSizNum ).FracOfAutosizedHeatingAirflow;
+				CalcSysSizing( AirLoopNum ).FlowPerCoolingCapacity = SysSizInput( SysSizNum ).FlowPerCoolingCapacity;
+				CalcSysSizing( AirLoopNum ).FlowPerHeatingCapacity = SysSizInput( SysSizNum ).FlowPerHeatingCapacity;
+
+
 			} else { // Set missing inputs to the first
 				ShowWarningError( "SetUpSysSizingArrays: Sizing for System (HVACAirLoop)=\"" + FinalSysSizing( AirLoopNum ).AirPriLoopName + "\" will use Sizing:System specifications listed for System=\"" + SysSizInput( 1 ).AirPriLoopName + "\"." );
 				FinalSysSizing( AirLoopNum ).LoadSizeType = SysSizInput( 1 ).LoadSizeType;
@@ -3670,6 +3687,14 @@ namespace SimAirServingZones {
 				FinalSysSizing( AirLoopNum ).SystemOAMethod = SysSizInput( 1 ).SystemOAMethod;
 				FinalSysSizing( AirLoopNum ).MaxZoneOAFraction = SysSizInput( 1 ).MaxZoneOAFraction;
 				FinalSysSizing( AirLoopNum ).OAAutoSized = SysSizInput( 1 ).OAAutoSized;
+
+				FinalSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
+				FinalSysSizing(AirLoopNum).FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
+				FinalSysSizing(AirLoopNum).FracOfAutosizedCoolingAirflow = SysSizInput(1).FracOfAutosizedCoolingAirflow;
+				FinalSysSizing(AirLoopNum).FracOfAutosizedHeatingAirflow = SysSizInput(1).FracOfAutosizedHeatingAirflow;
+				FinalSysSizing(AirLoopNum).FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
+				FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
+
 				CalcSysSizing( AirLoopNum ).LoadSizeType = SysSizInput( 1 ).LoadSizeType;
 				CalcSysSizing( AirLoopNum ).DesOutAirVolFlow = SysSizInput( 1 ).DesOutAirVolFlow;
 				CalcSysSizing( AirLoopNum ).SysAirMinFlowRat = SysSizInput( 1 ).SysAirMinFlowRat;
@@ -3691,6 +3716,14 @@ namespace SimAirServingZones {
 				CalcSysSizing( AirLoopNum ).SystemOAMethod = SysSizInput( 1 ).SystemOAMethod;
 				CalcSysSizing( AirLoopNum ).MaxZoneOAFraction = SysSizInput( 1 ).MaxZoneOAFraction;
 				CalcSysSizing( AirLoopNum ).OAAutoSized = SysSizInput( 1 ).OAAutoSized;
+
+				CalcSysSizing(AirLoopNum).FlowPerFloorAreaCooled = SysSizInput(1).FlowPerFloorAreaCooled;
+				CalcSysSizing(AirLoopNum).FlowPerFloorAreaHeated = SysSizInput(1).FlowPerFloorAreaHeated;
+				CalcSysSizing(AirLoopNum).FracOfAutosizedCoolingAirflow = SysSizInput(1).FracOfAutosizedCoolingAirflow;
+				CalcSysSizing(AirLoopNum).FracOfAutosizedHeatingAirflow = SysSizInput(1).FracOfAutosizedHeatingAirflow;
+				CalcSysSizing(AirLoopNum).FlowPerCoolingCapacity = SysSizInput(1).FlowPerCoolingCapacity;
+				CalcSysSizing(AirLoopNum).FlowPerHeatingCapacity = SysSizInput(1).FlowPerHeatingCapacity;
+
 			}
 			FinalSysSizing( AirLoopNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
 			FinalSysSizing( AirLoopNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
@@ -3718,6 +3751,8 @@ namespace SimAirServingZones {
 			FinalSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = 0.0;
 			FinalSysSizing( AirLoopNum ).SysHeatOutTempSeq = 0.0;
 			FinalSysSizing( AirLoopNum ).SysHeatOutHumRatSeq = 0.0;
+			FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 0.0;
+			FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated = 0.0;
 			CalcSysSizing( AirLoopNum ).HeatFlowSeq.allocate( NumOfTimeStepInDay );
 			CalcSysSizing( AirLoopNum ).CoolFlowSeq.allocate( NumOfTimeStepInDay );
 			CalcSysSizing( AirLoopNum ).SensCoolCapSeq.allocate( NumOfTimeStepInDay );
@@ -3744,6 +3779,8 @@ namespace SimAirServingZones {
 			CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).SysHeatOutTempSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).SysHeatOutHumRatSeq = 0.0;
+			CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled = 0.0;
+			CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated = 0.0;
 
 			if ( AnyEnergyManagementSystemInModel ) {
 
@@ -3934,7 +3971,12 @@ namespace SimAirServingZones {
 					if ( ZoneSA > 0.0 ) Ep = ZonePA / ZoneSA;
 					if ( Ep > 1.0 ) Ep = 1.0;
 					FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction = Ep;
-					FinalZoneSizing( CtrlZoneNum ).ZoneOAFracCooling = ZoneOAFracCooling;
+					FinalZoneSizing(CtrlZoneNum).ZoneOAFracCooling = ZoneOAFracCooling;
+				
+				    // determined cooled zone floor area in an airloop
+					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {							
+						FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+					}			
 				}
 
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
@@ -4042,6 +4084,12 @@ namespace SimAirServingZones {
 						if ( Ep > 1.0 ) Ep = 1.0;
 						FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFractionHtg = Ep;
 						FinalZoneSizing( CtrlZoneNum ).ZoneOAFracHeating = ZoneOAFracHeating;
+
+						// determined heated zone floor area in an airloop
+						if (ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {
+							FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
+						}
+
 					}
 
 				} else { // getting heating flow based values for Std 62.1 report for single path systems
@@ -5277,7 +5325,25 @@ namespace SimAirServingZones {
 					}
 
 				}
+				
+				//// scalable sizing for coincident sizing option
+				//if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FlowPerFloorArea){
+				//	CalcSysSizing(AirLoopNum).DesCoolVolFlow = CalcSysSizing(AirLoopNum).FlowPerFloorAreaCooled * CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
+				//} else if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FractionOfAutosizedCoolingAirflow) {
+				//	CalcSysSizing(AirLoopNum).DesCoolVolFlow = CalcSysSizing(AirLoopNum).FracOfAutosizedCoolingAirflow * CalcSysSizing(AirLoopNum).DesCoolVolFlow;
+				//} else if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FlowPerCoolingCapacity) {
+				//	CalcSysSizing(AirLoopNum).DesCoolVolFlow = CalcSysSizing(AirLoopNum).FlowPerCoolingCapacity * CalcSysSizing(AirLoopNum).SensCoolCap;
+				//}
 
+				//// scalable sizing for coincident sizing option
+				//if (FinalSysSizing(AirLoopNum).HeatAirDesMethod == FlowPerFloorArea){
+				//	CalcSysSizing(AirLoopNum).DesHeatVolFlow = CalcSysSizing(AirLoopNum).FlowPerFloorAreaHeated * CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopHeated;
+				//} else if (FinalSysSizing(AirLoopNum).HeatAirDesMethod == FractionOfAutosizedHeatingAirflow) {
+				//	CalcSysSizing(AirLoopNum).DesHeatVolFlow = CalcSysSizing(AirLoopNum).FracOfAutosizedHeatingAirflow * CalcSysSizing(AirLoopNum).DesHeatVolFlow;
+				//} else if (FinalSysSizing(AirLoopNum).HeatAirDesMethod == FlowPerHeatingCapacity) {
+				//	CalcSysSizing(AirLoopNum).DesHeatVolFlow = CalcSysSizing(AirLoopNum).FlowPerHeatingCapacity * CalcSysSizing(AirLoopNum).HeatCap;
+				//}
+				
 				CalcSysSizing( AirLoopNum ).DesMainVolFlow = max( CalcSysSizing( AirLoopNum ).DesCoolVolFlow, CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 
 				// For noncoincident sizing, find the max heat and cool mass flow for each zone over all the
@@ -5446,6 +5512,24 @@ namespace SimAirServingZones {
 					}
 					CalcSysSizing( AirLoopNum ).DesCoolVolFlow = CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow / StdRhoAir;
 					CalcSysSizing( AirLoopNum ).DesHeatVolFlow = CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow / StdRhoAir;
+					
+					//// scalable sizing for noncoincident sizing option for cooling
+					//if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FlowPerFloorArea){
+					//	CalcSysSizing(AirLoopNum).DesCoolVolFlow = CalcSysSizing(AirLoopNum).FlowPerFloorAreaCooled * CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopCooled;
+					//} else if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FractionOfAutosizedCoolingAirflow) {
+					//	CalcSysSizing(AirLoopNum).DesCoolVolFlow = CalcSysSizing(AirLoopNum).FracOfAutosizedCoolingAirflow * CalcSysSizing(AirLoopNum).DesCoolVolFlow;
+					//} else if (FinalSysSizing(AirLoopNum).CoolAirDesMethod == FlowPerCoolingCapacity) {
+					//	CalcSysSizing(AirLoopNum).DesCoolVolFlow = CalcSysSizing(AirLoopNum).FlowPerCoolingCapacity * CalcSysSizing(AirLoopNum).SensCoolCap;
+					//}
+
+					//// scalable sizing for noncoincident sizing option for heating
+					//if (FinalSysSizing(AirLoopNum).HeatAirDesMethod == FlowPerFloorArea){
+					//	CalcSysSizing(AirLoopNum).DesHeatVolFlow = CalcSysSizing(AirLoopNum).FlowPerFloorAreaHeated * CalcSysSizing(AirLoopNum).FloorAreaOnAirLoopHeated;
+					//} else if (FinalSysSizing(AirLoopNum).HeatAirDesMethod == FractionOfAutosizedHeatingAirflow) {
+					//	CalcSysSizing(AirLoopNum).DesHeatVolFlow = CalcSysSizing(AirLoopNum).FracOfAutosizedHeatingAirflow * CalcSysSizing(AirLoopNum).DesHeatVolFlow;
+					//} else if (FinalSysSizing(AirLoopNum).HeatAirDesMethod == FlowPerHeatingCapacity) {
+					//	CalcSysSizing(AirLoopNum).DesHeatVolFlow = CalcSysSizing(AirLoopNum).FlowPerHeatingCapacity * CalcSysSizing(AirLoopNum).HeatCap;
+					//}
 					CalcSysSizing( AirLoopNum ).DesMainVolFlow = max( CalcSysSizing( AirLoopNum ).DesCoolVolFlow, CalcSysSizing( AirLoopNum ).DesHeatVolFlow );
 
 				}

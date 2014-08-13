@@ -71,6 +71,9 @@ namespace BaseboardRadiator {
 		int BBLoadReSimIndex;
 		int BBMassFlowReSimIndex;
 		int BBInletTempFlowReSimIndex;
+		int HeatingCapMethod;    // - Method for water baseboard Radiator system heating capacity scaledsizing calculation
+		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity;   // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		BaseboardParams() :
@@ -103,7 +106,9 @@ namespace BaseboardRadiator {
 			CompNum( 0 ),
 			BBLoadReSimIndex( 0 ),
 			BBMassFlowReSimIndex( 0 ),
-			BBInletTempFlowReSimIndex( 0 )
+			BBInletTempFlowReSimIndex( 0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -139,7 +144,11 @@ namespace BaseboardRadiator {
 			int const CompNum, // plant loop component index
 			int const BBLoadReSimIndex,
 			int const BBMassFlowReSimIndex,
-			int const BBInletTempFlowReSimIndex
+			int const BBInletTempFlowReSimIndex,
+			int const HeatingCapMethod,   // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation
+			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity   // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+
 		) :
 			EquipID( EquipID ),
 			Schedule( Schedule ),
@@ -172,13 +181,33 @@ namespace BaseboardRadiator {
 			CompNum( CompNum ),
 			BBLoadReSimIndex( BBLoadReSimIndex ),
 			BBMassFlowReSimIndex( BBMassFlowReSimIndex ),
-			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex )
+			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
 
 	};
 
+	struct BaseboardParamsNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		BaseboardParamsNumericFieldData()
+		{}
+
+		// Member Constructor
+		BaseboardParamsNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
 	// Object Data
 	extern FArray1D< BaseboardParams > Baseboard;
+	extern FArray1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
+
 
 	// Functions
 
