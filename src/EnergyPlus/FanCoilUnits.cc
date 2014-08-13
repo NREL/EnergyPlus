@@ -1054,10 +1054,12 @@ namespace FanCoilUnits {
 
 		CoolingAirVolFlowDes = 0.0;
 		HeatingAirVolFlowDes = 0.0;
-		//DataFracOfAutosizedCoolingAirflow = 1.0;
-		//DataFracOfAutosizedHeatingAirflow = 1.0;
-		//DataFracOfAutosizedCoolingCapacity = 1.0;
-		//DataFracOfAutosizedHeatingCapacity = 1.0;
+		ZoneHeatingOnlyFan = false;
+		ZoneCoolingOnlyFan = false;
+		DataFracOfAutosizedCoolingAirflow = 1.0;
+		DataFracOfAutosizedHeatingAirflow = 1.0;
+		DataFracOfAutosizedCoolingCapacity = 1.0;
+		DataFracOfAutosizedHeatingCapacity = 1.0;
 		
 		CompType = FanCoil(FanCoilNum).UnitType;
 		CompName = FanCoil(FanCoilNum).Name;

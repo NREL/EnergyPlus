@@ -576,8 +576,8 @@ namespace ReportSizingManager {
 								TotCapTempModFac = 1.0;
 							}
 							if (ZoneEqFanCoil) {								
-								//PeakCoilLoad = max(0.0, (DesMassFlow * (CoilInEnth - CoilOutEnth)));
 								PeakCoilLoad = max( 0.0, ( StdRhoAir * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );
+								//PeakCoilLoad = max(0.0, ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * (CoilInEnth - CoilOutEnth)));
 							} else if ( ZoneEqUnitVent ) {
 								PeakCoilLoad = max( 0.0, ( StdRhoAir * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );
 							} else {
@@ -593,7 +593,7 @@ namespace ReportSizingManager {
 							AutosizeDes = 0.0;
 						}
 					}
-					//AutosizeDes = AutosizeDes * DataFracOfAutosizedCoolingCapacity;
+					AutosizeDes = AutosizeDes * DataFracOfAutosizedCoolingCapacity;
 				}
 				else if ( SizingType == HeatingCapacitySizing ) {
 					if (!IsAutoSize && !SizingDesRunThisZone && ! DataScalableCapSizingON) {
