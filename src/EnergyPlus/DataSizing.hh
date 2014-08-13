@@ -152,7 +152,6 @@ namespace DataSizing {
 	extern Real64 DataWaterFlowUsedForSizing; // water flow rate used for sizing with scalable inputs [m3/s]
 	extern Real64 DataCapacityUsedForSizing; // capacity used for sizing with scalable inputs [W]
 	extern Real64 DataDesignCoilCapacity; // calculated capacity of coil at end of UA calculation
-//	extern Real64 DataSysAirMinFlowRat; // minimum system air flow ratio for terminal units []
 	extern Real64 DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
 	extern Real64 DataEMSOverride; // value of EMS variable used to override autosizing
 	extern Real64 DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
