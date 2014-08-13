@@ -613,7 +613,7 @@ namespace ReportSizingManager {
 					} else {
 						AutosizeDes = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
 					}
-					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) { // zone coil uses mDot>0, sys coil uses cap > 0
+					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && SameString( CompType, "COIL:COOLING:WATER" ) ) { // zone coil uses mDot>0, sys coil uses cap > 0
 						ShowWarningError(  CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 						ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 						ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -630,7 +630,7 @@ namespace ReportSizingManager {
 					DesSatEnthAtWaterInTemp = PsyHFnTdbW( DataDesInletWaterTemp, PsyWFnTdpPb( DataDesInletWaterTemp, StdBaroPress ) );
 					DesHumRatAtWaterInTemp = PsyWFnTdbH( DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine );
 					if ( AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) {
-						if ( DataDesInletAirHumRat > AutosizeDes ) {
+						if ( DataDesInletAirHumRat > AutosizeDes && SameString( CompType, "COIL:COOLING:WATER" ) ) {
 							ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
 							ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 							ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -1114,7 +1114,7 @@ namespace ReportSizingManager {
 					} else {
 						AutosizeDes = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 					}
-					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) { // flow here is water vol flow rate
+					if ( AutosizeDes > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 && SameString( CompType, "COIL:COOLING:WATER" ) ) { // flow here is water vol flow rate
 						ShowWarningError(  CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving humidity ratio > entering humidity ratio." );
 						ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 						ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
@@ -1131,7 +1131,7 @@ namespace ReportSizingManager {
 					DesSatEnthAtWaterInTemp = PsyHFnTdbW( DataDesInletWaterTemp, PsyWFnTdpPb( DataDesInletWaterTemp, StdBaroPress ) );
 					DesHumRatAtWaterInTemp = PsyWFnTdbH( DataDesInletWaterTemp, DesSatEnthAtWaterInTemp, CallingRoutine );
 					if ( AutosizeDes < DataDesInletAirHumRat && DesHumRatAtWaterInTemp > DataDesInletAirHumRat && DataCapacityUsedForSizing > 0.0 ) { // flow here is water vol flow rate
-						if ( DataDesInletAirHumRat > AutosizeDes ) {
+						if ( DataDesInletAirHumRat > AutosizeDes && SameString( CompType, "COIL:COOLING:WATER" ) ) {
 							ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil is dry and has air leaving humidity ratio < entering humidity ratio." );
 							ShowContinueError( "    Wair,in =  " + RoundSigDigits( DataDesInletAirHumRat, 6 ) );
 							ShowContinueError( "    Wair,out = " + RoundSigDigits( AutosizeDes, 6 ) );
