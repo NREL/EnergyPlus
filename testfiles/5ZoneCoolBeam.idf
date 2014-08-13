@@ -2391,6 +2391,10 @@
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE1-1 HW Coil Water In Node,  !- Inlet Node Name
     SPACE1-1 HW Coil Water Out Node,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
 
@@ -2399,6 +2403,10 @@
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE2-1 HW Coil Water In Node,  !- Inlet Node Name
     SPACE2-1 HW Coil Water Out Node,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}	
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
 
@@ -2407,6 +2415,10 @@
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE3-1 HW Coil Water In Node,  !- Inlet Node Name
     SPACE3-1 HW Coil Water Out Node,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}	
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
 
@@ -2415,6 +2427,10 @@
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE4-1 HW Coil Water In Node,  !- Inlet Node Name
     SPACE4-1 HW Coil Water Out Node,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}	
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
 
@@ -2423,6 +2439,10 @@
     ReheatCoilAvailSched,    !- Availability Schedule Name
     SPACE5-1 HW Coil Water In Node,  !- Inlet Node Name
     SPACE5-1 HW Coil Water Out Node,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
 
