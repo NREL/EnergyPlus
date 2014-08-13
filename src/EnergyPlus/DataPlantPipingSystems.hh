@@ -1322,6 +1322,7 @@ namespace DataPlantPipingSystems {
 		Real64 HeatFlux;
 		Real64 AggregateHeatFlux;
 		int NumHeatFlux;
+		bool ResetHeatFluxFlag;
 		Real64 ConvCoeff;
 		bool FullHorizInsPresent;
 		bool VertInsPresentFlag;
@@ -1371,6 +1372,7 @@ namespace DataPlantPipingSystems {
 			HeatFlux( 0.0 ),
 			AggregateHeatFlux( 0.0 ),
 			NumHeatFlux ( 0 ),
+			ResetHeatFluxFlag( true ),
 			ConvCoeff( 0.0 ),
 			FullHorizInsPresent( false ),
 			VertInsPresentFlag( false ),
@@ -1437,6 +1439,7 @@ namespace DataPlantPipingSystems {
 			Real64 const HeatFlux,
 			Real64 const AggregateHeatFlux,
 			int const NumHeatFlux,
+			bool const ResetHeatFluxFlag,
 			Real64 const ConvCoeff,
 			bool const FullHorizInsPresent,
 			bool const VertInsPresentFlag,
@@ -1501,6 +1504,7 @@ namespace DataPlantPipingSystems {
 			HeatFlux( HeatFlux ),
 			AggregateHeatFlux( AggregateHeatFlux ),
 			NumHeatFlux( NumHeatFlux ),
+			ResetHeatFluxFlag( ResetHeatFluxFlag ),
 			ConvCoeff( ConvCoeff ),
 			FullHorizInsPresent( FullHorizInsPresent ),
 			VertInsPresentFlag( VertInsPresentFlag ),

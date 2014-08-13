@@ -1,5 +1,7 @@
 // C++ Headers
 #include <cmath>
+#include <fstream>
+#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -312,7 +314,7 @@ namespace PlantPipingSystemsManager {
 				// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
 				// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
 				// which would be carried over from the previous environment
-				
+				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
 				PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
 
 				//There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
@@ -326,6 +328,15 @@ namespace PlantPipingSystemsManager {
 				if ( !BeginSimFlag ) PipingSystemDomains( DomainNum ).BeginSimInit = true;
 				if ( !BeginEnvrnFlag ) PipingSystemDomains( DomainNum ).BeginSimEnvrn = true;
 
+				// Reset the heat fluxs if domain update has been completed
+				if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ){
+					PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
+					PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
+					PipingSystemDomains( DomainNum ).HeatFlux = 0;
+
+					PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
+				}
+				
 				// Aggregate the heat flux
 				PipingSystemDomains( DomainNum ).AggregateHeatFlux += GetZoneInterfaceHeatFlux( DomainNum );
 				PipingSystemDomains( DomainNum ).NumHeatFlux += 1;
@@ -6828,11 +6839,21 @@ namespace PlantPipingSystemsManager {
 			int CurDirection; // From Enum: Direction
 			Real64 AdiabaticMultiplier;
 
+			Real64 VolThisCell;
+			Real64 HeatFluxGain;
+			Real64 CumulativeHeatTransfer;
+
+			//std::ofstream static myfile("ZoneInterface.csv", std::ofstream::out);
+
 			//Initialize
 			Numerator = 0.0;
 			Denominator = 0.0;
 			Resistance = 0.0;
 			Beta = cell.MyBase.Beta;
+
+			VolThisCell = 0.0;
+			HeatFluxGain = 0.0;
+			CumulativeHeatTransfer = 0.0;
 
 			//add effect from previous time step
 			Numerator += cell.MyBase.Temperature_PrevTimeStep;
@@ -6841,6 +6862,12 @@ namespace PlantPipingSystemsManager {
 			// Get the average slab heat flux and add it to the tally
 			HeatFlux = PipingSystemDomains( DomainNum ).HeatFlux;
 			Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
+
+			//CumulativeHeatTransfer = HeatFlux * Width( cell ) * Depth( cell );
+
+			HeatFluxGain = HeatFlux * Width( cell ) * Depth( cell );
+			VolThisCell = Volume( cell );
+			//myfile << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << Beta << "," << HeatFluxGain << "," << cell.MyBase.Temperature_PrevTimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize << "," << VolThisCell << std::endl;
 
 			//determine the neighbor types based on cell location
 			EvaluateCellNeighborDirections( DomainNum, cell );
@@ -6862,14 +6889,22 @@ namespace PlantPipingSystemsManager {
 				}
 				//Use the multiplier to evaluate the transient expression terms
 				EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-				Numerator = AdiabaticMultiplier * Numerator + ( Beta / Resistance ) * NeighborTemp;
-				Denominator = AdiabaticMultiplier * Denominator + ( Beta / Resistance );
+				Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
+				Denominator += AdiabaticMultiplier * ( Beta / Resistance );
+
+				//CumulativeHeatTransfer += AdiabaticMultiplier * ( 1 / Resistance ) * ( NeighborTemp - cell.MyBase.Temperature );
+
+				//myfile << "," << "," << "," << "," << "," << "," << "," << "," << AdiabaticMultiplier << "," << NeighborTemp << "," << Resistance << std::endl;
 				
 			}
 
 			//now that we have passed all directions, update the temperature
 			
 			RetVal = Numerator / Denominator;
+
+			//RetVal = CumulativeHeatTransfer * Beta + cell.MyBase.Temperature_PrevTimeStep;
+
+			//myfile << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << RetVal << std::endl;
 
 			return RetVal;
 
@@ -6973,9 +7008,7 @@ namespace PlantPipingSystemsManager {
 			OSCM( OSCMIndex ).HRad = 0.0;
 
 			//Reset the interface heat flux after iteration
-			PipingSystemDomains( DomainNum ).HeatFlux = 0.0;
-			PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0.0;
-			PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
+			PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = true;
 
 		}
 
