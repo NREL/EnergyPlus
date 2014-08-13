@@ -95,6 +95,8 @@ namespace DataAirflowNetwork {
 	extern int NumOfNodesDistribution; // Number of nodes for distribution system calculation
 	extern int NumOfLinksMultiZone; // Number of links for multizone calculation
 	extern int NumOfLinksDistribution; // Number of links for distribution system calculation
+	extern int NumOfNodesIntraZone; // Number of nodes for intrazone calculation
+	extern int NumOfLinksIntraZone; // Number of links for intrazone calculation
 
 	extern int AirflowNetworkNumOfNodes; // Number of nodes for AirflowNetwork calculation
 	// = NumOfNodesMultiZone+NumOfNodesDistribution
@@ -269,7 +271,7 @@ namespace DataAirflowNetwork {
 		Real64 BuildWidth; // The width of the building along the facade that contains this zone.
 		int ASH55PeopleInd; // Index of people object with ASH55 comfort calcs for ventilation control
 		int CEN15251PeopleInd; // Index of people object with CEN15251 comfort calcs for ventilation control
-
+		int RAFNNodeNum;  // Index of RAFN node number
 		// Default Constructor
 		MultizoneZoneProp() :
 			VentControl( "NoVent" ),
@@ -286,7 +288,8 @@ namespace DataAirflowNetwork {
 			SingleSidedCpType( "STANDARD" ),
 			BuildWidth( 10.0 ),
 			ASH55PeopleInd( 0 ),
-			CEN15251PeopleInd( 0 )
+			CEN15251PeopleInd( 0 ),
+			RAFNNodeNum( 0 )
 		{}
 
 		// Member Constructor
@@ -308,8 +311,9 @@ namespace DataAirflowNetwork {
 			std::string const & SingleSidedCpType, // Type of calculation method for single sided wind pressure coefficients
 			Real64 const BuildWidth, // The width of the building along the facade that contains this zone.
 			int const ASH55PeopleInd, // Index of people object with ASH55 comfort calcs for ventilation control
-			int const CEN15251PeopleInd // Index of people object with CEN15251 comfort calcs for ventilation control
-		) :
+			int const CEN15251PeopleInd, // Index of people object with CEN15251 comfort calcs for ventilation control
+			int const RAFNNodeNum // Index of RAFN node number
+			) :
 			ZoneName( ZoneName ),
 			VentControl( VentControl ),
 			VentSchName( VentSchName ),
@@ -327,7 +331,8 @@ namespace DataAirflowNetwork {
 			SingleSidedCpType( SingleSidedCpType ),
 			BuildWidth( BuildWidth ),
 			ASH55PeopleInd( ASH55PeopleInd ),
-			CEN15251PeopleInd( CEN15251PeopleInd )
+			CEN15251PeopleInd( CEN15251PeopleInd ),
+			RAFNNodeNum( RAFNNodeNum )
 		{}
 
 	};
@@ -975,6 +980,86 @@ namespace DataAirflowNetwork {
 
 	};
 
+	struct IntraZoneNodeProp // Intra zone node data
+	{
+		// Members
+		std::string Name; // Name of node
+		std::string RAFNNodeName; // RoomAir model node name
+		Real64 Height; // Nodal height
+		int RAFNNodeNum; // RoomAir model node number
+		int ZoneNum; // Zone number
+		int AFNZoneNum; // MultiZone number
+
+		// Default Constructor
+		IntraZoneNodeProp() :
+			Height(0.0),
+			RAFNNodeNum(0),
+			ZoneNum(0),
+			AFNZoneNum(0)
+		{}
+
+		// Member Constructor
+		IntraZoneNodeProp(
+			std::string const & Name, // Name of node
+			std::string const & RAFNNodeName, // RoomAir model node name
+			Real64 const Height, // Nodal height
+			int const RAFNNodeNum, // RoomAir model node number
+			int const ZoneNum // Zone number
+			) :
+			Name(Name),
+			RAFNNodeName(RAFNNodeName),
+			Height( Height ),
+			RAFNNodeNum(RAFNNodeNum),
+			ZoneNum(ZoneNum),
+			AFNZoneNum(AFNZoneNum)
+		{}
+
+	};
+
+	struct IntraZoneLinkageProp // Intra zone linkage data
+	{
+		// Members
+		std::string Name; // Name of node
+		FArray1D_string NodeNames; // Names of nodes (limited to 2)
+		FArray1D< Real64 > NodeHeights; // Node heights
+		std::string CompName; // Name of element
+		int CompNum; // Element Number
+		FArray1D_int NodeNums; // Node numbers
+		std::string SurfaceName; // Connection Surface Name
+		int LinkNum; // Linkage number
+
+		// Default Constructor
+		IntraZoneLinkageProp() :
+			NodeNames(2),
+			NodeHeights(2, 0.0),
+			CompNum(0),
+			NodeNums(2, 0),
+			LinkNum(0)
+		{}
+
+		// Member Constructor
+		IntraZoneLinkageProp(
+			std::string const & Name, // Name of node
+			FArray1D_string const & NodeNames, // Names of nodes (limited to 2)
+			FArray1D< Real64 >  const & NodeHeights, // Node heights
+			std::string const & CompName, // Name of element
+			int const CompNum, // Element Number
+			FArray1D_int const & NodeNums, // Node numbers
+			std::string const & SurfaceName, // Connection Surface Name
+			int const LinkNum // Linkage number
+			) :
+			Name(Name),
+			NodeNames(2, NodeNames),
+			NodeHeights(2, NodeHeights),
+			CompName(CompName),
+			CompNum(CompNum),
+			NodeNums(2, NodeNums),
+			SurfaceName(SurfaceName),
+			LinkNum(LinkNum)
+		{}
+
+	};
+
 	struct DisSysNodeProp // CP Value
 	{
 		// Members
@@ -1490,6 +1575,8 @@ namespace DataAirflowNetwork {
 		int EPlusNodeNum;
 		int ExtNodeNum;
 		int EPlusTypeNum;
+		int RAFNNodeNum;  // RoomAir model node number
+		int NumOfLinks; // Number of links for RoomAir model
 
 		// Default Constructor
 		AirflowNetworkNodeProp() :
@@ -1499,7 +1586,9 @@ namespace DataAirflowNetwork {
 			EPlusZoneNum( 0 ),
 			EPlusNodeNum( 0 ),
 			ExtNodeNum( 0 ),
-			EPlusTypeNum( 0 )
+			EPlusTypeNum( 0 ),
+			RAFNNodeNum ( 0 ),
+			NumOfLinks ( 0 )
 		{}
 
 		// Member Constructor
@@ -1514,7 +1603,9 @@ namespace DataAirflowNetwork {
 			int const EPlusZoneNum, // E+ zone number
 			int const EPlusNodeNum,
 			int const ExtNodeNum,
-			int const EPlusTypeNum
+			int const EPlusTypeNum,
+			int const RAFNNodeNum,  // RoomAir model node number
+			int const NumOfLinks // Number of links for RoomAir model
 		) :
 			Name( Name ),
 			NodeType( NodeType ),
@@ -1526,7 +1617,8 @@ namespace DataAirflowNetwork {
 			EPlusZoneNum( EPlusZoneNum ),
 			EPlusNodeNum( EPlusNodeNum ),
 			ExtNodeNum( ExtNodeNum ),
-			EPlusTypeNum( EPlusTypeNum )
+			EPlusTypeNum( EPlusTypeNum ),
+			RAFNNodeNum(RAFNNodeNum)
 		{}
 
 	};
@@ -2077,6 +2169,7 @@ namespace DataAirflowNetwork {
 	extern FArray1D< AirflowNetworkLinkSimuData > AirflowNetworkLinkSimu;
 	extern FArray1D< AirflowNetworkExchangeProp > AirflowNetworkExchangeData;
 	extern FArray1D< AirflowNetworkExchangeProp > AirflowNetworkMultiExchangeData;
+	extern FArray1D< AirflowNetworkExchangeProp > AirflowNetworkRAFNExchangeData;
 	extern FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
 	extern FArray1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
 	extern FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
@@ -2101,6 +2194,10 @@ namespace DataAirflowNetwork {
 	extern FArray1D< DeltaCpProp > DeltaCp;
 	extern FArray1D< DeltaCpProp > EPDeltaCP;
 	extern FArray1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
+	
+	extern FArray1D< IntraZoneNodeProp > IntraZoneNodeData; //Intra zone data set
+	extern FArray1D< IntraZoneLinkageProp > IntraZoneLinkageData; //Intra zone linakge adat set
+
 	extern FArray1D< DisSysNodeProp > DisSysNodeData;
 	extern FArray1D< DisSysCompLeakProp > DisSysCompLeakData;
 	extern FArray1D< DisSysCompELRProp > DisSysCompELRData;
@@ -2113,6 +2210,7 @@ namespace DataAirflowNetwork {
 	extern FArray1D< DisSysCompTermUnitProp > DisSysCompTermUnitData;
 	extern FArray1D< DisSysCompCPDProp > DisSysCompCPDData;
 	extern FArray1D< AiflowNetworkReportProp > AirflowNetworkReportData;
+//	extern FArray1D< IntraZoneNodeProp > IntraZoneNodeData;
 
 } // DataAirflowNetwork
 
