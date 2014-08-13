@@ -169,30 +169,30 @@ namespace ReportSizingManager {
 		// Caution: DataFlowUsedForSizing might be either m3/s or kg/s, check the code during model development to be sure of usage
 		// Comments for ZONE or AIRLOOP coils indicates differences in calculations, OPTIONAL means 1 will otherwise be used)
 		//
-	    // CoolingAirflowSizing( 1 ); // request sizing for cooling air flow rate
-	    // CoolingWaterflowSizing( 2 ); // request sizing for cooling water flow rate (DataPltSizCoolNum, DataWaterLoopNum, AIRLOOP COILS: DataCapacityUsedForSizing)
-	    // HeatingWaterflowSizing( 3 ); // request sizing for heating coil water flow rate (DataPltSizHeatNum, DataWaterLoopNum, AIRLOOP COILS: DataCapacityUsedForSizing)
-	    // CoolingWaterDesAirInletTempSizing( 4 ); // request sizing for cooling water coil inlet air temp
-	    // CoolingWaterDesAirInletHumRatSizing( 5 ); // request sizing for cooling water coil inlet air humidity ratio
-	    // CoolingWaterDesWaterInletTempSizing( 6 ); // request sizing for cooling water coil inlet water temp (DataPltSizCoolNum)
-	    // CoolingWaterDesAirOutletTempSizing( 7 ); // request sizing for cooling water coil outlet air temp (DataPltSizCoolNum, DataWaterLoopNum, DataDesInletAirTemp, DataDesInletAirHumRat, DataAirFlowUsedForSizing, DataWaterFlowUsedForSizing, AIRLOOP COILS: DataDesInletWaterTemp)
-	    // CoolingWaterDesAirOutletHumRatSizing( 8 ); // request sizing for cooling water coil outlet air humidity ratio (DataDesInletAirHumRat, DataDesInletWaterTemp, DataCapacityUsedForSizing, ZONE COILS: DataDesOutletAirTemp)
-	    // CoolingWaterNumofTubesPerRowSizing( 9 ); // request sizing for cooling water coil number of tubes per row (DataWaterFlowUsedForSizing)
-	    // HeatingWaterDesAirInletTempSizing( 10 ); // request sizing for heating water coil inlet air temp
-	    // HeatingWaterDesAirInletHumRatSizing( 11 ); // request sizing for heating water coil inlet air humidity ratio
-	    // HeatingWaterDesCoilLoadUsedForUASizing( 12 ); // request sizing for heating water coil capacity used for UA sizing (DataWaterLoopNum, DataPltSizHeatNum, AIRLOOP COILS: DataAirFlowUsedForSizing)
-	    // HeatingWaterDesCoilWaterVolFlowUsedForUASizing( 13 ); // request sizing for heating water coil volume flow rate used for UA sizing (DataWaterFlowUsedForSizing)
-	    // HeatingAirflowSizing( 14 ); // request sizing for heating air flow rate
-	    // HeatingAirflowUASizing( 15 ); // request sizing for heating air flow rate
-	    // SystemAirflowSizing( 16 ); // request sizing for system air flow rate
-	    // CoolingCapacitySizing( 17 ); // request sizing for cooling capacity (DataFlowUsedForSizing [m3/s], DataTotCapCurveIndex [DX coils only])
-	    // HeatingCapacitySizing( 18 ); // request sizing for heating capacity (DataCoolCoilCap, DataFlowUsedForSizing, AIRLOOP COILS: DataCoilIsSuppHeater, OPTIONAL: DataHeatSizeRatio)
-	    // WaterHeatingCapacitySizing( 19 ); // request sizing for water-side heating capacity (ZONE COILS ONLY: DataWaterLoopNum, DataPltSizHeatNum, OPTIONAL: DataHeatSizeRatio)
-	    // WaterHeatingCoilUASizing( 20 ); // request sizing for heating coil UA (DataCapacityUsedForSizing, DataCoilNum, DataFanOpMode, DataCapacityUsedForSizing, DataDesInletAirTemp, DataDesInletAirHumRat, DataFlowUsedForSizing, DataDesignCoilCapacity)
-	    // SystemCapacitySizing( 21 ); // request sizing for system capacity
-	    // CoolingSHRSizing( 22 ); // request sizing for cooling SHR (DataFlowUsedForSizing, DataCapacityUsedForSizing)
-	    // HeatingDefrostSizing( 23 ); // request sizing for heating defrost capacity
-	    // AutoCalculateSizing ( 24 ); // identifies an autocalulate input
+		// CoolingAirflowSizing( 1 ); // request sizing for cooling air flow rate
+		// CoolingWaterflowSizing( 2 ); // request sizing for cooling water flow rate (DataPltSizCoolNum, DataWaterLoopNum, AIRLOOP COILS: DataCapacityUsedForSizing)
+		// HeatingWaterflowSizing( 3 ); // request sizing for heating coil water flow rate (DataPltSizHeatNum, DataWaterLoopNum, AIRLOOP COILS: DataCapacityUsedForSizing)
+		// CoolingWaterDesAirInletTempSizing( 4 ); // request sizing for cooling water coil inlet air temp
+		// CoolingWaterDesAirInletHumRatSizing( 5 ); // request sizing for cooling water coil inlet air humidity ratio
+		// CoolingWaterDesWaterInletTempSizing( 6 ); // request sizing for cooling water coil inlet water temp (DataPltSizCoolNum)
+		// CoolingWaterDesAirOutletTempSizing( 7 ); // request sizing for cooling water coil outlet air temp (DataPltSizCoolNum, DataWaterLoopNum, DataDesInletAirTemp, DataDesInletAirHumRat, DataAirFlowUsedForSizing, DataWaterFlowUsedForSizing, AIRLOOP COILS: DataDesInletWaterTemp)
+		// CoolingWaterDesAirOutletHumRatSizing( 8 ); // request sizing for cooling water coil outlet air humidity ratio (DataDesInletAirHumRat, DataDesInletWaterTemp, DataCapacityUsedForSizing, ZONE COILS: DataDesOutletAirTemp)
+		// CoolingWaterNumofTubesPerRowSizing( 9 ); // request sizing for cooling water coil number of tubes per row (DataWaterFlowUsedForSizing)
+		// HeatingWaterDesAirInletTempSizing( 10 ); // request sizing for heating water coil inlet air temp
+		// HeatingWaterDesAirInletHumRatSizing( 11 ); // request sizing for heating water coil inlet air humidity ratio
+		// HeatingWaterDesCoilLoadUsedForUASizing( 12 ); // request sizing for heating water coil capacity used for UA sizing (DataWaterLoopNum, DataPltSizHeatNum, AIRLOOP COILS: DataAirFlowUsedForSizing)
+		// HeatingWaterDesCoilWaterVolFlowUsedForUASizing( 13 ); // request sizing for heating water coil volume flow rate used for UA sizing (DataWaterFlowUsedForSizing)
+		// HeatingAirflowSizing( 14 ); // request sizing for heating air flow rate
+		// HeatingAirflowUASizing( 15 ); // request sizing for heating air flow rate
+		// SystemAirflowSizing( 16 ); // request sizing for system air flow rate
+		// CoolingCapacitySizing( 17 ); // request sizing for cooling capacity (DataFlowUsedForSizing [m3/s], DataTotCapCurveIndex [DX coils only])
+		// HeatingCapacitySizing( 18 ); // request sizing for heating capacity (DataCoolCoilCap, DataFlowUsedForSizing, AIRLOOP COILS: DataCoilIsSuppHeater, OPTIONAL: DataHeatSizeRatio)
+		// WaterHeatingCapacitySizing( 19 ); // request sizing for water-side heating capacity (ZONE COILS ONLY: DataWaterLoopNum, DataPltSizHeatNum, OPTIONAL: DataHeatSizeRatio)
+		// WaterHeatingCoilUASizing( 20 ); // request sizing for heating coil UA (DataCapacityUsedForSizing, DataCoilNum, DataFanOpMode, DataCapacityUsedForSizing, DataDesInletAirTemp, DataDesInletAirHumRat, DataFlowUsedForSizing, DataDesignCoilCapacity)
+		// SystemCapacitySizing( 21 ); // request sizing for system capacity
+		// CoolingSHRSizing( 22 ); // request sizing for cooling SHR (DataFlowUsedForSizing, DataCapacityUsedForSizing)
+		// HeatingDefrostSizing( 23 ); // request sizing for heating defrost capacity
+		// AutoCalculateSizing ( 24 ); // identifies an autocalulate input
 		//
 		// GLOBAL VARIABLES (previously used as optional arguments):
 		// (other global variables may be added as needed)
@@ -796,7 +796,7 @@ namespace ReportSizingManager {
 						DesMassFlow = FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow;
 						NominalCapacityDes = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 					}
-						AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
+					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
 				} else if ( SizingType == HeatingWaterDesCoilLoadUsedForUASizing ) {
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
 						DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow * TermUnitSizing( CurZoneEqNum ).ReheatAirFlowMult;
@@ -997,8 +997,7 @@ namespace ReportSizingManager {
 						AutosizeDes = DataCapacityUsedForSizing / ( CoilDesWaterDeltaT * Cp * rho );
 					} else {
 						AutosizeDes = 0.0;
-//						ShowWarningError( "The design coil load is zero for " + CompType + CompName );
-//						ShowContinueError( "The autosize value for max water flow rate is zero" );
+						// Warning about zero design coil load is issued elsewhere.
 					}
 					bCheckForZero = false;
 				} else if ( SizingType == HeatingWaterflowSizing ) {
@@ -1008,8 +1007,7 @@ namespace ReportSizingManager {
 						AutosizeDes = DataCapacityUsedForSizing / ( PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho );
 					} else {
 						AutosizeDes = 0.0;
-//						ShowWarningError( "The design coil load is zero for " + CompType + CompName );
-//						ShowContinueError( "The autosize value for max water flow rate is zero" );
+						// Warning about zero design coil load is issued elsewhere.
 					}
 					bCheckForZero = false;
 				} else if ( SizingType == HeatingWaterDesAirInletTempSizing ) {
