@@ -1686,7 +1686,6 @@ namespace VentilatedSlab {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", VentSlab( Item ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						//END IF
 						if ( PltSizHeatNum > 0 ) {
-<<<<<<< HEAD
 							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {								
 								SizingMethod = HeatingCapacitySizing;
 								if (VentSlab(Item).HVACSizingIndex > 0) {
@@ -1700,7 +1699,6 @@ namespace VentilatedSlab {
 												ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
 											} else {
 												DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-												//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
 											}
 											TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
 										} else if (CapSizingMethod == CapacityPerFloorArea){
@@ -1709,36 +1707,23 @@ namespace VentilatedSlab {
 										} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
 											DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-											//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
 											TempSize = AutoSize;
 										}
 									}
 									SizingString = "Maximum Hot Water Flow [m3/s]";
-									PrintFlag = false;
-									
+									PrintFlag = false;									
 									RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 									DesCoilLoad = TempSize;
 								} else {
 									SizingString = "Maximum Hot Water Flow [m3/s]";
 									PrintFlag = false;
 									TempSize = AutoSize;
-									//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
+									//DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 									RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 									DesCoilLoad = TempSize;
 								}								
 								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-=======
-							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-								CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
-								CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
-								CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
-								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
-								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-
-								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-
->>>>>>> remotes/origin/develop
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
@@ -1806,7 +1791,6 @@ namespace VentilatedSlab {
 												ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
 											} else {
 												DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-												//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
 											}
 											TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
 										} else if (CapSizingMethod == CapacityPerFloorArea){
@@ -1815,7 +1799,6 @@ namespace VentilatedSlab {
 										} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
 											DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-											//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
 											TempSize = AutoSize;
 										}
 									}
@@ -1827,7 +1810,7 @@ namespace VentilatedSlab {
 									SizingString = "Maximum Steam Flow [m3/s]";
 									PrintFlag = false;
 									TempSize = AutoSize;
-									//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
+									//DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 									RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 									DesCoilLoad = TempSize;
 								}										
@@ -1896,7 +1879,6 @@ namespace VentilatedSlab {
 					PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 					if ( PltSizCoolNum > 0 ) {
 						if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
-<<<<<<< HEAD
 							SizingMethod = CoolingCapacitySizing;
 							if (VentSlab(Item).HVACSizingIndex > 0) {
 								zoneHVACIndex = VentSlab(Item).HVACSizingIndex;
@@ -1909,7 +1891,6 @@ namespace VentilatedSlab {
 											ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
 										} else {
 											DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-											//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
 										}
 										TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
 									} else if (CapSizingMethod == CapacityPerFloorArea){
@@ -1918,7 +1899,6 @@ namespace VentilatedSlab {
 									} else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity){
 										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
 										DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-										//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
 										TempSize = AutoSize;
 									}
 								}
@@ -1930,24 +1910,12 @@ namespace VentilatedSlab {
 								SizingString = "Maximum Cold Water Flow [m3/s]";
 								PrintFlag = false;
 								TempSize = AutoSize;
-								//DataFlowUsedForSizing = VentSlab(Item).MaxAirVolFlow;
 								DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
 								RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 								DesCoilLoad = TempSize;
 							}
 							rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
 							Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-=======
-							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
-							CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
-							CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
-							CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
-							DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
-							rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5.0, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-
-							Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5.0, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-
->>>>>>> remotes/origin/develop
 							MaxVolColdWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 						} else {
 							MaxVolColdWaterFlowDes = 0.0;

@@ -2041,8 +2041,6 @@ namespace LowTempRadiantSystem {
 					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).HotWaterInNode, HydrRadSys( RadSysNum ).HotWaterOutNode, ErrorsFound );
 						if ( PltSizHeatNum > 0 ) {
-<<<<<<< HEAD
-
 							CompType = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
 							CompName = HydrRadSys( RadSysNum ).Name;
 							DataFracOfAutosizedHeatingCapacity = 1.0;
@@ -2084,10 +2082,6 @@ namespace LowTempRadiantSystem {
 							}
 							if ( DesCoilLoad >= SmallLoad ) {
 								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60., PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
-=======
-							if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
->>>>>>> remotes/origin/develop
 
 								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 
@@ -2137,9 +2131,6 @@ namespace LowTempRadiantSystem {
 					if ( IsAutoSize ) {
 						PltSizCoolNum = MyPlantSizingIndex( "ZoneHVAC:LowTemperatureRadiant:VariableFlow", HydrRadSys( RadSysNum ).Name, HydrRadSys( RadSysNum ).ColdWaterInNode, HydrRadSys( RadSysNum ).ColdWaterOutNode, ErrorsFound );
 						if ( PltSizCoolNum > 0 ) {
-<<<<<<< HEAD
-
-
 							CompType = "ZoneHVAC:LowTemperatureRadiant:VariableFlow";
 							CompName = HydrRadSys(RadSysNum).Name;
 							DataFracOfAutosizedCoolingCapacity = 1.0;
@@ -2181,10 +2172,6 @@ namespace LowTempRadiantSystem {
 
 							if ( DesCoilLoad >= SmallLoad ) {
 								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5., PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
-=======
-							if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesCoolLoad * CalcFinalZoneSizing( CurZoneEqNum ).CoolSizingFactor ) >= SmallLoad ) {
-								rho = GetDensityGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
->>>>>>> remotes/origin/develop
 
 								Cp = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
 

@@ -185,7 +185,6 @@ namespace DataSizing {
 	Real64 DataCapacityUsedForSizing( 0.0 ); //capacity used for sizing with scalable inputs [W]
 	Real64 DataDesignCoilCapacity( 0.0); // calculated capacity of coil at end of UA calculation
 	Real64 DataHeatSizeRatio( 1.0 ); // heating coil size as a ratio of cooling coil capacity
-<<<<<<< HEAD
 	Real64 DataEMSOverride ( 0.0 ); // value of EMS variable used to override autosizing
 	Real64 DataBypassFrac ( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
 	int DataZoneNumber( 0 );  // a pointer to a served by zoneHVAC equipment
@@ -201,15 +200,8 @@ namespace DataSizing {
 	Real64 DataFracOfAutosizedHeatingCapacity( 1.0 );  // fraction of autosized heating capacit
 	Real64 DataAutosizedCoolingCapacity( 0.0 );  // Autosized cooling capacity used for multiplying flow per capacity to get flow rate
 	Real64 DataAutosizedHeatingCapacity( 0.0 );  // Autosized heating capacit used for multiplying flow per capacity to get flow rate
-	Real64 DataConstantUsedForSizing ( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
-	Real64 DataFractionUsedForSizing ( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
-
-=======
-	Real64 DataEMSOverride( 0.0 ); // value of EMS variable used to override autosizing
-	Real64 DataBypassFrac( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
 	Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 	Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
->>>>>>> remotes/origin/develop
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio

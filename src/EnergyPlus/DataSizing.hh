@@ -154,7 +154,7 @@ namespace DataSizing {
 	extern Real64 DataFracOfAutosizedHeatingAirflow;  // fraction of design heating supply air flow rate
 	extern Real64 DataFlowPerCoolingCapacity;  // cooling supply air flow per unit cooling capacity
 	extern Real64 DataFlowPerHeatingCapacity;  // heating supply air flow per unit heating capacity
-    extern Real64 DataCoolingCapPerFloorArea;  // cooling capacity per floor area
+	extern Real64 DataCoolingCapPerFloorArea;  // cooling capacity per floor area
 	extern Real64 DataHeatingCapPerFloorArea;  // heating capacity per floor area
 	extern Real64 DataFracOfAutosizedCoolingCapacity;  // fraction of autosized cooling capacity
 	extern Real64 DataFracOfAutosizedHeatingCapacity;  // fraction of autosized heating capacit
@@ -1055,12 +1055,9 @@ namespace DataSizing {
 		//- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedHeatingCapacity) 
 		int HeatingCapMethod;    // - Method for heatiing capacity scaledsizing calculation
 		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-
-
 		Real64 MaxCoolAirVolFlow;// - maximum cooling supply air flow rate, m3/s
 		Real64 MaxHeatAirVolFlow;// - maximum heating supply air flow rate, m3/s
 		Real64 MaxNoCoolHeatAirVolFlow; // - maximum supply air flow rate when no cooling or heating, m3/s
-
 		Real64 ScaledCoolingCapacity;   // - scaled maximum cooling capacity of zone HVAC equipment, W
 		Real64 ScaledHeatingCapacity;   // - scaled maximum heating capacity of zone HVAC equipment, W
 		bool RequestAutoSize;       // - true if autosizing is requested
@@ -1237,7 +1234,6 @@ namespace DataSizing {
 			int const SystemOAMethod, // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
 			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
-
 			int const CoolingCapMethod,   // - Method for cooling capacity scaledsizing calculation
 			//- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
 			int const HeatingCapMethod,   // - Method for heatiing capacity scaledsizing calculation
@@ -1281,7 +1277,6 @@ namespace DataSizing {
 			SystemOAMethod( SystemOAMethod ),
 			MaxZoneOAFraction( MaxZoneOAFraction ),
 			OAAutoSized( OAAutoSized ),
-
 			CoolingCapMethod( CoolingCapMethod ),
 			HeatingCapMethod( HeatingCapMethod ),
 			ScaledCoolingCapacity( ScaledCoolingCapacity ),
