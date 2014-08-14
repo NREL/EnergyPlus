@@ -135,6 +135,7 @@ namespace PlantChillers {
 		int CondMassFlowIndex;
 		bool IsThisSized; // Ture if sizing is done
 		bool UserSpecSizesAlreadyReported;
+		bool UserSpecComparedAutoAlreadyReported;
 
 		// Default Constructor
 		BaseChillerSpecs() :
@@ -174,7 +175,8 @@ namespace PlantChillers {
 			PossibleSubcooling( false ),
 			CondMassFlowIndex( 0 ),
 			IsThisSized( false ),
-			UserSpecSizesAlreadyReported( false )
+			UserSpecSizesAlreadyReported( false ),
+			UserSpecComparedAutoAlreadyReported( false )
 		{}
 
 		// Member Constructor
@@ -218,7 +220,8 @@ namespace PlantChillers {
 			bool const PossibleSubcooling, // flag to indicate chiller is doing less cooling that requested
 			int const CondMassFlowIndex,
 			bool const IsThisSized, // Ture if sizing is done
-			bool const UserSpecSizesAlreadyReported
+			bool const UserSpecSizesAlreadyReported,
+			bool const UserSpecComparedAutoAlreadyReported
 		) :
 			Name( Name ),
 			CondenserType( CondenserType ),
@@ -259,7 +262,8 @@ namespace PlantChillers {
 			PossibleSubcooling( PossibleSubcooling ),
 			CondMassFlowIndex( CondMassFlowIndex ),
 			IsThisSized( IsThisSized ),
-			UserSpecSizesAlreadyReported( UserSpecSizesAlreadyReported )
+			UserSpecSizesAlreadyReported( UserSpecSizesAlreadyReported ),
+			UserSpecComparedAutoAlreadyReported( UserSpecComparedAutoAlreadyReported )
 		{}
 
 	};
