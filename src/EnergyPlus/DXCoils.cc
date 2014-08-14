@@ -2102,12 +2102,12 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 10 ) ); // convert curve name to number
-			if ( SameString( Alphas( 11 ), "ReverseCycle" ) ) {
+			if ( SameString( Alphas( 11 ), "ReverseCycle" ) && SameString( Alphas( 12 ), "OnDemand" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 10 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
 						ShowContinueError( "...required " + cAlphaFields( 10 ) + " is blank." );
-						ShowContinueError( "...field is required because " + cAlphaFields( 11 ) + " is \"ReverseCycle\"." );
+						ShowContinueError( "...field is required because " + cAlphaFields( 11 ) + " is \"ReverseCycle\" and " + cAlphaFields( 12 ) + " is \"OnDemand\"." );
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...not found " + cAlphaFields( 10 ) + "=\"" + Alphas( 10 ) + "\"." );
@@ -2182,14 +2182,14 @@ namespace DXCoils {
 
 			//Set defrost time period
 			DXCoil( DXCoilNum ).DefrostTime = Numbers( 10 );
-			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == 1 ) {
+			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == Timed ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 10 ) + " = 0.0 for defrost control = TIMED." );
 			}
 
 			//Set defrost capacity (for resistive defrost)
 			DXCoil( DXCoilNum ).DefrostCapacity = Numbers( 11 );
-			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == 2 ) {
+			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == OnDemand ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 11 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
@@ -3759,7 +3759,7 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 5 ) ); // convert curve name to number
-			if ( SameString( Alphas( 6 ), "ReverseCycle" ) ) {
+			if ( SameString( Alphas( 6 ), "ReverseCycle" ) && SameString( Alphas( 7 ), "OnDemand" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 5 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
@@ -3812,14 +3812,14 @@ namespace DXCoils {
 
 			//Set defrost time period
 			DXCoil( DXCoilNum ).DefrostTime = Numbers( 6 );
-			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == 1 ) {
+			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == Timed ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 5 ) + " = 0.0 for defrost control = TIMED." );
 			}
 
 			//Set defrost capacity (for resistive defrost)
 			DXCoil( DXCoilNum ).DefrostCapacity = Numbers( 7 );
-			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == 2 ) {
+			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == OnDemand ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 7 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
@@ -8118,7 +8118,7 @@ Label50: ;
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand) {
+					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 						DXCoil( DXCoilNum ).DefrostPower = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 ) * FractionalDefrostTime;
@@ -10297,7 +10297,7 @@ Label50: ;
 
 					if ( FractionalDefrostTime > 0.0 ) {
 						// Calculate defrost adjustment factors depending on defrost control strategy
-						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
+						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
 							DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 							LoadDueToDefrostLS = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ) / 1.01667 );
 							DefrostPowerLS = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ) / 1.01667 ) * FractionalDefrostTime;
@@ -10460,7 +10460,7 @@ Label50: ;
 
 					if ( FractionalDefrostTime > 0.0 ) {
 						// Calculate defrost adjustment factors depending on defrost control strategy
-						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
+						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
 							LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).MSRatedTotCap( 1 ) / 1.01667 );
 							DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 							DXCoil( DXCoilNum ).DefrostPower = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).MSRatedTotCap( 1 ) / 1.01667 ) * FractionalDefrostTime;
