@@ -1336,7 +1336,6 @@ namespace DataPlantPipingSystems {
 		int InsulationZIndex;
 		bool SimTimestepFlag;
 		bool SimHourlyFlag;
-		bool SimDailyFlag;
 		Real64 ZoneCoupledSurfaceTemp;
 
 		// Main 3D cells array
@@ -1386,7 +1385,6 @@ namespace DataPlantPipingSystems {
 			InsulationZIndex( 0 ),
 			SimTimestepFlag( false ),
 			SimHourlyFlag( false ),
-			SimDailyFlag( false ),
 			ZoneCoupledSurfaceTemp ( 0.0 )
 
 		{}
@@ -1453,7 +1451,6 @@ namespace DataPlantPipingSystems {
 			int const InsulationZIndex,
 			bool const SimTimestepFlag,
 			bool const SimHourlyFlag,
-			bool const SimDailyFlag,
 			Real64 ZoneCoupledSurfaceTemp,
 
 			FArray3< CartesianCell > const & Cells			
@@ -1518,7 +1515,6 @@ namespace DataPlantPipingSystems {
 			InsulationZIndex( InsulationZIndex ),
 			SimTimestepFlag( SimTimestepFlag ),
 			SimHourlyFlag( SimHourlyFlag ),
-			SimDailyFlag( SimDailyFlag ),
 			ZoneCoupledSurfaceTemp( ZoneCoupledSurfaceTemp ),
 			Cells( Cells )
 		{}

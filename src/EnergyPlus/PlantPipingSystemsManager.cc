@@ -314,7 +314,6 @@ namespace PlantPipingSystemsManager {
 				// The time init should be done here before we DoOneTimeInits because the DoOneTimeInits
 				// includes a ground temperature initialization, which is based on the Cur%CurSimTimeSeconds variable
 				// which would be carried over from the previous environment
-				PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
 				PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds = ( ( DayOfSim - 1 ) * 24 + ( HourOfDay - 1 ) + ( TimeStep - 1 ) * TimeStepZone + SysTimeElapsed ) * SecInHour;
 
 				//There are also some inits that are "close to one time" inits...( one-time in standalone, each envrn in E+ )
@@ -332,8 +331,6 @@ namespace PlantPipingSystemsManager {
 				if ( PipingSystemDomains( DomainNum ).ResetHeatFluxFlag ){
 					PipingSystemDomains( DomainNum ).AggregateHeatFlux = 0;
 					PipingSystemDomains( DomainNum ).NumHeatFlux = 0;
-					PipingSystemDomains( DomainNum ).HeatFlux = 0;
-
 					PipingSystemDomains( DomainNum ).ResetHeatFluxFlag = false;
 				}
 				
@@ -343,19 +340,14 @@ namespace PlantPipingSystemsManager {
 				PipingSystemDomains( DomainNum ).HeatFlux = PipingSystemDomains( DomainNum ).AggregateHeatFlux / PipingSystemDomains( DomainNum ).NumHeatFlux;
 
 				// Select run interval
-				if ( !WarmupFlag ) {
-					if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
-						// Keep on going!
-						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
-					} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
-						if ( TimeStep != 1 ) continue;
+				if ( PipingSystemDomains( DomainNum ).SimTimestepFlag ) {
+					// Keep on going!
+					PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = TimeStepZone * SecInHour;
+				} else if ( PipingSystemDomains( DomainNum ).SimHourlyFlag ) {
+					// Passes by if not time to run
+					if ( TimeStep != 1 ) continue;
 						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour;
-					} else if ( PipingSystemDomains( DomainNum ).SimDailyFlag ) {
-						if ( ( HourOfDay != 1 ) || ( TimeStep != 1 ) ) continue;
-						PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize = SecInHour * 24;
-					}
-				}
-
+				} 
 
 				//Shift history arrays only if necessary
 				if ( std::abs( PipingSystemDomains( DomainNum ).Cur.CurSimTimeSeconds - PipingSystemDomains( DomainNum ).Cur.PrevSimTimeSeconds ) > 1.0e-6 ) {
@@ -1199,8 +1191,6 @@ namespace PlantPipingSystemsManager {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
 				} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
-				} else if ( SameString( cAlphaArgs( 11 ), "DAILY" ) ) {
-					PipingSystemDomains( DomainCtr ).SimDailyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
 					ShowFatalError( "Preceding error causes program termination." );
@@ -6818,9 +6808,6 @@ namespace PlantPipingSystemsManager {
 			// na
 
 			// Using/Aliasing
-			using DataGlobals::TimeStep;
-			using DataEnvironment::CurMnDyHr;
-			using DataHeatBalSurface::TH;
 
 			// Return value
 			Real64 RetVal;
@@ -6839,21 +6826,11 @@ namespace PlantPipingSystemsManager {
 			int CurDirection; // From Enum: Direction
 			Real64 AdiabaticMultiplier;
 
-			Real64 VolThisCell;
-			Real64 HeatFluxGain;
-			Real64 CumulativeHeatTransfer;
-
-			//std::ofstream static myfile("ZoneInterface.csv", std::ofstream::out);
-
 			//Initialize
 			Numerator = 0.0;
 			Denominator = 0.0;
 			Resistance = 0.0;
 			Beta = cell.MyBase.Beta;
-
-			VolThisCell = 0.0;
-			HeatFluxGain = 0.0;
-			CumulativeHeatTransfer = 0.0;
 
 			//add effect from previous time step
 			Numerator += cell.MyBase.Temperature_PrevTimeStep;
@@ -6862,12 +6839,6 @@ namespace PlantPipingSystemsManager {
 			// Get the average slab heat flux and add it to the tally
 			HeatFlux = PipingSystemDomains( DomainNum ).HeatFlux;
 			Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
-
-			//CumulativeHeatTransfer = HeatFlux * Width( cell ) * Depth( cell );
-
-			HeatFluxGain = HeatFlux * Width( cell ) * Depth( cell );
-			VolThisCell = Volume( cell );
-			//myfile << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << Beta << "," << HeatFluxGain << "," << cell.MyBase.Temperature_PrevTimeStep << "," << PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize << "," << VolThisCell << std::endl;
 
 			//determine the neighbor types based on cell location
 			EvaluateCellNeighborDirections( DomainNum, cell );
@@ -6890,21 +6861,12 @@ namespace PlantPipingSystemsManager {
 				//Use the multiplier to evaluate the transient expression terms
 				EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 				Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-				Denominator += AdiabaticMultiplier * ( Beta / Resistance );
-
-				//CumulativeHeatTransfer += AdiabaticMultiplier * ( 1 / Resistance ) * ( NeighborTemp - cell.MyBase.Temperature );
-
-				//myfile << "," << "," << "," << "," << "," << "," << "," << "," << AdiabaticMultiplier << "," << NeighborTemp << "," << Resistance << std::endl;
-				
+				Denominator += AdiabaticMultiplier * ( Beta / Resistance );				
 			}
 
 			//now that we have passed all directions, update the temperature
 			
 			RetVal = Numerator / Denominator;
-
-			//RetVal = CumulativeHeatTransfer * Beta + cell.MyBase.Temperature_PrevTimeStep;
-
-			//myfile << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << "," << RetVal << std::endl;
 
 			return RetVal;
 
