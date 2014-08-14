@@ -486,9 +486,7 @@ namespace ReportSizingManager {
 							AutosizeDes = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
 						}
 					}
-					}
-				
-				
+					}				
 				}
 				else if ( SizingType == CoolingSHRSizing ) {
 					if ( DataFlowUsedForSizing >= SmallAirVolFlow && DataCapacityUsedForSizing > 0.0 ) {
@@ -577,7 +575,7 @@ namespace ReportSizingManager {
 							}
 							if (ZoneEqFanCoil) {								
 								PeakCoilLoad = max( 0.0, ( StdRhoAir * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );
-								//PeakCoilLoad = max(0.0, ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * (CoilInEnth - CoilOutEnth)));
+								//PeakCoilLoad = max(0.0, ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( CoilInEnth - CoilOutEnth ) ) );
 							} else if ( ZoneEqUnitVent ) {
 								PeakCoilLoad = max( 0.0, ( StdRhoAir * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );
 							} else {
@@ -647,8 +645,7 @@ namespace ReportSizingManager {
 								CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
 								CpAir = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
 								DesCoilLoad = CpAir * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
-								//DesCoilLoad = CpAir * StdRhoAir * DesVolFlow * (CoilOutTemp - CoilInTemp);
-								
+								//DesCoilLoad = CpAir * StdRhoAir * DesVolFlow * (CoilOutTemp - CoilInTemp);								
 							}
 							NominalCapacityDes = max( 0.0, DesCoilLoad );
 						} else {
@@ -689,14 +686,39 @@ namespace ReportSizingManager {
 							AutosizeDes = FinalSysSizing ( CurSysNum ).DesOutAirVolFlow;
 						}
 					} else {
-						AutosizeDes = FinalSysSizing ( CurSysNum ).DesMainVolFlow;
+						{ auto const SELECT_CASE_var(FinalSysSizing(CurSysNum).ScaleCoolSAFMethod);
+							if ((SELECT_CASE_var == FromDDCalc) || (SELECT_CASE_var == InpDesAirFlow)) {
+								AutosizeDes = FinalSysSizing(CurSysNum).DesCoolVolFlow;
+							} else if (SELECT_CASE_var == FlowPerFloorArea) {
+								AutosizeDes = FinalSysSizing(CurSysNum).FlowPerFloorAreaCooled * FinalSysSizing(CurSysNum).FloorAreaOnAirLoopCooled;
+							} else if (SELECT_CASE_var == FractionOfAutosizedCoolingAirflow) {
+								AutosizeDes = FinalSysSizing(CurSysNum).FractionOfAutosizedCoolingAirflow * FinalSysSizing(CurSysNum).DesCoolVolFlow;
+							} else if (SELECT_CASE_var == FlowPerCoolingCapacity) {
+								AutosizeDes = FinalSysSizing(CurSysNum).FlowPerCoolingCapacity * DataAutosizedCoolingCapacity;
+							} else {
+								AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+							}
+						}
 					}
-
 				} else if ( SizingType == HeatingAirflowSizing ) {
 					if ( UnitarySysEqSizing(CurSysNum).HeatingAirFlow ) {
 						AutosizeDes = UnitarySysEqSizing(CurSysNum).AirVolFlow;
 					} else {
-						AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+						{ auto const SELECT_CASE_var(FinalSysSizing(CurSysNum).ScaleHeatSAFMethod);
+							if ((SELECT_CASE_var == FromDDCalc) || (SELECT_CASE_var == InpDesAirFlow)) {
+								AutosizeDes = FinalSysSizing(CurSysNum).DesHeatVolFlow;
+							} else if (SELECT_CASE_var == FlowPerFloorArea) {
+								AutosizeDes = FinalSysSizing(CurSysNum).FlowPerFloorAreaHeated * FinalSysSizing(CurSysNum).FloorAreaOnAirLoopHeated;
+							} else if (SELECT_CASE_var == FractionOfAutosizedHeatingAirflow) {
+								AutosizeDes = FinalSysSizing(CurSysNum).FractionOfAutosizedCoolingAirflow * FinalSysSizing(CurSysNum).DesHeatVolFlow;
+							} else if (SELECT_CASE_var == FractionOfAutosizedCoolingAirflow) {
+								AutosizeDes = FinalSysSizing(CurSysNum).FractionOfAutosizedCoolingAirflow * FinalSysSizing(CurSysNum).DesCoolVolFlow;
+							} else if (SELECT_CASE_var == FlowPerCoolingCapacity) {
+								AutosizeDes = FinalSysSizing(CurSysNum).FlowPerCoolingCapacity * DataAutosizedHeatingCapacity;
+							}else {
+								AutosizeDes = FinalSysSizing(CurSysNum).DesMainVolFlow;
+							}
+						}
 					}
 				} else if ( SizingType == SystemAirflowSizing ) {
 					if ( AirLoopSysFlag ) {
@@ -753,53 +775,60 @@ namespace ReportSizingManager {
 							AutosizeDes = UnitarySysEqSizing ( CurSysNum ).DesCoolingLoad;
 						} else {
 //							CheckSysSizing ( CompType, CompName );
-							DesVolFlow = DataFlowUsedForSizing;
-							if ( DesVolFlow >= SmallAirVolFlow ) {
-								if ( CurOASysNum > 0 ) { // coil is in the OA stream
-									CoilInTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
-									CoilInHumRat = FinalSysSizing ( CurSysNum ).CoolOutHumRat;
-									CoilOutTemp = FinalSysSizing ( CurSysNum ).PrecoolTemp;
-									CoilOutHumRat = FinalSysSizing ( CurSysNum ).PrecoolHumRat;
-								} else { // coil is on the main air loop
-									CoilOutTemp = FinalSysSizing ( CurSysNum ).CoolSupTemp;
-									CoilOutHumRat = FinalSysSizing ( CurSysNum ).CoolSupHumRat;
-									if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-										CoilInTemp = FinalSysSizing ( CurSysNum ).CoolMixTemp;
-										CoilInHumRat = FinalSysSizing ( CurSysNum ).CoolMixHumRat;
-									} else { // there is precooling of OA stream
-										if ( DesVolFlow > 0.0 ) {
-											OutAirFrac = FinalSysSizing ( CurSysNum ).DesOutAirVolFlow / DesVolFlow;
-										} else {
-											OutAirFrac = 1.0;
+							if (FinalSysSizing(CurSysNum).CoolingCapMethod == CapacityPerFloorArea) {
+								AutosizeDes = CalcSysSizing( CurSysNum ).ScaledCoolingCapacity * CalcSysSizing( CurSysNum ).FloorAreaOnAirLoopCooled;
+							} else {								
+								DataFracOfAutosizedCoolingCapacity = FinalSysSizing( CurSysNum ).FractionOfAutosizedCoolingCapacity;
+								DesVolFlow = DataFlowUsedForSizing;
+								if ( DesVolFlow >= SmallAirVolFlow ) {
+									if ( CurOASysNum > 0 ) { // coil is in the OA stream
+										CoilInTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
+										CoilInHumRat = FinalSysSizing ( CurSysNum ).CoolOutHumRat;
+										CoilOutTemp = FinalSysSizing ( CurSysNum ).PrecoolTemp;
+										CoilOutHumRat = FinalSysSizing ( CurSysNum ).PrecoolHumRat;
+									} else { // coil is on the main air loop
+										CoilOutTemp = FinalSysSizing ( CurSysNum ).CoolSupTemp;
+										CoilOutHumRat = FinalSysSizing ( CurSysNum ).CoolSupHumRat;
+										if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
+											CoilInTemp = FinalSysSizing ( CurSysNum ).CoolMixTemp;
+											CoilInHumRat = FinalSysSizing ( CurSysNum ).CoolMixHumRat;
+										} else { // there is precooling of OA stream
+											if ( DesVolFlow > 0.0 ) {
+												OutAirFrac = FinalSysSizing ( CurSysNum ).DesOutAirVolFlow / DesVolFlow;
+											} else {
+												OutAirFrac = 1.0;
+											}
+											OutAirFrac = min ( 1.0, max ( 0.0, OutAirFrac ) );
+											CoilInTemp = OutAirFrac * FinalSysSizing ( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing ( CurSysNum ).CoolRetTemp;
+											CoilInHumRat = OutAirFrac*FinalSysSizing ( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing ( CurSysNum ).CoolRetHumRat;
 										}
-										OutAirFrac = min ( 1.0, max ( 0.0, OutAirFrac ) );
-										CoilInTemp = OutAirFrac * FinalSysSizing ( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing ( CurSysNum ).CoolRetTemp;
-										CoilInHumRat = OutAirFrac*FinalSysSizing ( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing ( CurSysNum ).CoolRetHumRat;
 									}
-								}
-								OutTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
-								rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
-								CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat );
-								CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine );
-								CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
-								if ( DataTotCapCurveIndex > 0 ) {
-									TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
+									OutTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
+									rhoair = PsyRhoAirFnPbTdbW ( StdBaroPress, CoilInTemp, CoilInHumRat, CallingRoutine );
+									CoilInEnth = PsyHFnTdbW ( CoilInTemp, CoilInHumRat );
+									CoilInWetBulb = PsyTwbFnTdbWPb ( CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine );
+									CoilOutEnth = PsyHFnTdbW ( CoilOutTemp, CoilOutHumRat );
+									if ( DataTotCapCurveIndex > 0 ) {
+										TotCapTempModFac = CurveValue ( DataTotCapCurveIndex, CoilInWetBulb, OutTemp );
+									} else {
+										TotCapTempModFac = 1.0;
+									}
+									PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );
+									if ( TotCapTempModFac > 0.0 ) {
+										NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;
+									} else {
+										NominalCapacityDes = PeakCoilLoad;
+									}
 								} else {
-									TotCapTempModFac = 1.0;
+									NominalCapacityDes = 0.0;
 								}
-								PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );
-								if ( TotCapTempModFac > 0.0 ) {
-									NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;
-								} else {
-									NominalCapacityDes = PeakCoilLoad;
-								}
-							} else {
-								NominalCapacityDes = 0.0;
 							}
 						} // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
+						AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedCoolingCapacity;
 					}
-					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
+					
 				} else if (SizingType == HeatingCapacitySizing) {
+					DataFracOfAutosizedHeatingCapacity = FinalSysSizing( CurSysNum ).FractionOfAutosizedHeatingCapacity;
 					if (CurOASysNum > 0) {
 						if (OASysEqSizing(CurOASysNum).HeatingAirFlow) {
 							DesVolFlow = OASysEqSizing(CurOASysNum).AirVolFlow;
@@ -888,7 +917,7 @@ namespace ReportSizingManager {
 							NominalCapacityDes = 0.0;
 						}
 					}
-					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio;
+					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedHeatingCapacity;
 				}
 			}
 		}
