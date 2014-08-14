@@ -46374,9 +46374,11 @@ EvaporativeCooler:Direct:CelDekPad,
   N1 , \field Direct Pad Area
        \units m2
        \minimum 0.0
+       \autosizable
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
+       \autosizable
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
@@ -46406,9 +46408,11 @@ EvaporativeCooler:Indirect:CelDekPad,
   N1 , \field Direct Pad Area
        \units m2
        \minimum 0.0
+       \autosizable
   N2 , \field Direct Pad Depth
        \units m
        \minimum 0.0
+       \autosizable
   N3 , \field Recirculating Water Pump Power Consumption
        \units W
        \ip-units W
