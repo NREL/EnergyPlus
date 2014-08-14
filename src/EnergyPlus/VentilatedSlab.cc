@@ -1275,7 +1275,7 @@ namespace VentilatedSlab {
 			if ( VentSlab( Item ).HCoilPresent ) { // Only initialize these if a heating coil is actually present
 
 				if ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && ! MyPlantScanFlag( Item ) ) {
-					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 
 					VentSlab( Item ).MaxHotWaterFlow = rho * VentSlab( Item ).MaxVolHotWaterFlow;
 					VentSlab( Item ).MinHotWaterFlow = rho * VentSlab( Item ).MinVolHotWaterFlow;
@@ -1686,6 +1686,7 @@ namespace VentilatedSlab {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", VentSlab( Item ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						//END IF
 						if ( PltSizHeatNum > 0 ) {
+<<<<<<< HEAD
 							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {								
 								SizingMethod = HeatingCapacitySizing;
 								if (VentSlab(Item).HVACSizingIndex > 0) {
@@ -1727,6 +1728,17 @@ namespace VentilatedSlab {
 								}								
 								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+=======
+							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+								CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
+								CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+								CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
+								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
+								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+
+								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+
+>>>>>>> remotes/origin/develop
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
 								MaxVolHotWaterFlowDes = 0.0;
@@ -1824,8 +1836,8 @@ namespace VentilatedSlab {
 								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
 								LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
 								SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( fluidNameWater, 60., DummyWaterIndex, RoutineName );
-								rho = GetDensityGlycol( fluidNameWater, 60., DummyWaterIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
+								rho = GetDensityGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
 								MaxVolHotSteamFlowDes = DesCoilLoad / ( ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho ) + SteamDensity * LatentHeatSteam );
 							} else {
 								MaxVolHotSteamFlowDes = 0.0;
@@ -1884,6 +1896,7 @@ namespace VentilatedSlab {
 					PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 					if ( PltSizCoolNum > 0 ) {
 						if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
+<<<<<<< HEAD
 							SizingMethod = CoolingCapacitySizing;
 							if (VentSlab(Item).HVACSizingIndex > 0) {
 								zoneHVACIndex = VentSlab(Item).HVACSizingIndex;
@@ -1924,6 +1937,17 @@ namespace VentilatedSlab {
 							}
 							rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
 							Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+=======
+							CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
+							CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
+							CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+							CoilInHumRat = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInHumRat;
+							DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
+							rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5.0, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+
+							Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5.0, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+
+>>>>>>> remotes/origin/develop
 							MaxVolColdWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 						} else {
 							MaxVolColdWaterFlowDes = 0.0;
@@ -3818,9 +3842,9 @@ namespace VentilatedSlab {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const MaxLaminarRe( 2300. ); // Maximum Reynolds number for laminar flow
+		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		int const NumOfPropDivisions( 13 );
-		Real64 const MaxExpPower( 50. ); // Maximum power after which EXP argument would be zero for DP variables
+		Real64 const MaxExpPower( 50.0 ); // Maximum power after which EXP argument would be zero for DP variables
 		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
 		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000088, 0.0000176, 0.00001781, 0.00001802, 0.000018225, 0.00001843, 0.00001865, 0.00001887, 0.00001908, 0.00001929, 0.0000195, 0.00001971, 0.00001992 } ); // Viscosity, in Ns/m2
 		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.01275, 0.0255, 0.0258, 0.0261, 0.0264, 0.0267, 0.02705, 0.0274, 0.02775, 0.0281, 0.0284, 0.0287, 0.01435 } ); // Conductivity, in W/mK
@@ -3878,7 +3902,7 @@ namespace VentilatedSlab {
 		// Calculate the Nusselt number based on what flow regime one is in
 		if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
 
-			NuD = 0.023 * ( std::pow( ReD, ( 0.8 ) ) ) * ( std::pow( PRactual, ( 1.0 / 3.0 ) ) );
+			NuD = 0.023 * std::pow( ReD, 0.8 ) * std::pow( PRactual, 1.0 / 3.0 );
 
 		} else { // Laminar flow --> use constant surface temperature relation
 

@@ -2382,6 +2382,7 @@ namespace SimAirServingZones {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// Maximum iterations of an air system/controllers simulation sequence
 		int const MaxIter( 50 );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK DEFINITIONS: None
 
@@ -2477,7 +2478,7 @@ namespace SimAirServingZones {
 							++ErrCount;
 							if ( ErrCount < 15 ) {
 								ErrEnvironmentName = EnvironmentName;
-								gio::write( CharErrOut, "*" ) << MaxIter;
+								gio::write( CharErrOut, fmtLD ) << MaxIter;
 								strip( CharErrOut );
 								ShowWarningError( "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " + PrimaryAirSystem( AirLoopNum ).Name + ", at " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 							} else {
@@ -4407,7 +4408,7 @@ namespace SimAirServingZones {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		static gio::Fmt const SSizeFmt10( "('Time')" );
 		static gio::Fmt const SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
 		static gio::Fmt const SSizeFmt20( "(I2.2,':',I2.2,':00')" );
@@ -4633,7 +4634,7 @@ namespace SimAirServingZones {
 				}
 				RetTempRise = ZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq( TimeStepInDay ) - ZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay );
 				if ( RetTempRise > 0.01 ) {
-					ZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq( TimeStepInDay ) = ZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay ) + RetTempRise * ( 1. / ( 1. + TermUnitSizing( CtrlZoneNum ).InducRat ) );
+					ZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneRetTempSeq( TimeStepInDay ) = ZoneSizing( CtrlZoneNum, CurOverallSimDay ).HeatZoneTempSeq( TimeStepInDay ) + RetTempRise * ( 1.0 / ( 1.0 + TermUnitSizing( CtrlZoneNum ).InducRat ) );
 				}
 			}
 
@@ -5628,7 +5629,7 @@ namespace SimAirServingZones {
 				}
 
 				// Calculate the new user modified system design quantities
-				if ( std::abs( SysCoolSizingRat - 1.0 ) > .00001 ) {
+				if ( std::abs( SysCoolSizingRat - 1.0 ) > 0.00001 ) {
 
 					FinalSysSizing( AirLoopNum ).CoinCoolMassFlow = SysCoolSizingRat * CalcSysSizing( AirLoopNum ).CoinCoolMassFlow;
 					FinalSysSizing( AirLoopNum ).NonCoinCoolMassFlow = SysCoolSizingRat * CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow;
@@ -5693,7 +5694,7 @@ namespace SimAirServingZones {
 
 				}
 
-				if ( std::abs( SysHeatSizingRat - 1.0 ) > .00001 ) {
+				if ( std::abs( SysHeatSizingRat - 1.0 ) > 0.00001 ) {
 
 					FinalSysSizing( AirLoopNum ).CoinHeatMassFlow = SysHeatSizingRat * CalcSysSizing( AirLoopNum ).CoinHeatMassFlow;
 					FinalSysSizing( AirLoopNum ).NonCoinHeatMassFlow = SysHeatSizingRat * CalcSysSizing( AirLoopNum ).NonCoinHeatMassFlow;

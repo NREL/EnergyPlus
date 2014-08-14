@@ -533,7 +533,7 @@ namespace SurfaceGroundHeatExchanger {
 				ShowFatalError( "InitSurfaceGroundHeatExchanger: Program terminated due to previous condition(s)." );
 			}
 			rho = GetDensityGlycol( PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( SurfaceGHE( SurfaceGHENum ).LoopNum ).FluidIndex, RoutineName );
-			SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate = Pi / 4.0 * std::pow( SurfaceGHE( SurfaceGHENum ).TubeDiameter, 2 ) * DesignVelocity * rho * SurfaceGHE( SurfaceGHENum ).TubeCircuits;
+			SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate = Pi / 4.0 * pow_2( SurfaceGHE( SurfaceGHENum ).TubeDiameter ) * DesignVelocity * rho * SurfaceGHE( SurfaceGHENum ).TubeCircuits;
 			InitComponentNodes( 0.0, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate, SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).OutletNodeNum, SurfaceGHE( SurfaceGHENum ).LoopNum, SurfaceGHE( SurfaceGHENum ).LoopSideNum, SurfaceGHE( SurfaceGHENum ).BranchNum, SurfaceGHE( SurfaceGHENum ).CompNum );
 			RegisterPlantCompDesignFlow( SurfaceGHE( SurfaceGHENum ).InletNodeNum, SurfaceGHE( SurfaceGHENum ).DesignMassFlowRate / rho );
 
@@ -1310,11 +1310,11 @@ namespace SurfaceGroundHeatExchanger {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const MaxLaminarRe( 2300. ); // Maximum Reynolds number for laminar flow
+		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		int const NumOfPropDivisions( 13 ); // intervals in property correlation
 		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { .001652, .001422, .001225, .00108, .000959, .000855, .000769, .000695, .000631, .000577, .000528, .000489, .000453 } ); // Viscosity, in Ns/m2
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { .574, .582, .590, .598, .606, .613, .620, .628, .634, .640, .645, .650, .656 } ); // Conductivity, in W/mK
+		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453 } ); // Viscosity, in Ns/m2
+		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
 		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
 		int const WaterIndex( 1 );
 		static std::string const RoutineName( "SurfaceGroundHeatExchanger:CalcHXEffectTerm" );
@@ -1380,7 +1380,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// Calculate the Nusselt number based on what flow regime one is in
 		if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
-			NuD = 0.023 * ( std::pow( ReD, ( 0.8 ) ) ) * ( std::pow( PRactual, ( 1.0 / 3.0 ) ) );
+			NuD = 0.023 * std::pow( ReD, 0.8 ) * std::pow( PRactual, 1.0 / 3.0 );
 		} else { // Laminar flow --> use constant surface temperature relation
 			NuD = 3.66;
 		}
@@ -1482,7 +1482,7 @@ namespace SurfaceGroundHeatExchanger {
 		ConvCoef = CalcASHRAESimpExtConvectCoeff( TopRoughness, ThisWindSpeed );
 		// radiation coefficient using surf temp from past time step
 		if ( std::abs( SurfTempAbs - SkyTempAbs ) > SmallNum ) {
-			RadCoef = StefBoltzmann * TopThermAbs * ( ( std::pow( SurfTempAbs, 4 ) ) - ( std::pow( SkyTempAbs, 4 ) ) ) / ( SurfTempAbs - SkyTempAbs );
+			RadCoef = StefBoltzmann * TopThermAbs * ( pow_4( SurfTempAbs ) - pow_4( SkyTempAbs ) ) / ( SurfTempAbs - SkyTempAbs );
 		} else {
 			RadCoef = 0.0;
 		}
@@ -1558,7 +1558,7 @@ namespace SurfaceGroundHeatExchanger {
 
 			// radiation coefficient using surf temp from past time step
 			if ( std::abs( SurfTempAbs - ExtTempAbs ) > SmallNum ) {
-				RadCoef = StefBoltzmann * TopThermAbs * ( ( std::pow( SurfTempAbs, 4 ) ) - ( std::pow( ExtTempAbs, 4 ) ) ) / ( SurfTempAbs - ExtTempAbs );
+				RadCoef = StefBoltzmann * TopThermAbs * ( pow_4( SurfTempAbs ) - pow_4( ExtTempAbs ) ) / ( SurfTempAbs - ExtTempAbs );
 			} else {
 				RadCoef = 0.0;
 			}

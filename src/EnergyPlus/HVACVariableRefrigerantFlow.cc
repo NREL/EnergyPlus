@@ -942,7 +942,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			VRF( VRFCond ).HRTime = max( 0.0, CurrentEndTime - VRF( VRFCond ).HRTimer );
-			if ( VRF( VRFCond ).HRTime < ( HRCapTC * 5. ) ) {
+			if ( VRF( VRFCond ).HRTime < ( HRCapTC * 5.0 ) ) {
 				if ( HRCapTC > 0.0 ) {
 					SUMultiplier = min( 1.0, 1.0 - std::exp( -VRF( VRFCond ).HRTime / HRCapTC ) );
 				} else {
@@ -1102,7 +1102,7 @@ namespace HVACVariableRefrigerantFlow {
 				// this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond)%TUCoolingLoad
 				VRF( VRFCond ).OperatingCoolingCOP = ( VRF( VRFCond ).TotalCoolingCapacity ) / ( VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
 			} else {
-				VRF( VRFCond ).OperatingCoolingCOP = 0.;
+				VRF( VRFCond ).OperatingCoolingCOP = 0.0;
 			}
 		}
 		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
@@ -1110,7 +1110,7 @@ namespace HVACVariableRefrigerantFlow {
 				// this calc should use deleivered capacity, not condenser capacity, use VRF(VRFCond)%TUHeatingLoad
 				VRF( VRFCond ).OperatingHeatingCOP = ( VRF( VRFCond ).TotalHeatingCapacity ) / ( VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
 			} else {
-				VRF( VRFCond ).OperatingHeatingCOP = 0.;
+				VRF( VRFCond ).OperatingHeatingCOP = 0.0;
 			}
 		}
 
@@ -3582,7 +3582,7 @@ namespace HVACVariableRefrigerantFlow {
 					TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) = false;
 					TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) = true;
 				}
-			} else if ( VRF( VRFCond ).EMSValueForHPOperatingMode == 2. ) { // Heating
+			} else if ( VRF( VRFCond ).EMSValueForHPOperatingMode == 2.0 ) { // Heating
 				HeatingLoad( VRFCond ) = true;
 				CoolingLoad( VRFCond ) = false;
 				QZnReq = LoadToHeatingSP;
@@ -4828,6 +4828,7 @@ namespace HVACVariableRefrigerantFlow {
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 		Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4963,7 +4964,7 @@ namespace HVACVariableRefrigerantFlow {
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						if ( VRFTU( VRFTUNum ).IterLimitExceeded == 0 ) {
-							gio::write( IterNum, "*" ) << MaxIte;
+							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
 							ShowWarningMessage( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 							ShowContinueError( " Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum );
@@ -5311,9 +5312,9 @@ namespace HVACVariableRefrigerantFlow {
 				VRFTU( VRFTUNum ).ParasiticElecCoolConsumption = VRFTU( VRFTUNum ).ParasiticCoolElecPower * ReportingConstant;
 			} else {
 				// split parasitic between both reporting variables
-				VRFTU( VRFTUNum ).ParasiticCoolElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.;
+				VRFTU( VRFTUNum ).ParasiticCoolElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.0;
 				VRFTU( VRFTUNum ).ParasiticElecCoolConsumption = VRFTU( VRFTUNum ).ParasiticCoolElecPower * ReportingConstant;
-				VRFTU( VRFTUNum ).ParasiticHeatElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.;
+				VRFTU( VRFTUNum ).ParasiticHeatElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.0;
 				VRFTU( VRFTUNum ).ParasiticElecHeatConsumption = VRFTU( VRFTUNum ).ParasiticHeatElecPower * ReportingConstant;
 			}
 		}

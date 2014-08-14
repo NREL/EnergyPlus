@@ -548,7 +548,7 @@
     Condenser Loop Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Loop Demand Branches,  !- Demand Side Branch List Name
     Condenser Loop Demand Connectors,  !- Demand Side Connector List Name
-    SEQUENTIAL;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
 !========================CONDENSER LOOP SUPPLY SIDE LOOP CONSTRUCTION========================
 !-----------------------LISTING AND MODELING ALL THE SUPPLY SIDE BRANCHES--------------------

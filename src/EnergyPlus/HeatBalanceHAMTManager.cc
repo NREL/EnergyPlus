@@ -91,11 +91,11 @@ namespace HeatBalanceHAMTManager {
 	int const ittermax( 150 ); // Maximum Number of itterations
 	int const adjmax( 6 ); // Maximum Number of Adjacent Cells
 
-	Real64 const wdensity( 1000. ); // Density of water kg.m-3
-	Real64 const wspech( 4180. ); // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
-	Real64 const whv( 2489000. ); // Evaporation enthalpy of water J.kg-1
+	Real64 const wdensity( 1000.0 ); // Density of water kg.m-3
+	Real64 const wspech( 4180.0 ); // Specific Heat Capacity of Water J.kg-1.K-1 (at 20C)
+	Real64 const whv( 2489000.0 ); // Evaporation enthalpy of water J.kg-1
 	Real64 const convt( 0.002 ); // Temperature convergence limit
-	Real64 const qvplim( 100000. ); // Maximum latent heat W
+	Real64 const qvplim( 100000.0 ); // Maximum latent heat W
 	Real64 const rhmax( 1.01 ); // Maximum RH value
 
 	static std::string const BlankString;
@@ -1458,7 +1458,7 @@ namespace HeatBalanceHAMTManager {
 			// fix HAMT values for this surface
 			cells( cid ).temp = cells( cid ).tempp1;
 			cells( cid ).rh = cells( cid ).rhp1;
-			cells( cid ).rhp = cells( cid ).rh * 100.;
+			cells( cid ).rhp = cells( cid ).rh * 100.0;
 			if ( cells( cid ).density > 0.0 ) {
 				cells( cid ).wreport = cells( cid ).water / cells( cid ).density;
 				watermass += ( cells( cid ).water * cells( cid ).volume );
@@ -1654,7 +1654,7 @@ namespace HeatBalanceHAMTManager {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		WVDC = ( 2.e-7 * std::pow( ( Temperature + KelvinConv ), 0.81 ) ) / ambp;
+		WVDC = ( 2.e-7 * std::pow( Temperature + KelvinConv, 0.81 ) ) / ambp;
 
 		return WVDC;
 	}

@@ -606,7 +606,7 @@ namespace UserDefinedComponents {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -638,7 +638,7 @@ namespace UserDefinedComponents {
 		std::string LoopStr;
 		int aArgCount;
 		int StackMngrNum;
-		bool lDummy;
+		static bool lDummy; //Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 		//  INTEGER  :: alphaNum
 		//  INTEGER  :: Loop
 		int MgrCountTest;
@@ -1102,7 +1102,7 @@ namespace UserDefinedComponents {
 						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).HowLoadServed = HowMet_NoneDemand;
 						UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 						//Setup Internal Variables
-						gio::write( LoopStr, "*" ) << ConnectionLoop;
+						gio::write( LoopStr, fmtLD ) << ConnectionLoop;
 						strip( LoopStr );
 						//model input related internal variables
 						SetupEMSInternalVariable( "Inlet Temperature for Plant Connection " + LoopStr, UserZoneAirHVAC( CompLoop ).Name, "[C]", UserZoneAirHVAC( CompLoop ).Loop( ConnectionLoop ).InletTemp );

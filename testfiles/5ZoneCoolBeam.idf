@@ -2705,7 +2705,7 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Hot Water Loop Setpoint Manager,  !- Name
@@ -3022,7 +3022,7 @@
     Primary CW Demand Outlet Node,  !- Demand Side Outlet Node Name
     Primary Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Primary Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   Sizing:Plant,
     Primary Chilled Water Loop,  !- Plant or Condenser Loop Name
@@ -3309,7 +3309,7 @@
     Secondary CW Demand Outlet Node,  !- Demand Side Outlet Node Name
     Secondary Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Secondary Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Secondary Chilled Water Loop Setpoint Manager,  !- Name
@@ -3581,7 +3581,7 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name

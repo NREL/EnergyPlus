@@ -801,7 +801,7 @@ namespace ZoneEquipmentManager {
 		HeatPeakDateHrMin = "";
 
 		ZoneSizThermSetPtHi = 0.0;
-		ZoneSizThermSetPtLo = 1000.;
+		ZoneSizThermSetPtLo = 1000.0;
 
 		for ( DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum ) {
 			DesDayWeath( DesDayNum ).Temp.allocate( NumOfTimeStepInHour * 24 );
@@ -1743,7 +1743,7 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		static gio::Fmt const ZSizeFmt10( "('Time')" );
 		static gio::Fmt const ZSizeFmt11( "(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )" );
 		static gio::Fmt const ZSizeFmt20( "(I2.2,':',I2.2,':00')" );
@@ -2272,7 +2272,7 @@ namespace ZoneEquipmentManager {
 					TotCoolSizMult = FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor;
 				}
 				// If the cooling sizing multiplier is not 1, adjust the cooling design data
-				if ( std::abs( TotCoolSizMult - 1.0 ) > .00001 ) {
+				if ( std::abs( TotCoolSizMult - 1.0 ) > 0.00001 ) {
 					if ( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
 						TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax;
 						DDNum = FinalZoneSizing( CtrlZoneNum ).CoolDDNum;
@@ -2399,7 +2399,7 @@ namespace ZoneEquipmentManager {
 					TotHeatSizMult = FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
 				}
 
-				if ( std::abs( TotHeatSizMult - 1.0 ) > .00001 ) {
+				if ( std::abs( TotHeatSizMult - 1.0 ) > 0.00001 ) {
 					if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
 						TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
 						DDNum = FinalZoneSizing( CtrlZoneNum ).HeatDDNum;
@@ -3040,66 +3040,49 @@ namespace ZoneEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string EquipTypeTemp;
-		std::string EquipNameTemp;
-		int EquipTypeNum;
-		int EquipPtrTemp;
-		int ComparedEquipTypeNum;
-		int TempNum;
 		int CurEqHeatingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
 		int CurEqCoolingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
-		int NumOfEquipTypes; // For improved readability
 
-		NumOfEquipTypes = ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes;
-		PrioritySimOrder.EquipType() = "";
-		PrioritySimOrder.EquipType_Num() = 0;
-		PrioritySimOrder.EquipName() = "";
-		PrioritySimOrder.EquipPtr() = 0;
+		auto const & zeq( ZoneEquipList( ControlledZoneNum ) );
+		int const NumOfEquipTypes( zeq.NumOfEquipTypes );
+		for ( int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
+			auto & pso( PrioritySimOrder( EquipTypeNum ) );
+			pso.EquipType = zeq.EquipType( EquipTypeNum );
+			pso.EquipName = zeq.EquipName( EquipTypeNum );
+			pso.EquipType_Num = zeq.EquipType_Num( EquipTypeNum );
+			pso.CoolingPriority = zeq.CoolingPriority( EquipTypeNum );
+			pso.HeatingPriority = zeq.HeatingPriority( EquipTypeNum );
+			pso.EquipPtr = DefaultSimOrder( EquipTypeNum );
+		}
+		for ( int EquipTypeNum = NumOfEquipTypes + 1, EquipTypeNum_end = PrioritySimOrder.u(); EquipTypeNum <= EquipTypeNum_end; ++EquipTypeNum ) { // Reset unused upper array portion
+			auto & pso( PrioritySimOrder( EquipTypeNum ) );
+			pso.EquipType.clear();
+			pso.EquipName.clear();
+			pso.EquipType_Num = 0;
+			pso.EquipPtr = 0;
+		}
 
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipType() = ZoneEquipList( ControlledZoneNum ).EquipType( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipName() = ZoneEquipList( ControlledZoneNum ).EquipName( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipType_Num() = ZoneEquipList( ControlledZoneNum ).EquipType_Num( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).CoolingPriority() = ZoneEquipList( ControlledZoneNum ).CoolingPriority( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).HeatingPriority() = ZoneEquipList( ControlledZoneNum ).HeatingPriority( {1,NumOfEquipTypes} );
+		for ( int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
+			auto & pso( PrioritySimOrder( EquipTypeNum ) );
 
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipPtr() = DefaultSimOrder( {1,NumOfEquipTypes} );
+			CurEqHeatingPriority = pso.HeatingPriority;
+			CurEqCoolingPriority = pso.CoolingPriority;
 
-		for ( EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
+			for ( int ComparedEquipTypeNum = EquipTypeNum; ComparedEquipTypeNum <= NumOfEquipTypes; ++ComparedEquipTypeNum ) {
+				auto & psc( PrioritySimOrder( ComparedEquipTypeNum ) );
 
-			CurEqHeatingPriority = PrioritySimOrder( EquipTypeNum ).HeatingPriority;
-			CurEqCoolingPriority = PrioritySimOrder( EquipTypeNum ).CoolingPriority;
+				if ( ( CurEqCoolingPriority > psc.CoolingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) || ( CurEqHeatingPriority > psc.HeatingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired >= 0.0 ) ) {
 
-			for ( ComparedEquipTypeNum = EquipTypeNum; ComparedEquipTypeNum <= NumOfEquipTypes; ++ComparedEquipTypeNum ) {
+					//Tuned C++ string swap avoids copying
+					std::swap( pso.EquipType, psc.EquipType );
+					std::swap( pso.EquipName, psc.EquipName );
+					std::swap( pso.EquipPtr, psc.EquipPtr );
+					std::swap( pso.EquipType_Num, psc.EquipType_Num );
+					std::swap( pso.CoolingPriority, psc.CoolingPriority );
+					std::swap( pso.HeatingPriority, psc.HeatingPriority );
 
-				if ( ( CurEqCoolingPriority > PrioritySimOrder( ComparedEquipTypeNum ).CoolingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) || ( CurEqHeatingPriority > PrioritySimOrder( ComparedEquipTypeNum ).HeatingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired >= 0.0 ) ) {
-
-					EquipTypeTemp = PrioritySimOrder( EquipTypeNum ).EquipType;
-					PrioritySimOrder( EquipTypeNum ).EquipType = PrioritySimOrder( ComparedEquipTypeNum ).EquipType;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipType = EquipTypeTemp;
-
-					EquipNameTemp = PrioritySimOrder( EquipTypeNum ).EquipName;
-					PrioritySimOrder( EquipTypeNum ).EquipName = PrioritySimOrder( ComparedEquipTypeNum ).EquipName;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipName = EquipNameTemp;
-
-					EquipPtrTemp = PrioritySimOrder( EquipTypeNum ).EquipPtr;
-					PrioritySimOrder( EquipTypeNum ).EquipPtr = PrioritySimOrder( ComparedEquipTypeNum ).EquipPtr;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipPtr = EquipPtrTemp;
-
-					EquipPtrTemp = PrioritySimOrder( EquipTypeNum ).EquipType_Num;
-					PrioritySimOrder( EquipTypeNum ).EquipType_Num = PrioritySimOrder( ComparedEquipTypeNum ).EquipType_Num;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipType_Num = EquipPtrTemp;
-
-					TempNum = PrioritySimOrder( EquipTypeNum ).CoolingPriority;
-					PrioritySimOrder( EquipTypeNum ).CoolingPriority = PrioritySimOrder( ComparedEquipTypeNum ).CoolingPriority;
-					PrioritySimOrder( ComparedEquipTypeNum ).CoolingPriority = TempNum;
-
-					CurEqCoolingPriority = PrioritySimOrder( EquipTypeNum ).CoolingPriority;
-
-					TempNum = PrioritySimOrder( EquipTypeNum ).HeatingPriority;
-					PrioritySimOrder( EquipTypeNum ).HeatingPriority = PrioritySimOrder( ComparedEquipTypeNum ).HeatingPriority;
-					PrioritySimOrder( ComparedEquipTypeNum ).HeatingPriority = TempNum;
-
-					CurEqHeatingPriority = PrioritySimOrder( EquipTypeNum ).HeatingPriority;
+					CurEqCoolingPriority = pso.CoolingPriority;
+					CurEqHeatingPriority = pso.HeatingPriority;
 
 				}
 

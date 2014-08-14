@@ -1748,12 +1748,12 @@ namespace HVACHXAssistedCoolingCoil {
 			if ( WhichCoil == 0 ) {
 				ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 				ErrorsFound = true;
-				MaxWaterFlowRate = -1000.;
+				MaxWaterFlowRate = -1000.0;
 			}
 		} else {
 			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
-			MaxWaterFlowRate = -1000.;
+			MaxWaterFlowRate = -1000.0;
 		}
 
 		return MaxWaterFlowRate;

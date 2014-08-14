@@ -3,16 +3,34 @@ Project(EnergyPlus)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 set( CMAKE_VERSION_MAJOR 8 )
-set( CMAKE_VERSION_MINOR 2 )
-set( CMAKE_VERSION_PATCH 0 ) 
+set( CMAKE_VERSION_MINOR 1 )
+set( CMAKE_VERSION_PATCH 2 ) 
+
+set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
+find_package(Git)
+if(GIT_FOUND)
+  execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
+                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                  TIMEOUT 10
+                  RESULT_VARIABLE RESULT
+                  OUTPUT_VARIABLE GIT_VERSION
+                  ERROR_QUIET
+                  OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(${RESULT} EQUAL 0 AND NOT "${GIT_VERSION}" EQUAL "${CMAKE_VERSION_BUILD}")
+    set(CMAKE_VERSION_BUILD ${GIT_VERSION} CACHE STRING "Build number" FORCE) # git sha
+  endif()
+
+  get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" PATH)
+else()
+  set(GIT_DIR "")
+endif()
+
+
+set(CPACK_PACKAGE_CONTACT "Kyle Benne <Kyle.Benne@nrel.gov>")
 
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
-
-# Not yet released by CMake, but is being developed
-# This will help us set the proper options for c++11 across various configurations
-#FIND_PACKAGE( CXXFeatures ) 
 
 if (MSVC)
   set(gtest_force_shared_crt ON)
@@ -28,17 +46,20 @@ include(cmake/CompilerFlags.cmake)
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
+
+ADD_SUBDIRECTORY(third_party/SQLite)
+ADD_SUBDIRECTORY(third_party/ObjexxFCL)
+ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_TESTING )
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
-  include(CTest) 
+  include(CTest)
   ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
+  ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
 endif()
-
-ADD_SUBDIRECTORY(third_party/ObjexxFCL)
-ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
@@ -50,7 +71,7 @@ install( FILES idd/Energy+.idd DESTINATION ./ )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
-    "${CMAKE_BINARY_DIR};EnergyPLus;ALL;/"
+    "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
   )
 
   if( BUILD_FORTRAN )

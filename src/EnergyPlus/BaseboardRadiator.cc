@@ -791,7 +791,7 @@ namespace BaseboardRadiator {
 						Par( 1 ) = DesCoilLoad;
 						Par( 2 ) = BaseboardNum;
 						// set the lower and upper limits on the UA
-						UA0 = .001 * DesCoilLoad;
+						UA0 = 0.001 * DesCoilLoad;
 						UA1 = DesCoilLoad;
 						// Invert the baseboard model: given the design inlet conditions and the design load,
 						// find the design UA.
@@ -961,13 +961,13 @@ namespace BaseboardRadiator {
 			// Effectiveness = 1. - EXP((1./CapacityRatio)*(NTU)**0.22*(EXP(-CapacityRatio*(NTU)**0.78)-1.))
 			// To prevent possible underflows (numbers smaller than the computer can handle) we must break
 			// the calculation up into steps and check the size of the exponential arguments.
-			AA = -CapacityRatio * std::pow( ( NTU ), 0.78 );
+			AA = -CapacityRatio * std::pow( NTU, 0.78 );
 			if ( AA < EXP_LowerLimit ) {
 				BB = 0.0;
 			} else {
 				BB = std::exp( AA );
 			}
-			CC = ( 1.0 / CapacityRatio ) * std::pow( ( NTU ), 0.22 ) * ( BB - 1.0 );
+			CC = ( 1.0 / CapacityRatio ) * std::pow( NTU, 0.22 ) * ( BB - 1.0 );
 			if ( CC < EXP_LowerLimit ) {
 				Effectiveness = 1.0;
 			} else {

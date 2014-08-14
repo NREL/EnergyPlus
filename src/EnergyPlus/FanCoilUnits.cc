@@ -873,7 +873,7 @@ namespace FanCoilUnits {
 			// set the mass flow rates from the input volume flow rates
 			FanCoil( FanCoilNum ).MaxAirMassFlow = RhoAir * FanCoil( FanCoilNum ).MaxAirVolFlow;
 			FanCoil( FanCoilNum ).OutAirMassFlow = RhoAir * FanCoil( FanCoilNum ).OutAirVolFlow;
-			rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60., PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 			FanCoil( FanCoilNum ).MaxHotWaterFlow = rho * FanCoil( FanCoilNum ).MaxHotWaterVolFlow;
 			FanCoil( FanCoilNum ).MinHotWaterFlow = rho * FanCoil( FanCoilNum ).MinHotWaterVolFlow;
@@ -1295,6 +1295,7 @@ namespace FanCoilUnits {
 						} else {
 							FinalZoneSizing(CurZoneEqNum).DesHeatOAFlowFrac = 0.0;
 						}
+<<<<<<< HEAD
 						if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
 							zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
 							CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
@@ -1330,6 +1331,19 @@ namespace FanCoilUnits {
 							rho = GetDensityGlycol(PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidName, 60., PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidIndex, RoutineNameNoSpace);
 							Cp = GetSpecificHeatGlycol(PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidName, 60., PlantLoop(FanCoil(FanCoilNum).HWLoopNum).FluidIndex, RoutineNameNoSpace);
 							MaxHotWaterVolFlowDes = DesCoilLoad / (PlantSizData(PltSizHeatNum).DeltaT * Cp * rho);
+=======
+						CoilInTemp = FCOAFrac * FinalZoneSizing( CurZoneEqNum ).OutTempAtHeatPeak + ( 1.0 - FCOAFrac ) * FinalZoneSizing( CurZoneEqNum ).ZoneTempAtHeatPeak;
+						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
+						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).HeatDesHumRat;
+						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
+						FanCoil( FanCoilNum ).DesHeatingLoad = DesCoilLoad;
+						if ( DesCoilLoad >= SmallLoad ) {
+							rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
+
+							Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
+
+							MaxHotWaterVolFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+>>>>>>> remotes/origin/develop
 						} else {
 							MaxHotWaterVolFlowDes = 0.0;
 						}
@@ -1392,6 +1406,7 @@ namespace FanCoilUnits {
 						} else {
 							FinalZoneSizing(CurZoneEqNum).DesCoolOAFlowFrac = 0.0;
 						}
+<<<<<<< HEAD
 						if (FanCoil(FanCoilNum).HVACSizingIndex > 0) {
 							zoneHVACIndex = FanCoil(FanCoilNum).HVACSizingIndex;
 							CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
@@ -1425,6 +1440,26 @@ namespace FanCoilUnits {
 							DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 							DesCoilLoad = TempSize;
+=======
+						CoilInTemp = FCOAFrac * FinalZoneSizing( CurZoneEqNum ).OutTempAtCoolPeak + ( 1.0 - FCOAFrac ) * FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak;
+						CoilInHumRat = FCOAFrac * FinalZoneSizing( CurZoneEqNum ).OutHumRatAtCoolPeak + ( 1.0 - FCOAFrac ) * FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak;
+						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).CoolDesTemp;
+						CoilOutHumRat = FinalZoneSizing( CurZoneEqNum ).CoolDesHumRat;
+						if ( CoilOutHumRat > CoilInHumRat ) {
+							if ( CoilInHumRat > 0.016 ) {
+								CoilOutHumRat = 0.5 * CoilInHumRat;
+							} else {
+								CoilOutHumRat = CoilInHumRat;
+							}
+						}
+						DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow * ( PsyHFnTdbW( CoilInTemp, CoilInHumRat ) - PsyHFnTdbW( CoilOutTemp, CoilOutHumRat ) );
+						FanCoil( FanCoilNum ).DesCoolingLoad = DesCoilLoad;
+						if ( DesCoilLoad >= SmallLoad ) {
+
+							rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineNameNoSpace );
+
+							Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineNameNoSpace );
+>>>>>>> remotes/origin/develop
 
 						}
 						FanCoil(FanCoilNum).DesCoolingLoad = DesCoilLoad;

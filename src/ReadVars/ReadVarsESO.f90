@@ -28,19 +28,20 @@
 
   character(len=*),parameter :: blank=' '
   character(len=*),parameter :: cTab=Char(9)
-  integer,parameter :: maxnamelength=100
+  integer,parameter :: maxnamelength=500
   character(len=*),parameter,dimension(12) :: months=(/'January  ','February ','March    ',  &
                                                        'April    ','May      ','June     ',  &
                                                        'July     ','August   ','September',  &
                                                        'October  ','November ','December '/)
-  integer,parameter,dimension(12) :: monlen=(/len_trim('January'),len_trim('February'),len_trim('March'),  &
-                                              len_trim('April'),len_trim('May'),len_trim('June'),   &
-											  len_trim('July'),len_trim('August'),len_trim('September'),  &
-											  len_trim('October'),len_trim('November'),len_trim('December')/)
+  integer,parameter,dimension(12) :: monlen=(/ &
+   len_trim('January'),len_trim('February'),len_trim('March'),  &
+   len_trim('April'),len_trim('May'),len_trim('June'),   &
+   len_trim('July'),len_trim('August'),len_trim('September'),  &
+   len_trim('October'),len_trim('November'),len_trim('December')/)
   character(len=1),  parameter :: charcomma=char(44) !comma
   character(len=1),  parameter :: chartab=char(9)    !tab
   character(len=1),  parameter :: charspace=char(32) !space
-  character(len=100) varfilename
+  character(len=500) varfilename
   character(len=*), parameter :: inoutformat='(A)'
   character(len=*), parameter :: dateformat="(1x,i2.2,'/',i2.2,2x,i2.2,':',i2.2,':',i2.2)"
   !   Lengths, including extra following ","
@@ -54,8 +55,8 @@
   integer :: cursnummax=10000
   integer :: incnum=1000
   integer, parameter :: numallowed=255
-  character(len=100) inputfilename
-  character(len=100) outputfilename
+  character(len=500) inputfilename
+  character(len=500) outputfilename
   integer esounit,csvunit
   character(len=500) line
   integer i,lineno,j
@@ -1555,4 +1556,3 @@ END FUNCTION myindex
       END SUBROUTINE DisplayString
 
 end program readvarseso
-
