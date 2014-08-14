@@ -46604,6 +46604,7 @@ Humidifier:Steam:Electric,
       \units m3/s
       \minimum 0.0
       \ip-units gal/min
+      \autosizable
   N2, \field Rated Power
       \type real
       \units W
