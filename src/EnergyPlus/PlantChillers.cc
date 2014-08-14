@@ -3058,8 +3058,10 @@ namespace PlantChillers {
 				ErrorsFound = true;
 			} else {
 				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
-					if ( ElectricChiller( ChillNum ).Base.NomCap > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Nominal Capacity [W]", ElectricChiller( ChillNum ).Base.NomCap );
+					if ( ! ElectricChiller( ChillNum ).Base.UserSpecSizesAlreadyReported ) {
+						if ( ElectricChiller( ChillNum ).Base.NomCap > 0.0 ) {
+							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Nominal Capacity [W]", ElectricChiller( ChillNum ).Base.NomCap );
+						}
 					}
 				}
 			}
@@ -3073,10 +3075,8 @@ namespace PlantChillers {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				tmpEvapVolFlowRate = PlantSizData( PltSizNum ).DesVolFlowRate * ElectricChiller( ChillNum ).Base.SizFac;
 				if ( ! IsAutoSize ) tmpEvapVolFlowRate = ElectricChiller( ChillNum ).Base.EvapVolFlowRate;
-				//IF (PlantSizesOkayToFinalize) ElectricChiller(ChillNum)%Base%EvapVolFlowRate = tmpEvapVolFlowRate
 			} else {
 				if ( IsAutoSize ) tmpEvapVolFlowRate = 0.0;
-				//IF (PlantSizesOkayToFinalize)  ElectricChiller(ChillNum)%Base%EvapVolFlowRate = tmpEvapVolFlowRate
 			}
 			if ( PlantSizesOkayToFinalize ) {
 				if ( IsAutoSize ) {
@@ -3110,8 +3110,10 @@ namespace PlantChillers {
 				ErrorsFound = true;
 			} else {
 				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
-					if ( ElectricChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.EvapVolFlowRate );
+					if ( ! ElectricChiller( ChillNum ).Base.UserSpecSizesAlreadyReported ) {
+						if ( ElectricChiller( ChillNum ).Base.EvapVolFlowRate > 0.0 ) {
+							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Design Chilled Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.EvapVolFlowRate );
+						}
 					}
 				}
 			}
@@ -3168,8 +3170,10 @@ namespace PlantChillers {
 				ErrorsFound = true;
 			} else {
 				if ( ! ElectricChiller( ChillNum ).Base.IsThisSized ) {
-					if ( ElectricChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) {
-						ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.CondVolFlowRate );
+					if ( ! ElectricChiller( ChillNum ).Base.UserSpecSizesAlreadyReported ) {
+						if ( ElectricChiller( ChillNum ).Base.CondVolFlowRate > 0.0 ) {
+							ReportSizingOutput( "Chiller:Electric", ElectricChiller( ChillNum ).Base.Name, "User-Specified Design Condenser Water Flow Rate [m3/s]", ElectricChiller( ChillNum ).Base.CondVolFlowRate );
+						}
 					}
 				}
 			}
@@ -3227,6 +3231,9 @@ namespace PlantChillers {
 			PreDefTableEntry( pdchMechNomEff, equipName, ElectricChiller( ChillNum ).Base.COP );
 			PreDefTableEntry( pdchMechNomCap, equipName, ElectricChiller( ChillNum ).Base.NomCap );
 		}
+		
+		// no matter what, flush out the user-specified sizing already reported flag to true after first pass
+		ElectricChiller( ChillNum ).Base.UserSpecSizesAlreadyReported = true;
 
 	}
 

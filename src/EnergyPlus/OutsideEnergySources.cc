@@ -579,9 +579,12 @@ namespace OutsideEnergySources {
 					ShowContinueError( "Occurs in DistrictCooling object=" + EnergySource( EnergySourceNum ).Name );
 					ErrorsFound = true;
 				} else {
-					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "DistrictCooling", EnergySource( EnergySourceNum ).Name, 
-							"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
+					if ( ! EnergySource( EnergySourceNum ).userSpecCapacityAlreadyReported ) {
+						if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
+							ReportSizingOutput( "DistrictCooling", EnergySource( EnergySourceNum ).Name, 
+								"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
+						}
+						EnergySource( EnergySourceNum ).userSpecCapacityAlreadyReported = true;
 					}
 				}
 			}
@@ -627,9 +630,12 @@ namespace OutsideEnergySources {
 					ShowContinueError( "Occurs in DistrictHeating object=" + EnergySource( EnergySourceNum ).Name );
 					ErrorsFound = true;
 				} else {
-					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "DistrictHeating", EnergySource( EnergySourceNum ).Name, 
-							"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
+					if ( ! EnergySource( EnergySourceNum ).userSpecCapacityAlreadyReported ) {
+						if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
+							ReportSizingOutput( "DistrictHeating", EnergySource( EnergySourceNum ).Name, 
+								"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
+						}
+						EnergySource( EnergySourceNum ).userSpecCapacityAlreadyReported = true;
 					}
 				}
 			}
