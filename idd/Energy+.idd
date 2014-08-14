@@ -46604,6 +46604,7 @@ Humidifier:Steam:Electric,
       \units m3/s
       \minimum 0.0
       \ip-units gal/min
+      \autosizable
   N2, \field Rated Power
       \type real
       \units W
@@ -57141,7 +57142,7 @@ ChillerHeater:Absorption:DoubleEffect,
 
 HeatPump:WaterToWater:EquationFit:Heating,
         \memo simple water-water hp curve-fit model
-        \min-fields 19
+        \min-fields 14
    A1,  \field Name
         \required-field
    A2,  \field Source Side Inlet Node Name
@@ -57161,17 +57162,20 @@ HeatPump:WaterToWater:EquationFit:Heating,
         \type real
         \minimum> 0.0
         \units m3/s
+        \autosizable
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
+        \autosizable
    N3,  \field Rated Heating Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
-   N4,  \field Rated Heating Power Consumption
+        \autosizable
+   N4,  \field Rated Heating COP
         \required-field
         \type real
         \minimum> 0.0
@@ -57188,28 +57192,28 @@ HeatPump:WaterToWater:EquationFit:Heating,
    N8,  \field Heating Capacity Coefficient 4
         \required-field
         \type real
-   N9,  \field Heating Capacity Coefficient 5
+   N9;  \field Heating Capacity Coefficient 5
         \required-field
         \type real
-   N10, \field Heating Compressor Power Coefficient 1
-        \required-field
-        \type real
-   N11, \field Heating Compressor Power Coefficient 2
-        \required-field
-        \type real
-   N12, \field Heating Compressor Power Coefficient 3
-        \required-field
-        \type real
-   N13, \field Heating Compressor Power Coefficient 4
-        \required-field
-        \type real
-   N14; \field Heating Compressor Power Coefficient 5
-        \required-field
-        \type real
+!   N10, \field Heating Compressor Power Coefficient 1
+!        \required-field
+!        \type real
+!   N11, \field Heating Compressor Power Coefficient 2
+!        \required-field
+!        \type real
+!   N12, \field Heating Compressor Power Coefficient 3
+!        \required-field
+!        \type real
+!   N13, \field Heating Compressor Power Coefficient 4
+!        \required-field
+!        \type real
+!   N14; \field Heating Compressor Power Coefficient 5
+!        \required-field
+!        \type real
 
 HeatPump:WaterToWater:EquationFit:Cooling,
         \memo simple water-water heatpump curve-fit model
-        \min-fields 19
+        \min-fields 14
    A1,  \field Name
         \required-field
    A2,  \field Source Side Inlet Node Name
@@ -57229,17 +57233,20 @@ HeatPump:WaterToWater:EquationFit:Cooling,
         \type real
         \minimum> 0.0
         \units m3/s
+        \autosizable
    N2,  \field Rated Source Side Flow Rate
         \required-field
         \type real
         \minimum> 0.0
         \units m3/s
+        \autosizable
    N3,  \field Rated Cooling Capacity
         \required-field
         \type real
         \minimum> 0.0
         \units W
-   N4,  \field Rated Cooling Power Consumption
+        \autosizable
+   N4,  \field Rated Cooling COP
         \required-field
         \type real
         \minimum> 0.0
@@ -57256,24 +57263,24 @@ HeatPump:WaterToWater:EquationFit:Cooling,
    N8,  \field Cooling Capacity Coefficient 4
         \required-field
         \type real
-   N9,  \field Cooling Capacity Coefficient 5
+   N9;  \field Cooling Capacity Coefficient 5
         \required-field
         \type real
-   N10, \field Cooling Compressor Power Coefficient 1
-        \required-field
-        \type real
-   N11, \field Cooling Compressor Power Coefficient 2
-        \required-field
-        \type real
-   N12, \field Cooling Compressor Power Coefficient 3
-        \required-field
-        \type real
-   N13, \field Cooling Compressor Power Coefficient 4
-        \required-field
-        \type real
-   N14; \field Cooling Compressor Power Coefficient 5
-        \required-field
-        \type real
+!   N10, \field Cooling Compressor Power Coefficient 1
+!        \required-field
+!        \type real
+!   N11, \field Cooling Compressor Power Coefficient 2
+!        \required-field
+!        \type real
+!   N12, \field Cooling Compressor Power Coefficient 3
+!        \required-field
+!        \type real
+!   N13, \field Cooling Compressor Power Coefficient 4
+!        \required-field
+!        \type real
+!   N14; \field Cooling Compressor Power Coefficient 5
+!        \required-field
+!        \type real
 
 HeatPump:WaterToWater:ParameterEstimation:Cooling,
   \memo OSU parameter estimation model
