@@ -32,10 +32,25 @@ namespace DataHVACGlobals {
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
 
 	extern int const CoolingAirflowSizing; // request sizing for cooling air flow rate
+	extern int const CoolingWaterflowSizing; // request sizing for cooling coil water flow rate
+	extern int const HeatingWaterflowSizing; // request sizing for heating coil water flow rate
+	extern int const CoolingWaterDesAirInletTempSizing; // request sizing for cooling water coil inlet air temp
+	extern int const CoolingWaterDesAirInletHumRatSizing; // request sizing for cooling water coil inlet air humidity ratio
+	extern int const CoolingWaterDesWaterInletTempSizing; // request sizing for cooling water coil inlet water temp
+	extern int const CoolingWaterDesAirOutletTempSizing; // request sizing for cooling water coil outlet air temp
+	extern int const CoolingWaterDesAirOutletHumRatSizing; // request sizing for cooling water coil outlet air humidity ratio
+	extern int const CoolingWaterNumofTubesPerRowSizing; // request sizing for cooling water coil number of tubes per row
+	extern int const HeatingWaterDesAirInletTempSizing; // request sizing for heating water coil inlet air temp
+	extern int const HeatingWaterDesAirInletHumRatSizing; // request sizing for heating water coil inlet air humidity ratio
+	extern int const HeatingWaterDesCoilLoadUsedForUASizing; // request sizing for heating water coil capacity used for UA sizing
+	extern int const HeatingWaterDesCoilWaterVolFlowUsedForUASizing; // request sizing for heating water coil volume flow rate used for UA sizing
 	extern int const HeatingAirflowSizing; // request sizing for heating air flow rate
+	extern int const HeatingAirflowUASizing; // request sizing for heating air flow rate
 	extern int const SystemAirflowSizing; // request sizing for system air flow rate
 	extern int const CoolingCapacitySizing; // request sizing for cooling capacity
 	extern int const HeatingCapacitySizing; // request sizing for heating capacity
+	extern int const WaterHeatingCapacitySizing; // request sizing for heating capacity
+	extern int const WaterHeatingCoilUASizing; // request sizing for heating coil UA
 	extern int const SystemCapacitySizing; // request sizing for system capacity
 	extern int const CoolingSHRSizing; // request sizing for cooling SHR
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
