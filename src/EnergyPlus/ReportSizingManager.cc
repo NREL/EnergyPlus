@@ -24,6 +24,7 @@
 #include <FluidProperties.hh>
 #include <DataPlant.hh>
 #include <WaterCoils.hh>
+#include <Fans.hh>
 
 namespace EnergyPlus {
 
@@ -304,6 +305,8 @@ namespace ReportSizingManager {
 		using FluidProperties::GetDensityGlycol;
 		using DataPlant::PlantLoop;
 		using WaterCoils::SimpleHeatingCoilUAResidual;
+		using Fans::FanDesDT;
+		using DataAirSystems::PrimaryAirSystem;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Acc( 0.0001 ); // Accuracy of result
@@ -359,6 +362,11 @@ namespace ReportSizingManager {
 		Real64 UA1; // upper bound of UA for autosizing
 		Real64 MinFlowFrac; // minimum flow fraction from terminal unit []
 		Real64 TDpIn; // coil inlet air dew point temperature [C]
+		int SupFanNum;
+		int RetFanNum;
+		Real64 SupFanDT;
+		Real64 RetFanDT;
+		Real64 FanCoolLoad;
 		FArray1D< Real64 > Par( 4 ); // array passed to RegulaFalsi
 
 		AutosizeDes = 0.0;
@@ -367,6 +375,12 @@ namespace ReportSizingManager {
 		OASysFlag = false;
 		AirLoopSysFlag = false;
 		bCheckForZero = true;
+		CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+		SupFanDT = 0.0;
+		RetFanDT = 0.0;
+		SupFanNum = 0;
+		RetFanNum = 0;
+		FanCoolLoad = 0;
 
 		if ( SysSizingRunDone || ZoneSizingRunDone ) {
 			HardSizeNoDesRun = false;
@@ -1177,6 +1191,13 @@ namespace ReportSizingManager {
 					} else {
 						CheckSysSizing ( CompType, CompName );
 						DesVolFlow = DataFlowUsedForSizing;
+						if (DesVolFlow > 0.0) {
+							OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DesVolFlow;
+						}
+						else {
+							OutAirFrac = 1.0;
+						}
+						OutAirFrac = min(1.0, max(0.0, OutAirFrac));
 						if ( DesVolFlow >= SmallAirVolFlow ) {
 							if ( CurOASysNum > 0 ) { // coil is in the OA stream
 								CoilInTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
@@ -1190,12 +1211,6 @@ namespace ReportSizingManager {
 									CoilInTemp = FinalSysSizing ( CurSysNum ).CoolMixTemp;
 									CoilInHumRat = FinalSysSizing ( CurSysNum ).CoolMixHumRat;
 								} else { // there is precooling of OA stream
-									if ( DesVolFlow > 0.0 ) {
-										OutAirFrac = FinalSysSizing ( CurSysNum ).DesOutAirVolFlow / DesVolFlow;
-									} else {
-										OutAirFrac = 1.0;
-									}
-									OutAirFrac = min ( 1.0, max ( 0.0, OutAirFrac ) );
 									CoilInTemp = OutAirFrac * FinalSysSizing ( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing ( CurSysNum ).CoolRetTemp;
 									CoilInHumRat = OutAirFrac*FinalSysSizing ( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing ( CurSysNum ).CoolRetHumRat;
 								}
@@ -1214,7 +1229,13 @@ namespace ReportSizingManager {
 							} else {
 								TotCapTempModFac = 1.0;
 							}
-							PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) ) );
+							SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
+							RetFanNum = PrimaryAirSystem(CurSysNum).RetFanNum;
+							SupFanDT = FanDesDT(SupFanNum, DesVolFlow);
+							RetFanDT = FanDesDT(RetFanNum, DesVolFlow);
+							PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp));
+							FanCoolLoad = rhoair * DesVolFlow * CpAirStd * (SupFanDT + (1.0 - OutAirFrac)*RetFanDT);
+							PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) + FanCoolLoad ) );
 							if ( TotCapTempModFac > 0.0 ) {
 								NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;
 							} else {
@@ -1271,7 +1292,6 @@ namespace ReportSizingManager {
 					} else {
 						CoilInTemp = OutAirFrac * FinalSysSizing( CurSysNum ).HeatOutTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).HeatRetTemp;
 					}
-					CpAirStd = PsyCpAirFnWTdb( 0.0, 20.0 );
 					// coil load
 					if ( CurOASysNum > 0 ) {
 						if ( OASysEqSizing( CurOASysNum ).HeatingCapacity ) {

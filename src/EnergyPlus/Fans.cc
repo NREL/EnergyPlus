@@ -3126,7 +3126,10 @@ namespace Fans {
 		Real64 MotInAirFrac; // fraction of motor in the air stream
 		Real64 PowerLossToAir; // fan and motor loss to air stream (W)
 		//
-		if ( !(Fan(FanNum).FanType_Num == FanType_ComponentModel) ) {
+		if (FanNum == 0) {
+			DesignDeltaT = 0.0;
+		}
+		else if ( !(Fan(FanNum).FanType_Num == FanType_ComponentModel) ) {
 			DeltaP = Fan(FanNum).DeltaPress;
 			TotEff = Fan(FanNum).FanEff;
 			MotEff = Fan(FanNum).MotEff;
