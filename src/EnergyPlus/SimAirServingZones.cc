@@ -1836,6 +1836,9 @@ namespace SimAirServingZones {
 			    } // end of Branch loop
 				EndOfAirLoop: ;
 
+				PrimaryAirSystem(AirLoopNum).SupFanNum = SupFanIndex;
+				PrimaryAirSystem(AirLoopNum).RetFanNum = RetFanIndex;
+
 			} // end of AirLoop loop
 
 		} //one time flag
