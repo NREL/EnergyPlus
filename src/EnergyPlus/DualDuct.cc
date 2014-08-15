@@ -1873,7 +1873,7 @@ namespace DualDuct {
 					Node(OutletNode).GenContam = (Node(HotInletNode).GenContam * Node(HotInletNode).MassFlowRate + Node(ColdInletNode).GenContam * Node(ColdInletNode).MassFlowRate) / Node(OutletNode).MassFlowRate;
 				}
 				else {
-					Node(OutletNode).CO2 = max(Node(HotInletNode).GenContam, Node(ColdInletNode).GenContam);
+					Node(OutletNode).GenContam = max(Node(HotInletNode).GenContam, Node(ColdInletNode).GenContam);
 				}
 			}
 		} else if ( Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
@@ -1898,11 +1898,21 @@ namespace DualDuct {
 			Node( OutletNode ).Press = Node( OAInletNode ).Press;
 
 			if (Damper(DamperNum).RecircIsUsed) {
-				if (Contaminant.CO2Simulation) {
-					Node(OutletNode).CO2 = (Node(OAInletNode).CO2*Node(OAInletNode).MassFlowRate + Node(RAInletNode).CO2*Node(RAInletNode).MassFlowRate) / Node(OutletNode).MassFlowRate;
+				if (Node(OutletNode).MassFlowRate > 0.0){
+					if (Contaminant.CO2Simulation) {
+						Node(OutletNode).CO2 = (Node(OAInletNode).CO2*Node(OAInletNode).MassFlowRate + Node(RAInletNode).CO2*Node(RAInletNode).MassFlowRate) / Node(OutletNode).MassFlowRate;
+					}
+					if (Contaminant.GenericContamSimulation) {
+						Node(OutletNode).GenContam = (Node(OAInletNode).GenContam*Node(OAInletNode).MassFlowRate + Node(RAInletNode).GenContam*Node(RAInletNode).MassFlowRate) / Node(OutletNode).MassFlowRate;
+					}
 				}
-				if (Contaminant.GenericContamSimulation) {
-					Node(OutletNode).GenContam = (Node(OAInletNode).GenContam*Node(OAInletNode).MassFlowRate + Node(RAInletNode).GenContam*Node(RAInletNode).MassFlowRate) / Node(OutletNode).MassFlowRate;
+				else {
+					if (Contaminant.CO2Simulation) {
+						Node(OutletNode).CO2 = Node(OAInletNode).CO2;
+					}
+					if (Contaminant.GenericContamSimulation) {
+						Node(OutletNode).GenContam = Node(OAInletNode).GenContam;
+					}
 				}
 
 			} else {
