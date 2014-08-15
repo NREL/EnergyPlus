@@ -1864,21 +1864,16 @@ namespace DualDuct {
 			if (Contaminant.CO2Simulation) {
 				if (Node(OutletNode).MassFlowRate > 0.0) {
 					Node(OutletNode).CO2 = (Node(HotInletNode).CO2 * Node(HotInletNode).MassFlowRate + Node(ColdInletNode).CO2 * Node(ColdInletNode).MassFlowRate) / Node(OutletNode).MassFlowRate;
-				} else if (Node(HotInletNode).MassFlowRate > 0.0) {
-					Node(OutletNode).CO2 = Node(HotInletNode).CO2;
 				} else {
-					Node(OutletNode).CO2 = Node(ColdInletNode).CO2;
+					Node(OutletNode).CO2 = max(Node(HotInletNode).CO2, Node(ColdInletNode).CO2);
 				}
 			}
 			if (Contaminant.GenericContamSimulation) {
 				if (Node(OutletNode).MassFlowRate > 0.0) {
 					Node(OutletNode).GenContam = (Node(HotInletNode).GenContam * Node(HotInletNode).MassFlowRate + Node(ColdInletNode).GenContam * Node(ColdInletNode).MassFlowRate) / Node(OutletNode).MassFlowRate;
 				}
-				else if (Node(HotInletNode).MassFlowRate > 0.0) {
-					Node(OutletNode).GenContam = Node(HotInletNode).GenContam;
-				}
 				else {
-					Node(OutletNode).GenContam = Node(ColdInletNode).GenContam;
+					Node(OutletNode).CO2 = max(Node(HotInletNode).GenContam, Node(ColdInletNode).GenContam);
 				}
 			}
 		} else if ( Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
