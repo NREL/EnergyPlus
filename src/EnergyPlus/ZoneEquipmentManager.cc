@@ -300,7 +300,7 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int NumOfSizingTypes = 7; // number of zone HVAC equipment supply air flow and capacity sizing types (Cooling, Heating and no-Cooling-No Heating, heating and cooling capacity)
+		int NumOfSizingTypes = 24; // number of sizing types 
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

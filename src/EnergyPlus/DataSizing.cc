@@ -158,9 +158,11 @@ namespace DataSizing {
 	bool DataCoilIsSuppHeater( false ); // TRUE if heating coil used as supplemental heater
 	bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
 	bool DataAutosizable( true ); // TRUE if component is autosizable
-	bool DataScalableSizingON( false ) ; // boolean determines scalable flow sizing is specified 
-	bool DataScalableCapSizingON( false ); // boolean determines scalable capacity sizing is specified
 	bool DataEMSOverrideON( false ); // boolean determines if user relies on EMS to override autosizing
+	bool DataScalableSizingON( false ); // boolean determines scalable flow sizing is specified 
+	bool DataScalableCapSizingON( false ); // boolean determines scalable capacity sizing is specified
+	bool DataSysScalableFlowSizingON( false ); // boolean determines scalable system flow sizing is specified 
+	bool DataSysScalableCapSizingON( false ); // boolean determines scalable system capacity sizing is specified 
 	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
 	bool TermUnitSingDuct( false ); // TRUE if a non-induction single duct terminal unit
 	bool TermUnitPIU( false ); // TRUE if a powered induction terminal unit
@@ -183,11 +185,10 @@ namespace DataSizing {
 	Real64 DataAirFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataWaterFlowUsedForSizing( 0.0 ); // water flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataCapacityUsedForSizing( 0.0 ); //capacity used for sizing with scalable inputs [W]
-	Real64 DataDesignCoilCapacity( 0.0); // calculated capacity of coil at end of UA calculation
+	Real64 DataDesignCoilCapacity( 0.0 ); // calculated capacity of coil at end of UA calculation
 	Real64 DataHeatSizeRatio( 1.0 ); // heating coil size as a ratio of cooling coil capacity
-	Real64 DataEMSOverride ( 0.0 ); // value of EMS variable used to override autosizing
-	Real64 DataBypassFrac ( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
-	int DataZoneNumber( 0 );  // a pointer to a served by zoneHVAC equipment
+	Real64 DataEMSOverride( 0.0 ); // value of EMS variable used to override autosizing
+	Real64 DataBypassFrac( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
 	Real64 DataCoolFlowPerFloorArea( 0.0 );  // cooling supply air flow per unit conditioned floor area
 	Real64 DataHeatFlowPerFloorArea( 0.0 );  // heating supply air flow per unit conditioned floor area
 	Real64 DataFracOfAutosizedCoolingAirflow( 1.0 );  // fraction of design cooling supply air flow rate
@@ -202,6 +203,8 @@ namespace DataSizing {
 	Real64 DataAutosizedHeatingCapacity( 0.0 );  // Autosized heating capacit used for multiplying flow per capacity to get flow rate
 	Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 	Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
+	int DataZoneNumber( 0 );  // a pointer to a served by zoneHVAC equipment
+	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
@@ -212,7 +215,6 @@ namespace DataSizing {
 	FArray1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
 	FArray1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	char SizingFileColSep; // Character to separate columns in sizing outputs
-	int NumZoneHVACSizing; // Number of zone HVAC sizing objects
 
 	// Object Data
 	FArray1D< OARequirementsData > OARequirements;

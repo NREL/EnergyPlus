@@ -64,77 +64,76 @@ namespace ReportSizingManager {
 	// Functions
 
 	void
-	ReportSizingOutput(
+		ReportSizingOutput(
 		std::string const & CompType, // the type of the component
 		std::string const & CompName, // the name of the component
 		std::string const & VarDesc, // the description of the input variable
 		Real64 const VarValue, // the value from the sizing calculation
 		Optional_string_const UsrDesc, // the description of a user-specified variable
 		Optional< Real64 const > UsrValue // the value from the user for the desc item
-	)
+		)
 	{
 
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Fred Buhl
-		//       DATE WRITTEN   Decenber 2001
-		//       MODIFIED       August 2008, Greg Stark
-		//       RE-ENGINEERED  na
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Fred Buhl
+			//       DATE WRITTEN   Decenber 2001
+			//       MODIFIED       August 2008, Greg Stark
+			//       RE-ENGINEERED  na
 
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine writes one item of sizing data to the "eio" file..
+			// PURPOSE OF THIS SUBROUTINE:
+			// This subroutine writes one item of sizing data to the "eio" file..
 
-		// METHODOLOGY EMPLOYED:
-		// na
+			// METHODOLOGY EMPLOYED:
+			// na
 
-		// REFERENCES:
-		// na
+			// REFERENCES:
+			// na
 
-		// Using/Aliasing
-		using namespace DataPrecisionGlobals;
-		using DataGlobals::OutputFileInits;
-		using namespace OutputReportPredefined;
-		using General::RoundSigDigits;
-		using namespace SQLiteProcedures;
+			// Using/Aliasing
+			using namespace DataPrecisionGlobals;
+			using DataGlobals::OutputFileInits;
+			using namespace OutputReportPredefined;
+			using General::RoundSigDigits;
 
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+			// Locals
+			// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			// na
 
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
+			// INTERFACE BLOCK SPECIFICATIONS
+			// na
 
-		// DERIVED TYPE DEFINITIONS
-		// na
+			// DERIVED TYPE DEFINITIONS
+			// na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool MyOneTimeFlag( true );
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+			static bool MyOneTimeFlag(true);
 
-		// Formats
-		static gio::Fmt const Format_990( "('! <Component Sizing Information>, Component Type, Component Name, ','Input Field Description, Value')" );
-		static gio::Fmt const Format_991( "(' Component Sizing Information, ',A,', ',A,', ',A,', ',A)" );
+			// Formats
+			static gio::Fmt const Format_990("('! <Component Sizing Information>, Component Type, Component Name, ','Input Field Description, Value')");
+			static gio::Fmt const Format_991("(' Component Sizing Information, ',A,', ',A,', ',A,', ',A)");
 
-		if ( MyOneTimeFlag ) {
-			gio::write( OutputFileInits, Format_990 );
-			MyOneTimeFlag = false;
+			if (MyOneTimeFlag) {
+				gio::write(OutputFileInits, Format_990);
+				MyOneTimeFlag = false;
+			}
+
+			gio::write(OutputFileInits, Format_991) << CompType << CompName << VarDesc << RoundSigDigits(VarValue, 5);
+			//add to tabular output reports
+			AddCompSizeTableEntry(CompType, CompName, VarDesc, VarValue);
+
+			if (present(UsrDesc) && present(UsrValue)) {
+				gio::write(OutputFileInits, Format_991) << CompType << CompName << UsrDesc << RoundSigDigits(UsrValue, 5);
+				AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
+			} else if (present(UsrDesc) || present(UsrValue)) {
+				ShowFatalError("ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");
+			}
+
+			// add to SQL output
+			if (sqlite->writeOutputToSQLite()) sqlite->addSQLiteComponentSizingRecord(CompType, CompName, VarDesc, VarValue);
+
 		}
-
-		gio::write( OutputFileInits, Format_991 ) << CompType << CompName << VarDesc << RoundSigDigits( VarValue, 5 );
-		//add to tabular output reports
-		AddCompSizeTableEntry( CompType, CompName, VarDesc, VarValue );
-
-		if ( present( UsrDesc ) && present( UsrValue ) ) {
-			gio::write( OutputFileInits, Format_991 ) << CompType << CompName << UsrDesc << RoundSigDigits( UsrValue, 5 );
-			AddCompSizeTableEntry( CompType, CompName, UsrDesc, UsrValue );
-		} else if ( present( UsrDesc ) || present( UsrValue ) ) {
-			ShowFatalError( "ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both." );
-		}
-
-		// add to SQL output
-		if ( WriteOutputToSQLite ) AddSQLiteComponentSizingRecord( CompType, CompName, VarDesc, VarValue );
-
-	}
 
 	void
 	RequestSizing(

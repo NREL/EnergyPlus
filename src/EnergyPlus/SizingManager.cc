@@ -2099,7 +2099,7 @@ namespace SizingManager {
 			} else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
 				ShowContinueError("... incorrect " + cAlphaFieldNames( iHeatSAFMAlphaNum ) + "=\"" + cAlphaArgs( iHeatSAFMAlphaNum ) + "\"." );
-				ShowContinueError( "... valid values are DesignDay or Flow/System." );
+				ShowContinueError( "... valid values are DesignDay, Flow/System, FlowPerFloorArea, FractionOfAutosizedHeatingAirflow, or FlowPerHeatingCapacity." );
 				ErrorsFound = true;
 			}}
 			{ auto const systemOAMethod(cAlphaArgs( iSystemOASMethodAlphaNum ));
@@ -2129,15 +2129,13 @@ namespace SizingManager {
 						ShowContinueError("Illegal " + cNumericFieldNames(iCoolDesignCapacityNumericNum) + " = " + TrimSigDigits(rNumericArgs(iCoolDesignCapacityNumericNum), 7));
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 					ShowContinueError("Input for " + cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " + cAlphaArgs(iCoolCAPMAlphaNum));
 					ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iCoolDesignCapacityNumericNum));
 					ErrorsFound = true;
 				}
-			}
-			else if (SameString(cAlphaArgs(iCoolCAPMAlphaNum), "CAPACITYPERFLOORAREA")) {
+			} else if (SameString(cAlphaArgs(iCoolCAPMAlphaNum), "CAPACITYPERFLOORAREA")) {
 				SysSizInput(SysSizIndex).CoolingCapMethod = CapacityPerFloorArea;
 				if (!lNumericFieldBlanks(iCoolCapacityPerFloorAreaNumericNum)) {
 					SysSizInput(SysSizIndex).ScaledCoolingCapacity = rNumericArgs(iCoolCapacityPerFloorAreaNumericNum);
@@ -2146,22 +2144,19 @@ namespace SizingManager {
 						ShowContinueError("Input for " + cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " + cAlphaArgs(iCoolCAPMAlphaNum));
 						ShowContinueError("Illegal " + cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum) + " = " + TrimSigDigits(rNumericArgs(iCoolCapacityPerFloorAreaNumericNum), 7));
 						ErrorsFound = true;
-					}
-					else if (SysSizInput(SysSizIndex).ScaledCoolingCapacity == AutoSize) {
+					} else if (SysSizInput(SysSizIndex).ScaledCoolingCapacity == AutoSize) {
 						ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 						ShowContinueError("Input for " + cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " + cAlphaArgs(iCoolCAPMAlphaNum));
 						ShowContinueError("Illegal " + cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum) + " = Autosize");
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 					ShowContinueError("Input for " + cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " + cAlphaArgs(iCoolCAPMAlphaNum));
 					ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iCoolCapacityPerFloorAreaNumericNum));
 					ErrorsFound = true;
 				}
-			}
-			else if (SameString(cAlphaArgs(iCoolCAPMAlphaNum), "FRACTIONOFAUTOSIZEDCOOLINGCAPACITY")){
+			} else if (SameString(cAlphaArgs(iCoolCAPMAlphaNum), "FRACTIONOFAUTOSIZEDCOOLINGCAPACITY")){
 				SysSizInput(SysSizIndex).CoolingCapMethod = FractionOfAutosizedCoolingCapacity;
 				if (!lNumericFieldBlanks(iCoolFracOfAutosizedCapacityNumericNum)) {
 					SysSizInput(SysSizIndex).ScaledCoolingCapacity = rNumericArgs(iCoolFracOfAutosizedCapacityNumericNum);
@@ -2170,8 +2165,7 @@ namespace SizingManager {
 						ShowContinueError("Illegal " + cNumericFieldNames(iCoolFracOfAutosizedCapacityNumericNum) + " = " + TrimSigDigits(rNumericArgs(iCoolFracOfAutosizedCapacityNumericNum), 7));
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 					ShowContinueError("Input for " + cAlphaFieldNames(iCoolCAPMAlphaNum) + " = " + cAlphaArgs(iCoolCAPMAlphaNum));
 					ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iCoolFracOfAutosizedCapacityNumericNum));
@@ -2195,15 +2189,13 @@ namespace SizingManager {
 						ShowContinueError("Illegal " + cNumericFieldNames(iHeatDesignCapacityNumericNum) + " = " + TrimSigDigits(rNumericArgs(iHeatDesignCapacityNumericNum), 7));
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 					ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
 					ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
 					ErrorsFound = true;
 				}
-			}
-			else if (SameString(cAlphaArgs(iHeatCAPMAlphaNum), "CAPACITYPERFLOORAREA")) {
+			} else if (SameString(cAlphaArgs(iHeatCAPMAlphaNum), "CAPACITYPERFLOORAREA")) {
 				SysSizInput(SysSizIndex).HeatingCapMethod = CapacityPerFloorArea;
 				if (!lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum)) {
 					SysSizInput(SysSizIndex).ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
@@ -2212,22 +2204,19 @@ namespace SizingManager {
 						ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
 						ShowContinueError("Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = " + TrimSigDigits(rNumericArgs(iHeatCapacityPerFloorAreaNumericNum), 7));
 						ErrorsFound = true;
-					}
-					else if (SysSizInput(SysSizIndex).ScaledHeatingCapacity == AutoSize) {
+					} else if (SysSizInput(SysSizIndex).ScaledHeatingCapacity == AutoSize) {
 						ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 						ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
 						ShowContinueError("Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 					ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
 					ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
 					ErrorsFound = true;
 				}
-			}
-			else if (SameString(cAlphaArgs(iHeatCAPMAlphaNum), "FRACTIONOFAUTOSIZEDHEATINGCAPACITY")){
+			} else if (SameString(cAlphaArgs(iHeatCAPMAlphaNum), "FRACTIONOFAUTOSIZEDHEATINGCAPACITY")){
 				SysSizInput(SysSizIndex).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
 				if (!lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum)) {
 					SysSizInput(SysSizIndex).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
@@ -2236,15 +2225,13 @@ namespace SizingManager {
 						ShowContinueError("Illegal " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum) + " = " + TrimSigDigits(rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum), 7));
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 					ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
 					ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
 					ErrorsFound = true;
 				}
-			}
-			else {
+			} else {
 				//ShowSevereError(cCurrentModuleObject + " = " + SysSizInput(SysSizIndex).AirPriLoopName);
 				//ShowContinueError("Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
 				//ErrorsFound = true;
@@ -2512,10 +2499,6 @@ namespace SizingManager {
 		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2542,8 +2525,8 @@ namespace SizingManager {
 		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 );
 
 		// BSLLC Start
-		if ( WriteOutputToSQLite ) {
-			AddSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
 		}
 		// BSLLC Finish
 
@@ -2578,10 +2561,6 @@ namespace SizingManager {
 		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2608,14 +2587,14 @@ namespace SizingManager {
 		gio::write( OutputFileInits, Format_991 ) << SysName << VarDesc << RoundSigDigits( VarValue, 5 );
 
 		// BSLLC Start
-		if ( WriteOutputToSQLite ) AddSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
+		if ( sqlite->writeOutputToSQLite() ) sqlite->addSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
 		// BSLLC Finish
 
 	}
 
 
 	void
-		GetZoneHVACSizing()
+	GetZoneHVACSizing()
 	{
 
 			// SUBROUTINE INFORMATION:

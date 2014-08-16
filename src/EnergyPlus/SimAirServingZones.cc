@@ -5593,7 +5593,7 @@ namespace SimAirServingZones {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
 
 				// adjust system sizing flow rates for scalable flows
-				UpdateSysSizingFlowForScalableInputs( AirLoopNum );
+				UpdateSysSizingForScalableInputs( AirLoopNum );
 
 				NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
@@ -5920,7 +5920,7 @@ namespace SimAirServingZones {
 	}
 
 	void
-	UpdateSysSizingFlowForScalableInputs( int const AirLoopNum )
+	UpdateSysSizingForScalableInputs( int const AirLoopNum )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -5953,7 +5953,7 @@ namespace SimAirServingZones {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const RoutineName("UpdateScalableSysSizing: "); // include trailing blank space
+		static std::string const RoutineName("UpdateSysSizingForScalableInputs: "); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -5976,6 +5976,13 @@ namespace SimAirServingZones {
 		Real64 CpAirStd;           // specific heat of air at standard condition
 		Real64 FractionOfAutosize; // user specified autosized fraction for capacity and supply air flow
 		Real64 AutosizedCapacity;  // autosized heating and cooling capacity  
+
+		int NumZonesHeated;        // number of zones heated by a system
+		int NumZonesCooled;        // numberof zones cooled by a system
+		int ZonesHeatedNum;        // loop index of zones heated in a system
+		int ZonesCooledNum;        // loop index of zones cooled in a system
+		int NumZonesForHtg;        // Number of heating zones for given primary system
+		int CtrlZoneNum;           // controlled zone index
 
 		if (AirLoopNum > 0) {
 
@@ -6021,6 +6028,15 @@ namespace SimAirServingZones {
 					CalcSysSizing(AirLoopNum).InpDesCoolAirFlow = TempSize;
 					FinalSysSizing(AirLoopNum).InpDesCoolAirFlow = TempSize;
 				} 
+			
+
+				// loop over the controlled zones by this system and setup the scalable sizing input for terminal units sizing
+				// min system cooling flow rate
+				//for (ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
+				//	CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum) .CoolCtrlZoneNums(ZonesCooledNum);
+				//	ZoneEqSizing(CurZoneEqNum).SizingMethod( CoolingAirflowSizing ) = FinalSysSizing(AirLoopNum).ScaleCoolSAFMethod
+				//}
+
 			}
 
 			// scalable sizing option for heating supply air flow rate
@@ -6065,8 +6081,23 @@ namespace SimAirServingZones {
 					TempSize = FinalSysSizing(AirLoopNum).FlowPerHeatingCapacity * AutosizedCapacity * FractionOfAutosize;
 					CalcSysSizing(AirLoopNum).InpDesHeatAirFlow = TempSize;
 					FinalSysSizing(AirLoopNum).InpDesHeatAirFlow = TempSize;
-				}			
+				}
+
+
+				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
+				NumZonesForHtg = NumZonesHeated;
+				if (NumZonesHeated == 0) NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;;
+				for (ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesForHtg; ++ZonesHeatedNum ) {
+					if (NumZonesHeated == 0) {
+						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum).CoolCtrlZoneNums( ZonesHeatedNum );
+					} else {
+						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+					}
+					ZoneEqSizing( CtrlZoneNum ).SizingMethod( FinalSysSizing( AirLoopNum) .ScaleHeatSAFMethod ) = SELECT_CASE_var;
+				}
+
 			}
+			
 
 			// save the total cooling capacity sizing data for scalable sizing
 			{ auto const SELECT_CASE_var(FinalSysSizing( AirLoopNum ).CoolingCapMethod);
@@ -6083,6 +6114,14 @@ namespace SimAirServingZones {
 					CalcSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 					FinalSysSizing( AirLoopNum ).FractionOfAutosizedCoolingCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 				}
+			
+							
+				//NumZonesCooled = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;;
+				//for (ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum) {
+				//	CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
+				//	ZoneEqSizing( CtrlZoneNum ).SizingMethod( FinalSysSizing( AirLoopNum ).CoolingCapMethod ) = SELECT_CASE_var;
+				//}
+			
 			}
 
 			// save the total heating capacity sizing data for scalable sizing
@@ -6098,9 +6137,19 @@ namespace SimAirServingZones {
 				} else if (SELECT_CASE_var == FractionOfAutosizedHeatingCapacity) {
 					FinalSysSizing(AirLoopNum).FractionOfAutosizedHeatingCapacity = CalcSysSizing(AirLoopNum).ScaledHeatingCapacity;
 				}
+
+				NumZonesHeated = AirToZoneNodeInfo(AirLoopNum).NumZonesHeated;
+				NumZonesForHtg = NumZonesHeated;
+				if (NumZonesHeated == 0) NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesCooled;;
+				for (ZonesHeatedNum = 1; ZonesHeatedNum <= NumZonesForHtg; ++ZonesHeatedNum) {
+					if (NumZonesHeated == 0) {
+						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesHeatedNum );
+					}else {
+						CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).HeatCtrlZoneNums( ZonesHeatedNum );
+					}
+					ZoneEqSizing( CtrlZoneNum ).SizingMethod( FinalSysSizing( AirLoopNum ).HeatingCapMethod ) = SELECT_CASE_var;
+				}
 			}
-
-
 		}
 
 	}
