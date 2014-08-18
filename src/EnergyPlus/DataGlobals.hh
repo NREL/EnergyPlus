@@ -148,6 +148,7 @@ namespace DataGlobals {
 	extern bool doLoadComponentPulseNow; // true for the time step that is the "pulse" for the load component report
 	extern bool ShowDecayCurvesInEIO; // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
+	extern bool AnyBasementsInModel; // true if there are any basements in the input file
 
 } // DataGlobals
 

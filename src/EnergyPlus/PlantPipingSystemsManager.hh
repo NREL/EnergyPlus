@@ -39,6 +39,7 @@ namespace PlantPipingSystemsManager {
 	extern std::string const ObjName_Segment;
 	extern std::string const ObjName_HorizTrench;
 	extern std::string const ObjName_ZoneCoupled;
+	extern std::string const ObjName_BasementDomain;
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -113,6 +114,12 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	void
+	CheckIfAnyBasements();
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
+	void
 	GetPipingSystemsInput();
 
 	//*********************************************************************************************!
@@ -147,7 +154,16 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************
+	void
+		ReadBasementDomainInputs(
+		int const StartingDomainNumForBasement,
+		int const NumBasements,
+		bool & ErrorsFound
+		);
 
+	//*********************************************************************************************!
+
+	//*********************
 	void
 	ReadPipeCircuitInputs(
 		int const NumPipeCircuits,
@@ -642,11 +658,11 @@ namespace PlantPipingSystemsManager {
 		bool const PartitionsExist,
 		Optional_int BasementWallXIndex = _,
 		Optional_int BasementFloorYIndex = _,
-		Optional_int SlabXIndex = _,
+		Optional_int XIndex = _,
 		Optional_int InsulationXIndex = _,
-		Optional_int SlabYIndex = _,
+		Optional_int YIndex = _,
 		Optional_int InsulationYIndex = _,
-		Optional_int SlabZIndex = _,
+		Optional_int ZIndex = _,
 		Optional_int InsulationZIndex = _
 		
 		

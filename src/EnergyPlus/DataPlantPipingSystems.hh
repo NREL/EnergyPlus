@@ -21,9 +21,9 @@ namespace DataPlantPipingSystems {
 	extern int const PartitionType_BasementFloor;
 	extern int const PartitionType_Pipe;
 	extern int const PartitionType_Slab;
-	extern int const PartitionType_SlabXSide;
-	extern int const PartitionType_SlabZSide;
-	extern int const PartitionType_HorizInsUnderSlab;
+	extern int const PartitionType_XSide;
+	extern int const PartitionType_ZSide;
+	extern int const PartitionType_HorizInsUnder;
 	extern int const PartitionType_HorizInsXSide;
 	extern int const PartitionType_HorizInsZSide;
 	extern int const PartitionType_VertInsLowerEdge;
@@ -35,9 +35,9 @@ namespace DataPlantPipingSystems {
 	extern int const RegionType_XDirection;
 	extern int const RegionType_YDirection;
 	extern int const RegionType_ZDirection;
-	extern int const RegionType_SlabXSide;
-	extern int const RegionType_SlabZSide;
-	extern int const RegionType_HorizInsUnderSlab;
+	extern int const RegionType_XSide;
+	extern int const RegionType_ZSide;
+	extern int const RegionType_HorizInsUnder;
 	extern int const RegionType_HorizInsXSide;
 	extern int const RegionType_HorizInsZSide;
 	extern int const RegionType_VertInsLowerEdge;
@@ -752,6 +752,7 @@ namespace DataPlantPipingSystems {
 		// Members
 		Real64 Depth; // m
 		Real64 Width; // m
+		Real64 Length; // m
 		bool ShiftPipesByWidth;
 		std::string WallBoundaryOSCMName;
 		int WallBoundaryOSCMIndex;
@@ -766,6 +767,7 @@ namespace DataPlantPipingSystems {
 		BasementZoneInfo() :
 			Depth( 0.0 ),
 			Width( 0.0 ),
+			Length(0.0),
 			ShiftPipesByWidth( false ),
 			WallBoundaryOSCMIndex( 0 ),
 			FloorBoundaryOSCMIndex( 0 ),
@@ -777,6 +779,7 @@ namespace DataPlantPipingSystems {
 		BasementZoneInfo(
 			Real64 const Depth, // m
 			Real64 const Width, // m
+			Real64 const Length, // m
 			bool const ShiftPipesByWidth,
 			std::string const & WallBoundaryOSCMName,
 			int const WallBoundaryOSCMIndex,
@@ -789,6 +792,7 @@ namespace DataPlantPipingSystems {
 		) :
 			Depth( Depth ),
 			Width( Width ),
+			Length(Length),
 			ShiftPipesByWidth( ShiftPipesByWidth ),
 			WallBoundaryOSCMName( WallBoundaryOSCMName ),
 			WallBoundaryOSCMIndex( WallBoundaryOSCMIndex ),
@@ -1312,15 +1316,19 @@ namespace DataPlantPipingSystems {
 		Real64 SlabWidth;
 		Real64 SlabLength;
 		Real64 SlabThickness;
-		Real64 SlabXIndex;
-		Real64 SlabYIndex;
-		Real64 SlabZIndex;
+		Real64 XIndex;
+		Real64 YIndex;
+		Real64 ZIndex;
 		bool HorizInsPresentFlag;
 		int HorizInsMaterialNum;
 		Real64 HorizInsThickness;
 		Real64 HorizInsWidth;
 		Real64 HeatFlux;
+		Real64 WallHeatFlux;
+		Real64 FloorHeatFlux;
 		Real64 AggregateHeatFlux;
+		Real64 AggregateWallHeatFlux;
+		Real64 AggregateFloorHeatFlux;
 		int NumHeatFlux;
 		bool ResetHeatFluxFlag;
 		Real64 ConvCoeff;
@@ -1362,15 +1370,19 @@ namespace DataPlantPipingSystems {
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
 			SlabThickness( 0.0 ),
-			SlabXIndex( 0 ),
-			SlabYIndex( 0 ),
-			SlabZIndex( 0 ),
+			XIndex( 0 ),
+			YIndex( 0 ),
+			ZIndex( 0 ),
 			HorizInsPresentFlag( false ),
 			HorizInsMaterialNum( 0 ),
 			HorizInsThickness( 0.0254 ),
 			HorizInsWidth( 0.0 ),
 			HeatFlux( 0.0 ),
+			WallHeatFlux(0.0),
+			FloorHeatFlux(0.0),
 			AggregateHeatFlux( 0.0 ),
+			AggregateWallHeatFlux(0.0),
+			AggregateFloorHeatFlux(0.0),
 			NumHeatFlux ( 0 ),
 			ResetHeatFluxFlag( true ),
 			ConvCoeff( 0.0 ),
@@ -1429,15 +1441,19 @@ namespace DataPlantPipingSystems {
 			Real64 const SlabWidth,
 			Real64 const SlabLength,
 			Real64 const SlabThickness,
-			Real64 const SlabXIndex,
-			Real64 const SlabYIndex,
-			Real64 const SlabZIndex,
+			Real64 const XIndex,
+			Real64 const YIndex,
+			Real64 const ZIndex,
 			bool const HorizInsPresentFlag,
 			int const HorizInsMaterialNum,
 			Real64 const HorizInsThickness,
 			Real64 const HorizInsWidth,
 			Real64 const HeatFlux,
+			Real64 const WallHeatFlux,
+			Real64 const FloorHeatFlux,
 			Real64 const AggregateHeatFlux,
+			Real64 const AggregateWallHeatFlux,
+			Real64 const AggregateFloorHeatFlux,
 			int const NumHeatFlux,
 			bool const ResetHeatFluxFlag,
 			Real64 const ConvCoeff,
@@ -1494,15 +1510,19 @@ namespace DataPlantPipingSystems {
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),
 			SlabThickness( SlabThickness ),
-			SlabXIndex( SlabXIndex ),
-			SlabYIndex( SlabYIndex ),
-			SlabZIndex( SlabZIndex ),
+			XIndex( XIndex ),
+			YIndex( YIndex ),
+			ZIndex( ZIndex ),
 			HorizInsPresentFlag( HorizInsPresentFlag ),
 			HorizInsMaterialNum( HorizInsMaterialNum ),
 			HorizInsThickness( HorizInsThickness ),
 			HorizInsWidth( HorizInsWidth ),
 			HeatFlux( HeatFlux ),
+			WallHeatFlux(WallHeatFlux),
+			FloorHeatFlux(FloorHeatFlux),
 			AggregateHeatFlux( AggregateHeatFlux ),
+			AggregateWallHeatFlux(AggregateWallHeatFlux),
+			AggregateFloorHeatFlux(AggregateFloorHeatFlux),
 			NumHeatFlux( NumHeatFlux ),
 			ResetHeatFluxFlag( ResetHeatFluxFlag ),
 			ConvCoeff( ConvCoeff ),

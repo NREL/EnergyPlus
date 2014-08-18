@@ -171,6 +171,7 @@ namespace DataGlobals {
 	bool doLoadComponentPulseNow( false ); // true for the time step that is the "pulse" for the load component report
 	bool ShowDecayCurvesInEIO( false ); // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	bool AnySlabsInModel ( false ); // true if there are any zone-coupled ground domains in the input file
+	bool AnyBasementsInModel(false); // true if there are any basements in the input file
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

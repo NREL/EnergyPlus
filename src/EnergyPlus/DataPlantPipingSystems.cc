@@ -40,9 +40,9 @@ namespace DataPlantPipingSystems {
 	int const PartitionType_BasementFloor( -2 );
 	int const PartitionType_Pipe( -3 );
 	int const PartitionType_Slab( -4 );
-	int const PartitionType_SlabXSide( -5 );
-	int const PartitionType_SlabZSide( -6 );
-	int const PartitionType_HorizInsUnderSlab( -7 );
+	int const PartitionType_XSide( -5 );
+	int const PartitionType_ZSide( -6 );
+	int const PartitionType_HorizInsUnder( -7 );
 	int const PartitionType_HorizInsXSide( -8 );
 	int const PartitionType_VertInsLowerEdge( -9 );
 	int const PartitionType_HorizInsZSide( -10 );
@@ -53,9 +53,9 @@ namespace DataPlantPipingSystems {
 	int const RegionType_XDirection( -4 );
 	int const RegionType_YDirection( -5 );
 	int const RegionType_ZDirection( -6 );
-	int const RegionType_SlabXSide( -7 );
-	int const RegionType_SlabZSide( -8 );
-	int const RegionType_HorizInsUnderSlab( -9 );
+	int const RegionType_XSide( -7 );
+	int const RegionType_ZSide( -8 );
+	int const RegionType_HorizInsUnder( -9 );
 	int const RegionType_HorizInsXSide( -10 );
 	int const RegionType_HorizInsZSide( -11 );
 	int const RegionType_VertInsLowerEdge( -12 );
