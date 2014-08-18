@@ -1733,7 +1733,8 @@ namespace WaterManager {
 			WaterStorage( TankNum ).VdotFromTank = 0.0;
 			WaterStorage( TankNum ).VdotToTank = 0.0;
 			if ( WaterStorage( TankNum ).NumWaterDemands > 0 ) {
-				WaterStorage( TankNum ).VdotRequestDemand = 0.0;
+				// don't reset the requested demand, it is up to the other components to update it themselves
+				//WaterStorage( TankNum ).VdotRequestDemand = 0.0;
 				WaterStorage( TankNum ).VdotAvailDemand = 0.0;
 			}
 			WaterStorage( TankNum ).VdotOverflow = 0.0;
