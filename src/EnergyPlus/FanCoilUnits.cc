@@ -1314,12 +1314,12 @@ namespace FanCoilUnits {
 									TempSize = AutoSize;
 								}
 							}
-							SizingString = "Maximum Hot Water Flow [m3/s]";
+							SizingString = "";
 							PrintFlag = false;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 							DesCoilLoad = TempSize;
 						} else {
-							SizingString = "Maximum Hot Water Flow [m3/s]";
+							SizingString = "";
 							PrintFlag = false;
 							TempSize = AutoSize;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -1416,12 +1416,12 @@ namespace FanCoilUnits {
 									TempSize = AutoSize;
 								}
 							}	
-							SizingString = "Maximum Cold Water Flow [m3/s]";
+							SizingString = "";
 							PrintFlag = false;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 							DesCoilLoad = TempSize;
 						} else {
-							SizingString = "Maximum Cold Water Flow [m3/s]";
+							SizingString = "";
 							PrintFlag = false;
 							TempSize = AutoSize;
 							DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;

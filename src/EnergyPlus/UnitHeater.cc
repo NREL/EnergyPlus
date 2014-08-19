@@ -1003,7 +1003,7 @@ namespace UnitHeater {
 								RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 								DesCoilLoad = TempSize;
 							} else {
-								SizingString = "Maximum Hot Water Flow [m3/s]";
+								SizingString = "";
 								PrintFlag = false;
 								TempSize = AutoSize;
 								ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
