@@ -306,6 +306,7 @@ namespace ReportSizingManager {
 		using DataPlant::PlantLoop;
 		using WaterCoils::SimpleHeatingCoilUAResidual;
 		using Fans::FanDesDT;
+		using Fans::FanDesHeatGain;
 		using DataAirSystems::PrimaryAirSystem;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -1235,6 +1236,7 @@ namespace ReportSizingManager {
 							RetFanDT = FanDesDT(RetFanNum, DesVolFlow);
 							PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp));
 							FanCoolLoad = rhoair * DesVolFlow * CpAirStd * (SupFanDT + (1.0 - OutAirFrac)*RetFanDT);
+							FanCoolLoad = FanDesHeatGain(SupFanNum, DesVolFlow) + (1.0 - OutAirFrac)*FanDesHeatGain(RetFanNum, DesVolFlow);
 							PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) + FanCoolLoad ) );
 							if ( TotCapTempModFac > 0.0 ) {
 								NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;

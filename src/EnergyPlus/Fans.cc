@@ -108,6 +108,7 @@ namespace Fans {
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
+	static FArray1D_bool MySizeFlag;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -893,6 +894,8 @@ namespace Fans {
 		}
 
 		ManageEMS( emsCallFromComponentGetInput );
+		MySizeFlag.allocate(NumFans);
+		MySizeFlag = true;
 
 	}
 
@@ -951,18 +954,14 @@ namespace Fans {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
 		int Loop;
-		Real64 FanDeltaT;
 
 		// FLOW:
 
 		if ( MyOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumFans );
-			MySizeFlag.allocate( NumFans );
 			MyEnvrnFlag = true;
-			MySizeFlag = true;
 
 			MyOneTimeFlag = false;
 
@@ -981,9 +980,7 @@ namespace Fans {
 		if ( ! SysSizingCalc && MySizeFlag( FanNum ) ) {
 
 			SizeFan( FanNum );
-			// FBTest
-			FanDeltaT = FanDesDT(FanNum, Fan(FanNum).MaxAirFlowRate);
-			// FBTest
+
 			// Set the loop cycling flag
 			if ( Fan( FanNum ).FanType_Num == FanType_SimpleOnOff ) {
 				if ( CurSysNum > 0 ) {
@@ -3145,6 +3142,82 @@ namespace Fans {
         return DesignDeltaT;
     
     } // FanDesDT
+
+	Real64
+		FanDesHeatGain(
+		int const FanNum, // index of fan in Fan array
+		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+		)
+
+	{
+
+			// FUNCTION INFORMATION:
+			//       AUTHOR         Fred Buhl
+			//       DATE WRITTEN   August 2014
+			//       MODIFIED       
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS FUNCTION:
+			// This function calculates and returns the design fan heat gain from the fan input data
+
+			// METHODOLOGY EMPLOYED:
+			// Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
+			//              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
+
+			// REFERENCES: EnergyPlus Engineering Reference
+
+			// Using/Aliasing
+			using InputProcessor::FindItemInList;
+			using DataSizing::CurSysNum;
+			using DataAirLoop::AirLoopControlInfo;
+
+			// Return value
+			Real64 DesignHeatGain; // returned heat gain of matched fan [W]
+
+			// Locals
+			// FUNCTION ARGUMENT DEFINITIONS:
+
+			// FUNCTION PARAMETER DEFINITIONS:
+			// na
+
+			// INTERFACE BLOCK SPECIFICATIONS:
+			// na
+
+			// DERIVED TYPE DEFINITIONS:
+			// na
+
+			// FUNCTION LOCAL VARIABLE DECLARATIONS:
+			Real64 RhoAir; // density of air [kg/m3]
+			Real64 CpAir;  // specific heat of air [J/kg-K]
+			Real64 DeltaP; // fan design pressure rise [N/m2]
+			Real64 TotEff; // fan design total efficiency
+			Real64 MotEff; // fan design motor efficiency
+			Real64 MotInAirFrac; // fraction of motor in the air stream
+			Real64 FanPowerTot; // total fan power consumption [W]
+			//
+			if (FanNum == 0) {
+				DesignHeatGain = 0.0;
+			}
+			else if (!(Fan(FanNum).FanType_Num == FanType_ComponentModel)) {
+				DeltaP = Fan(FanNum).DeltaPress;
+				TotEff = Fan(FanNum).FanEff;
+				MotEff = Fan(FanNum).MotEff;
+				MotInAirFrac = Fan(FanNum).MotInAirFrac;
+				FanPowerTot = (FanVolFlow*DeltaP) / TotEff;
+				DesignHeatGain = MotEff*FanPowerTot + (FanPowerTot - MotEff*FanPowerTot)*MotInAirFrac;
+			}
+			else {
+				if (!SysSizingCalc && MySizeFlag(FanNum)) {
+
+					SizeFan(FanNum);
+					MySizeFlag(FanNum) = false;
+				}
+				DesignHeatGain = Fan(FanNum).FanShaftPower + (Fan(FanNum).MotorInputPower - Fan(FanNum).FanShaftPower) * Fan(FanNum).MotInAirFrac;
+			}
+
+			return DesignHeatGain;
+
+		} // FanDesHeatGain
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************

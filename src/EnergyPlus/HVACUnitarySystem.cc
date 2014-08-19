@@ -1709,6 +1709,7 @@ namespace HVACUnitarySystem {
 		using DXCoils::GetCoilCapacityByIndexType;
 		using DXCoils::GetDXCoilCapFTCurveIndex;
 		using Fans::GetFanDesignVolumeFlowRate;
+		using Fans::FanDesHeatGain;
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using HVACHXAssistedCoolingCoil::GetCoilCapacity;
 		using HVACHXAssistedCoolingCoil::GetHXDXCoilName;
@@ -1793,6 +1794,7 @@ namespace HVACUnitarySystem {
 		Real64 SysHeatingFlow; // individually sized heating flow rate [m3/s]
 		std::string HXCoilName; // cooling coil name in HXAssisted parent
 		int ActualCoolCoilType; // cooling coil type in HXAssisted parent
+		int SupFanNum; // supply fan index
 
 		ManageEMS( emsCallFromUnitarySystemSizing ); // calling point
 
@@ -1810,6 +1812,7 @@ namespace HVACUnitarySystem {
 		SysHeatingFlow = 0.0;
 		CoolCapAtPeak = 0.0;
 		HeatCapAtPeak = 0.0;
+		SupFanNum = 0;
 
 		//  IF(UnitarySystem(UnitarySysNum)%CoolCoilExists)THEN
 		//    IF(
@@ -1831,6 +1834,10 @@ namespace HVACUnitarySystem {
 
 		if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 		if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
+
+		if (CurSysNum > 0 && CurOASysNum == 0 && UnitarySystem(UnitarySysNum).FanExists) {
+			PrimaryAirSystem(CurSysNum).SupFanNum = UnitarySystem(UnitarySysNum).FanIndex;
+		}
 
 		if ( UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
 			if ( CurOASysNum > 0 ) {
@@ -2102,6 +2109,8 @@ namespace HVACUnitarySystem {
 								TotCapTempModFac = 1.0;
 							}
 							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+							SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
+							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain(SupFanNum, VolFlowRate);
 							if ( TotCapTempModFac > 0.0 ) {
 								CoolCapAtPeak /= TotCapTempModFac;
 							}
@@ -2235,6 +2244,8 @@ namespace HVACUnitarySystem {
 								TotCapTempModFac = 1.0;
 							}
 							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
+							SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
+							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain(SupFanNum, VolFlowRate);
 							if ( TotCapTempModFac > 0.0 ) {
 								CoolCapAtPeak /= TotCapTempModFac;
 							}
