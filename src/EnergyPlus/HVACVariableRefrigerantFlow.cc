@@ -754,7 +754,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle  && VRF( VRFCond ).DefrostControl == OnDemand ) {
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 
@@ -5429,7 +5429,7 @@ namespace HVACVariableRefrigerantFlow {
 			ThisZoneNum = VRFTU( TUIndex ).ZoneNum;
 
 			//       check to see if coil is present
-			if ( TerminalUnitList( VRFCond ).CoolingCoilPresent( NumTU ) ) {
+			if ( TerminalUnitList( TUListNum ).CoolingCoilPresent( NumTU ) ) {
 				//         now check to see if coil is scheduled off
 				if ( GetCurrentScheduleValue( TerminalUnitList( TUListNum ).CoolingCoilAvailSchPtr( NumTU ) ) > 0.0 ) {
 					TerminalUnitList( TUListNum ).CoolingCoilAvailable( NumTU ) = true;
@@ -5437,7 +5437,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			//       check to see if coil is present
-			if ( TerminalUnitList( VRFCond ).HeatingCoilPresent( NumTU ) ) {
+			if ( TerminalUnitList( TUListNum ).HeatingCoilPresent( NumTU ) ) {
 				//         now check to see if coil is scheduled off
 				if ( GetCurrentScheduleValue( TerminalUnitList( TUListNum ).HeatingCoilAvailSchPtr( NumTU ) ) > 0.0 ) {
 					TerminalUnitList( TUListNum ).HeatingCoilAvailable( NumTU ) = true;
