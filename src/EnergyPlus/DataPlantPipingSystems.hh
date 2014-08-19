@@ -1338,14 +1338,11 @@ namespace DataPlantPipingSystems {
 		int VertInsMaterialNum;
 		Real64 VertInsThickness;
 		Real64 VertInsDepth;
-		bool FullHorizInsFlag;
-		bool PartialHorizInsFlag;
 		int InsulationXIndex;
 		int InsulationYIndex;
 		int InsulationZIndex;
 		bool SimTimestepFlag;
 		bool SimHourlyFlag;
-		bool SimDailyFlag;
 		Real64 ZoneCoupledSurfaceTemp;
 
 		// Main 3D cells array
@@ -1393,14 +1390,11 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( 0 ),
 			VertInsThickness( 0.0254 ),
 			VertInsDepth( 0.0 ),
-			FullHorizInsFlag( false ),
-			PartialHorizInsFlag( false ),
 			InsulationXIndex( 0 ),
 			InsulationYIndex( 0 ),
 			InsulationZIndex( 0 ),
 			SimTimestepFlag( false ),
 			SimHourlyFlag( false ),
-			SimDailyFlag( false ),
 			ZoneCoupledSurfaceTemp ( 0.0 )
 
 		{}
@@ -1465,14 +1459,11 @@ namespace DataPlantPipingSystems {
 			int const VertInsMaterialNum,
 			Real64 const VertInsThickness,
 			Real64 const VertInsDepth,
-			bool const FullHorizInsFlag,
-			bool const PartialHorizInsFlag,
 			int const InsulationXIndex,
 			int const InsulationYIndex,
 			int const InsulationZIndex,
 			bool const SimTimestepFlag,
 			bool const SimHourlyFlag,
-			bool const SimDailyFlag,
 			Real64 ZoneCoupledSurfaceTemp,
 
 			FArray3< CartesianCell > const & Cells			
@@ -1535,14 +1526,11 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( VertInsMaterialNum ),
 			VertInsThickness( VertInsThickness ),
 			VertInsDepth( VertInsDepth ),
-			FullHorizInsFlag( FullHorizInsFlag ),
-			PartialHorizInsFlag( PartialHorizInsFlag ),
 			InsulationXIndex( InsulationXIndex ),
 			InsulationYIndex( InsulationYIndex ),
 			InsulationZIndex( InsulationZIndex ),
 			SimTimestepFlag( SimTimestepFlag ),
 			SimHourlyFlag( SimHourlyFlag ),
-			SimDailyFlag( SimDailyFlag ),
 			ZoneCoupledSurfaceTemp( ZoneCoupledSurfaceTemp ),
 			Cells( Cells )
 		{}

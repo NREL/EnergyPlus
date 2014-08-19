@@ -292,7 +292,7 @@
 	Slab Insulation, 	!- Vertical Insulation Name
 	2, 					!- Vertical perimeter insulation depth from surface (m)
 	Yes, 				!- Slab Included in Ground Simulation (Yes/No). This option only applicable for in-grade situations.
-	Timestep;			!- Simulation timestep. (Timestep, Hourly, Daily)
+	Timestep;			!- Simulation timestep. (Timestep/Hourly)
 
   Material,
     WD10,                    !- Name
