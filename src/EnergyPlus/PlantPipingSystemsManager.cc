@@ -1129,10 +1129,8 @@ namespace PlantPipingSystemsManager {
 					//Set flag for horizontal insulation extents
 					if ( SameString( cAlphaArgs( 7 ), "PERIMETER" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = false;
-						PipingSystemDomains( DomainCtr ).PartialHorizInsFlag = true;
 					} else if ( SameString( cAlphaArgs( 7 ), "FULL" ) ) {
 						PipingSystemDomains( DomainCtr ).FullHorizInsPresent = true;
-						PipingSystemDomains( DomainCtr ).PartialHorizInsFlag = false;
 					} else {
 						ShowContinueError( "Must enter either PERIMETER or FULL for horizontal insulation extents." );
 						ShowFatalError( "Preceding error causes program termination." );
@@ -5108,7 +5106,7 @@ namespace PlantPipingSystemsManager {
 									else if ( CellYIndex == SlabYIndex ){
 										//Check if horizontal insulation present
 										if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-											//Entire underslap insulation
+											//Entire underslab insulation
 											if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
 												CellType = CellType_HorizInsulation;
 											}
@@ -8319,7 +8317,7 @@ namespace PlantPipingSystemsManager {
 							//Insulation present
 							if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
 								//Entire underslab insulated
-								if ( PipingSystemDomains( DomainNum ).FullHorizInsFlag ){
+								if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
 									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
 								}
 								else if ( CellXIndex <= PipingSystemDomains( DomainNum ).InsulationXIndex || CellZIndex <= PipingSystemDomains( DomainNum ).InsulationZIndex ){
@@ -8338,7 +8336,7 @@ namespace PlantPipingSystemsManager {
 							//Insulation present
 							if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
 								//Entire underslab insulated
-								if ( PipingSystemDomains( DomainNum ).FullHorizInsFlag ){
+								if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
 									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
 								}
 								else if ( CellXIndex <= PipingSystemDomains( DomainNum ).InsulationXIndex  || CellZIndex <= PipingSystemDomains( DomainNum ).InsulationZIndex ){

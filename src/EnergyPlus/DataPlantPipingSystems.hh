@@ -1329,8 +1329,6 @@ namespace DataPlantPipingSystems {
 		int VertInsMaterialNum;
 		Real64 VertInsThickness;
 		Real64 VertInsDepth;
-		bool FullHorizInsFlag;
-		bool PartialHorizInsFlag;
 		int InsulationXIndex;
 		int InsulationYIndex;
 		int InsulationZIndex;
@@ -1378,8 +1376,6 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( 0 ),
 			VertInsThickness( 0.0254 ),
 			VertInsDepth( 0.0 ),
-			FullHorizInsFlag( false ),
-			PartialHorizInsFlag( false ),
 			InsulationXIndex( 0 ),
 			InsulationYIndex( 0 ),
 			InsulationZIndex( 0 ),
@@ -1444,8 +1440,6 @@ namespace DataPlantPipingSystems {
 			int const VertInsMaterialNum,
 			Real64 const VertInsThickness,
 			Real64 const VertInsDepth,
-			bool const FullHorizInsFlag,
-			bool const PartialHorizInsFlag,
 			int const InsulationXIndex,
 			int const InsulationYIndex,
 			int const InsulationZIndex,
@@ -1508,8 +1502,6 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( VertInsMaterialNum ),
 			VertInsThickness( VertInsThickness ),
 			VertInsDepth( VertInsDepth ),
-			FullHorizInsFlag( FullHorizInsFlag ),
-			PartialHorizInsFlag( PartialHorizInsFlag ),
 			InsulationXIndex( InsulationXIndex ),
 			InsulationYIndex( InsulationYIndex ),
 			InsulationZIndex( InsulationZIndex ),
