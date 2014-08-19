@@ -4486,7 +4486,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// USE STATEMENTS:
-		using DataGlobals::AnyBasementsInModel;
+		// na
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4551,7 +4551,7 @@ namespace PlantPipingSystemsManager {
 
 		//'***** LAYOUT MESH REGIONS *****'
 		//Might use another bool variable analogous to HasBasement in place of AnyBasementsInModel. HasBasement causes some conflicts with the FHX model
-		if (PipingSystemDomains(DomainNum).IsZoneCoupled || AnyBasementsInModel){
+		if (PipingSystemDomains(DomainNum).IsZoneCoupled || PipingSystemDomains(DomainNum).HasCoupledBasement){
 			RegionListCount = CreateRegionListCount( XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, XPartitionsExist );
 			XRegions.allocate( { 0, RegionListCount - 1 } );
 			XRegions = CreateRegionList( DomainNum, XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, RegionType_XDirection, RegionListCount - 1, XPartitionsExist, _, _, PipingSystemDomains( DomainNum ).XIndex, PipingSystemDomains( DomainNum ).InsulationXIndex );
@@ -4637,7 +4637,7 @@ namespace PlantPipingSystemsManager {
 			// na
 
 			// USE STATEMENTS:
-			using DataGlobals::AnyBasementsInModel;
+			//na
 
 			// Locals
 			// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4718,8 +4718,9 @@ namespace PlantPipingSystemsManager {
 
 			}
 			//Underground Piping Systems Ground domain with basement interaction
-			//need to rename variable to distinguish between fhx and basement-only model
-			if (!AnyBasementsInModel){
+			//rename variable to distinguish between fhx and basement-only model
+			if (!PipingSystemDomains(DomainNum).HasCoupledBasement){
+				//FHX model
 				if (PipingSystemDomains(DomainNum).HasBasement) {
 					//'NOTE: the basement depth is still a depth from the ground surface, need to correct for this here
 					if (PipingSystemDomains(DomainNum).BasementZone.Width > 0) {
@@ -4759,7 +4760,7 @@ namespace PlantPipingSystemsManager {
 					}
 				}
 			}
-			//Zone-coupled ground
+			//Zone-coupled ground model
 			else{
 				//'NOTE: the basement depth is still a depth from the ground surface, need to correct for this here
 				if (PipingSystemDomains(DomainNum).BasementZone.Width > 0) {
@@ -4938,6 +4939,7 @@ namespace PlantPipingSystemsManager {
 					}
 				}
 			}
+			//Zone-coupled slab
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ) {
 				// NOTE: the slab depth is still a depth from the ground surface, need to correct for this here.
 				// Create partition at slab edges in the X direction
@@ -5658,7 +5660,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// USE STATEMENTS:
-		using DataGlobals::AnyBasementsInModel;
+		// na
 
 		// Argument array dimensioning
 
@@ -5982,7 +5984,8 @@ namespace PlantPipingSystemsManager {
 						
 						}
 					}
-					else if (AnyBasementsInModel){
+					//basement model, zone-coupled
+					else if (PipingSystemDomains(DomainNum).HasCoupledBasement){
 						//Set the appropriate cell type
 
 						//Farfield cells
@@ -6699,7 +6702,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// USE STATEMENTS:
-		using DataGlobals::AnyBasementsInModel;
+		// na
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6728,9 +6731,12 @@ namespace PlantPipingSystemsManager {
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature = EvaluateFarfieldBoundaryTemperature( DomainNum, PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
 					}
 					else if ( ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementCorner ) || ( SELECT_CASE_var == CellType_BasementFloor ) ) {
-						if (AnyBasementsInModel){
+						//basement model, zone-coupled. Call EvaluateZoneInterfaceTemperature routine to handle timestep/hourly simulation.
+						if (PipingSystemDomains(DomainNum).HasCoupledBasement){
 							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature = EvaluateZoneInterfaceTemperature(DomainNum, PipingSystemDomains(DomainNum).Cells(X, Y, Z));
-						} else{
+						} 
+						//FHX model.
+						else{
 							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature = EvaluateBasementCellTemperature(DomainNum, PipingSystemDomains(DomainNum).Cells(X, Y, Z));
 						}
 					}
@@ -7614,7 +7620,6 @@ namespace PlantPipingSystemsManager {
 
 			// Using/Aliasing
 			using DataGlobals::TimeStep;
-			using DataGlobals::AnyBasementsInModel;
 			using DataEnvironment::CurMnDyHr;
 			using DataHeatBalSurface::TH;
 
@@ -9096,7 +9101,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// USE STATEMENTS:
-		using DataGlobals::AnyBasementsInModel;
+		// na
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9152,7 +9157,7 @@ namespace PlantPipingSystemsManager {
 					}
 					else if ((SELECT_CASE_var == CellType_BasementWall) || (SELECT_CASE_var == CellType_BasementFloor) || (SELECT_CASE_var == CellType_BasementCorner)) {
 						//Check for insulation here
-						if (AnyBasementsInModel){
+						if (PipingSystemDomains(DomainNum).HasCoupledBasement){
 							if (SELECT_CASE_var == CellType_BasementFloor){
 								//Insulation present
 								if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
@@ -9389,8 +9394,7 @@ namespace PlantPipingSystemsManager {
 		using FluidProperties::GetConductivityGlycol;
 		using FluidProperties::GetViscosityGlycol;
 		using DataPlant::PlantLoop; // only for fluid name/index
-		using DataGlobals::AnyBasementsInModel;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -9441,7 +9445,7 @@ namespace PlantPipingSystemsManager {
 					{ auto const SELECT_CASE_var( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType );
 					if ((SELECT_CASE_var == CellType_GeneralField) || (SELECT_CASE_var == CellType_AdiabaticWall) || (SELECT_CASE_var == CellType_FarfieldBoundary) || (SELECT_CASE_var == CellType_GroundSurface) || (SELECT_CASE_var == CellType_BasementCorner) || (SELECT_CASE_var == CellType_BasementFloor) || (SELECT_CASE_var == CellType_BasementWall) || (SELECT_CASE_var == CellType_ZoneGroundInterface)) {
 						//check if basement floor or wall cell is insulation here. If ground cell, update cell property sets
-						if ((AnyBasementsInModel || PipingSystemDomains(DomainNum).IsZoneCoupled) && (PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Conductivity = PipingSystemDomains(DomainNum).HorizInsProperties.Conductivity)){
+						if ((PipingSystemDomains(DomainNum).HasCoupledBasement || PipingSystemDomains(DomainNum).IsZoneCoupled) && (PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Conductivity = PipingSystemDomains(DomainNum).HorizInsProperties.Conductivity)){
 							Beta = PipingSystemDomains(DomainNum).Cur.CurSimTimeStepSize / (PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Density * Volume(PipingSystemDomains(DomainNum).Cells(X, Y, Z)) * PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.SpecificHeat);
 							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Beta = Beta;
 						}

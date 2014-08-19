@@ -1289,6 +1289,7 @@ namespace DataPlantPipingSystems {
 		bool IsActuallyPartOfAHorizontalTrench;
 		bool HasAPipeCircuit;
 		bool IsZoneCoupled;
+		bool HasCoupledBasement;
 		// "Input" data structure variables
 		MeshExtents Extents;
 		MeshProperties Mesh;
@@ -1361,6 +1362,7 @@ namespace DataPlantPipingSystems {
 			IsActuallyPartOfAHorizontalTrench( false ),
 			HasAPipeCircuit( true ),
 			IsZoneCoupled( false ),
+			HasCoupledBasement(false), 
 			HasBasement( false ),
 			ZoneCoupledOSCMIndex( 0 ),
 			PerimeterOffset( 0.0 ),
@@ -1417,6 +1419,7 @@ namespace DataPlantPipingSystems {
 			bool const IsActuallyPartOfAHorizontalTrench,
 			bool const HasAPipeCircuit,
 			bool const IsZoneCoupled,
+			bool const HasCoupledBasement,
 			MeshExtents const & Extents,
 			MeshProperties const & Mesh,
 			BaseThermalPropertySet const & GroundProperties,
@@ -1486,6 +1489,7 @@ namespace DataPlantPipingSystems {
 			IsActuallyPartOfAHorizontalTrench( IsActuallyPartOfAHorizontalTrench ),
 			HasAPipeCircuit( HasAPipeCircuit ),
 			IsZoneCoupled( IsZoneCoupled ),
+			HasCoupledBasement(HasCoupledBasement),
 			Extents( Extents ),
 			Mesh( Mesh ),
 			GroundProperties( GroundProperties ),
