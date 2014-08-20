@@ -2189,7 +2189,7 @@ namespace DXCoils {
 
 			//Set defrost capacity (for resistive defrost)
 			DXCoil( DXCoilNum ).DefrostCapacity = Numbers( 11 );
-			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == OnDemand ) {
+			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == Resistive ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 11 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}

@@ -2506,7 +2506,6 @@ namespace CurveManager {
 		TableNum = PerfCurve( CurveNum ).TableIndex;
 
 		if ( ReadFromFile ) {
-			FileExists = false;
 			CheckForActualFileName( FileName, FileExists, TempFullFileName );
 			if ( ! FileExists ) goto Label999;
 			FileNum = GetNewUnitNumber();
