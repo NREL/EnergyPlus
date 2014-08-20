@@ -683,8 +683,8 @@ namespace HVACMultiSpeedHeatPump {
 							if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
 							AirNodeFound = true;
 						}
-						for (TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum) {
-							if (StageControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
+						for ( TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum ) {
+							if ( StageControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
 							AirNodeFound = true;
 						}
 					} else {
