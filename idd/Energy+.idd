@@ -34904,6 +34904,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \note Total length of pipe embedded in surface
         \units m
         \minimum> 0
+        \autosizable
    A5 , \field Temperature Control Type
         \note Temperature used to control system
         \type choice
@@ -34915,6 +34916,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \default MeanAirTemperature
    N3 , \field Rated Flow Rate
         \units m3/s
+        \autosizable
    A6 , \field Pump Flow Rate Schedule Name
         \note Modifies the Rated Flow Rate of the pump on a time basis
         \note the default is that the pump is ON and runs according to its other
@@ -57424,9 +57426,9 @@ DistrictCooling,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
        \units W
        \minimum 0.0
+       \autosizable
   A4 ; \field Capacity Fraction Schedule Name
        \note Schedule values are multiplied by Nominal Capacity for current capacity
        \type object-list
@@ -57443,9 +57445,9 @@ DistrictHeating,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
        \units W
        \minimum 0.0
+       \autosizable
   A4 ; \field Capacity Fraction Schedule Name
        \note Schedule values are multiplied by Nominal Capacity for current capacity
        \type object-list

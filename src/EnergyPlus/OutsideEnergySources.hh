@@ -52,6 +52,7 @@ namespace OutsideEnergySources {
 		bool OneTimeInitFlag;
 		bool BeginEnvrnInitFlag;
 		bool CheckEquipName;
+		bool userSpecCapacityAlreadyReported;
 
 		// Default Constructor
 		OutsideEnergySourceSpecs() :
@@ -69,7 +70,8 @@ namespace OutsideEnergySources {
 			CompNum( 0 ),
 			OneTimeInitFlag( true ),
 			BeginEnvrnInitFlag( true ),
-			CheckEquipName( true )
+			CheckEquipName( true ),
+			userSpecCapacityAlreadyReported ( false )
 		{}
 
 		// Member Constructor
@@ -92,7 +94,8 @@ namespace OutsideEnergySources {
 			int const CompNum,
 			bool const OneTimeInitFlag,
 			bool const BeginEnvrnInitFlag,
-			bool const CheckEquipName
+			bool const CheckEquipName,
+			bool const userSpecCapacityAlreadyReported
 		) :
 			PlantLoopID( PlantLoopID ),
 			SecndryLoopID( SecndryLoopID ),
@@ -112,7 +115,8 @@ namespace OutsideEnergySources {
 			CompNum( CompNum ),
 			OneTimeInitFlag( OneTimeInitFlag ),
 			BeginEnvrnInitFlag( BeginEnvrnInitFlag ),
-			CheckEquipName( CheckEquipName )
+			CheckEquipName( CheckEquipName ),
+			userSpecCapacityAlreadyReported( userSpecCapacityAlreadyReported )
 		{}
 
 	};
@@ -198,6 +202,11 @@ namespace OutsideEnergySources {
 
 	// Beginning of OutsideEnergySources Module Utility Subroutines
 	// *****************************************************************************
+
+	void
+	SizeDistrictEnergy( 
+		int const EnergySourceNum 
+		);
 
 	void
 	SimDistrictEnergy(
