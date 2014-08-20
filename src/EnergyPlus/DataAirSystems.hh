@@ -373,6 +373,7 @@ namespace DataAirSystems {
 		bool SizeAirloopCoil; // simulates air loop coils before calling controllers
 		int SupFanNum; // index of the supply fan in the Fan data structure
 		int RetFanNum; // index of the return fan in the Fan data structure
+		Real64 FanDesCoolLoad; // design fan heat gain for the air loop [W]
 
 		// Default Constructor
 		DefinePrimaryAirSystem() :
@@ -397,7 +398,8 @@ namespace DataAirSystems {
 			NumOAHeatCoils( 0 ),
 			SizeAirloopCoil( true ),
 			SupFanNum( 0 ),
-			RetFanNum( 0 )
+			RetFanNum( 0 ),
+			FanDesCoolLoad(0.0)
 		{}
 
 		// Member Constructor
@@ -432,7 +434,8 @@ namespace DataAirSystems {
 			int const NumOAHeatCoils, // number of heating coils in the outside air system
 			bool const SizeAirloopCoil, // simulates air loop coils before calling controllers
 			int const SupFanNum, // index of the supply fan in the Fan data structure
-			int const RetFanNum // index of the return fan in the Fan data structure
+			int const RetFanNum, // index of the return fan in the Fan data structure
+			Real64 const FanDesCoolLoad // air loop fan design heat gain
 		) :
 			Name( Name ),
 			DesignVolFlowRate( DesignVolFlowRate ),
@@ -464,7 +467,8 @@ namespace DataAirSystems {
 			NumOAHeatCoils( NumOAHeatCoils ),
 			SizeAirloopCoil( SizeAirloopCoil ),
 			SupFanNum( SupFanNum ),
-			RetFanNum( RetFanNum )
+			RetFanNum( RetFanNum ),
+			FanDesCoolLoad( FanDesCoolLoad )
 		{}
 
 	};

@@ -1806,6 +1806,7 @@ namespace SimAirServingZones {
 				SupFanIndex = 0;
 				RetFanIndex = 0;
 				FoundOASys = false;
+				PrimaryAirSystem(AirLoopNum).FanDesCoolLoad = 0.0;
 				
 				for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
 				

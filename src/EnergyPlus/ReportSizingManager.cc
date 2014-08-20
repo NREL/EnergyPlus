@@ -1232,11 +1232,9 @@ namespace ReportSizingManager {
 							}
 							SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
 							RetFanNum = PrimaryAirSystem(CurSysNum).RetFanNum;
-							SupFanDT = FanDesDT(SupFanNum, DesVolFlow);
-							RetFanDT = FanDesDT(RetFanNum, DesVolFlow);
 							PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp));
-							FanCoolLoad = rhoair * DesVolFlow * CpAirStd * (SupFanDT + (1.0 - OutAirFrac)*RetFanDT);
 							FanCoolLoad = FanDesHeatGain(SupFanNum, DesVolFlow) + (1.0 - OutAirFrac)*FanDesHeatGain(RetFanNum, DesVolFlow);
+							PrimaryAirSystem(CurSysNum).FanDesCoolLoad = FanCoolLoad;
 							PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) + FanCoolLoad ) );
 							if ( TotCapTempModFac > 0.0 ) {
 								NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;
