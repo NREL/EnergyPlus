@@ -22,6 +22,8 @@
 #  which could be useful for: build-eclipse, build-vs2013, build, etc.
 build
 builds
+Build
+Builds
 
 # App-specific project files, for example, for Geany IDE:
 *.geany
