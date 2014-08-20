@@ -2381,7 +2381,6 @@ namespace HVACVariableRefrigerantFlow {
 
 			if ( ! lAlphaFieldBlanks( 15 ) ) {
 				VRFTU( VRFTUNum ).AvailManagerListName = cAlphaArgs( 15 );
-				ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).AvailManagerListName = cAlphaArgs( 15 );
 			}
 			VRFTU( VRFTUNum ).ParasiticElec = rNumericArgs( 8 );
 			VRFTU( VRFTUNum ).ParasiticOffElec = rNumericArgs( 9 );
@@ -2843,6 +2842,7 @@ namespace HVACVariableRefrigerantFlow {
 		static FArray1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
 		static FArray1D_bool MyVRFFlag; // used for sizing VRF inputs one time
 		static FArray1D_bool MyVRFCondFlag; // used to reset timer counter
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int NumTULoop; // loop counter, number of TU's in list
 		int ELLoop; // loop counter, number of zone equipment lists
 		int ListLoop; // loop counter, number of equipment is each list
@@ -2870,6 +2870,7 @@ namespace HVACVariableRefrigerantFlow {
 			MyEnvrnFlag.allocate( NumVRFTU );
 			MySizeFlag.allocate( NumVRFTU );
 			MyVRFFlag.allocate( NumVRFTU );
+			MyZoneEqFlag.allocate ( NumVRFTU );
 			MyBeginTimeStepFlag.allocate( NumVRFCond );
 			MaxDeltaT.allocate( NumVRFCond );
 			MinDeltaT.allocate( NumVRFCond );
@@ -2885,6 +2886,7 @@ namespace HVACVariableRefrigerantFlow {
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyVRFFlag = true;
+			MyZoneEqFlag = true;
 			MyBeginTimeStepFlag = true;
 			MaxDeltaT = 0.0;
 			MinDeltaT = 0.0;
@@ -2920,7 +2922,11 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( VRFTUNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).AvailManagerListName = VRFTU( VRFTUNum ).AvailManagerListName;
+				ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( VRFTUNum ) = false;
+			}
 			VRFTU( VRFTUNum ).AvailStatus = ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).AvailStatus;
 		}
 

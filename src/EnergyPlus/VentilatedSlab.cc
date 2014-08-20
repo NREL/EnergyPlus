@@ -961,7 +961,6 @@ namespace VentilatedSlab {
 			}
 			if ( ! lAlphaBlanks( 33 ) ) {
 				VentSlab( Item ).AvailManagerListName = cAlphaArgs( 33 );
-				ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).AvailManagerListName = cAlphaArgs( 33 );
 			}
 
 			{ auto const SELECT_CASE_var( VentSlab( Item ).CoilOption );
@@ -1113,6 +1112,7 @@ namespace VentilatedSlab {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MyPlantScanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int HotConNode; // hot water control node number in Ventilated Slab loop
 		int InNode; // inlet node number in Ventilated Slab loop
 		int OutNode; // outlet node number in Ventilated Slab loop
@@ -1132,6 +1132,7 @@ namespace VentilatedSlab {
 			MyEnvrnFlag.allocate( NumOfVentSlabs );
 			MySizeFlag.allocate( NumOfVentSlabs );
 			MyPlantScanFlag.allocate( NumOfVentSlabs );
+			MyZoneEqFlag.allocate ( NumOfVentSlabs );
 			ZeroSourceSumHATsurf.allocate( NumOfZones );
 			ZeroSourceSumHATsurf = 0.0;
 			QRadSysSrcAvg.allocate( TotSurfaces );
@@ -1153,11 +1154,16 @@ namespace VentilatedSlab {
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).ZoneNum = VentSlabZoneNum;
+			if ( MyZoneEqFlag( Item ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).AvailManagerListName = VentSlab( Item ).AvailManagerListName;
+				ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).ZoneNum = VentSlabZoneNum;
+				MyZoneEqFlag ( Item ) = false;
+			}
 			VentSlab( Item ).AvailStatus = ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).AvailStatus;
 		}
 
