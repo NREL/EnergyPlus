@@ -39,6 +39,8 @@
 #include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
+#include <ZoneTempPredictorCorrector.hh>
+
 
 namespace EnergyPlus {
 
@@ -522,6 +524,8 @@ namespace HVACMultiSpeedHeatPump {
 		using SteamCoils::GetTypeOfCoil;
 		using SteamCoils::ZoneLoadControl;
 		using FluidProperties::GetSatDensityRefrig;
+		using ZoneTempPredictorCorrector::NumStageCtrZone;
+		using DataZoneControls::StageControlledZone;
 
 		// Locals
 		// PARAMETERS
@@ -677,6 +681,10 @@ namespace HVACMultiSpeedHeatPump {
 						}
 						for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
 							if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
+							AirNodeFound = true;
+						}
+						for (TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum) {
+							if (StageControlledZone(TstatZoneNum).ActualZoneNum != MSHeatPump(MSHPNum).ControlZoneNum) continue;
 							AirNodeFound = true;
 						}
 					} else {
