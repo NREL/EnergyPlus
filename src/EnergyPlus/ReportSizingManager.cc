@@ -408,7 +408,8 @@ namespace ReportSizingManager {
 				ShowFatalError( "Preceding conditions cause termination." );
 			}
 		} else if ( CurZoneEqNum > 0 ) {
-			if ( !IsAutoSize && ! SizingDesRunThisZone && ! DataScalableSizingON && ! DataScalableCapSizingON ) {
+			//if ( !IsAutoSize && ! SizingDesRunThisZone && ! DataScalableSizingON && ! DataScalableCapSizingON ) {
+			if ( ! IsAutoSize && ! SizingDesRunThisZone ) {
 				HardSizeNoDesRun = true;
 				AutosizeUser = SizingResult;
 				if ( PrintWarningFlag && SizingResult > 0.0 ) {
@@ -421,54 +422,28 @@ namespace ReportSizingManager {
 						ReportSizingOutput( CompType, CompName, "User-Specified " + SizingString, SizingResult );
 					}
 				}
-			} else if (!IsAutoSize && DataScalableSizingON && (SizingType == SystemAirflowSizing || SizingType == HeatingAirflowSizing || SizingType == SystemAirflowSizing) ) {
-				if ( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType ) == FlowPerFloorArea) {
-						if (ZoneCoolingOnlyFan) {
-							AutosizeDes = DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneHeatingOnlyFan) {
-							AutosizeDes = DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
-							AutosizeDes = DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = max(DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea, DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea);
-						} else {
-							AutosizeDes = max(DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea, DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea);
-						}
-				}
 			} else {
 				if ( SizingType == SystemAirflowSizing ) {
 				
 					{ auto const SELECT_CASE_var( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType) );
 					if ((SELECT_CASE_var == SupplyAirFlowRate) || (SELECT_CASE_var == None)) {
-						if (ZoneCoolingOnlyFan) {
-							AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-						} else if (ZoneHeatingOnlyFan) {
-							AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-						} else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
-							AutosizeDes = ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
+
+						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+							AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).AirVolFlow, ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
 						} else {
-							AutosizeDes = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
-						}
-					
-					} else if (SELECT_CASE_var == FlowPerFloorArea) {
-						if (ZoneCoolingOnlyFan) {
-							AutosizeDes = DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneHeatingOnlyFan) {
-							AutosizeDes = DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
-							AutosizeDes = DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = max(DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea, DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea);
-						} else {
-							AutosizeDes = max(DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea, DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea);
+							if (ZoneCoolingOnlyFan) {
+								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+							} else if (ZoneHeatingOnlyFan) {
+								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+							} else if (ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow) {
+								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							} else if (ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow) {
+								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							} else if (ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow) {
+								AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							} else {
+								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							}
 						}
 										
 					} else if (SELECT_CASE_var == FractionOfAutosizedCoolingAirflow) {
@@ -536,7 +511,9 @@ namespace ReportSizingManager {
 						} else if ( ZoneEqSizing ( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing ( CurZoneEqNum ).CoolingAirFlow ) {
 							AutosizeDes = max ( ZoneEqSizing ( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing ( CurZoneEqNum ).HeatingAirVolFlow );
 						} else {
-							if ( ZoneCoolingOnlyFan ) {
+							if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+								AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).AirVolFlow, ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							} else if (ZoneCoolingOnlyFan) {
 								AutosizeDes = FinalZoneSizing ( CurZoneEqNum ).DesCoolVolFlow;
 							} else if ( ZoneHeatingOnlyFan ) {
 								AutosizeDes = FinalZoneSizing ( CurZoneEqNum ).DesHeatVolFlow;
@@ -548,37 +525,31 @@ namespace ReportSizingManager {
 					}
 				} else if ( SizingType == CoolingAirflowSizing || SizingType == HeatingAirflowSizing ) {
 
-					{ auto const SELECT_CASE_var(ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingType));
+					{ auto const SELECT_CASE_var(ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType ) );
 					if ((SELECT_CASE_var == SupplyAirFlowRate) || (SELECT_CASE_var == None)) {
-						if (ZoneCoolingOnlyFan) {
-							AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-						} else if (ZoneHeatingOnlyFan) {
-							AutosizeDes = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-						} else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
-							AutosizeDes = ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = max(ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow, ZoneEqSizing(CurZoneEqNum).HeatingAirVolFlow);
+						if ( ZoneEqSizing( CurZoneEqNum ).SystemAirFlow ) {
+							if ( SizingType == CoolingAirflowSizing ) {
+								AutosizeDes =ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							} else if ( SizingType == HeatingAirflowSizing ) {
+								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							} else {
+								AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).AirVolFlow, ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							}
 						} else {
-							AutosizeDes = max(FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow, FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow);
+							if (ZoneCoolingOnlyFan) {
+								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+							} else if (ZoneHeatingOnlyFan) {
+								AutosizeDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+							} else if (ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow && !ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow) {
+								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow;
+							} else if (ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && !ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow) {
+								AutosizeDes = ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow;
+							} else if (ZoneEqSizing( CurZoneEqNum ).HeatingAirFlow && ZoneEqSizing( CurZoneEqNum ).CoolingAirFlow) {
+								AutosizeDes = max( ZoneEqSizing( CurZoneEqNum ).CoolingAirVolFlow, ZoneEqSizing( CurZoneEqNum ).HeatingAirVolFlow );
+							} else {
+								AutosizeDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
+							}
 						}
-
-					} else if (SELECT_CASE_var == FlowPerFloorArea) {
-						if (ZoneCoolingOnlyFan) {
-							AutosizeDes = DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneHeatingOnlyFan) {
-							AutosizeDes = DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).CoolingAirFlow && !ZoneEqSizing(CurZoneEqNum).HeatingAirFlow) {
-							AutosizeDes = DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && !ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						} else if (ZoneEqSizing(CurZoneEqNum).HeatingAirFlow && ZoneEqSizing(CurZoneEqNum).CoolingAirFlow) {
-							AutosizeDes = max(DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea, DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea);
-						} else {
-							AutosizeDes = max(DataCoolFlowPerFloorArea * Zone(DataZoneNumber).FloorArea, DataHeatFlowPerFloorArea * Zone(DataZoneNumber).FloorArea);
-						}
-
 					} else if (SELECT_CASE_var == FractionOfAutosizedCoolingAirflow) {
 						if (ZoneCoolingOnlyFan) {
 							AutosizeDes = DataFracOfAutosizedCoolingAirflow * FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
@@ -662,7 +633,7 @@ namespace ReportSizingManager {
 					rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 					if ( TermUnitIU ) {
 						AutosizeDes = TermUnitSizing( CurZoneEqNum ).MaxCWVolFlow;
-					} else if ( ZoneEqFanCoil ) {
+					} else if (ZoneEqFanCoil || ZoneEqUnitVent || ZoneEqVentedSlab ) {
 						AutosizeDes = ZoneEqSizing( CurZoneEqNum ).MaxCWVolFlow;
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTemp;
@@ -676,10 +647,6 @@ namespace ReportSizingManager {
 							AutosizeDes = 0.0;
 						}
 					}
-//					if ( AutosizeDes == 0.0 ) {
-//						ShowWarningError( "The design coil load is zero for " + CompName + CompName );
-//						ShowContinueError( "The autosize value for max water flow rate is zero" );
-//					}
 					bCheckForZero = false;
 				} else if ( SizingType == HeatingWaterflowSizing ) {
 					if ( TermUnitSingDuct || TermUnitPIU || TermUnitIU ) {
@@ -692,6 +659,8 @@ namespace ReportSizingManager {
 						Cp = GetSpecificHeatGlycol( PlantLoop( DataWaterLoopNum ).FluidName, 60.0, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						rho = GetDensityGlycol( PlantLoop( DataWaterLoopNum ).FluidName, InitConvTemp, PlantLoop( DataWaterLoopNum ).FluidIndex, CallingRoutine );
 						DesCoilLoad = AutosizeDes * PlantSizData( DataPltSizHeatNum ).DeltaT * Cp * rho;
+					} else if (ZoneEqUnitHeater || ZoneEqVentedSlab) {  // for unit ventilator the cp value is calculated at 5.05(InitConvTemp) for the child and 60.0C for the unit ventilator //|| ZoneEqUnitVent
+						AutosizeDes = ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow;
 					} else {
 						CoilInTemp = FinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTemp;
 						CoilOutTemp = FinalZoneSizing( CurZoneEqNum ).HeatDesTemp;
@@ -706,10 +675,6 @@ namespace ReportSizingManager {
 							AutosizeDes = 0.0;
 						}
 					}
-//					if ( AutosizeDes == 0.0 ) {
-//						ShowWarningError( "The design coil load is zero for " + CompType + CompName );
-//						ShowContinueError( "The autosize value for max water flow rate is zero" );
-//					}
 					bCheckForZero = false;
 				} else if ( SizingType == HeatingWaterDesAirInletTempSizing ) {
 					if ( TermUnitPIU ) {
@@ -876,10 +841,6 @@ namespace ReportSizingManager {
 					if ( ZoneEqSizing( CurZoneEqNum ).CoolingCapacity ) { // Parent object calculated capacity
 						AutosizeDes = ZoneEqSizing ( CurZoneEqNum ).DesCoolingLoad;
 						DesVolFlow = DataFlowUsedForSizing;
-					} else if (!IsAutoSize && DataScalableCapSizingON) {
-						if (ZoneEqSizing( CurZoneEqNum ).CapSizingMethod( SizingType ) == CapacityPerFloorArea) {
-							AutosizeDes = DataCoolingCapPerFloorArea * Zone(DataZoneNumber).FloorArea;
-						}
 					} else {
 						if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) ) {
 							if ( TermUnitIU ) {
@@ -954,10 +915,6 @@ namespace ReportSizingManager {
 					} else if ( DataCoolCoilCap > 0.0 && DataFlowUsedForSizing > 0.0 ) {
 						NominalCapacityDes = DataCoolCoilCap;
 						DesVolFlow = DataFlowUsedForSizing;
-					} else if (!IsAutoSize && DataScalableCapSizingON) {
-						if ( ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingType) == CapacityPerFloorArea) {
-							NominalCapacityDes = DataHeatingCapPerFloorArea * Zone( DataZoneNumber ).FloorArea;
-					    }
 					} else if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallMassFlow ) {
 						if ( TermUnitPIU ) {
 							MinPriFlowFrac = TermUnitSizing( CurZoneEqNum ).MinFlowFrac;
@@ -1405,17 +1362,17 @@ namespace ReportSizingManager {
 						AutosizeDes = OASysEqSizing ( CurOASysNum ).DesCoolingLoad;
 					} else if ( AirLoopSysFlag ) {
 						AutosizeDes = UnitarySysEqSizing ( CurSysNum ).DesCoolingLoad;
-					} else if (FinalSysSizing(CurSysNum).CoolingCapMethod == CapacityPerFloorArea) {
-							   AutosizeDes = FinalSysSizing( CurSysNum ).CoolingTotalCapacity;
 					} else {
 						CheckSysSizing ( CompType, CompName );
 						DesVolFlow = DataFlowUsedForSizing;
-						if (FinalSysSizing(CurSysNum).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
+						if ( FinalSysSizing( CurSysNum ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
 						    DataFracOfAutosizedCoolingCapacity = FinalSysSizing( CurSysNum ).FractionOfAutosizedCoolingCapacity;
-						} else {
-						    DataFracOfAutosizedCoolingCapacity = 1.0;
-						}
-						if ( DesVolFlow >= SmallAirVolFlow ) {
+						}						
+						if (FinalSysSizing( CurSysNum ).CoolingCapMethod == CapacityPerFloorArea) {
+							NominalCapacityDes = FinalSysSizing( CurSysNum ).CoolingTotalCapacity;
+						} else if (FinalSysSizing( CurSysNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( CurSysNum ).CoolingTotalCapacity > 0.0 ) {
+							NominalCapacityDes = FinalSysSizing( CurSysNum ).CoolingTotalCapacity;
+						} else if ( DesVolFlow >= SmallAirVolFlow ) {
 							if ( CurOASysNum > 0 ) { // coil is in the OA stream
 								CoilInTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
 								CoilInHumRat = FinalSysSizing ( CurSysNum ).CoolOutHumRat;
@@ -1472,11 +1429,9 @@ namespace ReportSizingManager {
 							DesVolFlow = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
 						}
 					} else {
-						if (FinalSysSizing(CurSysNum).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
+						if (FinalSysSizing( CurSysNum ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
 							DataFracOfAutosizedHeatingCapacity = FinalSysSizing(CurSysNum).FractionOfAutosizedHeatingCapacity;
-						} else {
-						    DataFracOfAutosizedHeatingCapacity = 1.0;
-						}
+						} 
 						if ( DataFlowUsedForSizing > 0.0 ) {
 							DesVolFlow = DataFlowUsedForSizing;
 						} else if ( UnitarySysEqSizing( CurSysNum ).HeatingAirFlow ) {
@@ -1549,6 +1504,10 @@ namespace ReportSizingManager {
 								}
 							}
 						}
+					} else if (FinalSysSizing( CurSysNum ).HeatingCapMethod == CapacityPerFloorArea) {
+						NominalCapacityDes = FinalSysSizing( CurSysNum ).HeatingTotalCapacity;
+					} else if (FinalSysSizing( CurSysNum ).HeatingCapMethod == HeatingDesignCapacity && FinalSysSizing( CurSysNum ).HeatingTotalCapacity > 0.0) {
+						NominalCapacityDes = FinalSysSizing( CurSysNum ).HeatingTotalCapacity;
 					} else {
 						if ( DataCoolCoilCap > 0.0 ) {
 							NominalCapacityDes = DataCoolCoilCap;

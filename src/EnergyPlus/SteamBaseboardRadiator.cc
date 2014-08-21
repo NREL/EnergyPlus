@@ -781,6 +781,7 @@ namespace SteamBaseboardRadiator {
 		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -865,10 +866,10 @@ namespace SteamBaseboardRadiator {
 								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 							}
 							TempSize = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-
 						} else if (CapSizingMethod == CapacityPerFloorArea){
-							DataHeatingCapPerFloorArea = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-							TempSize = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity;
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = SteamBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 							DataScalableCapSizingON = true;
 						} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 							CheckZoneSizing(CompType, CompName);

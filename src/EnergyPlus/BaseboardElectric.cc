@@ -481,6 +481,7 @@ namespace BaseboardElectric {
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -534,13 +535,14 @@ namespace BaseboardElectric {
 					} 
 					TempSize = Baseboard( BaseboardNum ).ScaledHeatingCapacity;					
 				} else if ( CapSizingMethod == CapacityPerFloorArea ){
-					DataHeatingCapPerFloorArea = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
-					TempSize = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 					DataScalableCapSizingON = true;
 				} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){	
 					CheckZoneSizing( CompType, CompName );
 					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-					DataFracOfAutosizedHeatingCapacity = Baseboard(BaseboardNum).ScaledHeatingCapacity;
+					DataFracOfAutosizedHeatingCapacity = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
 					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
 					TempSize = AutoSize;
 					DataScalableCapSizingON = true;

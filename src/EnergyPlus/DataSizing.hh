@@ -151,6 +151,9 @@ namespace DataSizing {
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit
 	extern bool ZoneEqFanCoil; // TRUE if a 4 pipe fan coil unit is being simulated
+	extern bool ZoneEqUnitHeater; // TRUE if a unit heater is being simulated
+	extern bool ZoneEqUnitVent;   // TRUE if a unit ventilator is being simulated
+	extern bool ZoneEqVentedSlab;   // TRUE if a ventilated slab is being simulated
 	extern bool ZoneEqDXCoil; // TRUE if a ZoneHVAC DX coil is being simulated
 	extern bool ZoneCoolingOnlyFan; // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
 	extern bool ZoneHeatingOnlyFan; // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
@@ -176,14 +179,10 @@ namespace DataSizing {
 	extern Real64 DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
 	extern Real64 DataEMSOverride; // value of EMS variable used to override autosizing
 	extern Real64 DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
-	extern Real64 DataCoolFlowPerFloorArea;  // cooling supply air flow per unit conditioned floor area
-	extern Real64 DataHeatFlowPerFloorArea;  // heating supply air flow per unit conditioned floor area
 	extern Real64 DataFracOfAutosizedCoolingAirflow;  // fraction of design cooling supply air flow rate
 	extern Real64 DataFracOfAutosizedHeatingAirflow;  // fraction of design heating supply air flow rate
 	extern Real64 DataFlowPerCoolingCapacity;  // cooling supply air flow per unit cooling capacity
 	extern Real64 DataFlowPerHeatingCapacity;  // heating supply air flow per unit heating capacity
-	extern Real64 DataCoolingCapPerFloorArea;  // cooling capacity per floor area
-	extern Real64 DataHeatingCapPerFloorArea;  // heating capacity per floor area
 	extern Real64 DataFracOfAutosizedCoolingCapacity;  // fraction of autosized cooling capacity
 	extern Real64 DataFracOfAutosizedHeatingCapacity;  // fraction of autosized heating capacit
 	extern Real64 DataAutosizedCoolingCapacity;  // Autosized cooling capacity used for multiplying flow per capacity to get flow rate

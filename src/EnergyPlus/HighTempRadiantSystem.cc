@@ -730,6 +730,7 @@ namespace HighTempRadiantSystem {
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -778,14 +779,17 @@ namespace HighTempRadiantSystem {
 
 				if (CapSizingMethod == HeatingDesignCapacity){
 					if (HighTempRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize) {
-						CheckZoneSizing( CompType, CompName );
-						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+						CheckZoneSizing( CompType, CompName );						
 						ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor / (HighTempRadSys(RadSysNum).FracRadiant + HighTempRadSys(RadSysNum).FracConvect);
+					} else {
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
 					}
-					TempSize = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 				} else if (CapSizingMethod == CapacityPerFloorArea){
-					DataHeatingCapPerFloorArea = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
-					TempSize = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 					DataScalableCapSizingON = true;
 				} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 					CheckZoneSizing( CompType, CompName );

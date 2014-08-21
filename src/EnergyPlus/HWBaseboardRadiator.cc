@@ -793,6 +793,7 @@ namespace HWBaseboardRadiator {
 		//       DATE WRITTEN   February 2002
 		//       MODIFIED       August 2009 Daeho Kang (Add UA autosizing by LMTD)
 		//                      Aug 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B.Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -811,6 +812,7 @@ namespace HWBaseboardRadiator {
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using ReportSizingManager::RequestSizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -897,8 +899,9 @@ namespace HWBaseboardRadiator {
 					TempSize = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
 
 				} else if (CapSizingMethod == CapacityPerFloorArea){
-					DataHeatingCapPerFloorArea = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
-					TempSize = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HWBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 					DataScalableCapSizingON = true;
 				} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 					CheckZoneSizing(CompType, CompName);

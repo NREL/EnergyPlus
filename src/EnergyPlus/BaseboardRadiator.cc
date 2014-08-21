@@ -9,6 +9,7 @@
 #include <BaseboardRadiator.hh>
 #include <BranchNodeConnections.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
@@ -562,6 +563,7 @@ namespace BaseboardRadiator {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   February 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B.Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -584,6 +586,8 @@ namespace BaseboardRadiator {
 		using ReportSizingManager::RequestSizing;
 		using DataLoopNode::Node;
 		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -654,8 +658,6 @@ namespace BaseboardRadiator {
 					}
 				} else {
 					CheckZoneSizing( cCMO_BBRadiator_Water, Baseboard( BaseboardNum ).EquipID );
-					
-					//DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
 					CompType = cCMO_BBRadiator_Water;
 					CompName = Baseboard(BaseboardNum).EquipID;
 					DataFracOfAutosizedHeatingCapacity = 1.0;
@@ -671,14 +673,16 @@ namespace BaseboardRadiator {
 						if (CapSizingMethod == HeatingDesignCapacity){
 							if (Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize) {
 								CheckZoneSizing(CompType, CompName);
-								ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
 								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+							} else {
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
 							}
-							TempSize = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
-
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 						} else if (CapSizingMethod == CapacityPerFloorArea){
-							DataHeatingCapPerFloorArea = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
-							TempSize = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 							DataScalableCapSizingON = true;
 						} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 							CheckZoneSizing(CompType, CompName);
@@ -693,7 +697,7 @@ namespace BaseboardRadiator {
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
 					} else {
-						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+						DesCoilLoad = 0.0; 
 					}
 
 					if ( DesCoilLoad >= SmallLoad ) {
@@ -756,18 +760,19 @@ namespace BaseboardRadiator {
 					CapSizingMethod = Baseboard(BaseboardNum).HeatingCapMethod;
 					ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 					if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-
 						if (CapSizingMethod == HeatingDesignCapacity){
 							if (Baseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
 								CheckZoneSizing(CompType, CompName);
-								ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
 								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+							} else {
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity;;
 							}
-							TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
-
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 						} else if (CapSizingMethod == CapacityPerFloorArea){
-							DataHeatingCapPerFloorArea = Baseboard(BaseboardNum).ScaledHeatingCapacity;
-							TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 							DataScalableCapSizingON = true;
 						} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 							CheckZoneSizing(CompType, CompName);

@@ -9,6 +9,7 @@
 #include <WindowAC.hh>
 #include <BranchNodeConnections.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -818,6 +819,7 @@ namespace WindowAC {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   January 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B. Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -839,6 +841,7 @@ namespace WindowAC {
 		using DataHVACGlobals::SystemAirflowSizing;
 		using DataHVACGlobals::CoolingAirflowSizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -900,10 +903,15 @@ namespace WindowAC {
 				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
 				if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
 					if (SAFMethod == SupplyAirFlowRate){
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+						if (ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					} else if (SAFMethod == FlowPerFloorArea){
-						DataCoolFlowPerFloorArea = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;;
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
 					} else if (SAFMethod == FractionOfAutosizedCoolingAirflow){
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
@@ -933,7 +941,7 @@ namespace WindowAC {
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					WindAC( WindACNum ).MaxAirVolFlow = TempSize;
 				}
-				DataScalableSizingON = false;
+				//DataScalableSizingON = false;
 			
 				// initialize capacity sizing variables: cooling
 				CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
@@ -945,9 +953,12 @@ namespace WindowAC {
 							ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
 						}
 					} else if (CapSizingMethod == CapacityPerFloorArea){
-						DataCoolingCapPerFloorArea = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
+						DataScalableCapSizingON = true;
 					} else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity){
 						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+						DataScalableCapSizingON = true;
 					}
 				}			
 			} else {

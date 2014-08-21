@@ -12,6 +12,7 @@
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobalConstants.hh>
+#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -2606,14 +2607,11 @@ namespace EvaporativeCoolers {
 		using ReportSizingManager::ReportSizingOutput;
 		using ReportSizingManager::RequestSizing;
 		using namespace DataSizing;
-		//using DataSizing::CurZoneEqNum;
-		//using DataSizing::ZoneEqSizing;
-		//using DataSizing::FinalZoneSizing;
 		using DataHVACGlobals::SmallAirVolFlow;
-		//using General::RoundSigDigits;
 		using DataHVACGlobals::SystemAirflowSizing;
 		using DataHVACGlobals::CoolingAirflowSizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2661,13 +2659,18 @@ namespace EvaporativeCoolers {
 				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
 				if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
 					if (SAFMethod == SupplyAirFlowRate){
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;						
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							PrintFlag = false;
 						}
 					} else if (SAFMethod == FlowPerFloorArea){
-						DataCoolFlowPerFloorArea = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;;
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
 					} else if (SAFMethod == FractionOfAutosizedCoolingAirflow){
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
@@ -2700,24 +2703,6 @@ namespace EvaporativeCoolers {
 				}
 				DataScalableSizingON = false;
 				ZoneCoolingOnlyFan = false;
-
-				//// initialize capacity sizing variables: cooling
-				//CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
-				//ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-				//if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-				//	if (CapSizingMethod == HeatingDesignCapacity){
-				//		if (ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
-				//			ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-				//			ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-				//		}
-				//	}
-				//	else if (CapSizingMethod == CapacityPerFloorArea){
-				//		DataCoolingCapPerFloorArea = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-				//	}
-				//	else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity){
-				//		DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
-				//	}
-				//}
 			
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
@@ -2732,21 +2717,7 @@ namespace EvaporativeCoolers {
 				ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = TempSize;
 				ZoneCoolingOnlyFan = false;
 			}
-
 		}
-
-		//if ( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate == AutoSize ) {
-
-		//	if ( CurZoneEqNum > 0 ) {
-		//		CheckZoneSizing( "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit( UnitNum ).Name );
-		//		ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-		//		if ( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate < SmallAirVolFlow ) {
-		//			ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate = 0.0;
-		//		}
-		//		ReportSizingOutput( "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit( UnitNum ).Name, "Design Supply Air Flow Rate [m3/s]", ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate );
-		//	}
-
-		//}
 
 	}
 

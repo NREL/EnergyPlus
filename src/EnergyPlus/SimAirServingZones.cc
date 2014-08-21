@@ -3301,6 +3301,7 @@ namespace SimAirServingZones {
 		std::string CompName; // Component name
 		std::string CoilName;
 		std::string CoilType;
+		std::string ScalableSM; // scalable sizing methods label for reporting
 		int CompType_Num; // Numeric equivalent for CompType
 		int CompNum;
 		bool ErrorsFound;
@@ -3334,7 +3335,19 @@ namespace SimAirServingZones {
 			if ( PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate == AutoSize ) {
 				CheckSysSizing( "AirLoopHVAC", PrimaryAirSystem( AirLoopNum ).Name );
 				PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate = FinalSysSizing( AirLoopNum ).DesMainVolFlow;
-				ReportSizingOutput( "AirLoopHVAC", PrimaryAirSystem( AirLoopNum ).Name, "Design Supply Air Flow Rate [m3/s]", PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate );
+
+				{ auto const SELECT_CASE_var( FinalSysSizing( AirLoopNum ).ScaleCoolSAFMethod );
+					if (SELECT_CASE_var == FlowPerFloorArea) {
+						ScalableSM = "User-Specified(scaled by flow / area) ";
+					} else if (SELECT_CASE_var == FractionOfAutosizedCoolingAirflow) {
+						ScalableSM = "User-Specified(scaled by fractional multiplier) ";
+					} else if (SELECT_CASE_var == FlowPerCoolingCapacity) {
+						ScalableSM = "User-Specified(scaled by flow / capacity) ";				
+					} else {
+						ScalableSM = "Design ";
+					}
+				}
+				ReportSizingOutput("AirLoopHVAC", PrimaryAirSystem(AirLoopNum).Name, ScalableSM + "Supply Air Flow Rate [m3/s]", PrimaryAirSystem(AirLoopNum).DesignVolFlowRate);
 			}
 
 			if ( PrimaryAirSystem( AirLoopNum ).DesignVolFlowRate < SmallAirVolFlow ) {
@@ -5930,7 +5943,7 @@ namespace SimAirServingZones {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// Modifies the design sizing flow rates for scalable sizing method inputs
+		// Modifies the design sizing flow rates for system scalable sizing method
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -6084,7 +6097,7 @@ namespace SimAirServingZones {
 						CalcSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 						FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity;
 					} else {
-						// autosized
+						FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = 0.0;  // autosized, set to zero initially
 					}
 				} else if (SELECT_CASE_var == CapacityPerFloorArea) {
 					FinalSysSizing( AirLoopNum ).CoolingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledCoolingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled;
@@ -6101,7 +6114,7 @@ namespace SimAirServingZones {
 					if (CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity > 0.0) {
 						FinalSysSizing( AirLoopNum ).HeatingTotalCapacity= CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity;
 					}else {
-						// autosized
+						FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = 0.0; // autosized, set to zero initially
 					}
 				} else if (SELECT_CASE_var == CapacityPerFloorArea) {
 					FinalSysSizing( AirLoopNum ).HeatingTotalCapacity = CalcSysSizing( AirLoopNum ).ScaledHeatingCapacity * CalcSysSizing( AirLoopNum ).FloorAreaOnAirLoopHeated;

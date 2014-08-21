@@ -653,6 +653,7 @@ namespace ElectricBaseboardRadiator {
 		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -701,13 +702,16 @@ namespace ElectricBaseboardRadiator {
 				if (CapSizingMethod == HeatingDesignCapacity){
 					if (ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize) {
 						CheckZoneSizing(CompType, CompName);
-						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 						ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+					} else {
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 					}
-					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 				} else if ( CapSizingMethod == CapacityPerFloorArea ){
-					DataHeatingCapPerFloorArea = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
-					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 					DataScalableCapSizingON = true;
 				} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 					CheckZoneSizing(CompType, CompName);

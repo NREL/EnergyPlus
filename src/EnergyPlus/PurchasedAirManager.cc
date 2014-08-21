@@ -988,6 +988,7 @@ namespace PurchasedAirManager {
 		using DataHVACGlobals::HeatingAirflowSizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
 		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1074,8 +1075,9 @@ namespace PurchasedAirManager {
 								}
 							}
 						} else if (SAFMethod == FlowPerFloorArea){
-							DataHeatFlowPerFloorArea = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
-							TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 							DataScalableSizingON = true;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 							HeatingAirVolFlowDes = TempSize;
@@ -1121,9 +1123,9 @@ namespace PurchasedAirManager {
 								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
 							}
 							TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
-						}
-						else if (CapSizingMethod == CapacityPerFloorArea){
-							DataHeatingCapPerFloorArea = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+						} else if (CapSizingMethod == CapacityPerFloorArea){
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 							DataScalableSizingON = true;
 						}
 						else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
@@ -1191,8 +1193,9 @@ namespace PurchasedAirManager {
 								}
 							}							
 						} else if (SAFMethod == FlowPerFloorArea){
-							DataCoolFlowPerFloorArea = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
-							TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 							DataScalableSizingON = true;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 							CoolingAirVolFlowDes = TempSize;
@@ -1240,7 +1243,8 @@ namespace PurchasedAirManager {
 							}
 							TempSize = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
 						} else if (CapSizingMethod == CapacityPerFloorArea){
-							DataCoolingCapPerFloorArea = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 							DataScalableSizingON = true;
 						} else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity){
 							DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;

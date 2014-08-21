@@ -1923,6 +1923,7 @@ namespace LowTempRadiantSystem {
 		using General::RoundSigDigits;
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1995,18 +1996,19 @@ namespace LowTempRadiantSystem {
 				CapSizingMethod = ElecRadSys(RadSysNum).HeatingCapMethod;
 				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 				if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-
 					if (CapSizingMethod == HeatingDesignCapacity){
 						if (ElecRadSys(RadSysNum).ScaledHeatingCapacity == AutoSize) {
 							CheckZoneSizing(CompType, CompName);
-							ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
 							ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+						}else {
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecRadSys( RadSysNum ).ScaledHeatingCapacity;
 						}
-						TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity;
-
+						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 					} else if (CapSizingMethod == CapacityPerFloorArea){
-						DataHeatingCapPerFloorArea = ElecRadSys(RadSysNum).ScaledHeatingCapacity;
-						TempSize = ElecRadSys(RadSysNum).ScaledHeatingCapacity;
+						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 						DataScalableCapSizingON = true;
 					} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 						CheckZoneSizing(CompType, CompName);
@@ -2052,7 +2054,6 @@ namespace LowTempRadiantSystem {
 							CapSizingMethod = HydrRadSys( RadSysNum ).HeatingCapMethod;
 							ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
 							if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-
 								if (CapSizingMethod == HeatingDesignCapacity){
 									if (HydrRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize) {
 										CheckZoneSizing(CompType, CompName);
@@ -2062,8 +2063,9 @@ namespace LowTempRadiantSystem {
 									TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
 
 								} else if (CapSizingMethod == CapacityPerFloorArea){
-									DataHeatingCapPerFloorArea = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
-									TempSize = HydrRadSys( RadSysNum ).ScaledHeatingCapacity;
+									ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+									ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HydrRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+									TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
 									DataScalableCapSizingON = true;
 								} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
 									CheckZoneSizing(CompType, CompName);
@@ -2151,8 +2153,9 @@ namespace LowTempRadiantSystem {
 									TempSize = HydrRadSys( RadSysNum ).ScaledCoolingCapacity;
 
 								} else if (CapSizingMethod == CapacityPerFloorArea){
-									DataCoolingCapPerFloorArea = HydrRadSys(RadSysNum).ScaledCoolingCapacity;
-									TempSize = HydrRadSys(RadSysNum).ScaledCoolingCapacity;
+									ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+									ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = HydrRadSys( RadSysNum ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
+									TempSize = ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad;
 									DataScalableCapSizingON = true;
 								} else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity){
 									CheckZoneSizing(CompType, CompName);
