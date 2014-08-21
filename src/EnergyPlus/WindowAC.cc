@@ -483,7 +483,6 @@ namespace WindowAC {
 
 			if ( ! lAlphaBlanks( 13 ) ) {
 				WindAC( WindACNum ).AvailManagerListName = Alphas( 13 );
-				ZoneComp( WindowAC_Num ).ZoneCompAvailMgrs( WindACNum ).AvailManagerListName = Alphas( 13 );
 			}
 
 			// Add fan to component sets array
@@ -668,6 +667,7 @@ namespace WindowAC {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // loop counter
 		static FArray1D_bool MyEnvrnFlag; // one time initialization flag
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 QToCoolSetPt; // sensible load to cooling setpoint (W)
 		Real64 NoCompOutput; // sensible load delivered with compressor off (W)
 
@@ -676,14 +676,20 @@ namespace WindowAC {
 
 			MyEnvrnFlag.allocate( NumWindAC );
 			MySizeFlag.allocate( NumWindAC );
+			MyZoneEqFlag.allocate ( NumWindAC );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( WindowAC_Num ).ZoneCompAvailMgrs( WindACNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( WindACNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( WindowAC_Num ).ZoneCompAvailMgrs( WindACNum ).AvailManagerListName = WindAC( WindACNum ).AvailManagerListName;
+				ZoneComp( WindowAC_Num ).ZoneCompAvailMgrs( WindACNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( WindACNum ) = false;
+			}
 			WindAC( WindACNum ).AvailStatus = ZoneComp( WindowAC_Num ).ZoneCompAvailMgrs( WindACNum ).AvailStatus;
 		}
 
