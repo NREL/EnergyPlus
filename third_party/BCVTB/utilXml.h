@@ -129,14 +129,14 @@ char Buff[BUFFSIZE]; ///< Local buffer for reading in the xml file
 ////////////////////////////////////////////////////////////////
 ///\struct A simple stack structure to keep track of the parent elements
 ////////////////////////////////////////////////////////////////  
-typedef struct Stack{
+typedef struct Stack2{
   char** head;
   int top;
   int cur;
-} Stack;
+} Stack2;
 
 
-Stack expStk; ///< Variables for getxmlvalue function
+Stack2 expStk; ///< Variables for getxmlvalue function
 
 char* att; ///< Local global variable for function \c getxmlvalue
 char* vals;  ///< Local global variable for function \c getxmlvalue

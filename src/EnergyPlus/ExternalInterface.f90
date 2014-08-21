@@ -24,319 +24,319 @@
     ! na
 
     ! USE STATEMENTS:
-    USE DataGlobals, ONLY: MaxNameLength
-    USE DataPrecisionGlobals
-    USE DataStringGlobals, ONLY: PathChar,AltPathChar,CurrentWorkingFolder
-    USE DataInterfaces, ONLY: ShowWarningError, ShowSevereError, &
-    ShowFatalError, SetupOutputVariable, ShowContinueError
-    USE General, ONLY: TrimSigDigits
-    USE ISO_C_BINDING, ONLY: C_PTR, C_INT, C_DOUBLE
+!    USE DataGlobals, ONLY: MaxNameLength
+!    USE DataPrecisionGlobals
+!    USE DataStringGlobals, ONLY: PathChar,AltPathChar,CurrentWorkingFolder
+!    USE DataInterfaces, ONLY: ShowWarningError, ShowSevereError, &
+!    ShowFatalError, SetupOutputVariable, ShowContinueError
+!    USE General, ONLY: TrimSigDigits
+!    USE ISO_C_BINDING, ONLY: C_PTR, C_INT, C_DOUBLE
 
     ! <use statements for access to subroutines in other modules>
 
-    IMPLICIT NONE ! Enforce explicit typing of all variables
+!    IMPLICIT NONE ! Enforce explicit typing of all variables
 
-    REAL(r64), PUBLIC :: tComm = 0.0d0      ! Communication time step
-    REAL(r64), PUBLIC :: tStop = 3600.0d0   ! Stop time used during the warmup period
-    REAL(r64), PUBLIC :: tStart = 0.0d0     ! Start time used during the warmup period
-    REAL(r64), PUBLIC :: hStep = 15.0d0     ! Communication step size
-    INTEGER, PUBLIC :: fmiTrue = 1
-    INTEGER, PUBLIC :: fmiFalse = 0
-    LOGICAL, PUBLIC :: FlagReIni = .FALSE.                         ! Flag for reinitialization of states in GetSetAndDoStep
-    CHARACTER(len=10*MaxNameLength) :: FMURootWorkingFolder = ' '  ! FMU root working folder
-    INTEGER ::LEN_FMU_ROOT_DIR
+!    REAL(r64), PUBLIC :: tComm = 0.0d0      ! Communication time step
+!    REAL(r64), PUBLIC :: tStop = 3600.0d0   ! Stop time used during the warmup period
+!    REAL(r64), PUBLIC :: tStart = 0.0d0     ! Start time used during the warmup period
+!    REAL(r64), PUBLIC :: hStep = 15.0d0     ! Communication step size
+!    INTEGER, PUBLIC :: fmiTrue = 1
+!    INTEGER, PUBLIC :: fmiFalse = 0
+!    LOGICAL, PUBLIC :: FlagReIni = .FALSE.                         ! Flag for reinitialization of states in GetSetAndDoStep
+!    CHARACTER(len=10*MaxNameLength) :: FMURootWorkingFolder = ' '  ! FMU root working folder
+!    INTEGER ::LEN_FMU_ROOT_DIR
 
-    PRIVATE ! Everything private unless explicitly made public
+!    PRIVATE ! Everything private unless explicitly made public
 
-    ! MODULE PARAMETER DEFINITIONS:
-    INTEGER, PARAMETER :: maxVar = 1024              ! Maximum number of variables to be exchanged
-    INTEGER, PARAMETER :: maxErrMsgLength = 10000    ! Maximum error message length from xml schema validation
-    INTEGER, PARAMETER :: indexSchedule = 1   ! Index for schedule in inpVarTypes
-    INTEGER, PARAMETER :: indexVariable = 2   ! Index for variable in inpVarTypes
-    INTEGER, PARAMETER :: indexActuator = 3   ! Index for actuator in inpVarTypes
-    INTEGER, PARAMETER :: nInKeys       = 3   ! Number of input variables available in ExternalInterface (=highest index* number)
-    INTEGER, PARAMETER :: fmiOK = 0           ! fmiOK
-    INTEGER, PARAMETER :: fmiWarning = 1      ! fmiWarning
-    INTEGER, PARAMETER :: fmiDiscard = 2      ! fmiDiscard
-    INTEGER, PARAMETER :: fmiError = 3        ! fmiError
-    INTEGER, PARAMETER :: fmiFatal = 4        ! fmiPending
-    INTEGER, PARAMETER :: fmiPending = 5      ! fmiPending
-    CHARACTER(len=*), PARAMETER :: socCfgFilNam="socket.cfg" ! socket configuration file
-    CHARACTER(len=*), PARAMETER :: BlankString=' '
+!    ! MODULE PARAMETER DEFINITIONS:
+!    INTEGER, PARAMETER :: maxVar = 1024              ! Maximum number of variables to be exchanged
+!    INTEGER, PARAMETER :: maxErrMsgLength = 10000    ! Maximum error message length from xml schema validation
+!    INTEGER, PARAMETER :: indexSchedule = 1   ! Index for schedule in inpVarTypes
+!    INTEGER, PARAMETER :: indexVariable = 2   ! Index for variable in inpVarTypes
+!    INTEGER, PARAMETER :: indexActuator = 3   ! Index for actuator in inpVarTypes
+!    INTEGER, PARAMETER :: nInKeys       = 3   ! Number of input variables available in ExternalInterface (=highest index* number)
+!    INTEGER, PARAMETER :: fmiOK = 0           ! fmiOK
+!    INTEGER, PARAMETER :: fmiWarning = 1      ! fmiWarning
+!    INTEGER, PARAMETER :: fmiDiscard = 2      ! fmiDiscard
+!    INTEGER, PARAMETER :: fmiError = 3        ! fmiError
+!    INTEGER, PARAMETER :: fmiFatal = 4        ! fmiPending
+!    INTEGER, PARAMETER :: fmiPending = 5      ! fmiPending
+!    CHARACTER(len=*), PARAMETER :: socCfgFilNam="socket.cfg" ! socket configuration file
+!    CHARACTER(len=*), PARAMETER :: BlankString=' '
 
 
     ! DERIVED TYPE DEFINITIONS:
 
-    TYPE  fmuInputVariableType
-        CHARACTER(len= MaxNameLength)      :: Name = BlankString         ! Name of FMU input variable
-        INTEGER                            :: ValueReference = 0       ! = fmiValueReference specific to FMU variable
-    END TYPE fmuInputVariableType
+!    TYPE  fmuInputVariableType
+!        CHARACTER(len= MaxNameLength)      :: Name = BlankString         ! Name of FMU input variable
+!        INTEGER                            :: ValueReference = 0       ! = fmiValueReference specific to FMU variable
+!    END TYPE fmuInputVariableType
 
-    TYPE  checkFMUInstanceNameType
-        CHARACTER(len= MaxNameLength)      :: Name = BlankString         ! Name of fmu instance
-    END TYPE checkFMUInstanceNameType
+!    TYPE  checkFMUInstanceNameType
+!        CHARACTER(len= MaxNameLength)      :: Name = BlankString         ! Name of fmu instance
+!    END TYPE checkFMUInstanceNameType
 
-    TYPE  eplusOutputVariableType
-        CHARACTER(len=MaxNameLength), DIMENSION(1)       :: Name   = BlankString ! Variable name in EnergyPlus
-        CHARACTER(len=MaxNameLength), DIMENSION(1)       :: VarKey = BlankString ! Key value in EnergyPlus
-        REAL(r64)                                        :: RTSValue  = 0.0d0    ! Real value of variable at the Zone Time Step
-        INTEGER                            :: ITSValue       = 0               ! Integer value of variable at the Zone Time Step
-        INTEGER                            :: VarIndex       = 0               ! Index Value of variable
-        INTEGER                            :: VarType        = 0               ! Type of variable at the Zone Time Step
-        CHARACTER(len=MaxNameLength)       :: VarUnits       = BlankString       ! Units string, may be blank
-    END TYPE eplusOutputVariableType
+!    TYPE  eplusOutputVariableType
+!        CHARACTER(len=MaxNameLength), DIMENSION(1)       :: Name   = BlankString ! Variable name in EnergyPlus
+!        CHARACTER(len=MaxNameLength), DIMENSION(1)       :: VarKey = BlankString ! Key value in EnergyPlus
+!        REAL(r64)                                        :: RTSValue  = 0.0d0    ! Real value of variable at the Zone Time Step
+!        INTEGER                            :: ITSValue       = 0               ! Integer value of variable at the Zone Time Step
+!        INTEGER                            :: VarIndex       = 0               ! Index Value of variable
+!        INTEGER                            :: VarType        = 0               ! Type of variable at the Zone Time Step
+!        CHARACTER(len=MaxNameLength)       :: VarUnits       = BlankString       ! Units string, may be blank
+!    END TYPE eplusOutputVariableType
 
-    TYPE  fmuOutputVariableScheduleType
-        CHARACTER(len=MaxNameLength)  :: Name = BlankString           ! Name of fmu output variable --> schedule in energyplus
-        REAL(r64)                     :: RealVarValue         = 0.0d0 ! = Real value at the Zone Time Step
-        INTEGER                       :: ValueReference       = 0   ! = fmiValueReference specific to FMU variable
-    END TYPE fmuOutputVariableScheduleType
+!    TYPE  fmuOutputVariableScheduleType
+!        CHARACTER(len=MaxNameLength)  :: Name = BlankString           ! Name of fmu output variable --> schedule in energyplus
+!        REAL(r64)                     :: RealVarValue         = 0.0d0 ! = Real value at the Zone Time Step
+!        INTEGER                       :: ValueReference       = 0   ! = fmiValueReference specific to FMU variable
+!    END TYPE fmuOutputVariableScheduleType
 
-    TYPE  fmuOutputVariableVariableType
-        CHARACTER(len=MaxNameLength)  :: Name = BlankString           ! Name of fmu output variable --> variable in energyplus
-        REAL(r64)                     :: RealVarValue         = 0.0d0 ! = Real value at the Zone Time Step
-        INTEGER                       :: ValueReference       = 0   ! = fmiValueReference specific to FMU variable
-    END TYPE fmuOutputVariableVariableType
+!    TYPE  fmuOutputVariableVariableType
+!        CHARACTER(len=MaxNameLength)  :: Name = BlankString           ! Name of fmu output variable --> variable in energyplus
+!        REAL(r64)                     :: RealVarValue         = 0.0d0 ! = Real value at the Zone Time Step
+!        INTEGER                       :: ValueReference       = 0   ! = fmiValueReference specific to FMU variable
+!    END TYPE fmuOutputVariableVariableType
 
-    TYPE  fmuOutputVariableActuatorType
-        CHARACTER(len=MaxNameLength)  :: Name = BlankString           ! Name of fmu output variable --> actuator in energyplus
-        REAL(r64)                     :: RealVarValue         = 0.0d0 ! = Real value at the Zone Time Step
-        INTEGER                       :: ValueReference       = 0   ! = fmiValueReference specific to FMU variable
-    END TYPE fmuOutputVariableActuatorType
+!    TYPE  fmuOutputVariableActuatorType
+!        CHARACTER(len=MaxNameLength)  :: Name = BlankString           ! Name of fmu output variable --> actuator in energyplus
+!        REAL(r64)                     :: RealVarValue         = 0.0d0 ! = Real value at the Zone Time Step
+!        INTEGER                       :: ValueReference       = 0   ! = fmiValueReference specific to FMU variable
+!    END TYPE fmuOutputVariableActuatorType
 
-    TYPE  eplusInputVariableScheduleType
-        CHARACTER(len=MaxNameLength)  :: Name = BlankString        ! Name of energyplus input variable from Type schedule
-        INTEGER                       :: VarIndex      = 0       ! Index Value of this variable
-        INTEGER                       :: InitialValue              ! Initial value used during the warmup
-    END TYPE eplusInputVariableScheduleType
+!    TYPE  eplusInputVariableScheduleType
+!        CHARACTER(len=MaxNameLength)  :: Name = BlankString        ! Name of energyplus input variable from Type schedule
+!        INTEGER                       :: VarIndex      = 0       ! Index Value of this variable
+!        INTEGER                       :: InitialValue              ! Initial value used during the warmup
+!    END TYPE eplusInputVariableScheduleType
 
-    TYPE  eplusInputVariableVariableType
-        CHARACTER(len=MaxNameLength)  :: Name   = BlankString      ! Name of energyplus input variable from Type variable
-        INTEGER                       :: VarIndex      = 0       ! Index Value of this variable
-    END TYPE eplusInputVariableVariableType
+!    TYPE  eplusInputVariableVariableType
+!        CHARACTER(len=MaxNameLength)  :: Name   = BlankString      ! Name of energyplus input variable from Type variable
+!        INTEGER                       :: VarIndex      = 0       ! Index Value of this variable
+!    END TYPE eplusInputVariableVariableType
 
-    TYPE  eplusInputVariableActuatorType
-        CHARACTER(len=MaxNameLength)  :: Name   = BlankString      ! Name of energyplus input variable from Type actuator
-        INTEGER                       :: VarIndex      = 0       ! Index Value of this variable
-    END TYPE eplusInputVariableActuatorType
+!    TYPE  eplusInputVariableActuatorType
+!        CHARACTER(len=MaxNameLength)  :: Name   = BlankString      ! Name of energyplus input variable from Type actuator
+!        INTEGER                       :: VarIndex      = 0       ! Index Value of this variable
+!    END TYPE eplusInputVariableActuatorType
 
-    TYPE InstanceType
-        CHARACTER(len=MaxNameLength)       :: Name = BlankString               ! FMU Filename
-        CHARACTER(len=10 * MaxNameLength)  :: modelID = BlankString            ! FMU modelID
-        CHARACTER(len=10 * MaxNameLength)  :: modelGUID = BlankString          ! FMU modelGUID
-        CHARACTER(len=10 * MaxNameLength)  :: WorkingFolder = BlankString      ! Path to the FMU wokring folder
-        CHARACTER(len=10 * MaxNameLength)  :: WorkingFolder_wLib = BlankString ! Path to the binaries
-        CHARACTER(len=10 * MaxNameLength)  :: fmiVersionNumber = BlankString   ! Version number of FMI used
-        INTEGER                            :: NumInputVariablesInFMU=0         ! Number of input variables in fmu
-        INTEGER                            :: NumInputVariablesInIDF=0         ! Number of fmus input variables in idf
-        INTEGER                            :: NumOutputVariablesInFMU=0        ! Number of output variables in fmu
-        INTEGER                            :: NumOutputVariablesInIDF=0        ! Number of output variables in idf
-        INTEGER                            :: NumOutputVariablesSchedule=0     ! Number of output variables from type schedule
-        INTEGER                            :: NumOutputVariablesVariable=0     ! Number of output variables from type variable
-        INTEGER                            :: NumOutputVariablesActuator=0     ! Number of output variables from type actuator
-        INTEGER                            :: LenModelID=0                     ! Length of modelID trimmed
-        INTEGER                            :: LenModelGUID=0                   ! Length of modelGUID trimmed
-        INTEGER                            :: LenWorkingFolder=0               ! Length of working folder trimmed
-        INTEGER                            :: LenWorkingFolder_wLib=0          ! Length of working folder with libraries trimmed
-        TYPE (C_PTR)                       :: fmiComponent                     ! FMU instance
-        INTEGER                            :: fmiStatus  ! Status of fmi
-        INTEGER                            :: Index      ! Index of FMU
-        ! Variable Types structure for fmu input variables
-        TYPE (fmuInputVariableType), &
-        DIMENSION(:), ALLOCATABLE  :: fmuInputVariable
-        ! Variable Types structure for checking duplicates fmu input variables
-        TYPE (fmuInputVariableType), &
-        DIMENSION(:), ALLOCATABLE  :: checkfmuInputVariable
-        ! Variable Types structure for energyplus output variables
-        TYPE (eplusOutputVariableType), &
-        DIMENSION(:), ALLOCATABLE  :: eplusOutputVariable
-        ! Variable Types structure for fmu output variables from type schedule
-        TYPE (fmuOutputVariableScheduleType), &
-        DIMENSION(:), ALLOCATABLE  :: fmuOutputVariableSchedule
-        ! Variable Types structure for energyplus input variables from type schedule
-        TYPE (eplusInputVariableScheduleType), &
-        DIMENSION(:), ALLOCATABLE  :: eplusInputVariableSchedule
-        ! Variable Types structure for fmu output variables from type variable
-        TYPE (fmuOutputVariableVariableType), &
-        DIMENSION(:), ALLOCATABLE  :: fmuOutputVariableVariable
-        ! Variable Types structure for energyplus input variables from type variable
-        TYPE (eplusInputVariableVariableType), &
-        DIMENSION(:), ALLOCATABLE  :: eplusInputVariableVariable
-        ! Variable Types structure for fmu output variables from type actuator
-        TYPE (fmuOutputVariableActuatorType), &
-        DIMENSION(:), ALLOCATABLE  :: fmuOutputVariableActuator
-        ! Variable Types structure for energyplus input variables from type actuator
-        TYPE (eplusInputVariableActuatorType), &
-        DIMENSION(:), ALLOCATABLE  :: eplusInputVariableActuator
-    END TYPE InstanceType
+!    TYPE InstanceType
+!        CHARACTER(len=MaxNameLength)       :: Name = BlankString               ! FMU Filename
+!        CHARACTER(len=10 * MaxNameLength)  :: modelID = BlankString            ! FMU modelID
+!        CHARACTER(len=10 * MaxNameLength)  :: modelGUID = BlankString          ! FMU modelGUID
+!        CHARACTER(len=10 * MaxNameLength)  :: WorkingFolder = BlankString      ! Path to the FMU wokring folder
+!        CHARACTER(len=10 * MaxNameLength)  :: WorkingFolder_wLib = BlankString ! Path to the binaries
+!        CHARACTER(len=10 * MaxNameLength)  :: fmiVersionNumber = BlankString   ! Version number of FMI used
+!        INTEGER                            :: NumInputVariablesInFMU=0         ! Number of input variables in fmu
+!        INTEGER                            :: NumInputVariablesInIDF=0         ! Number of fmus input variables in idf
+!        INTEGER                            :: NumOutputVariablesInFMU=0        ! Number of output variables in fmu
+!        INTEGER                            :: NumOutputVariablesInIDF=0        ! Number of output variables in idf
+!        INTEGER                            :: NumOutputVariablesSchedule=0     ! Number of output variables from type schedule
+!        INTEGER                            :: NumOutputVariablesVariable=0     ! Number of output variables from type variable
+!        INTEGER                            :: NumOutputVariablesActuator=0     ! Number of output variables from type actuator
+!        INTEGER                            :: LenModelID=0                     ! Length of modelID trimmed
+!        INTEGER                            :: LenModelGUID=0                   ! Length of modelGUID trimmed
+!        INTEGER                            :: LenWorkingFolder=0               ! Length of working folder trimmed
+!        INTEGER                            :: LenWorkingFolder_wLib=0          ! Length of working folder with libraries trimmed
+!        TYPE (C_PTR)                       :: fmiComponent                     ! FMU instance
+!        INTEGER                            :: fmiStatus  ! Status of fmi
+!        INTEGER                            :: Index      ! Index of FMU
+!        ! Variable Types structure for fmu input variables
+!        TYPE (fmuInputVariableType), &
+!        DIMENSION(:), ALLOCATABLE  :: fmuInputVariable
+!        ! Variable Types structure for checking duplicates fmu input variables
+!        TYPE (fmuInputVariableType), &
+!        DIMENSION(:), ALLOCATABLE  :: checkfmuInputVariable
+!        ! Variable Types structure for energyplus output variables
+!        TYPE (eplusOutputVariableType), &
+!        DIMENSION(:), ALLOCATABLE  :: eplusOutputVariable
+!        ! Variable Types structure for fmu output variables from type schedule
+!        TYPE (fmuOutputVariableScheduleType), &
+!        DIMENSION(:), ALLOCATABLE  :: fmuOutputVariableSchedule
+!        ! Variable Types structure for energyplus input variables from type schedule
+!        TYPE (eplusInputVariableScheduleType), &
+!        DIMENSION(:), ALLOCATABLE  :: eplusInputVariableSchedule
+!        ! Variable Types structure for fmu output variables from type variable
+!        TYPE (fmuOutputVariableVariableType), &
+!        DIMENSION(:), ALLOCATABLE  :: fmuOutputVariableVariable
+!        ! Variable Types structure for energyplus input variables from type variable
+!        TYPE (eplusInputVariableVariableType), &
+!        DIMENSION(:), ALLOCATABLE  :: eplusInputVariableVariable
+!        ! Variable Types structure for fmu output variables from type actuator
+!        TYPE (fmuOutputVariableActuatorType), &
+!        DIMENSION(:), ALLOCATABLE  :: fmuOutputVariableActuator
+!        ! Variable Types structure for energyplus input variables from type actuator
+!        TYPE (eplusInputVariableActuatorType), &
+!        DIMENSION(:), ALLOCATABLE  :: eplusInputVariableActuator
+!    END TYPE InstanceType
 
-    TYPE FMUType
-        CHARACTER(len=MaxNameLength)  :: Name      = BlankString          ! FMU Filename
-        REAL(r64)                     :: TimeOut   = 0.0d0                ! Default TimeOut value
-        INTEGER                       :: Visible   = 0                    ! Default Visible value
-        INTEGER                       :: Interactive = 0                  ! Default Interactive value
-        INTEGER                       :: LoggingOn = 0                    ! Default LoggingOn value
-        INTEGER                       :: NumInstances=0                   ! Number of Instances
-        INTEGER                       :: TotNumInputVariablesInIDF=0      ! Number of input variables
-        INTEGER                       :: TotNumOutputVariablesSchedule=0  ! Number of output variables from type schedule
-        INTEGER                       :: TotNumOutputVariablesVariable=0  ! Number of output variables from type variable
-        INTEGER                       :: TotNumOutputVariablesActuator=0  ! Number of output variables from type actuator
-        TYPE  (InstanceType), &
-        DIMENSION(:), ALLOCATABLE  :: Instance  ! Variable Types structure for energyplus input variables from type actuator
-    END TYPE FMUType
+!    TYPE FMUType
+!        CHARACTER(len=MaxNameLength)  :: Name      = BlankString          ! FMU Filename
+!        REAL(r64)                     :: TimeOut   = 0.0d0                ! Default TimeOut value
+!        INTEGER                       :: Visible   = 0                    ! Default Visible value
+!        INTEGER                       :: Interactive = 0                  ! Default Interactive value
+!        INTEGER                       :: LoggingOn = 0                    ! Default LoggingOn value
+!        INTEGER                       :: NumInstances=0                   ! Number of Instances
+!        INTEGER                       :: TotNumInputVariablesInIDF=0      ! Number of input variables
+!        INTEGER                       :: TotNumOutputVariablesSchedule=0  ! Number of output variables from type schedule
+!        INTEGER                       :: TotNumOutputVariablesVariable=0  ! Number of output variables from type variable
+!        INTEGER                       :: TotNumOutputVariablesActuator=0  ! Number of output variables from type actuator
+!        TYPE  (InstanceType), &
+!        DIMENSION(:), ALLOCATABLE  :: Instance  ! Variable Types structure for energyplus input variables from type actuator
+!    END TYPE FMUType
 
     ! MODULE VARIABLE DECLARATIONS:
 
-    TYPE (FMUType), &
-    DIMENSION(:), ALLOCATABLE      :: FMU  ! Variable Types structure
-    TYPE (FMUType), &
-    DIMENSION(:), ALLOCATABLE      :: FMUTemp  ! Variable Types structure
-    TYPE (checkFMUInstanceNameType), &
-    DIMENSION(:), ALLOCATABLE      :: checkInstanceName                   ! Variable Types structure for checking instance names
-    INTEGER, PUBLIC                         :: NumExternalInterfaces = 0           ! Number of ExternalInterface objects
-    INTEGER, PUBLIC                         :: NumExternalInterfacesBCVTB = 0      ! Number of BCVTB ExternalInterface objects
-    INTEGER, PUBLIC                         :: NumExternalInterfacesFMUImport = 0  ! Number of FMU ExternalInterface objects
-    INTEGER, PUBLIC                         :: NumExternalInterfacesFMUExport = 0  ! Number of FMU ExternalInterface objects
-    INTEGER, PUBLIC                         :: NumFMUObjects = 0                   ! Number of FMU objects
-    INTEGER, PUBLIC                         :: FMUExportActivate = 0               ! FMU Export flag
-    LOGICAL, PUBLIC                         :: haveExternalInterfaceBCVTB  = .FALSE.          ! Flag for BCVTB interface
-    LOGICAL, PUBLIC                         :: haveExternalInterfaceFMUImport = .FALSE.       ! Flag for FMU-Import interface
-    LOGICAL, PUBLIC                         :: haveExternalInterfaceFMUExport = .FALSE.       ! Flag for FMU-Export interface
-    INTEGER                                 :: simulationStatus = 1 ! Status flag. Used to report during
-    ! which phase an error occured.
-    ! (1=initialization, 2=time stepping)
+!    TYPE (FMUType), &
+!    DIMENSION(:), ALLOCATABLE      :: FMU  ! Variable Types structure
+!    TYPE (FMUType), &
+!    DIMENSION(:), ALLOCATABLE      :: FMUTemp  ! Variable Types structure
+!    TYPE (checkFMUInstanceNameType), &
+!    DIMENSION(:), ALLOCATABLE      :: checkInstanceName                   ! Variable Types structure for checking instance names
+!    INTEGER, PUBLIC                         :: NumExternalInterfaces = 0           ! Number of ExternalInterface objects
+!    INTEGER, PUBLIC                         :: NumExternalInterfacesBCVTB = 0      ! Number of BCVTB ExternalInterface objects
+!    INTEGER, PUBLIC                         :: NumExternalInterfacesFMUImport = 0  ! Number of FMU ExternalInterface objects
+!    INTEGER, PUBLIC                         :: NumExternalInterfacesFMUExport = 0  ! Number of FMU ExternalInterface objects
+!    INTEGER, PUBLIC                         :: NumFMUObjects = 0                   ! Number of FMU objects
+!    INTEGER, PUBLIC                         :: FMUExportActivate = 0               ! FMU Export flag
+!    LOGICAL, PUBLIC                         :: haveExternalInterfaceBCVTB  = .FALSE.          ! Flag for BCVTB interface
+!    LOGICAL, PUBLIC                         :: haveExternalInterfaceFMUImport = .FALSE.       ! Flag for FMU-Import interface
+!    LOGICAL, PUBLIC                         :: haveExternalInterfaceFMUExport = .FALSE.       ! Flag for FMU-Export interface
+!    INTEGER                                 :: simulationStatus = 1 ! Status flag. Used to report during
+!    ! which phase an error occured.
+!    ! (1=initialization, 2=time stepping)
 
-    INTEGER,      ALLOCATABLE, DIMENSION(:) :: keyVarIndexes        ! Array index for specific key name
-    INTEGER,      ALLOCATABLE, DIMENSION(:) :: varTypes             ! Types of variables in keyVarIndexes
-    INTEGER,      ALLOCATABLE, DIMENSION(:) :: varInd               ! Index of ErlVariables for ExternalInterface
-    INTEGER                                 :: socketFD = -1        ! socket file descriptor
-    LOGICAL                                 :: ErrorsFound=.false.  ! Set to true if errors are found
-    LOGICAL                                 :: noMoreValues=.false. ! Flag, true if no more values
-    ! will be sent by the server
+!    INTEGER,      ALLOCATABLE, DIMENSION(:) :: keyVarIndexes        ! Array index for specific key name
+!    INTEGER,      ALLOCATABLE, DIMENSION(:) :: varTypes             ! Types of variables in keyVarIndexes
+!    INTEGER,      ALLOCATABLE, DIMENSION(:) :: varInd               ! Index of ErlVariables for ExternalInterface
+!    INTEGER                                 :: socketFD = -1        ! socket file descriptor
+!    LOGICAL                                 :: ErrorsFound=.false.  ! Set to true if errors are found
+!    LOGICAL                                 :: noMoreValues=.false. ! Flag, true if no more values
+!    ! will be sent by the server
 
-    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: varKeys  ! Keys of report variables used for data exchange
-    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: varNames ! Names of report variables used for data exchange
-    INTEGER, ALLOCATABLE, DIMENSION(:)                      :: inpVarTypes! Names of report variables used for data exchange
-    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: inpVarNames ! Names of report variables used for data exchange
+!    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: varKeys  ! Keys of report variables used for data exchange
+!    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: varNames ! Names of report variables used for data exchange
+!    INTEGER, ALLOCATABLE, DIMENSION(:)                      :: inpVarTypes! Names of report variables used for data exchange
+!    CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: inpVarNames ! Names of report variables used for data exchange
 
-    LOGICAL       :: configuredControlPoints = .FALSE. ! True if control points have been configured
-    LOGICAL       :: useEMS = .false.  ! Will be set to true if ExternalInterface writes to EMS variables or actuators
+!    LOGICAL       :: configuredControlPoints = .FALSE. ! True if control points have been configured
+!    LOGICAL       :: useEMS = .false.  ! Will be set to true if ExternalInterface writes to EMS variables or actuators
 
-    ! SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
+!    ! SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
 
 
-    PUBLIC  ExternalInterfaceExchangeVariables
-    PUBLIC  CloseSocket
-    PRIVATE InitExternalInterface
-    PRIVATE GetExternalInterfaceInput
-    PRIVATE CalcExternalInterface
-    PRIVATE ParseString
-    PRIVATE GetReportVariableKey
-    PRIVATE StopExternalInterfaceIfError
-    PRIVATE ValidateRunControl
-    PRIVATE WarnIfExternalInterfaceObjectsAreUsed
-    PUBLIC CalcExternalInterfaceFMUImport
-    PUBLIC InitExternalInterfaceFMUImport
-    PUBLIC InstantiateInitializeFMUImport
-    PUBLIC TerminateResetFreeFMUImport
-    PUBLIC GetSetVariablesAndDoStepFMUImport
+!    PUBLIC  ExternalInterfaceExchangeVariables
+!    PUBLIC  CloseSocket
+!    PRIVATE InitExternalInterface
+!    PRIVATE GetExternalInterfaceInput
+!    PRIVATE CalcExternalInterface
+!    PRIVATE ParseString
+!    PRIVATE GetReportVariableKey
+!    PRIVATE StopExternalInterfaceIfError
+!    PRIVATE ValidateRunControl
+!    PRIVATE WarnIfExternalInterfaceObjectsAreUsed
+!    PUBLIC CalcExternalInterfaceFMUImport
+!    PUBLIC InitExternalInterfaceFMUImport
+!    PUBLIC InstantiateInitializeFMUImport
+!    PUBLIC TerminateResetFreeFMUImport
+!    PUBLIC GetSetVariablesAndDoStepFMUImport
 
-    CONTAINS
+!    CONTAINS
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE ExternalInterfaceExchangeVariables
+!    SUBROUTINE ExternalInterfaceExchangeVariables
 
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   2Dec2007
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   2Dec2007
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! Exchanges variables between EnergyPlus and the BCVTB socket.
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! Exchanges variables between EnergyPlus and the BCVTB socket.
 
-    ! METHODOLOGY EMPLOYED:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    ! USE STATEMENTS:
-    USE DataGlobals, ONLY: WarmupFlag, KindOfSim, ksRunPeriodWeather, ZoneTSReporting !, ZoneSizingCalc, SysSizingCalc
-    USE, INTRINSIC :: ieee_exceptions
-    USE, INTRINSIC :: ieee_arithmetic
-    USE, INTRINSIC :: ieee_features
+!    ! USE STATEMENTS:
+!    USE DataGlobals, ONLY: WarmupFlag, KindOfSim, ksRunPeriodWeather, ZoneTSReporting !, ZoneSizingCalc, SysSizingCalc
+!    USE, INTRINSIC :: ieee_exceptions
+!    USE, INTRINSIC :: ieee_arithmetic
+!    USE, INTRINSIC :: ieee_features
 
-    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+!    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE PARAMETER DEFINITIONS:
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
 
 
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    ! na
-    INTERFACE
-    INTEGER (C_INT) FUNCTION checkOperatingSystem(errorMessage) BIND (C, NAME="checkOperatingSystem")
-    ! Function called to check operating system
-    USE ISO_C_BINDING, ONLY: C_CHAR, C_INT
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: errorMessage ! error message
-    END FUNCTION checkOperatingSystem
-    END INTERFACE
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    ! na
+!    INTERFACE
+!    INTEGER (C_INT) FUNCTION checkOperatingSystem(errorMessage) BIND (C, NAME="checkOperatingSystem")
+!    ! Function called to check operating system
+!    USE ISO_C_BINDING, ONLY: C_CHAR, C_INT
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: errorMessage ! error message
+!    END FUNCTION checkOperatingSystem
+!    END INTERFACE
 
-    ! DERIVED TYPE DEFINITIONS:
-    ! na
+!    ! DERIVED TYPE DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    LOGICAL,SAVE :: GetInputFlag = .true.  ! First time, input is "gotten"
-    CHARACTER(len=10*MaxNameLength) :: errorMessage = BlankString ! Error message
-    INTEGER :: retValErrMsg
-    IF (GetInputFlag) THEN
-        CALL GetExternalInterfaceInput
-        GetInputFlag=.false.
-    ENDIF
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    LOGICAL,SAVE :: GetInputFlag = .true.  ! First time, input is "gotten"
+!    CHARACTER(len=10*MaxNameLength) :: errorMessage = BlankString ! Error message
+!    INTEGER :: retValErrMsg
+!    IF (GetInputFlag) THEN
+!        CALL GetExternalInterfaceInput
+!        GetInputFlag=.false.
+!    ENDIF
 
-    ! Parameters for KindOfSim
-    !INTEGER, PARAMETER :: ksDesignDay = 1
-    !INTEGER, PARAMETER :: ksRunPeriodDesign = 2
-    !INTEGER, PARAMETER :: ksRunPeriodWeather = 3
+!    ! Parameters for KindOfSim
+!    !INTEGER, PARAMETER :: ksDesignDay = 1
+!    !INTEGER, PARAMETER :: ksRunPeriodDesign = 2
+!    !INTEGER, PARAMETER :: ksRunPeriodWeather = 3
 
-    IF (haveExternalInterfaceBCVTB .OR. haveExternalInterfaceFMUExport) THEN
-        CALL InitExternalInterface()
-        ! Exchange data only after sizing and after warm-up.
-        ! Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
-        ! use the KindOfSim flag
-        IF (.NOT.(WarmupFlag)  .AND. (KindOfSim .EQ. ksRunPeriodWeather)) THEN
-            CALL CalcExternalInterface()
-        ENDIF
-    END IF
+!    IF (haveExternalInterfaceBCVTB .OR. haveExternalInterfaceFMUExport) THEN
+!        CALL InitExternalInterface()
+!        ! Exchange data only after sizing and after warm-up.
+!        ! Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
+!        ! use the KindOfSim flag
+!        IF (.NOT.(WarmupFlag)  .AND. (KindOfSim .EQ. ksRunPeriodWeather)) THEN
+!            CALL CalcExternalInterface()
+!        ENDIF
+!    END IF
 
-    IF (haveExternalInterfaceFMUImport) THEN
-        retValErrMsg = checkOperatingSystem(errorMessage)
-        IF (retValErrMsg .NE. 0 ) THEN
-            CALL ShowSevereError('ExternalInterface/ExternalInterfaceExchangeVariables:"'//TRIM(errorMessage)//'"')
-            ErrorsFound = .true.
-            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            CALL StopExternalInterfaceIfError
-        END IF
-        ! initialize the FunctionalMockupUnitImport interface
-        CALL IEEE_SET_HALTING_MODE(IEEE_OVERFLOW,.FALSE.)
-        CALL IEEE_SET_HALTING_MODE(IEEE_INVALID,.FALSE.)
-        CALL IEEE_SET_HALTING_MODE(IEEE_DIVIDE_BY_ZERO,.FALSE.)
-        CALL InitExternalInterfaceFMUImport()
-        ! No Data exchange during design days
-        ! Data Exchange data during warmup and after warmup
-        CALL CalcExternalInterfaceFMUImport()
-        CALL IEEE_SET_FLAG(ieee_all,.false.)
-        CALL IEEE_SET_HALTING_MODE(IEEE_OVERFLOW,.TRUE.)
-        CALL IEEE_SET_HALTING_MODE(IEEE_INVALID,.TRUE.)
-        CALL IEEE_SET_HALTING_MODE(IEEE_DIVIDE_BY_ZERO,.TRUE.)
-    END IF
+!    IF (haveExternalInterfaceFMUImport) THEN
+!        retValErrMsg = checkOperatingSystem(errorMessage)
+!        IF (retValErrMsg .NE. 0 ) THEN
+!            CALL ShowSevereError('ExternalInterface/ExternalInterfaceExchangeVariables:"'//TRIM(errorMessage)//'"')
+!            ErrorsFound = .true.
+!            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!            CALL StopExternalInterfaceIfError
+!        END IF
+!        ! initialize the FunctionalMockupUnitImport interface
+!        CALL IEEE_SET_HALTING_MODE(IEEE_OVERFLOW,.FALSE.)
+!        CALL IEEE_SET_HALTING_MODE(IEEE_INVALID,.FALSE.)
+!        CALL IEEE_SET_HALTING_MODE(IEEE_DIVIDE_BY_ZERO,.FALSE.)
+!        CALL InitExternalInterfaceFMUImport()
+!        ! No Data exchange during design days
+!        ! Data Exchange data during warmup and after warmup
+!        CALL CalcExternalInterfaceFMUImport()
+!        CALL IEEE_SET_FLAG(ieee_all,.false.)
+!        CALL IEEE_SET_HALTING_MODE(IEEE_OVERFLOW,.TRUE.)
+!        CALL IEEE_SET_HALTING_MODE(IEEE_INVALID,.TRUE.)
+!        CALL IEEE_SET_HALTING_MODE(IEEE_DIVIDE_BY_ZERO,.TRUE.)
+!    END IF
 
-    RETURN
+!    RETURN
 
-    END SUBROUTINE ExternalInterfaceExchangeVariables
+!    END SUBROUTINE ExternalInterfaceExchangeVariables
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     SUBROUTINE GetExternalInterfaceInput
@@ -550,71 +550,71 @@
     END SUBROUTINE StopExternalInterfaceIfError
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE CloseSocket(FlagToWriteToSocket)
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   December 2008
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    SUBROUTINE CloseSocket(FlagToWriteToSocket)
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   December 2008
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This subroutine tries to write the optional error code to the
-    ! socket and then closes the socket
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This subroutine tries to write the optional error code to the
+!    ! socket and then closes the socket
 
-    ! METHODOLOGY EMPLOYED:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+!    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
 
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    INTERFACE
-    INTEGER(C_INT) FUNCTION establishclientsocket(fileName) BIND (C, NAME="establishclientsocket")
-    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! file from which socket port number will be read
-    END FUNCTION establishclientsocket
-    END INTERFACE
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION establishclientsocket(fileName) BIND (C, NAME="establishclientsocket")
+!    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! file from which socket port number will be read
+!    END FUNCTION establishclientsocket
+!    END INTERFACE
 
-    INTERFACE
-    INTEGER(C_INT) function sendclientmessage(socketFD, flaWri) BIND (C, NAME="sendclientmessage")
-    USE ISO_C_BINDING, ONLY: C_INT
-    INTEGER(C_INT) socketFD ! socket file descriptor
-    INTEGER(C_INT) flaWri   ! flag to write to the socket
-    END FUNCTION sendclientmessage
-    END INTERFACE
+!    INTERFACE
+!    INTEGER(C_INT) function sendclientmessage(socketFD, flaWri) BIND (C, NAME="sendclientmessage")
+!    USE ISO_C_BINDING, ONLY: C_INT
+!    INTEGER(C_INT) socketFD ! socket file descriptor
+!    INTEGER(C_INT) flaWri   ! flag to write to the socket
+!    END FUNCTION sendclientmessage
+!    END INTERFACE
 
-    ! USE STATEMENTS:
-    ! na
+!    ! USE STATEMENTS:
+!    ! na
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    INTEGER, INTENT(IN) :: FlagToWriteToSocket  ! flag to write to the socket
-    ! +1: E+ reached final time
-    ! -1: E+ had some error
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    INTEGER, INTENT(IN) :: FlagToWriteToSocket  ! flag to write to the socket
+!    ! +1: E+ reached final time
+!    ! -1: E+ had some error
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    INTEGER retVal ! Return value, needed to catch return value of function call
-    LOGICAL fileExist ! Set to true if file exists
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    INTEGER retVal ! Return value, needed to catch return value of function call
+!    LOGICAL fileExist ! Set to true if file exists
 
-    ! Try to establish socket connection. This is needed if Ptolemy started E+,
-    ! but E+ had an error before the call to InitExternalInterface.
+!    ! Try to establish socket connection. This is needed if Ptolemy started E+,
+!    ! but E+ had an error before the call to InitExternalInterface.
 
-    INQUIRE (FILE=socCfgFilNam, EXIST=fileExist)
+!    INQUIRE (FILE=socCfgFilNam, EXIST=fileExist)
 
-    IF ( socketFD ==  -1 .AND. fileExist) THEN
-        socketFD = establishclientsocket(socCfgFilNam)
-    END IF
+!    IF ( socketFD ==  -1 .AND. fileExist) THEN
+!        socketFD = establishclientsocket(socCfgFilNam)
+!    END IF
 
-    IF ( socketFD .GE. 0 ) THEN
-        retVal = sendclientmessage(socketFD, FlagToWriteToSocket)
-        ! Don't close socket as this may give sometimes an IOException in Windows
-        ! This problem seems to affect only Windows but not Mac
-        !     close(socketFD)
-    ENDIF
-    RETURN
+!    IF ( socketFD .GE. 0 ) THEN
+!        retVal = sendclientmessage(socketFD, FlagToWriteToSocket)
+!        ! Don't close socket as this may give sometimes an IOException in Windows
+!        ! This problem seems to affect only Windows but not Mac
+!        !     close(socketFD)
+!    ENDIF
+!    RETURN
 
-    END SUBROUTINE CloseSocket
+!    END SUBROUTINE CloseSocket
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     SUBROUTINE ParseString(str, ele, nEle)

@@ -1,7 +1,30 @@
 // EnergyPlus Headers
+#include <EnergyPlus.hh>
+#include <DataGlobals.hh>
+#include <DataPrecisionGlobals.hh>
+#include <DataStringGlobals.hh>
 #include <ExternalInterface.hh>
+#include <General.hh>
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
+#include <ScheduleManager.hh>
+#include <RuntimeLanguageProcessor.hh>
+#include <DisplayRoutines.hh>
+
+// C++ Standard Library Headers
+#include <string>
+
+// Objexx Headers
+#include <ObjexxFCL/FArray1D.hh>
+#include <ObjexxFCL/Inquire.hh>
+#include <ObjexxFCL/IOFlags.hh>
+
+// FMI-Related Headers
+extern "C" {
+#include <FMI/main.h>
+#include <BCVTB/utilSocket.h>
+#include <BCVTB/utilXml.h>
+}
 
 namespace EnergyPlus {
 
@@ -39,92 +62,401 @@ namespace ExternalInterface {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	bool haveExternalInterfaceBCVTB( false );
+	Real64 tComm( 0.0 ); // Communication time step
+	Real64 tStop( 3600.0 ); // Stop time used during the warmup period
+	Real64 tStart( 0.0 ); // Start time used during the warmup period
+	Real64 hStep( 15.0 ); // Communication step size
+	bool FlagReIni( false ); // Flag for reinitialization of states in GetSetAndDoStep
+	std::string FMURootWorkingFolder( " " ); // FMU root working folder
+	int LEN_FMU_ROOT_DIR;
+
+    // MODULE PARAMETER DEFINITIONS:
+    int const maxVar( 1024 );             // Maximum number of variables to be exchanged
+    int const maxErrMsgLength( 10000 );   // Maximum error message length from xml schema validation
+    int const indexSchedule( 1 );  // Index for schedule in inpVarTypes
+    int const indexVariable( 2 );  // Index for variable in inpVarTypes
+    int const indexActuator( 3 );  // Index for actuator in inpVarTypes
+    int const nInKeys( 3 );  // Number of input variables available in ExternalInterface (=highest index* number)
+    int const fmiOK( 0 );          // fmiOK
+    int const fmiWarning( 1 );     // fmiWarning
+    int const fmiDiscard( 2 );     // fmiDiscard
+    int const fmiError( 3 );       // fmiError
+    int const fmiFatal( 4 );       // fmiPending
+    int const fmiPending( 5 );     // fmiPending
+	std::string const socCfgFilNam( "socket.cfg" ); // socket configuration file
+    std::string const BlankString( " " );
+
+	FArray1D< FMUType > FMU; // Variable Types structure
+    FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+    int NumExternalInterfaces( 0 ); //Number of ExternalInterface objects
+    int NumExternalInterfacesBCVTB( 0 ); //Number of BCVTB ExternalInterface objects
+    int NumExternalInterfacesFMUImport( 0 ); //Number of FMU ExternalInterface objects
+    int NumExternalInterfacesFMUExport( 0 ); //Number of FMU ExternalInterface objects
+    int NumFMUObjects( 0 ); //Number of FMU objects
+    int FMUExportActivate( 0 ); //FMU Export flag
+    bool haveExternalInterfaceBCVTB( false ); //Flag for BCVTB interface
+    bool haveExternalInterfaceFMUImport( false ); //Flag for FMU-Import interface
+    bool haveExternalInterfaceFMUExport( false ); //Flag for FMU-Export interface
+    int simulationStatus( 1 ); // Status flag. Used to report during
+    // which phase an error occured.
+    // (1=initialization, 2=time stepping)
+
+	FArray1D< int > keyVarIndexes; // Array index for specific key name
+    FArray1D< int > varTypes; // Types of variables in keyVarIndexes
+    FArray1D< int > varInd; // Index of ErlVariables for ExternalInterface
+    int socketFD( -1 ); // socket file descriptor
+    bool ErrorsFound( false ); // Set to true if errors are found
+    bool noMoreValues( false ); //Flag, true if no more values
+    // will be sent by the server
+
+    FArray1D< std::string > varKeys; // Keys of report variables used for data exchange
+    FArray1D< std::string > varNames; // Names of report variables used for data exchange
+    FArray1D< int > inpVarTypes; // Names of report variables used for data exchange
+    FArray1D< std::string > inpVarNames; // Names of report variables used for data exchange
+
+    bool configuredControlPoints( false ); // True if control points have been configured
+    bool useEMS( false ); // Will be set to true if ExternalInterface writes to EMS variables or actuators
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
-	int NumExternalInterfaces( 0 ); // Number of ExternalInterface objects
-
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+	
 	// Functions
 
 	void
 	ExternalInterfaceExchangeVariables()
 	{
 
-		// SUBROUTINE INFORMATION:
+		//SUBROUTINE INFORMATION:
 		//       AUTHOR         Michael Wetter
-		//       DATE WRITTEN   5Jan2010
+		//       DATE WRITTEN   2Dec2007
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Exchanges variables between EnergyPlus and the BCVTB socket.
 
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Using/Aliasing
-		using InputProcessor::GetNumObjectsFound;
-
-		// Locals
-		static int NumExternalInterfaces( 0 ); // Number of ExternalInterface objects
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
+		// USE STATEMENTS:
+		using DataGlobals::WarmupFlag;
+		using DataGlobals::KindOfSim;
+		using DataGlobals::ksRunPeriodWeather;
+		using DataGlobals::ZoneTSReporting;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
-
+		bool static GetInputFlag( true ); // First time, input is "gotten"
+		std::string errorMessage( BlankString ); // Error message
+		int retValErrMsg;
+    
 		if ( GetInputFlag ) {
-			NumExternalInterfaces = GetNumObjectsFound( "ExternalInterface" );
+			GetExternalInterfaceInput();
 			GetInputFlag = false;
-			if ( NumExternalInterfaces > 0 ) {
-				ShowFatalError( "ExternalInterface is not available in this version." );
+		}
+		
+		if ( haveExternalInterfaceBCVTB || haveExternalInterfaceFMUExport ) {
+			InitExternalInterface();
+			// Exchange data only after sizing and after warm-up.
+			// Note that checking for ZoneSizingCalc SysSizingCalc does not work here, hence we
+			// use the KindOfSim flag
+			if ( !WarmupFlag && ( KindOfSim == ksRunPeriodWeather ) ) {
+				CalcExternalInterface();
 			}
+		}
+
+		if ( haveExternalInterfaceFMUImport ) {
+			retValErrMsg = checkOperatingSystem( (char*)errorMessage.c_str() );
+			if ( retValErrMsg != 0 ) {
+				ShowSevereError( "ExternalInterface/ExternalInterfaceExchangeVariables:" + errorMessage );
+				ErrorsFound = true;
+				StopExternalInterfaceIfError();
+			}
+			// initialize the FunctionalMockupUnitImport interface
+			InitExternalInterfaceFMUImport();
+			// No Data exchange during design days
+			// Data Exchange data during warmup and after warmup
+			CalcExternalInterfaceFMUImport();
 		}
 
 	}
 
 	void
-	CloseSocket( int const FlagToWriteToSocket ) // flag to write to the socket
+	CloseSocket( int const FlagToWriteToSocket )
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Michael Wetter
-		//       DATE WRITTEN   5Jan2010
+		//       DATE WRITTEN   December 2008
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine does nothing, but it is needed since EnergyPlus
-		// may call CloseSocket when it terminates.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// Locals
-		// USE STATEMENTS:
-		// na
-
-		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// This subroutine tries to write the optional error code to the
+		// socket and then closes the socket
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int retVal; // Return value, needed to catch return value of function call
+		bool fileExist; // Set to true if file exists
 
+		// Try to establish socket connection. This is needed if Ptolemy started E+,
+		//  but E+ had an error before the call to InitExternalInterface.
+
+		IOFlags flags;
+		Inquire( socCfgFilNam, flags );
+
+		if ( ( socketFD == -1 ) && ( flags.exists() ) ) {
+			socketFD = establishclientsocket( (char*)socCfgFilNam.c_str() );
+		}
+
+		if ( socketFD >= 0 ) {
+			retVal = sendclientmessage( &socketFD, &FlagToWriteToSocket );
+			// Don't close socket as this may give sometimes an IOException in Windows
+			// This problem seems to affect only Windows but not Mac
+			//     close(socketFD)
+		}
+		
+		
 	}
+
+	void
+	InitExternalInterface()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   2Dec2007
+		//       MODIFIED       Rui Zhang Aug 2009
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine is for initializations of the ExternalInterface
+
+		// USE STATEMENTS:
+		using ScheduleManager::GetDayScheduleIndex;
+		using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
+		using RuntimeLanguageProcessor::FindEMSVariable;
+		using DataGlobals::WeathSimReq;
+		using General::TrimSigDigits;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool static FirstCall( true ); // First time, input has been read
+		std::string const simCfgFilNam( "variables.cfg" );
+		int i, j; // loop counters
+		std::string xmlStrOut; // xml values in string, separated by ';'
+		std::string xmlStrOutTyp; // xml values in string, separated by ';'
+		std::string xmlStrInKey; // xml values in string, separated by ';'
+		std::string xmlStrIn; // xml values in string, separated by ';'
+		std::string xmlStrInTyp; // xml values in string, separated by ';'
+		int static nOutVal; // Number of output values (E+ -> ExternalInterface)
+		int static nInpVar; // Number of input values (ExternalInterface -> E+)
+		int retVal; // Return value of function call, used for error handling
+		int counter( 0 ); // Counter for ErlVariables
+		int mainVersion; // The version number
+		FArray1D< std::string > curVals; // Names of schedules (i.e., schedule names)
+		int curNumInpVal; // current number of input values for the InputValType
+		std::string validateErrMsg; // error returned when xml Schema validate failed
+		int errMsgLen; // the length of the error message
+		bool socFileExist; // Set to true if socket configuration
+		// file exists
+		bool simFileExist; // Set to true if simulation configuration
+		// file exists
+		
+		if ( FirstCall ) {
+			DisplayString( "ExternalInterface initializes." );
+			// do one time initializations
+			
+			if ( haveExternalInterfaceBCVTB ) {
+				// Check version number
+				mainVersion = getmainversionnumber();
+				if ( mainVersion < 0.0 ) {
+					ShowSevereError( "ExternalInterface: BCVTB is not installed in this version." );
+					ErrorsFound = true;
+					StopExternalInterfaceIfError();
+				}
+			}
+
+			// Get port number
+			IOFlags flags;
+			Inquire( socCfgFilNam, flags );
+			if ( flags.exists() ) {
+				socketFD = establishclientsocket( (char*)socCfgFilNam.c_str() );
+				if ( socketFD < 0 ) {
+					ShowSevereError( "ExternalInterface: Could not open socket. File descriptor = " + TrimSigDigits(socketFD) );
+					ErrorsFound = true;
+				}
+			} else {
+				ShowSevereError("ExternalInterface: Did not find file " + socCfgFilNam );
+				ShowContinueError("This file needs to be in same directory as in.idf.");
+				ShowContinueError("Check the documentation for the ExternalInterface.");
+				ErrorsFound = true;
+			}
+			
+			// Make sure that idf file specified a run period other than
+			//  design day and system sizing.
+			ValidateRunControl();
+
+			StopExternalInterfaceIfError();
+
+			int const lenXmlStr( 1000 ); // TODO: Fix string length here
+			xmlStrOut = "";
+			xmlStrOutTyp = "";
+			xmlStrInKey = "";
+			xmlStrIn = "";
+			
+			// Get input and output variables for EnergyPlus in sequence
+			xmlStrInKey = "schedule,variable,actuator\0";
+			// Check if simCfgFilNam exists.
+			IOFlags flags2;
+			Inquire( simCfgFilNam, flags2 );
+			if ( flags2.exists() ) {
+				if ( haveExternalInterfaceBCVTB ) {
+					retVal = getepvariables( (char*)simCfgFilNam.c_str(), (char*)xmlStrOutTyp.c_str(), (char*)xmlStrOut.c_str(), (int*)nOutVal, (char*)xmlStrInKey.c_str(), (int*)nInKeys, (char*)xmlStrIn.c_str(), (int*)nInpVar, inpVarTypes.data_, (int*)lenXmlStr );
+				} else if ( haveExternalInterfaceFMUExport ) {
+					retVal = getepvariablesFMU( (char*)simCfgFilNam.c_str(), (char*)xmlStrOutTyp.c_str(), (char*)xmlStrOut.c_str(), (int*)nOutVal, (char*)xmlStrInKey.c_str(), (int*)nInKeys, (char*)xmlStrIn.c_str(), (int*)nInpVar, inpVarTypes.data_, (int*)lenXmlStr );
+				}
+				// handle errors when reading variables.cfg file
+				if ( retVal < 0 ) {
+					ShowSevereError( "ExternalInterface: Error when getting input and output variables for EnergyPlus," );
+					ShowContinueError( "check simulation.log for error message." );
+					ErrorsFound = true;
+				}
+			} else {
+				ShowSevereError( "ExternalInterface: Did not find file " + simCfgFilNam );
+				ShowContinueError( "This file needs to be in same directory as in.idf." );
+				ShowContinueError( "Check the documentation for the ExternalInterface." );
+				ErrorsFound = true;
+			}
+			StopExternalInterfaceIfError();
+
+			if ( (nOutVal + nInpVar) > maxVar ) {
+				ShowSevereError("ExternalInterface: Too many variables to be exchanged.");
+				ShowContinueError("Attempted to exchange " + TrimSigDigits(nOutVal) + " outputs");
+				ShowContinueError("plus " + TrimSigDigits(nOutVal) + " inputs.");
+				ShowContinueError("Maximum allowed is sum is " + TrimSigDigits(maxVar) );
+				ShowContinueError("To fix, increase maxVar in ExternalInterface.cc");
+				ErrorsFound = true;
+			}
+			StopExternalInterfaceIfError();
+			
+			if ( nOutVal < 0 ) {
+				ShowSevereError("ExternalInterface: Error when getting number of xml values for outputs.");
+				ErrorsFound = true;
+			} else {
+				ParseString( xmlStrOut, varNames, nOutVal );
+				ParseString( xmlStrOutTyp, varKeys, nOutVal );
+			}
+			StopExternalInterfaceIfError();
+
+			if ( nInpVar < 0 ) {
+				ShowSevereError("ExternalInterface: Error when getting number of xml values for inputs.");
+				ErrorsFound = true;
+			} else {
+				ParseString( xmlStrIn, inpVarNames, nInpVar );
+			}
+			StopExternalInterfaceIfError();
+
+			DisplayString( "Number of outputs in ExternalInterface = " + TrimSigDigits( nOutVal ) );
+			DisplayString( "Number of inputs  in ExternalInterface = " + TrimSigDigits( nInpVar ) );
+
+			FirstCall = false;
+
+		} else if ( ! configuredControlPoints ) {
+			keyVarIndexes.allocate( nOutVal );
+			varTypes.allocate( nOutVal );
+			GetReportVariableKey( varKeys, nOutVal, varNames, keyVarIndexes, varTypes );
+			varInd.allocate( nInpVar );
+			for ( i = 1; i <= nInpVar; i++ ) {
+				if ( inpVarTypes( i ) == indexSchedule ) {
+					varInd( i ) = GetDayScheduleIndex( inpVarNames( i ) );
+				} else if ( inpVarTypes(i) == indexVariable ) {
+					varInd( i ) = FindEMSVariable( inpVarNames( i ), 0 );
+				} else if ( inpVarTypes(i) == indexActuator ) {
+					varInd( i ) = FindEMSVariable( inpVarNames( i ), 0 );
+				}
+				if ( varInd( i ) <= 0 ) {
+					ShowSevereError( "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames( i ) );
+					ShowContinueError( "but variable was not found in idf file." );
+					ErrorsFound = true;
+				}
+			}
+			StopExternalInterfaceIfError();
+			// Configure Erl variables
+			for ( i = 1; i <= nInpVar; i++ ) {
+				if ( inpVarTypes( i ) == indexVariable ) { // ems-globalvariable
+					useEMS = true;
+					if ( ! isExternalInterfaceErlVariable( varInd( i ) ) ) {
+						ShowSevereError( "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames( i ) + "\"" );
+						ShowContinueError( "But this variable is an ordinary Erl variable, not an ExternalInterface variable." );
+						ShowContinueError( "You must specify a variable of type \"ExternalInterface:Variable\"" );
+						ErrorsFound = true;
+					}
+				} else if ( inpVarTypes( i ) == indexActuator ) { // ems-actuator
+					useEMS = true;
+					if ( ! isExternalInterfaceErlVariable( varInd( i ) ) ) {
+						ShowSevereError( "ExternalInterface: Error, xml file \"" + simCfgFilNam + "\" declares variable \"" + inpVarNames( i ) + "\"" );
+						ShowContinueError( "But this variable is an ordinary Erl actuator, not an ExternalInterface actuator." );
+						ShowContinueError( "You must specify a variable of type \"ExternalInterface:Actuator\"" );
+						ErrorsFound = true;
+					}
+				}
+			}
+			configuredControlPoints = true;
+		}
+		StopExternalInterfaceIfError();
+		
+	}
+    
+    void
+	GetExternalInterfaceInput()
+	{}
+    
+    void
+	CalcExternalInterface()
+	{}
+    
+    void
+	ParseString(
+		std::string const str,
+		FArray1D< std::string > & ele,
+		int const nEle
+	)
+	{}
+    
+    void
+	GetReportVariableKey(
+		FArray1D< std::string > varKeys,
+		int const numberOfKeys,
+		FArray1D< std::string > varNames,
+		FArray1D< int > & keyVarIndexes,
+		FArray1D< int > & varTypes
+	)
+	{}
+    
+    void
+	StopExternalInterfaceIfError()
+	{}
+    
+    void
+	ValidateRunControl()
+	{}
+    
+    void
+	WarnIfExternalInterfaceObjectsAreUsed( std::string ObjectWord )
+	{}
+    
+    void
+	CalcExternalInterfaceFMUImport()
+	{}
+    
+    void
+	InitExternalInterfaceFMUImport()
+	{}
+    
+    void
+	InstantiateInitializeFMUImport()
+	{}
+    
+    void
+	TerminateResetFreeFMUImport()
+	{}
+    
+    void
+	GetSetVariablesAndDoStepFMUImport()
+	{}
 
 	//     NOTICE
 
