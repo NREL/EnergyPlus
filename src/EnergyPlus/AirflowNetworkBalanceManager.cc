@@ -996,7 +996,7 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneSurfaceData( i ).UpValueTemp = Numbers( 4 ); // Upper temperature value for modulation of temperature control
 				MultizoneSurfaceData( i ).LowValueEnth = Numbers( 5 ); // Lower Enthalpy value for modulation of Enthalpy control
 				MultizoneSurfaceData( i ).UpValueEnth = Numbers( 6 ); // Lower Enthalpy value for modulation of Enthalpy control
-				if ( MultizoneSurfaceData( i ).VentSurfCtrNum < 4 ) {
+				if (MultizoneSurfaceData(i).VentSurfCtrNum < 4 || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjTemp || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjEnth) {
 					if ( ! lAlphaBlanks( 6 ) ) {
 						MultizoneSurfaceData( i ).VentingSchName = Alphas( 6 ); // Name of ventilation availability schedule
 					}
