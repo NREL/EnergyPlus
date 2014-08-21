@@ -1408,7 +1408,7 @@ namespace SystemAvailabilityManager {
 			GetAvailListsInput = false;
 		}
 
-		if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input ) {
+		if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input ) { // when both air loop and zone eq avail managers are present, zone avail mngrs list name has not been read in first time through here (see end of if block)
 			AvailabilityListName = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerListName;
 			Found = 0;
 			if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
@@ -1439,7 +1439,8 @@ namespace SystemAvailabilityManager {
 					}
 				} //End of Num Loop
 			}
-			ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input = false;
+			if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Count > 0 || Found > 0)ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input = false;
+			ZoneComp ( ZoneEquipType ).ZoneCompAvailMgrs ( CompNum ).Count += 1;
 		}
 
 	}

@@ -533,7 +533,6 @@ namespace UnitVentilator {
 
 			if ( ! lAlphaBlanks( 18 ) ) {
 				UnitVent( UnitVentNum ).AvailManagerListName = Alphas( 18 );
-				ZoneComp( UnitVentilator_Num ).ZoneCompAvailMgrs( UnitVentNum ).AvailManagerListName = Alphas( 18 );
 			}
 
 			//   A13, \field Coil Option
@@ -918,6 +917,7 @@ namespace UnitVentilator {
 		int Loop;
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MyPlantScanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int HotConNode; // hot water control node number in unit ventilator loop
 		int InNode; // inlet node number in unit ventilator loop
 		int OutNode; // outlet node number in unit ventilator loop
@@ -938,15 +938,21 @@ namespace UnitVentilator {
 			MyEnvrnFlag.allocate( NumOfUnitVents );
 			MySizeFlag.allocate( NumOfUnitVents );
 			MyPlantScanFlag.allocate( NumOfUnitVents );
+			MyZoneEqFlag.allocate ( NumOfUnitVents );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( UnitVentilator_Num ).ZoneCompAvailMgrs( UnitVentNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( UnitVentNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( UnitVentilator_Num ).ZoneCompAvailMgrs( UnitVentNum ).AvailManagerListName = UnitVent( UnitVentNum ).AvailManagerListName;
+				ZoneComp( UnitVentilator_Num ).ZoneCompAvailMgrs( UnitVentNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( UnitVentNum ) = false;
+			}
 			UnitVent( UnitVentNum ).AvailStatus = ZoneComp( UnitVentilator_Num ).ZoneCompAvailMgrs( UnitVentNum ).AvailStatus;
 		}
 

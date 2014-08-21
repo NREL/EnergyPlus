@@ -734,7 +734,6 @@ namespace OutdoorAirUnit {
 			}
 			if ( ! lAlphaBlanks( 17 ) ) {
 				OutAirUnit( OAUnitNum ).AvailManagerListName = cAlphaArgs( 17 );
-				ZoneComp( OutdoorAirUnit_Num ).ZoneCompAvailMgrs( OAUnitNum ).AvailManagerListName = cAlphaArgs( 17 );
 			}
 
 		}
@@ -846,6 +845,7 @@ namespace OutdoorAirUnit {
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MyPlantScanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int InNode; // inlet node number in outdoor air unit
 		int OutNode; // outlet node number in outdoor air unit
 		int OutsideAirNode; // outside air node number outdoor air unit
@@ -871,15 +871,21 @@ namespace OutdoorAirUnit {
 			MyEnvrnFlag.allocate( NumOfOAUnits );
 			MySizeFlag.allocate( NumOfOAUnits );
 			MyPlantScanFlag.allocate( NumOfOAUnits );
+			MyZoneEqFlag.allocate ( NumOfOAUnits );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( OutdoorAirUnit_Num ).ZoneCompAvailMgrs( OAUnitNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( OAUnitNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( OutdoorAirUnit_Num ).ZoneCompAvailMgrs( OAUnitNum ).AvailManagerListName = OutAirUnit( OAUnitNum ).AvailManagerListName;
+				ZoneComp( OutdoorAirUnit_Num ).ZoneCompAvailMgrs( OAUnitNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( OAUnitNum ) = false;
+			}
 			OutAirUnit( OAUnitNum ).AvailStatus = ZoneComp( OutdoorAirUnit_Num ).ZoneCompAvailMgrs( OAUnitNum ).AvailStatus;
 		}
 
