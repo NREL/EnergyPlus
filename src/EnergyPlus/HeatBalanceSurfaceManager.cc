@@ -1,6 +1,7 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -4503,7 +4504,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 	int ZoneNum; // Zone number the current surface is attached to
 	int OPtr;
 	Real64 RhoVaporSat; // Local temporary saturated vapor density for checking
-
+	std::ofstream static myfile("HeatFlux.csv", std::ofstream::out);
 	// FUNCTION DEFINITIONS:
 	// na
 
@@ -4898,6 +4899,7 @@ CalcHeatBalanceOutsideSurf( Optional_int_const ZoneToResimulate ) // if passed i
 
 		if ( Surface( SurfNum ).OSCMPtr > 0 ) { //Optr is set above in this case, use OSCM boundary data
 			QdotConvOutRepPerArea( SurfNum ) = -OSCM( OPtr ).HConv * ( TH( SurfNum, 1, 1 ) - OSCM( OPtr ).TConv );
+			myfile << QdotConvOutRepPerArea( SurfNum ) << "," << -OSCM( OPtr ).HConv << "," << TH( SurfNum, 1, 1 ) << "," << OSCM( OPtr ).TConv << std::endl;
 		} else {
 			QdotConvOutRepPerArea( SurfNum ) = -HcExtSurf( SurfNum ) * ( TH( SurfNum, 1, 1 ) - Surface( SurfNum ).OutDryBulbTemp );
 		}
