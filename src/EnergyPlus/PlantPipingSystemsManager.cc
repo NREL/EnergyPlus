@@ -1,6 +1,5 @@
 // C++ Headers
 #include <cmath>
-#include <fstream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -5022,7 +5021,7 @@ namespace PlantPipingSystemsManager {
 		InsulationXIndex = PipingSystemDomains( DomainNum ).InsulationXIndex;
 		InsulationYIndex = PipingSystemDomains( DomainNum ).InsulationYIndex;
 		InsulationZIndex = PipingSystemDomains( DomainNum ).InsulationZIndex;
-		std::ofstream static myfile("CellTypes.csv", std::ofstream::out);
+
 		for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
 			for ( Y = lbound( PipingSystemDomains( DomainNum ).Cells, 2 ); Y <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ); ++Y ) {
 				for ( X = lbound( PipingSystemDomains( DomainNum ).Cells, 1 ); X <= ubound( PipingSystemDomains( DomainNum ).Cells, 1 ); ++X ) {
@@ -5077,19 +5076,16 @@ namespace PlantPipingSystemsManager {
 							//Farfield cells
 							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 								CellType = CellType_FarfieldBoundary;
-								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 							//Slab cells
 							else if ( CellXIndex > MinSlabXIndex && CellZIndex > MinSlabZIndex ) {
 								//General slab cells
 								if ( CellYIndex < ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > SlabYIndex ){
 									CellType = CellType_Slab;
-									myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 								}
 								//Surface cells
 								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
 									CellType = CellType_ZoneGroundInterface;
-									myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 								}
 								//Underslab insulation cells
 								else if ( CellYIndex == SlabYIndex ){
@@ -5098,13 +5094,11 @@ namespace PlantPipingSystemsManager {
 										//Entire underslab insulation
 										if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
 											CellType = CellType_HorizInsulation;
-											myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 										}
 										//Perimeter insulation
 										else{
 											if ( CellXIndex <= InsulationXIndex || CellZIndex <= InsulationZIndex ){
 												CellType = CellType_HorizInsulation;
-												myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 											}
 										}
 									}
@@ -5117,12 +5111,10 @@ namespace PlantPipingSystemsManager {
 									//Check depth of vertical insulation
 									if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
 										CellType = CellType_VertInsulation;
-										myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 									}
 								}
 								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 									CellType = CellType_GroundSurface;
-									myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 								}
 							}
 							//Z side interface
@@ -5132,24 +5124,20 @@ namespace PlantPipingSystemsManager {
 									//Check depth of vertical insulation
 									if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
 										CellType = CellType_VertInsulation;
-										myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 									}
 								}
 								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 									CellType = CellType_GroundSurface;
-									myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 								}
 							}
 							//Surface cells
 							else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 								CellType = CellType_GroundSurface;
-								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 							//Farfield boundary
 							else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 )  || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
 								CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) {
 								CellType = CellType_FarfieldBoundary;
-								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 
 						}
@@ -5157,12 +5145,10 @@ namespace PlantPipingSystemsManager {
 						else {
 							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 								CellType = CellType_FarfieldBoundary;
-								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 							else if ( CellXIndex > MinSlabXIndex  && CellZIndex > MinSlabZIndex && CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 								// If insulated, cell properties will be assigned in DoOneTimeInit based on insulation flags
 								CellType = CellType_ZoneGroundInterface;
-								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 							//Vertical insulation 
 							else if ( ( CellXIndex == MinSlabXIndex  &&  CellZIndex > MinSlabZIndex  ) ||
@@ -5171,24 +5157,20 @@ namespace PlantPipingSystemsManager {
 								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
 									if ( CellYIndex >= InsulationYIndex ){
 										CellType = CellType_VertInsulation;
-										myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 									}
 								}
 								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
 									CellType = CellType_GroundSurface;
-									myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 								}
 							}
 							//Surface Cells
 							else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 								CellType = CellType_GroundSurface;
-								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 							//Domain 'bottom' surface
 							else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
 								CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ){
 								CellType = CellType_FarfieldBoundary;
-								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 						
 						}
@@ -5249,7 +5231,6 @@ namespace PlantPipingSystemsManager {
 					//'if it still isn't anything, then it is just an interior node
 					if ( CellType == CellType_Unknown ) {
 						CellType = CellType_GeneralField;
-						myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 					}
 
 					// if we were found on a pipe circuit, get some things for convenience
@@ -8225,7 +8206,7 @@ namespace PlantPipingSystemsManager {
 		int TotalSegments;
 		int SegCtr2;
 		Real64 ThisCellTemp;
-		std::ofstream static myfile("CellProps.csv", std::ofstream::out);
+
 		//'initialize cell properties
 		for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
 			for ( Y = lbound( PipingSystemDomains( DomainNum ).Cells, 2 ); Y <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ); ++Y ) {
@@ -8247,26 +8228,20 @@ namespace PlantPipingSystemsManager {
 						}
 					} else if ( ( SELECT_CASE_var == CellType_GeneralField ) || ( SELECT_CASE_var == CellType_GroundSurface ) || ( SELECT_CASE_var == CellType_AdiabaticWall ) || ( SELECT_CASE_var == CellType_FarfieldBoundary ) || ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementFloor ) || ( SELECT_CASE_var == CellType_BasementCorner ) ) {
 						//basement cells are partially ground, give them some props
-						myfile << -3 << "," << X << "," << Y << "," << Z << std::endl;
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 					} else if ( SELECT_CASE_var == CellType_Slab ){
-						myfile << -11 << "," << X << "," << Y << "," << Z << std::endl;
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
 					} else if ( SELECT_CASE_var == CellType_HorizInsulation ){
-						myfile << -12 << "," << X << "," << Y << "," << Z << std::endl;
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
 					} else if ( SELECT_CASE_var == CellType_VertInsulation ){
-						myfile << -13 << "," << X << "," << Y << "," << Z << std::endl;
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).VertInsProperties;
 					} else if ( SELECT_CASE_var == CellType_ZoneGroundInterface ){
 						// Slab In-Grade
 						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
-							myfile << -11 << "," << X << "," << Y << "," << Z << std::endl;
 							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
 						}
 						// Slab On-Grade
 						else {
-							myfile << -3 << "," << X << "," << Y << "," << Z << std::endl;
 							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 						}
 					}}
