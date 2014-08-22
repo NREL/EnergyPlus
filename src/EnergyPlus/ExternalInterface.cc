@@ -10,6 +10,7 @@
 #include <ScheduleManager.hh>
 #include <RuntimeLanguageProcessor.hh>
 #include <DisplayRoutines.hh>
+#include <DataIPShortCuts.hh>
 
 // C++ Standard Library Headers
 #include <string>
@@ -402,7 +403,145 @@ namespace ExternalInterface {
     
     void
 	GetExternalInterfaceInput()
-	{}
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   2Dec2007
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// Obtains input data for ExternalInterface
+
+		// METHODOLOGY EMPLOYED:
+		// Uses InputProcessor "Get" routines to obtain data.
+
+		// USE STATEMENTS:
+		using InputProcessor::GetNumObjectsFound;
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::VerifyName;
+		using InputProcessor::SameString;
+		using DataIPShortCuts::cCurrentModuleObject;
+		using DataIPShortCuts::cAlphaArgs;
+		using DataIPShortCuts::rNumericArgs;
+		using DataIPShortCuts::cAlphaFieldNames;
+		using DataIPShortCuts::cNumericFieldNames;
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		//FArray1D< std::string > Alphas;  // Alpha items for object
+		//FArray< Real64 > Numbers; // Numeric items for object
+		int NumAlphas; // Number of Alphas for each GetObjectItem call
+		int NumNumbers; // Number of Numbers for each GetObjectItem call
+		int IOStatus; //Used in GetObjectItem
+		int Loop; // Loop counter
+		bool IsNotOK; // Flag to verify name
+		bool IsBlank; // Flag for blank name
+
+		cCurrentModuleObject = "ExternalInterface";
+		NumExternalInterfaces = GetNumObjectsFound( cCurrentModuleObject );
+
+		for ( Loop = 1; Loop <= NumExternalInterfaces; Loop++ ) { // This loop determines whether the external interface is for FMU or BCVTB
+			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+			if ( SameString( cAlphaArgs(1), "PtolemyServer" ) ) { 
+				// The BCVTB interface is activated.
+				NumExternalInterfacesBCVTB++;
+			} else if ( SameString( cAlphaArgs(1), "FunctionalMockupUnitImport" ) ) {
+				// The functional mock up unit import interface is activated.
+				NumExternalInterfacesFMUImport++;
+			} else if ( SameString( cAlphaArgs(1), "FunctionalMockupUnitExport" ) ) {
+				// The functional mock up unit export interface is activated.
+				NumExternalInterfacesFMUExport++;
+			}
+		}
+
+		// Check if objects are used although BCVTB interface object is not defined
+		if ( NumExternalInterfacesBCVTB == 0 ) {
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:Schedule" );
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:Variable" );
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:Actuator" );
+		}
+
+		// Check if objects are used although FMUExport interface is not defined
+		if ( NumExternalInterfacesFMUExport == 0 ) {
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:FunctionalMockupUnitExport:To:Schedule" );
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:FunctionalMockupUnitExport:To:Variable" );
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:FunctionalMockupUnitExport:To:Actuator" );
+		}
+
+		// Check if objects are used although FMU Import interface is not defined
+		if ( NumExternalInterfacesFMUImport == 0 ) {
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:FunctionalMockupUnitImport:To:Schedule" );
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:FunctionalMockupUnitImport:To:Variable" );
+			WarnIfExternalInterfaceObjectsAreUsed( "ExternalInterface:FunctionalMockupUnitImport:To:Actuator" );
+		}
+
+		if ( ( NumExternalInterfacesBCVTB == 1 ) && ( NumExternalInterfacesFMUExport == 0 ) ) {
+			haveExternalInterfaceBCVTB = true;
+			DisplayString( "Instantiating Building Controls Virtual Test Bed" );
+			varKeys.allocate(maxVar); // Keys of report variables used for data exchange
+			//varKeys = ' ';
+			varNames.allocate(maxVar); // Names of report variables used for data exchange
+			//varNames = ' ';
+			inpVarTypes.allocate(maxVar); // Names of report variables used for data exchange
+			//inpVarTypes = 0;
+			inpVarNames.allocate(maxVar); // Names of report variables used for data exchange
+			//inpVarNames = ' ';
+			VerifyExternalInterfaceObject();
+		} else if ( ( NumExternalInterfacesBCVTB == 0 ) && ( NumExternalInterfacesFMUExport == 1 ) ) {
+			haveExternalInterfaceFMUExport = true;
+			FMUExportActivate = 1;
+			DisplayString( "Instantiating FunctionalMockupUnitExport interface" );
+			varKeys.allocate(maxVar); // Keys of report variables used for data exchange
+			//varKeys = ' ';
+			varNames.allocate(maxVar); // Names of report variables used for data exchange
+			//varNames = ' ';
+			inpVarTypes.allocate(maxVar); // Names of report variables used for data exchange
+			//inpVarTypes = 0;
+			inpVarNames.allocate(maxVar); // Names of report variables used for data exchange
+			//inpVarNames = ' ';
+			VerifyExternalInterfaceObject();
+		} else if ( ( NumExternalInterfacesBCVTB == 1 ) && ( NumExternalInterfacesFMUExport != 0 ) ) {
+			ShowSevereError( "GetExternalInterfaceInput: Cannot have Ptolemy and FMU-Export interface simultaneously." );
+			ErrorsFound = true;
+		}
+
+		if ( ( NumExternalInterfacesFMUImport == 1 ) && ( NumExternalInterfacesFMUExport == 0 ) ) {
+			haveExternalInterfaceFMUImport = true;
+			DisplayString( "Instantiating FunctionalMockupUnitImport interface" );
+			cCurrentModuleObject = "ExternalInterface:FunctionalMockupUnitImport";
+			NumFMUObjects = GetNumObjectsFound( cCurrentModuleObject );
+			VerifyExternalInterfaceObject();
+		} else if ( ( NumExternalInterfacesFMUImport == 1 ) && ( NumExternalInterfacesFMUExport != 0 ) ) {
+			ShowSevereError( "GetExternalInterfaceInput: Cannot have FMU-Import and FMU-Export interface simultaneously." );
+			ErrorsFound = true;
+		}
+
+		if ( NumExternalInterfacesBCVTB > 1 ) {
+			ShowSevereError( "GetExternalInterfaceInput: Cannot have more than one Ptolemy interface." );
+			ShowContinueError( "GetExternalInterfaceInput: Errors found in input." );
+			ErrorsFound = true;
+		}
+
+		if ( NumExternalInterfacesFMUExport > 1 ) {
+			ShowSevereError( "GetExternalInterfaceInput: Cannot have more than one FMU-Export interface." );
+			ShowContinueError( "Errors found in input." );
+			ErrorsFound = true;
+		}
+
+		if ( NumExternalInterfacesFMUImport > 1 ) {
+			ShowSevereError( "GetExternalInterfaceInput: Cannot have more than one FMU-Import interface." );
+			ShowContinueError( "Errors found in input." );
+			ErrorsFound = true;
+		}
+		
+		if ( ErrorsFound ) {
+			ShowFatalError( "GetExternalInterfaceInput: preceding conditions cause termination." );
+		}
+		
+		StopExternalInterfaceIfError();
+		
+	}
     
     void
 	CalcExternalInterface()
@@ -457,6 +596,47 @@ namespace ExternalInterface {
     void
 	GetSetVariablesAndDoStepFMUImport()
 	{}
+
+	void
+	VerifyExternalInterfaceObject()
+    {
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   12Dec2009
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine verifies the correctness of the fields of
+		// the ExternalInterface object in the idf file
+
+		// USE STATEMENTS:
+		using InputProcessor::GetObjectItem;
+		using InputProcessor::SameString;
+		using DataIPShortCuts::cCurrentModuleObject;
+		using DataIPShortCuts::cAlphaArgs;
+		using DataIPShortCuts::rNumericArgs;
+		using DataIPShortCuts::cAlphaFieldNames;
+		using DataIPShortCuts::cNumericFieldNames;
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int retVal; // Return value, needed to catch return value of function call
+		int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
+		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
+		int IOStatus( 0 ); // Used in GetObjectItem
+
+		cCurrentModuleObject = "ExternalInterface";
+		GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
+		if ( ( ! SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) &&
+		     ( ! SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) &&
+		     ( ! SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) ) {
+			ShowSevereError( "VerifyExternalInterfaceObject: " + cCurrentModuleObject + ", invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs(1) + "\"" );
+			ShowContinueError( "only \"PtolemyServer or FunctionalMockupUnitImport or FunctionalMockupUnitExport\" allowed." );
+			ErrorsFound = true;
+		}
+
+	}
+
 
 	//     NOTICE
 

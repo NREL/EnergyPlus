@@ -385,6 +385,8 @@ namespace ExternalInterface {
     void
 	GetSetVariablesAndDoStepFMUImport();
 
+	void
+	VerifyExternalInterfaceObject();
 
 	//     NOTICE
 
