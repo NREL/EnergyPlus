@@ -54023,9 +54023,9 @@ Pipe:Underground,
         \required-field
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
    A4, 	\field Name of slab material
-        \field-required
+        \field-optional
    A5,  \field Horizontal Insulation
-        \required-field
+        \required-optional
         \note This field specifies the presence of insulation beneath the slab.
    A6,  \field Insulation Material
         \note optional
@@ -54045,12 +54045,9 @@ Pipe:Underground,
    N14, \field Vertical Insulation Depth
         \field-optional
         \note This field specifies the depth of the vertical insulation		
-   A10, \field Slab Included in Ground Simulation
+   A10; \field Simulation Timestep
         \required-field
-        \note This field specifies whether the slab is included in the ground domain simulation.
-   A11; \field Simulation Timestep
-        \required-field
-        \note This field specifies the domain simulation timestep. Timstep/Hourly.
+        \note This field specifies the domain simulation timestep.
 	
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.

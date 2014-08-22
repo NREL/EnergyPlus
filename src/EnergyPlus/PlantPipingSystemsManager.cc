@@ -1087,28 +1087,32 @@ namespace PlantPipingSystemsManager {
 				}
 
 				//Get slab material properties
-				Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 4 );
-				PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material.Name(), TotMaterials );
-				if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
-					ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
-					ErrorsFound = true;
-				} else {
-					//check this
-					PipingSystemDomains( DomainCtr ).SlabThickness = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Thickness;
-					PipingSystemDomains( DomainCtr ).SlabProperties.Density = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Density;
-					PipingSystemDomains( DomainCtr ).SlabProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).SpecHeat;
-					PipingSystemDomains( DomainCtr ).SlabProperties.Conductivity = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Conductivity;
+				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ){
+					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 4 );
+					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material.Name(), TotMaterials );
+					if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
+						ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
+						ErrorsFound = true;
+					} else {
+						//check this
+						PipingSystemDomains( DomainCtr ).SlabThickness = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Thickness;
+						PipingSystemDomains( DomainCtr ).SlabProperties.Density = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Density;
+						PipingSystemDomains( DomainCtr ).SlabProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).SpecHeat;
+						PipingSystemDomains( DomainCtr ).SlabProperties.Conductivity = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Conductivity;
+					}
 				}
 
 				// set flag for horizontal insulation
-				if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
-					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
-				} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
-					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
-				} else {
-					ShowContinueError( "Must enter either yes or no for horizontal insulation." );
-					ShowFatalError( "Preceding error causes program termination." );
+				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ){
+					if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
+					} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
+						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
+					} else {
+						ShowContinueError( "Must enter either yes or no for horizontal insulation." );
+						ShowFatalError( "Preceding error causes program termination." );
+					}
 				}
 
 				// Get horizontal insulation material properties
@@ -1166,7 +1170,13 @@ namespace PlantPipingSystemsManager {
 					}
 
 					//vertical insulation depth
-					PipingSystemDomains( DomainCtr ).VertInsDepth = Domain( ZoneCoupledDomainCtr ).VertInsDepth;
+					if ( Domain( ZoneCoupledDomainCtr ).VertInsDepth < Domain( ZoneCoupledDomainCtr ).Depth ){ 
+						PipingSystemDomains( DomainCtr ).VertInsDepth = Domain( ZoneCoupledDomainCtr ).VertInsDepth;
+					} else {
+						ShowContinueError( "Vertical insulation depth must be less than the domain depth. Check input." );
+						ShowFatalError( "Preceding error causes program termination." );
+					}
+					
 				}
 
 				//Domain perimeter offset
