@@ -339,215 +339,215 @@
 !    END SUBROUTINE ExternalInterfaceExchangeVariables
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE GetExternalInterfaceInput
+!    SUBROUTINE GetExternalInterfaceInput
 
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   2Dec2007
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   2Dec2007
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! Obtains input data for ExternalInterface
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! Obtains input data for ExternalInterface
 
-    ! METHODOLOGY EMPLOYED:
-    ! Uses InputProcessor "Get" routines to obtain data.
+!    ! METHODOLOGY EMPLOYED:
+!    ! Uses InputProcessor "Get" routines to obtain data.
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    ! USE STATEMENTS:
-    USE InputProcessor, ONLY: GetNumObjectsFound, GetObjectItem, VerifyName, SameString
-    USE DataIPShortCuts
+!    ! USE STATEMENTS:
+!    USE InputProcessor, ONLY: GetNumObjectsFound, GetObjectItem, VerifyName, SameString
+!    USE DataIPShortCuts
 
-    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+!    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE PARAMETER DEFINITIONS:
-    ! na
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
+!    ! na
 
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    ! na
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    ! na
 
-    ! DERIVED TYPE DEFINITIONS:
-    ! na
+!    ! DERIVED TYPE DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    CHARACTER(len=MaxNameLength), DIMENSION(3) :: Alphas  ! Alpha items for object
-    REAL, DIMENSION(1)             :: Numbers ! Numeric items for object
-    INTEGER                        :: NumAlphas  ! Number of Alphas for each GetObjectItem call
-    INTEGER                        :: NumNumbers ! Number of Numbers for each GetObjectItem call
-    INTEGER                        :: IOStatus   ! Used in GetObjectItem
-    INTEGER                        :: Loop       ! Loop counter
-    LOGICAL                        :: IsNotOK              ! Flag to verify name
-    LOGICAL                        :: IsBlank              ! Flag for blank name
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    CHARACTER(len=MaxNameLength), DIMENSION(3) :: Alphas  ! Alpha items for object
+!    REAL, DIMENSION(1)             :: Numbers ! Numeric items for object
+!    INTEGER                        :: NumAlphas  ! Number of Alphas for each GetObjectItem call
+!    INTEGER                        :: NumNumbers ! Number of Numbers for each GetObjectItem call
+!    INTEGER                        :: IOStatus   ! Used in GetObjectItem
+!    INTEGER                        :: Loop       ! Loop counter
+!    LOGICAL                        :: IsNotOK              ! Flag to verify name
+!    LOGICAL                        :: IsBlank              ! Flag for blank name
 
 
-    cCurrentModuleObject='ExternalInterface'
-    NumExternalInterfaces = GetNumObjectsFound(cCurrentModuleObject)
+!    cCurrentModuleObject='ExternalInterface'
+!    NumExternalInterfaces = GetNumObjectsFound(cCurrentModuleObject)
 
-    DO Loop=1,NumExternalInterfaces ! This loop determines whether the external interface is for FMU or BCVTB
-        CALL GetObjectItem(cCurrentModuleObject,Loop,cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, &
-        AlphaFieldnames=cAlphaFieldNames, NumericFieldNames=cNumericFieldNames)
-        IF (SameString(cAlphaArgs(1), 'PtolemyServer')) THEN ! The BCVTB interface is activated.
-            NumExternalInterfacesBCVTB = NumExternalInterfacesBCVTB + 1
-        ELSEIF (SameString(cAlphaArgs(1), 'FunctionalMockupUnitImport')) THEN
-            ! The functional mock up unit import interface is activated.
-            NumExternalInterfacesFMUImport = NumExternalInterfacesFMUImport + 1
-        ELSEIF (SameString(cAlphaArgs(1), 'FunctionalMockupUnitExport')) THEN
-            ! The functional mock up unit export interface is activated.
-            NumExternalInterfacesFMUExport = NumExternalInterfacesFMUExport + 1
-        END IF
-    END DO
-    ! Check if objects are used although BCVTB interface object is not defined
-    IF (NumExternalInterfacesBCVTB == 0) THEN
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:Schedule')
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:Variable')
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:Actuator')
-    ENDIF
+!    DO Loop=1,NumExternalInterfaces ! This loop determines whether the external interface is for FMU or BCVTB
+!        CALL GetObjectItem(cCurrentModuleObject,Loop,cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, &
+!        AlphaFieldnames=cAlphaFieldNames, NumericFieldNames=cNumericFieldNames)
+!        IF (SameString(cAlphaArgs(1), 'PtolemyServer')) THEN ! The BCVTB interface is activated.
+!            NumExternalInterfacesBCVTB = NumExternalInterfacesBCVTB + 1
+!        ELSEIF (SameString(cAlphaArgs(1), 'FunctionalMockupUnitImport')) THEN
+!            ! The functional mock up unit import interface is activated.
+!            NumExternalInterfacesFMUImport = NumExternalInterfacesFMUImport + 1
+!        ELSEIF (SameString(cAlphaArgs(1), 'FunctionalMockupUnitExport')) THEN
+!            ! The functional mock up unit export interface is activated.
+!            NumExternalInterfacesFMUExport = NumExternalInterfacesFMUExport + 1
+!        END IF
+!    END DO
+!    ! Check if objects are used although BCVTB interface object is not defined
+!    IF (NumExternalInterfacesBCVTB == 0) THEN
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:Schedule')
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:Variable')
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:Actuator')
+!    ENDIF
 
-    ! Check if objects are used although FMUExport interface is not defined
-    IF (NumExternalInterfacesFMUExport == 0) THEN
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitExport:To:Schedule')
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitExport:To:Variable')
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitExport:To:Actuator')
-    ENDIF
+!    ! Check if objects are used although FMUExport interface is not defined
+!    IF (NumExternalInterfacesFMUExport == 0) THEN
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitExport:To:Schedule')
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitExport:To:Variable')
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitExport:To:Actuator')
+!    ENDIF
 
-    ! Check if objects are used although FMU Import interface is not defined
-    IF (NumExternalInterfacesFMUImport == 0) THEN
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitImport:To:Schedule')
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitImport:To:Variable')
-        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitImport:To:Actuator')
-    ENDIF
+!    ! Check if objects are used although FMU Import interface is not defined
+!    IF (NumExternalInterfacesFMUImport == 0) THEN
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitImport:To:Schedule')
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitImport:To:Variable')
+!        CALL WarnIfExternalInterfaceObjectsAreUsed('ExternalInterface:FunctionalMockupUnitImport:To:Actuator')
+!    ENDIF
 
-    IF ((NumExternalInterfacesBCVTB == 1) .AND. (NumExternalInterfacesFMUExport == 0)) THEN
-        haveExternalInterfaceBCVTB = .TRUE.
-        CALL DisplayString('Instantiating Building Controls Virtual Test Bed')
-        ALLOCATE(varKeys(maxVar))  ! Keys of report variables used for data exchange
-        varKeys=' '
-        ALLOCATE(varNames(maxVar)) ! Names of report variables used for data exchange
-        varNames=' '
-        ALLOCATE(inpVarTypes(maxVar)) ! Names of report variables used for data exchange
-        inpVarTypes=0
-        ALLOCATE(inpVarNames(maxVar)) ! Names of report variables used for data exchange
-        inpVarNames=' '
-        CALL VerifyExternalInterfaceObject
-    ELSEIF ((NumExternalInterfacesBCVTB == 0) .AND. (NumExternalInterfacesFMUExport == 1)) THEN
-        haveExternalInterfaceFMUExport = .TRUE.
-        FMUExportActivate = 1
-        CALL DisplayString('Instantiating FunctionalMockupUnitExport interface')
-        ALLOCATE(varKeys(maxVar))  ! Keys of report variables used for data exchange
-        varKeys=' '
-        ALLOCATE(varNames(maxVar)) ! Names of report variables used for data exchange
-        varNames=' '
-        ALLOCATE(inpVarTypes(maxVar)) ! Names of report variables used for data exchange
-        inpVarTypes=0
-        ALLOCATE(inpVarNames(maxVar)) ! Names of report variables used for data exchange
-        inpVarNames=' '
-        CALL VerifyExternalInterfaceObject
-    ELSEIF ((NumExternalInterfacesBCVTB == 1) .AND. (NumExternalInterfacesFMUExport /= 0)) THEN
-        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have Ptolemy and FMU-Export interface simultaneously.')
-        ErrorsFound = .true.
-    ENDIF
+!    IF ((NumExternalInterfacesBCVTB == 1) .AND. (NumExternalInterfacesFMUExport == 0)) THEN
+!        haveExternalInterfaceBCVTB = .TRUE.
+!        CALL DisplayString('Instantiating Building Controls Virtual Test Bed')
+!        ALLOCATE(varKeys(maxVar))  ! Keys of report variables used for data exchange
+!        varKeys=' '
+!        ALLOCATE(varNames(maxVar)) ! Names of report variables used for data exchange
+!        varNames=' '
+!        ALLOCATE(inpVarTypes(maxVar)) ! Names of report variables used for data exchange
+!        inpVarTypes=0
+!        ALLOCATE(inpVarNames(maxVar)) ! Names of report variables used for data exchange
+!        inpVarNames=' '
+!        CALL VerifyExternalInterfaceObject
+!    ELSEIF ((NumExternalInterfacesBCVTB == 0) .AND. (NumExternalInterfacesFMUExport == 1)) THEN
+!        haveExternalInterfaceFMUExport = .TRUE.
+!        FMUExportActivate = 1
+!        CALL DisplayString('Instantiating FunctionalMockupUnitExport interface')
+!        ALLOCATE(varKeys(maxVar))  ! Keys of report variables used for data exchange
+!        varKeys=' '
+!        ALLOCATE(varNames(maxVar)) ! Names of report variables used for data exchange
+!        varNames=' '
+!        ALLOCATE(inpVarTypes(maxVar)) ! Names of report variables used for data exchange
+!        inpVarTypes=0
+!        ALLOCATE(inpVarNames(maxVar)) ! Names of report variables used for data exchange
+!        inpVarNames=' '
+!        CALL VerifyExternalInterfaceObject
+!    ELSEIF ((NumExternalInterfacesBCVTB == 1) .AND. (NumExternalInterfacesFMUExport /= 0)) THEN
+!        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have Ptolemy and FMU-Export interface simultaneously.')
+!        ErrorsFound = .true.
+!    ENDIF
 
-    IF ((NumExternalInterfacesFMUImport == 1) .AND. (NumExternalInterfacesFMUExport == 0)) THEN
-        haveExternalInterfaceFMUImport = .TRUE.
-        CALL DisplayString('Instantiating FunctionalMockupUnitImport interface')
-        cCurrentModuleObject='ExternalInterface:FunctionalMockupUnitImport'
-        NumFMUObjects = GetNumObjectsFound(cCurrentModuleObject)
-        CALL VerifyExternalInterfaceObject
-    ELSEIF ((NumExternalInterfacesFMUImport == 1) .AND. (NumExternalInterfacesFMUExport /= 0)) THEN
-        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have FMU-Import and FMU-Export interface simultaneously.')
-        ErrorsFound = .true.
-    ENDIF
+!    IF ((NumExternalInterfacesFMUImport == 1) .AND. (NumExternalInterfacesFMUExport == 0)) THEN
+!        haveExternalInterfaceFMUImport = .TRUE.
+!        CALL DisplayString('Instantiating FunctionalMockupUnitImport interface')
+!        cCurrentModuleObject='ExternalInterface:FunctionalMockupUnitImport'
+!        NumFMUObjects = GetNumObjectsFound(cCurrentModuleObject)
+!        CALL VerifyExternalInterfaceObject
+!    ELSEIF ((NumExternalInterfacesFMUImport == 1) .AND. (NumExternalInterfacesFMUExport /= 0)) THEN
+!        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have FMU-Import and FMU-Export interface simultaneously.')
+!        ErrorsFound = .true.
+!    ENDIF
 
-    IF (NumExternalInterfacesBCVTB > 1) THEN
-        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have more than one Ptolemy interface.')
-        CALL ShowContinueError('GetExternalInterfaceInput: Errors found in input.')
-        ErrorsFound = .true.
-    ENDIF
+!    IF (NumExternalInterfacesBCVTB > 1) THEN
+!        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have more than one Ptolemy interface.')
+!        CALL ShowContinueError('GetExternalInterfaceInput: Errors found in input.')
+!        ErrorsFound = .true.
+!    ENDIF
 
-    IF (NumExternalInterfacesFMUExport > 1) THEN
-        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have more than one FMU-Export interface.')
-        CALL ShowContinueError('Errors found in input.')
-        ErrorsFound = .true.
-    ENDIF
+!    IF (NumExternalInterfacesFMUExport > 1) THEN
+!        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have more than one FMU-Export interface.')
+!        CALL ShowContinueError('Errors found in input.')
+!        ErrorsFound = .true.
+!    ENDIF
 
-    IF (NumExternalInterfacesFMUImport > 1) THEN
-        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have more than one FMU-Import interface.')
-        CALL ShowContinueError('Errors found in input.')
-        ErrorsFound = .true.
-    ENDIF
-    IF (ErrorsFound) THEN
-        CALL ShowFatalError('GetExternalInterfaceInput: preceding conditions cause termination.')
-    ENDIF
-    CALL StopExternalInterfaceIfError
+!    IF (NumExternalInterfacesFMUImport > 1) THEN
+!        CALL ShowSevereError('GetExternalInterfaceInput: Cannot have more than one FMU-Import interface.')
+!        CALL ShowContinueError('Errors found in input.')
+!        ErrorsFound = .true.
+!    ENDIF
+!    IF (ErrorsFound) THEN
+!        CALL ShowFatalError('GetExternalInterfaceInput: preceding conditions cause termination.')
+!    ENDIF
+!    CALL StopExternalInterfaceIfError
 
-    RETURN
+!    RETURN
 
-    END SUBROUTINE GetExternalInterfaceInput
+!    END SUBROUTINE GetExternalInterfaceInput
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE StopExternalInterfaceIfError
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   9Jan2008
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    SUBROUTINE StopExternalInterfaceIfError
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   9Jan2008
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This subroutine gracefully stops the ExternalInterface if an error has been found.
-    ! It sends an appropriate message to the ExternalInterface
-    ! and then calls a fatal error to stop EnergyPlus.
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This subroutine gracefully stops the ExternalInterface if an error has been found.
+!    ! It sends an appropriate message to the ExternalInterface
+!    ! and then calls a fatal error to stop EnergyPlus.
 
-    ! METHODOLOGY EMPLOYED:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+!    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
 
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    INTERFACE
-    INTEGER(C_INT) FUNCTION sendclientmessage(socketFD, flaWri) BIND (C, NAME="sendclientmessage")
-    USE ISO_C_BINDING, ONLY: C_INT
-    INTEGER(C_INT) socketFD ! socket file descriptor
-    INTEGER(C_INT) flaWri   ! flag to write to the socket
-    END FUNCTION sendclientmessage
-    END INTERFACE
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION sendclientmessage(socketFD, flaWri) BIND (C, NAME="sendclientmessage")
+!    USE ISO_C_BINDING, ONLY: C_INT
+!    INTEGER(C_INT) socketFD ! socket file descriptor
+!    INTEGER(C_INT) flaWri   ! flag to write to the socket
+!    END FUNCTION sendclientmessage
+!    END INTERFACE
 
-    ! USE STATEMENTS:
-    ! na
+!    ! USE STATEMENTS:
+!    ! na
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    INTEGER retVal ! Return value, needed to catch return value of function call
-    IF ((NumExternalInterfacesBCVTB /= 0) .OR. (NumExternalInterfacesFMUExport /= 0))  THEN
-        IF ( ErrorsFound ) THEN
-            ! Check if the socket is open
-            IF ( socketFD .GE. 0 ) THEN
-                ! Socket is open
-                IF (simulationStatus == 1) THEN
-                    retVal = sendclientmessage(socketFD, -10)
-                ELSE
-                    retVal = sendclientmessage(socketFD, -20)
-                ENDIF
-            ENDIF
-            CALL ShowFatalError('Error in ExternalInterface: Check EnergyPlus *.err file.')
-        ENDIF
-    END IF
-    IF (NumExternalInterfacesFMUImport /= 0) THEN
-        IF ( ErrorsFound ) THEN
-            CALL ShowFatalError('ExternalInterface/StopExternalInterfaceIfError: Error in ExternalInterface:'// &
-            'Check EnergyPlus *.err file.')
-        ENDIF
-    END IF
-    END SUBROUTINE StopExternalInterfaceIfError
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    INTEGER retVal ! Return value, needed to catch return value of function call
+!    IF ((NumExternalInterfacesBCVTB /= 0) .OR. (NumExternalInterfacesFMUExport /= 0))  THEN
+!        IF ( ErrorsFound ) THEN
+!            ! Check if the socket is open
+!            IF ( socketFD .GE. 0 ) THEN
+!                ! Socket is open
+!                IF (simulationStatus == 1) THEN
+!                    retVal = sendclientmessage(socketFD, -10)
+!                ELSE
+!                    retVal = sendclientmessage(socketFD, -20)
+!                ENDIF
+!            ENDIF
+!            CALL ShowFatalError('Error in ExternalInterface: Check EnergyPlus *.err file.')
+!        ENDIF
+!    END IF
+!    IF (NumExternalInterfacesFMUImport /= 0) THEN
+!        IF ( ErrorsFound ) THEN
+!            CALL ShowFatalError('ExternalInterface/StopExternalInterfaceIfError: Error in ExternalInterface:'// &
+!            'Check EnergyPlus *.err file.')
+!        ENDIF
+!    END IF
+!    END SUBROUTINE StopExternalInterfaceIfError
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !    SUBROUTINE CloseSocket(FlagToWriteToSocket)
@@ -617,596 +617,596 @@
 !    END SUBROUTINE CloseSocket
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE ParseString(str, ele, nEle)
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   8Jan2008
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    SUBROUTINE ParseString(str, ele, nEle)
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   8Jan2008
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This subroutine parses the semicolon separated string xmlStr
-    ! and assigns each element to ele
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This subroutine parses the semicolon separated string xmlStr
+!    ! and assigns each element to ele
 
-    ! METHODOLOGY EMPLOYED:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    ! USE STATEMENTS:
-    USE InputProcessor, ONLY: MakeUPPERCase
+!    ! USE STATEMENTS:
+!    USE InputProcessor, ONLY: MakeUPPERCase
 
-    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+!    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    CHARACTER(len=*), INTENT(IN) :: str                          ! The string, with all elements separated by ';'
-    CHARACTER(len=MaxNameLength), DIMENSION(:), INTENT(OUT) :: ele  ! The elements
-    INTEGER, INTENT(IN)                  :: nEle ! The number of elements
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    CHARACTER(len=*), INTENT(IN) :: str                          ! The string, with all elements separated by ';'
+!    CHARACTER(len=MaxNameLength), DIMENSION(:), INTENT(OUT) :: ele  ! The elements
+!    INTEGER, INTENT(IN)                  :: nEle ! The number of elements
 
-    ! SUBROUTINE PARAMETER DEFINITIONS:
-    ! na
-    INTEGER :: i ! Counter
-    INTEGER :: iSta ! Start of substring
-    INTEGER :: iEnd ! End of substring
-    INTEGER :: lenStr ! Length of string
-    lenStr = len(str)
-    iEnd = 1
-    DO i = 1, nEle
-        iSta = iEnd  ! add one to skip ';'
-        iEnd = iSta+INDEX(str(iSta:lenStr), ';')
-        ele(i) = TRIM(MakeUPPERCase(str(iSta:(iEnd-2))))
-    ENDDO
-    END SUBROUTINE ParseString
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE InitExternalInterface()
-
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   2Dec2007
-    !       MODIFIED       Rui Zhang Aug 2009
-    !       RE-ENGINEERED  na
-
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This subroutine is for initializations of the ExternalInterface
-
-    ! METHODOLOGY EMPLOYED:
-    ! na
-
-    ! REFERENCES:
-    ! na
-
-    ! USE STATEMENTS:
-    USE ScheduleManager, ONLY: GetDayScheduleIndex
-    USE RuntimeLanguageProcessor, ONLY: isExternalInterfaceErlVariable, FindEMSVariable
-    USE DataGlobals, ONLY: WeathSimReq
-
-    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
-
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
-
-    ! SUBROUTINE PARAMETER DEFINITIONS:
-
-    LOGICAL,SAVE :: firstCall    = .TRUE.  ! First time, input has been read
-
-    CHARACTER(len=*), PARAMETER :: simCfgFilNam="variables.cfg"
-
-    INTEGER :: i, j         ! Loop counter
-    ! INTERFACE BLOCK SPECIFICATIONS
-    ! na
-
-    ! DERIVED TYPE DEFINITIONS
-    ! na
-
-    INTERFACE
-    INTEGER(C_INT) FUNCTION establishclientsocket(fileName) BIND (C, NAME="establishclientsocket")
-    ! Returns the logical unit number of the socket
-    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! file from which socket port number will be read
-    END FUNCTION establishclientsocket
-    END INTERFACE
-
-    INTERFACE
-    INTEGER(C_INT) FUNCTION getmainversionnumber() BIND (C, NAME="getmainversionnumber")
-    ! Returns the main version number of the interface, or a negative
-    ! number if a dummy dll is used
-    USE ISO_C_BINDING, ONLY: C_INT
-    END FUNCTION getmainversionnumber
-    END INTERFACE
-
-    INTERFACE
-    INTEGER(C_INT) FUNCTION getnumberofxmlvalues(fileName, xpathExpr)
-    ! Returns the number of XML values in the file, or a negative
-    ! value if an error occurred
-    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! Name of XML file
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: xpathExpr ! XPath expression
-    END FUNCTION getnumberofxmlvalues
-    END INTERFACE
-
-    INTERFACE
-    INTEGER(C_INT) FUNCTION getxmlvalue(fileName, xpathExpr, res, nAtr) BIND (C, NAME="getxmlvalue")
-    ! Gets the xml values, and returns -1 if an error occurred, or 0 otherwise
-    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! Name of XML file
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: xpathExpr ! XPath expression
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: res       ! The values of the xml attributes will be stored here
-    INTEGER(C_INT)                :: nAtr             ! The number of attributes to be obtained
-    END FUNCTION getxmlvalue
-    END INTERFACE
-
-    INTERFACE
-    INTEGER(C_INT) FUNCTION getepvariables(fileName, outVarsNam, outVarsTyp, nOutVars, inVarsKey, &
-    nInVarsKeys, inVars, nInVars, inVarsTyp, strLen) BIND (C, NAME="getepvariables")
-    ! Gets the EnergyPlus variables with which data is being exchanged.
-    ! This function return -1 if an error occurred, or 0 otherwise.
-    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName    ! Name of the XMLfile
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsNam  ! Comma seperated string for returned
-    ! output variable names
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsTyp  ! Comma seperated string for returned
-    ! output variable types
-    INTEGER(C_INT)                :: nOutVars           ! Number of output variables found
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVarsKey   ! The available variable types from
-    ! ExternalInterface for EP input(comma seperated)
-    INTEGER(C_INT)                :: nInVarsKeys        ! Number of available variables types
-    ! from ExternalInterface for EP input
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVars      ! Comma seperated string for returned
-    ! input variables names
-    INTEGER(C_INT)                :: nInVars            ! Number of input variables found
-    INTEGER(C_INT), DIMENSION(*)  :: inVarsTyp          ! Comma seperated string for returned
-    ! input variable type
-    INTEGER(C_INT)                :: strLen             ! Length of the xml string
-    ! to be returned
-    END FUNCTION getepvariables
-    END INTERFACE
-
-    INTERFACE
-    INTEGER(C_INT) FUNCTION getepvariablesFMU(fileName, outVarsNam, outVarsTyp, nOutVars, inVarsKey, &
-    nInVarsKeys, inVars, nInVars, inVarsTyp, strLen) BIND (C, NAME="getepvariablesFMU")
-    ! Gets the EnergyPlus variables with which data is being exchanged.
-    ! This function return -1 if an error occurred, or 0 otherwise.
-    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName    ! Name of the XMLfile
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsNam  ! Comma seperated string for returned
-    ! output variable names
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsTyp  ! Comma seperated string for returned
-    ! output variable types
-    INTEGER(C_INT)                :: nOutVars           ! Number of output variables found
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVarsKey   ! The available variable types from
-    ! ExternalInterface for EP input(comma seperated)
-    INTEGER(C_INT)                :: nInVarsKeys        ! Number of available variables types
-    ! from ExternalInterface for EP input
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVars      ! Comma seperated string for returned
-    ! input variables names
-    INTEGER(C_INT)                :: nInVars            ! Number of input variables found
-    INTEGER(C_INT), DIMENSION(*)  :: inVarsTyp          ! Comma seperated string for returned
-    ! input variable type
-    INTEGER(C_INT)                :: strLen             ! Length of the xml string
-    ! to be returned
-    END FUNCTION getepvariablesFMU
-    END INTERFACE
-
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    INTEGER, PARAMETER :: lenXmlStr = maxVar*MaxNameLength ! Length of xml string
-    CHARACTER(len=lenXmlStr)     :: xmlStrOut       ! xml values in string, separated by ';'
-    CHARACTER(len=lenXmlStr)     :: xmlStrOutTyp    ! xml values in string, separated by ';'
-    CHARACTER(len=lenXmlStr)     :: xmlStrInKey     ! xml values in string, separated by ';'
-    CHARACTER(len=lenXmlStr)     :: xmlStrIn        ! xml values in string, separated by ';'
-    CHARACTER(len=lenXmlStr)     :: xmlStrInTyp     ! xml values in string, separated by ';'
-    INTEGER, SAVE                :: nOutVal         ! Number of output values (E+ -> ExternalInterface)
-    INTEGER, SAVE                :: nInpVar         ! Number of input values (ExternalInterface -> E+)
-    INTEGER                      :: retVal          ! Return value of function call, used for error handling
-    INTEGER                      :: counter = 0     ! Counter for ErlVariables
-    INTEGER                      :: mainVersion     ! The version number
-
-    CHARACTER(len=MaxNameLength), DIMENSION(maxVar) :: curVals ! Names of schedules (i.e., schedule names)
-    INTEGER curNumInpVal                                       ! current number of input values for the InputValType
-    CHARACTER(len=maxErrMsgLength)   :: validateErrMsg         ! error returned when xml Schema validate failed
-    INTEGER                          :: errMsgLen              ! the length of the error message
-    LOGICAL socFileExist                                       ! Set to true if socket configuration
-    ! file exists
-    LOGICAL simFileExist                                       ! Set to true if simulation configuration
-    ! file exists
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    IF (FirstCall) THEN
-        CALL DisplayString('ExternalInterface initializes.')
-        ! do one time initializations
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        IF (haveExternalInterfaceBCVTB) THEN
-            ! Check version number
-            mainVersion = getmainversionnumber()
-            IF (mainVersion .LT. 0.0d0) THEN
-                CALL ShowSevereError('ExternalInterface: BCVTB is not installed in this version.')
-                ErrorsFound = .true.
-                CALL StopExternalInterfaceIfError
-            END IF
-        END IF
-
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Get port number
-        INQUIRE (FILE=socCfgFilNam, EXIST=socFileExist)
-        IF (socFileExist) THEN
-            socketFD = establishclientsocket(socCfgFilNam)
-            IF (socketFD .LT. 0) THEN
-                CALL ShowSevereError('ExternalInterface: Could not open socket. File descriptor = ' &
-                //TRIM(TrimSigDigits(socketFD))//'.')
-                ErrorsFound = .true.
-            END IF
-        ELSE
-            CALL ShowSevereError('ExternalInterface: Did not find file "'//socCfgFilNam//'".')
-            CALL ShowContinueError('This file needs to be in same directory as in.idf.')
-            CALL ShowContinueError('Check the documentation for the ExternalInterface.')
-            ErrorsFound = .true.
-        END IF
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Make sure that idf file specified a run period other than
-        ! design day and system sizing.
-        CALL ValidateRunControl
-
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        CALL StopExternalInterfaceIfError
-
-        xmlStrOut(1:lenXmlStr) = " "
-        xmlStrOutTyp(1:lenXmlStr) = " "
-        xmlStrInKey(1:lenXmlStr) = " "
-        xmlStrIn(1:lenXmlStr) = " "
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Get input and output variables for EnergyPlus in sequence
-        xmlStrInKey= "schedule," &
-        //"variable," &
-        //"actuator"//char(0)
-        ! Check if simCfgFilNam exists.
-        INQUIRE (FILE=simCfgFilNam, EXIST=simFileExist)
-        IF (simFileExist) THEN
-            IF (haveExternalInterfaceBCVTB) THEN
-                retVal = getepvariables(simCfgFilNam, &
-                xmlStrOutTyp ,xmlStrOut, nOutVal, &
-                xmlStrInKey, nInKeys, &
-                xmlStrIn, nInpVar, inpVarTypes, lenXmlStr)
-            ELSEIF (haveExternalInterfaceFMUExport) THEN
-                retVal = getepvariablesFMU(simCfgFilNam, &
-                xmlStrOutTyp ,xmlStrOut, nOutVal, &
-                xmlStrInKey, nInKeys, &
-                xmlStrIn, nInpVar, inpVarTypes, lenXmlStr)
-            END IF
-            ! handle errors when reading variables.cfg file
-            IF ( retVal .LT. 0 ) THEN
-                CALL ShowSevereError('ExternalInterface: Error when getting input and output variables for EnergyPlus,')
-                CALL ShowContinueError('check simulation.log for error message.')
-                ErrorsFound = .true.
-            END IF
-        ELSE
-            CALL ShowSevereError('ExternalInterface: Did not find file "'//simCfgFilNam//'".')
-            CALL ShowContinueError('This file needs to be in same directory as in.idf.')
-            CALL ShowContinueError('Check the documentation for the ExternalInterface.')
-            ErrorsFound = .true.
-        END IF
-        CALL StopExternalInterfaceIfError
-
-        IF ( nOutVal + nInpVar .GT. maxVar ) THEN
-            CALL ShowSevereError('ExternalInterface: Too many variables to be exchanged.')
-            CALL ShowContinueError('Attempted to exchange '//TRIM(TrimSigDigits(nOutVal))//' outputs')
-            CALL ShowContinueError('plus '//TRIM(TrimSigDigits(nOutVal))//' inputs.')
-            CALL ShowContinueError('Maximum allowed is sum is '//TRIM(TrimSigDigits(maxVar))//'.')
-            CALL ShowContinueError('To fix, increase maxVar in ExternalInterface.f90')
-            ErrorsFound = .true.
-        END IF
-        CALL StopExternalInterfaceIfError
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        !!!!!!!!!!!!!!!!!!!!!
-        IF ( nOutVal .LT. 0 ) THEN
-            CALL ShowSevereError('ExternalInterface: Error when getting number of xml values for outputs.')
-            ErrorsFound = .true.
-        ELSE
-            CALL ParseString(xmlStrOut, varNames, nOutVal)
-            CALL ParseString(xmlStrOutTyp, varkeys, nOutVal)
-        END IF
-        CALL StopExternalInterfaceIfError
-
-        IF ( nInpVar .LT. 0 ) THEN
-            CALL ShowSevereError('ExternalInterface: Error when getting number of xml values for inputs.')
-            ErrorsFound = .true.
-        ELSE
-            CALL ParseString(xmlStrIn, inpVarNames, nInpVar)
-        END IF
-        CALL StopExternalInterfaceIfError
-
-        CALL DisplayString('Number of outputs in ExternalInterface = '//TrimSigDigits(nOutVal))
-        CALL DisplayString('Number of inputs  in ExternalInterface = '//TrimSigDigits(nInpVar))
-
-        FirstCall = .FALSE.
-
-    ELSEIF (.NOT.ConfiguredControlPoints) THEN
-        ALLOCATE(keyVarIndexes( nOutVal ))
-        ALLOCATE(varTypes( nOutVal ))
-        CALL GetReportVariableKey(varKeys, nOutVal, varNames, keyVarIndexes, varTypes)
-        ALLOCATE(varInd( nInpVar ))
-        DO i=1, nInpVar
-            IF (inpVarTypes(i) .EQ. indexSchedule) THEN
-                varInd(i) = GetDayScheduleIndex(inpVarNames(i))
-            ELSEIF (inpVarTypes(i) .EQ. indexVariable) THEN
-                varInd(i) = FindEMSVariable(inpVarNames(i), 0)
-            ELSEIF (inpVarTypes(i) .EQ. indexActuator) THEN
-                varInd(i) = FindEMSVariable(inpVarNames(i), 0)
-            END IF
-            IF (varInd(i) .LE. 0) THEN
-                CALL ShowSevereError('ExternalInterface: Error, xml file "' // simCfgFilNam // '" declares variable "' &
-                //TRIM(inpVarNames(i))//'",')
-                CALL ShowContinueError('but variable was not found in idf file.')
-                ErrorsFound = .true.
-            END IF
-        ENDDO
-        CALL StopExternalInterfaceIfError
-        ! Configure Erl variables
-        DO i=1, nInpVar
-            IF (inpVarTypes(i) .EQ. indexVariable) THEN ! ems-globalvariable
-                useEMS = .true.
-                IF ( .NOT. isExternalInterfaceErlVariable(varInd(i)) ) THEN
-                    CALL ShowSevereError('ExternalInterface: Error, xml file "' // simCfgFilNam // '" declares variable "' &
-                    //TRIM(inpVarNames(i))//'",')
-                    CALL ShowContinueError('But this variable is an ordinary Erl variable, not an ExternalInterface variable.')
-                    CALL ShowContinueError('You must specify a variable of type "ExternalInterface:Variable".')
-                    ErrorsFound = .true.
-                ENDIF
-            ELSEIF (inpVarTypes(i) .EQ. indexActuator) THEN ! ems-actuator
-                useEMS = .true.
-                IF ( .NOT. isExternalInterfaceErlVariable(varInd(i)) ) THEN
-                    CALL ShowSevereError('ExternalInterface: Error, xml file "' // simCfgFilNam // '" declares variable "' &
-                    //TRIM(inpVarNames(i))//'",')
-                    CALL ShowContinueError('But this variable is an ordinary Erl actuator, not an ExternalInterface actuator.')
-                    CALL ShowContinueError('You must specify a variable of type "ExternalInterface:Actuator".')
-                    ErrorsFound = .true.
-                ENDIF
-            END IF
-        ENDDO
-        ConfiguredControlPoints = .TRUE.
-    END IF
-    CALL StopExternalInterfaceIfError
-    RETURN
-
-    END SUBROUTINE InitExternalInterface
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
+!    ! na
+!    INTEGER :: i ! Counter
+!    INTEGER :: iSta ! Start of substring
+!    INTEGER :: iEnd ! End of substring
+!    INTEGER :: lenStr ! Length of string
+!    lenStr = len(str)
+!    iEnd = 1
+!    DO i = 1, nEle
+!        iSta = iEnd  ! add one to skip ';'
+!        iEnd = iSta+INDEX(str(iSta:lenStr), ';')
+!        ele(i) = TRIM(MakeUPPERCase(str(iSta:(iEnd-2))))
+!    ENDDO
+!    END SUBROUTINE ParseString
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE GetSetVariablesAndDoStepFMUImport()
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
-    !       DATE WRITTEN   08Aug2011
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    SUBROUTINE InitExternalInterface()
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This routine gets, sets and does the time integration in FMUs.
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   2Dec2007
+!    !       MODIFIED       Rui Zhang Aug 2009
+!    !       RE-ENGINEERED  na
 
-    ! METHODOLOGY EMPLOYED:
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This subroutine is for initializations of the ExternalInterface
 
-    ! REFERENCES:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! USE STATEMENTS:
-    USE RuntimeLanguageProcessor, ONLY: isExternalInterfaceErlVariable, FindEMSVariable
-    USE DataInterfaces, ONLY:GetInternalVariableValueExternalInterface, GetInternalVariableValue
-    USE ScheduleManager, ONLY: ExternalInterfaceSetSchedule
-    USE RuntimeLanguageProcessor, ONLY: ExternalInterfaceSetErlVariable
-    USE EMSManager, ONLY: ManageEMS
-    USE DataGlobals, ONLY: WarmupFlag, KindOfSim, ksRunPeriodWeather, emsCallFromExternalInterface
+!    ! REFERENCES:
+!    ! na
+
+!    ! USE STATEMENTS:
+!    USE ScheduleManager, ONLY: GetDayScheduleIndex
+!    USE RuntimeLanguageProcessor, ONLY: isExternalInterfaceErlVariable, FindEMSVariable
+!    USE DataGlobals, ONLY: WeathSimReq
+
+!    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
+
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
+
+!    LOGICAL,SAVE :: firstCall    = .TRUE.  ! First time, input has been read
+
+!    CHARACTER(len=*), PARAMETER :: simCfgFilNam="variables.cfg"
+
+!    INTEGER :: i, j         ! Loop counter
+!    ! INTERFACE BLOCK SPECIFICATIONS
+!    ! na
+
+!    ! DERIVED TYPE DEFINITIONS
+!    ! na
+
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION establishclientsocket(fileName) BIND (C, NAME="establishclientsocket")
+!    ! Returns the logical unit number of the socket
+!    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! file from which socket port number will be read
+!    END FUNCTION establishclientsocket
+!    END INTERFACE
+
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION getmainversionnumber() BIND (C, NAME="getmainversionnumber")
+!    ! Returns the main version number of the interface, or a negative
+!    ! number if a dummy dll is used
+!    USE ISO_C_BINDING, ONLY: C_INT
+!    END FUNCTION getmainversionnumber
+!    END INTERFACE
+
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION getnumberofxmlvalues(fileName, xpathExpr)
+!    ! Returns the number of XML values in the file, or a negative
+!    ! value if an error occurred
+!    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! Name of XML file
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: xpathExpr ! XPath expression
+!    END FUNCTION getnumberofxmlvalues
+!    END INTERFACE
+
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION getxmlvalue(fileName, xpathExpr, res, nAtr) BIND (C, NAME="getxmlvalue")
+!    ! Gets the xml values, and returns -1 if an error occurred, or 0 otherwise
+!    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName  ! Name of XML file
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: xpathExpr ! XPath expression
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: res       ! The values of the xml attributes will be stored here
+!    INTEGER(C_INT)                :: nAtr             ! The number of attributes to be obtained
+!    END FUNCTION getxmlvalue
+!    END INTERFACE
+
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION getepvariables(fileName, outVarsNam, outVarsTyp, nOutVars, inVarsKey, &
+!    nInVarsKeys, inVars, nInVars, inVarsTyp, strLen) BIND (C, NAME="getepvariables")
+!    ! Gets the EnergyPlus variables with which data is being exchanged.
+!    ! This function return -1 if an error occurred, or 0 otherwise.
+!    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName    ! Name of the XMLfile
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsNam  ! Comma seperated string for returned
+!    ! output variable names
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsTyp  ! Comma seperated string for returned
+!    ! output variable types
+!    INTEGER(C_INT)                :: nOutVars           ! Number of output variables found
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVarsKey   ! The available variable types from
+!    ! ExternalInterface for EP input(comma seperated)
+!    INTEGER(C_INT)                :: nInVarsKeys        ! Number of available variables types
+!    ! from ExternalInterface for EP input
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVars      ! Comma seperated string for returned
+!    ! input variables names
+!    INTEGER(C_INT)                :: nInVars            ! Number of input variables found
+!    INTEGER(C_INT), DIMENSION(*)  :: inVarsTyp          ! Comma seperated string for returned
+!    ! input variable type
+!    INTEGER(C_INT)                :: strLen             ! Length of the xml string
+!    ! to be returned
+!    END FUNCTION getepvariables
+!    END INTERFACE
+
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION getepvariablesFMU(fileName, outVarsNam, outVarsTyp, nOutVars, inVarsKey, &
+!    nInVarsKeys, inVars, nInVars, inVarsTyp, strLen) BIND (C, NAME="getepvariablesFMU")
+!    ! Gets the EnergyPlus variables with which data is being exchanged.
+!    ! This function return -1 if an error occurred, or 0 otherwise.
+!    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fileName    ! Name of the XMLfile
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsNam  ! Comma seperated string for returned
+!    ! output variable names
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: outVarsTyp  ! Comma seperated string for returned
+!    ! output variable types
+!    INTEGER(C_INT)                :: nOutVars           ! Number of output variables found
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVarsKey   ! The available variable types from
+!    ! ExternalInterface for EP input(comma seperated)
+!    INTEGER(C_INT)                :: nInVarsKeys        ! Number of available variables types
+!    ! from ExternalInterface for EP input
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: inVars      ! Comma seperated string for returned
+!    ! input variables names
+!    INTEGER(C_INT)                :: nInVars            ! Number of input variables found
+!    INTEGER(C_INT), DIMENSION(*)  :: inVarsTyp          ! Comma seperated string for returned
+!    ! input variable type
+!    INTEGER(C_INT)                :: strLen             ! Length of the xml string
+!    ! to be returned
+!    END FUNCTION getepvariablesFMU
+!    END INTERFACE
+
+!    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    INTEGER, PARAMETER :: lenXmlStr = maxVar*MaxNameLength ! Length of xml string
+!    CHARACTER(len=lenXmlStr)     :: xmlStrOut       ! xml values in string, separated by ';'
+!    CHARACTER(len=lenXmlStr)     :: xmlStrOutTyp    ! xml values in string, separated by ';'
+!    CHARACTER(len=lenXmlStr)     :: xmlStrInKey     ! xml values in string, separated by ';'
+!    CHARACTER(len=lenXmlStr)     :: xmlStrIn        ! xml values in string, separated by ';'
+!    CHARACTER(len=lenXmlStr)     :: xmlStrInTyp     ! xml values in string, separated by ';'
+!    INTEGER, SAVE                :: nOutVal         ! Number of output values (E+ -> ExternalInterface)
+!    INTEGER, SAVE                :: nInpVar         ! Number of input values (ExternalInterface -> E+)
+!    INTEGER                      :: retVal          ! Return value of function call, used for error handling
+!    INTEGER                      :: counter = 0     ! Counter for ErlVariables
+!    INTEGER                      :: mainVersion     ! The version number
+
+!    CHARACTER(len=MaxNameLength), DIMENSION(maxVar) :: curVals ! Names of schedules (i.e., schedule names)
+!    INTEGER curNumInpVal                                       ! current number of input values for the InputValType
+!    CHARACTER(len=maxErrMsgLength)   :: validateErrMsg         ! error returned when xml Schema validate failed
+!    INTEGER                          :: errMsgLen              ! the length of the error message
+!    LOGICAL socFileExist                                       ! Set to true if socket configuration
+!    ! file exists
+!    LOGICAL simFileExist                                       ! Set to true if simulation configuration
+!    ! file exists
+!    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    IF (FirstCall) THEN
+!        CALL DisplayString('ExternalInterface initializes.')
+!        ! do one time initializations
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        IF (haveExternalInterfaceBCVTB) THEN
+!            ! Check version number
+!            mainVersion = getmainversionnumber()
+!            IF (mainVersion .LT. 0.0d0) THEN
+!                CALL ShowSevereError('ExternalInterface: BCVTB is not installed in this version.')
+!                ErrorsFound = .true.
+!                CALL StopExternalInterfaceIfError
+!            END IF
+!        END IF
+
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Get port number
+!        INQUIRE (FILE=socCfgFilNam, EXIST=socFileExist)
+!        IF (socFileExist) THEN
+!            socketFD = establishclientsocket(socCfgFilNam)
+!            IF (socketFD .LT. 0) THEN
+!                CALL ShowSevereError('ExternalInterface: Could not open socket. File descriptor = ' &
+!                //TRIM(TrimSigDigits(socketFD))//'.')
+!                ErrorsFound = .true.
+!            END IF
+!        ELSE
+!            CALL ShowSevereError('ExternalInterface: Did not find file "'//socCfgFilNam//'".')
+!            CALL ShowContinueError('This file needs to be in same directory as in.idf.')
+!            CALL ShowContinueError('Check the documentation for the ExternalInterface.')
+!            ErrorsFound = .true.
+!        END IF
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Make sure that idf file specified a run period other than
+!        ! design day and system sizing.
+!        CALL ValidateRunControl
+
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        CALL StopExternalInterfaceIfError
+
+!        xmlStrOut(1:lenXmlStr) = " "
+!        xmlStrOutTyp(1:lenXmlStr) = " "
+!        xmlStrInKey(1:lenXmlStr) = " "
+!        xmlStrIn(1:lenXmlStr) = " "
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Get input and output variables for EnergyPlus in sequence
+!        xmlStrInKey= "schedule," &
+!        //"variable," &
+!        //"actuator"//char(0)
+!        ! Check if simCfgFilNam exists.
+!        INQUIRE (FILE=simCfgFilNam, EXIST=simFileExist)
+!        IF (simFileExist) THEN
+!            IF (haveExternalInterfaceBCVTB) THEN
+!                retVal = getepvariables(simCfgFilNam, &
+!                xmlStrOutTyp ,xmlStrOut, nOutVal, &
+!                xmlStrInKey, nInKeys, &
+!                xmlStrIn, nInpVar, inpVarTypes, lenXmlStr)
+!            ELSEIF (haveExternalInterfaceFMUExport) THEN
+!                retVal = getepvariablesFMU(simCfgFilNam, &
+!                xmlStrOutTyp ,xmlStrOut, nOutVal, &
+!                xmlStrInKey, nInKeys, &
+!                xmlStrIn, nInpVar, inpVarTypes, lenXmlStr)
+!            END IF
+!            ! handle errors when reading variables.cfg file
+!            IF ( retVal .LT. 0 ) THEN
+!                CALL ShowSevereError('ExternalInterface: Error when getting input and output variables for EnergyPlus,')
+!                CALL ShowContinueError('check simulation.log for error message.')
+!                ErrorsFound = .true.
+!            END IF
+!        ELSE
+!            CALL ShowSevereError('ExternalInterface: Did not find file "'//simCfgFilNam//'".')
+!            CALL ShowContinueError('This file needs to be in same directory as in.idf.')
+!            CALL ShowContinueError('Check the documentation for the ExternalInterface.')
+!            ErrorsFound = .true.
+!        END IF
+!        CALL StopExternalInterfaceIfError
+
+!        IF ( nOutVal + nInpVar .GT. maxVar ) THEN
+!            CALL ShowSevereError('ExternalInterface: Too many variables to be exchanged.')
+!            CALL ShowContinueError('Attempted to exchange '//TRIM(TrimSigDigits(nOutVal))//' outputs')
+!            CALL ShowContinueError('plus '//TRIM(TrimSigDigits(nOutVal))//' inputs.')
+!            CALL ShowContinueError('Maximum allowed is sum is '//TRIM(TrimSigDigits(maxVar))//'.')
+!            CALL ShowContinueError('To fix, increase maxVar in ExternalInterface.f90')
+!            ErrorsFound = .true.
+!        END IF
+!        CALL StopExternalInterfaceIfError
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        !!!!!!!!!!!!!!!!!!!!!
+!        IF ( nOutVal .LT. 0 ) THEN
+!            CALL ShowSevereError('ExternalInterface: Error when getting number of xml values for outputs.')
+!            ErrorsFound = .true.
+!        ELSE
+!            CALL ParseString(xmlStrOut, varNames, nOutVal)
+!            CALL ParseString(xmlStrOutTyp, varkeys, nOutVal)
+!        END IF
+!        CALL StopExternalInterfaceIfError
+
+!        IF ( nInpVar .LT. 0 ) THEN
+!            CALL ShowSevereError('ExternalInterface: Error when getting number of xml values for inputs.')
+!            ErrorsFound = .true.
+!        ELSE
+!            CALL ParseString(xmlStrIn, inpVarNames, nInpVar)
+!        END IF
+!        CALL StopExternalInterfaceIfError
+
+!        CALL DisplayString('Number of outputs in ExternalInterface = '//TrimSigDigits(nOutVal))
+!        CALL DisplayString('Number of inputs  in ExternalInterface = '//TrimSigDigits(nInpVar))
+
+!        FirstCall = .FALSE.
+
+!    ELSEIF (.NOT.ConfiguredControlPoints) THEN
+!        ALLOCATE(keyVarIndexes( nOutVal ))
+!        ALLOCATE(varTypes( nOutVal ))
+!        CALL GetReportVariableKey(varKeys, nOutVal, varNames, keyVarIndexes, varTypes)
+!        ALLOCATE(varInd( nInpVar ))
+!        DO i=1, nInpVar
+!            IF (inpVarTypes(i) .EQ. indexSchedule) THEN
+!                varInd(i) = GetDayScheduleIndex(inpVarNames(i))
+!            ELSEIF (inpVarTypes(i) .EQ. indexVariable) THEN
+!                varInd(i) = FindEMSVariable(inpVarNames(i), 0)
+!            ELSEIF (inpVarTypes(i) .EQ. indexActuator) THEN
+!                varInd(i) = FindEMSVariable(inpVarNames(i), 0)
+!            END IF
+!            IF (varInd(i) .LE. 0) THEN
+!                CALL ShowSevereError('ExternalInterface: Error, xml file "' // simCfgFilNam // '" declares variable "' &
+!                //TRIM(inpVarNames(i))//'",')
+!                CALL ShowContinueError('but variable was not found in idf file.')
+!                ErrorsFound = .true.
+!            END IF
+!        ENDDO
+!        CALL StopExternalInterfaceIfError
+!        ! Configure Erl variables
+!        DO i=1, nInpVar
+!            IF (inpVarTypes(i) .EQ. indexVariable) THEN ! ems-globalvariable
+!                useEMS = .true.
+!                IF ( .NOT. isExternalInterfaceErlVariable(varInd(i)) ) THEN
+!                    CALL ShowSevereError('ExternalInterface: Error, xml file "' // simCfgFilNam // '" declares variable "' &
+!                    //TRIM(inpVarNames(i))//'",')
+!                    CALL ShowContinueError('But this variable is an ordinary Erl variable, not an ExternalInterface variable.')
+!                    CALL ShowContinueError('You must specify a variable of type "ExternalInterface:Variable".')
+!                    ErrorsFound = .true.
+!                ENDIF
+!            ELSEIF (inpVarTypes(i) .EQ. indexActuator) THEN ! ems-actuator
+!                useEMS = .true.
+!                IF ( .NOT. isExternalInterfaceErlVariable(varInd(i)) ) THEN
+!                    CALL ShowSevereError('ExternalInterface: Error, xml file "' // simCfgFilNam // '" declares variable "' &
+!                    //TRIM(inpVarNames(i))//'",')
+!                    CALL ShowContinueError('But this variable is an ordinary Erl actuator, not an ExternalInterface actuator.')
+!                    CALL ShowContinueError('You must specify a variable of type "ExternalInterface:Actuator".')
+!                    ErrorsFound = .true.
+!                ENDIF
+!            END IF
+!        ENDDO
+!        ConfiguredControlPoints = .TRUE.
+!    END IF
+!    CALL StopExternalInterfaceIfError
+!    RETURN
+
+!    END SUBROUTINE InitExternalInterface
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !SUBROUTINE GetSetVariablesAndDoStepFMUImport()
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
+!    !       DATE WRITTEN   08Aug2011
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
+
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This routine gets, sets and does the time integration in FMUs.
+
+!    ! METHODOLOGY EMPLOYED:
+
+!    ! REFERENCES:
+!    ! na
+
+!    ! USE STATEMENTS:
+!    USE RuntimeLanguageProcessor, ONLY: isExternalInterfaceErlVariable, FindEMSVariable
+!    USE DataInterfaces, ONLY:GetInternalVariableValueExternalInterface, GetInternalVariableValue
+!    USE ScheduleManager, ONLY: ExternalInterfaceSetSchedule
+!    USE RuntimeLanguageProcessor, ONLY: ExternalInterfaceSetErlVariable
+!    USE EMSManager, ONLY: ManageEMS
+!    USE DataGlobals, ONLY: WarmupFlag, KindOfSim, ksRunPeriodWeather, emsCallFromExternalInterface
 
 
-    USE ISO_C_BINDING, ONLY : C_PTR
-    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+!    USE ISO_C_BINDING, ONLY : C_PTR
+!    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE PARAMETER DEFINITIONS:
-    INTEGER, PARAMETER :: IntegerVar = 1      ! Integer variable
-    INTEGER, PARAMETER :: RealVar = 2         ! Real variable
-    LOGICAL, SAVE      :: FirstCallGetSetDoStep = .TRUE.  ! Flag to check when External Interface is called first time
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    ! na
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
+!    INTEGER, PARAMETER :: IntegerVar = 1      ! Integer variable
+!    INTEGER, PARAMETER :: RealVar = 2         ! Real variable
+!    LOGICAL, SAVE      :: FirstCallGetSetDoStep = .TRUE.  ! Flag to check when External Interface is called first time
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    ! na
 
-    ! DERIVED TYPE DEFINITIONS:
+!    ! DERIVED TYPE DEFINITIONS:
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    INTEGER :: i, j, k       ! Loop counter
-
-
-    INTERFACE
-    INTEGER FUNCTION fmiGetReal(fmiComponent, valRef, &
-    fmuVariableValue, numOutputs, index) BIND (C, NAME="fmiEPlusGetReal")
-    ! Function called to get real values from FMU outputs
-    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
-    TYPE (C_PTR)                         :: fmiComponent                 ! Pointer to FMU instance
-    INTEGER(kind=C_INT), DIMENSION(*)    :: valRef                       ! Parameter fmiValueReference
-    REAL (kind=C_DOUBLE), DIMENSION(*)   :: fmuVariableValue             ! FMU output variables
-    INTEGER(kind=C_INT)                  :: numOutputs                   ! Number of input variables
-    INTEGER(kind=C_INT)                  :: index                        ! Index of the FMU
-    END FUNCTION fmiGetReal
-    END INTERFACE
+!    INTEGER :: i, j, k       ! Loop counter
 
 
-    INTERFACE
-    INTEGER FUNCTION fmiSetReal(fmiComponent, valRef, &
-    fmuVariableValue, numInputs, index) BIND (C, NAME="fmiEPlusSetReal")
-    ! Function called to set real values to FMU inputs
-    USE ISO_C_BINDING, ONLY: C_INT, C_DOUBLE, C_PTR
-    TYPE (C_PTR)                              :: fmiComponent                ! Pointer to FMU instance
-    INTEGER(kind=C_INT) , DIMENSION(*)        :: valRef                      ! Parameter fmiValueReference
-    REAL (kind=C_DOUBLE), DIMENSION(*)        :: fmuVariableValue            ! FMU input variables
-    INTEGER(kind=C_INT)                       :: numInputs                   ! Number of input variables
-    INTEGER(kind=C_INT)                       :: index                        ! Index of the FMU
-    END FUNCTION fmiSetReal
-    END INTERFACE
-
-    INTERFACE
-    INTEGER FUNCTION fmiDoStep(fmiComponent, curCommPoint, &
-    commStepSize, newStep, index) BIND (C, NAME="fmiEPlusDoStep")
-    !  Function called to do one step of the co-simulation
-    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
-    TYPE (C_PTR)                               :: fmiComponent               ! Pointer to FMU instance
-    REAL(kind=C_DOUBLE)                        :: curCommPoint               ! Current communication point
-    REAL(kind=C_DOUBLE)                        :: commStepSize               ! Communication step size
-    INTEGER (C_INT)                            :: newStep
-    INTEGER(kind=C_INT)                        :: index                        ! Index of the FMU
-    END FUNCTION fmiDoStep
-    END INTERFACE
-
-    DO i = 1, NumFMUObjects
-        DO j = 1, FMU(i)%NumInstances
-            IF (FlagReIni) THEN
-                ! Get from FMUs, values that will be set in EnergyPlus (Schedule)
-                DO k = 1, FMUTemp(i)%Instance(j)%NumOutputVariablesSchedule
-                    FMU(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue = &
-                    FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue
-                END DO
-
-                ! Get from FMUs, values that will be set in EnergyPlus (Variable)
-                DO k = 1, FMUTemp(i)%Instance(j)%NumOutputVariablesVariable
-                    FMU(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue = &
-                    FMUTemp(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue
-                END DO
-
-                ! Get from FMUs, values that will be set in EnergyPlus (Actuator)
-                DO k = 1, FMUTemp(i)%Instance(j)%NumOutputVariablesActuator
-                    FMU(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue = &
-                    FMUTemp(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue
-                END DO
-            ELSE
-                ! Get from FMUs, values that will be set in EnergyPlus (Schedule)
-
-                FMU(i)%Instance(j)%fmiStatus = &
-                fmiGetReal (FMU(i)%Instance(j)%fmiComponent, &
-                FMU(i)%Instance(j)%fmuOutputVariableSchedule%ValueReference, &
-                FMU(i)%Instance(j)%fmuOutputVariableSchedule%RealVarValue, &
-                FMU(i)%Instance(j)%NumOutputVariablesSchedule, &
-                FMU(i)%Instance(j)%Index)
-
-                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
-                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs')
-                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
-                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
-                    ErrorsFound = .true.
-                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    CALL StopExternalInterfaceIfError
-                END IF
+!    INTERFACE
+!    INTEGER FUNCTION fmiGetReal(fmiComponent, valRef, &
+!    fmuVariableValue, numOutputs, index) BIND (C, NAME="fmiEPlusGetReal")
+!    ! Function called to get real values from FMU outputs
+!    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
+!    TYPE (C_PTR)                         :: fmiComponent                 ! Pointer to FMU instance
+!    INTEGER(kind=C_INT), DIMENSION(*)    :: valRef                       ! Parameter fmiValueReference
+!    REAL (kind=C_DOUBLE), DIMENSION(*)   :: fmuVariableValue             ! FMU output variables
+!    INTEGER(kind=C_INT)                  :: numOutputs                   ! Number of input variables
+!    INTEGER(kind=C_INT)                  :: index                        ! Index of the FMU
+!    END FUNCTION fmiGetReal
+!    END INTERFACE
 
 
-                ! Get from FMUs, values that will be set in EnergyPlus (Variable)
-                FMU(i)%Instance(j)%fmiStatus = &
-                fmiGetReal (FMU(i)%Instance(j)%fmiComponent, &
-                FMU(i)%Instance(j)%fmuOutputVariableVariable%ValueReference, &
-                FMU(i)%Instance(j)%fmuOutputVariableVariable%RealVarValue, &
-                FMU(i)%Instance(j)%NumOutputVariablesVariable, &
-                FMU(i)%Instance(j)%Index)
+!    INTERFACE
+!    INTEGER FUNCTION fmiSetReal(fmiComponent, valRef, &
+!    fmuVariableValue, numInputs, index) BIND (C, NAME="fmiEPlusSetReal")
+!    ! Function called to set real values to FMU inputs
+!    USE ISO_C_BINDING, ONLY: C_INT, C_DOUBLE, C_PTR
+!    TYPE (C_PTR)                              :: fmiComponent                ! Pointer to FMU instance
+!    INTEGER(kind=C_INT) , DIMENSION(*)        :: valRef                      ! Parameter fmiValueReference
+!    REAL (kind=C_DOUBLE), DIMENSION(*)        :: fmuVariableValue            ! FMU input variables
+!    INTEGER(kind=C_INT)                       :: numInputs                   ! Number of input variables
+!    INTEGER(kind=C_INT)                       :: index                        ! Index of the FMU
+!    END FUNCTION fmiSetReal
+!    END INTERFACE
 
-                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
-                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs')
-                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
-                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
-                    ErrorsFound = .true.
-                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    CALL StopExternalInterfaceIfError
-                END IF
+!    INTERFACE
+!    INTEGER FUNCTION fmiDoStep(fmiComponent, curCommPoint, &
+!    commStepSize, newStep, index) BIND (C, NAME="fmiEPlusDoStep")
+!    !  Function called to do one step of the co-simulation
+!    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
+!    TYPE (C_PTR)                               :: fmiComponent               ! Pointer to FMU instance
+!    REAL(kind=C_DOUBLE)                        :: curCommPoint               ! Current communication point
+!    REAL(kind=C_DOUBLE)                        :: commStepSize               ! Communication step size
+!    INTEGER (C_INT)                            :: newStep
+!    INTEGER(kind=C_INT)                        :: index                        ! Index of the FMU
+!    END FUNCTION fmiDoStep
+!    END INTERFACE
 
-                ! Get from FMUs, values that will be set in EnergyPlus (Actuator)
-                FMU(i)%Instance(j)%fmiStatus = &
-                fmiGetReal (FMU(i)%Instance(j)%fmiComponent, &
-                FMU(i)%Instance(j)%fmuOutputVariableActuator%ValueReference, &
-                FMU(i)%Instance(j)%fmuOutputVariableActuator%RealVarValue, &
-                FMU(i)%Instance(j)%NumOutputVariablesActuator, &
-                FMU(i)%Instance(j)%Index)
+!    DO i = 1, NumFMUObjects
+!        DO j = 1, FMU(i)%NumInstances
+!            IF (FlagReIni) THEN
+!                ! Get from FMUs, values that will be set in EnergyPlus (Schedule)
+!                DO k = 1, FMUTemp(i)%Instance(j)%NumOutputVariablesSchedule
+!                    FMU(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue = &
+!                    FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue
+!                END DO
 
-                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
-                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs')
-                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
-                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
-                    ErrorsFound = .true.
-                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    CALL StopExternalInterfaceIfError
-                END IF
-            END IF
+!                ! Get from FMUs, values that will be set in EnergyPlus (Variable)
+!                DO k = 1, FMUTemp(i)%Instance(j)%NumOutputVariablesVariable
+!                    FMU(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue = &
+!                    FMUTemp(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue
+!                END DO
 
-            ! Set in EnergyPlus the values of the schedules
-            DO k =1,  FMU(i)%Instance(j)%NumOutputVariablesSchedule
-                CALL ExternalInterfaceSetSchedule(FMU(i)%Instance(j)%eplusInputVariableSchedule(k)%VarIndex, &
-                FMU(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue)
-            END DO
+!                ! Get from FMUs, values that will be set in EnergyPlus (Actuator)
+!                DO k = 1, FMUTemp(i)%Instance(j)%NumOutputVariablesActuator
+!                    FMU(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue = &
+!                    FMUTemp(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue
+!                END DO
+!            ELSE
+!                ! Get from FMUs, values that will be set in EnergyPlus (Schedule)
 
-            ! Set in EnergyPlus the values of the variables
-            DO k =1,  FMU(i)%Instance(j)%NumOutputVariablesVariable
-                CALL ExternalInterfaceSetErlVariable(FMU(i)%Instance(j)%eplusInputVariableVariable(k)%VarIndex, &
-                FMU(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue)
-            END DO
+!                FMU(i)%Instance(j)%fmiStatus = &
+!                fmiGetReal (FMU(i)%Instance(j)%fmiComponent, &
+!                FMU(i)%Instance(j)%fmuOutputVariableSchedule%ValueReference, &
+!                FMU(i)%Instance(j)%fmuOutputVariableSchedule%RealVarValue, &
+!                FMU(i)%Instance(j)%NumOutputVariablesSchedule, &
+!                FMU(i)%Instance(j)%Index)
 
-            ! Set in EnergyPlus the values of the actuators
-            DO k =1,  FMU(i)%Instance(j)%NumOutputVariablesActuator
-                CALL ExternalInterfaceSetErlVariable(FMU(i)%Instance(j)%eplusInputVariableActuator(k)%VarIndex, &
-                FMU(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue)
-            END DO
+!                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
+!                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs')
+!                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
+!                    ErrorsFound = .true.
+!                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                    CALL StopExternalInterfaceIfError
+!                END IF
 
-            IF (FirstCallGetSetDoStep) THEN
-                ! Get from EnergyPlus, values that will be set in fmus
-                DO k = 1, FMU(i)%Instance(j)%NumInputVariablesInIDF
-                    !This make sure that the variables are updated at the Zone Time Step
-                    FMU(i)%Instance(j)%eplusOutputVariable(k)%RTSValue = &
-                    GetInternalVariableValue(FMU(i)%Instance(j)%eplusOutputVariable(k)%VarType, &
-                    FMU(i)%Instance(j)%eplusOutputVariable(k)%VarIndex)
-                END DO
-            ELSE
-                ! Get from EnergyPlus, values that will be set in fmus
-                DO k = 1, FMU(i)%Instance(j)%NumInputVariablesInIDF
-                    !This make sure that the variables are updated at the Zone Time Step
-                    FMU(i)%Instance(j)%eplusOutputVariable(k)%RTSValue = &
-                    GetInternalVariableValueExternalInterface(FMU(i)%Instance(j)%eplusOutputVariable(k)%VarType, &
-                    FMU(i)%Instance(j)%eplusOutputVariable(k)%VarIndex)
-                END DO
-            END IF
 
-            IF (.NOT.FlagReIni) THEN
-                FMU(i)%Instance(j)%fmiStatus = &
-                fmiSetReal(FMU(i)%Instance(j)%fmiComponent, &
-                FMU(i)%Instance(j)%fmuInputVariable%ValueReference, &
-                FMU(i)%Instance(j)%eplusOutputVariable%RTSValue, FMU(i)%Instance(j)%NumInputVariablesInIDF, &
-                FMU(i)%Instance(j)%Index)
-                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
-                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to set inputs')
-                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
-                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
-                    ErrorsFound = .true.
-                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    CALL StopExternalInterfaceIfError
-                END IF
-            END IF
-            !   END IF
-            ! END DO
+!                ! Get from FMUs, values that will be set in EnergyPlus (Variable)
+!                FMU(i)%Instance(j)%fmiStatus = &
+!                fmiGetReal (FMU(i)%Instance(j)%fmiComponent, &
+!                FMU(i)%Instance(j)%fmuOutputVariableVariable%ValueReference, &
+!                FMU(i)%Instance(j)%fmuOutputVariableVariable%RealVarValue, &
+!                FMU(i)%Instance(j)%NumOutputVariablesVariable, &
+!                FMU(i)%Instance(j)%Index)
 
-            ! Call and simulate the FMUs to get values at the corresponding timestep.
-            FMU(i)%Instance(j)%fmiStatus = &
-            fmiDoStep(FMU(i)%Instance(j)%fmiComponent, &
-            tComm, hStep, fmiTrue, FMU(i)%Instance(j)%Index)
-            IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
-                CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to')
-                CALL ShowContinueError('do the coSimulation with instance "'//TRIM(FMU(i)%Instance(j)%Name)//'"')
-                CALL ShowContinueError('of FMU "'//TRIM(FMU(i)%Name)//'".')
-                CALL ShowContinueError('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
-                ErrorsFound = .true.
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                CALL StopExternalInterfaceIfError
-            END IF
-        END DO
-    END DO
-    ! If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
-    IF (useEMS) THEN
-        CALL ManageEMS(emsCallFromExternalInterface)
-    END IF
-    FirstCallGetSetDoStep = .FALSE.
+!                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
+!                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs')
+!                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
+!                    ErrorsFound = .true.
+!                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                    CALL StopExternalInterfaceIfError
+!                END IF
 
-    END SUBROUTINE GetSetVariablesAndDoStepFMUImport
+!                ! Get from FMUs, values that will be set in EnergyPlus (Actuator)
+!                FMU(i)%Instance(j)%fmiStatus = &
+!                fmiGetReal (FMU(i)%Instance(j)%fmiComponent, &
+!                FMU(i)%Instance(j)%fmuOutputVariableActuator%ValueReference, &
+!                FMU(i)%Instance(j)%fmuOutputVariableActuator%RealVarValue, &
+!                FMU(i)%Instance(j)%NumOutputVariablesActuator, &
+!                FMU(i)%Instance(j)%Index)
+
+!                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
+!                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs')
+!                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
+!                    ErrorsFound = .true.
+!                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                    CALL StopExternalInterfaceIfError
+!                END IF
+!            END IF
+
+!            ! Set in EnergyPlus the values of the schedules
+!            DO k =1,  FMU(i)%Instance(j)%NumOutputVariablesSchedule
+!                CALL ExternalInterfaceSetSchedule(FMU(i)%Instance(j)%eplusInputVariableSchedule(k)%VarIndex, &
+!                FMU(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue)
+!            END DO
+
+!            ! Set in EnergyPlus the values of the variables
+!            DO k =1,  FMU(i)%Instance(j)%NumOutputVariablesVariable
+!                CALL ExternalInterfaceSetErlVariable(FMU(i)%Instance(j)%eplusInputVariableVariable(k)%VarIndex, &
+!                FMU(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue)
+!            END DO
+
+!            ! Set in EnergyPlus the values of the actuators
+!            DO k =1,  FMU(i)%Instance(j)%NumOutputVariablesActuator
+!                CALL ExternalInterfaceSetErlVariable(FMU(i)%Instance(j)%eplusInputVariableActuator(k)%VarIndex, &
+!                FMU(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue)
+!            END DO
+
+!            IF (FirstCallGetSetDoStep) THEN
+!                ! Get from EnergyPlus, values that will be set in fmus
+!                DO k = 1, FMU(i)%Instance(j)%NumInputVariablesInIDF
+!                    !This make sure that the variables are updated at the Zone Time Step
+!                    FMU(i)%Instance(j)%eplusOutputVariable(k)%RTSValue = &
+!                    GetInternalVariableValue(FMU(i)%Instance(j)%eplusOutputVariable(k)%VarType, &
+!                    FMU(i)%Instance(j)%eplusOutputVariable(k)%VarIndex)
+!                END DO
+!            ELSE
+!                ! Get from EnergyPlus, values that will be set in fmus
+!                DO k = 1, FMU(i)%Instance(j)%NumInputVariablesInIDF
+!                    !This make sure that the variables are updated at the Zone Time Step
+!                    FMU(i)%Instance(j)%eplusOutputVariable(k)%RTSValue = &
+!                    GetInternalVariableValueExternalInterface(FMU(i)%Instance(j)%eplusOutputVariable(k)%VarType, &
+!                    FMU(i)%Instance(j)%eplusOutputVariable(k)%VarIndex)
+!                END DO
+!            END IF
+
+!            IF (.NOT.FlagReIni) THEN
+!                FMU(i)%Instance(j)%fmiStatus = &
+!                fmiSetReal(FMU(i)%Instance(j)%fmiComponent, &
+!                FMU(i)%Instance(j)%fmuInputVariable%ValueReference, &
+!                FMU(i)%Instance(j)%eplusOutputVariable%RTSValue, FMU(i)%Instance(j)%NumInputVariablesInIDF, &
+!                FMU(i)%Instance(j)%Index)
+!                IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
+!                    CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to set inputs')
+!                    CALL ShowContinueError ('in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                    CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
+!                    ErrorsFound = .true.
+!                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                    CALL StopExternalInterfaceIfError
+!                END IF
+!            END IF
+!            !   END IF
+!            ! END DO
+
+!            ! Call and simulate the FMUs to get values at the corresponding timestep.
+!            FMU(i)%Instance(j)%fmiStatus = &
+!            fmiDoStep(FMU(i)%Instance(j)%fmiComponent, &
+!            tComm, hStep, fmiTrue, FMU(i)%Instance(j)%Index)
+!            IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
+!                CALL ShowSevereError('ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to')
+!                CALL ShowContinueError('do the coSimulation with instance "'//TRIM(FMU(i)%Instance(j)%Name)//'"')
+!                CALL ShowContinueError('of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                CALL ShowContinueError('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
+!                ErrorsFound = .true.
+!                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                CALL StopExternalInterfaceIfError
+!            END IF
+!        END DO
+!    END DO
+!    ! If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
+!    IF (useEMS) THEN
+!        CALL ManageEMS(emsCallFromExternalInterface)
+!    END IF
+!    FirstCallGetSetDoStep = .FALSE.
+
+!    END SUBROUTINE GetSetVariablesAndDoStepFMUImport
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -3072,55 +3072,55 @@
 
     END SUBROUTINE WarnIfExternalInterfaceObjectsAreUsed
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE VerifyExternalInterfaceObject
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   12Dec2009
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    SUBROUTINE VerifyExternalInterfaceObject
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   12Dec2009
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This subroutine verifies the correctness of the fields of
-    ! the ExternalInterface object in the idf file
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This subroutine verifies the correctness of the fields of
+!    ! the ExternalInterface object in the idf file
 
-    ! USE STATEMENTS:
-    USE InputProcessor, ONLY: GetObjectItem, SameString
-    USE DataIPShortCuts
+!    ! USE STATEMENTS:
+!    USE InputProcessor, ONLY: GetObjectItem, SameString
+!    USE DataIPShortCuts
 
-    ! METHODOLOGY EMPLOYED:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+!    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
 
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    ! na
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    ! na
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    INTEGER retVal ! Return value, needed to catch return value of function call
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    INTEGER retVal ! Return value, needed to catch return value of function call
 
-    INTEGER                        :: NumAlphas  = 0 ! Number of Alphas for each GetObjectItem call
-    INTEGER                        :: NumNumbers = 0 ! Number of Numbers for each GetObjectItem call
-    INTEGER                        :: IOStatus = 0  ! Used in GetObjectItem
+!    INTEGER                        :: NumAlphas  = 0 ! Number of Alphas for each GetObjectItem call
+!    INTEGER                        :: NumNumbers = 0 ! Number of Numbers for each GetObjectItem call
+!    INTEGER                        :: IOStatus = 0  ! Used in GetObjectItem
 
-    cCurrentModuleObject='ExternalInterface'
-    CALL GetObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, &
-    AlphaFieldnames=cAlphaFieldNames, NumericFieldNames=cNumericFieldNames)
-    IF ((.NOT. SameString(cAlphaArgs(1), 'PtolemyServer')).AND.(.NOT. SameString(cAlphaArgs(1), 'FunctionalMockupUnitImport'))&
-    .AND.(.NOT. SameString(cAlphaArgs(1), 'FunctionalMockupUnitExport'))) THEN
-        CALL ShowSevereError('VerifyExternalInterfaceObject: '//trim(cCurrentModuleObject)//   &
-        ', invalid '//trim(cAlphaFieldNames(1))//'="'//trim(cAlphaArgs(1))//'".')
-        CALL ShowContinueError('only "PtolemyServer or FunctionalMockupUnitImport or FunctionalMockupUnitExport" allowed.')
-        ErrorsFound = .TRUE.
-    ENDIF
+!    cCurrentModuleObject='ExternalInterface'
+!    CALL GetObjectItem(cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, &
+!    AlphaFieldnames=cAlphaFieldNames, NumericFieldNames=cNumericFieldNames)
+!    IF ((.NOT. SameString(cAlphaArgs(1), 'PtolemyServer')).AND.(.NOT. SameString(cAlphaArgs(1), 'FunctionalMockupUnitImport'))&
+!    .AND.(.NOT. SameString(cAlphaArgs(1), 'FunctionalMockupUnitExport'))) THEN
+!        CALL ShowSevereError('VerifyExternalInterfaceObject: '//trim(cCurrentModuleObject)//   &
+!        ', invalid '//trim(cAlphaFieldNames(1))//'="'//trim(cAlphaArgs(1))//'".')
+!        CALL ShowContinueError('only "PtolemyServer or FunctionalMockupUnitImport or FunctionalMockupUnitExport" allowed.')
+!        ErrorsFound = .TRUE.
+!    ENDIF
 
-    END SUBROUTINE VerifyExternalInterfaceObject
+!    END SUBROUTINE VerifyExternalInterfaceObject
 
 
 

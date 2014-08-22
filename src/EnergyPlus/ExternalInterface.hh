@@ -65,15 +65,6 @@ namespace ExternalInterface {
 			Name( BlankString ),
 			ValueReference( 0 )
 		{}
-		
-		//// Member Constructor
-		//fmuInputVariableType(
-			//std::string const & Name,  
-			//int const ValueReference
-		//) :
-			//Name( Name ),
-			//ValueReference( ValueReference )
-		//{}
 
 	};
 
@@ -217,8 +208,8 @@ namespace ExternalInterface {
 		int LenModelGUID; // Length of modelGUID trimmed
 		int LenWorkingFolder; // Length of working folder trimmed
 		int LenWorkingFolder_wLib; // Length of working folder with libraries trimmed
-		//TODO: TYPE (C_PTR)                       :: fmiComponent; // FMU instance
-		int fmiStatus; // Status of fmi
+		fmiComponent fmicomponent; // FMU instance
+		fmiStatus fmistatus; // Status of fmi
 		int Index; // Index of FMU
 		// Variable Types structure for fmu input variables
 		FArray1D< fmuInputVariableType > fmuInputVariable;
@@ -298,6 +289,7 @@ namespace ExternalInterface {
 	};
 
 	extern FArray1D< FMUType > FMU; // Variable Types structure
+	extern FArray1D< FMUType > FMUTemp; // Variable Types structure
     extern FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
     extern int NumExternalInterfaces; //Number of ExternalInterface objects
     extern int NumExternalInterfacesBCVTB; //Number of BCVTB ExternalInterface objects

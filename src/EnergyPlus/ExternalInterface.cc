@@ -11,6 +11,8 @@
 #include <RuntimeLanguageProcessor.hh>
 #include <DisplayRoutines.hh>
 #include <DataIPShortCuts.hh>
+#include <OutputProcessor.hh>
+#include <EMSManager.hh>
 
 // C++ Standard Library Headers
 #include <string>
@@ -88,6 +90,7 @@ namespace ExternalInterface {
     std::string const BlankString( " " );
 
 	FArray1D< FMUType > FMU; // Variable Types structure
+	FArray1D< FMUType > FMUTemp;
     FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
     int NumExternalInterfaces( 0 ); //Number of ExternalInterface objects
     int NumExternalInterfacesBCVTB( 0 ); //Number of BCVTB ExternalInterface objects
@@ -657,7 +660,170 @@ namespace ExternalInterface {
     
     void
 	GetSetVariablesAndDoStepFMUImport()
-	{}
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
+		//       DATE WRITTEN   08Aug2011
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine gets, sets and does the time integration in FMUs.
+
+		// USE STATEMENTS:
+		using RuntimeLanguageProcessor::isExternalInterfaceErlVariable;
+		using RuntimeLanguageProcessor::FindEMSVariable;
+		using RuntimeLanguageProcessor::ExternalInterfaceSetErlVariable;
+		using ScheduleManager::ExternalInterfaceSetSchedule;
+		using EMSManager::ManageEMS;
+		using DataGlobals::WarmupFlag;
+		using DataGlobals::KindOfSim;
+		using DataGlobals::ksRunPeriodWeather;
+		using DataGlobals::emsCallFromExternalInterface;
+		using General::TrimSigDigits;
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		int const IntegerVar( 1 ); // Integer variable
+		int const RealVar( 2 ); // Real variable
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		bool static FirstCallGetSetDoStep( true ); // Flag to check when External Interface is called first time
+		int i, j, k; // Loop counters
+
+		for ( i = 1; i <= NumFMUObjects; i++ ) {
+			for ( j = 1; j <= FMU( i ).NumInstances; j++ ) {
+				if ( FlagReIni ) {
+					// Get from FMUs, values that will be set in EnergyPlus (Schedule)
+					for ( k = 1; k <= FMUTemp( i ).Instance( j ).NumOutputVariablesSchedule; k++ ) {
+						FMU( i ).Instance( j ).fmuOutputVariableSchedule( k ).RealVarValue = FMUTemp( i ).Instance( j ).fmuOutputVariableSchedule( k ).RealVarValue;
+					}
+
+					// Get from FMUs, values that will be set in EnergyPlus (Variable)
+					for ( k = 1; FMUTemp( i ).Instance( j ).NumOutputVariablesVariable; k++ ) {
+						FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).RealVarValue = FMUTemp( i ).Instance( j ).fmuOutputVariableVariable( k ).RealVarValue;
+					}
+
+					// Get from FMUs, values that will be set in EnergyPlus (Actuator)
+					for ( k = 1; FMUTemp( i ).Instance( j ).NumOutputVariablesActuator; k++ ) {
+						FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).RealVarValue = FMUTemp( i ).Instance( j ).fmuOutputVariableActuator( k ).RealVarValue;
+					}
+				} else {
+					// Get from FMUs, values that will be set in EnergyPlus (Schedule)
+
+					// TODO: The arguments are trying to do FORTRAN array member transformations
+					//FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( FMU( i ).Instance( j ).fmicomponent,
+																	//FMU( i ).Instance( j ).fmuOutputVariableSchedule.ValueReference,
+																	//FMU( i ).Instance( j ).fmuOutputVariableSchedule.RealVarValue,
+																	//FMU( i ).Instance( j ).NumOutputVariablesSchedule,
+																	//FMU( i ).Instance( j ).Index );
+
+					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
+						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+						ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+						ErrorsFound = true;
+						StopExternalInterfaceIfError();
+					}
+
+
+					// Get from FMUs, values that will be set in EnergyPlus (Variable)
+					// TODO: The arguments are trying to do FORTRAN array member transformations
+					//FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( FMU( i ).Instance( j ).fmicomponent,
+																	//FMU( i ).Instance( j ).fmuOutputVariableVariable.ValueReference,
+																	//FMU( i ).Instance( j ).fmuOutputVariableVariable.RealVarValue,
+																	//FMU( i ).Instance( j ).NumOutputVariablesVariable,
+																	//FMU( i ).Instance( j ).Index );
+
+					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
+						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+						ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+						ErrorsFound = true;
+						StopExternalInterfaceIfError();
+					}
+
+					// Get from FMUs, values that will be set in EnergyPlus (Actuator)
+					// TODO: The arguments are trying to do FORTRAN array member transformations
+					//FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( FMU( i ).Instance( j ).fmicomponent, &
+																	//FMU( i ).Instance( j ).fmuOutputVariableActuator.ValueReference, &
+																	//FMU( i ).Instance( j ).fmuOutputVariableActuator.RealVarValue, &
+																	//FMU( i ).Instance( j ).NumOutputVariablesActuator, &
+																	//FMU( i ).Instance( j ).Index );
+
+					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
+						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+						ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+						ErrorsFound = true;
+						StopExternalInterfaceIfError();
+					}
+				}
+
+				// Set in EnergyPlus the values of the schedules
+				for ( k =1; k <= FMU( i ).Instance( j ).NumOutputVariablesSchedule; k++ ) {
+					ExternalInterfaceSetSchedule( FMU( i ).Instance( j ).eplusInputVariableSchedule( k ).VarIndex, FMU( i ).Instance( j ).fmuOutputVariableSchedule( k ).RealVarValue );
+				}
+
+				// Set in EnergyPlus the values of the variables
+				for ( k =1; k <= FMU( i ).Instance( j ).NumOutputVariablesVariable; k++ ) {
+					ExternalInterfaceSetErlVariable( FMU( i ).Instance( j ).eplusInputVariableVariable( k ).VarIndex, FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).RealVarValue );
+				}
+
+				// Set in EnergyPlus the values of the actuators
+				for ( k =1; k <= FMU( i ).Instance( j ).NumOutputVariablesActuator; k++ ) {
+					ExternalInterfaceSetErlVariable( FMU( i ).Instance( j ).eplusInputVariableActuator( k ).VarIndex, FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).RealVarValue );
+				}
+
+				if ( FirstCallGetSetDoStep ) {
+					// Get from EnergyPlus, values that will be set in fmus
+					for ( k = 1; k <= FMU( i ).Instance( j ).NumInputVariablesInIDF; k++ ) {
+						//This make sure that the variables are updated at the Zone Time Step
+						FMU( i ).Instance( j ).eplusOutputVariable( k ).RTSValue = GetInternalVariableValue( FMU( i ).Instance( j ).eplusOutputVariable( k ).VarType, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarIndex );
+					}
+				} else {
+					// Get from EnergyPlus, values that will be set in fmus
+					for ( k = 1; k<= FMU( i ).Instance( j ).NumInputVariablesInIDF; k++ ) {
+						//This make sure that the variables are updated at the Zone Time Step
+						FMU( i ).Instance( j ).eplusOutputVariable( k ).RTSValue = GetInternalVariableValueExternalInterface( FMU( i ).Instance( j ).eplusOutputVariable( k ).VarType, FMU( i ).Instance( j ).eplusOutputVariable( k ).VarIndex );
+					}
+				}
+
+				if ( ! FlagReIni ) {
+					// TODO: The arguments are trying to do FORTRAN array member transformations
+					//FMU( i ).Instance( j ).fmistatus = fmiEPlusSetReal( FMU( i ).Instance( j ).fmicomponent,
+																//FMU( i ).Instance( j ).fmuInputVariable.ValueReference,
+																//FMU( i ).Instance( j ).eplusOutputVariable.RTSValue, 
+																//FMU( i ).Instance( j ).NumInputVariablesInIDF,
+																//FMU( i ).Instance( j ).Index );
+					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to set inputs" );
+						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+						ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+						ErrorsFound = true;
+						StopExternalInterfaceIfError();
+					}
+				}
+				int localfmitrue( fmiTrue );
+				// Call and simulate the FMUs to get values at the corresponding timestep.
+				FMU( i ).Instance( j ).fmistatus = fmiEPlusDoStep( &FMU( i ).Instance( j ).fmicomponent, &tComm, &hStep, &localfmitrue, &FMU( i ).Instance( j ).Index );
+				if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+					ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to" );
+					ShowContinueError( "do the coSimulation with instance \"" + FMU( i ).Instance( j ).Name + "\"" );
+					ShowContinueError( "of FMU \"" + FMU( i ).Name + "\"" );
+					ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+					ErrorsFound = true;
+					StopExternalInterfaceIfError();
+				}
+			}
+		}
+		
+		// If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
+		if ( useEMS ) {
+			ManageEMS( emsCallFromExternalInterface );
+		}
+		
+		FirstCallGetSetDoStep = false;
+	}
 
 	void
 	VerifyExternalInterfaceObject()
