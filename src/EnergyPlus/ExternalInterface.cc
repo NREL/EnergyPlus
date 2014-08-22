@@ -652,7 +652,46 @@ namespace ExternalInterface {
     
     void
 	InstantiateInitializeFMUImport()
-	{}
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
+		//       DATE WRITTEN   08Aug2011
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This routine instantiates and initializes FMUs.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int i, j; // Loop counters
+		
+		// Instantiate FMUs
+		for ( i = 1; i <= NumFMUObjects; i++ ) {
+			for ( j = 1; j <= FMU( i ).NumInstances; j++ ) {
+				FMU( i ).Instance( j ).fmiComponent = fmiEPlusInstantiateSlave( FMU( i ).Instance( j ).WorkingFolder, FMU( i ).Instance( j ).LenWorkingFolder, FMU( i ).TimeOut, FMU( i ).Visible, FMU( i ).Interactive, FMU( i ).LoggingOn, FMU( i ).Instance( j ).Index );
+				if ( ! FMU( i ).Instance( j ).fmiComponent ) {
+					ShowSevereError( "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to instantiate" );
+					ShowContinueError( "instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+					ErrorsFound = true;
+					StopExternalInterfaceIfError();
+				}
+			}
+		}
+
+		// Initialize FMUs
+		for ( i = 1; i <= NumFMUObjects; i++ ) {
+			for ( j = 1; j <= FMU( i ).NumInstances; j++ ) {
+				FMU( i ).Instance( j ).fmiStatus = fmiEPlusInitializeSlave( FMU( i ).Instance( j ).fmiComponent, tStart, fmiTrue, tStop, FMU( i ).Instance( j ).Index );
+				if ( FMU( i ).Instance( j ).fmiStatus != fmiOK ) {
+					ShowSevereError( "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize" );
+					ShowContinueError( "instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+					ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+					ErrorsFound = true;
+					StopExternalInterfaceIfError();
+				}
+			}
+		}
+	}
     
     void
 	TerminateResetFreeFMUImport()

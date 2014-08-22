@@ -1210,102 +1210,102 @@
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE InstantiateInitializeFMUImport()
+!    SUBROUTINE InstantiateInitializeFMUImport()
 
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
-    !       DATE WRITTEN   08Aug2011
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
+!    !       DATE WRITTEN   08Aug2011
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This routine instantiates and initializes FMUs.
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This routine instantiates and initializes FMUs.
 
-    ! METHODOLOGY EMPLOYED:
+!    ! METHODOLOGY EMPLOYED:
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    ! USE STATEMENTS:
+!    ! USE STATEMENTS:
 
-    USE ISO_C_BINDING, ONLY : C_PTR, C_ASSOCIATED
-    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+!    USE ISO_C_BINDING, ONLY : C_PTR, C_ASSOCIATED
+!    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE PARAMETER DEFINITIONS:
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
 
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    ! na
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    ! na
 
-    ! DERIVED TYPE DEFINITIONS:
+!    ! DERIVED TYPE DEFINITIONS:
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-    INTEGER :: i, j         ! Loop counter
+!    INTEGER :: i, j         ! Loop counter
 
-    INTERFACE
-    TYPE (C_PTR) FUNCTION fmiInstantiateSlave (fmuWorkFolder, sizeFmuWorkFolder, &
-    timeOut, & visible, interactive, loggingon, index) BIND (C, NAME="fmiEPlusInstantiateSlave")
-    ! Function called to Instantiate FMU
+!    INTERFACE
+!    TYPE (C_PTR) FUNCTION fmiInstantiateSlave (fmuWorkFolder, sizeFmuWorkFolder, &
+!    timeOut, & visible, interactive, loggingon, index) BIND (C, NAME="fmiEPlusInstantiateSlave")
+!    ! Function called to Instantiate FMU
 
-    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR, C_PTR, C_DOUBLE
-    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fmuWorkFolder                 ! FMU resource folder
-    INTEGER(kind=C_INT)                  :: sizeFmuWorkFolder             ! Size of the FMU resource folder trimmed
-    REAL(kind = C_DOUBLE)                :: timeOut                      ! timeOut in milli seconds
-    INTEGER(C_INT)                       :: visible !
-    INTEGER(C_INT)                       :: interactive !
-    INTEGER(C_INT)                       :: loggingon !
-    INTEGER(kind=C_INT)                  :: index                        ! Index of FMU
-    END FUNCTION fmiInstantiateSlave
-    END INTERFACE
+!    USE ISO_C_BINDING, ONLY: C_INT, C_CHAR, C_PTR, C_DOUBLE
+!    CHARACTER(kind=C_CHAR), DIMENSION(*) :: fmuWorkFolder                 ! FMU resource folder
+!    INTEGER(kind=C_INT)                  :: sizeFmuWorkFolder             ! Size of the FMU resource folder trimmed
+!    REAL(kind = C_DOUBLE)                :: timeOut                      ! timeOut in milli seconds
+!    INTEGER(C_INT)                       :: visible !
+!    INTEGER(C_INT)                       :: interactive !
+!    INTEGER(C_INT)                       :: loggingon !
+!    INTEGER(kind=C_INT)                  :: index                        ! Index of FMU
+!    END FUNCTION fmiInstantiateSlave
+!    END INTERFACE
 
-    INTERFACE
-    INTEGER FUNCTION fmiInitializeSlave(fmiComponent, tStart, fmiTrue, tStop, index)BIND (C, NAME="fmiEPlusInitializeSlave")
-    ! Function called to initialize FMU
-    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
-    TYPE (C_PTR)                         :: fmiComponent                 ! Pointer to FMU instance
-    REAL(kind=C_DOUBLE)                  :: tStart                       ! Starttime for co-simulation
-    REAL(kind=C_DOUBLE)                  :: tStop                        ! Stoptime for co-simulation
-    INTEGER (kind = C_INT)               :: fmiTrue                      ! Flag set to true for initialization
-    INTEGER(kind=C_INT)                  :: index                        ! Index of FMU 
-    END FUNCTION fmiInitializeSlave
-    END INTERFACE
+!    INTERFACE
+!    INTEGER FUNCTION fmiInitializeSlave(fmiComponent, tStart, fmiTrue, tStop, index)BIND (C, NAME="fmiEPlusInitializeSlave")
+!    ! Function called to initialize FMU
+!    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
+!    TYPE (C_PTR)                         :: fmiComponent                 ! Pointer to FMU instance
+!    REAL(kind=C_DOUBLE)                  :: tStart                       ! Starttime for co-simulation
+!    REAL(kind=C_DOUBLE)                  :: tStop                        ! Stoptime for co-simulation
+!    INTEGER (kind = C_INT)               :: fmiTrue                      ! Flag set to true for initialization
+!    INTEGER(kind=C_INT)                  :: index                        ! Index of FMU 
+!    END FUNCTION fmiInitializeSlave
+!    END INTERFACE
 
-    !Instantiate FMUs
-    DO i = 1, NumFMUObjects
-        DO j = 1, FMU(i)%NumInstances
-            FMU(i)%Instance(j)%fmiComponent = &
-            fmiInstantiateSlave(FMU(i)%Instance(j)%WorkingFolder, &
-            FMU(i)%Instance(j)%LenWorkingFolder, FMU(i)%TimeOut, FMU(i)%Visible, &
-            FMU(i)%Interactive, FMU(i)%LoggingOn, FMU(i)%Instance(j)%Index)
-            IF (.NOT.(C_ASSOCIATED(FMU(i)%Instance(j)%fmiComponent))) THEN
-                CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to instantiate')
-                CALL ShowContinueError('instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
-                ErrorsFound = .true.
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                CALL StopExternalInterfaceIfError
-            END IF
-        END DO
-    END DO
+!    !Instantiate FMUs
+!    DO i = 1, NumFMUObjects
+!        DO j = 1, FMU(i)%NumInstances
+!            FMU(i)%Instance(j)%fmiComponent = &
+!            fmiInstantiateSlave(FMU(i)%Instance(j)%WorkingFolder, &
+!            FMU(i)%Instance(j)%LenWorkingFolder, FMU(i)%TimeOut, FMU(i)%Visible, &
+!            FMU(i)%Interactive, FMU(i)%LoggingOn, FMU(i)%Instance(j)%Index)
+!            IF (.NOT.(C_ASSOCIATED(FMU(i)%Instance(j)%fmiComponent))) THEN
+!                CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to instantiate')
+!                CALL ShowContinueError('instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                ErrorsFound = .true.
+!                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                CALL StopExternalInterfaceIfError
+!            END IF
+!        END DO
+!    END DO
 
-    ! Initialize FMUs
-    DO i = 1, NumFMUObjects
-        DO j = 1, FMU(i)%NumInstances
-            FMU(i)%Instance(j)%fmiStatus = fmiInitializeSlave(FMU(i)%Instance(j)%fmiComponent, &
-            tStart, fmiTrue, tStop, FMU(i)%Instance(j)%Index)
-            IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus .EQ. fmiOK )) THEN
-                CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize')
-                CALL ShowContinueError('instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
-                CALL ShowContinueError('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
-                ErrorsFound = .true.
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                CALL StopExternalInterfaceIfError
-            END IF
-        END DO
-    END DO
-    END SUBROUTINE InstantiateInitializeFMUImport
+!    ! Initialize FMUs
+!    DO i = 1, NumFMUObjects
+!        DO j = 1, FMU(i)%NumInstances
+!            FMU(i)%Instance(j)%fmiStatus = fmiInitializeSlave(FMU(i)%Instance(j)%fmiComponent, &
+!            tStart, fmiTrue, tStop, FMU(i)%Instance(j)%Index)
+!            IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus .EQ. fmiOK )) THEN
+!                CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to initialize')
+!                CALL ShowContinueError('instance "'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                CALL ShowContinueError('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
+!                ErrorsFound = .true.
+!                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                CALL StopExternalInterfaceIfError
+!            END IF
+!        END DO
+!    END DO
+!    END SUBROUTINE InstantiateInitializeFMUImport
 
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
