@@ -380,6 +380,9 @@ namespace ExternalInterface {
 	void
 	VerifyExternalInterfaceObject();
 
+	Real64
+	GetCurSimStartTimeSeconds();
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
