@@ -567,7 +567,40 @@ namespace ExternalInterface {
     
     void
 	StopExternalInterfaceIfError()
-	{}
+	{
+	    // SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   9Jan2008
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gracefully stops the ExternalInterface if an error has been found.
+		// It sends an appropriate message to the ExternalInterface
+		// and then calls a fatal error to stop EnergyPlus.
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int retVal; // Return value, needed to catch return value of function call
+		if ( ( NumExternalInterfacesBCVTB != 0 ) || ( NumExternalInterfacesFMUExport != 0 ) ) {
+			if ( ErrorsFound ) {
+				// Check if the socket is open
+				if ( socketFD >= 0 ) {
+					// Socket is open
+					if ( simulationStatus == 1 ) {
+						retVal = sendclientmessage( socketFD, -10 );
+					} else {
+						retVal = sendclientmessage( socketFD, -20 );
+					}
+				}
+				ShowFatalError( "Error in ExternalInterface: Check EnergyPlus *.err file." );
+			}
+		}
+		if ( NumExternalInterfacesFMUImport != 0 ) {
+			if ( ErrorsFound ) {
+				ShowFatalError( "ExternalInterface/StopExternalInterfaceIfError: Error in ExternalInterface: Check EnergyPlus *.err file." );
+			}
+		}
+	}
     
     void
 	ValidateRunControl()
@@ -620,7 +653,6 @@ namespace ExternalInterface {
 		using DataIPShortCuts::cNumericFieldNames;
 		
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int retVal; // Return value, needed to catch return value of function call
 		int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
 		int NumNumbers( 0 ); // Number of Numbers for each GetObjectItem call
 		int IOStatus( 0 ); // Used in GetObjectItem
