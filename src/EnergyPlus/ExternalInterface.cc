@@ -549,11 +549,38 @@ namespace ExternalInterface {
     
     void
 	ParseString(
-		std::string const str,
-		FArray1D< std::string > & ele,
-		int const nEle
+		std::string const str, // The string, with all elements separated by ';'
+		FArray1D< std::string > & ele, // The elements
+		int const nEle // The number of elements
 	)
-	{}
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Michael Wetter
+		//       DATE WRITTEN   8Jan2008
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine parses the semicolon separated string xmlStr
+		// and assigns each element to ele
+
+		// USE STATEMENTS:
+		using InputProcessor::MakeUPPERCase;
+
+		// SUBROUTINE VARIABLE DEFINITIONS:
+		int i; // Counter
+		int iSta; // Start of substring
+		int iEnd; // End of substring
+		int lenStr; // Length of string
+		lenStr = len(str);
+		iEnd = 1;
+		for ( i = 1; i <= nEle; i++ ) {
+			iSta = iEnd; // add one to skip ';'
+			iEnd = iSta + str.substr( iSta, lenStr ).find( ";" );
+			ele( i ) = MakeUPPERCase( str.substr( iSta, ( iEnd - 2 ) ) ); //TODO: this was TRIMmed
+		}
+    
+	}
     
     void
 	GetReportVariableKey(
@@ -581,15 +608,17 @@ namespace ExternalInterface {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int retVal; // Return value, needed to catch return value of function call
+		int const flag1( -10 );
+		int const flag2( -20 );
 		if ( ( NumExternalInterfacesBCVTB != 0 ) || ( NumExternalInterfacesFMUExport != 0 ) ) {
 			if ( ErrorsFound ) {
 				// Check if the socket is open
 				if ( socketFD >= 0 ) {
 					// Socket is open
 					if ( simulationStatus == 1 ) {
-						retVal = sendclientmessage( socketFD, -10 );
+						retVal = sendclientmessage( &socketFD, &flag1 );
 					} else {
-						retVal = sendclientmessage( socketFD, -20 );
+						retVal = sendclientmessage( &socketFD, &flag2 );
 					}
 				}
 				ShowFatalError( "Error in ExternalInterface: Check EnergyPlus *.err file." );
