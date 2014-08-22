@@ -1184,6 +1184,8 @@ namespace DataSizing {
 		//  (zone time step)
 		FArray1D< Real64 > SensCoolCapSeq; // daily sequence of system sensible cooling capacity
 		//  (zone time step)
+		FArray1D< Real64 > TotCoolCapSeq; // daily sequence of system total cooling capacity
+		//  (zone time step)
 		FArray1D< Real64 > HeatCapSeq; // daily sequence of system heating capacity [zone time step]
 		FArray1D< Real64 > PreheatCapSeq; // daily sequence of system preheat capacity [zone time step]
 		FArray1D< Real64 > SysCoolRetTempSeq; // daily sequence of system cooling return temperatures [C]
@@ -1335,6 +1337,7 @@ namespace DataSizing {
 			FArray1< Real64 > const & HeatFlowSeq, // daily sequence of system heating air mass flow rate
 			FArray1< Real64 > const & CoolFlowSeq, // daily sequence of system cooling air mass flow rate
 			FArray1< Real64 > const & SensCoolCapSeq, // daily sequence of system sensible cooling capacity
+			FArray1< Real64 > const & TotCoolCapSeq, // daily sequence of system total cooling capacity
 			FArray1< Real64 > const & HeatCapSeq, // daily sequence of system heating capacity [zone time step]
 			FArray1< Real64 > const & PreheatCapSeq, // daily sequence of system preheat capacity [zone time step]
 			FArray1< Real64 > const & SysCoolRetTempSeq, // daily sequence of system cooling return temperatures [C]
@@ -1411,6 +1414,7 @@ namespace DataSizing {
 			HeatFlowSeq( HeatFlowSeq ),
 			CoolFlowSeq( CoolFlowSeq ),
 			SensCoolCapSeq( SensCoolCapSeq ),
+			TotCoolCapSeq( TotCoolCapSeq ),
 			HeatCapSeq( HeatCapSeq ),
 			PreheatCapSeq( PreheatCapSeq ),
 			SysCoolRetTempSeq( SysCoolRetTempSeq ),
