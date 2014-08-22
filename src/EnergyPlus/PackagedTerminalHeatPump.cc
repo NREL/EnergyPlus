@@ -3724,7 +3724,6 @@ namespace PackagedTerminalHeatPump {
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = TempSize;
 				}
-				//DataScalableSizingON = false;
 
 				// initialize capacity sizing variables: cooling
 				SizingMethod = CoolingCapacitySizing;
@@ -3947,7 +3946,6 @@ namespace PackagedTerminalHeatPump {
 		if ( CurZoneEqNum > 0 ) {
 			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = max( PTUnit( PTUnitNum ).CoolOutAirVolFlow, PTUnit( PTUnitNum ).HeatOutAirVolFlow );
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
-			//ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 		}
 
 		if ( ErrorsFound ) {
