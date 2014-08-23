@@ -2301,351 +2301,351 @@
 
 !    END FUNCTION GetCurSimStartTimeSeconds
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE CalcExternalInterfaceFMUImport()
+!    SUBROUTINE CalcExternalInterfaceFMUImport()
 
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
-    !       DATE WRITTEN   08Aug2011
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
+!    !       DATE WRITTEN   08Aug2011
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! This subroutine organizes the data exchange between FMU and EnergyPlus.
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! This subroutine organizes the data exchange between FMU and EnergyPlus.
 
-    ! METHODOLOGY EMPLOYED:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    ! USE STATEMENTS:
-    USE DataEnvironment, ONLY: TotalOverallSimDays, TotDesDays
-    USE ScheduleManager, ONLY: GetDayScheduleIndex, ExternalInterfaceSetSchedule
-    USE RuntimeLanguageProcessor, ONLY: isExternalInterfaceErlVariable, FindEMSVariable
-    USE DataInterfaces, ONLY:GetVariableKeyCountandType, GetVariableKeys
-    USE RuntimeLanguageProcessor, ONLY: ExternalInterfaceSetErlVariable
-    USE EMSManager, ONLY: ManageEMS
-    USE InputProcessor, ONLY: GetNumObjectsFound, GetObjectItem, VerifyName, SameString
-    USE DataIPShortCuts
-    USE DataGlobals, ONLY: WarmupFlag, KindOfSim, ksRunPeriodWeather, TimeStepZone, emsCallFromExternalInterface
-    USE DataSystemVariables, ONLY: UpdateDataDuringWarmupExternalInterface
-    USE ISO_C_BINDING, ONLY : C_PTR
-
-
-    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
-
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
-
-    ! SUBROUTINE PARAMETER DEFINITIONS:
-    ! These parameters are also declared in an interface below.
+!    ! USE STATEMENTS:
+!    USE DataEnvironment, ONLY: TotalOverallSimDays, TotDesDays
+!    USE ScheduleManager, ONLY: GetDayScheduleIndex, ExternalInterfaceSetSchedule
+!    USE RuntimeLanguageProcessor, ONLY: isExternalInterfaceErlVariable, FindEMSVariable
+!    USE DataInterfaces, ONLY:GetVariableKeyCountandType, GetVariableKeys
+!    USE RuntimeLanguageProcessor, ONLY: ExternalInterfaceSetErlVariable
+!    USE EMSManager, ONLY: ManageEMS
+!    USE InputProcessor, ONLY: GetNumObjectsFound, GetObjectItem, VerifyName, SameString
+!    USE DataIPShortCuts
+!    USE DataGlobals, ONLY: WarmupFlag, KindOfSim, ksRunPeriodWeather, TimeStepZone, emsCallFromExternalInterface
+!    USE DataSystemVariables, ONLY: UpdateDataDuringWarmupExternalInterface
+!    USE ISO_C_BINDING, ONLY : C_PTR
 
 
-    INTEGER, PARAMETER :: IntegerVar = 1      ! Integer variable
-    INTEGER, PARAMETER :: RealVar = 2         ! Real variable
+!    IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
+
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
+!    ! These parameters are also declared in an interface below.
 
 
-    INTEGER :: i, j, k, l         ! Loop counter
-    ! INTERFACE BLOCK SPECIFICATIONS
-    ! na
-
-    ! DERIVED TYPE DEFINITIONS
-
-    INTERFACE
-    INTEGER FUNCTION fmiGetReal(fmiComponent, valRef, &
-    fmuVariableValue, numOutputs, index) BIND (C, NAME="fmiEPlusGetReal")
-    ! Function called to get real values from FMU outputs
-    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
-    TYPE (C_PTR)                         :: fmiComponent                 ! Pointer to FMU instance
-    INTEGER(kind=C_INT), DIMENSION(*)    :: valRef                       ! Parameter fmiValueReference
-    REAL (kind=C_DOUBLE), DIMENSION(*)   :: fmuVariableValue             ! FMU output variables
-    INTEGER(kind=C_INT)                  :: numOutputs                   ! Number of input variables
-    INTEGER(kind=C_INT)                  :: index                        ! Index of the FMU 
-    END FUNCTION fmiGetReal
-    END INTERFACE
+!    INTEGER, PARAMETER :: IntegerVar = 1      ! Integer variable
+!    INTEGER, PARAMETER :: RealVar = 2         ! Real variable
 
 
-    INTERFACE
-    INTEGER FUNCTION fmiSetReal(fmiComponent, valRef, &
-    fmuVariableValue, numInputs, index) BIND (C, NAME="fmiEPlusSetReal")
-    ! Function called to set real values to FMU inputs
-    USE ISO_C_BINDING, ONLY: C_INT, C_DOUBLE, C_PTR
-    TYPE (C_PTR)                              :: fmiComponent                ! Pointer to FMU instance
-    INTEGER(kind=C_INT) , DIMENSION(*)        :: valRef                      ! Parameter fmiValueReference
-    REAL (kind=C_DOUBLE), DIMENSION(*)        :: fmuVariableValue            ! FMU input variables
-    INTEGER(kind=C_INT)                       :: numInputs                   ! Number of input variables
-    INTEGER(kind=C_INT)                       :: index                       ! Index of the FMU 
-    END FUNCTION fmiSetReal
-    END INTERFACE
+!    INTEGER :: i, j, k, l         ! Loop counter
+!    ! INTERFACE BLOCK SPECIFICATIONS
+!    ! na
 
-    INTERFACE
-    INTEGER FUNCTION fmiDoStep(fmiComponent, &
-    curCommPoint, commStepSize, newStep, index) BIND (C, NAME="fmiEPlusDoStep")
-    !  Function called to do one step of the co-simulation
-    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
-    TYPE (C_PTR)                               :: fmiComponent               ! Pointer to FMU instance
-    REAL(kind=C_DOUBLE)                        :: curCommPoint               ! Current communication point
-    REAL(kind=C_DOUBLE)                        :: commStepSize               ! Communication step size
-    INTEGER (C_INT)                            :: newStep
-    INTEGER(kind=C_INT)                        :: index                        ! Index of the FMU
-    END FUNCTION fmiDoStep
-    END INTERFACE
+!    ! DERIVED TYPE DEFINITIONS
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-    INTEGER                        :: retVal          ! Return value of function call, used for error handling
-    INTEGER                        :: NumAlphas  = 0 ! Number of Alphas for each GetObjectItem call
-    INTEGER                        :: NumNumbers = 0 ! Number of Numbers for each GetObjectItem call
-    INTEGER                        :: IOStatus = 0  ! Used in GetObjectItem
-    INTEGER                        :: NumFMUInputVariables = 0     ! Number of FMU input variables
-
-    INTEGER :: NumNumeric  ! Number of numbers being input
-    LOGICAL :: IsNotOK               ! Flag to verify name
-    LOGICAL :: IsBlank               ! Flag for blank name
-    LOGICAL, SAVE :: FirstCallFlag = .TRUE.               ! Flag for first call
-    LOGICAL, SAVE :: FirstCallDesignDays = .TRUE.         ! Flag fo first call during warmup
-    LOGICAL, SAVE :: FirstCallWUp = .TRUE.                ! Flag fo first call during warmup
-    LOGICAL, SAVE :: FirstCallTStep = .TRUE.              ! Flag for first call during time stepping
-    INTEGER :: Count
-
-    CHARACTER(len=MaxNameLength), DIMENSION(5) :: Alphas
-    INTEGER NumAlpha, NumNumber, IOStat
-    INTEGER :: Num
-
-    CHARACTER(len=MaxNameLength), DIMENSION(maxVar) :: curVals  ! Names of schedules (i.e., schedule names)
-    INTEGER curNumInpVal                                        ! current number of input values for the InputValType
-    CHARACTER(len=maxErrMsgLength)    :: validateErrMsg         ! error returned when xml Schema validate failed
-    INTEGER                           :: errMsgLen              ! the length of the error message
+!    INTERFACE
+!    INTEGER FUNCTION fmiGetReal(fmiComponent, valRef, &
+!    fmuVariableValue, numOutputs, index) BIND (C, NAME="fmiEPlusGetReal")
+!    ! Function called to get real values from FMU outputs
+!    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
+!    TYPE (C_PTR)                         :: fmiComponent                 ! Pointer to FMU instance
+!    INTEGER(kind=C_INT), DIMENSION(*)    :: valRef                       ! Parameter fmiValueReference
+!    REAL (kind=C_DOUBLE), DIMENSION(*)   :: fmuVariableValue             ! FMU output variables
+!    INTEGER(kind=C_INT)                  :: numOutputs                   ! Number of input variables
+!    INTEGER(kind=C_INT)                  :: index                        ! Index of the FMU 
+!    END FUNCTION fmiGetReal
+!    END INTERFACE
 
 
-    INTEGER                           :: varType      = 0 ! 0=not found, 1=integer, 2=real, 3=meter
-    INTEGER                           :: numKey       = 0 ! Number of keys found
-    INTEGER                           :: varAvgSum    = 0 ! Variable  is Averaged=1 or Summed=2
-    INTEGER                           :: varStepType  = 0 ! Variable time step is Zone=1 or HVAC=2
-    CHARACTER(len=10)                 :: varUnits         ! Units sting, may be blank
-    CHARACTER(len=1000)               :: tempChar         ! Units sting, may be blank
+!    INTERFACE
+!    INTEGER FUNCTION fmiSetReal(fmiComponent, valRef, &
+!    fmuVariableValue, numInputs, index) BIND (C, NAME="fmiEPlusSetReal")
+!    ! Function called to set real values to FMU inputs
+!    USE ISO_C_BINDING, ONLY: C_INT, C_DOUBLE, C_PTR
+!    TYPE (C_PTR)                              :: fmiComponent                ! Pointer to FMU instance
+!    INTEGER(kind=C_INT) , DIMENSION(*)        :: valRef                      ! Parameter fmiValueReference
+!    REAL (kind=C_DOUBLE), DIMENSION(*)        :: fmuVariableValue            ! FMU input variables
+!    INTEGER(kind=C_INT)                       :: numInputs                   ! Number of input variables
+!    INTEGER(kind=C_INT)                       :: index                       ! Index of the FMU 
+!    END FUNCTION fmiSetReal
+!    END INTERFACE
+
+!    INTERFACE
+!    INTEGER FUNCTION fmiDoStep(fmiComponent, &
+!    curCommPoint, commStepSize, newStep, index) BIND (C, NAME="fmiEPlusDoStep")
+!    !  Function called to do one step of the co-simulation
+!    USE ISO_C_BINDING, ONLY: C_INT, C_PTR, C_DOUBLE
+!    TYPE (C_PTR)                               :: fmiComponent               ! Pointer to FMU instance
+!    REAL(kind=C_DOUBLE)                        :: curCommPoint               ! Current communication point
+!    REAL(kind=C_DOUBLE)                        :: commStepSize               ! Communication step size
+!    INTEGER (C_INT)                            :: newStep
+!    INTEGER(kind=C_INT)                        :: index                        ! Index of the FMU
+!    END FUNCTION fmiDoStep
+!    END INTERFACE
+
+!    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+!    INTEGER                        :: retVal          ! Return value of function call, used for error handling
+!    INTEGER                        :: NumAlphas  = 0 ! Number of Alphas for each GetObjectItem call
+!    INTEGER                        :: NumNumbers = 0 ! Number of Numbers for each GetObjectItem call
+!    INTEGER                        :: IOStatus = 0  ! Used in GetObjectItem
+!    INTEGER                        :: NumFMUInputVariables = 0     ! Number of FMU input variables
+
+!    INTEGER :: NumNumeric  ! Number of numbers being input
+!    LOGICAL :: IsNotOK               ! Flag to verify name
+!    LOGICAL :: IsBlank               ! Flag for blank name
+!    LOGICAL, SAVE :: FirstCallFlag = .TRUE.               ! Flag for first call
+!    LOGICAL, SAVE :: FirstCallDesignDays = .TRUE.         ! Flag fo first call during warmup
+!    LOGICAL, SAVE :: FirstCallWUp = .TRUE.                ! Flag fo first call during warmup
+!    LOGICAL, SAVE :: FirstCallTStep = .TRUE.              ! Flag for first call during time stepping
+!    INTEGER :: Count
+
+!    CHARACTER(len=MaxNameLength), DIMENSION(5) :: Alphas
+!    INTEGER NumAlpha, NumNumber, IOStat
+!    INTEGER :: Num
+
+!    CHARACTER(len=MaxNameLength), DIMENSION(maxVar) :: curVals  ! Names of schedules (i.e., schedule names)
+!    INTEGER curNumInpVal                                        ! current number of input values for the InputValType
+!    CHARACTER(len=maxErrMsgLength)    :: validateErrMsg         ! error returned when xml Schema validate failed
+!    INTEGER                           :: errMsgLen              ! the length of the error message
 
 
-    INTEGER                           :: Loop      ! Loop counter
-    INTEGER                           :: NumTSObjects
+!    INTEGER                           :: varType      = 0 ! 0=not found, 1=integer, 2=real, 3=meter
+!    INTEGER                           :: numKey       = 0 ! Number of keys found
+!    INTEGER                           :: varAvgSum    = 0 ! Variable  is Averaged=1 or Summed=2
+!    INTEGER                           :: varStepType  = 0 ! Variable time step is Zone=1 or HVAC=2
+!    CHARACTER(len=10)                 :: varUnits         ! Units sting, may be blank
+!    CHARACTER(len=1000)               :: tempChar         ! Units sting, may be blank
 
-    INTEGER, DIMENSION(1):: keyIndexes ! Array index for
-    CHARACTER(len=MaxNameLength), DIMENSION(1):: NamesOfKeys      ! Specific key name
 
-    IF (WarmupFlag .AND. (KindOfSim .NE. ksRunPeriodWeather)) THEN ! No data exchange during design days
-        IF (FirstCallDesignDays) THEN
-            CALL ShowWarningError('ExternalInterface/CalcExternalInterfaceFMUImport: '//  &
-            'ExternalInterface does not exchange data during design days.')
-        END IF
-        FirstCallDesignDays = .FALSE.
-    END IF
-    IF (WarmupFlag .AND. (KindOfSim .EQ. ksRunPeriodWeather)) THEN ! Data exchange after design days
-        IF (FirstCallWUp) THEN
-            ! set the report during warmup to true so that variables are also updated during the warmup
-            UpdateDataDuringWarmupExternalInterface = .TRUE.
-            hStep = (60.0d0 * TimeStepZone) * 60.0d0
-            tStart = GetCurSimStartTimeSeconds()
-            tStop =  tStart + 24.0d0* 3600.0d0
-            tComm = tStart
+!    INTEGER                           :: Loop      ! Loop counter
+!    INTEGER                           :: NumTSObjects
 
-            ! instantiate and initialize the unpack fmus
-            CALL InstantiateInitializeFMUImport ()
+!    INTEGER, DIMENSION(1):: keyIndexes ! Array index for
+!    CHARACTER(len=MaxNameLength), DIMENSION(1):: NamesOfKeys      ! Specific key name
 
-            ! allocate memory for a temporary FMU that will be used at the end of the warmup
-            ALLOCATE(FMUTemp(NumFMUObjects))
-            DO i =1, NumFMUObjects
-                ALLOCATE(FMUTemp(i)%Instance(FMU(i)%NumInstances))
-            END DO
-            DO i = 1, NumFMUObjects
-                DO j = 1, FMU(i)%NumInstances
-                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuInputVariable(FMU(i)%Instance(j)%NumInputVariablesInIDF))
-                    ALLOCATE(FMUTemp(i)%Instance(j)%eplusOutputVariable(FMU(i)%Instance(j)%NumInputVariablesInIDF))
-                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule(FMU(i)%Instance(j)%NumOutputVariablesSchedule))
-                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuOutputVariableVariable(FMU(i)%Instance(j)%NumOutputVariablesVariable))
-                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuOutputVariableActuator(FMU(i)%Instance(j)%NumOutputVariablesActuator))
-                END DO
-            END DO
+!    IF (WarmupFlag .AND. (KindOfSim .NE. ksRunPeriodWeather)) THEN ! No data exchange during design days
+!        IF (FirstCallDesignDays) THEN
+!            CALL ShowWarningError('ExternalInterface/CalcExternalInterfaceFMUImport: '//  &
+!            'ExternalInterface does not exchange data during design days.')
+!        END IF
+!        FirstCallDesignDays = .FALSE.
+!    END IF
+!    IF (WarmupFlag .AND. (KindOfSim .EQ. ksRunPeriodWeather)) THEN ! Data exchange after design days
+!        IF (FirstCallWUp) THEN
+!            ! set the report during warmup to true so that variables are also updated during the warmup
+!            UpdateDataDuringWarmupExternalInterface = .TRUE.
+!            hStep = (60.0d0 * TimeStepZone) * 60.0d0
+!            tStart = GetCurSimStartTimeSeconds()
+!            tStop =  tStart + 24.0d0* 3600.0d0
+!            tComm = tStart
 
-            CALL GetSetVariablesAndDoStepFMUImport ()
-            tComm = tComm + hStep
-            FirstCallWUp = .FALSE.
+!            ! instantiate and initialize the unpack fmus
+!            CALL InstantiateInitializeFMUImport ()
 
-        ELSE
-            IF (tComm .LT. tStop) THEN
-                CALL GetSetVariablesAndDoStepFMUImport ()
-                ! Advance the communication time step
-                tComm = tComm + hStep
-            ELSE
-                DO i = 1, NumFMUObjects
-                    DO j = 1, FMU(i)%NumInstances
-                        FMUTemp(i)%Instance(j)%NumInputVariablesInIDF = FMU(i)%Instance(j)%NumInputVariablesInIDF
-                        DO k = 1, FMU(i)%Instance(j)%NumInputVariablesInIDF
-                            FMUTemp(i)%Instance(j)%fmuInputVariable(k)%ValueReference = &
-                            FMU(i)%Instance(j)%fmuInputVariable(k)%ValueReference
-                            FMUTemp(i)%Instance(j)%eplusOutputVariable(k)%RTSValue = &
-                            FMU(i)%Instance(j)%eplusOutputVariable(k)%RTSValue
-                            FMUTemp(i)%Instance(j)%eplusOutputVariable(k)%ITSValue = &
-                            FMU(i)%Instance(j)%eplusOutputVariable(k)%ITSValue
-                            FMUTemp(i)%Instance(j)%eplusOutputVariable(k)%VarType  = &
-                            FMU(i)%Instance(j)%eplusOutputVariable(k)%VarType
-                        END DO
+!            ! allocate memory for a temporary FMU that will be used at the end of the warmup
+!            ALLOCATE(FMUTemp(NumFMUObjects))
+!            DO i =1, NumFMUObjects
+!                ALLOCATE(FMUTemp(i)%Instance(FMU(i)%NumInstances))
+!            END DO
+!            DO i = 1, NumFMUObjects
+!                DO j = 1, FMU(i)%NumInstances
+!                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuInputVariable(FMU(i)%Instance(j)%NumInputVariablesInIDF))
+!                    ALLOCATE(FMUTemp(i)%Instance(j)%eplusOutputVariable(FMU(i)%Instance(j)%NumInputVariablesInIDF))
+!                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule(FMU(i)%Instance(j)%NumOutputVariablesSchedule))
+!                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuOutputVariableVariable(FMU(i)%Instance(j)%NumOutputVariablesVariable))
+!                    ALLOCATE(FMUTemp(i)%Instance(j)%fmuOutputVariableActuator(FMU(i)%Instance(j)%NumOutputVariablesActuator))
+!                END DO
+!            END DO
 
-                        FMUTemp(i)%Instance(j)%NumOutputVariablesSchedule = FMU(i)%Instance(j)%NumOutputVariablesSchedule
-                        ! save values that will be set in EnergyPlus (Schedule)
-                        DO k = 1, FMU(i)%Instance(j)%NumOutputVariablesSchedule
-                            FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue = &
-                            FMU(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue
-                        END DO
+!            CALL GetSetVariablesAndDoStepFMUImport ()
+!            tComm = tComm + hStep
+!            FirstCallWUp = .FALSE.
 
-                        ! save values that will be set in EnergyPlus (Variable)
-                        FMUTemp(i)%Instance(j)%NumOutputVariablesVariable = FMU(i)%Instance(j)%NumOutputVariablesVariable
-                        DO k = 1, FMU(i)%Instance(j)%NumOutputVariablesVariable
-                            FMUTemp(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue =  &
-                            FMU(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue
-                        END DO
+!        ELSE
+!            IF (tComm .LT. tStop) THEN
+!                CALL GetSetVariablesAndDoStepFMUImport ()
+!                ! Advance the communication time step
+!                tComm = tComm + hStep
+!            ELSE
+!                DO i = 1, NumFMUObjects
+!                    DO j = 1, FMU(i)%NumInstances
+!                        FMUTemp(i)%Instance(j)%NumInputVariablesInIDF = FMU(i)%Instance(j)%NumInputVariablesInIDF
+!                        DO k = 1, FMU(i)%Instance(j)%NumInputVariablesInIDF
+!                            FMUTemp(i)%Instance(j)%fmuInputVariable(k)%ValueReference = &
+!                            FMU(i)%Instance(j)%fmuInputVariable(k)%ValueReference
+!                            FMUTemp(i)%Instance(j)%eplusOutputVariable(k)%RTSValue = &
+!                            FMU(i)%Instance(j)%eplusOutputVariable(k)%RTSValue
+!                            FMUTemp(i)%Instance(j)%eplusOutputVariable(k)%ITSValue = &
+!                            FMU(i)%Instance(j)%eplusOutputVariable(k)%ITSValue
+!                            FMUTemp(i)%Instance(j)%eplusOutputVariable(k)%VarType  = &
+!                            FMU(i)%Instance(j)%eplusOutputVariable(k)%VarType
+!                        END DO
 
-                        ! save values that will be set in EnergyPlus (Actuator)
-                        FMUTemp(i)%Instance(j)%NumOutputVariablesActuator = FMU(i)%Instance(j)%NumOutputVariablesActuator
-                        DO k = 1, FMU(i)%Instance(j)%NumOutputVariablesActuator
-                            FMUTemp(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue =  &
-                            FMU(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue
-                        END DO
-                    END DO
-                END DO
+!                        FMUTemp(i)%Instance(j)%NumOutputVariablesSchedule = FMU(i)%Instance(j)%NumOutputVariablesSchedule
+!                        ! save values that will be set in EnergyPlus (Schedule)
+!                        DO k = 1, FMU(i)%Instance(j)%NumOutputVariablesSchedule
+!                            FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue = &
+!                            FMU(i)%Instance(j)%fmuOutputVariableSchedule(k)%RealVarValue
+!                        END DO
 
-                CALL StopExternalInterfaceIfError
+!                        ! save values that will be set in EnergyPlus (Variable)
+!                        FMUTemp(i)%Instance(j)%NumOutputVariablesVariable = FMU(i)%Instance(j)%NumOutputVariablesVariable
+!                        DO k = 1, FMU(i)%Instance(j)%NumOutputVariablesVariable
+!                            FMUTemp(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue =  &
+!                            FMU(i)%Instance(j)%fmuOutputVariableVariable(k)%RealVarValue
+!                        END DO
 
-                ! Terminate all FMUs
-                CALL TerminateResetFreeFMUImport()
+!                        ! save values that will be set in EnergyPlus (Actuator)
+!                        FMUTemp(i)%Instance(j)%NumOutputVariablesActuator = FMU(i)%Instance(j)%NumOutputVariablesActuator
+!                        DO k = 1, FMU(i)%Instance(j)%NumOutputVariablesActuator
+!                            FMUTemp(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue =  &
+!                            FMU(i)%Instance(j)%fmuOutputVariableActuator(k)%RealVarValue
+!                        END DO
+!                    END DO
+!                END DO
 
-                ! Reset the communication time step
-                tComm = tStart
+!                CALL StopExternalInterfaceIfError
 
-                ! Reinstantiate and reinitialize the FMUs
-                CALL InstantiateInitializeFMUImport()
+!                ! Terminate all FMUs
+!                CALL TerminateResetFreeFMUImport()
 
-                ! Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
-                DO i = 1, NumFMUObjects
-                    DO j = 1, FMU(i)%NumInstances
-                        FMU(i)%Instance(j)%fmiStatus = fmiSetReal(FMU(i)%Instance(j)%fmiComponent, &
-                        FMU(i)%Instance(j)%fmuInputVariable%ValueReference, &
-                        FMUTemp(i)%Instance(j)%eplusOutputVariable%RTSValue, &
-                        FMUTemp(i)%Instance(j)%NumInputVariablesInIDF, &
-                        FMU(i)%Instance(j)%Index)
-                        IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
-                            CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying '// &
-                            'to set an input value in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'"')
-                            CALL ShowContinueError('of FMU "'//TRIM(FMU(i)%Name)//'". &
-                            &Error Code = '//TRIM(TrimSigDigits(FMU(i)%Instance(j)%fmiStatus))//'.')
-                            ErrorsFound = .true.
-                            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            CALL StopExternalInterfaceIfError
-                        END IF
-                    END DO
-                END DO
-                ! set the flag to reinitialize states to be true
-                FlagReIni = .TRUE.
-                CALL GetSetVariablesAndDoStepFMUImport
-                FlagReIni = .FALSE.
-                ! advance one time step ahead for the next calculation
-                tComm = tComm + hStep
-            END IF
-        END IF
-    END IF
-    ! BeginSimulation
-    IF (.NOT.(WarmupFlag) .AND. (KindOfSim .EQ. ksRunPeriodWeather)) THEN
-        IF (FirstCallTStep) THEN
-            ! reset the UpdateDataDuringWarmupExternalInterface to be false.
-            UpdateDataDuringWarmupExternalInterface = .FALSE.
-            ! The time is computed in seconds for FMU
-            tStart = GetCurSimStartTimeSeconds()
-            tStop = tStart + (TotalOverallSimDays - TotDesDays ) * 24.0d0 * 3600.0d0
-            tComm = tStart
+!                ! Reset the communication time step
+!                tComm = tStart
 
-            ! Terminate all FMUs
-            CALL TerminateResetFreeFMUImport()
+!                ! Reinstantiate and reinitialize the FMUs
+!                CALL InstantiateInitializeFMUImport()
 
-            ! Reinstantiate and reinitialize the FMUs
-            CALL InstantiateInitializeFMUImport()
+!                ! Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
+!                DO i = 1, NumFMUObjects
+!                    DO j = 1, FMU(i)%NumInstances
+!                        FMU(i)%Instance(j)%fmiStatus = fmiSetReal(FMU(i)%Instance(j)%fmiComponent, &
+!                        FMU(i)%Instance(j)%fmuInputVariable%ValueReference, &
+!                        FMUTemp(i)%Instance(j)%eplusOutputVariable%RTSValue, &
+!                        FMUTemp(i)%Instance(j)%NumInputVariablesInIDF, &
+!                        FMU(i)%Instance(j)%Index)
+!                        IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
+!                            CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying '// &
+!                            'to set an input value in instance "'//TRIM(FMU(i)%Instance(j)%Name)//'"')
+!                            CALL ShowContinueError('of FMU "'//TRIM(FMU(i)%Name)//'". &
+!                            &Error Code = '//TRIM(TrimSigDigits(FMU(i)%Instance(j)%fmiStatus))//'.')
+!                            ErrorsFound = .true.
+!                            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                            CALL StopExternalInterfaceIfError
+!                        END IF
+!                    END DO
+!                END DO
+!                ! set the flag to reinitialize states to be true
+!                FlagReIni = .TRUE.
+!                CALL GetSetVariablesAndDoStepFMUImport
+!                FlagReIni = .FALSE.
+!                ! advance one time step ahead for the next calculation
+!                tComm = tComm + hStep
+!            END IF
+!        END IF
+!    END IF
+!    ! BeginSimulation
+!    IF (.NOT.(WarmupFlag) .AND. (KindOfSim .EQ. ksRunPeriodWeather)) THEN
+!        IF (FirstCallTStep) THEN
+!            ! reset the UpdateDataDuringWarmupExternalInterface to be false.
+!            UpdateDataDuringWarmupExternalInterface = .FALSE.
+!            ! The time is computed in seconds for FMU
+!            tStart = GetCurSimStartTimeSeconds()
+!            tStop = tStart + (TotalOverallSimDays - TotDesDays ) * 24.0d0 * 3600.0d0
+!            tComm = tStart
 
-            ! Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
-            DO i = 1, NumFMUObjects
-                DO j = 1, FMU(i)%NumInstances
-                    FMU(i)%Instance(j)%fmiStatus = fmiSetReal(FMU(i)%Instance(j)%fmiComponent, &
-                    FMUTemp(i)%Instance(j)%fmuInputVariable%ValueReference, &
-                    FMUTemp(i)%Instance(j)%eplusOutputVariable%RTSValue, &
-                    FMUTemp(i)%Instance(j)%NumInputVariablesInIDF, &
-                    FMU(i)%Instance(j)%Index)
+!            ! Terminate all FMUs
+!            CALL TerminateResetFreeFMUImport()
 
-                    IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
-                        CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: ')
-                        CALL ShowContinueError('Error when trying to set inputs in instance ')
-                        CALL ShowContinueError ('"'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
-                        CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
-                        ErrorsFound = .true.
-                        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                        CALL StopExternalInterfaceIfError
-                    END IF
-                    !   END IF
-                    ! END DO
-                END DO
-            END DO
-            ! set the flag to reinitialize states to be true
-            FlagReIni = .TRUE.
-            CALL GetSetVariablesAndDoStepFMUImport ()
-            FlagReIni = .FALSE.
-            ! advance one time step ahead for the next calculation
-            tComm = tComm + hStep
-            FirstCallTStep = .FALSE.
-        ELSE
-            IF (tComm .NE. tStop) THEN
-                CALL GetSetVariablesAndDoStepFMUImport ()
-                tComm = tComm + hStep
-            ELSE
-                ! Terminate reset and free Slaves
-                CALL TerminateResetFreeFMUImport ()
-                DO i = 1, NumFMUObjects
-                    DO j = 1, FMU(i)%NumInstances
-                        ! Deallocate used objects
-                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuInputVariable)
-                        DEALLOCATE (FMUTemp(i)%Instance(j)%eplusOutputVariable)
-                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule)
-                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuOutputVariableVariable)
-                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuOutputVariableActuator)
-                    END DO
-                END DO
+!            ! Reinstantiate and reinitialize the FMUs
+!            CALL InstantiateInitializeFMUImport()
 
-                DO i = 1, NumFMUObjects
-                    ! Deallocate used objects
-                    DEALLOCATE (FMUTemp(i)%Instance)
-                END DO
+!            ! Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
+!            DO i = 1, NumFMUObjects
+!                DO j = 1, FMU(i)%NumInstances
+!                    FMU(i)%Instance(j)%fmiStatus = fmiSetReal(FMU(i)%Instance(j)%fmiComponent, &
+!                    FMUTemp(i)%Instance(j)%fmuInputVariable%ValueReference, &
+!                    FMUTemp(i)%Instance(j)%eplusOutputVariable%RTSValue, &
+!                    FMUTemp(i)%Instance(j)%NumInputVariablesInIDF, &
+!                    FMU(i)%Instance(j)%Index)
 
-                DEALLOCATE (FMUTemp)
+!                    IF ( .NOT. (FMU(i)%Instance(j)%fmiStatus.EQ. fmiOK)) THEN
+!                        CALL ShowSevereError('ExternalInterface/CalcExternalInterfaceFMUImport: ')
+!                        CALL ShowContinueError('Error when trying to set inputs in instance ')
+!                        CALL ShowContinueError ('"'//TRIM(FMU(i)%Instance(j)%Name)//'" of FMU "'//TRIM(FMU(i)%Name)//'".')
+!                        CALL ShowContinueError ('Error Code = "'//TrimSigDigits(FMU(i)%Instance(j)%fmiStatus)//'".')
+!                        ErrorsFound = .true.
+!                        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                        CALL StopExternalInterfaceIfError
+!                    END IF
+!                    !   END IF
+!                    ! END DO
+!                END DO
+!            END DO
+!            ! set the flag to reinitialize states to be true
+!            FlagReIni = .TRUE.
+!            CALL GetSetVariablesAndDoStepFMUImport ()
+!            FlagReIni = .FALSE.
+!            ! advance one time step ahead for the next calculation
+!            tComm = tComm + hStep
+!            FirstCallTStep = .FALSE.
+!        ELSE
+!            IF (tComm .NE. tStop) THEN
+!                CALL GetSetVariablesAndDoStepFMUImport ()
+!                tComm = tComm + hStep
+!            ELSE
+!                ! Terminate reset and free Slaves
+!                CALL TerminateResetFreeFMUImport ()
+!                DO i = 1, NumFMUObjects
+!                    DO j = 1, FMU(i)%NumInstances
+!                        ! Deallocate used objects
+!                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuInputVariable)
+!                        DEALLOCATE (FMUTemp(i)%Instance(j)%eplusOutputVariable)
+!                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuOutputVariableSchedule)
+!                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuOutputVariableVariable)
+!                        DEALLOCATE (FMUTemp(i)%Instance(j)%fmuOutputVariableActuator)
+!                    END DO
+!                END DO
 
-                DO i = 1, NumFMUObjects
-                    DO j = 1, FMU(i)%NumInstances
-                        DEALLOCATE (FMU(i)%Instance(j)%eplusInputVariableSchedule)
-                        DEALLOCATE (FMU(i)%Instance(j)%fmuOutputVariableSchedule)
-                        DEALLOCATE (FMU(i)%Instance(j)%eplusInputVariableVariable)
-                        DEALLOCATE (FMU(i)%Instance(j)%fmuOutputVariableVariable)
-                        DEALLOCATE (FMU(i)%Instance(j)%eplusInputVariableActuator)
-                        DEALLOCATE (FMU(i)%Instance(j)%fmuOutputVariableActuator)
-                        DEALLOCATE (FMU(i)%Instance(j)%fmuInputVariable)
-                        DEALLOCATE (FMU(i)%Instance(j)%checkfmuInputVariable)
+!                DO i = 1, NumFMUObjects
+!                    ! Deallocate used objects
+!                    DEALLOCATE (FMUTemp(i)%Instance)
+!                END DO
 
-                    END DO
-                END DO
+!                DEALLOCATE (FMUTemp)
 
-                DO i = 1, NumFMUObjects
-                    DEALLOCATE (FMU(i)%Instance)
-                END DO
-                DEALLOCATE (FMU)
-            END IF
-        END IF
-    ENDIF
-    RETURN
-    END SUBROUTINE CalcExternalInterfaceFMUImport
+!                DO i = 1, NumFMUObjects
+!                    DO j = 1, FMU(i)%NumInstances
+!                        DEALLOCATE (FMU(i)%Instance(j)%eplusInputVariableSchedule)
+!                        DEALLOCATE (FMU(i)%Instance(j)%fmuOutputVariableSchedule)
+!                        DEALLOCATE (FMU(i)%Instance(j)%eplusInputVariableVariable)
+!                        DEALLOCATE (FMU(i)%Instance(j)%fmuOutputVariableVariable)
+!                        DEALLOCATE (FMU(i)%Instance(j)%eplusInputVariableActuator)
+!                        DEALLOCATE (FMU(i)%Instance(j)%fmuOutputVariableActuator)
+!                        DEALLOCATE (FMU(i)%Instance(j)%fmuInputVariable)
+!                        DEALLOCATE (FMU(i)%Instance(j)%checkfmuInputVariable)
+
+!                    END DO
+!                END DO
+
+!                DO i = 1, NumFMUObjects
+!                    DEALLOCATE (FMU(i)%Instance)
+!                END DO
+!                DEALLOCATE (FMU)
+!            END IF
+!        END IF
+!    ENDIF
+!    RETURN
+!    END SUBROUTINE CalcExternalInterfaceFMUImport
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !    SUBROUTINE ValidateRunControl
@@ -2706,243 +2706,243 @@
 !    END SUBROUTINE ValidateRunControl
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    SUBROUTINE CalcExternalInterface()
+!    SUBROUTINE CalcExternalInterface()
 
-    ! SUBROUTINE INFORMATION:
-    !       AUTHOR         Michael Wetter
-    !       DATE WRITTEN   2Dec2007
-    !       MODIFIED       na
-    !       RE-ENGINEERED  na
+!    ! SUBROUTINE INFORMATION:
+!    !       AUTHOR         Michael Wetter
+!    !       DATE WRITTEN   2Dec2007
+!    !       MODIFIED       na
+!    !       RE-ENGINEERED  na
 
-    ! PURPOSE OF THIS SUBROUTINE:
-    ! na
+!    ! PURPOSE OF THIS SUBROUTINE:
+!    ! na
 
-    ! METHODOLOGY EMPLOYED:
-    ! na
+!    ! METHODOLOGY EMPLOYED:
+!    ! na
 
-    ! REFERENCES:
-    ! na
+!    ! REFERENCES:
+!    ! na
 
-    ! USE STATEMENTS:
-    USE DataGlobals, ONLY: SimTimeSteps, MinutesPerTimeStep, emsCallFromExternalInterface
-    USE DataInterfaces, ONLY: GetInternalVariableValueExternalInterface, GetInternalVariableValue
-    USE ScheduleManager, ONLY: ExternalInterfaceSetSchedule
-    USE RuntimeLanguageProcessor, ONLY: ExternalInterfaceSetErlVariable
-    USE EMSManager, ONLY: ManageEMS
+!    ! USE STATEMENTS:
+!    USE DataGlobals, ONLY: SimTimeSteps, MinutesPerTimeStep, emsCallFromExternalInterface
+!    USE DataInterfaces, ONLY: GetInternalVariableValueExternalInterface, GetInternalVariableValue
+!    USE ScheduleManager, ONLY: ExternalInterfaceSetSchedule
+!    USE RuntimeLanguageProcessor, ONLY: ExternalInterfaceSetErlVariable
+!    USE EMSManager, ONLY: ManageEMS
 
-    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
+!    IMPLICIT NONE ! Enforce explicit typing of all variables in this routine
 
-    ! SUBROUTINE ARGUMENT DEFINITIONS:
-    ! na
+!    ! SUBROUTINE ARGUMENT DEFINITIONS:
+!    ! na
 
-    ! SUBROUTINE PARAMETER DEFINITIONS:
-    ! These parameters are also declared in an interface below.
-    ! Change all together.
-    INTEGER, PARAMETER :: nDblMax = 1024   ! Maximum number of doubles
-    INTEGER, PARAMETER :: nIntMax = 0      ! Maximum number of integers
-    INTEGER, PARAMETER :: nBooMax = 0      ! Maximum number of booleans
-
-
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    INTERFACE
-    INTEGER(C_INT) FUNCTION exchangeDoublesWithSocket(socketFD, &
-    flaWri, flaRea, &
-    nDblWri, nDblRea, &
-    simTimWri, dblValWri, &
-    simTimRea, dblValRea) BIND (C, NAME="exchangedoubleswithsocket")
-    ! Exchanges data with the socket
-    USE ISO_C_BINDING, ONLY: C_INT
-    USE DataPrecisionGlobals
-
-    ! These parameters are also declared in an interface below.
-    ! Change all together.
-    INTEGER(C_INT), PARAMETER :: nDblMax = 1024       ! Maximum number of doubles
-
-    INTEGER(C_INT) socketFD                           ! socket file descriptor
-    INTEGER(C_INT) flaWri                             ! flag to write to the socket
-    INTEGER(C_INT) flaRea                             ! flag read from the socket
-    INTEGER(C_INT) nDblWri                            ! number of doubles to write to socket
-    INTEGER(C_INT) nDblRea                            ! number of doubles to read from socket
-    REAL(r64) simTimWri                               ! simulation time to write to socket
-    REAL(r64) simTimRea                               ! simulation time to read from socket
-    REAL(r64), DIMENSION(nDblMax) :: dblValWri        ! dbl values to be written to the socket
-    REAL(r64), DIMENSION(nDblMax) :: dblValRea        ! dbl values to be read from the socket
-    END FUNCTION exchangeDoublesWithSocket
-    END INTERFACE
-
-    ! INTERFACE BLOCK SPECIFICATIONS:
-    INTERFACE
-    INTEGER(C_INT) FUNCTION exchangeDoublesWithSocketFMU(socketFD, &
-    flaWri, flaRea, &
-    nDblWri, nDblRea, &
-    simTimWri, dblValWri, &
-    simTimRea, dblValRea, epexport) BIND (C, NAME="exchangedoubleswithsocketFMU")
-    ! Exchanges data with the socket
-    USE ISO_C_BINDING, ONLY: C_INT
-    USE DataPrecisionGlobals
-
-    ! These parameters are also declared in an interface below.
-    ! Change all together.
-    INTEGER(C_INT), PARAMETER :: nDblMax = 1024       ! Maximum number of doubles
-
-    INTEGER(C_INT) socketFD                           ! socket file descriptor
-    INTEGER(C_INT) flaWri                             ! flag to write to the socket
-    INTEGER(C_INT) flaRea                             ! flag read from the socket
-    INTEGER(C_INT) nDblWri                            ! number of doubles to write to socket
-    INTEGER(C_INT) nDblRea                            ! number of doubles to read from socket
-    REAL(r64) simTimWri                               ! simulation time to write to socket
-    REAL(r64) simTimRea                               ! simulation time to read from socket
-    REAL(r64), DIMENSION(nDblMax) :: dblValWri        ! dbl values to be written to the socket
-    REAL(r64), DIMENSION(nDblMax) :: dblValRea        ! dbl values to be read from the socket
-    INTEGER(C_INT) epexport                           ! FMU Export flag
-    END FUNCTION exchangeDoublesWithSocketFMU
-    END INTERFACE
+!    ! SUBROUTINE PARAMETER DEFINITIONS:
+!    ! These parameters are also declared in an interface below.
+!    ! Change all together.
+!    INTEGER, PARAMETER :: nDblMax = 1024   ! Maximum number of doubles
+!    INTEGER, PARAMETER :: nIntMax = 0      ! Maximum number of integers
+!    INTEGER, PARAMETER :: nBooMax = 0      ! Maximum number of booleans
 
 
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION exchangeDoublesWithSocket(socketFD, &
+!    flaWri, flaRea, &
+!    nDblWri, nDblRea, &
+!    simTimWri, dblValWri, &
+!    simTimRea, dblValRea) BIND (C, NAME="exchangedoubleswithsocket")
+!    ! Exchanges data with the socket
+!    USE ISO_C_BINDING, ONLY: C_INT
+!    USE DataPrecisionGlobals
 
-    ! DERIVED TYPE DEFINITIONS:
-    ! na
+!    ! These parameters are also declared in an interface below.
+!    ! Change all together.
+!    INTEGER(C_INT), PARAMETER :: nDblMax = 1024       ! Maximum number of doubles
 
-    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    INTEGER      :: i, j    ! Loop counter
-    INTEGER      :: retVal  ! Return value from socket
+!    INTEGER(C_INT) socketFD                           ! socket file descriptor
+!    INTEGER(C_INT) flaWri                             ! flag to write to the socket
+!    INTEGER(C_INT) flaRea                             ! flag read from the socket
+!    INTEGER(C_INT) nDblWri                            ! number of doubles to write to socket
+!    INTEGER(C_INT) nDblRea                            ! number of doubles to read from socket
+!    REAL(r64) simTimWri                               ! simulation time to write to socket
+!    REAL(r64) simTimRea                               ! simulation time to read from socket
+!    REAL(r64), DIMENSION(nDblMax) :: dblValWri        ! dbl values to be written to the socket
+!    REAL(r64), DIMENSION(nDblMax) :: dblValRea        ! dbl values to be read from the socket
+!    END FUNCTION exchangeDoublesWithSocket
+!    END INTERFACE
 
-    INTEGER flaWri   ! flag to write to the socket
-    INTEGER flaRea   ! flag read from the socket
-    INTEGER nDblWri ! number of doubles to write to socket
-    INTEGER nDblRea ! number of doubles to read from socket
-    REAL(r64) :: curSimTim ! current simulation time
-    REAL(r64) :: preSimTim ! previous time step's simulation time
+!    ! INTERFACE BLOCK SPECIFICATIONS:
+!    INTERFACE
+!    INTEGER(C_INT) FUNCTION exchangeDoublesWithSocketFMU(socketFD, &
+!    flaWri, flaRea, &
+!    nDblWri, nDblRea, &
+!    simTimWri, dblValWri, &
+!    simTimRea, dblValRea, epexport) BIND (C, NAME="exchangedoubleswithsocketFMU")
+!    ! Exchanges data with the socket
+!    USE ISO_C_BINDING, ONLY: C_INT
+!    USE DataPrecisionGlobals
 
-    REAL(r64), DIMENSION(nDblMax) :: dblValWri
-    REAL(r64), DIMENSION(nDblMax) :: dblValRea
-    character*5 retValCha
-    LOGICAL                              :: continueSimulation ! Flag, true if simulation should continue
-    LOGICAL, SAVE                        :: firstCall = .true.
-    LOGICAL, SAVE                        :: showContinuationWithoutUpdate = .true.
+!    ! These parameters are also declared in an interface below.
+!    ! Change all together.
+!    INTEGER(C_INT), PARAMETER :: nDblMax = 1024       ! Maximum number of doubles
 
-    IF (firstCall) THEN
-        CALL DisplayString('ExternalInterface starts first data exchange.')
-        simulationStatus = 2
-        !firstCall = .false. ! bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
-        preSimTim = 0 ! In the first call, E+ did not reset SimTimeSteps to zero
-    ELSE
-        preSimTim = SimTimeSteps * MinutesPerTimeStep * 60.0d0
-    ENDIF
-
-    ! Socket asked to terminate simulation, but simulation continues
-    IF (noMoreValues .AND. showContinuationWithoutUpdate) THEN
-        IF (haveExternalInterfaceBCVTB) THEN
-            CALL ShowWarningError('ExternalInterface: Continue simulation without updated values from server at t =' &
-            //TrimSigDigits(preSimTim/3600, 2) // ' hours')
-        END IF
-        showContinuationWithoutUpdate = .false.
-    ENDIF
+!    INTEGER(C_INT) socketFD                           ! socket file descriptor
+!    INTEGER(C_INT) flaWri                             ! flag to write to the socket
+!    INTEGER(C_INT) flaRea                             ! flag read from the socket
+!    INTEGER(C_INT) nDblWri                            ! number of doubles to write to socket
+!    INTEGER(C_INT) nDblRea                            ! number of doubles to read from socket
+!    REAL(r64) simTimWri                               ! simulation time to write to socket
+!    REAL(r64) simTimRea                               ! simulation time to read from socket
+!    REAL(r64), DIMENSION(nDblMax) :: dblValWri        ! dbl values to be written to the socket
+!    REAL(r64), DIMENSION(nDblMax) :: dblValRea        ! dbl values to be read from the socket
+!    INTEGER(C_INT) epexport                           ! FMU Export flag
+!    END FUNCTION exchangeDoublesWithSocketFMU
+!    END INTERFACE
 
 
-    ! Usual branch, control is configured and simulation should continue
-    IF (ConfiguredControlPoints .AND. (.NOT.noMoreValues)) THEN
-        ! Data to be exchanged
-        nDblWri = SIZE(varTypes)
-        nDblRea = 0
-        flaWri  = 0
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Get EnergyPlus variables
-        IF (firstcall) then ! bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
-            DO i = 1, nDblWri
-                dblValWri(i) = GetInternalVariableValue(varTypes(i), keyVarIndexes(i))
-            ENDDO
-        ELSE
-            DO i = 1, nDblWri
-                dblValWri(i) = GetInternalVariableValueExternalInterface(varTypes(i), keyVarIndexes(i))
-            ENDDO
-        END IF
 
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Exchange data with socket
-        retVal = 0
-        flaRea = 0
-        IF (haveExternalInterfaceBCVTB) THEN
-            retVal = exchangeDoublesWithSocket(socketFD, &
-            flaWri, flaRea, &
-            nDblWri, nDblRea, &
-            preSimTim, dblValWri, &
-            curSimTim, dblValRea)
-        ELSEIF (haveExternalInterfaceFMUExport) THEN
-            retVal = exchangeDoublesWithSocketFMU(socketFD, &
-            flaWri, flaRea, &
-            nDblWri, nDblRea, &
-            preSimTim, dblValWri, &
-            curSimTim, dblValRea, &
-            FMUExportActivate)
-        ENDIF
-        continueSimulation = .true.
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Check for errors, in which case we terminate the simulation loop
-        ! Added a check since the FMUExport is terminated with the flaRea set to 1.
-        IF (haveExternalInterfaceBCVTB .OR. (haveExternalInterfaceFMUExport .AND. (flaRea .EQ. 0))) THEN
-            IF (retVal .NE. 0) THEN
-                continueSimulation = .false.
-                write (retValCha,1000) retVal
-                CALL ShowSevereError('ExternalInterface: Socket communication received error value "' &
-                //TRIM(retValCha)// '" at time = ' &
-                //TRIM(TrimSigDigits(preSimTim/3600,2 ))// ' hours.')
-                write (retValCha,1000) flaRea
-                CALL ShowContinueError('ExternalInterface: Flag from server "' &
-                //TRIM(retValCha)// '".')
-                ErrorsFound = .true.
-                CALL StopExternalInterfaceIfError
-            END IF
-        END IF
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Check communication flag
-        IF (flaRea .NE. 0) THEN
-            ! No more values will be received in future steps
-            ! Added a check since the FMUExport  is terminated with the flaRea set to 1.
-            noMoreValues = .true.
-            write (retValCha,1000) flaRea
-            IF (haveExternalInterfaceBCVTB) THEN
-                CALL ShowSevereError('ExternalInterface: Received end of simulation flag at time = ' &
-                //TRIM(TrimSigDigits(preSimTim/3600,2 ))// ' hours.')
-                CALL StopExternalInterfaceIfError
-            END IF
-        END IF
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! Make sure we get the right number of double values, unless retVal != 0
-        IF ( (flaRea .EQ. 0 ) .AND. (.NOT. ErrorsFound) .AND. &
-        continueSimulation .AND. (nDblRea .NE. SIZE(varInd) ) ) THEN
-            CALL ShowSevereError('ExternalInterface: Received "' &
-            //TRIM(TrimSigDigits(nDblRea))// '" double values, expected "' &
-            //TRIM(TrimSigDigits(SIZE(varInd)))// '".')
-            ErrorsFound = .true.
-            CALL StopExternalInterfaceIfError
-        END IF
+!    ! DERIVED TYPE DEFINITIONS:
+!    ! na
 
-1000    format(I2)
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        ! No errors found. Assign exchanged variables
-        IF ( (flaRea .EQ. 0 ) .AND. continueSimulation ) THEN
-            DO i = 1, SIZE(varInd)
-                IF ( (inpVarTypes(i) .EQ. indexSchedule) ) THEN
-                    CALL ExternalInterfaceSetSchedule(varInd(i), dblValRea(i))
-                ELSE IF ( (inpVarTypes(i) .EQ. indexVariable) .OR. (inpVarTypes(i) .EQ. indexActuator) ) THEN
-                    CALL ExternalInterfaceSetErlVariable(varInd(i), dblValRea(i))
-                ELSE
-                    CALL ShowContinueError('ExternalInterface: Error in finding the type of the input variable for EnergyPlus')
-                    CALL ShowContinueError('variable index: '//TrimSigDigits(i, 2)//'. Variable will not be updated.')
-                ENDIF
-            ENDDO
-        ENDIF
-    ENDIF
-    ! If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
-    IF (useEMS) THEN
-        CALL ManageEMS(emsCallFromExternalInterface)
-    END IF
+!    ! SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+!    INTEGER      :: i, j    ! Loop counter
+!    INTEGER      :: retVal  ! Return value from socket
 
-    firstCall = .false. ! bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
-    RETURN
+!    INTEGER flaWri   ! flag to write to the socket
+!    INTEGER flaRea   ! flag read from the socket
+!    INTEGER nDblWri ! number of doubles to write to socket
+!    INTEGER nDblRea ! number of doubles to read from socket
+!    REAL(r64) :: curSimTim ! current simulation time
+!    REAL(r64) :: preSimTim ! previous time step's simulation time
 
-    END SUBROUTINE CalcExternalInterface
+!    REAL(r64), DIMENSION(nDblMax) :: dblValWri
+!    REAL(r64), DIMENSION(nDblMax) :: dblValRea
+!    character*5 retValCha
+!    LOGICAL                              :: continueSimulation ! Flag, true if simulation should continue
+!    LOGICAL, SAVE                        :: firstCall = .true.
+!    LOGICAL, SAVE                        :: showContinuationWithoutUpdate = .true.
+
+!    IF (firstCall) THEN
+!        CALL DisplayString('ExternalInterface starts first data exchange.')
+!        simulationStatus = 2
+!        !firstCall = .false. ! bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
+!        preSimTim = 0 ! In the first call, E+ did not reset SimTimeSteps to zero
+!    ELSE
+!        preSimTim = SimTimeSteps * MinutesPerTimeStep * 60.0d0
+!    ENDIF
+
+!    ! Socket asked to terminate simulation, but simulation continues
+!    IF (noMoreValues .AND. showContinuationWithoutUpdate) THEN
+!        IF (haveExternalInterfaceBCVTB) THEN
+!            CALL ShowWarningError('ExternalInterface: Continue simulation without updated values from server at t =' &
+!            //TrimSigDigits(preSimTim/3600, 2) // ' hours')
+!        END IF
+!        showContinuationWithoutUpdate = .false.
+!    ENDIF
+
+
+!    ! Usual branch, control is configured and simulation should continue
+!    IF (ConfiguredControlPoints .AND. (.NOT.noMoreValues)) THEN
+!        ! Data to be exchanged
+!        nDblWri = SIZE(varTypes)
+!        nDblRea = 0
+!        flaWri  = 0
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Get EnergyPlus variables
+!        IF (firstcall) then ! bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
+!            DO i = 1, nDblWri
+!                dblValWri(i) = GetInternalVariableValue(varTypes(i), keyVarIndexes(i))
+!            ENDDO
+!        ELSE
+!            DO i = 1, nDblWri
+!                dblValWri(i) = GetInternalVariableValueExternalInterface(varTypes(i), keyVarIndexes(i))
+!            ENDDO
+!        END IF
+
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Exchange data with socket
+!        retVal = 0
+!        flaRea = 0
+!        IF (haveExternalInterfaceBCVTB) THEN
+!            retVal = exchangeDoublesWithSocket(socketFD, &
+!            flaWri, flaRea, &
+!            nDblWri, nDblRea, &
+!            preSimTim, dblValWri, &
+!            curSimTim, dblValRea)
+!        ELSEIF (haveExternalInterfaceFMUExport) THEN
+!            retVal = exchangeDoublesWithSocketFMU(socketFD, &
+!            flaWri, flaRea, &
+!            nDblWri, nDblRea, &
+!            preSimTim, dblValWri, &
+!            curSimTim, dblValRea, &
+!            FMUExportActivate)
+!        ENDIF
+!        continueSimulation = .true.
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Check for errors, in which case we terminate the simulation loop
+!        ! Added a check since the FMUExport is terminated with the flaRea set to 1.
+!        IF (haveExternalInterfaceBCVTB .OR. (haveExternalInterfaceFMUExport .AND. (flaRea .EQ. 0))) THEN
+!            IF (retVal .NE. 0) THEN
+!                continueSimulation = .false.
+!                write (retValCha,1000) retVal
+!                CALL ShowSevereError('ExternalInterface: Socket communication received error value "' &
+!                //TRIM(retValCha)// '" at time = ' &
+!                //TRIM(TrimSigDigits(preSimTim/3600,2 ))// ' hours.')
+!                write (retValCha,1000) flaRea
+!                CALL ShowContinueError('ExternalInterface: Flag from server "' &
+!                //TRIM(retValCha)// '".')
+!                ErrorsFound = .true.
+!                CALL StopExternalInterfaceIfError
+!            END IF
+!        END IF
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Check communication flag
+!        IF (flaRea .NE. 0) THEN
+!            ! No more values will be received in future steps
+!            ! Added a check since the FMUExport  is terminated with the flaRea set to 1.
+!            noMoreValues = .true.
+!            write (retValCha,1000) flaRea
+!            IF (haveExternalInterfaceBCVTB) THEN
+!                CALL ShowSevereError('ExternalInterface: Received end of simulation flag at time = ' &
+!                //TRIM(TrimSigDigits(preSimTim/3600,2 ))// ' hours.')
+!                CALL StopExternalInterfaceIfError
+!            END IF
+!        END IF
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! Make sure we get the right number of double values, unless retVal != 0
+!        IF ( (flaRea .EQ. 0 ) .AND. (.NOT. ErrorsFound) .AND. &
+!        continueSimulation .AND. (nDblRea .NE. SIZE(varInd) ) ) THEN
+!            CALL ShowSevereError('ExternalInterface: Received "' &
+!            //TRIM(TrimSigDigits(nDblRea))// '" double values, expected "' &
+!            //TRIM(TrimSigDigits(SIZE(varInd)))// '".')
+!            ErrorsFound = .true.
+!            CALL StopExternalInterfaceIfError
+!        END IF
+
+!1000    format(I2)
+!        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!        ! No errors found. Assign exchanged variables
+!        IF ( (flaRea .EQ. 0 ) .AND. continueSimulation ) THEN
+!            DO i = 1, SIZE(varInd)
+!                IF ( (inpVarTypes(i) .EQ. indexSchedule) ) THEN
+!                    CALL ExternalInterfaceSetSchedule(varInd(i), dblValRea(i))
+!                ELSE IF ( (inpVarTypes(i) .EQ. indexVariable) .OR. (inpVarTypes(i) .EQ. indexActuator) ) THEN
+!                    CALL ExternalInterfaceSetErlVariable(varInd(i), dblValRea(i))
+!                ELSE
+!                    CALL ShowContinueError('ExternalInterface: Error in finding the type of the input variable for EnergyPlus')
+!                    CALL ShowContinueError('variable index: '//TrimSigDigits(i, 2)//'. Variable will not be updated.')
+!                ENDIF
+!            ENDDO
+!        ENDIF
+!    ENDIF
+!    ! If we have Erl variables, we need to call ManageEMS so that they get updated in the Erl data structure
+!    IF (useEMS) THEN
+!        CALL ManageEMS(emsCallFromExternalInterface)
+!    END IF
+
+!    firstCall = .false. ! bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
+!    RETURN
+
+!    END SUBROUTINE CalcExternalInterface
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !    SUBROUTINE GetReportVariableKey(varKeys, numberOfKeys, varNames, keyVarIndexes, varTypes)

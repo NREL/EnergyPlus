@@ -26,10 +26,6 @@ namespace EnergyPlus {
 
 namespace ExternalInterface {
 
-	// Data
-	// DERIVED TYPE DEFINITIONS:
-	// na
-
 	// MODULE VARIABLE DECLARATIONS:
 	extern Real64 tComm;
 	extern Real64 tStop;
@@ -290,35 +286,35 @@ namespace ExternalInterface {
 
 	extern FArray1D< FMUType > FMU; // Variable Types structure
 	extern FArray1D< FMUType > FMUTemp; // Variable Types structure
-    extern FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
-    extern int NumExternalInterfaces; //Number of ExternalInterface objects
-    extern int NumExternalInterfacesBCVTB; //Number of BCVTB ExternalInterface objects
-    extern int NumExternalInterfacesFMUImport; //Number of FMU ExternalInterface objects
-    extern int NumExternalInterfacesFMUExport; //Number of FMU ExternalInterface objects
-    extern int NumFMUObjects; //Number of FMU objects
-    extern int FMUExportActivate; //FMU Export flag
-    extern bool haveExternalInterfaceBCVTB; //Flag for BCVTB interface
-    extern bool haveExternalInterfaceFMUImport; //Flag for FMU-Import interface
-    extern bool haveExternalInterfaceFMUExport; //Flag for FMU-Export interface
-    extern int simulationStatus; // Status flag. Used to report during
-    // which phase an error occured.
-    // (1=initialization, 2=time stepping)
+	extern FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+	extern int NumExternalInterfaces; //Number of ExternalInterface objects
+	extern int NumExternalInterfacesBCVTB; //Number of BCVTB ExternalInterface objects
+	extern int NumExternalInterfacesFMUImport; //Number of FMU ExternalInterface objects
+	extern int NumExternalInterfacesFMUExport; //Number of FMU ExternalInterface objects
+	extern int NumFMUObjects; //Number of FMU objects
+	extern int FMUExportActivate; //FMU Export flag
+	extern bool haveExternalInterfaceBCVTB; //Flag for BCVTB interface
+	extern bool haveExternalInterfaceFMUImport; //Flag for FMU-Import interface
+	extern bool haveExternalInterfaceFMUExport; //Flag for FMU-Export interface
+	extern int simulationStatus; // Status flag. Used to report during
+	// which phase an error occured.
+	// (1=initialization, 2=time stepping)
 
 	extern FArray1D< int > keyVarIndexes; // Array index for specific key name
-    extern FArray1D< int > varTypes; // Types of variables in keyVarIndexes
-    extern FArray1D< int > varInd; // Index of ErlVariables for ExternalInterface
-    extern int socketFD; // socket file descriptor
-    extern bool ErrorsFound; // Set to true if errors are found
-    extern bool noMoreValues; //Flag, true if no more values
-    // will be sent by the server
+	extern FArray1D< int > varTypes; // Types of variables in keyVarIndexes
+	extern FArray1D< int > varInd; // Index of ErlVariables for ExternalInterface
+	extern int socketFD; // socket file descriptor
+	extern bool ErrorsFound; // Set to true if errors are found
+	extern bool noMoreValues; //Flag, true if no more values
+	// will be sent by the server
 
-    extern FArray1D< std::string > varKeys; // Keys of report variables used for data exchange
-    extern FArray1D< std::string > varNames; // Names of report variables used for data exchange
-    extern FArray1D< int > inpVarTypes; // Names of report variables used for data exchange
-    extern FArray1D< std::string > inpVarNames; // Names of report variables used for data exchange
+	extern FArray1D< std::string > varKeys; // Keys of report variables used for data exchange
+	extern FArray1D< std::string > varNames; // Names of report variables used for data exchange
+	extern FArray1D< int > inpVarTypes; // Names of report variables used for data exchange
+	extern FArray1D< std::string > inpVarNames; // Names of report variables used for data exchange
 
-    extern bool configuredControlPoints; // True if control points have been configured
-    extern bool useEMS; // Will be set to true if ExternalInterface writes to EMS variables or actuators
+	extern bool configuredControlPoints; // True if control points have been configured
+	extern bool useEMS; // Will be set to true if ExternalInterface writes to EMS variables or actuators
 
 	// Functions
 
@@ -330,21 +326,21 @@ namespace ExternalInterface {
 
 	void
 	InitExternalInterface();
-    
-    void
+	
+	void
 	GetExternalInterfaceInput();
-    
-    void
+	
+	void
 	CalcExternalInterface();
-    
-    void
+	
+	void
 	ParseString(
 		std::string const str,
 		FArray1D< std::string > & ele,
 		int const nEle
 	);
-    
-    void
+	
+	void
 	GetReportVariableKey(
 		FArray1D< std::string > varKeys,
 		int const numberOfKeys,
@@ -352,29 +348,29 @@ namespace ExternalInterface {
 		FArray1D< int > & keyVarIndexes,
 		FArray1D< int > & varTypes
 	);
-    
-    void
+	
+	void
 	StopExternalInterfaceIfError();
-    
-    void
+	
+	void
 	ValidateRunControl();
-    
-    void
+	
+	void
 	WarnIfExternalInterfaceObjectsAreUsed( std::string ObjectWord );
-    
-    void
+	
+	void
 	CalcExternalInterfaceFMUImport();
-    
-    void
+	
+	void
 	InitExternalInterfaceFMUImport();
-    
-    void
+	
+	void
 	InstantiateInitializeFMUImport();
-    
-    void
+	
+	void
 	TerminateResetFreeFMUImport();
-    
-    void
+	
+	void
 	GetSetVariablesAndDoStepFMUImport();
 
 	void

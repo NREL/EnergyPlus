@@ -39,32 +39,19 @@ namespace ExternalInterface {
 
 	// MODULE INFORMATION:
 	//       AUTHOR         Michael Wetter
-	//       DATE WRITTEN   5Jan2010
-	//       MODIFIED       na
+	//       DATE WRITTEN   2Dec2007
+	//       MODIFIED       Rui Zhang July 2009
+	//       MODIFIED       Thierry S. Nouidui 2011
 	//       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// Do nothing except show fatal error when an instance is made of an ExternalInterface
-	// object.
-	// This module replaces ExternalInterface.f90 when building EnergyPlus without the bcvtb LIB and DLL.
-	// This should only be done during development. The official EnergyPlus release needs to be
-	// compiled with ExternalInterface.f90, and linked to a dummy bcvtb LIB and DLL.
 
-	// METHODOLOGY EMPLOYED:
-	// na
+	// PURPOSE OF THIS MODULE:
+	// To encapsulate the data and routines required to interface
+	// the Building Controls Virtual Test Bed (BCVTB) and FunctionalMockupUnits (FMU)
 
 	// REFERENCES:
 	// http://simulationresearch.lbl.gov/bcvtb
-
-	// OTHER NOTES:
-	// na
-
-	// USE STATEMENTS:
-	// na
-
-	// Data
-	// DERIVED TYPE DEFINITIONS:
-	// na
+	// http://www.modelisar.com
 
 	// MODULE VARIABLE DECLARATIONS:
 	Real64 tComm( 0.0 ); // Communication time step
@@ -75,53 +62,53 @@ namespace ExternalInterface {
 	std::string FMURootWorkingFolder( " " ); // FMU root working folder
 	//int LEN_FMU_ROOT_DIR;
 
-    // MODULE PARAMETER DEFINITIONS:
-    int const maxVar( 1024 );             // Maximum number of variables to be exchanged
-    int const maxErrMsgLength( 10000 );   // Maximum error message length from xml schema validation
-    int const indexSchedule( 1 );  // Index for schedule in inpVarTypes
-    int const indexVariable( 2 );  // Index for variable in inpVarTypes
-    int const indexActuator( 3 );  // Index for actuator in inpVarTypes
-    int const nInKeys( 3 );  // Number of input variables available in ExternalInterface (=highest index* number)
-    int const fmiOK( 0 );          // fmiOK
-    int const fmiWarning( 1 );     // fmiWarning
-    int const fmiDiscard( 2 );     // fmiDiscard
-    int const fmiError( 3 );       // fmiError
-    int const fmiFatal( 4 );       // fmiPending
-    int const fmiPending( 5 );     // fmiPending
+	// MODULE PARAMETER DEFINITIONS:
+	int const maxVar( 1024 );             // Maximum number of variables to be exchanged
+	int const maxErrMsgLength( 10000 );   // Maximum error message length from xml schema validation
+	int const indexSchedule( 1 );  // Index for schedule in inpVarTypes
+	int const indexVariable( 2 );  // Index for variable in inpVarTypes
+	int const indexActuator( 3 );  // Index for actuator in inpVarTypes
+	int const nInKeys( 3 );  // Number of input variables available in ExternalInterface (=highest index* number)
+	int const fmiOK( 0 );          // fmiOK
+	int const fmiWarning( 1 );     // fmiWarning
+	int const fmiDiscard( 2 );     // fmiDiscard
+	int const fmiError( 3 );       // fmiError
+	int const fmiFatal( 4 );       // fmiPending
+	int const fmiPending( 5 );     // fmiPending
 	std::string const socCfgFilNam( "socket.cfg" ); // socket configuration file
-    std::string const BlankString( " " );
+	std::string const BlankString( " " );
 
 	FArray1D< FMUType > FMU; // Variable Types structure
 	FArray1D< FMUType > FMUTemp;
-    FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
-    int NumExternalInterfaces( 0 ); //Number of ExternalInterface objects
-    int NumExternalInterfacesBCVTB( 0 ); //Number of BCVTB ExternalInterface objects
-    int NumExternalInterfacesFMUImport( 0 ); //Number of FMU ExternalInterface objects
-    int NumExternalInterfacesFMUExport( 0 ); //Number of FMU ExternalInterface objects
-    int NumFMUObjects( 0 ); //Number of FMU objects
-    int FMUExportActivate( 0 ); //FMU Export flag
-    bool haveExternalInterfaceBCVTB( false ); //Flag for BCVTB interface
-    bool haveExternalInterfaceFMUImport( false ); //Flag for FMU-Import interface
-    bool haveExternalInterfaceFMUExport( false ); //Flag for FMU-Export interface
-    int simulationStatus( 1 ); // Status flag. Used to report during
-    // which phase an error occured.
-    // (1=initialization, 2=time stepping)
+	FArray1D< checkFMUInstanceNameType > checkInstanceName; // Variable Types structure for checking instance names
+	int NumExternalInterfaces( 0 ); //Number of ExternalInterface objects
+	int NumExternalInterfacesBCVTB( 0 ); //Number of BCVTB ExternalInterface objects
+	int NumExternalInterfacesFMUImport( 0 ); //Number of FMU ExternalInterface objects
+	int NumExternalInterfacesFMUExport( 0 ); //Number of FMU ExternalInterface objects
+	int NumFMUObjects( 0 ); //Number of FMU objects
+	int FMUExportActivate( 0 ); //FMU Export flag
+	bool haveExternalInterfaceBCVTB( false ); //Flag for BCVTB interface
+	bool haveExternalInterfaceFMUImport( false ); //Flag for FMU-Import interface
+	bool haveExternalInterfaceFMUExport( false ); //Flag for FMU-Export interface
+	int simulationStatus( 1 ); // Status flag. Used to report during
+	// which phase an error occured.
+	// (1=initialization, 2=time stepping)
 
 	FArray1D< int > keyVarIndexes; // Array index for specific key name
-    FArray1D< int > varTypes; // Types of variables in keyVarIndexes
-    FArray1D< int > varInd; // Index of ErlVariables for ExternalInterface
-    int socketFD( -1 ); // socket file descriptor
-    bool ErrorsFound( false ); // Set to true if errors are found
-    bool noMoreValues( false ); //Flag, true if no more values
-    // will be sent by the server
+	FArray1D< int > varTypes; // Types of variables in keyVarIndexes
+	FArray1D< int > varInd; // Index of ErlVariables for ExternalInterface
+	int socketFD( -1 ); // socket file descriptor
+	bool ErrorsFound( false ); // Set to true if errors are found
+	bool noMoreValues( false ); //Flag, true if no more values
+	// will be sent by the server
 
-    FArray1D< std::string > varKeys; // Keys of report variables used for data exchange
-    FArray1D< std::string > varNames; // Names of report variables used for data exchange
-    FArray1D< int > inpVarTypes; // Names of report variables used for data exchange
-    FArray1D< std::string > inpVarNames; // Names of report variables used for data exchange
+	FArray1D< std::string > varKeys; // Keys of report variables used for data exchange
+	FArray1D< std::string > varNames; // Names of report variables used for data exchange
+	FArray1D< int > inpVarTypes; // Names of report variables used for data exchange
+	FArray1D< std::string > inpVarNames; // Names of report variables used for data exchange
 
-    bool configuredControlPoints( false ); // True if control points have been configured
-    bool useEMS( false ); // Will be set to true if ExternalInterface writes to EMS variables or actuators
+	bool configuredControlPoints( false ); // True if control points have been configured
+	bool useEMS( false ); // Will be set to true if ExternalInterface writes to EMS variables or actuators
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE ExternalInterface:
 	
@@ -150,7 +137,7 @@ namespace ExternalInterface {
 		bool static GetInputFlag( true ); // First time, input is "gotten"
 		std::string errorMessage( BlankString ); // Error message
 		int retValErrMsg;
-    
+	
 		if ( GetInputFlag ) {
 			GetExternalInterfaceInput();
 			GetInputFlag = false;
@@ -405,8 +392,8 @@ namespace ExternalInterface {
 		StopExternalInterfaceIfError();
 		
 	}
-    
-    void
+	
+	void
 	GetExternalInterfaceInput()
 	{
 
@@ -434,8 +421,6 @@ namespace ExternalInterface {
 		using DataIPShortCuts::cNumericFieldNames;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		//FArray1D< std::string > Alphas;  // Alpha items for object
-		//FArray< Real64 > Numbers; // Numeric items for object
 		int NumAlphas; // Number of Alphas for each GetObjectItem call
 		int NumNumbers; // Number of Numbers for each GetObjectItem call
 		int IOStatus; //Used in GetObjectItem
@@ -547,8 +532,8 @@ namespace ExternalInterface {
 		StopExternalInterfaceIfError();
 		
 	}
-    
-    void
+	
+	void
 	CalcExternalInterface()
 	{
 		// SUBROUTINE INFORMATION:
@@ -690,10 +675,10 @@ namespace ExternalInterface {
 		}
 
 		firstCall = false; // bug fix causing external interface to send zero at the beginning of sim, Thierry Nouidui
-    
+	
 	}
-    
-    void
+	
+	void
 	ParseString(
 		std::string const str, // The string, with all elements separated by ';'
 		FArray1D< std::string > & ele, // The elements
@@ -725,11 +710,11 @@ namespace ExternalInterface {
 			iEnd = iSta + str.substr( iSta, lenStr ).find( ";" );
 			ele( i ) = MakeUPPERCase( str.substr( iSta, ( iEnd - 2 ) ) ); //TODO: this was TRIMmed
 		}
-    
+	
 	}
-    
-    void
-    GetReportVariableKey(
+	
+	void
+	GetReportVariableKey(
 		std::string varKey,
 		int const numberOfKeys,
 		std::string varName,
@@ -745,8 +730,8 @@ namespace ExternalInterface {
 		nameArray( 1 ) = varName;
 		GetReportVariableKey( keyArray, numberOfKeys, nameArray, keyVarIndexes, varTypes );
 	}
-    
-    void
+	
+	void
 	GetReportVariableKey(
 		FArray1D< std::string > varKeys,
 		int const numberOfKeys,
@@ -801,11 +786,11 @@ namespace ExternalInterface {
 			}
 		}
 	}
-    
-    void
+	
+	void
 	StopExternalInterfaceIfError()
 	{
-	    // SUBROUTINE INFORMATION:
+		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Michael Wetter
 		//       DATE WRITTEN   9Jan2008
 		//       MODIFIED       na
@@ -840,8 +825,8 @@ namespace ExternalInterface {
 			}
 		}
 	}
-    
-    void
+	
+	void
 	ValidateRunControl()
 	{
 		// SUBROUTINE INFORMATION:
@@ -882,8 +867,8 @@ namespace ExternalInterface {
 			}
 		}
 	}
-    
-    void
+	
+	void
 	WarnIfExternalInterfaceObjectsAreUsed( std::string ObjectWord )
 	{
 		// SUBROUTINE INFORMATION:
@@ -904,8 +889,8 @@ namespace ExternalInterface {
 			ShowContinueError( "but object \"ExternalInterface\" with appropriate key entry is not specified. Values will not be updated." );
 		}
 	}
-    
-    void
+	
+	void
 	CalcExternalInterfaceFMUImport()
 	{
 
@@ -931,11 +916,6 @@ namespace ExternalInterface {
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
 		using InputProcessor::SameString;
-		//using DataIPShortCuts::
-		//using DataIPShortCuts::
-		//using DataIPShortCuts::
-		//using DataIPShortCuts::
-		//using DataIPShortCuts::
 		using DataGlobals::WarmupFlag;
 		using DataGlobals::KindOfSim;
 		using DataGlobals::ksRunPeriodWeather;
@@ -1199,11 +1179,11 @@ namespace ExternalInterface {
 		}
 
 	}
-    
-    void
+	
+	void
 	InitExternalInterfaceFMUImport()
 	{
-    
+	
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
 		//       DATE WRITTEN   08Aug2011
@@ -1771,10 +1751,10 @@ namespace ExternalInterface {
 			FirstCallIni = false;
 		}
 	}
-    
-    Real64
-    GetCurSimStartTimeSeconds()
-    {
+	
+	Real64
+	GetCurSimStartTimeSeconds()
+	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
 		//       DATE WRITTEN   August 2011
@@ -1834,8 +1814,8 @@ namespace ExternalInterface {
 
 		return simtime;
 	}
-    
-    void
+	
+	void
 	InstantiateInitializeFMUImport()
 	{
 		// SUBROUTINE INFORMATION:
@@ -1880,10 +1860,10 @@ namespace ExternalInterface {
 			}
 		}
 	}
-    
-    void
-    InitializeFMU()
-    {
+	
+	void
+	InitializeFMU()
+	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Thierry S. Nouidui, Michael Wetter, Wangda Zuo
 		//       DATE WRITTEN   08Aug2011
@@ -1914,8 +1894,8 @@ namespace ExternalInterface {
 			}
 		}
 	}
-    
-    void
+	
+	void
 	TerminateResetFreeFMUImport()
 	{
 		// SUBROUTINE INFORMATION:
@@ -1947,8 +1927,8 @@ namespace ExternalInterface {
 			}
 		}
 	}
-    
-    void
+	
+	void
 	GetSetVariablesAndDoStepFMUImport()
 	{
 		// SUBROUTINE INFORMATION:
@@ -2117,7 +2097,7 @@ namespace ExternalInterface {
 
 	void
 	VerifyExternalInterfaceObject()
-    {
+	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Michael Wetter
 		//       DATE WRITTEN   12Dec2009
@@ -2145,8 +2125,8 @@ namespace ExternalInterface {
 		cCurrentModuleObject = "ExternalInterface";
 		GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, _, cAlphaFieldNames, cNumericFieldNames );
 		if ( ( ! SameString( cAlphaArgs( 1 ), "PtolemyServer" ) ) &&
-		     ( ! SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) &&
-		     ( ! SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) ) {
+			 ( ! SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitImport" ) ) &&
+			 ( ! SameString( cAlphaArgs( 1 ), "FunctionalMockupUnitExport" ) ) ) {
 			ShowSevereError( "VerifyExternalInterfaceObject: " + cCurrentModuleObject + ", invalid " + cAlphaFieldNames( 1 ) + "=\"" + cAlphaArgs(1) + "\"" );
 			ShowContinueError( "only \"PtolemyServer or FunctionalMockupUnitImport or FunctionalMockupUnitExport\" allowed." );
 			ErrorsFound = true;
