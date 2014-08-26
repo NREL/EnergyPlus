@@ -44,7 +44,8 @@ namespace CurveManager {
 	extern int const ExponentialDecay;
 	extern int const DoubleExponentialDecay;
 	extern int const QuadLinear;
-
+	extern int const ChillerPartLoadCustom;
+	
 	// Interpolation Types
 	extern int const LinearInterpolationOfTable;
 	extern int const LagrangeInterpolationLinearExtrapolation;
@@ -82,6 +83,7 @@ namespace CurveManager {
 	extern int const CurveType_ExponentialDecay;
 	extern int const CurveType_DoubleExponentialDecay;
 	extern int const CurveType_QuadLinear;
+	extern int const CurveType_ChillerPartLoadCustom;
 
 	extern FArray1D_string const cCurveTypes;
 
@@ -296,6 +298,8 @@ namespace CurveManager {
 		Real64 Coeff8; // cubic coeff for bicubic (2nd ind var)
 		Real64 Coeff9; // cross coeff for bicubic (1st quadratic & 2nd linear)
 		Real64 Coeff10; // cross coeff for bicubic (1st linear & 2nd quadratic)
+		Real64 Coeff11; // cross coeff  
+		Real64 Coeff12; // cross coeff  
 		Real64 Var1Max; // maximum of 1st independent variable
 		Real64 Var1Min; // minimum of 1st independent variable
 		Real64 Var2Max; // maximum of 2nd independent variable
@@ -343,6 +347,8 @@ namespace CurveManager {
 			Coeff8( 0.0 ),
 			Coeff9( 0.0 ),
 			Coeff10( 0.0 ),
+			Coeff11( 0.0 ),
+			Coeff12( 0.0 ),
 			Var1Max( 0.0 ),
 			Var1Min( 0.0 ),
 			Var2Max( 0.0 ),
@@ -390,6 +396,8 @@ namespace CurveManager {
 			Real64 const Coeff8, // cubic coeff for bicubic (2nd ind var)
 			Real64 const Coeff9, // cross coeff for bicubic (1st quadratic & 2nd linear)
 			Real64 const Coeff10, // cross coeff for bicubic (1st linear & 2nd quadratic)
+			Real64 const Coeff11, // cross coeff 
+			Real64 const Coeff12, // cross coeff 
 			Real64 const Var1Max, // maximum of 1st independent variable
 			Real64 const Var1Min, // minimum of 1st independent variable
 			Real64 const Var2Max, // maximum of 2nd independent variable
@@ -435,6 +443,8 @@ namespace CurveManager {
 			Coeff8( Coeff8 ),
 			Coeff9( Coeff9 ),
 			Coeff10( Coeff10 ),
+			Coeff11( Coeff11 ),
+			Coeff12( Coeff12 ),
 			Var1Max( Var1Max ),
 			Var1Min( Var1Min ),
 			Var2Max( Var2Max ),
