@@ -79,8 +79,8 @@ namespace IceThermalStorage {
 	int const IceStorageType_Simple( 1 );
 	int const IceStorageType_Detailed( 2 );
 
-    int const CurveType_QuadraticLinear( 1 );
-    int const CurveType_CubicLinear( 2 );
+    int const CurveQuadraticLinear( 1 );
+    int const CurveCubicLinear( 2 );
 
 	int const DetIceInsideMelt( 1 ); // Inside melt system--charge starting with bare coil
 	int const DetIceOutsideMelt( 2 ); // Outside melt system--charge from existing ice layer on coil
@@ -547,9 +547,9 @@ namespace IceThermalStorage {
 					AvgFracCharged = DetIceStor( IceNum ).IceFracRemaining + ( ChargeFrac / 2.0 );
 				}
 
-				if ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveType_QuadraticLinear ) {
+				if ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveQuadraticLinear ) {
                     Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, AvgFracCharged, LMTDstar ) );
-                } else  { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveType_CubicLinear )
+                } else  { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveCubicLinear )
                     MassFlowstar = DetIceStor( IceNum ).MassFlowRate/SIEquiv100GPMinMassFlowRate;
                     Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, LMTDstar, MassFlowstar ) );
                 }
@@ -576,9 +576,9 @@ namespace IceThermalStorage {
 							// Calculate new values for LMTDstar and Qstar based on updated outlet temperature
 							ToutOld = ToutNew;
 							LMTDstar = CalcDetIceStorLMTDstar( TempIn, ToutOld, DetIceStor( IceNum ).FreezingTemp );
-                            if ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveType_QuadraticLinear ) {
+                            if ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveQuadraticLinear ) {
                                 Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, AvgFracCharged, LMTDstar ) );
-                            } else  { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveType_CubicLinear )
+                            } else  { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveCubicLinear )
                                 MassFlowstar = DetIceStor( IceNum ).MassFlowRate/SIEquiv100GPMinMassFlowRate;
                                 Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, LMTDstar, MassFlowstar ) );
                             }
@@ -680,9 +680,9 @@ namespace IceThermalStorage {
 				if ( ( DetIceStor( IceNum ).IceFracRemaining - ChargeFrac ) < 0.0 ) ChargeFrac = DetIceStor( IceNum ).IceFracRemaining;
 				AvgFracCharged = DetIceStor( IceNum ).IceFracRemaining - ( ChargeFrac / 2.0 );
 
-				if ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveType_QuadraticLinear ) {
+				if ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveQuadraticLinear ) {
                     Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, ( 1.0 - AvgFracCharged ), LMTDstar ) );
-                } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveType_CubicLinear )
+                } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
                     Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, LMTDstar, AvgFracCharged ) );
                 }
                     
@@ -710,9 +710,9 @@ namespace IceThermalStorage {
 							ToutOld = ToutNew;
 							LMTDstar = CalcDetIceStorLMTDstar( TempIn, ToutOld, DetIceStor( IceNum ).FreezingTemp );
 
-                            if ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveType_QuadraticLinear ) {
+                            if ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveQuadraticLinear ) {
                                 Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, ( 1.0 - AvgFracCharged ), LMTDstar ) );
-                            } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveType_CubicLinear )
+                            } else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
                                 Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, LMTDstar, AvgFracCharged ) );
                             }
 
@@ -1009,13 +1009,13 @@ namespace IceThermalStorage {
 			} else {
 				DetIceStor( IceNum ).DischargeCurveType = GetCurveType( DetIceStor( IceNum ).DischargeCurveNum );
                 if ( DetIceStor( IceNum ).DischargeCurveType == "QUADRATICLINEAR") {
-                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveType_QuadraticLinear;
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveQuadraticLinear;
                 } else if ( DetIceStor( IceNum ).DischargeCurveType == "CUBICLINEAR") {
-                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveType_CubicLinear;
+                    DetIceStor(IceNum).DischargeCurveTypeNum = CurveCubicLinear;
                 }
 			}
-			if ( ( DetIceStor( IceNum ).DischargeCurveType != cAlphaArgs( 5 ) ) || ( DetIceStor( IceNum ).DischargeCurveType != "QUADRATICLINEAR" ) ||
-                 ( DetIceStor( IceNum ).DischargeCurveType != "CUBICLINEAR" ) ) {
+			if ( ( DetIceStor( IceNum ).DischargeCurveType != cAlphaArgs( 5 ) ) || ( ( DetIceStor( IceNum ).DischargeCurveType != "QUADRATICLINEAR" ) &&
+                 ( DetIceStor( IceNum ).DischargeCurveType != "CUBICLINEAR" ) ) ) {
 				ShowSevereError( cCurrentModuleObject + ": Discharge curve type not valid, type=" + cAlphaArgs( 5 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear" );
@@ -1031,13 +1031,13 @@ namespace IceThermalStorage {
 			} else {
 				DetIceStor( IceNum ).ChargeCurveType = GetCurveType( DetIceStor( IceNum ).ChargeCurveNum );
                 if ( DetIceStor( IceNum ).ChargeCurveType == "QUADRATICLINEAR") {
-                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveType_QuadraticLinear;
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveQuadraticLinear;
                 } else if ( DetIceStor( IceNum ).ChargeCurveType == "CUBICLINEAR") {
-                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveType_CubicLinear;
+                    DetIceStor(IceNum).ChargeCurveTypeNum = CurveCubicLinear;
                 }
 			}
-			if ( ( DetIceStor( IceNum ).ChargeCurveType != cAlphaArgs( 7 ) ) || ( DetIceStor( IceNum ).ChargeCurveType != "QUADRATICLINEAR" ) ||
-                 ( DetIceStor( IceNum ).ChargeCurveType != "CUBICLINEAR" ) ) {
+			if ( ( DetIceStor( IceNum ).ChargeCurveType != cAlphaArgs( 7 ) ) || ( ( DetIceStor( IceNum ).ChargeCurveType != "QUADRATICLINEAR" ) &&
+                 ( DetIceStor( IceNum ).ChargeCurveType != "CUBICLINEAR" ) ) ) {
 				ShowSevereError( cCurrentModuleObject + ": Charge curve type not valid, type=" + cAlphaArgs( 7 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear" );
