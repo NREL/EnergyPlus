@@ -30043,10 +30043,225 @@ Sizing:Zone,
       \type object-list
       \object-list DesignSpecificationZoneAirDistributionNames
 
+
+DesignSpecification:ZoneHVAC:Sizing,
+  \min-fields 1
+  \memo This object is used to describe general scalable zone HVAC equipment sizing which
+  \memo are referenced by other objects. 
+  A1, \field Name
+      \required-field
+      \type alpha
+      \reference   
+  A2, \field Cooling Design Air Flow Method
+      \type choice 
+      \key None
+      \key SupplyAirFlowRate
+      \key FlowPerFloorArea
+      \key FractionOfAutosizedCoolingAirflow
+      \key FlowPerCoolingCapacity
+      \default SupplyAirFlowRate
+      \note Enter the method used to determine the cooling supply air volume flow rate.
+      \note None is used when a cooling coil is not included in the Zone HVAC Equip or this field 
+      \note may be blank. SupplyAirFlowRate => selected when the magnitude of the supply air volume 
+      \note flow rate is specified. FlowPerFloorArea => selected when the supply air volume flow rate
+      \note is determined from total floor area served by the Zone HVAC unit and Flow Per Floor Area 
+      \note value specified. FractionOfAutosizedCoolingAirflow => is selected when the supply air volume
+      \note is determined from a user specified fraction and the autosized cooling supply air flow rate 
+      \note value determined by the simulation. FlowPerCoolingCapacity => is selected when the supply 
+      \note air volume is determined from user specified flow per Cooling Capacity and Cooling Capacity 
+      \note determined by the simulation.
+  N1, \field Cooling Design Supply Air Flow Rate {m3/s}
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \autosizable
+      \note Enter the magnitude of supply air volume flow rate during cooling operation.
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is SupplyAirFlowRate.
+      \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
+  N2, \field Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+      \type real
+      \units m3/s-m2
+      \minimum 0.0
+      \note Enter the cooling supply air volume flow rate per total conditioned floor area.
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerFloorArea.
+      \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
+  N3, \field Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
+      \type real
+      \minimum 0.0
+      \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is 
+      \note FractionOfAutosizedCoolingAirflow.
+      \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.  
+  N4, \field Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+      \type real
+      \units m3/s-W
+      \minimum 0.0
+      \note Enter the cooling supply air volume flow rate unit cooling capacity.
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is 
+      \note FlowPerCoolingCapacity. This field may be blank if a cooling coil is not 
+      \note included in the Zone HVAC equipment.
+  A3, \field Supply Air Flow Rate Method When No Cooling or Heating is Required
+      \type choice 
+      \key None
+      \key SupplyAirFlowRate
+      \key FlowPerFloorArea
+      \key FractionOfAutosizedCoolingAirflow
+      \key FractionOfAutosizedHeatingAirflow
+      \default SupplyAirFlowRate
+      \note Enter the method used to determine the supply air volume flow rate When No Cooling or Heating
+      \note is Required. None is used when a cooling or heating coils is not included in the Zone HVAC   
+      \note Equipment or this field may be blank. SupplyAirFlowRate => selected when the magnitude of the
+      \note supply air volume flow rate is specified. FlowPerFloorArea => selected when the supply air 
+      \note volume flow rate is determined from total floor area served by the Zone HVAC unit and Flow Per 
+      \note Floor Area is specified. FractionOfAutosizedCoolingAirflow => is selected when the supply 
+      \note air volume is determined from a user specified fraction and the Autosized cooling supply
+      \note air flow rate value determined by the simulation. FractionOfAutosizedHeatingAirflow => is 
+      \note selected when the supply air volume is determined from a user specified fraction and the 
+      \note Autosized heating supply air flow rate value determined by the simulation.
+  N5, \field Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \autosizable  
+      \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating 
+      \note is required. Required field when Supply air Flow Rate Method When No Cooling or Heating
+      \note is Required is SupplyAirFlowRate.   
+  N6, \field Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required  {m3/s-m2}
+      \type real
+      \units m3/s-m2
+      \minimum 0.0
+      \note Enter the supply air volume flow rate per total floor area.
+      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
+      \note is FlowPerFloorArea.   
+  N7, \field Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required {-}
+      \type real
+      \minimum 0.0
+      \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
+      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
+      \note is FractionOfAutosizedCoolingAirflow.   
+  N8, \field Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required {-}
+      \type real
+      \minimum 0.0
+      \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
+      \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
+      \note is FractionOfAutosizedHeatingAirflow.    
+  A4, \field Heating Design Air Flow Method
+      \type choice 
+      \key None
+      \key SupplyAirFlowRate
+      \key FlowPerFloorArea
+      \key FractionOfAutosizedHeatingAirflow
+      \key FlowPerHeatingCapacity
+      \default SupplyAirFlowRate
+      \note Enter the method used to determine the heating supply air volume flow rate.
+      \note None is used when a heating coil is not included in the Zone HVAC Equipment or this field may
+      \note be blank. SupplyAirFlowRate => selected when the magnitude of the heating supply air volume
+      \note flow rate is specified.  FlowPerFloorArea => selected when the supply air volume flow rate is 
+      \note determined from total floor area served by a Zone HVAC unit and user specified value of Flow 
+      \note Per Floor Area. FractionOfAutosizedHeatingAirflow => is selected when the supply air volume 
+      \note is determined from a user specified fraction and the Autosized heating supply air flow rate 
+      \note value determined by the simulation. FlowPerHeatingCapacity => is selected when the supply 
+      \note air volume is determined from user specified flow per Heating Capacity and Heating Capacity 
+      \note determined by the simulation.
+  N9, \field Heating Design Supply Air Flow Rate {m3/s}
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \autosizable
+      \note Enter the magnitude of the supply air volume flow rate during heating operation.
+      \note Required field when Supply air Flow Rate Method During Heating Operation is SupplyAirFlowRate.
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.  
+ N10, \field Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+      \type real
+      \units m3/s-m2
+      \minimum 0.0
+      \note Enter the heating supply air volume flow rate per total conditioned floor area.
+      \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerFloorArea.
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment. 
+ N11, \field Fraction of Heating Design Supply Air Flow Rate {-}
+      \type real
+      \minimum 0.0
+      \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
+      \note Required field when Supply air Flow Rate Method During Heating Operation is 
+      \note FractionOfAutosizedHeatingAirflow.
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.  
+ N12, \field Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+      \type real
+      \units m3/s-W
+      \minimum 0.0
+      \note Enter the supply air volume flow rate per unit heating capacity.
+      \note Required field when Supply air Flow Rate Method During Heating Operation is 
+      \note FlowPerHeatingCapacity.
+      \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.   
+  A5, \field Cooling Design Capacity Method
+      \type choice 
+      \key None
+      \key CoolingDesignCapacity
+      \key CapacityPerFloorArea
+      \key FractionOfAutosizedCoolingCapacity
+      \default None
+      \note Enter the method used to determine the cooling design capacity for scalable sizing.
+      \note None is used when a cooling coils is not included in the Zone HVAC Equipment or 
+      \note this field may be blank. If this input field is left blank, then the design cooling 
+      \note capacity is set to zero. CoolingDesignCapacity => selected when the design cooling capacity 
+      \note value is specified or auto-sized. CapacityPerFloorArea => selected when the design cooling 
+      \note capacity is determine from user specified cooling capacity per floor area and zone floor area.
+      \note FractionOfAutosizedCoolingCapacity => is selected when the design cooling capacity is 
+      \note determined from a user specified fraction and the auto-sized design cooling capacity.
+ N13, \field Cooling Design Capacity {W}
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \autosizable
+      \note Enter the design cooling capacity. Required field when the cooling design capacity method
+      \note CoolingDesignCapacity.
+ N14, \field Cooling Design Capacity Per Floor Area {W/m2}
+      \type real
+      \minimum 0.0
+      \note Enter the cooling design capacity per zone floor area. Required field when the cooling design 
+      \note capacity method field is CapacityPerFloorArea. 
+ N15, \field Fraction of Autosized Cooling Design Capacity {-}
+      \type real
+      \minimum 0.0
+      \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
+      \note design capacity method field is FractionOfAutosizedCoolingCapacity. 
+  A6, \field Heating Design Capacity Method
+      \type choice 
+      \key None
+      \key HeatingDesignCapacity
+      \key CapacityPerFloorArea
+      \key FractionOfAutosizedHeatingCapacity
+      \default None
+      \note Enter the method used to determine the heating design capacity for scalable sizing.
+      \note None is used when a heating coil is not included in the Zone HVAC Equipment or 
+      \note this field may be blank. If this input field is left blank, then the design heating
+      \note capacity is set to zero. HeatingDesignCapacity => selected when the design heating capacity 
+      \note value is specified or auto-sized. CapacityPerFloorArea => selected when the design cooling 
+      \note capacity is determine from user specified heating capacity per flow area and zone floor area.
+      \note FractionOfAutosizedHeatingCapacity => is selected when the design heating capacity is 
+      \note determined from a user specified fraction and the auto-sized design heating capacity
+ N16, \field Heating Design Capacity {W}
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \autosizable
+      \note Enter the design heating capacity. Required field when the heating design capacity method
+      \note HeatingDesignCapacity.
+ N17, \field Heating Design Capacity Per Floor Area {W/m2}
+      \type real
+      \minimum 0.0
+      \note Enter the heating design capacity per zone floor area. Required field when the heating design 
+      \note capacity method field is CapacityPerFloorArea. 
+ N18; \field Fraction of Autosized Heating Design Capacity {-}
+      \type real
+      \minimum 0.0
+      \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the 
+      \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+  
 Sizing:System,
       \memo Specifies the input needed to perform sizing calculations for a central forced air
       \memo system design air flow, heating capacity, and cooling capacity.
-  \min-fields 20
+      \min-fields 20
   A1, \field AirLoop Name
       \required-field
       \type object-list
@@ -30118,7 +30333,7 @@ Sizing:System,
       \type real
       \default 0.008
       \units kgWater/kgDryAir
-  N10, \field Central Heating Design Supply Air Humidity Ratio
+ N10, \field Central Heating Design Supply Air Humidity Ratio
       \required-field
       \type real
       \default 0.008
@@ -30127,8 +30342,11 @@ Sizing:System,
       \type choice
       \key Flow/System
       \key DesignDay
+      \key FlowPerFloorArea
+      \key FractionOfAutosizedCoolingAirflow
+      \key FlowPerCoolingCapacity
       \default DesignDay
-  N11, \field Cooling Design Air Flow Rate
+ N11, \field Cooling Design Air Flow Rate {m3/s}
       \note This input is used if Cooling Design Air Flow Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
@@ -30136,12 +30354,35 @@ Sizing:System,
       \units m3/s
       \minimum 0
       \default 0
+ N12, \field Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+      \type real
+      \units m3/s-m2
+      \minimum 0.0
+      \note Enter the cooling supply air volume flow rate per total conditioned floor area.
+      \note Required field when Supply air Flow Rate Method during cooling operation is FlowPerFloorArea.
+ N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+      \type real
+      \minimum 0.0
+      \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
+      \note Required field when Supply air Flow Rate Method during cooling operation is 
+      \note FractionOfAutosizedCoolingAirflow.
+ N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+      \type real
+      \units m3/s-W
+      \minimum 0.0
+      \note Enter the supply air volume flow rate per unit cooling capacity.
+      \note Required field when Supply air Flow Rate Method During Cooling Operation is 
+      \note FlowPerCoolingCapacity.
   A7, \field Heating Design Air Flow Method
       \type choice
       \key Flow/System
       \key DesignDay
+      \key FlowPerFloorArea
+      \key FractionOfAutosizedHeatingAirflow
+      \key FractionOfAutosizedCoolingAirflow
+      \key FlowPerCoolingCapacity
       \default DesignDay
-  N12,\field Heating Design Air Flow Rate
+ N15, \field Heating Design Air Flow Rate {m3/s}
       \note This input is used if Heating Design Air Flow Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
@@ -30149,16 +30390,107 @@ Sizing:System,
       \units m3/s
       \minimum 0
       \default 0
+ N16, \field Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+      \type real
+      \units m3/s-m2
+      \minimum 0.0
+      \note Enter the heating supply air volume flow rate per total conditioned floor area.
+      \note Required field when Supply air Flow Rate Method during heating operation is FlowPerFloorArea.
+ N17, \field Fraction of Autosized Design Heating Supply Air Flow Rate {-}
+      \type real
+      \minimum 0.0
+      \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
+      \note Required field when Supply air Flow Rate Method during heating operation is 
+      \note FractionOfAutosizedHeatingAirflow.
+ N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+      \type real
+      \minimum 0.0
+      \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
+      \note Required field when Supply air Flow Rate Method during heating operation is 
+      \note FractionOfAutosizedCoolingAirflow.
+ N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+      \type real
+      \units m3/s-W
+      \minimum 0.0
+      \note Enter the heating supply air volume flow rate per unit heating capacity.
+      \note Required field when Supply air Flow Rate Method during heating operation is 
+      \note FlowPerHeatingCapacity.
   A8, \field System Outdoor Air Method
       \type choice
       \key ZoneSum
       \key VentilationRateProcedure
       \default ZoneSum
-  N13;\field Zone Maximum Outdoor Air Fraction
+ N20, \field Zone Maximum Outdoor Air Fraction
       \type real
       \default 1.0
       \minimum> 0.0
       \units dimensionless
+  A9, \field Cooling Design Capacity Method
+      \type choice 
+      \key None
+      \key CoolingDesignCapacity
+      \key CapacityPerFloorArea
+      \key FractionOfAutosizedCoolingCapacity
+      \default CoolingDesignCapacity
+      \note Enter the method used to determine the system cooling design capacity for scalable sizing.
+      \note None is used when a cooling coils is not included in an airloop or this field may be blank.
+      \note If this input field is left blank, then the design cooling capacity is set to zero.  
+      \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or 
+      \note auto-sized. CapacityPerFloorArea => selected when the design cooling capacity is determined
+      \note from user specified cooling capacity per floor area and total floor area of cooled zones 
+      \note served by an airloop. FractionOfAutosizedCoolingCapacity => is selected when the design 
+      \note cooling capacity is determined from a user specified fraction and the auto-sized design 
+      \note cooling capacity of the system.
+ N21, \field Cooling Design Capacity {W}
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \autosizable
+      \note Enter the design cooling capacity. Required field when the cooling design capacity method
+      \note CoolingDesignCapacity.
+ N22, \field Cooling Design Capacity Per Floor Area {W/m2}
+      \type real
+      \minimum 0.0
+      \note Enter the cooling design capacity per total floor area of cooled zones served by an airloop.
+      \note Required field when the cooling design capacity method field is CapacityPerFloorArea. 
+ N23, \field Fraction of Autosized Cooling Design Capacity {-}
+      \type real
+      \minimum 0.0
+      \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
+      \note design capacity method field is FractionOfAutosizedCoolingCapacity. 
+ A10, \field Heating Design Capacity Method
+      \type choice 
+      \key None
+      \key HeatingDesignCapacity
+      \key CapacityPerFloorArea
+      \key FractionOfAutosizedHeatingCapacity
+      \default HeatingDesignCapacity
+      \note Enter the method used to determine the heating design capacity for scalable sizing.
+      \note None is used when a heating coil not included in an airloop or this field may be blank. 
+      \note If this input field is left blank, then the design heating capacity is set to zero.
+      \note HeatingDesignCapacity => selected when the design heating capacity value is specified or
+      \note auto-sized. CapacityPerFloorArea => selected when the design heating capacity is determined 
+      \note from user specified heating capacity per flow area and total floor area of heated zones
+      \note served by an airloop. FractionOfAutosizedHeatingCapacity => is selected when the design 
+      \note heating capacity is determined from a user specified fraction and the auto-sized design 
+      \note heating capacity of the system.
+ N24, \field Heating Design Capacity {W}
+      \type real
+      \units m3/s
+      \minimum 0.0
+      \autosizable
+      \note Enter the design heating capacity. Required field when the heating design capacity method
+      \note HeatingDesignCapacity.
+ N25, \field Heating Design Capacity Per Floor Area {W/m2}
+      \type real
+      \minimum 0.0
+      \note Enter the heating design capacity per zone floor area. Required field when the heating design 
+      \note capacity method field is CapacityPerFloorArea. 
+ N26; \field Fraction of Autosized Heating Design Capacity {-}
+      \type real
+      \minimum 0.0
+      \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the 
+      \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
 
 Sizing:Plant,
       \memo Specifies the input needed to autosize plant loop flow rates and equipment capacities.
@@ -30895,18 +31227,23 @@ ZoneHVAC:IdealLoadsAirSystem,
        \minimum 0.0
        \maximum 1.0
        \default 0.70
-  N11; \field Latent Heat Recovery Effectiveness
+  N11, \field Latent Heat Recovery Effectiveness
        \note Applicable only if Heat Recovery Type is Enthalpy.
        \units dimensionless
        \minimum 0.0
        \maximum 1.0
        \default 0.65
+  A16; \field Design Specification ZoneHVAC Sizing Object Name
+       \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+       \type object
+       \object-name DesignSpecificationZoneHVACSizingName   
 
 ZoneHVAC:FourPipeFanCoil,
         \memo Four pipe fan coil system. Forced-convection hydronic heating-cooling unit with
         \memo supply fan, hot water heating coil, chilled water cooling coil, and fixed-position
         \memo outdoor air mixer.
         \min-fields 24
+        \reference DesignSpecificationZoneHVACSizingName
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
@@ -31015,10 +31352,15 @@ ZoneHVAC:FourPipeFanCoil,
         \type real
         \minimum> 0.0
         \default 0.001
-   A15; \field Availability Manager List Name
+   A15, \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
+   A16; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
+
 
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct
@@ -31096,11 +31438,16 @@ ZoneHVAC:WindowAirConditioner,
         \type real
         \minimum> 0.0
         \default 0.001
-   A13; \field Availability Manager List Name
+   A13, \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
+   A14; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
 
+   
 ZoneHVAC:PackagedTerminalAirConditioner,
         \memo Packaged terminal air conditioner (PTAC).  Forced-convection heating-cooling unit
         \memo with supply fan, direct expansion (DX) cooling coil, heating coil (gas, electric, hot
@@ -31236,10 +31583,14 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \note Enter the name of a schedule that controls fan operation. Schedule Name values of 0 denote
         \note cycling fan operation (fan cycles with cooling or heating coil). Schedule Name values greater
         \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
-   A15; \field Availability Manager List Name
+   A15, \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
+   A16; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:PackagedTerminalHeatPump,
         \memo Packaged terminal heat pump (PTHP). Forced-convection heating-cooling unit with
@@ -31418,11 +31769,15 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \note cycling fan operation (fan cycles with cooling or heating coil). Schedule Name values greater
         \note than 0 denote constant fan operation (fan runs continually regardless of coil operation).
         \note The fan operating mode defaults to cycling fan operation if this field is left blank.
-   A17; \field Availability Manager List Name
+   A17, \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-
+   A18; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
+   
 ZoneHVAC:WaterToAirHeatPump,
         \memo Water-to-air heat pump. Forced-convection heating-cooling unit with supply fan,
         \memo water-to-air cooling and heating coils, supplemental heating coil (gas, electric, hot
@@ -31601,7 +31956,7 @@ ZoneHVAC:WaterToAirHeatPump,
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
-   A19; \field Heat Pump Coil Water Flow Mode
+   A19, \field Heat Pump Coil Water Flow Mode
         \type choice
         \key Constant
         \key Cycling
@@ -31611,6 +31966,10 @@ ZoneHVAC:WaterToAirHeatPump,
         \note Constant results in 100% water flow regardless of compressor PLR
         \note Cycling results in water flow that matches compressor PLR
         \note ConstantOnDemand results in 100% water flow whenever the coil is on, but is 0% whenever the coil has no load
+   A20; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:Dehumidifier:DX,
         \memo This object calculates the performance of zone (room) air dehumidifiers.
@@ -31965,10 +32324,14 @@ ZoneHVAC:UnitVentilator,
         \type real
         \minimum> 0.0
         \default 0.001
-   A19; \field Availability Manager List Name
+   A19, \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
+   A20; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:UnitHeater,
         \memo Unit heater. Forced-convection heating-only unit with supply fan, heating coil
@@ -32048,10 +32411,14 @@ ZoneHVAC:UnitHeater,
         \type real
         \minimum> 0.0
         \default 0.001
-   A11; \field Availability Manager List Name
+   A11, \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
+   A12; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:EvaporativeCoolerUnit,
         \memo Zone evaporative cooler. Forced-convection cooling-only unit with supply fan,
@@ -32138,11 +32505,14 @@ ZoneHVAC:EvaporativeCoolerUnit,
         \key EvaporativeCooler:Indirect:CelDekPad
         \key EvaporativeCooler:Indirect:WetCoil
         \key EvaporativeCooler:Indirect:ResearchSpecial
-   A14; \field Second Evaporative Cooler Name
+   A14, \field Second Evaporative Cooler Name
         \note optional, used for direct/indirect configurations
         \type object-list
         \object-list EvapCoolerNames
-
+   A15; \field Design Specification ZoneHVAC Sizing Object Name
+        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+        \type object
+        \object-name DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:OutdoorAirUnit,
        \memo The zone outdoor air unit models a single-zone dedicated outdoor air system (DOAS).
@@ -32486,10 +32856,14 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
        \note to be equal to the cooling capacity multiplied by this sizing ratio.
        \note This input applies to the terminal unit heating coil and overrides the sizing
        \note ratio entered in the AirConditioner:VariableRefrigerantFlow object.
-  A15; \field Availability Manager List Name
-        \note Enter the name of an AvailabilityManagerAssignmentList object.
-        \type object-list
-        \object-list SystemAvailabilityManagerLists
+  A15, \field Availability Manager List Name
+       \note Enter the name of an AvailabilityManagerAssignmentList object.
+       \type object-list
+       \object-list SystemAvailabilityManagerLists
+  A16; \field Design Specification ZoneHVAC Sizing Object Name
+       \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+       \type object
+       \object-name DesignSpecificationZoneHVACSizingName
 
 \group Zone HVAC Radiative/Convective Units
 
@@ -32529,731 +32903,759 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \minimum> 0.0
        \units Kg/s
        \default 0.063
-  N3,  \field Rated Capacity
-       \note Users must multiply the actual finned length published in the literature.
-       \note Rated Capacity is for an inlet air dry-bulb temperature of 18.0C, the Rated Water Mass Flow Rate
-       \note of 0.063kg/s or 0.252kg/s, and the Rated Average Water Temperature between 32.2C and 115.6C.
-       \autosizable
+  A5,  \field Heating Design Capacity Method
+       \required-field
+       \type choice
+       \key HeatingDesignCapacity
+       \key CapacityPerFloorArea
+       \key FractionOfAutosizedHeatingCapacity
+       \default HeatingDesignCapacity
+       \note Enter the method used to determine the heating design capacity. 
+       \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+       \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+       \note determine from user specified heating capacity per floor area and zone floor area.
+       \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+       \note determined from a user specified fraction and the auto-sized design heating capacity.
+  N3 , \field Heating Design Capacity
        \type real
        \units W
+       \minimum 0.0
+       \autosizable
+       \ip-units W
        \default autosize
-  N4,  \field Maximum Water Flow Rate
+       \note Enter the design heating capacity. Required field when the heating design capacity method
+       \note HeatingDesignCapacity. This input field is rated heating capacity. Users must multiply the 
+       \note actual finned length published in the literature to determine the rated capacity. Rated 
+       \note Capacity is for an inlet air dry-bulb temperature of 18.0C, the Rated Water Mass Flow Rate
+       \note of 0.063kg/s or 0.252kg/s, and the Rated Average Water Temperature between 32.2C and 115.6C.
+  N4 , \field Heating Design Capacity Per Floor Area
+       \type real
+       \minimum 0.0
+       \note Enter the heating design capacity per zone floor area.Required field when the heating design
+       \note capacity method field is CapacityPerFloorArea.
+  N5 , \field Fraction of Autosized Heating Design Capacity{ -}
+       \type real
+       \minimum 0.0
+       \default 1.0
+       \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+  N6,  \field Maximum Water Flow Rate
        \required-field
        \autosizable
        \type real
        \units m3/s
-  N5,  \field Convergence Tolerance
+  N7,  \field Convergence Tolerance
        \type real
        \minimum> 0.0
        \default 0.001
-  N6,  \field Fraction Radiant
+  N8,  \field Fraction Radiant
        \required-field
        \type real
        \minimum 0
        \maximum 1
-  N7,  \field Fraction of Radiant Energy Incident on People
+  N9,  \field Fraction of Radiant Energy Incident on People
        \type real
        \minimum 0
        \maximum 1
-  A5,  \field Surface 1 Name
+  A6,  \field Surface 1 Name
        \begin-extensible
        \note Radiant energy may be distributed to specific surfaces
        \type object-list
        \object-list AllHeatTranSurfNames
-  N8,  \field Fraction of Radiant Energy to Surface 1
+  N10, \field Fraction of Radiant Energy to Surface 1
        \type real
        \minimum 0
        \maximum 1
-  A6,  \field Surface 2 Name
+  A7,  \field Surface 2 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N9, \field Fraction of Radiant Energy to Surface 2
+  N11, \field Fraction of Radiant Energy to Surface 2
        \type real
        \minimum 0
        \maximum 1
-  A7,  \field Surface 3 Name
+  A8,  \field Surface 3 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N10, \field Fraction of Radiant Energy to Surface 3
+  N12, \field Fraction of Radiant Energy to Surface 3
        \type real
        \minimum 0
        \maximum 1
-  A8,  \field Surface 4 Name
+  A9,  \field Surface 4 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N11, \field Fraction of Radiant Energy to Surface 4
+  N13, \field Fraction of Radiant Energy to Surface 4
        \type real
        \minimum 0
        \maximum 1
-  A9,  \field Surface 5 Name
+  A10, \field Surface 5 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N12, \field Fraction of Radiant Energy to Surface 5
+  N14, \field Fraction of Radiant Energy to Surface 5
        \type real
        \minimum 0
        \maximum 1
-  A10, \field Surface 6 Name
+  A11, \field Surface 6 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N13, \field Fraction of Radiant Energy to Surface 6
+  N15, \field Fraction of Radiant Energy to Surface 6
        \type real
        \minimum 0
        \maximum 1
-  A11, \field Surface 7 Name
+  A12, \field Surface 7 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N14, \field Fraction of Radiant Energy to Surface 7
+  N16, \field Fraction of Radiant Energy to Surface 7
        \type real
        \minimum 0
        \maximum 1
-  A12, \field Surface 8 Name
+  A13, \field Surface 8 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N15, \field Fraction of Radiant Energy to Surface 8
+  N17, \field Fraction of Radiant Energy to Surface 8
        \type real
        \minimum 0
        \maximum 1
-  A13, \field Surface 9 Name
+  A14, \field Surface 9 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N16, \field Fraction of Radiant Energy to Surface 9
+  N18, \field Fraction of Radiant Energy to Surface 9
        \type real
        \minimum 0
        \maximum 1
-  A14, \field Surface 10 Name
+  A15, \field Surface 10 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N17, \field Fraction of Radiant Energy to Surface 10
+  N19, \field Fraction of Radiant Energy to Surface 10
        \type real
        \minimum 0
        \maximum 1
-  A15, \field Surface 11 Name
+  A16, \field Surface 11 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N18, \field Fraction of Radiant Energy to Surface 11
+  N20, \field Fraction of Radiant Energy to Surface 11
        \type real
        \minimum 0
        \maximum 1
-  A16, \field Surface 12 Name
+  A17, \field Surface 12 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N19, \field Fraction of Radiant Energy to Surface 12
+  N21, \field Fraction of Radiant Energy to Surface 12
        \type real
        \minimum 0
        \maximum 1
-  A17, \field Surface 13 Name
+  A18, \field Surface 13 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N20, \field Fraction of Radiant Energy to Surface 13
+  N22, \field Fraction of Radiant Energy to Surface 13
        \type real
        \minimum 0
        \maximum 1
-  A18, \field Surface 14 Name
+  A19, \field Surface 14 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N21, \field Fraction of Radiant Energy to Surface 14
+  N23, \field Fraction of Radiant Energy to Surface 14
        \type real
        \minimum 0
        \maximum 1
-  A19, \field Surface 15 Name
+  A20, \field Surface 15 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N22, \field Fraction of Radiant Energy to Surface 15
+  N24, \field Fraction of Radiant Energy to Surface 15
        \type real
        \minimum 0
        \maximum 1
-  A20, \field Surface 16 Name
+  A21, \field Surface 16 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N23, \field Fraction of Radiant Energy to Surface 16
+  N25, \field Fraction of Radiant Energy to Surface 16
        \type real
        \minimum 0
        \maximum 1
-  A21, \field Surface 17 Name
+  A22, \field Surface 17 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N24, \field Fraction of Radiant Energy to Surface 17
+  N26, \field Fraction of Radiant Energy to Surface 17
        \type real
        \minimum 0
        \maximum 1
-  A22, \field Surface 18 Name
+  A23, \field Surface 18 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N25, \field Fraction of Radiant Energy to Surface 18
+  N27, \field Fraction of Radiant Energy to Surface 18
        \type real
        \minimum 0
        \maximum 1
-  A23, \field Surface 19 Name
+  A24, \field Surface 19 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N26, \field Fraction of Radiant Energy to Surface 19
+  N28, \field Fraction of Radiant Energy to Surface 19
        \type real
        \minimum 0
        \maximum 1
-  A24, \field Surface 20 Name
+  A25, \field Surface 20 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N27, \field Fraction of Radiant Energy to Surface 20
+  N29, \field Fraction of Radiant Energy to Surface 20
        \type real
        \minimum 0
        \maximum 1
-  A25, \field Surface 21 Name
+  A26, \field Surface 21 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N28, \field Fraction of Radiant Energy to Surface 21
+  N30, \field Fraction of Radiant Energy to Surface 21
        \type real
        \minimum 0
        \maximum 1
-  A26, \field Surface 22 Name
+  A27, \field Surface 22 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N29, \field Fraction of Radiant Energy to Surface 22
+  N31, \field Fraction of Radiant Energy to Surface 22
        \type real
        \minimum 0
        \maximum 1
-  A27, \field Surface 23 Name
+  A28, \field Surface 23 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N30, \field Fraction of Radiant Energy to Surface 23
+  N32, \field Fraction of Radiant Energy to Surface 23
        \type real
        \minimum 0
        \maximum 1
-  A28, \field Surface 24 Name
+  A29, \field Surface 24 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N31, \field Fraction of Radiant Energy to Surface 24
+  N33, \field Fraction of Radiant Energy to Surface 24
        \type real
        \minimum 0
        \maximum 1
-  A29, \field Surface 25 Name
+  A30, \field Surface 25 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N32, \field Fraction of Radiant Energy to Surface 25
+  N34, \field Fraction of Radiant Energy to Surface 25
        \type real
        \minimum 0
        \maximum 1
-  A30, \field Surface 26 Name
+  A31, \field Surface 26 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N33, \field Fraction of Radiant Energy to Surface 26
+  N35, \field Fraction of Radiant Energy to Surface 26
        \type real
        \minimum 0
        \maximum 1
-  A31, \field Surface 27 Name
+  A32, \field Surface 27 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N34, \field Fraction of Radiant Energy to Surface 27
+  N36, \field Fraction of Radiant Energy to Surface 27
        \type real
        \minimum 0
        \maximum 1
-  A32, \field Surface 28 Name
+  A33, \field Surface 28 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N35, \field Fraction of Radiant Energy to Surface 28
+  N37, \field Fraction of Radiant Energy to Surface 28
        \type real
        \minimum 0
        \maximum 1
-  A33, \field Surface 29 Name
+  A34, \field Surface 29 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N36, \field Fraction of Radiant Energy to Surface 29
+  N38, \field Fraction of Radiant Energy to Surface 29
        \type real
        \minimum 0
        \maximum 1
-  A34, \field Surface 30 Name
+  A35, \field Surface 30 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N37, \field Fraction of Radiant Energy to Surface 30
+  N39, \field Fraction of Radiant Energy to Surface 30
        \type real
        \minimum 0
        \maximum 1
-  A35, \field Surface 31 Name
+  A36, \field Surface 31 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N38, \field Fraction of Radiant Energy to Surface 31
+  N40, \field Fraction of Radiant Energy to Surface 31
        \type real
        \minimum 0
        \maximum 1
-  A36, \field Surface 32 Name
+  A37, \field Surface 32 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N39, \field Fraction of Radiant Energy to Surface 32
+  N41, \field Fraction of Radiant Energy to Surface 32
        \type real
        \minimum 0
        \maximum 1
-  A37, \field Surface 33 Name
+  A38, \field Surface 33 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N40, \field Fraction of Radiant Energy to Surface 33
+  N42, \field Fraction of Radiant Energy to Surface 33
        \type real
        \minimum 0
        \maximum 1
-  A38, \field Surface 34 Name
+  A39, \field Surface 34 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N41, \field Fraction of Radiant Energy to Surface 34
+  N43, \field Fraction of Radiant Energy to Surface 34
        \type real
        \minimum 0
        \maximum 1
-  A39, \field Surface 35 Name
+  A40, \field Surface 35 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N42, \field Fraction of Radiant Energy to Surface 35
+  N44, \field Fraction of Radiant Energy to Surface 35
        \type real
        \minimum 0
        \maximum 1
-  A40, \field Surface 36 Name
+  A41, \field Surface 36 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N43, \field Fraction of Radiant Energy to Surface 36
+  N45, \field Fraction of Radiant Energy to Surface 36
        \type real
        \minimum 0
        \maximum 1
-  A41, \field Surface 37 Name
+  A42, \field Surface 37 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N44, \field Fraction of Radiant Energy to Surface 37
+  N46, \field Fraction of Radiant Energy to Surface 37
        \type real
        \minimum 0
        \maximum 1
-  A42, \field Surface 38 Name
+  A43, \field Surface 38 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N45, \field Fraction of Radiant Energy to Surface 38
+  N47, \field Fraction of Radiant Energy to Surface 38
        \type real
        \minimum 0
        \maximum 1
-  A43, \field Surface 39 Name
+  A44, \field Surface 39 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N46, \field Fraction of Radiant Energy to Surface 39
+  N48, \field Fraction of Radiant Energy to Surface 39
        \type real
        \minimum 0
        \maximum 1
-  A44, \field Surface 40 Name
+  A45, \field Surface 40 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N47, \field Fraction of Radiant Energy to Surface 40
+  N49, \field Fraction of Radiant Energy to Surface 40
        \type real
        \minimum 0
        \maximum 1
-  A45, \field Surface 41 Name
+  A46, \field Surface 41 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N48, \field Fraction of Radiant Energy to Surface 41
+  N50, \field Fraction of Radiant Energy to Surface 41
        \type real
        \minimum 0
        \maximum 1
-  A46, \field Surface 42 Name
+  A47, \field Surface 42 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N49, \field Fraction of Radiant Energy to Surface 42
+  N51, \field Fraction of Radiant Energy to Surface 42
        \type real
        \minimum 0
        \maximum 1
-  A47, \field Surface 43 Name
+  A48, \field Surface 43 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N50, \field Fraction of Radiant Energy to Surface 43
+  N52, \field Fraction of Radiant Energy to Surface 43
        \type real
        \minimum 0
        \maximum 1
-  A48, \field Surface 44 Name
+  A49, \field Surface 44 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N51, \field Fraction of Radiant Energy to Surface 44
+  N53, \field Fraction of Radiant Energy to Surface 44
        \type real
        \minimum 0
        \maximum 1
-  A49, \field Surface 45 Name
+  A50, \field Surface 45 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N52, \field Fraction of Radiant Energy to Surface 45
+  N54, \field Fraction of Radiant Energy to Surface 45
        \type real
        \minimum 0
        \maximum 1
-  A50, \field Surface 46 Name
+  A51, \field Surface 46 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N53, \field Fraction of Radiant Energy to Surface 46
+  N55, \field Fraction of Radiant Energy to Surface 46
        \type real
        \minimum 0
        \maximum 1
-  A51, \field Surface 47 Name
+  A52, \field Surface 47 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N54, \field Fraction of Radiant Energy to Surface 47
+  N56, \field Fraction of Radiant Energy to Surface 47
        \type real
        \minimum 0
        \maximum 1
-  A52, \field Surface 48 Name
+  A53, \field Surface 48 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N55, \field Fraction of Radiant Energy to Surface 48
+  N57, \field Fraction of Radiant Energy to Surface 48
        \type real
        \minimum 0
        \maximum 1
-  A53, \field Surface 49 Name
+  A54, \field Surface 49 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N56, \field Fraction of Radiant Energy to Surface 49
+  N58, \field Fraction of Radiant Energy to Surface 49
        \type real
        \minimum 0
        \maximum 1
-  A54, \field Surface 50 Name
+  A55, \field Surface 50 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N57, \field Fraction of Radiant Energy to Surface 50
+  N59, \field Fraction of Radiant Energy to Surface 50
        \type real
        \minimum 0
        \maximum 1
-  A55, \field Surface 51 Name
+  A56, \field Surface 51 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N58, \field Fraction of Radiant Energy to Surface 51
+  N60, \field Fraction of Radiant Energy to Surface 51
        \type real
        \minimum 0
        \maximum 1
-  A56, \field Surface 52 Name
+  A57, \field Surface 52 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N59, \field Fraction of Radiant Energy to Surface 52
+  N61, \field Fraction of Radiant Energy to Surface 52
        \type real
        \minimum 0
        \maximum 1
-  A57, \field Surface 53 Name
+  A58, \field Surface 53 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N60, \field Fraction of Radiant Energy to Surface 53
+  N62, \field Fraction of Radiant Energy to Surface 53
        \type real
        \minimum 0
        \maximum 1
-  A58, \field Surface 54 Name
+  A59, \field Surface 54 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N61, \field Fraction of Radiant Energy to Surface 54
+  N63, \field Fraction of Radiant Energy to Surface 54
        \type real
        \minimum 0
        \maximum 1
-  A59, \field Surface 55 Name
+  A60, \field Surface 55 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N62, \field Fraction of Radiant Energy to Surface 55
+  N64, \field Fraction of Radiant Energy to Surface 55
        \type real
        \minimum 0
        \maximum 1
-  A60, \field Surface 56 Name
+  A61, \field Surface 56 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N63, \field Fraction of Radiant Energy to Surface 56
+  N65, \field Fraction of Radiant Energy to Surface 56
        \type real
        \minimum 0
        \maximum 1
-  A61, \field Surface 57 Name
+  A62, \field Surface 57 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N64, \field Fraction of Radiant Energy to Surface 57
+  N66, \field Fraction of Radiant Energy to Surface 57
        \type real
        \minimum 0
        \maximum 1
-  A62, \field Surface 58 Name
+  A63, \field Surface 58 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N65, \field Fraction of Radiant Energy to Surface 58
+  N67, \field Fraction of Radiant Energy to Surface 58
        \type real
        \minimum 0
        \maximum 1
-  A63, \field Surface 59 Name
+  A64, \field Surface 59 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N66, \field Fraction of Radiant Energy to Surface 59
+  N68, \field Fraction of Radiant Energy to Surface 59
        \type real
        \minimum 0
        \maximum 1
-  A64, \field Surface 60 Name
+  A65, \field Surface 60 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N67, \field Fraction of Radiant Energy to Surface 60
+  N69, \field Fraction of Radiant Energy to Surface 60
        \type real
        \minimum 0
        \maximum 1
-  A65, \field Surface 61 Name
+  A66, \field Surface 61 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N68, \field Fraction of Radiant Energy to Surface 61
+  N70, \field Fraction of Radiant Energy to Surface 61
        \type real
        \minimum 0
        \maximum 1
-  A66, \field Surface 62 Name
+  A67, \field Surface 62 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N69, \field Fraction of Radiant Energy to Surface 62
+  N71, \field Fraction of Radiant Energy to Surface 62
        \type real
        \minimum 0
        \maximum 1
-  A67, \field Surface 63 Name
+  A68, \field Surface 63 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N70, \field Fraction of Radiant Energy to Surface 63
+  N72, \field Fraction of Radiant Energy to Surface 63
        \type real
        \minimum 0
        \maximum 1
-  A68, \field Surface 64 Name
+  A69, \field Surface 64 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N71, \field Fraction of Radiant Energy to Surface 64
+  N73, \field Fraction of Radiant Energy to Surface 64
        \type real
        \minimum 0
        \maximum 1
-  A69, \field Surface 65 Name
+  A70, \field Surface 65 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N72, \field Fraction of Radiant Energy to Surface 65
+  N74, \field Fraction of Radiant Energy to Surface 65
        \type real
        \minimum 0
        \maximum 1
-  A70, \field Surface 66 Name
+  A71, \field Surface 66 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N73, \field Fraction of Radiant Energy to Surface 66
+  N75, \field Fraction of Radiant Energy to Surface 66
        \type real
        \minimum 0
        \maximum 1
-  A71, \field Surface 67 Name
+  A72, \field Surface 67 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N74, \field Fraction of Radiant Energy to Surface 67
+  N76, \field Fraction of Radiant Energy to Surface 67
        \type real
        \minimum 0
        \maximum 1
-  A72, \field Surface 68 Name
+  A73, \field Surface 68 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N75, \field Fraction of Radiant Energy to Surface 68
+  N77, \field Fraction of Radiant Energy to Surface 68
        \type real
        \minimum 0
        \maximum 1
-  A73, \field Surface 69 Name
+  A74, \field Surface 69 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N76, \field Fraction of Radiant Energy to Surface 69
+  N78, \field Fraction of Radiant Energy to Surface 69
        \type real
        \minimum 0
        \maximum 1
-  A74, \field Surface 70 Name
+  A75, \field Surface 70 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N77, \field Fraction of Radiant Energy to Surface 70
+  N79, \field Fraction of Radiant Energy to Surface 70
        \type real
        \minimum 0
        \maximum 1
-  A75, \field Surface 71 Name
+  A76, \field Surface 71 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N78, \field Fraction of Radiant Energy to Surface 71
+  N80, \field Fraction of Radiant Energy to Surface 71
        \type real
        \minimum 0
        \maximum 1
-  A76, \field Surface 72 Name
+  A77, \field Surface 72 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N79, \field Fraction of Radiant Energy to Surface 72
+  N81, \field Fraction of Radiant Energy to Surface 72
        \type real
        \minimum 0
        \maximum 1
-  A77, \field Surface 73 Name
+  A78, \field Surface 73 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N80, \field Fraction of Radiant Energy to Surface 73
+  N82, \field Fraction of Radiant Energy to Surface 73
        \type real
        \minimum 0
        \maximum 1
-  A78, \field Surface 74 Name
+  A79, \field Surface 74 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N81, \field Fraction of Radiant Energy to Surface 74
+  N83, \field Fraction of Radiant Energy to Surface 74
        \type real
        \minimum 0
        \maximum 1
-  A79, \field Surface 75 Name
+  A80, \field Surface 75 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N82, \field Fraction of Radiant Energy to Surface 75
+  N84, \field Fraction of Radiant Energy to Surface 75
        \type real
        \minimum 0
        \maximum 1
-  A80, \field Surface 76 Name
+  A81, \field Surface 76 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N83, \field Fraction of Radiant Energy to Surface 76
+  N85, \field Fraction of Radiant Energy to Surface 76
        \type real
        \minimum 0
        \maximum 1
-  A81, \field Surface 77 Name
+  A82, \field Surface 77 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N84, \field Fraction of Radiant Energy to Surface 77
+  N86, \field Fraction of Radiant Energy to Surface 77
        \type real
        \minimum 0
        \maximum 1
-  A82, \field Surface 78 Name
+  A83, \field Surface 78 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N85, \field Fraction of Radiant Energy to Surface 78
+  N87, \field Fraction of Radiant Energy to Surface 78
        \type real
        \minimum 0
        \maximum 1
-  A83, \field Surface 79 Name
+  A84, \field Surface 79 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N86, \field Fraction of Radiant Energy to Surface 79
+  N88, \field Fraction of Radiant Energy to Surface 79
        \type real
        \minimum 0
        \maximum 1
-  A84, \field Surface 80 Name
+  A85, \field Surface 80 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N87, \field Fraction of Radiant Energy to Surface 80
+  N89, \field Fraction of Radiant Energy to Surface 80
        \type real
        \minimum 0
        \maximum 1
-  A85, \field Surface 81 Name
+  A86, \field Surface 81 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N88, \field Fraction of Radiant Energy to Surface 81
+  N90, \field Fraction of Radiant Energy to Surface 81
        \type real
        \minimum 0
        \maximum 1
-  A86, \field Surface 82 Name
+  A87, \field Surface 82 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N89, \field Fraction of Radiant Energy to Surface 82
+  N91, \field Fraction of Radiant Energy to Surface 82
        \type real
        \minimum 0
        \maximum 1
-  A87, \field Surface 83 Name
+  A88, \field Surface 83 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N90, \field Fraction of Radiant Energy to Surface 83
+  N92, \field Fraction of Radiant Energy to Surface 83
        \type real
        \minimum 0
        \maximum 1
-  A88, \field Surface 84 Name
+  A89, \field Surface 84 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N91, \field Fraction of Radiant Energy to Surface 84
+  N93, \field Fraction of Radiant Energy to Surface 84
        \type real
        \minimum 0
        \maximum 1
-  A89, \field Surface 85 Name
+  A90, \field Surface 85 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N92, \field Fraction of Radiant Energy to Surface 85
+  N94, \field Fraction of Radiant Energy to Surface 85
        \type real
        \minimum 0
        \maximum 1
-  A90, \field Surface 86 Name
+  A91, \field Surface 86 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N93, \field Fraction of Radiant Energy to Surface 86
+  N95, \field Fraction of Radiant Energy to Surface 86
        \type real
        \minimum 0
        \maximum 1
-  A91, \field Surface 87 Name
+  A92, \field Surface 87 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N94, \field Fraction of Radiant Energy to Surface 87
+  N96, \field Fraction of Radiant Energy to Surface 87
        \type real
        \minimum 0
        \maximum 1
-  A92, \field Surface 88 Name
+  A93, \field Surface 88 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N95, \field Fraction of Radiant Energy to Surface 88
+  N97, \field Fraction of Radiant Energy to Surface 88
        \type real
        \minimum 0
        \maximum 1
-  A93, \field Surface 89 Name
+  A94, \field Surface 89 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N96, \field Fraction of Radiant Energy to Surface 89
+  N98, \field Fraction of Radiant Energy to Surface 89
        \type real
        \minimum 0
        \maximum 1
-  A94, \field Surface 90 Name
+  A95, \field Surface 90 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N97, \field Fraction of Radiant Energy to Surface 90
+  N99, \field Fraction of Radiant Energy to Surface 90
        \type real
        \minimum 0
        \maximum 1
-  A95, \field Surface 91 Name
+  A96, \field Surface 91 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N98, \field Fraction of Radiant Energy to Surface 91
+ N100, \field Fraction of Radiant Energy to Surface 91
        \type real
        \minimum 0
        \maximum 1
-  A96, \field Surface 92 Name
+  A97, \field Surface 92 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N99, \field Fraction of Radiant Energy to Surface 92
+ N101, \field Fraction of Radiant Energy to Surface 92
        \type real
        \minimum 0
        \maximum 1
-  A97, \field Surface 93 Name
+  A98, \field Surface 93 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N100, \field Fraction of Radiant Energy to Surface 93
+ N102, \field Fraction of Radiant Energy to Surface 93
        \type real
        \minimum 0
        \maximum 1
-  A98, \field Surface 94 Name
+  A99, \field Surface 94 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N101, \field Fraction of Radiant Energy to Surface 94
+ N103, \field Fraction of Radiant Energy to Surface 94
        \type real
        \minimum 0
        \maximum 1
-  A99, \field Surface 95 Name
+ A100, \field Surface 95 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N102, \field Fraction of Radiant Energy to Surface 95
+ N104, \field Fraction of Radiant Energy to Surface 95
        \type real
        \minimum 0
        \maximum 1
- A100, \field Surface 96 Name
+ A101, \field Surface 96 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N103, \field Fraction of Radiant Energy to Surface 96
+ N105, \field Fraction of Radiant Energy to Surface 96
        \type real
        \minimum 0
        \maximum 1
- A101, \field Surface 97 Name
+ A102, \field Surface 97 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N104, \field Fraction of Radiant Energy to Surface 97
+ N106, \field Fraction of Radiant Energy to Surface 97
        \type real
        \minimum 0
        \maximum 1
- A102, \field Surface 98 Name
+ A103, \field Surface 98 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N105, \field Fraction of Radiant Energy to Surface 98
+ N107, \field Fraction of Radiant Energy to Surface 98
        \type real
        \minimum 0
        \maximum 1
- A103, \field Surface 99 Name
+ A104, \field Surface 99 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N106, \field Fraction of Radiant Energy to Surface 99
+ N108, \field Fraction of Radiant Energy to Surface 99
        \type real
        \minimum 0
        \maximum 1
- A104, \field Surface 100 Name
+ A105, \field Surface 100 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N107; \field Fraction of Radiant Energy to Surface 100
+ N109; \field Fraction of Radiant Energy to Surface 100
        \type real
        \minimum 0
        \maximum 1
@@ -33276,729 +33678,762 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
   A4,  \field Outlet Node Name
        \required-field
        \type node
-  N1,  \field Degree of SubCooling
+  A5 , \field Heating Design Capacity Method
+       \required-field
+       \type choice
+       \key HeatingDesignCapacity
+       \key CapacityPerFloorArea
+       \key FractionOfAutosizedHeatingCapacity
+       \default HeatingDesignCapacity
+       \note Enter the method used to determine the heating design capacity. 
+       \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+       \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+       \note determine from user specified heating capacity per floor area and zone floor area.
+       \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+       \note determined from a user specified fraction and the auto-sized design heating capacity.
+  N1 , \field Heating Design Capacity
+       \type real
+       \units W
+       \minimum 0.0
+       \autosizable
+       \ip-units W
+       \default autosize
+       \note Enter the design heating capacity.Required field when the heating design capacity method
+       \note HeatingDesignCapacity.
+  N2 , \field Heating Design Capacity Per Floor Area
+       \type real
+       \minimum 0.0
+       \note Enter the heating design capacity per zone floor area.Required field when the heating design
+       \note capacity method field is CapacityPerFloorArea.
+  N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+       \type real
+       \minimum 0.0
+       \default 1.0
+       \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+  N4,  \field Degree of SubCooling
        \type real
        \minimum 1.0
        \default 5.0
        \units C
-  N2,  \field Maximum Steam Flow Rate
+  N5,  \field Maximum Steam Flow Rate
        \required-field
        \type real
        \autosizable
        \minimum> 0.0
        \units m3/s
-  N3,  \field Convergence Tolerance
+  N6,  \field Convergence Tolerance
        \type real
        \minimum> 0.0
        \default 0.001
-  N4,  \field Fraction Radiant
+  N7,  \field Fraction Radiant
        \required-field
        \type real
        \minimum 0
        \maximum 1
-  N5,  \field Fraction of Radiant Energy Incident on People
+  N8,  \field Fraction of Radiant Energy Incident on People
        \type real
        \minimum 0
        \maximum 1
-  A5,  \field Surface 1 Name
+  A6,  \field Surface 1 Name
        \begin-extensible
        \note Radiant energy may be distributed to specific surfaces
        \type object-list
        \object-list AllHeatTranSurfNames
-  N6,  \field Fraction of Radiant Energy to Surface 1
+  N9,  \field Fraction of Radiant Energy to Surface 1
        \type real
        \minimum 0
        \maximum 1
-  A6,  \field Surface 2 Name
+  A7,  \field Surface 2 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N7,  \field Fraction of Radiant Energy to Surface 2
+  N10, \field Fraction of Radiant Energy to Surface 2
        \type real
        \minimum 0
        \maximum 1
-  A7,  \field Surface 3 Name
+  A8,  \field Surface 3 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N8,  \field Fraction of Radiant Energy to Surface 3
+  N11, \field Fraction of Radiant Energy to Surface 3
        \type real
        \minimum 0
        \maximum 1
-  A8,  \field Surface 4 Name
+  A9,  \field Surface 4 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N9,  \field Fraction of Radiant Energy to Surface 4
+  N12, \field Fraction of Radiant Energy to Surface 4
        \type real
        \minimum 0
        \maximum 1
-  A9,  \field Surface 5 Name
+  A10, \field Surface 5 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N10, \field Fraction of Radiant Energy to Surface 5
+  N13, \field Fraction of Radiant Energy to Surface 5
        \type real
        \minimum 0
        \maximum 1
-  A10, \field Surface 6 Name
+  A11, \field Surface 6 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N11, \field Fraction of Radiant Energy to Surface 6
+  N14, \field Fraction of Radiant Energy to Surface 6
        \type real
        \minimum 0
        \maximum 1
-  A11, \field Surface 7 Name
+  A12, \field Surface 7 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N12, \field Fraction of Radiant Energy to Surface 7
+  N15, \field Fraction of Radiant Energy to Surface 7
        \type real
        \minimum 0
        \maximum 1
-  A12, \field Surface 8 Name
+  A13, \field Surface 8 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N13, \field Fraction of Radiant Energy to Surface 8
+  N16, \field Fraction of Radiant Energy to Surface 8
        \type real
        \minimum 0
        \maximum 1
-  A13, \field Surface 9 Name
+  A14, \field Surface 9 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N14, \field Fraction of Radiant Energy to Surface 9
+  N17, \field Fraction of Radiant Energy to Surface 9
        \type real
        \minimum 0
        \maximum 1
-  A14, \field Surface 10 Name
+  A15, \field Surface 10 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N15, \field Fraction of Radiant Energy to Surface 10
+  N18, \field Fraction of Radiant Energy to Surface 10
        \type real
        \minimum 0
        \maximum 1
-  A15, \field Surface 11 Name
+  A16, \field Surface 11 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N16, \field Fraction of Radiant Energy to Surface 11
+  N19, \field Fraction of Radiant Energy to Surface 11
        \type real
        \minimum 0
        \maximum 1
-  A16, \field Surface 12 Name
+  A17, \field Surface 12 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N17, \field Fraction of Radiant Energy to Surface 12
+  N20, \field Fraction of Radiant Energy to Surface 12
        \type real
        \minimum 0
        \maximum 1
-  A17, \field Surface 13 Name
+  A18, \field Surface 13 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N18, \field Fraction of Radiant Energy to Surface 13
+  N21, \field Fraction of Radiant Energy to Surface 13
        \type real
        \minimum 0
        \maximum 1
-  A18, \field Surface 14 Name
+  A19, \field Surface 14 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N19, \field Fraction of Radiant Energy to Surface 14
+  N22, \field Fraction of Radiant Energy to Surface 14
        \type real
        \minimum 0
        \maximum 1
-  A19, \field Surface 15 Name
+  A20, \field Surface 15 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N20, \field Fraction of Radiant Energy to Surface 15
+  N23, \field Fraction of Radiant Energy to Surface 15
        \type real
        \minimum 0
        \maximum 1
-  A20, \field Surface 16 Name
+  A21, \field Surface 16 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N21, \field Fraction of Radiant Energy to Surface 16
+  N24, \field Fraction of Radiant Energy to Surface 16
        \type real
        \minimum 0
        \maximum 1
-  A21, \field Surface 17 Name
+  A22, \field Surface 17 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N22, \field Fraction of Radiant Energy to Surface 17
+  N25, \field Fraction of Radiant Energy to Surface 17
        \type real
        \minimum 0
        \maximum 1
-  A22, \field Surface 18 Name
+  A23, \field Surface 18 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N23, \field Fraction of Radiant Energy to Surface 18
+  N26, \field Fraction of Radiant Energy to Surface 18
        \type real
        \minimum 0
        \maximum 1
-  A23, \field Surface 19 Name
+  A24, \field Surface 19 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N24, \field Fraction of Radiant Energy to Surface 19
+  N27, \field Fraction of Radiant Energy to Surface 19
        \type real
        \minimum 0
        \maximum 1
-  A24, \field Surface 20 Name
+  A25, \field Surface 20 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N25, \field Fraction of Radiant Energy to Surface 20
+  N28, \field Fraction of Radiant Energy to Surface 20
        \type real
        \minimum 0
        \maximum 1
-  A25, \field Surface 21 Name
+  A26, \field Surface 21 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N26, \field Fraction of Radiant Energy to Surface 21
+  N29, \field Fraction of Radiant Energy to Surface 21
        \type real
        \minimum 0
        \maximum 1
-  A26, \field Surface 22 Name
+  A27, \field Surface 22 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N27, \field Fraction of Radiant Energy to Surface 22
+  N30, \field Fraction of Radiant Energy to Surface 22
        \type real
        \minimum 0
        \maximum 1
-  A27, \field Surface 23 Name
+  A28, \field Surface 23 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N28, \field Fraction of Radiant Energy to Surface 23
+  N31, \field Fraction of Radiant Energy to Surface 23
        \type real
        \minimum 0
        \maximum 1
-  A28, \field Surface 24 Name
+  A29, \field Surface 24 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N29, \field Fraction of Radiant Energy to Surface 24
+  N32, \field Fraction of Radiant Energy to Surface 24
        \type real
        \minimum 0
        \maximum 1
-  A29, \field Surface 25 Name
+  A30, \field Surface 25 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N30, \field Fraction of Radiant Energy to Surface 25
+  N33, \field Fraction of Radiant Energy to Surface 25
        \type real
        \minimum 0
        \maximum 1
-  A30, \field Surface 26 Name
+  A31, \field Surface 26 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N31, \field Fraction of Radiant Energy to Surface 26
+  N34, \field Fraction of Radiant Energy to Surface 26
        \type real
        \minimum 0
        \maximum 1
-  A31, \field Surface 27 Name
+  A32, \field Surface 27 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N32, \field Fraction of Radiant Energy to Surface 27
+  N35, \field Fraction of Radiant Energy to Surface 27
        \type real
        \minimum 0
        \maximum 1
-  A32, \field Surface 28 Name
+  A33, \field Surface 28 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N33, \field Fraction of Radiant Energy to Surface 28
+  N36, \field Fraction of Radiant Energy to Surface 28
        \type real
        \minimum 0
        \maximum 1
-  A33, \field Surface 29 Name
+  A34, \field Surface 29 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N34, \field Fraction of Radiant Energy to Surface 29
+  N37, \field Fraction of Radiant Energy to Surface 29
        \type real
        \minimum 0
        \maximum 1
-  A34, \field Surface 30 Name
+  A35, \field Surface 30 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N35, \field Fraction of Radiant Energy to Surface 30
+  N38, \field Fraction of Radiant Energy to Surface 30
        \type real
        \minimum 0
        \maximum 1
-  A35, \field Surface 31 Name
+  A36, \field Surface 31 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N36, \field Fraction of Radiant Energy to Surface 31
+  N39, \field Fraction of Radiant Energy to Surface 31
        \type real
        \minimum 0
        \maximum 1
-  A36, \field Surface 32 Name
+  A37, \field Surface 32 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N37, \field Fraction of Radiant Energy to Surface 32
+  N40, \field Fraction of Radiant Energy to Surface 32
        \type real
        \minimum 0
        \maximum 1
-  A37, \field Surface 33 Name
+  A38, \field Surface 33 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N38, \field Fraction of Radiant Energy to Surface 33
+  N41, \field Fraction of Radiant Energy to Surface 33
        \type real
        \minimum 0
        \maximum 1
-  A38, \field Surface 34 Name
+  A39, \field Surface 34 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N39, \field Fraction of Radiant Energy to Surface 34
+  N42, \field Fraction of Radiant Energy to Surface 34
        \type real
        \minimum 0
        \maximum 1
-  A39, \field Surface 35 Name
+  A40, \field Surface 35 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N40, \field Fraction of Radiant Energy to Surface 35
+  N43, \field Fraction of Radiant Energy to Surface 35
        \type real
        \minimum 0
        \maximum 1
-  A40, \field Surface 36 Name
+  A41, \field Surface 36 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N41, \field Fraction of Radiant Energy to Surface 36
+  N44, \field Fraction of Radiant Energy to Surface 36
        \type real
        \minimum 0
        \maximum 1
-  A41, \field Surface 37 Name
+  A42, \field Surface 37 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N42, \field Fraction of Radiant Energy to Surface 37
+  N45, \field Fraction of Radiant Energy to Surface 37
        \type real
        \minimum 0
        \maximum 1
-  A42, \field Surface 38 Name
+  A43, \field Surface 38 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N43, \field Fraction of Radiant Energy to Surface 38
+  N46, \field Fraction of Radiant Energy to Surface 38
        \type real
        \minimum 0
        \maximum 1
-  A43, \field Surface 39 Name
+  A44, \field Surface 39 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N44, \field Fraction of Radiant Energy to Surface 39
+  N47, \field Fraction of Radiant Energy to Surface 39
        \type real
        \minimum 0
        \maximum 1
-  A44, \field Surface 40 Name
+  A45, \field Surface 40 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N45, \field Fraction of Radiant Energy to Surface 40
+  N48, \field Fraction of Radiant Energy to Surface 40
        \type real
        \minimum 0
        \maximum 1
-  A45, \field Surface 41 Name
+  A46, \field Surface 41 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N46, \field Fraction of Radiant Energy to Surface 41
+  N49, \field Fraction of Radiant Energy to Surface 41
        \type real
        \minimum 0
        \maximum 1
-  A46, \field Surface 42 Name
+  A47, \field Surface 42 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N47, \field Fraction of Radiant Energy to Surface 42
+  N50, \field Fraction of Radiant Energy to Surface 42
        \type real
        \minimum 0
        \maximum 1
-  A47, \field Surface 43 Name
+  A48, \field Surface 43 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N48, \field Fraction of Radiant Energy to Surface 43
+  N51, \field Fraction of Radiant Energy to Surface 43
        \type real
        \minimum 0
        \maximum 1
-  A48, \field Surface 44 Name
+  A49, \field Surface 44 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N49, \field Fraction of Radiant Energy to Surface 44
+  N52, \field Fraction of Radiant Energy to Surface 44
        \type real
        \minimum 0
        \maximum 1
-  A49, \field Surface 45 Name
+  A50, \field Surface 45 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N50, \field Fraction of Radiant Energy to Surface 45
+  N53, \field Fraction of Radiant Energy to Surface 45
        \type real
        \minimum 0
        \maximum 1
-  A50, \field Surface 46 Name
+  A51, \field Surface 46 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N51, \field Fraction of Radiant Energy to Surface 46
+  N54, \field Fraction of Radiant Energy to Surface 46
        \type real
        \minimum 0
        \maximum 1
-  A51, \field Surface 47 Name
+  A52, \field Surface 47 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N52, \field Fraction of Radiant Energy to Surface 47
+  N55, \field Fraction of Radiant Energy to Surface 47
        \type real
        \minimum 0
        \maximum 1
-  A52, \field Surface 48 Name
+  A53, \field Surface 48 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N53, \field Fraction of Radiant Energy to Surface 48
+  N56, \field Fraction of Radiant Energy to Surface 48
        \type real
        \minimum 0
        \maximum 1
-  A53, \field Surface 49 Name
+  A54, \field Surface 49 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N54, \field Fraction of Radiant Energy to Surface 49
+  N57, \field Fraction of Radiant Energy to Surface 49
        \type real
        \minimum 0
        \maximum 1
-  A54, \field Surface 50 Name
+  A55, \field Surface 50 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N55, \field Fraction of Radiant Energy to Surface 50
+  N58, \field Fraction of Radiant Energy to Surface 50
        \type real
        \minimum 0
        \maximum 1
-  A55, \field Surface 51 Name
+  A56, \field Surface 51 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N56, \field Fraction of Radiant Energy to Surface 51
+  N59, \field Fraction of Radiant Energy to Surface 51
        \type real
        \minimum 0
        \maximum 1
-  A56, \field Surface 52 Name
+  A57, \field Surface 52 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N57, \field Fraction of Radiant Energy to Surface 52
+  N60, \field Fraction of Radiant Energy to Surface 52
        \type real
        \minimum 0
        \maximum 1
-  A57, \field Surface 53 Name
+  A58, \field Surface 53 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N58, \field Fraction of Radiant Energy to Surface 53
+  N61, \field Fraction of Radiant Energy to Surface 53
        \type real
        \minimum 0
        \maximum 1
-  A58, \field Surface 54 Name
+  A59, \field Surface 54 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N59, \field Fraction of Radiant Energy to Surface 54
+  N62, \field Fraction of Radiant Energy to Surface 54
        \type real
        \minimum 0
        \maximum 1
-  A59, \field Surface 55 Name
+  A60, \field Surface 55 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N60, \field Fraction of Radiant Energy to Surface 55
+  N63, \field Fraction of Radiant Energy to Surface 55
        \type real
        \minimum 0
        \maximum 1
-  A60, \field Surface 56 Name
+  A61, \field Surface 56 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N61, \field Fraction of Radiant Energy to Surface 56
+  N64, \field Fraction of Radiant Energy to Surface 56
        \type real
        \minimum 0
        \maximum 1
-  A61, \field Surface 57 Name
+  A62, \field Surface 57 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N62, \field Fraction of Radiant Energy to Surface 57
+  N65, \field Fraction of Radiant Energy to Surface 57
        \type real
        \minimum 0
        \maximum 1
-  A62, \field Surface 58 Name
+  A63, \field Surface 58 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N63, \field Fraction of Radiant Energy to Surface 58
+  N66, \field Fraction of Radiant Energy to Surface 58
        \type real
        \minimum 0
        \maximum 1
-  A63, \field Surface 59 Name
+  A64, \field Surface 59 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N64, \field Fraction of Radiant Energy to Surface 59
+  N67, \field Fraction of Radiant Energy to Surface 59
        \type real
        \minimum 0
        \maximum 1
-  A64, \field Surface 60 Name
+  A65, \field Surface 60 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N65, \field Fraction of Radiant Energy to Surface 60
+  N68, \field Fraction of Radiant Energy to Surface 60
        \type real
        \minimum 0
        \maximum 1
-  A65, \field Surface 61 Name
+  A66, \field Surface 61 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N66, \field Fraction of Radiant Energy to Surface 61
+  N69, \field Fraction of Radiant Energy to Surface 61
        \type real
        \minimum 0
        \maximum 1
-  A66, \field Surface 62 Name
+  A67, \field Surface 62 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N67, \field Fraction of Radiant Energy to Surface 62
+  N70, \field Fraction of Radiant Energy to Surface 62
        \type real
        \minimum 0
        \maximum 1
-  A67, \field Surface 63 Name
+  A68, \field Surface 63 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N68, \field Fraction of Radiant Energy to Surface 63
+  N71, \field Fraction of Radiant Energy to Surface 63
        \type real
        \minimum 0
        \maximum 1
-  A68, \field Surface 64 Name
+  A69, \field Surface 64 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N69, \field Fraction of Radiant Energy to Surface 64
+  N72, \field Fraction of Radiant Energy to Surface 64
        \type real
        \minimum 0
        \maximum 1
-  A69, \field Surface 65 Name
+  A70, \field Surface 65 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N70, \field Fraction of Radiant Energy to Surface 65
+  N73, \field Fraction of Radiant Energy to Surface 65
        \type real
        \minimum 0
        \maximum 1
-  A70, \field Surface 66 Name
+  A71, \field Surface 66 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N71, \field Fraction of Radiant Energy to Surface 66
+  N74, \field Fraction of Radiant Energy to Surface 66
        \type real
        \minimum 0
        \maximum 1
-  A71, \field Surface 67 Name
+  A72, \field Surface 67 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N72, \field Fraction of Radiant Energy to Surface 67
+  N75, \field Fraction of Radiant Energy to Surface 67
        \type real
        \minimum 0
        \maximum 1
-  A72, \field Surface 68 Name
+  A73, \field Surface 68 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N73, \field Fraction of Radiant Energy to Surface 68
+  N76, \field Fraction of Radiant Energy to Surface 68
        \type real
        \minimum 0
        \maximum 1
-  A73, \field Surface 69 Name
+  A74, \field Surface 69 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N74, \field Fraction of Radiant Energy to Surface 69
+  N77, \field Fraction of Radiant Energy to Surface 69
        \type real
        \minimum 0
        \maximum 1
-  A74, \field Surface 70 Name
+  A75, \field Surface 70 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N75, \field Fraction of Radiant Energy to Surface 70
+  N78, \field Fraction of Radiant Energy to Surface 70
        \type real
        \minimum 0
        \maximum 1
-  A75, \field Surface 71 Name
+  A76, \field Surface 71 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N76, \field Fraction of Radiant Energy to Surface 71
+  N79, \field Fraction of Radiant Energy to Surface 71
        \type real
        \minimum 0
        \maximum 1
-  A76, \field Surface 72 Name
+  A77, \field Surface 72 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N77, \field Fraction of Radiant Energy to Surface 72
+  N80, \field Fraction of Radiant Energy to Surface 72
        \type real
        \minimum 0
        \maximum 1
-  A77, \field Surface 73 Name
+  A78, \field Surface 73 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N78, \field Fraction of Radiant Energy to Surface 73
+  N81, \field Fraction of Radiant Energy to Surface 73
        \type real
        \minimum 0
        \maximum 1
-  A78, \field Surface 74 Name
+  A79, \field Surface 74 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N79, \field Fraction of Radiant Energy to Surface 74
+  N82, \field Fraction of Radiant Energy to Surface 74
        \type real
        \minimum 0
        \maximum 1
-  A79, \field Surface 75 Name
+  A80, \field Surface 75 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N80, \field Fraction of Radiant Energy to Surface 75
+  N83, \field Fraction of Radiant Energy to Surface 75
        \type real
        \minimum 0
        \maximum 1
-  A80, \field Surface 76 Name
+  A81, \field Surface 76 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N81, \field Fraction of Radiant Energy to Surface 76
+  N84, \field Fraction of Radiant Energy to Surface 76
        \type real
        \minimum 0
        \maximum 1
-  A81, \field Surface 77 Name
+  A82, \field Surface 77 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N82, \field Fraction of Radiant Energy to Surface 77
+  N85, \field Fraction of Radiant Energy to Surface 77
        \type real
        \minimum 0
        \maximum 1
-  A82, \field Surface 78 Name
+  A83, \field Surface 78 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N83, \field Fraction of Radiant Energy to Surface 78
+  N86, \field Fraction of Radiant Energy to Surface 78
        \type real
        \minimum 0
        \maximum 1
-  A83, \field Surface 79 Name
+  A84, \field Surface 79 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N84, \field Fraction of Radiant Energy to Surface 79
+  N87, \field Fraction of Radiant Energy to Surface 79
        \type real
        \minimum 0
        \maximum 1
-  A84, \field Surface 80 Name
+  A85, \field Surface 80 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N85, \field Fraction of Radiant Energy to Surface 80
+  N88, \field Fraction of Radiant Energy to Surface 80
        \type real
        \minimum 0
        \maximum 1
-  A85, \field Surface 81 Name
+  A86, \field Surface 81 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N86, \field Fraction of Radiant Energy to Surface 81
+  N89, \field Fraction of Radiant Energy to Surface 81
        \type real
        \minimum 0
        \maximum 1
-  A86, \field Surface 82 Name
+  A87, \field Surface 82 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N87, \field Fraction of Radiant Energy to Surface 82
+  N90, \field Fraction of Radiant Energy to Surface 82
        \type real
        \minimum 0
        \maximum 1
-  A87, \field Surface 83 Name
+  A88, \field Surface 83 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N88, \field Fraction of Radiant Energy to Surface 83
+  N91, \field Fraction of Radiant Energy to Surface 83
        \type real
        \minimum 0
        \maximum 1
-  A88, \field Surface 84 Name
+  A89, \field Surface 84 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N89, \field Fraction of Radiant Energy to Surface 84
+  N92, \field Fraction of Radiant Energy to Surface 84
        \type real
        \minimum 0
        \maximum 1
-  A89, \field Surface 85 Name
+  A90, \field Surface 85 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N90, \field Fraction of Radiant Energy to Surface 85
+  N93, \field Fraction of Radiant Energy to Surface 85
        \type real
        \minimum 0
        \maximum 1
-  A90, \field Surface 86 Name
+  A91, \field Surface 86 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N91, \field Fraction of Radiant Energy to Surface 86
+  N94, \field Fraction of Radiant Energy to Surface 86
        \type real
        \minimum 0
        \maximum 1
-  A91, \field Surface 87 Name
+  A92, \field Surface 87 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N92, \field Fraction of Radiant Energy to Surface 87
+  N95, \field Fraction of Radiant Energy to Surface 87
        \type real
        \minimum 0
        \maximum 1
-  A92, \field Surface 88 Name
+  A93, \field Surface 88 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N93, \field Fraction of Radiant Energy to Surface 88
+  N96, \field Fraction of Radiant Energy to Surface 88
        \type real
        \minimum 0
        \maximum 1
-  A93, \field Surface 89 Name
+  A94, \field Surface 89 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N94, \field Fraction of Radiant Energy to Surface 89
+  N97, \field Fraction of Radiant Energy to Surface 89
        \type real
        \minimum 0
        \maximum 1
-  A94, \field Surface 90 Name
+  A95, \field Surface 90 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N95, \field Fraction of Radiant Energy to Surface 90
+  N98, \field Fraction of Radiant Energy to Surface 90
        \type real
        \minimum 0
        \maximum 1
-  A95, \field Surface 91 Name
+  A96, \field Surface 91 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N96, \field Fraction of Radiant Energy to Surface 91
+  N99, \field Fraction of Radiant Energy to Surface 91
        \type real
        \minimum 0
        \maximum 1
-  A96, \field Surface 92 Name
+  A97, \field Surface 92 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N97, \field Fraction of Radiant Energy to Surface 92
+ N100, \field Fraction of Radiant Energy to Surface 92
        \type real
        \minimum 0
        \maximum 1
-  A97, \field Surface 93 Name
+  A98, \field Surface 93 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N98, \field Fraction of Radiant Energy to Surface 93
+ N101, \field Fraction of Radiant Energy to Surface 93
        \type real
        \minimum 0
        \maximum 1
-  A98, \field Surface 94 Name
+  A99, \field Surface 94 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N99, \field Fraction of Radiant Energy to Surface 94
+ N102, \field Fraction of Radiant Energy to Surface 94
        \type real
        \minimum 0
        \maximum 1
-  A99, \field Surface 95 Name
+ A100, \field Surface 95 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N100, \field Fraction of Radiant Energy to Surface 95
+ N103, \field Fraction of Radiant Energy to Surface 95
        \type real
        \minimum 0
        \maximum 1
- A100, \field Surface 96 Name
+ A101, \field Surface 96 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N101, \field Fraction of Radiant Energy to Surface 96
+ N104, \field Fraction of Radiant Energy to Surface 96
        \type real
        \minimum 0
        \maximum 1
- A101, \field Surface 97 Name
+ A102, \field Surface 97 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N102, \field Fraction of Radiant Energy to Surface 97
+ N105, \field Fraction of Radiant Energy to Surface 97
        \type real
        \minimum 0
        \maximum 1
- A102, \field Surface 98 Name
+ A103, \field Surface 98 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N103, \field Fraction of Radiant Energy to Surface 98
+ N106, \field Fraction of Radiant Energy to Surface 98
        \type real
        \minimum 0
        \maximum 1
- A103, \field Surface 99 Name
+ A104, \field Surface 99 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N104, \field Fraction of Radiant Energy to Surface 99
+ N107, \field Fraction of Radiant Energy to Surface 99
        \type real
        \minimum 0
        \maximum 1
- A104, \field Surface 100 Name
+ A105, \field Surface 100 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N105; \field Fraction of Radiant Energy to Surface 100
+ N108; \field Fraction of Radiant Energy to Surface 100
        \type real
        \minimum 0
        \maximum 1
@@ -34015,724 +34450,752 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \note If this field is blank, the system is always available.
        \type object-list
        \object-list ScheduleNames
-  N1 , \field Nominal Capacity
+  A3 , \field Heating Design Capacity Method
        \required-field
+       \type choice
+       \key HeatingDesignCapacity
+       \key CapacityPerFloorArea
+       \key FractionOfAutosizedHeatingCapacity
+       \default HeatingDesignCapacity
+       \note Enter the method used to determine the heating design capacity. 
+       \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+       \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+       \note determine from user specified heating capacity per floor area and zone floor area.
+       \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+       \note determined from a user specified fraction and the auto-sized design heating capacity.
+  N1 , \field Heating Design Capacity
+       \type real
        \units W
+       \minimum 0.0
        \autosizable
        \ip-units W
-  N2 , \field Efficiency
+       \default autosize
+       \note Enter the design heating capacity.Required field when the heating design capacity method
+       \note HeatingDesignCapacity.
+  N2 , \field Heating Design Capacity Per Floor Area
+       \type real
+       \minimum 0.0
+       \note Enter the heating design capacity per zone floor area.Required field when the heating design
+       \note capacity method field is CapacityPerFloorArea.
+  N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+       \type real
+       \minimum 0.0
+       \default 1.0
+       \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+  N4 , \field Efficiency
        \required-field
        \maximum 1.0
        \minimum> 0.0
        \default 1.0
-  N3,  \field Fraction Radiant
+  N5,  \field Fraction Radiant
        \required-field
        \type real
        \minimum 0
        \maximum 1
-  N4,  \field Fraction of Radiant Energy Incident on People
+  N6,  \field Fraction of Radiant Energy Incident on People
        \type real
        \minimum 0
        \maximum 1
-  A3,  \field Surface 1 Name
+  A4,  \field Surface 1 Name
        \begin-extensible
        \note Radiant energy may be distributed to specific surfaces
        \type object-list
        \object-list AllHeatTranSurfNames
-  N5,  \field Fraction of Radiant Energy to Surface 1
+  N7,  \field Fraction of Radiant Energy to Surface 1
        \type real
        \minimum 0
        \maximum 1
-  A4,  \field Surface 2 Name
+  A5,  \field Surface 2 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N6,  \field Fraction of Radiant Energy to Surface 2
+  N8,  \field Fraction of Radiant Energy to Surface 2
        \type real
        \minimum 0
        \maximum 1
-  A5,  \field Surface 3 Name
+  A6,  \field Surface 3 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N7,  \field Fraction of Radiant Energy to Surface 3
+  N9,  \field Fraction of Radiant Energy to Surface 3
        \type real
        \minimum 0
        \maximum 1
-  A6,  \field Surface 4 Name
+  A7,  \field Surface 4 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N8,  \field Fraction of Radiant Energy to Surface 4
+  N10, \field Fraction of Radiant Energy to Surface 4
        \type real
        \minimum 0
        \maximum 1
-  A7,  \field Surface 5 Name
+  A8,  \field Surface 5 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N9,  \field Fraction of Radiant Energy to Surface 5
+  N11, \field Fraction of Radiant Energy to Surface 5
        \type real
        \minimum 0
        \maximum 1
-  A8,  \field Surface 6 Name
+  A9,  \field Surface 6 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N10, \field Fraction of Radiant Energy to Surface 6
+  N12, \field Fraction of Radiant Energy to Surface 6
        \type real
        \minimum 0
        \maximum 1
-  A9,  \field Surface 7 Name
+  A10,  \field Surface 7 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N11, \field Fraction of Radiant Energy to Surface 7
+  N13, \field Fraction of Radiant Energy to Surface 7
        \type real
        \minimum 0
        \maximum 1
-  A10, \field Surface 8 Name
+  A11, \field Surface 8 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N12, \field Fraction of Radiant Energy to Surface 8
+  N14, \field Fraction of Radiant Energy to Surface 8
        \type real
        \minimum 0
        \maximum 1
-  A11, \field Surface 9 Name
+  A12, \field Surface 9 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N13, \field Fraction of Radiant Energy to Surface 9
+  N15, \field Fraction of Radiant Energy to Surface 9
        \type real
        \minimum 0
        \maximum 1
-  A12, \field Surface 10 Name
+  A13, \field Surface 10 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N14, \field Fraction of Radiant Energy to Surface 10
+  N16, \field Fraction of Radiant Energy to Surface 10
        \type real
        \minimum 0
        \maximum 1
-  A13, \field Surface 11 Name
+  A14, \field Surface 11 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N15, \field Fraction of Radiant Energy to Surface 11
+  N17, \field Fraction of Radiant Energy to Surface 11
        \type real
        \minimum 0
        \maximum 1
-  A14, \field Surface 12 Name
+  A15, \field Surface 12 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N16, \field Fraction of Radiant Energy to Surface 12
+  N18, \field Fraction of Radiant Energy to Surface 12
        \type real
        \minimum 0
        \maximum 1
-  A15, \field Surface 13 Name
+  A16, \field Surface 13 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N17, \field Fraction of Radiant Energy to Surface 13
+  N19, \field Fraction of Radiant Energy to Surface 13
        \type real
        \minimum 0
        \maximum 1
-  A16, \field Surface 14 Name
+  A17, \field Surface 14 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N18, \field Fraction of Radiant Energy to Surface 14
+  N20, \field Fraction of Radiant Energy to Surface 14
        \type real
        \minimum 0
        \maximum 1
-  A17, \field Surface 15 Name
+  A18, \field Surface 15 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N19, \field Fraction of Radiant Energy to Surface 15
+  N21, \field Fraction of Radiant Energy to Surface 15
        \type real
        \minimum 0
        \maximum 1
-  A18, \field Surface 16 Name
+  A19, \field Surface 16 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N20, \field Fraction of Radiant Energy to Surface 16
+  N22, \field Fraction of Radiant Energy to Surface 16
        \type real
        \minimum 0
        \maximum 1
-  A19, \field Surface 17 Name
+  A20, \field Surface 17 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N21, \field Fraction of Radiant Energy to Surface 17
+  N23, \field Fraction of Radiant Energy to Surface 17
        \type real
        \minimum 0
        \maximum 1
-  A20, \field Surface 18 Name
+  A21, \field Surface 18 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N22, \field Fraction of Radiant Energy to Surface 18
+  N24, \field Fraction of Radiant Energy to Surface 18
        \type real
        \minimum 0
        \maximum 1
-  A21, \field Surface 19 Name
+  A22, \field Surface 19 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N23, \field Fraction of Radiant Energy to Surface 19
+  N25, \field Fraction of Radiant Energy to Surface 19
        \type real
        \minimum 0
        \maximum 1
-  A22, \field Surface 20 Name
+  A23, \field Surface 20 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N24, \field Fraction of Radiant Energy to Surface 20
+  N26, \field Fraction of Radiant Energy to Surface 20
        \type real
        \minimum 0
        \maximum 1
-  A23, \field Surface 21 Name
+  A24, \field Surface 21 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N25, \field Fraction of Radiant Energy to Surface 21
+  N27, \field Fraction of Radiant Energy to Surface 21
        \type real
        \minimum 0
        \maximum 1
-  A24, \field Surface 22 Name
+  A25, \field Surface 22 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N26, \field Fraction of Radiant Energy to Surface 22
+  N28, \field Fraction of Radiant Energy to Surface 22
        \type real
        \minimum 0
        \maximum 1
-  A25, \field Surface 23 Name
+  A26, \field Surface 23 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N27, \field Fraction of Radiant Energy to Surface 23
+  N29, \field Fraction of Radiant Energy to Surface 23
        \type real
        \minimum 0
        \maximum 1
-  A26, \field Surface 24 Name
+  A27, \field Surface 24 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N28, \field Fraction of Radiant Energy to Surface 24
+  N30, \field Fraction of Radiant Energy to Surface 24
        \type real
        \minimum 0
        \maximum 1
-  A27, \field Surface 25 Name
+  A28, \field Surface 25 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N29, \field Fraction of Radiant Energy to Surface 25
+  N31, \field Fraction of Radiant Energy to Surface 25
        \type real
        \minimum 0
        \maximum 1
-  A28, \field Surface 26 Name
+  A29, \field Surface 26 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N30, \field Fraction of Radiant Energy to Surface 26
+  N32, \field Fraction of Radiant Energy to Surface 26
        \type real
        \minimum 0
        \maximum 1
-  A29, \field Surface 27 Name
+  A30, \field Surface 27 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N31, \field Fraction of Radiant Energy to Surface 27
+  N33, \field Fraction of Radiant Energy to Surface 27
        \type real
        \minimum 0
        \maximum 1
-  A30, \field Surface 28 Name
+  A31, \field Surface 28 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N32, \field Fraction of Radiant Energy to Surface 28
+  N34, \field Fraction of Radiant Energy to Surface 28
        \type real
        \minimum 0
        \maximum 1
-  A31, \field Surface 29 Name
+  A32, \field Surface 29 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N33, \field Fraction of Radiant Energy to Surface 29
+  N35, \field Fraction of Radiant Energy to Surface 29
        \type real
        \minimum 0
        \maximum 1
-  A32, \field Surface 30 Name
+  A33, \field Surface 30 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N34, \field Fraction of Radiant Energy to Surface 30
+  N36, \field Fraction of Radiant Energy to Surface 30
        \type real
        \minimum 0
        \maximum 1
-  A33, \field Surface 31 Name
+  A34, \field Surface 31 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N35, \field Fraction of Radiant Energy to Surface 31
+  N37, \field Fraction of Radiant Energy to Surface 31
        \type real
        \minimum 0
        \maximum 1
-  A34, \field Surface 32 Name
+  A35, \field Surface 32 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N36, \field Fraction of Radiant Energy to Surface 32
+  N38, \field Fraction of Radiant Energy to Surface 32
        \type real
        \minimum 0
        \maximum 1
-  A35, \field Surface 33 Name
+  A36, \field Surface 33 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N37, \field Fraction of Radiant Energy to Surface 33
+  N39, \field Fraction of Radiant Energy to Surface 33
        \type real
        \minimum 0
        \maximum 1
-  A36, \field Surface 34 Name
+  A37, \field Surface 34 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N38, \field Fraction of Radiant Energy to Surface 34
+  N40, \field Fraction of Radiant Energy to Surface 34
        \type real
        \minimum 0
        \maximum 1
-  A37, \field Surface 35 Name
+  A38, \field Surface 35 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N39, \field Fraction of Radiant Energy to Surface 35
+  N41, \field Fraction of Radiant Energy to Surface 35
        \type real
        \minimum 0
        \maximum 1
-  A38, \field Surface 36 Name
+  A39, \field Surface 36 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N40, \field Fraction of Radiant Energy to Surface 36
+  N42, \field Fraction of Radiant Energy to Surface 36
        \type real
        \minimum 0
        \maximum 1
-  A39, \field Surface 37 Name
+  A40, \field Surface 37 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N41, \field Fraction of Radiant Energy to Surface 37
+  N43, \field Fraction of Radiant Energy to Surface 37
        \type real
        \minimum 0
        \maximum 1
-  A40, \field Surface 38 Name
+  A41, \field Surface 38 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N42, \field Fraction of Radiant Energy to Surface 38
+  N44, \field Fraction of Radiant Energy to Surface 38
        \type real
        \minimum 0
        \maximum 1
-  A41, \field Surface 39 Name
+  A42, \field Surface 39 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N43, \field Fraction of Radiant Energy to Surface 39
+  N45, \field Fraction of Radiant Energy to Surface 39
        \type real
        \minimum 0
        \maximum 1
-  A42, \field Surface 40 Name
+  A43, \field Surface 40 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N44, \field Fraction of Radiant Energy to Surface 40
+  N46, \field Fraction of Radiant Energy to Surface 40
        \type real
        \minimum 0
        \maximum 1
-  A43, \field Surface 41 Name
+  A44, \field Surface 41 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N45, \field Fraction of Radiant Energy to Surface 41
+  N47, \field Fraction of Radiant Energy to Surface 41
        \type real
        \minimum 0
        \maximum 1
-  A44, \field Surface 42 Name
+  A45, \field Surface 42 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N46, \field Fraction of Radiant Energy to Surface 42
+  N48, \field Fraction of Radiant Energy to Surface 42
        \type real
        \minimum 0
        \maximum 1
-  A45, \field Surface 43 Name
+  A46, \field Surface 43 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N47, \field Fraction of Radiant Energy to Surface 43
+  N49, \field Fraction of Radiant Energy to Surface 43
        \type real
        \minimum 0
        \maximum 1
-  A46, \field Surface 44 Name
+  A47, \field Surface 44 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N48, \field Fraction of Radiant Energy to Surface 44
+  N50, \field Fraction of Radiant Energy to Surface 44
        \type real
        \minimum 0
        \maximum 1
-  A47, \field Surface 45 Name
+  A48, \field Surface 45 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N49, \field Fraction of Radiant Energy to Surface 45
+  N51, \field Fraction of Radiant Energy to Surface 45
        \type real
        \minimum 0
        \maximum 1
-  A48, \field Surface 46 Name
+  A49, \field Surface 46 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N50, \field Fraction of Radiant Energy to Surface 46
+  N52, \field Fraction of Radiant Energy to Surface 46
        \type real
        \minimum 0
        \maximum 1
-  A49, \field Surface 47 Name
+  A50, \field Surface 47 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N51, \field Fraction of Radiant Energy to Surface 47
+  N53, \field Fraction of Radiant Energy to Surface 47
        \type real
        \minimum 0
        \maximum 1
-  A50, \field Surface 48 Name
+  A51, \field Surface 48 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N52, \field Fraction of Radiant Energy to Surface 48
+  N54, \field Fraction of Radiant Energy to Surface 48
        \type real
        \minimum 0
        \maximum 1
-  A51, \field Surface 49 Name
+  A52, \field Surface 49 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N53, \field Fraction of Radiant Energy to Surface 49
+  N55, \field Fraction of Radiant Energy to Surface 49
        \type real
        \minimum 0
        \maximum 1
-  A52, \field Surface 50 Name
+  A53, \field Surface 50 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N54, \field Fraction of Radiant Energy to Surface 50
+  N56, \field Fraction of Radiant Energy to Surface 50
        \type real
        \minimum 0
        \maximum 1
-  A53, \field Surface 51 Name
+  A54, \field Surface 51 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N55, \field Fraction of Radiant Energy to Surface 51
+  N57, \field Fraction of Radiant Energy to Surface 51
        \type real
        \minimum 0
        \maximum 1
-  A54, \field Surface 52 Name
+  A55, \field Surface 52 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N56, \field Fraction of Radiant Energy to Surface 52
+  N58, \field Fraction of Radiant Energy to Surface 52
        \type real
        \minimum 0
        \maximum 1
-  A55, \field Surface 53 Name
+  A56, \field Surface 53 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N57, \field Fraction of Radiant Energy to Surface 53
+  N59, \field Fraction of Radiant Energy to Surface 53
        \type real
        \minimum 0
        \maximum 1
-  A56, \field Surface 54 Name
+  A57, \field Surface 54 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N58, \field Fraction of Radiant Energy to Surface 54
+  N60, \field Fraction of Radiant Energy to Surface 54
        \type real
        \minimum 0
        \maximum 1
-  A57, \field Surface 55 Name
+  A58, \field Surface 55 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N59, \field Fraction of Radiant Energy to Surface 55
+  N61, \field Fraction of Radiant Energy to Surface 55
        \type real
        \minimum 0
        \maximum 1
-  A58, \field Surface 56 Name
+  A59, \field Surface 56 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N60, \field Fraction of Radiant Energy to Surface 56
+  N62, \field Fraction of Radiant Energy to Surface 56
        \type real
        \minimum 0
        \maximum 1
-  A59, \field Surface 57 Name
+  A60, \field Surface 57 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N61, \field Fraction of Radiant Energy to Surface 57
+  N63, \field Fraction of Radiant Energy to Surface 57
        \type real
        \minimum 0
        \maximum 1
-  A60, \field Surface 58 Name
+  A61, \field Surface 58 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N62, \field Fraction of Radiant Energy to Surface 58
+  N64, \field Fraction of Radiant Energy to Surface 58
        \type real
        \minimum 0
        \maximum 1
-  A61, \field Surface 59 Name
+  A62, \field Surface 59 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N63, \field Fraction of Radiant Energy to Surface 59
+  N65, \field Fraction of Radiant Energy to Surface 59
        \type real
        \minimum 0
        \maximum 1
-  A62, \field Surface 60 Name
+  A63, \field Surface 60 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N64, \field Fraction of Radiant Energy to Surface 60
+  N66, \field Fraction of Radiant Energy to Surface 60
        \type real
        \minimum 0
        \maximum 1
-  A63, \field Surface 61 Name
+  A64, \field Surface 61 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N65, \field Fraction of Radiant Energy to Surface 61
+  N67, \field Fraction of Radiant Energy to Surface 61
        \type real
        \minimum 0
        \maximum 1
-  A64, \field Surface 62 Name
+  A65, \field Surface 62 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N66, \field Fraction of Radiant Energy to Surface 62
+  N68, \field Fraction of Radiant Energy to Surface 62
        \type real
        \minimum 0
        \maximum 1
-  A65, \field Surface 63 Name
+  A66, \field Surface 63 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N67, \field Fraction of Radiant Energy to Surface 63
+  N69, \field Fraction of Radiant Energy to Surface 63
        \type real
        \minimum 0
        \maximum 1
-  A66, \field Surface 64 Name
+  A67, \field Surface 64 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N68, \field Fraction of Radiant Energy to Surface 64
+  N70, \field Fraction of Radiant Energy to Surface 64
        \type real
        \minimum 0
        \maximum 1
-  A67, \field Surface 65 Name
+  A68, \field Surface 65 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N69, \field Fraction of Radiant Energy to Surface 65
+  N71, \field Fraction of Radiant Energy to Surface 65
        \type real
        \minimum 0
        \maximum 1
-  A68, \field Surface 66 Name
+  A69, \field Surface 66 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N70, \field Fraction of Radiant Energy to Surface 66
+  N72, \field Fraction of Radiant Energy to Surface 66
        \type real
        \minimum 0
        \maximum 1
-  A69, \field Surface 67 Name
+  A70, \field Surface 67 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N71, \field Fraction of Radiant Energy to Surface 67
+  N73, \field Fraction of Radiant Energy to Surface 67
        \type real
        \minimum 0
        \maximum 1
-  A70, \field Surface 68 Name
+  A71, \field Surface 68 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N72, \field Fraction of Radiant Energy to Surface 68
+  N74, \field Fraction of Radiant Energy to Surface 68
        \type real
        \minimum 0
        \maximum 1
-  A71, \field Surface 69 Name
+  A72, \field Surface 69 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N73, \field Fraction of Radiant Energy to Surface 69
+  N75, \field Fraction of Radiant Energy to Surface 69
        \type real
        \minimum 0
        \maximum 1
-  A72, \field Surface 70 Name
+  A73, \field Surface 70 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N74, \field Fraction of Radiant Energy to Surface 70
+  N76, \field Fraction of Radiant Energy to Surface 70
        \type real
        \minimum 0
        \maximum 1
-  A73, \field Surface 71 Name
+  A74, \field Surface 71 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N75, \field Fraction of Radiant Energy to Surface 71
+  N77, \field Fraction of Radiant Energy to Surface 71
        \type real
        \minimum 0
        \maximum 1
-  A74, \field Surface 72 Name
+  A75, \field Surface 72 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N76, \field Fraction of Radiant Energy to Surface 72
+  N78, \field Fraction of Radiant Energy to Surface 72
        \type real
        \minimum 0
        \maximum 1
-  A75, \field Surface 73 Name
+  A76, \field Surface 73 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N77, \field Fraction of Radiant Energy to Surface 73
+  N79, \field Fraction of Radiant Energy to Surface 73
        \type real
        \minimum 0
        \maximum 1
-  A76, \field Surface 74 Name
+  A77, \field Surface 74 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N78, \field Fraction of Radiant Energy to Surface 74
+  N80, \field Fraction of Radiant Energy to Surface 74
        \type real
        \minimum 0
        \maximum 1
-  A77, \field Surface 75 Name
+  A78, \field Surface 75 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N79, \field Fraction of Radiant Energy to Surface 75
+  N81, \field Fraction of Radiant Energy to Surface 75
        \type real
        \minimum 0
        \maximum 1
-  A78, \field Surface 76 Name
+  A79, \field Surface 76 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N80, \field Fraction of Radiant Energy to Surface 76
+  N82, \field Fraction of Radiant Energy to Surface 76
        \type real
        \minimum 0
        \maximum 1
-  A79, \field Surface 77 Name
+  A80, \field Surface 77 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N81, \field Fraction of Radiant Energy to Surface 77
+  N83, \field Fraction of Radiant Energy to Surface 77
        \type real
        \minimum 0
        \maximum 1
-  A80, \field Surface 78 Name
+  A81, \field Surface 78 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N82, \field Fraction of Radiant Energy to Surface 78
+  N84, \field Fraction of Radiant Energy to Surface 78
        \type real
        \minimum 0
        \maximum 1
-  A81, \field Surface 79 Name
+  A82, \field Surface 79 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N83, \field Fraction of Radiant Energy to Surface 79
+  N85, \field Fraction of Radiant Energy to Surface 79
        \type real
        \minimum 0
        \maximum 1
-  A82, \field Surface 80 Name
+  A83, \field Surface 80 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N84, \field Fraction of Radiant Energy to Surface 80
+  N86, \field Fraction of Radiant Energy to Surface 80
        \type real
        \minimum 0
        \maximum 1
-  A83, \field Surface 81 Name
+  A84, \field Surface 81 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N85, \field Fraction of Radiant Energy to Surface 81
+  N87, \field Fraction of Radiant Energy to Surface 81
        \type real
        \minimum 0
        \maximum 1
-  A84, \field Surface 82 Name
+  A85, \field Surface 82 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N86, \field Fraction of Radiant Energy to Surface 82
+  N88, \field Fraction of Radiant Energy to Surface 82
        \type real
        \minimum 0
        \maximum 1
-  A85, \field Surface 83 Name
+  A86, \field Surface 83 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N87, \field Fraction of Radiant Energy to Surface 83
+  N89, \field Fraction of Radiant Energy to Surface 83
        \type real
        \minimum 0
        \maximum 1
-  A86, \field Surface 84 Name
+  A87, \field Surface 84 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N88, \field Fraction of Radiant Energy to Surface 84
+  N90, \field Fraction of Radiant Energy to Surface 84
        \type real
        \minimum 0
        \maximum 1
-  A87, \field Surface 85 Name
+  A88, \field Surface 85 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N89, \field Fraction of Radiant Energy to Surface 85
+  N91, \field Fraction of Radiant Energy to Surface 85
        \type real
        \minimum 0
        \maximum 1
-  A88, \field Surface 86 Name
+  A89, \field Surface 86 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N90, \field Fraction of Radiant Energy to Surface 86
+  N92, \field Fraction of Radiant Energy to Surface 86
        \type real
        \minimum 0
        \maximum 1
-  A89, \field Surface 87 Name
+  A90, \field Surface 87 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N91, \field Fraction of Radiant Energy to Surface 87
+  N93, \field Fraction of Radiant Energy to Surface 87
        \type real
        \minimum 0
        \maximum 1
-  A90, \field Surface 88 Name
+  A91, \field Surface 88 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N92, \field Fraction of Radiant Energy to Surface 88
+  N94, \field Fraction of Radiant Energy to Surface 88
        \type real
        \minimum 0
        \maximum 1
-  A91, \field Surface 89 Name
+  A92, \field Surface 89 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N93, \field Fraction of Radiant Energy to Surface 89
+  N95, \field Fraction of Radiant Energy to Surface 89
        \type real
        \minimum 0
        \maximum 1
-  A92, \field Surface 90 Name
+  A93, \field Surface 90 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N94, \field Fraction of Radiant Energy to Surface 90
+  N96, \field Fraction of Radiant Energy to Surface 90
        \type real
        \minimum 0
        \maximum 1
-  A93, \field Surface 91 Name
+  A94, \field Surface 91 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N95, \field Fraction of Radiant Energy to Surface 91
+  N97, \field Fraction of Radiant Energy to Surface 91
        \type real
        \minimum 0
        \maximum 1
-  A94, \field Surface 92 Name
+  A95, \field Surface 92 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N96, \field Fraction of Radiant Energy to Surface 92
+  N98, \field Fraction of Radiant Energy to Surface 92
        \type real
        \minimum 0
        \maximum 1
-  A95, \field Surface 93 Name
+  A96, \field Surface 93 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N97, \field Fraction of Radiant Energy to Surface 93
+  N99, \field Fraction of Radiant Energy to Surface 93
        \type real
        \minimum 0
        \maximum 1
-  A96, \field Surface 94 Name
+  A97, \field Surface 94 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N98, \field Fraction of Radiant Energy to Surface 94
+ N100, \field Fraction of Radiant Energy to Surface 94
        \type real
        \minimum 0
        \maximum 1
-  A97, \field Surface 95 Name
+  A98, \field Surface 95 Name
        \type object-list
        \object-list AllHeatTranSurfNames
-  N99, \field Fraction of Radiant Energy to Surface 95
+ N101, \field Fraction of Radiant Energy to Surface 95
        \type real
        \minimum 0
        \maximum 1
-  A98, \field Surface 96 Name
+  A99, \field Surface 96 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N100, \field Fraction of Radiant Energy to Surface 96
+ N102, \field Fraction of Radiant Energy to Surface 96
        \type real
        \minimum 0
        \maximum 1
-  A99, \field Surface 97 Name
+ A100, \field Surface 97 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N101, \field Fraction of Radiant Energy to Surface 97
+ N103, \field Fraction of Radiant Energy to Surface 97
        \type real
        \minimum 0
        \maximum 1
- A100, \field Surface 98 Name
+ A101, \field Surface 98 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N102, \field Fraction of Radiant Energy to Surface 98
+ N104, \field Fraction of Radiant Energy to Surface 98
        \type real
        \minimum 0
        \maximum 1
- A101, \field Surface 99 Name
+ A102, \field Surface 99 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N103, \field Fraction of Radiant Energy to Surface 99
+ N105, \field Fraction of Radiant Energy to Surface 99
        \type real
        \minimum 0
        \maximum 1
- A102, \field Surface 100 Name
+ A103, \field Surface 100 Name
        \type object-list
        \object-list AllHeatTranSurfNames
- N104; \field Fraction of Radiant Energy to Surface 100
+ N106; \field Fraction of Radiant Energy to Surface 100
        \type real
        \minimum 0
        \maximum 1
@@ -34747,21 +35210,54 @@ ZoneHVAC:Baseboard:Convective:Water,
        \type object-list
        \object-list ScheduleNames
   A3 , \field Inlet Node Name
-        \required-field
-        \type node
+       \required-field
+       \type node
   A4 , \field Outlet Node Name
-        \required-field
-        \type node
-  N1 , \field U-Factor Times Area Value
+       \required-field
+       \type node
+  A5 , \field Heating Design Capacity Method
+       \required-field
+       \type choice
+       \key HeatingDesignCapacity
+       \key CapacityPerFloorArea
+       \key FractionOfAutosizedHeatingCapacity
+       \default HeatingDesignCapacity
+       \note Enter the method used to determine the heating design capacity. 
+       \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+       \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+       \note determine from user specified heating capacity per floor area and zone floor area.
+       \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+       \note determined from a user specified fraction and the auto-sized design heating capacity.
+  N1 , \field Heating Design Capacity
+       \type real
+       \units W
+       \minimum 0.0
+       \autosizable
+       \ip-units W
+       \default autosize
+       \note Enter the design heating capacity.Required field when the heating design capacity method
+       \note HeatingDesignCapacity.
+  N2 , \field Heating Design Capacity Per Floor Area
+       \type real
+       \minimum 0.0
+       \note Enter the heating design capacity per zone floor area.Required field when the heating design
+       \note capacity method field is CapacityPerFloorArea.
+  N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+       \type real
+       \minimum 0.0
+       \default 1.0
+       \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+       \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+  N4 , \field U-Factor Times Area Value
        \required-field
        \autosizable
        \units W/K
-  N2 , \field Maximum Water Flow Rate
+  N5 , \field Maximum Water Flow Rate
        \required-field
        \units m3/s
        \autosizable
        \ip-units gal/min
-  N3 ; \field Convergence Tolerance
+  N6 ; \field Convergence Tolerance
        \type real
        \minimum> 0.0
        \default 0.001
@@ -34775,15 +35271,43 @@ ZoneHVAC:Baseboard:Convective:Electric,
         \note If this field is blank, the system is always available.
         \type object-list
         \object-list ScheduleNames
-  N1 , \field Nominal Capacity
+  A3 ,  \field Heating Design Capacity Method
         \required-field
+        \type choice
+        \key HeatingDesignCapacity
+        \key CapacityPerFloorArea
+        \key FractionOfAutosizedHeatingCapacity
+        \default HeatingDesignCapacity
+        \note Enter the method used to determine the heating design capacity. 
+        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+        \note determine from user specified heating capacity per floor area and zone floor area.
+        \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+        \note determined from a user specified fraction and the auto-sized design heating capacity.
+  N1 ,  \field Heating Design Capacity
+        \type real
         \units W
+        \minimum 0.0
         \autosizable
         \ip-units W
-  N2 ; \field Efficiency
+        \default autosize
+        \note Enter the design heating capacity.Required field when the heating design capacity method
+        \note HeatingDesignCapacity.
+  N2 ,  \field Heating Design Capacity Per Floor Area
+        \type real
+        \minimum 0.0
+        \note Enter the heating design capacity per zone floor area.Required field when the heating design
+        \note capacity method field is CapacityPerFloorArea.
+  N3 ,  \field Fraction of Autosized Heating Design Capacity{ -}
+        \type real
+        \minimum 0.0
+        \default 1.0
+        \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+        \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+  N4 ;  \field Efficiency
         \required-field
         \maximum 1.0
-        \minimum> 0.0
+        \minimum 0.0
         \default 1.0
 
 ZoneHVAC:LowTemperatureRadiant:VariableFlow,
@@ -34827,53 +35351,117 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \key OutdoorDryBulbTemperature
         \key OutdoorWetBulbTemperature
         \default MeanAirTemperature
-   N3 , \field Maximum Hot Water Flow
+   A6 , \field Heating Design Capacity Method
+        \required-field
+        \type choice
+        \key HeatingDesignCapacity
+        \key CapacityPerFloorArea
+        \key FractionOfAutosizedHeatingCapacity
+        \default HeatingDesignCapacity
+        \note Enter the method used to determine the heating design capacity. 
+        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+        \note determine from user specified heating capacity per floor area and zone floor area.
+        \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+        \note determined from a user specified fraction and the auto-sized design heating capacity.
+   N3 , \field Heating Design Capacity
+        \type real
+        \units W
+        \minimum 0.0
+        \autosizable
+        \ip-units W
+        \default autosize
+        \note Enter the design heating capacity.Required field when the heating design capacity method
+        \note HeatingDesignCapacity.
+   N4 , \field Heating Design Capacity Per Floor Area
+        \type real
+        \minimum 0.0
+        \note Enter the heating design capacity per zone floor area.Required field when the heating design
+        \note capacity method field is CapacityPerFloorArea.
+   N5 , \field Fraction of Autosized Heating Design Capacity{ -}
+        \type real
+        \minimum 0.0
+        \default 1.0
+        \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+        \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+   N6 , \field Maximum Hot Water Flow
         \units m3/s
         \minimum 0
         \autosizable
         \ip-units gal/min
-   A6 , \field Heating Water Inlet Node Name
+   A7 , \field Heating Water Inlet Node Name
         \type node
-   A7 , \field Heating Water Outlet Node Name
+   A8 , \field Heating Water Outlet Node Name
         \type node
-   N4 , \field Heating Control Throttling Range
+   N7 , \field Heating Control Throttling Range
         \units deltaC
         \minimum 0.5
         \default 0.5
-   A8 , \field Heating Control Temperature Schedule Name
+   A9 , \field Heating Control Temperature Schedule Name
         \type object-list
         \object-list ScheduleNames
-   N5 , \field Maximum Cold Water Flow
+  A10,  \field Cooling Design Capacity Method
+        \type choice 
+        \key None
+        \key CoolingDesignCapacity
+        \key CapacityPerFloorArea
+        \key FractionOfAutosizedCoolingCapacity
+        \default CoolingDesignCapacity
+        \note Enter the method used to determine the cooling design capacity for scalable sizing.
+        \note CoolingDesignCapacity => selected when the design cooling capacity value is specified or 
+        \note auto-sized. CapacityPerFloorArea => selected when the design cooling capacity is determined
+        \note from user specified cooling capacity per floor area and total floor area of cooled zone 
+        \note served by the hydrolic unit. FractionOfAutosizedCoolingCapacity => is selected when the  
+        \note design cooling capacity is determined from a user specified fraction and the auto-sized  
+        \note design cooling capacity of the system.
+   N8 , \field Cooling Design Capacity {W}
+        \type real
+        \units m3/s
+        \minimum 0.0
+        \autosizable
+        \note Enter the design cooling capacity. Required field when the cooling design capacity method
+        \note CoolingDesignCapacity.
+   N9 , \field Cooling Design Capacity Per Floor Area {W/m2}
+        \type real
+        \minimum 0.0
+        \note Enter the cooling design capacity per total floor area of cooled zones served by the unit.
+        \note Required field when the cooling design capacity method field is CapacityPerFloorArea. 
+   N10, \field Fraction of Autosized Cooling Design Capacity {-}
+        \type real
+        \minimum 0.0
+        \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
+        \note design capacity method field is FractionOfAutosizedCoolingCapacity. 
+   N11, \field Maximum Cold Water Flow
         \units m3/s
         \minimum 0
         \autosizable
         \ip-units gal/min
-   A9 , \field Cooling Water Inlet Node Name
+   A11, \field Cooling Water Inlet Node Name
         \type node
-   A10, \field Cooling Water Outlet Node Name
+   A12, \field Cooling Water Outlet Node Name
         \type node
-   N6 , \field Cooling Control Throttling Range
+   N12, \field Cooling Control Throttling Range
         \units deltaC
         \minimum 0.5
         \default 0.5
-   A11, \field Cooling Control Temperature Schedule Name
+   A13, \field Cooling Control Temperature Schedule Name
         \type object-list
         \object-list ScheduleNames
-   A12, \field Condensation Control Type
+   A14, \field Condensation Control Type
         \type choice
         \key Off
         \key SimpleOff
         \key VariableOff
         \default SimpleOff
-   N7 , \field Condensation Control Dewpoint Offset
+   N13, \field Condensation Control Dewpoint Offset
         \units C
         \default 1.0
-   A13, \field Number of Circuits
+   A15, \field Number of Circuits
         \type choice
         \key OnePerSurface
         \key CalculateFromCircuitLength
         \default OnePerSurface
-   N8 ; \field Circuit Length
+   N14; \field Circuit Length
         \units m
         \default 106.7
 
@@ -35023,12 +35611,40 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \note a ZoneHVAC:LowTemperatureRadiant:SurfaceGroup object.
         \type object-list
         \object-list RadGroupAndSurfNames
-   N1 , \field Maximum Electrical Power to Panel
+   A5 , \field Heating Design Capacity Method
+        \required-field
+        \type choice
+        \key HeatingDesignCapacity
+        \key CapacityPerFloorArea
+        \key FractionOfAutosizedHeatingCapacity
+        \default HeatingDesignCapacity
+        \note Enter the method used to determine the maximum electrical heating design capacity. 
+        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+        \note determine from user specified heating capacity per floor area and zone floor area.
+        \n te FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+        \note determined from a user specified fraction and the auto-sized design heating capacity.
+   N1 , \field Heating Design Capacity
+        \type real
         \units W
-        \minimum 0
+        \minimum 0.0
         \autosizable
         \ip-units W
-   A5 , \field Temperature Control Type
+        \default autosize
+        \note Enter the design heating capacity.Required field when the heating design capacity method
+        \note HeatingDesignCapacity.
+   N2 , \field Heating Design Capacity Per Floor Area
+        \type real
+        \minimum 0.0
+        \note Enter the heating design capacity per zone floor area.Required field when the heating design
+        \note capacity method field is CapacityPerFloorArea.
+   N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+        \type real
+        \minimum 0.0
+        \default 1.0
+        \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+        \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+   A6 , \field Temperature Control Type
         \note Temperature used to control unit
         \type choice
         \key MeanAirTemperature
@@ -35037,11 +35653,11 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \key OutdoorDryBulbTemperature
         \key OutdoorWetBulbTemperature
         \default MeanAirTemperature
-   N2 , \field Heating Throttling Range
+   N4 , \field Heating Throttling Range
         \units deltaC
         \minimum 0
         \default 0
-   A6 ; \field Heating Setpoint Temperature Schedule Name
+   A7 ; \field Heating Setpoint Temperature Schedule Name
         \type object-list
         \object-list ScheduleNames
 
@@ -35575,41 +36191,68 @@ ZoneHVAC:HighTemperatureRadiant,
         \required-field
         \type object-list
         \object-list ZoneNames
-   N1 , \field Maximum Power Input
+   A4 , \field Heating Design Capacity Method
         \required-field
+        \type choice
+        \key HeatingDesignCapacity
+        \key CapacityPerFloorArea
+        \key FractionOfAutosizedHeatingCapacity
+        \default HeatingDesignCapacity
+        \note Enter the method used to determine the maximum heating power input capacity. 
+        \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
+        \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
+        \note determine from user specified heating capacity per floor area and zone floor area.
+        \n te FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+        \note determined from a user specified fraction and the auto-sized design heating capacity.
+   N1 , \field Heating Design Capacity
+        \type real
         \units W
-        \minimum 0
+        \minimum 0.0
         \autosizable
-   A4 , \field Fuel Type
+        \default autosize
+        \note Enter the design heating capacity.Required field when the heating design capacity method
+        \note HeatingDesignCapacity.
+   N2 , \field Heating Design Capacity Per Floor Area
+        \type real
+        \minimum 0.0
+        \note Enter the heating design capacity per zone floor area.Required field when the heating design
+        \note capacity method field is CapacityPerFloorArea.
+   N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+        \type real
+        \minimum 0.0
+        \default 1.0
+        \note Enter the fraction of auto - sized heating design capacity.Required field when capacity the
+        \note heating design capacity method field is FractionOfAutosizedHeatingCapacity.
+   A5 , \field Fuel Type
         \note Natural gas or electricity
         \required-field
         \type choice
         \key NaturalGas
         \key Electricity
-   N2 , \field Combustion Efficiency
+   N4 , \field Combustion Efficiency
         \note Not used for non-gas radiant heaters
         \required-field
         \minimum 0
         \maximum 1
         \default 0.9
-   N3 , \field Fraction of Input Converted to Radiant Energy
+   N5 , \field Fraction of Input Converted to Radiant Energy
         \required-field
         \note Radiant+latent+lost fractions must sum to 1 or less, remainder is considered convective heat
         \minimum 0
         \maximum 1
         \default 0.7
-   N4 , \field Fraction of Input Converted to Latent Energy
+   N6 , \field Fraction of Input Converted to Latent Energy
         \required-field
         \minimum 0
         \maximum 1
         \default 0.0
-   N5 , \field Fraction of Input that Is Lost
+   N7 , \field Fraction of Input that Is Lost
         \note Fraction of input vented to outdoor environment
         \required-field
         \minimum 0
         \maximum 1
         \default 0.0
-   A5 , \field Temperature Control Type
+   A6 , \field Temperature Control Type
         \note Temperature type used to control unit
         \type choice
         \key MeanAirTemperature
@@ -35619,620 +36262,620 @@ ZoneHVAC:HighTemperatureRadiant,
         \key MeanRadiantTemperatureSetpoint
         \key OperativeTemperatureSetpoint
         \default OperativeTemperature
-   N6 , \field Heating Throttling Range
+   N8 , \field Heating Throttling Range
         \required-field
         \units deltaC
         \minimum 0
         \default 2.0
-   A6 , \field Heating Setpoint Temperature Schedule Name
+   A7 , \field Heating Setpoint Temperature Schedule Name
         \note This setpoint is an "operative temperature" setpoint
         \type object-list
         \object-list ScheduleNames
-   N7,  \field Fraction of Radiant Energy Incident on People
+   N9,  \field Fraction of Radiant Energy Incident on People
         \note This will affect thermal comfort but from an energy balance standpoint this value
         \note gets added to the convective gains from the radiant heater
         \minimum 0
         \maximum 1
-   A7,  \field Surface 1 Name
+   A8,  \field Surface 1 Name
         \begin-extensible
         \note Radiant energy may be distributed to specific surfaces
         \type object-list
         \object-list AllHeatTranSurfNames
-   N8,  \field Fraction of Radiant Energy to Surface 1
+   N10, \field Fraction of Radiant Energy to Surface 1
         \minimum 0
         \maximum 1
-   A8,  \field Surface 2 Name
+   A9,  \field Surface 2 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N9,  \field Fraction of Radiant Energy to Surface 2
+   N11, \field Fraction of Radiant Energy to Surface 2
         \minimum 0
         \maximum 1
-   A9,  \field Surface 3 Name
+   A10, \field Surface 3 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N10, \field Fraction of Radiant Energy to Surface 3
+   N12, \field Fraction of Radiant Energy to Surface 3
         \minimum 0
         \maximum 1
-   A10, \field Surface 4 Name
+   A11, \field Surface 4 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N11, \field Fraction of Radiant Energy to Surface 4
+   N13, \field Fraction of Radiant Energy to Surface 4
         \minimum 0
         \maximum 1
-   A11, \field Surface 5 Name
+   A12, \field Surface 5 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N12, \field Fraction of Radiant Energy to Surface 5
+   N14, \field Fraction of Radiant Energy to Surface 5
         \minimum 0
         \maximum 1
-   A12, \field Surface 6 Name
+   A13, \field Surface 6 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N13, \field Fraction of Radiant Energy to Surface 6
+   N15, \field Fraction of Radiant Energy to Surface 6
         \minimum 0
         \maximum 1
-   A13, \field Surface 7 Name
+   A14, \field Surface 7 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N14, \field Fraction of Radiant Energy to Surface 7
+   N16, \field Fraction of Radiant Energy to Surface 7
         \minimum 0
         \maximum 1
-   A14, \field Surface 8 Name
+   A15, \field Surface 8 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N15, \field Fraction of Radiant Energy to Surface 8
+   N17, \field Fraction of Radiant Energy to Surface 8
         \minimum 0
         \maximum 1
-   A15, \field Surface 9 Name
+   A16, \field Surface 9 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N16, \field Fraction of Radiant Energy to Surface 9
+   N18, \field Fraction of Radiant Energy to Surface 9
         \minimum 0
         \maximum 1
-   A16, \field Surface 10 Name
+   A17, \field Surface 10 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N17, \field Fraction of Radiant Energy to Surface 10
+   N19, \field Fraction of Radiant Energy to Surface 10
         \minimum 0
         \maximum 1
-   A17, \field Surface 11 Name
+   A18, \field Surface 11 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N18, \field Fraction of Radiant Energy to Surface 11
+   N20, \field Fraction of Radiant Energy to Surface 11
         \minimum 0
         \maximum 1
-   A18, \field Surface 12 Name
+   A19, \field Surface 12 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N19, \field Fraction of Radiant Energy to Surface 12
+   N21, \field Fraction of Radiant Energy to Surface 12
         \minimum 0
         \maximum 1
-   A19, \field Surface 13 Name
+   A20, \field Surface 13 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N20, \field Fraction of Radiant Energy to Surface 13
+   N22, \field Fraction of Radiant Energy to Surface 13
         \minimum 0
         \maximum 1
-   A20, \field Surface 14 Name
+   A21, \field Surface 14 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N21, \field Fraction of Radiant Energy to Surface 14
+   N23, \field Fraction of Radiant Energy to Surface 14
         \minimum 0
         \maximum 1
-   A21, \field Surface 15 Name
+   A22, \field Surface 15 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N22, \field Fraction of Radiant Energy to Surface 15
+   N24, \field Fraction of Radiant Energy to Surface 15
         \minimum 0
         \maximum 1
-   A22, \field Surface 16 Name
+   A23, \field Surface 16 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N23, \field Fraction of Radiant Energy to Surface 16
+   N25, \field Fraction of Radiant Energy to Surface 16
         \minimum 0
         \maximum 1
-   A23, \field Surface 17 Name
+   A24, \field Surface 17 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N24, \field Fraction of Radiant Energy to Surface 17
+   N26, \field Fraction of Radiant Energy to Surface 17
         \minimum 0
         \maximum 1
-   A24, \field Surface 18 Name
+   A25, \field Surface 18 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N25, \field Fraction of Radiant Energy to Surface 18
+   N27, \field Fraction of Radiant Energy to Surface 18
         \minimum 0
         \maximum 1
-   A25, \field Surface 19 Name
+   A26, \field Surface 19 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N26, \field Fraction of Radiant Energy to Surface 19
+   N28, \field Fraction of Radiant Energy to Surface 19
         \minimum 0
         \maximum 1
-   A26, \field Surface 20 Name
+   A27, \field Surface 20 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N27, \field Fraction of Radiant Energy to Surface 20
+   N29, \field Fraction of Radiant Energy to Surface 20
         \minimum 0
         \maximum 1
-   A27, \field Surface 21 Name
+   A28, \field Surface 21 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N28, \field Fraction of Radiant Energy to Surface 21
+   N30, \field Fraction of Radiant Energy to Surface 21
         \minimum 0
         \maximum 1
-   A28, \field Surface 22 Name
+   A29, \field Surface 22 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N29, \field Fraction of Radiant Energy to Surface 22
+   N31, \field Fraction of Radiant Energy to Surface 22
         \minimum 0
         \maximum 1
-   A29, \field Surface 23 Name
+   A30, \field Surface 23 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N30, \field Fraction of Radiant Energy to Surface 23
+   N32, \field Fraction of Radiant Energy to Surface 23
         \minimum 0
         \maximum 1
-   A30, \field Surface 24 Name
+   A31, \field Surface 24 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N31, \field Fraction of Radiant Energy to Surface 24
+   N33, \field Fraction of Radiant Energy to Surface 24
         \minimum 0
         \maximum 1
-   A31, \field Surface 25 Name
+   A32, \field Surface 25 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N32, \field Fraction of Radiant Energy to Surface 25
+   N34, \field Fraction of Radiant Energy to Surface 25
         \minimum 0
         \maximum 1
-   A32, \field Surface 26 Name
+   A33, \field Surface 26 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N33, \field Fraction of Radiant Energy to Surface 26
+   N35, \field Fraction of Radiant Energy to Surface 26
         \minimum 0
         \maximum 1
-   A33, \field Surface 27 Name
+   A34, \field Surface 27 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N34, \field Fraction of Radiant Energy to Surface 27
+   N36, \field Fraction of Radiant Energy to Surface 27
         \minimum 0
         \maximum 1
-   A34, \field Surface 28 Name
+   A35, \field Surface 28 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N35, \field Fraction of Radiant Energy to Surface 28
+   N37, \field Fraction of Radiant Energy to Surface 28
         \minimum 0
         \maximum 1
-   A35, \field Surface 29 Name
+   A36, \field Surface 29 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N36, \field Fraction of Radiant Energy to Surface 29
+   N38, \field Fraction of Radiant Energy to Surface 29
         \minimum 0
         \maximum 1
-   A36, \field Surface 30 Name
+   A37, \field Surface 30 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N37, \field Fraction of Radiant Energy to Surface 30
+   N39, \field Fraction of Radiant Energy to Surface 30
         \minimum 0
         \maximum 1
-   A37, \field Surface 31 Name
+   A38, \field Surface 31 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N38, \field Fraction of Radiant Energy to Surface 31
+   N40, \field Fraction of Radiant Energy to Surface 31
         \minimum 0
         \maximum 1
-   A38, \field Surface 32 Name
+   A39, \field Surface 32 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N39, \field Fraction of Radiant Energy to Surface 32
+   N41, \field Fraction of Radiant Energy to Surface 32
         \minimum 0
         \maximum 1
-   A39, \field Surface 33 Name
+   A40, \field Surface 33 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N40, \field Fraction of Radiant Energy to Surface 33
+   N42, \field Fraction of Radiant Energy to Surface 33
         \minimum 0
         \maximum 1
-   A40, \field Surface 34 Name
+   A41, \field Surface 34 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N41, \field Fraction of Radiant Energy to Surface 34
+   N43, \field Fraction of Radiant Energy to Surface 34
         \minimum 0
         \maximum 1
-   A41, \field Surface 35 Name
+   A42, \field Surface 35 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N42, \field Fraction of Radiant Energy to Surface 35
+   N44, \field Fraction of Radiant Energy to Surface 35
         \minimum 0
         \maximum 1
-   A42, \field Surface 36 Name
+   A43, \field Surface 36 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N43, \field Fraction of Radiant Energy to Surface 36
+   N45, \field Fraction of Radiant Energy to Surface 36
         \minimum 0
         \maximum 1
-   A43, \field Surface 37 Name
+   A44, \field Surface 37 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N44, \field Fraction of Radiant Energy to Surface 37
+   N46, \field Fraction of Radiant Energy to Surface 37
         \minimum 0
         \maximum 1
-   A44, \field Surface 38 Name
+   A45, \field Surface 38 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N45, \field Fraction of Radiant Energy to Surface 38
+   N47, \field Fraction of Radiant Energy to Surface 38
         \minimum 0
         \maximum 1
-   A45, \field Surface 39 Name
+   A46, \field Surface 39 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N46, \field Fraction of Radiant Energy to Surface 39
+   N48, \field Fraction of Radiant Energy to Surface 39
         \minimum 0
         \maximum 1
-   A46, \field Surface 40 Name
+   A47, \field Surface 40 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N47, \field Fraction of Radiant Energy to Surface 40
+   N49, \field Fraction of Radiant Energy to Surface 40
         \minimum 0
         \maximum 1
-   A47, \field Surface 41 Name
+   A48, \field Surface 41 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N48, \field Fraction of Radiant Energy to Surface 41
+   N50, \field Fraction of Radiant Energy to Surface 41
         \minimum 0
         \maximum 1
-   A48, \field Surface 42 Name
+   A49, \field Surface 42 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N49, \field Fraction of Radiant Energy to Surface 42
+   N51, \field Fraction of Radiant Energy to Surface 42
         \minimum 0
         \maximum 1
-   A49, \field Surface 43 Name
+   A50, \field Surface 43 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N50, \field Fraction of Radiant Energy to Surface 43
+   N52, \field Fraction of Radiant Energy to Surface 43
         \minimum 0
         \maximum 1
-   A50, \field Surface 44 Name
+   A51, \field Surface 44 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N51, \field Fraction of Radiant Energy to Surface 44
+   N53, \field Fraction of Radiant Energy to Surface 44
         \minimum 0
         \maximum 1
-   A51, \field Surface 45 Name
+   A52, \field Surface 45 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N52, \field Fraction of Radiant Energy to Surface 45
+   N54, \field Fraction of Radiant Energy to Surface 45
         \minimum 0
         \maximum 1
-   A52, \field Surface 46 Name
+   A53, \field Surface 46 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N53, \field Fraction of Radiant Energy to Surface 46
+   N55, \field Fraction of Radiant Energy to Surface 46
         \minimum 0
         \maximum 1
-   A53, \field Surface 47 Name
+   A54, \field Surface 47 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N54, \field Fraction of Radiant Energy to Surface 47
+   N56, \field Fraction of Radiant Energy to Surface 47
         \minimum 0
         \maximum 1
-   A54, \field Surface 48 Name
+   A55, \field Surface 48 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N55, \field Fraction of Radiant Energy to Surface 48
+   N57, \field Fraction of Radiant Energy to Surface 48
         \minimum 0
         \maximum 1
-   A55, \field Surface 49 Name
+   A56, \field Surface 49 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N56, \field Fraction of Radiant Energy to Surface 49
+   N58, \field Fraction of Radiant Energy to Surface 49
         \minimum 0
         \maximum 1
-   A56, \field Surface 50 Name
+   A57, \field Surface 50 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N57, \field Fraction of Radiant Energy to Surface 50
+   N59, \field Fraction of Radiant Energy to Surface 50
         \minimum 0
         \maximum 1
-   A57, \field Surface 51 Name
+   A58, \field Surface 51 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N58, \field Fraction of Radiant Energy to Surface 51
+   N60, \field Fraction of Radiant Energy to Surface 51
         \minimum 0
         \maximum 1
-   A58, \field Surface 52 Name
+   A59, \field Surface 52 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N59, \field Fraction of Radiant Energy to Surface 52
+   N61, \field Fraction of Radiant Energy to Surface 52
         \minimum 0
         \maximum 1
-   A59, \field Surface 53 Name
+   A60, \field Surface 53 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N60, \field Fraction of Radiant Energy to Surface 53
+   N62, \field Fraction of Radiant Energy to Surface 53
         \minimum 0
         \maximum 1
-   A60, \field Surface 54 Name
+   A61, \field Surface 54 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N61, \field Fraction of Radiant Energy to Surface 54
+   N63, \field Fraction of Radiant Energy to Surface 54
         \minimum 0
         \maximum 1
-   A61, \field Surface 55 Name
+   A62, \field Surface 55 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N62, \field Fraction of Radiant Energy to Surface 55
+   N64, \field Fraction of Radiant Energy to Surface 55
         \minimum 0
         \maximum 1
-   A62, \field Surface 56 Name
+   A63, \field Surface 56 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N63, \field Fraction of Radiant Energy to Surface 56
+   N65, \field Fraction of Radiant Energy to Surface 56
         \minimum 0
         \maximum 1
-   A63, \field Surface 57 Name
+   A64, \field Surface 57 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N64, \field Fraction of Radiant Energy to Surface 57
+   N66, \field Fraction of Radiant Energy to Surface 57
         \minimum 0
         \maximum 1
-   A64, \field Surface 58 Name
+   A65, \field Surface 58 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N65, \field Fraction of Radiant Energy to Surface 58
+   N67, \field Fraction of Radiant Energy to Surface 58
         \minimum 0
         \maximum 1
-   A65, \field Surface 59 Name
+   A66, \field Surface 59 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N66, \field Fraction of Radiant Energy to Surface 59
+   N68, \field Fraction of Radiant Energy to Surface 59
         \minimum 0
         \maximum 1
-   A66, \field Surface 60 Name
+   A67, \field Surface 60 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N67, \field Fraction of Radiant Energy to Surface 60
+   N69, \field Fraction of Radiant Energy to Surface 60
         \minimum 0
         \maximum 1
-   A67, \field Surface 61 Name
+   A68, \field Surface 61 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N68, \field Fraction of Radiant Energy to Surface 61
+   N70, \field Fraction of Radiant Energy to Surface 61
         \minimum 0
         \maximum 1
-   A68, \field Surface 62 Name
+   A69, \field Surface 62 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N69, \field Fraction of Radiant Energy to Surface 62
+   N71, \field Fraction of Radiant Energy to Surface 62
         \minimum 0
         \maximum 1
-   A69, \field Surface 63 Name
+   A70, \field Surface 63 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N70, \field Fraction of Radiant Energy to Surface 63
+   N72, \field Fraction of Radiant Energy to Surface 63
         \minimum 0
         \maximum 1
-   A70, \field Surface 64 Name
+   A71, \field Surface 64 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N71, \field Fraction of Radiant Energy to Surface 64
+   N73, \field Fraction of Radiant Energy to Surface 64
         \minimum 0
         \maximum 1
-   A71, \field Surface 65 Name
+   A72, \field Surface 65 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N72, \field Fraction of Radiant Energy to Surface 65
+   N74, \field Fraction of Radiant Energy to Surface 65
         \minimum 0
         \maximum 1
-   A72, \field Surface 66 Name
+   A73, \field Surface 66 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N73, \field Fraction of Radiant Energy to Surface 66
+   N75, \field Fraction of Radiant Energy to Surface 66
         \minimum 0
         \maximum 1
-   A73, \field Surface 67 Name
+   A74, \field Surface 67 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N74, \field Fraction of Radiant Energy to Surface 67
+   N76, \field Fraction of Radiant Energy to Surface 67
         \minimum 0
         \maximum 1
-   A74, \field Surface 68 Name
+   A75, \field Surface 68 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N75, \field Fraction of Radiant Energy to Surface 68
+   N77, \field Fraction of Radiant Energy to Surface 68
         \minimum 0
         \maximum 1
-   A75, \field Surface 69 Name
+   A76, \field Surface 69 Name
         \type object-list
         \object-list AllHeatTranSurfNames
    N76, \field Fraction of Radiant Energy to Surface 69
         \minimum 0
         \maximum 1
-   A76, \field Surface 70 Name
+   A77, \field Surface 70 Name
         \type object-list
         \object-list AllHeatTranSurfNames
    N77, \field Fraction of Radiant Energy to Surface 70
         \minimum 0
         \maximum 1
-   A77, \field Surface 71 Name
+   A78, \field Surface 71 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N78, \field Fraction of Radiant Energy to Surface 71
+   N80, \field Fraction of Radiant Energy to Surface 71
         \minimum 0
         \maximum 1
-   A78, \field Surface 72 Name
+   A79, \field Surface 72 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N79, \field Fraction of Radiant Energy to Surface 72
+   N81, \field Fraction of Radiant Energy to Surface 72
         \minimum 0
         \maximum 1
-   A79, \field Surface 73 Name
+   A80, \field Surface 73 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N80, \field Fraction of Radiant Energy to Surface 73
+   N82, \field Fraction of Radiant Energy to Surface 73
         \minimum 0
         \maximum 1
-   A80, \field Surface 74 Name
+   A81, \field Surface 74 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N81, \field Fraction of Radiant Energy to Surface 74
+   N83, \field Fraction of Radiant Energy to Surface 74
         \minimum 0
         \maximum 1
-   A81, \field Surface 75 Name
+   A82, \field Surface 75 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N82, \field Fraction of Radiant Energy to Surface 75
+   N84, \field Fraction of Radiant Energy to Surface 75
         \minimum 0
         \maximum 1
-   A82, \field Surface 76 Name
+   A83, \field Surface 76 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N83, \field Fraction of Radiant Energy to Surface 76
+   N85, \field Fraction of Radiant Energy to Surface 76
         \minimum 0
         \maximum 1
-   A83, \field Surface 77 Name
+   A84, \field Surface 77 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N84, \field Fraction of Radiant Energy to Surface 77
+   N86, \field Fraction of Radiant Energy to Surface 77
         \minimum 0
         \maximum 1
-   A84, \field Surface 78 Name
+   A85, \field Surface 78 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N85, \field Fraction of Radiant Energy to Surface 78
+   N87, \field Fraction of Radiant Energy to Surface 78
         \minimum 0
         \maximum 1
-   A85, \field Surface 79 Name
+   A86, \field Surface 79 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N86, \field Fraction of Radiant Energy to Surface 79
+   N88, \field Fraction of Radiant Energy to Surface 79
         \minimum 0
         \maximum 1
-   A86, \field Surface 80 Name
+   A87, \field Surface 80 Name
         \type object-list
         \object-list AllHeatTranSurfNames
    N87, \field Fraction of Radiant Energy to Surface 80
         \minimum 0
         \maximum 1
-   A87, \field Surface 81 Name
+   A88, \field Surface 81 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N88, \field Fraction of Radiant Energy to Surface 81
+   N90, \field Fraction of Radiant Energy to Surface 81
         \minimum 0
         \maximum 1
-   A88, \field Surface 82 Name
+   A89, \field Surface 82 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N89, \field Fraction of Radiant Energy to Surface 82
+   N91, \field Fraction of Radiant Energy to Surface 82
         \minimum 0
         \maximum 1
-   A89, \field Surface 83 Name
+   A90, \field Surface 83 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N90, \field Fraction of Radiant Energy to Surface 83
+   N92, \field Fraction of Radiant Energy to Surface 83
         \minimum 0
         \maximum 1
-   A90, \field Surface 84 Name
+   A91, \field Surface 84 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N91, \field Fraction of Radiant Energy to Surface 84
+   N93, \field Fraction of Radiant Energy to Surface 84
         \minimum 0
         \maximum 1
-   A91, \field Surface 85 Name
+   A92, \field Surface 85 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N92, \field Fraction of Radiant Energy to Surface 85
+   N94, \field Fraction of Radiant Energy to Surface 85
         \minimum 0
         \maximum 1
-   A92, \field Surface 86 Name
+   A93, \field Surface 86 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N93, \field Fraction of Radiant Energy to Surface 86
+   N95, \field Fraction of Radiant Energy to Surface 86
         \minimum 0
         \maximum 1
-   A93, \field Surface 87 Name
+   A94, \field Surface 87 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N94, \field Fraction of Radiant Energy to Surface 87
+   N96, \field Fraction of Radiant Energy to Surface 87
         \minimum 0
         \maximum 1
-   A94, \field Surface 88 Name
+   A95, \field Surface 88 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N95, \field Fraction of Radiant Energy to Surface 88
+   N97, \field Fraction of Radiant Energy to Surface 88
         \minimum 0
         \maximum 1
-   A95, \field Surface 89 Name
+   A96, \field Surface 89 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N96, \field Fraction of Radiant Energy to Surface 89
+   N98, \field Fraction of Radiant Energy to Surface 89
         \minimum 0
         \maximum 1
-   A96, \field Surface 90 Name
+   A97, \field Surface 90 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N97, \field Fraction of Radiant Energy to Surface 90
+   N99, \field Fraction of Radiant Energy to Surface 90
         \minimum 0
         \maximum 1
-   A97, \field Surface 91 Name
+   A98, \field Surface 91 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N98, \field Fraction of Radiant Energy to Surface 91
+  N100, \field Fraction of Radiant Energy to Surface 91
         \minimum 0
         \maximum 1
-   A98, \field Surface 92 Name
+   A99, \field Surface 92 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-   N99, \field Fraction of Radiant Energy to Surface 92
+  N101, \field Fraction of Radiant Energy to Surface 92
         \minimum 0
         \maximum 1
-   A99, \field Surface 93 Name
+  A100, \field Surface 93 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N100, \field Fraction of Radiant Energy to Surface 93
+  N102, \field Fraction of Radiant Energy to Surface 93
         \minimum 0
         \maximum 1
-  A100, \field Surface 94 Name
+  A101, \field Surface 94 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N101, \field Fraction of Radiant Energy to Surface 94
+  N103, \field Fraction of Radiant Energy to Surface 94
         \minimum 0
         \maximum 1
-  A101, \field Surface 95 Name
+  A102, \field Surface 95 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N102, \field Fraction of Radiant Energy to Surface 95
+  N104, \field Fraction of Radiant Energy to Surface 95
         \minimum 0
         \maximum 1
-  A102, \field Surface 96 Name
+  A103, \field Surface 96 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N103, \field Fraction of Radiant Energy to Surface 96
+  N105, \field Fraction of Radiant Energy to Surface 96
         \minimum 0
         \maximum 1
-  A103, \field Surface 97 Name
+  A104, \field Surface 97 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N104, \field Fraction of Radiant Energy to Surface 97
+  N106, \field Fraction of Radiant Energy to Surface 97
         \minimum 0
         \maximum 1
-  A104, \field Surface 98 Name
+  A105, \field Surface 98 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N105, \field Fraction of Radiant Energy to Surface 98
+  N107, \field Fraction of Radiant Energy to Surface 98
         \minimum 0
         \maximum 1
-  A105, \field Surface 99 Name
+  A106, \field Surface 99 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N106, \field Fraction of Radiant Energy to Surface 99
+  N108, \field Fraction of Radiant Energy to Surface 99
         \minimum 0
         \maximum 1
-  A106, \field Surface 100 Name
+  A107, \field Surface 100 Name
         \type object-list
         \object-list AllHeatTranSurfNames
-  N107; \field Fraction of Radiant Energy to Surface 100
+  N109; \field Fraction of Radiant Energy to Surface 100
         \minimum 0
         \maximum 1
 
@@ -36426,10 +37069,14 @@ ZoneHVAC:VentilatedSlab,
        \object-list CoolingCoilsWater
   A32, \field Cold Water Inlet Node Name
        \type node
-  A33; \field Availability Manager List Name
-        \note Enter the name of an AvailabilityManagerAssignmentList object.
-        \type object-list
-        \object-list SystemAvailabilityManagerLists
+  A33, \field Availability Manager List Name
+       \note Enter the name of an AvailabilityManagerAssignmentList object.
+       \type object-list
+       \object-list SystemAvailabilityManagerLists
+  A34; \field Design Specification ZoneHVAC Sizing Object Name
+       \note Enter the name of a DesignSpecificationZoneHVACSizing object.
+       \type object
+       \object-name DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:VentilatedSlab:SlabGroup,
         \memo This is used to allow the coordinate control of several ventilad slab system

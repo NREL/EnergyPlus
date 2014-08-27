@@ -88,6 +88,9 @@ namespace HighTempRadiantSystem {
 		Real64 GasEnergy; // system gas consumption in Joules
 		Real64 HeatPower; // actual heating sent to zone (convective and radiative) in Watts
 		Real64 HeatEnergy; // actual heating sent to zone (convective and radiative) in Joules
+		int HeatingCapMethod;     // - Method for High Temperature Radiant heating capacity scalable sizing calculation
+			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity;   // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
 
 		// Default Constructor
 		HighTempRadiantSystemData() :
@@ -110,7 +113,9 @@ namespace HighTempRadiantSystem {
 			GasPower( 0.0 ),
 			GasEnergy( 0.0 ),
 			HeatPower( 0.0 ),
-			HeatEnergy( 0.0 )
+			HeatEnergy( 0.0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -141,7 +146,10 @@ namespace HighTempRadiantSystem {
 			Real64 const GasPower, // system gas consumption in Watts
 			Real64 const GasEnergy, // system gas consumption in Joules
 			Real64 const HeatPower, // actual heating sent to zone (convective and radiative) in Watts
-			Real64 const HeatEnergy // actual heating sent to zone (convective and radiative) in Joules
+			Real64 const HeatEnergy, // actual heating sent to zone (convective and radiative) in Joules
+			int const HeatingCapMethod,     // - Method for High Temperature Radiant heating capacity scalable sizing calculation
+			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity   // - High Temperature Radiant scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -169,13 +177,33 @@ namespace HighTempRadiantSystem {
 			GasPower( GasPower ),
 			GasEnergy( GasEnergy ),
 			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy )
+			HeatEnergy( HeatEnergy ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
 
 	};
 
+	struct HighTempRadSysNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		HighTempRadSysNumericFieldData()
+		{}
+
+		// Member Constructor
+		HighTempRadSysNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< HighTempRadiantSystemData > HighTempRadSys;
+	extern FArray1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
 
