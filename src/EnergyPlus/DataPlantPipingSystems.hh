@@ -1242,6 +1242,7 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		ZoneCoupledSurfaceData(
+			std::string Name,
 			int const IndexInSurfaceArray,
 			Real64 const SurfaceArea,
 			Real64 const Width,
@@ -1252,7 +1253,6 @@ namespace DataPlantPipingSystems {
 			Real64 const InsulationConductivity,
 			Real64 const InsulationDensity
 		) :
-
 			Name( Name ),
 			IndexInSurfaceArray( IndexInSurfaceArray ),
 			SurfaceArea( SurfaceArea ),
