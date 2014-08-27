@@ -650,49 +650,6 @@ ZoneAirContaminantBalance,
        \type object-list
        \object-list ScheduleNames
 
-ZoneAirMassFlowConservation,
-       \memo Enforces the zone air mass flow balance by adjusting zone mixing object flow rates. 
-       \memo The infiltration object mass flow rate may also be adjusted or may add infiltration
-       \memo air flow to the base infiltration air flow for source zones only.
-       \unique-object
-  A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
-       \note If Yes, Zone mixing object flow rates are adjusted to balance the zone air mass flow
-       \note and additional infiltration air flow may be added if required in order to balance the
-       \note zone air mass flow.
-       \type choice
-       \key Yes
-       \key No
-       \default No
-       \note This optional choice input field allows users triggering the zone air mass flow 
-       \note balance calculation when desired. This global object has two choice KEYs: “Yes” and 
-       \note “No”. If this input field is specified as “Yes”, then EnergyPlus attempts to enforce        
-       \note the zone air mass flow conservation, or else if it is specified as “No”, then EnergyPlus      
-       \note calculation defaults to zone air mass flow balance that does not include zone mixing
-       \note objects and that assumes self-balanced simple flow objects per the default procedure, 
-       \note which may not necessarily enforce zone mass conservation unless the user specified  
-       \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
-       \note and source zones if there is at least one mixing object defined. The default input 
-       \note is “No”. (Note that “No” input may also results in balanced flow depending on the 
-       \note system specified).
-  A2;  \field Source Zone Infiltration Treatment
-       \note This input field allows user to choose how zone infiltration flow is treated during 
-       \note the zone air mass flow balance calculation. 
-       \type choice
-       \key AddInfiltrationFlow
-       \key AdjustInfiltrationFlow
-       \default AddInfiltrationFlow
-       \note It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this
-       \note input is specified as “AddInfiltrationFlow”, then energy plus adds infiltration air 
-       \note mass flow on top of the base flow, which is calculated using the infiltration object
-       \note user inputs, in order to balance the zone air mass flow.  The additional infiltration 
-       \note air mass flow is not self-balanced.  If this input is specified as 
-       \note “AdjustInfiltrationFlow”, then energy plus may adjust the base flow calculated using 
-       \note the infiltration object user inputs in order to balance the zone air mass flow. If it
-       \note is not required to adjust the base infiltration air flow calculated from the user
-       \note specified infiltration object inputs, then the base infiltration air mass flow 
-       \note is assumed self-balanced. If the above input field specified as "No", then this input
-       \note field has no impact on the simulation.
-   
 ZoneCapacitanceMultiplier:ResearchSpecial,
        \unique-object
        \format singleLine
@@ -8296,7 +8253,7 @@ Construction:ComplexFenestrationState,
   A28, \field Layer 4 Name
        \type object-list
        \object-list CFSGlazingName
-       \object-list WindowComplexShades
+	   \object-list WindowComplexShades
   A29, \field Layer 4 Directional Front Absoptance Matrix Name
        \type object-list
        \object-list DataMatrices
@@ -8317,7 +8274,7 @@ Construction:ComplexFenestrationState,
   A34, \field Layer 5 Name
        \type object-list
        \object-list CFSGlazingName
-       \object-list WindowComplexShades
+	   \object-list WindowComplexShades
   A35, \field Layer 5 Directional Front Absoptance Matrix Name
        \type object-list
        \object-list DataMatrices
@@ -17000,12 +16957,12 @@ SurfaceProperty:ExteriorNaturalVentedCavity,
 
 SurfaceProperty:SolarIncidentInside,
        \memo Used to provide incident solar radiation on the inside of the surface. Reference surface-construction pair
-       \memo and if that pair is used in a simulation, then program will use value provided in schedule instead of calculating it.
+	   \memo and if that pair is used in a simulation, then program will use value provided in schedule instead of calculating it.
   A1,  \field Name
        \required-field
   A2,  \field Surface Name
        \required-field
-       \type object-list
+	   \type object-list
        \object-list SurfaceNames
   A3,  \field Construction Name
        \required-field
@@ -17014,43 +16971,43 @@ SurfaceProperty:SolarIncidentInside,
   A4;  \field Inside Surface Incident Sun Solar Radiation Schedule Name
        \memo Values in schedule are expected to be in W/m2
        \required-field
-       \type object-list
-       \object-list ScheduleNames
+	   \type object-list
+	   \object-list ScheduleNames
 
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
-       \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
+	   \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
   A1,  \field Name
        \required-field
   A2,  \field Fenestration Surface
        \required-field
-       \type object-list
+	   \type object-list
        \object-list SubSurfNames
   A3,  \field Construction Name
        \required-field
        \type object-list
-       \object-list ComplexFenestrationStates
+	   \object-list ComplexFenestrationStates
   A4,  \field Layer 1 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
        \required-field
-       \type object-list
-       \object-list ScheduleNames
+	   \type object-list
+	   \object-list ScheduleNames
   A5,  \field Layer 2 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-       \type object-list
-       \object-list ScheduleNames
+	   \type object-list
+	   \object-list ScheduleNames
   A6,  \field Layer 3 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-       \type object-list
-       \object-list ScheduleNames
+	   \type object-list
+	   \object-list ScheduleNames
   A7,  \field Layer 4 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-       \type object-list
-       \object-list ScheduleNames
+	   \type object-list
+	   \object-list ScheduleNames
   A8;  \field Layer 5 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-       \type object-list
-       \object-list ScheduleNames
+	   \type object-list
+	   \object-list ScheduleNames
 
 ZoneProperty:UserViewFactors:bySurfaceName,
        \memo View factors for Surface to Surface in a zone.
@@ -21789,7 +21746,7 @@ AirflowNetwork:MultiZone:Zone,
       \default 300000.0
       \note Applicable only if Ventilation Control Mode = Enthalpy.
       \note This value must be greater than the corresponding lower value (previous field).
-  A4, \field Venting Availability Schedule Name
+  A4; \field Venting Availability Schedule Name
       \type object-list
       \object-list ScheduleNames
       \note Non-zero Schedule value means venting is allowed if other venting control conditions are
@@ -21798,20 +21755,6 @@ AirflowNetwork:MultiZone:Zone,
       \note circumstances. If this Schedule is not specified then venting is allowed if
       \note other venting control conditions are satisfied.
       \note Not used if Ventilation Control Mode = NoVent.
-  A5, \field Single Sided Wind Pressure Coefficient Algorithm
-      \type choice
-      \key Advanced
-      \key Standard
-      \default Standard
-      \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
-      \note to account for wind direction and turbulence effects on single sided ventilation rates.
-      \note Model is only valid for zones with 2 openings, both of which are on a single facade.
-  N6; \field Facade Width
-      \type real
-      \units m
-      \minimum 0.0
-      \default 10.0
-      \note This is the whole building width along the direction of the facade of this zone.
 
 AirflowNetwork:MultiZone:Surface,
       \min-fields 4
@@ -31443,6 +31386,7 @@ ZoneHVAC:WaterToAirHeatPump,
         \required-field
         \type node
    A5,  \field Outdoor Air Mixer Object Type
+        \required-field
         \type choice
         \key OutdoorAir:Mixer
         \note currently only one OutdoorAir:Mixer object type is available.
@@ -31916,10 +31860,9 @@ ZoneHVAC:UnitVentilator,
    A11, \field Supply Air Fan Object Type
         \required-field
         \type choice
-        \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff and
+        \note Allowable fan types are Fan:ConstantVolume and
         \note Fan:VariableVolume
    A12, \field Supply Air Fan Name
         \required-field
@@ -31932,40 +31875,32 @@ ZoneHVAC:UnitVentilator,
         \key Heating
         \key Cooling
         \key HeatingAndCooling
-   A14, \field Supply Air Fan Operating Mode Schedule Name
-        \object-list ScheduleNames
-        \note Enter the name of a schedule that controls fan operation. Schedule
-        \note name values of 0 denote cycling fan operation (fan cycles with
-        \note cooling/heating coil). Schedule values greater than 0 denote
-        \note constant fan operation (fan runs continually regardless of coil 
-        \note operation). The fan operating mode defaults to cycling fan operation 
-        \note if this input field is left blank.
-   A15, \field Heating Coil Object Type
+   A14, \field Heating Coil Object Type
         \type choice
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
         \key Coil:Heating:Gas
         \key Coil:Heating:Steam
-   A16, \field Heating Coil Name
+   A15, \field Heating Coil Name
         \type object-list
         \object-list HeatingCoilName
    N4 , \field Heating Convergence Tolerance
         \type real
         \minimum> 0.0
         \default 0.001
-   A17, \field Cooling Coil Object Type
+   A16, \field Cooling Coil Object Type
         \type choice
         \key Coil:Cooling:Water
         \key Coil:Cooling:Water:DetailedGeometry
         \key CoilSystem:Cooling:Water:HeatExchangerAssisted
-   A18, \field Cooling Coil Name
+   A17, \field Cooling Coil Name
         \type object-list
         \object-list CoolingCoilsWater
    N5 , \field Cooling Convergence Tolerance
         \type real
         \minimum> 0.0
         \default 0.001
-   A19; \field Availability Manager List Name
+   A18; \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
@@ -31987,10 +31922,9 @@ ZoneHVAC:UnitHeater,
    A5 , \field Supply Air Fan Object Type
         \required-field
         \type choice
-        \key Fan:OnOff
         \key Fan:ConstantVolume
         \key Fan:VariableVolume
-        \note Allowable fan types are Fan:ConstantVolume, Fan:OnOff and
+        \note Allowable fan types are Fan:ConstantVolume and
         \note Fan:VariableVolume
    A6 , \field Supply Air Fan Name
         \required-field
@@ -32001,37 +31935,22 @@ ZoneHVAC:UnitHeater,
         \units m3/s
         \minimum> 0
         \autosizable
-   A7 , \field Heating Coil Object Type
+   A7 , \field Fan Control Type
+        \required-field
+        \type choice
+        \key OnOff
+        \key Continuous
+   A8 , \field Heating Coil Object Type
         \required-field
         \type choice
         \key Coil:Heating:Water
         \key Coil:Heating:Electric
         \key Coil:Heating:Gas
         \key Coil:Heating:Steam
-   A8 , \field Heating Coil Name
+   A9 , \field Heating Coil Name
         \required-field
         \type object-list
         \object-list HeatingCoilName
-   A9 , \field Supply Air Fan Operating Mode Schedule Name
-        \object-list ScheduleNames
-        \note Enter the name of a schedule that controls fan operation. Schedule
-        \note name values of 0 denote cycling fan operation (fan cycles with the
-        \note heating coil). Schedule values greater than 0 denote constant fan
-        \note operation (fan runs continually regardless of coil operation). 
-        \note The fan operating mode defaults to cycling fan operation if this 
-        \note input field is left blank.
-   A10, \field Supply Air Fan Operation During No Heating
-        \required-field
-        \type choice
-        \key Yes
-        \key No
-        \note This choice field allows the user to define how the unit heater will operate 
-        \note under “no heating load” or cooling conditions. If the “No” is selected, then 
-        \note the fan will not run unless there is a heating load. If the fan does not run, 
-        \note this effectively shuts the unit heater system off when there is no heating load. 
-        \note If the “Yes” is selected, the unit heater is available and has a ConstantVolume 
-        \note fan, or has an OnOff fan with “Supply Air Fan Operating Mode Schedule” value 
-        \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
         \units m3/s
@@ -32048,7 +31967,7 @@ ZoneHVAC:UnitHeater,
         \type real
         \minimum> 0.0
         \default 0.001
-   A11; \field Availability Manager List Name
+   A10; \field Availability Manager List Name
         \note Enter the name of an AvailabilityManagerAssignmentList object.
         \type object-list
         \object-list SystemAvailabilityManagerLists
@@ -38915,7 +38834,6 @@ Coil:Cooling:Water,
        \reference CoolingCoilsWater
        \reference CoolingCoilsWaterNoHX
        \reference AFNCoilNames
-       \reference SimpleCoils
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41307,7 +41225,6 @@ Coil:Heating:Water,
        \reference HeatingCoilName
        \reference HeatingCoilsWater
        \reference AFNCoilNames
-       \reference SimpleCoils
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
        \note If this field is blank, the system is always available.
@@ -41946,6 +41863,7 @@ Coil:Heating:DX:MultiSpeed,
        \type node
   N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
        \type real
+       \minimum -20.0
        \default -8.0
        \units C
   N2 , \field Outdoor Dry-Bulb Temperature to Turn On Compressor
@@ -48941,6 +48859,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \object-list HeatingCoilsGasMultiStage
    N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
         \type real
+        \minimum -20.0
         \default -8.0
         \units C
         \note Needs to match the corresponding minimum outdoor temperature defined
@@ -55781,9 +55700,9 @@ Chiller:Electric:EIR,
 
 
 Chiller:Electric:ReformulatedEIR,
-\min-fields 21
+\min-fields 22
    \memo This chiller model is an empirical model, a reformulated version of Chiller:Electric:EIR
-   \memo where the performance is a function of condenser leaving fluid Temperature instead of
+   \memo where the performance is a function of condenser leaving fluid Temperature or chiller lift instead of
    \memo condenser entering fluid Temperature. Chiller performance at off-reference conditions is
    \memo modeled using three polynomial equations. Three curve objects are required.
   A1 , \field Name
@@ -55841,16 +55760,41 @@ Chiller:Electric:ReformulatedEIR,
        \note curve = a + b*CWS + c*CWS**2 + d*LCT + e*LCT**2 + f*CWS*LCT
        \note CWS = supply (leaving) chilled water temperature(C)
        \note LCT = leaving condenser fluid temperature(C)
-  A4 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+  A4, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+       \note Two part-load curves are available. 
+       \note The previous one uses the leaving condenser water temperature.
+       \note The new one uses the normalized lift. Lift is the temperature difference between the
+       \note leaving condenser water temperature and the leaving evaporator water temperature. 
+       \note Two new terms are included in the new curve to improve model accuracy when the leaving chilled 
+       \note water temperature deviates from the design conditions especially at high part-load conditions.
+       \required-field
+       \type choice
+       \key UseLeavingCondenserWaterTemperature
+       \key UseLift
+       \default UseLeavingCondenserWaterTemperature
+  A5 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note Electric Input Ratio (EIR) as a function of Part Load Ratio (PLR)
        \note EIR = 1/COP
        \required-field
        \type object-list
        \object-list BicubicCurves
+       \object-list ChillerPartLoadWithLiftCurves
+       \note two types of part-load curves are available: BicubicCurves or ChillerPartLoadWithLiftCurves
+       \note Type 1: BicubicCurves; 
+       \note Calculated based on LCT and PLR       
        \note curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
        \note + i*0 + j*0
        \note PLR = part load ratio (cooling load/steady state capacity)
        \note LCT = leaving condenser fluid temperature(C)
+       \note Type 2: ChillerPartLoadWithLiftCurves 
+       \note Calculated based on dT*, Tdev* and PLR
+       \note curve = a + b*(dT*) + c*(dT*)**2 + d*PLR + e*PLR**2 + f*(dT*)*PLR + g*(dT*)**3
+       \note + h*PLR**3 + i*(dT*)**2*PLR + j*(dT*)*PLR**2 + k*(dT*)**2*PLR**2 + l*(Tdev*)*PLR**3
+       \note Tdev = Leaving Chilled Water Temperature â€“ Reference Chilled Water Temperature
+       \note Tdev* = normalized Tdev = Tdev / dTref
+       \note dT* = normalized fractional Lift = dT / dTref
+       \note dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature(C)
+       \note dTref = dT at the reference condition
   N7 , \field Minimum Part Load Ratio
        \type real
        \note Part load ratio below which the chiller starts cycling on/off to meet the load.
@@ -55876,16 +55820,16 @@ Chiller:Electric:ReformulatedEIR,
        \note and less than or equal to the Maximum Part Load Ratio.
        \minimum 0.0
        \default 0.2
-  A5 , \field Chilled Water Inlet Node Name
+  A6 , \field Chilled Water Inlet Node Name
        \type node
        \required-field
-  A6 , \field Chilled Water Outlet Node Name
+  A7 , \field Chilled Water Outlet Node Name
        \type node
        \required-field
-  A7 , \field Condenser Inlet Node Name
+  A8 , \field Condenser Inlet Node Name
        \type node
        \required-field
-  A8 , \field Condenser Outlet Node Name
+  A9 , \field Condenser Outlet Node Name
        \type node
        \required-field
   N11, \field Fraction of Compressor Electric Consumption Rejected by Condenser
@@ -55901,7 +55845,7 @@ Chiller:Electric:ReformulatedEIR,
        \type real
        \default 2.0
        \units C
-  A9, \field Chiller Flow Mode Type
+  A10, \field Chiller Flow Mode Type
        \note Select operating mode for fluid flow through the chiller. "NotModulated" is for
        \note either variable or constant pumping with flow controlled by the external plant system.
        \note "ConstantFlow" is for constant pumping with flow controlled by chiller to operate at
@@ -55920,9 +55864,9 @@ Chiller:Electric:ReformulatedEIR,
        \default 0.0
        \ip-units gal/min
        \autosizable
-  A10, \field Heat Recovery Inlet Node Name
+  A11, \field Heat Recovery Inlet Node Name
        \type node
-  A11, \field Heat Recovery Outlet Node Name
+  A12, \field Heat Recovery Outlet Node Name
        \type node
   N14, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
@@ -55934,11 +55878,11 @@ Chiller:Electric:ReformulatedEIR,
        \type real
        \minimum 0.0
        \maximum 1.0
-  A12, \field Heat Recovery Inlet High Temperature Limit Schedule Name
+  A13, \field Heat Recovery Inlet High Temperature Limit Schedule Name
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A13; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A14; \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
@@ -62209,11 +62153,9 @@ PlantLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key SequentialLoad
-        \key UniformLoad
-        \key UniformPLR
-        \key SequentialUniformPLR
-        \default SequentialLoad
+        \key Sequential
+        \key Uniform
+        \default Sequential
   A15, \field Availability Manager List Name
         \type object-list
         \object-list SystemAvailabilityManagerLists
@@ -62323,11 +62265,8 @@ CondenserLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key SequentialLoad
-        \key UniformLoad
-        \key UniformPLR
-        \key SequentialUniformPLR
-        \default SequentialLoad
+        \key Sequential
+        \default Sequential
   A15; \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection
@@ -72853,57 +72792,7 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
-   
-FaultModel:Fouling:Coil,
-   \memo This object describes fouling water heating or cooling coils
-   A1, \field Name
-       \required-field
-       \type alpha
-   A2, \field Coil Name
-       \required-field
-       \type object-list
-       \object-list SimpleCoils
-   A3, \field Availability Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   A4, \field Severity Schedule Name
-       \type object-list
-       \object-list ScheduleNames
-   A5, \field Fouling Input Method
-       \type choice
-       \key FouledUARated
-       \key FoulingFactor
-       \default FouledUARated
-   N1, \field UAFouled
-       \note Fouling coil UA value under rating conditions
-       \note For Fouling Input Method: FouledUARated
-       \units W/K
-       \type real       
-       \minimum> 0.0
-   N2, \field Water Side Fouling Factor       
-       \note For Fouling Input Method: FoulingFactor
-       \units m2-K/W  
-       \type real  
-       \minimum 0.0
-       \default 0.0
-   N3, \field Air Side Fouling Factor       
-       \note For Fouling Input Method: FoulingFactor
-       \units m2-K/W 
-       \type real
-       \minimum 0.0   
-       \default 0.0
-   N4, \field Outside Coil Surface Area       
-       \note For Fouling Input Method: FoulingFactor
-       \units m2 
-       \type real   
-       \minimum> 0.0   
-   N5; \field Inside to Outside Coil Surface Area Ratio      
-       \note For Fouling Input Method: FoulingFactor
-       \units dimensionless
-       \type real       
-       \minimum> 0.0
-       \default 0.07
-       
+
 \group General Data Entry
 
 
@@ -75131,6 +75020,102 @@ Curve:DoubleExponentialDecay,
        \key Dimensionless
        \default Dimensionless
 
+Curve:ChillerPartLoadWithLift,
+       \memo This new chiller part-load performance curve has three independent variables.
+       \memo Input consists of the curve name, the twelve coefficients, and the maximum
+       \memo and minimum valid independent variable values. Optional inputs for the curve minimum
+       \memo and maximum may be used to limit the output of the performance curve.
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference ChillerPartLoadWithLiftCurves
+       \reference AllCurves
+       \note See Input Output Reference for curve description
+  N1 , \field Coefficient1 C1
+       \required-field
+       \type real
+  N2 , \field Coefficient2 C2
+       \required-field
+       \type real
+  N3 , \field Coefficient3 C3
+       \required-field
+       \type real
+  N4 , \field Coefficient4 C4
+       \required-field
+       \type real
+  N5 , \field Coefficient5 C5
+       \required-field
+       \type real
+  N6 , \field Coefficient6 C6
+       \required-field
+       \type real
+  N7 , \field Coefficient7 C7
+       \required-field
+       \type real
+  N8 , \field Coefficient8 C8
+       \required-field
+       \type real
+  N9 , \field Coefficient9 C9
+       \required-field
+       \type real
+  N10, \field Coefficient10 C10
+       \required-field
+       \type real
+  N11, \field Coefficient11 C11
+       \required-field
+       \type real
+  N12, \field Coefficient12 C12
+       \required-field
+       \type real
+  N13, \field Minimum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N14, \field Maximum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N15, \field Minimum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N16, \field Maximum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N17, \field Minimum Value of z
+       \required-field
+       \type real
+       \unitsBasedOnField A4
+  N18, \field Maximum Value of z
+       \required-field
+       \type real
+       \unitsBasedOnField A4
+  N19, \field Minimum Curve Output
+       \type real
+       \unitsBasedOnField A5
+       \note Specify the minimum value calculated by this curve object
+  N20, \field Maximum Curve Output
+       \type real
+       \unitsBasedOnField A5
+       \note Specify the maximum value calculated by this curve object
+  A2 , \field Input Unit Type for x
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A3 , \field Input Unit Type for y
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A4 , \field Input Unit Type for z
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A5;  \field Output Unit Type
+       \type choice
+       \key Dimensionless
+       \default Dimensionless	   
+	   
 \group Performance Tables
 
 Table:OneIndependentVariable,
