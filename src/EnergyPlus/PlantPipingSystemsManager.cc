@@ -1613,17 +1613,17 @@ namespace PlantPipingSystemsManager {
 
 			//check if there is a basement
 			if (SameString(cAlphaArgs(2), "YES")) {
-				PipingSystemDomains(DomainNum).HasBasement = true;
+				PipingSystemDomains(DomainNum).HasCoupledBasement = true;
 			}
 			else if (SameString(cAlphaArgs(2), "NO")) {
-				PipingSystemDomains(DomainNum).HasBasement = false;
+				PipingSystemDomains(DomainNum).HasCoupledBasement = false;
 			}
 			else {
 				IssueSevereInputFieldError(RoutineName, ObjName_BasementDomain, cAlphaArgs(1), cAlphaFieldNames(5), cAlphaArgs(5), "Must enter either yes or no.", ErrorsFound);
 			}
 
 			//more work to do if there is a basement
-			if (PipingSystemDomains(DomainNum).HasBasement) {
+			if (PipingSystemDomains(DomainNum).HasCoupledBasement) {
 
 				// check if there are blank inputs related to the basement,
 				// IP can't catch this because they are inherently optional if there ISN'T a basement
@@ -1700,6 +1700,8 @@ namespace PlantPipingSystemsManager {
 				//	}
 				//}
 
+				PipingSystemDomains(DomainNum).HasBasement = true;
+
 			}
 			//get some convergence tolerances, minimum/maximum are enforced by the IP, along with default values if user left them blank
 			PipingSystemDomains(DomainNum).SimControls.Convergence_CurrentToPrevIteration = rNumericArgs(13);
@@ -1708,11 +1710,11 @@ namespace PlantPipingSystemsManager {
 			//additional evapotranspiration parameter, min/max validated by IP
 			PipingSystemDomains(DomainNum).Moisture.GroundCoverCoefficient = rNumericArgs(15);
 
-			PipingSystemDomains(DomainNum).Mesh.X.RegionMeshCount = 4;
+			PipingSystemDomains(DomainNum).Mesh.X.RegionMeshCount = 1;
 			PipingSystemDomains(DomainNum).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-			PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount = 4;
+			PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount = 1;
 			PipingSystemDomains(DomainNum).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-			PipingSystemDomains(DomainNum).Mesh.Z.RegionMeshCount = 4;
+			PipingSystemDomains(DomainNum).Mesh.Z.RegionMeshCount = 1;
 			PipingSystemDomains(DomainNum).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
 
 
@@ -5992,14 +5994,13 @@ namespace PlantPipingSystemsManager {
 								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 						}
-						//X side interface 
-						else if (CellXIndex == MinXIndex &&  CellZIndex >= MinZIndex) {
-							// Check for insulation that is next to the basement wall and assign it properties in DoOneTimeInitialization
+						//X side basementwall
+						else if (CellXIndex == MinXIndex &&  CellZIndex > MinZIndex) {
 							if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex >= YIndex){
 								CellType = CellType_BasementWall;
 								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
-							//Assign insulation type to cells below basement floor only, if insulation present
+							//Assign insulation type to cells below basement floor, if insulation present
 							if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
 								//Check depth of vertical insulation
 								if (CellYIndex < YIndex && CellYIndex >= InsulationYIndex &&  CellZIndex > MinZIndex){
@@ -6008,9 +6009,8 @@ namespace PlantPipingSystemsManager {
 								}
 							}
 						}
-						//Z side interface
+						//Z side basement wall
 						else if (CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex){
-							// Check for insulation that is next to the basement wall and assign it properties in DoOneTimeInitialization
 							if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex >= YIndex){
 								CellType = CellType_BasementWall;
 								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
@@ -6022,6 +6022,13 @@ namespace PlantPipingSystemsManager {
 									CellType = CellType_VertInsulation;
 									myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 								}
+							}
+						}
+						//Basement corner cells
+						else if (CellZIndex == MinZIndex  &&  CellXIndex == MinXIndex){
+							if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex >= YIndex){
+								CellType = CellType_BasementCorner;
+								myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 							}
 						}
 						//Surface cells
@@ -6686,7 +6693,8 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// USE STATEMENTS:
-		// na
+		using DataGlobals::TimeStep;
+		using DataEnvironment::CurMnDyHr;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6695,6 +6703,9 @@ namespace PlantPipingSystemsManager {
 		int X;
 		int Y;
 		int Z;
+
+		std::ofstream static myfile("temps.csv", std::ofstream::out);
+
 
 		for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
 			for ( Y = lbound( PipingSystemDomains( DomainNum ).Cells, 2 ); Y <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ); ++Y ) {
@@ -6709,7 +6720,7 @@ namespace PlantPipingSystemsManager {
 					}
 					else if ( SELECT_CASE_var == CellType_GroundSurface ) {
 					
-						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature = EvaluateGroundSurfaceTemperature( DomainNum, PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
+						PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature = EvaluateGroundSurfaceTemperature(DomainNum, PipingSystemDomains(DomainNum).Cells(X, Y, Z));
 					}
 					else if ( SELECT_CASE_var == CellType_FarfieldBoundary ) {
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature = EvaluateFarfieldBoundaryTemperature( DomainNum, PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
@@ -6729,7 +6740,10 @@ namespace PlantPipingSystemsManager {
 					}
 					else if ( SELECT_CASE_var == CellType_ZoneGroundInterface ) {
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Temperature = EvaluateZoneInterfaceTemperature( DomainNum, PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) );
-					}}			
+					}}		
+
+					myfile << CurMnDyHr << "," << TimeStep << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).CellType << "," << X << "," << Y << "," << Z << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature << "," << PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Conductivity << std::endl;
+
 				}
 			}
 		}
@@ -6947,6 +6961,10 @@ namespace PlantPipingSystemsManager {
 		Real64 MyElevation;
 		Real64 GroundCoverCoefficient;
 
+		std::ofstream static myfile("surfacetemps.csv", std::ofstream::out);
+
+
+
 		//retrieve information from E+ globals
 		Latitude_Degrees = Latitude;
 		StMeridian_Degrees = -TimeZoneMeridian; //Standard meridian, degrees W
@@ -6973,8 +6991,8 @@ namespace PlantPipingSystemsManager {
 		for ( DirectionCounter = lbound( NeighborFieldCells, 1 ); DirectionCounter <= ubound( NeighborFieldCells, 1 ); ++DirectionCounter ) {
 			CurDirection = NeighborFieldCells( DirectionCounter );
 
-			//For Zone-Coupled slab configuration
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ){
+			//For Zone-Coupled slab or basement configuration
+			if (PipingSystemDomains(DomainNum).IsZoneCoupled || PipingSystemDomains(DomainNum).HasCoupledBasement	){
 				//We have adiabatic z- and x-faces, check if the cell is adjacent to one
 				if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
 					AdiabaticMultiplier = 2.0;
@@ -7003,6 +7021,7 @@ namespace PlantPipingSystemsManager {
 			EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 			Numerator = AdiabaticMultiplier * Numerator + ( Beta / Resistance ) * NeighborTemp;
 			Denominator = AdiabaticMultiplier * Denominator + ( Beta / Resistance );
+			myfile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << CurDirection << "," << Numerator << "," << NeighborTemp << "," << AdiabaticMultiplier << std::endl;
 
 		}
 
@@ -7010,8 +7029,8 @@ namespace PlantPipingSystemsManager {
 		for ( DirectionCounter = lbound( NeighborBoundaryCells, 1 ); DirectionCounter <= ubound( NeighborBoundaryCells, 1 ); ++DirectionCounter ) {
 			CurDirection = NeighborBoundaryCells( DirectionCounter );
 
-			//For Zone-coupled slab Configuration
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ){
+			//For Zone-coupled slab or basement configuration
+			if (PipingSystemDomains(DomainNum).IsZoneCoupled || PipingSystemDomains(DomainNum).HasCoupledBasement){
 				//-x-direction will always be a farfield boundary
 				//-z will also be a farfield boundary
 				//+x and +z will be handled above since they are adiabatic faces
@@ -7621,11 +7640,24 @@ namespace PlantPipingSystemsManager {
 			int CurDirection; // From Enum: Direction
 			Real64 AdiabaticMultiplier;
 
+			std::ofstream static myfile("basementtemps.csv", std::ofstream::out);
+			
+
 			//Initialize
 			Numerator = 0.0;
 			Denominator = 0.0;
 			Resistance = 0.0;
 			Beta = cell.MyBase.Beta;
+
+			{ auto const SELECT_CASE_var(cell.CellType);
+			if ((SELECT_CASE_var == CellType_BasementWall) || (SELECT_CASE_var == CellType_BasementFloor)) {
+				//This is actually only a half-cell since the basement wall slices right through the middle in one direction
+				Beta = cell.MyBase.Beta / 2.0;
+			}
+			else if (SELECT_CASE_var == CellType_BasementCorner) {
+				//This is actually only a three-quarter-cell since the basement wall slices right through the middle in both directions
+				Beta = cell.MyBase.Beta * 3.0 / 4.0;
+			}}
 
 			//add effect from previous time step
 			Numerator += cell.MyBase.Temperature_PrevTimeStep;
@@ -7636,48 +7668,95 @@ namespace PlantPipingSystemsManager {
 				// Get the average basement wall heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains(DomainNum).WallHeatFlux;
 				Numerator += Beta * HeatFlux * Width(cell) * Depth(cell);
+
 			}
 			if (SELECT_CASE_var == CellType_BasementFloor) {
 				// Get the average basement floor heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains(DomainNum).FloorHeatFlux;
 				Numerator += Beta * HeatFlux * Width(cell) * Depth(cell);
+
 			}
 			if (SELECT_CASE_var == CellType_ZoneGroundInterface) {
 				// Get the average slab heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains(DomainNum).HeatFlux;
 				Numerator += Beta * HeatFlux * Width(cell) * Depth(cell);
 			}}
-			
+
 			//determine the neighbor types based on cell location
-			EvaluateCellNeighborDirections( DomainNum, cell );
+			EvaluateCellNeighborDirections(DomainNum, cell);
 
 			//loop across each direction in the simulation
-			for ( DirectionCounter = lbound( NeighborFieldCells, 1 ); DirectionCounter <= ubound( NeighborFieldCells, 1 ); ++DirectionCounter ) {
+			for (DirectionCounter = lbound(NeighborFieldCells, 1); DirectionCounter <= ubound(NeighborFieldCells, 1); ++DirectionCounter) {
 
-				CurDirection = NeighborFieldCells( DirectionCounter );
+				CurDirection = NeighborFieldCells(DirectionCounter);
 
 				//There are a few cases for cells adjacent to adiabatic x- and z- walls to be handled here. Check if the cell is next to one.
-				if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
+				if ((CurDirection == Direction_NegativeZ) && (cell.Z_index == ubound(PipingSystemDomains(DomainNum).Cells, 3))) {
 					AdiabaticMultiplier = 2.0;
 				}
-				else if ( ( CurDirection == Direction_NegativeX ) && ( cell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
+				else if ((CurDirection == Direction_NegativeX) && (cell.X_index == ubound(PipingSystemDomains(DomainNum).Cells, 1))) {
 					AdiabaticMultiplier = 2.0;
 				}
 				else {
 					AdiabaticMultiplier = 1.0;
 				}
-				//Use the multiplier to evaluate the transient expression terms
-				EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-				Numerator += AdiabaticMultiplier * ( Beta / Resistance ) * NeighborTemp;
-				Denominator += AdiabaticMultiplier * ( Beta / Resistance );				
+
+				//Have to be careful here to make sure heat conduction happens only in the appropriate directions
+
+				{ auto const SELECT_CASE_var(cell.CellType);
+				if (SELECT_CASE_var == CellType_BasementWall) {
+					//No heat conduction from the X-side basementwall cell to the +x cell (basement cutaway)
+					if (cell.X_index == PipingSystemDomains(DomainNum).XIndex && CurDirection != Direction_PositiveX){
+
+						//Evaluate the transient expression terms
+						EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance);
+						Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
+						Denominator += AdiabaticMultiplier * (Beta / Resistance);
+						myfile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << CurDirection << "," << Numerator << "," << NeighborTemp << "," << AdiabaticMultiplier << std::endl;
+
+					}
+
+					//No heat conduction from the Z-side basementwall cell to the +z cell (basement cutaway)
+					if (cell.Z_index == PipingSystemDomains(DomainNum).ZIndex && CurDirection != Direction_PositiveZ){
+
+						//Evaluate the transient expression terms
+						EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance);
+						Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
+						Denominator += AdiabaticMultiplier * (Beta / Resistance);
+						myfile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << CurDirection << "," << Numerator << "," << NeighborTemp << "," << AdiabaticMultiplier << std::endl;
+
+					}
+				}
+				else if (SELECT_CASE_var == CellType_BasementFloor) {
+					//No heat conduction from the basement floorcell to the +y cell (basement cutaway)
+					if (CurDirection != Direction_PositiveY){
+
+						//Evaluate the transient expression terms
+						EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance);
+						Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
+						Denominator += AdiabaticMultiplier * (Beta / Resistance);
+						myfile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << CurDirection << "," << Numerator << "," << NeighborTemp << "," << AdiabaticMultiplier << std::endl;
+
+					}
+				}
+				
+				else if (SELECT_CASE_var == CellType_BasementCorner || SELECT_CASE_var == CellType_ZoneGroundInterface) {
+					//Heat conduction in all directions
+					//Evaluate the transient expression terms
+					EvaluateNeighborCharacteristics(DomainNum, cell, CurDirection, NeighborTemp, Resistance);
+					Numerator += AdiabaticMultiplier * (Beta / Resistance) * NeighborTemp;
+					Denominator += AdiabaticMultiplier * (Beta / Resistance);
+					myfile << cell.CellType << "," << cell.X_index << "," << cell.Y_index << "," << cell.Z_index << "," << CurDirection << "," << Numerator << "," << NeighborTemp << "," << AdiabaticMultiplier << std::endl;
+				}}
 			}
 
-			//now that we have passed all directions, update the temperature
+				//now that we have passed all directions, update the temperature
+
+				RetVal = Numerator / Denominator;
+
+				return RetVal;
+
 			
-			RetVal = Numerator / Denominator;
-
-			return RetVal;
-
 		}
 
 	//*********************************************************************************************!
@@ -9108,54 +9187,57 @@ namespace PlantPipingSystemsManager {
 						if ( PipingSystemCircuits( CircuitNum ).HasInsulation ) {
 							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).PipeCellData.Insulation.MyBase.Properties = PipingSystemCircuits( CircuitNum ).InsulationProperties;
 						}
-					} else if ( ( SELECT_CASE_var == CellType_GeneralField ) || ( SELECT_CASE_var == CellType_GroundSurface ) || ( SELECT_CASE_var == CellType_AdiabaticWall ) || ( SELECT_CASE_var == CellType_FarfieldBoundary ) || ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementFloor ) || ( SELECT_CASE_var == CellType_BasementCorner ) ) {
+					} else if ( ( SELECT_CASE_var == CellType_GeneralField ) || ( SELECT_CASE_var == CellType_GroundSurface ) || ( SELECT_CASE_var == CellType_AdiabaticWall ) || ( SELECT_CASE_var == CellType_FarfieldBoundary )  ) {
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
 					}
 					else if ((SELECT_CASE_var == CellType_BasementWall) || (SELECT_CASE_var == CellType_BasementFloor) || (SELECT_CASE_var == CellType_BasementCorner)) {
-						//Check for insulation here
-						if (PipingSystemDomains(DomainNum).HasCoupledBasement){
-							if (SELECT_CASE_var == CellType_BasementFloor){
-								//Insulation present
-								if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
-									//Entire underbasement insulated
-									if (PipingSystemDomains(DomainNum).FullHorizInsFlag){
-										PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
-									}
-									else if (CellXIndex <= PipingSystemDomains(DomainNum).InsulationXIndex || CellZIndex <= PipingSystemDomains(DomainNum).InsulationZIndex){
-										PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
-									}
-									else {
-										PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
-									}
-								}
-								else {
-									//basement cells are partially ground, give them some props
-									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
-								}
-							}
-							else if (SELECT_CASE_var == CellType_BasementWall){
-								//Insulation present
-								if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
-									if (CellYIndex >= PipingSystemDomains(DomainNum).InsulationYIndex){
-										PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
-									}
-									else {
-										PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
-									}
-								}
-								else {
-									//basement cells are partially ground, give them some props
-									PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
-								}
-							}							
-							else {
-								//basement corner cells are partially ground, give them some props
-								PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
-							}
-						}else{
-							//basement cells are partially ground, give them some props
-							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
-						}
+						////Check for insulation here
+						//if (PipingSystemDomains(DomainNum).HasCoupledBasement){
+						//	if (SELECT_CASE_var == CellType_BasementFloor){
+						//		//Insulation present
+						//		if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+						//			//Entire underbasement insulated
+						//			if (PipingSystemDomains(DomainNum).FullHorizInsPresent){
+						//				PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+						//			}
+						//			else if (CellXIndex <= PipingSystemDomains(DomainNum).InsulationXIndex || CellZIndex <= PipingSystemDomains(DomainNum).InsulationZIndex){
+						//				PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+						//			}
+						//			else {
+						//				PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						//			}
+						//		}
+						//		else {
+						//			//basement cells are partially ground, give them some props
+						//			PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						//		}
+						//	}
+						//	else if (SELECT_CASE_var == CellType_BasementWall){
+						//		//Insulation present
+						//		if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+						//			if (CellYIndex >= PipingSystemDomains(DomainNum).InsulationYIndex){
+						//				PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).HorizInsProperties;
+						//			}
+						//			else {
+						//				PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						//			}
+						//		}
+						//		else {
+						//			//basement cells are partially ground, give them some props
+						//			PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						//		}
+						//	}							
+						//	else {
+						//		//basement corner cells are partially ground, give them some props
+						//		PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						//	}
+						//}else{
+						//	//basement cells are partially ground, give them some props
+						//	PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
+						//}
+
+						//basement cells are partially ground, give them some props
+						 PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties = PipingSystemDomains(DomainNum).GroundProperties;
 						
 						
 					} else if ( SELECT_CASE_var == CellType_Slab ){
@@ -9400,14 +9482,7 @@ namespace PlantPipingSystemsManager {
 
 					{ auto const SELECT_CASE_var( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).CellType );
 					if ((SELECT_CASE_var == CellType_GeneralField) || (SELECT_CASE_var == CellType_AdiabaticWall) || (SELECT_CASE_var == CellType_FarfieldBoundary) || (SELECT_CASE_var == CellType_GroundSurface) || (SELECT_CASE_var == CellType_BasementCorner) || (SELECT_CASE_var == CellType_BasementFloor) || (SELECT_CASE_var == CellType_BasementWall) || (SELECT_CASE_var == CellType_ZoneGroundInterface)) {
-						//check if basement floor or wall cell is insulation here. If ground cell, update cell property sets
-						if ((PipingSystemDomains(DomainNum).HasCoupledBasement || PipingSystemDomains(DomainNum).IsZoneCoupled) && (PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Conductivity = PipingSystemDomains(DomainNum).HorizInsProperties.Conductivity)){
-							Beta = PipingSystemDomains(DomainNum).Cur.CurSimTimeStepSize / (PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Density * Volume(PipingSystemDomains(DomainNum).Cells(X, Y, Z)) * PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.SpecificHeat);
-							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Beta = Beta;
-						}
-						else
-						{
-							//UPDATE CELL PROPERTY SETS
+						    //UPDATE CELL PROPERTY SETS
 							//'main ground cells, update with soil properties
 							CellTemp = PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Temperature;
 							EvaluateSoilRhoCp(DomainNum, CellTemp, CellRhoCp);
@@ -9417,7 +9492,7 @@ namespace PlantPipingSystemsManager {
 							//'these are basic cartesian calculation cells
 							Beta = PipingSystemDomains(DomainNum).Cur.CurSimTimeStepSize / (PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.Density * Volume(PipingSystemDomains(DomainNum).Cells(X, Y, Z)) * PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Properties.SpecificHeat);
 							PipingSystemDomains(DomainNum).Cells(X, Y, Z).MyBase.Beta = Beta;
-						}
+						
 					}
 					else if ( ( SELECT_CASE_var == CellType_HorizInsulation ) || ( SELECT_CASE_var == CellType_VertInsulation ) ) {
 
