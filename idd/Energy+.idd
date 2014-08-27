@@ -55781,9 +55781,9 @@ Chiller:Electric:EIR,
 
 
 Chiller:Electric:ReformulatedEIR,
-\min-fields 21
+\min-fields 22
    \memo This chiller model is an empirical model, a reformulated version of Chiller:Electric:EIR
-   \memo where the performance is a function of condenser leaving fluid Temperature instead of
+   \memo where the performance is a function of condenser leaving fluid Temperature or chiller lift instead of
    \memo condenser entering fluid Temperature. Chiller performance at off-reference conditions is
    \memo modeled using three polynomial equations. Three curve objects are required.
   A1 , \field Name
@@ -55841,16 +55841,41 @@ Chiller:Electric:ReformulatedEIR,
        \note curve = a + b*CWS + c*CWS**2 + d*LCT + e*LCT**2 + f*CWS*LCT
        \note CWS = supply (leaving) chilled water temperature(C)
        \note LCT = leaving condenser fluid temperature(C)
-  A4 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
+  A4, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
+       \note Two part-load curves are available. 
+       \note The previous one uses the leaving condenser water temperature.
+       \note The new one uses the normalized lift. Lift is the temperature difference between the
+       \note leaving condenser water temperature and the leaving evaporator water temperature. 
+       \note Two new terms are included in the new curve to improve model accuracy when the leaving chilled 
+       \note water temperature deviates from the design conditions especially at high part-load conditions.
+       \required-field
+       \type choice
+       \key UseLeavingCondenserWaterTemperature
+       \key UseLift
+       \default UseLeavingCondenserWaterTemperature
+  A5 , \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note Electric Input Ratio (EIR) as a function of Part Load Ratio (PLR)
        \note EIR = 1/COP
        \required-field
        \type object-list
        \object-list BicubicCurves
+       \object-list ChillerPartLoadWithLiftCurves
+       \note two types of part-load curves are available: BicubicCurves or ChillerPartLoadWithLiftCurves
+       \note Type 1: BicubicCurves; 
+       \note Calculated based on LCT and PLR       
        \note curve = a + b*LCT + c*LCT**2 + d*PLR + e*PLR**2 + f*LCT*PLR + g*0 + h*PLR**3
        \note + i*0 + j*0
        \note PLR = part load ratio (cooling load/steady state capacity)
        \note LCT = leaving condenser fluid temperature(C)
+       \note Type 2: ChillerPartLoadWithLiftCurves 
+       \note Calculated based on dT*, Tdev* and PLR
+       \note curve = a + b*(dT*) + c*(dT*)**2 + d*PLR + e*PLR**2 + f*(dT*)*PLR + g*(dT*)**3
+       \note + h*PLR**3 + i*(dT*)**2*PLR + j*(dT*)*PLR**2 + k*(dT*)**2*PLR**2 + l*(Tdev*)*PLR**3
+       \note Tdev = Leaving Chilled Water Temperature – Reference Chilled Water Temperature
+       \note Tdev* = normalized Tdev = Tdev / dTref
+       \note dT* = normalized fractional Lift = dT / dTref
+       \note dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature(C)
+       \note dTref = dT at the reference condition
   N7 , \field Minimum Part Load Ratio
        \type real
        \note Part load ratio below which the chiller starts cycling on/off to meet the load.
@@ -55876,16 +55901,16 @@ Chiller:Electric:ReformulatedEIR,
        \note and less than or equal to the Maximum Part Load Ratio.
        \minimum 0.0
        \default 0.2
-  A5 , \field Chilled Water Inlet Node Name
+  A6 , \field Chilled Water Inlet Node Name
        \type node
        \required-field
-  A6 , \field Chilled Water Outlet Node Name
+  A7 , \field Chilled Water Outlet Node Name
        \type node
        \required-field
-  A7 , \field Condenser Inlet Node Name
+  A8 , \field Condenser Inlet Node Name
        \type node
        \required-field
-  A8 , \field Condenser Outlet Node Name
+  A9 , \field Condenser Outlet Node Name
        \type node
        \required-field
   N11, \field Fraction of Compressor Electric Consumption Rejected by Condenser
@@ -55901,7 +55926,7 @@ Chiller:Electric:ReformulatedEIR,
        \type real
        \default 2.0
        \units C
-  A9, \field Chiller Flow Mode Type
+  A10, \field Chiller Flow Mode Type
        \note Select operating mode for fluid flow through the chiller. "NotModulated" is for
        \note either variable or constant pumping with flow controlled by the external plant system.
        \note "ConstantFlow" is for constant pumping with flow controlled by chiller to operate at
@@ -55920,9 +55945,9 @@ Chiller:Electric:ReformulatedEIR,
        \default 0.0
        \ip-units gal/min
        \autosizable
-  A10, \field Heat Recovery Inlet Node Name
+  A11, \field Heat Recovery Inlet Node Name
        \type node
-  A11, \field Heat Recovery Outlet Node Name
+  A12, \field Heat Recovery Outlet Node Name
        \type node
   N14, \field Sizing Factor
        \note Multiplies the autosized capacity and flow rates
@@ -55934,11 +55959,11 @@ Chiller:Electric:ReformulatedEIR,
        \type real
        \minimum 0.0
        \maximum 1.0
-  A12, \field Heat Recovery Inlet High Temperature Limit Schedule Name
+  A13, \field Heat Recovery Inlet High Temperature Limit Schedule Name
        \note This optional schedule of temperatures will turn off heat recovery if inlet exceeds the value
        \type object-list
        \object-list ScheduleNames
-  A13; \field Heat Recovery Leaving Temperature Setpoint Node Name
+  A14; \field Heat Recovery Leaving Temperature Setpoint Node Name
        \note This optional field provides control over the heat recovery
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
@@ -75131,6 +75156,102 @@ Curve:DoubleExponentialDecay,
        \key Dimensionless
        \default Dimensionless
 
+Curve:ChillerPartLoadWithLift,
+       \memo This new chiller part-load performance curve has three independent variables.
+       \memo Input consists of the curve name, the twelve coefficients, and the maximum
+       \memo and minimum valid independent variable values. Optional inputs for the curve minimum
+       \memo and maximum may be used to limit the output of the performance curve.
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference ChillerPartLoadWithLiftCurves
+       \reference AllCurves
+       \note See Input Output Reference for curve description
+  N1 , \field Coefficient1 C1
+       \required-field
+       \type real
+  N2 , \field Coefficient2 C2
+       \required-field
+       \type real
+  N3 , \field Coefficient3 C3
+       \required-field
+       \type real
+  N4 , \field Coefficient4 C4
+       \required-field
+       \type real
+  N5 , \field Coefficient5 C5
+       \required-field
+       \type real
+  N6 , \field Coefficient6 C6
+       \required-field
+       \type real
+  N7 , \field Coefficient7 C7
+       \required-field
+       \type real
+  N8 , \field Coefficient8 C8
+       \required-field
+       \type real
+  N9 , \field Coefficient9 C9
+       \required-field
+       \type real
+  N10, \field Coefficient10 C10
+       \required-field
+       \type real
+  N11, \field Coefficient11 C11
+       \required-field
+       \type real
+  N12, \field Coefficient12 C12
+       \required-field
+       \type real
+  N13, \field Minimum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N14, \field Maximum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N15, \field Minimum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N16, \field Maximum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N17, \field Minimum Value of z
+       \required-field
+       \type real
+       \unitsBasedOnField A4
+  N18, \field Maximum Value of z
+       \required-field
+       \type real
+       \unitsBasedOnField A4
+  N19, \field Minimum Curve Output
+       \type real
+       \unitsBasedOnField A5
+       \note Specify the minimum value calculated by this curve object
+  N20, \field Maximum Curve Output
+       \type real
+       \unitsBasedOnField A5
+       \note Specify the maximum value calculated by this curve object
+  A2 , \field Input Unit Type for x
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A3 , \field Input Unit Type for y
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A4 , \field Input Unit Type for z
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A5;  \field Output Unit Type
+       \type choice
+       \key Dimensionless
+       \default Dimensionless	   
+	   
 \group Performance Tables
 
 Table:OneIndependentVariable,
