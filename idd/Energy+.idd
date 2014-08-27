@@ -61693,15 +61693,19 @@ ThermalStorage:Ice:Detailed,
   A5 , \field Discharging Curve Object Type
        \type choice
        \key Curve:QuadraticLinear
+       \key Curve:CubicLinear
   A6 , \field Discharging Curve Name
        \type alpha
-       \object-list QuadLinearCurves
+       \object-list QuadraticLinearCurves
+       \object-list CubicLinearCurves
   A7 , \field Charging Curve Object Type
        \type choice
        \key Curve:QuadraticLinear
+       \key Curve:CubicLinear
   A8 , \field Charging Curve Name
        \type alpha
-       \object-list QuadLinearCurves
+       \object-list QuadraticLinearCurves
+       \object-list CubicLinearCurves
   N2 , \field Timestep of the Curve Data
        \units hr
   N3 , \field Parasitic Electric Load During Discharging
@@ -74524,6 +74528,72 @@ Curve:QuadraticLinear,
        \key Dimensionless
        \key Capacity
        \key Power
+       \default Dimensionless
+
+Curve:CubicLinear,
+       \memo Cubic-linear curve with two independent variables. Input consists of the curve
+       \memo name, the six coefficients, and min and max values for each of the independent
+       \memo variables. Optional inputs for curve minimum and maximum may be used to limit the
+       \memo output of the performance curve.
+       \memo curve = (C1 + C2*x + C3*x**2 + C4*x**3) + (C5 + C6*x)*y
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference CubicLinearCurves
+       \reference AllCurves
+  N1 , \field Coefficient1 Constant
+       \required-field
+       \type real
+  N2 , \field Coefficient2 x
+       \required-field
+       \type real
+  N3 , \field Coefficient3 x**2
+       \required-field
+       \type real
+  N4 , \field Coefficient4 x**3
+       \required-field
+       \type real
+  N5 , \field Coefficient5 y
+       \required-field
+       \type real
+  N6 , \field Coefficient6 x*y
+       \required-field
+       \type real
+  N7 , \field Minimum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N8 , \field Maximum Value of x
+       \required-field
+       \type real
+       \unitsBasedOnField A2
+  N9 , \field Minimum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N10, \field Maximum Value of y
+       \required-field
+       \type real
+       \unitsBasedOnField A3
+  N11, \field Minimum Curve Output
+       \type real
+       \note Specify the minimum value calculated by this curve object
+       \unitsBasedOnField A4
+  N12, \field Maximum Curve Output
+       \type real
+       \note Specify the maximum value calculated by this curve object
+       \unitsBasedOnField A4
+  A2,  \field Input Unit Type for X
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A3,  \field Input Unit Type for Y
+       \type choice
+       \key Dimensionless
+       \default Dimensionless
+  A4;  \field Output Unit Type
+       \type choice
+       \key Dimensionless
        \default Dimensionless
 
 Curve:Triquadratic,
@@ -90243,4 +90313,5 @@ Output:PreprocessorMessage,
         \retaincase
    A12; \field Message Line 10
         \retaincase
+
 
