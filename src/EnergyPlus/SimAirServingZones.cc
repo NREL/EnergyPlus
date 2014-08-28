@@ -1350,8 +1350,7 @@ namespace SimAirServingZones {
 		int ZoneInSysIndex; // index into CoolCtrlZoneNums or HeatCtrlZoneNums
 		int NumComponentsInSys; // total number of components in the primary air system
 		int NumComponentsOnBranch; // total number of components in the primary air system
-		bool FoundSupPathZoneConnect; // true if there is a valid connection between the supply air path
-		                              // and a zone terminal unit inlet
+		bool FoundSupPathZoneConnect; // true if there is a valid connection between the supply air path and a zone terminal unit inlet
 		int CompTypeNum; // component_type number for components on branches
 		int SupFanIndex;
 		int RetFanIndex;
@@ -1802,7 +1801,7 @@ namespace SimAirServingZones {
 			}
 
 			for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
-              
+
 				SupFanIndex = 0;
 				RetFanIndex = 0;
 				FoundOASys = false;
@@ -1810,12 +1809,12 @@ namespace SimAirServingZones {
 				
 				for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
 				
-                    for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
+					for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
 					    CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
 						if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == OAMixer_Num) {
 							FoundOASys = true;
 						}
-					    if (CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel) {
+						if (CompTypeNum == Fan_Simple_CV || CompTypeNum == Fan_Simple_VAV || CompTypeNum == Fan_ComponentModel) {
 							if (PrimaryAirSystem(AirLoopNum).OASysExists) {
 								if (FoundOASys) {
 									if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
@@ -1832,9 +1831,9 @@ namespace SimAirServingZones {
 								goto EndOfAirLoop;
 							}
 						}
-                    } // end of component loop
+					} // end of component loop
 
-			    } // end of Branch loop
+				} // end of Branch loop
 				EndOfAirLoop: ;
 
 				PrimaryAirSystem(AirLoopNum).SupFanNum = SupFanIndex;

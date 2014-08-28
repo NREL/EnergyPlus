@@ -1172,8 +1172,8 @@ namespace WaterCoils {
 
 					// Total Coil Load from Inlet and Outlet Air States.
 					WaterCoil( CoilNum ).DesTotWaterCoilLoad = WaterCoil( CoilNum ).DesAirMassFlowRate * ( DesInletAirEnth - DesOutletAirEnth );
-					if (CurSysNum > 0) {
-						WaterCoil(CoilNum).DesTotWaterCoilLoad = WaterCoil(CoilNum).DesTotWaterCoilLoad + PrimaryAirSystem(CurSysNum).FanDesCoolLoad;
+					if ( CurSysNum > 0 ) {
+						WaterCoil( CoilNum ).DesTotWaterCoilLoad = WaterCoil( CoilNum ).DesTotWaterCoilLoad + PrimaryAirSystem( CurSysNum ).FanDesCoolLoad;
 					}
 
 					// Enthalpy of Water at Intlet design conditions

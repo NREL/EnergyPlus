@@ -307,7 +307,6 @@ namespace ReportSizingManager {
 		using WaterCoils::SimpleHeatingCoilUAResidual;
 		using Fans::FanDesDT;
 		using Fans::FanDesHeatGain;
-		using DataAirSystems::PrimaryAirSystem;
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Acc( 0.0001 ); // Accuracy of result
@@ -1192,13 +1191,13 @@ namespace ReportSizingManager {
 					} else {
 						CheckSysSizing ( CompType, CompName );
 						DesVolFlow = DataFlowUsedForSizing;
-						if (DesVolFlow > 0.0) {
-							OutAirFrac = FinalSysSizing(CurSysNum).DesOutAirVolFlow / DesVolFlow;
+						if ( DesVolFlow > 0.0 ) {
+							OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / DesVolFlow;
 						}
 						else {
 							OutAirFrac = 1.0;
 						}
-						OutAirFrac = min(1.0, max(0.0, OutAirFrac));
+						OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
 						if ( DesVolFlow >= SmallAirVolFlow ) {
 							if ( CurOASysNum > 0 ) { // coil is in the OA stream
 								CoilInTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
@@ -1230,11 +1229,11 @@ namespace ReportSizingManager {
 							} else {
 								TotCapTempModFac = 1.0;
 							}
-							SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
-							RetFanNum = PrimaryAirSystem(CurSysNum).RetFanNum;
-							PsyCpAirFnWTdb(CoilOutHumRat, 0.5 * (CoilInTemp + CoilOutTemp));
-							FanCoolLoad = FanDesHeatGain(SupFanNum, DesVolFlow) + (1.0 - OutAirFrac)*FanDesHeatGain(RetFanNum, DesVolFlow);
-							PrimaryAirSystem(CurSysNum).FanDesCoolLoad = FanCoolLoad;
+							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
+							RetFanNum = PrimaryAirSystem( CurSysNum ).RetFanNum;
+							PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) );
+							FanCoolLoad = FanDesHeatGain( SupFanNum, DesVolFlow ) + ( 1.0 - OutAirFrac ) * FanDesHeatGain( RetFanNum, DesVolFlow );
+							PrimaryAirSystem( CurSysNum ).FanDesCoolLoad = FanCoolLoad;
 							PeakCoilLoad = max ( 0.0, ( rhoair * DesVolFlow * ( CoilInEnth - CoilOutEnth ) + FanCoolLoad ) );
 							if ( TotCapTempModFac > 0.0 ) {
 								NominalCapacityDes = PeakCoilLoad / TotCapTempModFac;

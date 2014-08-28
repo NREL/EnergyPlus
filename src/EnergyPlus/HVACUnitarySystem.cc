@@ -1835,8 +1835,8 @@ namespace HVACUnitarySystem {
 		if ( UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow != AutoSize ) SysCoolingFlow = UnitarySystem( UnitarySysNum ).MaxCoolAirVolFlow;
 		if ( UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow != AutoSize ) SysHeatingFlow = UnitarySystem( UnitarySysNum ).MaxHeatAirVolFlow;
 
-		if (CurSysNum > 0 && CurOASysNum == 0 && UnitarySystem(UnitarySysNum).FanExists) {
-			PrimaryAirSystem(CurSysNum).SupFanNum = UnitarySystem(UnitarySysNum).FanIndex;
+		if ( CurSysNum > 0 && CurOASysNum == 0 && UnitarySystem( UnitarySysNum ).FanExists ) {
+			PrimaryAirSystem( CurSysNum ).SupFanNum = UnitarySystem( UnitarySysNum ).FanIndex;
 		}
 
 		if ( UnitarySystem( UnitarySysNum ).RequestAutoSize ) {
@@ -2109,8 +2109,8 @@ namespace HVACUnitarySystem {
 								TotCapTempModFac = 1.0;
 							}
 							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-							SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
-							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain(SupFanNum, VolFlowRate);
+							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
+							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain( SupFanNum, VolFlowRate );
 							if ( TotCapTempModFac > 0.0 ) {
 								CoolCapAtPeak /= TotCapTempModFac;
 							}
@@ -2244,8 +2244,8 @@ namespace HVACUnitarySystem {
 								TotCapTempModFac = 1.0;
 							}
 							CoolCapAtPeak = max( 0.0, ( rhoair * VolFlowRate * ( MixEnth - SupEnth ) ) );
-							SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
-							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain(SupFanNum, VolFlowRate);
+							SupFanNum = PrimaryAirSystem( CurSysNum ).SupFanNum;
+							CoolCapAtPeak = CoolCapAtPeak + FanDesHeatGain( SupFanNum, VolFlowRate );
 							if ( TotCapTempModFac > 0.0 ) {
 								CoolCapAtPeak /= TotCapTempModFac;
 							}
