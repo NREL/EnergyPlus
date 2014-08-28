@@ -568,7 +568,7 @@ namespace ChillerReformulatedEIR {
 				ElecReformEIRChiller( EIRChillerNum ).DesignHeatRecMassFlowRate = 0.0;
 				ElecReformEIRChiller( EIRChillerNum ).HeatRecInletNodeNum = 0;
 				ElecReformEIRChiller( EIRChillerNum ).HeatRecOutletNodeNum = 0;
-				if ( ( ! lAlphaFieldBlanks( 11 ) ) || ( !lAlphaFieldBlanks( 12 ) ) ) {
+				if ( ( ! lAlphaFieldBlanks( 11 ) ) || ( ! lAlphaFieldBlanks( 12 ) ) ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
 					ShowWarningError( "Since Reference Heat Reclaim Volume Flow Rate = 0.0, heat recovery is inactive." );
 					ShowContinueError( "However, node names were specified for heat recovery inlet or outlet nodes." );
@@ -1324,7 +1324,7 @@ namespace ChillerReformulatedEIR {
 				ShowContinueError( StringVar );
 				gio::write( StringVar, "'Curve Output = '" );
 				for ( CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr ) {
-					gio::write( StringVar, "( F7.2,$ )" ) << CurveValArray( CurveValPtr );
+					gio::write( StringVar, "(F7.2,$)" ) << CurveValArray( CurveValPtr );
 				}
 				gio::write( StringVar );
 				ShowContinueError( StringVar );
@@ -2375,7 +2375,7 @@ namespace ChillerReformulatedEIR {
 		Real64 ChillerTdev;    //Deviation of leaving chilled water temperature from the reference condition
 		Real64 ChillerTdevNom; //Normalized ChillerTdev
 		int PlantLoopNum; // Plant loop which contains the current chiller
-		int LoopSideNum;  // Plant loop side which contains the current chiller (usually supply side)
+		int LoopSideNum; // Plant loop side which contains the current chiller (usually supply side)
 		int BranchNum;
 		int CompNum;
 

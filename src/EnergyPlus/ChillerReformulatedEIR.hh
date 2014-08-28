@@ -373,7 +373,7 @@ namespace ChillerReformulatedEIR {
 			CAPFTName( CAPFTName ),
 			EIRFTName( EIRFTName ),
 			EIRFPLRName( EIRFPLRName ),
-			CondenserType(CondenserType),
+			CondenserType( CondenserType ),
 			PartLoadCurveType(PartLoadCurveType),
 			RefCap( RefCap ),
 			RefCOP( RefCOP ),

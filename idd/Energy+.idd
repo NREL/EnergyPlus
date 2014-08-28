@@ -55871,7 +55871,7 @@ Chiller:Electric:ReformulatedEIR,
        \note Calculated based on dT*, Tdev* and PLR
        \note curve = a + b*(dT*) + c*(dT*)**2 + d*PLR + e*PLR**2 + f*(dT*)*PLR + g*(dT*)**3
        \note + h*PLR**3 + i*(dT*)**2*PLR + j*(dT*)*PLR**2 + k*(dT*)**2*PLR**2 + l*(Tdev*)*PLR**3
-       \note Tdev = Leaving Chilled Water Temperature – Reference Chilled Water Temperature
+       \note Tdev = Leaving Chilled Water Temperature - Reference Chilled Water Temperature
        \note Tdev* = normalized Tdev = Tdev / dTref
        \note dT* = normalized fractional Lift = dT / dTref
        \note dT = Lift = Leaving Condenser Water Temperature - Leaving Chilled Water Temperature(C)
