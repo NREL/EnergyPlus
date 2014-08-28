@@ -65,6 +65,7 @@ if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/Transition PROJECT Transition NO_EXTERNAL_INSTALL )
 endif()
 
 install( FILES idd/Energy+.idd DESTINATION ./ )
