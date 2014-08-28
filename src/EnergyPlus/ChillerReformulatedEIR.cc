@@ -338,7 +338,7 @@ namespace ChillerReformulatedEIR {
 			}
 			ElecReformEIRChiller( EIRChillerNum ).Name = cAlphaArgs( 1 );
 			// Performance curves
-			ElecReformEIRChiller( EIRChillerNum ).ChillerCapFT = GetCurveIndex(cAlphaArgs( 2 ) );
+			ElecReformEIRChiller( EIRChillerNum ).ChillerCapFT = GetCurveIndex( cAlphaArgs( 2 ) );
 			ElecReformEIRChiller( EIRChillerNum ).CAPFTName = cAlphaArgs( 2 );
 			if ( ElecReformEIRChiller( EIRChillerNum ).ChillerCapFT == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
@@ -350,7 +350,7 @@ namespace ChillerReformulatedEIR {
 			ElecReformEIRChiller( EIRChillerNum ).EIRFTName = cAlphaArgs( 3 );
 			if ( ElecReformEIRChiller( EIRChillerNum ).ChillerEIRFT == 0 ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
-				ShowContinueError("Invalid " + cAlphaFieldNames( 3 ) + "=" + cAlphaArgs( 3 ) );
+				ShowContinueError( "Invalid " + cAlphaFieldNames( 3 ) + "=" + cAlphaArgs( 3 ) );
 				ErrorsFound = true;
 			}
 
@@ -418,20 +418,16 @@ namespace ChillerReformulatedEIR {
 			{ auto const SELECT_CASE_var( cAlphaArgs( 10 ) );
 			if ( SELECT_CASE_var == "CONSTANTFLOW" ) {
 				ElecReformEIRChiller( EIRChillerNum ).FlowMode = ConstantFlow;
-			}
-			else if ( SELECT_CASE_var == "VARIABLEFLOW" ) {
+			} else if ( SELECT_CASE_var == "VARIABLEFLOW" ) {
 				ElecReformEIRChiller( EIRChillerNum ).FlowMode = LeavingSetPointModulated;
 				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
 				ShowContinueError( "Key choice is now called \"LeavingSetpointModulated\" and the simulation continues" );
-			}
-			else if ( SELECT_CASE_var == "LEAVINGSETPOINTMODULATED" ) {
+			} else if ( SELECT_CASE_var == "LEAVINGSETPOINTMODULATED" ) {
 				ElecReformEIRChiller( EIRChillerNum ).FlowMode = LeavingSetPointModulated;
-			}
-			else if ( SELECT_CASE_var == "NOTMODULATED" ) {
+			} else if ( SELECT_CASE_var == "NOTMODULATED" ) {
 				ElecReformEIRChiller( EIRChillerNum ).FlowMode = NotModulated;
-			}
-			else {
+			} else {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"," );
 				ShowContinueError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
 				ShowContinueError( "Available choices are ConstantFlow, NotModulated, or LeavingSetpointModulated" );
@@ -453,7 +449,7 @@ namespace ChillerReformulatedEIR {
 				ErrorsFound = true;
 			}
 			ElecReformEIRChiller( EIRChillerNum ).TempRefEvapOut = rNumericArgs( 3 );
-			ElecReformEIRChiller( EIRChillerNum ).TempRefCondOut = rNumericArgs( 4 );					
+			ElecReformEIRChiller( EIRChillerNum ).TempRefCondOut = rNumericArgs( 4 );		
 			if ( ElecReformEIRChiller( EIRChillerNum ).TempRefEvapOut >= ElecReformEIRChiller( EIRChillerNum ).TempRefCondOut ) {
 				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
 				ShowContinueError( cNumericFieldNames( 3 ) + " [" + RoundSigDigits( rNumericArgs( 3 ), 2 ) + "] >= " + cNumericFieldNames( 4 ) + " [" + RoundSigDigits( rNumericArgs( 4 ), 2 ) + ']' );
@@ -533,7 +529,7 @@ namespace ChillerReformulatedEIR {
 					RegisterPlantCompDesignFlow( ElecReformEIRChiller( EIRChillerNum ).HeatRecInletNodeNum, ElecReformEIRChiller( EIRChillerNum ).DesignHeatRecVolFlowRate );
 				}
 				if ( NumNums > 14 ) {
-					if ( !lNumericFieldBlanks( 15 ) ) {
+					if ( ! lNumericFieldBlanks( 15 ) ) {
 						ElecReformEIRChiller( EIRChillerNum ).HeatRecCapacityFraction = rNumericArgs( 15 );
 					} else {
 						ElecReformEIRChiller( EIRChillerNum ).HeatRecCapacityFraction = 1.0;
@@ -543,7 +539,7 @@ namespace ChillerReformulatedEIR {
 				}
 
 				if ( NumAlphas > 11 ) {
-					if ( !lAlphaFieldBlanks( 13 ) ) {
+					if ( ! lAlphaFieldBlanks( 13 ) ) {
 						ElecReformEIRChiller( EIRChillerNum ).HeatRecInletLimitSchedNum = GetScheduleIndex( cAlphaArgs( 13 ) );
 						if ( ElecReformEIRChiller( EIRChillerNum ).HeatRecInletLimitSchedNum == 0 ) {
 							ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
@@ -558,7 +554,7 @@ namespace ChillerReformulatedEIR {
 				}
 
 				if ( NumAlphas > 12 ) {
-					if ( !lAlphaFieldBlanks( 14 ) ) {
+					if ( ! lAlphaFieldBlanks( 14 ) ) {
 						ElecReformEIRChiller( EIRChillerNum ).HeatRecSetPointNodeNum = GetOnlySingleNode( cAlphaArgs( 14 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 					} else {
 						ElecReformEIRChiller( EIRChillerNum ).HeatRecSetPointNodeNum = 0;
@@ -572,7 +568,7 @@ namespace ChillerReformulatedEIR {
 				ElecReformEIRChiller( EIRChillerNum ).DesignHeatRecMassFlowRate = 0.0;
 				ElecReformEIRChiller( EIRChillerNum ).HeatRecInletNodeNum = 0;
 				ElecReformEIRChiller( EIRChillerNum ).HeatRecOutletNodeNum = 0;
-				if ( ( !lAlphaFieldBlanks( 11 ) ) || ( !lAlphaFieldBlanks( 12 ) ) ) {
+				if ( ( ! lAlphaFieldBlanks( 11 ) ) || ( !lAlphaFieldBlanks( 12 ) ) ) {
 					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\"" );
 					ShowWarningError( "Since Reference Heat Reclaim Volume Flow Rate = 0.0, heat recovery is inactive." );
 					ShowContinueError( "However, node names were specified for heat recovery inlet or outlet nodes." );
@@ -625,7 +621,7 @@ namespace ChillerReformulatedEIR {
 			if ( AnyEnergyManagementSystemInModel ) {
 				SetupEMSInternalVariable( "Chiller Nominal Capacity", ElecReformEIRChiller( EIRChillerNum ).Name, "[W]", ElecReformEIRChiller( EIRChillerNum ).RefCap );
 			}
-			
+
 		}
 
 	}
@@ -1257,7 +1253,7 @@ namespace ChillerReformulatedEIR {
 				}
 				if ( CurveVal > 1.10 || CurveVal < 0.90 ) {
 					ShowWarningError( "Energy input ratio as a function of part-load ratio curve output is not equal to 1.0" );
-					ShowContinueError( "( + or - 10% ) at reference conditions for Chiller:Electric:ReformulatedEIR = " + equipName );
+					ShowContinueError( "(+ or - 10%) at reference conditions for Chiller:Electric:ReformulatedEIR = " + equipName );
 					ShowContinueError( "Curve output at reference conditions = " + TrimSigDigits( CurveVal, 3 ) );
 				}
 
@@ -1309,8 +1305,8 @@ namespace ChillerReformulatedEIR {
 						CurveValTmp = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLR, CondTemp, PLRTemp );
 					}
 					if ( CurveValTmp < 0.0 ) FoundNegValue = true;
-						CurveValArray( CurveCheck + 1 ) = int( CurveValTmp * 100.0 ) / 100.0;
-						CondTempArray( CurveCheck + 1 ) = int( CondTemp * 100.0 ) / 100.0;
+					CurveValArray( CurveCheck + 1 ) = int( CurveValTmp * 100.0 ) / 100.0;
+					CondTempArray( CurveCheck + 1 ) = int( CondTemp * 100.0 ) / 100.0;
 					}
 				}
 
@@ -1320,9 +1316,9 @@ namespace ChillerReformulatedEIR {
 				ShowContinueError( "for  Chiller:Electric:ReformulatedEIR = " + equipName + '.' );
 				ShowContinueError( "EIR as a function of PLR curve output at various part-load ratios and condenser " "water temperatures shown below:" );
 				ShowContinueError( "PLR           =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
-				gio::write( StringVar, "'Cond Temp( C ) = '" );
+				gio::write( StringVar, "'Cond Temp(C) = '" );
 				for ( CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr ) {
-					gio::write( StringVar, "( F7.2,$ )" ) << CondTempArray( CurveValPtr );
+					gio::write( StringVar, "(F7.2,$)" ) << CondTempArray( CurveValPtr );
 				}
 				gio::write( StringVar );
 				ShowContinueError( StringVar );
@@ -2404,7 +2400,7 @@ namespace ChillerReformulatedEIR {
 		if ( EvapOutletTemp < CAPFTXTmin || EvapOutletTemp > CAPFTXTmax ) {
 			++ElecReformEIRChiller( EIRChillNum ).CAPFTXIter;
 			if ( ElecReformEIRChiller( EIRChillNum ).CAPFTXIter == 1 ) {
-				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The evaporator outlet temperature ( " + TrimSigDigits( EvapOutletTemp, 2 ) + " C ) is outside the range of " "evaporator outlet temperatures ( X var ) given in Cooling Capacity Function of Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).CAPFTName );
+				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The evaporator outlet temperature (" + TrimSigDigits( EvapOutletTemp, 2 ) + " C) is outside the range of " "evaporator outlet temperatures (X var) given in Cooling Capacity Function of Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).CAPFTName );
 				ShowContinueErrorTimeStamp( "The range specified = " + TrimSigDigits( CAPFTXTmin, 2 ) + " C to " + TrimSigDigits( CAPFTXTmax, 2 ) + " C." );
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The evap outlet temp range in Cooling Capacity Function of Temp curve error continues.", ElecReformEIRChiller( EIRChillNum ).CAPFTXIterIndex, EvapOutletTemp, EvapOutletTemp );
 			} else {
@@ -2415,7 +2411,7 @@ namespace ChillerReformulatedEIR {
 		if ( EvapOutletTemp < EIRFTXTmin || EvapOutletTemp > EIRFTXTmax ) {
 			++ElecReformEIRChiller( EIRChillNum ).EIRFTXIter;
 			if ( ElecReformEIRChiller( EIRChillNum ).EIRFTXIter == 1 ) {
-				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The evaporator outlet temperature ( " + TrimSigDigits( EvapOutletTemp, 2 ) + " C ) is outside the range of " "evaporator outlet temperatures ( X var ) given in Electric Input to Cooling Output Ratio Function of " "Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFTName );
+				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The evaporator outlet temperature (" + TrimSigDigits( EvapOutletTemp, 2 ) + " C) is outside the range of " "evaporator outlet temperatures (X var) given in Electric Input to Cooling Output Ratio Function of " "Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFTName );
 				ShowContinueErrorTimeStamp( "The range specified = " + TrimSigDigits( EIRFTXTmin, 2 ) + " C to " + TrimSigDigits( EIRFTXTmax, 2 ) + " C." );
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The evap outlet temp range in Electric Input to Cooling Output Ratio Function of Temp curve error" " continues.", ElecReformEIRChiller( EIRChillNum ).EIRFTXIterIndex, EvapOutletTemp, EvapOutletTemp );
 			} else {
@@ -2443,7 +2439,7 @@ namespace ChillerReformulatedEIR {
 		if ( CondOutletTemp < CAPFTYTmin || CondOutletTemp > CAPFTYTmax ) {
 			++ElecReformEIRChiller( EIRChillNum ).CAPFTYIter;
 			if ( ElecReformEIRChiller( EIRChillNum ).CAPFTYIter == 1 ) {
-				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The condenser outlet temperature ( " + TrimSigDigits( CondOutletTemp, 2 ) + " C ) is outside the range of " "condenser outlet temperatures ( Y var ) given in Cooling Capacity Function of Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).CAPFTName );
+				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The condenser outlet temperature (" + TrimSigDigits( CondOutletTemp, 2 ) + " C) is outside the range of " "condenser outlet temperatures (Y var) given in Cooling Capacity Function of Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).CAPFTName );
 				ShowContinueErrorTimeStamp( "The range specified = " + TrimSigDigits( CAPFTYTmin, 2 ) + " C to " + TrimSigDigits( CAPFTYTmax, 2 ) + " C." );
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The cond outlet temp range in Cooling Capacity Function of Temp curve error continues.", ElecReformEIRChiller( EIRChillNum ).CAPFTYIterIndex, CondOutletTemp, CondOutletTemp );
 			} else {
@@ -2454,7 +2450,7 @@ namespace ChillerReformulatedEIR {
 		if ( CondOutletTemp < EIRFTYTmin || CondOutletTemp > EIRFTYTmax ) {
 			++ElecReformEIRChiller( EIRChillNum ).EIRFTYIter;
 			if ( ElecReformEIRChiller( EIRChillNum ).EIRFTYIter == 1 ) {
-				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The condenser outlet temperature ( " + TrimSigDigits( CondOutletTemp, 2 ) + " C ) is outside the range of " "condenser outlet temperatures ( Y var ) given in Electric Input to Cooling Output Ratio Function of " "Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFTName );
+				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The condenser outlet temperature (" + TrimSigDigits( CondOutletTemp, 2 ) + " C) is outside the range of " "condenser outlet temperatures (Y var) given in Electric Input to Cooling Output Ratio Function of " "Temperature biquadratic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFTName );
 				ShowContinueErrorTimeStamp( "The range specified = " + TrimSigDigits( EIRFTYTmin, 2 ) + " C to " + TrimSigDigits( EIRFTYTmax, 2 ) + " C." );
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The cond outlet temp range in Electric Input to Cooling Output Ratio as a Function of Temp " "curve error continues.", ElecReformEIRChiller( EIRChillNum ).EIRFTYIterIndex, CondOutletTemp, CondOutletTemp );
 			} else {
@@ -2466,7 +2462,7 @@ namespace ChillerReformulatedEIR {
 			if ( CondOutletTemp < EIRFPLRTmin || CondOutletTemp > EIRFPLRTmax ) {
 				++ElecReformEIRChiller( EIRChillNum ).EIRFPLRTIter;
 				if ( ElecReformEIRChiller( EIRChillNum ).EIRFPLRTIter == 1 ) {
-					ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The condenser outlet temperature ( " + TrimSigDigits( CondOutletTemp, 2 ) + " C ) is outside the range of " "condenser outlet temperatures ( X var ) given in Electric Input to Cooling Output Ratio Function of Part-load Ratio " "bicubic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFPLRName );
+					ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The condenser outlet temperature (" + TrimSigDigits( CondOutletTemp, 2 ) + " C) is outside the range of " "condenser outlet temperatures (X var) given in Electric Input to Cooling Output Ratio Function of Part-load Ratio " "bicubic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFPLRName );
 					ShowContinueErrorTimeStamp( "The range specified = " + TrimSigDigits( EIRFPLRTmin, 2 ) + " C to " + TrimSigDigits( EIRFPLRTmax, 2 ) + " C." );
 					ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The cond outlet temp range in Electric Input to Cooling Output Ratio Function of PLR " "curve error continues.", ElecReformEIRChiller( EIRChillNum ).EIRFPLRTIterIndex, CondOutletTemp, CondOutletTemp );
 				} else {
@@ -2478,7 +2474,7 @@ namespace ChillerReformulatedEIR {
 		if ( ChillerPartLoadRatio < EIRFPLRPLRmin || ChillerPartLoadRatio > EIRFPLRPLRmax ) {
 			++ElecReformEIRChiller( EIRChillNum ).EIRFPLRPLRIter;
 			if ( ElecReformEIRChiller( EIRChillNum ).EIRFPLRPLRIter == 1 ) {
-				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The part-load ratio ( " + TrimSigDigits( ChillerPartLoadRatio, 3 ) + " ) is outside the range of " "part-load ratios ( Y var ) given in Electric Input to Cooling Output Ratio Function of Part-load Ratio " "bicubic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFPLRName );
+				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The part-load ratio (" + TrimSigDigits( ChillerPartLoadRatio, 3 ) + ") is outside the range of " "part-load ratios (Y var) given in Electric Input to Cooling Output Ratio Function of Part-load Ratio " "bicubic curve = " + ElecReformEIRChiller( EIRChillNum ).EIRFPLRName );
 				ShowContinueErrorTimeStamp( "The range specified = " + TrimSigDigits( EIRFPLRPLRmin, 3 ) + " to " + TrimSigDigits( EIRFPLRPLRmax, 3 ) + '.' );
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": The part-load ratio range in Electric Input to Cooling Output Ratio Function of PLRatio curve " "error continues.", ElecReformEIRChiller( EIRChillNum ).EIRFPLRPLRIterIndex, ChillerPartLoadRatio, ChillerPartLoadRatio );
 			} else {
@@ -2506,13 +2502,13 @@ namespace ChillerReformulatedEIR {
 		ChillerCapFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, EvapOutletTempSetPoint, CondOutletTemp );
 
 		if ( ChillerCapFT < 0 ) {
-			if ( ElecReformEIRChiller( EIRChillNum ).ChillerCapFTError < 1 && PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && !WarmupFlag ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).ChillerCapFTError < 1 && PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElecReformEIRChiller( EIRChillNum ).ChillerCapFTError;
 				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\":" );
-				ShowContinueError( " Chiller Capacity as a Function of Temperature curve output is negative ( " + RoundSigDigits( ChillerCapFT, 3 ) + " )." );
+				ShowContinueError( " Chiller Capacity as a Function of Temperature curve output is negative (" + RoundSigDigits( ChillerCapFT, 3 ) + ")." );
 				ShowContinueError( " Negative value occurs using an Evaporator Leaving Temp of " + RoundSigDigits( EvapOutletTempSetPoint, 1 ) + " and a Condenser Leaving Temp of " + RoundSigDigits( CondOutletTemp, 1 ) + '.' );
 				ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
-			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && !WarmupFlag ) {
+			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElecReformEIRChiller( EIRChillNum ).ChillerCapFTError;
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": Chiller Capacity as a Function of Temperature curve output is negative warning continues...", ElecReformEIRChiller( EIRChillNum ).ChillerCapFTErrorIndex, ChillerCapFT, ChillerCapFT );
 			}
@@ -2521,13 +2517,13 @@ namespace ChillerReformulatedEIR {
 		ChillerEIRFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFT, EvapOutletTemp, CondOutletTemp );
 
 		if ( ChillerEIRFT < 0.0 ) {
-			if ( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTError < 1 && PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && !WarmupFlag ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTError < 1 && PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTError;
 				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\":" );
-				ShowContinueError( " Reformulated Chiller EIR as a Function of Temperature curve output is negative ( " + RoundSigDigits( ChillerEIRFT, 3 ) + " )." );
+				ShowContinueError( " Reformulated Chiller EIR as a Function of Temperature curve output is negative (" + RoundSigDigits( ChillerEIRFT, 3 ) + ")." );
 				ShowContinueError( " Negative value occurs using an Evaporator Leaving Temp of " + RoundSigDigits( EvapOutletTemp, 1 ) + " and a Condenser Leaving Temp of " + RoundSigDigits( CondOutletTemp, 1 ) + '.' );
 				ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
-			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && !WarmupFlag ) {
+			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTError;
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": Chiller EIR as a Function of Temperature curve output is negative warning continues...", ElecReformEIRChiller( EIRChillNum ).ChillerEIRFTErrorIndex, ChillerEIRFT, ChillerEIRFT );
 			}
@@ -2546,19 +2542,19 @@ namespace ChillerReformulatedEIR {
 		}
 
 		if ( ChillerEIRFPLR < 0.0 ) {
-			if ( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRError < 1 && PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && !WarmupFlag ) {
+			if ( ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRError < 1 && PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRError;
 				ShowWarningError( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\":" );
-				ShowContinueError( " Chiller EIR as a function of PLR and condenser water temperature curve output is negative ( " + RoundSigDigits( ChillerEIRFPLR, 3 ) + " )." );
+				ShowContinueError( " Chiller EIR as a function of PLR and condenser water temperature curve output is negative (" + RoundSigDigits( ChillerEIRFPLR, 3 ) + ")." );
 				ShowContinueError( " Negative value occurs using a part-load ratio of " + RoundSigDigits( ChillerPartLoadRatio, 3 ) + " and a Condenser Leaving Temp of " + RoundSigDigits( CondOutletTemp, 1 ) + " C." );
 				ShowContinueErrorTimeStamp( " Resetting curve output to zero and continuing simulation." );
-			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && !WarmupFlag ) {
+			} else if ( PlantLoop( PlantLoopNum ).LoopSide( LoopSideNum ).FlowLock != 0 && ! WarmupFlag ) {
 				++ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRError;
 				ShowRecurringWarningErrorAtEnd( "CHILLER:ELECTRIC:REFORMULATEDEIR \"" + ElecReformEIRChiller( EIRChillNum ).Name + "\": Chiller EIR as a function of PLR curve output is negative warning continues...", ElecReformEIRChiller( EIRChillNum ).ChillerEIRFPLRErrorIndex, ChillerEIRFPLR, ChillerEIRFPLR );
 			}
 		}
-	}
 
+	}
 
 } // ChillerReformulatedEIR
 
