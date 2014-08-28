@@ -1793,6 +1793,7 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 		using DataGlobals::NumOfTimeStepInHour;
@@ -1802,7 +1803,7 @@ namespace IceThermalStorage {
 		using DataPlant::DualSetPointDeadBand;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetComponentFlowRate;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1899,7 +1900,7 @@ namespace IceThermalStorage {
 			Qice = max( Qice, -MaxCap );
 
 			// Calculate leaving water temperature
-			if ( ( Qice >= 0.0 ) || ( XCurIceFrac <= 0.0 ) ) {
+			if ( ( Qice >= 0.0 ) || ( XCurIceFrac <= 0.0 ) || ( ITSMassFlowRate < MassFlowTolerance ) ) {
 				ITSOutletTemp = ITSInletTemp;
 				DeltaTemp = 0.0;
 				Qice = 0.0;

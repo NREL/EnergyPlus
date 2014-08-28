@@ -2185,9 +2185,7 @@
 
   Output:Variable,*,Earth Tube Air Flow Volume,hourly;
 
-  Output:Variable,*,Earth Tube Air Current Density Air Volume Flow Rate,hourly;
-
-  Output:Variable,*,Earth Tube Air Standard Density Air Volume Flow Rate,hourly;
+  Output:Variable,*,Earth Tube Current Density Air Volume Flow Rate,hourly;
 
   Output:Variable,*,Earth Tube Air Flow Mass,hourly;
 

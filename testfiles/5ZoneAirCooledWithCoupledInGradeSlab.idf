@@ -170,29 +170,6 @@
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
 
-!  RunPeriod,
-!    1,                       !- Begin Month
-!    14,                      !- Begin Day Of Month
-!    1,                       !- End Month
-!    14,                      !- End Day Of Month
-!    Tuesday,                 !- Day Of Week For Start Day
-!    Yes,                     !- Use WeatherFile Holidays/Special Days
-!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-!    No,                      !- Apply Weekend Holiday Rule
-!    Yes,                     !- Use WeatherFile Rain Indicators
-!    Yes;                     !- Use WeatherFile Snow Indicators
-!  RunPeriod,
-!    7,                       !- Begin Month
-!    7,                       !- Begin Day Of Month
-!    7,                       !- End Month
-!    7,                       !- End Day Of Month
-!    Tuesday,                 !- Day Of Week For Start Day
-!    Yes,                     !- Use WeatherFile Holidays/Special Days
-!    Yes,                     !- Use WeatherFile DaylightSavingPeriod
-!    No,                      !- Apply Weekend Holiday Rule
-!    Yes,                     !- Use WeatherFile Rain Indicators
-!    Yes;                     !- Use WeatherFile Snow Indicators
-
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
     41.78,                   !- Latitude {deg}
@@ -268,31 +245,30 @@
     1.0;                     !- Sky Clearness
 
   Site:GroundDomain,
-	IngradeCoupledSlab,	!- Name
-	5, 					!- Ground Domain Depth {m}
-	1, 					!- Aspect Ratio
-	5, 					!- Domain Perimeter Offset {m}
-	1.8, 				!- Soil Thermal Conductivity {W/m-K}
-	3200, 				!- Soil Density {kg/m3}
-	836, 				!- Soil Specific Heat {J/kg-K}
-	30, 				!- Soil Moisture Content Volume Fraction {percent}
-	50, 				!- Soil Moisture Content Volume Fraction at Saturation {percent}
-	15.5,               !- Kusuda-Achenbach Average Surface Temperature {C}
-	12.8,               !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-	17.3,               !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-	1, 					!- Evapotranspiration Ground Cover Parameter
-	GroundCoupledOSCM, 	!- Name of Floor Boundary Condition Model
-	InGrade, 			!- Slab Location (InGrade/OnGrade)
-	Slab Material, 		!- Slab Material Name
-	Yes, 				!- Horizontal Insulation (Yes/No)
-	Slab Insulation,	!- Horizontal Insulation Material Name
-	Full,				!- Full Horizontal or Perimeter Only (Full/Perimeter)
-	, 					!- Perimeter insulation width (m)
-	Yes, 				!- Vertical Insulation (Yes/No)
-	Slab Insulation, 	!- Vertical Insulation Name
-	2, 					!- Vertical perimeter insulation depth from surface (m)
-	Yes, 				!- Slab Included in Ground Simulation (Yes/No). This option only applicable for in-grade situations.
-	Timestep;			!- Simulation timestep. (Timestep/Hourly)
+    IngradeCoupledSlab,	!- Name
+    5,                  !- Ground Domain Depth {m}
+    1,                  !- Aspect Ratio
+    5,                  !- Domain Perimeter Offset {m}
+    1.8,                !- Soil Thermal Conductivity {W/m-K}
+    3200,               !- Soil Density {kg/m3}
+    836,                !- Soil Specific Heat {J/kg-K}
+    30,                 !- Soil Moisture Content Volume Fraction {percent}
+    50,                 !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    15.5,               !- Kusuda-Achenbach Average Surface Temperature {C}
+    12.8,               !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+    17.3,               !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    1, 					!- Evapotranspiration Ground Cover Parameter
+    GroundCoupledOSCM, 	!- Name of Floor Boundary Condition Model
+    InGrade,            !- Slab Location (InGrade/OnGrade)
+	Slab Material-In-grade, !- Slab Material Name
+    Yes,                !- Horizontal Insulation (Yes/No)
+    Slab Insulation,    !- Horizontal Insulation Material Name
+    Full,               !- Full Horizontal or Perimeter Only (Full/Perimeter)
+    ,                   !- Perimeter insulation width (m)
+    Yes,                !- Vertical Insulation (Yes/No)
+    Slab Insulation,    !- Vertical Insulation Name
+    2,                  !- Vertical perimeter insulation depth from surface (m)
+    Timestep;           !- Simulation timestep. (Timestep/Hourly)
 
   Material,
     WD10,                    !- Name
@@ -394,9 +370,9 @@
     0.7500000;               !- Visible Absorptance
 
   Material,
-    CC03,                    !- Name
+    Slab Material-In-grade,            !- Name
     MediumRough,             !- Roughness
-    0.012700,               !- Thickness {m}
+    0.1397,                  !- Thickness {m}
     1.310000,                !- Conductivity {W/m-K}
     2243.000,                !- Density {kg/m3}
     837.0000,                !- Specific Heat {J/kg-K}
@@ -405,9 +381,9 @@
     0.6500000;               !- Visible Absorptance
 	
   Material,
-    Slab Material,            !- Name
+    Slab Material-Top Layer,            !- Name
     MediumRough,             !- Roughness
-    0.088900,               !- Thickness {m}
+    0.01270,                 !- Thickness {m}
     1.310000,                !- Conductivity {W/m-K}
     2243.000,                !- Density {kg/m3}
     837.0000,                !- Specific Heat {J/kg-K}
@@ -486,7 +462,7 @@
 
   Construction,
     FLOOR-SLAB-1,            !- Name
-    CC03;                    !- Outside Layer
+    Slab Material-Top Layer; !- Outside Layer
 
   Construction,
     INT-WALL-1,              !- Name
@@ -3403,60 +3379,24 @@ SurfaceProperty:OtherSideConditionsModel,
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
-	Output:VariableDictionary,IDF;
+  Output:VariableDictionary,IDF;
 	
-  !Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
+  
+  Output:Variable,*,Zone Coupled Surface Heat Flux,hourly;
+  
+  Output:Variable,*,Zone Coupled Surface Temperature,hourly;
+  
+  Output:Variable,*,Zone Air Temperature,hourly;
 
-  !Output:Variable,*,Zone Air Temperature,hourly;
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
 
-  !Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
-
-  !Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
   
   Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature,hourly; !- HVAC Average [C]
   
-  Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate,hourly; !- Zone Average [W]
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,monthly;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
-
-  Output:Meter:MeterFileOnly,MyGeneralLights,monthly;
-
-  Output:Meter:MeterFileOnly,MyGeneralLights,runperiod;
-
-  Output:Meter:MeterFileOnly,MyBuildingElectric,monthly;
-
-  Output:Meter:MeterFileOnly,MyBuildingElectric,runperiod;
-
-  Output:Meter:MeterFileOnly,MyBuildingOther,monthly;
-
-  Output:Meter:MeterFileOnly,MyBuildingOther,runperiod;
-  
+  Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area,hourly; !- Zone Average [W]
+ 
   Output:Diagnostics,DisplayExtraWarnings;
 
 ! The following custom meters are set up to illustrate the capabilities

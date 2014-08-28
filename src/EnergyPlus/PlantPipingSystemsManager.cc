@@ -1155,28 +1155,32 @@ namespace PlantPipingSystemsManager {
 				}
 
 				//Get slab material properties
-				Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 4 );
-				PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material.Name(), TotMaterials );
-				if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
-					ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
-					ErrorsFound = true;
-				} else {
-					//check this
-					PipingSystemDomains( DomainCtr ).SlabThickness = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Thickness;
-					PipingSystemDomains( DomainCtr ).SlabProperties.Density = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Density;
-					PipingSystemDomains( DomainCtr ).SlabProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).SpecHeat;
-					PipingSystemDomains( DomainCtr ).SlabProperties.Conductivity = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Conductivity;
+				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ){
+					Domain( ZoneCoupledDomainCtr ).SlabMaterial = cAlphaArgs( 4 );
+					PipingSystemDomains( DomainCtr ).SlabMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material.Name(), TotMaterials );
+					if ( PipingSystemDomains( DomainCtr ).SlabMaterialNum == 0 ) {
+						ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
+						ShowContinueError( "Found in " + PipingSystemDomains( DomainCtr ).Name );
+						ErrorsFound = true;
+					} else {
+						//check this
+						PipingSystemDomains( DomainCtr ).SlabThickness = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Thickness;
+						PipingSystemDomains( DomainCtr ).SlabProperties.Density = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Density;
+						PipingSystemDomains( DomainCtr ).SlabProperties.SpecificHeat = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).SpecHeat;
+						PipingSystemDomains( DomainCtr ).SlabProperties.Conductivity = Material( PipingSystemDomains( DomainCtr ).SlabMaterialNum ).Conductivity;
+					}
 				}
 
 				// set flag for horizontal insulation
-				if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
-					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
-				} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
-					PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
-				} else {
-					ShowContinueError( "Must enter either yes or no for horizontal insulation." );
-					ShowFatalError( "Preceding error causes program termination." );
+				if ( PipingSystemDomains( DomainCtr ).SlabInGradeFlag ){
+					if ( SameString( cAlphaArgs( 5 ), "NO" ) ) {
+						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = false;
+					} else if ( SameString( cAlphaArgs( 5 ), "YES" ) ) {
+						PipingSystemDomains( DomainCtr ).HorizInsPresentFlag = true;
+					} else {
+						ShowContinueError( "Must enter either yes or no for horizontal insulation." );
+						ShowFatalError( "Preceding error causes program termination." );
+					}
 				}
 
 				// Get horizontal insulation material properties
@@ -1236,26 +1240,22 @@ namespace PlantPipingSystemsManager {
 					}
 
 					//vertical insulation depth
-					PipingSystemDomains( DomainCtr ).VertInsDepth = Domain( ZoneCoupledDomainCtr ).VertInsDepth;
+					if ( Domain( ZoneCoupledDomainCtr ).VertInsDepth < Domain( ZoneCoupledDomainCtr ).Depth ){ 
+						PipingSystemDomains( DomainCtr ).VertInsDepth = Domain( ZoneCoupledDomainCtr ).VertInsDepth;
+					} else {
+						ShowContinueError( "Vertical insulation depth must be less than the domain depth. Check input." );
+						ShowFatalError( "Preceding error causes program termination." );
+					}
+					
 				}
 
 				//Domain perimeter offset
 				PipingSystemDomains( DomainCtr ).PerimeterOffset = Domain( ZoneCoupledDomainCtr ).PerimeterOffset;
 
-				// Set flag for slab simulation
-				if ( SameString( cAlphaArgs( 10 ), "YES" ) ) {
-					PipingSystemDomains( DomainCtr ).SimSlabFlag = true;
-				} else if ( SameString( cAlphaArgs( 10 ), "NO" ) ) {
-					PipingSystemDomains( DomainCtr ).SimSlabFlag = false;
-				} else {
-					ShowContinueError( "Could not determine if slab is included in ground simulation. Check input." );
-					ShowFatalError( "Preceding error causes program termination." );
-				}
-
 				// Set simulation interval flag
-				if ( SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
+				if ( SameString( cAlphaArgs( 10 ), "TIMESTEP" ) ) {
 					PipingSystemDomains( DomainCtr ).SimTimestepFlag = true;
-				} else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
+				} else if ( SameString( cAlphaArgs( 10 ), "HOURLY" ) ) {
 					PipingSystemDomains( DomainCtr ).SimHourlyFlag = true;
 				} else {
 					ShowContinueError( "Could not determine slab simulation interval. Check input." );
@@ -4760,19 +4760,6 @@ namespace PlantPipingSystemsManager {
 								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
 								PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
 
-								//Insulation Edge X direction
-								SideX1InsulationLocation = SideX1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
-								PipingSystemDomains(DomainNum).Partitions.X(1) = MeshPartition(SideX1InsulationLocation, PartitionType_HorizInsXSide, CellWidth);
-							}
-							else {
-								PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 0 });
-								//Side X direction
-								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
-								PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
-							}
-						}
-						else{
-							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 0 });
 							//Side X direction
 							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
 							PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
@@ -4965,14 +4952,6 @@ namespace PlantPipingSystemsManager {
 						PreviousEntries = PipingSystemDomains( DomainNum ).Partitions.X;
 						PipingSystemDomains( DomainNum ).Partitions.X.deallocate();
 
-						//Partition at insulation edges in the X direction, if horizontal insulation present
-						if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-							if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
-								PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, PreviousUbound + 4 } );
-								PipingSystemDomains( DomainNum ).Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
-								//Side X direction
-								SideX1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideX1Location, PartitionType_XSide, CellWidth );
 							
 								//Insulation Edge X direction
 								SideX1InsulationLocation = SideX1Location + PipingSystemDomains( DomainNum ).HorizInsWidth;
@@ -5054,16 +5033,6 @@ namespace PlantPipingSystemsManager {
 				}
 
 
-				if ( PipingSystemDomains( DomainNum ).SlabWidth > 0 ) {
-					CellWidth = PipingSystemDomains( DomainNum ).VertInsThickness;
-					if ( !allocated( PipingSystemDomains( DomainNum ).Partitions.Z ) ) {
-						//Partition at insulation edges in the Z direction, if horizontal insulation present
-						if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-							if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
-								PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, 1 } );
-								//Side Z direction
-								SideZ1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.Z( 0 ) = MeshPartition( SideZ1Location, PartitionType_ZSide, CellWidth );
 							
 								//Insulation Edge Z direction
 								SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains( DomainNum ).HorizInsWidth;
@@ -5090,14 +5059,6 @@ namespace PlantPipingSystemsManager {
 						PreviousEntries = PipingSystemDomains( DomainNum ).Partitions.Z;
 						PipingSystemDomains( DomainNum ).Partitions.Z.deallocate();
 
-						//Partition at insulation edges in the Z direction, if horizontal insulation present
-						if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-							if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
-								PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, PreviousUbound + 2 } );
-								PipingSystemDomains( DomainNum ).Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
-								//Side Z direction
-								SideZ1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZ1Location, PartitionType_ZSide, CellWidth );
 
 								//Insulation Edge Z direction
 								SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains( DomainNum ).HorizInsWidth;
@@ -5808,133 +5769,43 @@ namespace PlantPipingSystemsManager {
 					if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ){
 						//Slab in-grade 
 						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
-							//Slab included in simulation domain
-							if ( PipingSystemDomains( DomainNum ).SimSlabFlag ){
-								//Set the appropriate cell type
-
-								//Farfield cells
-								if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
-									CellType = CellType_FarfieldBoundary;
+							//Farfield cells
+							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+								CellType = CellType_FarfieldBoundary;
+							}
+							//Slab cells
+							else if ( CellXIndex > MinSlabXIndex && CellZIndex > MinSlabZIndex ) {
+								//General slab cells
+								if ( CellYIndex < ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > SlabYIndex ){
+									CellType = CellType_Slab;
 								}
-
-								//Slab cells
-								else if ( CellXIndex > MinXIndex && CellZIndex > MinZIndex ) {
-									//General slab cells
-									if ( CellYIndex < ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YIndex ){
-										CellType = CellType_Slab;
-									}
-									//Surface cells
-									else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
-										CellType = CellType_ZoneGroundInterface;
-									}
-									//Underslab insulation cells
-									else if ( CellYIndex == YIndex ){
-										//Check if horizontal insulation present
-										if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-											//Entire underslab insulation
-											if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
 												CellType = CellType_HorizInsulation;
 											}
-											//Perimeter insulation
-											else{
-												if ( CellXIndex <= InsulationXIndex || CellZIndex <= InsulationZIndex ){
-													CellType = CellType_HorizInsulation;
-												}
-											}
 										}
 									}
 								}
-								//X side interface 
-								else if ( CellXIndex == MinXIndex &&  CellZIndex > MinZIndex ) {
-									//Check if vertical insulation present
-									if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-										//Check depth of vertical insulation
-										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
-											CellType = CellType_VertInsulation;
-										}
-									}
-									else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
-										CellType = CellType_GroundSurface;
 									}
 								}
-								//Z side interface
-								else if ( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex ){
-									//Check if vertical insulation present
-									if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-										//Check depth of vertical insulation
-										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
-											CellType = CellType_VertInsulation;
-										}
-									}
-									else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
-										CellType = CellType_GroundSurface;
-									}
-								}
-								//Surface cells
 								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 									CellType = CellType_GroundSurface;
 								}
-								//Farfield boundary
-								else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 )  || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
-									CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) {
-									CellType = CellType_FarfieldBoundary;
-								}
 							}
-							//Slab not included in simulation
-							else{
-								//Set the appropriate cell type
-								if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
-									CellType = CellType_FarfieldBoundary;
-								}
-								//Slab cells
-								else if ( CellXIndex > MinXIndex && CellZIndex > MinZIndex ) {
-									//General slab cells
-									if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YIndex ){
-										CellType = CellType_Slab;
-									}
-									//Interface cells
-									else if ( CellYIndex == YIndex ) {
-										//Underslab cell properties will be assigned in DoOneTimeInit based on insulation flags
-										CellType = CellType_ZoneGroundInterface;
 									}
 								}
-								//X side interface 
-								else if ( CellXIndex == MinXIndex  && CellZIndex > MinZIndex ){
-									//Check if vertical insulation present
-									if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-										//Check depth of vertical insulation
-										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
-											CellType = CellType_VertInsulation;
-										}
-									}
-									else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
-										CellType = CellType_GroundSurface;
-									}
-								}
-								//Z side interface
-								else if ( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex ){
-									//Check if vertical insulation present
-									if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-										//Check depth of vertical insulation
-										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
-											CellType = CellType_VertInsulation;
-										}
-									}
-									else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
-										CellType = CellType_GroundSurface;
-									}
-								}
-								//Surface cells
 								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
 									CellType = CellType_GroundSurface;
 								}
-								//Domain 'bottom' surface
-								else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
-									CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ){
-									CellType = CellType_FarfieldBoundary;
-								}
-								
 							}
+							//Surface cells
+							else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+								CellType = CellType_GroundSurface;
+							}
+							//Farfield boundary
+							else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 )  || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
+								CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) {
+								CellType = CellType_FarfieldBoundary;
+							}
+
 						}
 						//Slab on-grade situations
 						else {
@@ -9241,64 +9112,21 @@ namespace PlantPipingSystemsManager {
 						
 						
 					} else if ( SELECT_CASE_var == CellType_Slab ){
-						// Slab in-grade; slab not included in simulation
-						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag && !PipingSystemDomains( DomainNum ).SimSlabFlag ){
-							//Assign dummy properties to slab cells
-							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).DummyProperties;
-						} else{
-							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
-						}
+						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
 					} else if ( SELECT_CASE_var == CellType_HorizInsulation ){
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
 					} else if ( SELECT_CASE_var == CellType_VertInsulation ){
 						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).VertInsProperties;
 					} else if ( SELECT_CASE_var == CellType_ZoneGroundInterface ){
-						// Slab On-Grade
-						if ( !PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
-							//Insulation present
-							if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-								//Entire underslab insulated
-								if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
-									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
-								}
-								else if ( CellXIndex <= PipingSystemDomains( DomainNum ).InsulationXIndex || CellZIndex <= PipingSystemDomains( DomainNum ).InsulationZIndex ){
-									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
-								}
-								else {
-									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
-								}
-							}
-							else {
-								PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
-							}
-						}
-						// Slab In-Grade; slab not included in simulation
-						else if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag && !PipingSystemDomains( DomainNum ).SimSlabFlag ){
-							//Insulation present
-							if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-								//Entire underslab insulated
-								if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
-									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
-								}
-								else if ( CellXIndex <= PipingSystemDomains( DomainNum ).InsulationXIndex  || CellZIndex <= PipingSystemDomains( DomainNum ).InsulationZIndex ){
-									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).HorizInsProperties;
-								}
-								else {
-									PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
-								}
-							}
-							else {
-								PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
-							}
-						}
-						//Slab In-Grade; slab included in simulation
-						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag && PipingSystemDomains( DomainNum ).SimSlabFlag ){
+						// Slab In-Grade
+						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
 							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).SlabProperties;
 						}
-					}
-
-					}
-
+						// Slab On-Grade
+						else {
+							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
+						}
+					}}
 				}
 			}
 		}
@@ -9495,21 +9323,14 @@ namespace PlantPipingSystemsManager {
 						
 					}
 					else if ( ( SELECT_CASE_var == CellType_HorizInsulation ) || ( SELECT_CASE_var == CellType_VertInsulation ) ) {
-
+						
 						Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.Density * Volume( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) ) * PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.SpecificHeat );
 						PipingSystemDomains ( DomainNum ).Cells ( X, Y, Z ).MyBase.Beta = Beta;
 
-					}
-					else if ( ( SELECT_CASE_var == CellType_Slab ) ) {
-						if ( PipingSystemDomains ( DomainNum ).SlabInGradeFlag && !PipingSystemDomains( DomainNum ).SimSlabFlag ){
-							Beta = 0;
-							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Beta = Beta;
+					} else if ( ( SELECT_CASE_var == CellType_Slab ) ) {
 
-						}
-						else {
-							Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.Density * Volume( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) ) * PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.SpecificHeat );
-							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Beta = Beta;
-					}
+						Beta = PipingSystemDomains( DomainNum ).Cur.CurSimTimeStepSize / ( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.Density * Volume( PipingSystemDomains( DomainNum ).Cells( X, Y, Z ) ) * PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.SpecificHeat );
+						PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Beta = Beta;
 
 					} else if ( SELECT_CASE_var == CellType_Pipe ) {
 						//If pipe circuit present

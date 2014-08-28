@@ -10744,7 +10744,7 @@
     TowerWaterSys Demand Outlet Node,  !- Demand Side Outlet Node Name
     TowerWaterSys Demand Branches,  !- Condenser Demand Side Branch List Name
     TowerWaterSys Demand Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     TowerWaterSys,           !- Name

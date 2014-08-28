@@ -1246,6 +1246,7 @@ namespace DataPlantPipingSystems {
 
 		// Member Constructor
 		ZoneCoupledSurfaceData(
+			std::string Name,
 			int const IndexInSurfaceArray,
 			Real64 const SurfaceArea,
 			Real64 const Width,
@@ -1256,7 +1257,6 @@ namespace DataPlantPipingSystems {
 			Real64 const InsulationConductivity,
 			Real64 const InsulationDensity
 		) :
-
 			Name( Name ),
 			IndexInSurfaceArray( IndexInSurfaceArray ),
 			SurfaceArea( SurfaceArea ),
@@ -1295,7 +1295,6 @@ namespace DataPlantPipingSystems {
 		MeshProperties Mesh;
 		BaseThermalPropertySet GroundProperties;
 		BaseThermalPropertySet SlabProperties;
-		BaseThermalPropertySet DummyProperties;
 		BaseThermalPropertySet HorizInsProperties;
 		BaseThermalPropertySet VertInsProperties;
 		SimulationControl SimControls;
@@ -1312,7 +1311,6 @@ namespace DataPlantPipingSystems {
 		int ZoneCoupledOSCMIndex;
 		Real64 PerimeterOffset;
 		bool SlabInGradeFlag;
-		bool SimSlabFlag;
 		int SlabMaterialNum;
 		Real64 SlabWidth;
 		Real64 SlabLength;
@@ -1364,7 +1362,6 @@ namespace DataPlantPipingSystems {
 			ZoneCoupledOSCMIndex( 0 ),
 			PerimeterOffset( 0.0 ),
 			SlabInGradeFlag( false ),
-			SimSlabFlag( false ),
 			SlabMaterialNum( 0 ),
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
@@ -1418,7 +1415,6 @@ namespace DataPlantPipingSystems {
 			MeshProperties const & Mesh,
 			BaseThermalPropertySet const & GroundProperties,
 			BaseThermalPropertySet const & SlabProperties,
-			BaseThermalPropertySet const & DummyProperties,
 			BaseThermalPropertySet const & HorizInsProperties,
 			BaseThermalPropertySet const & VertInsProperties,
 			SimulationControl const & SimControls,
@@ -1433,7 +1429,6 @@ namespace DataPlantPipingSystems {
 			int const ZoneCoupledOSCMIndex,
 			Real64 const PerimeterOffset,
 			bool const SlabInGradeFlag,
-			bool const SimSlabFlag,
 			int const SlabMaterialNum,
 			Real64 const SlabWidth,
 			Real64 const SlabLength,
@@ -1485,7 +1480,6 @@ namespace DataPlantPipingSystems {
 			Mesh( Mesh ),
 			GroundProperties( GroundProperties ),
 			SlabProperties( SlabProperties ),
-			DummyProperties( DummyProperties ),
 			HorizInsProperties( HorizInsProperties ),
 			VertInsProperties( VertInsProperties ),
 			SimControls( SimControls ),
@@ -1500,7 +1494,6 @@ namespace DataPlantPipingSystems {
 			ZoneCoupledOSCMIndex( ZoneCoupledOSCMIndex ),
 			PerimeterOffset( PerimeterOffset ),
 			SlabInGradeFlag( SlabInGradeFlag ),
-			SimSlabFlag( SimSlabFlag ),
 			SlabMaterialNum( SlabMaterialNum ),
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),

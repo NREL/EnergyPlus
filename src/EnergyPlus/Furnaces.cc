@@ -569,7 +569,7 @@ namespace Furnaces {
 		if ( Furnace( FurnaceNum ).OpMode == CycFanCycCoil ) {
 			AirLoopFlow( AirLoopNum ).FanPLR = Furnace( FurnaceNum ).FanPartLoadRatio;
 		} else {
-			AirLoopFlow( AirLoopNum ).FanPLR = 0.0; // 0 means don't include PLR in OA calc's.
+			AirLoopFlow( AirLoopNum ).FanPLR = 1.0; // 1 means constant fan does not cycle.
 		}
 
 		// Report the current Furnace output
