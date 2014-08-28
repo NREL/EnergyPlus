@@ -274,6 +274,7 @@ namespace DataPlant {
 	int const TypeOf_UnitarySystemRecovery( 87 );
 	int const TypeOf_PackagedTESCoolingCoil( 88 );
 	int const TypeOf_CoolingTower_VarSpdMerkel( 89 );
+    int const TypeOf_ChilledCeilingPanel_Simple( 90 );
 
 	// Parameters for General Equipment Types
 	int const NumGeneralEquipTypes( 23 );
@@ -962,7 +963,7 @@ namespace DataPlant {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -234,7 +234,7 @@ namespace DataPlant {
 	extern int const TypeOf_PVTSolarCollectorFlatPlate;
 	extern int const TypeOf_Baseboard_Conv_Water;
 	extern int const TypeOf_Baseboard_Rad_Conv_Steam;
-	extern int const TypeOf_Baseboard_Rad_Conv_Water;
+    extern int const TypeOf_ChilledCeilingPanel_Simple;
 	extern int const TypeOf_LowTempRadiant_VarFlow;
 	extern int const TypeOf_LowTempRadiant_ConstFlow;
 	extern int const TypeOf_CooledBeamAirTerminal;
@@ -262,6 +262,7 @@ namespace DataPlant {
 	extern int const TypeOf_UnitarySystemRecovery;
 	extern int const TypeOf_PackagedTESCoolingCoil;
 	extern int const TypeOf_CoolingTower_VarSpdMerkel;
+	extern int const TypeOf_Baseboard_Rad_Conv_Water;
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
@@ -2354,7 +2355,7 @@ namespace DataPlant {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
