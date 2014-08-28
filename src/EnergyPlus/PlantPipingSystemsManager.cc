@@ -4760,9 +4760,10 @@ namespace PlantPipingSystemsManager {
 								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
 								PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
 
-							//Side X direction
-							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
-							PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
+								//Side X direction
+								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
+							}
 						}
 					}
 					else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.X, PipingSystemDomains(DomainNum).BasementZone.Width)) {
@@ -4913,175 +4914,208 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 			//Zone-coupled slab
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ) {
+			if (PipingSystemDomains(DomainNum).IsZoneCoupled) {
 				// NOTE: the slab depth is still a depth from the ground surface, need to correct for this here.
 				// Create partition at slab edges in the X direction
-				if ( PipingSystemDomains( DomainNum ).SlabWidth > 0 ) {
-					CellWidth = PipingSystemDomains( DomainNum ).VertInsThickness;
-					if ( !allocated( PipingSystemDomains( DomainNum ).Partitions.X ) ) {
+				if (PipingSystemDomains(DomainNum).SlabWidth > 0) {
+					CellWidth = PipingSystemDomains(DomainNum).VertInsThickness;
+					if (!allocated(PipingSystemDomains(DomainNum).Partitions.X)) {
 						//Partition at insulation edges in the X direction, if horizontal insulation present
-						if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-							if ( !PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
-								PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, 1 } );
+						if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+							if (!PipingSystemDomains(DomainNum).FullHorizInsPresent && PipingSystemDomains(DomainNum).SlabInGradeFlag){
+								PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 1 });
 								//Side X direction
-								SideX1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.X( 0 ) = MeshPartition( SideX1Location, PartitionType_XSide, CellWidth );
-							
-								//Insulation Edge X direction
-								SideX1InsulationLocation = SideX1Location + PipingSystemDomains( DomainNum ).HorizInsWidth;
-								PipingSystemDomains( DomainNum ).Partitions.X( 1 ) = MeshPartition( SideX1InsulationLocation, PartitionType_HorizInsXSide, CellWidth );
+								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
 
-							} else {
-								PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, 0 } );
+								//Insulation Edge X direction
+								SideX1InsulationLocation = SideX1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+								PipingSystemDomains(DomainNum).Partitions.X(1) = MeshPartition(SideX1InsulationLocation, PartitionType_HorizInsXSide, CellWidth);
+
+							}
+							else {
+								PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 0 });
 								//Side X direction
-								SideX1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.X( 0 ) = MeshPartition( SideX1Location, PartitionType_XSide, CellWidth );
+								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
 							}
 						}
 						else {
-							PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, 0 } );
+							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 0 });
 							//Side X direction
-							SideX1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-							PipingSystemDomains( DomainNum ).Partitions.X( 0 ) = MeshPartition( SideX1Location, PartitionType_XSide, CellWidth );
+							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
 						}
 					}
-					else if ( !MeshPartitionArray_Contains( PipingSystemDomains( DomainNum ).Partitions.X, PipingSystemDomains( DomainNum ).SlabWidth ) ) {
-						PreviousUbound = ubound( PipingSystemDomains( DomainNum ).Partitions.X, 1 );
-						if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-						PreviousEntries.allocate( { 0, PreviousUbound } );
-						PreviousEntries = PipingSystemDomains( DomainNum ).Partitions.X;
-						PipingSystemDomains( DomainNum ).Partitions.X.deallocate();
+					else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.X, PipingSystemDomains(DomainNum).SlabWidth)) {
+						PreviousUbound = ubound(PipingSystemDomains(DomainNum).Partitions.X, 1);
+						if (allocated(PreviousEntries)) PreviousEntries.deallocate();
+						PreviousEntries.allocate({ 0, PreviousUbound });
+						PreviousEntries = PipingSystemDomains(DomainNum).Partitions.X;
+						PipingSystemDomains(DomainNum).Partitions.X.deallocate();
 
-							
-								//Insulation Edge X direction
-								SideX1InsulationLocation = SideX1Location + PipingSystemDomains( DomainNum ).HorizInsWidth;
-								PipingSystemDomains( DomainNum ).Partitions.X( PreviousUbound + 2 ) = MeshPartition( SideX1InsulationLocation, PartitionType_HorizInsXSide, CellWidth );
-
-							} else {
-								PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, PreviousUbound + 1 } );
-								PipingSystemDomains( DomainNum ).Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
+						//Partition at insulation edges in the X direction, if horizontal insulation present
+						if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+							if (!PipingSystemDomains(DomainNum).FullHorizInsPresent && PipingSystemDomains(DomainNum).SlabInGradeFlag){
+								PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, PreviousUbound + 4 });
+								PipingSystemDomains(DomainNum).Partitions.X({ 0, PreviousUbound }) = PreviousEntries;
 								//Side X direction
-								SideX1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideX1Location, PartitionType_XSide, CellWidth );
+								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 1) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
+
+								//Insulation Edge X direction
+								SideX1InsulationLocation = SideX1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+								PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 2) = MeshPartition(SideX1InsulationLocation, PartitionType_HorizInsXSide, CellWidth);
+
+							}
+							else {
+								PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, PreviousUbound + 1 });
+								PipingSystemDomains(DomainNum).Partitions.X({ 0, PreviousUbound }) = PreviousEntries;
+								//Side X direction
+								SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 1) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
 							}
 						}
 						else {
-							PipingSystemDomains( DomainNum ).Partitions.X.allocate( { 0, PreviousUbound + 1 } );
-							PipingSystemDomains( DomainNum ).Partitions.X( { 0, PreviousUbound } ) = PreviousEntries;
+							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, PreviousUbound + 1 });
+							PipingSystemDomains(DomainNum).Partitions.X({ 0, PreviousUbound }) = PreviousEntries;
 							//Side X direction
-							SideX1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-							PipingSystemDomains( DomainNum ).Partitions.X( PreviousUbound + 1 ) = MeshPartition( SideX1Location, PartitionType_XSide, CellWidth );
+							SideX1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.X(PreviousUbound + 1) = MeshPartition(SideX1Location, PartitionType_XSide, CellWidth);
 						}
 					}
 				}
 
-				if ( PipingSystemDomains( DomainNum ).SlabThickness > 0 ) {
-					CellWidth = PipingSystemDomains( DomainNum ).HorizInsThickness;
+				if (PipingSystemDomains(DomainNum).SlabThickness > 0) {
+					CellWidth = PipingSystemDomains(DomainNum).HorizInsThickness;
 
-					if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
-						SlabDistFromBottom = PipingSystemDomains( DomainNum ).Extents.Ymax - PipingSystemDomains( DomainNum ).SlabThickness;
+					if (PipingSystemDomains(DomainNum).SlabInGradeFlag){
+						SlabDistFromBottom = PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemDomains(DomainNum).SlabThickness;
 					}
 					else{
 						//Create underslab partition such that interface cell thickness is constant and consistent with other slab configurations regardless of the mesh count.
-						SlabDistFromBottom = PipingSystemDomains( DomainNum ).Extents.Ymax - ( PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount * CellWidth + CellWidth / 2 );
+						SlabDistFromBottom = PipingSystemDomains(DomainNum).Extents.Ymax - (PipingSystemDomains(DomainNum).Mesh.Y.RegionMeshCount * CellWidth + CellWidth / 2);
 					}
 
 					//Partition at bottom edge of vertical insulation, if vertical insulation present
-					if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-						YInsulationLocation = PipingSystemDomains( DomainNum ).Extents.Ymax - PipingSystemDomains( DomainNum ).VertInsDepth;
+					if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+						YInsulationLocation = PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemDomains(DomainNum).VertInsDepth;
 					}
 
-					if ( !allocated( PipingSystemDomains( DomainNum ).Partitions.Y ) ) {
-						if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-							PipingSystemDomains( DomainNum ).Partitions.Y.allocate( { 0, 1 } );
+					if (!allocated(PipingSystemDomains(DomainNum).Partitions.Y)) {
+						if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+							PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, 1 });
 							// Underslab partition
-							PipingSystemDomains( DomainNum ).Partitions.Y( 0 ) = MeshPartition( SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth );
+							PipingSystemDomains(DomainNum).Partitions.Y(0) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth);
 							//Vertical-Insulation edge partition
-							PipingSystemDomains( DomainNum ).Partitions.Y( 1 ) = MeshPartition( YInsulationLocation, PartitionType_VertInsLowerEdge, CellWidth );
+							PipingSystemDomains(DomainNum).Partitions.Y(1) = MeshPartition(YInsulationLocation, PartitionType_VertInsLowerEdge, CellWidth);
 						}
 						else{
-							PipingSystemDomains( DomainNum ).Partitions.Y.allocate( { 0, 0 } );
+							PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, 0 });
 							// Underslab partition
-							PipingSystemDomains( DomainNum ).Partitions.Y( 0 ) = MeshPartition( SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth );
+							PipingSystemDomains(DomainNum).Partitions.Y(0) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth);
 						}
 					}
-					else if ( !MeshPartitionArray_Contains( PipingSystemDomains( DomainNum ).Partitions.Y, SlabDistFromBottom ) ) {
-						PreviousUbound = ubound( PipingSystemDomains( DomainNum ).Partitions.Y, 1 );
-						if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-						PreviousEntries.allocate( { 0, PreviousUbound } );
-						PreviousEntries = PipingSystemDomains( DomainNum ).Partitions.Y;
-						PipingSystemDomains( DomainNum ).Partitions.Y.deallocate();
+					else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.Y, SlabDistFromBottom)) {
+						PreviousUbound = ubound(PipingSystemDomains(DomainNum).Partitions.Y, 1);
+						if (allocated(PreviousEntries)) PreviousEntries.deallocate();
+						PreviousEntries.allocate({ 0, PreviousUbound });
+						PreviousEntries = PipingSystemDomains(DomainNum).Partitions.Y;
+						PipingSystemDomains(DomainNum).Partitions.Y.deallocate();
 
 						// Partition at bottom edge of vertical insulation, if vertical insulation present
-						if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-							PipingSystemDomains( DomainNum ).Partitions.Y.allocate( { 0, PreviousUbound + 2 } );
-							PipingSystemDomains( DomainNum ).Partitions.Y( { 0, PreviousUbound } ) = PreviousEntries;
+						if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+							PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, PreviousUbound + 2 });
+							PipingSystemDomains(DomainNum).Partitions.Y({ 0, PreviousUbound }) = PreviousEntries;
 
 							// Underslab partition
-							PipingSystemDomains( DomainNum ).Partitions.Y( PreviousUbound + 1 ) = MeshPartition( SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth );
+							PipingSystemDomains(DomainNum).Partitions.Y(PreviousUbound + 1) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth);
 							//Vertical-Insulation edge partition
-							PipingSystemDomains( DomainNum ).Partitions.Y( PreviousUbound + 2 ) = MeshPartition( YInsulationLocation, PartitionType_VertInsLowerEdge, CellWidth );
+							PipingSystemDomains(DomainNum).Partitions.Y(PreviousUbound + 2) = MeshPartition(YInsulationLocation, PartitionType_VertInsLowerEdge, CellWidth);
 						}
 						else {
-							PipingSystemDomains( DomainNum ).Partitions.Y.allocate( { 0, PreviousUbound + 1 } );
-							PipingSystemDomains( DomainNum ).Partitions.Y( { 0, PreviousUbound } ) = PreviousEntries;
+							PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, PreviousUbound + 1 });
+							PipingSystemDomains(DomainNum).Partitions.Y({ 0, PreviousUbound }) = PreviousEntries;
 							// Underslab partition
-							PipingSystemDomains( DomainNum ).Partitions.Y( PreviousUbound + 1 ) = MeshPartition( SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth );
+							PipingSystemDomains(DomainNum).Partitions.Y(PreviousUbound + 1) = MeshPartition(SlabDistFromBottom, PartitionType_HorizInsUnder, CellWidth);
 						}
 
 					}
 				}
 
 
-							
-								//Insulation Edge Z direction
-								SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains( DomainNum ).HorizInsWidth;
-								PipingSystemDomains( DomainNum ).Partitions.Z( 1 ) = MeshPartition( SideZ1InsulationLocation, PartitionType_HorizInsZSide, CellWidth );
-
-							} else {
-								PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, 0 } );
+				if (PipingSystemDomains(DomainNum).SlabWidth > 0) {
+					CellWidth = PipingSystemDomains(DomainNum).VertInsThickness;
+					if (!allocated(PipingSystemDomains(DomainNum).Partitions.Z)) {
+						//Partition at insulation edges in the Z direction, if horizontal insulation present
+						if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+							if (!PipingSystemDomains(DomainNum).FullHorizInsPresent && PipingSystemDomains(DomainNum).SlabInGradeFlag){
+								PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, 1 });
 								//Side Z direction
-								SideZ1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.Z( 0 ) = MeshPartition( SideZ1Location, PartitionType_ZSide, CellWidth );
+								SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.Z(0) = MeshPartition(SideZ1Location, PartitionType_ZSide, CellWidth);
+
+								//Insulation Edge Z direction
+								SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+								PipingSystemDomains(DomainNum).Partitions.Z(1) = MeshPartition(SideZ1InsulationLocation, PartitionType_HorizInsZSide, CellWidth);
+
+							}
+							else {
+								PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, 0 });
+								//Side Z direction
+								SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.Z(0) = MeshPartition(SideZ1Location, PartitionType_ZSide, CellWidth);
 							}
 						}
 						else {
-							PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, 0 } );
+							PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, 0 });
 							//Side Z direction
-							SideZ1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-							PipingSystemDomains( DomainNum ).Partitions.Z( 0 ) = MeshPartition( SideZ1Location, PartitionType_ZSide, CellWidth );
+							SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.Z(0) = MeshPartition(SideZ1Location, PartitionType_ZSide, CellWidth);
 						}
 
-					} else if ( !MeshPartitionArray_Contains( PipingSystemDomains( DomainNum ).Partitions.Z, PipingSystemDomains( DomainNum ).SlabWidth ) ) {
-						PreviousUbound = ubound( PipingSystemDomains( DomainNum ).Partitions.Z, 1 );
-						if ( allocated( PreviousEntries ) ) PreviousEntries.deallocate();
-						PreviousEntries.allocate( { 0, PreviousUbound } );
-						PreviousEntries = PipingSystemDomains( DomainNum ).Partitions.Z;
-						PipingSystemDomains( DomainNum ).Partitions.Z.deallocate();
+					}
+					else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.Z, PipingSystemDomains(DomainNum).SlabWidth)) {
+						PreviousUbound = ubound(PipingSystemDomains(DomainNum).Partitions.Z, 1);
+						if (allocated(PreviousEntries)) PreviousEntries.deallocate();
+						PreviousEntries.allocate({ 0, PreviousUbound });
+						PreviousEntries = PipingSystemDomains(DomainNum).Partitions.Z;
+						PipingSystemDomains(DomainNum).Partitions.Z.deallocate();
 
+						//Partition at insulation edges in the Z direction, if horizontal insulation present
+						if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+							if (!PipingSystemDomains(DomainNum).FullHorizInsPresent && PipingSystemDomains(DomainNum).SlabInGradeFlag){
+								PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, PreviousUbound + 2 });
+								PipingSystemDomains(DomainNum).Partitions.Z({ 0, PreviousUbound }) = PreviousEntries;
+								//Side Z direction
+								SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 1) = MeshPartition(SideZ1Location, PartitionType_ZSide, CellWidth);
 
 								//Insulation Edge Z direction
-								SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains( DomainNum ).HorizInsWidth;
-								PipingSystemDomains( DomainNum ).Partitions.Z( PreviousUbound + 2 ) = MeshPartition( SideZ1InsulationLocation, PartitionType_HorizInsZSide, CellWidth );
+								SideZ1InsulationLocation = SideZ1Location + PipingSystemDomains(DomainNum).HorizInsWidth;
+								PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 2) = MeshPartition(SideZ1InsulationLocation, PartitionType_HorizInsZSide, CellWidth);
 
-							} else {
-								PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, PreviousUbound + 1 } );
-								PipingSystemDomains( DomainNum ).Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
+							}
+							else {
+								PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, PreviousUbound + 1 });
+								PipingSystemDomains(DomainNum).Partitions.Z({ 0, PreviousUbound }) = PreviousEntries;
 								//Side Z direction
-								SideZ1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-								PipingSystemDomains( DomainNum ).Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZ1Location, PartitionType_ZSide, CellWidth );
+								SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+								PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 1) = MeshPartition(SideZ1Location, PartitionType_ZSide, CellWidth);
 							}
 
-						} else {
-							PipingSystemDomains( DomainNum ).Partitions.Z.allocate( { 0, PreviousUbound + 1 } );
-							PipingSystemDomains( DomainNum ).Partitions.Z( { 0, PreviousUbound } ) = PreviousEntries;
+						}
+						else {
+							PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, PreviousUbound + 1 });
+							PipingSystemDomains(DomainNum).Partitions.Z({ 0, PreviousUbound }) = PreviousEntries;
 							//Side Z direction
-							SideZ1Location = PipingSystemDomains( DomainNum ).PerimeterOffset;
-							PipingSystemDomains( DomainNum ).Partitions.Z( PreviousUbound + 1 ) = MeshPartition( SideZ1Location, PartitionType_ZSide, CellWidth );
+							SideZ1Location = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.Z(PreviousUbound + 1) = MeshPartition(SideZ1Location, PartitionType_ZSide, CellWidth);
 						}
 					}
 				}
 			}
+
 
 
 		MeshPartition_SelectionSort( PipingSystemDomains( DomainNum ).Partitions.X );
@@ -5766,81 +5800,112 @@ namespace PlantPipingSystemsManager {
 					//'apply boundary conditions
 
 					// For zone-coupled ground domain
-					if ( PipingSystemDomains( DomainNum ).IsZoneCoupled ){
+					if (PipingSystemDomains(DomainNum).IsZoneCoupled){
 						//Slab in-grade 
-						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
+						if (PipingSystemDomains(DomainNum).SlabInGradeFlag){
 							//Farfield cells
-							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							if (CellYIndex == lbound(PipingSystemDomains(DomainNum).Cells, 2)){
 								CellType = CellType_FarfieldBoundary;
 							}
 							//Slab cells
-							else if ( CellXIndex > MinSlabXIndex && CellZIndex > MinSlabZIndex ) {
+							else if (CellXIndex > MinXIndex && CellZIndex > MinZIndex) {
 								//General slab cells
-								if ( CellYIndex < ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > SlabYIndex ){
+								if (CellYIndex < ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex > YIndex){
 									CellType = CellType_Slab;
 								}
+								//Surface cells
+								else if (CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)) {
+									CellType = CellType_ZoneGroundInterface;
+								}
+								//Underslab insulation cells
+								else if (CellYIndex == YIndex){
+									//Check if horizontal insulation present
+									if (PipingSystemDomains(DomainNum).HorizInsPresentFlag){
+										//Entire underslab insulation
+										if (PipingSystemDomains(DomainNum).FullHorizInsPresent){
+											CellType = CellType_HorizInsulation;
+										}
+										//Perimeter insulation
+										else{
+											if (CellXIndex <= InsulationXIndex || CellZIndex <= InsulationZIndex){
 												CellType = CellType_HorizInsulation;
 											}
 										}
 									}
 								}
+							}
+							//X side interface 
+							else if (CellXIndex == MinXIndex &&  CellZIndex > MinZIndex) {
+								//Check if vertical insulation present
+								if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+									//Check depth of vertical insulation
+									if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex >= InsulationYIndex){
+										CellType = CellType_VertInsulation;
 									}
 								}
-								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+								else if (CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)){
 									CellType = CellType_GroundSurface;
 								}
 							}
+							//Z side interface
+							else if (CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex){
+								//Check if vertical insulation present
+								if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+									//Check depth of vertical insulation
+									if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex >= InsulationYIndex){
+										CellType = CellType_VertInsulation;
 									}
 								}
-								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+								else if (CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)){
 									CellType = CellType_GroundSurface;
 								}
 							}
 							//Surface cells
-							else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							else if (CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)){
 								CellType = CellType_GroundSurface;
 							}
 							//Farfield boundary
-							else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 )  || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
-								CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) {
+							else if (CellYIndex == lbound(PipingSystemDomains(DomainNum).Cells, 2) || CellXIndex == lbound(PipingSystemDomains(DomainNum).Cells, 1) ||
+								CellZIndex == lbound(PipingSystemDomains(DomainNum).Cells, 3)) {
 								CellType = CellType_FarfieldBoundary;
 							}
 
 						}
 						//Slab on-grade situations
 						else {
-							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							if (CellYIndex == lbound(PipingSystemDomains(DomainNum).Cells, 2)){
 								CellType = CellType_FarfieldBoundary;
 							}
-							else if ( CellXIndex > MinXIndex  && CellZIndex > MinZIndex && CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							else if (CellXIndex > MinXIndex  && CellZIndex > MinZIndex && CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)){
 								// If insulated, cell properties will be assigned in DoOneTimeInit based on insulation flags
 								CellType = CellType_ZoneGroundInterface;
 							}
 							//Vertical insulation 
-							else if ( ( CellXIndex == MinXIndex  &&  CellZIndex > MinZIndex  ) ||
-								( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex  ) ){
+							else if ((CellXIndex == MinXIndex  &&  CellZIndex > MinZIndex) ||
+								(CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex)){
 								//Check if vertical insulation present
-								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-									if ( CellYIndex >= InsulationYIndex ){
+								if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
+									if (CellYIndex >= InsulationYIndex){
 										CellType = CellType_VertInsulation;
 									}
 								}
-								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
+								else if (CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)) {
 									CellType = CellType_GroundSurface;
 								}
 							}
 							//Surface Cells
-							else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							else if (CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)){
 								CellType = CellType_GroundSurface;
 							}
 							//Domain 'bottom' surface
-							else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
-								CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ){
+							else if (CellYIndex == lbound(PipingSystemDomains(DomainNum).Cells, 2) || CellXIndex == lbound(PipingSystemDomains(DomainNum).Cells, 1) ||
+								CellZIndex == lbound(PipingSystemDomains(DomainNum).Cells, 3)){
 								CellType = CellType_FarfieldBoundary;
 							}
-						
+
 						}
 					}
+
 					//basement model, zone-coupled
 					else if (PipingSystemDomains(DomainNum).HasCoupledBasement){
 						//Set the appropriate cell type
