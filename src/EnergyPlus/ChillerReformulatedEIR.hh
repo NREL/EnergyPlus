@@ -174,8 +174,8 @@ namespace ChillerReformulatedEIR {
 		// Default Constructor
 		ReformulatedEIRChillerSpecs() :
 			TypeNum( 0 ),
-			CondenserType(0),
-			PartLoadCurveType(0),
+			CondenserType( 0 ),
+			PartLoadCurveType( 0 ),
 			RefCap( 0.0 ),
 			RefCOP( 0.0 ),
 			FlowMode( FlowModeNotSet ),

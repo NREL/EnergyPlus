@@ -433,10 +433,10 @@ namespace CurveManager {
 		NumExpDecay = GetNumObjectsFound( "Curve:ExponentialDecay" ); //cpw22Aug2010
 		NumDoubleExpDecay = GetNumObjectsFound( "Curve:DoubleExponentialDecay" ); //ykt July 2011
 		NumChillerPartLoadWithLift = GetNumObjectsFound( "Curve:ChillerPartLoadWithLift" ); // zrp_Aug2014
-		
+
 		NumOneVarTab = GetNumObjectsFound( "Table:OneIndependentVariable" );
 		NumTwoVarTab = GetNumObjectsFound( "Table:TwoIndependentVariables" );
-		
+
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic + NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 + NumExpDecay + NumDoubleExpDecay + NumQLinear + NumChillerPartLoadWithLift; //cpw22Aug2010 // zrp_Aug2014
 
 		// intermediate count for one and two variable performance tables
@@ -4913,7 +4913,7 @@ Label999: ;
 				GetCurveType = "EXPONENTIALDECAY";
 			} else if ( SELECT_CASE_var == DoubleExponentialDecay ) {
 				GetCurveType = "DOUBLEEXPONENTIALDECAY";
-			}else if ( SELECT_CASE_var == ChillerPartLoadWithLift ) {
+			} else if ( SELECT_CASE_var == ChillerPartLoadWithLift ) {
 				GetCurveType = "CHILLERPARTLOADWITHLIFT";
 			}}
 		} else {

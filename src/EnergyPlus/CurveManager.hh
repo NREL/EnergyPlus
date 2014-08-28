@@ -45,7 +45,7 @@ namespace CurveManager {
 	extern int const DoubleExponentialDecay;
 	extern int const QuadLinear;
 	extern int const ChillerPartLoadCustom;
-	
+
 	// Interpolation Types
 	extern int const LinearInterpolationOfTable;
 	extern int const LagrangeInterpolationLinearExtrapolation;
