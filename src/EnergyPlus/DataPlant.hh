@@ -50,6 +50,7 @@ namespace DataPlant {
 	extern int const WetBulbTDBOpSchemeType; // Scheme Type for Wet bulb range based Operation
 	extern int const DewPointTDBOpSchemeType; // Scheme Type for Wet bulb range based Operation
 	extern int const CompSetPtBasedSchemeType; // *Sankar Temp Based Control
+    extern int const ThermalEnergyStorageSchemeType; // Scheme for Simplified Thermal Energy Storage
 	extern int const UncontrolledOpSchemeType; // Scheme Type for Uncontrolled Operation
 	extern int const EMSOpSchemeType; // Scheme Type for EMS based operation user Define scheme
 	extern int const PumpOpSchemeType; // Not really an OpScheme, just a placeholder
@@ -2354,7 +2355,7 @@ namespace DataPlant {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
