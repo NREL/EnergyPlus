@@ -1908,10 +1908,10 @@ namespace DualDuct {
 				}
 				else {
 					if ( Contaminant.CO2Simulation ) {
-						Node( OutletNode ).CO2 = Node( OAInletNode ).CO2;
+						Node( OutletNode ).CO2 = max( Node( OAInletNode ).CO2, Node( RAInletNode ).CO2 );
 					}
 					if ( Contaminant.GenericContamSimulation ) {
-						Node( OutletNode ).GenContam = Node( OAInletNode ).GenContam;
+						Node( OutletNode ).GenContam = max( Node( OAInletNode ).GenContam, Node( RAInletNode ).GenContam );
 					}
 				}
 
