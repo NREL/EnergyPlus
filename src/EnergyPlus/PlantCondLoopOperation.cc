@@ -1352,6 +1352,8 @@ namespace PlantCondLoopOperation {
 		bool NodeEMSSetPointMissing;
         std::string OnPeakSchedName;
         int OnPeakSchedPtr;
+        std::string ChargeSchedName;
+        int ChargeSchedPtr;
         Real64 NonChargCHWTemp;
         Real64 OffPeakCHWTemp;
         int CompNumA;
@@ -1391,6 +1393,13 @@ namespace PlantCondLoopOperation {
                                         " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
                         ErrorsFound = true;
                     }
+                    ChargeSchedName = cAlphaArgs ( 3 );
+                    ChargeSchedPtr  = GetScheduleIndex( ChargeSchedName );
+                    if ( ChargeSchedPtr == 0 ) {
+                        ShowSevereError( "Could not find Charging Availability Schedule " + ChargeSchedName +
+                                        " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
+                        ErrorsFound = true;
+                    }
                     NonChargCHWTemp = rNumericArgs ( 1 );
                     OffPeakCHWTemp  = rNumericArgs ( 2 );
                 }
@@ -1402,7 +1411,7 @@ namespace PlantCondLoopOperation {
                             CompNumA = CompNum * 5;
                             CompNumN = CompNum;
                         } else if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
-                            CompNumA = CompNum * 5 + 1;
+                            CompNumA = CompNum * 5 + 2;
                             CompNumN = CompNum + 2;
                         }
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).TypeOf = cAlphaArgs( CompNumA - 3 );
@@ -1448,7 +1457,7 @@ namespace PlantCondLoopOperation {
                             // detailed input that is necessary to get thermal energy storage to work from the simpler input.
                             CompOpType = ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum ) - 1;
                             if ( ( CompOpType < 1 ) || ( CompOpType > 2 ) ) CompOpType = 2;
-                            SetUpNewScheduledTESSetPtMgr( OnPeakSchedPtr, NonChargCHWTemp, OffPeakCHWTemp, CompOpType,
+                            SetUpNewScheduledTESSetPtMgr( OnPeakSchedPtr, ChargeSchedPtr, NonChargCHWTemp, OffPeakCHWTemp, CompOpType,
                                                           PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum );
                         }
 						//check that setpoint node has valid setpoint managers or EMS

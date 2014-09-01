@@ -1846,6 +1846,7 @@ namespace SetPointManager {
 	{
 		// Members
 		int SchedPtr;
+        int SchedPtrCharge;
 		int CtrlNodeNum;
         Real64 NonChargeCHWTemp;
         Real64 ChargeCHWTemp;
@@ -1855,6 +1856,7 @@ namespace SetPointManager {
 		// Default Constructor
 		DefineScheduledTESSetPointManager() :
         SchedPtr( 0 ),
+        SchedPtrCharge( 0 ),
         CtrlNodeNum( 0 ),
         NonChargeCHWTemp( 0.0 ),
         ChargeCHWTemp( 0.0 ),
@@ -1865,6 +1867,7 @@ namespace SetPointManager {
 		// Member Constructor
 		DefineScheduledTESSetPointManager(
                                        int const SchedPtr,
+                                       int const SchedPtrCharge,
                                        int const CtrlNodeNum,
                                        Real64 NonChargeCHWTemp,
                                        Real64 ChargeCHWTemp,
@@ -1872,6 +1875,7 @@ namespace SetPointManager {
                                        Real64 const SetPt
                                        ) :
         SchedPtr( SchedPtr ),
+        SchedPtrCharge( SchedPtrCharge ),
         CtrlNodeNum( CtrlNodeNum ),
         NonChargeCHWTemp( NonChargeCHWTemp ),
         ChargeCHWTemp( ChargeCHWTemp ),
@@ -2050,6 +2054,7 @@ namespace SetPointManager {
     void
     SetUpNewScheduledTESSetPtMgr(
         int const SchedPtr,
+        int const SchedPtrCharge,
         Real64 NonChargeCHWTemp,
         Real64 ChargeCHWTemp,
         int const CompOpType,

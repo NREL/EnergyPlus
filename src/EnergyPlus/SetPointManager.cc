@@ -4295,16 +4295,20 @@ namespace SetPointManager {
         
 		// Locals
 		// SUBROUTINE ARGUMENTS:
-        Real64 CurSchVal;
-        Real64 const OnPeak( 0.5 );
+        Real64 CurSchValOnPeak;
+        Real64 CurSchValCharge;
+        Real64 const OnVal( 0.5 );
         int const CoolOpComp ( 1 ); // a component that cools only (chillers)
         int const DualOpComp ( 2 ); // a component that heats or cools (ice storage tank)
         
-        CurSchVal = GetCurrentScheduleValue( SchTESSetPtMgr( SetPtMgrNum ).SchedPtr );
+        CurSchValOnPeak  = GetCurrentScheduleValue( SchTESSetPtMgr( SetPtMgrNum ).SchedPtr );
+        CurSchValCharge = GetCurrentScheduleValue( SchTESSetPtMgr( SetPtMgrNum ).SchedPtrCharge );
 
         if ( SchTESSetPtMgr( SetPtMgrNum ).CompOpType == CoolOpComp ) { //this is some sort of chiller
-            if ( CurSchVal >= OnPeak ) {
+            if ( CurSchValOnPeak >= OnVal ) {
                 SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;
+            } else if ( CurSchValCharge < OnVal ) {
+                SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).NonChargeCHWTemp;                
             } else {
                 SchTESSetPtMgr( SetPtMgrNum ).SetPt = SchTESSetPtMgr( SetPtMgrNum ).ChargeCHWTemp;
             }
@@ -7644,6 +7648,7 @@ namespace SetPointManager {
     void
     SetUpNewScheduledTESSetPtMgr(
         int const SchedPtr,
+        int const SchedPtrCharge,
         Real64 NonChargeCHWTemp,
         Real64 ChargeCHWTemp,
         int const CompOpType,
@@ -7696,6 +7701,7 @@ namespace SetPointManager {
         
         // Set up the scheduled TES setpoint manager information
         SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtr = SchedPtr;
+        SchTESSetPtMgr( NumSchTESSetPtMgrs ).SchedPtrCharge = SchedPtrCharge;
         SchTESSetPtMgr( NumSchTESSetPtMgrs ).NonChargeCHWTemp = NonChargeCHWTemp;
         SchTESSetPtMgr( NumSchTESSetPtMgrs ).ChargeCHWTemp = ChargeCHWTemp;
         SchTESSetPtMgr( NumSchTESSetPtMgrs ).CompOpType = CompOpType;
