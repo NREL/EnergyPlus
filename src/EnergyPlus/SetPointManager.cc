@@ -4296,7 +4296,7 @@ namespace SetPointManager {
 		// Locals
 		// SUBROUTINE ARGUMENTS:
         Real64 CurSchVal;
-        Real64 const OnPeak( 1.0 );
+        Real64 const OnPeak( 0.5 );
         int const CoolOpComp ( 1 ); // a component that cools only (chillers)
         int const DualOpComp ( 2 ); // a component that heats or cools (ice storage tank)
         
@@ -7711,8 +7711,9 @@ namespace SetPointManager {
 
         // Now verify that there is no overlap (no other SPM uses the node of the new setpoint manager)
         VerifySetPointManagers( ErrorsFoundinTESSchSetup );
-        ShowFatalError( "Errors found in verification step of SetUpNewScheduledTESSetPtMgr.  Program terminates." );
-        
+        if ( ErrorsFoundinTESSchSetup ) {
+            ShowFatalError( "Errors found in verification step of SetUpNewScheduledTESSetPtMgr.  Program terminates." );
+        }
         // Since all of the other setpoint managers not only been read and verified but also initialized, simulated, and updated,
         // we must now also initialize, simulate, and update the current SchTESStPtMgr that was just added.  But the init and simulate
         // steps are the same so we can call the simulate first.
