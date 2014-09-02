@@ -20,6 +20,9 @@
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/DimensionExpressions.hh>
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Vector2.hh>
+#include <ObjexxFCL/Vector3.hh>
+#include <ObjexxFCL.unit.hh>
 
 // C++ Headers
 #include <array>
@@ -138,7 +141,7 @@ TEST( FArray1Test, ConstructionInitializerListOnlyFstring )
 	EXPECT_EQ( "Eggs", r( 3 ) );
 }
 
-TEST( FArray1Test, ConstructionArray )
+TEST( FArray1Test, ConstructionStdArray )
 {
 	FArray1D_int v( std::array< int, 3 >{ { 11, 22, 33 } } );
 	EXPECT_EQ( 3u, v.size() );
@@ -152,7 +155,7 @@ TEST( FArray1Test, ConstructionArray )
 	EXPECT_EQ( 33, v( 3 ) );
 }
 
-TEST( FArray1Test, ConstructionVector )
+TEST( FArray1Test, ConstructionStdVector )
 {
 	FArray1D_int v( std::vector< int >{ 11, 22, 33 } );
 	EXPECT_EQ( 3u, v.size() );
@@ -168,6 +171,33 @@ TEST( FArray1Test, ConstructionVector )
 	EXPECT_EQ( 33, v( 3 ) );
 }
 
+TEST( FArray1Test, ConstructionVector2 )
+{
+	FArray1D_int v( Vector2_int{ { 11, 22 } } );
+	EXPECT_EQ( 2u, v.size() );
+	EXPECT_EQ( 2u, v.size1() );
+	EXPECT_EQ( 1, v.l() );
+	EXPECT_EQ( 1, v.l1() );
+	EXPECT_EQ( 2, v.u() );
+	EXPECT_EQ( 2, v.u1() );
+	EXPECT_EQ( 11, v( 1 ) );
+	EXPECT_EQ( 22, v( 2 ) );
+}
+
+TEST( FArray1Test, ConstructionVector3 )
+{
+	FArray1D_int v( Vector3_int{ { 11, 22, 33 } } );
+	EXPECT_EQ( 3u, v.size() );
+	EXPECT_EQ( 3u, v.size1() );
+	EXPECT_EQ( 1, v.l() );
+	EXPECT_EQ( 1, v.l1() );
+	EXPECT_EQ( 3, v.u() );
+	EXPECT_EQ( 3, v.u1() );
+	EXPECT_EQ( 11, v( 1 ) );
+	EXPECT_EQ( 22, v( 2 ) );
+	EXPECT_EQ( 33, v( 3 ) );
+}
+
 static void initializer_function( FArray1D_string & array )
 {
 	array( 1 ) = "This";
@@ -176,7 +206,7 @@ static void initializer_function( FArray1D_string & array )
 	array( 4 ) = "string";
 }
 
-template < typename T >
+template< typename T >
 static void initializer_function_template( FArray1D< T > & array )
 {
 	array( 1 ) = T( 1 );

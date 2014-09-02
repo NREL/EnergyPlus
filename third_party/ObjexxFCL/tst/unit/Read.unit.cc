@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Read.hh>
+#include <ObjexxFCL.unit.hh>
 
 // C++ Headers
 #include <sstream>

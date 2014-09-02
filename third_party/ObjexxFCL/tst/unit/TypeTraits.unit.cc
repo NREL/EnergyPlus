@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/TypeTraits.hh>
+#include <ObjexxFCL.unit.hh>
 
 // C++ Headers
 //#include <cstddef>

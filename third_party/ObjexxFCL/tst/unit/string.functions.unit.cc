@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL.unit.hh>
 
 using namespace ObjexxFCL;
 using std::string;

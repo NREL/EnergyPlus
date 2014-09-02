@@ -76,13 +76,13 @@ public: // Creation
 	// Copy Constructor
 	inline
 	MArray5( MArray5 const & a ) :
-		Super( a )
+	 Super( a )
 	{}
 
 	// Constructor
 	inline
 	MArray5( A & a, T Class::* pmem ) :
-		Super( a, pmem )
+	 Super( a, pmem )
 	{}
 
 	// Destructor
@@ -91,7 +91,7 @@ public: // Creation
 	~MArray5()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -137,7 +137,7 @@ public: // Assignment
 	}
 
 	// Array Assignment Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray5 &
 	operator =( ArrayType< U > const & a )
@@ -243,7 +243,7 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray5 &
 	operator +=( ArrayType< U > const & a )
@@ -264,7 +264,7 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray5 &
 	operator -=( ArrayType< U > const & a )
@@ -285,7 +285,7 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray5 &
 	operator *=( ArrayType< U > const & a )
@@ -306,7 +306,7 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray5 &
 	operator /=( ArrayType< U > const & a )
@@ -326,6 +326,54 @@ public: // Assignment
 		}
 		return *this;
 	}
+
+public: // Assignment: Logical
+
+	// &&= MArray5 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray5 &
+	and_equals( MArray5 const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i5 = 1, e5 = u5(); i5 <= e5; ++i5 ) {
+			for ( int i4 = 1, e4 = u4(); i4 <= e4; ++i4 ) {
+				for ( int i3 = 1, e3 = u3(); i3 <= e3; ++i3 ) {
+					for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
+						for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
+							auto & v( operator ()( i1, i2, i3, i4, i5 ) );
+							v = v && a( i1, i2, i3, i4, i5 ); // Not overlap-safe
+						}
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// ||= MArray5 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray5 &
+	or_equals( MArray5 const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i5 = 1, e5 = u5(); i5 <= e5; ++i5 ) {
+			for ( int i4 = 1, e4 = u4(); i4 <= e4; ++i4 ) {
+				for ( int i3 = 1, e3 = u3(); i3 <= e3; ++i3 ) {
+					for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
+						for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
+							auto & v( operator ()( i1, i2, i3, i4, i5 ) );
+							v = v || a( i1, i2, i3, i4, i5 ); // Not overlap-safe
+						}
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+public: // Assignment: Value
 
 	// = Value
 	inline
@@ -347,7 +395,7 @@ public: // Assignment
 	}
 
 	// = Value Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray5 &
 	operator =( U const & t )
@@ -1471,7 +1519,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
@@ -1495,7 +1543,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
@@ -1519,7 +1567,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
@@ -1543,7 +1591,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
@@ -1567,7 +1615,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
@@ -1591,7 +1639,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {

@@ -1123,8 +1123,8 @@ alpha_token( Tokens const & tokens )
 	// Create Format
 	Format *
 	FormatFactory::create(
-		std::string const & s,
-		Format * p
+	 std::string const & s,
+	 Format * p
 	)
 	{
 		typedef  Format::Size  Size;

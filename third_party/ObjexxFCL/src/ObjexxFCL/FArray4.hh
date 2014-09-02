@@ -21,7 +21,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename > class FArray4D;
 template< typename > class FArray4P;
 template< typename > class FArray4A;
@@ -96,37 +96,37 @@ protected: // Creation
 	// Default Constructor
 	inline
 	FArray4() :
-		z1_( 0 ),
-		z2_( 0 ),
-		z3_( 0 )
+	 z1_( 0 ),
+	 z2_( 0 ),
+	 z3_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	FArray4( FArray4 const & a ) :
-		Super( a ),
-		z1_( a.z1_ ),
-		z2_( a.z2_ ),
-		z3_( a.z3_ )
+	 Super( a ),
+	 z1_( a.z1_ ),
+	 z2_( a.z2_ ),
+	 z3_( a.z3_ )
 	{}
 
 	// Copy Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray4( FArray4< U > const & a ) :
-		Super( a ),
-		z1_( a.z1_ ),
-		z2_( a.z2_ ),
-		z3_( a.z3_ )
+	 Super( a ),
+	 z1_( a.z1_ ),
+	 z2_( a.z2_ ),
+	 z3_( a.z3_ )
 	{}
 
 	// Slice Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray4( FArray4S< U > const & a ) :
-		Super( a )
+	 Super( a )
 	{}
 
 	// MArray Constructor Template
@@ -134,60 +134,60 @@ protected: // Creation
 	inline
 	explicit
 	FArray4( MArray4< A, M > const & a ) :
-		Super( a )
+	 Super( a )
 	{}
 
 	// Size Constructor
 	inline
 	explicit
 	FArray4( size_type const size ) :
-		Super( size )
+	 Super( size )
 	{}
 
 	// Size + InitializerSentinel Constructor
 	inline
 	FArray4( size_type const size, InitializerSentinel const & initialized ) :
-		Super( size, initialized )
+	 Super( size, initialized )
 	{}
 
 	// Initializer List Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray4( std::initializer_list< U > const l ) :
-		Super( l )
+	 Super( l )
 	{}
 
 	// Default Proxy Constructor
 	inline
 	FArray4( ProxySentinel const & proxy ) :
-		Super( proxy ),
-		z1_( 0 ),
-		z2_( 0 ),
-		z3_( 0 )
+	 Super( proxy ),
+	 z1_( 0 ),
+	 z2_( 0 ),
+	 z3_( 0 )
 	{}
 
 	// Copy Proxy Constructor
 	inline
 	FArray4( FArray4 const & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
+	 Super( a, proxy )
 	{}
 
 	// Base Proxy Constructor
 	inline
 	FArray4( Base const & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
+	 Super( a, proxy )
 	{}
 
 	// Tail Proxy Constructor
 	inline
 	FArray4( Tail const & s, ProxySentinel const & proxy ) :
-		Super( s, proxy )
+	 Super( s, proxy )
 	{}
 
 	// Value Proxy Constructor
 	inline
 	FArray4( T const & t, ProxySentinel const & proxy ) :
-		Super( t, proxy )
+	 Super( t, proxy )
 	{}
 
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
@@ -195,25 +195,25 @@ protected: // Creation
 	// Non-Const Copy Proxy Constructor
 	inline
 	FArray4( FArray4 & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
+	 Super( a, proxy )
 	{}
 
 	// Non-Const Base Proxy Constructor
 	inline
 	FArray4( Base & a, ProxySentinel const & proxy ) :
-		Super( a, proxy )
+	 Super( a, proxy )
 	{}
 
 	// Non-Const Tail Proxy Constructor
 	inline
 	FArray4( Tail & s, ProxySentinel const & proxy ) :
-		Super( s, proxy )
+	 Super( s, proxy )
 	{}
 
 	// Non-Const Value Proxy Constructor
 	inline
 	FArray4( T & t, ProxySentinel const & proxy ) :
-		Super( t, proxy )
+	 Super( t, proxy )
 	{}
 
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
@@ -226,7 +226,7 @@ public: // Creation
 	~FArray4()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -241,7 +241,7 @@ public: // Assignment
 	}
 
 	// Copy Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator =( FArray4< U > const & a )
@@ -287,7 +287,7 @@ public: // Assignment
 	}
 
 	// Slice Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator =( FArray4S< U > const & a )
@@ -329,7 +329,7 @@ public: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator =( std::initializer_list< U > const l )
@@ -339,7 +339,7 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator +=( FArray4< U > const & a )
@@ -350,7 +350,7 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator -=( FArray4< U > const & a )
@@ -361,7 +361,7 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator *=( FArray4< U > const & a )
@@ -372,35 +372,13 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator /=( FArray4< U > const & a )
 	{
 		assert( conformable( a ) );
 		Super::operator /=( a );
-		return *this;
-	}
-
-	// &&= Array Template
-	template< typename U >
-	inline
-	FArray4 &
-	and_equals( FArray4< U > const & a )
-	{
-		assert( conformable( a ) );
-		Super::and_equals( a );
-		return *this;
-	}
-
-	// ||= Array Template
-	template< typename U >
-	inline
-	FArray4 &
-	or_equals( FArray4< U > const & a )
-	{
-		assert( conformable( a ) );
-		Super::or_equals( a );
 		return *this;
 	}
 
@@ -546,78 +524,8 @@ public: // Assignment
 		return *this;
 	}
 
-	// &&= Slice
-	inline
-	FArray4 &
-	and_equals( FArray4S< T > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0 );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
-			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-							c[ l ] = a( i1, i2, i3, i4 );
-						}
-					}
-				}
-			}
-			for ( size_type i = 0; i < c.size(); ++i ) {
-				data_[ i ] = data_[ i ] && c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-							data_[ l ] = data_[ l ] && a( i1, i2, i3, i4 );
-						}
-					}
-				}
-			}
-		}
-		return *this;
-	}
-
-	// ||= Slice
-	inline
-	FArray4 &
-	or_equals( FArray4S< T > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0 );
-		if ( overlap( a ) ) { // Overlap-safe
-			CArray< T > c( a.size() );
-			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-							c[ l ] = a( i1, i2, i3, i4 );
-						}
-					}
-				}
-			}
-			for ( size_type i = 0; i < c.size(); ++i ) {
-				data_[ i ] = data_[ i ] || c[ i ];
-			}
-		} else { // Not overlap-safe
-			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-							data_[ l ] = data_[ l ] || a( i1, i2, i3, i4 );
-						}
-					}
-				}
-			}
-		}
-		return *this;
-	}
-
 	// += Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator +=( FArray4S< U > const & a )
@@ -637,7 +545,7 @@ public: // Assignment
 	}
 
 	// -= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator -=( FArray4S< U > const & a )
@@ -657,7 +565,7 @@ public: // Assignment
 	}
 
 	// *= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator *=( FArray4S< U > const & a )
@@ -677,7 +585,7 @@ public: // Assignment
 	}
 
 	// /= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4 &
 	operator /=( FArray4S< U > const & a )
@@ -690,46 +598,6 @@ public: // Assignment
 					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
 						assert( T( a( i1, i2, i3, i4 ) ) != T( 0 ) );
 						data_[ l ] /= a( i1, i2, i3, i4 );
-					}
-				}
-			}
-		}
-		return *this;
-	}
-
-	// &&= Slice Template
-	template< typename U >
-	inline
-	FArray4 &
-	and_equals( FArray4S< U > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0 );
-		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-						data_[ l ] = data_[ l ] && a( i1, i2, i3, i4 );
-					}
-				}
-			}
-		}
-		return *this;
-	}
-
-	// ||= Slice Template
-	template< typename U >
-	inline
-	FArray4 &
-	or_equals( FArray4S< U > const & a )
-	{
-		assert( conformable( a ) );
-		size_type l( 0 );
-		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
-						data_[ l ] = data_[ l ] || a( i1, i2, i3, i4 );
 					}
 				}
 			}
@@ -826,6 +694,140 @@ public: // Assignment
 		return *this;
 	}
 
+public: // Assignment: Array: Logical
+
+	// &&= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray4 &
+	and_equals( FArray4< U > const & a )
+	{
+		assert( conformable( a ) );
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray4 &
+	or_equals( FArray4< U > const & a )
+	{
+		assert( conformable( a ) );
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= Slice
+	inline
+	FArray4 &
+	and_equals( FArray4S< T > const & a )
+	{
+		assert( conformable( a ) );
+		size_type l( 0 );
+		if ( overlap( a ) ) { // Overlap-safe
+			CArray< T > c( a.size() );
+			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
+				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
+					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+							c[ l ] = a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+			for ( size_type i = 0; i < c.size(); ++i ) {
+				data_[ i ] = data_[ i ] && c[ i ];
+			}
+		} else { // Not overlap-safe
+			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
+				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
+					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+							data_[ l ] = data_[ l ] && a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// ||= Slice
+	inline
+	FArray4 &
+	or_equals( FArray4S< T > const & a )
+	{
+		assert( conformable( a ) );
+		size_type l( 0 );
+		if ( overlap( a ) ) { // Overlap-safe
+			CArray< T > c( a.size() );
+			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
+				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
+					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+							c[ l ] = a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+			for ( size_type i = 0; i < c.size(); ++i ) {
+				data_[ i ] = data_[ i ] || c[ i ];
+			}
+		} else { // Not overlap-safe
+			for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
+				for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
+					for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+						for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+							data_[ l ] = data_[ l ] || a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// &&= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray4 &
+	and_equals( FArray4S< U > const & a )
+	{
+		assert( conformable( a ) );
+		size_type l( 0 );
+		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
+			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
+				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+						data_[ l ] = data_[ l ] && a( i1, i2, i3, i4 );
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// ||= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray4 &
+	or_equals( FArray4S< U > const & a )
+	{
+		assert( conformable( a ) );
+		size_type l( 0 );
+		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
+			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
+				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
+					for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
+						data_[ l ] = data_[ l ] || a( i1, i2, i3, i4 );
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
 	// &&= MArray Template
 	template< class A, typename M >
 	inline
@@ -869,6 +871,8 @@ public: // Assignment
 		}
 		return *this;
 	}
+
+public: // Assignment: Value
 
 	// = Value
 	inline
@@ -1452,7 +1456,7 @@ public: // Inspector
 		}
 	}
 
-	// Upper Index of Dimension
+	// Upper Index of a Dimension
 	inline
 	int
 	u( int const d ) const

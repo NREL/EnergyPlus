@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/CArray.hh>
+#include <ObjexxFCL.unit.hh>
 
 using namespace ObjexxFCL;
 

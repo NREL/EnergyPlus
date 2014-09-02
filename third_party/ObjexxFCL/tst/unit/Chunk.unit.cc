@@ -16,6 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Chunk.hh>
 #include <ObjexxFCL/TypeTraits.hh>
+#include <ObjexxFCL.unit.hh>
 
 // C++ Headers
 #include <iomanip>

@@ -41,8 +41,8 @@ public: // Creation
 	// Default Constructor
 	inline
 	Required() :
-		ptr_( nullptr ),
-		own_( false )
+	 ptr_( nullptr ),
+	 own_( false )
 	{
 		assert( false ); // Required object not present
 	}
@@ -50,49 +50,49 @@ public: // Creation
 	// Copy Constructor
 	inline
 	Required( Required const & r ) :
-		ptr_( r.own_ ? new Value( r() ) : r.ptr_ ),
-		own_( r.own_ )
+	 ptr_( r.own_ ? new T( r() ) : r.ptr_ ),
+	 own_( r.own_ )
 	{
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Required Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	inline
-	Required( Required< U, Enable > const & o, typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type * = 0 ) :
-		ptr_( o.own_ ? new Value( o() ) : o.ptr_ ),
-		own_( o.own_ )
+	Required( Required< U, Enable > const & o ) :
+	 ptr_( o.own_ ? new T( o() ) : o.ptr_ ),
+	 own_( o.own_ )
 	{
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Value Constructor
 	inline
-	Required( Value const & val ) :
-		ptr_( const_cast< Value * >( &val ) ),
-		own_( false )
+	Required( T const & val ) :
+	 ptr_( const_cast< T * >( &val ) ),
+	 own_( false )
 	{}
 
 	// Value Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	Required( U const & val ) :
-		ptr_( new Value( val ) ), // Requires Value( U ) constructor
-		own_( true )
+	 ptr_( new T( val ) ), // Requires Value( U ) constructor
+	 own_( true )
 	{}
 
 	// rvalue Constructor
 	inline
-	Required( Value && val ) :
-		ptr_( new Value( val ) ), // Requires Value copy constructor
-		own_( true )
+	Required( T && val ) :
+	 ptr_( new T( val ) ), // Requires Value copy constructor
+	 own_( true )
 	{}
 
 	// Omit Constructor
 	inline
 	Required( Omit ) :
-		ptr_( nullptr ),
-		own_( false )
+	 ptr_( nullptr ),
+	 own_( false )
 	{
 		assert( false ); // Required object not present
 	}
@@ -112,7 +112,7 @@ public: // Assignment
 	operator =( Required const & r )
 	{
 		if ( own_ ) delete ptr_;
-		ptr_ = r.own_ ? new Value( r() ) : r.ptr_;
+		ptr_ = r.own_ ? new T( r() ) : r.ptr_;
 		assert( ptr_ != nullptr ); // Required object must be present
 		own_ = r.own_;
 		return *this;
@@ -121,7 +121,7 @@ public: // Assignment
 	// Value Assignment
 	inline
 	Required &
-	operator =( Value const & val )
+	operator =( T const & val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -129,7 +129,7 @@ public: // Assignment
 	}
 
 	// Value Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Required &
 	operator =( U const & val )
@@ -142,7 +142,7 @@ public: // Assignment
 	// rvalue Assignment
 	inline
 	Required &
-	operator =( Value && val )
+	operator =( T && val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -153,7 +153,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value const &() const
+	operator T const &() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -161,7 +161,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value &()
+	operator T &()
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -171,7 +171,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value const &
+	T const &
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -180,7 +180,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value &
+	T &
 	operator ()()
 	{
 		assert( ptr_ != nullptr );
@@ -229,7 +229,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Required const & a, Value const & b )
+	operator ==( Required const & a, T const & b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
@@ -238,7 +238,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Required const & a, Value const & b )
+	operator !=( Required const & a, T const & b )
 	{
 		return !( a == b );
 	}
@@ -247,7 +247,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Value const & a, Required const & b )
+	operator ==( T const & a, Required const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
@@ -256,14 +256,14 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Value const & a, Required const & b )
+	operator !=( T const & a, Required const & b )
 	{
 		return !( a == b );
 	}
 
 private: // Data
 
-	Value * ptr_; // Pointer to object
+	T * ptr_; // Pointer to object
 	bool own_; // Own the object?
 
 }; // Required
@@ -287,7 +287,7 @@ public: // Creation
 	// Default Constructor
 	inline
 	Required() :
-		ptr_( nullptr )
+	 ptr_( nullptr )
 	{
 		assert( false ); // Required object not present
 	}
@@ -295,30 +295,30 @@ public: // Creation
 	// Copy Constructor
 	inline
 	Required( Required const & r ) :
-		ptr_( r.ptr_ )
+	 ptr_( r.ptr_ )
 	{
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Required Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type >
 	inline
-	Required( Required< U, EnableType > const & o, typename std::enable_if< std::is_const< T >::value && std::is_same< U, typename std::remove_const< T >::type >::value >::type * = 0 ) :
-		ptr_( o.ptr_ )
+	Required( Required< U, EnableType > const & o ) :
+	 ptr_( o.ptr_ )
 	{
 		assert( ptr_ != nullptr ); // Required object must be present
 	}
 
 	// Value Constructor
 	inline
-	Required( Value const & val ) :
-		ptr_( const_cast< Value * >( &val ) )
+	Required( T const & val ) :
+	 ptr_( const_cast< T * >( &val ) )
 	{}
 
 	// Omit Constructor
 	inline
 	Required( Omit ) :
-		ptr_( nullptr )
+	 ptr_( nullptr )
 	{
 		assert( false ); // Required object not present
 	}
@@ -343,7 +343,7 @@ public: // Assignment
 	// Value Assignment
 	inline
 	Required &
-	operator =( Value const & val )
+	operator =( T const & val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -351,7 +351,7 @@ public: // Assignment
 	}
 
 	// Value Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Required &
 	operator =( U const & val )
@@ -364,7 +364,7 @@ public: // Assignment
 	// rvalue Assignment
 	inline
 	Required &
-	operator =( Value && val )
+	operator =( T && val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -375,7 +375,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value const &() const
+	operator T const &() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -383,7 +383,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value &()
+	operator T &()
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -393,7 +393,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value const &
+	T const &
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -402,7 +402,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value &
+	T &
 	operator ()()
 	{
 		assert( ptr_ != nullptr );
@@ -443,7 +443,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Required const & a, Value const & b )
+	operator ==( Required const & a, T const & b )
 	{
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
 	}
@@ -452,7 +452,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Required const & a, Value const & b )
+	operator !=( Required const & a, T const & b )
 	{
 		return !( a == b );
 	}
@@ -461,7 +461,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Value const & a, Required const & b )
+	operator ==( T const & a, Required const & b )
 	{
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
 	}
@@ -470,14 +470,14 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Value const & a, Required const & b )
+	operator !=( T const & a, Required const & b )
 	{
 		return !( a == b );
 	}
 
 private: // Data
 
-	Value * ptr_; // Pointer
+	T * ptr_; // Pointer
 
 }; // Required
 

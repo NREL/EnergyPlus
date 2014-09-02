@@ -18,14 +18,15 @@
 #include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
+#include <ObjexxFCL.unit.hh>
 
 using namespace ObjexxFCL;
 
 struct C
 {
 	C( int const m_ = 0, float const x_ = 0.0f ) :
-		m( m_ ),
-		x( x_ )
+	 m( m_ ),
+	 x( x_ )
 	{}
 
 	int m;
