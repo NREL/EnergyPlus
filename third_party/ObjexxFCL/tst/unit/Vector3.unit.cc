@@ -87,7 +87,7 @@ TEST( Vector3Test, InitializerList )
 	EXPECT_EQ( 88, v.x );
 	EXPECT_EQ( 110, v.y );
 	EXPECT_EQ( 132, v.z );
-	v /= 2;
+	v /= 2.0;
 	EXPECT_EQ( 44, v.x );
 	EXPECT_EQ( 55, v.y );
 	EXPECT_EQ( 66, v.z );

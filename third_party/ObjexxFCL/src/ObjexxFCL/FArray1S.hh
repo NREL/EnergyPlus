@@ -1031,13 +1031,28 @@ public: // Assignment: Value
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray1S &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( int i = 1; i <= u_; ++i ) {
-			operator ()( i ) /= t;
+			operator ()( i ) *= inv_u;
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	FArray1S &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( int i = 1; i <= u_; ++i ) {
+			operator ()( i ) /= u;
 		}
 		return *this;
 	}

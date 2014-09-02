@@ -806,13 +806,28 @@ public: // Assignment: Value
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator ()( i ) /= t;
+			operator ()( i ) *= inv_u;
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	MArray1 &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( int i = 1, e = u(); i <= e; ++i ) {
+			operator ()( i ) /= u;
 		}
 		return *this;
 	}

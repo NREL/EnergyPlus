@@ -435,16 +435,37 @@ public: // Assignment: Value
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray4 &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( int i4 = 1, e4 = u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 					for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-						operator ()( i1, i2, i3, i4 ) /= t;
+						operator ()( i1, i2, i3, i4 ) *= inv_u;
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	MArray4 &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( int i4 = 1, e4 = u4(); i4 <= e4; ++i4 ) {
+			for ( int i3 = 1, e3 = u3(); i3 <= e3; ++i3 ) {
+				for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
+					for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
+						operator ()( i1, i2, i3, i4 ) /= u;
 					}
 				}
 			}

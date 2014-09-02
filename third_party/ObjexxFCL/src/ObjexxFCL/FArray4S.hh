@@ -867,16 +867,37 @@ public: // Assignment: Value
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator ()( i1, i2, i3, i4 ) /= t;
+						operator ()( i1, i2, i3, i4 ) *= inv_u;
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	FArray4S &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						operator ()( i1, i2, i3, i4 ) /= u;
 					}
 				}
 			}

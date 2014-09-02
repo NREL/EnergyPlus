@@ -438,7 +438,7 @@ public: // Assignment
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_same< T, U >::value >::type, typename = void >
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 	inline
 	Vector3 &
 	operator /=( U const & u )
@@ -452,7 +452,7 @@ public: // Assignment
 	}
 
 	// /= Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_same< T, U >::value >::type, typename = void, typename = void >
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void, typename = void >
 	inline
 	Vector3 &
 	operator /=( U const & u )
@@ -1151,7 +1151,7 @@ public: // Generators
 	}
 
 	// Vector3 / Value
-	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_same< T, U >::value >::type >
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	friend
 	inline
 	Vector3
@@ -1163,7 +1163,7 @@ public: // Generators
 	}
 
 	// Vector3 / Value
-	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_same< T, U >::value >::type, typename = void >
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
 	friend
 	inline
 	Vector3

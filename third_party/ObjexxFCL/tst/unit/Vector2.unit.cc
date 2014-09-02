@@ -71,7 +71,7 @@ TEST( Vector2Test, InitializerList )
 	v *= 2;
 	EXPECT_EQ( 88, v.x );
 	EXPECT_EQ( 110, v.y );
-	v /= 2;
+	v /= 2.0;
 	EXPECT_EQ( 44, v.x );
 	EXPECT_EQ( 55, v.y );
 	v.negate();

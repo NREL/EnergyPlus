@@ -1057,15 +1057,32 @@ public: // Assignment: Value
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
 		proxy_const_assert( not_const_proxy() );
 		assert( size_bounded() );
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] /= t;
+			data_[ i ] *= inv_u;
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	FArray &
+	operator /=( U const & u )
+	{
+		proxy_const_assert( not_const_proxy() );
+		assert( size_bounded() );
+		assert( u != U( 0 ) );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] /= u;
 		}
 		return *this;
 	}
