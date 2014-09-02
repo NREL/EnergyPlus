@@ -16,7 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Backspace.hh>
 #include <ObjexxFCL/Read.hh>
-#include <ObjexxFCL.unit.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <sstream>

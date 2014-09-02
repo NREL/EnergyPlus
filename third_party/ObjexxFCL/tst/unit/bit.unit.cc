@@ -15,7 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/bit.hh>
-#include <ObjexxFCL.unit.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <cstdint>

@@ -22,7 +22,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/Vector3.hh>
-#include <ObjexxFCL.unit.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <array>

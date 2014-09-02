@@ -16,6 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Vector2.hh>
 #include <ObjexxFCL/FArray1D.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <array>

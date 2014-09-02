@@ -16,7 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/DimensionSlice.hh>
 #include <ObjexxFCL/StaticIndexRange.hh>
-#include <ObjexxFCL.unit.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 

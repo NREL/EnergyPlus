@@ -18,7 +18,7 @@
 #include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
-#include <ObjexxFCL.unit.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 
