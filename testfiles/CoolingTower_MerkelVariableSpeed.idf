@@ -7195,7 +7195,7 @@
     AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
     WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
     WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-	,				 		 !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type (default: UseLeavingCondenserWaterTemperature)
+    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.1,                     !- Minimum Part Load Ratio
     1,                       !- Maximum Part Load Ratio
@@ -7229,7 +7229,7 @@
     AutoSize,                !- Reference Condenser Water Flow Rate {m3/s}
     WC Screw Default 90.1-2004 Cap_fT,  !- Cooling Capacity Function of Temperature Curve Name
     WC Screw Default 90.1-2004 EIR_fT,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
-	,				 		 !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type (default: UseLeavingCondenserWaterTemperature)
+    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     ReformEIRChiller Carrier 19XR 1259kW/6.26COP/Vanes EIRFPLR,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.1,                     !- Minimum Part Load Ratio
     1,                       !- Maximum Part Load Ratio
