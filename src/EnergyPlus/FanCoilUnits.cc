@@ -2288,8 +2288,6 @@ namespace FanCoilUnits {
 
 	}
 
-	// I'm going to insert my new function here - FB
-
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
