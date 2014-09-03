@@ -101,7 +101,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
 ! HVAC SYSTEM 1
 !  AirLoopHVAC:UnitaryHeatPump:WaterToAir,
@@ -154,7 +154,7 @@
     ,                        !- Latent Load Control
     Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
-    SupplyAirFlowRate,       !- Supply air Flow Rate Method During Cooling Operation
+    SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     1.0,                     !- Supply Air Flow Rate During Cooling Operation {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
@@ -164,7 +164,7 @@
     ,                        !- Supply Air Flow Rate Per Floor Area during Heating Operation {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
-    SupplyAirFlowRate,       !- Supply air Flow Rate Method When No Cooling or Heating is Required
+    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
     0.00,                    !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
@@ -3889,7 +3889,7 @@
   Fan:OnOff,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4072,7 +4072,7 @@
   Fan:OnOff,
     Supply Fan 2,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4255,7 +4255,7 @@
   Fan:OnOff,
     Supply Fan 3,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4438,7 +4438,7 @@
   Fan:OnOff,
     Supply Fan 4,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4621,7 +4621,7 @@
   Fan:OnOff,
     Supply Fan 5,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4658,7 +4658,7 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowGroundTemperature,
     MyCondenserControl,      !- Name

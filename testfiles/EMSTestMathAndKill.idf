@@ -68,7 +68,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -4181,7 +4181,7 @@
   Fan:ConstantVolume,
     PSZ-AC:1_Fan,            !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.174028,                !- Fan Efficiency
+    0.174028,                !- Fan Total Efficiency
     330,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8250,                  !- Motor Efficiency
@@ -4465,7 +4465,7 @@
   Fan:ConstantVolume,
     PSZ-AC:2_Fan,            !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.174028,                !- Fan Efficiency
+    0.174028,                !- Fan Total Efficiency
     330,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8250,                  !- Motor Efficiency
@@ -4749,7 +4749,7 @@
   Fan:ConstantVolume,
     PSZ-AC:3_Fan,            !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.174028,                !- Fan Efficiency
+    0.174028,                !- Fan Total Efficiency
     330,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8250,                  !- Motor Efficiency
@@ -5033,7 +5033,7 @@
   Fan:ConstantVolume,
     PSZ-AC:4_Fan,            !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.174028,                !- Fan Efficiency
+    0.174028,                !- Fan Total Efficiency
     330,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8250,                  !- Motor Efficiency
@@ -5317,7 +5317,7 @@
   Fan:ConstantVolume,
     PSZ-AC:5_Fan,            !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.174028,                !- Fan Efficiency
+    0.174028,                !- Fan Total Efficiency
     330,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8250,                  !- Motor Efficiency

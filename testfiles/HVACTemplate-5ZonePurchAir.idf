@@ -97,7 +97,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -1937,7 +1937,6 @@
   Output:Variable,SPACE4-1 Ideal Loads Outdoor Air Inlet,System Node Standard Density Volume Flow Rate,hourly;
 
   Output:Variable,SPACE5-1 Ideal Loads Outdoor Air Inlet,System Node Standard Density Volume Flow Rate,hourly;
-
 
   Output:VariableDictionary,IDF;
 

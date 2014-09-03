@@ -193,7 +193,7 @@
 !
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -5607,7 +5607,7 @@
   Fan:ConstantVolume,
     Cooler_1UnitHeatFan,     !- Name
     UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -5683,7 +5683,7 @@
   Fan:ConstantVolume,
     Cooler_2UnitHeatFan,     !- Name
     UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -5755,7 +5755,7 @@
   Fan:ConstantVolume,
     Cooler_3UnitHeatFan,     !- Name
     UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -5829,7 +5829,7 @@
   Fan:ConstantVolume,
     DockUnitHeatFan,         !- Name
     UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     5.,                      !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -13341,13 +13341,6 @@
   Output:Variable,*,Zone Mixing Total Heat Loss Energy,hourly;
 
   Output:Variable,*,Zone Mixing Total Heat Gain Energy,hourly;
-  
-  Output:Variable,*,Zone Zone Mixing Mass Flow Rate,hourly;
-
-  Output:Variable,*,Zone Zone Mixing Current Density Volumetric Flow Rate,hourly;
- 
-  Output:Variable,*,Zone Zone Mixing Standard Density Volumetric Flow Rate,hourly;
-
 
   Output:Variable,*,Refrigeration Zone Air Chiller Sensible Heat Ratio,hourly;
 

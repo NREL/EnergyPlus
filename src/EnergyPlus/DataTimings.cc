@@ -305,7 +305,7 @@ namespace DataTimings {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -322,16 +322,16 @@ namespace DataTimings {
 #endif
 #ifdef EP_Timings
 		EchoInputFile = FindUnitNumber( "eplusout.audit" );
-		gio::write( EchoInputFile, fmta ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
+		gio::write( EchoInputFile, fmtA ) << "Timing Element" + tabchar + "# calls" + tabchar + "Time {s}" + tabchar + "Time {s} (per call)";
 
 		for ( loop = 1; loop <= NumTimingElements; ++loop ) {
 			if ( Timing( loop ).calls > 0 ) {
-				gio::write( EchoInputFile, fmta ) << Timing( loop ).Element + tabchar + RoundSigDigits( Timing( loop ).calls ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum / double( Timing( loop ).calls ), 3 );
+				gio::write( EchoInputFile, fmtA ) << Timing( loop ).Element + tabchar + RoundSigDigits( Timing( loop ).calls ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum / double( Timing( loop ).calls ), 3 );
 			} else {
-				gio::write( EchoInputFile, fmta ) << Timing( loop ).Element + tabchar + RoundSigDigits( Timing( loop ).calls ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) + tabchar + RoundSigDigits( -999.0, 3 );
+				gio::write( EchoInputFile, fmtA ) << Timing( loop ).Element + tabchar + RoundSigDigits( Timing( loop ).calls ) + tabchar + RoundSigDigits( Timing( loop ).currentTimeSum, 3 ) + tabchar + RoundSigDigits( -999.0, 3 );
 			}
 		}
-		gio::write( EchoInputFile, fmta ) << "Time from CPU_Time" + tabchar + RoundSigDigits( TimeUsed_CPUTime, 3 );
+		gio::write( EchoInputFile, fmtA ) << "Time from CPU_Time" + tabchar + RoundSigDigits( TimeUsed_CPUTime, 3 );
 #endif
 
 	}

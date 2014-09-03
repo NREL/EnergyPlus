@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -2627,7 +2627,7 @@
   Fan:ConstantVolume,
     Zone1UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2638,7 +2638,7 @@
   Fan:ConstantVolume,
     Zone2UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2649,7 +2649,7 @@
   Fan:ConstantVolume,
     Zone3UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2660,7 +2660,7 @@
   Fan:ConstantVolume,
     Zone4UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2671,7 +2671,7 @@
   Fan:ConstantVolume,
     Zone5UnitVentFan,        !- Name
     UnitVentAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

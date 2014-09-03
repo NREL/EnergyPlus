@@ -990,7 +990,7 @@ namespace EvaporativeCoolers {
 			//******************************************************************************
 			//   SAT EFF IS FOR DIFFERENT THICKNESS CELDEK PAD (CURVE FIT FROM DATA)
 			//******************************************************************************
-			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * std::pow( PadDepth, 2 ) + 2.62659e-2 * std::pow( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * std::pow( PadDepth, 2 ) - 1.89919e-2 * std::pow( AirVel, 3 ) * PadDepth + 1.13137 * std::pow( PadDepth, 3 ) * AirVel + 3.27622e-2 * std::pow( AirVel, 3 ) * std::pow( PadDepth, 2 ) - 0.145384 * std::pow( PadDepth, 3 ) * std::pow( AirVel, 2 );
+			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * pow_2( PadDepth ) + 2.62659e-2 * pow_2( AirVel ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * pow_2( PadDepth ) - 1.89919e-2 * pow_3( AirVel ) * PadDepth + 1.13137 * pow_3( PadDepth ) * AirVel + 3.27622e-2 * pow_3( AirVel ) * pow_2( PadDepth ) - 0.145384 * pow_3( PadDepth ) * pow_2( AirVel );
 
 			if ( SatEff >= 1.0 ) SatEff = 1.0;
 			if ( SatEff < 0.0 ) { // we have a serious problem.  Pad Area and/or depth not suitable for system air flow rates
@@ -1122,7 +1122,7 @@ namespace EvaporativeCoolers {
 			//******************************************************************************
 			//   SAT EFF IS FOR DIFFERENT THICKNESS CELDEK PAD (CURVE FIT FROM DATA)
 			//******************************************************************************
-			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * std::pow( PadDepth, 2 ) + 2.62659e-2 * std::pow( AirVel, 2 ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * std::pow( PadDepth, 2 ) - 1.89919e-2 * std::pow( AirVel, 3 ) * PadDepth + 1.13137 * std::pow( PadDepth, 3 ) * AirVel + 3.27622e-2 * std::pow( AirVel, 3 ) * std::pow( PadDepth, 2 ) - 0.145384 * std::pow( PadDepth, 3 ) * std::pow( AirVel, 2 );
+			SatEff = 0.792714 + 0.958569 * PadDepth - 0.25193 * AirVel - 1.03215 * pow_2( PadDepth ) + 2.62659e-2 * pow_2( AirVel ) + 0.914869 * PadDepth * AirVel - 1.48241 * AirVel * pow_2( PadDepth ) - 1.89919e-2 * pow_3( AirVel ) * PadDepth + 1.13137 * pow_3( PadDepth ) * AirVel + 3.27622e-2 * pow_3( AirVel ) * pow_2( PadDepth ) - 0.145384 * pow_3( PadDepth ) * pow_2( AirVel );
 
 			if ( SatEff >= 1.0 ) SatEff = 1.0;
 			EvapCond( EvapCoolNum ).SatEff = SatEff;
@@ -2166,7 +2166,6 @@ namespace EvaporativeCoolers {
 
 				if ( ! lAlphaBlanks( 3 ) ) {
 					ZoneEvapUnit( UnitLoop ).AvailManagerListName = Alphas( 3 );
-					ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitLoop ).AvailManagerListName = Alphas( 3 );
 				}
 
 				ZoneEvapUnit( UnitLoop ).OAInletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_OutsideAir, 1, ObjectIsParent );
@@ -2389,6 +2388,7 @@ namespace EvaporativeCoolers {
 		using DataGlobals::HourOfDay;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
+		using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataHVACGlobals::ZoneComp;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -2414,6 +2414,7 @@ namespace EvaporativeCoolers {
 		static bool MyOneTimeFlag( true ); // one time flag
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MyFanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		bool errFlag;
 		int Loop;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
@@ -2426,12 +2427,18 @@ namespace EvaporativeCoolers {
 			MyEnvrnFlag = true;
 			MyFanFlag.allocate( NumZoneEvapUnits );
 			MyFanFlag = true;
+			MyZoneEqFlag.allocate ( NumZoneEvapUnits );
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( ZoneEvapUnit( UnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( UnitNum ).ZoneNum = ZoneNum;
-			ZoneEvapUnit( UnitNum ).FanAvailStatus = ZoneComp( ZoneEvapUnit( UnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( UnitNum ).AvailStatus;
+			if ( MyZoneEqFlag( UnitNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitNum ).AvailManagerListName = ZoneEvapUnit( UnitNum ).AvailManagerListName;
+				ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( UnitNum ) = false;
+			}
+			ZoneEvapUnit( UnitNum ).FanAvailStatus = ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitNum ).AvailStatus;
 		}
 
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
@@ -2464,14 +2471,12 @@ namespace EvaporativeCoolers {
 		if ( ZoneEvapUnit( UnitNum ).FanAvailSchedPtr > 0 ) {
 			// include fan is not available, then unit is not available
 			if ( ( GetCurrentScheduleValue( ZoneEvapUnit( UnitNum ).FanAvailSchedPtr ) > 0.0 ) && ( GetCurrentScheduleValue( ZoneEvapUnit( UnitNum ).AvailSchedIndex ) > 0.0 ) ) {
-				// .AND. ( ZoneComp(ZoneEvapUnit(UnitNum)%ZoneEquipType)%ZoneCompAvailMgrs(UnitNum)%AvailStatus) ) THEN
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = true;
 			} else {
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = false;
 			}
 		} else {
 			if ( GetCurrentScheduleValue( ZoneEvapUnit( UnitNum ).AvailSchedIndex ) > 0.0 ) {
-				//.AND. ( ZoneComp(ZoneEvapUnit(UnitNum)%ZoneEquipType)%ZoneCompAvailMgrs(UnitNum)%AvailStatus) )THEN
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = true;
 			} else {
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = false;

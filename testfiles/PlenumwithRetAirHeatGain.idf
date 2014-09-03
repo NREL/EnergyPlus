@@ -9,7 +9,7 @@
 ! plenum zone back to the system air loop.  The cooling coil is water with a chilled water plant loop and the
 ! reheat coil is a gas fired coil.  The surfaces between the main zone and the plenum are interzone.
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,4;
 
@@ -1155,7 +1155,7 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name
@@ -1454,7 +1454,7 @@
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     1.5,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

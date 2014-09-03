@@ -82,7 +82,7 @@
 ! Utility Tariffs:                Yes, PSI Indiana year 2004.
 !**********************************VERSION IDENTIFIER****************************************
 
-  Version,8.1;
+  Version,8.2;
 
 !********************************************************************************************
 !***********************COMMON PLANT LOOP SCHEDULES AND SCHEDULETYPELIMITS*******************
@@ -548,7 +548,7 @@
     Condenser Loop Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Loop Demand Branches,  !- Demand Side Branch List Name
     Condenser Loop Demand Connectors,  !- Demand Side Connector List Name
-    SEQUENTIAL;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
 !========================CONDENSER LOOP SUPPLY SIDE LOOP CONSTRUCTION========================
 !-----------------------LISTING AND MODELING ALL THE SUPPLY SIDE BRANCHES--------------------
@@ -5080,7 +5080,7 @@
   Fan:VariableVolume,
     VAV WITH REHEAT Fan,     !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.4,                     !- Fan Efficiency
+    0.4,                     !- Fan Total Efficiency
     500,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method

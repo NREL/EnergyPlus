@@ -1154,7 +1154,6 @@ namespace PackagedTerminalHeatPump {
 
 			if ( ! lAlphaBlanks( 17 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 17 );
-				ZoneComp( PkgTermHPAirToAir_Num ).ZoneCompAvailMgrs( PTUnitNum ).AvailManagerListName = Alphas( 17 );
 			}
 
 			//   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
@@ -1692,7 +1691,6 @@ namespace PackagedTerminalHeatPump {
 
 			if ( ! lAlphaBlanks( 15 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 15 );
-				ZoneComp( PkgTermACAirToAir_Num ).ZoneCompAvailMgrs( PTUnitNum ).AvailManagerListName = Alphas( 15 );
 			}
 			//   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
 			//                              UseCompressorOffFlow = operate at value specified by user
@@ -2127,7 +2125,6 @@ namespace PackagedTerminalHeatPump {
 
 			if ( ! lAlphaBlanks( 18 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 18 );
-				ZoneComp( PkgTermHPWaterToAir_Num ).ZoneCompAvailMgrs( PTUnitNum ).AvailManagerListName = Alphas( 18 );
 			}
 
 			// Get AirTerminal mixer data
@@ -2678,6 +2675,7 @@ namespace PackagedTerminalHeatPump {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
+		using DataZoneEquipment::ZoneEquipSimulatedOnce;
 		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
@@ -2730,6 +2728,7 @@ namespace PackagedTerminalHeatPump {
 		static FArray1D_bool MySizeFlag; // used for sizing PTHP inputs one time
 		static FArray1D_bool MyFanFlag; // used for sizing PTHP fan inputs one time
 		static FArray1D_bool MyPlantScanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 QActual; // actual PTAC steam heating coil load met (W)
 		bool ErrorsFound; // flag returned from mining call
 		Real64 QToCoolSetPt;
@@ -2760,17 +2759,23 @@ namespace PackagedTerminalHeatPump {
 			MySizeFlag.allocate( NumPTUs );
 			MyFanFlag.allocate( NumPTUs );
 			MyPlantScanFlag.allocate( NumPTUs );
+			MyZoneEqFlag.allocate ( NumPTUs );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyFanFlag = true;
 			MyPlantScanFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
 			PTObjectIndex = PTUnit( PTUnitNum ).PTObjectIndex;
-			ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( PTUnitNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).AvailManagerListName = PTUnit( PTUnitNum ).AvailManagerListName;
+				ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( PTUnitNum ) = false;
+			}
 			PTUnit( PTUnitNum ).AvailStatus = ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).AvailStatus;
 		}
 
@@ -3822,6 +3827,7 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3945,7 +3951,7 @@ namespace PackagedTerminalHeatPump {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						CalcPTUnit( PTUnitNum, FirstHVACIteration, PartLoadFrac, TempOutput, QZnReq, OnOffAirFlowRatio, SupHeaterLoad, HXUnitOn );
 						if ( PTUnit( PTUnitNum ).IterErrIndex == 0 ) {
-							gio::write( IterNum, "*" ) << MaxIte;
+							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
 							ShowWarningError( PTUnit( PTUnitNum ).UnitType + " \"" + PTUnit( PTUnitNum ).Name + "\"" );
 							ShowContinueError( " Iteration limit exceeded calculating packaged terminal unit part-load ratio, " "maximum iterations = " + IterNum );
@@ -4439,7 +4445,7 @@ namespace PackagedTerminalHeatPump {
 
 			} else {
 				// Calculate PLF
-				A = 4. * tau * ( Nmax / 3600. ) * ( 1 - PLR / PLF1 );
+				A = 4.0 * tau * ( Nmax / 3600.0 ) * ( 1 - PLR / PLF1 );
 				if ( A < 1.5e-3 ) {
 					// A safety check to prevent PLF2 = 1 - A * (1 - Exp(-1 / A))
 					// from "float underflow error". Occurs when PLR is very close to 1.0,
@@ -4683,7 +4689,7 @@ namespace PackagedTerminalHeatPump {
 		OpMode = int( Par()( 4 ) );
 		QZnReq = Par()( 5 );
 		QZnReqTemp = QZnReq;
-		if ( std::abs( QZnReq ) < 100. ) QZnReqTemp = sign( 100., QZnReq );
+		if ( std::abs( QZnReq ) < 100.0 ) QZnReqTemp = sign( 100.0, QZnReq );
 		OnOffAirFlowRatio = Par()( 6 );
 		SupHeaterLoad = Par()( 7 ) * PartLoadFrac;
 		if ( Par()( 8 ) == 1.0 ) {

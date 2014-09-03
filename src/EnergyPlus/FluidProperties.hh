@@ -950,7 +950,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1< Real64 > const & Array, // Array of values in ascending order
+		FArray1D< Real64 > const & Array, // Array of values in ascending order
 		int const LowBound, // Valid values lower bound (set by calling program)
 		int const UpperBound // Valid values upper bound (set by calling program)
 	);
@@ -958,7 +958,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1< Real64 > const & Array // Array of values in ascending order
+		FArray1D< Real64 > const & Array // Array of values in ascending order
 	);
 
 	//*****************************************************************************
@@ -966,9 +966,9 @@ namespace FluidProperties {
 	Real64
 	GetInterpolatedSatProp(
 		Real64 const Temperature, // Saturation Temp.
-		FArray1< Real64 > const & PropTemps, // Array of temperature at which props are available
-		FArray1< Real64 > const & LiqProp, // Array of saturated liquid properties
-		FArray1< Real64 > const & VapProp, // Array of saturatedvapour properties
+		FArray1D< Real64 > const & PropTemps, // Array of temperature at which props are available
+		FArray1D< Real64 > const & LiqProp, // Array of saturated liquid properties
+		FArray1D< Real64 > const & VapProp, // Array of saturatedvapour properties
 		Real64 const Quality, // Quality
 		std::string const & CalledFrom, // routine this function was called from (error messages)
 		int const LowBound, // Valid values lower bound (set by calling program)

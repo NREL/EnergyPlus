@@ -75,7 +75,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  VERSION,8.1;
+  VERSION,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -86364,7 +86364,7 @@
   Fan:ConstantVolume,
     SYS-1 Supply Fan,        !- Name
     FAN-SCHED,               !- Availability Schedule Name
-    0.6,                     !- Fan Efficiency
+    0.6,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

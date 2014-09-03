@@ -536,7 +536,6 @@ namespace FanCoilUnits {
 
 			if ( ! lAlphaBlanks( 15 ) ) {
 				FanCoil( FanCoilNum ).AvailManagerListName = Alphas( 15 );
-				ZoneComp( FanCoil4Pipe_Num ).ZoneCompAvailMgrs( FanCoilNum ).AvailManagerListName = Alphas( 15 );
 			}
 
 			errFlag = false;
@@ -778,6 +777,7 @@ namespace FanCoilUnits {
 		int Loop;
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MyPlantScanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 rho;
 		bool errFlag;
 
@@ -789,15 +789,21 @@ namespace FanCoilUnits {
 			MyEnvrnFlag.allocate( NumFanCoils );
 			MySizeFlag.allocate( NumFanCoils );
 			MyPlantScanFlag.allocate( NumFanCoils );
+			MyZoneEqFlag.allocate ( NumFanCoils );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( FanCoil4Pipe_Num ).ZoneCompAvailMgrs( FanCoilNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( FanCoilNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( FanCoil4Pipe_Num ).ZoneCompAvailMgrs( FanCoilNum ).AvailManagerListName = FanCoil( FanCoilNum ).AvailManagerListName;
+				ZoneComp( FanCoil4Pipe_Num ).ZoneCompAvailMgrs( FanCoilNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( FanCoilNum ) = false;
+			}
 			FanCoil( FanCoilNum ).AvailStatus = ZoneComp( FanCoil4Pipe_Num ).ZoneCompAvailMgrs( FanCoilNum ).AvailStatus;
 		}
 
@@ -852,7 +858,7 @@ namespace FanCoilUnits {
 			// set the mass flow rates from the input volume flow rates
 			FanCoil( FanCoilNum ).MaxAirMassFlow = RhoAir * FanCoil( FanCoilNum ).MaxAirVolFlow;
 			FanCoil( FanCoilNum ).OutAirMassFlow = RhoAir * FanCoil( FanCoilNum ).OutAirVolFlow;
-			rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60., PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineName );
+			rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 			FanCoil( FanCoilNum ).MaxHotWaterFlow = rho * FanCoil( FanCoilNum ).MaxHotWaterVolFlow;
 			FanCoil( FanCoilNum ).MinHotWaterFlow = rho * FanCoil( FanCoilNum ).MinHotWaterVolFlow;
@@ -1142,9 +1148,9 @@ namespace FanCoilUnits {
 						DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow * ( CoilOutTemp - CoilInTemp );
 						FanCoil( FanCoilNum ).DesHeatingLoad = DesCoilLoad;
 						if ( DesCoilLoad >= SmallLoad ) {
-							rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60., PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
+							rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
 
-							Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60., PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
+							Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( FanCoil( FanCoilNum ).HWLoopNum ).FluidIndex, RoutineNameNoSpace );
 
 							MaxHotWaterVolFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 						} else {
@@ -1221,9 +1227,9 @@ namespace FanCoilUnits {
 						FanCoil( FanCoilNum ).DesCoolingLoad = DesCoilLoad;
 						if ( DesCoilLoad >= SmallLoad ) {
 
-							rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, 5., PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineNameNoSpace );
+							rho = GetDensityGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineNameNoSpace );
 
-							Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, 5., PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineNameNoSpace );
+							Cp = GetSpecificHeatGlycol( PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidName, 5.0, PlantLoop( FanCoil( FanCoilNum ).CWLoopNum ).FluidIndex, RoutineNameNoSpace );
 
 							MaxColdWaterVolFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
 						} else {

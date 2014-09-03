@@ -709,7 +709,7 @@ public: // Inspector
 	back() const
 	{
 		assert( size_ > 0u );
-		return operator()( size_ );
+		return operator ()( size_ );
 	}
 
 	// Length
@@ -721,7 +721,8 @@ public: // Inspector
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			Chunk_type & chunk( chunks_[ i ] );
 			for ( size_type j = 0, je = chunk.size(); j < je; ++j ) {
-				length_sq += square( chunk[ j ] );
+				T const chunk_j( chunk[ j ] );
+				length_sq += chunk_j * chunk_j;
 			}
 		}
 		return std::sqrt( length_sq );
@@ -736,7 +737,8 @@ public: // Inspector
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			Chunk_type & chunk( chunks_[ i ] );
 			for ( size_type j = 0, je = chunk.size(); j < je; ++j ) {
-				length_sq += square( chunk[ j ] );
+				T const chunk_j( chunk[ j ] );
+				length_sq += chunk_j * chunk_j;
 			}
 		}
 		return length_sq;
@@ -759,7 +761,7 @@ public: // Modifier
 	back()
 	{
 		assert( size_ > 0u );
-		return operator()( size_ );
+		return operator ()( size_ );
 	}
 
 	// Append an Element
@@ -1045,17 +1047,6 @@ private: // Functions
 		return *this;
 	}
 
-private: // Static Methods
-
-	// square( x ) == x^2
-	inline
-	static
-	T
-	square( T const & x )
-	{
-		return x * x;
-	}
-
 private: // Data
 
 	size_type size_; // Number of elements
@@ -1071,6 +1062,64 @@ private: // Data
 }; // ChunkVector
 
 // Functions
+
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( ChunkVector< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( ChunkVector< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return mag_sq;
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( ChunkVector< T > const & a, ChunkVector< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( ChunkVector< T > const & a, ChunkVector< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
 
 // Dot Product
 template< typename T >
@@ -1098,34 +1147,6 @@ dot_product( ChunkVector< T > const & a, ChunkVector< T > const & b )
 		sum += a[ i ] * b[ i ];
 	}
 	return sum;
-}
-
-// Distance
-template< typename T >
-inline
-T
-distance( ChunkVector< T > const & a, ChunkVector< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return std::sqrt( distance_sq );
-}
-
-// Distance Squared
-template< typename T >
-inline
-T
-distance_squared( ChunkVector< T > const & a, ChunkVector< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return distance_sq;
 }
 
 // Swap
