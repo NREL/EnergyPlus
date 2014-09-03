@@ -4608,6 +4608,13 @@ namespace HVACUnitarySystem {
 						errFlag = false;
 					}
 
+					UnitarySystem( UnitarySysNum ).DesignHeatingCapacity = GetWtoAHPCoilCapacity( HeatingCoilType, HeatingCoilName, errFlag );
+					if ( errFlag ) {
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
+						ErrorsFound = true;
+						errFlag = false;
+					}
+
 					// Get the Heating Coil Inlet Node
 					errFlag = false;
 					HeatingCoilInletNode = GetWtoAHPCoilInletNode( HeatingCoilType, HeatingCoilName, errFlag );
@@ -5228,6 +5235,13 @@ namespace HVACUnitarySystem {
 						if ( UnitarySystem( UnitarySysNum ).CoolingCoilIndex == 0 ) {
 							ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ShowContinueError( "Illegal " + cAlphaFields( iCoolingCoilNameAlphaNum ) + " = " + CoolingCoilName );
+							ErrorsFound = true;
+							errFlag = false;
+						}
+
+						UnitarySystem( UnitarySysNum ).DesignCoolingCapacity = GetWtoAHPCoilCapacity( CoolingCoilType, CoolingCoilName, errFlag );
+						if ( errFlag ) {
+							ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
 							ErrorsFound = true;
 							errFlag = false;
 						}
