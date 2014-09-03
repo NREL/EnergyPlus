@@ -135,6 +135,7 @@ namespace SizingManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ManageSizing: " );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: none
 
@@ -286,7 +287,7 @@ namespace SizingManager {
 							++CurEnvirNumSimDay;
 						}
 
-						gio::write( DayOfSimChr, "*" ) << DayOfSim;
+						gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
 						strip( DayOfSimChr );
 						BeginDayFlag = true;
 						EndDayFlag = false;
@@ -487,7 +488,7 @@ namespace SizingManager {
 					if ( ! WarmupFlag && DayOfSim > 1 ) {
 						++CurEnvirNumSimDay;
 					}
-					gio::write( DayOfSimChr, "*" ) << DayOfSim;
+					gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
 					strip( DayOfSimChr );
 					BeginDayFlag = true;
 					EndDayFlag = false;
@@ -1028,7 +1029,7 @@ namespace SizingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1097,7 +1098,7 @@ namespace SizingManager {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered value=\"" + cAlphaArgs( 1 ) + "\", Commas will be used to separate fields." );
 				cAlphaArgs( 1 ) = "Comma";
 			}
-			gio::write( OutputFileInits, "(A)" ) << "! <Sizing Output Files>,Style";
+			gio::write( OutputFileInits, fmtA ) << "! <Sizing Output Files>,Style";
 			gio::write( OutputFileInits, "('Sizing Output Files,',A)" ) << cAlphaArgs( 1 );
 		}
 
@@ -1493,7 +1494,7 @@ namespace SizingManager {
 					//      \note This input is used if Cooling Design Air Flow Method is design day with limit
 					if ( lNumericFieldBlanks( 10 ) ) {
 						if ( rNumericArgs( 10 ) <= 0.0 ) { // in case someone changes the default in the IDD
-							ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowPerArea = .000762;
+							ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowPerArea = 0.000762;
 						} else {
 							ZoneSizingInput( ZoneSizIndex ).DesCoolMinAirFlowPerArea = rNumericArgs( 10 );
 						}
@@ -2275,10 +2276,6 @@ namespace SizingManager {
 		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2305,8 +2302,8 @@ namespace SizingManager {
 		gio::write( OutputFileInits, Format_991 ) << ZoneName << LoadType << RoundSigDigits( CalcDesLoad, 5 ) << RoundSigDigits( UserDesLoad, 5 ) << RoundSigDigits( CalcDesFlow, 5 ) << RoundSigDigits( UserDesFlow, 5 ) << DesDayName << PeakHrMin << RoundSigDigits( PeakTemp, 5 ) << RoundSigDigits( PeakHumRat, 5 ) << RoundSigDigits( FloorArea, 5 ) << RoundSigDigits( TotOccs, 5 ) << RoundSigDigits( MinOAVolFlow, 5 );
 
 		// BSLLC Start
-		if ( WriteOutputToSQLite ) {
-			AddSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
+		if ( sqlite->writeOutputToSQLite() ) {
+			sqlite->addSQLiteZoneSizingRecord( ZoneName, LoadType, CalcDesLoad, UserDesLoad, CalcDesFlow, UserDesFlow, DesDayName, PeakHrMin, PeakTemp, PeakHumRat, MinOAVolFlow );
 		}
 		// BSLLC Finish
 
@@ -2341,10 +2338,6 @@ namespace SizingManager {
 		using DataStringGlobals::VerString;
 		using General::RoundSigDigits;
 
-		// BSLLC Start
-		using namespace SQLiteProcedures;
-		// BSLLC Finish
-
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -2371,7 +2364,7 @@ namespace SizingManager {
 		gio::write( OutputFileInits, Format_991 ) << SysName << VarDesc << RoundSigDigits( VarValue, 5 );
 
 		// BSLLC Start
-		if ( WriteOutputToSQLite ) AddSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
+		if ( sqlite->writeOutputToSQLite() ) sqlite->addSQLiteSystemSizingRecord( SysName, VarDesc, VarValue );
 		// BSLLC Finish
 
 	}

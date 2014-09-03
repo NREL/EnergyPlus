@@ -1,4 +1,4 @@
-!IDD_Version 8.2.0.001
+!IDD_Version 8.1.0.009
 ! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
 ! The IDD defines the syntax and data model for each type of input "Object."
@@ -650,6 +650,49 @@ ZoneAirContaminantBalance,
        \type object-list
        \object-list ScheduleNames
 
+ZoneAirMassFlowConservation,
+       \memo Enforces the zone air mass flow balance by adjusting zone mixing object flow rates. 
+       \memo The infiltration object mass flow rate may also be adjusted or may add infiltration
+       \memo air flow to the base infiltration air flow for source zones only.
+       \unique-object
+  A1,  \field Adjust Zone Mixing For Zone Air Mass Flow Balance
+       \note If Yes, Zone mixing object flow rates are adjusted to balance the zone air mass flow
+       \note and additional infiltration air flow may be added if required in order to balance the
+       \note zone air mass flow.
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note This optional choice input field allows users triggering the zone air mass flow 
+       \note balance calculation when desired. This global object has two choice KEYs: “Yes” and 
+       \note “No”. If this input field is specified as “Yes”, then EnergyPlus attempts to enforce        
+       \note the zone air mass flow conservation, or else if it is specified as “No”, then EnergyPlus      
+       \note calculation defaults to zone air mass flow balance that does not include zone mixing
+       \note objects and that assumes self-balanced simple flow objects per the default procedure, 
+       \note which may not necessarily enforce zone mass conservation unless the user specified  
+       \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
+       \note and source zones if there is at least one mixing object defined. The default input 
+       \note is “No”. (Note that “No” input may also results in balanced flow depending on the 
+       \note system specified).
+  A2;  \field Source Zone Infiltration Treatment
+       \note This input field allows user to choose how zone infiltration flow is treated during 
+       \note the zone air mass flow balance calculation. 
+       \type choice
+       \key AddInfiltrationFlow
+       \key AdjustInfiltrationFlow
+       \default AddInfiltrationFlow
+       \note It has two choice KEYs: “AddInfiltrationFlow” and “AdjustInfiltrationFlow”.  If this
+       \note input is specified as “AddInfiltrationFlow”, then energy plus adds infiltration air 
+       \note mass flow on top of the base flow, which is calculated using the infiltration object
+       \note user inputs, in order to balance the zone air mass flow.  The additional infiltration 
+       \note air mass flow is not self-balanced.  If this input is specified as 
+       \note “AdjustInfiltrationFlow”, then energy plus may adjust the base flow calculated using 
+       \note the infiltration object user inputs in order to balance the zone air mass flow. If it
+       \note is not required to adjust the base infiltration air flow calculated from the user
+       \note specified infiltration object inputs, then the base infiltration air mass flow 
+       \note is assumed self-balanced. If the above input field specified as "No", then this input
+       \note field has no impact on the simulation.
+   
 ZoneCapacitanceMultiplier:ResearchSpecial,
        \unique-object
        \format singleLine
@@ -8253,7 +8296,7 @@ Construction:ComplexFenestrationState,
   A28, \field Layer 4 Name
        \type object-list
        \object-list CFSGlazingName
-	   \object-list WindowComplexShades
+       \object-list WindowComplexShades
   A29, \field Layer 4 Directional Front Absoptance Matrix Name
        \type object-list
        \object-list DataMatrices
@@ -8274,7 +8317,7 @@ Construction:ComplexFenestrationState,
   A34, \field Layer 5 Name
        \type object-list
        \object-list CFSGlazingName
-	   \object-list WindowComplexShades
+       \object-list WindowComplexShades
   A35, \field Layer 5 Directional Front Absoptance Matrix Name
        \type object-list
        \object-list DataMatrices
@@ -15729,11 +15772,14 @@ SurfaceProperty:OtherSideConditionsModel,
       \type choice
       \key GapConvectionRadiation
       \key UndergroundPipingSystemSurface
+      \key GroundCoupledSurface
       \note GapConvectionRadiation provides boundary conditions for convection
       \note  and linearized thermal radiation across a gap or cavity
       \note  on the other side of the surface that are modeled sperately.
       \note UndergroundPipingSystemSurface provides boundary conditions for
       \note  surfaces in contact with PipingSystem:Underground domains
+      \note GroundCoupledSurface provides boundary conditions for surfaces
+      \note  in contact with GroundDomain objects
       \default GapConvectionRadiation
 
 
@@ -16954,12 +17000,12 @@ SurfaceProperty:ExteriorNaturalVentedCavity,
 
 SurfaceProperty:SolarIncidentInside,
        \memo Used to provide incident solar radiation on the inside of the surface. Reference surface-construction pair
-	   \memo and if that pair is used in a simulation, then program will use value provided in schedule instead of calculating it.
+       \memo and if that pair is used in a simulation, then program will use value provided in schedule instead of calculating it.
   A1,  \field Name
        \required-field
   A2,  \field Surface Name
        \required-field
-	   \type object-list
+       \type object-list
        \object-list SurfaceNames
   A3,  \field Construction Name
        \required-field
@@ -16968,43 +17014,43 @@ SurfaceProperty:SolarIncidentInside,
   A4;  \field Inside Surface Incident Sun Solar Radiation Schedule Name
        \memo Values in schedule are expected to be in W/m2
        \required-field
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
 
 ComplexFenestrationProperty:SolarAbsorbedLayers,
        \memo Used to provide solar radiation absorbed in fenestration layers. References surface-construction pair
-	   \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
+       \memo and if that pair is used in a simulation, then program will use value provided in schedules instead of calculating it.
   A1,  \field Name
        \required-field
   A2,  \field Fenestration Surface
        \required-field
-	   \type object-list
+       \type object-list
        \object-list SubSurfNames
   A3,  \field Construction Name
        \required-field
        \type object-list
-	   \object-list ComplexFenestrationStates
+       \object-list ComplexFenestrationStates
   A4,  \field Layer 1 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
        \required-field
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A5,  \field Layer 2 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A6,  \field Layer 3 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A7,  \field Layer 4 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
   A8;  \field Layer 5 Solar Radiation Absorbed Schedule Name
        \memo Values in schedule are expected to be in W/m2
-	   \type object-list
-	   \object-list ScheduleNames
+       \type object-list
+       \object-list ScheduleNames
 
 ZoneProperty:UserViewFactors:bySurfaceName,
        \memo View factors for Surface to Surface in a zone.
@@ -21754,19 +21800,18 @@ AirflowNetwork:MultiZone:Zone,
       \note Not used if Ventilation Control Mode = NoVent.
   A5, \field Single Sided Wind Pressure Coefficient Algorithm
       \type choice
-	    \key Advanced
-	    \key Standard
-	    \default Standard
-	    \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
-	    \note to account for wind direction and turbulence effects on single sided ventilation rates.
-	    \note Model is only valid for zones with 2 openings, both of which are on a single facade.
+      \key Advanced
+      \key Standard
+      \default Standard
+      \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
+      \note to account for wind direction and turbulence effects on single sided ventilation rates.
+      \note Model is only valid for zones with 2 openings, both of which are on a single facade.
   N6; \field Facade Width
       \type real
-	    \units m
-	    \minimum 0.0
-	    \default 10.0
-	    \note This is the whole building width along the direction of the facade of this zone.
-	  
+      \units m
+      \minimum 0.0
+      \default 10.0
+      \note This is the whole building width along the direction of the facade of this zone.
 
 AirflowNetwork:MultiZone:Surface,
       \min-fields 4
@@ -31398,7 +31443,6 @@ ZoneHVAC:WaterToAirHeatPump,
         \required-field
         \type node
    A5,  \field Outdoor Air Mixer Object Type
-        \required-field
         \type choice
         \key OutdoorAir:Mixer
         \note currently only one OutdoorAir:Mixer object type is available.
@@ -31982,11 +32026,11 @@ ZoneHVAC:UnitHeater,
         \key Yes
         \key No
         \note This choice field allows the user to define how the unit heater will operate 
-        \note under "no heating load" or cooling conditions. If the "No" is selected, then 
+        \note under “no heating load” or cooling conditions. If the “No” is selected, then 
         \note the fan will not run unless there is a heating load. If the fan does not run, 
         \note this effectively shuts the unit heater system off when there is no heating load. 
-        \note If the "Yes" is selected, the unit heater is available and has a ConstantVolume 
-        \note fan, or has an OnOff fan with "Supply Air Fan Operating Mode Schedule" value 
+        \note If the “Yes” is selected, the unit heater is available and has a ConstantVolume 
+        \note fan, or has an OnOff fan with “Supply Air Fan Operating Mode Schedule” value 
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -41902,7 +41946,6 @@ Coil:Heating:DX:MultiSpeed,
        \type node
   N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
        \type real
-       \minimum -20.0
        \default -8.0
        \units C
   N2 , \field Outdoor Dry-Bulb Temperature to Turn On Compressor
@@ -48898,7 +48941,6 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \object-list HeatingCoilsGasMultiStage
    N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
         \type real
-        \minimum -20.0
         \default -8.0
         \units C
         \note Needs to match the corresponding minimum outdoor temperature defined
@@ -53910,6 +53952,100 @@ Pipe:Underground,
         \minimum 0
         \default 0
 
+  Site:GroundDomain,
+   A1,  \field Name
+        \required-field
+   N1,  \field Ground Domain Depth
+        \required-field
+        \type real
+        \minimum> 0
+        \units m
+   N2,  \field Aspect Ratio
+        \required-field
+        \type real
+   N3,  \field Perimeter Offset
+        \required-field
+        \type real
+        \units m
+        \minimum>0
+   N4,  \field Soil Thermal Conductivity {W/m-K}
+        \required-field
+        \type real
+        \units W/m-K
+        \minimum> 0
+   N5,  \field Soil Density {kg/m3}
+        \required-field
+        \type real
+   N6,  \field Soil Specific Heat {J/kg-K}
+        \required-field
+        \type real
+   N7,  \field Soil Moisture Content Volume Fraction {percent}
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8,  \field Soil Moisture Content Volume Fraction at Saturation {percent}
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9,  \field Kusuda-Achenbach Average Surface Temperature {C}
+        \required-field
+        \type real
+        \units C
+   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+        \required-field
+        \type real
+        \units C
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+        \required-field
+        \type real
+        \units days
+   N12, \field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  The value roughly represents the following cases:
+        \note  = 0   : concrete or other solid, non-permeable ground surface material
+        \note  = 0.5 : short grass, much like a manicured lawn
+        \note  = 1   : standard reference state (12 cm grass)
+        \note  = 1.5 : wild growth
+   A2,  \field Name of  Slab Boundary Condition Model
+        \required-field
+   A3,  \field Slab Location
+        \required-field
+        \note This field specifies whether the slab is located "in-grade" or "on-grade"
+   A4, 	\field Name of slab material
+        \field-optional
+   A5,  \field Horizontal Insulation
+        \required-optional
+        \note This field specifies the presence of insulation beneath the slab.
+   A6,  \field Insulation Material
+        \note optional
+        \note This field specifies the horizontal insulation material.
+   A7,  \field Horizontal Insulation Extents
+        \field-optional
+        \note This field specifies whether the horizontal insulation fully insulates the surface or is perimeter only insulation
+   N13, \field Perimeter Insulation Width
+        \field-optional
+        \note This field specifies the width of the perimeter insulation
+   A8,  \field Vertical Insulation
+        \required-field
+        \note This field specifies the presence of vertical insulation at the slab edge.
+   A9,  \field Insulation Material
+        \note optional
+        \note This field specifies the vertical insulation material.
+   N14, \field Vertical Insulation Depth
+        \field-optional
+        \note This field specifies the depth of the vertical insulation		
+   A10; \field Simulation Timestep
+        \required-field
+        \note This field specifies the domain simulation timestep.
+	
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
         \min-fields 31
@@ -62073,9 +62209,11 @@ PlantLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key Sequential
-        \key Uniform
-        \default Sequential
+        \key SequentialLoad
+        \key UniformLoad
+        \key UniformPLR
+        \key SequentialUniformPLR
+        \default SequentialLoad
   A15, \field Availability Manager List Name
         \type object-list
         \object-list SystemAvailabilityManagerLists
@@ -62185,8 +62323,11 @@ CondenserLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key Sequential
-        \default Sequential
+        \key SequentialLoad
+        \key UniformLoad
+        \key UniformPLR
+        \key SequentialUniformPLR
+        \default SequentialLoad
   A15; \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection
@@ -72712,7 +72853,7 @@ FaultModel:EnthalpySensorOffset:ReturnAir,
        \maximum< 20000
        \default 0.0
        \units J/kg
-	   
+   
 FaultModel:Fouling:Coil,
    \memo This object describes fouling water heating or cooling coils
    A1, \field Name
@@ -72735,34 +72876,34 @@ FaultModel:Fouling:Coil,
        \default FouledUARated
    N1, \field UAFouled
        \note Fouling coil UA value under rating conditions
-	     \note For Fouling Input Method: FouledUARated
+       \note For Fouling Input Method: FouledUARated
        \units W/K
        \type real       
        \minimum> 0.0
    N2, \field Water Side Fouling Factor       
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units m2-K/W  
-       \type real	   
+       \type real  
        \minimum 0.0
        \default 0.0
    N3, \field Air Side Fouling Factor       
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units m2-K/W 
        \type real
-       \minimum 0.0	   
+       \minimum 0.0   
        \default 0.0
    N4, \field Outside Coil Surface Area       
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units m2 
-       \type real	   
-       \minimum> 0.0	   
+       \type real   
+       \minimum> 0.0   
    N5; \field Inside to Outside Coil Surface Area Ratio      
-	     \note For Fouling Input Method: FoulingFactor
+       \note For Fouling Input Method: FoulingFactor
        \units dimensionless
        \type real       
-	     \minimum> 0.0
+       \minimum> 0.0
        \default 0.07
-
+       
 \group General Data Entry
 
 

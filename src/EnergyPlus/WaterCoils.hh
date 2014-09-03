@@ -553,9 +553,26 @@ namespace WaterCoils {
 		{}
 
 	};
+	struct WaterCoilNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		WaterCoilNumericFieldData()
+		{}
+
+		// Member Constructor
+		WaterCoilNumericFieldData(
+			FArray1_string const & FieldNames // Name of the WaterCoil numeric field descriptions
+		) :
+			FieldNames( FieldNames )
+		{}
+	};
 
 	// Object Data
 	extern FArray1D< WaterCoilEquipConditions > WaterCoil;
+	extern FArray1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
 
 	// Functions
 
@@ -742,8 +759,8 @@ namespace WaterCoils {
 
 	void
 	CalcDryFinEffCoef(
-		Real64 & OutTubeEffFinDiamRatio,
-		FArray1S< Real64 > PolynomCoef
+		Real64 const OutTubeEffFinDiamRatio,
+		FArray1< Real64 > & PolynomCoef
 	);
 
 	void
@@ -764,8 +781,8 @@ namespace WaterCoils {
 
 	void
 	CalcPolynomCoef(
-		FArray2A< Real64 > OrderedPair,
-		FArray1S< Real64 > PolynomCoef
+		FArray2< Real64 > const & OrderedPair,
+		FArray1< Real64 > & PolynomCoef
 	);
 
 	Real64

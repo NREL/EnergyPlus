@@ -528,7 +528,7 @@ namespace SteamCoils {
 			AirOutletNode = SteamCoil( CoilNum ).AirOutletNodeNum;
 
 			Node( SteamInletNode ).Temp = 100.0;
-			Node( SteamInletNode ).Press = 101325.;
+			Node( SteamInletNode ).Press = 101325.0;
 			SteamDensity = GetSatDensityRefrig( fluidNameSteam, Node( SteamInletNode ).Temp, 1.0, Node( SteamInletNode ).FluidIndex, RoutineName );
 			StartEnthSteam = GetSatEnthalpyRefrig( fluidNameSteam, Node( SteamInletNode ).Temp, 1.0, Node( SteamInletNode ).FluidIndex, RoutineName );
 			Node( SteamInletNode ).Enthalpy = StartEnthSteam;
@@ -1530,7 +1530,7 @@ namespace SteamCoils {
 		if ( WhichCoil == 0 ) {
 			ShowSevereError( "GetCoilMaxWaterFlowRate: Could not find CoilType=\"" + CoilType + "\" with Name=\"" + CoilName + "\"" );
 			ErrorsFound = true;
-			MaxWaterFlowRate = -1000.;
+			MaxWaterFlowRate = -1000.0;
 		}
 
 		return MaxWaterFlowRate;

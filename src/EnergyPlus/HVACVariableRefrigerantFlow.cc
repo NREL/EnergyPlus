@@ -754,7 +754,7 @@ namespace HVACVariableRefrigerantFlow {
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle ) {
+					if ( VRF( VRFCond ).DefrostStrategy == ReverseCycle && VRF( VRFCond ).DefrostControl == OnDemand ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( VRF( VRFCond ).HeatingCapacity / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( VRF( VRFCond ).DefrostEIRPtr, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 
@@ -941,7 +941,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			VRF( VRFCond ).HRTime = max( 0.0, CurrentEndTime - VRF( VRFCond ).HRTimer );
-			if ( VRF( VRFCond ).HRTime < ( HRCapTC * 5. ) ) {
+			if ( VRF( VRFCond ).HRTime < ( HRCapTC * 5.0 ) ) {
 				if ( HRCapTC > 0.0 ) {
 					SUMultiplier = min( 1.0, 1.0 - std::exp( -VRF( VRFCond ).HRTime / HRCapTC ) );
 				} else {
@@ -1101,7 +1101,7 @@ namespace HVACVariableRefrigerantFlow {
 				// this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond)%TUCoolingLoad
 				VRF( VRFCond ).OperatingCoolingCOP = ( VRF( VRFCond ).TotalCoolingCapacity ) / ( VRF( VRFCond ).ElecCoolingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
 			} else {
-				VRF( VRFCond ).OperatingCoolingCOP = 0.;
+				VRF( VRFCond ).OperatingCoolingCOP = 0.0;
 			}
 		}
 		if ( HeatingLoad( VRFCond ) && HeatingPLR > 0.0 ) {
@@ -1109,7 +1109,7 @@ namespace HVACVariableRefrigerantFlow {
 				// this calc should use deleivered capacity, not condenser capacity, use VRF(VRFCond)%TUHeatingLoad
 				VRF( VRFCond ).OperatingHeatingCOP = ( VRF( VRFCond ).TotalHeatingCapacity ) / ( VRF( VRFCond ).ElecHeatingPower + VRF( VRFCond ).CrankCaseHeaterPower + VRF( VRFCond ).EvapCondPumpElecPower + VRF( VRFCond ).DefrostPower );
 			} else {
-				VRF( VRFCond ).OperatingHeatingCOP = 0.;
+				VRF( VRFCond ).OperatingHeatingCOP = 0.0;
 			}
 		}
 
@@ -1799,13 +1799,13 @@ namespace HVACVariableRefrigerantFlow {
 						ErrorsFound = true;
 					}}
 				} else {
-					if ( SameString( cAlphaArgs( 31 ), "ReverseCycle" ) ) {
+					if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
 						ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 						ErrorsFound = true;
 					}
 				}
 			} else {
-				if ( SameString( cAlphaArgs( 31 ), "ReverseCycle" ) ) {
+				if ( VRF( VRFNum ).DefrostStrategy == ReverseCycle && VRF( VRFNum ).DefrostControl == OnDemand ) {
 					ShowSevereError( cCurrentModuleObject + ", \"" + VRF( VRFNum ).Name + "\" " + cAlphaFieldNames( 33 ) + " not found:" + cAlphaArgs( 33 ) );
 					ErrorsFound = true;
 				}
@@ -2381,7 +2381,6 @@ namespace HVACVariableRefrigerantFlow {
 
 			if ( ! lAlphaFieldBlanks( 15 ) ) {
 				VRFTU( VRFTUNum ).AvailManagerListName = cAlphaArgs( 15 );
-				ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).AvailManagerListName = cAlphaArgs( 15 );
 			}
 			VRFTU( VRFTUNum ).ParasiticElec = rNumericArgs( 8 );
 			VRFTU( VRFTUNum ).ParasiticOffElec = rNumericArgs( 9 );
@@ -2843,6 +2842,7 @@ namespace HVACVariableRefrigerantFlow {
 		static FArray1D_bool MyBeginTimeStepFlag; // Flag to sense beginning of time step
 		static FArray1D_bool MyVRFFlag; // used for sizing VRF inputs one time
 		static FArray1D_bool MyVRFCondFlag; // used to reset timer counter
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		int NumTULoop; // loop counter, number of TU's in list
 		int ELLoop; // loop counter, number of zone equipment lists
 		int ListLoop; // loop counter, number of equipment is each list
@@ -2870,6 +2870,7 @@ namespace HVACVariableRefrigerantFlow {
 			MyEnvrnFlag.allocate( NumVRFTU );
 			MySizeFlag.allocate( NumVRFTU );
 			MyVRFFlag.allocate( NumVRFTU );
+			MyZoneEqFlag.allocate ( NumVRFTU );
 			MyBeginTimeStepFlag.allocate( NumVRFCond );
 			MaxDeltaT.allocate( NumVRFCond );
 			MinDeltaT.allocate( NumVRFCond );
@@ -2885,6 +2886,7 @@ namespace HVACVariableRefrigerantFlow {
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyVRFFlag = true;
+			MyZoneEqFlag = true;
 			MyBeginTimeStepFlag = true;
 			MaxDeltaT = 0.0;
 			MinDeltaT = 0.0;
@@ -2920,7 +2922,11 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( VRFTUNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).AvailManagerListName = VRFTU( VRFTUNum ).AvailManagerListName;
+				ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( VRFTUNum ) = false;
+			}
 			VRFTU( VRFTUNum ).AvailStatus = ZoneComp( VRFTerminalUnit_Num ).ZoneCompAvailMgrs( VRFTUNum ).AvailStatus;
 		}
 
@@ -3560,7 +3566,7 @@ namespace HVACVariableRefrigerantFlow {
 					TerminalUnitList( TUListIndex ).HRHeatRequest( IndexToTUInTUList ) = false;
 					TerminalUnitList( TUListIndex ).HRCoolRequest( IndexToTUInTUList ) = true;
 				}
-			} else if ( VRF( VRFCond ).EMSValueForHPOperatingMode == 2. ) { // Heating
+			} else if ( VRF( VRFCond ).EMSValueForHPOperatingMode == 2.0 ) { // Heating
 				HeatingLoad( VRFCond ) = true;
 				CoolingLoad( VRFCond ) = false;
 				QZnReq = LoadToHeatingSP;
@@ -4538,6 +4544,7 @@ namespace HVACVariableRefrigerantFlow {
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 		Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4673,7 +4680,7 @@ namespace HVACVariableRefrigerantFlow {
 				if ( SolFla == -1 ) {
 					if ( ! FirstHVACIteration && ! WarmupFlag ) {
 						if ( VRFTU( VRFTUNum ).IterLimitExceeded == 0 ) {
-							gio::write( IterNum, "*" ) << MaxIte;
+							gio::write( IterNum, fmtLD ) << MaxIte;
 							strip( IterNum );
 							ShowWarningMessage( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + " \"" + VRFTU( VRFTUNum ).Name + "\"" );
 							ShowContinueError( " Iteration limit exceeded calculating terminal unit part-load ratio, maximum iterations = " + IterNum );
@@ -5021,9 +5028,9 @@ namespace HVACVariableRefrigerantFlow {
 				VRFTU( VRFTUNum ).ParasiticElecCoolConsumption = VRFTU( VRFTUNum ).ParasiticCoolElecPower * ReportingConstant;
 			} else {
 				// split parasitic between both reporting variables
-				VRFTU( VRFTUNum ).ParasiticCoolElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.;
+				VRFTU( VRFTUNum ).ParasiticCoolElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.0;
 				VRFTU( VRFTUNum ).ParasiticElecCoolConsumption = VRFTU( VRFTUNum ).ParasiticCoolElecPower * ReportingConstant;
-				VRFTU( VRFTUNum ).ParasiticHeatElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.;
+				VRFTU( VRFTUNum ).ParasiticHeatElecPower = VRFTU( VRFTUNum ).ParasiticOffElec / 2.0;
 				VRFTU( VRFTUNum ).ParasiticElecHeatConsumption = VRFTU( VRFTUNum ).ParasiticHeatElecPower * ReportingConstant;
 			}
 		}
@@ -5428,7 +5435,7 @@ namespace HVACVariableRefrigerantFlow {
 			ThisZoneNum = VRFTU( TUIndex ).ZoneNum;
 
 			//       check to see if coil is present
-			if ( TerminalUnitList( VRFCond ).CoolingCoilPresent( NumTU ) ) {
+			if ( TerminalUnitList( TUListNum ).CoolingCoilPresent( NumTU ) ) {
 				//         now check to see if coil is scheduled off
 				if ( GetCurrentScheduleValue( TerminalUnitList( TUListNum ).CoolingCoilAvailSchPtr( NumTU ) ) > 0.0 ) {
 					TerminalUnitList( TUListNum ).CoolingCoilAvailable( NumTU ) = true;
@@ -5436,7 +5443,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 
 			//       check to see if coil is present
-			if ( TerminalUnitList( VRFCond ).HeatingCoilPresent( NumTU ) ) {
+			if ( TerminalUnitList( TUListNum ).HeatingCoilPresent( NumTU ) ) {
 				//         now check to see if coil is scheduled off
 				if ( GetCurrentScheduleValue( TerminalUnitList( TUListNum ).HeatingCoilAvailSchPtr( NumTU ) ) > 0.0 ) {
 					TerminalUnitList( TUListNum ).HeatingCoilAvailable( NumTU ) = true;

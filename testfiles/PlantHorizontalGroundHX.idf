@@ -51,7 +51,7 @@
 !****** SIMULATION CONTROLS ********************************
 !***********************************************************
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Piping System Example,   !- Name
@@ -260,7 +260,7 @@
     Plant Demand Outlet Node,!- Demand Side Outlet Node Name
     Plant Demand Side Branches,  !- Demand Side Branch List Name
     ,                        !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Main Loop Setpoint Manager,  !- Name

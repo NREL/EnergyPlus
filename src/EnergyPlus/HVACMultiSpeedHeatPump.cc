@@ -39,6 +39,8 @@
 #include <SteamCoils.hh>
 #include <UtilityRoutines.hh>
 #include <WaterCoils.hh>
+#include <ZoneTempPredictorCorrector.hh>
+
 
 namespace EnergyPlus {
 
@@ -522,6 +524,8 @@ namespace HVACMultiSpeedHeatPump {
 		using SteamCoils::GetTypeOfCoil;
 		using SteamCoils::ZoneLoadControl;
 		using FluidProperties::GetSatDensityRefrig;
+		using ZoneTempPredictorCorrector::NumStageCtrZone;
+		using DataZoneControls::StageControlledZone;
 
 		// Locals
 		// PARAMETERS
@@ -677,6 +681,10 @@ namespace HVACMultiSpeedHeatPump {
 						}
 						for ( TstatZoneNum = 1; TstatZoneNum <= NumComfortControlledZones; ++TstatZoneNum ) {
 							if ( ComfortControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
+							AirNodeFound = true;
+						}
+						for ( TstatZoneNum = 1; TstatZoneNum <= NumStageCtrZone; ++TstatZoneNum ) {
+							if ( StageControlledZone( TstatZoneNum ).ActualZoneNum != MSHeatPump( MSHPNum ).ControlZoneNum ) continue;
 							AirNodeFound = true;
 						}
 					} else {
@@ -959,11 +967,6 @@ namespace HVACMultiSpeedHeatPump {
 			}
 
 			MSHeatPump( MSHPNum ).MinOATCompressor = Numbers( 1 );
-			if ( Numbers( 1 ) < -20.0 ) {
-				ShowSevereError( CurrentModuleObject + ", \"" + MSHeatPump( MSHPNum ).Name + "\", " + cNumericFields( 1 ) + " is -20.0" );
-				ShowContinueError( "The input value is " + RoundSigDigits( Numbers( 4 ), 2 ) );
-				ErrorsFound = true;
-			}
 
 			if ( SameString( Alphas( 12 ), "Coil:Cooling:DX:MultiSpeed" ) ) {
 				MSHeatPump( MSHPNum ).CoolCoilType = MultiSpeedCoolingCoil;
@@ -1825,7 +1828,7 @@ namespace HVACMultiSpeedHeatPump {
 
 			if ( ( MSHeatPump( MSHeatPumpNum ).HeatRecActive ) && ( ! MyPlantScantFlag( MSHeatPumpNum ) ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60., PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidName, 60.0, PlantLoop( MSHeatPump( MSHeatPumpNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 				MSHeatPump( MSHeatPumpNum ).DesignHeatRecMassFlowRate = MSHeatPump( MSHeatPumpNum ).DesignHeatRecFlowRate * rho;
 

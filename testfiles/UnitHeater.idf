@@ -106,7 +106,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -1225,7 +1225,7 @@
   Fan:ConstantVolume,
     Zone1UnitHeatFan,        !- Name
     UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1292,7 +1292,7 @@
   Fan:ConstantVolume,
     Zone2UnitHeatFan,        !- Name
     UnitHeatAvailability,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1359,7 +1359,7 @@
   Fan:ConstantVolume,
     Zone3UnitHeatFan,        !- Name
     UnitVent3FanSched,       !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.84,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -31,8 +30,6 @@ namespace SurfaceGeometry {
 	// referencing another in adjacent zone
 	extern int const UnreconciledZoneSurface; // interim value between entering surfaces ("Surface") and reconciling
 	// surface names in other zones
-
-	extern gio::Fmt const fmt3;
 
 	// DERIVED TYPE DEFINITIONS
 

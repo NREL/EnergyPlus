@@ -590,7 +590,7 @@ namespace HVACSingleDuctInduc {
 			HotConNode = IndUnit( IUNum ).HWControlNode;
 			if ( HotConNode > 0 && ! MyPlantScanFlag( IUNum ) ) {
 
-				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60., PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+				rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 				IndUnit( IUNum ).MaxHotWaterFlow = rho * IndUnit( IUNum ).MaxVolHotWaterFlow;
 				IndUnit( IUNum ).MinHotWaterFlow = rho * IndUnit( IUNum ).MinVolHotWaterFlow;
 				// get component outlet node from plant structure
@@ -796,9 +796,9 @@ namespace HVACSingleDuctInduc {
 									DesCoilLoad = CpAir * RhoAir * DesPriVolFlow * ( ZoneSizThermSetPtLo( CurZoneEqNum ) - TermUnitFinalZoneSizing( CurZoneEqNum ).DesHeatCoilInTempTU );
 								}
 								IndUnit( IUNum ).DesHeatingLoad = DesCoilLoad;
-								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60., PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
-								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60., PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								rho = GetDensityGlycol( PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( IndUnit( IUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 								MaxVolHotWaterFlowDes = max( MaxVolHotWaterFlowDes, 0.0 );

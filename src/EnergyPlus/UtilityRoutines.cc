@@ -79,13 +79,12 @@ AbortEnergyPlus(
 	using PlantManager::CheckPlantOnAbort;
 	using ExternalInterface::NumExternalInterfaces;
 	using ExternalInterface::CloseSocket;
-	using SQLiteProcedures::UpdateSQLiteSimulationRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
+	static gio::Fmt const fmtLD( "*" );
 	static gio::Fmt const OutFmt( "('Press ENTER to continue after reading above message>')" );
 	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
@@ -110,8 +109,8 @@ AbortEnergyPlus(
 	bool TerminalError;
 	int write_stat;
 
-	if ( WriteOutputToSQLite ) {
-		UpdateSQLiteSimulationRecord( true, false );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->updateSQLiteSimulationRecord( true, false );
 	}
 
 	AbortProcessing = true;
@@ -199,7 +198,7 @@ AbortEnergyPlus(
 	epStopTime( "EntireRun=" );
 #endif
 	if ( Elapsed_Time < 0.0 ) Elapsed_Time = 0.0;
-	Hours = Elapsed_Time / 3600.;
+	Hours = Elapsed_Time / 3600.0;
 	Elapsed_Time -= Hours * 3600.0;
 	Minutes = Elapsed_Time / 60.0;
 	Elapsed_Time -= Minutes * 60.0;
@@ -209,14 +208,14 @@ AbortEnergyPlus(
 
 	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
 	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
-	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed );
+	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
 		DisplayString( "AbortEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
 	}
-	gio::write( tempfl, "*" ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed;
+	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
 	gio::close( tempfl );
 #ifdef EP_Detailed_Timings
@@ -376,14 +375,13 @@ EndEnergyPlus()
 	using ExternalInterface::NumExternalInterfaces;
 	using ExternalInterface::CloseSocket;
 	using ExternalInterface::haveExternalInterfaceBCVTB;
-	using SQLiteProcedures::UpdateSQLiteSimulationRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
+	static gio::Fmt const fmtA( "(A)" );
 	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -405,8 +403,8 @@ EndEnergyPlus()
 	Real64 Seconds; // Elapsed Time Second Reporting
 	int write_stat;
 
-	if ( WriteOutputToSQLite ) {
-		UpdateSQLiteSimulationRecord( true, true );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->updateSQLiteSimulationRecord( true, true );
 	}
 
 	ReportSurfaceErrors();
@@ -442,14 +440,14 @@ EndEnergyPlus()
 
 	ShowMessage( "EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup + " Severe Errors." );
 	ShowMessage( "EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing + " Severe Errors." );
-	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed );
+	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
 		DisplayString( "EndEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
 	}
-	gio::write( tempfl, "(A)" ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors;" " Elapsed Time=" + Elapsed;
+	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
 #ifdef EP_Detailed_Timings
 	epSummaryTimes( Time_Finish - Time_Start );
@@ -812,8 +810,6 @@ ShowFatalError(
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -837,8 +833,8 @@ ShowFatalError(
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
-	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
 	AbortEnergyPlus( NoIdf, NoIDD );
 
@@ -874,8 +870,6 @@ ShowSevereError(
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DoingSizing;
 	using DataGlobals::KickOffSimulation;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -903,8 +897,8 @@ ShowSevereError(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 1, ErrorMessage, 1 );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 1 );
 	}
 
 }
@@ -938,8 +932,6 @@ ShowSevereMessage(
 	// Using/Aliasing
 	using namespace DataStringGlobals;
 	using namespace DataErrorTracking;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -964,8 +956,8 @@ ShowSevereMessage(
 
 	//  Could set a variable here that gets checked at some point?
 
-	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->createSQLiteErrorRecord( 1, 1, ErrorMessage, 0 );
 	}
 
 }
@@ -994,8 +986,6 @@ ShowContinueError(
 	// na
 
 	// Using/Aliasing
-	using SQLiteProcedures::UpdateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1012,8 +1002,8 @@ ShowContinueError(
 	// na
 
 	ShowErrorMessage( " **   ~~~   ** " + Message, OutUnit1, OutUnit2 );
-	if ( WriteOutputToSQLite ) {
-		UpdateSQLiteErrorRecord( Message );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->updateSQLiteErrorRecord( Message );
 	}
 
 }
@@ -1047,8 +1037,6 @@ ShowContinueErrorTimeStamp(
 	using DataEnvironment::CurMnDy;
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DoingSizing;
-	using SQLiteProcedures::UpdateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1080,14 +1068,14 @@ ShowContinueErrorTimeStamp(
 
 	if ( len( Message ) < 50 ) {
 		ShowErrorMessage( " **   ~~~   ** " + Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( WriteOutputToSQLite ) {
-			UpdateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
+		if ( sqlite && sqlite->writeOutputToSQLite() ) {
+			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	} else {
 		ShowErrorMessage( " **   ~~~   ** " + Message );
 		ShowErrorMessage( " **   ~~~   ** " + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString(), OutUnit1, OutUnit2 );
-		if ( WriteOutputToSQLite ) {
-			UpdateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
+		if ( sqlite && sqlite->writeOutputToSQLite() ) {
+			sqlite->updateSQLiteErrorRecord( Message + cEnvHeader + EnvironmentName + ", at Simulation time=" + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 		}
 	}
 
@@ -1170,8 +1158,6 @@ ShowWarningError(
 	using DataGlobals::WarmupFlag;
 	using DataGlobals::DoingSizing;
 	using DataGlobals::KickOffSimulation;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1196,8 +1182,8 @@ ShowWarningError(
 	if ( DoingSizing ) ++TotalWarningErrorsDuringSizing;
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
 
-	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 0, ErrorMessage, 1 );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 1 );
 	}
 
 }
@@ -1231,8 +1217,6 @@ ShowWarningMessage(
 	// Using/Aliasing
 	using namespace DataStringGlobals;
 	using namespace DataErrorTracking;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1253,8 +1237,8 @@ ShowWarningMessage(
 	}
 
 	ShowErrorMessage( " ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2 );
-	if ( WriteOutputToSQLite ) {
-		CreateSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
+	if ( sqlite && sqlite->writeOutputToSQLite() ) {
+		sqlite->createSQLiteErrorRecord( 1, 0, ErrorMessage, 0 );
 	}
 
 }
@@ -1617,7 +1601,7 @@ ShowErrorMessage(
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
 			ShowFatalError( "ShowErrorMessage: Could not open file \"eplusout.err\" for output (write)." );
 		}
-		gio::write( StandardErrorOutput, "(A)" ) << "Program Version," + VerString + ',' + IDDVerString;
+		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;
 	}
 
@@ -1724,11 +1708,8 @@ ShowRecurringErrors()
 	// Using/Aliasing
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
-	using General::RemoveTrailingZeros;
-	using SQLiteProcedures::UpdateSQLiteErrorRecord;
-	using SQLiteProcedures::CreateSQLiteErrorRecord;
-	using SQLiteProcedures::WriteOutputToSQLite;
-
+    using General::strip_trailing_zeros;
+	
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 	// na
@@ -1758,8 +1739,8 @@ ShowRecurringErrors()
 			// Suppress reporting the count if it is a continue error
 			if ( has_prefix( error.Message, " **   ~~~   ** " ) ) {
 				ShowMessage( error.Message );
-				if ( WriteOutputToSQLite ) {
-					UpdateSQLiteErrorRecord( error.Message );
+				if ( sqlite && sqlite->writeOutputToSQLite() ) {
+					sqlite->updateSQLiteErrorRecord( error.Message );
 				}
 			} else {
 				ShowMessage( "" );
@@ -1767,30 +1748,30 @@ ShowRecurringErrors()
 				ShowMessage( StatMessageStart + "  This error occurred " + RoundSigDigits( error.Count ) + " total times;" );
 				ShowMessage( StatMessageStart + "  during Warmup " + RoundSigDigits( error.WarmupCount ) + " times;" );
 				ShowMessage( StatMessageStart + "  during Sizing " + RoundSigDigits( error.SizingCount ) + " times." );
-				if ( WriteOutputToSQLite ) {
+				if ( sqlite && sqlite->writeOutputToSQLite() ) {
 					if ( has_prefix( error.Message, " ** Warning ** " ) ) {
-						CreateSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
+						sqlite->createSQLiteErrorRecord( 1, 0, error.Message.substr( 15 ), error.Count );
 					} else if ( has_prefix( error.Message, " ** Severe  ** " ) ) {
-						CreateSQLiteErrorRecord( 1, 1, error.Message.substr( 15 ), error.Count );
+						sqlite->createSQLiteErrorRecord( 1, 1, error.Message.substr( 15 ), error.Count );
 					}
 				}
 			}
 			StatMessage = "";
 			if ( error.ReportMax ) {
 				MaxOut = RoundSigDigits( error.MaxValue, 6 );
-				MaxOut = RemoveTrailingZeros( MaxOut );
+				strip_trailing_zeros( MaxOut );
 				StatMessage += "  Max=" + MaxOut;
 				if ( ! error.MaxUnits.empty() ) StatMessage += ' ' + error.MaxUnits;
 			}
 			if ( error.ReportMin ) {
 				MinOut = RoundSigDigits( error.MinValue, 6 );
-				MinOut = RemoveTrailingZeros( MinOut );
+				strip_trailing_zeros( MinOut );
 				StatMessage += "  Min=" + MinOut;
 				if ( ! error.MinUnits.empty() ) StatMessage += ' ' + error.MinUnits;
 			}
 			if ( error.ReportSum ) {
 				SumOut = RoundSigDigits( error.SumValue, 6 );
-				SumOut = RemoveTrailingZeros( SumOut );
+				strip_trailing_zeros( SumOut );
 				StatMessage += "  Sum=" + SumOut;
 				if ( ! error.SumUnits.empty() ) StatMessage += ' ' + error.SumUnits;
 			}

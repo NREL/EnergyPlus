@@ -386,7 +386,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		static std::string const RoutineName( "GetAirflowNetworkInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -996,7 +996,7 @@ namespace AirflowNetworkBalanceManager {
 				MultizoneSurfaceData( i ).UpValueTemp = Numbers( 4 ); // Upper temperature value for modulation of temperature control
 				MultizoneSurfaceData( i ).LowValueEnth = Numbers( 5 ); // Lower Enthalpy value for modulation of Enthalpy control
 				MultizoneSurfaceData( i ).UpValueEnth = Numbers( 6 ); // Lower Enthalpy value for modulation of Enthalpy control
-				if ( MultizoneSurfaceData( i ).VentSurfCtrNum < 4 ) {
+				if (MultizoneSurfaceData(i).VentSurfCtrNum < 4 || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjTemp || MultizoneSurfaceData(i).VentSurfCtrNum == VentCtrNum_AdjEnth) {
 					if ( ! lAlphaBlanks( 6 ) ) {
 						MultizoneSurfaceData( i ).VentingSchName = Alphas( 6 ); // Name of ventilation availability schedule
 					}
@@ -1624,8 +1624,8 @@ namespace AirflowNetworkBalanceManager {
 			AirflowNetworkNumOfStdCndns = 0;
 			MultizoneSurfaceStdConditionsCrackData.allocate( {0,1} );
 			MultizoneSurfaceStdConditionsCrackData( 0 ).Name = "*";
-			MultizoneSurfaceStdConditionsCrackData( 0 ).StandardT = 20.;
-			MultizoneSurfaceStdConditionsCrackData( 0 ).StandardP = 101325.;
+			MultizoneSurfaceStdConditionsCrackData( 0 ).StandardT = 20.0;
+			MultizoneSurfaceStdConditionsCrackData( 0 ).StandardP = 101325.0;
 			MultizoneSurfaceStdConditionsCrackData( 0 ).StandardW = 0.0;
 		}
 
@@ -1891,50 +1891,50 @@ namespace AirflowNetworkBalanceManager {
 		if ( ErrorsFound ) ShowFatalError( RoutineName + "Errors found getting inputs. Previous error(s) cause program termination." );
 
 		// Write wind pressure coefficients in the EIO file
-		gio::write( OutputFileInits, fmta ) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << "AirflowNetwork Model:Wind Direction, "; }
+		gio::write( OutputFileInits, fmtA ) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Direction, "; }
 		for ( i = 1; i <= AirflowNetworkSimu.NWind - 1; ++i ) {
 			StringOut = RoundSigDigits( MultizoneCPArrayData( 1 ).WindDir( i ), 1 );
-			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 		}
 		StringOut = RoundSigDigits( MultizoneCPArrayData( 1 ).WindDir( AirflowNetworkSimu.NWind ), 1 );
-		gio::write( OutputFileInits, fmta ) << StringOut;
+		gio::write( OutputFileInits, fmtA ) << StringOut;
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, "; }
-		gio::write( OutputFileInits, fmta ) << "Wind Pressure Coefficients #1 to n (dimensionless)";
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, "; }
+		gio::write( OutputFileInits, fmtA ) << "Wind Pressure Coefficients #1 to n (dimensionless)";
 
 		if ( AirflowNetworkNumOfSingleSideZones == 0 ) {
 			for ( i = 1; i <= AirflowNetworkNumOfCPValue; ++i ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << MultizoneCPValueData( i ).Name + ", "; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneCPValueData( i ).Name + ", "; }
 				for ( j = 1; j <= AirflowNetworkSimu.NWind - 1; ++j ) {
 					StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( j ), 2 );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				}
 				StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( AirflowNetworkSimu.NWind ), 2 );
-				gio::write( OutputFileInits, fmta ) << StringOut;
+				gio::write( OutputFileInits, fmtA ) << StringOut;
 			}
 		} else if ( AirflowNetworkNumOfSingleSideZones > 0 ) {
 			for ( i = 1; i <= 4; ++i ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << MultizoneCPValueData( i ).Name + ", "; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork Model:Wind Pressure Coefficients, "; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneCPValueData( i ).Name + ", "; }
 				for ( j = 1; j <= AirflowNetworkSimu.NWind - 1; ++j ) {
 					StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( j ), 2 );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 				}
 				StringOut = RoundSigDigits( MultizoneCPValueData( i ).CPValue( AirflowNetworkSimu.NWind ), 2 );
-				gio::write( OutputFileInits, fmta ) << StringOut;
+				gio::write( OutputFileInits, fmtA ) << StringOut;
 			}
 			for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
 				if ( MultizoneZoneData( i ).SingleSidedCpType == "ADVANCED" ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), "; }
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << MultizoneZoneData( i ).ZoneName + ", "; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), "; }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << MultizoneZoneData( i ).ZoneName + ", "; }
 					for ( j = 1; j <= AirflowNetworkSimu.NWind - 1; ++j ) {
 						StringOut = RoundSigDigits( EPDeltaCP( i ).WindDir( j ), 2 );
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmta, flags ) << StringOut + ','; }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 					}
 					StringOut = RoundSigDigits( EPDeltaCP( i ).WindDir( AirflowNetworkSimu.NWind ), 2 );
-					gio::write( OutputFileInits, fmta ) << StringOut;
+					gio::write( OutputFileInits, fmtA ) << StringOut;
 				}
 			}
 		}
@@ -3677,7 +3677,8 @@ namespace AirflowNetworkBalanceManager {
 
 					if ( SameString( AirflowNetworkSimu.BldgType, "LowRise" ) && FacadeNum <= 4 ) {
 						IncRad = IncAng * DegToRadians;
-						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2. ) - 1.175 * std::pow( std::sin( IncRad ), 2 ) + 0.131 * std::pow( std::sin( 2. * IncRad * SideRatioFac ), 3 ) + 0.769 * std::cos( IncRad / 2. ) + 0.07 * std::pow( ( SideRatioFac * std::sin( IncRad / 2. ) ), 2 ) + 0.717 * std::pow( std::cos( IncRad / 2. ), 2 ) );
+						Real64 const cos_IncRad_over_2( std::cos( IncRad / 2.0 ) );
+						MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * cos_IncRad_over_2 + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( cos_IncRad_over_2 ) );
 					}
 
 					// Wind-pressure coefficients for vertical facades, high-rise building
@@ -3752,7 +3753,7 @@ namespace AirflowNetworkBalanceManager {
 					WtAng = 1.0 - DelAng / 10.0;
 					// Wind-pressure coefficients for vertical facades, low-rise building
 					IncRad = IncAng * DegToRadians;
-					MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2. ) - 1.175 * std::pow( std::sin( IncRad ), 2 ) + 0.131 * std::pow( std::sin( 2. * IncRad * SideRatioFac ), 3 ) + 0.769 * std::cos( IncRad / 2. ) + 0.07 * std::pow( ( SideRatioFac * std::sin( IncRad / 2. ) ), 2 ) + 0.717 * std::pow( std::cos( IncRad / 2. ), 2 ) );
+					MultizoneCPValueData( FacadeNum ).CPValue( WindDirNum ) = 0.6 * std::log( 1.248 - 0.703 * std::sin( IncRad / 2.0 ) - 1.175 * pow_2( std::sin( IncRad ) ) + 0.131 * pow_3( std::sin( 2.0 * IncRad * SideRatioFac ) ) + 0.769 * std::cos( IncRad / 2.0 ) + 0.07 * pow_2( SideRatioFac * std::sin( IncRad / 2.0 ) ) + 0.717 * pow_2( std::cos( IncRad / 2.0 ) ) );
 				} // End of wind direction loop
 			} // End of facade number loop
 			CalcSingleSidedCps(); //run the advanced single sided subroutine if at least one zone calls for it
@@ -5280,7 +5281,7 @@ Label90: ;
 			for ( i = NumOfLinksMultiZone + 1; i <= AirflowNetworkNumOfLinks; ++i ) {
 				n = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 				M = AirflowNetworkLinkageData( i ).NodeNums( 2 );
-				AirDensity = PsyRhoAirFnPbTdbW( ( AirflowNetworkNodeSimu( n ).PZ + AirflowNetworkNodeSimu( M ).PZ ) / 2. + OutBaroPress, ( AirflowNetworkNodeSimu( n ).TZ + AirflowNetworkNodeSimu( M ).TZ ) / 2., ( AirflowNetworkNodeSimu( n ).WZ + AirflowNetworkNodeSimu( M ).WZ ) / 2. );
+				AirDensity = PsyRhoAirFnPbTdbW( ( AirflowNetworkNodeSimu( n ).PZ + AirflowNetworkNodeSimu( M ).PZ ) / 2.0 + OutBaroPress, ( AirflowNetworkNodeSimu( n ).TZ + AirflowNetworkNodeSimu( M ).TZ ) / 2.0, ( AirflowNetworkNodeSimu( n ).WZ + AirflowNetworkNodeSimu( M ).WZ ) / 2.0 );
 				if ( SupplyFanType == FanType_SimpleOnOff && OnOffFanRunTimeFraction < 1.0 && OnOffFanRunTimeFraction > 0.0 ) {
 					AirflowNetworkLinkReport( i ).VolFLOW = AirflowNetworkLinkReport( i ).FLOW / AirDensity * ( 1.0 - OnOffFanRunTimeFraction );
 					AirflowNetworkLinkReport( i ).VolFLOW2 = AirflowNetworkLinkReport( i ).FLOW2 / AirDensity * ( 1.0 - OnOffFanRunTimeFraction );
@@ -6832,7 +6833,6 @@ Label90: ;
 		Real64 ZoneAngDiff;
 		Real64 SSZoneNum;
 		Real64 SmallArea;
-		Real64 VelRatio;
 		FArray1D< Real64 > ZoneAng; // Azimuth angle of the exterior wall of the zone
 		FArray1D< Real64 > PiFormula; // Formula for the mean pressure difference
 		FArray1D< Real64 > SigmaFormula; // Formula for the flucuating pressure difference
@@ -6942,19 +6942,19 @@ Label90: ;
 					}
 				}
 				if ( NumofExtSurfInZone( AFNZnNum ) == 0 ) {
-					ShowWarningError( "AirflowNetwork:Multizone:Zone = " + MultizoneZoneData( AFNZnNum ).ZoneName + " has single side wind pressure coefficient type \"ADVANCED\", but has no exterior " "AirflowNetwork:MultiZone:Component:DetailedOpening and/or AirflowNetwork:MultiZone:Component:SimpleOpening objects." );
-					ShowContinueError( "Zones must have exactly two exterior openings in order for the \"ADVANCED\" single sided " "wind pressure coefficient model to be used." );
+					ShowWarningError( "AirflowNetwork:Multizone:Zone = " + MultizoneZoneData( AFNZnNum ).ZoneName + " has single side wind pressure coefficient type \"ADVANCED\", but has no exterior AirflowNetwork:MultiZone:Component:DetailedOpening and/or AirflowNetwork:MultiZone:Component:SimpleOpening objects." );
+					ShowContinueError( "Zones must have exactly two exterior openings in order for the \"ADVANCED\" single sided wind pressure coefficient model to be used." );
 					ShowContinueError( "The wind pressure coefficient model for this zone will be set to \"STANDARD\" and simulation continues." );
 					MultizoneZoneData( AFNZnNum ).SingleSidedCpType = "STANDARD";
 				} else if ( NumofExtSurfInZone( AFNZnNum ) == 1 ) {
 					ShowWarningError( "AirflowNetwork:Multizone:Zone = " + MultizoneZoneData( AFNZnNum ).ZoneName );
-					ShowContinueError( "has single side wind pressure coefficient type \"ADVANCED\", but has only one exterior " "AirflowNetwork:MultiZone:Component:DetailedOpening and/or AirflowNetwork:MultiZone:Component:SimpleOpening objects." );
-					ShowContinueError( "Zones must have exactly two openings in order for the \"ADVANCED\" single side " "wind pressure coefficient model to be used." );
+					ShowContinueError( "has single side wind pressure coefficient type \"ADVANCED\", but has only one exterior AirflowNetwork:MultiZone:Component:DetailedOpening and/or AirflowNetwork:MultiZone:Component:SimpleOpening objects." );
+					ShowContinueError( "Zones must have exactly two openings in order for the \"ADVANCED\" single side wind pressure coefficient model to be used." );
 					ShowContinueError( "The wind pressure coefficient model for this zone will be set to \"STANDARD\" and simulation continues." );
 					MultizoneZoneData( AFNZnNum ).SingleSidedCpType = "STANDARD";
 				} else if ( NumofExtSurfInZone( AFNZnNum ) > 2 ) {
-					ShowWarningError( "AirflowNetwork:Multizone:Zone = " + MultizoneZoneData( AFNZnNum ).ZoneName + " has single side wind pressure coefficient type \"ADVANCED\", but has " + RoundSigDigits( NumofExtSurfInZone( AFNZnNum ) ) + " exterior AirflowNetwork:MultiZone:Component:DetailedOpening and/or " "AirflowNetwork:MultiZone:Component:SimpleOpening objects." );
-					ShowContinueError( "Zones must have exactly two openings in order for the \"ADVANCED\" single side " "wind pressure coefficient model to be used." );
+					ShowWarningError( "AirflowNetwork:Multizone:Zone = " + MultizoneZoneData( AFNZnNum ).ZoneName + " has single side wind pressure coefficient type \"ADVANCED\", but has " + RoundSigDigits( NumofExtSurfInZone( AFNZnNum ) ) + " exterior AirflowNetwork:MultiZone:Component:DetailedOpening and/or AirflowNetwork:MultiZone:Component:SimpleOpening objects." );
+					ShowContinueError( "Zones must have exactly two openings in order for the \"ADVANCED\" single side wind pressure coefficient model to be used." );
 					ShowContinueError( "The wind pressure coefficient model for this zone will be set to \"STANDARD\" and simulation continues." );
 					MultizoneZoneData( AFNZnNum ).SingleSidedCpType = "STANDARD";
 				}
@@ -7058,6 +7058,7 @@ Label90: ;
 			if ( MultizoneZoneData( ZnNum ).SingleSidedCpType == "ADVANCED" ) {
 				OpenNuminZone = 1;
 				for ( ExtOpenNum = 1; ExtOpenNum <= AFNNumOfExtOpenings; ++ExtOpenNum ) {
+					if ( OpenNuminZone > 2 ) break; //Tuned
 					if ( AFNExtSurfaces( ExtOpenNum ).MZDZoneNum == ZnNum ) {
 						if ( OpenNuminZone == 1 ) {
 							X1 = Surface( AFNExtSurfaces( ExtOpenNum ).SurfNum ).Centroid.x;
@@ -7078,7 +7079,7 @@ Label90: ;
 					ShowContinueError( "The openings should be coplanar for the model to be valid. Simulation Continues." );
 				}
 				ZoneAng( ZnNum ) = ZoneAng1;
-				Sprime( ZnNum ) = std::sqrt( std::pow( std::abs( X1 - X2 ), 2 ) + std::pow( std::abs( Y1 - Y2 ), 2 ) ) / MultizoneZoneData( ZnNum ).BuildWidth;
+				Sprime( ZnNum ) = std::sqrt( pow_2( X1 - X2 ) + pow_2( Y1 - Y2 ) ) / MultizoneZoneData( ZnNum ).BuildWidth;
 				//Calculate DeltaCp for each wind direction for each zone
 				for ( WindDirNum = 1; WindDirNum <= AirflowNetworkNumofWindDir; ++WindDirNum ) {
 					WindDir = ( WindDirNum - 1 ) * 10.0;
@@ -7125,13 +7126,15 @@ Label90: ;
 			if ( MultizoneZoneData( ZnNum ).SingleSidedCpType == "ADVANCED" ) {
 				OpenNuminZone = 1;
 				for ( ExtOpenNum = 1; ExtOpenNum <= AFNNumOfExtOpenings; ++ExtOpenNum ) {
+					if ( OpenNuminZone > 2 ) break; //Tuned
 					if ( AFNExtSurfaces( ExtOpenNum ).MZDZoneNum == ZnNum ) {
-						VelRatio = std::pow( ( 10 / AFNExtSurfaces( ExtOpenNum ).NodeHeight ), SiteWindExp );
+						Real64 const VelRatio_2( std::pow( 10.0 / AFNExtSurfaces( ExtOpenNum ).NodeHeight, 2.0 * SiteWindExp ) );
+						Real64 const AFNEExtSurface_fac( 0.5 * ( 1.0 / pow_2( AFNExtSurfaces( ExtOpenNum ).DischCoeff ) ) );
 						if ( OpenNuminZone == 1 ) {
 							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
-								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) + 0.5 * ( 1 / std::pow( AFNExtSurfaces( ExtOpenNum ).DischCoeff, 2 ) ) * DeltaCp( ZnNum ).WindDir( WindDirNum );
+								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) + AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
-								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = ( std::pow( VelRatio, 2 ) ) * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
+								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
 								MultizoneCPValueDataTemp( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								CPV1( WindDirNum ) = MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum );
 							}
@@ -7141,9 +7144,9 @@ Label90: ;
 							++SrfNum;
 						} else if ( OpenNuminZone == 2 ) {
 							for ( WindDirNum = 1; WindDirNum <= MultizoneCPArrayData( 1 ).NumWindDir; ++WindDirNum ) {
-								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) - 0.5 * ( 1 / std::pow( AFNExtSurfaces( ExtOpenNum ).DischCoeff, 2 ) ) * DeltaCp( ZnNum ).WindDir( WindDirNum );
+								MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum ) = MultizoneCPValueData( AFNExtSurfaces( ExtOpenNum ).CPVNum ).CPValue( WindDirNum ) - AFNEExtSurface_fac * DeltaCp( ZnNum ).WindDir( WindDirNum );
 								MultizoneCPValueDataTempUnMod( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
-								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = ( std::pow( VelRatio, 2 ) ) * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
+								MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum ) = VelRatio_2 * MultizoneCPValueDataTempUnMod( SrfNum ).CPValue( WindDirNum );
 								MultizoneCPValueDataTemp( SrfNum ).Name = AFNExtSurfaces( ExtOpenNum ).SurfName;
 								CPV2( WindDirNum ) = MultizoneCPValueDataTemp( SrfNum ).CPValue( WindDirNum );
 								EPDeltaCP( ZnNum ).WindDir( WindDirNum ) = std::abs( CPV2( WindDirNum ) - CPV1( WindDirNum ) );

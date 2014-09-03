@@ -11,6 +11,7 @@
 #include <ZoneEquipmentManager.hh>
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
+#include <CoolTower.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
@@ -29,6 +30,7 @@
 #include <DataZoneEquipment.hh>
 #include <DirectAirManager.hh>
 #include <DisplayRoutines.hh>
+#include <EarthTube.hh>
 #include <ElectricBaseboardRadiator.hh>
 #include <EMSManager.hh>
 #include <EvaporativeCoolers.hh>
@@ -55,6 +57,7 @@
 #include <SplitterComponent.hh>
 #include <SteamBaseboardRadiator.hh>
 #include <SystemAvailabilityManager.hh>
+#include <ThermalChimney.hh>
 #include <UnitHeater.hh>
 #include <UnitVentilator.hh>
 #include <UserDefinedComponents.hh>
@@ -470,6 +473,7 @@ namespace ZoneEquipmentManager {
 				AirLoopFlow( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ).RetFlow = 0.0;
 				AirLoopFlow( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ).RetFlow0 = 0.0;
 				AirLoopFlow( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ).RecircFlow = 0.0;
+				AirLoopFlow( ZoneEquipConfig( ControlledZoneNum ).AirLoopNum ).ZoneMixingFlow = 0.0;
 			}
 
 		}
@@ -792,7 +796,7 @@ namespace ZoneEquipmentManager {
 		HeatPeakDateHrMin = "";
 
 		ZoneSizThermSetPtHi = 0.0;
-		ZoneSizThermSetPtLo = 1000.;
+		ZoneSizThermSetPtLo = 1000.0;
 
 		for ( DesDayNum = 1; DesDayNum <= TotDesDays + TotRunDesPersDays; ++DesDayNum ) {
 			DesDayWeath( DesDayNum ).Temp.allocate( NumOfTimeStepInHour * 24 );
@@ -1734,7 +1738,7 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		static gio::Fmt const ZSizeFmt10( "('Time')" );
 		static gio::Fmt const ZSizeFmt11( "(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )" );
 		static gio::Fmt const ZSizeFmt20( "(I2.2,':',I2.2,':00')" );
@@ -2263,7 +2267,7 @@ namespace ZoneEquipmentManager {
 					TotCoolSizMult = FinalZoneSizing( CtrlZoneNum ).CoolSizingFactor;
 				}
 				// If the cooling sizing multiplier is not 1, adjust the cooling design data
-				if ( std::abs( TotCoolSizMult - 1.0 ) > .00001 ) {
+				if ( std::abs( TotCoolSizMult - 1.0 ) > 0.00001 ) {
 					if ( FinalZoneSizing( CtrlZoneNum ).DesCoolVolFlow > 0.0 ) {
 						TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtCoolMax;
 						DDNum = FinalZoneSizing( CtrlZoneNum ).CoolDDNum;
@@ -2390,7 +2394,7 @@ namespace ZoneEquipmentManager {
 					TotHeatSizMult = FinalZoneSizing( CtrlZoneNum ).HeatSizingFactor;
 				}
 
-				if ( std::abs( TotHeatSizMult - 1.0 ) > .00001 ) {
+				if ( std::abs( TotHeatSizMult - 1.0 ) > 0.00001 ) {
 					if ( FinalZoneSizing( CtrlZoneNum ).DesHeatVolFlow > 0.0 ) {
 						TimeStepAtPeak = FinalZoneSizing( CtrlZoneNum ).TimeStepNumAtHeatMax;
 						DDNum = FinalZoneSizing( CtrlZoneNum ).HeatDDNum;
@@ -2592,6 +2596,8 @@ namespace ZoneEquipmentManager {
 		using DataGlobals::isPulseZoneSizing;
 		using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
 		using HVACUnitarySystem::SimUnitarySystem;
+		using DataHeatBalance::Mixing;
+		using DataHeatBalance::ZoneAirMassFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2632,6 +2638,7 @@ namespace ZoneEquipmentManager {
 
 		// Determine flow rate and temperature of supply air based on type of damper
 
+		bool AdjustZoneMixingFlowFlag( true );  // holds zone mixing flow calc status
 		FirstCall = true;
 		ErrorFlag = false;
 
@@ -2669,6 +2676,10 @@ namespace ZoneEquipmentManager {
 
 		// Loop over all the primary air loop; simulate their components (equipment)
 		// and controllers
+
+		if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
+			 CalcAirFlowSimple( AdjustZoneMixingFlowFlag );
+		}
 
 		for ( ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum ) {
 
@@ -2900,7 +2911,7 @@ namespace ZoneEquipmentManager {
 				if ( AirLoopNum > 0 ) {
 					if ( ! PrimaryAirSystem( AirLoopNum ).OASysExists ) {
 						if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
-							if ( ! isPulseZoneSizing ) {
+							if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
 								ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
 								ShowContinueErrorTimeStamp( "" );
 								ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
@@ -2912,7 +2923,7 @@ namespace ZoneEquipmentManager {
 					}
 				} else {
 					if ( ZoneEquipConfig( ControlledZoneNum ).ZoneExh > 0.0 && ! ZoneEquipConfig( ControlledZoneNum ).FlowError && AirLoopsSimOnce ) {
-						if ( ! isPulseZoneSizing ) {
+						if ( !isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
 							ShowWarningError( "In zone " + ZoneEquipConfig( ControlledZoneNum ).ZoneName + " there is unbalanced exhaust air flow." );
 							ShowContinueErrorTimeStamp( "" );
 							ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
@@ -3024,66 +3035,49 @@ namespace ZoneEquipmentManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string EquipTypeTemp;
-		std::string EquipNameTemp;
-		int EquipTypeNum;
-		int EquipPtrTemp;
-		int ComparedEquipTypeNum;
-		int TempNum;
 		int CurEqHeatingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
 		int CurEqCoolingPriority; // Used to make sure "optimization features" on compilers don't defeat purpose of this routine
-		int NumOfEquipTypes; // For improved readability
 
-		NumOfEquipTypes = ZoneEquipList( ControlledZoneNum ).NumOfEquipTypes;
-		PrioritySimOrder.EquipType() = "";
-		PrioritySimOrder.EquipType_Num() = 0;
-		PrioritySimOrder.EquipName() = "";
-		PrioritySimOrder.EquipPtr() = 0;
+		auto const & zeq( ZoneEquipList( ControlledZoneNum ) );
+		int const NumOfEquipTypes( zeq.NumOfEquipTypes );
+		for ( int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
+			auto & pso( PrioritySimOrder( EquipTypeNum ) );
+			pso.EquipType = zeq.EquipType( EquipTypeNum );
+			pso.EquipName = zeq.EquipName( EquipTypeNum );
+			pso.EquipType_Num = zeq.EquipType_Num( EquipTypeNum );
+			pso.CoolingPriority = zeq.CoolingPriority( EquipTypeNum );
+			pso.HeatingPriority = zeq.HeatingPriority( EquipTypeNum );
+			pso.EquipPtr = DefaultSimOrder( EquipTypeNum );
+		}
+		for ( int EquipTypeNum = NumOfEquipTypes + 1, EquipTypeNum_end = PrioritySimOrder.u(); EquipTypeNum <= EquipTypeNum_end; ++EquipTypeNum ) { // Reset unused upper array portion
+			auto & pso( PrioritySimOrder( EquipTypeNum ) );
+			pso.EquipType.clear();
+			pso.EquipName.clear();
+			pso.EquipType_Num = 0;
+			pso.EquipPtr = 0;
+		}
 
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipType() = ZoneEquipList( ControlledZoneNum ).EquipType( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipName() = ZoneEquipList( ControlledZoneNum ).EquipName( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipType_Num() = ZoneEquipList( ControlledZoneNum ).EquipType_Num( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).CoolingPriority() = ZoneEquipList( ControlledZoneNum ).CoolingPriority( {1,NumOfEquipTypes} );
-		PrioritySimOrder( {1,NumOfEquipTypes} ).HeatingPriority() = ZoneEquipList( ControlledZoneNum ).HeatingPriority( {1,NumOfEquipTypes} );
+		for ( int EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
+			auto & pso( PrioritySimOrder( EquipTypeNum ) );
 
-		PrioritySimOrder( {1,NumOfEquipTypes} ).EquipPtr() = DefaultSimOrder( {1,NumOfEquipTypes} );
+			CurEqHeatingPriority = pso.HeatingPriority;
+			CurEqCoolingPriority = pso.CoolingPriority;
 
-		for ( EquipTypeNum = 1; EquipTypeNum <= NumOfEquipTypes; ++EquipTypeNum ) {
+			for ( int ComparedEquipTypeNum = EquipTypeNum; ComparedEquipTypeNum <= NumOfEquipTypes; ++ComparedEquipTypeNum ) {
+				auto & psc( PrioritySimOrder( ComparedEquipTypeNum ) );
 
-			CurEqHeatingPriority = PrioritySimOrder( EquipTypeNum ).HeatingPriority;
-			CurEqCoolingPriority = PrioritySimOrder( EquipTypeNum ).CoolingPriority;
+				if ( ( CurEqCoolingPriority > psc.CoolingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) || ( CurEqHeatingPriority > psc.HeatingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired >= 0.0 ) ) {
 
-			for ( ComparedEquipTypeNum = EquipTypeNum; ComparedEquipTypeNum <= NumOfEquipTypes; ++ComparedEquipTypeNum ) {
+					//Tuned C++ string swap avoids copying
+					std::swap( pso.EquipType, psc.EquipType );
+					std::swap( pso.EquipName, psc.EquipName );
+					std::swap( pso.EquipPtr, psc.EquipPtr );
+					std::swap( pso.EquipType_Num, psc.EquipType_Num );
+					std::swap( pso.CoolingPriority, psc.CoolingPriority );
+					std::swap( pso.HeatingPriority, psc.HeatingPriority );
 
-				if ( ( CurEqCoolingPriority > PrioritySimOrder( ComparedEquipTypeNum ).CoolingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired < 0.0 ) || ( CurEqHeatingPriority > PrioritySimOrder( ComparedEquipTypeNum ).HeatingPriority && ZoneSysEnergyDemand( ActualZoneNum ).RemainingOutputRequired >= 0.0 ) ) {
-
-					EquipTypeTemp = PrioritySimOrder( EquipTypeNum ).EquipType;
-					PrioritySimOrder( EquipTypeNum ).EquipType = PrioritySimOrder( ComparedEquipTypeNum ).EquipType;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipType = EquipTypeTemp;
-
-					EquipNameTemp = PrioritySimOrder( EquipTypeNum ).EquipName;
-					PrioritySimOrder( EquipTypeNum ).EquipName = PrioritySimOrder( ComparedEquipTypeNum ).EquipName;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipName = EquipNameTemp;
-
-					EquipPtrTemp = PrioritySimOrder( EquipTypeNum ).EquipPtr;
-					PrioritySimOrder( EquipTypeNum ).EquipPtr = PrioritySimOrder( ComparedEquipTypeNum ).EquipPtr;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipPtr = EquipPtrTemp;
-
-					EquipPtrTemp = PrioritySimOrder( EquipTypeNum ).EquipType_Num;
-					PrioritySimOrder( EquipTypeNum ).EquipType_Num = PrioritySimOrder( ComparedEquipTypeNum ).EquipType_Num;
-					PrioritySimOrder( ComparedEquipTypeNum ).EquipType_Num = EquipPtrTemp;
-
-					TempNum = PrioritySimOrder( EquipTypeNum ).CoolingPriority;
-					PrioritySimOrder( EquipTypeNum ).CoolingPriority = PrioritySimOrder( ComparedEquipTypeNum ).CoolingPriority;
-					PrioritySimOrder( ComparedEquipTypeNum ).CoolingPriority = TempNum;
-
-					CurEqCoolingPriority = PrioritySimOrder( EquipTypeNum ).CoolingPriority;
-
-					TempNum = PrioritySimOrder( EquipTypeNum ).HeatingPriority;
-					PrioritySimOrder( EquipTypeNum ).HeatingPriority = PrioritySimOrder( ComparedEquipTypeNum ).HeatingPriority;
-					PrioritySimOrder( ComparedEquipTypeNum ).HeatingPriority = TempNum;
-
-					CurEqHeatingPriority = PrioritySimOrder( EquipTypeNum ).HeatingPriority;
+					CurEqCoolingPriority = pso.CoolingPriority;
+					CurEqHeatingPriority = pso.HeatingPriority;
 
 				}
 
@@ -3299,12 +3293,27 @@ namespace ZoneEquipmentManager {
 		using DataAirflowNetwork::AirflowNetworkNumOfExhFan;
 		using DataGlobals::isPulseZoneSizing;
 
+		using DataHeatBalance::Zone;
+		using DataHeatBalance::MassConservation;
+		using DataHeatBalance::Mixing;
+		using DataHeatBalance::Infiltration;
+		using DataHeatBalance::ZoneAirMassFlow;
+		using DataHeatBalance::AddInfiltrationFlow;
+		using DataHeatBalance::AdjustInfiltrationFlow;
+		using DataHeatBalFanSys::ZoneMassBalanceFlag;
+		using DataHeatBalFanSys::ZoneInfiltrationFlag;
+		using DataHeatBalFanSys::MixingMassFlowZone;
+		using DataHeatBalFanSys::ZoneReOrder;
+		using DataHVACGlobals::ZoneMassBalanceHVACReSim;
+		using DataHVACGlobals::SmallMassFlow;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		int const IterMax( 25 );
+		Real64 const ConvergenceTolerance( 0.000010 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3326,100 +3335,240 @@ namespace ZoneEquipmentManager {
 		Real64 TotExhaustAirMassFlowRate;
 		Real64 TotSupplyAirMassFlowRate;
 
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
+		Real64 ZoneMixingAirMassFlowRate;
+		Real64 ZoneMixingNetAirMassFlowRate;
+		Real64 ZoneMixMassFlowRate;
+		Real64 ZoneMixingAirMassFlowRatePrevious;
+		Real64 ZoneInfiltrationMassFlowRate;
+		Real64 BuildingZoneMixingFlowOld;
+		Real64 BuildingZoneMixingFlow;
 
-			if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
+		int Iteration;
+		int ZoneNum1;
 
-			TotInletAirMassFlowRate = 0.0;
-			TotInletAirMassFlowRateMax = 0.0;
-			TotInletAirMassFlowRateMaxAvail = 0.0;
-			TotInletAirMassFlowRateMin = 0.0;
-			TotInletAirMassFlowRateMinAvail = 0.0;
-			TotExhaustAirMassFlowRate = 0.0;
+		ZoneMassBalanceHVACReSim = false;
+		Iteration = 0;
+		BuildingZoneMixingFlow = 0.0;
+		BuildingZoneMixingFlowOld = 0.0;
 
-			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumInletNodes; ++NodeNum ) {
-				TotInletAirMassFlowRate += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRate;
-				TotInletAirMassFlowRateMax += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRateMax;
-				TotInletAirMassFlowRateMaxAvail += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRateMaxAvail;
-				TotInletAirMassFlowRateMin += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRateMin;
-				TotInletAirMassFlowRateMinAvail += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRateMinAvail;
+		do
+		{
+			if (ZoneAirMassFlow.EnforceZoneMassBalance) {
+				for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
+					if (!ZoneEquipConfig(ZoneNum).IsControlled) continue;
+					if (ZoneEquipConfig(ZoneNum).AirLoopNum > 0) {
+						AirLoopFlow(ZoneEquipConfig(ZoneNum).AirLoopNum).ZoneExhaust = 0.0;
+						AirLoopFlow(ZoneEquipConfig(ZoneNum).AirLoopNum).ZoneExhaustBalanced = 0.0;
+						AirLoopFlow(ZoneEquipConfig(ZoneNum).AirLoopNum).SupFlow = 0.0;
+						AirLoopFlow(ZoneEquipConfig(ZoneNum).AirLoopNum).RetFlow = 0.0;
+						AirLoopFlow(ZoneEquipConfig(ZoneNum).AirLoopNum).RetFlow0 = 0.0;
+						AirLoopFlow(ZoneEquipConfig(ZoneNum).AirLoopNum).RecircFlow = 0.0;
+						AirLoopFlow(ZoneEquipConfig(ZoneNum).AirLoopNum).ZoneMixingFlow = 0.0;
+					}
+					ZoneInfiltrationFlag(ZoneNum) = false;
+					MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 0;
+				}
 			}
+			BuildingZoneMixingFlowOld = BuildingZoneMixingFlow;
+			BuildingZoneMixingFlow = 0.0;
 
-			for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumExhaustNodes; ++NodeNum ) {
+			for ( ZoneNum1 = 1; ZoneNum1 <= NumOfZones; ++ZoneNum1 ) {
+				ZoneNum = ZoneNum1;
+				if ( ZoneAirMassFlow.EnforceZoneMassBalance ) ZoneNum = ZoneReOrder( ZoneNum1 );
 
-				if ( AirflowNetworkNumOfExhFan == 0 ) TotExhaustAirMassFlowRate += Node( ZoneEquipConfig( ZoneNum ).ExhaustNode( NodeNum ) ).MassFlowRate;
+				if ( !ZoneEquipConfig(ZoneNum).IsControlled ) continue;
 
+				TotInletAirMassFlowRate = 0.0;
+				TotInletAirMassFlowRateMax = 0.0;
+				TotInletAirMassFlowRateMaxAvail = 0.0;
+				TotInletAirMassFlowRateMin = 0.0;
+				TotInletAirMassFlowRateMinAvail = 0.0;
+				TotExhaustAirMassFlowRate = 0.0;
+
+				ZoneMixingAirMassFlowRate = 0.0;
+				ZoneMixingNetAirMassFlowRate = 0.0;
+				ZoneMixMassFlowRate = 0.0;
+				ZoneInfiltrationMassFlowRate = 0.0;
+				ZoneMixingAirMassFlowRatePrevious = 0.0;
+
+				for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( ZoneNum ).NumInletNodes; ++NodeNum ) {
+					TotInletAirMassFlowRate += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum) ).MassFlowRate;
+					TotInletAirMassFlowRateMax += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum) ).MassFlowRateMax;
+					TotInletAirMassFlowRateMaxAvail += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum) ).MassFlowRateMaxAvail;
+					TotInletAirMassFlowRateMin += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum)).MassFlowRateMin;
+					TotInletAirMassFlowRateMinAvail += Node( ZoneEquipConfig( ZoneNum ).InletNode( NodeNum ) ).MassFlowRateMinAvail;
+				}
+
+				for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumExhaustNodes; ++NodeNum) {
+
+					if (AirflowNetworkNumOfExhFan == 0) TotExhaustAirMassFlowRate += Node(ZoneEquipConfig(ZoneNum).ExhaustNode(NodeNum)).MassFlowRate;
+
+				}
+
+
+				//
+				// Include zone mixing mass flow rate
+				if ( ZoneMassBalanceFlag( ZoneNum ) ) {
+					if (Iteration == 0) {
+						ZoneMixingAirMassFlowRate = MixingMassFlowZone( ZoneNum );
+					}
+					else {
+						RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
+						if (RetNode > 0) {
+							ZoneMixingAirMassFlowRate = max(0.0, Node(RetNode).MassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate + MassConservation(ZoneNum).MixingSourceMassFlowRate);
+						}
+					}
+					CalcZoneMixingFlowRateOfReceivingZone(ZoneNum, ZoneMixingAirMassFlowRate);
+					if (MassConservation(ZoneNum).IsOnlySourceZone) {
+						ZoneInfiltrationMassFlowRate = max(0.0, MassConservation(ZoneNum).MixingSourceMassFlowRate + TotExhaustAirMassFlowRate - TotInletAirMassFlowRate);
+
+						if (MassConservation(ZoneNum).MixingSourceMassFlowRate > TotInletAirMassFlowRate) {
+
+							if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+								if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
+									ZoneInfiltrationFlag(ZoneNum) = true;
+									MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+									Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate = ZoneInfiltrationMassFlowRate;
+									MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+								}
+								else {
+									MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+								}
+							}
+
+							if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+								if (ZoneInfiltrationMassFlowRate > ConvergenceTolerance) {
+									ZoneInfiltrationFlag(ZoneNum) = true;
+									MassConservation(ZoneNum).InfiltrationMassFlowRate = ZoneInfiltrationMassFlowRate;
+									MassConservation(ZoneNum).IncludeInfilToZoneMassBal = 1;
+								}
+								else {
+									MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+								}
+							}
+						}
+						else {
+
+							if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+								MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+							}
+							if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+								MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+							}
+						}
+					}
+					else {
+						if (MassConservation(ZoneNum).InfiltrationPtr > 0) {
+							MassConservation(ZoneNum).InfiltrationMassFlowRate = Infiltration(MassConservation(ZoneNum).InfiltrationPtr).MassFlowRate;
+						}
+						else {
+							MassConservation(ZoneNum).InfiltrationMassFlowRate = 0.0;
+						}
+					}
+
+					MassConservation(ZoneNum).InMassFlowRate = TotInletAirMassFlowRate;
+					MassConservation(ZoneNum).ExhMassFlowRate = TotExhaustAirMassFlowRate;
+					ZoneMixingNetAirMassFlowRate = MassConservation(ZoneNum).MixingMassFlowRate - MassConservation(ZoneNum).MixingSourceMassFlowRate;
+				}
+				//
+
+				AirLoopNum = ZoneEquipConfig(ZoneNum).AirLoopNum;
+				ZoneNode = ZoneEquipConfig(ZoneNum).ZoneNode;
+				Node(ZoneNode).MassFlowRate = TotInletAirMassFlowRate;
+				Node(ZoneNode).MassFlowRateMax = TotInletAirMassFlowRateMax;
+				Node(ZoneNode).MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
+				Node(ZoneNode).MassFlowRateMin = TotInletAirMassFlowRateMin;
+				Node(ZoneNode).MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
+
+				// Update Return Air Node Conditions; If one Exists
+				RetNode = ZoneEquipConfig(ZoneNum).ReturnAirNode;
+				if (RetNode > 0) {
+					Node(RetNode).MassFlowRate = max(Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExhBalanced), 0.0);
+					if (AirLoopNum > 0) {
+						if (!PrimaryAirSystem(AirLoopNum).OASysExists) {
+							Node(RetNode).MassFlowRate = max(Node(ZoneNode).MassFlowRate + ZoneMixingNetAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh), 0.0);
+						}
+					}
+					MassConservation(ZoneNum).RetMassFlowRate = Node(RetNode).MassFlowRate;
+					Node(RetNode).MassFlowRateMax = Node(ZoneNode).MassFlowRateMax;
+					Node(RetNode).MassFlowRateMin = Node(ZoneNode).MassFlowRateMin;
+					Node(RetNode).MassFlowRateMaxAvail = Node(ZoneNode).MassFlowRateMaxAvail;
+					Node(RetNode).MassFlowRateMinAvail = 0.0;
+				}
+
+				TotSupplyAirMassFlowRate = TotInletAirMassFlowRate - (TotExhaustAirMassFlowRate - ZoneEquipConfig(ZoneNum).ZoneExh) - ZoneEquipConfig(ZoneNum).PlenumMassFlow;
+
+				if (AirLoopNum > 0) {
+					AirLoopFlow(AirLoopNum).ZoneExhaust += ZoneEquipConfig(ZoneNum).ZoneExh;
+					AirLoopFlow(AirLoopNum).ZoneExhaustBalanced += ZoneEquipConfig(ZoneNum).ZoneExhBalanced;
+					AirLoopFlow(AirLoopNum).SupFlow += TotSupplyAirMassFlowRate;
+					AirLoopFlow(AirLoopNum).RetFlow0 += Node(RetNode).MassFlowRate;
+					AirLoopFlow(AirLoopNum).RecircFlow += ZoneEquipConfig(ZoneNum).PlenumMassFlow;
+				}
+				BuildingZoneMixingFlow += MassConservation(ZoneNum).MixingMassFlowRate;
 			}
-
-			AirLoopNum = ZoneEquipConfig( ZoneNum ).AirLoopNum;
-			ZoneNode = ZoneEquipConfig( ZoneNum ).ZoneNode;
-			Node( ZoneNode ).MassFlowRate = TotInletAirMassFlowRate;
-			Node( ZoneNode ).MassFlowRateMax = TotInletAirMassFlowRateMax;
-			Node( ZoneNode ).MassFlowRateMaxAvail = TotInletAirMassFlowRateMaxAvail;
-			Node( ZoneNode ).MassFlowRateMin = TotInletAirMassFlowRateMin;
-			Node( ZoneNode ).MassFlowRateMinAvail = TotInletAirMassFlowRateMinAvail;
-
-			// Update Return Air Node Conditions; If one Exists
-			RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
-			if ( RetNode > 0 ) {
-				Node( RetNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate - ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExhBalanced ), 0.0 );
-				if ( AirLoopNum > 0 ) {
-					if ( ! PrimaryAirSystem( AirLoopNum ).OASysExists ) {
-						Node( RetNode ).MassFlowRate = max( Node( ZoneNode ).MassFlowRate - ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExh ), 0.0 );
+			// Calculate an air loop return air flow rate
+			for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
+				if ((AirLoopFlow(AirLoopNum).ZoneExhaust > (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) || AirLoopFlow(AirLoopNum).ZoneExhaust > (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced)) && !AirLoopFlow(AirLoopNum).FlowError && AirLoopsSimOnce) {
+					if (!isPulseZoneSizing && !ZoneAirMassFlow.EnforceZoneMassBalance) {
+						ShowWarningError("In AirLoopHVAC " + PrimaryAirSystem(AirLoopNum).Name + " there is unbalanced exhaust air flow.");
+						ShowContinueErrorTimeStamp(" ");
+						ShowContinueError("  Unless there is balancing infiltration / ventilation air flow, this will result in");
+						ShowContinueError("  load due to induced outdoor air being neglected in the simulation.");
+						AirLoopFlow(AirLoopNum).FlowError = true;
 					}
 				}
-				Node( RetNode ).MassFlowRateMax = Node( ZoneNode ).MassFlowRateMax;
-				Node( RetNode ).MassFlowRateMin = Node( ZoneNode ).MassFlowRateMin;
-				Node( RetNode ).MassFlowRateMaxAvail = Node( ZoneNode ).MassFlowRateMaxAvail;
-				Node( RetNode ).MassFlowRateMinAvail = 0.0;
-			}
+				AirLoopFlow(AirLoopNum).ZoneExhaust = min(AirLoopFlow(AirLoopNum).ZoneExhaust, (AirLoopFlow(AirLoopNum).SupFlow + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced + AirLoopFlow(AirLoopNum).ZoneMixingFlow));
+				AirLoopFlow(AirLoopNum).ZoneExhaust = min(AirLoopFlow(AirLoopNum).ZoneExhaust, (AirLoopFlow(AirLoopNum).MaxOutAir + AirLoopFlow(AirLoopNum).ZoneExhaustBalanced + AirLoopFlow(AirLoopNum).ZoneMixingFlow));
 
-			TotSupplyAirMassFlowRate = TotInletAirMassFlowRate - ( TotExhaustAirMassFlowRate - ZoneEquipConfig( ZoneNum ).ZoneExh ) - ZoneEquipConfig( ZoneNum ).PlenumMassFlow;
-
-			if ( AirLoopNum > 0 ) {
-				AirLoopFlow( AirLoopNum ).ZoneExhaust += ZoneEquipConfig( ZoneNum ).ZoneExh;
-				AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced += ZoneEquipConfig( ZoneNum ).ZoneExhBalanced;
-				AirLoopFlow( AirLoopNum ).SupFlow += TotSupplyAirMassFlowRate;
-				AirLoopFlow( AirLoopNum ).RetFlow0 += Node( RetNode ).MassFlowRate;
-				AirLoopFlow( AirLoopNum ).RecircFlow += ZoneEquipConfig( ZoneNum ).PlenumMassFlow;
-			}
-		}
-		// Calculate an air loop return air flow rate
-		for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
-			if ( ( AirLoopFlow( AirLoopNum ).ZoneExhaust > ( AirLoopFlow( AirLoopNum ).SupFlow + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) || AirLoopFlow( AirLoopNum ).ZoneExhaust > ( AirLoopFlow( AirLoopNum ).MaxOutAir + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) ) && ! AirLoopFlow( AirLoopNum ).FlowError && AirLoopsSimOnce ) {
-				if ( ! isPulseZoneSizing ) {
-					ShowWarningError( "In AirLoopHVAC " + PrimaryAirSystem( AirLoopNum ).Name + " there is unbalanced exhaust air flow." );
-					ShowContinueErrorTimeStamp( "" );
-					ShowContinueError( "  Unless there is balancing infiltration / ventilation air flow, this will result in" );
-					ShowContinueError( "  load due to induced outdoor air being neglected in the simulation." );
-					AirLoopFlow( AirLoopNum ).FlowError = true;
+				if (AirLoopFlow(AirLoopNum).ZoneMixingFlow < 0.0) {
+					// the source zone and the recieving zone are in different air loops
+					AirLoopFlow(AirLoopNum).ZoneExhaust = max(0.0, (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneMixingFlow));
+					AirLoopFlow(AirLoopNum).RetFlow = AirLoopFlow(AirLoopNum).SupFlow - (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) + AirLoopFlow(AirLoopNum).RecircFlow;
+				}
+				else {
+					AirLoopFlow(AirLoopNum).RetFlow = AirLoopFlow(AirLoopNum).SupFlow - (AirLoopFlow(AirLoopNum).ZoneExhaust - AirLoopFlow(AirLoopNum).ZoneExhaustBalanced) + AirLoopFlow(AirLoopNum).RecircFlow + AirLoopFlow(AirLoopNum).ZoneMixingFlow;
 				}
 			}
-			AirLoopFlow( AirLoopNum ).ZoneExhaust = min( AirLoopFlow( AirLoopNum ).ZoneExhaust, ( AirLoopFlow( AirLoopNum ).SupFlow + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) );
-			AirLoopFlow( AirLoopNum ).ZoneExhaust = min( AirLoopFlow( AirLoopNum ).ZoneExhaust, ( AirLoopFlow( AirLoopNum ).MaxOutAir + AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) );
-			AirLoopFlow( AirLoopNum ).RetFlow = AirLoopFlow( AirLoopNum ).SupFlow - ( AirLoopFlow( AirLoopNum ).ZoneExhaust - AirLoopFlow( AirLoopNum ).ZoneExhaustBalanced ) + AirLoopFlow( AirLoopNum ).RecircFlow;
-		}
-		// adjust the zone return air flow rates to match the air loop return air flow rate
-		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-			if ( ! ZoneEquipConfig( ZoneNum ).IsControlled ) continue;
-			RetNode = ZoneEquipConfig( ZoneNum ).ReturnAirNode;
-			AirLoopNum = ZoneEquipConfig( ZoneNum ).AirLoopNum;
-			if ( AirLoopNum > 0 && RetNode > 0 ) {
-				if ( PrimaryAirSystem( AirLoopNum ).OASysExists ) {
-					if ( AirLoopFlow( AirLoopNum ).RetFlow0 > 0.0 ) {
-						Node( RetNode ).MassFlowRate *= ( AirLoopFlow( AirLoopNum ).RetFlow / AirLoopFlow( AirLoopNum ).RetFlow0 );
-					} else {
-						Node( RetNode ).MassFlowRate = 0.0;
+
+			// adjust the zone return air flow rates to match the air loop return air flow rate
+			for (ZoneNum1 = 1; ZoneNum1 <= NumOfZones; ++ZoneNum1) {
+				ZoneNum = ZoneNum1;
+				if (ZoneAirMassFlow.EnforceZoneMassBalance) ZoneNum = ZoneReOrder(ZoneNum1);
+				if (!ZoneEquipConfig(ZoneNum).IsControlled) continue;
+				RetNode = ZoneEquipConfig(ZoneNum).ReturnAirNode;
+				AirLoopNum = ZoneEquipConfig(ZoneNum).AirLoopNum;
+				if (AirLoopNum > 0 && RetNode > 0) {
+					if (PrimaryAirSystem(AirLoopNum).OASysExists) {
+						if (AirLoopFlow(AirLoopNum).RetFlow0 > 0.0) {
+							Node(RetNode).MassFlowRate *= (AirLoopFlow(AirLoopNum).RetFlow / AirLoopFlow(AirLoopNum).RetFlow0);
+						}
+						else {
+							Node(RetNode).MassFlowRate = 0.0;
+						}
 					}
 				}
+				//       IF (AirLoopNum == 0 .AND. RetNode > 0) THEN
+				//         ! sometimes models for ZoneHVAC have input a return node, but no air loop HVAC.
+				//         ! this block was tried but caused problems such as UA coil sizing issues and water coil controller problems
+				//         !  CR 7967, no air loop HVAC, but there is a return air node that never gets used or set
+				//         Node(RetNode)%MassFlowRate = 0.0d0
+				//       ENDIF
 			}
-			//       IF (AirLoopNum == 0 .AND. RetNode > 0) THEN
-			//         ! sometimes models for ZoneHVAC have input a return node, but no air loop HVAC.
-			//         ! this block was tried but caused problems such as UA coil sizing issues and water coil controller problems
-			//         !  CR 7967, no air loop HVAC, but there is a return air node that never gets used or set
-			//         Node(RetNode)%MassFlowRate = 0.0d0
-			//       ENDIF
-		}
+			// update the
+			if (Iteration > 0) {
+				if (abs(BuildingZoneMixingFlow - BuildingZoneMixingFlowOld) < ConvergenceTolerance) {
+					ZoneMassBalanceHVACReSim = false;
+					break;
+				}
+				else {
+					ZoneMassBalanceHVACReSim = true;
+				}
+			}
+			if (!ZoneAirMassFlow.EnforceZoneMassBalance) break;
+			Iteration += 1;
+
+		} while (Iteration < IterMax);
 
 	}
 
@@ -3729,6 +3878,1166 @@ namespace ZoneEquipmentManager {
 		// na
 
 	}
+
+	void
+	CalcAirFlowSimple(Optional_int_const SysTimestepLoop, Optional_bool_const AdjustZoneMixingFlowFlag) // System time step index
+	{
+
+					// SUBROUTINE INFORMATION:
+					//       AUTHOR         Legacy Code
+					//       DATE WRITTEN   na
+					//       MODIFIED       Shirey, Jan 2008 (MIXING objects, use avg. conditions for Cp, Air Density and Hfg)
+					//       MODIFIED       L. Lawrie and L. GU, Jan. 2008 (Allow multiple infiltration and ventilation objects)
+					//                      B. Griffith. Jan 2009 add infiltration, residential basic/sherman-grimsrud and enhanced/AIM2
+					//                      L. Lawrie - March 2009 - move ventilation electric calculation to this routine (for
+					//                        Electricity Net.
+					//                      L. Gu - Dec. 2009 - Added a new ventilation object to calculate flow rate based on wind and stack
+					//                        effect through an opening.
+					//       MODIFIED       Stovall - Aug 2011 (add refrigerator door mixing)
+					//       RE-ENGINEERED  na
+
+					// PURPOSE OF THIS SUBROUTINE:
+					// This subroutine calculates the air component of the heat balance.
+
+					// METHODOLOGY EMPLOYED:
+					// na
+
+					// REFERENCES:
+					// na
+
+					// Using/Aliasing
+					using DataEnvironment::OutBaroPress;
+					using DataEnvironment::OutHumRat;
+					using DataEnvironment::OutEnthalpy;
+					using DataEnvironment::WindSpeed;
+					using DataEnvironment::WindDir;
+					using namespace DataHeatBalFanSys;
+					using namespace DataHeatBalance;
+					using Psychrometrics::PsyRhoAirFnPbTdbW;
+					using Psychrometrics::PsyCpAirFnWTdb;
+					using Psychrometrics::PsyTdbFnHW;
+					using DataRoomAirModel::ZTJET;
+					using DataRoomAirModel::AirModel;
+					using DataRoomAirModel::RoomAirModel_UCSDDV;
+					using DataRoomAirModel::RoomAirModel_UCSDCV;
+					using ScheduleManager::GetCurrentScheduleValue;
+					using DataAirflowNetwork::SimulateAirflowNetwork;
+					using DataAirflowNetwork::AirflowNetworkControlSimple;
+					using DataAirflowNetwork::AirflowNetworkControlSimpleADS;
+					using DataAirflowNetwork::AirflowNetworkZoneFlag;
+					using EarthTube::ManageEarthTube;
+					using CoolTower::ManageCoolTower;
+					using ThermalChimney::ManageThermalChimney;
+					using DataZoneEquipment::ZoneEquipAvail;
+					using DataHVACGlobals::CycleOn;
+					using DataHVACGlobals::CycleOnZoneFansOnly;
+					using DataContaminantBalance::Contaminant;
+					using DataContaminantBalance::ZoneAirCO2;
+					using DataContaminantBalance::MixingMassFlowCO2;
+					using DataContaminantBalance::ZoneAirGC;
+					using DataContaminantBalance::MixingMassFlowGC;
+
+					using DataHeatBalance::Ventilation;
+					using DataGlobals::TimeStepZone;
+					using DataGlobals::WarmupFlag;
+					using DataGlobals::EndHourFlag;
+					using DataGlobals::SecInHour;
+					using DataGlobals::KickOffSimulation;
+					using DataGlobals::HourOfDay;
+					using DataHVACGlobals::TimeStepSys;
+					using namespace DataLoopNode;
+
+					// Locals
+					// SUBROUTINE ARGUMENT DEFINITIONS:
+
+					// SUBROUTINE PARAMETER DEFINITIONS:
+					Real64 const StdGravity(9.80665); // The acceleration of gravity at the sea level (m/s2)
+					static std::string const RoutineNameMixing("CalcAirFlowSimple:Mixing");
+					static std::string const RoutineNameCrossMixing("CalcAirFlowSimple:CrossMixing");
+					static std::string const RoutineNameRefrigerationDoorMixing("CalcAirFlowSimple:RefrigerationDoorMixing");
+					static std::string const RoutineNameInfiltration("CalcAirFlowSimple:Infiltration");
+					static std::string const RoutineNameZoneAirBalance("CalcAirFlowSimple:ZoneAirBalance");
+
+					// INTERFACE BLOCK SPECIFICATIONS:
+					// na
+
+					// DERIVED TYPE DEFINITIONS:
+					// na
+
+					// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+					Real64 MCP;
+					Real64 MCPxM;
+					Real64 MCPxN;
+					Real64 TZM; // Temperature of From Zone
+					Real64 TZN; // Temperature of this zone
+					Real64 TD; // Delta Temp limit of Mixing statement
+					Real64 Tavg; // Average temperature in two zones exchanging air
+					Real64 Wavg; // Average humidity ratio in two zones exchanging air
+					int m; // Index to From Zone
+					int n; // Index of this zone
+					int j; // Loop Counter
+					int NZ; // A pointer
+					int I; // Ventilation master object index
+					int NH; // Hybrid controlled zone number
+					Real64 AirDensity; // Density of air (kg/m^3)
+					Real64 CpAir; // Heat capacity of air (J/kg-C)
+					Real64 OutletAirEnthalpy; // Enthlapy of outlet air (VENTILATION objects)
+					Real64 TempExt;
+					Real64 WindExt;
+					bool MixingLimitFlag;
+					Real64 MixingTmin;
+					Real64 MixingTmax;
+
+					Real64 IVF; // DESIGN INFILTRATION FLOW RATE (M**3/SEC)
+					Real64 VVF; // DESIGN VENTILATION FLOW RATE (M**3/SEC)
+					Real64 MCpI_temp;
+					Real64 VAMFL_temp;
+					static FArray1D< Real64 > ZMAT; // Zone air temperature
+					static FArray1D< Real64 > ZHumRat; // Zone air humidity ratio
+					Real64 Cw; // Opening effectivenss
+					Real64 Cd; // Discharge coefficent
+					Real64 angle; // Angle between wind direction and effective angle
+					Real64 Qw; // Volumetric flow driven by wind
+					Real64 Qst; // Volumetric flow driven by stack effect
+					Real64 MassFlowDiff;
+					//following variables used for refrigeration door mixing and all defined in EngRef
+					int ZoneA;
+					int ZoneB;
+					Real64 TZoneA;
+					Real64 TZoneB;
+					Real64 HumRatZoneA;
+					Real64 HumRatZoneB;
+					Real64 AirDensityZoneA;
+					Real64 CpAirZoneA;
+					Real64 AirDensityZoneB;
+					Real64 CpAirZoneB;
+					Real64 AirDensityAvg;
+					Real64 MassFlowDryAir;
+					Real64 SchedDoorOpen;
+					Real64 DoorHeight;
+					Real64 DoorArea;
+					Real64 DoorProt;
+					Real64 FDens;
+					Real64 Fb;
+					Real64 FFlow;
+					Real64 MassFlowToA;
+					Real64 MassFlowToB;
+					Real64 MassFlowXCpToA;
+					Real64 MassFlowXCpToB;
+					Real64 MassFlowXCpXTempToA;
+					Real64 MassFlowXCpXTempToB;
+					Real64 MassFlowXHumRatToA;
+					Real64 MassFlowXHumRatToB;
+
+					Real64 MassFlowRate;
+					bool AdjustFlow;
+
+					// Allocate the ZMAT and ZHumRat arrays
+
+					if (!allocated(ZMAT)) ZMAT.allocate(NumOfZones);
+					if (!allocated(ZHumRat)) ZHumRat.allocate(NumOfZones);
+					if (!allocated(VentMCP)) VentMCP.allocate(TotVentilation);
+
+					// Allocate module level logical arrays for MIXING and CROSS MIXING reporting
+					if (!allocated(CrossMixingReportFlag)) CrossMixingReportFlag.allocate(TotCrossMixing);
+					if (!allocated(MixingReportFlag)) MixingReportFlag.allocate(TotMixing);
+
+					if (!allocated(MCPTThermChim)) MCPTThermChim.allocate(NumOfZones);
+					if (!allocated(MCPThermChim)) MCPThermChim.allocate(NumOfZones);
+					if (!allocated(ThermChimAMFL)) ThermChimAMFL.allocate(NumOfZones);
+
+					if (present( AdjustZoneMixingFlowFlag ) ) {
+						AdjustFlow = true;
+					}
+					else {
+						AdjustFlow = false;
+					}
+					//                                      COMPUTE ZONE AIR MIXINGS
+					MCPM = 0.0;
+					MCPTM = 0.0;
+					MixingMassFlowZone = 0.0;
+					MixingMassFlowXHumRat = 0.0;
+					CrossMixingFlag = false;
+					CrossMixingReportFlag = false;
+					MixingReportFlag = false;
+					if (Contaminant.CO2Simulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) MixingMassFlowCO2 = 0.0;
+					if (Contaminant.GenericContamSimulation && TotMixing + TotCrossMixing + TotRefDoorMixing > 0) MixingMassFlowGC = 0.0;
+
+					IVF = 0.0;
+					MCPTI = 0.0;
+					MCPI = 0.0;
+					OAMFL = 0.0;
+					VVF = 0.0;
+					MCPTV = 0.0;
+					MCPV = 0.0;
+					VAMFL = 0.0;
+					VentMCP = 0.0;
+					MDotCPOA = 0.0;
+					MDotOA = 0.0;
+
+					MCPThermChim = 0.0;
+					ThermChimAMFL = 0.0;
+					MCPTThermChim = 0.0;
+					MassFlowRate = 0.0;
+
+					if (AirFlowFlag != UseSimpleAirFlow) return;
+					// AirflowNetwork Multizone field /= SIMPLE
+					if (!(SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS)) return;
+
+					ManageEarthTube();
+					ManageCoolTower();
+					ManageThermalChimney();
+
+					// Assign zone air temperature
+					for (j = 1; j <= NumOfZones; ++j) {
+						ZMAT(j) = MAT(j);
+						ZHumRat(j) = ZoneAirHumRat(j);
+						// This is only temperory fix for CR8867.  (L. Gu 8/12)
+						if (present(SysTimestepLoop) && SysTimestepLoop == 1) {
+							ZMAT(j) = XMPT(j);
+							ZHumRat(j) = WZoneTimeMinusP(j);
+						}
+					}
+
+					// Process the scheduled Ventilation for air heat balance
+					if (TotVentilation > 0) {
+						ZnAirRpt.VentilFanElec() = 0.0;
+					}
+
+					// Initialization of ZoneAirBalance
+					if (TotZoneAirBalance > 0) {
+						ZoneAirBalance.BalMassFlowRate() = 0.0;
+						ZoneAirBalance.InfMassFlowRate() = 0.0;
+						ZoneAirBalance.NatMassFlowRate() = 0.0;
+						ZoneAirBalance.ExhMassFlowRate() = 0.0;
+						ZoneAirBalance.IntMassFlowRate() = 0.0;
+						ZoneAirBalance.ERVMassFlowRate() = 0.0;
+					}
+
+					for (j = 1; j <= TotVentilation; ++j) {
+						NZ = Ventilation(j).ZonePtr;
+						Ventilation(j).FanPower = 0.0;
+						TempExt = Zone(NZ).OutDryBulbTemp;
+						WindExt = Zone(NZ).WindSpeed;
+						AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, TempExt, OutHumRat);
+						CpAir = PsyCpAirFnWTdb(OutHumRat, TempExt);
+						//CR7751 should maybe use code below, indoor conditions instead of outdoor conditions
+						//   AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZMAT(NZ), ZHumRat(NZ))
+						//   CpAir = PsyCpAirFnWTdb(ZHumRat(NZ),ZMAT(NZ))
+						// Hybrid ventilation global control
+						if (Ventilation(j).HybridControlType == HybridControlTypeGlobal && Ventilation(j).HybridControlMasterNum > 0) {
+							I = Ventilation(j).HybridControlMasterNum;
+							NH = Ventilation(I).ZonePtr;
+							if (j == I) Ventilation(j).HybridControlMasterStatus = false;
+						}
+						else {
+							I = j;
+							NH = NZ;
+						}
+						// Check scheduled temperatures
+						if (Ventilation(I).MinIndoorTempSchedPtr > 0) {
+							Ventilation(I).MinIndoorTemperature = GetCurrentScheduleValue(Ventilation(I).MinIndoorTempSchedPtr);
+						}
+						if (Ventilation(I).MaxIndoorTempSchedPtr > 0) {
+							Ventilation(I).MaxIndoorTemperature = GetCurrentScheduleValue(Ventilation(I).MaxIndoorTempSchedPtr);
+						}
+						// Ensure the minimum indoor temperature <= the maximum indoor temperature
+						if (Ventilation(I).MinIndoorTempSchedPtr > 0 || Ventilation(I).MaxIndoorTempSchedPtr > 0) {
+							if (Ventilation(I).MinIndoorTemperature > Ventilation(I).MaxIndoorTemperature) {
+								++Ventilation(I).IndoorTempErrCount;
+								if (Ventilation(I).IndoorTempErrCount < 2) {
+									ShowWarningError("Ventilation indoor temperature control: The minimum indoor temperature is above " "the maximum indoor temperature in " + Ventilation(I).Name);
+									ShowContinueError("The minimum indoor temperature is set to the maximum indoor temperature. " "Simulation continues.");
+									ShowContinueErrorTimeStamp(" Occurrence info:");
+								}
+								else {
+									ShowRecurringWarningErrorAtEnd("The minimum indoor temperature is still above " "the maximum indoor temperature", Ventilation(I).IndoorTempErrIndex, Ventilation(I).MinIndoorTemperature, Ventilation(I).MinIndoorTemperature);
+								}
+								Ventilation(I).MinIndoorTemperature = Ventilation(I).MaxIndoorTemperature;
+							}
+						}
+						if (Ventilation(I).MinOutdoorTempSchedPtr > 0) {
+							Ventilation(I).MinOutdoorTemperature = GetCurrentScheduleValue(Ventilation(I).MinOutdoorTempSchedPtr);
+						}
+						if (Ventilation(I).MaxOutdoorTempSchedPtr > 0) {
+							Ventilation(I).MaxOutdoorTemperature = GetCurrentScheduleValue(Ventilation(I).MaxOutdoorTempSchedPtr);
+						}
+						// Ensure the minimum outdoor temperature <= the maximum outdoor temperature
+						if (Ventilation(I).MinOutdoorTempSchedPtr > 0 || Ventilation(I).MaxOutdoorTempSchedPtr > 0) {
+							if (Ventilation(I).MinOutdoorTemperature > Ventilation(I).MaxOutdoorTemperature) {
+								++Ventilation(I).OutdoorTempErrCount;
+								if (Ventilation(I).OutdoorTempErrCount < 2) {
+									ShowWarningError("Ventilation outdoor temperature control: The minimum outdoor temperature is above " "the maximum outdoor temperature in " + Ventilation(I).Name);
+									ShowContinueError("The minimum outdoor temperature is set to the maximum outdoor temperature. " "Simulation continues.");
+									ShowContinueErrorTimeStamp(" Occurrence info:");
+								}
+								else {
+									ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above " "the maximum outdoor temperature", Ventilation(I).OutdoorTempErrIndex, Ventilation(I).MinOutdoorTemperature, Ventilation(I).MinOutdoorTemperature);
+								}
+								Ventilation(I).MinIndoorTemperature = Ventilation(I).MaxIndoorTemperature;
+							}
+						}
+						if (Ventilation(I).DeltaTempSchedPtr > 0) {
+							Ventilation(I).DelTemperature = GetCurrentScheduleValue(Ventilation(I).DeltaTempSchedPtr);
+						}
+						// Skip this if the zone is below the minimum indoor temperature limit
+						if ((ZMAT(NH) < Ventilation(I).MinIndoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+						// Skip this if the zone is above the maximum indoor temperature limit
+						if ((ZMAT(NH) > Ventilation(I).MaxIndoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+						// Skip if below the temperature difference limit (3/12/03 Negative DelTemperature allowed now)
+						if (((ZMAT(NH) - TempExt) < Ventilation(I).DelTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+						// Skip this if the outdoor temperature is below the minimum outdoor temperature limit
+						if ((TempExt < Ventilation(I).MinOutdoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+						// Skip this if the outdoor temperature is above the maximum outdoor temperature limit
+						if ((TempExt > Ventilation(I).MaxOutdoorTemperature) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+						// Skip this if the outdoor wind speed is above the maximum windspeed limit
+						if ((WindExt > Ventilation(I).MaxWindSpeed) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+
+						// Hybrid ventilation controls
+						if ((Ventilation(j).HybridControlType == HybridControlTypeClose) && (!Ventilation(j).EMSSimpleVentOn)) continue;
+						if (Ventilation(j).HybridControlType == HybridControlTypeGlobal && Ventilation(j).HybridControlMasterNum > 0) {
+							if (j == I) Ventilation(j).HybridControlMasterStatus = true;
+						}
+
+						if (Ventilation(j).ModelType == VentilationDesignFlowRate) {
+							// CR6845 if calculated < 0, don't propagate.
+							VVF = Ventilation(j).DesignLevel * GetCurrentScheduleValue(Ventilation(j).SchedPtr);
+
+							if (Ventilation(j).EMSSimpleVentOn) VVF = Ventilation(j).EMSimpleVentFlowRate;
+
+							if (VVF < 0.0) VVF = 0.0;
+							VentMCP(j) = VVF * AirDensity * CpAir * (Ventilation(j).ConstantTermCoef + std::abs(TempExt - ZMAT(NZ)) * Ventilation(j).TemperatureTermCoef + WindExt * (Ventilation(j).VelocityTermCoef + WindExt * Ventilation(j).VelocitySQTermCoef));
+							if (VentMCP(j) < 0.0) VentMCP(j) = 0.0;
+							VAMFL_temp = VentMCP(j) / CpAir;
+							if (Ventilation(j).QuadratureSum) {
+								{ auto const SELECT_CASE_var(Ventilation(j).FanType); // ventilation type based calculation
+								if (SELECT_CASE_var == ExhaustVentilation) {
+									ZoneAirBalance(Ventilation(j).OABalancePtr).ExhMassFlowRate += VentMCP(j) / CpAir;
+								}
+								else if (SELECT_CASE_var == IntakeVentilation) {
+									ZoneAirBalance(Ventilation(j).OABalancePtr).IntMassFlowRate += VentMCP(j) / CpAir;
+								}
+								else if (SELECT_CASE_var == NaturalVentilation) {
+									ZoneAirBalance(Ventilation(j).OABalancePtr).NatMassFlowRate += VentMCP(j) / CpAir;
+								}
+								else if (SELECT_CASE_var == BalancedVentilation) {
+									ZoneAirBalance(Ventilation(j).OABalancePtr).BalMassFlowRate += VentMCP(j) / CpAir;
+								} }
+							}
+							else {
+								MCPV(NZ) += VentMCP(j);
+								VAMFL(NZ) += VAMFL_temp;
+							}
+							if (Ventilation(j).FanEfficiency > 0.0) {
+								Ventilation(j).FanPower = VAMFL_temp * Ventilation(j).FanPressure / (Ventilation(j).FanEfficiency * AirDensity);
+								if (Ventilation(j).FanType == BalancedVentilation) Ventilation(j).FanPower *= 2.0;
+								// calc electric
+								if (SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
+									// CR7608 IF (.not. TurnFansOn .or. .not. AirflowNetworkZoneFlag(NZ)) &
+									if (!KickOffSimulation) {
+										if (!(ZoneEquipAvail(NZ) == CycleOn || ZoneEquipAvail(NZ) == CycleOnZoneFansOnly) || !AirflowNetworkZoneFlag(NZ)) ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+									}
+									else if (!AirflowNetworkZoneFlag(NZ)) {
+										ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+									}
+								}
+								else {
+									ZnAirRpt(NZ).VentilFanElec += Ventilation(j).FanPower * TimeStepSys * SecInHour;
+								}
+							}
+							// Intake fans will add some heat to the air, raising the temperature for an intake fan...
+							if (Ventilation(j).FanType == IntakeVentilation || Ventilation(j).FanType == BalancedVentilation) {
+								if (VAMFL_temp == 0.0) {
+									OutletAirEnthalpy = OutEnthalpy;
+								}
+								else {
+									if (Ventilation(j).FanPower > 0.0) {
+										if (Ventilation(j).FanType == BalancedVentilation) {
+											OutletAirEnthalpy = OutEnthalpy + Ventilation(j).FanPower / VAMFL_temp / 2.0; // Half fan power to calculate inlet T
+										}
+										else {
+											OutletAirEnthalpy = OutEnthalpy + Ventilation(j).FanPower / VAMFL_temp;
+										}
+									}
+									else {
+										OutletAirEnthalpy = OutEnthalpy;
+									}
+								}
+								Ventilation(j).AirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutHumRat);
+							}
+							else {
+								Ventilation(j).AirTemp = TempExt;
+							}
+							if (!Ventilation(j).QuadratureSum) MCPTV(NZ) += VentMCP(j) * Ventilation(j).AirTemp;
+						}
+
+						if (Ventilation(j).ModelType == VentilationWindAndStack) {
+							if (Ventilation(j).OpenEff != AutoCalculate) {
+								Cw = Ventilation(j).OpenEff;
+							}
+							else {
+								// linear interpolation between effective angle and wind direction
+								angle = std::abs(WindDir - Ventilation(j).EffAngle);
+								if (angle > 180.0) angle -= 180.0;
+								Cw = 0.55 + angle / 180.0 * (0.3 - 0.55);
+							}
+							if (Ventilation(j).DiscCoef != AutoCalculate) {
+								Cd = Ventilation(j).DiscCoef;
+							}
+							else {
+								Cd = 0.40 + 0.0045 * std::abs(TempExt - ZMAT(NZ));
+							}
+							Qw = Cw * Ventilation(j).OpenArea * GetCurrentScheduleValue(Ventilation(j).OpenAreaSchedPtr) * WindExt;
+							Qst = Cd * Ventilation(j).OpenArea * GetCurrentScheduleValue(Ventilation(j).OpenAreaSchedPtr) * std::sqrt(2.0 * 9.81 * Ventilation(j).DH * std::abs(TempExt - ZMAT(NZ)) / (ZMAT(NZ) + 273.15));
+							VVF = std::sqrt(Qw * Qw + Qst * Qst);
+							if (Ventilation(j).EMSSimpleVentOn) VVF = Ventilation(j).EMSimpleVentFlowRate;
+							if (VVF < 0.0) VVF = 0.0;
+							VentMCP(j) = VVF * AirDensity * CpAir;
+							if (VentMCP(j) < 0.0) VentMCP(j) = 0.0;
+							if (Ventilation(j).QuadratureSum) {
+								ZoneAirBalance(Ventilation(j).OABalancePtr).NatMassFlowRate += VentMCP(j) / CpAir;
+							}
+							else {
+								MCPV(NZ) += VentMCP(j);
+								VAMFL_temp = VentMCP(j) / CpAir;
+								VAMFL(NZ) += VAMFL_temp;
+								Ventilation(j).AirTemp = TempExt;
+								MCPTV(NZ) += VentMCP(j) * Ventilation(j).AirTemp;
+							}
+						}
+					}
+
+					// Process Mixing
+					for (j = 1; j <= TotMixing; ++j) {
+						n = Mixing(j).ZonePtr;
+						m = Mixing(j).FromZone;
+						TD = Mixing(j).DeltaTemperature;
+						// Get scheduled delta temperature
+						if (Mixing(j).DeltaTempSchedPtr > 0) {
+							TD = GetCurrentScheduleValue(Mixing(j).DeltaTempSchedPtr);
+						}
+						TZN = ZMAT(n);
+						TZM = ZMAT(m);
+
+						// Hybrid ventilation controls
+						if (Mixing(j).HybridControlType == HybridControlTypeClose) continue;
+						// Check temperature limit
+						MixingLimitFlag = false;
+
+						// Hybrid ventilation global control
+						if (Mixing(j).HybridControlType == HybridControlTypeGlobal && Mixing(j).HybridControlMasterNum > 0) {
+							I = Mixing(j).HybridControlMasterNum;
+							if (!Ventilation(I).HybridControlMasterStatus) continue;
+						}
+						else {
+							// Ensure the minimum indoor temperature <= the maximum indoor temperature
+							if (Mixing(j).MinIndoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(Mixing(j).MinIndoorTempSchedPtr);
+							if (Mixing(j).MaxIndoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(Mixing(j).MaxIndoorTempSchedPtr);
+							if (Mixing(j).MinIndoorTempSchedPtr > 0 && Mixing(j).MaxIndoorTempSchedPtr > 0) {
+								if (MixingTmin > MixingTmax) {
+									++Mixing(j).IndoorTempErrCount;
+									if (Mixing(j).IndoorTempErrCount < 2) {
+										ShowWarningError("Mixing zone temperature control: The minimum zone temperature is above " "the maximum zone temperature in " + Mixing(j).Name);
+										ShowContinueError("The minimum zone temperature is set to the maximum zone temperature. " "Simulation continues.");
+										ShowContinueErrorTimeStamp(" Occurrence info:");
+									}
+									else {
+										ShowRecurringWarningErrorAtEnd("The minimum zone temperature is still above " "the maximum zone temperature", Mixing(j).IndoorTempErrIndex, MixingTmin, MixingTmin);
+									}
+									MixingTmin = MixingTmax;
+								}
+							}
+							if (Mixing(j).MinIndoorTempSchedPtr > 0) {
+								if (TZN < MixingTmin) MixingLimitFlag = true;
+							}
+							if (Mixing(j).MaxIndoorTempSchedPtr > 0) {
+								if (TZN > MixingTmax) MixingLimitFlag = true;
+							}
+							// Ensure the minimum source temperature <= the maximum source temperature
+							if (Mixing(j).MinSourceTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(Mixing(j).MinSourceTempSchedPtr);
+							if (Mixing(j).MaxSourceTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(Mixing(j).MaxSourceTempSchedPtr);
+							if (Mixing(j).MinSourceTempSchedPtr > 0 && Mixing(j).MaxSourceTempSchedPtr > 0) {
+								if (MixingTmin > MixingTmax) {
+									++Mixing(j).SourceTempErrCount;
+									if (Mixing(j).SourceTempErrCount < 2) {
+										ShowWarningError("Mixing source temperature control: The minimum source temperature is above " "the maximum source temperature in " + Mixing(j).Name);
+										ShowContinueError("The minimum source temperature is set to the maximum source temperature. " "Simulation continues.");
+										ShowContinueErrorTimeStamp(" Occurrence info:");
+									}
+									else {
+										ShowRecurringWarningErrorAtEnd("The minimum source temperature is still above " "the maximum source temperature", Mixing(j).SourceTempErrIndex, MixingTmin, MixingTmin);
+									}
+									MixingTmin = MixingTmax;
+								}
+							}
+							if (Mixing(j).MinSourceTempSchedPtr > 0) {
+								if (TZM < MixingTmin) MixingLimitFlag = true;
+							}
+							if (Mixing(j).MaxSourceTempSchedPtr > 0) {
+								if (TZM > MixingTmax) MixingLimitFlag = true;
+							}
+							// Ensure the minimum outdoor temperature <= the maximum outdoor temperature
+							TempExt = Zone(n).OutDryBulbTemp;
+							if (Mixing(j).MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(Mixing(j).MinOutdoorTempSchedPtr);
+							if (Mixing(j).MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(Mixing(j).MaxOutdoorTempSchedPtr);
+							if (Mixing(j).MinOutdoorTempSchedPtr > 0 && Mixing(j).MaxOutdoorTempSchedPtr > 0) {
+								if (MixingTmin > MixingTmax) {
+									++Mixing(j).OutdoorTempErrCount;
+									if (Mixing(j).OutdoorTempErrCount < 2) {
+										ShowWarningError("Mixing outdoor temperature control: The minimum outdoor temperature is above " "the maximum outdoor temperature in " + Mixing(j).Name);
+										ShowContinueError("The minimum outdoor temperature is set to the maximum source temperature. " "Simulation continues.");
+										ShowContinueErrorTimeStamp(" Occurrence info:");
+									}
+									else {
+										ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above " "the maximum outdoor temperature", Mixing(j).OutdoorTempErrIndex, MixingTmin, MixingTmin);
+									}
+									MixingTmin = MixingTmax;
+								}
+							}
+							if (Mixing(j).MinOutdoorTempSchedPtr > 0) {
+								if (TempExt < MixingTmin) MixingLimitFlag = true;
+							}
+							if (Mixing(j).MaxOutdoorTempSchedPtr > 0) {
+								if (TempExt > MixingTmax) MixingLimitFlag = true;
+							}
+						}
+
+						if (Mixing(j).HybridControlType != HybridControlTypeGlobal && MixingLimitFlag) continue;
+						if (Mixing(j).HybridControlType == HybridControlTypeGlobal) TD = 0.0;
+
+						//  If TD equals zero (default) set coefficients for full mixing otherwise test
+						//    for mixing conditions if user input delta temp > 0, then from zone temp (TZM)
+						//    must be td degrees warmer than zone temp (TZN).  If user input delta temp < 0,
+						//    then from zone temp (TZM) must be TD degrees cooler than zone temp (TZN).
+						if (TD < 0.0) {
+							if (TZM < TZN + TD) {
+								//            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
+								//             RhoAirM = PsyRhoAirFnPbTdbW(OutBaroPress,tzm,ZHumRat(m))
+								//             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnWTdb(ZHumRat(m),tzm) * RhoAirM
+								AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0);
+								CpAir = PsyCpAirFnWTdb((ZHumRat(n) + ZHumRat(m)) / 2.0, (TZN + TZM) / 2.0); // Use average conditions
+
+								Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
+								if (ZoneMassBalanceFlag(n) && AdjustFlow) {
+									if (Mixing(j).MixingMassFlowRate > 0.0) {
+										Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
+									}
+								}
+								Mixing(j).MixingMassFlowRate = Mixing(j).DesiredAirFlowRate * AirDensity;
+
+								MCP = Mixing(j).DesiredAirFlowRate * CpAir * AirDensity;
+								MCPM(n) += MCP;
+								MCPTM(n) += MCP * TZM;
+
+								// Now to determine the moisture conditions
+								MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
+								MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
+								if (Contaminant.CO2Simulation) {
+									MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+								}
+								if (Contaminant.GenericContamSimulation) {
+									MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+								}
+								MixingReportFlag(j) = true;
+							}
+						}
+						if (TD > 0.0) {
+							if (TZM > TZN + TD) {
+								//             RhoAirM = PsyRhoAirFnPbTdbW(OutBaroPress,tzm,ZHumRat(m))
+								//             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnWTdb(ZHumRat(m),tzm) * RhoAirM
+								AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0); // Use avg conditions
+								CpAir = PsyCpAirFnWTdb((ZHumRat(n) + ZHumRat(m)) / 2.0, (TZN + TZM) / 2.0); // Use average conditions
+
+								Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
+								if (ZoneMassBalanceFlag(n) && AdjustFlow) {
+									if (Mixing(j).MixingMassFlowRate > 0.0) {
+										Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
+									}
+								}
+								Mixing(j).MixingMassFlowRate = Mixing(j).DesiredAirFlowRate * AirDensity;
+								MCP = Mixing(j).DesiredAirFlowRate * CpAir * AirDensity;
+								MCPM(n) += MCP;
+								MCPTM(n) += MCP * TZM;
+								// Now to determine the moisture conditions
+								MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
+								MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
+								if (Contaminant.CO2Simulation) {
+									MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+								}
+								if (Contaminant.GenericContamSimulation) {
+									MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+								}
+								MixingReportFlag(j) = true;
+							}
+						}
+						if (TD == 0.0) {
+							//          RhoAirM = PsyRhoAirFnPbTdbW(OutBaroPress,tzm,ZHumRat(m))
+							//          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnWTdb(ZHumRat(m),tzm) * RhoAirM
+							AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0, RoutineNameMixing); // Use avg conditions
+							CpAir = PsyCpAirFnWTdb((ZHumRat(n) + ZHumRat(m)) / 2.0, (TZN + TZM) / 2.0); // Use average conditions
+
+							Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
+							if (ZoneMassBalanceFlag(n) && AdjustFlow) {
+								if (Mixing(j).MixingMassFlowRate > 0.0) {
+									Mixing(j).DesiredAirFlowRate = Mixing(j).MixingMassFlowRate / AirDensity;
+								}
+							}
+							Mixing(j).MixingMassFlowRate = Mixing(j).DesiredAirFlowRate * AirDensity;
+							MCP = Mixing(j).DesiredAirFlowRate * CpAir * AirDensity;
+							MCPM(n) += MCP;
+							MCPTM(n) += MCP * TZM;
+							// Now to determine the moisture conditions
+							MixingMassFlowZone(n) += Mixing(j).DesiredAirFlowRate * AirDensity;
+							MixingMassFlowXHumRat(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZHumRat(m);
+							if (Contaminant.CO2Simulation) {
+								MixingMassFlowCO2(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirCO2(m);
+							}
+							if (Contaminant.GenericContamSimulation) {
+								MixingMassFlowGC(n) += Mixing(j).DesiredAirFlowRate * AirDensity * ZoneAirGC(m);
+							}
+							MixingReportFlag(j) = true;
+						}
+					}
+
+					//                              COMPUTE CROSS ZONE
+					//                              AIR MIXING
+					for (j = 1; j <= TotCrossMixing; ++j) {
+						n = CrossMixing(j).ZonePtr;
+						m = CrossMixing(j).FromZone;
+						TD = MTC(j);
+						// Get scheduled delta temperature
+						if (CrossMixing(j).DeltaTempSchedPtr > 0) {
+							TD = GetCurrentScheduleValue(CrossMixing(j).DeltaTempSchedPtr);
+						}
+
+						if (TD >= 0.0) {
+							TZN = ZMAT(n);
+							TZM = ZMAT(m);
+							// Check temperature limit
+							MixingLimitFlag = false;
+							// Ensure the minimum indoor temperature <= the maximum indoor temperature
+							if (CrossMixing(j).MinIndoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(CrossMixing(j).MinIndoorTempSchedPtr);
+							if (CrossMixing(j).MaxIndoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(CrossMixing(j).MaxIndoorTempSchedPtr);
+							if (CrossMixing(j).MinIndoorTempSchedPtr > 0 && CrossMixing(j).MaxIndoorTempSchedPtr > 0) {
+								if (MixingTmin > MixingTmax) {
+									++CrossMixing(j).IndoorTempErrCount;
+									if (CrossMixing(j).IndoorTempErrCount < 2) {
+										ShowWarningError("CrossMixing zone temperature control: The minimum zone temperature is above " "the maximum zone temperature in " + CrossMixing(j).Name);
+										ShowContinueError("The minimum zone temperature is set to the maximum zone temperature. " "Simulation continues.");
+										ShowContinueErrorTimeStamp(" Occurrence info:");
+									}
+									else {
+										ShowRecurringWarningErrorAtEnd("The minimum zone temperature is still above " "the maximum zone temperature", CrossMixing(j).IndoorTempErrIndex, MixingTmin, MixingTmin);
+									}
+									MixingTmin = MixingTmax;
+								}
+							}
+							if (CrossMixing(j).MinIndoorTempSchedPtr > 0) {
+								if (TZN < MixingTmin) MixingLimitFlag = true;
+							}
+							if (CrossMixing(j).MaxIndoorTempSchedPtr > 0) {
+								if (TZN > MixingTmax) MixingLimitFlag = true;
+							}
+							// Ensure the minimum source temperature <= the maximum source temperature
+							if (CrossMixing(j).MinSourceTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(CrossMixing(j).MinSourceTempSchedPtr);
+							if (CrossMixing(j).MaxSourceTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(CrossMixing(j).MaxSourceTempSchedPtr);
+							if (CrossMixing(j).MinSourceTempSchedPtr > 0 && CrossMixing(j).MaxSourceTempSchedPtr > 0) {
+								if (MixingTmin > MixingTmax) {
+									++CrossMixing(j).SourceTempErrCount;
+									if (CrossMixing(j).SourceTempErrCount < 2) {
+										ShowWarningError("CrossMixing source temperature control: The minimum source temperature is above " "the maximum source temperature in " + CrossMixing(j).Name);
+										ShowContinueError("The minimum source temperature is set to the maximum source temperature. " "Simulation continues.");
+										ShowContinueErrorTimeStamp(" Occurrence info:");
+									}
+									else {
+										ShowRecurringWarningErrorAtEnd("The minimum source temperature is still above " "the maximum source temperature", CrossMixing(j).SourceTempErrIndex, MixingTmin, MixingTmin);
+									}
+									MixingTmin = MixingTmax;
+								}
+							}
+							if (CrossMixing(j).MinSourceTempSchedPtr > 0) {
+								if (TZM < MixingTmin) MixingLimitFlag = true;
+							}
+							if (CrossMixing(j).MaxSourceTempSchedPtr > 0) {
+								if (TZM > MixingTmax) MixingLimitFlag = true;
+							}
+							// Ensure the minimum outdoor temperature <= the maximum outdoor temperature
+							TempExt = Zone(n).OutDryBulbTemp;
+							if (CrossMixing(j).MinOutdoorTempSchedPtr > 0) MixingTmin = GetCurrentScheduleValue(CrossMixing(j).MinOutdoorTempSchedPtr);
+							if (CrossMixing(j).MaxOutdoorTempSchedPtr > 0) MixingTmax = GetCurrentScheduleValue(CrossMixing(j).MaxOutdoorTempSchedPtr);
+							if (CrossMixing(j).MinOutdoorTempSchedPtr > 0 && CrossMixing(j).MaxOutdoorTempSchedPtr > 0) {
+								if (MixingTmin > MixingTmax) {
+									++CrossMixing(j).OutdoorTempErrCount;
+									if (CrossMixing(j).OutdoorTempErrCount < 2) {
+										ShowWarningError("CrossMixing outdoor temperature control: The minimum outdoor temperature is above " "the maximum outdoor temperature in " + Mixing(j).Name);
+										ShowContinueError("The minimum outdoor temperature is set to the maximum source temperature. " "Simulation continues.");
+										ShowContinueErrorTimeStamp(" Occurrence info:");
+									}
+									else {
+										ShowRecurringWarningErrorAtEnd("The minimum outdoor temperature is still above " "the maximum outdoor temperature", CrossMixing(j).OutdoorTempErrIndex, MixingTmin, MixingTmin);
+									}
+									MixingTmin = MixingTmax;
+								}
+							}
+							if (CrossMixing(j).MinOutdoorTempSchedPtr > 0) {
+								if (TempExt < MixingTmin) MixingLimitFlag = true;
+							}
+							if (CrossMixing(j).MaxOutdoorTempSchedPtr > 0) {
+								if (TempExt > MixingTmax) MixingLimitFlag = true;
+							}
+							if (MixingLimitFlag) continue;
+
+							if ((TD == 0.0 || (TD > 0.0 && (TZM - TZN) >= TD))) {
+								CrossMixingReportFlag(j) = true; // set reporting flag
+							}
+
+							if (((TD <= 0.0) && (!CrossMixingFlag(n) && !CrossMixingFlag(m))) || ((TD > 0.0) && (TZM - TZN >= TD))) {
+								//                                      SET COEFFICIENTS .
+								CrossMixingFlag(n) = true;
+								CrossMixingFlag(m) = true;
+
+								Tavg = (TZN + TZM) / 2.0;
+								Wavg = (ZHumRat(n) + ZHumRat(m)) / 2.0;
+								AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
+								CpAir = PsyCpAirFnWTdb(Wavg, Tavg);
+								MCPxN = MVFC(j) * CpAir * AirDensity;
+								MCPM(n) += MCPxN;
+
+								MCPxM = MVFC(j) * CpAir * AirDensity;
+								MCPM(m) += MCPxM;
+								MCPTM(n) += MCPxM * TZM;
+								MCPTM(m) += MCPxN * TZN;
+
+								// Now to determine the moisture conditions
+								MixingMassFlowZone(m) += MVFC(j) * AirDensity;
+								MixingMassFlowXHumRat(m) += MVFC(j) * AirDensity * ZHumRat(n);
+
+								MixingMassFlowZone(n) += MVFC(j) * AirDensity;
+								MixingMassFlowXHumRat(n) += MVFC(j) * AirDensity * ZHumRat(m);
+								if (Contaminant.CO2Simulation) {
+									MixingMassFlowCO2(m) += MVFC(j) * AirDensity * ZoneAirCO2(n);
+									MixingMassFlowCO2(n) += MVFC(j) * AirDensity * ZoneAirCO2(m);
+								}
+								if (Contaminant.GenericContamSimulation) {
+									MixingMassFlowGC(m) += MVFC(j) * AirDensity * ZoneAirGC(n);
+									MixingMassFlowGC(n) += MVFC(j) * AirDensity * ZoneAirGC(m);
+								}
+							}
+						}
+					}
+
+					//                              COMPUTE REFRIGERATION DOOR
+					//                              AIR MIXING
+					if (TotRefDoorMixing > 0) {
+						//Zone loops structured in getinput so only do each pair of zones bounding door once, even if multiple doors in one zone
+						for (ZoneA = 1; ZoneA <= (NumOfZones - 1); ++ZoneA) {
+							if (!RefDoorMixing(ZoneA).RefDoorMixFlag) continue;
+							for (j = 1; j <= RefDoorMixing(ZoneA).NumRefDoorConnections; ++j) {
+								ZoneB = RefDoorMixing(ZoneA).MateZonePtr(j);
+								TZoneA = ZMAT(ZoneA);
+								TZoneB = ZMAT(ZoneB);
+								HumRatZoneA = ZHumRat(ZoneA);
+								HumRatZoneB = ZHumRat(ZoneB);
+								AirDensityZoneA = PsyRhoAirFnPbTdbW(OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
+								CpAirZoneA = PsyCpAirFnWTdb(HumRatZoneA, TZoneA);
+								AirDensityZoneB = PsyRhoAirFnPbTdbW(OutBaroPress, TZoneB, HumRatZoneB, RoutineNameRefrigerationDoorMixing);
+								CpAirZoneB = PsyCpAirFnWTdb(HumRatZoneB, TZoneB);
+								Tavg = (TZoneA + TZoneB) / 2.0;
+								Wavg = (HumRatZoneA + HumRatZoneB) / 2.0;
+								AirDensityAvg = PsyRhoAirFnPbTdbW(OutBaroPress, Tavg, Wavg, RoutineNameRefrigerationDoorMixing);
+
+								if (RefDoorMixing(ZoneA).EMSRefDoorMixingOn(j)) {
+									MassFlowDryAir = RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) * AirDensityAvg;
+								}
+								else {
+									SchedDoorOpen = GetCurrentScheduleValue(RefDoorMixing(ZoneA).OpenSchedPtr(j));
+									if (SchedDoorOpen == 0.0) continue;
+									DoorHeight = RefDoorMixing(ZoneA).DoorHeight(j);
+									DoorArea = RefDoorMixing(ZoneA).DoorArea(j);
+									DoorProt = RefDoorMixing(ZoneA).Protection(j);
+									if (AirDensityZoneA >= AirDensityZoneB) {
+										// Mass of dry air flow between zones is equal,
+										// but have to calc directionally to avoid sqrt(neg number)
+										FDens = std::pow((2.0 / (1.0 + (std::pow((AirDensityZoneA / AirDensityZoneB), (1.0 / 3.0))))), 1.5);
+										Fb = 0.221 * DoorArea * AirDensityZoneA * FDens * std::sqrt((1.0 - AirDensityZoneB / AirDensityZoneA) * StdGravity * DoorHeight);
+									}
+									else { //ZoneADens < ZoneBDens
+										FDens = std::pow((2.0 / (1.0 + (std::pow((AirDensityZoneB / AirDensityZoneA), (1.0 / 3.0))))), 1.5);
+										Fb = 0.221 * DoorArea * AirDensityZoneB * FDens * std::sqrt((1.0 - AirDensityZoneA / AirDensityZoneB) * StdGravity * DoorHeight);
+									} //ZoneADens .GE. ZoneBDens
+									// FFlow = Doorway flow factor, is determined by temperature difference
+									FFlow = 1.1;
+									if (std::abs(TZoneA - TZoneB) > 11.0) FFlow = 0.8;
+									MassFlowDryAir = Fb * SchedDoorOpen * FFlow * (1.0 - DoorProt);
+									RefDoorMixing(ZoneA).VolRefDoorFlowRate(j) = MassFlowDryAir / AirDensityAvg;
+									//Note - VolRefDoorFlowRate is used ONLY for reporting purposes, where it is
+									//       used with the avg density to generate a reported mass flow
+									//       Considering the small values typical for HumRat, this is not far off.
+								} // EMSRefDoorMixingOn
+
+								MassFlowToA = MassFlowDryAir * (1.0 + HumRatZoneB);
+								MassFlowToB = MassFlowDryAir * (1.0 + HumRatZoneA);
+								MassFlowXCpToA = MassFlowToA * CpAirZoneB;
+								MassFlowXCpToB = MassFlowToB * CpAirZoneA;
+								MassFlowXCpXTempToA = MassFlowXCpToA * TZoneB;
+								MassFlowXCpXTempToB = MassFlowXCpToB * TZoneA;
+								MassFlowXHumRatToA = MassFlowToA * HumRatZoneB;
+								MassFlowXHumRatToB = MassFlowToB * HumRatZoneA;
+
+								MCPM(ZoneA) += MassFlowXCpToA;
+								MCPM(ZoneB) += MassFlowXCpToB;
+								MCPTM(ZoneA) += MassFlowXCpXTempToA;
+								MCPTM(ZoneB) += MassFlowXCpXTempToB;
+
+								// Now to determine the moisture conditions
+								MixingMassFlowZone(ZoneA) += MassFlowToA;
+								MixingMassFlowZone(ZoneB) += MassFlowToB;
+								MixingMassFlowXHumRat(ZoneA) += MassFlowXHumRatToA;
+								MixingMassFlowXHumRat(ZoneB) += MassFlowXHumRatToB;
+
+								// Now to determine the CO2 and generic contaminant conditions
+								if (Contaminant.CO2Simulation) {
+									MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirCO2(ZoneB);
+									MixingMassFlowCO2(ZoneB) += MassFlowToB * ZoneAirCO2(ZoneA);
+								}
+								if (Contaminant.GenericContamSimulation) {
+									MixingMassFlowCO2(ZoneA) += MassFlowToA * ZoneAirGC(ZoneB);
+									MixingMassFlowCO2(ZoneB) += MassFlowToB * ZoneAirGC(ZoneA);
+								}
+
+							} // J=1,RefDoorMixing(ZoneA)%NumRefDoorConnections
+						} //ZoneA=1,(NumOfZones - 1)
+					} //(TotRefrigerationDoorMixing > 0) THEN
+
+					// Process the scheduled Infiltration for air heat balance depending on model type
+					for (j = 1; j <= TotInfiltration; ++j) {
+
+						NZ = Infiltration(j).ZonePtr;
+
+						TempExt = Zone(NZ).OutDryBulbTemp;
+						WindExt = Zone(NZ).WindSpeed;
+						AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, TempExt, OutHumRat, RoutineNameInfiltration);
+						CpAir = PsyCpAirFnWTdb(OutHumRat, TempExt);
+						//CR7751  should maybe use code below, indoor conditions instead of outdoor conditions
+						//   AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZMAT(NZ), ZHumRat(NZ))
+						//   CpAir = PsyCpAirFnWTdb(ZHumRat(NZ),ZMAT(NZ))
+						{ auto const SELECT_CASE_var(Infiltration(j).ModelType);
+
+						if (SELECT_CASE_var == InfiltrationDesignFlowRate) {
+
+							IVF = Infiltration(j).DesignLevel * GetCurrentScheduleValue(Infiltration(j).SchedPtr);
+							// CR6845 if calculated < 0.0, don't propagate
+							if (IVF < 0.0) IVF = 0.0;
+							MCpI_temp = IVF * AirDensity * CpAir * (Infiltration(j).ConstantTermCoef + std::abs(TempExt - ZMAT(NZ)) * Infiltration(j).TemperatureTermCoef + WindExt * (Infiltration(j).VelocityTermCoef + WindExt * Infiltration(j).VelocitySQTermCoef));
+
+							if (MCpI_temp < 0.0) MCpI_temp = 0.0;
+							Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
+							if (AdjustFlow && ZoneInfiltrationFlag(NZ)) {
+								if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+									if (Infiltration(j).MassFlowRate > 0.0) {
+										Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
+										MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
+									}
+								}
+								if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+									Infiltration(j).VolumeFlowRate = Infiltration(j).VolumeFlowRate + MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
+									MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
+								}
+							}
+							Infiltration(j).MassFlowRate = Infiltration(j).VolumeFlowRate * AirDensity;
+						}
+						else if (SELECT_CASE_var == InfiltrationShermanGrimsrud) {
+							// Sherman Grimsrud model as formulated in ASHRAE HoF
+							WindExt = WindSpeed; // formulated to use wind at Meterological Station rather than local
+							IVF = GetCurrentScheduleValue(Infiltration(j).SchedPtr) * Infiltration(j).LeakageArea / 1000.0 * std::sqrt(Infiltration(j).BasicStackCoefficient * std::abs(TempExt - ZMAT(NZ)) + Infiltration(j).BasicWindCoefficient * std::pow(WindExt, 2));
+							if (IVF < 0.0) IVF = 0.0;
+							MCpI_temp = IVF * AirDensity * CpAir;
+							if (MCpI_temp < 0.0) MCpI_temp = 0.0;
+							Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
+							if (AdjustFlow && ZoneInfiltrationFlag(NZ)) {
+								if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+									if (Infiltration(j).MassFlowRate > 0.0) {
+										Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
+										MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
+									}
+								}
+								if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+									Infiltration(j).VolumeFlowRate = Infiltration(j).VolumeFlowRate + MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
+									MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
+								}
+							}
+							Infiltration(j).MassFlowRate = Infiltration(j).VolumeFlowRate * AirDensity;
+						}
+						else if (SELECT_CASE_var == InfiltrationAIM2) {
+							// Walker Wilson model as formulated in ASHRAE HoF
+							IVF = GetCurrentScheduleValue(Infiltration(j).SchedPtr) * std::sqrt(std::pow((Infiltration(j).FlowCoefficient * Infiltration(j).AIM2StackCoefficient * std::pow((std::abs(TempExt - ZMAT(NZ))), Infiltration(j).PressureExponent)), 2) + std::pow((Infiltration(j).FlowCoefficient * Infiltration(j).AIM2WindCoefficient * std::pow((Infiltration(j).ShelterFactor * WindExt), (2.0 * Infiltration(j).PressureExponent))), 2));
+							if (IVF < 0.0) IVF = 0.0;
+							MCpI_temp = IVF * AirDensity * CpAir;
+							if (MCpI_temp < 0.0) MCpI_temp = 0.0;
+							Infiltration(j).VolumeFlowRate = MCpI_temp / AirDensity / CpAir;
+							if (AdjustFlow && ZoneInfiltrationFlag(NZ)) {
+								if (ZoneAirMassFlow.InfiltrationTreatment == AdjustInfiltrationFlow) {
+									if (Infiltration(j).MassFlowRate > 0.0) {
+										Infiltration(j).VolumeFlowRate = Infiltration(j).MassFlowRate / AirDensity;
+										MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
+									}
+								}
+								if (ZoneAirMassFlow.InfiltrationTreatment == AddInfiltrationFlow) {
+									Infiltration(j).VolumeFlowRate = Infiltration(j).VolumeFlowRate + MassConservation(NZ).InfiltrationMassFlowRate / AirDensity;
+									MCpI_temp = Infiltration(j).VolumeFlowRate * AirDensity * CpAir;
+								}
+							}
+							Infiltration(j).MassFlowRate = Infiltration(j).VolumeFlowRate * AirDensity;
+						}}
+
+						if (Infiltration(j).EMSOverrideOn) {
+							IVF = Infiltration(j).EMSAirFlowRateValue;
+							if (IVF < 0.0) IVF = 0.0;
+							MCpI_temp = IVF * AirDensity * CpAir;
+							if (MCpI_temp < 0.0) MCpI_temp = 0.0;
+						}
+
+						if (Infiltration(j).QuadratureSum) {
+							ZoneAirBalance(Infiltration(j).OABalancePtr).InfMassFlowRate += MCpI_temp / CpAir;
+						}
+						else {
+							MCPI(NZ) += MCpI_temp;
+							OAMFL(NZ) += MCpI_temp / CpAir;
+							MCPTI(NZ) += MCpI_temp * TempExt;
+						}
+
+					}
+
+					// Add infiltration rate enhanced by the existence of thermal chimney
+					for (NZ = 1; NZ <= NumOfZones; ++NZ) {
+						MCPI(NZ) += MCPThermChim(NZ);
+						OAMFL(NZ) += ThermChimAMFL(NZ);
+						MCPTI(NZ) += MCPTThermChim(NZ);
+					}
+
+					// Calculate combined outdoor air flows
+					for (j = 1; j <= TotZoneAirBalance; ++j) {
+						if (ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature) {
+							if (!ZoneAirBalance(j).OneTimeFlag) GetStandAloneERVNodes(j);
+							if (ZoneAirBalance(j).NumOfERVs > 0) {
+								for (I = 1; I <= ZoneAirBalance(j).NumOfERVs; ++I) {
+									MassFlowDiff = Node(ZoneAirBalance(j).ERVExhaustNode(I)).MassFlowRate - Node(ZoneAirBalance(j).ERVInletNode(I)).MassFlowRate;
+									if (MassFlowDiff > 0.0) {
+										ZoneAirBalance(j).ERVMassFlowRate += MassFlowDiff;
+									}
+								}
+							}
+							NZ = ZoneAirBalance(j).ZonePtr;
+							AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(NZ).OutDryBulbTemp, OutHumRat, RoutineNameZoneAirBalance);
+							CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(NZ).OutDryBulbTemp);
+							ZoneAirBalance(j).ERVMassFlowRate *= AirDensity;
+							MDotOA(NZ) = std::sqrt(std::pow((ZoneAirBalance(j).NatMassFlowRate), 2) + std::pow((ZoneAirBalance(j).IntMassFlowRate), 2) + std::pow((ZoneAirBalance(j).ExhMassFlowRate), 2) + std::pow((ZoneAirBalance(j).ERVMassFlowRate), 2) + std::pow((ZoneAirBalance(j).InfMassFlowRate), 2) + std::pow((AirDensity * ZoneAirBalance(j).InducedAirRate * GetCurrentScheduleValue(ZoneAirBalance(j).InducedAirSchedPtr)), 2)) + ZoneAirBalance(j).BalMassFlowRate;
+							MDotCPOA(NZ) = MDotOA(NZ) * CpAir;
+						}
+					}
+
+	}
+
+	void
+		GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
+	{
+
+			// SUBROUTINE INFORMATION:
+			//       AUTHOR         Lixing Gu
+			//       DATE WRITTEN   July 2010
+			//       MODIFIED       na
+			//       RE-ENGINEERED  na
+
+			// PURPOSE OF THIS SUBROUTINE:
+			// This subroutine gets node numbers of stand alone ERVs to calculate combined outdoor air flows.
+
+			// METHODOLOGY EMPLOYED:
+			// Uses program data structures ZoneEquipInfo
+
+			// REFERENCES:
+			// na
+
+			// Using/Aliasing
+			using DataZoneEquipment::ZoneEquipList;
+			using DataZoneEquipment::ERVStandAlone_Num;
+			using DataHeatBalance::ZoneAirBalance;
+			using DataHeatBalance::AirBalanceQuadrature;
+			using HVACStandAloneERV::GetStandAloneERVOutAirNode;
+			using HVACStandAloneERV::GetStandAloneERVReturnAirNode;
+
+			// Locals
+			// SUBROUTINE ARGUMENTS:
+
+			// SUBROUTINE PARAMETER DEFINITIONS:
+			// na
+
+			// INTERFACE BLOCK SPECIFICATIONS:
+			// na
+
+			// DERIVED TYPE DEFINITIONS:
+			// na
+
+			// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+			//  INTEGER      :: ERVNum=0                   ! the stand alone ERV index
+			static int ZoneNum(0); // zone index
+			int j; // index
+			int I; // index
+
+			if (allocated(ZoneEquipList)) {
+				ZoneNum = ZoneAirBalance(OutdoorNum).ZonePtr;
+				ZoneAirBalance(OutdoorNum).OneTimeFlag = true;
+				if (ZoneEquipList(ZoneNum).NumOfEquipTypes > 0) {
+					for (I = 1; I <= ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
+						if (ZoneEquipList(ZoneNum).EquipType_Num(I) == ERVStandAlone_Num) {
+							++ZoneAirBalance(OutdoorNum).NumOfERVs;
+						}
+					}
+					if (ZoneAirBalance(OutdoorNum).NumOfERVs > 0) {
+						ZoneAirBalance(OutdoorNum).ERVInletNode.allocate(ZoneAirBalance(OutdoorNum).NumOfERVs);
+						ZoneAirBalance(OutdoorNum).ERVExhaustNode.allocate(ZoneAirBalance(OutdoorNum).NumOfERVs);
+						j = 1;
+						for (I = 1; I <= ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
+							if (ZoneEquipList(ZoneNum).EquipType_Num(I) == ERVStandAlone_Num) {
+								ZoneAirBalance(OutdoorNum).ERVInletNode(j) = GetStandAloneERVOutAirNode(ZoneEquipList(ZoneNum).EquipIndex(I));
+								ZoneAirBalance(OutdoorNum).ERVExhaustNode(j) = GetStandAloneERVReturnAirNode(ZoneEquipList(ZoneNum).EquipIndex(I));
+								++j;
+							}
+						}
+					}
+				}
+			}
+
+	}
+
+	void 
+	    CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 & ZoneMixingMassFlowRate)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine updates the receiving zone mixing flow rate to ensures the zone
+		// air mass balance.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+		// 
+
+		// Using/Aliasing
+		using DataZoneEquipment::ZoneEquipConfig;
+		using DataHeatBalance::MassConservation;
+		using DataHeatBalance::TotMixing;
+		using DataHeatBalance::Mixing;
+		using DataHeatBalFanSys::MixingMassFlowZone;
+
+		// Enforce explicit typing of all variables in this routine
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+
+		int Loop;
+		int MixingNum;
+		int NumOfReceivingZoneMixingObjects;
+		Real64 MixingMassFlowRate;         // current zone mixing mass flow rate, [kg/s]
+
+		MixingMassFlowRate = 0.0;
+		// distribute the total zone mixing flow rate to the source zones
+		NumOfReceivingZoneMixingObjects = MassConservation(ZoneNum).NumReceivingZonesMixingObject;
+		if (NumOfReceivingZoneMixingObjects > 0) {
+			for (Loop = 1; Loop <= NumOfReceivingZoneMixingObjects; ++Loop) {
+				MixingNum = MassConservation(ZoneNum).ZoneMixingReceivingPtr(Loop);
+				Mixing(MixingNum).MixingMassFlowRate = MassConservation(ZoneNum).ZoneMixingReceivingFr(Loop) * ZoneMixingMassFlowRate;
+				MixingMassFlowRate += Mixing(MixingNum).MixingMassFlowRate;
+				CalcZoneMixingFlowRateOfSourceZone(Mixing(MixingNum).FromZone);
+			}
+		}
+		MassConservation(ZoneNum).MixingMassFlowRate = MixingMassFlowRate;
+		ZoneMixingMassFlowRate = MixingMassFlowRate;
+	}
+
+	void 
+		CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum) 
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Bereket Nigusse
+		//       DATE WRITTEN   February 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine calculates the zone mixing flow rate such that it ensures the zone
+		// air mass balance.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+		// 
+
+		// Using/Aliasing
+		using DataZoneEquipment::ZoneEquipConfig;
+		using DataHeatBalance::MassConservation;
+		using DataHeatBalance::TotMixing;
+		using DataHeatBalance::Mixing;
+		using DataHeatBalance::Zone;
+		using DataHeatBalFanSys::MixingMassFlowZone;
+
+		// Enforce explicit typing of all variables in this routine
+
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Loop;
+		int MixingNum;
+		int ZoneMixingNum;
+		int NumOfSourceZoneMixingObjects;
+		Real64 ZoneSourceMassFlowRate;     // current zone as a source mass flow rate for zone mixing in other zones, [kg/s]
+
+		ZoneSourceMassFlowRate = 0.0;
+		NumOfSourceZoneMixingObjects = MassConservation(ZoneNum).NumSourceZonesMixingObject;
+		if (NumOfSourceZoneMixingObjects > 0) {
+			for (ZoneMixingNum = 1; ZoneMixingNum <= NumOfSourceZoneMixingObjects; ++ZoneMixingNum) {
+				MixingNum = MassConservation(ZoneNum).ZoneMixingSourcesPtr(ZoneMixingNum);
+				for (Loop = 1; Loop <= TotMixing; ++Loop) {
+					if (Loop == MixingNum) {
+						ZoneSourceMassFlowRate += Mixing(Loop).MixingMassFlowRate;
+					}
+				}
+			}
+		}
+		MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
+	}
+
 
 	//     NOTICE
 

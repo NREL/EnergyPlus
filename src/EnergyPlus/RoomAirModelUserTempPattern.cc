@@ -291,7 +291,6 @@ namespace RoomAirModelUserTempPattern {
 		using DataHeatBalance::Zone;
 		using InputProcessor::FindItem;
 		using OutputReportTabular::IntToStr;
-		using FluidProperties::FindArrayIndex; // routine should be moved to a general module rather than FluidProperties
 		using General::FindNumberInList;
 
 		// Locals
@@ -815,7 +814,7 @@ namespace RoomAirModelUserTempPattern {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const TolValue( .0001 );
+		Real64 const TolValue( 0.0001 );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

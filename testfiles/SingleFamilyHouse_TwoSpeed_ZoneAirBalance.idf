@@ -99,7 +99,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Single family House,     !- Name
@@ -1884,7 +1884,7 @@
   Fan:OnOff,
     Supply Fan 1,            !- Name
     HVACAvailSched,          !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     400.0,                   !- Pressure Rise {Pa}
     0.7551,                  !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1897,8 +1897,6 @@
   Output:Variable,*,Zone Combined Outdoor Air Current Density Volume Flow Rate,TimeStep,ReportSch;
 
   Output:Variable,*,Zone Combined Outdoor Air Mass,TimeStep,ReportSch;
-
-  Output:Variable,*,Zone Combined Outdoor Air Mass Flow Rate,TimeStep,ReportSch;
 
   Output:Variable,*,Cooling Coil Total Cooling Energy,TimeStep,ReportSch;
 

@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
 ! HVAC SYSTEM 1
 
@@ -3881,7 +3881,7 @@
   Fan:OnOff,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.4,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4070,7 +4070,7 @@
   Fan:OnOff,
     Supply Fan 2,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.3,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4259,7 +4259,7 @@
   Fan:OnOff,
     Supply Fan 3,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.4,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4448,7 +4448,7 @@
   Fan:OnOff,
     Supply Fan 4,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.4,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4637,7 +4637,7 @@
   Fan:OnOff,
     Supply Fan 5,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.5,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4674,7 +4674,7 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name

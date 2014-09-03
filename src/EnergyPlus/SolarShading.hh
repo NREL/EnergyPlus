@@ -208,9 +208,9 @@ namespace SolarShading {
 	void
 	CLIP(
 		int const NVT,
-		FArray1S< Real64 > XVT,
-		FArray1S< Real64 > YVT,
-		FArray1S< Real64 > ZVT
+		FArray1< Real64 > & XVT,
+		FArray1< Real64 > & YVT,
+		FArray1< Real64 > & ZVT
 	);
 
 	void
@@ -218,9 +218,9 @@ namespace SolarShading {
 		int const NS, // Surface number whose vertex coordinates are being transformed
 		int const NGRS, // Base surface number for surface NS
 		int & NVT, // Number of vertices for surface NS
-		FArray1S< Real64 > XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-		FArray1S< Real64 > YVT,
-		FArray1S< Real64 > ZVT
+		FArray1< Real64 > & XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+		FArray1< Real64 > & YVT,
+		FArray1< Real64 > & ZVT
 	);
 
 	void

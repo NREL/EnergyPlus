@@ -65,8 +65,8 @@ namespace DataLoopNode {
 	bool const ObjectIsNotParent( false );
 	bool const IncrementFluidStreamYes( true );
 	bool const IncrementFluidStreamNo( false );
-	Real64 const SensedNodeFlagValue( -999. );
-	Real64 const SensedLoadFlagValue( -999. );
+	Real64 const SensedNodeFlagValue( -999.0 );
+	Real64 const SensedLoadFlagValue( -999.0 );
 
 	// DERIVED TYPE DEFINITIONS:
 

@@ -21,9 +21,17 @@ namespace DataPlant {
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
 	// Parameters for use in Load Distribution Schemes
-	extern int const OptimalLoading; // Optimal Load Distribution Scheme
-	extern int const SequentialLoading; // sequential Distribution Scheme
-	extern int const UniformLoading; // sequential Distribution Scheme
+	//extern int const OptimalLoading; // Optimal Load Distribution Scheme
+	//extern int const SequentialLoading; // Seqential Load Distribution Scheme
+	//extern int const UniformLoading; // Uniform Load Distribution Scheme
+	//extern int const UniformPLRLoading; // Uniform PLR Load Distribution Scheme
+	//extern int const SequentialUniformPLRLoading; // Sequential Uniform PLR Load Distribution Scheme
+
+	int const OptimalLoading( 1 ); // Optimal Load Distribution Scheme
+	int const SequentialLoading( 2 ); // Sequential Load Distribution Scheme
+	int const UniformLoading( 3 ); // Uniform Load Distribution Scheme
+	int const UniformPLRLoading( 4 ); // Uniform PLR Load Distribution Scheme
+	int const SequentialUniformPLRLoading( 5 ); // Sequential Uniform PLR Load Distribution Scheme
 
 	// Parameters for scheme types
 	// Used in TYPE(OperationData)%OpSchemeType
@@ -304,6 +312,9 @@ namespace DataPlant {
 
 	extern int const NumConvergenceHistoryTerms;
 	extern FArray1D< Real64 > const ConvergenceHistoryARR;
+	extern Real64 const sum_ConvergenceHistoryARR;
+	extern Real64 const square_sum_ConvergenceHistoryARR;
+	extern Real64 const sum_square_ConvergenceHistoryARR;
 
 	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.f90.  A common definition would be nicer.
 
@@ -645,7 +656,7 @@ namespace DataPlant {
 			MinOutletTemp( 0.0 ),
 			MaxOutletTemp( 0.0 ),
 			FreeCoolCntrlShutDown( false ),
-			FreeCoolCntrlMinCntrlTemp( 0. ),
+			FreeCoolCntrlMinCntrlTemp( 0.0 ),
 			FreeCoolCntrlMode( 0 ),
 			FreeCoolCntrlNodeNum( 0 ),
 			IndexInLoopSidePumps( 0 ),

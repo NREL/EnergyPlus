@@ -122,7 +122,7 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth );
+		static FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
 		// FLOW:
 
@@ -912,7 +912,7 @@ namespace HVACInterfaceManager {
 			MdotPriRCLeg = 0.0;
 			MdotSecRCLeg = 0.0;
 			CPFlowDir = NoRecircFlow;
-			CommonPipeTemp = ( TempPriOutTankOut + TempSecOutTankOut ) / 2.;
+			CommonPipeTemp = ( TempPriOutTankOut + TempSecOutTankOut ) / 2.0;
 		}
 
 		// now calculate inlet temps
@@ -1262,11 +1262,11 @@ namespace HVACInterfaceManager {
 		PlantCommonPipe.allocate( TotNumLoops );
 
 		for ( CurLoopNum = 1; CurLoopNum <= TotNumLoops; ++CurLoopNum ) {
-		    
+
 			// reference to easily lookup the first item once
 			auto & first_demand_component_typenum( PlantLoop( CurLoopNum ).LoopSide( DemandSide ).Branch( 1 ).Comp( 1 ).TypeOf_Num );
 			auto & first_supply_component_typenum( PlantLoop( CurLoopNum ).LoopSide( SupplySide ).Branch( 1 ).Comp( 1 ).TypeOf_Num );
-		    
+
 			{ auto const SELECT_CASE_var( PlantLoop( CurLoopNum ).CommonPipeType );
 			if ( SELECT_CASE_var == CommonPipe_No ) {
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_No;

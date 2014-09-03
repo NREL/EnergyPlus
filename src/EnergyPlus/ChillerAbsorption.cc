@@ -1483,7 +1483,7 @@ namespace ChillerAbsorption {
 		SteamInputRat = SteamLoadFactor( 1 ) / PartLoadRat + SteamLoadFactor( 2 ) + SteamLoadFactor( 3 ) * PartLoadRat;
 
 		//Calculate electric input ratio
-		ElectricInputRat = ElectricLoadFactor( 1 ) + ElectricLoadFactor( 2 ) * PartLoadRat + ElectricLoadFactor( 3 ) * std::pow( PartLoadRat, 2 );
+		ElectricInputRat = ElectricLoadFactor( 1 ) + ElectricLoadFactor( 2 ) * PartLoadRat + ElectricLoadFactor( 3 ) * pow_2( PartLoadRat );
 
 		//Calculate electric energy input
 		PumpingPower = ElectricInputRat * NomPumpPower * FRAC;
