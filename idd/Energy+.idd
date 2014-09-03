@@ -38905,7 +38905,7 @@ Fan:ComponentModel,
   A16 , \field Maximum Motor Efficiency Curve Name
         \type object-list
         \object-list RectangularHyperbola1Curves
-       \note Table:OneIndependentVariable object can also be used
+        \note Table:OneIndependentVariable object can also be used
         \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes output of curve is always 1.0
   A17 , \field Normalized Motor Efficiency Curve Name
@@ -43055,7 +43055,7 @@ Coil:Heating:DX:VariableSpeed,
         \note db = entering air dry bulb temperature (C)
         \note oat = air entering temperature seen by the evaporator (C)
    A45, \field Speed 10 Heating Capacity Function of Air Flow Fraction Curve Name
-         \type object-list
+        \type object-list
         \object-list QuadraticCubicCurves
         \note Table:OneIndependentVariable object can also be used
         \note quadratic curve = a + b*ffa + c*ffa**2
@@ -45604,7 +45604,7 @@ Coil:WaterHeating:Desuperheater,
   A4 , \field Heat Reclaim Efficiency Function of Temperature Curve Name
        \type object-list
        \object-list BiquadraticCurves
-        \note Table:TwoIndependentVariables object can also be used
+       \note Table:TwoIndependentVariables object can also be used
        \note A biquadratic curve defining the performance of the desuperheater heating coil.
        \note Performance can be specified as a function of inlet water temperature, outdoor air
        \note dry-bulb temperature, or both.
@@ -49570,7 +49570,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
-        \note Table:OneIndependentVariable object can also be used
+       \note Table:OneIndependentVariable object can also be used
        \note This curve defines the cycling losses when the heat pump compressor cycles on and off
        \note below the Minimum Heat Pump Part-Load Ratio specified in the field below.
   N5 , \field Gross Rated Heating Capacity
@@ -49693,7 +49693,7 @@ AirConditioner:VariableRefrigerantFlow,
        \type object-list
        \object-list LinearCurves
        \object-list QuadraticCubicCurves
-        \note Table:OneIndependentVariable object can also be used
+       \note Table:OneIndependentVariable object can also be used
        \note This curve defines the cycling losses when the heat pump compressor cycles on and off
        \note below the Minimum Heat Pump Part-Load Ratio specified in the following field.
   N10, \field Minimum Heat Pump Part-Load Ratio
@@ -54404,7 +54404,7 @@ Pipe:Underground,
    A3,  \field Slab Location
         \required-field
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
-   A4, 	\field Name of slab material
+   A4,  \field Name of slab material
         \field-optional
    A5,  \field Horizontal Insulation
         \required-optional
@@ -54426,11 +54426,11 @@ Pipe:Underground,
         \note This field specifies the vertical insulation material.
    N14, \field Vertical Insulation Depth
         \field-optional
-        \note This field specifies the depth of the vertical insulation		
+        \note This field specifies the depth of the vertical insulation
    A10; \field Simulation Timestep
         \required-field
         \note This field specifies the domain simulation timestep.
-	
+
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
         \min-fields 31
