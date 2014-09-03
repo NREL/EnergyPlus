@@ -2000,18 +2000,18 @@ namespace PackagedThermalStorageCoil {
 				VolFlowRate = TESCoil( TESCoilNum ).RatedEvapAirVolFlowRate;
 				if ( VolFlowRate >= SmallAirVolFlow ) {
 					if ( CurOASysNum > 0 ) { // coil is in the OA stream
-						MixTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
-						MixHumRat = FinalSysSizing( CurSysNum ).CoolOutHumRat;
+						MixTemp = FinalSysSizing( CurSysNum ).OutTempAtSensCoolPeak;
+						MixHumRat = FinalSysSizing( CurSysNum ).OutHumRatAtSensCoolPeak;
 						SupTemp = FinalSysSizing( CurSysNum ).PrecoolTemp;
 						SupHumRat = FinalSysSizing( CurSysNum ).PrecoolHumRat;
 					} else { // coil is on the main air loop
-						//     MixTemp = FinalSysSizing(CurSysNum)%CoolMixTemp
-						//     MixHumRat = FinalSysSizing(CurSysNum)%CoolMixHumRat
+						//     MixTemp = FinalSysSizing(CurSysNum)%MixTempAtSensCoolPeak
+						//     MixHumRat = FinalSysSizing(CurSysNum)%MixHumRatAtSensCoolPeak
 						SupTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
 						SupHumRat = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 						if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-							MixTemp = FinalSysSizing( CurSysNum ).CoolMixTemp;
-							MixHumRat = FinalSysSizing( CurSysNum ).CoolMixHumRat;
+							MixTemp = FinalSysSizing( CurSysNum ).MixTempAtSensCoolPeak;
+							MixHumRat = FinalSysSizing( CurSysNum ).MixHumRatAtSensCoolPeak;
 						} else { // there is precooling of OA stream
 							if ( VolFlowRate > 0.0 ) {
 								OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / VolFlowRate;
@@ -2019,11 +2019,11 @@ namespace PackagedThermalStorageCoil {
 								OutAirFrac = 1.0;
 							}
 							OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-							MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetTemp;
-							MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).CoolRetHumRat;
+							MixTemp = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtSensCoolPeak;
+							MixHumRat = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtSensCoolPeak;
 						}
 					}
-					OutTemp = FinalSysSizing( CurSysNum ).CoolOutTemp;
+					OutTemp = FinalSysSizing( CurSysNum ).OutTempAtSensCoolPeak;
 					rhoair = PsyRhoAirFnPbTdbW( StdBaroPress, MixTemp, MixHumRat, RoutineName );
 					MixEnth = PsyHFnTdbW( MixTemp, MixHumRat );
 					MixWetBulb = PsyTwbFnTdbWPb( MixTemp, MixHumRat, StdBaroPress, RoutineName );

@@ -1163,14 +1163,15 @@ namespace DataSizing {
 		bool EMSOverrideDesCoolVolFlowOn; // If true, EMS is acting to change DesCoolVolFlow
 		Real64 EMSValueDesCoolVolFlow; // Value EMS providing for design cool  supply duct volume flow [m3/s]
 		Real64 SensCoolCap; // design sensible cooling capacity [W]
+		Real64 TotCoolCap; // design total cooling capacity [W]
 		Real64 HeatCap; // design heating capacity [W]
 		Real64 PreheatCap; // design preheat capacity [W]
-		Real64 CoolMixTemp; // design mixed air temperature for cooling [C]
-		Real64 CoolMixHumRat; // design mixed air hum ratio for cooling [kg water/kg dry air]
-		Real64 CoolRetTemp; // design return air temperature for cooling [C]
-		Real64 CoolRetHumRat; // design return air hum ratio for cooling [kg water/kg dry air]
-		Real64 CoolOutTemp; // design outside air temperature for cooling [C]
-		Real64 CoolOutHumRat; // design outside air hum ratio for cooling [kg water/kg dry air]
+		Real64 MixTempAtSensCoolPeak; // design mixed air temperature for cooling [C]
+		Real64 MixHumRatAtSensCoolPeak; // design mixed air hum ratio for cooling [kg water/kg dry air]
+		Real64 RetTempAtSensCoolPeak; // design return air temperature for cooling [C]
+		Real64 RetHumRatAtSensCoolPeak; // design return air hum ratio for cooling [kg water/kg dry air]
+		Real64 OutTempAtSensCoolPeak; // design outside air temperature for cooling [C]
+		Real64 OutHumRatAtSensCoolPeak; // design outside air hum ratio for cooling [kg water/kg dry air]
 		Real64 HeatMixTemp; // design mixed air temperature for heating [C]
 		Real64 HeatMixHumRat; // design mixed air hum ratio for heating [kg water/kg dry air]
 		Real64 HeatRetTemp; // design return air temperature for heating [C]
@@ -1253,14 +1254,15 @@ namespace DataSizing {
 			EMSOverrideDesCoolVolFlowOn( false ),
 			EMSValueDesCoolVolFlow( 0.0 ),
 			SensCoolCap( 0.0 ),
+			TotCoolCap( 0.0 ),
 			HeatCap( 0.0 ),
 			PreheatCap( 0.0 ),
-			CoolMixTemp( 0.0 ),
-			CoolMixHumRat( 0.0 ),
-			CoolRetTemp( 0.0 ),
-			CoolRetHumRat( 0.0 ),
-			CoolOutTemp( 0.0 ),
-			CoolOutHumRat( 0.0 ),
+			MixTempAtSensCoolPeak( 0.0 ),
+			MixHumRatAtSensCoolPeak( 0.0 ),
+			RetTempAtSensCoolPeak( 0.0 ),
+			RetHumRatAtSensCoolPeak( 0.0 ),
+			OutTempAtSensCoolPeak( 0.0 ),
+			OutHumRatAtSensCoolPeak( 0.0 ),
 			HeatMixTemp( 0.0 ),
 			HeatMixHumRat( 0.0 ),
 			HeatRetTemp( 0.0 ),
@@ -1319,14 +1321,15 @@ namespace DataSizing {
 			bool const EMSOverrideDesCoolVolFlowOn, // If true, EMS is acting to change DesCoolVolFlow
 			Real64 const EMSValueDesCoolVolFlow, // Value EMS providing for design cool  supply duct volume flow [m3/s]
 			Real64 const SensCoolCap, // design sensible cooling capacity [W]
+			Real64 const TotCoolCap, //design total cooling capacity [W]
 			Real64 const HeatCap, // design heating capacity [W]
 			Real64 const PreheatCap, // design preheat capacity [W]
-			Real64 const CoolMixTemp, // design mixed air temperature for cooling [C]
-			Real64 const CoolMixHumRat, // design mixed air hum ratio for cooling [kg water/kg dry air]
-			Real64 const CoolRetTemp, // design return air temperature for cooling [C]
-			Real64 const CoolRetHumRat, // design return air hum ratio for cooling [kg water/kg dry air]
-			Real64 const CoolOutTemp, // design outside air temperature for cooling [C]
-			Real64 const CoolOutHumRat, // design outside air hum ratio for cooling [kg water/kg dry air]
+			Real64 const MixTempAtSensCoolPeak, // design mixed air temperature for cooling [C]
+			Real64 const MixHumRatAtSensCoolPeak, // design mixed air hum ratio for cooling [kg water/kg dry air]
+			Real64 const RetTempAtSensCoolPeak, // design return air temperature for cooling [C]
+			Real64 const RetHumRatAtSensCoolPeak, // design return air hum ratio for cooling [kg water/kg dry air]
+			Real64 const OutTempAtSensCoolPeak, // design outside air temperature for cooling [C]
+			Real64 const OutHumRatAtSensCoolPeak, // design outside air hum ratio for cooling [kg water/kg dry air]
 			Real64 const HeatMixTemp, // design mixed air temperature for heating [C]
 			Real64 const HeatMixHumRat, // design mixed air hum ratio for heating [kg water/kg dry air]
 			Real64 const HeatRetTemp, // design return air temperature for heating [C]
@@ -1396,14 +1399,15 @@ namespace DataSizing {
 			EMSOverrideDesCoolVolFlowOn( EMSOverrideDesCoolVolFlowOn ),
 			EMSValueDesCoolVolFlow( EMSValueDesCoolVolFlow ),
 			SensCoolCap( SensCoolCap ),
+			TotCoolCap( TotCoolCap ),
 			HeatCap( HeatCap ),
 			PreheatCap( PreheatCap ),
-			CoolMixTemp( CoolMixTemp ),
-			CoolMixHumRat( CoolMixHumRat ),
-			CoolRetTemp( CoolRetTemp ),
-			CoolRetHumRat( CoolRetHumRat ),
-			CoolOutTemp( CoolOutTemp ),
-			CoolOutHumRat( CoolOutHumRat ),
+			MixTempAtSensCoolPeak( MixTempAtSensCoolPeak ),
+			MixHumRatAtSensCoolPeak( MixHumRatAtSensCoolPeak ),
+			RetTempAtSensCoolPeak( RetTempAtSensCoolPeak ),
+			RetHumRatAtSensCoolPeak( RetHumRatAtSensCoolPeak ),
+			OutTempAtSensCoolPeak( OutTempAtSensCoolPeak ),
+			OutHumRatAtSensCoolPeak( OutHumRatAtSensCoolPeak ),
 			HeatMixTemp( HeatMixTemp ),
 			HeatMixHumRat( HeatMixHumRat ),
 			HeatRetTemp( HeatRetTemp ),

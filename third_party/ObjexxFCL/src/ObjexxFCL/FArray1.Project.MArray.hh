@@ -369,17 +369,17 @@
 	inline MA1c_double CoolCap5() const { return ma( &T::CoolCap5 ); }
 	inline MA1c_double CoolCycleTime() const { return ma( &T::CoolCycleTime ); }
 	inline MA1c_double CoolingDemand() const { return ma( &T::CoolingDemand ); }
-	inline MA1c_double CoolMixHumRat() const { return ma( &T::CoolMixHumRat ); }
-	inline MA1c_double CoolMixTemp() const { return ma( &T::CoolMixTemp ); }
-	inline MA1c_double CoolOutHumRat() const { return ma( &T::CoolOutHumRat ); }
-	inline MA1c_double CoolOutTemp() const { return ma( &T::CoolOutTemp ); }
+	inline MA1c_double MixHumRatAtSensCoolPeak() const { return ma( &T::MixHumRatAtSensCoolPeak ); }
+	inline MA1c_double MixTempAtSensCoolPeak() const { return ma( &T::MixTempAtSensCoolPeak ); }
+	inline MA1c_double OutHumRatAtSensCoolPeak() const { return ma( &T::OutHumRatAtSensCoolPeak ); }
+	inline MA1c_double OutTempAtSensCoolPeak() const { return ma( &T::OutTempAtSensCoolPeak ); }
 	inline MA1c_double CoolPower1() const { return ma( &T::CoolPower1 ); }
 	inline MA1c_double CoolPower2() const { return ma( &T::CoolPower2 ); }
 	inline MA1c_double CoolPower3() const { return ma( &T::CoolPower3 ); }
 	inline MA1c_double CoolPower4() const { return ma( &T::CoolPower4 ); }
 	inline MA1c_double CoolPower5() const { return ma( &T::CoolPower5 ); }
-	inline MA1c_double CoolRetHumRat() const { return ma( &T::CoolRetHumRat ); }
-	inline MA1c_double CoolRetTemp() const { return ma( &T::CoolRetTemp ); }
+	inline MA1c_double RetHumRatAtSensCoolPeak() const { return ma( &T::RetHumRatAtSensCoolPeak ); }
+	inline MA1c_double RetTempAtSensCoolPeak() const { return ma( &T::RetTempAtSensCoolPeak ); }
 	inline MA1c_double CurrentMaxAvail() const { return ma( &T::CurrentMaxAvail ); }
 	inline MA1c_double CurrentMinAvail() const { return ma( &T::CurrentMinAvail ); }
 	inline MA1c_double DCElectProdRate() const { return ma( &T::DCElectProdRate ); }
@@ -960,17 +960,17 @@
 	inline MA1_double CoolCap5() { return ma( &T::CoolCap5 ); }
 	inline MA1_double CoolCycleTime() { return ma( &T::CoolCycleTime ); }
 	inline MA1_double CoolingDemand() { return ma( &T::CoolingDemand ); }
-	inline MA1_double CoolMixHumRat() { return ma( &T::CoolMixHumRat ); }
-	inline MA1_double CoolMixTemp() { return ma( &T::CoolMixTemp ); }
-	inline MA1_double CoolOutHumRat() { return ma( &T::CoolOutHumRat ); }
-	inline MA1_double CoolOutTemp() { return ma( &T::CoolOutTemp ); }
+	inline MA1_double MixHumRatAtSensCoolPeak() { return ma( &T::MixHumRatAtSensCoolPeak ); }
+	inline MA1_double MixTempAtSensCoolPeak() { return ma( &T::MixTempAtSensCoolPeak ); }
+	inline MA1_double OutHumRatAtSensCoolPeak() { return ma( &T::OutHumRatAtSensCoolPeak ); }
+	inline MA1_double OutTempAtSensCoolPeak() { return ma( &T::OutTempAtSensCoolPeak ); }
 	inline MA1_double CoolPower1() { return ma( &T::CoolPower1 ); }
 	inline MA1_double CoolPower2() { return ma( &T::CoolPower2 ); }
 	inline MA1_double CoolPower3() { return ma( &T::CoolPower3 ); }
 	inline MA1_double CoolPower4() { return ma( &T::CoolPower4 ); }
 	inline MA1_double CoolPower5() { return ma( &T::CoolPower5 ); }
-	inline MA1_double CoolRetHumRat() { return ma( &T::CoolRetHumRat ); }
-	inline MA1_double CoolRetTemp() { return ma( &T::CoolRetTemp ); }
+	inline MA1_double RetHumRatAtSensCoolPeak() { return ma( &T::RetHumRatAtSensCoolPeak ); }
+	inline MA1_double RetTempAtSensCoolPeak() { return ma( &T::RetTempAtSensCoolPeak ); }
 	inline MA1_double CurrentMaxAvail() { return ma( &T::CurrentMaxAvail ); }
 	inline MA1_double CurrentMinAvail() { return ma( &T::CurrentMinAvail ); }
 	inline MA1_double DCElectProdRate() { return ma( &T::DCElectProdRate ); }
