@@ -362,6 +362,17 @@
                   OutArgs(19)=InArgs(19) ! Redundant, but clear
                 endif
                 
+              CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! fields 1-9 aren't affected
+                OutArgs(1:9)=InArgs(1:9)
+                ! add a blank for the new curve type field
+                OutArgs(10)=blank
+                ! then we just push the rest of the fields down 1
+                OutArgs(11:)=InArgs(10:)
+                CurArgs = CurArgs + 1
+                
     !!!   Changes for report variables, meters, tables -- update names
 
               CASE('OUTPUT:VARIABLE')
