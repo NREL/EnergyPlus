@@ -1211,19 +1211,8 @@ namespace ReportSizingManager {
 									CoilInTemp = FinalSysSizing ( CurSysNum ).MixTempAtSensCoolPeak;
 									CoilInHumRat = FinalSysSizing ( CurSysNum ).MixHumRatAtSensCoolPeak;
 								} else { // there is precooling of OA stream
-<<<<<<< HEAD
-									if ( DesVolFlow > 0.0 ) {
-										OutAirFrac = FinalSysSizing ( CurSysNum ).DesOutAirVolFlow / DesVolFlow;
-									} else {
-										OutAirFrac = 1.0;
-									}
-									OutAirFrac = min ( 1.0, max ( 0.0, OutAirFrac ) );
 									CoilInTemp = OutAirFrac * FinalSysSizing ( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing ( CurSysNum ).RetTempAtSensCoolPeak;
 									CoilInHumRat = OutAirFrac*FinalSysSizing ( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing ( CurSysNum ).RetHumRatAtSensCoolPeak;
-=======
-									CoilInTemp = OutAirFrac * FinalSysSizing ( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing ( CurSysNum ).CoolRetTemp;
-									CoilInHumRat = OutAirFrac*FinalSysSizing ( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing ( CurSysNum ).CoolRetHumRat;
->>>>>>> develop
 								}
 							}
 							OutTemp = FinalSysSizing ( CurSysNum ).OutTempAtSensCoolPeak;
