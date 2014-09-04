@@ -335,8 +335,8 @@ namespace ExternalInterface {
 	
 	void
 	ParseString(
-		std::string const str,
-		FArray1D< std::string > & ele,
+		std::string const & str,
+		FArray1S_string ele,
 		int const nEle
 	);
 	
@@ -356,7 +356,7 @@ namespace ExternalInterface {
 	ValidateRunControl();
 	
 	void
-	WarnIfExternalInterfaceObjectsAreUsed( std::string ObjectWord );
+	WarnIfExternalInterfaceObjectsAreUsed( std::string const & ObjectWord );
 	
 	void
 	CalcExternalInterfaceFMUImport();
