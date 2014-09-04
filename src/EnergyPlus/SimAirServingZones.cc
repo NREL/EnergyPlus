@@ -3826,12 +3826,20 @@ namespace SimAirServingZones {
 
 				SetupEMSInternalVariable( "Air System Outdoor Air Design Volume Flow Rate", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[m3/s]", FinalSysSizing( AirLoopNum ).DesOutAirVolFlow );
 
-				SetupEMSInternalVariable( "Air System Cooling Design Mixed Air Temperature", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).MixTempAtSensCoolPeak );
-				SetupEMSInternalVariable( "Air System Cooling Design Mixed Air Humidity Ratio", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).MixHumRatAtSensCoolPeak );
-				SetupEMSInternalVariable( "Air System Cooling Design Return Air Temperature", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).RetTempAtSensCoolPeak );
-				SetupEMSInternalVariable( "Air System Cooling Design Return Air Humidity Ratio", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).RetHumRatAtSensCoolPeak );
-				SetupEMSInternalVariable( "Air System Cooling Design Outdoor Air Temperature", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).OutTempAtSensCoolPeak );
-				SetupEMSInternalVariable( "Air System Cooling Design Outdoor Air Humidity Ratio", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).OutHumRatAtSensCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Mixed Air Temperature At Sens Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).MixTempAtSensCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Mixed Air Humidity Ratio At Sens Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).MixHumRatAtSensCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Return Air Temperature At Sens Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).RetTempAtSensCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Return Air Humidity Ratio At Sens Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).RetHumRatAtSensCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Outdoor Air Temperature At Sens Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).OutTempAtSensCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Outdoor Air Humidity Ratio At Sens Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).OutHumRatAtSensCoolPeak );
+
+				SetupEMSInternalVariable( "Air System Design Mixed Air Temperature At Tot Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).MixTempAtTotCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Mixed Air Humidity Ratio At Tot Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).MixHumRatAtTotCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Return Air Temperature At Tot Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).RetTempAtTotCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Return Air Humidity Ratio At Tot Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).RetHumRatAtTotCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Outdoor Air Temperature At Tot Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).OutTempAtTotCoolPeak );
+				SetupEMSInternalVariable( "Air System Design Outdoor Air Humidity Ratio At Tot Cooling Peak", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).OutHumRatAtTotCoolPeak );
+
 
 				SetupEMSInternalVariable( "Air System Heating Design Mixed Air Temperature", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[C]", FinalSysSizing( AirLoopNum ).HeatMixTemp );
 				SetupEMSInternalVariable( "Air System Heating Design Mixed Air Humidity Ratio", FinalSysSizing( AirLoopNum ).AirPriLoopName, "[kgWater/kgDryAir]", FinalSysSizing( AirLoopNum ).HeatMixHumRat );
@@ -4657,7 +4665,7 @@ namespace SimAirServingZones {
 					SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCapSeq( TimeStepInDay ) = SysTotCoolCap;
 				} // end of system mass flow check
 
-				// get the maximum system sensible cooling capacity
+				// get the peak system sensible cooling capacity and save mixed, return, and outside conditions at the peak
 				if ( SysSensCoolCap > SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap ) {
 					SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap = SysSensCoolCap;
 					SysSizing( AirLoopNum, CurOverallSimDay ).MixTempAtSensCoolPeak = SysCoolMixTemp;
@@ -4667,6 +4675,18 @@ namespace SimAirServingZones {
 					SysSizing( AirLoopNum, CurOverallSimDay ).OutTempAtSensCoolPeak = OutDryBulbTemp;
 					SysSizing( AirLoopNum, CurOverallSimDay ).OutHumRatAtSensCoolPeak = OutHumRat;
 				}
+
+				// get the peak system total cooling capacity and save the mixed, return, and outside conditions at the peak
+				if ( SysTotCoolCap > SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap ) {
+					SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap = SysTotCoolCap;
+					SysSizing( AirLoopNum, CurOverallSimDay ).MixTempAtTotCoolPeak = SysCoolMixTemp;
+					SysSizing( AirLoopNum, CurOverallSimDay ).MixHumRatAtTotCoolPeak = SysCoolMixHumRat;
+					SysSizing( AirLoopNum, CurOverallSimDay ).RetTempAtTotCoolPeak = SysCoolRetTemp;
+					SysSizing( AirLoopNum, CurOverallSimDay ).RetHumRatAtTotCoolPeak = SysCoolRetHumRat;
+					SysSizing( AirLoopNum, CurOverallSimDay ).OutTempAtTotCoolPeak = OutDryBulbTemp;
+					SysSizing( AirLoopNum, CurOverallSimDay ).OutHumRatAtTotCoolPeak = OutHumRat;
+				}
+
 				// get the maximum cooling mass flow rate
 				SysSizing( AirLoopNum, CurOverallSimDay ).CoinCoolMassFlow = max( SysSizing( AirLoopNum, CurOverallSimDay ).CoinCoolMassFlow, SysSizing( AirLoopNum, CurOverallSimDay ).CoolFlowSeq( TimeStepInDay ) );
 

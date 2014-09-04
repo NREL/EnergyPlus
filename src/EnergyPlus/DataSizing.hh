@@ -1166,12 +1166,18 @@ namespace DataSizing {
 		Real64 TotCoolCap; // design total cooling capacity [W]
 		Real64 HeatCap; // design heating capacity [W]
 		Real64 PreheatCap; // design preheat capacity [W]
-		Real64 MixTempAtSensCoolPeak; // design mixed air temperature for cooling [C]
-		Real64 MixHumRatAtSensCoolPeak; // design mixed air hum ratio for cooling [kg water/kg dry air]
-		Real64 RetTempAtSensCoolPeak; // design return air temperature for cooling [C]
-		Real64 RetHumRatAtSensCoolPeak; // design return air hum ratio for cooling [kg water/kg dry air]
-		Real64 OutTempAtSensCoolPeak; // design outside air temperature for cooling [C]
-		Real64 OutHumRatAtSensCoolPeak; // design outside air hum ratio for cooling [kg water/kg dry air]
+		Real64 MixTempAtSensCoolPeak; // design mixed air temperature at the sensible cooling peak [C]
+		Real64 MixHumRatAtSensCoolPeak; // design mixed air hum ratio at the sensible cooling peak [kg water/kg dry air]
+		Real64 RetTempAtSensCoolPeak; // design return air temperature at the sensible cooling peak [C]
+		Real64 RetHumRatAtSensCoolPeak; // design return air hum ratio at the sensible cooling peak [kg water/kg dry air]
+		Real64 OutTempAtSensCoolPeak; // design outside air temperature at the sensible cooling peak [C]
+		Real64 OutHumRatAtSensCoolPeak; // design outside air hum ratio at the sensible cooling peak [kg water/kg dry air]
+		Real64 MixTempAtTotCoolPeak; // design mixed air temperature at the total cooling peak [C]
+		Real64 MixHumRatAtTotCoolPeak; // design mixed air hum ratio at the total cooling peak [kg water/kg dry air]
+		Real64 RetTempAtTotCoolPeak; // design return air temperature at the total cooling peak [C]
+		Real64 RetHumRatAtTotCoolPeak; // design return air hum ratio at the total cooling peak [kg water/kg dry air]
+		Real64 OutTempAtTotCoolPeak; // design outside air temperature at the total cooling peak [C]
+		Real64 OutHumRatAtTotCoolPeak; // design outside air hum ratio at the total cooling peak [kg water/kg dry air]
 		Real64 HeatMixTemp; // design mixed air temperature for heating [C]
 		Real64 HeatMixHumRat; // design mixed air hum ratio for heating [kg water/kg dry air]
 		Real64 HeatRetTemp; // design return air temperature for heating [C]
@@ -1263,6 +1269,12 @@ namespace DataSizing {
 			RetHumRatAtSensCoolPeak( 0.0 ),
 			OutTempAtSensCoolPeak( 0.0 ),
 			OutHumRatAtSensCoolPeak( 0.0 ),
+			MixTempAtTotCoolPeak( 0.0 ),
+			MixHumRatAtTotCoolPeak( 0.0 ),
+			RetTempAtTotCoolPeak( 0.0 ),
+			RetHumRatAtTotCoolPeak( 0.0 ),
+			OutTempAtTotCoolPeak( 0.0 ),
+			OutHumRatAtTotCoolPeak( 0.0 ),
 			HeatMixTemp( 0.0 ),
 			HeatMixHumRat( 0.0 ),
 			HeatRetTemp( 0.0 ),
@@ -1324,12 +1336,18 @@ namespace DataSizing {
 			Real64 const TotCoolCap, //design total cooling capacity [W]
 			Real64 const HeatCap, // design heating capacity [W]
 			Real64 const PreheatCap, // design preheat capacity [W]
-			Real64 const MixTempAtSensCoolPeak, // design mixed air temperature for cooling [C]
-			Real64 const MixHumRatAtSensCoolPeak, // design mixed air hum ratio for cooling [kg water/kg dry air]
-			Real64 const RetTempAtSensCoolPeak, // design return air temperature for cooling [C]
-			Real64 const RetHumRatAtSensCoolPeak, // design return air hum ratio for cooling [kg water/kg dry air]
-			Real64 const OutTempAtSensCoolPeak, // design outside air temperature for cooling [C]
-			Real64 const OutHumRatAtSensCoolPeak, // design outside air hum ratio for cooling [kg water/kg dry air]
+			Real64 const MixTempAtSensCoolPeak, // design mixed air temperature at sens cooling peak [C]
+			Real64 const MixHumRatAtSensCoolPeak, // design mixed air hum ratio at sens cooling peak [kg water/kg dry air]
+			Real64 const RetTempAtSensCoolPeak, // design return air temperature at sens cooling peak [C]
+			Real64 const RetHumRatAtSensCoolPeak, // design return air hum ratio at sens cooling peak [kg water/kg dry air]
+			Real64 const OutTempAtSensCoolPeak, // design outside air temperature at sens cooling peak [C]
+			Real64 const OutHumRatAtSensCoolPeak, // design outside air hum ratio at sens cooling peak [kg water/kg dry air]
+			Real64 const MixTempAtTotCoolPeak, // design mixed air temperature at Tot cooling peak [C]
+			Real64 const MixHumRatAtTotCoolPeak, // design mixed air hum ratio at Tot cooling peak [kg water/kg dry air]
+			Real64 const RetTempAtTotCoolPeak, // design return air temperature at Tot cooling peak [C]
+			Real64 const RetHumRatAtTotCoolPeak, // design return air hum ratio at Tot cooling peak [kg water/kg dry air]
+			Real64 const OutTempAtTotCoolPeak, // design outside air temperature at Tot cooling peak [C]
+			Real64 const OutHumRatAtTotCoolPeak, // design outside air hum ratio at Tot cooling peak [kg water/kg dry air]
 			Real64 const HeatMixTemp, // design mixed air temperature for heating [C]
 			Real64 const HeatMixHumRat, // design mixed air hum ratio for heating [kg water/kg dry air]
 			Real64 const HeatRetTemp, // design return air temperature for heating [C]
@@ -1408,6 +1426,12 @@ namespace DataSizing {
 			RetHumRatAtSensCoolPeak( RetHumRatAtSensCoolPeak ),
 			OutTempAtSensCoolPeak( OutTempAtSensCoolPeak ),
 			OutHumRatAtSensCoolPeak( OutHumRatAtSensCoolPeak ),
+			MixTempAtTotCoolPeak( MixTempAtTotCoolPeak ),
+			MixHumRatAtTotCoolPeak( MixHumRatAtTotCoolPeak ),
+			RetTempAtTotCoolPeak( RetTempAtTotCoolPeak ),
+			RetHumRatAtTotCoolPeak( RetHumRatAtTotCoolPeak ),
+			OutTempAtTotCoolPeak( OutTempAtTotCoolPeak ),
+			OutHumRatAtTotCoolPeak( OutHumRatAtTotCoolPeak ),
 			HeatMixTemp( HeatMixTemp ),
 			HeatMixHumRat( HeatMixHumRat ),
 			HeatRetTemp( HeatRetTemp ),
