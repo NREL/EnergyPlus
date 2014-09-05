@@ -2226,15 +2226,15 @@ namespace ExternalInterface {
 	std::vector< char >
 	getCharArrayFromString( std::string const & originalString )
 	{
-		std::vector< char > returnVal( originalString.begin(), originalString.end() );
-		returnVal.push_back( '\0' ); // get null terminated string of chars
-		return returnVal;
+		// c_str returns null terminated, so we don't need a +1?
+		return std::vector< char >( originalString.c_str(), originalString.c_str() + originalString.size() );
 	}
 	
 	std::string
 	getStringFromCharArray( std::vector< char > originalCharArray )
 	{
-		return std::string( originalCharArray.begin(), originalCharArray.end() );
+		originalCharArray.back() = '\0';
+		return std::string( &originalCharArray.front() );
 	}
 
 	//     NOTICE
