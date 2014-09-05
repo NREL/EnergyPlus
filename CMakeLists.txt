@@ -57,9 +57,12 @@ ADD_SUBDIRECTORY(third_party/BCVTB)
 ADD_SUBDIRECTORY(third_party/Expat)
 ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
+ADD_SUBDIRECTORY(third_party/DElight)
 IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
+
+# of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_TESTING )

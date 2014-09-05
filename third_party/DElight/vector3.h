@@ -405,7 +405,7 @@ inline vector2 proj(const vector3 &v)
     return(result);
 }
 
-};	//	end namespace BldgGeomLib
+}	//	end namespace BldgGeomLib
 
 std::ostream &operator << (std::ostream &s, const BldgGeomLib::vector3 &v);
 std::istream &operator >> (std::istream &s, BldgGeomLib::vector3 &v);
