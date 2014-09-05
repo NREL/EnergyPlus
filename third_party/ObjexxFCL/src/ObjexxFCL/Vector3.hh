@@ -1582,8 +1582,9 @@ public: // Friends
 	T
 	angle( Vector3 const & a, Vector3 const & b )
 	{
-		T const mag( a.length() * b.length() );
-		return ( mag > T( 0 ) ? std::acos( sin_cos_range( a.dot( b ) / mag ) ) : T( 0 ) );
+		T const axb( a.cross( b ).magnitude() );
+		T const adb( a.dot( b ) );
+		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
 	}
 
 	// Angle abc Formed by Three Vector3s (in Radians on [0,pi])
@@ -1601,7 +1602,7 @@ public: // Friends
 	T
 	cos( Vector3 const & a, Vector3 const & b )
 	{
-		T const mag( a.length() * b.length() );
+		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
 		return ( mag > T( 0 ) ? sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
 	}
 
@@ -1620,7 +1621,8 @@ public: // Friends
 	T
 	sin( Vector3 const & a, Vector3 const & b )
 	{
-		return std::sqrt( T( 1 ) - square( cos( a, b ) ) );
+		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+		return ( mag > T( 0 ) ? std::abs( sin_cos_range( a.cross( b ).magnitude() / mag ) ) : T( 0 ) );
 	}
 
 	// Sine of Angle abc Formed by Three Vector3s
@@ -1634,13 +1636,13 @@ public: // Friends
 
 private: // Methods
 
-	// Max of Three Values
+	// Square of a value
 	inline
 	static
-	T const &
-	max3( T const & a, T const & b, T const & c )
+	T
+	square( T const & t )
 	{
-		return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
+		return t * t;
 	}
 
 	// Value Clipped to [-1,1]
@@ -1652,13 +1654,23 @@ private: // Methods
 		return std::min( std::max( t, T( -1 ) ), T( 1 ) );
 	}
 
-	// Square of a value
+	// Add 2*Pi to a Negative Value
 	inline
 	static
 	T
-	square( T const & t )
+	bump_up_angle( T const & t )
 	{
-		return t * t;
+		static T const Two_Pi( T( 2 ) * std::acos( -1.0 ) );
+		return ( t >= T( 0 ) ? t : Two_Pi + t );
+	}
+
+	// Max of Three Values
+	inline
+	static
+	T const &
+	max3( T const & a, T const & b, T const & c )
+	{
+		return ( a < b ? ( b < c ? c : b ) : ( a < c ? c : a ) );
 	}
 
 public: // Data

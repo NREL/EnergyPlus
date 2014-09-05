@@ -20,6 +20,7 @@
 
 // C++ Headers
 #include <array>
+#include <cmath>
 #include <vector>
 
 using namespace ObjexxFCL;
@@ -288,6 +289,33 @@ TEST( Vector3Test, Center )
 	Vector3_double x( 4.0, 0.0, 77.0 );
 	Vector3_double y( 0.0, 4.0, 77.0 );
 	EXPECT_EQ( Vector3_double( 2.0, 2.0, 77.0 ), cen( x, y ) );
+}
+
+TEST( Vector3Test, Angle )
+{
+	double const Pi( std::acos( -1.0 ) );
+	double const Pi_2( std::asin( 1.0 ) );
+	{
+		Vector3_double a( 4.0, 0.0, 0.0 );
+		Vector3_double b( 0.0, 4.0, 0.0 );
+		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
+	}
+	{
+		Vector3_double a( 4.0, 0.0, 0.0 );
+		Vector3_double b( 0.0, 0.0, -4.0 );
+		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
+	}
+	{
+		Vector3_double a( 0.0, 4.0, 0.0 );
+		Vector3_double b( 0.0, -1.0, 0.0 );
+		EXPECT_DOUBLE_EQ( Pi, angle( a, b ) );
+		EXPECT_DOUBLE_EQ( -1.0, cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, sin( a, b ) );
+	}
 }
 
 TEST( Vector3Test, BinaryOperations )

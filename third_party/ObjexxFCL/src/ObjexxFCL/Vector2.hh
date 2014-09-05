@@ -1476,8 +1476,9 @@ public: // Friends
 	T
 	angle( Vector2 const & a, Vector2 const & b )
 	{
-		T const mag( a.length() * b.length() );
-		return ( mag > T( 0 ) ? std::acos( sin_cos_range( a.dot( b ) / mag ) ) : T( 0 ) );
+		T const axb( a.cross( b ) );
+		T const adb( a.dot( b ) );
+		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( std::abs( axb ), adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
 	}
 
 	// Angle abc Formed by Three Vector2s (in Radians on [0,pi])
@@ -1486,7 +1487,7 @@ public: // Friends
 	T
 	angle( Vector2 const & a, Vector2 const & b, Vector2 const & c )
 	{
-		return angle_of( a - b, c - b );
+		return angle( a - b, c - b );
 	}
 
 	// Cosine of Angle Between Two Vector2s
@@ -1495,7 +1496,7 @@ public: // Friends
 	T
 	cos( Vector2 const & a, Vector2 const & b )
 	{
-		T const mag( a.length() * b.length() );
+		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
 		return ( mag > T( 0 ) ? sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
 	}
 
@@ -1514,7 +1515,8 @@ public: // Friends
 	T
 	sin( Vector2 const & a, Vector2 const & b )
 	{
-		return std::sqrt( T( 1 ) - square( cos( a, b ) ) );
+		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+		return ( mag > T( 0 ) ? std::abs( sin_cos_range( a.cross( b ) / mag ) ) : T( 0 ) );
 	}
 
 	// Sine of Angle abc Formed by Three Vector2s
@@ -1526,7 +1528,74 @@ public: // Friends
 		return sin( a - b, c - b );
 	}
 
+	// Directed Angle Between Two Vector2s (in Radians on [0,2*pi])
+	friend
+	inline
+	T
+	dir_angle( Vector2 const & a, Vector2 const & b )
+	{
+		T const axb( a.cross( b ) );
+		T const adb( a.dot( b ) );
+		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) );
+	}
+
+	// Directed Angle abc Formed by Three Vector2s (in Radians on [0,2*pi])
+	friend
+	inline
+	T
+	dir_angle( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		return dir_angle( a - b, c - b );
+	}
+
+	// Cosine of Directed Angle Between Two Vector2s
+	friend
+	inline
+	T
+	dir_cos( Vector2 const & a, Vector2 const & b )
+	{
+		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+		return ( mag > T( 0 ) ? sin_cos_range( a.dot( b ) / mag ) : T( 1 ) );
+	}
+
+	// Cosine of Directed Angle abc Formed by Three Vector2s
+	friend
+	inline
+	T
+	dir_cos( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		return dir_cos( a - b, c - b );
+	}
+
+	// Sine of Directed Angle Between Two Vector2s
+	friend
+	inline
+	T
+	dir_sin( Vector2 const & a, Vector2 const & b )
+	{
+		T const mag( std::sqrt( a.length_squared() * b.length_squared() ) );
+		return ( mag > T( 0 ) ? sin_cos_range( a.cross( b ) / mag ) : T( 0 ) );
+	}
+
+	// Sine of Directed Angle abc Formed by Three Vector2s
+	friend
+	inline
+	T
+	dir_sin( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		return dir_sin( a - b, c - b );
+	}
+
 private: // Methods
+
+	// Square of a value
+	inline
+	static
+	T
+	square( T const & t )
+	{
+		return t * t;
+	}
 
 	// Value Clipped to [-1,1]
 	inline
@@ -1537,13 +1606,14 @@ private: // Methods
 		return std::min( std::max( t, T( -1 ) ), T( 1 ) );
 	}
 
-	// Square of a value
+	// Add 2*Pi to a Negative Value
 	inline
 	static
 	T
-	square( T const & t )
+	bump_up_angle( T const & t )
 	{
-		return t * t;
+		static T const Two_Pi( T( 2 ) * std::acos( -1.0 ) );
+		return ( t >= T( 0 ) ? t : Two_Pi + t );
 	}
 
 public: // Data

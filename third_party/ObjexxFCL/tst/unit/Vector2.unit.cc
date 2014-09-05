@@ -20,6 +20,7 @@
 
 // C++ Headers
 #include <array>
+#include <cmath>
 #include <vector>
 
 using namespace ObjexxFCL;
@@ -249,6 +250,42 @@ TEST( Vector2Test, Center )
 	Vector2_double x( 4.0, 0.0 );
 	Vector2_double y( 0.0, 4.0 );
 	EXPECT_EQ( Vector2_double( 2.0, 2.0 ), cen( x, y ) );
+}
+
+TEST( Vector2Test, Angle )
+{
+	double const Pi( std::acos( -1.0 ) );
+	double const Pi_2( std::asin( 1.0 ) );
+	{
+		Vector2_double a( 4.0, 0.0 );
+		Vector2_double b( 0.0, 4.0 );
+		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
+		EXPECT_DOUBLE_EQ( Pi_2, dir_angle( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, dir_cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 1.0, dir_sin( a, b ) );
+	}
+	{
+		Vector2_double a( 4.0, 0.0 );
+		Vector2_double b( 0.0, -4.0 );
+		EXPECT_DOUBLE_EQ( Pi_2, angle( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 1.0, sin( a, b ) );
+		EXPECT_DOUBLE_EQ( 3.0 * Pi_2, dir_angle( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, dir_cos( a, b ) );
+		EXPECT_DOUBLE_EQ( -1.0, dir_sin( a, b ) );
+	}
+	{
+		Vector2_double a( 4.0, 0.0 );
+		Vector2_double b( -1.0, 0.0 );
+		EXPECT_DOUBLE_EQ( Pi, angle( a, b ) );
+		EXPECT_DOUBLE_EQ( -1.0, cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, sin( a, b ) );
+		EXPECT_DOUBLE_EQ( Pi, dir_angle( a, b ) );
+		EXPECT_DOUBLE_EQ( -1.0, dir_cos( a, b ) );
+		EXPECT_DOUBLE_EQ( 0.0, dir_sin( a, b ) );
+	}
 }
 
 TEST( Vector2Test, BinaryOperations )
