@@ -46,7 +46,7 @@ namespace DElightManagerF {
 		Real64 dSOLCOSX, 
 		Real64 dSOLCOSY, 
 		Real64 dSOLCOSZ,
-		Real64 pdPowerReducFac,
+		Real64 & pdPowerReducFac,
 		int piErrorFlag
 	);
 
