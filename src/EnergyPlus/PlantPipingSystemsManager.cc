@@ -5702,6 +5702,7 @@ namespace PlantPipingSystemsManager {
 
 			//we have it quite simple
 
+			assert(ThisMesh.RegionMeshCount > 0);
 			CellWidth = GridWidth / ThisMesh.RegionMeshCount;
 
 			for ( I = 0; I <= ThisMesh.RegionMeshCount - 1; ++I ) {
