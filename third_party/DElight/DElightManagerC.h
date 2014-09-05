@@ -27,9 +27,10 @@ INFORMATION, APPARATUS, PRODUCT, OR PROCESS DISCLOSED, OR REPRESENTS THAT ITS US
 WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 */
 
+#include <string>
 #include "DElightAPI.h"
 
-void writewndo(const char* instring, string sfpflg);
+void writewndo(const char* instring, std::string sfpflg);
 
 extern "C" DllExport void delightdaylightcoefficients(double dBldgLat, 
                                                       int* piErrorFlag); 
