@@ -41,7 +41,7 @@ namespace ExternalInterface {
 	extern int const indexSchedule;  // Index for schedule in inpVarTypes
 	extern int const indexVariable;  // Index for variable in inpVarTypes
 	extern int const indexActuator;  // Index for actuator in inpVarTypes
-	extern int const nInKeys;  // Number of input variables available in ExternalInterface (=highest index* number)
+	extern int nInKeys;  // Number of input variables available in ExternalInterface (=highest index* number)
 	extern int const fmiOK;          // fmiOK
 	extern int const fmiWarning;     // fmiWarning
 	extern int const fmiDiscard;     // fmiDiscard
@@ -342,12 +342,18 @@ namespace ExternalInterface {
 	
 	void
 	GetReportVariableKey(
-		FArray1D< std::string > varKeys,
+		FArray1S_string const varKeys,
 		int const numberOfKeys,
-		FArray1D< std::string > varNames,
-		FArray1D< int > & keyVarIndexes,
-		FArray1D< int > & varTypes
+		FArray1S_string const varNames,
+		FArray1S_int keyVarIndexes,
+		FArray1S_int varTypes
 	);
+	
+	std::vector< char >
+	getCharArrayFromString( std::string const & originalString );
+	
+	std::string
+	getStringFromCharArray( std::vector< char > originalCharArray );
 	
 	void
 	StopExternalInterfaceIfError();
