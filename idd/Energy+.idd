@@ -54046,6 +54046,151 @@ Pipe:Underground,
         \required-field
         \note This field specifies the domain simulation timestep.
 	
+Site:GroundDomain:Basement,
+        \memo The ground domain object for simulation.
+   A1,  \field Name
+        \required-field
+        \type alpha
+        \reference PipingSystemUndergroundDomainNames
+   N1,  \field Ground Domain Depth
+        \required-field
+        \type real
+        \units m
+        \minimum> 0
+        \note Domain extent in the local 'X' direction
+   N2,  \field Aspect ratio
+        \required-field
+        \type real
+        \minimum> 0
+        \note Domain extent in the local 'Y' direction
+   N3,  \field Perimeter Offset
+        \required-field
+        \type real
+        \units m
+        \minimum> 0
+        \note Domain extent in the local 'Y' direction
+   N4, \field Soil Thermal Conductivity
+        \required-field
+        \type real
+        \units W/m-K
+        \minimum> 0
+   N5, \field Soil Density
+        \required-field
+        \type real
+        \units kg/m3
+        \minimum> 0
+   N6, \field Soil Specific Heat
+        \required-field
+        \type real
+        \units J/kg-K
+        \minimum> 0
+        \note This is a dry soil property, which is adjusted for freezing effects
+        \note   by the simulation algorithm.
+   N7, \field Soil Moisture Content Volume Fraction
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8, \field Soil Moisture Content Volume Fraction at Saturation
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9, \field Kusuda-Achenbach Average Surface Temperature
+        \required-field
+        \type real
+        \units C
+   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
+        \required-field
+        \type real
+        \units C
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+        \required-field
+        \type real
+        \units days
+   A2,  \field This Domain Includes Basement Surface Interaction
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note if Yes, then the following basement inputs are used
+        \note if No, then the following basement inputs are *ignored*
+   N12, \field Depth of Basement Wall In Ground Domain
+        \type real
+        \units m
+        \note Required only if Domain Has Basement Interaction
+   A3,  \field Name of Basement Wall Boundary Condition Model
+        \type object-list
+        \object-list OSCMNames
+        \note Required only if Domain Has Basement Interaction
+   A4,  \field Name of Basement Floor Boundary Condition Model
+        \type object-list
+        \object-list OSCMNames
+        \note Required only if Domain Has Basement Interaction
+   N13, \field Convergence Criterion for the Outer Cartesian Domain Iteration Loop
+        \type real
+        \units deltaC
+        \minimum 0.000001
+        \maximum 0.5
+        \default 0.001
+   N14, \field Maximum Iterations in the Outer Cartesian Domain Iteration Loop
+        \type integer
+        \minimum 3
+        \maximum 10000
+        \default 500
+   N15, \field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  The value roughly represents the following cases:
+        \note  = 0   : concrete or other solid, non-permeable ground surface material
+        \note  = 0.5 : short grass, much like a manicured lawn
+        \note  = 1   : standard reference state (12 cm grass)
+        \note  = 1.5 : wild growth
+   A5,  \field This Domain includes horizontal insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note if Yes, then the following inputs are used
+        \note if No, then the following inputs are *ignored*
+   A6,  \field Name of horizontal insulation material
+        \required-field
+        \type alpha
+   A7,  \field The type of horizontal insulation
+        \type choice
+        \key Perimeter
+        \key Full
+        \default Full
+        \note if Perimeter, then the following input is used
+        \note if No, then the following input is *ignored*
+   N16, \field Width of horizontal insulation
+        \type real
+        \units m
+   A8,  \field This Domain includes vertical insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note if Yes, then the following input is used
+        \note if No, then the following input is *ignored*	
+   A9,  \field Name of vertical insulation material
+        \required-field
+        \type alpha	
+   N17, \field Depth of vertical insulation from Grade
+        \type real
+        \units m
+   A10,  \field Simulation Interval - Timestep/Daily
+        \required-field
+        \type alpha		
+   A11;  \field Basement Wall/Floor Material Name
+        \required-field
+        \type alpha	
+		
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
         \min-fields 31
