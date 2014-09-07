@@ -38,8 +38,8 @@ namespace PlantPipingSystemsManager {
 	extern std::string const ObjName_Circuit;
 	extern std::string const ObjName_Segment;
 	extern std::string const ObjName_HorizTrench;
-	extern std::string const ObjName_ZoneCoupled;
-	extern std::string const ObjName_BasementDomain;
+	extern std::string const ObjName_ZoneCoupled_Slab;
+	extern std::string const ObjName_ZoneCoupled_Basement;
 
 	// MODULE INTERFACE DEFINITIONS:
 
@@ -155,7 +155,7 @@ namespace PlantPipingSystemsManager {
 
 	//*********************
 	void
-		ReadBasementDomainInputs(
+		ReadBasementInputs(
 		int const StartingDomainNumForBasement,
 		int const NumBasements,
 		bool & ErrorsFound
@@ -659,10 +659,13 @@ namespace PlantPipingSystemsManager {
 		Optional_int BasementWallXIndex = _,
 		Optional_int BasementFloorYIndex = _,
 		Optional_int XIndex = _,
+		Optional_int XWallIndex = _,
 		Optional_int InsulationXIndex = _,
 		Optional_int YIndex = _,
+		Optional_int YFloorIndex = _,
 		Optional_int InsulationYIndex = _,
 		Optional_int ZIndex = _,
+		Optional_int ZWallIndex = _,
 		Optional_int InsulationZIndex = _
 		
 		

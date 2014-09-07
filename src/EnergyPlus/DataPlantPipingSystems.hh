@@ -22,8 +22,11 @@ namespace DataPlantPipingSystems {
 	extern int const PartitionType_Pipe;
 	extern int const PartitionType_Slab;
 	extern int const PartitionType_XSide;
+	extern int const PartitionType_XSideWallInside;
 	extern int const PartitionType_ZSide;
-	extern int const PartitionType_HorizInsUnder;
+	extern int const PartitionType_ZSideWallInside;
+	extern int const PartitionType_FloorInside;
+	extern int const PartitionType_UnderFloor;
 	extern int const PartitionType_HorizInsXSide;
 	extern int const PartitionType_HorizInsZSide;
 	extern int const PartitionType_VertInsLowerEdge;
@@ -36,8 +39,11 @@ namespace DataPlantPipingSystems {
 	extern int const RegionType_YDirection;
 	extern int const RegionType_ZDirection;
 	extern int const RegionType_XSide;
+	extern int const RegionType_XSideWallInside;
 	extern int const RegionType_ZSide;
-	extern int const RegionType_HorizInsUnder;
+	extern int const RegionType_ZSideWallInside;
+	extern int const RegionType_FloorInside;
+	extern int const RegionType_UnderFloor;
 	extern int const RegionType_HorizInsXSide;
 	extern int const RegionType_HorizInsZSide;
 	extern int const RegionType_VertInsLowerEdge;
@@ -69,6 +75,7 @@ namespace DataPlantPipingSystems {
 	extern int const CellType_HorizInsulation;
 	extern int const CellType_VertInsulation;
 	extern int const CellType_ZoneGroundInterface;
+	extern int const CellType_Basement;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -1295,6 +1302,7 @@ namespace DataPlantPipingSystems {
 		MeshProperties Mesh;
 		BaseThermalPropertySet GroundProperties;
 		BaseThermalPropertySet SlabProperties;
+		BaseThermalPropertySet BasementProperties;
 		BaseThermalPropertySet HorizInsProperties;
 		BaseThermalPropertySet VertInsProperties;
 		SimulationControl SimControls;
@@ -1315,6 +1323,8 @@ namespace DataPlantPipingSystems {
 		Real64 SlabWidth;
 		Real64 SlabLength;
 		Real64 SlabThickness;
+		int BasementMaterialNum;
+		Real64 BasementThickness;
 		Real64 XIndex;
 		Real64 YIndex;
 		Real64 ZIndex;
@@ -1336,6 +1346,9 @@ namespace DataPlantPipingSystems {
 		int VertInsMaterialNum;
 		Real64 VertInsThickness;
 		Real64 VertInsDepth;
+		int XWallIndex;
+		int YFloorIndex;
+		int ZWallIndex;
 		int InsulationXIndex;
 		int InsulationYIndex;
 		int InsulationZIndex;
@@ -1366,6 +1379,8 @@ namespace DataPlantPipingSystems {
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
 			SlabThickness( 0.0 ),
+			BasementMaterialNum(0),
+			BasementThickness(0.0),
 			XIndex( 0 ),
 			YIndex( 0 ),
 			ZIndex( 0 ),
@@ -1387,6 +1402,9 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( 0 ),
 			VertInsThickness( 0.0254 ),
 			VertInsDepth( 0.0 ),
+			XWallIndex(0),
+			YFloorIndex(0),
+			ZWallIndex(0),
 			InsulationXIndex( 0 ),
 			InsulationYIndex( 0 ),
 			InsulationZIndex( 0 ),
@@ -1415,6 +1433,7 @@ namespace DataPlantPipingSystems {
 			MeshProperties const & Mesh,
 			BaseThermalPropertySet const & GroundProperties,
 			BaseThermalPropertySet const & SlabProperties,
+			BaseThermalPropertySet const & BasementProperties,
 			BaseThermalPropertySet const & HorizInsProperties,
 			BaseThermalPropertySet const & VertInsProperties,
 			SimulationControl const & SimControls,
@@ -1433,6 +1452,8 @@ namespace DataPlantPipingSystems {
 			Real64 const SlabWidth,
 			Real64 const SlabLength,
 			Real64 const SlabThickness,
+			int const BasementMaterialNum,
+			Real64 const BasementThickness,
 			Real64 const XIndex,
 			Real64 const YIndex,
 			Real64 const ZIndex,
@@ -1454,6 +1475,9 @@ namespace DataPlantPipingSystems {
 			int const VertInsMaterialNum,
 			Real64 const VertInsThickness,
 			Real64 const VertInsDepth,
+			int const XWallIndex,
+			int const YFloorIndex,
+			int const ZWallIndex,
 			int const InsulationXIndex,
 			int const InsulationYIndex,
 			int const InsulationZIndex,
@@ -1480,6 +1504,7 @@ namespace DataPlantPipingSystems {
 			Mesh( Mesh ),
 			GroundProperties( GroundProperties ),
 			SlabProperties( SlabProperties ),
+			BasementProperties(BasementProperties),
 			HorizInsProperties( HorizInsProperties ),
 			VertInsProperties( VertInsProperties ),
 			SimControls( SimControls ),
@@ -1498,6 +1523,8 @@ namespace DataPlantPipingSystems {
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),
 			SlabThickness( SlabThickness ),
+			BasementMaterialNum(BasementMaterialNum),
+			BasementThickness(BasementThickness),
 			XIndex( XIndex ),
 			YIndex( YIndex ),
 			ZIndex( ZIndex ),
@@ -1519,6 +1546,9 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( VertInsMaterialNum ),
 			VertInsThickness( VertInsThickness ),
 			VertInsDepth( VertInsDepth ),
+			XWallIndex(XWallIndex),
+			YFloorIndex(YFloorIndex),
+			ZWallIndex(ZWallIndex),
 			InsulationXIndex( InsulationXIndex ),
 			InsulationYIndex( InsulationYIndex ),
 			InsulationZIndex( InsulationZIndex ),
