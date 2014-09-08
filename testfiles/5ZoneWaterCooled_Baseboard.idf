@@ -20,7 +20,7 @@
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
 ! Run Control:             Zone and System sizing with weather file run control (no design days ran)
-! 
+!
 ! Building: Single floor rectangular building 100 ft x 50 ft. 5 zones - 4 exterior, 1 interior, zone height 8 feet.
 !           Exterior zone depth is 12 feet. There is a 2 foot high return plenum: the overall building height is
 !           10 feet. There are windows on all 4 facades; the south and north facades have glass doors.
