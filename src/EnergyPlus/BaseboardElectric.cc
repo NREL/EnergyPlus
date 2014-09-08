@@ -276,11 +276,11 @@ namespace BaseboardElectric {
 				Baseboard( BaseboardNum ).BaseboardEfficiency = rNumericArgs( 4 );
 
 				// Determine baseboard electric heating design capacity sizing method
-				if( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+				if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = HeatingDesignCapacity;
-					if( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
+					if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
-						if( Baseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0 && Baseboard( BaseboardNum ).ScaledHeatingCapacity != AutoSize ) {
+						if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0 && Baseboard( BaseboardNum ).ScaledHeatingCapacity != AutoSize ) {
 							ShowSevereError( cCurrentModuleObject + " = " + Baseboard( BaseboardNum ).EquipName );
 							ShowContinueError( "Illegal " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatDesignCapacityNumericNum ), 7 ) );
 							ErrorsFound = true;
@@ -291,16 +291,16 @@ namespace BaseboardElectric {
 						ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+				} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
 					Baseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
-					if( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
+					if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
-						if( Baseboard( BaseboardNum ).ScaledHeatingCapacity <= 0.0 ) {
+						if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity <= 0.0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + Baseboard( BaseboardNum ).EquipName );
 							ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
 							ShowContinueError( "Illegal " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatCapacityPerFloorAreaNumericNum ), 7 ) );
 							ErrorsFound = true;
-						} else if( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
+						} else if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
 							ShowSevereError( cCurrentModuleObject + " = " + Baseboard( BaseboardNum ).EquipName );
 							ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
 							ShowContinueError( "Illegal " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) + " = Autosize" );
@@ -312,11 +312,11 @@ namespace BaseboardElectric {
 						ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
 						ErrorsFound = true;
 					}
-				} else if( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ){
+				} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ){
 					Baseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
-					if( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
+					if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
 						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
-						if( Baseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0 ) {
+						if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0 ) {
 							ShowSevereError( cCurrentModuleObject + " = " + Baseboard( BaseboardNum ).EquipName );
 							ShowContinueError( "Illegal " + cNumericFieldNames( iHeatFracOfAutosizedCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum ), 7 ) );
 							ErrorsFound = true;
@@ -333,9 +333,9 @@ namespace BaseboardElectric {
 					ErrorsFound = true;
 				}
 
-				for( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
-					for( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( CtrlZone ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
-						if( ZoneEquipList( CtrlZone ).EquipType_Num( ZoneEquipTypeNum ) == BBElectricConvective_Num && ZoneEquipList( CtrlZone ).EquipName( ZoneEquipTypeNum ) == Baseboard( BaseboardNum ).EquipName ) {
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					for ( ZoneEquipTypeNum = 1; ZoneEquipTypeNum <= ZoneEquipList( CtrlZone ).NumOfEquipTypes; ++ZoneEquipTypeNum ) {
+						if ( ZoneEquipList( CtrlZone ).EquipType_Num( ZoneEquipTypeNum ) == BBElectricConvective_Num && ZoneEquipList( CtrlZone ).EquipName( ZoneEquipTypeNum ) == Baseboard( BaseboardNum ).EquipName ) {
 							Baseboard( BaseboardNum ).ZonePtr = CtrlZone;
 						}
 					}
