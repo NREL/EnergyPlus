@@ -2380,6 +2380,7 @@ namespace SimAirServingZones {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// Maximum iterations of an air system/controllers simulation sequence
 		int const MaxIter( 50 );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK DEFINITIONS: None
 
@@ -2475,7 +2476,7 @@ namespace SimAirServingZones {
 							++ErrCount;
 							if ( ErrCount < 15 ) {
 								ErrEnvironmentName = EnvironmentName;
-								gio::write( CharErrOut, "*" ) << MaxIter;
+								gio::write( CharErrOut, fmtLD ) << MaxIter;
 								strip( CharErrOut );
 								ShowWarningError( "SolveAirLoopControllers: Maximum iterations (" + CharErrOut + ") exceeded for " + PrimaryAirSystem( AirLoopNum ).Name + ", at " + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString() );
 							} else {

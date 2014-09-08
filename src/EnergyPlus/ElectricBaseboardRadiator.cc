@@ -665,7 +665,7 @@ namespace ElectricBaseboardRadiator {
 		bool IsAutoSize; // Indicator to autosizing nominal capacity
 
 		std::string CompName; // component name
-		std::string	CompType; // component type
+		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
 		Real64 TempSize; // autosized value of coil input field
 		int FieldNum = 1; // IDD numeric field number where input field description is found

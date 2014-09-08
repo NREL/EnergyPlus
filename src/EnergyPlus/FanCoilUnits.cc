@@ -1220,7 +1220,7 @@ namespace FanCoilUnits {
 				if ( IsAutoSize ) {
 					FanCoil( FanCoilNum ).MaxAirVolFlow = MaxAirVolFlowDes;
 				} else { // Hard size with sizing data
-					if (FanCoil( FanCoilNum ).MaxAirVolFlow > 0.0 && MaxAirVolFlowDes > 0.0 ) {
+					if ( FanCoil( FanCoilNum ).MaxAirVolFlow > 0.0 && MaxAirVolFlowDes > 0.0 ) {
 						MaxAirVolFlowUser = FanCoil( FanCoilNum ).MaxAirVolFlow;
 						if ( DisplayExtraWarnings ) {
 							if ( ( std::abs( MaxAirVolFlowDes - MaxAirVolFlowUser ) / MaxAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
@@ -1238,7 +1238,7 @@ namespace FanCoilUnits {
 			SimulateFanComponents( FanCoil( FanCoilNum ).FanName, true, FanCoil( FanCoilNum ).FanIndex );
 			FanCoil( FanCoilNum ).FanAirVolFlow = GetFanDesignVolumeFlowRate( cFanTypes( FanCoil( FanCoilNum ).FanType_Num ), FanCoil( FanCoilNum ).FanName, ErrorsFound );
 			//   Check that the fan volumetric flow rate is greater than or equal to the FCU volumetric flow rate
-			if  (FanCoil( FanCoilNum ).MaxAirVolFlow > FanCoil( FanCoilNum ).FanAirVolFlow ) {
+			if  ( FanCoil( FanCoilNum ).MaxAirVolFlow > FanCoil( FanCoilNum ).FanAirVolFlow ) {
 				ShowWarningError( RoutineName + FanCoil (FanCoilNum ).UnitType + ": " + FanCoil( FanCoilNum ).Name );
 				ShowContinueError( "... Maximum supply air flow rate is greater than the maximum fan flow rate." );
 				ShowContinueError( "... Fan Coil Unit flow = " + TrimSigDigits( FanCoil( FanCoilNum ).MaxAirVolFlow, 5 ) + " m3/s." );
@@ -1352,8 +1352,8 @@ namespace FanCoilUnits {
 							MaxHotWaterVolFlowDes = 0.0;
 						}
 					} else {
-						ShowSevereError("Autosizing of water flow requires a heating loop Sizing:Plant object");
-						ShowContinueError("Occurs in " + FanCoil(FanCoilNum).UnitType + " Object=" + FanCoil(FanCoilNum).Name);
+						ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
+						ShowContinueError( "Occurs in " + FanCoil( FanCoilNum ).UnitType + " Object=" + FanCoil( FanCoilNum ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -1389,13 +1389,11 @@ namespace FanCoilUnits {
 				if ( FanCoil( FanCoilNum ).MaxColdWaterVolFlow > 0.0 ) {
 					ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", FanCoil( FanCoilNum ).MaxColdWaterVolFlow );
 				}
-			}
-			else {
+			} else {
 				if ( SameString( FanCoil( FanCoilNum ).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted" ) ) {
 					CoolingCoilName = GetHXDXCoilName( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound );
 					CoolingCoilType = GetHXCoilType( FanCoil( FanCoilNum ).CCoilType, FanCoil( FanCoilNum ).CCoilName, ErrorsFound );
-				}
-				else {
+				} else {
 					CoolingCoilName = FanCoil( FanCoilNum ).CCoilName;
 					CoolingCoilType = FanCoil( FanCoilNum ).CCoilType;
 				}
@@ -1454,7 +1452,6 @@ namespace FanCoilUnits {
 						} else {
 							MaxColdWaterVolFlowDes = 0.0;
 						}
-
 					} else {
 						ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
 						ShowContinueError( "Occurs in " + FanCoil( FanCoilNum ).UnitType + " Object=" + FanCoil( FanCoilNum ).Name );
@@ -1464,8 +1461,7 @@ namespace FanCoilUnits {
 				if ( IsAutoSize ) {
 					FanCoil( FanCoilNum ).MaxColdWaterVolFlow = MaxColdWaterVolFlowDes;
 					ReportSizingOutput (FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowDes );
-				}
-				else { // Hard size with sizing data
+				} else { // Hard size with sizing data
 					if ( FanCoil( FanCoilNum ).MaxColdWaterVolFlow > 0.0 && MaxColdWaterVolFlowDes > 0.0 ) {
 						MaxColdWaterVolFlowUser = FanCoil( FanCoilNum ).MaxColdWaterVolFlow;
 						ReportSizingOutput( FanCoil( FanCoilNum ).UnitType, FanCoil( FanCoilNum ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxColdWaterVolFlowUser );

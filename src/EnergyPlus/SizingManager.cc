@@ -135,6 +135,7 @@ namespace SizingManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ManageSizing: " );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: none
 
@@ -287,7 +288,7 @@ namespace SizingManager {
 							++CurEnvirNumSimDay;
 						}
 
-						gio::write( DayOfSimChr, "*" ) << DayOfSim;
+						gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
 						strip( DayOfSimChr );
 						BeginDayFlag = true;
 						EndDayFlag = false;
@@ -488,7 +489,7 @@ namespace SizingManager {
 					if ( ! WarmupFlag && DayOfSim > 1 ) {
 						++CurEnvirNumSimDay;
 					}
-					gio::write( DayOfSimChr, "*" ) << DayOfSim;
+					gio::write( DayOfSimChr, fmtLD ) << DayOfSim;
 					strip( DayOfSimChr );
 					BeginDayFlag = true;
 					EndDayFlag = false;
@@ -1029,7 +1030,7 @@ namespace SizingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1098,7 +1099,7 @@ namespace SizingManager {
 				ShowWarningError( cCurrentModuleObject + ": invalid " + cAlphaFieldNames( 1 ) + " entered value=\"" + cAlphaArgs( 1 ) + "\", Commas will be used to separate fields." );
 				cAlphaArgs( 1 ) = "Comma";
 			}
-			gio::write( OutputFileInits, "(A)" ) << "! <Sizing Output Files>,Style";
+			gio::write( OutputFileInits, fmtA ) << "! <Sizing Output Files>,Style";
 			gio::write( OutputFileInits, "('Sizing Output Files,',A)" ) << cAlphaArgs( 1 );
 		}
 

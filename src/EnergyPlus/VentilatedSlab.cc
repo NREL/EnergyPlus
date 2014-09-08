@@ -1507,29 +1507,29 @@ namespace VentilatedSlab {
 		CompName = VentSlab( Item ).Name;
 		DataZoneNumber = VentSlab( Item ).ZonePtr;
 
-		if( VentSlab( Item ).HVACSizingIndex > 0 ) {
+		if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
 			zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
 			// N1 , \field Maximum Supply Air Flow Rate
 			FieldNum = 1;
 			PrintFlag = true;
 			SizingString = VentSlabNumericFields( Item ).FieldNames( FieldNum ) + " [m3/s]";
-			if( ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod > 0 ) {
+			if ( ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod > 0 ) {
 				SizingMethod = CoolingAirflowSizing;
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
-				if( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-					if( SAFMethod == SupplyAirFlowRate ){
-						if( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					} else if( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ){
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -1539,7 +1539,7 @@ namespace VentilatedSlab {
 					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					CoolingAirVolFlowScalable = TempSize;
 
-				} else if( SAFMethod == FlowPerCoolingCapacity ) {
+				} else if ( SAFMethod == FlowPerCoolingCapacity ) {
 					SizingMethod = CoolingCapacitySizing;
 					TempSize = AutoSize;
 					PrintFlag = false;
@@ -1555,23 +1555,23 @@ namespace VentilatedSlab {
 					CoolingAirVolFlowScalable = TempSize;
 				}
 			}
-			if( ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod > 0 )	{
+			if ( ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod > 0 )	{
 				SizingMethod = HeatingAirflowSizing;
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
-				if( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
-					if( SAFMethod == SupplyAirFlowRate ){
-						if( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					} else if( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ){
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
 						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
@@ -1580,7 +1580,7 @@ namespace VentilatedSlab {
 					}
 					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					HeatingAirVolFlowScalable = TempSize;
-				} else if( SAFMethod == FlowPerHeatingCapacity ) {
+				} else if ( SAFMethod == FlowPerHeatingCapacity ) {
 					SizingMethod = HeatingCapacitySizing;
 					TempSize = AutoSize;
 					PrintFlag = false;
@@ -1612,26 +1612,26 @@ namespace VentilatedSlab {
 		}
 
 		IsAutoSize = false;
-		if( VentSlab( Item ).OutAirVolFlow == AutoSize ) {
+		if ( VentSlab( Item ).OutAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if( CurZoneEqNum > 0 ) {
-			if( !IsAutoSize && !ZoneSizingRunDone ) {
-				if( VentSlab( Item ).OutAirVolFlow > 0.0 ) {
+		if ( CurZoneEqNum > 0 ) {
+			if ( !IsAutoSize && !ZoneSizingRunDone ) {
+				if ( VentSlab( Item ).OutAirVolFlow > 0.0 ) {
 					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", VentSlab( Item ).OutAirVolFlow );
 				}
 			} else { // Autosize or hard-size with sizing run
 				CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
 				OutAirVolFlowDes = VentSlab( Item ).MaxAirVolFlow;
-				if( IsAutoSize ) {
+				if ( IsAutoSize ) {
 					VentSlab( Item ).OutAirVolFlow = OutAirVolFlowDes;
 					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes );
 				} else {
-					if( VentSlab( Item ).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0 ) {
+					if ( VentSlab( Item ).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0 ) {
 						OutAirVolFlowUser = VentSlab( Item ).OutAirVolFlow;
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
-						if( DisplayExtraWarnings ) {
-							if( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
 								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
@@ -1645,29 +1645,29 @@ namespace VentilatedSlab {
 		}
 
 		IsAutoSize = false;
-		if( VentSlab( Item ).MinOutAirVolFlow == AutoSize ) {
+		if ( VentSlab( Item ).MinOutAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if( CurZoneEqNum > 0 ) {
-			if( !IsAutoSize && !ZoneSizingRunDone ) {
-				if( VentSlab( Item ).MinOutAirVolFlow > 0.0 ) {
+		if ( CurZoneEqNum > 0 ) {
+			if ( !IsAutoSize && !ZoneSizingRunDone ) {
+				if ( VentSlab( Item ).MinOutAirVolFlow > 0.0 ) {
 					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", VentSlab( Item ).MinOutAirVolFlow );
 				}
 			} else {
 				CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
 				MinOutAirVolFlowDes = min( FinalZoneSizing( CurZoneEqNum ).MinOA, VentSlab( Item ).MaxAirVolFlow );
-				if( MinOutAirVolFlowDes < SmallAirVolFlow ) {
+				if ( MinOutAirVolFlowDes < SmallAirVolFlow ) {
 					MinOutAirVolFlowDes = 0.0;
 				}
-				if( IsAutoSize ) {
+				if ( IsAutoSize ) {
 					VentSlab( Item ).MinOutAirVolFlow = MinOutAirVolFlowDes;
 					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes );
 				} else { // Hard-size with sizing data
-					if( VentSlab( Item ).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0 ) {
+					if ( VentSlab( Item ).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0 ) {
 						MinOutAirVolFlowUser = VentSlab( Item ).MinOutAirVolFlow;
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowUser );
-						if( DisplayExtraWarnings ) {
-							if( ( std::abs( MinOutAirVolFlowDes - MinOutAirVolFlowUser ) / MinOutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( MinOutAirVolFlowDes - MinOutAirVolFlowUser ) / MinOutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
 								ShowContinueError( "User-Specified Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowDes, 5 ) + " [m3/s]" );
@@ -1681,14 +1681,14 @@ namespace VentilatedSlab {
 		}
 
 		IsAutoSize = false;
-		if( VentSlab( Item ).MaxVolHotWaterFlow == AutoSize ) {
+		if ( VentSlab( Item ).MaxVolHotWaterFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if( VentSlab( Item ).HCoilType == Heating_WaterCoilType ) {
+		if ( VentSlab( Item ).HCoilType == Heating_WaterCoilType ) {
 
-			if( CurZoneEqNum > 0 ) {
-				if( !IsAutoSize && !ZoneSizingRunDone ) {
-					if( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 ) {
+			if ( CurZoneEqNum > 0 ) {
+				if ( !IsAutoSize && !ZoneSizingRunDone ) {
+					if ( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 ) {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Hot Water Flow [m3/s]", VentSlab( Item ).MaxVolHotWaterFlow );
 					}
 				} else { // Autosize or hard-size with sizing run
@@ -1696,30 +1696,30 @@ namespace VentilatedSlab {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
-					if( IsAutoSize ) {
+					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", VentSlab( Item ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 						//END IF
-						if( PltSizHeatNum > 0 ) {
-							if( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+						if ( PltSizHeatNum > 0 ) {
+							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = HeatingCapacitySizing;
-								if( VentSlab( Item ).HVACSizingIndex > 0 ) {
+								if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
 									zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
 									CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 									ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-									if( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-										if( CapSizingMethod == HeatingDesignCapacity ){
-											if( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
+									if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+										if ( CapSizingMethod == HeatingDesignCapacity ){
+											if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
 												ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 												ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 											} else {
 												DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											}
 											TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-										} else if( CapSizingMethod == CapacityPerFloorArea ){
+										} else if ( CapSizingMethod == CapacityPerFloorArea ){
 											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 											DataScalableCapSizingON = true;
-										} else if( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
 											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											TempSize = AutoSize;
@@ -1750,15 +1750,15 @@ namespace VentilatedSlab {
 						}
 					}
 
-					if( IsAutoSize ) {
+					if ( IsAutoSize ) {
 						VentSlab( Item ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes );
 					} else { // Hard-size with sizing data
-						if( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
+						if ( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
 							MaxVolHotWaterFlowUser = VentSlab( Item ).MaxVolHotWaterFlow;
 							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowUser );
-							if( DisplayExtraWarnings ) {
-								if( ( std::abs( MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser ) / MaxVolHotWaterFlowUser ) > AutoVsHardSizingThreshold ) {
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser ) / MaxVolHotWaterFlowUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) + " [m3/s]" );
@@ -1775,14 +1775,14 @@ namespace VentilatedSlab {
 		}
 
 		IsAutoSize = false;
-		if( VentSlab( Item ).MaxVolHotSteamFlow == AutoSize ) {
+		if ( VentSlab( Item ).MaxVolHotSteamFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if( VentSlab( Item ).HCoilType == Heating_SteamCoilType ) {
+		if ( VentSlab( Item ).HCoilType == Heating_SteamCoilType ) {
 
-			if( CurZoneEqNum > 0 ) {
-				if( !IsAutoSize && !ZoneSizingRunDone ) {
-					if( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 ) {
+			if ( CurZoneEqNum > 0 ) {
+				if ( !IsAutoSize && !ZoneSizingRunDone ) {
+					if ( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 ) {
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Steam Flow [m3/s]", VentSlab( Item ).MaxVolHotSteamFlow );
 					}
 				} else { // Autosize or hard-size with sizing run
@@ -1790,29 +1790,29 @@ namespace VentilatedSlab {
 
 					CoilSteamInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
 					CoilSteamOutletNode = GetCoilSteamOutletNode( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
-					if( IsAutoSize ) {
+					if ( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound );
-						if( PltSizHeatNum > 0 ) {
-							if( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+						if ( PltSizHeatNum > 0 ) {
+							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
 								SizingMethod = HeatingCapacitySizing;
-								if( VentSlab( Item ).HVACSizingIndex > 0 ) {
+								if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
 									zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
 									CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
 									ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-									if( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-										if( CapSizingMethod == HeatingDesignCapacity ){
-											if( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
+									if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+										if ( CapSizingMethod == HeatingDesignCapacity ){
+											if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
 												ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 												ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 											} else {
 												DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											}
 											TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-										} else if( CapSizingMethod == CapacityPerFloorArea ){
+										} else if ( CapSizingMethod == CapacityPerFloorArea ){
 											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 											DataScalableCapSizingON = true;
-										} else if( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
 											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
 											TempSize = AutoSize;
@@ -1847,15 +1847,15 @@ namespace VentilatedSlab {
 							ErrorsFound = true;
 						}
 					}
-					if( IsAutoSize ) {
+					if ( IsAutoSize ) {
 						VentSlab( Item ).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes );
 					} else {
-						if( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0 ) {
+						if ( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0 ) {
 							MaxVolHotSteamFlowUser = VentSlab( Item ).MaxVolHotSteamFlow;
 							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser );
-							if( DisplayExtraWarnings ) {
-								if( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
+							if ( DisplayExtraWarnings ) {
+								if ( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
 									ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) + " [m3/s]" );
@@ -1872,17 +1872,17 @@ namespace VentilatedSlab {
 		}
 
 		IsAutoSize = false;
-		if( VentSlab( Item ).MaxVolColdWaterFlow == AutoSize ) {
+		if ( VentSlab( Item ).MaxVolColdWaterFlow == AutoSize ) {
 			IsAutoSize = true;
 		}
-		if( CurZoneEqNum > 0 ) {
-			if( !IsAutoSize && !ZoneSizingRunDone ) {
-				if( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 ) {
+		if ( CurZoneEqNum > 0 ) {
+			if ( !IsAutoSize && !ZoneSizingRunDone ) {
+				if ( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 ) {
 					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", VentSlab( Item ).MaxVolColdWaterFlow );
 				}
 			} else {
 				CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
-				if( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
+				if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
 					CoolingCoilName = GetHXDXCoilName( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
 					CoolingCoilType = GetHXCoilType( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
 				} else {
@@ -1891,29 +1891,29 @@ namespace VentilatedSlab {
 				}
 				CoilWaterInletNode = GetCoilWaterInletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
 				CoilWaterOutletNode = GetCoilWaterOutletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
-				if( IsAutoSize ) {
+				if ( IsAutoSize ) {
 					PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-					if( PltSizCoolNum > 0 ) {
-						if( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
+					if ( PltSizCoolNum > 0 ) {
+						if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
 							SizingMethod = CoolingCapacitySizing;
-							if( VentSlab( Item ).HVACSizingIndex > 0 ) {
+							if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
 								zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
 								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
 								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-								if( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-									if( CapSizingMethod == CoolingDesignCapacity ){
-										if( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
+								if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+									if ( CapSizingMethod == CoolingDesignCapacity ){
+										if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
 											ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 											ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 										} else {
 											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 										}
 										TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-									} else if( CapSizingMethod == CapacityPerFloorArea ){
+									} else if ( CapSizingMethod == CapacityPerFloorArea ){
 										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 										DataScalableCapSizingON = true;
-									} else if( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+									} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
 										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
 										TempSize = AutoSize;
@@ -1944,15 +1944,15 @@ namespace VentilatedSlab {
 						ErrorsFound = true;
 					}
 				}
-				if( IsAutoSize ) {
+				if ( IsAutoSize ) {
 					VentSlab( Item ).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
 					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes );
 				} else {
-					if( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0 ) {
+					if ( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0 ) {
 						MaxVolColdWaterFlowUser = VentSlab( Item ).MaxVolColdWaterFlow;
 						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowUser );
-						if( DisplayExtraWarnings ) {
-							if( ( std::abs( MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser ) / MaxVolColdWaterFlowUser ) > AutoVsHardSizingThreshold ) {
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser ) / MaxVolColdWaterFlowUser ) > AutoVsHardSizingThreshold ) {
 								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
 								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowUser, 5 ) + " [m3/s]" );
 								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowDes, 5 ) + " [m3/s]" );
@@ -1965,7 +1965,7 @@ namespace VentilatedSlab {
 			}
 		}
 
-		if( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
+		if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
 			CoolingCoilName = GetHXDXCoilName( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
 			CoolingCoilType = GetHXCoilType( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
 		} else {
@@ -1975,12 +1975,12 @@ namespace VentilatedSlab {
 		SetCoilDesFlow( CoolingCoilType, CoolingCoilName, VentSlab( Item ).MaxAirVolFlow, ErrorsFound );
 		SetCoilDesFlow( VentSlab( Item ).HCoilTypeCh, VentSlab( Item ).HCoilName, VentSlab( Item ).MaxAirVolFlow, ErrorsFound );
 
-		if( CurZoneEqNum > 0 ) {
+		if ( CurZoneEqNum > 0 ) {
 			ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow = VentSlab( Item ).MaxVolHotWaterFlow;
 			ZoneEqSizing( CurZoneEqNum ).MaxCWVolFlow = VentSlab( Item ).MaxVolColdWaterFlow;
 		}
 
-		if( ErrorsFound ) {
+		if ( ErrorsFound ) {
 			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
