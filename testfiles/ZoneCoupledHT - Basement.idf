@@ -545,22 +545,20 @@ CoupledBasement, !- Name
 5, 						 !- Kusuda-Achenbach Average Surface Temperature {C}
 0, 						 !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
 0, 						 !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-Yes,                     !- This Domain Includes Basement Surface Interaction
-2.5,                     !- Depth of Basement Wall In Ground Domain {m}
-BasementWallOSCM,        !- Name of Basement Wall Boundary Condition Model
-BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
-0.005,                   !- Convergence Criterion for the Outer Cartesian Domain Iteration Loop {deltaC}
-100,                     !- Maximum Iterations in the Outer Cartesian Domain Iteration Loop
 0,						 !- Evapotranspiration Ground Cover Parameter
-Yes,					 !- Horizontal Insulation (Yes/No)
-Basement Insulation,	 !- Horizontal Insulation Material Name
-Full, 				 !- Full Horizontal or Perimeter Only (Full/Perimeter)
+BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
+Basement Floor Material, !- Basement Floor Material Name;
+yes,					 !- Basement Horizontal Underfloor Insulation Present (Yes/No)
+Basement Insulation,	 !- Basement Horizontal Insulation Underfloor Material Name
+Perimeter, 				 !- Full Horizontal or Perimeter Only (Full/Perimeter)
 1, 						 !- Perimeter width (m)
-Yes,					 !- Vertical Insulation (Yes/No)
-Basement Insulation, 	 !- Vertical Insulation Name
-3,						 !- Vertical perimeter insulation depth from surface (m)
-timestep,				 !- Simulation interval. (Timestep, Hourly)
-Basement Wall/Floor Material;	 !- Basement Wall/Floor Material Name;
+2.5,                     !- Depth of Basement Wall In Ground Domain {m}
+BasementWallOSCM,        !- Name of Basement Floor Boundary Condition Model
+Basement Wall Material,	!- Basement Wall/Floor Material Name;
+Yes,					 !- Basement Wall Vertical Insulation Present(Yes/No)
+Basement Insulation, 	 !- Basement Wall Vertical Insulation Material Name
+2.3,					 !- Vertical insulation depth from surface (m)
+timestep;				 !- Domain Update interval. (Timestep, Hourly);
 
 
 
