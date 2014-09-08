@@ -16,7 +16,6 @@ namespace EnergyPlus {
 namespace EvaporativeCoolers {
 
 	// Using/Aliasing
-	using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
@@ -334,7 +333,6 @@ namespace EvaporativeCoolers {
 	{
 		// Members
 		std::string Name; // user identifier
-		int ZoneEquipType;
 		int ZoneNodeNum;
 		int AvailSchedIndex; // pointer to local availability schedule
 		std::string AvailManagerListName; // Name of an availability manager list object
@@ -399,7 +397,6 @@ namespace EvaporativeCoolers {
 
 		// Default Constructor
 		ZoneEvapCoolerUnitStruct() :
-			ZoneEquipType( ZoneEvaporativeCoolerUnit_Num ),
 			ZoneNodeNum( 0 ),
 			AvailSchedIndex( 0 ),
 			UnitIsAvailable( false ),
@@ -459,7 +456,6 @@ namespace EvaporativeCoolers {
 		// Member Constructor
 		ZoneEvapCoolerUnitStruct(
 			std::string const & Name, // user identifier
-			int const ZoneEquipType,
 			int const ZoneNodeNum,
 			int const AvailSchedIndex, // pointer to local availability schedule
 			std::string const & AvailManagerListName, // Name of an availability manager list object
@@ -523,7 +519,6 @@ namespace EvaporativeCoolers {
 		    int const HVACSizingIndex // index of a HVACSizing object for an evaportive cooler unit
 		) :
 			Name( Name ),
-			ZoneEquipType( ZoneEquipType ),
 			ZoneNodeNum( ZoneNodeNum ),
 			AvailSchedIndex( AvailSchedIndex ),
 			AvailManagerListName( AvailManagerListName ),

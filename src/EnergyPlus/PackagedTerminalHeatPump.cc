@@ -1166,7 +1166,6 @@ namespace PackagedTerminalHeatPump {
 
 			if ( ! lAlphaBlanks( 17 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 17 );
-				ZoneComp( PkgTermHPAirToAir_Num ).ZoneCompAvailMgrs( PTUnitNum ).AvailManagerListName = Alphas( 17 );
 			}
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
@@ -1721,7 +1720,6 @@ namespace PackagedTerminalHeatPump {
 
 			if ( ! lAlphaBlanks( 15 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 15 );
-				ZoneComp( PkgTermACAirToAir_Num ).ZoneCompAvailMgrs( PTUnitNum ).AvailManagerListName = Alphas( 15 );
 			}
 			
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
@@ -2172,7 +2170,6 @@ namespace PackagedTerminalHeatPump {
 
 			if ( ! lAlphaBlanks( 18 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 18 );
-				ZoneComp( PkgTermHPWaterToAir_Num ).ZoneCompAvailMgrs( PTUnitNum ).AvailManagerListName = Alphas( 18 );
 			}
 
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
@@ -2734,6 +2731,7 @@ namespace PackagedTerminalHeatPump {
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
+		using DataZoneEquipment::ZoneEquipSimulatedOnce;
 		auto & GetHeatingCoilCapacity( HeatingCoils::GetCoilCapacity );
 		using SteamCoils::SimulateSteamCoilComponents;
 		auto & GetCoilMaxSteamFlowRate( SteamCoils::GetCoilMaxSteamFlowRate );
@@ -2786,6 +2784,7 @@ namespace PackagedTerminalHeatPump {
 		static FArray1D_bool MySizeFlag; // used for sizing PTHP inputs one time
 		static FArray1D_bool MyFanFlag; // used for sizing PTHP fan inputs one time
 		static FArray1D_bool MyPlantScanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		Real64 QActual; // actual PTAC steam heating coil load met (W)
 		bool ErrorsFound; // flag returned from mining call
 		Real64 QToCoolSetPt;
@@ -2816,17 +2815,23 @@ namespace PackagedTerminalHeatPump {
 			MySizeFlag.allocate( NumPTUs );
 			MyFanFlag.allocate( NumPTUs );
 			MyPlantScanFlag.allocate( NumPTUs );
+			MyZoneEqFlag.allocate ( NumPTUs );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyFanFlag = true;
 			MyPlantScanFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
 			PTObjectIndex = PTUnit( PTUnitNum ).PTObjectIndex;
-			ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( PTUnitNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).AvailManagerListName = PTUnit( PTUnitNum ).AvailManagerListName;
+				ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( PTUnitNum ) = false;
+			}
 			PTUnit( PTUnitNum ).AvailStatus = ZoneComp( PTUnit( PTUnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( PTObjectIndex ).AvailStatus;
 		}
 

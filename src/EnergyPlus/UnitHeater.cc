@@ -503,7 +503,6 @@ namespace UnitHeater {
 
 			if ( ! lAlphaBlanks( 11 ) ) {
 				UnitHeat( UnitHeatNum ).AvailManagerListName = Alphas( 11 );
-				ZoneComp( UnitHeater_Num ).ZoneCompAvailMgrs( UnitHeatNum ).AvailManagerListName = Alphas( 11 );
 			}
 
 			UnitHeat( UnitHeatNum ).HVACSizingIndex = 0;
@@ -645,6 +644,7 @@ namespace UnitHeater {
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MyPlantScanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop;
 		int HotConNode; // hot water control node number in unit heater loop
@@ -664,15 +664,21 @@ namespace UnitHeater {
 			MyEnvrnFlag.allocate( NumOfUnitHeats );
 			MySizeFlag.allocate( NumOfUnitHeats );
 			MyPlantScanFlag.allocate( NumOfUnitHeats );
+			MyZoneEqFlag.allocate ( NumOfUnitHeats );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MyPlantScanFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( UnitHeater_Num ).ZoneCompAvailMgrs( UnitHeatNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( UnitHeatNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( UnitHeater_Num ).ZoneCompAvailMgrs( UnitHeatNum ).AvailManagerListName = UnitHeat( UnitHeatNum ).AvailManagerListName;
+				ZoneComp( UnitHeater_Num ).ZoneCompAvailMgrs( UnitHeatNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( UnitHeatNum ) = false;
+			}
 			UnitHeat( UnitHeatNum ).AvailStatus = ZoneComp( UnitHeater_Num ).ZoneCompAvailMgrs( UnitHeatNum ).AvailStatus;
 		}
 
