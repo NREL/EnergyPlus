@@ -1997,12 +1997,10 @@ namespace PlantLoopSolver {
 			ParallelBranchMinAvail = 0.0;
 			for ( iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch ) {
 
-				BranchNum = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
-				auto & this_branch( this_loopside.Branch( BranchNum ) );
 				SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
 				auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
-				LastNodeOnBranch = this_branch.NodeNumOut;
-				FirstNodeOnBranch = this_branch.NodeNumIn;
+				LastNodeOnBranch = this_splitter_outlet_branch.NodeNumOut;
+				FirstNodeOnBranch = this_splitter_outlet_branch.NodeNumIn;
 				BranchFlowReq = DetermineBranchFlowRequest( LoopNum, LoopSideNum, BranchNum );
 
 				//now, if we are have branch pumps, here is the situation:
@@ -2011,9 +2009,9 @@ namespace PlantLoopSolver {
 				// the DetermineBranchFlowRequest routine only looks at the branch inlet node
 				// for variable speed branch pumps then, this won't work because the branch will be requesting zero
 				// so let's adjust for this here to make sure these branches get good representation
-				for ( CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter ) {
+				for ( CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter ) {
 
-					auto & this_comp( this_branch.Comp( CompCounter ) );
+					auto & this_comp( this_splitter_outlet_branch.Comp( CompCounter ) );
 
 					//if this isn't a variable speed pump then just keep cycling
 					if ( ( this_comp.TypeOf_Num != TypeOf_PumpVariableSpeed ) && ( this_comp.TypeOf_Num != TypeOf_PumpBankVariableSpeed ) ) {
@@ -2229,17 +2227,39 @@ namespace PlantLoopSolver {
 				//DSU? didn't take the time to figure out what this should be... SplitterFlowIn = SplitterInletFlow(SplitNum)
 				// 1) apportion flow based on requested fraction of total
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
+					
 					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
 					ThisBranchRequest = DetermineBranchFlowRequest( LoopNum, LoopSideNum, SplitterBranchOut );
 					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
-					if ( ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Active ) || ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) ) {
+					auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
+				
+					if ( ( this_splitter_outlet_branch.ControlType == ControlType_Active ) || ( this_splitter_outlet_branch.ControlType == ControlType_SeriesActive ) ) {
+						
+						// since we are calculating this fraction based on the total parallel request calculated above, we must mimic the logic to make sure the math works every time
+						// that means we must make the variable speed pump correction here as well.
+						for ( CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter ) {
+
+							auto & this_comp( this_splitter_outlet_branch.Comp( CompCounter ) );
+
+							//if this isn't a variable speed pump then just keep cycling
+							if ( ( this_comp.TypeOf_Num != TypeOf_PumpVariableSpeed ) && ( this_comp.TypeOf_Num != TypeOf_PumpBankVariableSpeed ) ) {
+								continue;
+							}
+
+							CompInletNode = this_comp.NodeNumIn;
+							ThisBranchRequest = max( ThisBranchRequest, Node( CompInletNode ).MassFlowRateRequest );
+
+						}
+						
 						ThisBranchRequestFrac = ThisBranchRequest / TotParallelBranchFlowReq;
 						//    FracFlow = Node(FirstNodeOnBranch)%MassFlowRate/TotParallelBranchFlowReq
 						//    Node(FirstNodeOnBranch)%MassFlowRate = MIN((FracFlow * Node(FirstNodeOnBranch)%MassFlowRate),FlowRemaining)
 						Node( FirstNodeOnBranch ).MassFlowRate = ThisBranchRequestFrac * ThisLoopSideFlow;
 						PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
+						
 					}
+					
 				}
 
 				// 1b) check if flow all apportioned
