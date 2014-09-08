@@ -1997,10 +1997,12 @@ namespace PlantLoopSolver {
 			ParallelBranchMinAvail = 0.0;
 			for ( iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch ) {
 
+				BranchNum = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
+				auto & this_branch( this_loopside.Branch( BranchNum ) );
 				SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
 				auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
-				LastNodeOnBranch = this_splitter_outlet_branch.NodeNumOut;
-				FirstNodeOnBranch = this_splitter_outlet_branch.NodeNumIn;
+				LastNodeOnBranch = this_branch.NodeNumOut;
+				FirstNodeOnBranch = this_branch.NodeNumIn;
 				BranchFlowReq = DetermineBranchFlowRequest( LoopNum, LoopSideNum, BranchNum );
 
 				//now, if we are have branch pumps, here is the situation:
@@ -2009,9 +2011,9 @@ namespace PlantLoopSolver {
 				// the DetermineBranchFlowRequest routine only looks at the branch inlet node
 				// for variable speed branch pumps then, this won't work because the branch will be requesting zero
 				// so let's adjust for this here to make sure these branches get good representation
-				for ( CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter ) {
+				for ( CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter ) {
 
-					auto & this_comp( this_splitter_outlet_branch.Comp( CompCounter ) );
+					auto & this_comp( this_branch.Comp( CompCounter ) );
 
 					//if this isn't a variable speed pump then just keep cycling
 					if ( ( this_comp.TypeOf_Num != TypeOf_PumpVariableSpeed ) && ( this_comp.TypeOf_Num != TypeOf_PumpBankVariableSpeed ) ) {
