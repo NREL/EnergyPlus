@@ -139,12 +139,10 @@ namespace LowTempRadiantSystem {
 		Real64 CoolEnergy; // cooling sent to panel in Joules
 		int OutRangeHiErrorCount; // recurring errors for crazy results too high fluid temperature
 		int OutRangeLoErrorCount; // recurring errors for crazy results too low fluid temperature
-		int HeatingCapMethod;    // - Method for Low Temp Radiant system heating capacity scaledsizing calculation
-		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledHeatingCapacity;   // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
-		int CoolingCapMethod;     // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation
-	    //- (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
-		Real64 ScaledCoolingCapacity;  // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+		int HeatingCapMethod; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+		int CoolingCapMethod; // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
+		Real64 ScaledCoolingCapacity; // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		HydronicRadiantSystemData() :
@@ -262,13 +260,10 @@ namespace LowTempRadiantSystem {
 			Real64 const CoolEnergy, // cooling sent to panel in Joules
 			int const OutRangeHiErrorCount, // recurring errors for crazy results too high fluid temperature
 			int const OutRangeLoErrorCount, // recurring errors for crazy results too low fluid temperature
-			int const HeatingCapMethod,    // - Method for Low Temp Radiant system heating capacity scaledsizing calculation
-		    //- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		    Real64 const ScaledHeatingCapacity,   // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
-			int const CoolingCapMethod,    // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation
-			//- (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
-			Real64 const ScaledCoolingCapacity   // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
-
+			int const HeatingCapMethod, // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity, // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+			int const CoolingCapMethod, // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
+			Real64 const ScaledCoolingCapacity // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -333,7 +328,6 @@ namespace LowTempRadiantSystem {
 			CoolingCapMethod( CoolingCapMethod ),
 			ScaledCoolingCapacity( ScaledCoolingCapacity )
 		{}
-
 	};
 
 	struct ConstantFlowRadiantSystemData

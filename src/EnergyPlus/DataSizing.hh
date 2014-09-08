@@ -100,7 +100,6 @@ namespace DataSizing {
 	extern int const FractionOfAutosizedHeatingAirflow;
 	extern int const FlowPerCoolingCapacity;
 	extern int const FlowPerHeatingCapacity;
-
 	extern int const CoolingDesignCapacity;
 	extern int const HeatingDesignCapacity;
 	extern int const CapacityPerFloorArea;
@@ -152,8 +151,8 @@ namespace DataSizing {
 	extern bool TermUnitIU; // TRUE if an unpowered induction terminal unit
 	extern bool ZoneEqFanCoil; // TRUE if a 4 pipe fan coil unit is being simulated
 	extern bool ZoneEqUnitHeater; // TRUE if a unit heater is being simulated
-	extern bool ZoneEqUnitVent;   // TRUE if a unit ventilator is being simulated
-	extern bool ZoneEqVentedSlab;   // TRUE if a ventilated slab is being simulated
+	extern bool ZoneEqUnitVent; // TRUE if a unit ventilator is being simulated
+	extern bool ZoneEqVentedSlab; // TRUE if a ventilated slab is being simulated
 	extern bool ZoneEqDXCoil; // TRUE if a ZoneHVAC DX coil is being simulated
 	extern bool ZoneCoolingOnlyFan; // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
 	extern bool ZoneHeatingOnlyFan; // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
@@ -179,17 +178,17 @@ namespace DataSizing {
 	extern Real64 DataHeatSizeRatio; // heating coil size as a ratio of cooling coil capacity
 	extern Real64 DataEMSOverride; // value of EMS variable used to override autosizing
 	extern Real64 DataBypassFrac; // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
-	extern Real64 DataFracOfAutosizedCoolingAirflow;  // fraction of design cooling supply air flow rate
-	extern Real64 DataFracOfAutosizedHeatingAirflow;  // fraction of design heating supply air flow rate
-	extern Real64 DataFlowPerCoolingCapacity;  // cooling supply air flow per unit cooling capacity
-	extern Real64 DataFlowPerHeatingCapacity;  // heating supply air flow per unit heating capacity
-	extern Real64 DataFracOfAutosizedCoolingCapacity;  // fraction of autosized cooling capacity
-	extern Real64 DataFracOfAutosizedHeatingCapacity;  // fraction of autosized heating capacit
-	extern Real64 DataAutosizedCoolingCapacity;  // Autosized cooling capacity used for multiplying flow per capacity to get flow rate
-	extern Real64 DataAutosizedHeatingCapacity;  // Autosized heating capacit used for multiplying flow per capacity to get flow rate
+	extern Real64 DataFracOfAutosizedCoolingAirflow; // fraction of design cooling supply air flow rate
+	extern Real64 DataFracOfAutosizedHeatingAirflow; // fraction of design heating supply air flow rate
+	extern Real64 DataFlowPerCoolingCapacity; // cooling supply air flow per unit cooling capacity
+	extern Real64 DataFlowPerHeatingCapacity; // heating supply air flow per unit heating capacity
+	extern Real64 DataFracOfAutosizedCoolingCapacity; // fraction of autosized cooling capacity
+	extern Real64 DataFracOfAutosizedHeatingCapacity; // fraction of autosized heating capacit
+	extern Real64 DataAutosizedCoolingCapacity; // Autosized cooling capacity used for multiplying flow per capacity to get flow rate
+	extern Real64 DataAutosizedHeatingCapacity; // Autosized heating capacit used for multiplying flow per capacity to get flow rate
 	extern Real64 DataConstantUsedForSizing; // base value used for sizing inputs that are ratios of other inputs
 	extern Real64 DataFractionUsedForSizing; // fractional value of base value used for sizing inputs that are ratios of other inputs
-	extern int DataZoneNumber;               // a pointer to a served by zoneHVAC equipment
+	extern int DataZoneNumber; // a pointer to a served by zoneHVAC equipment
 	extern int NumZoneHVACSizing; // Number of zone HVAC sizing objects
 	extern bool TermUnitSingDuct; // TRUE if a non-induction single duct terminal unit
 	extern bool TermUnitPIU; // TRUE if a powered induction terminal unit
@@ -210,8 +209,8 @@ namespace DataSizing {
 	extern Real64 GlobalCoolSizingFactor; // the global cooling sizing ratio
 	extern FArray1D< Real64 > ZoneSizThermSetPtHi; // highest zone thermostat setpoint during zone sizing calcs
 	extern FArray1D< Real64 > ZoneSizThermSetPtLo; // lowest zone thermostat setpoint during zone sizing calcs
-	extern FArray1D_string CoolPeakDateHrMin;
-	extern FArray1D_string HeatPeakDateHrMin;
+	extern FArray1D_string CoolPeakDateHrMin; // date:hr:min of cooling peak
+	extern FArray1D_string HeatPeakDateHrMin; // date:hr:min of heating peak
 	extern char SizingFileColSep; // Character to separate columns in sizing outputs
 
 
@@ -994,8 +993,8 @@ namespace DataSizing {
 		bool CoolingCapacity; // TRUE if AirloopHVAC system cooling capacity is calculated
 		bool HeatingCapacity; // TRUE if AirloopHVAC system heating capacity is calculated
 		bool SystemCapacity; // TRUE if AirloopHVAC system heating capacity is calculated
-		FArray1D_int SizingMethod;  // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
-		FArray1D_int CapSizingMethod;  // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity and FractionOfAutosizedHeatingCapacity )
+		FArray1D_int SizingMethod; // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and FractionOfAutosizedHeatingAirflow)
+		FArray1D_int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity and FractionOfAutosizedHeatingCapacity )
 
 		// Default Constructor
 		ZoneEqSizingData() :
@@ -1067,24 +1066,17 @@ namespace DataSizing {
 	{
 		// Members
 		std::string Name;
-		int CoolingSAFMethod;    // - Method for cooling supply air flow rate sizing calculation
-		//- (SupplyAirFlowRate,FlowPerFloorArea, FractionOfAutoSizedCoolingValue, 
-		//   FlowPerCoolingCapacity) 
-		int HeatingSAFMethod;    // - Method for heating supply air flow rate sizing calculation
-		//- (SupplyAirFlowRate,FlowPerFloorArea, FractionOfAutoSizedHeatingValue, 
-		//   FlowPerHeatingCapacity,
-		int NoCoolHeatSAFMethod; // - Method for supply air flow sizing during no cooling and heating calculation
-		//- (SupplyAirFlowRate, FractionOfAutoSizedCoolingValue, FractionOfAutoSizedHeatingValue)
-		int CoolingCapMethod;    // - Method for cooling capacity scaledsizing calculation
-		//- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedHeatingCapacity) 
-		int HeatingCapMethod;    // - Method for heatiing capacity scaledsizing calculation
-		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		int CoolingSAFMethod; // - Method for cooling supply air flow rate sizing calculation (SupplyAirFlowRate,FlowPerFloorArea, FractionOfAutoSizedCoolingValue, FlowPerCoolingCapacity) 
+		int HeatingSAFMethod; // - Method for heating supply air flow rate sizing calculation (SupplyAirFlowRate,FlowPerFloorArea, FractionOfAutoSizedHeatingValue, FlowPerHeatingCapacity,
+		int NoCoolHeatSAFMethod; // - Method for supply air flow sizing during no cooling and heating calculation (SupplyAirFlowRate, FractionOfAutoSizedCoolingValue, FractionOfAutoSizedHeatingValue)
+		int CoolingCapMethod; // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedHeatingCapacity) 
+		int HeatingCapMethod; // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
 		Real64 MaxCoolAirVolFlow;// - maximum cooling supply air flow rate, m3/s
 		Real64 MaxHeatAirVolFlow;// - maximum heating supply air flow rate, m3/s
 		Real64 MaxNoCoolHeatAirVolFlow; // - maximum supply air flow rate when no cooling or heating, m3/s
-		Real64 ScaledCoolingCapacity;   // - scaled maximum cooling capacity of zone HVAC equipment, W
-		Real64 ScaledHeatingCapacity;   // - scaled maximum heating capacity of zone HVAC equipment, W
-		bool RequestAutoSize;       // - true if autosizing is requested
+		Real64 ScaledCoolingCapacity; // - scaled maximum cooling capacity of zone HVAC equipment, W
+		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity of zone HVAC equipment, W
+		bool RequestAutoSize; // - true if autosizing is requested
 
 
 		// Default Constructor
@@ -1093,7 +1085,7 @@ namespace DataSizing {
 			HeatingSAFMethod(0),
 			NoCoolHeatSAFMethod(0),
 			CoolingCapMethod(0),		
-	  	    HeatingCapMethod(0),
+			HeatingCapMethod(0),
 			MaxCoolAirVolFlow(0.0),
 			MaxHeatAirVolFlow(0.0),
 			MaxNoCoolHeatAirVolFlow(0.0),
@@ -1105,17 +1097,17 @@ namespace DataSizing {
 		// Member Constructor
 		ZoneHVACSizingData(
 			std::string const & Name,
-			int const CoolingSAFMethod,    // - Method for cooling supply air flow rate sizing calculation
-			int const HeatingSAFMethod,    // - Method for heating supply air flow rate sizing calculation
+			int const CoolingSAFMethod, // - Method for cooling supply air flow rate sizing calculation
+			int const HeatingSAFMethod, // - Method for heating supply air flow rate sizing calculation
 			int const NoCoolHeatSAFMethod, // - Method for supply air flow rate sizing during no cooling and heating calculation
-			int const CoolingCapMethod,    // - Method for cooling capacity scaledsizing calculation
-			int const HeatingCapMethod,    // - Method for heatiing capacity scaledsizing calculation		
-			Real64 const MaxCoolAirVolFlow,// - maximum cooling supply air flow rate, m3/s
-			Real64 const MaxHeatAirVolFlow,// - maximum heating supply air flow rate, m3/s
+			int const CoolingCapMethod, // - Method for cooling capacity scaledsizing calculation
+			int const HeatingCapMethod, // - Method for heatiing capacity scaledsizing calculation		
+			Real64 const MaxCoolAirVolFlow, // - maximum cooling supply air flow rate, m3/s
+			Real64 const MaxHeatAirVolFlow, // - maximum heating supply air flow rate, m3/s
 			Real64 const MaxNoCoolHeatAirVolFlow, // - maximum supply air flow rate when no cooling or heating, m3/s
-			Real64 const ScaledCoolingCapacity,  // - scaled maximum cooling capacity of zone HVAC equipment, W
-			Real64 const ScaledHeatingCapacity,  // - scaled maximum heating capacity of zone HVAC equipment, W
-			bool const RequestAutoSize,       // - true if autosizing is requested
+			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of zone HVAC equipment, W
+			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of zone HVAC equipment, W
+			bool const RequestAutoSize, // - true if autosizing is requested
 			bool const CoolCoilExists, // True if a cooling coil is specified in the ZoneHVAC equip
 			bool const HeatCoilExists // True if a heating coil is specified in the ZoneHVAC equipm
 			) :
@@ -1161,29 +1153,23 @@ namespace DataSizing {
 		int HeatAirDesMethod; // choice of how to get system heating design air flow rates;
 		//  1 = calc from des day simulation; 2=m3/s per zone, user input
 		Real64 DesHeatAirFlow; // design system heating supply air flow rate [m3/s]
-		int ScaleCoolSAFMethod; // choice of how to get system cooling scalable air flow rates;
-		// (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
-		int ScaleHeatSAFMethod; // choice of how to get system heating scalable air flow rates;
-		// (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
+		int ScaleCoolSAFMethod; // choice of how to get system cooling scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
+		int ScaleHeatSAFMethod; // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
 		int SystemOAMethod; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 		Real64 MaxZoneOAFraction; // maximum value of min OA for zones served by system
 		bool OAAutoSized; // Set to true if design OA vol flow is set to 'autosize'
-
-		int CoolingCapMethod;    // - Method for cooling capacity scaledsizing calculation
-		//- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
-		int HeatingCapMethod;    // - Method for heatiing capacity scaledsizing calculation
-		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledCoolingCapacity;   // - scaled maximum cooling capacity of cooling coil in an air loop
-		Real64 ScaledHeatingCapacity;   // - scaled maximum heating capacity of cooling coil in an air loop
-		Real64 FloorAreaOnAirLoopCooled;  // total floor of cooled zones served by an airloop
-		Real64 FloorAreaOnAirLoopHeated;  // total floor of heated zones served by an airloop 
-		Real64 FlowPerFloorAreaCooled;  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-		Real64 FlowPerFloorAreaHeated;  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+		int CoolingCapMethod; // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
+		int HeatingCapMethod; // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledCoolingCapacity; // - scaled maximum cooling capacity of cooling coil in an air loop
+		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity of cooling coil in an air loop
+		Real64 FloorAreaOnAirLoopCooled; // total floor of cooled zones served by an airloop
+		Real64 FloorAreaOnAirLoopHeated; // total floor of heated zones served by an airloop 
+		Real64 FlowPerFloorAreaCooled; // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+		Real64 FlowPerFloorAreaHeated; // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
 		Real64 FractionOfAutosizedCoolingAirflow; // fraction of of cooling supply air flow rate an airloop
 		Real64 FractionOfAutosizedHeatingAirflow; // fraction of of heating supply air flow rate an airloop
-		Real64 FlowPerCoolingCapacity;   // ratio of cooling supply air flow rate to cooling capacity of an airloop
-		Real64 FlowPerHeatingCapacity;   // ratio of heating supply air flow rate to heating capacity of an airloop
-
+		Real64 FlowPerCoolingCapacity; // ratio of cooling supply air flow rate to cooling capacity of an airloop
+		Real64 FlowPerHeatingCapacity; // ratio of heating supply air flow rate to heating capacity of an airloop
 
 		// in Sizing:System
 
@@ -1213,7 +1199,6 @@ namespace DataSizing {
 			SystemOAMethod( 0 ),
 			MaxZoneOAFraction( 0.0 ),
 			OAAutoSized( false ),
-
 			CoolingCapMethod( 0 ),
 			HeatingCapMethod( 0 ),
 			ScaledCoolingCapacity( 0.0 ),
@@ -1226,7 +1211,6 @@ namespace DataSizing {
 			FractionOfAutosizedHeatingAirflow( 1.0 ),
 			FlowPerCoolingCapacity( 0.0 ),
 			FlowPerHeatingCapacity( 0.0 )
-
 		{}
 
 		// Member Constructor
@@ -1251,30 +1235,23 @@ namespace DataSizing {
 			Real64 const DesCoolAirFlow, // design system supply air flow rate for cooling[m3/s]
 			int const HeatAirDesMethod, // choice of how to get system heating design air flow rates;
 			Real64 const DesHeatAirFlow, // design system heating supply air flow rate [m3/s]
-			int const ScaleCoolSAFMethod, // choice of how to get system cooling scalable air flow rates;
-		    // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
-			int const ScaleHeatSAFMethod, // choice of how to get system heating scalable air flow rates;
-			// (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
+			int const ScaleCoolSAFMethod, // choice of how to get system cooling scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
+			int const ScaleHeatSAFMethod, // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
 			int const SystemOAMethod, // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
 			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
-			int const CoolingCapMethod,   // - Method for cooling capacity scaledsizing calculation
-			//- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
-			int const HeatingCapMethod,   // - Method for heatiing capacity scaledsizing calculation
-			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-			Real64 const ScaledCoolingCapacity,  // - scaled maximum cooling capacity of cooling coil in an air loop
-			Real64 const ScaledHeatingCapacity,  // - scaled maximum heating capacity of cooling coil in an air loop
+			int const CoolingCapMethod, // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
+			int const HeatingCapMethod, // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of cooling coil in an air loop
+			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of cooling coil in an air loop
 			Real64 const FloorAreaOnAirLoopCooled, // total floor of cooled zones served by an airloop
 			Real64 const FloorAreaOnAirLoopHeated, // total floor of heated zones served by an airloop 
-			Real64 const FlowPerFloorAreaCooled,  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-			Real64 const FlowPerFloorAreaHeated,  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+			Real64 const FlowPerFloorAreaCooled, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+			Real64 const FlowPerFloorAreaHeated, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
 			Real64 const FractionOfAutosizedCoolingAirflow, // fraction of of cooling supply air flow rate an airloop
 			Real64 const FractionOfAutosizedHeatingAirflow, // fraction of of heating supply air flow rate an airloop
-			Real64 const FlowPerCoolingCapacity,   // ratio of cooling supply air flow rate to cooling capacity of an airloop
-			Real64 const FlowPerHeatingCapacity   // ratio of heating supply air flow rate to heating capacity of an airloop
-
-
-
+			Real64 const FlowPerCoolingCapacity, // ratio of cooling supply air flow rate to cooling capacity of an airloop
+			Real64 const FlowPerHeatingCapacity // ratio of heating supply air flow rate to heating capacity of an airloop
 		) :
 			AirPriLoopName( AirPriLoopName ),
 			AirLoopNum( AirLoopNum ),
@@ -1313,9 +1290,7 @@ namespace DataSizing {
 			FractionOfAutosizedHeatingAirflow( FractionOfAutosizedHeatingAirflow ),
 			FlowPerCoolingCapacity( FlowPerCoolingCapacity ),
 			FlowPerHeatingCapacity( FlowPerHeatingCapacity )
-
 		{}
-
 	};
 
 	struct SystemSizingData // Contains data for system sizing
@@ -1408,27 +1383,22 @@ namespace DataSizing {
 		//   [kg water/kg dry air] [zone time step]
 		int SystemOAMethod; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 		Real64 MaxZoneOAFraction; // maximum value of min OA for zones served by system
-		Real64 SysUncOA; // uncorrected system outdoor air flow based on zone people and
-		// zone area
+		Real64 SysUncOA; // uncorrected system outdoor air flow based on zone people and zone area
 		bool OAAutoSized; // Set to true if design OA vol flow is set to 'autosize'
-		int ScaleCoolSAFMethod; // choice of how to get system cooling scalable air flow rates;
-		// (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
-		int ScaleHeatSAFMethod; // choice of how to get system heating scalable air flow rates;
-		// (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-		int CoolingCapMethod;    // - Method for cooling capacity scaledsizing calculation
-		//- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
-		int HeatingCapMethod;    // - Method for heatiing capacity scaledsizing calculation
-		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledCoolingCapacity;   // - scaled maximum cooling capacity of cooling coil in an air loop
-		Real64 ScaledHeatingCapacity;   // - scaled maximum heating capacity of cooling coil in an air loop
-		Real64 FloorAreaOnAirLoopCooled;  // total floor of cooled zones served by an airloop
-		Real64 FloorAreaOnAirLoopHeated;  // total floor of heated zones served by an airloop 
-		Real64 FlowPerFloorAreaCooled;  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-		Real64 FlowPerFloorAreaHeated;  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+		int ScaleCoolSAFMethod; // choice of how to get system cooling scalable air flow rates; (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
+		int ScaleHeatSAFMethod; // choice of how to get system heating scalable air flow rates; (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
+		int CoolingCapMethod; // - Method for cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
+		int HeatingCapMethod; // - Method for heatiing capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledCoolingCapacity; // - scaled maximum cooling capacity of cooling coil in an air loop
+		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity of cooling coil in an air loop
+		Real64 FloorAreaOnAirLoopCooled; // total floor of cooled zones served by an airloop
+		Real64 FloorAreaOnAirLoopHeated; // total floor of heated zones served by an airloop 
+		Real64 FlowPerFloorAreaCooled; // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+		Real64 FlowPerFloorAreaHeated; // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
 		Real64 FractionOfAutosizedCoolingAirflow; // fraction of of cooling supply air flow rate an airloop
 		Real64 FractionOfAutosizedHeatingAirflow; // fraction of of heating supply air flow rate an airloop
-		Real64 FlowPerCoolingCapacity;   // ratio of cooling supply air flow rate to cooling capacity of an airloop
-		Real64 FlowPerHeatingCapacity;   // ratio of heating supply air flow rate to heating capacity of an airloop
+		Real64 FlowPerCoolingCapacity; // ratio of cooling supply air flow rate to cooling capacity of an airloop
+		Real64 FlowPerHeatingCapacity; // ratio of heating supply air flow rate to heating capacity of an airloop
 		Real64 FractionOfAutosizedCoolingCapacity; // fraction of of cooling total capacity
 		Real64 FractionOfAutosizedHeatingCapacity; // fraction of of heating total capacity
 		Real64 CoolingTotalCapacity; // system total cooling capacity
@@ -1504,7 +1474,7 @@ namespace DataSizing {
 			ScaledCoolingCapacity( 0.0 ),
 			ScaledHeatingCapacity( 0.0 ),
 			FloorAreaOnAirLoopCooled( 0.0 ),
-		    FloorAreaOnAirLoopHeated( 0.0 ),
+			FloorAreaOnAirLoopHeated( 0.0 ),
 			FlowPerFloorAreaCooled( 0.0 ),
 			FlowPerFloorAreaHeated( 0.0 ),
 			FractionOfAutosizedCoolingAirflow( 1.0 ),
@@ -1595,28 +1565,24 @@ namespace DataSizing {
 			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
 			Real64 const SysUncOA, // uncorrected system outdoor air flow based on zone people and
 			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
-			int const ScaleCoolSAFMethod, // choice of how to get system cooling scalable air flow rates;
-			// (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
-			int const ScaleHeatSAFMethod, // choice of how to get system heating scalable air flow rates;
-			// (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
-			int const CoolingCapMethod,   // - Method for cooling capacity scaledsizing calculation
-			//- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
-			int const HeatingCapMethod,   // - Method for heatiing capacity scaledsizing calculation
-			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-			Real64 const ScaledCoolingCapacity,  // - scaled maximum cooling capacity of cooling coil in an air loop
-			Real64 const ScaledHeatingCapacity,  // - scaled maximum heating capacity of cooling coil in an air loop
+			int const ScaleCoolSAFMethod, // choice of how to get system cooling scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FlowPerCoolingCapacity)
+			int const ScaleHeatSAFMethod, // choice of how to get system heating scalable air flow rates; // (FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow, FlowPerHeatingCapacity)
+			int const CoolingCapMethod, // - Method for cooling capacity scaledsizing calculation //- (CoolingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity) 
+			int const HeatingCapMethod, // - Method for heatiing capacity scaledsizing calculation //- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledCoolingCapacity, // - scaled maximum cooling capacity of cooling coil in an air loop
+			Real64 const ScaledHeatingCapacity, // - scaled maximum heating capacity of cooling coil in an air loop
 			Real64 const FloorAreaOnAirLoopCooled, // total floor of cooled zones served by an airloop
 			Real64 const FloorAreaOnAirLoopHeated, // total floor of heated zones served by an airloop 
-			Real64 const FlowPerFloorAreaCooled,  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
-			Real64 const FlowPerFloorAreaHeated,  // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+			Real64 const FlowPerFloorAreaCooled, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
+			Real64 const FlowPerFloorAreaHeated, // ratio of cooling supply air flow rate to total floor area of cooled zones served by an airloop
 			Real64 const FractionOfAutosizedCoolingAirflow, // fraction of of cooling supply air flow rate an airloop
 			Real64 const FractionOfAutosizedHeatingAirflow, // fraction of of heating supply air flow rate an airloop
-			Real64 const FlowPerCoolingCapacity,   // ratio of cooling supply air flow rate to cooling capacity of an airloop
-			Real64 const FlowPerHeatingCapacity,   // ratio of heating supply air flow rate to heating capacity of an airloop
+			Real64 const FlowPerCoolingCapacity, // ratio of cooling supply air flow rate to cooling capacity of an airloop
+			Real64 const FlowPerHeatingCapacity, // ratio of heating supply air flow rate to heating capacity of an airloop
 			Real64 const FractionOfAutosizedCoolingCapacity, // fraction of of cooling total capacity
-		    Real64 const FractionOfAutosizedHeatingCapacity, // fraction of of heating total capacity
+			Real64 const FractionOfAutosizedHeatingCapacity, // fraction of of heating total capacity
 			Real64 const CoolingTotalCapacity, // system total cooling capacity
-		    Real64 const HeatingTotalCapacity // system total heating capacity
+			Real64 const HeatingTotalCapacity // system total heating capacity
 		) :
 			AirPriLoopName( AirPriLoopName ),
 			CoolDesDay( CoolDesDay ),
@@ -1711,9 +1677,7 @@ namespace DataSizing {
 			FractionOfAutosizedHeatingCapacity( FractionOfAutosizedHeatingCapacity ),
 			CoolingTotalCapacity( CoolingTotalCapacity ),
 			HeatingTotalCapacity( HeatingTotalCapacity )
-
 		{}
-
 	};
 
 	struct PlantSizingData

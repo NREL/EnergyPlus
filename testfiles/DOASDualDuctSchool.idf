@@ -75,7 +75,7 @@
 ! End SimMetaData
 ! Number of Zones: 11
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -1721,7 +1721,7 @@
   Fan:OnOff,
     Corner_Class_1_Pod_1 Fan Coil Fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2601,7 +2601,7 @@
   Fan:OnOff,
     Mult_Class_1_Pod_1 Fan Coil Fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2974,7 +2974,7 @@
   Fan:OnOff,
     Corridor_Pod_1 Fan Coil Fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -3462,7 +3462,7 @@
   Fan:OnOff,
     Corner_Class_2_Pod_1 Fan Coil Fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4142,7 +4142,7 @@
   Fan:OnOff,
     Mult_Class_2_Pod_1 Fan Coil Fan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -5983,7 +5983,7 @@
   Fan:ZoneExhaust,
     Bathrooms Exhaust Fan 1, !- Name
     MinOA_Sched,             !- Availability Schedule Name
-    0.4500,                  !- Fan Efficiency
+    0.4500,                  !- Fan Total Efficiency
     125.0000,                !- Pressure Rise {Pa}
     0.3861,                  !- Maximum Flow Rate {m3/s}
     Bathrooms Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -7773,7 +7773,7 @@
   Fan:VariableVolume,
     DOAS_POD_1_OA_Fan,       !- Name
     MinOA_Sched,             !- Availability Schedule Name
-    0.69,                    !- Fan Efficiency
+    0.69,                    !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
@@ -8132,7 +8132,7 @@
   Fan:VariableVolume,
     DUALDUCT_OTHER_OA_Fan,   !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.69,                    !- Fan Efficiency
+    0.69,                    !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
@@ -8176,7 +8176,7 @@
   Fan:VariableVolume,
     DUALDUCT_OTHER_RC_Fan,   !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.69,                    !- Fan Efficiency
+    0.69,                    !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method

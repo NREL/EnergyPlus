@@ -841,6 +841,7 @@ namespace UnitHeater {
 		using DataHVACGlobals::HeatingCapacitySizing;
 		using DataHVACGlobals::HeatingWaterflowSizing;
 		using DataHeatBalance::Zone;
+
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -876,17 +877,16 @@ namespace UnitHeater {
 		Real64 MaxVolHotWaterFlowUser; // Hardsized maximum hot water flow for reporting
 		Real64 MaxVolHotSteamFlowDes; // Autosized maximum hot steam flow for reporting
 		Real64 MaxVolHotSteamFlowUser; // Hardsized maximum hot steam flow for reporting
-
-		std::string CompName;     // component name
-		std::string	CompType;     // component type
+		std::string CompName; // component name
+		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		Real64 TempSize;          // autosized value of coil input field
-		int FieldNum = 1;         // IDD numeric field number where input field description is found
-		int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
-		bool PrintFlag;           // TRUE when sizing information is reported in the eio file
-		int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
-		int SAFMethod( 0 );       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
-		int CapSizingMethod(0);  // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 1; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
+		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		PltSizHeatNum = 0;
 		ErrorsFound = false;
@@ -905,55 +905,55 @@ namespace UnitHeater {
 		CompName = UnitHeat( UnitHeatNum ).Name;
 		DataZoneNumber = UnitHeat( UnitHeatNum ).ZonePtr;
 
-		if ( CurZoneEqNum > 0 ) {
-			if (UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
-				zoneHVACIndex = UnitHeat(UnitHeatNum).HVACSizingIndex;
+		if( CurZoneEqNum > 0 ) {
+			if( UnitHeat( UnitHeatNum ).HVACSizingIndex > 0 ) {
+				zoneHVACIndex = UnitHeat( UnitHeatNum ).HVACSizingIndex;
 				//  N1 , \field Maximum Supply Air Flow Rate
 				SizingMethod = HeatingAirflowSizing;
 				FieldNum = 1;
 				PrintFlag = true;
-				SizingString = UnitHeatNumericFields(UnitHeatNum).FieldNames(FieldNum) + " [m3/s]";
-				SAFMethod = ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod( SizingMethod ) = SAFMethod;
-				if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow) {
-					if (SAFMethod == SupplyAirFlowRate){
-						if (ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0) {
+				SizingString = UnitHeatNumericFields( UnitHeatNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
+					if( SAFMethod == SupplyAirFlowRate ){
+						if( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					} else if (SAFMethod == FlowPerFloorArea){
+					} else if( SAFMethod == FlowPerFloorArea ){
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if (SAFMethod == FractionOfAutosizedHeatingAirflow){
-						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+					} else if( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else {
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 					}
-					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-					UnitHeat(UnitHeatNum).MaxAirVolFlow = TempSize;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					UnitHeat( UnitHeatNum ).MaxAirVolFlow = TempSize;
 
-				} else if (SAFMethod == FlowPerHeatingCapacity) {
+				} else if( SAFMethod == FlowPerHeatingCapacity ) {
 					SizingMethod = HeatingCapacitySizing;
 					TempSize = AutoSize;
 					PrintFlag = false;
 					DataScalableSizingON = true;
-					DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-					if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
-						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					if( ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity ) {
+						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 					}
 					DataAutosizedHeatingCapacity = TempSize;
-					DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+					DataFlowPerHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 					SizingMethod = HeatingAirflowSizing;
 					PrintFlag = true;
 					TempSize = AutoSize;
-					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-					UnitHeat(UnitHeatNum).MaxAirVolFlow = TempSize;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					UnitHeat( UnitHeatNum ).MaxAirVolFlow = TempSize;
 				}
 				DataScalableSizingON = false;
 			} else {
@@ -963,10 +963,10 @@ namespace UnitHeater {
 				SizingMethod = HeatingAirflowSizing;
 				FieldNum = 1;
 				PrintFlag = true;
-				SizingString = UnitHeatNumericFields( UnitHeatNum ).FieldNames( FieldNum ) + " [m3/s]";				
-				TempSize = UnitHeat(UnitHeatNum).MaxAirVolFlow;
-				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-				UnitHeat(UnitHeatNum).MaxAirVolFlow = TempSize;
+				SizingString = UnitHeatNumericFields( UnitHeatNum ).FieldNames( FieldNum ) + " [m3/s]";
+				TempSize = UnitHeat( UnitHeatNum ).MaxAirVolFlow;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				UnitHeat( UnitHeatNum ).MaxAirVolFlow = TempSize;
 			}
 		}
 
@@ -987,47 +987,47 @@ namespace UnitHeater {
 
 					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
 					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
-					if ( IsAutoSize ) {
+					if( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", UnitHeat( UnitHeatNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						if (PltSizHeatNum > 0) {
+						if( PltSizHeatNum > 0 ) {
 							SizingMethod = HeatingCapacitySizing;
-							if (UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
-								zoneHVACIndex = UnitHeat(UnitHeatNum).HVACSizingIndex;
-								CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
-								ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-								if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-									if (CapSizingMethod == HeatingDesignCapacity){
-										if (ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity == AutoSize) {
+							if( UnitHeat( UnitHeatNum ).HVACSizingIndex > 0 ) {
+								zoneHVACIndex = UnitHeat( UnitHeatNum ).HVACSizingIndex;
+								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
+								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+								if( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+									if( CapSizingMethod == HeatingDesignCapacity ){
+										if( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity == AutoSize ) {
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 										} else {
 											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										}
-										ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
+										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										TempSize = AutoSize;
-									} else if (CapSizingMethod == CapacityPerFloorArea){
+									} else if( CapSizingMethod == CapacityPerFloorArea ){
 										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 										DataScalableCapSizingON = true;
-									} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
-										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+									} else if( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										DataScalableCapSizingON = true;
 										TempSize = AutoSize;
 									}
 								}
 								PrintFlag = false;
-								RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
 							} else {
 								SizingString = "";
 								PrintFlag = false;
 								TempSize = AutoSize;
-								ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).DesHeatLoad;
-								RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
+								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
 							}
 
-							if ( DesCoilLoad >= SmallLoad ) {
+							if( DesCoilLoad >= SmallLoad ) {
 								rho = GetDensityGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 								Cp = GetSpecificHeatGlycol( PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( UnitHeat( UnitHeatNum ).HWLoopNum ).FluidIndex, RoutineName );
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
@@ -1083,41 +1083,41 @@ namespace UnitHeater {
 
 					CoilSteamInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
 					CoilSteamOutletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", UnitHeat( UnitHeatNum ).HCoilName, ErrorsFound );
-					if ( IsAutoSize ) {
+					if( IsAutoSize ) {
 						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Steam", UnitHeat( UnitHeatNum ).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound );
-						if ( PltSizHeatNum > 0 ) {
-							if (UnitHeat(UnitHeatNum).HVACSizingIndex > 0) {
-								zoneHVACIndex = UnitHeat(UnitHeatNum).HVACSizingIndex;
+						if( PltSizHeatNum > 0 ) {
+							if( UnitHeat( UnitHeatNum ).HVACSizingIndex > 0 ) {
+								zoneHVACIndex = UnitHeat( UnitHeatNum ).HVACSizingIndex;
 								SizingMethod = HeatingCapacitySizing;
-								CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
-								ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-								if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-									if (CapSizingMethod == HeatingDesignCapacity){
-										if (ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity == AutoSize) {
-											ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).DesHeatLoad;
+								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
+								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+								if( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+									if( CapSizingMethod == HeatingDesignCapacity ){
+										if( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity == AutoSize ) {
+											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 										} else {
-											ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										}
-										ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
+										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										TempSize = AutoSize;
-									} else if (CapSizingMethod == CapacityPerFloorArea){
+									} else if( CapSizingMethod == CapacityPerFloorArea ){
 										ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 										ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 										DataScalableCapSizingON = true;
-									} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
-										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+									} else if( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 										TempSize = AutoSize;
 										DataScalableCapSizingON = true;
 									}
 								}
 								SizingMethod = HeatingCapacitySizing;
 								PrintFlag = false;
-								RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 								DesCoilLoad = TempSize;
 							} else {
-								DesCoilLoad = FinalZoneSizing(CurZoneEqNum).DesHeatLoad;
+								DesCoilLoad = FinalZoneSizing( CurZoneEqNum ).DesHeatLoad;
 							}
-							if ( DesCoilLoad >= SmallLoad ) {
+							if( DesCoilLoad >= SmallLoad ) {
 								TempSteamIn = 100.00;
 								EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, RefrigIndex, RoutineName );
 								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, RefrigIndex, RoutineName );
@@ -1133,15 +1133,15 @@ namespace UnitHeater {
 							ErrorsFound = true;
 						}
 					}
-					if ( IsAutoSize ) {
+					if( IsAutoSize ) {
 						UnitHeat( UnitHeatNum ).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
 						ReportSizingOutput( "ZoneHVAC:UnitHeater", UnitHeat( UnitHeatNum ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes );
 					} else {
-						if ( UnitHeat( UnitHeatNum ).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0 ) {
+						if( UnitHeat( UnitHeatNum ).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0 ) {
 							MaxVolHotSteamFlowUser = UnitHeat( UnitHeatNum ).MaxVolHotSteamFlow;
 							ReportSizingOutput( "ZoneHVAC:UnitHeater", UnitHeat( UnitHeatNum ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
+							if( DisplayExtraWarnings ) {
+								if( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
 									ShowMessage( "SizeUnitHeater: Potential issue with equipment sizing for ZoneHVAC:UnitHeater " + UnitHeat( UnitHeatNum ).Name );
 									ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) + " [m3/s]" );
 									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) + " [m3/s]" );

@@ -861,16 +861,15 @@ namespace WindowAC {
 		Real64 OutAirVolFlowDes; // Autosized outdoor air flow for reporting
 		Real64 OutAirVolFlowUser; // Hardsized outdoor ari flow for reporting
 		bool IsAutoSize; // Indicator to autosize
-
-		std::string CompName;     // component name
-		std::string	CompType;     // component type
+		std::string CompName; // component name
+		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		Real64 TempSize;          // autosized value of coil input field
-		int FieldNum = 2;         // IDD numeric field number where input field description is found
-		int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
-		bool PrintFlag;           // TRUE when sizing information is reported in the eio file
-		int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
-		int SAFMethod( 0 );       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
+		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod(0);  // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		IsAutoSize = false;
@@ -878,89 +877,87 @@ namespace WindowAC {
 		MaxAirVolFlowUser = 0.0;
 		OutAirVolFlowDes = 0.0;
 		OutAirVolFlowUser = 0.0;
-
 		DataFracOfAutosizedCoolingAirflow = 1.0;
 		DataFracOfAutosizedHeatingAirflow = 1.0;
 		DataFracOfAutosizedCoolingCapacity = 1.0;
 		DataFracOfAutosizedHeatingCapacity = 1.0;
-
 		DataScalableSizingON = false;
 		ZoneHeatingOnlyFan = false;
 		ZoneCoolingOnlyFan = true;
 		CompType = "ZoneHVAC:WindowAirConditioner";
-		CompName = WindAC(WindACNum).Name;
-		DataZoneNumber = WindAC(WindACNum).ZonePtr;
+		CompName = WindAC( WindACNum ).Name;
+		DataZoneNumber = WindAC( WindACNum ).ZonePtr;
 
-		if (CurZoneEqNum > 0) {
-			if (WindAC(WindACNum).HVACSizingIndex > 0) {
-				zoneHVACIndex = WindAC(WindACNum).HVACSizingIndex;
+		if( CurZoneEqNum > 0 ) {
+			if( WindAC( WindACNum ).HVACSizingIndex > 0 ) {
+				zoneHVACIndex = WindAC( WindACNum ).HVACSizingIndex;
 				// N1 , \field Maximum Supply Air Flow Rate
 				SizingMethod = CoolingAirflowSizing;
 				FieldNum = 1;
-				SizingString = WindACNumericFields(WindACNum).FieldNames(FieldNum) + " [m3/s]";
+				SizingString = WindACNumericFields( WindACNum ).FieldNames( FieldNum ) + " [m3/s]";
 				PrintFlag = true;
-				SAFMethod = ZoneHVACSizing(zoneHVACIndex).CoolingSAFMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
-				if (SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
-					if (SAFMethod == SupplyAirFlowRate){
-						if (ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0) {
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+					if( SAFMethod == SupplyAirFlowRate ){
+						if( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					} else if (SAFMethod == FlowPerFloorArea){
+					} else if( SAFMethod == FlowPerFloorArea ){
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if (SAFMethod == FractionOfAutosizedCoolingAirflow){
-						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+					} else if( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else {
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					}
-					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					WindAC( WindACNum ).MaxAirVolFlow = TempSize;
 
-				} else if (SAFMethod == FlowPerCoolingCapacity) {
+				} else if( SAFMethod == FlowPerCoolingCapacity ) {
 					SizingMethod = CoolingCapacitySizing;
 					TempSize = AutoSize;
 					PrintFlag = false;
 					DataScalableSizingON = true;
-					DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-					if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+					if( ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 					}
-					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					DataCapacityUsedForSizing = TempSize;
-					DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+					DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					SizingMethod = CoolingAirflowSizing;
 					PrintFlag = true;
 					TempSize = AutoSize;
-					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					WindAC( WindACNum ).MaxAirVolFlow = TempSize;
 				}
 				//DataScalableSizingON = false;
-			
+
 				// initialize capacity sizing variables: cooling
-				CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-				if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-					if (CapSizingMethod == HeatingDesignCapacity){
-						if (ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
-							ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-							ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+					if( CapSizingMethod == HeatingDesignCapacity ){
+						if( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						}
-					} else if (CapSizingMethod == CapacityPerFloorArea){
+					} else if( CapSizingMethod == CapacityPerFloorArea ){
 						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 						DataScalableCapSizingON = true;
-					} else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity){
-						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+					} else if( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						DataScalableCapSizingON = true;
 					}
-				}			
+				}
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
 				// specified in the zoneHVAC object 
@@ -968,20 +965,20 @@ namespace WindowAC {
 				SizingMethod = SystemAirflowSizing;
 				FieldNum = 1;
 				PrintFlag = true;
-				SizingString = WindACNumericFields(WindACNum).FieldNames(FieldNum) + " [m3/s]";
+				SizingString = WindACNumericFields( WindACNum ).FieldNames( FieldNum ) + " [m3/s]";
 				TempSize = WindAC( WindACNum ).MaxAirVolFlow;
-				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				WindAC( WindACNum ).MaxAirVolFlow = TempSize;
 			}
 		}
 
-		if ( WindAC( WindACNum ).OutAirVolFlow == AutoSize ) {
+		if( WindAC( WindACNum ).OutAirVolFlow == AutoSize ) {
 
-			if ( CurZoneEqNum > 0 ) {
+			if( CurZoneEqNum > 0 ) {
 
 				CheckZoneSizing( cWindowAC_UnitTypes( WindAC( WindACNum ).UnitType ), WindAC( WindACNum ).Name );
 				WindAC( WindACNum ).OutAirVolFlow = min( FinalZoneSizing( CurZoneEqNum ).MinOA, WindAC( WindACNum ).MaxAirVolFlow );
-				if ( WindAC( WindACNum ).OutAirVolFlow < SmallAirVolFlow ) {
+				if( WindAC( WindACNum ).OutAirVolFlow < SmallAirVolFlow ) {
 					WindAC( WindACNum ).OutAirVolFlow = 0.0;
 				}
 				ReportSizingOutput( cWindowAC_UnitTypes( WindAC( WindACNum ).UnitType ), WindAC( WindACNum ).Name, "Maximum Outdoor Air Flow Rate [m3/s]", WindAC( WindACNum ).OutAirVolFlow );
@@ -990,7 +987,7 @@ namespace WindowAC {
 
 		}
 
-		if ( CurZoneEqNum > 0 ) {
+		if( CurZoneEqNum > 0 ) {
 			ZoneEqSizing( CurZoneEqNum ).OAVolFlow = WindAC( WindACNum ).OutAirVolFlow;
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = WindAC( WindACNum ).MaxAirVolFlow;
 		}

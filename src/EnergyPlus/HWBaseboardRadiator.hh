@@ -94,9 +94,8 @@ namespace HWBaseboardRadiator {
 		int BBLoadReSimIndex;
 		int BBMassFlowReSimIndex;
 		int BBInletTempFlowReSimIndex;
-		int HeatingCapMethod;    // - Method for heating capacity scaledsizing calculation
-		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledHeatingCapacity;   // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+		int HeatingCapMethod; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		HWBaseboardParams() :
@@ -205,9 +204,8 @@ namespace HWBaseboardRadiator {
 			int const BBLoadReSimIndex,
 			int const BBMassFlowReSimIndex,
 			int const BBInletTempFlowReSimIndex,
-		    int const HeatingCapMethod,     // - Method for HW baseboard heating capacity scalable sizing calculation
-		    //- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		    Real64 const ScaledHeatingCapacity   // - HW baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
+			int const HeatingCapMethod, // - Method for HW baseboard heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity // - HW baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
 		) :
 			EquipID( EquipID ),
 			EquipType( EquipType ),
@@ -264,7 +262,6 @@ namespace HWBaseboardRadiator {
 			HeatingCapMethod( HeatingCapMethod ),
 			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
-
 	};
 
 	struct HWBaseboardNumericFieldData

@@ -10426,7 +10426,7 @@
     CoolSys1 Demand Outlet Node,  !- Demand Side Outlet Node Name
     CoolSys1 Demand Branches,!- Demand Side Branch List Name
     CoolSys1 Demand Connectors,  !- Demand Side Connector List Name
-    Uniform;                 !- Load Distribution Scheme
+    UniformLoad;                 !- Load Distribution Scheme
 
   PlantLoop,
     HeatSys1,                !- Name

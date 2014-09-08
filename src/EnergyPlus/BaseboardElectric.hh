@@ -46,9 +46,9 @@ namespace BaseboardElectric {
 		Real64 Energy;
 		Real64 ElecUseLoad;
 		Real64 ElecUseRate;
-		int ZonePtr;             // point to teh zone where the basebaord is located   
-		int HeatingCapMethod;    // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
-		Real64 ScaledHeatingCapacity;   // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+		int ZonePtr; // point to teh zone where the basebaord is located   
+		int HeatingCapMethod; // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		BaseboardParams() :
@@ -83,8 +83,8 @@ namespace BaseboardElectric {
 			Real64 const ElecUseLoad,
 			Real64 const ElecUseRate,
 			int const ZonePtr, // point to teh zone where the electric baseboard is located  
-			int const HeatingCapMethod,    // - Method for electric baseboard heating capacity scalable sizing calculation
-		    Real64 const ScaledHeatingCapacity   // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
+			int const HeatingCapMethod, // - Method for electric baseboard heating capacity scalable sizing calculation
+			Real64 const ScaledHeatingCapacity // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
 		) :
 			EquipName( EquipName ),
 			EquipType( EquipType ),

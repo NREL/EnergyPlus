@@ -3854,18 +3854,16 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 EvapCondPumpPowerDes; // Autosized evaporative condenser pump power for reporting
 		Real64 EvapCondPumpPowerUser; // Hardsized evaporative condenser pump power for reporting
 
-		std::string CompName;     // component name
-		std::string	CompType;     // component type
+		std::string CompName; // component name
+		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		Real64 TempSize;          // autosized value of coil input field
-		int FieldNum = 2;         // IDD numeric field number where input field description is found
-		int SizingMethod;         // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
-		bool PrintFlag = true;     // TRUE when sizing information is reported in the eio file
-		int zoneHVACIndex;        // index of zoneHVAC equipment sizing specification
-		int SAFMethod( 0 );       // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
-		int CapSizingMethod( 0 );  // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-		//Real64 CoolingAirVolFlowScalable; // cooling airvolume for rate determined using scalable sizing method
-		//Real64 HeatingAirVolFlowScalable; // heating airvolume for rate determined using scalable sizing method
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
+		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
+		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		// Formats
 		static gio::Fmt const Format_990( "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping Correction Factor')" );
@@ -3913,20 +3911,19 @@ namespace HVACVariableRefrigerantFlow {
 		}
 
 		CompType = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
-		CompName = VRFTU(VRFTUNum).Name;
-		if (CurZoneEqNum > 0) {
-			if (VRFTU(VRFTUNum).HVACSizingIndex > 0) {
-				zoneHVACIndex = VRFTU(VRFTUNum).HVACSizingIndex;
-				DataZoneNumber = VRFTU(VRFTUNum).ZoneNum;
+		CompName = VRFTU( VRFTUNum ).Name;
+		if ( CurZoneEqNum > 0 ) {
+			if ( VRFTU( VRFTUNum ).HVACSizingIndex > 0 ) {
+				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;
+				DataZoneNumber = VRFTU( VRFTUNum ).ZoneNum;
 
-				// N1, \field Supply Air Flow Rate During Cooling Operation
 				SizingMethod = CoolingAirflowSizing;
-				FieldNum = 1;
+				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
 				PrintFlag = true;
-				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames(FieldNum) + " [m3/s]";
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
-				if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow) {
+				if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 					if ( SAFMethod == SupplyAirFlowRate ){
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
@@ -3943,23 +3940,22 @@ namespace HVACVariableRefrigerantFlow {
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else {
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					VRFTU( VRFTUNum ).MaxCoolAirVolFlow = TempSize;
-
 				} else if ( SAFMethod == FlowPerCoolingCapacity ) {
 					SizingMethod = CoolingCapacitySizing;
 					TempSize = AutoSize;
 					PrintFlag = false;
 					DataScalableSizingON = true;
 					DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-					if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
-						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+					if ( ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					DataAutosizedCoolingCapacity = TempSize;
-					DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+					DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					SizingMethod = CoolingAirflowSizing;
 					PrintFlag = true;
 					TempSize = AutoSize;
@@ -3967,14 +3963,13 @@ namespace HVACVariableRefrigerantFlow {
 					VRFTU( VRFTUNum ).MaxCoolAirVolFlow = TempSize;
 				}
 
-				//N3, \field Supply Air Flow Rate During Heating Operation
 				SizingMethod = HeatingAirflowSizing;
-				FieldNum = 3;
+				FieldNum = 3; //N3, \field Supply Air Flow Rate During Heating Operation
 				PrintFlag = true;
-				SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-				SAFMethod = ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
-				if (SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow) {
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 					if ( SAFMethod == SupplyAirFlowRate ){
 						if (ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
@@ -3987,27 +3982,26 @@ namespace HVACVariableRefrigerantFlow {
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
 					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
-						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else {
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					VRFTU( VRFTUNum ).MaxHeatAirVolFlow = TempSize;
-
 				} else if ( SAFMethod == FlowPerHeatingCapacity ) {
 					SizingMethod = HeatingCapacitySizing;
 					TempSize = AutoSize;
 					PrintFlag = false;
 					DataScalableSizingON = true;
-					DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-					if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
-						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+					if ( ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity ) {
+						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					DataAutosizedHeatingCapacity = TempSize;
-					DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
+					DataFlowPerHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 					SizingMethod = HeatingAirflowSizing;
 					PrintFlag = true;
 					TempSize = AutoSize;
@@ -4015,13 +4009,12 @@ namespace HVACVariableRefrigerantFlow {
 					VRFTU( VRFTUNum ).MaxHeatAirVolFlow = TempSize;
 				}
 
-				//N2, \field Supply Air Flow Rate When No Cooling is Needed						
 				SizingMethod = CoolingAirflowSizing;
-				FieldNum = 2;
+				FieldNum = 2; //N2, \field Supply Air Flow Rate When No Cooling is Needed
 				PrintFlag = true;
-				SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-				SAFMethod = ZoneHVACSizing(zoneHVACIndex).NoCoolHeatSAFMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( ( SAFMethod == SupplyAirFlowRate ) || ( SAFMethod == FlowPerFloorArea ) || ( SAFMethod == FractionOfAutosizedHeatingAirflow ) || ( SAFMethod == FractionOfAutosizedCoolingAirflow ) ) {
 					if ( SAFMethod == SupplyAirFlowRate ){
 						if (ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0) {
@@ -4035,30 +4028,28 @@ namespace HVACVariableRefrigerantFlow {
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
 					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
-						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
-						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else {
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-					VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = TempSize;
+					VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow = TempSize;
 				}
 
-
-				//N4, \field Supply Air Flow Rate When No Heating is Needed
 				SizingMethod = HeatingAirflowSizing;
-				FieldNum = 4;
+				FieldNum = 4; //N4, \field Supply Air Flow Rate When No Heating is Needed
 				PrintFlag = true;
-				SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-				SAFMethod = ZoneHVACSizing(zoneHVACIndex).NoCoolHeatSAFMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = SAFMethod;
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames(FieldNum) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod(SizingMethod) = SAFMethod;
 				if ( ( SAFMethod == SupplyAirFlowRate ) || ( SAFMethod == FlowPerFloorArea ) || ( SAFMethod == FractionOfAutosizedHeatingAirflow ) || ( SAFMethod == FractionOfAutosizedCoolingAirflow ) ) {
 					if ( SAFMethod == SupplyAirFlowRate ){
 						if (ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0) {
@@ -4072,17 +4063,17 @@ namespace HVACVariableRefrigerantFlow {
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
 					} else if  (SAFMethod == FractionOfAutosizedHeatingAirflow ){
-						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
-						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
-						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
 					} else {
-						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow = TempSize;
@@ -4090,81 +4081,76 @@ namespace HVACVariableRefrigerantFlow {
 
 				// initialize capacity sizing variables: cooling
 				SizingMethod = CoolingCapacitySizing;
-				CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-				if (CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
-					if (CapSizingMethod == HeatingDesignCapacity){
-						if (ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0) {
-							ZoneEqSizing(CurZoneEqNum).CoolingCapacity = true;
-							ZoneEqSizing(CurZoneEqNum).DesCoolingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+					if ( CapSizingMethod == HeatingDesignCapacity ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						}
 					} else if (CapSizingMethod == CapacityPerFloorArea){
 						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
 						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
 						DataScalableCapSizingON = true;
-					} else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity){
-						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
 						DataScalableCapSizingON = true;
 					}
 				}
 
 				// initialize capacity sizing variables: heating
 				SizingMethod = HeatingCapacitySizing;
-				CapSizingMethod = ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod;
-				ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
-				if (CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity) {
-					if (CapSizingMethod == HeatingDesignCapacity){
-						if (ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity > 0.0) {
-							ZoneEqSizing(CurZoneEqNum).HeatingCapacity = true;
-							ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+					if ( CapSizingMethod == HeatingDesignCapacity ){
+						if (ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0) {
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 						}
-					} else if (CapSizingMethod == CapacityPerFloorArea){
+					} else if ( CapSizingMethod == CapacityPerFloorArea ){
 						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
 						DataScalableCapSizingON = true;
-					} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
-						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 						DataScalableCapSizingON = true;
 					}
 				}
-
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
 				// specified in the zoneHVAC object 
 
 				PrintFlag = true;
 
-				// N1, \field Supply Air Flow Rate During Cooling Operation
 				SizingMethod = CoolingAirflowSizing;
-				FieldNum = 1;
-				SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
-				TempSize = VRFTU(VRFTUNum).MaxCoolAirVolFlow;
+				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames(FieldNum) + " [m3/s]";
+				TempSize = VRFTU( VRFTUNum ).MaxCoolAirVolFlow;
 				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 				VRFTU( VRFTUNum ).MaxCoolAirVolFlow = TempSize;
 
-				//N3, \field Supply Air Flow Rate During Heating Operation
-				FieldNum = 3;
-				SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
+				FieldNum = 3; //N3, \field Supply Air Flow Rate During Heating Operation
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
 				SizingMethod = HeatingAirflowSizing;
-				TempSize = VRFTU(VRFTUNum).MaxHeatAirVolFlow;
+				TempSize = VRFTU( VRFTUNum ).MaxHeatAirVolFlow;
 				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 				VRFTU( VRFTUNum ).MaxHeatAirVolFlow = TempSize;
 
-				//N2, \field Supply Air Flow Rate When No Cooling is Needed
-				FieldNum = 2;
-				SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
+				FieldNum = 2; //N2, \field Supply Air Flow Rate When No Cooling is Needed
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
 				SizingMethod = SystemAirflowSizing;
-				TempSize = VRFTU(VRFTUNum).MaxNoCoolAirVolFlow;
+				TempSize = VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow;
 				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-				VRFTU(VRFTUNum).MaxNoCoolAirVolFlow = TempSize;
+				VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow = TempSize;
 
-				//N4, \field Supply Air Flow Rate When No Heating is Needed
-				FieldNum = 4;
-				SizingString = VRFTUNumericFields(VRFTUNum).FieldNames(FieldNum) + " [m3/s]";
+				FieldNum = 4; //N4, \field Supply Air Flow Rate When No Heating is Needed
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
 				SizingMethod = SystemAirflowSizing;
-				TempSize = VRFTU(VRFTUNum).MaxNoHeatAirVolFlow;
+				TempSize = VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow;
 				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-				VRFTU(VRFTUNum).MaxNoHeatAirVolFlow = TempSize;
+				VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow = TempSize;
 			}
 		}
 		IsAutoSize = false;
@@ -4278,7 +4264,7 @@ namespace HVACVariableRefrigerantFlow {
 			}
 		}
 
-		if (CurZoneEqNum > 0) {
+		if ( CurZoneEqNum > 0 ) {
 			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( VRFTU( VRFTUNum ).MaxCoolAirVolFlow, VRFTU( VRFTUNum ).MaxHeatAirVolFlow );
 		}
 
