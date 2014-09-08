@@ -497,7 +497,7 @@ namespace PlantPipingSystemsManager {
 		TotalNumCircuits = NumPipeCircuits + NumHorizontalTrenches;
 		PipingSystemCircuits.allocate( TotalNumCircuits );
 
-		// then segmentsObjName_ZoneCoupled_Basement
+		// then segments
 		NumPipeSegmentsInInput = GetNumObjectsFound( ObjName_Segment );
 		NumSegmentsInHorizontalTrenches = GetNumSegmentsForHorizontalTrenches( NumHorizontalTrenches );
 		TotalNumSegments = NumPipeSegmentsInInput + NumSegmentsInHorizontalTrenches;
@@ -1853,7 +1853,7 @@ namespace PlantPipingSystemsManager {
 			//Add error-handling for perimeter insulation width
 
 
-
+			
 		}
 
 	}
@@ -4726,7 +4726,7 @@ namespace PlantPipingSystemsManager {
 
 			}
 			//Underground Piping Systems Ground domain with basement interaction
-			if (!PipingSystemDomains(DomainNum).HasCoupledBasement){
+ 			if (!PipingSystemDomains(DomainNum).HasCoupledBasement){
 				//FHX model
 				if (PipingSystemDomains(DomainNum).HasBasement) {
 					//'NOTE: the basement depth is still a depth from the ground surface, need to correct for this here
@@ -4802,6 +4802,17 @@ namespace PlantPipingSystemsManager {
 
 							}
 						}
+						else{
+							PipingSystemDomains(DomainNum).Partitions.X.allocate({ 0, 1 });
+							//Side X direction - Wall outside face
+							SideXLocation = PipingSystemDomains(DomainNum).PerimeterOffset - PipingSystemDomains(DomainNum).BasementThickness;
+							PipingSystemDomains(DomainNum).Partitions.X(0) = MeshPartition(SideXLocation, PartitionType_XSide, CellWidth);
+
+							//Side X direction - Wall inside face
+							SideXWallInsideLocation = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.X(1) = MeshPartition(SideXWallInsideLocation, PartitionType_XSideWallInside, CellWidth);
+
+						}
 					}
 					else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.X, PipingSystemDomains(DomainNum).BasementZone.Width)) {
 						PreviousUbound = ubound(PipingSystemDomains(DomainNum).Partitions.X, 1);
@@ -4855,15 +4866,15 @@ namespace PlantPipingSystemsManager {
 				if (PipingSystemDomains(DomainNum).BasementZone.Depth > 0) {
 					CellWidth = PipingSystemDomains(DomainNum).HorizInsThickness;
 					//Distance of basement floor's upper surface from domain bottom
-					BasementDistFromBottom = PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemDomains(DomainNum).BasementZone.Depth;
+					BasementDistFromBottom = PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemDomains(DomainNum).BasementZone.Depth + PipingSystemDomains(DomainNum).BasementThickness;
 					//Distance of basement floor's lower surface from domain bottom
 					BasementDistFromBottom2 = BasementDistFromBottom - PipingSystemDomains(DomainNum).BasementThickness;
 					if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
 						YInsulationLocation = PipingSystemDomains(DomainNum).Extents.Ymax - PipingSystemDomains(DomainNum).VertInsDepth;
 					}
 					if (!allocated(PipingSystemDomains(DomainNum).Partitions.Y)) {
-						//Partition at bottom edge of vertical insulation, if vertical insulation is present and extends below the basement floor
-						if (PipingSystemDomains(DomainNum).VertInsPresentFlag && PipingSystemDomains(DomainNum).VertInsDepth > PipingSystemDomains(DomainNum).BasementZone.Depth){
+						//Partition at bottom edge of vertical insulation, if vertical insulation is present 
+						if (PipingSystemDomains(DomainNum).VertInsPresentFlag && YInsulationLocation > BasementDistFromBottom){
 							PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, 2 });
 							//Partition at upper basement floor surface
 							PipingSystemDomains(DomainNum).Partitions.Y(0) = MeshPartition(BasementDistFromBottom, PartitionType_FloorInside, CellWidth);
@@ -4887,7 +4898,7 @@ namespace PlantPipingSystemsManager {
 						PreviousEntries = PipingSystemDomains(DomainNum).Partitions.Y;
 						PipingSystemDomains(DomainNum).Partitions.Y.deallocate();
 						// Partition at bottom edge of vertical insulation, if vertical insulation is present and extends below the basement floor
-						if (PipingSystemDomains(DomainNum).VertInsPresentFlag && PipingSystemDomains(DomainNum).VertInsDepth > PipingSystemDomains(DomainNum).BasementZone.Depth){
+						if (PipingSystemDomains(DomainNum).VertInsPresentFlag && YInsulationLocation > BasementDistFromBottom){
 							PipingSystemDomains(DomainNum).Partitions.Y.allocate({ 0, PreviousUbound + 3 });
 							PipingSystemDomains(DomainNum).Partitions.Y({ 0, PreviousUbound }) = PreviousEntries;
 
@@ -4940,6 +4951,17 @@ namespace PlantPipingSystemsManager {
 								PipingSystemDomains(DomainNum).Partitions.Z(1) = MeshPartition(SideZWallInsideLocation, PartitionType_ZSideWallInside, CellWidth);
 
 							}
+						}
+						else {
+							PipingSystemDomains(DomainNum).Partitions.Z.allocate({ 0, 1 });
+							//Side Z direction - Wall outside face
+							SideZLocation = PipingSystemDomains(DomainNum).PerimeterOffset - PipingSystemDomains(DomainNum).BasementThickness;
+							PipingSystemDomains(DomainNum).Partitions.Z(0) = MeshPartition(SideZLocation, PartitionType_ZSide, CellWidth);
+
+							//Side Z direction - Wall inside face
+							SideZWallInsideLocation = PipingSystemDomains(DomainNum).PerimeterOffset;
+							PipingSystemDomains(DomainNum).Partitions.Z(1) = MeshPartition(SideZWallInsideLocation, PartitionType_ZSideWallInside, CellWidth);
+
 						}
 					}
 					else if (!MeshPartitionArray_Contains(PipingSystemDomains(DomainNum).Partitions.Z, PipingSystemDomains(DomainNum).BasementZone.Width)) {
@@ -6070,8 +6092,26 @@ namespace PlantPipingSystemsManager {
 						//Vertical Insulation cells
 						else if ((CellXIndex == MinXIndex && CellZIndex > MinZIndex) || (CellZIndex == MinZIndex && CellXIndex > MinXIndex)) {
 							if (PipingSystemDomains(DomainNum).VertInsPresentFlag){
-								if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex >= InsulationYIndex){
-									CellType = CellType_VertInsulation;
+								//Partial vertical insulation 
+								if (InsulationYIndex != 0){
+									if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex >= InsulationYIndex){
+										CellType = CellType_VertInsulation;
+										myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
+									}
+								}
+								//Vertical insulation extends to depth of basement floor 
+								else{
+									if (CellYIndex <= ubound(PipingSystemDomains(DomainNum).Cells, 2) && CellYIndex > YIndex){
+										CellType = CellType_VertInsulation;
+										myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
+									}
+
+								}
+
+							}
+							else{
+								if (CellYIndex == ubound(PipingSystemDomains(DomainNum).Cells, 2)){
+									CellType = CellType_GroundSurface;
 									myfile << CellType << "," << X << "," << Y << "," << Z << std::endl;
 								}
 							}
