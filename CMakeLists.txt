@@ -32,6 +32,28 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 
+if( BUILD_TESTING )
+  option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
+  if( ENABLE_REGRESSION_TESTING )
+    if ( CMAKE_CL_64 )
+      set( ARCH_FLAG "-64bit" )
+    else()
+      set( ARCH_FLAG "" )
+    endif()
+
+    find_package(PythonInterp REQUIRED)
+    set( REGRESSION_BASELINE_SHA "" CACHE STRING "SHA of baseline comparison" )
+    set( COMMIT_SHA "" CACHE STRING "Commit sha of this build" )
+    set( REGRESSION_SCRIPT_PATH "" CACHE PATH "Path to regression scripts" )
+    set( REGRESSION_BASELINE_PATH "" CACHE PATH "Path to energyplus baseline folder to compare against" )
+    set( DEVICE_ID "${CMAKE_SYSTEM_NAME}-${CMAKE_CXX_COMPILER_ID}${ARCH_FLAG}" CACHE STRING "Identifier for this device configuration" )
+  endif()
+endif()
+
+# Not yet released by CMake, but is being developed
+# This will help us set the proper options for c++11 across various configurations
+#FIND_PACKAGE( CXXFeatures ) 
+
 if (MSVC)
   set(gtest_force_shared_crt ON)
 endif()
@@ -65,6 +87,7 @@ if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/Transition PROJECT Transition NO_EXTERNAL_INSTALL )
 endif()
 
 install( FILES idd/Energy+.idd DESTINATION ./ )
