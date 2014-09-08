@@ -1205,19 +1205,28 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Zone1Baseboard,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    5000,                    !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    5000.0,                  !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.97;                    !- Efficiency
-
+  
   ZoneHVAC:Baseboard:Convective:Electric,
     Zone2Baseboard,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    5000,                    !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    5000.0,                  !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     Zone3Baseboard,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    5000,                    !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    5000.0,                  !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.97;                    !- Efficiency
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========

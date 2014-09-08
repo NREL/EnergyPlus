@@ -394,6 +394,8 @@ namespace EvaporativeCoolers {
 		Real64 UnitFanSpeedRatio; // unit fan speed ratio, dimensionless [ ]
 		int UnitVSControlMaxIterErrorIndex; // regula falsi errors, fan speed iteration limits
 		int UnitVSControlLimitsErrorIndex; // regula falsi errors, limits exceeded.
+		int ZonePtr; // pointer to a zone served by an evaportive cooler unit
+		int HVACSizingIndex; // index of a HVACSizing object for an evaportive cooler unit
 
 		// Default Constructor
 		ZoneEvapCoolerUnitStruct() :
@@ -449,7 +451,9 @@ namespace EvaporativeCoolers {
 			UnitLatentCoolingEnergy( 0.0 ),
 			UnitFanSpeedRatio( 0.0 ),
 			UnitVSControlMaxIterErrorIndex( 0 ),
-			UnitVSControlLimitsErrorIndex( 0 )
+			UnitVSControlLimitsErrorIndex( 0 ),
+			ZonePtr( 0 ),
+			HVACSizingIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -514,7 +518,9 @@ namespace EvaporativeCoolers {
 			Real64 const UnitLatentCoolingEnergy, // unit output to zone, latent cooling energy [J]
 			Real64 const UnitFanSpeedRatio, // unit fan speed ratio, dimensionless [ ]
 			int const UnitVSControlMaxIterErrorIndex, // regula falsi errors, fan speed iteration limits
-			int const UnitVSControlLimitsErrorIndex // regula falsi errors, limits exceeded.
+			int const UnitVSControlLimitsErrorIndex, // regula falsi errors, limits exceeded.
+			int const ZonePtr, // pointer to a zone served by an evaportive cooler unit
+		    int const HVACSizingIndex // index of a HVACSizing object for an evaportive cooler unit
 		) :
 			Name( Name ),
 			ZoneEquipType( ZoneEquipType ),
@@ -576,14 +582,35 @@ namespace EvaporativeCoolers {
 			UnitLatentCoolingEnergy( UnitLatentCoolingEnergy ),
 			UnitFanSpeedRatio( UnitFanSpeedRatio ),
 			UnitVSControlMaxIterErrorIndex( UnitVSControlMaxIterErrorIndex ),
-			UnitVSControlLimitsErrorIndex( UnitVSControlLimitsErrorIndex )
+			UnitVSControlLimitsErrorIndex( UnitVSControlLimitsErrorIndex ),
+			ZonePtr( ZonePtr ),
+			HVACSizingIndex( HVACSizingIndex )
 		{}
 
+	};
+
+	struct ZoneEvapCoolerUnitFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		ZoneEvapCoolerUnitFieldData()
+		{}
+
+		// Member Constructor
+		ZoneEvapCoolerUnitFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
 	};
 
 	// Object Data
 	extern FArray1D< EvapConditions > EvapCond;
 	extern FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
+	extern FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
+	
 
 	// Functions
 

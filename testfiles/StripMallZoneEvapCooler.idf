@@ -3959,9 +3959,9 @@
     EvaporativeCooler:Indirect:CelDekPad,  !- First Evaporative Cooler Object Type
     LGstore1 Indirect Evaporative Cooler,  !- First Evaporative Cooler Object Name
     EvaporativeCooler:Direct:ResearchSpecial,  !- Second Evaporative Cooler Object Type
-    LGstore1 Direct Evaporative Cooler;  !- Second Evaporative Cooler Name
+    LGstore1 Direct Evaporative Cooler; !- Second Evaporative Cooler Name
 
-  OutdoorAir:Node,
+   OutdoorAir:Node,
     LGstore1 Cooler Unit OA Inlet;  !- Name
 
   Fan:ComponentModel,
@@ -4791,62 +4791,92 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     LGstore1 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     LGstore2 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore1 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore2 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore3 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore4 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore5 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore6 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore7 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore8 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
-    0.97;                    !- Efficiency
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    0.97;                    !- Efficiency	
 
 ! ***SCHEDULES***
 
