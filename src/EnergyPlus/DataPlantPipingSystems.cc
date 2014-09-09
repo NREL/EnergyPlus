@@ -57,11 +57,11 @@ namespace DataPlantPipingSystems {
 	int const RegionType_YDirection( -5 );
 	int const RegionType_ZDirection( -6 );
 	int const RegionType_XSide( -7 );
-	int const RegionType_XSideWallInside(-8);
-	int const RegionType_ZSide(-9);
-	int const RegionType_ZSideWallInside(-10);
-	int const RegionType_FloorInside(-11);
-	int const RegionType_UnderFloor(-12);
+	int const RegionType_XSideWallInside( -8 );
+	int const RegionType_ZSide( -9 );
+	int const RegionType_ZSideWallInside( -10 );
+	int const RegionType_FloorInside( -11 );
+	int const RegionType_UnderFloor( -12 );
 	int const RegionType_HorizInsXSide( -13 );
 	int const RegionType_HorizInsZSide( -14 );
 	int const RegionType_VertInsLowerEdge( -15 );
@@ -93,7 +93,7 @@ namespace DataPlantPipingSystems {
 	int const CellType_HorizInsulation( -12 );
 	int const CellType_VertInsulation( -13 );
 	int const CellType_ZoneGroundInterface( -14 );
-	int const CellType_Basement(-15);
+	int const CellType_Basement( -15 );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -124,7 +124,7 @@ namespace DataPlantPipingSystems {
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     Beginning five ( 5 ) years after permission to assert copyright is granted,
 	//     subject to two possible five year renewals, the U.S. Government is granted for
 	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
 	//     worldwide license in this data to reproduce, prepare derivative works,

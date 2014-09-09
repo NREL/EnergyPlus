@@ -749,7 +749,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
-	//FUNCTION GetCellWidths(DomainNum, g) RESULT(RetVal)
+	//FUNCTION GetCellWidths( DomainNum, g ) RESULT( RetVal )
 
 	void
 	GetCellWidths(
@@ -1102,7 +1102,7 @@ namespace PlantPipingSystemsManager {
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
+	//     Beginning five ( 5 ) years after permission to assert copyright is granted,
 	//     subject to two possible five year renewals, the U.S. Government is granted for
 	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
 	//     worldwide license in this data to reproduce, prepare derivative works,
