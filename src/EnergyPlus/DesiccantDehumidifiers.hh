@@ -164,6 +164,7 @@ namespace DesiccantDehumidifiers {
 		int HotWaterCoilMaxIterIndex2; // Index to recurring warning message
 		Real64 MaxCoilFluidFlow; // hot water or steam mass flow rate regen. heating coil [kg/s]
 		Real64 RegenCoilCapacity; // hot water or steam coil operating capacity [W]
+		Real64 NomPwrPerAirFlow; // nominal power consumption per unit process air flow rate [W/m3/s]
 
 		// Default Constructor
 		DesiccantDehumidifierData() :
@@ -263,7 +264,8 @@ namespace DesiccantDehumidifiers {
 			HotWaterCoilMaxIterIndex( 0 ),
 			HotWaterCoilMaxIterIndex2( 0 ),
 			MaxCoilFluidFlow( 0.0 ),
-			RegenCoilCapacity( 0.0 )
+			RegenCoilCapacity( 0.0 ),
+			NomPwrPerAirFlow( 0.0 )
 		{}
 
 		// Member Constructor
@@ -376,7 +378,8 @@ namespace DesiccantDehumidifiers {
 			int const HotWaterCoilMaxIterIndex, // Index to recurring warning message
 			int const HotWaterCoilMaxIterIndex2, // Index to recurring warning message
 			Real64 const MaxCoilFluidFlow, // hot water or steam mass flow rate regen. heating coil [kg/s]
-			Real64 const RegenCoilCapacity // hot water or steam coil operating capacity [W]
+			Real64 const RegenCoilCapacity, // hot water or steam coil operating capacity [W]
+			Real64 const NomPwrPerAirFlow
 		) :
 			Name( Name ),
 			Sched( Sched ),
@@ -486,7 +489,8 @@ namespace DesiccantDehumidifiers {
 			HotWaterCoilMaxIterIndex( HotWaterCoilMaxIterIndex ),
 			HotWaterCoilMaxIterIndex2( HotWaterCoilMaxIterIndex2 ),
 			MaxCoilFluidFlow( MaxCoilFluidFlow ),
-			RegenCoilCapacity( RegenCoilCapacity )
+			RegenCoilCapacity( RegenCoilCapacity ),
+			NomPwrPerAirFlow( NomPwrPerAirFlow )
 		{}
 
 	};
@@ -511,7 +515,10 @@ namespace DesiccantDehumidifiers {
 		int const DesicDehumNum, // number of the current dehumidifier being simulated
 		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
 	);
-
+	
+	void
+	SizeDesiccantDehumidifier ( int const DesicDehumNum ); // number of the current dehumidifier being simulated
+	
 	void
 	ControlDesiccantDehumidifier(
 		int const DesicDehumNum, // number of the current dehumidifier being simulated

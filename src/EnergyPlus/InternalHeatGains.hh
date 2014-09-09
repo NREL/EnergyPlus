@@ -38,6 +38,9 @@ namespace InternalHeatGains {
 	InitInternalHeatGains();
 
 	void
+	SizeOaControlledBaseboard();
+
+	void
 	ReportInternalHeatGains();
 
 	Real64

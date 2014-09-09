@@ -212,6 +212,7 @@ namespace PlantCentralGSHP {
 		Real64 Evapmdot; // Evaporator mass flow rate [kg/s]
 		Real64 Condmdot; // Condenser mass flow rate [kg/s]
 		Real64 DesignHotWaterVolFlowRate; // Design hot water volumetric flow rate through the condenser [m3/s]
+		Real64 tmpDesignHotWaterVolFlowRate; // temporary design hot water volumetric flow rate through the condenser [m3/s]
 		Real64 OpenMotorEff; // Open chiller motor efficiency [fraction, 0 to 1]
 		Real64 SizFac; // sizing factor
 		Real64 RefCap; // Reference evaporator capacity [W]
@@ -286,6 +287,7 @@ namespace PlantCentralGSHP {
 			Evapmdot( 0.0 ),
 			Condmdot( 0.0 ),
 			DesignHotWaterVolFlowRate( 0.0 ),
+			tmpDesignHotWaterVolFlowRate( 0.0 ),
 			OpenMotorEff( 0.0 ),
 			SizFac( 0.0 ),
 			RefCap( 0.0 ),
@@ -369,6 +371,7 @@ namespace PlantCentralGSHP {
 			Real64 const Evapmdot, // Evaporator mass flow rate [kg/s]
 			Real64 const Condmdot, // Condenser mass flow rate [kg/s]
 			Real64 const DesignHotWaterVolFlowRate, // Design hot water volumetric flow rate through the condenser [m3/s]
+			Real64 const tmpDesignHotWaterVolFlowRate, // temporary design hot water volumetric flow rate through the condenser [m3/s]
 			Real64 const OpenMotorEff, // Open chiller motor efficiency [fraction, 0 to 1]
 			Real64 const SizFac, // sizing factor
 			Real64 const RefCap, // Reference evaporator capacity [W]
@@ -449,6 +452,7 @@ namespace PlantCentralGSHP {
 			Evapmdot( Evapmdot ),
 			Condmdot( Condmdot ),
 			DesignHotWaterVolFlowRate( DesignHotWaterVolFlowRate ),
+			tmpDesignHotWaterVolFlowRate( tmpDesignHotWaterVolFlowRate ),
 			OpenMotorEff( OpenMotorEff ),
 			SizFac( SizFac ),
 			RefCap( RefCap ),

@@ -19709,29 +19709,41 @@ ZoneBaseboard:OutdoorTemperatureControlled,
        \type real
        \units W
        \minimum> 0
+       \autosizable
+       \default autosize
   N2 , \field Low Temperature
        \required-field
        \units C
        \type real
+       \autosizable
+       \default autosize	
   N3 , \field Capacity at High Temperature
        \required-field
        \type real
        \units W
        \minimum 0
+       \autosizable
+       \default autosize
   N4 , \field High Temperature
        \required-field
        \units C
        \type real
+       \autosizable
+       \default autosize
   N5 , \field Fraction Radiant
        \required-field
        \type real
        \minimum 0.0
        \maximum 1.0
        \default 0
-  A4 ; \field End-Use Subcategory
+  A4 , \field End-Use Subcategory
        \type alpha
        \retaincase
        \default General
+  N6 ; \field Design Zone Heating Setpoint 
+       \type real
+       \units C
+       \default 20.0
 
 ZoneContaminantSourceAndSink:CarbonDioxide,
    \memo Represents internal CO2 gains and sinks in the zone.
@@ -47679,6 +47691,7 @@ Dehumidifier:Desiccant:NoFans,
        \type real
        \units m3/s
        \minimum> 0.0
+       \autosizable
    N3, \field Nominal Process Air Velocity
        \note Process air velocity at nominal flow
        \note When using Performance Model Type of Default, must be 2.032 to 4.064 m/s (400 to 800 fpm)
@@ -47686,6 +47699,7 @@ Dehumidifier:Desiccant:NoFans,
        \units m/s
        \minimum> 0.0
        \maximum 6
+       \default 3.0
    N4, \field Rotor Power
        \note Power input to wheel rotor motor
        \type real
@@ -47800,7 +47814,7 @@ Dehumidifier:Desiccant:NoFans,
        \note Table:OneIndependentVariable object can also be used
        \note curve = C1 + C2*v + C3*v**2
        \note v = process air velocity [m/s]
-   N5; \field Nominal Regeneration Temperature
+   N5, \field Nominal Regeneration Temperature
        \note Nominal regen temperature upon which the regen energy modifier
        \note  curve is based.  Not used if Default if chosen for the field Performance Mode Type.
        \note 121 C is a commonly used value.
@@ -47808,6 +47822,12 @@ Dehumidifier:Desiccant:NoFans,
        \units C
        \minimum 40
        \maximum 250
+   N6; \field Nominal Power Per Unit Air Flow Rate
+       \note This field is used to calculate electricity usage when no rotor power is entered.
+       \note If rotor power is specified, the value will be used.
+       \type real
+       \units W/(m3/s)
+       \minimum 0
 
 Dehumidifier:Desiccant:System,
       \memo This compound object models a desiccant heat exchanger, an optional
@@ -59048,7 +59068,7 @@ ChillerHeaterPerformance:Electric:EIR,
        \type real
        \units m3/s
        \minimum 0.0
-       \default 0.0
+       \autosizable
        \ip-units gal/min
   N15, \field Compressor Motor Efficiency
        \type real
