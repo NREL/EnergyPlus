@@ -1004,23 +1004,24 @@ namespace ExternalInterface {
 
 			// Add the fmus root folder name to the current working folder /currentWorkingFolder/tmp-fmus/... (9-characters)
 			// preprocess to prepare for library call
-			auto FMUWorkingFolderCharArr( getCharArrayFromString( FMURootWorkingFolder ) );
-			auto CurWorkingFolderCharArr( getCharArrayFromString( CurrentWorkingFolder ) );
-			int lenCurFolder( len( CurrentWorkingFolder ) );
+			//std::vector< char > FMUWorkingFolderCharArr;
+			
+			// so, CurrentWorkingFolder isn't being properly set in main.cc
+			//auto CurWorkingFolderCharArr( getCharArrayFromString( CurrentWorkingFolder ) );
+			//int lenCurFolder( len( CurrentWorkingFolder ) );
 			
 			// make the library call
-			retValue = addFMURootFolderName( &FMUWorkingFolderCharArr[0], &CurWorkingFolderCharArr[0], &lenCurFolder );
+			//retValue = addFMURootFolderName( &FMUWorkingFolderCharArr[0], &CurWorkingFolderCharArr[0], &lenCurFolder );
 			
 			// post process as needed in case these are used later
-			FMURootWorkingFolder = getStringFromCharArray( FMUWorkingFolderCharArr );
-			CurrentWorkingFolder = getStringFromCharArray( CurWorkingFolderCharArr );
+			FMURootWorkingFolder = "tmp-fmus/"; //getStringFromCharArray( FMUWorkingFolderCharArr );
 			
-			if ( retValue != 0 ) {
-				ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: FMU root folder" );
-				ShowContinueError( "could not be added to working directory." );
-				ErrorsFound = true;
-				StopExternalInterfaceIfError();
-			}
+			//if ( retValue != 0 ) {
+				//ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: FMU root folder" );
+				//ShowContinueError( "could not be added to working directory." );
+				//ErrorsFound = true;
+				//StopExternalInterfaceIfError();
+			//}
 
 			// Get and store the names of all FMUs in EnergyPlus data structure
 			strippedFileName.allocate( NumFMUObjects );
@@ -1181,6 +1182,7 @@ namespace ExternalInterface {
 
 					// get the path to the binaries
 					// preprocess args for library call
+					FMU( i ).Instance( j ).WorkingFolder_wLib = "  ";
 					auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
 					workingFolderArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder );
 					
