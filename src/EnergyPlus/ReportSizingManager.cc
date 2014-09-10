@@ -1065,10 +1065,10 @@ namespace ReportSizingManager {
 					bCheckForZero = false;
 				} else if ( SizingType == CoolingWaterDesAirInletTempSizing ) {
 					if ( CurOASysNum > 0 ) { // coil is in OA stream
-						AutosizeDes = FinalSysSizing( CurSysNum ).OutTempAtSensCoolPeak;
+						AutosizeDes = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 					} else { // coil is in main air loop
 						if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-							AutosizeDes = FinalSysSizing( CurSysNum ).MixTempAtSensCoolPeak;
+							AutosizeDes = FinalSysSizing( CurSysNum ).MixTempAtCoolPeak;
 						} else { // thereis precooling of the OA stream
 							if ( DataFlowUsedForSizing > 0.0 ) {
 								OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / DataFlowUsedForSizing;
@@ -1076,12 +1076,12 @@ namespace ReportSizingManager {
 								OutAirFrac = 1.0;
 							}
 							OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-							AutosizeDes = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtSensCoolPeak;
+							AutosizeDes = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetTempAtCoolPeak;
 						}
 					}
 					bCheckForZero = false;
 				} else if ( SizingType == CoolingWaterDesWaterInletTempSizing ) {
-					AutosizeDes = FinalSysSizing( CurSysNum ).OutTempAtSensCoolPeak;
+					AutosizeDes = FinalSysSizing( CurSysNum ).OutTempAtCoolPeak;
 					AutosizeDes = PlantSizData( DataPltSizCoolNum ).ExitTemp;
 					bCheckForZero = false;
 				} else if ( SizingType == CoolingWaterNumofTubesPerRowSizing ) {
@@ -1104,10 +1104,10 @@ namespace ReportSizingManager {
 					bCheckForZero = false;
 				} else if ( SizingType == CoolingWaterDesAirInletHumRatSizing ) {
 					if ( CurOASysNum > 0 ) { // coil is in OA stream
-						AutosizeDes = FinalSysSizing( CurSysNum ).OutHumRatAtSensCoolPeak;
+						AutosizeDes = FinalSysSizing( CurSysNum ).OutHumRatAtCoolPeak;
 					} else { // coil is in main air loop
 						if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-							AutosizeDes = FinalSysSizing( CurSysNum ).MixHumRatAtSensCoolPeak;
+							AutosizeDes = FinalSysSizing( CurSysNum ).MixHumRatAtCoolPeak;
 						} else { // there is precooling of the OA stream
 							if ( DataFlowUsedForSizing > 0.0 ) {
 								OutAirFrac = FinalSysSizing( CurSysNum ).DesOutAirVolFlow / DataFlowUsedForSizing;
@@ -1115,7 +1115,7 @@ namespace ReportSizingManager {
 								OutAirFrac = 1.0;
 							}
 							OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
-							AutosizeDes = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtSensCoolPeak;
+							AutosizeDes = OutAirFrac * FinalSysSizing( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac ) * FinalSysSizing( CurSysNum ).RetHumRatAtCoolPeak;
 						}
 					}
 					bCheckForZero = false;
@@ -1200,22 +1200,22 @@ namespace ReportSizingManager {
 						OutAirFrac = min( 1.0, max( 0.0, OutAirFrac ) );
 						if ( DesVolFlow >= SmallAirVolFlow ) {
 							if ( CurOASysNum > 0 ) { // coil is in the OA stream
-								CoilInTemp = FinalSysSizing ( CurSysNum ).OutTempAtSensCoolPeak;
-								CoilInHumRat = FinalSysSizing ( CurSysNum ).OutHumRatAtSensCoolPeak;
+								CoilInTemp = FinalSysSizing ( CurSysNum ).OutTempAtCoolPeak;
+								CoilInHumRat = FinalSysSizing ( CurSysNum ).OutHumRatAtCoolPeak;
 								CoilOutTemp = FinalSysSizing ( CurSysNum ).PrecoolTemp;
 								CoilOutHumRat = FinalSysSizing ( CurSysNum ).PrecoolHumRat;
 							} else { // coil is on the main air loop
 								CoilOutTemp = FinalSysSizing ( CurSysNum ).CoolSupTemp;
 								CoilOutHumRat = FinalSysSizing ( CurSysNum ).CoolSupHumRat;
 								if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
-									CoilInTemp = FinalSysSizing ( CurSysNum ).MixTempAtSensCoolPeak;
-									CoilInHumRat = FinalSysSizing ( CurSysNum ).MixHumRatAtSensCoolPeak;
+									CoilInTemp = FinalSysSizing ( CurSysNum ).MixTempAtCoolPeak;
+									CoilInHumRat = FinalSysSizing ( CurSysNum ).MixHumRatAtCoolPeak;
 								} else { // there is precooling of OA stream
-									CoilInTemp = OutAirFrac * FinalSysSizing ( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing ( CurSysNum ).RetTempAtSensCoolPeak;
-									CoilInHumRat = OutAirFrac*FinalSysSizing ( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing ( CurSysNum ).RetHumRatAtSensCoolPeak;
+									CoilInTemp = OutAirFrac * FinalSysSizing ( CurSysNum ).PrecoolTemp + ( 1.0 - OutAirFrac ) * FinalSysSizing ( CurSysNum ).RetTempAtCoolPeak;
+									CoilInHumRat = OutAirFrac*FinalSysSizing ( CurSysNum ).PrecoolHumRat + ( 1.0 - OutAirFrac )*FinalSysSizing ( CurSysNum ).RetHumRatAtCoolPeak;
 								}
 							}
-							OutTemp = FinalSysSizing ( CurSysNum ).OutTempAtSensCoolPeak;
+							OutTemp = FinalSysSizing ( CurSysNum ).OutTempAtCoolPeak;
 							if ( SameString( CompType, "COIL:COOLING:WATER" ) || SameString( CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) ) {
 								rhoair = StdRhoAir;
 							} else {

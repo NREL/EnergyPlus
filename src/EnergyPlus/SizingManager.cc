@@ -1857,6 +1857,7 @@ namespace SizingManager {
 				ShowContinueError( "... valid values are Sensible, Latent, Total, or VentilationRequirement." );
 				ErrorsFound = true;
 			}}
+			SysSizInput( SysSizIndex ).CoolingPeakLoadType = SensibleCoolingLoad; // wfb
 			{ auto const sizingOption( cAlphaArgs( 3 ) );
 			if ( sizingOption == "COINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = Coincident;

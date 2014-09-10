@@ -60,6 +60,9 @@ namespace DataSizing {
 	int const NonCoincident( 1 );
 	int const Coincident( 2 );
 
+	int const SensibleCoolingLoad( 1 );
+	int const TotalCoolingLoad( 2 );
+
 	// paramters for supply air flow rate method
 	int const SupplyAirTemperature( 1 );
 	int const TemperatureDifference( 2 );

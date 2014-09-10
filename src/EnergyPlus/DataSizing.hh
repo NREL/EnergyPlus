@@ -49,6 +49,10 @@ namespace DataSizing {
 	extern int const NonCoincident;
 	extern int const Coincident;
 
+	// parameters for Cooling Peak Load Type
+	extern int const SensibleCoolingLoad;
+	extern int const TotalCoolingLoad;
+
 	// paramters for supply air flow rate method
 	extern int const SupplyAirTemperature;
 	extern int const TemperatureDifference;
@@ -1032,8 +1036,9 @@ namespace DataSizing {
 		Real64 DesHeatAirFlow; // design system heating supply air flow rate [m3/s]
 		int SystemOAMethod; // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 		Real64 MaxZoneOAFraction; // maximum value of min OA for zones served by system
-		bool OAAutoSized; // Set to true if design OA vol flow is set to 'autosize'
-		// in Sizing:System
+		bool OAAutoSized; // Set to true if design OA vol flow is set to 'autosize' in Sizing:System
+		// wfb
+		int CoolingPeakLoadType; //Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
 
 		// Default Constructor
 		SystemSizingInputData() :
@@ -1058,7 +1063,8 @@ namespace DataSizing {
 			DesHeatAirFlow( 0.0 ),
 			SystemOAMethod( 0 ),
 			MaxZoneOAFraction( 0.0 ),
-			OAAutoSized( false )
+			OAAutoSized( false ),
+			CoolingPeakLoadType( 0 ) // wfb
 		{}
 
 		// Member Constructor
@@ -1085,7 +1091,9 @@ namespace DataSizing {
 			Real64 const DesHeatAirFlow, // design system heating supply air flow rate [m3/s]
 			int const SystemOAMethod, // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
-			bool const OAAutoSized // Set to true if design OA vol flow is set to 'autosize'
+			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
+			// wfb
+			int const CoolingPeakLoadType // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
 		) :
 			AirPriLoopName( AirPriLoopName ),
 			AirLoopNum( AirLoopNum ),
@@ -1109,7 +1117,8 @@ namespace DataSizing {
 			DesHeatAirFlow( DesHeatAirFlow ),
 			SystemOAMethod( SystemOAMethod ),
 			MaxZoneOAFraction( MaxZoneOAFraction ),
-			OAAutoSized( OAAutoSized )
+			OAAutoSized( OAAutoSized ),
+			CoolingPeakLoadType( CoolingPeakLoadType ) //wfb
 		{}
 
 	};
@@ -1166,18 +1175,12 @@ namespace DataSizing {
 		Real64 TotCoolCap; // design total cooling capacity [W]
 		Real64 HeatCap; // design heating capacity [W]
 		Real64 PreheatCap; // design preheat capacity [W]
-		Real64 MixTempAtSensCoolPeak; // design mixed air temperature at the sensible cooling peak [C]
-		Real64 MixHumRatAtSensCoolPeak; // design mixed air hum ratio at the sensible cooling peak [kg water/kg dry air]
-		Real64 RetTempAtSensCoolPeak; // design return air temperature at the sensible cooling peak [C]
-		Real64 RetHumRatAtSensCoolPeak; // design return air hum ratio at the sensible cooling peak [kg water/kg dry air]
-		Real64 OutTempAtSensCoolPeak; // design outside air temperature at the sensible cooling peak [C]
-		Real64 OutHumRatAtSensCoolPeak; // design outside air hum ratio at the sensible cooling peak [kg water/kg dry air]
-		Real64 MixTempAtTotCoolPeak; // design mixed air temperature at the total cooling peak [C]
-		Real64 MixHumRatAtTotCoolPeak; // design mixed air hum ratio at the total cooling peak [kg water/kg dry air]
-		Real64 RetTempAtTotCoolPeak; // design return air temperature at the total cooling peak [C]
-		Real64 RetHumRatAtTotCoolPeak; // design return air hum ratio at the total cooling peak [kg water/kg dry air]
-		Real64 OutTempAtTotCoolPeak; // design outside air temperature at the total cooling peak [C]
-		Real64 OutHumRatAtTotCoolPeak; // design outside air hum ratio at the total cooling peak [kg water/kg dry air]
+		Real64 MixTempAtCoolPeak; // design mixed air temperature for cooling [C]
+		Real64 MixHumRatAtCoolPeak; // design mixed air hum ratio for cooling [kg water/kg dry air]
+		Real64 RetTempAtCoolPeak; // design return air temperature for cooling [C]
+		Real64 RetHumRatAtCoolPeak; // design return air hum ratio for cooling [kg water/kg dry air]
+		Real64 OutTempAtCoolPeak; // design outside air temperature for cooling [C]
+		Real64 OutHumRatAtCoolPeak; // design outside air hum ratio for cooling [kg water/kg dry air]
 		Real64 HeatMixTemp; // design mixed air temperature for heating [C]
 		Real64 HeatMixHumRat; // design mixed air hum ratio for heating [kg water/kg dry air]
 		Real64 HeatRetTemp; // design return air temperature for heating [C]
@@ -1217,6 +1220,8 @@ namespace DataSizing {
 		// zone area
 		bool OAAutoSized; // Set to true if design OA vol flow is set to 'autosize'
 		// in Sizing:System
+		// wfb
+		int CoolingPeakLoadType; //Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
 
 		// Default Constructor
 		SystemSizingData() :
@@ -1263,18 +1268,12 @@ namespace DataSizing {
 			TotCoolCap( 0.0 ),
 			HeatCap( 0.0 ),
 			PreheatCap( 0.0 ),
-			MixTempAtSensCoolPeak( 0.0 ),
-			MixHumRatAtSensCoolPeak( 0.0 ),
-			RetTempAtSensCoolPeak( 0.0 ),
-			RetHumRatAtSensCoolPeak( 0.0 ),
-			OutTempAtSensCoolPeak( 0.0 ),
-			OutHumRatAtSensCoolPeak( 0.0 ),
-			MixTempAtTotCoolPeak( 0.0 ),
-			MixHumRatAtTotCoolPeak( 0.0 ),
-			RetTempAtTotCoolPeak( 0.0 ),
-			RetHumRatAtTotCoolPeak( 0.0 ),
-			OutTempAtTotCoolPeak( 0.0 ),
-			OutHumRatAtTotCoolPeak( 0.0 ),
+			MixTempAtCoolPeak( 0.0 ),
+			MixHumRatAtCoolPeak( 0.0 ),
+			RetTempAtCoolPeak( 0.0 ),
+			RetHumRatAtCoolPeak( 0.0 ),
+			OutTempAtCoolPeak( 0.0 ),
+			OutHumRatAtCoolPeak( 0.0 ),
 			HeatMixTemp( 0.0 ),
 			HeatMixHumRat( 0.0 ),
 			HeatRetTemp( 0.0 ),
@@ -1285,7 +1284,8 @@ namespace DataSizing {
 			SystemOAMethod( 0 ),
 			MaxZoneOAFraction( 0.0 ),
 			SysUncOA( 0.0 ),
-			OAAutoSized( false )
+			OAAutoSized( false ),
+			CoolingPeakLoadType( 0 ) // wfb
 		{}
 
 		// Member Constructor
@@ -1336,18 +1336,12 @@ namespace DataSizing {
 			Real64 const TotCoolCap, //design total cooling capacity [W]
 			Real64 const HeatCap, // design heating capacity [W]
 			Real64 const PreheatCap, // design preheat capacity [W]
-			Real64 const MixTempAtSensCoolPeak, // design mixed air temperature at sens cooling peak [C]
-			Real64 const MixHumRatAtSensCoolPeak, // design mixed air hum ratio at sens cooling peak [kg water/kg dry air]
-			Real64 const RetTempAtSensCoolPeak, // design return air temperature at sens cooling peak [C]
-			Real64 const RetHumRatAtSensCoolPeak, // design return air hum ratio at sens cooling peak [kg water/kg dry air]
-			Real64 const OutTempAtSensCoolPeak, // design outside air temperature at sens cooling peak [C]
-			Real64 const OutHumRatAtSensCoolPeak, // design outside air hum ratio at sens cooling peak [kg water/kg dry air]
-			Real64 const MixTempAtTotCoolPeak, // design mixed air temperature at Tot cooling peak [C]
-			Real64 const MixHumRatAtTotCoolPeak, // design mixed air hum ratio at Tot cooling peak [kg water/kg dry air]
-			Real64 const RetTempAtTotCoolPeak, // design return air temperature at Tot cooling peak [C]
-			Real64 const RetHumRatAtTotCoolPeak, // design return air hum ratio at Tot cooling peak [kg water/kg dry air]
-			Real64 const OutTempAtTotCoolPeak, // design outside air temperature at Tot cooling peak [C]
-			Real64 const OutHumRatAtTotCoolPeak, // design outside air hum ratio at Tot cooling peak [kg water/kg dry air]
+			Real64 const MixTempAtCoolPeak, // design mixed air temperature for cooling [C]
+			Real64 const MixHumRatAtCoolPeak, // design mixed air hum ratio for cooling [kg water/kg dry air]
+			Real64 const RetTempAtCoolPeak, // design return air temperature for cooling [C]
+			Real64 const RetHumRatAtCoolPeak, // design return air hum ratio for cooling [kg water/kg dry air]
+			Real64 const OutTempAtCoolPeak, // design outside air temperature for cooling [C]
+			Real64 const OutHumRatAtCoolPeak, // design outside air hum ratio for cooling [kg water/kg dry air]
 			Real64 const HeatMixTemp, // design mixed air temperature for heating [C]
 			Real64 const HeatMixHumRat, // design mixed air hum ratio for heating [kg water/kg dry air]
 			Real64 const HeatRetTemp, // design return air temperature for heating [C]
@@ -1372,7 +1366,9 @@ namespace DataSizing {
 			int const SystemOAMethod, // System Outdoor Air Method; 1 = SOAM_ZoneSum, 2 = SOAM_VRP
 			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
 			Real64 const SysUncOA, // uncorrected system outdoor air flow based on zone people and
-			bool const OAAutoSized // Set to true if design OA vol flow is set to 'autosize'
+			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
+			// wfb
+			int const CoolingPeakLoadType // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
 		) :
 			AirPriLoopName( AirPriLoopName ),
 			CoolDesDay( CoolDesDay ),
@@ -1420,18 +1416,12 @@ namespace DataSizing {
 			TotCoolCap( TotCoolCap ),
 			HeatCap( HeatCap ),
 			PreheatCap( PreheatCap ),
-			MixTempAtSensCoolPeak( MixTempAtSensCoolPeak ),
-			MixHumRatAtSensCoolPeak( MixHumRatAtSensCoolPeak ),
-			RetTempAtSensCoolPeak( RetTempAtSensCoolPeak ),
-			RetHumRatAtSensCoolPeak( RetHumRatAtSensCoolPeak ),
-			OutTempAtSensCoolPeak( OutTempAtSensCoolPeak ),
-			OutHumRatAtSensCoolPeak( OutHumRatAtSensCoolPeak ),
-			MixTempAtTotCoolPeak( MixTempAtTotCoolPeak ),
-			MixHumRatAtTotCoolPeak( MixHumRatAtTotCoolPeak ),
-			RetTempAtTotCoolPeak( RetTempAtTotCoolPeak ),
-			RetHumRatAtTotCoolPeak( RetHumRatAtTotCoolPeak ),
-			OutTempAtTotCoolPeak( OutTempAtTotCoolPeak ),
-			OutHumRatAtTotCoolPeak( OutHumRatAtTotCoolPeak ),
+			MixTempAtCoolPeak( MixTempAtCoolPeak ),
+			MixHumRatAtCoolPeak( MixHumRatAtCoolPeak ),
+			RetTempAtCoolPeak( RetTempAtCoolPeak ),
+			RetHumRatAtCoolPeak( RetHumRatAtCoolPeak ),
+			OutTempAtCoolPeak( OutTempAtCoolPeak ),
+			OutHumRatAtCoolPeak( OutHumRatAtCoolPeak ),
 			HeatMixTemp( HeatMixTemp ),
 			HeatMixHumRat( HeatMixHumRat ),
 			HeatRetTemp( HeatRetTemp ),
@@ -1456,7 +1446,8 @@ namespace DataSizing {
 			SystemOAMethod( SystemOAMethod ),
 			MaxZoneOAFraction( MaxZoneOAFraction ),
 			SysUncOA( SysUncOA ),
-			OAAutoSized( OAAutoSized )
+			OAAutoSized( OAAutoSized ),
+			CoolingPeakLoadType( CoolingPeakLoadType ) //wfb
 		{}
 
 	};
