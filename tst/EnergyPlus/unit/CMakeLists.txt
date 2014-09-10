@@ -16,6 +16,9 @@ set( test_dependencies
   EnergyPlusLib
   objexx
   sqlite
+  bcvtb 
+  epexpat 
+  epfmiimport 
 )
 
 # Executable name will be EnergyPlus_tests

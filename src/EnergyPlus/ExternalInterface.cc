@@ -1,3 +1,11 @@
+// FMI-Related Headers
+extern "C" {
+#include <FMI/main.h>
+#include <BCVTB/utilSocket.h>
+#include <BCVTB/utilXml.h>
+}
+
+
 // C++ Headers
 #include <string>
 
@@ -22,12 +30,6 @@
 #include <UtilityRoutines.hh>
 #include <DisplayRoutines.hh>
 
-// FMI-Related Headers
-extern "C" {
-#include <FMI/main.h>
-#include <BCVTB/utilSocket.h>
-#include <BCVTB/utilXml.h>
-}
 
 namespace EnergyPlus {
 
