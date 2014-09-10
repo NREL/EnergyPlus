@@ -1,6 +1,6 @@
 
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/SourceCode/Expat/lib")
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/SourceCode/")
+INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat/lib")
+INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/")
 
 SET(SRC 
   main.h
