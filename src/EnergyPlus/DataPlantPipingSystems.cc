@@ -93,7 +93,8 @@ namespace DataPlantPipingSystems {
 	int const CellType_HorizInsulation( -12 );
 	int const CellType_VertInsulation( -13 );
 	int const CellType_ZoneGroundInterface( -14 );
-	int const CellType_Basement(-15);
+	int const CellType_BasementWallGeneral(-15);
+	int const CellType_BasementFloorGeneral(-16);
 
 	// DERIVED TYPE DEFINITIONS:
 

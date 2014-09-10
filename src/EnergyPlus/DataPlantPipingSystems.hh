@@ -75,7 +75,8 @@ namespace DataPlantPipingSystems {
 	extern int const CellType_HorizInsulation;
 	extern int const CellType_VertInsulation;
 	extern int const CellType_ZoneGroundInterface;
-	extern int const CellType_Basement;
+	extern int const CellType_BasementWallGeneral;
+	extern int const CellType_BasementFloorGeneral;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -1302,7 +1303,8 @@ namespace DataPlantPipingSystems {
 		MeshProperties Mesh;
 		BaseThermalPropertySet GroundProperties;
 		BaseThermalPropertySet SlabProperties;
-		BaseThermalPropertySet BasementProperties;
+		BaseThermalPropertySet BasementFloorProperties;
+		BaseThermalPropertySet BasementWallProperties;
 		BaseThermalPropertySet HorizInsProperties;
 		BaseThermalPropertySet VertInsProperties;
 		SimulationControl SimControls;
@@ -1323,8 +1325,10 @@ namespace DataPlantPipingSystems {
 		Real64 SlabWidth;
 		Real64 SlabLength;
 		Real64 SlabThickness;
-		int BasementMaterialNum;
-		Real64 BasementThickness;
+		int BasementFloorMaterialNum; 
+		int BasementWallMaterialNum;
+		Real64 BasementFloorThickness;
+		Real64 BasementWallThickness;
 		Real64 XIndex;
 		Real64 YIndex;
 		Real64 ZIndex;
@@ -1379,8 +1383,10 @@ namespace DataPlantPipingSystems {
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
 			SlabThickness( 0.0 ),
-			BasementMaterialNum(0),
-			BasementThickness(0.0),
+			BasementWallMaterialNum(0),
+			BasementFloorMaterialNum(0),
+			BasementWallThickness(0.0),
+			BasementFloorThickness(0.0),
 			XIndex( 0 ),
 			YIndex( 0 ),
 			ZIndex( 0 ),
@@ -1433,7 +1439,8 @@ namespace DataPlantPipingSystems {
 			MeshProperties const & Mesh,
 			BaseThermalPropertySet const & GroundProperties,
 			BaseThermalPropertySet const & SlabProperties,
-			BaseThermalPropertySet const & BasementProperties,
+			BaseThermalPropertySet const & BasementFloorProperties,
+			BaseThermalPropertySet const & BasementWallProperties,
 			BaseThermalPropertySet const & HorizInsProperties,
 			BaseThermalPropertySet const & VertInsProperties,
 			SimulationControl const & SimControls,
@@ -1452,8 +1459,10 @@ namespace DataPlantPipingSystems {
 			Real64 const SlabWidth,
 			Real64 const SlabLength,
 			Real64 const SlabThickness,
-			int const BasementMaterialNum,
-			Real64 const BasementThickness,
+			int const BasementWallMaterialNum,
+			int const BasementFloorMaterialNum,
+			Real64 const BasementWallThickness,
+			Real64 const BasementFloorThickness,
 			Real64 const XIndex,
 			Real64 const YIndex,
 			Real64 const ZIndex,
@@ -1487,24 +1496,25 @@ namespace DataPlantPipingSystems {
 
 			FArray3< CartesianCell > const & Cells			
 		) :
-			Name( Name ),
-			CircuitNames( CircuitNames ),
-			CircuitIndeces( CircuitIndeces ),
-			MaxIterationsPerTS( MaxIterationsPerTS ),
-			OneTimeInit( OneTimeInit ),
-			BeginSimInit( BeginSimInit ),
-			BeginSimEnvrn( BeginSimEnvrn ),
-			DomainNeedsSimulation( DomainNeedsSimulation ),
-			DomainNeedsToBeMeshed( DomainNeedsToBeMeshed ),
-			IsActuallyPartOfAHorizontalTrench( IsActuallyPartOfAHorizontalTrench ),
-			HasAPipeCircuit( HasAPipeCircuit ),
-			IsZoneCoupled( IsZoneCoupled ),
+		Name(Name),
+			CircuitNames(CircuitNames),
+			CircuitIndeces(CircuitIndeces),
+			MaxIterationsPerTS(MaxIterationsPerTS),
+			OneTimeInit(OneTimeInit),
+			BeginSimInit(BeginSimInit),
+			BeginSimEnvrn(BeginSimEnvrn),
+			DomainNeedsSimulation(DomainNeedsSimulation),
+			DomainNeedsToBeMeshed(DomainNeedsToBeMeshed),
+			IsActuallyPartOfAHorizontalTrench(IsActuallyPartOfAHorizontalTrench),
+			HasAPipeCircuit(HasAPipeCircuit),
+			IsZoneCoupled(IsZoneCoupled),
 			HasCoupledBasement(HasCoupledBasement),
-			Extents( Extents ),
-			Mesh( Mesh ),
-			GroundProperties( GroundProperties ),
-			SlabProperties( SlabProperties ),
-			BasementProperties(BasementProperties),
+			Extents(Extents),
+			Mesh(Mesh),
+			GroundProperties(GroundProperties),
+			SlabProperties(SlabProperties),
+			BasementFloorProperties(BasementFloorProperties),
+			BasementWallProperties(BasementWallProperties),
 			HorizInsProperties( HorizInsProperties ),
 			VertInsProperties( VertInsProperties ),
 			SimControls( SimControls ),
@@ -1523,8 +1533,10 @@ namespace DataPlantPipingSystems {
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),
 			SlabThickness( SlabThickness ),
-			BasementMaterialNum(BasementMaterialNum),
-			BasementThickness(BasementThickness),
+			BasementFloorMaterialNum(BasementFloorMaterialNum),
+			BasementWallMaterialNum(BasementWallMaterialNum),
+			BasementFloorThickness(BasementFloorThickness),
+			BasementWallThickness(BasementWallThickness),
 			XIndex( XIndex ),
 			YIndex( YIndex ),
 			ZIndex( ZIndex ),
