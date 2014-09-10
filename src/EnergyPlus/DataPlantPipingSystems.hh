@@ -100,7 +100,7 @@ namespace DataPlantPipingSystems {
 		Real64 SpecificHeat; // J/kgK
 
 		// Default Constructor
-		BaseThermalPropertySet() :
+		BaseThermalPropertySet( ) :
 			Conductivity( 0.0 ),
 			Density( 0.0 ),
 			SpecificHeat( 0.0 )
@@ -127,7 +127,7 @@ namespace DataPlantPipingSystems {
 		Real64 Prandtl; // -
 
 		// Default Constructor
-		ExtendedFluidProperties()
+		ExtendedFluidProperties( )
 		{}
 
 		// Member Constructor
@@ -153,7 +153,7 @@ namespace DataPlantPipingSystems {
 		BaseThermalPropertySet Properties;
 
 		// Default Constructor
-		BaseCell() :
+		BaseCell( ) :
 			Temperature( 0.0 ),
 			Temperature_PrevIteration( 0.0 ),
 			Temperature_PrevTimeStep( 0.0 ),
@@ -186,7 +186,7 @@ namespace DataPlantPipingSystems {
 		Real64 OuterRadius;
 
 		// Default Constructor
-		RadialCellInformation()
+		RadialCellInformation( )
 		{}
 
 		// Member Constructor
@@ -213,7 +213,7 @@ namespace DataPlantPipingSystems {
 		ExtendedFluidProperties Properties;
 
 		// Default Constructor
-		FluidCellInformation()
+		FluidCellInformation( )
 		{}
 
 		// Member Constructor
@@ -242,7 +242,7 @@ namespace DataPlantPipingSystems {
 		Real64 InterfaceVolume;
 
 		// Default Constructor
-		CartesianPipeCellInformation()
+		CartesianPipeCellInformation( )
 		{}
 
 		// Member Constructor
@@ -271,7 +271,7 @@ namespace DataPlantPipingSystems {
 		int Y;
 
 		// Default Constructor
-		Point()
+		Point( )
 		{}
 
 		// Member Constructor
@@ -292,7 +292,7 @@ namespace DataPlantPipingSystems {
 		Real64 Y;
 
 		// Default Constructor
-		PointF()
+		PointF( )
 		{}
 
 		// Member Constructor
@@ -314,7 +314,7 @@ namespace DataPlantPipingSystems {
 		int Z;
 
 		// Default Constructor
-		Point3DInteger()
+		Point3DInteger( )
 		{}
 
 		// Member Constructor
@@ -338,7 +338,7 @@ namespace DataPlantPipingSystems {
 		Real64 Z;
 
 		// Default Constructor
-		Point3DReal()
+		Point3DReal( )
 		{}
 
 		// Member Constructor
@@ -363,7 +363,7 @@ namespace DataPlantPipingSystems {
 		int YMax;
 
 		// Default Constructor
-		DomainRectangle()
+		DomainRectangle( )
 		{}
 
 		// Member Constructor
@@ -389,7 +389,7 @@ namespace DataPlantPipingSystems {
 		Real64 TotalWidth;
 
 		// Default Constructor
-		MeshPartition()
+		MeshPartition( )
 		{}
 
 		// Member Constructor
@@ -414,7 +414,7 @@ namespace DataPlantPipingSystems {
 		FArray1D< Real64 > CellWidths;
 
 		// Default Constructor
-		GridRegion()
+		GridRegion( )
 		{}
 
 		// Member Constructor
@@ -440,7 +440,7 @@ namespace DataPlantPipingSystems {
 		int RegionType; // From Enum: RegionType
 
 		// Default Constructor
-		TempGridRegionData()
+		TempGridRegionData( )
 		{}
 
 		// Member Constructor
@@ -465,7 +465,7 @@ namespace DataPlantPipingSystems {
 		Real64 Height;
 
 		// Default Constructor
-		RectangleF()
+		RectangleF( )
 		{}
 
 		// Member Constructor
@@ -493,7 +493,7 @@ namespace DataPlantPipingSystems {
 		Point3DInteger NeighborCellIndeces;
 
 		// Default Constructor
-		NeighborInformation()
+		NeighborInformation( )
 		{}
 
 		// Member Constructor
@@ -520,7 +520,7 @@ namespace DataPlantPipingSystems {
 		Real64 OuterDia;
 
 		// Default Constructor
-		RadialSizing()
+		RadialSizing( )
 		{}
 
 		// Member Constructor
@@ -541,7 +541,7 @@ namespace DataPlantPipingSystems {
 		NeighborInformation Value;
 
 		// Default Constructor
-		DirectionNeighbor_Dictionary()
+		DirectionNeighbor_Dictionary( )
 		{}
 
 		// Member Constructor
@@ -575,7 +575,7 @@ namespace DataPlantPipingSystems {
 		CartesianPipeCellInformation PipeCellData;
 
 		// Default Constructor
-		CartesianCell()
+		CartesianCell( )
 		{}
 
 		// Member Constructor
@@ -623,7 +623,7 @@ namespace DataPlantPipingSystems {
 		Real64 Zmax;
 
 		// Default Constructor
-		MeshExtents() :
+		MeshExtents( ) :
 			Xmax( 0.0 ),
 			Ymax( 0.0 ),
 			Zmax( 0.0 )
@@ -650,7 +650,7 @@ namespace DataPlantPipingSystems {
 		Real64 GeometricSeriesCoefficient;
 
 		// Default Constructor
-		DistributionStructure() :
+		DistributionStructure( ) :
 			MeshDistribution( 0 ),
 			RegionMeshCount( 0 ),
 			GeometricSeriesCoefficient( 0.0 )
@@ -677,7 +677,7 @@ namespace DataPlantPipingSystems {
 		DistributionStructure Z;
 
 		// Default Constructor
-		MeshProperties()
+		MeshProperties( )
 		{}
 
 		// Member Constructor
@@ -702,7 +702,7 @@ namespace DataPlantPipingSystems {
 		int MaxIterationsPerTS;
 
 		// Default Constructor
-		SimulationControl() :
+		SimulationControl( ) :
 			MinimumTemperatureLimit( -1000.0 ),
 			MaximumTemperatureLimit( 1000.0 ),
 			Convergence_CurrentToPrevIteration( 0.0 ),
@@ -733,7 +733,7 @@ namespace DataPlantPipingSystems {
 		Real64 PhaseShiftOfMinGroundTemp; // seconds
 
 		// Default Constructor
-		FarfieldInfo() :
+		FarfieldInfo( ) :
 			AverageGroundTemperature( 0.0 ),
 			AverageGroundTemperatureAmplitude( 0.0 ),
 			PhaseShiftOfMinGroundTempDays( 0.0 ),
@@ -772,10 +772,10 @@ namespace DataPlantPipingSystems {
 		int BasementFloorYIndex;
 
 		// Default Constructor
-		BasementZoneInfo() :
+		BasementZoneInfo( ) :
 			Depth( 0.0 ),
 			Width( 0.0 ),
-			Length(0.0),
+			Length( 0.0 ),
 			ShiftPipesByWidth( false ),
 			WallBoundaryOSCMIndex( 0 ),
 			FloorBoundaryOSCMIndex( 0 ),
@@ -800,7 +800,7 @@ namespace DataPlantPipingSystems {
 		) :
 			Depth( Depth ),
 			Width( Width ),
-			Length(Length),
+			Length( Length ),
 			ShiftPipesByWidth( ShiftPipesByWidth ),
 			WallBoundaryOSCMName( WallBoundaryOSCMName ),
 			WallBoundaryOSCMIndex( WallBoundaryOSCMIndex ),
@@ -821,7 +821,7 @@ namespace DataPlantPipingSystems {
 		Real64 Value;
 
 		// Default Constructor
-		DirectionReal_Dictionary() :
+		DirectionReal_Dictionary( ) :
 			Direction( 0 ),
 			Value( 0.0 )
 		{}
@@ -852,7 +852,7 @@ namespace DataPlantPipingSystems {
 		Real64 AverageBasementWallTemperature;
 
 		// Default Constructor
-		ReportingInformation() :
+		ReportingInformation( ) :
 			TotalBoundaryHeatTransfer( 0.0 ),
 			EnergyStoredInCells( 0.0 ),
 			AverageSurfaceTemperature( 0.0 ),
@@ -899,7 +899,7 @@ namespace DataPlantPipingSystems {
 		FArray1D< MeshPartition > Z;
 
 		// Default Constructor
-		MeshPartitions()
+		MeshPartitions( )
 		{}
 
 		// Member Constructor
@@ -923,7 +923,7 @@ namespace DataPlantPipingSystems {
 		Real64 GroundCoverCoefficient;
 
 		// Default Constructor
-		MoistureInfo() :
+		MoistureInfo( ) :
 			Theta_liq( 0.3 ),
 			Theta_sat( 0.5 ),
 			GroundCoverCoefficient( 0.408 )
@@ -956,7 +956,7 @@ namespace DataPlantPipingSystems {
 		Real64 CurRelativeHumidity;
 
 		// Default Constructor
-		CurSimConditionsInfo() :
+		CurSimConditionsInfo( ) :
 			PrevSimTimeSeconds( -1.0 ),
 			CurSimTimeSeconds( 0.0 ),
 			CurSimTimeStepSize( 0.0 ),
@@ -1008,7 +1008,7 @@ namespace DataPlantPipingSystems {
 		bool IsActuallyPartOfAHorizontalTrench;
 
 		// Default Constructor
-		PipeSegmentInfo() :
+		PipeSegmentInfo( ) :
 			FlowDirection( 0 ),
 			ParentCircuitIndex( 0 ),
 			InletTemperature( 0.0 ),
@@ -1074,7 +1074,7 @@ namespace DataPlantPipingSystems {
 		int NumRadialCells;
 		BaseThermalPropertySet PipeProperties;
 		BaseThermalPropertySet InsulationProperties;
-		// A list of 3d cell indeces that span the entire length of this pipe circuit (useful for reporting)
+		// A list of 3d cell indeces that span the entire length of this pipe circuit ( useful for reporting )
 		FArray1D< Point3DInteger > ListOfCircuitPoints;
 		// Flags
 		bool CheckEquipName;
@@ -1102,7 +1102,7 @@ namespace DataPlantPipingSystems {
 		Real64 FluidHeatLoss;
 
 		// Default Constructor
-		PipeCircuitInfo() :
+		PipeCircuitInfo( ) :
 			InletNodeNum( 0 ),
 			OutletNodeNum( 0 ),
 			ParentDomainIndex( 0 ),
@@ -1239,7 +1239,7 @@ namespace DataPlantPipingSystems {
 		Real64 InsulationDensity;
 
 		// Default Constructor
-		ZoneCoupledSurfaceData() :
+		ZoneCoupledSurfaceData( ) :
 			IndexInSurfaceArray( 0 ),
 			SurfaceArea( 0.0 ),
 			Width( 0.0 ),
@@ -1364,7 +1364,7 @@ namespace DataPlantPipingSystems {
 		FArray3D< CartesianCell > Cells;
 
 		// Default Constructor
-		FullDomainStructureInfo() :
+		FullDomainStructureInfo( ) :
 			MaxIterationsPerTS( 10 ),
 			OneTimeInit( true ),
 			BeginSimInit( true ),
@@ -1374,7 +1374,7 @@ namespace DataPlantPipingSystems {
 			IsActuallyPartOfAHorizontalTrench( false ),
 			HasAPipeCircuit( true ),
 			IsZoneCoupled( false ),
-			HasCoupledBasement(false), 
+			HasCoupledBasement( false ), 
 			HasBasement( false ),
 			ZoneCoupledOSCMIndex( 0 ),
 			PerimeterOffset( 0.0 ),
@@ -1383,10 +1383,10 @@ namespace DataPlantPipingSystems {
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
 			SlabThickness( 0.0 ),
-			BasementWallMaterialNum(0),
-			BasementFloorMaterialNum(0),
-			BasementWallThickness(0.0),
-			BasementFloorThickness(0.0),
+			BasementWallMaterialNum( 0 ),
+			BasementFloorMaterialNum( 0 ),
+			BasementWallThickness( 0.0 ),
+			BasementFloorThickness( 0.0 ),
 			XIndex( 0 ),
 			YIndex( 0 ),
 			ZIndex( 0 ),
@@ -1395,11 +1395,11 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( 0.0254 ),
 			HorizInsWidth( 0.0 ),
 			HeatFlux( 0.0 ),
-			WallHeatFlux(0.0),
-			FloorHeatFlux(0.0),
+			WallHeatFlux( 0.0 ),
+			FloorHeatFlux( 0.0 ),
 			AggregateHeatFlux( 0.0 ),
-			AggregateWallHeatFlux(0.0),
-			AggregateFloorHeatFlux(0.0),
+			AggregateWallHeatFlux( 0.0 ),
+			AggregateFloorHeatFlux( 0.0 ),
 			NumHeatFlux ( 0 ),
 			ResetHeatFluxFlag( true ),
 			ConvCoeff( 0.0 ),
@@ -1408,9 +1408,9 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( 0 ),
 			VertInsThickness( 0.0254 ),
 			VertInsDepth( 0.0 ),
-			XWallIndex(0),
-			YFloorIndex(0),
-			ZWallIndex(0),
+			XWallIndex( 0 ),
+			YFloorIndex( 0 ),
+			ZWallIndex( 0 ),
 			InsulationXIndex( 0 ),
 			InsulationYIndex( 0 ),
 			InsulationZIndex( 0 ),
@@ -1496,25 +1496,25 @@ namespace DataPlantPipingSystems {
 
 			FArray3< CartesianCell > const & Cells			
 		) :
-		Name(Name),
-			CircuitNames(CircuitNames),
-			CircuitIndeces(CircuitIndeces),
-			MaxIterationsPerTS(MaxIterationsPerTS),
-			OneTimeInit(OneTimeInit),
-			BeginSimInit(BeginSimInit),
-			BeginSimEnvrn(BeginSimEnvrn),
-			DomainNeedsSimulation(DomainNeedsSimulation),
-			DomainNeedsToBeMeshed(DomainNeedsToBeMeshed),
-			IsActuallyPartOfAHorizontalTrench(IsActuallyPartOfAHorizontalTrench),
-			HasAPipeCircuit(HasAPipeCircuit),
-			IsZoneCoupled(IsZoneCoupled),
-			HasCoupledBasement(HasCoupledBasement),
-			Extents(Extents),
-			Mesh(Mesh),
-			GroundProperties(GroundProperties),
-			SlabProperties(SlabProperties),
-			BasementFloorProperties(BasementFloorProperties),
-			BasementWallProperties(BasementWallProperties),
+		Name( Name ),
+			CircuitNames( CircuitNames ),
+			CircuitIndeces( CircuitIndeces ),
+			MaxIterationsPerTS( MaxIterationsPerTS ),
+			OneTimeInit( OneTimeInit ),
+			BeginSimInit( BeginSimInit ),
+			BeginSimEnvrn( BeginSimEnvrn ),
+			DomainNeedsSimulation( DomainNeedsSimulation ),
+			DomainNeedsToBeMeshed( DomainNeedsToBeMeshed ),
+			IsActuallyPartOfAHorizontalTrench( IsActuallyPartOfAHorizontalTrench ),
+			HasAPipeCircuit( HasAPipeCircuit ),
+			IsZoneCoupled( IsZoneCoupled ),
+			HasCoupledBasement( HasCoupledBasement ),
+			Extents( Extents ),
+			Mesh( Mesh ),
+			GroundProperties( GroundProperties ),
+			SlabProperties( SlabProperties ),
+			BasementFloorProperties( BasementFloorProperties ),
+			BasementWallProperties( BasementWallProperties ),
 			HorizInsProperties( HorizInsProperties ),
 			VertInsProperties( VertInsProperties ),
 			SimControls( SimControls ),
@@ -1533,10 +1533,10 @@ namespace DataPlantPipingSystems {
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),
 			SlabThickness( SlabThickness ),
-			BasementFloorMaterialNum(BasementFloorMaterialNum),
-			BasementWallMaterialNum(BasementWallMaterialNum),
-			BasementFloorThickness(BasementFloorThickness),
-			BasementWallThickness(BasementWallThickness),
+			BasementFloorMaterialNum( BasementFloorMaterialNum ),
+			BasementWallMaterialNum( BasementWallMaterialNum ),
+			BasementFloorThickness( BasementFloorThickness ),
+			BasementWallThickness( BasementWallThickness ),
 			XIndex( XIndex ),
 			YIndex( YIndex ),
 			ZIndex( ZIndex ),
@@ -1545,11 +1545,11 @@ namespace DataPlantPipingSystems {
 			HorizInsThickness( HorizInsThickness ),
 			HorizInsWidth( HorizInsWidth ),
 			HeatFlux( HeatFlux ),
-			WallHeatFlux(WallHeatFlux),
-			FloorHeatFlux(FloorHeatFlux),
+			WallHeatFlux( WallHeatFlux ),
+			FloorHeatFlux( FloorHeatFlux ),
 			AggregateHeatFlux( AggregateHeatFlux ),
-			AggregateWallHeatFlux(AggregateWallHeatFlux),
-			AggregateFloorHeatFlux(AggregateFloorHeatFlux),
+			AggregateWallHeatFlux( AggregateWallHeatFlux ),
+			AggregateFloorHeatFlux( AggregateFloorHeatFlux ),
 			NumHeatFlux( NumHeatFlux ),
 			ResetHeatFluxFlag( ResetHeatFluxFlag ),
 			ConvCoeff( ConvCoeff ),
@@ -1558,9 +1558,9 @@ namespace DataPlantPipingSystems {
 			VertInsMaterialNum( VertInsMaterialNum ),
 			VertInsThickness( VertInsThickness ),
 			VertInsDepth( VertInsDepth ),
-			XWallIndex(XWallIndex),
-			YFloorIndex(YFloorIndex),
-			ZWallIndex(ZWallIndex),
+			XWallIndex( XWallIndex ),
+			YFloorIndex( YFloorIndex ),
+			ZWallIndex( ZWallIndex ),
 			InsulationXIndex( InsulationXIndex ),
 			InsulationYIndex( InsulationYIndex ),
 			InsulationZIndex( InsulationZIndex ),
