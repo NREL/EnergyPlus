@@ -197,6 +197,7 @@ namespace DataSizing {
 	FArray2D< SystemSizingData > SysSizing; // Data array for system sizing (all data)
 	FArray1D< SystemSizingData > FinalSysSizing; // Data array for system sizing (max heat/cool)
 	FArray1D< SystemSizingData > CalcSysSizing; // Data array for system sizing (max heat/cool)
+	FArray1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices 
 	FArray1D< TermUnitSizingData > TermUnitSizing; // Data added in sizing routines
 	FArray1D< ZoneEqSizingData > ZoneEqSizing; // Data added in zone eq component sizing routines
 	FArray1D< ZoneEqSizingData > UnitarySysEqSizing; // Data added in unitary system sizing routines

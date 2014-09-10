@@ -1181,6 +1181,9 @@ namespace DataSizing {
 		Real64 RetHumRatAtCoolPeak; // design return air hum ratio for cooling [kg water/kg dry air]
 		Real64 OutTempAtCoolPeak; // design outside air temperature for cooling [C]
 		Real64 OutHumRatAtCoolPeak; // design outside air hum ratio for cooling [kg water/kg dry air]
+		int TimeStepAtSensCoolPeak; // time step index for sensible cooling load peak
+		int TimeStepAtTotCoolPeak; // time step index for total cooling load peak
+		int TimeStepAtCoolFlowPeak; // time step index for cooling air flow peak
 		Real64 HeatMixTemp; // design mixed air temperature for heating [C]
 		Real64 HeatMixHumRat; // design mixed air hum ratio for heating [kg water/kg dry air]
 		Real64 HeatRetTemp; // design return air temperature for heating [C]
@@ -1274,6 +1277,9 @@ namespace DataSizing {
 			RetHumRatAtCoolPeak( 0.0 ),
 			OutTempAtCoolPeak( 0.0 ),
 			OutHumRatAtCoolPeak( 0.0 ),
+			TimeStepAtSensCoolPeak( 0 ),
+			TimeStepAtTotCoolPeak( 0 ),
+			TimeStepAtCoolFlowPeak( 0 ),
 			HeatMixTemp( 0.0 ),
 			HeatMixHumRat( 0.0 ),
 			HeatRetTemp( 0.0 ),
@@ -1342,6 +1348,9 @@ namespace DataSizing {
 			Real64 const RetHumRatAtCoolPeak, // design return air hum ratio for cooling [kg water/kg dry air]
 			Real64 const OutTempAtCoolPeak, // design outside air temperature for cooling [C]
 			Real64 const OutHumRatAtCoolPeak, // design outside air hum ratio for cooling [kg water/kg dry air]
+			int const TimeStepAtSensCoolPeak, // time step index for sensible cooling load peak
+			int const TimeStepAtTotCoolPeak, // time step index for total cooling load peak
+			int const TimeStepAtCoolFlowPeak, // time step index for cooling air flow peak
 			Real64 const HeatMixTemp, // design mixed air temperature for heating [C]
 			Real64 const HeatMixHumRat, // design mixed air hum ratio for heating [kg water/kg dry air]
 			Real64 const HeatRetTemp, // design return air temperature for heating [C]
@@ -1422,6 +1431,9 @@ namespace DataSizing {
 			RetHumRatAtCoolPeak( RetHumRatAtCoolPeak ),
 			OutTempAtCoolPeak( OutTempAtCoolPeak ),
 			OutHumRatAtCoolPeak( OutHumRatAtCoolPeak ),
+			TimeStepAtSensCoolPeak( TimeStepAtSensCoolPeak ),
+			TimeStepAtTotCoolPeak( TimeStepAtTotCoolPeak ),
+			TimeStepAtCoolFlowPeak( TimeStepAtCoolFlowPeak ),
 			HeatMixTemp( HeatMixTemp ),
 			HeatMixHumRat( HeatMixHumRat ),
 			HeatRetTemp( HeatRetTemp ),
@@ -1448,6 +1460,33 @@ namespace DataSizing {
 			SysUncOA( SysUncOA ),
 			OAAutoSized( OAAutoSized ),
 			CoolingPeakLoadType( CoolingPeakLoadType ) //wfb
+		{}
+
+	};
+
+	struct SysSizPeakDDNumData
+	{
+		// Members
+		int SensCoolPeakDD; // design day containing the sensible cooling peak
+		int TotCoolPeakDD;
+		int CoolFlowPeakDD;
+
+		// Default Constructor
+		SysSizPeakDDNumData() :
+			SensCoolPeakDD( 0 ),
+			TotCoolPeakDD( 0 ),
+			CoolFlowPeakDD( 0 )
+		{}
+
+		// Member Constructor
+		SysSizPeakDDNumData(
+			int const SensCoolPeakDD, // design day containing the sensible cooling peak
+			int const TotCoolPeakDD, // design day containing total cooling peak
+			int const CoolFlowPeakDD
+			) :
+			SensCoolPeakDD( SensCoolPeakDD ),
+			TotCoolPeakDD( TotCoolPeakDD ),
+			CoolFlowPeakDD( CoolFlowPeakDD )
 		{}
 
 	};
