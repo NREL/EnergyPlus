@@ -5075,7 +5075,7 @@ namespace PlantPipingSystemsManager {
 					}
 				}
 
-				if ( PipingSystemDomains( DomainNum ).SlabThickness > 0 ) {
+				if ( PipingSystemDomains( DomainNum ).SlabWidth > 0 ) {
 					CellWidth = PipingSystemDomains( DomainNum ).HorizInsThickness;
 
 					if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
@@ -5423,8 +5423,8 @@ namespace PlantPipingSystemsManager {
 		Optional_int XIndex,
 		Optional_int XWallIndex,
 		Optional_int InsulationXIndex,
-		Optional_int YFloorIndex,
 		Optional_int YIndex,
+		Optional_int YFloorIndex,
 		Optional_int InsulationYIndex,
 		Optional_int ZIndex,
 		Optional_int ZWallIndex,
