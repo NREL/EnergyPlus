@@ -163,16 +163,16 @@ public: // Creation
 
 public: // Conversion
 
-	// C string Conversion: Invalid after str_ is reallocated
+	// C string Conversion
 	inline
 	operator c_cstring() const
 	{
 		return str_;
 	}
 
-	// C string Conversion: Invalid after str_ is reallocated
+	// C string Conversion
 	inline
-	operator cstring()
+	operator cstring &()
 	{
 		return str_;
 	}
