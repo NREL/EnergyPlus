@@ -14,6 +14,9 @@
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
 
+//Standard C++ library
+#include <string>
+
 namespace EnergyPlus {
 
 namespace InputProcessor {
@@ -45,6 +48,7 @@ namespace InputProcessor {
 	// USE STATEMENTS:
 	// Use statements for data only modules
 	// Using/Aliasing
+    
 	using namespace DataPrecisionGlobals;
 	using namespace DataStringGlobals;
 	using DataGlobals::MaxNameLength;
@@ -59,7 +63,8 @@ namespace InputProcessor {
 	using DataSystemVariables::SortedIDD;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
-
+    
+    
 	// Use statements for access to subroutines in other modules
 
 	// Data
@@ -85,6 +90,8 @@ namespace InputProcessor {
 	Real64 const DefAutoCalculateValue( AutoCalculate );
 	static gio::Fmt const fmtLD( "*" );
 	static gio::Fmt const fmtA( "(A)" );
+    std::string inputFileName;
+    std::string inputEnergyFile;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -163,6 +170,19 @@ namespace InputProcessor {
 	FArray1D< LineDefinition > IDFRecords; // All the objects read from the IDF
 	FArray1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
 
+    std::string assign(std::string& _FileName){
+        std::cout<<"====================================================================== \n";
+        std::cout<<"== Module 'Input Processor'::Name of the input file = "<<_FileName<<std::endl;
+        return _FileName;
+    }
+    
+    std::string assignEFile(std::string& _EFileName){
+        std::cout<<"== Module 'Input Processor'::Name of the energy file = "<<_EFileName<<std::endl;
+        std::cout<<"====================================================================== \n\n";
+        return _EFileName;
+    }
+    
+    
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
@@ -224,7 +244,7 @@ namespace InputProcessor {
 		int endcol;
 		int write_stat;
 		int read_stat;
-
+        
 		InitSecretObjects();
 
 		EchoInputFile = GetNewUnitNumber();
@@ -252,26 +272,26 @@ namespace InputProcessor {
 
 		//               FullName from StringGlobals is used to build file name with Path
 		if ( len( ProgramPath ) == 0 ) {
-			FullName = "Energy+.idd";
+			FullName = inputEnergyFile;
 		} else {
-			FullName = ProgramPath + "Energy+.idd";
+			FullName = ProgramPath + inputEnergyFile;
 		}
 		{ IOFlags flags; gio::inquire( FullName, flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
 			DisplayString( "Missing " + FullName );
-			ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + FullName );
+			ShowFatalError( "ProcessInput: " + inputEnergyFile + " missing. Program terminates. Fullname = " + FullName );
 		}
 		IDDFile = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, FullName, flags ); read_stat = flags.ios(); }
 		if ( read_stat != 0 ) {
-			DisplayString( "Could not open (read) Energy+.idd." );
-			ShowFatalError( "ProcessInput: Could not open file \"Energy+.idd\" for input (read)." );
+			DisplayString( "Could not open (read) " + inputEnergyFile );
+			ShowFatalError( "ProcessInput: Could not open file " + inputEnergyFile + " for input (read)." );
 		}
 		gio::read( IDDFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: \"Energy+.idd\" appears to be a Unicode or binary file." );
+				ShowSevereError( "ProcessInput: " + inputEnergyFile + " appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
 				ShowFatalError( "Program terminates due to previous condition." );
 			}
@@ -280,7 +300,7 @@ namespace InputProcessor {
 		NumLines = 0;
 
 		DoingInputProcessing = true;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary ("+inputEnergyFile+") File -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
 
@@ -310,7 +330,7 @@ namespace InputProcessor {
 		}
 
 		ProcessingIDD = false;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary ("+inputEnergyFile+") File -- Complete";
 
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
@@ -320,25 +340,25 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (inputFileName) -- Start";
 
-		{ IOFlags flags; gio::inquire( "in.idf", flags ); FileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( inputFileName, flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
-			DisplayString( "Missing " + CurrentWorkingFolder + "in.idf" );
-			ShowFatalError( "ProcessInput: in.idf missing. Program terminates." );
+			DisplayString( "Missing " + CurrentWorkingFolder + inputFileName );
+			ShowFatalError( "ProcessInput: " + inputFileName + " missing. Program terminates." );
 		}
 
 		IDFFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, "in.idf", flags ); read_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, inputFileName, flags ); read_stat = flags.ios(); }
 		if ( read_stat != 0 ) {
-			DisplayString( "Could not open (read) in.idf." );
+			DisplayString( "Could not open (read)" + inputFileName );
 			ShowFatalError( "ProcessInput: Could not open file \"in.idf\" for input (read)." );
 		}
 		gio::read( IDFFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: \"in.idf\" appears to be a Unicode or binary file." );
+				ShowSevereError( "ProcessInput: " + inputFileName +" appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
 				ShowFatalError( "Program terminates due to previous condition." );
 			}
@@ -6153,7 +6173,7 @@ namespace InputProcessor {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
@@ -6177,3 +6197,4 @@ namespace InputProcessor {
 } // InputProcessor
 
 } // EnergyPlus
+

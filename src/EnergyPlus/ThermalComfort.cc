@@ -28,6 +28,7 @@
 #include <OutputReportTabular.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -2467,7 +2468,7 @@ namespace ThermalComfort {
 
 		if ( initiate && weathersimulation ) {
 			{ IOFlags flags; gio::inquire( "in.stat", flags ); statFileExists = flags.exists(); }
-			{ IOFlags flags; gio::inquire( "in.epw", flags ); epwFileExists = flags.exists(); }
+			{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); epwFileExists = flags.exists(); }
 			readStat = 0;
 			if ( statFileExists ) {
 				statFile = GetNewUnitNumber();
@@ -2492,9 +2493,9 @@ namespace ThermalComfort {
 				useStatData = true;
 			} else if ( epwFileExists ) {
 				epwFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, "in.epw", flags ); readStat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, SimulationManager::inputWeatherFile, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file \"in.epw\" for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file " +SimulationManager::inputWeatherFile+ " for input (read)." );
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
 					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
@@ -2718,13 +2719,13 @@ namespace ThermalComfort {
 		}
 
 		if ( initiate && weathersimulation ) {
-			{ IOFlags flags; gio::inquire( "in.epw", flags ); epwFileExists = flags.exists(); }
+			{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); epwFileExists = flags.exists(); }
 			readStat = 0;
 			if ( epwFileExists ) {
 				epwFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, "in.epw", flags ); readStat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, SimulationManager::inputWeatherFile, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveCEN15251: Could not open file \"in.epw\" for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveCEN15251: Could not open file "+SimulationManager::inputWeatherFile+" for input (read)." );
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
 					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
@@ -2928,7 +2929,7 @@ namespace ThermalComfort {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -149,6 +149,14 @@ namespace SimulationManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
+    std::string inputWeatherFile;
+    
+    std::string assignWFile(std::string& _WFileName){
+        std::cout<<"====================================================================== \n";
+        std::cout<<"== Module 'Manage Simulation'::Name of the weather file = "<<_WFileName<<std::endl;
+        std::cout<<"====================================================================== \n";
+        return _WFileName;
+    }
 
 	void
 	ManageSimulation()
@@ -250,7 +258,8 @@ namespace SimulationManager {
 
 		//  CHARACTER(len=70) :: tdstring
 		//  CHARACTER(len=138) :: tdstringlong
-
+        
+      
 		int EnvCount;
 
 		// Formats
@@ -432,7 +441,8 @@ namespace SimulationManager {
 				if ( WarmupFlag ) {
 					++NumOfWarmupDays;
 					cWarmupDay = TrimSigDigits( NumOfWarmupDays );
-					DisplayString( "Warming up {" + cWarmupDay + '}' );
+				//	DisplayString( "Warming up {" + cWarmupDay + '}' );
+                    DisplayString( "Warming up {"+cWarmupDay+"}" );
 				} else if ( DayOfSim == 1 ) {
 					DisplayString( "Starting Simulation at " + CurMnDy + " for " + EnvironmentName );
 					gio::write( OutputFileInits, Format_700 ) << NumOfWarmupDays;
@@ -1041,7 +1051,7 @@ namespace SimulationManager {
 		NumDesignDays = GetNumObjectsFound( "SizingPeriod:DesignDay" );
 		NumRunPeriodDesign = GetNumObjectsFound( "SizingPeriod:WeatherFileDays" ) + GetNumObjectsFound( "SizingPeriod:WeatherFileConditionType" );
 		NumSizingDays = NumDesignDays + NumRunPeriodDesign;
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); WeatherFileAttached = flags.exists(); }
+		{ IOFlags flags; gio::inquire( inputWeatherFile, flags ); WeatherFileAttached = flags.exists(); }
 
 		if ( RunControlInInput ) {
 			if ( DoZoneSizing ) {
@@ -2784,7 +2794,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

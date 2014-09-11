@@ -20,6 +20,9 @@ namespace EnergyPlus {
 
 namespace OutputReportTabular {
 
+    extern std::string outputFile;
+    std::string assignOFile(std::string& _OFileName);
+    
 	// Using/Aliasing
 
 	// Data
@@ -290,6 +293,7 @@ namespace OutputReportTabular {
 	extern std::string activeReportName;
 	extern std::string activeForName;
 	extern std::string prevReportName;
+    
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
 	//PRIVATE      DateToStr
@@ -724,7 +728,7 @@ namespace OutputReportTabular {
 	extern FArray1D< UnitConvType > UnitConv;
 
 	// Functions
-
+    
 	void
 	UpdateTabularReports( int const IndexTypeKey ); // What kind of data to update (Zone, HVAC)
 
@@ -736,6 +740,7 @@ namespace OutputReportTabular {
 	//======================================================================================================================
 	//======================================================================================================================
 
+    
 	void
 	GetInputTabularMonthly();
 
@@ -1063,7 +1068,7 @@ namespace OutputReportTabular {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of
 	//     Berkeley National Laboratory.  All rights reserved.
 

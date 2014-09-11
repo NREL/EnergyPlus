@@ -406,7 +406,13 @@ namespace OutputReportTabular {
 	static gio::Fmt const fmtA( "(A)" );
 
 	// Functions
-
+    std::string outputFile;
+    std::string assignOFile(std::string& _OFileName){
+        std::cout<<"== Module 'Output report tabular'::Name of the output file = "<<_OFileName<<std::endl;
+        std::cout<<"====================================================================== \n\n";
+        return _OFileName;
+    }
+    
 	void
 	UpdateTabularReports( int const IndexTypeKey ) // What kind of data to update (Zone, HVAC)
 	{
@@ -3109,9 +3115,9 @@ namespace OutputReportTabular {
 				curDel = del( iStyle );
 				if ( TableStyle( iStyle ) == tableStyleComma ) {
 					DisplayString( "Writing tabular output file results using comma format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, "eplustbl.csv", flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputFile, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.csv\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file (" + outputFile + ") for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "Program Version:" + curDel + VerString;
 					gio::write( curFH, fmtLD ) << "Tabular Output Report in Format: " + curDel + "Comma";

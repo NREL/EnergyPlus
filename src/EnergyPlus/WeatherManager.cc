@@ -25,6 +25,7 @@
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
+#include <SimulationManager.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 
@@ -4389,7 +4390,7 @@ Label903: ;
 
 		// FLOW:
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); WeatherFileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); WeatherFileExists = flags.exists(); }
 
 		if ( WeatherFileExists ) {
 			OpenEPlusWeatherFile( ErrorsFound, true );
@@ -4442,11 +4443,11 @@ Label903: ;
 		bool EPWOpen;
 		int unitnumber;
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 		WeatherFileUnitNumber = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, "in.epw", flags ); if ( flags.err() ) goto Label9999; }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, SimulationManager::inputWeatherFile, flags ); if ( flags.err() ) goto Label9999; }
 
 		if ( ProcessHeader ) {
 			// Read in Header Information
@@ -4530,7 +4531,7 @@ Label9999: ;
 
 		//  Make sure it's open
 
-		{ IOFlags flags; gio::inquire( "in.epw", flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 	}
@@ -9466,7 +9467,7 @@ Label9998: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
