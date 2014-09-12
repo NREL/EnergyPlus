@@ -13,7 +13,7 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // CLI Headers
-#include <../../CLI/ezOptionParser.hpp> // Added by Monika Sharma for CLI
+#include <ezOptionParser.hpp> // Added by Monika Sharma for CLI
 #include <stdio.h> // Added by Monika Sharma for CLI
 
 // EnergyPlus Headers
@@ -232,7 +232,9 @@ main(int argc, const char * argv[])
     ///////// Added for CLI /////////////////////////////
     ezOptionParser opt;
     
-    opt.overview = "\n*******************************************\nCopyright (C) 2012-2014 Big Ladder Software\nWeb: www.bigladdersoftware.com\n";
+    opt.overview =  "*******************************************\n";
+    opt.overview += "Copyright (C) 1996-2014 \n"; // Add owners of copyright?
+    opt.overview += "Web: www.energyplus.gov\n";
     opt.overview += VerString;
     opt.overview += "\n*******************************************\n";
     opt.syntax = "./EnergyPlus -df InputFile.idf -i Energy+.idd -w WeatherFile.epw -o OutFile.csv";
@@ -311,7 +313,7 @@ main(int argc, const char * argv[])
     
 
     opt.parse(argc, argv);
-    if(argv[1]==0) cout<<"No arguments provided"<<endl;
+    //if(argv[1]==0) cout<<"No arguments provided"<<endl;
     
     std::string usage;
     
@@ -322,7 +324,7 @@ main(int argc, const char * argv[])
 	}
     
     if (opt.isSet("-v")) {
-		cout << VerString;
+		cout << VerString << endl;
 		return 1;
     }
     
