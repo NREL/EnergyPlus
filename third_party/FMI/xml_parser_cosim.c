@@ -153,7 +153,9 @@ Enu getEnumValue(void* element, Att a, ValueStatus* vs) {
         }
     }
     id = checkEnumValue(value);
-    if (id==-1) *vs = valueIllegal;
+    // following line is commented due to the compiler warning:
+    // comparison of constant -1 with expression of type 'Enu' is always false [-Wtautological-constant-out-of-range-compare]
+    //if (id==-1) *vs = valueIllegal;
     return id;
 }
 
@@ -376,7 +378,11 @@ static int checkPeek(Elm e) {
         XML_StopParser(parser, XML_FALSE);
         return 0; // error
     }
-    return e==ANY_TYPE ? 1 : checkElementType(stackPeek(stack), e);
+    // following line is commented due to the compiler warning:
+    // comparison of constant -1 with expression of type 'Elm' is always false [-Wtautological-constant-out-of-range-compare]
+    // the condition is always false, therefore the first part of the ternary will never be hit, therefore just return the else side
+    //return e==ANY_TYPE ? 1 : checkElementType(stackPeek(stack), e);
+    return checkElementType(stackPeek(stack), e);
 }
 
 // Returns NULL to indicate error
@@ -460,7 +466,10 @@ static void XMLCALL startElement(void *context, const char *elm, const char **at
     void* e;
     int size;
     el = checkElement(elm);
-    if (el==-1) return; // error
+    // following line is commented due to the following compiler warning:
+    // comparison of constant -1 with expression of type 'Elm' is always false [-Wtautological-constant-out-of-range-compare]
+    // since it will always be false, we'll never return here
+    //if (el==-1) return; // error
     skipData = (el != elm_Name); // skip element content for all elements but Name
     switch(getAstNodeType(el)){
         case astElement: size = sizeof(Element); break;
@@ -667,7 +676,9 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  stackPush(stack, name);
                  break;
             }
-        case -1: return; // illegal element error
+        // following switch case is commented because of compiler warning:
+        // case value not in enumerated type 'Elm' [-Wswitch]
+        //case -1: return; // illegal element error
         default: // must be a leaf Element
                  assert(getAstNodeType(el)==astElement);
                  break;
@@ -846,6 +857,8 @@ void printidf(const char* fmuFilNam, ModelDescription* md)
 					break;
 				case enu_output:
 					fprintf(fp, "   %s,\t\t!- FMU Variable Name\n", e->attributes[varname]);				   
+					break;
+				default:
 					break;
 				}
 			}

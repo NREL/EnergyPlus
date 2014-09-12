@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "stack.h"
+#include <stdlib.h>
 
 Stack* stackNew(int initialSize, int inc){
     Stack* s = (Stack*)malloc(sizeof(Stack));

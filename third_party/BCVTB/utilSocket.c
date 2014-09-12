@@ -106,7 +106,9 @@ derivative works thereof, in binary and source code form.
 /// \sa closeipc
 ///
 ///////////////////////////////////////////////////////
+#include <fcntl.h>
 #include "utilSocket.h"
+#include "utilXml.h"
 // Global variable to check for FMUExport case
 int FMUEXPORT = 0;
 ////////////////////////////////////////////////////////////////
@@ -423,7 +425,7 @@ int getsocketportnumber(const char *const docname) {
 #endif
     return -1;
   }
-  if (0 == getxmlvalue(docname, xPat, res, &i, BUFFER_LENGTH))
+  if (0 == getxmlvalue((char*)docname, xPat, res, &i, BUFFER_LENGTH))
     retVal = atoi((char*)res);
   else
     retVal = -1;
@@ -454,7 +456,7 @@ int getmainversionnumber(){
 int getsockethost(const char *const docname, char *const hostname) {
   char *xPat = "//ipc/socket[@hostname]";
   int i;
-  int r = getxmlvalue(docname, xPat, hostname, &i, BUFFER_LENGTH);
+  int r = getxmlvalue((char*)docname, xPat, hostname, &i, BUFFER_LENGTH);
   return r;
 }
 
@@ -680,7 +682,7 @@ if (*sockfd < 0 ){
   /////////////////////////////////////////////////////
   // allocate storage for buffer
 #ifdef NDEBUG
-  fprintf(f1, "Assembling buffer.\n", *sockfd);
+  fprintf(f1, "Assembling buffer.\n");
 #endif
   buffer = malloc(bufLen);
   if (buffer == NULL) {
@@ -1033,8 +1035,8 @@ int exchangewithsocket(const int *sockfd,
     return -1;
   }
   rewind(f1);
-  fprintf(f1, "*** BCVTB client log file.\n", *simTimWri);
-  fprintf(f1, "*************************.\n", *simTimWri);
+  fprintf(f1, "*** BCVTB client log file.\n");
+  fprintf(f1, "*************************.\n");
   fprintf(f1, "Writing to socket at time = %e\n", *simTimWri);
 #endif
 
