@@ -1,5 +1,23 @@
 include(CMakeParseArguments)
 
+# Install files from a remote url
+# TYPE can be either "FILES" or "PROGRAMS"
+# Use the appropriate TYPE to get the proper permissions on the installed file
+# SOURCE should be a url where the function will attempt to download from
+# DESTINATION is the absolute or relative destination which will be passed to 
+# the built in install command after the SOURCE is downloaded to a temporary location
+function( install_remote TYPE SOURCE DESTINATION )
+  get_filename_component(FILENAME ${SOURCE} NAME)
+  set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/install_temp")
+  install(CODE "
+    file(DOWNLOAD ${SOURCE} \"${OUTPUT_DIR}/${FILENAME}\")
+  ")
+  install(${TYPE} "${OUTPUT_DIR}/${FILENAME}" DESTINATION ${DESTINATION})
+  install(CODE "
+    file(REMOVE_RECURSE \"${OUTPUT_DIR}\")
+  ")
+endfunction()
+
 # Add google tests macro
 macro(ADD_GOOGLE_TESTS executable)
   foreach ( source ${ARGN} )

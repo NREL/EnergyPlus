@@ -18,6 +18,8 @@ endif()
 
 set(CPACK_PACKAGING_INSTALL_PREFIX "/${CMAKE_PROJECT_NAME}-${PROJECT_VERSION_STRING}")
 
+install_remote(FILES https://raw.githubusercontent.com/NREL/OpenStudio/develop/license.txt ./)
+
 # Install files that are in the current repo
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets")
@@ -117,7 +119,7 @@ INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/Bugreprt.txt" DESTINATION "./"
 INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/Enhancement_List_Items-V8-1-0.html" DESTINATION "./")
 INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/ep.gif" DESTINATION "./")
 INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/Known_Issues-V8-1-0.html" DESTINATION "./")
-INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/license.txt" DESTINATION "./")
+#INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/license.txt" DESTINATION "./")
 INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/ObjectStatus.xls" DESTINATION "./")
 INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/readme.html" DESTINATION "./")
 INSTALL(FILES "${EPLUS_BUILDSUPPORT_REPO}/release/Rules8-0-0-to-8-1-0.xls" DESTINATION "./")
