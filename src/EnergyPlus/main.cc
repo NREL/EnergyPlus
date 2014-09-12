@@ -12,6 +12,10 @@
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
+// CLI Headers
+#include <../../CLI/ezOptionParser.hpp> // Added by Monika Sharma for CLI
+#include <stdio.h> // Added by Monika Sharma for CLI
+
 // EnergyPlus Headers
 #include <main.hh>
 #include <DataEnvironment.hh>
@@ -29,9 +33,6 @@
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
-#include <stdio.h> // Added by Monika Sharma for CLI
-#include "ezOptionParser.hpp" // Added by Monika Sharma for CLI
-//#include <Globals.hh>
 
 using namespace ez;
 using namespace std;
@@ -232,8 +233,8 @@ main(int argc, const char * argv[])
     ezOptionParser opt;
     
     opt.overview = "\n*******************************************\nCopyright (C) 2012-2014 Big Ladder Software\nWeb: www.bigladdersoftware.com\n";
-    opt.overview1 = VerString;
-    opt.overview2 = "\n*******************************************\n";
+    opt.overview += VerString;
+    opt.overview += "\n*******************************************\n";
     opt.syntax = "./EnergyPlus -df InputFile.idf -i Energy+.idd -w WeatherFile.epw -o OutFile.csv";
     
     opt.add(
@@ -313,7 +314,6 @@ main(int argc, const char * argv[])
     if(argv[1]==0) cout<<"No arguments provided"<<endl;
     
     std::string usage;
-    std::string version;
     
 	if (opt.isSet("-h")) {
 		opt.getUsage(usage);
@@ -322,8 +322,7 @@ main(int argc, const char * argv[])
 	}
     
     if (opt.isSet("-v")) {
-        opt.getVersion(version);
-		cout << version;
+		cout << VerString;
 		return 1;
     }
     
@@ -334,7 +333,7 @@ main(int argc, const char * argv[])
         
 		opt.getUsage(usage);
 		cout << usage;
-		return 1;
+		return -1;
 	}
     
 /*	if(!opt.gotRequired(badOptions)) {

@@ -1328,7 +1328,6 @@ public:
   inline bool exportFile(const char * filename, bool all=false);
   inline OptionGroup * get(const char * name);
   inline void getUsage(std::string & usage, int width=80, Layout layout=ALIGN);
-  inline void getVersion(std::string & version, int width=80, Layout layout=ALIGN);
   inline void getUsageDescriptions(std::string & usage, int width=80, Layout layout=STAGGER);
   inline bool gotExpected(std::vector<std::string> & badOptions);
   inline bool gotRequired(std::vector<std::string> & badOptions);
@@ -1346,8 +1345,6 @@ public:
   // General description in human language on what the user's tool does.
   // It's the first section to get printed in the full usage message.
   std::string overview;
-  std::string overview1;
-  std::string overview2;
   // A synopsis of command and options usage to show expected order of input arguments.
   // It's the second section to get printed in the full usage message.
   std::string syntax;
@@ -1781,8 +1778,6 @@ OptionGroup * ezOptionParser::get(const char * name) {
 void ezOptionParser::getUsage(std::string & usage, int width, Layout layout) {
 
   usage.append(overview);
-  usage.append(overview1);
-  usage.append(overview2);
   usage.append("\n\n");
   usage.append("USAGE: ");
   usage.append(syntax);
@@ -1797,14 +1792,6 @@ void ezOptionParser::getUsage(std::string & usage, int width, Layout layout) {
   if (!footer.empty()) {
     usage.append(footer);
   }
-};
-/* ################################################################### */
-void ezOptionParser::getVersion(std::string & version, int width, Layout layout) {
-    
-    version.append(overview);
-    version.append(overview1);
-    version.append(overview2);
-    version.append("\n\n");
 };
 /* ################################################################### */
 // Creates 2 column formatted help descriptions for each option flag.
