@@ -49,6 +49,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 
 # E+ required libraries
 ADD_SUBDIRECTORY(third_party/SQLite)
