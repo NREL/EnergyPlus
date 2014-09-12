@@ -305,7 +305,6 @@ namespace VentilatedSlab {
 		using DataPlant::TypeOf_CoilWaterSimpleHeating;
 		using DataPlant::TypeOf_CoilSteamAirHeating;
 		using DataHVACGlobals::ZoneComp;
-		using DataSizing::AutoSize;
 		using DataSizing::ZoneHVACSizing;
 		using DataSizing::NumZoneHVACSizing;
 
