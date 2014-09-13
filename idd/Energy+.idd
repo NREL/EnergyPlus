@@ -54045,7 +54045,7 @@ Pipe:Underground,
    A10; \field Simulation Timestep
         \required-field
         \note This field specifies the domain simulation timestep.
-	
+
 Site:GroundDomain:Basement,
         \memo The ground domain object for simulation.
    A1,  \field Name
@@ -54127,7 +54127,7 @@ Site:GroundDomain:Basement,
         \required-field
         \note This field specifies the presence of insulation beneath the basement floor.
    A5,  \field Name of horizontal insulation material
-		\required-field
+        \required-field
         \type alpha
    A6,  \field The type of horizontal insulation
         \type choice
@@ -54163,7 +54163,7 @@ Site:GroundDomain:Basement,
         \units m
    A11;  \field Simulation Interval - Timestep/Daily
         \required-field
-        \type alpha		
+        \type alpha
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
