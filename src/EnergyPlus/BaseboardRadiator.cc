@@ -9,6 +9,7 @@
 #include <BaseboardRadiator.hh>
 #include <BranchNodeConnections.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
 #include <DataLoopNode.hh>
@@ -90,6 +91,7 @@ namespace BaseboardRadiator {
 
 	// Object Data
 	FArray1D< BaseboardParams > Baseboard;
+	FArray1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
 
 	// Functions
 
@@ -243,6 +245,8 @@ namespace BaseboardRadiator {
 		using namespace DataLoopNode;
 		using GlobalNames::VerifyUniqueBaseboardName;
 		using namespace DataIPShortCuts;
+		using namespace DataSizing;
+		using General::TrimSigDigits;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -250,6 +254,10 @@ namespace BaseboardRadiator {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetBaseboardInput: " ); // include trailing blank space
+		int const iHeatCAPMAlphaNum( 5 ); // get input index to water baseboard Radiator system heating capacity sizing method
+		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to water baseboard Radiator system electric heating capacity
+		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to water baseboard Radiator system electric heating capacity per floor area sizing
+		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to water baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -279,12 +287,17 @@ namespace BaseboardRadiator {
 		Baseboard.allocate( NumBaseboards );
 		CheckEquipName.allocate( NumBaseboards );
 		CheckEquipName = true;
+		BaseboardParamsNumericFields.allocate( NumBaseboards );
 
 		if ( NumConvHWBaseboards > 0 ) { //Get the data for cooling schemes
 			BaseboardNum = 0;
 			for ( ConvHWBaseboardNum = 1; ConvHWBaseboardNum <= NumConvHWBaseboards; ++ConvHWBaseboardNum ) {
 
 				GetObjectItem( cCurrentModuleObject, ConvHWBaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames.allocate(NumNums);
+				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = "";
+				BaseboardParamsNumericFields( ConvHWBaseboardNum ).FieldNames = cNumericFieldNames;
 
 				IsNotOK = false;
 				IsBlank = false;
@@ -317,9 +330,67 @@ namespace BaseboardRadiator {
 
 				TestCompSet( cCMO_BBRadiator_Water, cAlphaArgs( 1 ), cAlphaArgs( 3 ), cAlphaArgs( 4 ), "Hot Water Nodes" );
 
-				Baseboard( BaseboardNum ).UA = rNumericArgs( 1 );
-				Baseboard( BaseboardNum ).WaterVolFlowRateMax = rNumericArgs( 2 );
-				Baseboard( BaseboardNum ).Offset = rNumericArgs( 3 );
+				// Determine steam baseboard radiator system heating design capacity sizing method
+				if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "HeatingDesignCapacity" ) ) {
+					Baseboard(BaseboardNum).HeatingCapMethod = HeatingDesignCapacity;
+					if ( !lNumericFieldBlanks(iHeatDesignCapacityNumericNum) ) {
+						Baseboard(BaseboardNum).ScaledHeatingCapacity = rNumericArgs(iHeatDesignCapacityNumericNum);
+						if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0 && Baseboard( BaseboardNum ).ScaledHeatingCapacity != AutoSize ) {
+							ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+							ShowContinueError("Illegal " + cNumericFieldNames(iHeatDesignCapacityNumericNum) + " = " + TrimSigDigits(rNumericArgs(iHeatDesignCapacityNumericNum), 7));
+							ErrorsFound = true;
+						}
+					} else {
+						ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+						ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatDesignCapacityNumericNum));
+						ErrorsFound = true;
+					}
+				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "CapacityPerFloorArea" ) ) {
+					Baseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
+					if ( !lNumericFieldBlanks(iHeatCapacityPerFloorAreaNumericNum) ) {
+						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatCapacityPerFloorAreaNumericNum);
+						if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity <= 0.0 ) {
+							ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+							ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+							ShowContinueError("Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = " + TrimSigDigits(rNumericArgs(iHeatCapacityPerFloorAreaNumericNum), 7));
+							ErrorsFound = true;
+						} else if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
+							ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+							ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+							ShowContinueError("Illegal " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum) + " = Autosize");
+							ErrorsFound = true;
+						}
+					} else {
+						ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+						ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatCapacityPerFloorAreaNumericNum));
+						ErrorsFound = true;
+					}
+				} else if ( SameString( cAlphaArgs(iHeatCAPMAlphaNum), "FractionOfAutosizedHeatingCapacity" ) ){
+					Baseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+					if ( !lNumericFieldBlanks(iHeatFracOfAutosizedCapacityNumericNum) ) {
+						Baseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum);
+						if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0 ) {
+							ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+							ShowContinueError("Illegal " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum) + " = " + TrimSigDigits(rNumericArgs(iHeatFracOfAutosizedCapacityNumericNum), 7));
+							ErrorsFound = true;
+						}
+					} else {
+						ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+						ShowContinueError("Input for " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+						ShowContinueError("Blank field not allowed for " + cNumericFieldNames(iHeatFracOfAutosizedCapacityNumericNum));
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCMO_BBRadiator_Water  + " = " + Baseboard( BaseboardNum ).EquipID);
+					ShowContinueError("Illegal " + cAlphaFieldNames(iHeatCAPMAlphaNum) + " = " + cAlphaArgs(iHeatCAPMAlphaNum));
+					ErrorsFound = true;
+				}
+
+				Baseboard( BaseboardNum ).UA = rNumericArgs( 4 );
+				Baseboard( BaseboardNum ).WaterVolFlowRateMax = rNumericArgs( 5 );
+				Baseboard( BaseboardNum ).Offset = rNumericArgs( 6 );
 				// Set default convergence tolerance
 				if ( Baseboard( BaseboardNum ).Offset <= 0.0 ) {
 					Baseboard( BaseboardNum ).Offset = 0.001;
@@ -490,6 +561,7 @@ namespace BaseboardRadiator {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   February 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B.Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -509,7 +581,10 @@ namespace BaseboardRadiator {
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 		using DataLoopNode::Node;
+		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -545,6 +620,14 @@ namespace BaseboardRadiator {
 		Real64 WaterVolFlowRateMaxUser; // User hard-sized volume flow for reporting
 		Real64 UADes; // Design UA value for reproting
 		Real64 UAUser; // User hard-sized value for reporting
+		std::string CompName; // component name
+		std::string CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 1; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (HeatingCapacitySizing)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, and FractionOfAutosizedHeatingCapacity )
 
 		PltSizHeatNum = 0;
 		PltSizNum = 0;
@@ -573,7 +656,48 @@ namespace BaseboardRadiator {
 					}
 				} else {
 					CheckZoneSizing( cCMO_BBRadiator_Water, Baseboard( BaseboardNum ).EquipID );
-					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+					CompType = cCMO_BBRadiator_Water;
+					CompName = Baseboard(BaseboardNum).EquipID;
+					DataFracOfAutosizedHeatingCapacity = 1.0;
+					DataZoneNumber = Baseboard(BaseboardNum).ZonePtr;
+					SizingMethod = HeatingCapacitySizing;
+					FieldNum = 1;
+					PrintFlag = false;
+					SizingString = BaseboardParamsNumericFields( BaseboardNum ).FieldNames(FieldNum) + " [W]";
+					CapSizingMethod = Baseboard( BaseboardNum ).HeatingCapMethod;
+					ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+
+						if ( CapSizingMethod == HeatingDesignCapacity ){
+							if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
+								CheckZoneSizing(CompType, CompName);
+								ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							} else {
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
+							}
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+						} else if ( CapSizingMethod == CapacityPerFloorArea ){
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+							DataScalableCapSizingON = true;
+						} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+							CheckZoneSizing(CompType, CompName);
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							DataFracOfAutosizedHeatingCapacity = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							TempSize = AutoSize;
+							DataScalableCapSizingON = true;
+						} else {
+							TempSize = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
+						}
+						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+						DesCoilLoad = TempSize;
+					} else {
+						DesCoilLoad = 0.0; 
+					}
+
 					if ( DesCoilLoad >= SmallLoad ) {
 						Cp = GetSpecificHeatGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, 60.0, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 						rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
@@ -622,7 +746,47 @@ namespace BaseboardRadiator {
 					WaterInletNode = Baseboard( BaseboardNum ).WaterInletNode;
 					rho = GetDensityGlycol( PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Baseboard( BaseboardNum ).LoopNum ).FluidIndex, RoutineName );
 					Node( WaterInletNode ).MassFlowRate = rho * Baseboard( BaseboardNum ).WaterVolFlowRateMax;
-					DesCoilLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+
+					CompType = cCMO_BBRadiator_Water;
+					CompName = Baseboard( BaseboardNum ).EquipID;
+					DataFracOfAutosizedHeatingCapacity = 1.0;
+					DataZoneNumber = Baseboard( BaseboardNum ).ZonePtr;
+					SizingMethod = HeatingCapacitySizing;
+					FieldNum = 1;
+					PrintFlag = false;
+					SizingString = BaseboardParamsNumericFields( BaseboardNum ).FieldNames(FieldNum) + " [W]";
+					CapSizingMethod = Baseboard( BaseboardNum ).HeatingCapMethod;
+					ZoneEqSizing(CurZoneEqNum).SizingMethod(SizingMethod) = CapSizingMethod;
+					if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						if ( CapSizingMethod == HeatingDesignCapacity ){
+							if ( Baseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
+								CheckZoneSizing(CompType, CompName);
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							} else {
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity;;
+							}
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+						} else if ( CapSizingMethod == CapacityPerFloorArea ){
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = Baseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+							TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+							DataScalableCapSizingON = true;
+						} else if (CapSizingMethod == FractionOfAutosizedHeatingCapacity){
+							CheckZoneSizing(CompType, CompName);
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							DataFracOfAutosizedHeatingCapacity = Baseboard(BaseboardNum).ScaledHeatingCapacity;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+							TempSize = AutoSize;
+							DataScalableCapSizingON = true;
+						} else {
+							TempSize = Baseboard( BaseboardNum ).ScaledHeatingCapacity;
+						}
+						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+						DesCoilLoad = TempSize;
+					} else {
+						DesCoilLoad = 0.0; // CalcFinalZoneSizing(CurZoneEqNum).DesHeatLoad * CalcFinalZoneSizing(CurZoneEqNum).HeatSizingFactor;
+					}
 					if ( DesCoilLoad >= SmallLoad ) {
 						// pick an air  mass flow rate that is twice the water mass flow rate (CR8842)
 						Baseboard( BaseboardNum ).DesAirMassFlowRate = 2.0 * rho * Baseboard( BaseboardNum ).WaterVolFlowRateMax;

@@ -93,8 +93,30 @@ function( ADD_SIMULATION_TEST )
       -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
     )  
   endif()
+
   SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
   SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+
+  if( ENABLE_REGRESSION_TESTING )
+    add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
+      -DBINARY_DIR=${CMAKE_BINARY_DIR}
+      -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
+      -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
+      -DREGRESSION_SCRIPT_PATH=${REGRESSION_SCRIPT_PATH}
+      -DREGRESSION_BASELINE_PATH=${REGRESSION_BASELINE_PATH}
+      -DREGRESSION_BASELINE_SHA=${REGRESSION_BASELINE_SHA}
+      -DCOMMIT_SHA=${COMMIT_SHA}
+      -DDEVICE_ID=${DEVICE_ID}
+      -P ${CMAKE_SOURCE_DIR}/cmake/RunRegression.cmake
+      )
+    # Note, CMake / CTest doesn't seem to validate if this dependent name actually exists,
+    # but it does seem to honor the requirement
+    set_tests_properties("regression.${IDF_NAME}" PROPERTIES DEPENDS "integration.${IDF_NAME}")
+    set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
+    set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+  endif()
+
+
 endfunction()
 
 macro( ADD_CXX_DEFINITIONS NEWFLAGS )
