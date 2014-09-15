@@ -21,6 +21,12 @@ SET(SRC
 
 SET(CMAKE_EXE_LINKER_FLAGS "")
 
+IF( MSVC )
+  ADD_DEFINITIONS( "/w" )
+ELSE()
+  ADD_DEFINITIONS( "-w" )
+ENDIF()
+
 ADD_EXECUTABLE( parser ${SRC} )
 
 TARGET_LINK_LIBRARIES( parser epexpat miniziplib )

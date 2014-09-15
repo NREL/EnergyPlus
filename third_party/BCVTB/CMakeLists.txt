@@ -20,6 +20,12 @@ IF( WIN32 )
   TARGET_LINK_LIBRARIES( bcvtb wsock32 )
 ENDIF()
 
+IF( MSVC )
+  ADD_DEFINITIONS( "/w" )
+ELSE()
+  ADD_DEFINITIONS( "-w" )
+ENDIF()
+
 set_target_properties(
   bcvtb
   PROPERTIES
