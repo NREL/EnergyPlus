@@ -567,3 +567,5 @@ Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperatu
 Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area,hourly;
 Output:Variable,*,Zone Coupled Surface Heat Flux,hourly;
 Output:Variable,*,Zone Coupled Surface Temperature,hourly;
+OutputControl:Table:Style, HTML;
+Output:Table:SummaryReports, AllSummary;
