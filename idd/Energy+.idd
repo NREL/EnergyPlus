@@ -54022,25 +54022,25 @@ Pipe:Underground,
    A4, 	\field Name of slab material
         \optional-field
    A5,  \field Horizontal Insulation
-        \required-field
+        \optional-field
         \note This field specifies the presence of insulation beneath the slab.
    A6,  \field Insulation Material
-        \note optional
+        \optional-field
         \note This field specifies the horizontal insulation material.
    A7,  \field Horizontal Insulation Extents
-        \field-optional
+        \optional-field
         \note This field specifies whether the horizontal insulation fully insulates the surface or is perimeter only insulation
    N13, \field Perimeter Insulation Width
-        \field-optional
+        \optional-field
         \note This field specifies the width of the perimeter insulation
    A8,  \field Vertical Insulation
         \required-field
         \note This field specifies the presence of vertical insulation at the slab edge.
    A9,  \field Insulation Material
-        \note optional
+        \optional-field
         \note This field specifies the vertical insulation material.
    N14, \field Vertical Insulation Depth
-        \field-optional
+        \optional-field
         \note This field specifies the depth of the vertical insulation		
    A10; \field Simulation Timestep
         \required-field
@@ -54127,7 +54127,7 @@ Site:GroundDomain:Basement,
         \required-field
         \note This field specifies the presence of insulation beneath the basement floor.
    A5,  \field Name of horizontal insulation material
-        \required-field
+        \optional-field
         \type alpha
    A6,  \field The type of horizontal insulation
         \type choice
