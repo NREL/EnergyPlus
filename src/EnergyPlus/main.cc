@@ -12,12 +12,9 @@
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/Time_Date.hh>
 
-// CLI Headers
-#include <ezOptionParser.hpp> // Added by Monika Sharma for CLI
-#include <stdio.h> // Added by Monika Sharma for CLI
-
 // EnergyPlus Headers
 #include <main.hh>
+#include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
@@ -32,17 +29,7 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
-#include <UtilityRoutines.hh>
-
-using namespace ez;
-using namespace std;
-//using namespace vif;
-
-void Usage(ezOptionParser& opt) {
-	string usage;
-	opt.getUsage(usage);
-	cout << usage;
-};
+//#include <UtilityRoutines.hh>
 
 
 int
@@ -52,7 +39,7 @@ main(int argc, const char * argv[])
 	using namespace EnergyPlus;
   	//      NOTICE
 
-	//      Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//      Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -127,11 +114,11 @@ main(int argc, const char * argv[])
 	//      (Conjunction Of Multizone Infiltration Specialists) developed by a multinational, multi-institutional
 	//      effort under the auspices of the International Energy Agency's Buildings and Community Systems Agreement
 	//      working group focusing on multizone air flow modeling (Annex 23) and now administered by the Swiss Federal
-	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Überlandstrasse 129, CH-8600 Dübendorf,
+	//      Laboratories for Materials Testing and Research (EMPA), Division 175, ï¿½berlandstrasse 129, CH-8600 Dï¿½bendorf,
 	//      Switzerland.
 
 	//      The EnergyPlus v1.2 model for displacement ventilation and cross-ventilation was developed
-	//      by Guilherme Carrilho da Graça and Paul Linden of the Department of Mechanical and Aerospace
+	//      by Guilherme Carrilho da Graï¿½a and Paul Linden of the Department of Mechanical and Aerospace
 	//      Engineering, University of California, San Diego.
 
 	//      The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department
@@ -228,213 +215,15 @@ main(int argc, const char * argv[])
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
-    
-    ///////// Added for CLI /////////////////////////////
-    ezOptionParser opt;
-    
-    opt.overview =  "*******************************************\n";
-    opt.overview += "Copyright (C) 1996-2014 \n"; // Add owners of copyright?
-    opt.overview += "Web: www.energyplus.gov\n";
-    opt.overview += VerString;
-    opt.overview += "\n*******************************************\n";
-    opt.syntax = "./EnergyPlus -df InputFile.idf -i Energy+.idd -w WeatherFile.epw -o OutFile.csv";
-    
-    opt.add(
-            "", // Default.
-            0, // Required?
-            1, // Number of args expected.
-            0, // Delimiter if expecting multiple args.
-            "Usage information displayed on top", // Help description.
-            "-h",     // Flag token.
-            "-help",  // Flag token.
-            "--help", // Flag token.
-            "--usage" // Flag token.
-            );
-    
-    opt.add(
-            "",
-            0,
-            1,
-            0,
-            "Options to get version control",
-            "-v",
-            "--v",
-            "-version",
-            "--version"
-            );
-    
-    opt.add(
-            "in.idf",
-            0,
-            1,
-            0,
-            "Input file to process",
-            "-df",
-            "--df"
-            //"--in",
-            //"--input"
-            );
-    
-    opt.add(
-            "in.epw",
-            0,
-            1,
-            0,
-            "Input weather file to process",
-            "-w",
-            "-wea",
-            "--w",
-            "--wea"
-            );
-    
-    opt.add(
-            "Energy+.idd",
-            0,
-            1,
-            0,
-            "Input energy file to process",
-            "-i",
-            "-in",
-            "--i",
-            "--in"
-            );
-    
-    opt.add(
-            "eplustbl.csv",
-            0,
-            1,
-            0,
-            "Output file",
-            "-o",
-            "-out",
-            "--o",
-            "--out"
-            );
-    
+	// CLI module
+	using namespace options;
 
-    opt.parse(argc, argv);
-    //if(argv[1]==0) cout<<"No arguments provided"<<endl;
-    
-    std::string usage;
-    
-	if (opt.isSet("-h")) {
-		opt.getUsage(usage);
-        std::cout << usage;
-		return 1;
-	}
-    
-    if (opt.isSet("-v")) {
-		cout << VerString << endl;
-		return 1;
-    }
-    
-    std::vector<std::string> badOptions;
-    if(!opt.gotExpected(badOptions)) {
-		for(int i=0; i < badOptions.size(); ++i)
-			cerr << "ERROR: Got unexpected number of arguments for option " << badOptions[i] << ".\n\n";
-        
-		opt.getUsage(usage);
-		cout << usage;
-		return -1;
-	}
-    
-/*	if(!opt.gotRequired(badOptions)) {
-		for(int i=0; i < badOptions.size(); ++i)
-			std::cerr << "ERROR: Missing required option " << badOptions[i] << ".\n\n";
-	//	Usage(opt);
-        opt.getUsage(usage);
-		return 1;
-	}
-    
-    std::vector<std::string> badArgs;
-    if(!opt.gotValid(badOptions, badArgs)) {
-        for(int i=0; i < badOptions.size(); ++i)
-            std::cerr << "ERROR: Got invalid argument \"" << badArgs[i] << "\" for option " << badOptions[i] << ".\n\n";
-        
-        //Usage(opt);
-        return 1;
-    }
-    
-    if (opt.lastArgs.size() < 2) {
-        cout << "Zeroth argument = " << argv[0] << '\t'<< argv[1] << '\t'<< argv[2] << endl;
-		cerr << "\n\n-------------------------------------------\n";
-        cerr << "** EnergyPlus in default configuration **\n";
-        cerr << "-------------------------------------------\n";
-		Usage(opt);
-	}
- */ // gotRequired, gotValid and lastArgs.size() options aren't working at the moment.
-    
-    Usage(opt); //Ugly at the moment
-    
     int status = 0;
-    std::istream* instream;
-    std::string input_filename;
-    std::string input_weatherFile;
-    std::string input_energyFile;
-    std::string output_File;
-    std::ifstream input;
-    std::ifstream input1;
-    std::ifstream input2;
-    
-    if (opt.isSet("-df")) {
-		opt.get("-df")->getString(input_filename);
-        input.open( input_filename.c_str() );
-        instream = &input;
-        std::cout << "\n\n====================================================================== \n";
-        std::cout << "-- Input file request by the user = " << input_filename << std::endl;
-        if (!input) {
-            status = -1;
-            std::cerr << "\n -X- Error opening input file = " << input_filename << " -X- \n";
-            std::cerr << " -X- Exiting -X- \n" ;
-            return -1;
-        }
-    }
-    
-    if (opt.isSet("-w")) {
-		opt.get("-w")->getString(input_weatherFile);
-        input1.open( input_weatherFile.c_str() );
-        instream = &input1;
-        std::cout << "====================================================================== \n";
-        std::cout << "-- Weather file requested by the user = " << input_weatherFile << std::endl;
-        if (!input1) {
-            status = -1;
-            std::cerr << "\n -X- Error opening weather file =  " << input_weatherFile << " -X- \n";
-            std::cerr << " -X- Exiting -X- \n";
-            return -1;
-        }
-    }
-    
-    if (opt.isSet("-i")) {
-		opt.get("-i")->getString(input_energyFile);
-        input2.open( input_energyFile.c_str() );
-        instream = &input2;
-        std::cout << "====================================================================== \n";
-        std::cout << "-- Energy file requested by the user = " << input_energyFile << std::endl;
-        std::cout << "====================================================================== ";
-        if (!input2) {
-            status = -1;
-            std::cerr << "\n -X- Error opening energy file =  " << input_energyFile << " -X- \n";
-            std::cerr << " -X- Exiting -X- \n";
-            return -1;
-        }
-    }
-    
-    if (opt.isSet("-o")) {
-		opt.get("-o")->getString(output_File);
-        std::ofstream output;
-        output.open( output_File.c_str() );
-        std::cout << "====================================================================== \n";
-        std::cout << "-- Output to be stored in file = " << output_File << std::endl;
-        std::cout << "====================================================================== ";
-        if (!output) {
-            status = -1;
-            std::cerr << "\n -X- Error opening output file =  " << output_File << " -X- \n";
-            std::cerr << " -X- Exiting -X- \n";
-            return -1;
-        }
-    }
-    
-    /////////////////////////////////////////////////////
+    status = ProcessArgs(argc, argv);
+    if(status == 1 || status == -1)
+    	return 0;
+	//ProcessArgs(argc, argv);
+
 
 // Enable floating point exceptions
 #ifndef NDEBUG
@@ -587,7 +376,7 @@ main(int argc, const char * argv[])
 		// Relying on compiler to supply full path name here
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
 		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == string::npos ) {
+		if ( TempIndx == std::string::npos ) {
 			CurrentWorkingFolder = "";
 		} else {
 			CurrentWorkingFolder.erase( TempIndx + 1 );
@@ -609,25 +398,7 @@ main(int argc, const char * argv[])
 	//Call ProcessInput to produce the IDF file which is read by all of the
 	// Get input routines in the rest of the simulation
 
-   if(input_filename.empty())
-        input_filename = "in.idf";
-    
-    inputFileName = assign(input_filename);
-    
-    if(input_weatherFile.empty())
-        input_weatherFile = "in.epw";
-    
-    inputWeatherFile = assignWFile(input_weatherFile);
-    
-    if(input_energyFile.empty())
-        input_energyFile = "Energy+.idd";
-    
-    inputEnergyFile = assignEFile(input_energyFile);
-    
-    if(output_File.empty())
-        output_File = "eplustbl.csv";
-    
-    outputFile = assignOFile(output_File);
+
     
 	ProcessInput();
 
