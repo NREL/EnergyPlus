@@ -1296,7 +1296,7 @@ namespace DataPlantPipingSystems {
 		bool DomainNeedsToBeMeshed;
 		bool IsActuallyPartOfAHorizontalTrench;
 		bool HasAPipeCircuit;
-		bool IsZoneCoupled;
+		bool IsZoneCoupledSlab;
 		bool HasCoupledBasement;
 		// "Input" data structure variables
 		MeshExtents Extents;
@@ -1373,7 +1373,7 @@ namespace DataPlantPipingSystems {
 			DomainNeedsToBeMeshed( true ),
 			IsActuallyPartOfAHorizontalTrench( false ),
 			HasAPipeCircuit( true ),
-			IsZoneCoupled( false ),
+			IsZoneCoupledSlab( false ),
 			HasCoupledBasement( false ), 
 			HasBasement( false ),
 			ZoneCoupledOSCMIndex( 0 ),
@@ -1433,7 +1433,7 @@ namespace DataPlantPipingSystems {
 			bool const DomainNeedsToBeMeshed,
 			bool const IsActuallyPartOfAHorizontalTrench,
 			bool const HasAPipeCircuit,
-			bool const IsZoneCoupled,
+			bool const IsZoneCoupledSlab,
 			bool const HasCoupledBasement,
 			MeshExtents const & Extents,
 			MeshProperties const & Mesh,
@@ -1496,7 +1496,7 @@ namespace DataPlantPipingSystems {
 
 			FArray3< CartesianCell > const & Cells			
 		) :
-		Name( Name ),
+			Name( Name ),
 			CircuitNames( CircuitNames ),
 			CircuitIndeces( CircuitIndeces ),
 			MaxIterationsPerTS( MaxIterationsPerTS ),
@@ -1507,7 +1507,7 @@ namespace DataPlantPipingSystems {
 			DomainNeedsToBeMeshed( DomainNeedsToBeMeshed ),
 			IsActuallyPartOfAHorizontalTrench( IsActuallyPartOfAHorizontalTrench ),
 			HasAPipeCircuit( HasAPipeCircuit ),
-			IsZoneCoupled( IsZoneCoupled ),
+			IsZoneCoupledSlab( IsZoneCoupledSlab ),
 			HasCoupledBasement( HasCoupledBasement ),
 			Extents( Extents ),
 			Mesh( Mesh ),
