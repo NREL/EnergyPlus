@@ -1898,7 +1898,7 @@ namespace CondenserLoopTowers {
 				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume Flow Rate [m3/s]", SimpleTowerReport( TowerNum ).TankSupplyVdot, "System", "Average", SimpleTower( TowerNum ).Name );
 				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume [m3]", SimpleTowerReport( TowerNum ).TankSupplyVol, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
 				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume Flow Rate [m3/s]", SimpleTowerReport( TowerNum ).StarvedMakeUpVdot, "System", "Average", SimpleTower( TowerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume [m3]", SimpleTowerReport( TowerNum ).StarvedMakeUpVol, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume [m3]", SimpleTowerReport( TowerNum ).StarvedMakeUpVol, "System", "Sum", SimpleTower( TowerNum ).Name );
 				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume [m3]", SimpleTowerReport( TowerNum ).StarvedMakeUpVol, "System", "Sum", SimpleTower( TowerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
 			} else { // tower water from mains and gets metered
 				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate [m3/s]", SimpleTowerReport( TowerNum ).MakeUpVdot, "System", "Average", SimpleTower( TowerNum ).Name );
