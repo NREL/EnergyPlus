@@ -21,6 +21,14 @@ set( test_dependencies
   epfmiimport 
 )
 
+if(CMAKE_HOST_UNIX)
+  if(NOT APPLE)
+    list(APPEND test_dependencies dl )
+  endif()
+endif()
+
+
+
 # Executable name will be EnergyPlus_tests
 # Execute EnergyPlus_tests --help for options using gtest runner
 # Execute EnergyPlus_tests with no arguments to run all tests
