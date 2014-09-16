@@ -1,6 +1,12 @@
 #ifndef ExternalInterface_hh_INCLUDED
 #define ExternalInterface_hh_INCLUDED
 
+// FMI-Related Headers
+extern "C" {
+#include <FMI/main.h>
+}
+
+
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
@@ -17,10 +23,6 @@
 // Objexx Headers
 #include <ObjexxFCL/FArray1D.hh>
 
-// FMI-Related Headers
-extern "C" {
-#include <FMI/main.h>
-}
 
 namespace EnergyPlus {
 
@@ -246,7 +248,6 @@ namespace ExternalInterface {
 			LenWorkingFolder( 0 ), 
 			LenWorkingFolder_wLib( 0 )
 		{
-			//TODO: initialize TYPE (C_PTR)
 			//fmiStatus, Index, and arrays not initialized in default constructor
 		}
 

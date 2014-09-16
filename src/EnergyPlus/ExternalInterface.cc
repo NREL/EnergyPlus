@@ -1,3 +1,11 @@
+// FMI-Related Headers
+extern "C" {
+#include <FMI/main.h>
+#include <BCVTB/utilSocket.h>
+#include <BCVTB/utilXml.h>
+}
+
+
 // C++ Headers
 #include <string>
 
@@ -22,12 +30,6 @@
 #include <UtilityRoutines.hh>
 #include <DisplayRoutines.hh>
 
-// FMI-Related Headers
-extern "C" {
-#include <FMI/main.h>
-#include <BCVTB/utilSocket.h>
-#include <BCVTB/utilXml.h>
-}
 
 namespace EnergyPlus {
 
@@ -683,51 +685,87 @@ namespace ExternalInterface {
 				} else {
 					// Get from FMUs, values that will be set in EnergyPlus (Schedule)
 
-					// TODO: The arguments are trying to do FORTRAN array member transformations
-					//FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( FMU( i ).Instance( j ).fmicomponent,
-																	//FMU( i ).Instance( j ).fmuOutputVariableSchedule.ValueReference,
-																	//FMU( i ).Instance( j ).fmuOutputVariableSchedule.RealVarValue,
-																	//FMU( i ).Instance( j ).NumOutputVariablesSchedule,
-																	//FMU( i ).Instance( j ).Index );
+					if ( size( FMU(i).Instance(j).fmuOutputVariableSchedule ) > 0 ) {
 
-					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
-						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
-						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
-						ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						// generate vectors here first
+						std::vector<unsigned int> valueReferenceVec;
+						std::vector<Real64> realVarValueVec;
+						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
+							valueReferenceVec.push_back( FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).ValueReference );
+							realVarValueVec.push_back( FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).RealVarValue );
+						}
+					
+						// pass in the vectors as pointers to the first member of the vector
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec[0], &realVarValueVec[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
+						
+						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
+							FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).ValueReference = valueReferenceVec[x-1];
+							FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).RealVarValue = realVarValueVec[x-1];
+						}
+
+						if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+							ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
+							ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+							ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
+
 					}
 
-					// Get from FMUs, values that will be set in EnergyPlus (Variable)
-					// TODO: The arguments are trying to do FORTRAN array member transformations
-					//FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( FMU( i ).Instance( j ).fmicomponent,
-																	//FMU( i ).Instance( j ).fmuOutputVariableVariable.ValueReference,
-																	//FMU( i ).Instance( j ).fmuOutputVariableVariable.RealVarValue,
-																	//FMU( i ).Instance( j ).NumOutputVariablesVariable,
-																	//FMU( i ).Instance( j ).Index );
+					// generate vectors here first
+					if ( size(FMU(i).Instance(j).fmuOutputVariableVariable) > 0 ) {
+						
+						std::vector<unsigned int> valueReferenceVec2;
+						std::vector<Real64> realVarValueVec2;
+						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
+							valueReferenceVec2.push_back( FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).ValueReference );
+							realVarValueVec2.push_back( FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).RealVarValue );
+						}
+					
+						// pass in the vectors as pointers to the first member of the vector
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec2[0], &realVarValueVec2[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
 
-					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
-						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
-						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
-						ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
+							FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).ValueReference = valueReferenceVec2[x-1];
+							FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).RealVarValue = realVarValueVec2[x-1];
+						}
+
+						if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+							ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
+							ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+							ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
+
 					}
 
-					// Get from FMUs, values that will be set in EnergyPlus (Actuator)
-					// TODO: The arguments are trying to do FORTRAN array member transformations
-					//FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( FMU( i ).Instance( j ).fmicomponent, &
-																	//FMU( i ).Instance( j ).fmuOutputVariableActuator.ValueReference, &
-																	//FMU( i ).Instance( j ).fmuOutputVariableActuator.RealVarValue, &
-																	//FMU( i ).Instance( j ).NumOutputVariablesActuator, &
-																	//FMU( i ).Instance( j ).Index );
+					if ( size( FMU( i ).Instance( j ).fmuOutputVariableActuator ) > 0 ) {
 
-					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
-						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
-						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
-						ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						// generate vectors here first
+						std::vector<unsigned int> valueReferenceVec3;
+						std::vector<Real64> realVarValueVec3;
+						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
+							valueReferenceVec3.push_back( FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).ValueReference );
+							realVarValueVec3.push_back( FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).RealVarValue );
+						}
+					
+						// pass in the vectors as pointers to the first member of the vector
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec3[0], &realVarValueVec3[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
+
+						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
+							FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).ValueReference = valueReferenceVec3[x-1];
+							FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).RealVarValue = realVarValueVec3[x-1];
+						}
+
+						if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
+							ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to get outputs" );
+							ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
+							ShowContinueError( "Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 					}
 				}
 
@@ -761,12 +799,20 @@ namespace ExternalInterface {
 				}
 
 				if ( ! FlagReIni ) {
-					// TODO: The arguments are trying to do FORTRAN array member transformations
-					//FMU( i ).Instance( j ).fmistatus = fmiEPlusSetReal( FMU( i ).Instance( j ).fmicomponent,
-																//FMU( i ).Instance( j ).fmuInputVariable.ValueReference,
-																//FMU( i ).Instance( j ).eplusOutputVariable.RTSValue,
-																//FMU( i ).Instance( j ).NumInputVariablesInIDF,
-																//FMU( i ).Instance( j ).Index );
+					
+					// generate vectors here first
+					std::vector<unsigned int> valueReferenceVec4;
+					for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
+						valueReferenceVec4.push_back( FMU( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
+					}
+					
+					std::vector<Real64> rtsValueVec4;
+					for ( int x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+						rtsValueVec4.push_back( FMU( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
+					}
+					
+					FMU( i ).Instance( j ).fmistatus = fmiEPlusSetReal( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec4[0], &rtsValueVec4[0], &FMU( i ).Instance( j ).NumInputVariablesInIDF, &FMU( i ).Instance( j ).Index );
+					
 					if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
 						ShowSevereError( "ExternalInterface/GetSetVariablesAndDoStepFMUImport: Error when trying to set inputs" );
 						ShowContinueError( "in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"" );
@@ -983,25 +1029,13 @@ namespace ExternalInterface {
 			ValidateRunControl();
 			FMU.allocate( NumFMUObjects );
 
-			// Add the fmus root folder name to the current working folder /currentWorkingFolder/tmp-fmus/... (9-characters)
-			// preprocess to prepare for library call
-			auto FMUWorkingFolderCharArr( getCharArrayFromString( FMURootWorkingFolder ) );
-			auto CurWorkingFolderCharArr( getCharArrayFromString( CurrentWorkingFolder ) );
-			int lenCurFolder( len( CurrentWorkingFolder ) );
-			
-			// make the library call
-			retValue = addFMURootFolderName( &FMUWorkingFolderCharArr[0], &CurWorkingFolderCharArr[0], &lenCurFolder );
-			
+			// there used to be code in here to apply the root working folder to create an absolute path
+			// however, this wasn't working, as the root working folder was coming back empty
+			// in any case, the relative paths work fine here
+
 			// post process as needed in case these are used later
-			FMURootWorkingFolder = getStringFromCharArray( FMUWorkingFolderCharArr );
-			CurrentWorkingFolder = getStringFromCharArray( CurWorkingFolderCharArr );
-			
-			if ( retValue != 0 ) {
-				ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: FMU root folder" );
-				ShowContinueError( "could not be added to working directory." );
-				ErrorsFound = true;
-				StopExternalInterfaceIfError();
-			}
+			FMURootWorkingFolder = "tmp-fmus";
+			FMURootWorkingFolder += pathChar; //getStringFromCharArray( FMUWorkingFolderCharArr );
 
 			// Get and store the names of all FMUs in EnergyPlus data structure
 			strippedFileName.allocate( NumFMUObjects );
@@ -1148,9 +1182,6 @@ namespace ExternalInterface {
 					// make the library call
 					FMU( i ).Instance( j ).Index = model_ID_GUID( &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).NumInputVariablesInFMU, &FMU( i ).Instance( j ).NumOutputVariablesInFMU );
 					
-					// post process in case args are used later
-					FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
-					
 					if ( FMU( i ).Instance( j ).Index < 0 ) {
 						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
 						ShowContinueError( "get the model ID and model GUID" );
@@ -1162,15 +1193,14 @@ namespace ExternalInterface {
 
 					// get the path to the binaries
 					// preprocess args for library call
+					FMU(i).Instance(j).WorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder + "                                                                                           ";
 					auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
-					workingFolderArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder );
-					
+
 					// make the library call
 					retValfmiPathLib = addLibPathCurrentWorkingFolder( &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).Index );
 					
 					// post process args in case they are used later
 					FMU( i ).Instance( j ).WorkingFolder_wLib = getStringFromCharArray( workingFolderWithLibArr );
-					FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
 					
 					if ( retValfmiPathLib != 0 ) {
 						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
@@ -1187,13 +1217,12 @@ namespace ExternalInterface {
 					// determine the FMI version
 					// preprocess args for library call
 					workingFolderWithLibArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib );
-					auto VersionNumArr( getCharArrayFromString( FMU( i ).Instance( j ).fmiVersionNumber ) );
+					auto VersionNumArr( getCharArrayFromString( "   " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
 					
 					// make the library call
-					retValfmiVersion = getfmiEPlusVersion( &workingFolderWithLibArr[0], &FMU( i ).Instance( j ).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU( i ).Instance( j ).Index );
+					retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
 					
 					// post process in case args are used later
-					FMU( i ).Instance( j ).WorkingFolder_wLib = getStringFromCharArray( workingFolderWithLibArr );
 					FMU( i ).Instance( j ).fmiVersionNumber = getStringFromCharArray( VersionNumArr );
 					
 					if ( retValfmiVersion != 0 ) {
@@ -1427,7 +1456,7 @@ namespace ExternalInterface {
 							auto NameCharArr( getCharArrayFromString( FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name ) );
 							int tempLength( len( FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name ) );
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).ValueReference = getValueReferenceByNameFMUOutputVariables( &NameCharArr[0], &tempLength, &FMU( i ).Instance( j ).Index );
-							FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name = getStringFromCharArray( NameCharArr );
+							//FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).Name = getStringFromCharArray( NameCharArr );
 							
 							if ( FMU( i ).Instance( j ).fmuOutputVariableVariable( k ).ValueReference == -999 ) {
 								ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to get the value reference of the FMU output variable" );
@@ -1666,13 +1695,7 @@ namespace ExternalInterface {
 		int const IntegerVar( 1 ); // Integer variable
 		int const RealVar( 2 ); // Real variable
 
-		// INTERFACES
-		//INTEGER FUNCTION fmiGetReal(fmiComponent, valRef, fmuVariableValue, numOutputs, index) BIND (C, NAME="fmiEPlusGetReal")
-		//INTEGER FUNCTION fmiSetReal(fmiComponent, valRef, fmuVariableValue, numInputs, index) BIND (C, NAME="fmiEPlusSetReal")
-		//INTEGER FUNCTION fmiDoStep(fmiComponent, curCommPoint, commStepSize, newStep, index) BIND (C, NAME="fmiEPlusDoStep")
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		int i, j, k, l; // Loop counter
 		int retVal; // Return value of function call, used for error handling
 		int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
@@ -1799,12 +1822,20 @@ namespace ExternalInterface {
 					// Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
 					for ( i = 1; i <= NumFMUObjects; ++i ) {
 						for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
-							// Doing member transformation still, need to convert to const <> []
-							//FMU( i ).Instance( j ).fmistatus = fmiEPlusSetReal( FMU( i ).Instance( j ).fmicomponent,
-																				//FMU( i ).Instance( j ).fmuInputVariable.ValueReference,
-																				//FMUTemp( i ).Instance( j ).eplusOutputVariable.RTSValue,
-																				//FMUTemp( i ).Instance( j ).NumInputVariablesInIDF,
-																				//FMU( i ).Instance( j ).Index );
+							
+							std::vector< unsigned int > valRefVec;
+							for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
+								valRefVec.push_back( FMU( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
+							}
+							
+							std::vector< Real64 > rtsValVec;
+							for ( int x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+								rtsValVec.push_back( FMU( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
+							}
+							
+							// make the library call
+							FMU( i ).Instance( j ).fmistatus = fmiEPlusSetReal( &FMU( i ).Instance( j ).fmicomponent, &valRefVec[0], &rtsValVec[0], &FMUTemp( i ).Instance( j ).NumInputVariablesInIDF, &FMU( i ).Instance( j ).Index );
+							
 							if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
 								ShowSevereError( "ExternalInterface/CalcExternalInterfaceFMUImport: Error when trying to set an input value in instance \"" + FMU( i ).Instance( j ).Name + "\"" );
 								ShowContinueError( "of FMU \"" + FMU( i ).Name + "\"; Error Code = \"" + TrimSigDigits( FMU( i ).Instance( j ).fmistatus ) + "\"" );
@@ -1842,12 +1873,19 @@ namespace ExternalInterface {
 				// Set the values that have been saved in the FMUs-- saveFMUStateVariables ()
 				for ( i = 1; i <= NumFMUObjects; ++i ) {
 					for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
-						// TODO: This is trying to do member transformation
-						//FMU( i ).Instance( j ).fmistatus = fmiEPlusSetReal( FMU( i ).Instance( j ).fmicomponent, &
-										//FMUTemp( i ).Instance( j ).fmuInputVariable%ValueReference, &
-										//FMUTemp( i ).Instance( j ).eplusOutputVariable%RTSValue, &
-										//FMUTemp( i ).Instance( j ).NumInputVariablesInIDF, &
-										//FMU( i ).Instance( j ).Index );
+						
+						// make vectors first
+						std::vector< unsigned int > valRefVec;
+						for ( int x = 1; x <= size( FMUTemp( i ).Instance( j ).fmuInputVariable ); x++ ) {
+							valRefVec.push_back( FMUTemp( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
+						}
+						std::vector< Real64 > rtsValVec;
+						for ( int x = 1; x <= size( FMUTemp( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+							rtsValVec.push_back( FMUTemp( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
+						}
+						
+						// make the library call
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusSetReal( &FMU( i ).Instance( j ).fmicomponent, &valRefVec[0], &rtsValVec[0], &FMUTemp( i ).Instance( j ).NumInputVariablesInIDF, &FMU( i ).Instance( j ).Index );
 
 						if ( FMU( i ).Instance( j ).fmistatus != fmiOK ) {
 							ShowSevereError( "ExternalInterface/CalcExternalInterfaceFMUImport: " );
@@ -1979,10 +2017,6 @@ namespace ExternalInterface {
 		int const nDblMax( 1024 ); // Maximum number of doubles
 		int const nIntMax( 0 ); // Maximum number of integers
 		int const nBooMax( 0 ); // Maximum number of booleans
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//INTEGER(C_INT) FUNCTION exchangeDoublesWithSocket(socketFD, flaWri, flaRea, nDblWri, nDblRea, simTimWri, dblValWri, simTimRea, dblValRea) BIND (C, NAME="exchangedoubleswithsocket")
-		//INTEGER(C_INT) FUNCTION exchangeDoublesWithSocketFMU(socketFD, flaWri, flaRea, nDblWri, nDblRea, simTimWri, dblValWri, simTimRea, dblValRea, epexport) BIND (C, NAME="exchangedoubleswithsocketFMU")
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j; // Loop counter
@@ -2156,7 +2190,7 @@ namespace ExternalInterface {
 				keyIndexes.deallocate();
 				NamesOfKeys.deallocate();
 			}
-			if ( ( varType == 0 ) || ( iKey > size( NamesOfKeys ) ) ) {
+			if ( ( varType == 0 ) || ( iKey > numKeys ) ) {
 				ShowSevereError( "ExternalInterface: Simulation model has no variable \"" + varNames( Loop ) + "\" with key \"" + varKeys( Loop ) + "\"." );
 				ErrorsFound = true;
 			}
@@ -2226,15 +2260,15 @@ namespace ExternalInterface {
 	std::vector< char >
 	getCharArrayFromString( std::string const & originalString )
 	{
-		std::vector< char > returnVal( originalString.begin(), originalString.end() );
-		returnVal.push_back( '\0' ); // get null terminated string of chars
-		return returnVal;
+		// c_str returns null terminated, so we don't need a +1?
+		return std::vector< char >( originalString.c_str(), originalString.c_str() + originalString.size() );
 	}
 	
 	std::string
 	getStringFromCharArray( std::vector< char > originalCharArray )
 	{
-		return std::string( originalCharArray.begin(), originalCharArray.end() );
+		originalCharArray.push_back('\0');
+		return std::string( &originalCharArray.front() );
 	}
 
 	//     NOTICE

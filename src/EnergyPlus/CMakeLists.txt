@@ -1,7 +1,7 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 if(MSVC)
-  add_definitions(/Za)
+#  add_definitions(/Za)
 endif()
 
 
@@ -518,7 +518,6 @@ SET( SRC
 ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
 ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
 
-#TARGET_LINK_LIBRARIES( EnergyPlus DElight )
 TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight)
 
 if(CMAKE_HOST_UNIX)

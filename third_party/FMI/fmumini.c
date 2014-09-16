@@ -151,7 +151,7 @@ int mymkdir(dirname)
 }
 
 int makedir (newdir)
-    char *newdir;
+    const char *newdir;
 {
   char *buffer ;
   char *p;
@@ -633,7 +633,7 @@ int unpackmz(const char *filNam, char *tmpPat)
 #ifdef _WIN32   
   _chdir(dirname); // Command in windows 
 #else
-  chdir(dirname); // Command in linux
+  int i_unused = chdir(dirname); // Command in linux
 #endif
 
   ret_value = do_extract(uf, opt_do_extract_withoutpath, opt_overwrite, password); // Extract all files
@@ -643,7 +643,7 @@ int unpackmz(const char *filNam, char *tmpPat)
 #ifdef _WIN32   
   _chdir(cwd); // Command in windows 
 #else
-  chdir(cwd); // Command in linux
+  int j_unused = chdir(cwd); // Command in linux
 #endif
   
   return ret_value;
