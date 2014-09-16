@@ -1181,9 +1181,7 @@ namespace DataSizing {
 		Real64 RetHumRatAtCoolPeak; // design return air hum ratio for cooling [kg water/kg dry air]
 		Real64 OutTempAtCoolPeak; // design outside air temperature for cooling [C]
 		Real64 OutHumRatAtCoolPeak; // design outside air hum ratio for cooling [kg water/kg dry air]
-		int TimeStepAtSensCoolPeak; // time step index for sensible cooling load peak
-		int TimeStepAtTotCoolPeak; // time step index for total cooling load peak
-		int TimeStepAtCoolFlowPeak; // time step index for cooling air flow peak
+		Real64 MassFlowAtCoolPeak; // air mass flow rate at the cooling peak [kg/s]
 		Real64 HeatMixTemp; // design mixed air temperature for heating [C]
 		Real64 HeatMixHumRat; // design mixed air hum ratio for heating [kg water/kg dry air]
 		Real64 HeatRetTemp; // design return air temperature for heating [C]
@@ -1277,9 +1275,7 @@ namespace DataSizing {
 			RetHumRatAtCoolPeak( 0.0 ),
 			OutTempAtCoolPeak( 0.0 ),
 			OutHumRatAtCoolPeak( 0.0 ),
-			TimeStepAtSensCoolPeak( 0 ),
-			TimeStepAtTotCoolPeak( 0 ),
-			TimeStepAtCoolFlowPeak( 0 ),
+			MassFlowAtCoolPeak( 0.0 ),
 			HeatMixTemp( 0.0 ),
 			HeatMixHumRat( 0.0 ),
 			HeatRetTemp( 0.0 ),
@@ -1348,9 +1344,7 @@ namespace DataSizing {
 			Real64 const RetHumRatAtCoolPeak, // design return air hum ratio for cooling [kg water/kg dry air]
 			Real64 const OutTempAtCoolPeak, // design outside air temperature for cooling [C]
 			Real64 const OutHumRatAtCoolPeak, // design outside air hum ratio for cooling [kg water/kg dry air]
-			int const TimeStepAtSensCoolPeak, // time step index for sensible cooling load peak
-			int const TimeStepAtTotCoolPeak, // time step index for total cooling load peak
-			int const TimeStepAtCoolFlowPeak, // time step index for cooling air flow peak
+			Real64 const MassFlowAtCoolPeak, // air mass flow rate at the cooling peak [kg/s]
 			Real64 const HeatMixTemp, // design mixed air temperature for heating [C]
 			Real64 const HeatMixHumRat, // design mixed air hum ratio for heating [kg water/kg dry air]
 			Real64 const HeatRetTemp, // design return air temperature for heating [C]
@@ -1431,9 +1425,7 @@ namespace DataSizing {
 			RetHumRatAtCoolPeak( RetHumRatAtCoolPeak ),
 			OutTempAtCoolPeak( OutTempAtCoolPeak ),
 			OutHumRatAtCoolPeak( OutHumRatAtCoolPeak ),
-			TimeStepAtSensCoolPeak( TimeStepAtSensCoolPeak ),
-			TimeStepAtTotCoolPeak( TimeStepAtTotCoolPeak ),
-			TimeStepAtCoolFlowPeak( TimeStepAtCoolFlowPeak ),
+			MassFlowAtCoolPeak( MassFlowAtCoolPeak ),
 			HeatMixTemp( HeatMixTemp ),
 			HeatMixHumRat( HeatMixHumRat ),
 			HeatRetTemp( HeatRetTemp ),
@@ -1468,8 +1460,11 @@ namespace DataSizing {
 	{
 		// Members
 		int SensCoolPeakDD; // design day containing the sensible cooling peak
-		int TotCoolPeakDD;
-		int CoolFlowPeakDD;
+		int TotCoolPeakDD; // design day containing total cooling peak
+		int CoolFlowPeakDD; // design day containing the cooling air flow peak
+		FArray1D< int > TimeStepAtSensCoolPk; // time step of the sensible cooling peak
+		FArray1D< int > TimeStepAtTotCoolPk; // time step of the total cooling peak
+		FArray1D< int > TimeStepAtCoolFlowPk; // time step of the cooling air flow peak
 
 		// Default Constructor
 		SysSizPeakDDNumData() :
@@ -1482,11 +1477,17 @@ namespace DataSizing {
 		SysSizPeakDDNumData(
 			int const SensCoolPeakDD, // design day containing the sensible cooling peak
 			int const TotCoolPeakDD, // design day containing total cooling peak
-			int const CoolFlowPeakDD
+			int const CoolFlowPeakDD, // design day containing the cooling air flow peak
+			FArray1< int > const & TimeStepAtSensCoolPk, // time step of the sensible cooling peak
+			FArray1< int > const & TimeStepAtTotCoolPk, // time step of the total cooling peak
+			FArray1< int > const & TimeStepAtCoolFlowPk // time step of the cooling air flow peak
 			) :
 			SensCoolPeakDD( SensCoolPeakDD ),
 			TotCoolPeakDD( TotCoolPeakDD ),
-			CoolFlowPeakDD( CoolFlowPeakDD )
+			CoolFlowPeakDD( CoolFlowPeakDD ),
+			TimeStepAtSensCoolPk( TimeStepAtSensCoolPk ),
+			TimeStepAtTotCoolPk( TimeStepAtTotCoolPk ),
+			TimeStepAtCoolFlowPk( TimeStepAtCoolFlowPk )
 		{}
 
 	};
@@ -1685,6 +1686,7 @@ namespace DataSizing {
 	extern FArray1D< PlantSizingData > PlantSizData; // Input data array for plant sizing
 	extern FArray1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
 	extern FArray1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
+	extern FArray1D< SysSizPeakDDNumData > SysSizPeakDDNum; // data array for peak des day indices
 
 } // DataSizing
 

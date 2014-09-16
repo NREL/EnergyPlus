@@ -732,6 +732,7 @@
 	inline MA1c_double SenCreditToZoneEnergy() const { return ma( &T::SenCreditToZoneEnergy ); }
 	inline MA1c_double SenCreditToZoneRate() const { return ma( &T::SenCreditToZoneRate ); }
 	inline MA1c_double SensCoolCap() const { return ma( &T::SensCoolCap ); }
+	inline MA1c_double TotCoolCap( ) const { return ma( &T::TotCoolCap ); }
 	inline MA1c_double SensCoolEnergyRate() const { return ma( &T::SensCoolEnergyRate ); }
 	inline MA1c_double SensCoolingEnergy() const { return ma( &T::SensCoolingEnergy ); }
 	inline MA1c_double SensCoolingEnergyRate() const { return ma( &T::SensCoolingEnergyRate ); }
@@ -1321,6 +1322,7 @@
 	inline MA1_double SenCreditToZoneEnergy() { return ma( &T::SenCreditToZoneEnergy ); }
 	inline MA1_double SenCreditToZoneRate() { return ma( &T::SenCreditToZoneRate ); }
 	inline MA1_double SensCoolCap() { return ma( &T::SensCoolCap ); }
+	inline MA1_double TotCoolCap( ) { return ma( &T::TotCoolCap ); }
 	inline MA1_double SensCoolEnergyRate() { return ma( &T::SensCoolEnergyRate ); }
 	inline MA1_double SensCoolingEnergy() { return ma( &T::SensCoolingEnergy ); }
 	inline MA1_double SensCoolingEnergyRate() { return ma( &T::SensCoolingEnergyRate ); }

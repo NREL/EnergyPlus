@@ -3566,6 +3566,8 @@ namespace SimAirServingZones {
 		SysSizing.allocate( NumPrimaryAirSys, TotDesDays + TotRunDesPersDays );
 		FinalSysSizing.allocate( NumPrimaryAirSys );
 		CalcSysSizing.allocate( NumPrimaryAirSys );
+		SysSizPeakDDNum.allocate( NumPrimaryAirSys );
+
 
 		for ( DesDayEnvrnNum = 1; DesDayEnvrnNum <= TotDesDays + TotRunDesPersDays; ++DesDayEnvrnNum ) {
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
@@ -3802,6 +3804,13 @@ namespace SimAirServingZones {
 			CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).SysHeatOutTempSeq = 0.0;
 			CalcSysSizing( AirLoopNum ).SysHeatOutHumRatSeq = 0.0;
+
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtSensCoolPk.allocate( TotDesDays + TotRunDesPersDays );
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtTotCoolPk.allocate( TotDesDays + TotRunDesPersDays );
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtCoolFlowPk.allocate( TotDesDays + TotRunDesPersDays );
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtSensCoolPk = 0;
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtTotCoolPk = 0;
+			SysSizPeakDDNum( AirLoopNum ).TimeStepAtCoolFlowPk = 0;
 
 			if ( AnyEnergyManagementSystemInModel ) {
 
@@ -4665,17 +4674,39 @@ namespace SimAirServingZones {
 
 				// get the maximum system sensible cooling capacity
 				if ( SysSensCoolCap > SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap ) {
-					SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap = SysSensCoolCap;
-					SysSizing( AirLoopNum, CurOverallSimDay ).MixTempAtCoolPeak = SysCoolMixTemp;
-					SysSizing( AirLoopNum, CurOverallSimDay ).MixHumRatAtCoolPeak = SysCoolMixHumRat;
-					SysSizing( AirLoopNum, CurOverallSimDay ).RetTempAtCoolPeak = SysCoolRetTemp;
-					SysSizing( AirLoopNum, CurOverallSimDay ).RetHumRatAtCoolPeak = SysCoolRetHumRat;
-					SysSizing( AirLoopNum, CurOverallSimDay ).OutTempAtCoolPeak = OutDryBulbTemp;
-					SysSizing( AirLoopNum, CurOverallSimDay ).OutHumRatAtCoolPeak = OutHumRat;
+					SysSizPeakDDNum( AirLoopNum ).TimeStepAtSensCoolPk( CurOverallSimDay ) = TimeStepInDay;
+					if ( SysSizing( AirLoopNum, CurOverallSimDay ).CoolingPeakLoadType == SensibleCoolingLoad ) {
+						SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap = SysSensCoolCap;
+						SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap = SysTotCoolCap;
+						SysSizing( AirLoopNum, CurOverallSimDay ).MixTempAtCoolPeak = SysCoolMixTemp;
+						SysSizing( AirLoopNum, CurOverallSimDay ).MixHumRatAtCoolPeak = SysCoolMixHumRat;
+						SysSizing( AirLoopNum, CurOverallSimDay ).RetTempAtCoolPeak = SysCoolRetTemp;
+						SysSizing( AirLoopNum, CurOverallSimDay ).RetHumRatAtCoolPeak = SysCoolRetHumRat;
+						SysSizing( AirLoopNum, CurOverallSimDay ).OutTempAtCoolPeak = OutDryBulbTemp;
+						SysSizing( AirLoopNum, CurOverallSimDay ).OutHumRatAtCoolPeak = OutHumRat;
+						SysSizing( AirLoopNum, CurOverallSimDay ).MassFlowAtCoolPeak = SysSizing( AirLoopNum, CurOverallSimDay ).CoolFlowSeq( TimeStepInDay );
+					}
+				}
+				// get the maximum system total cooling capacity
+				if ( SysTotCoolCap > SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap ) {
+					SysSizPeakDDNum( AirLoopNum ).TimeStepAtTotCoolPk( CurOverallSimDay ) = TimeStepInDay;
+					if ( SysSizing( AirLoopNum, CurOverallSimDay ).CoolingPeakLoadType == TotalCoolingLoad ) {
+						SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap = SysSensCoolCap;
+						SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap = SysTotCoolCap;
+						SysSizing( AirLoopNum, CurOverallSimDay ).MixTempAtCoolPeak = SysCoolMixTemp;
+						SysSizing( AirLoopNum, CurOverallSimDay ).MixHumRatAtCoolPeak = SysCoolMixHumRat;
+						SysSizing( AirLoopNum, CurOverallSimDay ).RetTempAtCoolPeak = SysCoolRetTemp;
+						SysSizing( AirLoopNum, CurOverallSimDay ).RetHumRatAtCoolPeak = SysCoolRetHumRat;
+						SysSizing( AirLoopNum, CurOverallSimDay ).OutTempAtCoolPeak = OutDryBulbTemp;
+						SysSizing( AirLoopNum, CurOverallSimDay ).OutHumRatAtCoolPeak = OutHumRat;
+						SysSizing( AirLoopNum, CurOverallSimDay ).MassFlowAtCoolPeak = SysSizing( AirLoopNum, CurOverallSimDay ).CoolFlowSeq( TimeStepInDay );
+					}
 				}
 				// get the maximum cooling mass flow rate
-				SysSizing( AirLoopNum, CurOverallSimDay ).CoinCoolMassFlow = max( SysSizing( AirLoopNum, CurOverallSimDay ).CoinCoolMassFlow, SysSizing( AirLoopNum, CurOverallSimDay ).CoolFlowSeq( TimeStepInDay ) );
-
+				if ( SysSizing( AirLoopNum, CurOverallSimDay ).CoolFlowSeq( TimeStepInDay ) > SysSizing( AirLoopNum, CurOverallSimDay ).CoinCoolMassFlow ) {
+					SysSizing( AirLoopNum, CurOverallSimDay ).CoinCoolMassFlow = SysSizing( AirLoopNum, CurOverallSimDay ).CoolFlowSeq( TimeStepInDay );
+					SysSizPeakDDNum( AirLoopNum ).TimeStepAtCoolFlowPk( CurOverallSimDay ) = TimeStepInDay;
+				}
 				SysHeatRetTemp = 0.0;
 				OutAirFrac = 0.0;
 				SysHeatMixTemp = 0.0;
@@ -5304,23 +5335,58 @@ namespace SimAirServingZones {
 				for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
 
 					if ( SysSizing( AirLoopNum, DDNum ).SensCoolCap > CalcSysSizing( AirLoopNum ).SensCoolCap ) {
-						CalcSysSizing( AirLoopNum ).DesCoolVolFlow = SysSizing( AirLoopNum, DDNum ).DesCoolVolFlow;
-						CalcSysSizing( AirLoopNum ).CoolDesDay = SysSizing( AirLoopNum, DDNum ).CoolDesDay;
+						SysSizPeakDDNum( AirLoopNum ).SensCoolPeakDD = DDNum;
+						if ( SysSizing( AirLoopNum, DDNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
+							CalcSysSizing( AirLoopNum ).DesCoolVolFlow = SysSizing( AirLoopNum, DDNum ).DesCoolVolFlow;
+							CalcSysSizing( AirLoopNum ).CoolDesDay = SysSizing( AirLoopNum, DDNum ).CoolDesDay;
+							// CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( AirLoopNum, DDNum ).CoinCoolMassFlow;
+							CalcSysSizing( AirLoopNum ).MassFlowAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MassFlowAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).SensCoolCap = SysSizing( AirLoopNum, DDNum ).SensCoolCap;
+							CalcSysSizing( AirLoopNum ).TotCoolCap = SysSizing( AirLoopNum, DDNum ).TotCoolCap;
+							CalcSysSizing( AirLoopNum ).CoolFlowSeq = SysSizing( AirLoopNum, DDNum ).CoolFlowSeq;
+							CalcSysSizing( AirLoopNum ).SensCoolCapSeq = SysSizing( AirLoopNum, DDNum ).SensCoolCapSeq;
+							CalcSysSizing( AirLoopNum ).TotCoolCapSeq = SysSizing( AirLoopNum, DDNum ).TotCoolCapSeq;
+							CalcSysSizing( AirLoopNum ).MixTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MixTempAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).RetTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).RetTempAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).MixHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MixHumRatAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).RetHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).RetHumRatAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).OutTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).OutTempAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).OutHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).OutHumRatAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).SysCoolRetTempSeq = SysSizing( AirLoopNum, DDNum ).SysCoolRetTempSeq;
+							CalcSysSizing( AirLoopNum ).SysCoolRetHumRatSeq = SysSizing( AirLoopNum, DDNum ).SysCoolRetHumRatSeq;
+							CalcSysSizing( AirLoopNum ).SysCoolOutTempSeq = SysSizing( AirLoopNum, DDNum ).SysCoolOutTempSeq;
+							CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = SysSizing( AirLoopNum, DDNum ).SysCoolOutHumRatSeq;
+						}
+					}
+
+					if ( SysSizing( AirLoopNum, DDNum ).TotCoolCap > CalcSysSizing( AirLoopNum ).TotCoolCap ) {
+						SysSizPeakDDNum( AirLoopNum ).TotCoolPeakDD = DDNum;
+						if ( SysSizing( AirLoopNum, DDNum ).CoolingPeakLoadType == TotalCoolingLoad ) {
+							CalcSysSizing( AirLoopNum ).DesCoolVolFlow = SysSizing( AirLoopNum, DDNum ).DesCoolVolFlow;
+							CalcSysSizing( AirLoopNum ).CoolDesDay = SysSizing( AirLoopNum, DDNum ).CoolDesDay;
+							// CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( AirLoopNum, DDNum ).CoinCoolMassFlow;
+							CalcSysSizing( AirLoopNum ).MassFlowAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MassFlowAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).SensCoolCap = SysSizing( AirLoopNum, DDNum ).SensCoolCap;
+							CalcSysSizing( AirLoopNum ).TotCoolCap = SysSizing( AirLoopNum, DDNum ).TotCoolCap;
+							CalcSysSizing( AirLoopNum ).CoolFlowSeq = SysSizing( AirLoopNum, DDNum ).CoolFlowSeq;
+							CalcSysSizing( AirLoopNum ).SensCoolCapSeq = SysSizing( AirLoopNum, DDNum ).SensCoolCapSeq;
+							CalcSysSizing( AirLoopNum ).TotCoolCapSeq = SysSizing( AirLoopNum, DDNum ).TotCoolCapSeq;
+							CalcSysSizing( AirLoopNum ).MixTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MixTempAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).RetTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).RetTempAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).MixHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MixHumRatAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).RetHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).RetHumRatAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).OutTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).OutTempAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).OutHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).OutHumRatAtCoolPeak;
+							CalcSysSizing( AirLoopNum ).SysCoolRetTempSeq = SysSizing( AirLoopNum, DDNum ).SysCoolRetTempSeq;
+							CalcSysSizing( AirLoopNum ).SysCoolRetHumRatSeq = SysSizing( AirLoopNum, DDNum ).SysCoolRetHumRatSeq;
+							CalcSysSizing( AirLoopNum ).SysCoolOutTempSeq = SysSizing( AirLoopNum, DDNum ).SysCoolOutTempSeq;
+							CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = SysSizing( AirLoopNum, DDNum ).SysCoolOutHumRatSeq;
+						}
+					}
+
+					if ( SysSizing( AirLoopNum, DDNum ).CoinCoolMassFlow > CalcSysSizing( AirLoopNum ).CoinCoolMassFlow ) {
 						CalcSysSizing( AirLoopNum ).CoinCoolMassFlow = SysSizing( AirLoopNum, DDNum ).CoinCoolMassFlow;
-						CalcSysSizing( AirLoopNum ).SensCoolCap = SysSizing( AirLoopNum, DDNum ).SensCoolCap;
-						CalcSysSizing( AirLoopNum ).CoolFlowSeq = SysSizing( AirLoopNum, DDNum ).CoolFlowSeq;
-						CalcSysSizing( AirLoopNum ).SensCoolCapSeq = SysSizing( AirLoopNum, DDNum ).SensCoolCapSeq;
-						CalcSysSizing( AirLoopNum ).TotCoolCapSeq = SysSizing( AirLoopNum, DDNum ).TotCoolCapSeq;
-						CalcSysSizing( AirLoopNum ).MixTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MixTempAtCoolPeak;
-						CalcSysSizing( AirLoopNum ).RetTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).RetTempAtCoolPeak;
-						CalcSysSizing( AirLoopNum ).MixHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).MixHumRatAtCoolPeak;
-						CalcSysSizing( AirLoopNum ).RetHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).RetHumRatAtCoolPeak;
-						CalcSysSizing( AirLoopNum ).OutTempAtCoolPeak = SysSizing( AirLoopNum, DDNum ).OutTempAtCoolPeak;
-						CalcSysSizing( AirLoopNum ).OutHumRatAtCoolPeak = SysSizing( AirLoopNum, DDNum ).OutHumRatAtCoolPeak;
-						CalcSysSizing( AirLoopNum ).SysCoolRetTempSeq = SysSizing( AirLoopNum, DDNum ).SysCoolRetTempSeq;
-						CalcSysSizing( AirLoopNum ).SysCoolRetHumRatSeq = SysSizing( AirLoopNum, DDNum ).SysCoolRetHumRatSeq;
-						CalcSysSizing( AirLoopNum ).SysCoolOutTempSeq = SysSizing( AirLoopNum, DDNum ).SysCoolOutTempSeq;
-						CalcSysSizing( AirLoopNum ).SysCoolOutHumRatSeq = SysSizing( AirLoopNum, DDNum ).SysCoolOutHumRatSeq;
+						SysSizPeakDDNum( AirLoopNum ).CoolFlowPeakDD = DDNum;
 					}
 
 					if ( SysSizing( AirLoopNum, DDNum ).HeatCap > CalcSysSizing( AirLoopNum ).HeatCap ) {
@@ -5357,6 +5423,7 @@ namespace SimAirServingZones {
 				OutAirFrac = 0.0;
 				SysCoolMixTemp = 0.0;
 				SysSensCoolCap = 0.0;
+				SysTotCoolCap = 0.0;
 				CoolTimeStepNum = 0;
 				CoolDDNum = 0;
 				OutAirTemp = 0.0;
@@ -5399,6 +5466,9 @@ namespace SimAirServingZones {
 					SysCoolMixHumRat = OutAirHumRat * OutAirFrac + SysCoolRetHumRat * ( 1.0 - OutAirFrac );
 					SysSensCoolCap = PsyCpAirFnWTdb( constant_zero, constant_twenty ) * CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow * ( SysCoolMixTemp - CalcSysSizing( AirLoopNum ).CoolSupTemp );
 					SysSensCoolCap = max( 0.0, SysSensCoolCap );
+					SysTotCoolCap = CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow * ( PsyHFnTdbW( SysCoolMixTemp, SysCoolMixHumRat ) -
+						PsyHFnTdbW( CalcSysSizing( AirLoopNum ).CoolSupTemp, CalcSysSizing( AirLoopNum ).CoolSupHumRat ) );
+					SysTotCoolCap = max( 0.0, SysTotCoolCap );
 				}
 
 				SysHeatRetTemp = 0.0;
@@ -5495,6 +5565,7 @@ namespace SimAirServingZones {
 					// But first check to see if the noncoincident result is actually bigger than the coincident (for 100% outside air)
 					if ( ! ( FinalSysSizing( AirLoopNum ).CoolOAOption == 1 && SysSensCoolCap <= 0.0 ) ) {
 						CalcSysSizing( AirLoopNum ).SensCoolCap = SysSensCoolCap;
+						CalcSysSizing( AirLoopNum ).TotCoolCap = SysTotCoolCap;
 						CalcSysSizing( AirLoopNum ).MixTempAtCoolPeak = SysCoolMixTemp;
 						CalcSysSizing( AirLoopNum ).RetTempAtCoolPeak = SysCoolRetTemp;
 						CalcSysSizing( AirLoopNum ).MixHumRatAtCoolPeak = SysCoolMixHumRat;
@@ -5531,6 +5602,7 @@ namespace SimAirServingZones {
 			FinalSysSizing.DesHeatVolFlow() = CalcSysSizing.DesHeatVolFlow();
 			FinalSysSizing.DesCoolVolFlow() = CalcSysSizing.DesCoolVolFlow();
 			FinalSysSizing.SensCoolCap() = CalcSysSizing.SensCoolCap();
+			FinalSysSizing.TotCoolCap() = CalcSysSizing.TotCoolCap();
 			FinalSysSizing.HeatCap() = CalcSysSizing.HeatCap();
 			FinalSysSizing.PreheatCap() = CalcSysSizing.PreheatCap();
 			FinalSysSizing.MixTempAtCoolPeak() = CalcSysSizing.MixTempAtCoolPeak();
@@ -5647,7 +5719,10 @@ namespace SimAirServingZones {
 						FinalSysSizing( AirLoopNum ).MixHumRatAtCoolPeak = FinalSysSizing( AirLoopNum ).OutHumRatAtCoolPeak * OutAirFrac + FinalSysSizing( AirLoopNum ).RetHumRatAtCoolPeak * ( 1.0 - OutAirFrac );
 						FinalSysSizing( AirLoopNum ).SensCoolCap = PsyCpAirFnWTdb( constant_zero, constant_twenty ) * RhoAir * FinalSysSizing( AirLoopNum ).DesCoolVolFlow * ( FinalSysSizing( AirLoopNum ).MixTempAtCoolPeak - FinalSysSizing( AirLoopNum ).CoolSupTemp );
 						FinalSysSizing( AirLoopNum ).SensCoolCap = max( 0.0, FinalSysSizing( AirLoopNum ).SensCoolCap );
-
+						FinalSysSizing( AirLoopNum ).TotCoolCap = RhoAir * FinalSysSizing( AirLoopNum ).DesCoolVolFlow * 
+							( PsyHFnTdbW( FinalSysSizing( AirLoopNum ).MixTempAtCoolPeak, FinalSysSizing( AirLoopNum ).MixHumRatAtCoolPeak ) - 
+							PsyHFnTdbW( FinalSysSizing( AirLoopNum ).CoolSupTemp, FinalSysSizing( AirLoopNum ).CoolSupHumRat ) );
+						FinalSysSizing( AirLoopNum ).TotCoolCap = max( 0.0, FinalSysSizing( AirLoopNum ).TotCoolCap );
 					}
 
 					// take account of the user input system flow rates and alter the zone flow rates to match
