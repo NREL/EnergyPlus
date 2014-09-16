@@ -1359,6 +1359,8 @@ namespace DataPlantPipingSystems {
 		bool SimTimestepFlag;
 		bool SimHourlyFlag;
 		Real64 ZoneCoupledSurfaceTemp;
+		Real64 BasementWallTemp;
+		Real64 BasementFloorTemp;
 
 		// Main 3D cells array
 		FArray3D< CartesianCell > Cells;
@@ -1416,7 +1418,9 @@ namespace DataPlantPipingSystems {
 			InsulationZIndex( 0 ),
 			SimTimestepFlag( false ),
 			SimHourlyFlag( false ),
-			ZoneCoupledSurfaceTemp ( 0.0 )
+			ZoneCoupledSurfaceTemp( 0.0 ),
+			BasementWallTemp( 0.0 ),
+			BasementFloorTemp( 0.0 )
 
 		{}
 
@@ -1493,6 +1497,8 @@ namespace DataPlantPipingSystems {
 			bool const SimTimestepFlag,
 			bool const SimHourlyFlag,
 			Real64 ZoneCoupledSurfaceTemp,
+			Real64 BasementWallTemp,
+			Real64 BasementFloorTemp,
 
 			FArray3< CartesianCell > const & Cells			
 		) :
@@ -1567,6 +1573,8 @@ namespace DataPlantPipingSystems {
 			SimTimestepFlag( SimTimestepFlag ),
 			SimHourlyFlag( SimHourlyFlag ),
 			ZoneCoupledSurfaceTemp( ZoneCoupledSurfaceTemp ),
+			BasementWallTemp( BasementWallTemp ),
+			BasementFloorTemp( BasementFloorTemp ),
 			Cells( Cells )
 		{}
 

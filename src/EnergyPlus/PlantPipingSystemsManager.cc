@@ -1838,6 +1838,9 @@ namespace PlantPipingSystemsManager {
 			// Domain name
 			PipingSystemDomains( DomainNum ).Name = Domain( BasementCtr ).ObjName;
 
+			// setup output variables
+			SetupZoneCoupledOutputVariables( BasementCtr );
+
 			//Add error-handling for perimeter insulation width
 
 		}
@@ -2576,10 +2579,19 @@ namespace PlantPipingSystemsManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
+		if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+			//Zone-coupled slab outputs
+			SetupOutputVariable( "Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		} else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
+			//Zone-coupled basement wall outputs
+			SetupOutputVariable( "Zone Coupled Basement Wall Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).WallHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "Zone Coupled Basement Wall Temperature [C]", PipingSystemDomains( DomainNum ).BasementWallTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			//Zone-coupled basement floor outputs
+			SetupOutputVariable( "Zone Coupled Basement Floor Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).FloorHeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+			SetupOutputVariable( "Zone Coupled Basement Floor Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
+		}
 
-		SetupOutputVariable( "Zone Coupled Surface Heat Flux [W/m2]", PipingSystemDomains( DomainNum ).HeatFlux, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
-
-		SetupOutputVariable( "Zone Coupled Surface Temperature [C]", PipingSystemDomains( DomainNum ).ZoneCoupledSurfaceTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 
 	}
 
@@ -7628,23 +7640,22 @@ namespace PlantPipingSystemsManager {
 		Real64 const BigNumber( 10000.0 );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 AvgTemp;
 		int OSCMIndex;
 
 		//First the wall
-		AvgTemp = GetAverageTempByType( DomainNum, CellType_BasementWall );
+		PipingSystemDomains( DomainNum ).BasementWallTemp = GetAverageTempByType( DomainNum, CellType_BasementWall );
 		OSCMIndex = PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex;
-		OSCM( OSCMIndex ).TConv = AvgTemp;
+		OSCM( OSCMIndex ).TConv = PipingSystemDomains( DomainNum ).BasementWallTemp;
 		OSCM( OSCMIndex ).HConv = BigNumber;
-		OSCM( OSCMIndex ).TRad = AvgTemp;
+		OSCM( OSCMIndex ).TRad = PipingSystemDomains( DomainNum ).BasementWallTemp;
 		OSCM( OSCMIndex ).HRad = 0.0;
 
 		//Then the floor
-		AvgTemp = GetAverageTempByType( DomainNum, CellType_BasementFloor );
+		PipingSystemDomains( DomainNum ).BasementFloorTemp = GetAverageTempByType( DomainNum, CellType_BasementFloor );
 		OSCMIndex = PipingSystemDomains( DomainNum ).BasementZone.FloorBoundaryOSCMIndex;
-		OSCM( OSCMIndex ).TConv = AvgTemp;
+		OSCM( OSCMIndex ).TConv = PipingSystemDomains( DomainNum ).BasementFloorTemp;
 		OSCM( OSCMIndex ).HConv = BigNumber;
-		OSCM( OSCMIndex ).TRad = AvgTemp;
+		OSCM( OSCMIndex ).TRad = PipingSystemDomains( DomainNum ).BasementFloorTemp;
 		OSCM( OSCMIndex ).HRad = 0.0;
 
 	}
