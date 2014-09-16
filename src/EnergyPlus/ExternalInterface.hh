@@ -248,7 +248,6 @@ namespace ExternalInterface {
 			LenWorkingFolder( 0 ), 
 			LenWorkingFolder_wLib( 0 )
 		{
-			//TODO: initialize TYPE (C_PTR)
 			//fmiStatus, Index, and arrays not initialized in default constructor
 		}
 

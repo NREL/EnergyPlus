@@ -1029,27 +1029,13 @@ namespace ExternalInterface {
 			ValidateRunControl();
 			FMU.allocate( NumFMUObjects );
 
-			// Add the fmus root folder name to the current working folder /currentWorkingFolder/tmp-fmus/... (9-characters)
-			// preprocess to prepare for library call
-			//std::vector< char > FMUWorkingFolderCharArr;
-			
-			// so, CurrentWorkingFolder isn't being properly set in main.cc
-			//auto CurWorkingFolderCharArr( getCharArrayFromString( CurrentWorkingFolder ) );
-			//int lenCurFolder( len( CurrentWorkingFolder ) );
-			
-			// make the library call
-			//retValue = addFMURootFolderName( &FMUWorkingFolderCharArr[0], &CurWorkingFolderCharArr[0], &lenCurFolder );
-			
+			// there used to be code in here to apply the root working folder to create an absolute path
+			// however, this wasn't working, as the root working folder was coming back empty
+			// in any case, the relative paths work fine here
+
 			// post process as needed in case these are used later
 			FMURootWorkingFolder = "tmp-fmus";
 			FMURootWorkingFolder += pathChar; //getStringFromCharArray( FMUWorkingFolderCharArr );
-			
-			//if ( retValue != 0 ) {
-				//ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: FMU root folder" );
-				//ShowContinueError( "could not be added to working directory." );
-				//ErrorsFound = true;
-				//StopExternalInterfaceIfError();
-			//}
 
 			// Get and store the names of all FMUs in EnergyPlus data structure
 			strippedFileName.allocate( NumFMUObjects );
@@ -1196,9 +1182,6 @@ namespace ExternalInterface {
 					// make the library call
 					FMU( i ).Instance( j ).Index = model_ID_GUID( &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).NumInputVariablesInFMU, &FMU( i ).Instance( j ).NumOutputVariablesInFMU );
 					
-					// post process in case args are used later
-					//FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
-					
 					if ( FMU( i ).Instance( j ).Index < 0 ) {
 						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
 						ShowContinueError( "get the model ID and model GUID" );
@@ -1212,14 +1195,12 @@ namespace ExternalInterface {
 					// preprocess args for library call
 					FMU(i).Instance(j).WorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder + "                                                                                           ";
 					auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
-					//workingFolderArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder );
-					
+
 					// make the library call
 					retValfmiPathLib = addLibPathCurrentWorkingFolder( &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).Index );
 					
 					// post process args in case they are used later
 					FMU( i ).Instance( j ).WorkingFolder_wLib = getStringFromCharArray( workingFolderWithLibArr );
-					//FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
 					
 					if ( retValfmiPathLib != 0 ) {
 						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
@@ -1236,13 +1217,12 @@ namespace ExternalInterface {
 					// determine the FMI version
 					// preprocess args for library call
 					workingFolderWithLibArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib );
-					auto VersionNumArr( getCharArrayFromString( "      " ) );
+					auto VersionNumArr( getCharArrayFromString( "   " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
 					
 					// make the library call
 					retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
 					
 					// post process in case args are used later
-					//FMU( i ).Instance( j ).WorkingFolder_wLib = getStringFromCharArray( workingFolderWithLibArr );
 					FMU( i ).Instance( j ).fmiVersionNumber = getStringFromCharArray( VersionNumArr );
 					
 					if ( retValfmiVersion != 0 ) {
@@ -1715,13 +1695,7 @@ namespace ExternalInterface {
 		int const IntegerVar( 1 ); // Integer variable
 		int const RealVar( 2 ); // Real variable
 
-		// INTERFACES
-		//INTEGER FUNCTION fmiGetReal(fmiComponent, valRef, fmuVariableValue, numOutputs, index) BIND (C, NAME="fmiEPlusGetReal")
-		//INTEGER FUNCTION fmiSetReal(fmiComponent, valRef, fmuVariableValue, numInputs, index) BIND (C, NAME="fmiEPlusSetReal")
-		//INTEGER FUNCTION fmiDoStep(fmiComponent, curCommPoint, commStepSize, newStep, index) BIND (C, NAME="fmiEPlusDoStep")
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
 		int i, j, k, l; // Loop counter
 		int retVal; // Return value of function call, used for error handling
 		int NumAlphas( 0 ); // Number of Alphas for each GetObjectItem call
@@ -2043,10 +2017,6 @@ namespace ExternalInterface {
 		int const nDblMax( 1024 ); // Maximum number of doubles
 		int const nIntMax( 0 ); // Maximum number of integers
 		int const nBooMax( 0 ); // Maximum number of booleans
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//INTEGER(C_INT) FUNCTION exchangeDoublesWithSocket(socketFD, flaWri, flaRea, nDblWri, nDblRea, simTimWri, dblValWri, simTimRea, dblValRea) BIND (C, NAME="exchangedoubleswithsocket")
-		//INTEGER(C_INT) FUNCTION exchangeDoublesWithSocketFMU(socketFD, flaWri, flaRea, nDblWri, nDblRea, simTimWri, dblValWri, simTimRea, dblValRea, epexport) BIND (C, NAME="exchangedoubleswithsocketFMU")
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j; // Loop counter
