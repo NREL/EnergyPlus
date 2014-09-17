@@ -97,15 +97,6 @@ endif()
 install( FILES idd/Energy+.idd DESTINATION ./ )
 
 if( BUILD_PACKAGE )
-  set(CPACK_INSTALL_CMAKE_PROJECTS
-    "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
-  )
-
-  if( BUILD_FORTRAN )
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
-  endif()
-
   include(CPack.cmake)
 endif()
 
