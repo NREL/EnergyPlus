@@ -6656,11 +6656,9 @@ Label1000: ;
 				}
 			} else {
 				if ( SchedPtr != 0 ) {
-					ZoneScheduled = ZoneScheduled;
 					ZoneUnscheduled = false;
 				} else {
 					ZoneScheduled = false;
-					ZoneUnscheduled = ZoneUnscheduled;
 				}
 			}
 
