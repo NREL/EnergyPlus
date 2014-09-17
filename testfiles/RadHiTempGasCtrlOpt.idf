@@ -2111,8 +2111,8 @@
     RadiantPanelAvailSched,  !- Availability Schedule Name
     West Zone,               !- Zone Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    10000,                   !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    10000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     NaturalGas,              !- Fuel Type
     0.85,                    !- Combustion Efficiency
@@ -2139,8 +2139,8 @@
     RadiantPanelAvailSched,  !- Availability Schedule Name
     EAST ZONE,               !- Zone Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    10000,                   !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    10000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     NaturalGas,              !- Fuel Type
     0.8,                     !- Combustion Efficiency
@@ -2167,8 +2167,8 @@
     RadiantPanelAvailSched,  !- Availability Schedule Name
     NORTH ZONE,              !- Zone Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    15000,                   !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    15000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     NaturalGas,              !- Fuel Type
     0.9,                     !- Combustion Efficiency

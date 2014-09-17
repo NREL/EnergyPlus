@@ -536,8 +536,8 @@
     Main Zone Baseboard,     !- Name
     System Availability Schedule,  !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    8000,                    !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    8000,                    !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.97;                    !- Efficiency
 

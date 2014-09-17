@@ -1673,8 +1673,8 @@
     Zone1BBHWInletNode,      !- Inlet Node Name
     Zone1BBHWOutletNode,     !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     500.,                    !- U-Factor Times Area Value {W/K}
     0.0013,                  !- Maximum Water Flow Rate {m3/s}
@@ -1686,8 +1686,8 @@
     Zone2BBHWInletNode,      !- Inlet Node Name
     Zone2BBHWOutletNode,     !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     500.,                    !- U-Factor Times Area Value {W/K}
     0.0012,                  !- Maximum Water Flow Rate {m3/s}
@@ -1699,8 +1699,8 @@
     Zone3BBHWInletNode,      !- Inlet Node Name
     Zone3BBHWOutletNode,     !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     500.,                    !- U-Factor Times Area Value {W/K}
     0.0013,                  !- Maximum Water Flow Rate {m3/s}

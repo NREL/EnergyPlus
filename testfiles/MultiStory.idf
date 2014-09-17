@@ -904,8 +904,8 @@
     Gnd West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -1164,8 +1164,8 @@
     Gnd Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -1440,8 +1440,8 @@
     Gnd East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -1727,8 +1727,8 @@
     Mid West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -1987,8 +1987,8 @@
     Mid Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -2263,8 +2263,8 @@
     Mid East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -2550,8 +2550,8 @@
     Top West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -2810,8 +2810,8 @@
     Top Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
@@ -3086,8 +3086,8 @@
     Top East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 

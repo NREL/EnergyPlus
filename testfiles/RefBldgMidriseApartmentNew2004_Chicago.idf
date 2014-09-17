@@ -9297,17 +9297,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:02,        !- AirLoop Name
@@ -9326,17 +9334,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:03,        !- AirLoop Name
@@ -9355,17 +9371,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:04,        !- AirLoop Name
@@ -9384,17 +9408,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:05,        !- AirLoop Name
@@ -9413,17 +9445,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:06,        !- AirLoop Name
@@ -9442,17 +9482,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:07,        !- AirLoop Name
@@ -9471,17 +9519,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:08,        !- AirLoop Name
@@ -9500,17 +9556,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:09,        !- AirLoop Name
@@ -9529,17 +9593,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:10,        !- AirLoop Name
@@ -9558,17 +9630,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:11,        !- AirLoop Name
@@ -9587,17 +9667,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:12,        !- AirLoop Name
@@ -9616,17 +9704,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:13,        !- AirLoop Name
@@ -9645,17 +9741,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:14,        !- AirLoop Name
@@ -9674,17 +9778,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:15,        !- AirLoop Name
@@ -9703,17 +9815,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:16,        !- AirLoop Name
@@ -9732,17 +9852,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:17,        !- AirLoop Name
@@ -9761,17 +9889,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:18,        !- AirLoop Name
@@ -9790,17 +9926,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:19,        !- AirLoop Name
@@ -9819,17 +9963,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:20,        !- AirLoop Name
@@ -9848,17 +10000,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:21,        !- AirLoop Name
@@ -9877,17 +10037,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:22,        !- AirLoop Name
@@ -9906,17 +10074,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:23,        !- AirLoop Name
@@ -9935,17 +10111,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Sizing:System,
     SPLITSYSTEMAC:24,        !- AirLoop Name
@@ -9964,17 +10148,25 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    0.0,                     !- Cooling Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    0.0,                     !- Heating Design Air Flow Rate {m3/s} {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
-    ;                        !- System Outdoor Air Method
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    ,                        !- System Outdoor Air Method
+    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
+    ,                        !- Cooling Design Capacity Method
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
+    ,                        !- Heating Design Capacity Method
+    ,                        !- Heating Design Capacity {W} {m3/s}
+    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
 
   Controller:OutdoorAir,
     SPLITSYSTEMAC:01_OA_Controller,  !- Name

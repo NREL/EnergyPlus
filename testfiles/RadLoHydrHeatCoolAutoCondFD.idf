@@ -1383,8 +1383,8 @@
     autosize,                !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     autosize,                !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
@@ -1392,9 +1392,9 @@
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity{ W }
-    ,                        !- Cooling Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Cooling Design Capacity{ -}
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
@@ -1414,8 +1414,8 @@
     autosize,                !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     autosize,                !- Maximum Hot Water Flow {m3/s}
     East Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
@@ -1423,9 +1423,9 @@
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity{ W }
-    ,                        !- Cooling Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Cooling Design Capacity{ -}
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 2 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 2 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
@@ -1445,8 +1445,8 @@
     autosize,                !- Hydronic Tubing Length {m}
     MeanAirTemperature,      !- Temperature Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
     ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     autosize,                !- Maximum Hot Water Flow {m3/s}
     North Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
@@ -1454,9 +1454,9 @@
     2.0,                     !- Heating Control Throttling Range {deltaC}
     Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
-    autosize,                !- Cooling Design Capacity{ W }
-    ,                        !- Cooling Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Cooling Design Capacity{ -}
+    ,                        !- Cooling Design Capacity {W} {m3/s}
+    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
     autosize,                !- Maximum Cold Water Flow {m3/s}
     Zone 3 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 3 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
