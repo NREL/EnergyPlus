@@ -7716,6 +7716,7 @@ namespace SetPointManager {
         AllSetPtMgr( NumAllSetPtMgrs ).NumCtrlNodes = 1;
 
         // Now verify that there is no overlap (no other SPM uses the node of the new setpoint manager)
+        ErrorsFoundinTESSchSetup = false;
         VerifySetPointManagers( ErrorsFoundinTESSchSetup );
         if ( ErrorsFoundinTESSchSetup ) {
             ShowFatalError( "Errors found in verification step of SetUpNewScheduledTESSetPtMgr.  Program terminates." );
