@@ -1387,6 +1387,7 @@ namespace ReportSizingManager {
 						} else if (FinalSysSizing( CurSysNum ).CoolingCapMethod == CoolingDesignCapacity && FinalSysSizing( CurSysNum ).CoolingTotalCapacity > 0.0 ) {
 							NominalCapacityDes = FinalSysSizing( CurSysNum ).CoolingTotalCapacity;
 						} else if ( DesVolFlow >= SmallAirVolFlow ) {
+							OutAirFrac = 0.0;
 							if ( CurOASysNum > 0 ) { // coil is in the OA stream
 								CoilInTemp = FinalSysSizing ( CurSysNum ).CoolOutTemp;
 								CoilInHumRat = FinalSysSizing ( CurSysNum ).CoolOutHumRat;
