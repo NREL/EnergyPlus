@@ -25,11 +25,10 @@
 #include <FluidProperties.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
-#include <OutputReportTabular.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
-//#include <UtilityRoutines.hh>
+#include <UtilityRoutines.hh>
 
 
 int
@@ -37,9 +36,10 @@ main(int argc, const char * argv[])
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
-  	//      NOTICE
 
-	//      Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//      NOTICE
+
+	//      Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -114,11 +114,11 @@ main(int argc, const char * argv[])
 	//      (Conjunction Of Multizone Infiltration Specialists) developed by a multinational, multi-institutional
 	//      effort under the auspices of the International Energy Agency's Buildings and Community Systems Agreement
 	//      working group focusing on multizone air flow modeling (Annex 23) and now administered by the Swiss Federal
-	//      Laboratories for Materials Testing and Research (EMPA), Division 175, ï¿½berlandstrasse 129, CH-8600 Dï¿½bendorf,
+	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Überlandstrasse 129, CH-8600 Dübendorf,
 	//      Switzerland.
 
 	//      The EnergyPlus v1.2 model for displacement ventilation and cross-ventilation was developed
-	//      by Guilherme Carrilho da Graï¿½a and Paul Linden of the Department of Mechanical and Aerospace
+	//      by Guilherme Carrilho da Graça and Paul Linden of the Department of Mechanical and Aerospace
 	//      Engineering, University of California, San Diego.
 
 	//      The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department
@@ -211,7 +211,6 @@ main(int argc, const char * argv[])
 	using namespace InputProcessor;
 	using namespace OutputProcessor;
 	using namespace SimulationManager;
-    using namespace OutputReportTabular;
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
@@ -237,7 +236,7 @@ main(int argc, const char * argv[])
 	// Note: General Parameters for the entire EnergyPlus program are contained
 	// in "DataGlobals.f90"
 	gio::Fmt const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
-	string const BlankString;
+	std::string const BlankString;
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -248,8 +247,8 @@ main(int argc, const char * argv[])
 	// PROGRAM LOCAL VARIABLE DECLARATIONS:
 	int LFN; // Unit Number for reads
 	bool EPlusINI;
-	string::size_type TempIndx;
-	static string cEnvValue;
+	std::string::size_type TempIndx;
+	static std::string cEnvValue;
 	int iostatus;
 	bool FileExists;
 
@@ -356,7 +355,7 @@ main(int argc, const char * argv[])
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
 		// Relying on compiler to supply full path name here
 		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == string::npos ) {
+		if ( TempIndx == std::string::npos ) {
 			CurrentWorkingFolder = "";
 		} else {
 			CurrentWorkingFolder.erase( TempIndx + 1 );
@@ -386,9 +385,9 @@ main(int argc, const char * argv[])
 	}
 	TestAllPaths = true;
 
-    DisplayString( "\n" );
-    DisplayString( "\n" );
-    
+	DisplayString( "EnergyPlus Starting" );
+	DisplayString( VerString );
+
 	OutputFileDebug = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, "eplusout.dbg", flags ); iostatus = flags.ios(); }
 	if ( iostatus != 0 ) {
@@ -398,8 +397,6 @@ main(int argc, const char * argv[])
 	//Call ProcessInput to produce the IDF file which is read by all of the
 	// Get input routines in the rest of the simulation
 
-
-    
 	ProcessInput();
 
 	ManageSimulation();
@@ -420,7 +417,7 @@ main(int argc, const char * argv[])
 }
 
 void
-CreateCurrentDateTimeString( string & CurrentDateTimeString )
+CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 {
 
 	// SUBROUTINE INFORMATION:
@@ -464,7 +461,7 @@ CreateCurrentDateTimeString( string & CurrentDateTimeString )
 	//value(6)   Minutes (0-59)
 	//value(7)   Seconds (0-59)
 	//value(8)   Milliseconds (0-999)
-	string datestring; // supposedly returns blank when no date available.
+	std::string datestring; // supposedly returns blank when no date available.
 
 	date_and_time_string( datestring, _, _, value );
 	if ( ! datestring.empty() ) {
@@ -478,9 +475,9 @@ CreateCurrentDateTimeString( string & CurrentDateTimeString )
 void
 ReadINIFile(
 	int const UnitNumber, // Unit number of the opened INI file
-	string const & Heading, // Heading for the parameters ('[heading]')
-	string const & KindofParameter, // Kind of parameter to be found (String)
-	string & DataOut // Output from the retrieval
+	std::string const & Heading, // Heading for the parameters ('[heading]')
+	std::string const & KindofParameter, // Kind of parameter to be found (String)
+	std::string & DataOut // Output from the retrieval
 )
 {
 
@@ -518,15 +515,15 @@ ReadINIFile(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static string LINE;
-	static string LINEOut;
-	string Param;
-	string::size_type ILB;
-	string::size_type IRB;
-	string::size_type IEQ;
-	string::size_type IPAR;
-	string::size_type IPOS;
-	string::size_type ILEN;
+	static std::string LINE;
+	static std::string LINEOut;
+	std::string Param;
+	std::string::size_type ILB;
+	std::string::size_type IRB;
+	std::string::size_type IEQ;
+	std::string::size_type IPAR;
+	std::string::size_type IPOS;
+	std::string::size_type ILEN;
 	int ReadStat;
 	bool EndofFile;
 	bool Found;
@@ -564,7 +561,7 @@ ReadINIFile(
 		//                                  See if [ and ] are on line
 		ILB = index( LINEOut, '[' );
 		IRB = index( LINEOut, ']' );
-		if ( ILB == string::npos && IRB == string::npos ) continue;
+		if ( ILB == std::string::npos && IRB == std::string::npos ) continue;
 		if ( ! has( LINEOut, '[' + Heading + ']' ) ) continue; // Must be really correct heading line
 
 		//                                  Heading line found, now looking for Kind
@@ -583,14 +580,14 @@ ReadINIFile(
 
 			ILB = index( LINEOut, '[' );
 			IRB = index( LINEOut, ']' );
-			NewHeading = ( ILB != string::npos && IRB != string::npos );
+			NewHeading = ( ILB != std::string::npos && IRB != std::string::npos );
 
 			//                                  Should be a parameter line
 			//                                  KindofParameter = string
 			IEQ = index( LINEOut, '=' );
 			IPAR = index( LINEOut, Param );
-			if ( IEQ == string::npos ) continue;
-			if ( IPAR == string::npos ) continue;
+			if ( IEQ == std::string::npos ) continue;
+			if ( IPAR == std::string::npos ) continue;
 			if ( IPAR != 0 ) continue;
 			if ( ! has( LINEOut, Param + '=' ) ) continue; // needs to be param=
 
@@ -620,6 +617,5 @@ ReadINIFile(
 
 		}
 	}
-    
 
 }
