@@ -103,9 +103,11 @@ public: // Assignment
 	Optional &
 	operator =( Optional const & o )
 	{
-		if ( own_ ) delete ptr_;
-		ptr_ = o.own_ ? new T( o() ) : o.ptr_;
-		own_ = o.own_;
+		if ( this != &o ) {
+			if ( own_ ) delete ptr_;
+			ptr_ = o.own_ ? new T( o() ) : o.ptr_;
+			own_ = o.own_;
+		}
 		return *this;
 	}
 

@@ -111,10 +111,12 @@ public: // Assignment
 	Required &
 	operator =( Required const & r )
 	{
-		if ( own_ ) delete ptr_;
-		ptr_ = r.own_ ? new T( r() ) : r.ptr_;
-		assert( ptr_ != nullptr ); // Required object must be present
-		own_ = r.own_;
+		if ( this != &r ) {
+			if ( own_ ) delete ptr_;
+			ptr_ = r.own_ ? new T( r() ) : r.ptr_;
+			assert( ptr_ != nullptr ); // Required object must be present
+			own_ = r.own_;
+		}
 		return *this;
 	}
 

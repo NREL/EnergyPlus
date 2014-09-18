@@ -58,7 +58,7 @@ public: // Creation
 	 data_( s.data_ ),
 	 size_( s.size_ )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( true )
+	 , const_proxy_( true )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
@@ -68,7 +68,7 @@ public: // Creation
 	 data_( const_cast< T * >( array ) ),
 	 size_( size )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( true )
+	 , const_proxy_( true )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 

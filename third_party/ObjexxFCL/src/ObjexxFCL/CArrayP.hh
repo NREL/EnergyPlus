@@ -77,6 +77,9 @@ public: // Creation
 	 size_( 0 ),
 	 data_( nullptr ),
 	 owner_( true )
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+	 , const_proxy_( false )
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
 	// Copy Constructor
@@ -86,7 +89,7 @@ public: // Creation
 	 data_( a.owner_ ? ( size_ > 0u ? new T[ size_ ] : nullptr ) : a.data_ ),
 	 owner_( a.owner_ )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( ! a.owner_ )
+	 , const_proxy_( ! a.owner_ )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		if ( owner_ ) {
@@ -121,7 +124,7 @@ public: // Creation
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( false )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -139,7 +142,7 @@ public: // Creation
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( false )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -158,7 +161,7 @@ public: // Creation
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( false )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -177,7 +180,7 @@ public: // Creation
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( false )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		if ( size_ > 0u ) {
@@ -197,7 +200,7 @@ public: // Creation
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( false )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
@@ -211,7 +214,7 @@ public: // Creation
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( false )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
@@ -227,7 +230,7 @@ public: // Creation
 	 data_( size_ > 0u ? new T[ size_ ] : nullptr ),
 	 owner_( true )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( false )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{
 		std::copy( l.begin(), l.end(), data_ );

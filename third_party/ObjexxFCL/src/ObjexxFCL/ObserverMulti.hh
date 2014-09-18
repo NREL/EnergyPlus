@@ -59,7 +59,7 @@ protected: // Assignment
 	inline
 	void
 	operator =( ObserverMulti const & )
-	{}
+	{} // observers_p_ is identity, not value, state and is intentionally not assigned
 
 public: // Subject Inspector
 

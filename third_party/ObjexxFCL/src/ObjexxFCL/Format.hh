@@ -1226,14 +1226,14 @@ protected: // Creation
 	 format_( format )
 	{}
 
-	// Constructor
+	// Size Constructor
 	inline
 	FormatGroup( Format * p, Size const r, Format * format = nullptr ) :
 	 FormatCombo( p, r ),
 	 format_( format )
 	{}
 
-	// Constructor
+	// Star Constructor
 	inline
 	FormatGroup( Format * p, char const star, Format * format = nullptr ) :
 	 FormatCombo( p, star ),
@@ -1361,11 +1361,12 @@ public: // Creation
 	 spacer_( false )
 	{}
 
-	// Constructor
+	// Size Constructor
 	inline
 	explicit
 	FormatGroupTop( Size const r, Format * format = nullptr ) :
 	 FormatGroup( nullptr, r, format ),
+	 P_( 0 ),
 	 blank_zero_( false ),
 	 colon_terminated_( false ),
 	 slash_terminated_( false ),
@@ -1377,11 +1378,12 @@ public: // Creation
 	 spacer_( false )
 	{}
 
-	// Constructor
+	// Star Constructor
 	inline
 	explicit
 	FormatGroupTop( char const star, Format * format = nullptr ) :
 	 FormatGroup( nullptr, star, format ),
+	 P_( 0 ),
 	 blank_zero_( false ),
 	 colon_terminated_( false ),
 	 slash_terminated_( false ),
