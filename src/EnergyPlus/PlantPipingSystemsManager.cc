@@ -1671,9 +1671,8 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 			
-			PipingSystemDomains( DomainNum ).HasCoupledBasement = true;
-			PipingSystemDomains( DomainNum ).HasBasement = true;
-
+			
+			
 			
 			//get some convergence tolerances, minimum/maximum are enforced by the IP, along with default values if user left them blank
 			PipingSystemDomains( DomainNum ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
@@ -1833,7 +1832,8 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).IsActuallyPartOfAHorizontalTrench = false;
 			PipingSystemDomains( DomainNum ).HasAPipeCircuit = false;
 			PipingSystemDomains( DomainNum ).IsZoneCoupledSlab = false;
-			PipingSystemDomains( DomainNum ).HasBasement = true;
+			PipingSystemDomains( DomainNum ).HasBasement = false;
+			PipingSystemDomains( DomainNum ).HasCoupledBasement = true;
 
 			// Domain name
 			PipingSystemDomains( DomainNum ).Name = Domain( BasementCtr ).ObjName;
@@ -6735,7 +6735,7 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Update the basement surface temperatures, if any
-			if ( PipingSystemDomains( DomainNum ).HasBasement ) {
+			if (PipingSystemDomains(DomainNum).HasBasement || PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
 				UpdateBasementSurfaceTemperatures( DomainNum );
 			}
 
@@ -6881,31 +6881,12 @@ namespace PlantPipingSystemsManager {
 
 			CurDirection = NeighborFieldCells( DirectionCounter );
 
-			////Zone-coupled slab configuration
-			//if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ){
-			//	//There are a few cases for cells adjacent to adiabatic x- and z- walls to be handled here. Check if the cell is next to one.
-			//	if ( ( CurDirection == Direction_NegativeZ ) && ( ThisCell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
-			//		AdiabaticMultiplier = 2.0;
-			//	}
-			//	else if ( ( CurDirection == Direction_NegativeX ) && ( ThisCell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
-			//		AdiabaticMultiplier = 2.0;
-			//	}
-			//	else {
-			//		AdiabaticMultiplier = 1.0;
-			//	}
-			//	//Use the multiplier to evaluate the transient expression terms
-			//	EvaluateNeighborCharacteristics( DomainNum, ThisCell, CurDirection, NeighborTemp, Resistance );
-			//	Numerator = AdiabaticMultiplier * Numerator + ( Beta / Resistance ) * NeighborTemp;
-			//	Denominator = AdiabaticMultiplier * Denominator + ( Beta / Resistance );
-
-			//}
-			//else{
 				//'evaluate the transient expression terms
 				EvaluateNeighborCharacteristics( DomainNum, ThisCell, CurDirection, NeighborTemp, Resistance );
 				Numerator += ( Beta / Resistance ) * NeighborTemp;
 				Denominator += Beta / Resistance;
 			}
-		//}
+		
 		
 		//'now that we have passed all directions, update the temperature
 		RetVal = Numerator / Denominator;
@@ -7039,6 +7020,7 @@ namespace PlantPipingSystemsManager {
 		GroundCoverCoefficient = PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient;
 
 		//initialize values
+		AdiabaticMultiplier = 1.0;
 		Numerator = 0.0;
 		Denominator = 0.0;
 		Resistance = 0.0;
@@ -7056,22 +7038,7 @@ namespace PlantPipingSystemsManager {
 		for ( DirectionCounter = lbound( NeighborFieldCells, 1 ); DirectionCounter <= ubound( NeighborFieldCells, 1 ); ++DirectionCounter ) {
 			CurDirection = NeighborFieldCells( DirectionCounter );
 
-			//For Zone-Coupled slab or basement configuration
-			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasCoupledBasement	){
-				//We have adiabatic z- and x-faces, check if the cell is adjacent to one
-			/*	if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
-					AdiabaticMultiplier = 2.0;
-				}
-				else if ( ( CurDirection == Direction_NegativeX ) && ( cell.X_index == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) ) ) {
-					AdiabaticMultiplier = 2.0;
-				}
-				else {
-					AdiabaticMultiplier = 1.0;
-				}*/
-				
-				AdiabaticMultiplier = 1.0;
-			}
-			else{
+			if ( PipingSystemDomains( DomainNum ).HasBasement ){
 				//We have adiabatic z-faces, check if we are adjacent to one in the opposite direction
 				if ( ( CurDirection == Direction_NegativeZ ) && ( cell.Z_index == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) ) {
 					AdiabaticMultiplier = 2.0;
@@ -7098,34 +7065,27 @@ namespace PlantPipingSystemsManager {
 			if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab || PipingSystemDomains( DomainNum ).HasCoupledBasement ){
 				//-x-direction will always be a farfield boundary
 				//-z will also be a farfield boundary
-				//+x and +z will be handled above since they are adiabatic faces
+				//+x and +z will be handled above 
 				//-y will always be a neighbor cell, so it is handled above
 				//+y will always be the outdoor air
 				{ auto const SELECT_CASE_var( CurDirection );
-				if ( SELECT_CASE_var == Direction_NegativeX ) {
+				if ( SELECT_CASE_var == Direction_NegativeX || SELECT_CASE_var == Direction_NegativeZ ) {
 					// always farfield
 					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 					Numerator += ( Beta / Resistance ) * NeighborTemp;
 					Denominator += ( Beta / Resistance );
-				}
-				else if ( SELECT_CASE_var == Direction_NegativeZ ) {
-					// always farfield
-					EvaluateFarfieldCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
-					Numerator += ( Beta / Resistance ) * NeighborTemp;
-					Denominator += ( Beta / Resistance );
-				}
-				else if ( SELECT_CASE_var == Direction_PositiveY ) {
+				} else if ( SELECT_CASE_var == Direction_PositiveY ) {
 					// convection at the surface
 					if ( WindSpeed > 0.1 ) {
 						Resistance = 208.0 / ( AirDensity * AirSpecificHeat * WindSpeed * ThisNormalArea );
 						Numerator += ( Beta / Resistance ) * PipingSystemDomains( DomainNum ).Cur.CurAirTemp;
 						Denominator += ( Beta / Resistance );
 					}
-				}
-				else if ( SELECT_CASE_var == Direction_NegativeY ) {
+				} else if ( SELECT_CASE_var == Direction_NegativeY ) {
 					//debug error, can't get here!
 				}}
 			}
+			//FHX model
 			else{
 				//x-direction will always be a farfield boundary
 				//z-direction will be handled above -- adiabatic
