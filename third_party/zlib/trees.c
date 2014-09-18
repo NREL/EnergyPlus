@@ -1103,7 +1103,7 @@ local void compress_block(s, ltree, dtree)
             code = d_code(dist);
             Assert (code < D_CODES, "bad d_code");
 
-            send_code(s, code, dtree);       /* send the distance code */
+            send_code(s, (long)code, dtree);       /* send the distance code */
             extra = extra_dbits[code];
             if (extra != 0) {
                 dist -= base_dist[code];

@@ -716,11 +716,11 @@ static void XMLCALL startElement(void *context, const char *elm, const char **at
     int size;
     el = checkElement(elm);  //Get the index of element
     printfDebug("startElement():%s\n", elm);
-    printfDebug("*** starting element %s\n", elmNames[el]);
     if (el==-1) { 
       printDebug("Error!"); 
       return; // error
     }
+    printfDebug("*** starting element %s\n", elmNames[el]);
     skipData = (el != elm_Name); // skip element content for all elements but Name
 
     switch(getAstNodeType(el)){

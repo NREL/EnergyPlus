@@ -127,7 +127,7 @@ EPstart(void *data, const char *el, const char **attr)
   } 
   if( 0 == strcmp(el, "EnergyPlus") ) {
     if( 0 == source){
-      for(i=0; attr[i]; i++)i=i; 
+      for(i=0; attr[i]; i++){}
       if (i != 4) {
         fprintf(stderr, "Error: Variable configuration file invalid.\n"
                         "       Expected two attribute values for source\n"
@@ -164,7 +164,7 @@ EPstart(void *data, const char *el, const char **attr)
       *numOutputVars = *numOutputVars + 1;
     }
     else if( 1 == source) {
-      for( i=0; attr[i]; i++)i=i; 
+      for( i=0; attr[i]; i++){} 
       if( 2 != i ){
         fprintf(stderr, "Error: Expecting one input variable in one\n"
                         "       element in xml file.\n");
@@ -264,6 +264,7 @@ int getepvariables( char*  const fileName,
   p = XML_ParserCreate(NULL);
   if(!p){
     fprintf(stderr, "Error: Could not allocate memory for parser in function 'getepvariables'.\n");
+    fclose(fd);
     return -1;
   }
   
@@ -398,6 +399,7 @@ int getepvariablesFMU( char*  const fileName,
   p = XML_ParserCreate(NULL);
   if(!p){
     fprintf(stderr, "Error: Could not allocate memory for parser in function 'getepvariables'.\n");
+    fclose(fd);
     return -1;
   }
   
@@ -572,13 +574,16 @@ getxmlvalues(char* const fileName,
   p = XML_ParserCreate(NULL);
   if (!p) {
     fprintf(stderr, "Error: Could not allocate memory for parser in function 'getxmlvalue'.\n");
+    fclose(fd);
     return -1;
   }
   i=2; j=0;
-  if(!exp || '\0' == exp[0]) 
-    return -1;
-  if( exp[0] != '/' || exp[1] != '/')
-    return -1;
+  if(!exp || '\0' == exp[0]) {
+    fclose(fd);
+    return -1; }
+  if( exp[0] != '/' || exp[1] != '/') {
+    fclose(fd);
+    return -1; }
 
   temp = NULL;
   while(exp[i] != '\0'){
@@ -906,6 +911,7 @@ int check_variable_cfg_Validate(char* const fileName){
                     "       check_variable_cfg_Validate"
                     "       when parsing file '%s'. \n"
                     "       Program aborting.\n", fileName);
+    free(dtdFileName);
     return -1;
   }
 
@@ -913,15 +919,22 @@ int check_variable_cfg_Validate(char* const fileName){
   dtdF = fopen(dtdFileName, "r");
   if( NULL == dtdF ){
     fprintf(stderr, "Error: Cannot open '%s'.\n", dtdFileName);
+    free(command);
+    free(dtdFileName);
     return -1;
   }
   else fclose(dtdF);
   sprintf(command, "java -jar \"%s%s\" \"%s\" \"%s%s\"", 
                     BCVTB_HOME, jarPath, fileName, BCVTB_HOME, xmlPath);
   ret = system(command);
-  if( ret != 0) 
+  if( ret != 0) {
+    free(command);
+    free(dtdFileName);
     return -1;
-  else 
+  } else {
+    free(command);
+    free(dtdFileName);
     return 0;
+  }
 }
 

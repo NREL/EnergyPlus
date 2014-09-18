@@ -562,7 +562,7 @@ int unpackmz(const char *filNam, char *tmpPat)
     unzFile uf=NULL;                 
 
     printDebug("Start Minizip\n");
-    if (zipfilename!=NULL)
+    if (zipfilename)
     {
 
 #     ifdef USEWIN32IOAPI
@@ -588,6 +588,11 @@ int unpackmz(const char *filNam, char *tmpPat)
           uf = unzOpen64(filename_try);
 #       endif
       }
+    }
+    else
+    {
+      printf("Null zipfilename pointer, aborting\n");
+      return 1;
     }
 
     if (uf==NULL)
