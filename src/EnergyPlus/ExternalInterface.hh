@@ -386,6 +386,9 @@ namespace ExternalInterface {
 	Real64
 	GetCurSimStartTimeSeconds();
 
+	std::string
+	trim(std::string const& str);
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

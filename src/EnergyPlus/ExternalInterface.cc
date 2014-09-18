@@ -1156,92 +1156,101 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).LenWorkingFolder = FMU( i ).Instance( j ).WorkingFolder.length();
 					// unpack fmus
 					// preprocess arguments for library call
-					auto fullFileNameArr( getCharArrayFromString( fullFileName( i ) ) );
-					auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
-					int lenFileName( len( fullFileName( i ) ) );
+					{
+						auto fullFileNameArr( getCharArrayFromString( fullFileName( i ) ) );
+						auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
+						int lenFileName( len( fullFileName( i ) ) );
 					
-					// make the library call
-					retVal = fmiEPlusUnpack( &fullFileNameArr[0], &workingFolderArr[0], &lenFileName, &FMU( i ).Instance( j ).LenWorkingFolder );
+						// make the library call
+						retVal = fmiEPlusUnpack( &fullFileNameArr[0], &workingFolderArr[0], &lenFileName, &FMU( i ).Instance( j ).LenWorkingFolder );
 					
-					// post process in case args are used later
-					fullFileName( i ) = getStringFromCharArray( fullFileNameArr );
-					FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
+						// post process in case args are used later
+						fullFileName( i ) = getStringFromCharArray( fullFileNameArr );
+						FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
 					
-					if ( retVal != 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "unpack the FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "Check if the FMU exists. Also check if the FMU folder is not write protected." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( retVal != 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "unpack the FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "Check if the FMU exists. Also check if the FMU folder is not write protected." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 					}
 
-					// determine modelID and modelGUID of all FMU instances
-					// preprocess arguments for library call
-					workingFolderArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder );
+					{
+						// determine modelID and modelGUID of all FMU instances
+						// preprocess arguments for library call
+						auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
 					
-					// make the library call
-					FMU( i ).Instance( j ).Index = model_ID_GUID( &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).NumInputVariablesInFMU, &FMU( i ).Instance( j ).NumOutputVariablesInFMU );
+						// make the library call
+						FMU( i ).Instance( j ).Index = model_ID_GUID( &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).NumInputVariablesInFMU, &FMU( i ).Instance( j ).NumOutputVariablesInFMU );
 					
-					if ( FMU( i ).Instance( j ).Index < 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "get the model ID and model GUID" );
-						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "Check if modelDescription.xml exists in the folder where the FMU has been unpacked." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( FMU( i ).Instance( j ).Index < 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "get the model ID and model GUID" );
+							ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "Check if modelDescription.xml exists in the folder where the FMU has been unpacked." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 					}
 
-					// get the path to the binaries
-					// preprocess args for library call
-					FMU(i).Instance(j).WorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder + "                                                                                           ";
-					auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
+					{
+						// get the path to the binaries
+						// preprocess args for library call
+						auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
+						FMU(i).Instance(j).WorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder + "                                                                                           ";
+						auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
 
-					// make the library call
-					retValfmiPathLib = addLibPathCurrentWorkingFolder( &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).Index );
+						// make the library call
+						retValfmiPathLib = addLibPathCurrentWorkingFolder( &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).Index );
 					
-					// post process args in case they are used later
-					FMU( i ).Instance( j ).WorkingFolder_wLib = getStringFromCharArray( workingFolderWithLibArr );
+						// post process args in case they are used later
+						FMU( i ).Instance( j ).WorkingFolder_wLib = trim(getStringFromCharArray( workingFolderWithLibArr ));
 					
-					if ( retValfmiPathLib != 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "get the path to the binaries of instance" );
-						ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "Check if binaries folder exists where the FMU has been unpacked." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( retValfmiPathLib != 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "get the path to the binaries of instance" );
+							ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "Check if binaries folder exists where the FMU has been unpacked." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
+
+						// get the length of the working folder with libraries
+						FMU( i ).Instance( j ).LenWorkingFolder_wLib = FMU( i ).Instance( j ).WorkingFolder_wLib.length();
 					}
 
-					// get the length of the working folder with libraries
-					FMU( i ).Instance( j ).LenWorkingFolder_wLib = FMU( i ).Instance( j ).WorkingFolder_wLib.length();
+					{
+						// determine the FMI version
+						// preprocess args for library call
+						auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
+						auto VersionNumArr( getCharArrayFromString( "   " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
+					
+						// make the library call
+						retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
+					
+						// post process in case args are used later
+						FMU( i ).Instance( j ).fmiVersionNumber = getStringFromCharArray( VersionNumArr );
+					
+						if ( retValfmiVersion != 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "load FMI functions library of instance" );
+							ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "\"" + FMU( i ).Instance( j ).fmiVersionNumber + "\"." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 
-					// determine the FMI version
-					// preprocess args for library call
-					workingFolderWithLibArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib );
-					auto VersionNumArr( getCharArrayFromString( "   " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
-					
-					// make the library call
-					retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
-					
-					// post process in case args are used later
-					FMU( i ).Instance( j ).fmiVersionNumber = getStringFromCharArray( VersionNumArr );
-					
-					if ( retValfmiVersion != 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "load FMI functions library of instance" );
-						ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "\"" + FMU( i ).Instance( j ).fmiVersionNumber + "\"." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
-					}
-
-					if ( FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) != "1.0" ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when getting version" );
-						ShowContinueError( "number of instance \"" + FMU( i ).Instance( j ).Name + "\"" );
-						ShowContinueError( "of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "The version number found (\"" + FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) + "\")" );
-						ShowContinueError( "differs from version 1.0 which is currently supported." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) != "1.0" ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when getting version" );
+							ShowContinueError( "number of instance \"" + FMU( i ).Instance( j ).Name + "\"" );
+							ShowContinueError( "of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "The version number found (\"" + FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) + "\")" );
+							ShowContinueError( "differs from version 1.0 which is currently supported." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 					}
 
 				}
@@ -1592,6 +1601,13 @@ namespace ExternalInterface {
 			StopExternalInterfaceIfError();
 			FirstCallIni = false;
 		}
+	}
+
+	std::string trim(std::string const& str)
+	{
+		std::size_t first = str.find_first_not_of(' ');
+		std::size_t last = str.find_last_not_of(' ');
+		return str.substr(first, last - first + 1);
 	}
 
 	Real64
