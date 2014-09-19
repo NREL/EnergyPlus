@@ -11,6 +11,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputProcessor.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobalConstants.hh>
@@ -20,6 +21,7 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
+#include <DisplayRoutines.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -54,6 +56,7 @@ namespace OutputProcessor {
 	// na
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::MaxNameLength;
 	using DataGlobals::OutputFileMeters;
@@ -240,7 +243,25 @@ namespace OutputProcessor {
 	//  UpdateDataandReport
 	//  UpdateMeterReporting
 
-	// Functions
+	// Function
+
+    std::string assignMtdFile(std::string& _MtdFileName){
+		    	DisplayString("== Module 'Output Processor'::Name of the output (mtd) file = " +_MtdFileName+ "\n");
+		    	DisplayString("====================================================================== \n\n");
+		    	return _MtdFileName;
+		        }
+
+    std::string assignMddFile(std::string& _MddFileName){
+    		   	DisplayString("== Module 'Output Processor'::Name of the output (mdd) file = " +_MddFileName+ "\n");
+    		   	DisplayString("====================================================================== \n\n");
+    	        return _MddFileName;
+    	        }
+
+    std::string assignRddFile(std::string& _RddFileName){
+        	    DisplayString("== Module 'Output Processor'::Name of the output (rdd) file = " +_RddFileName+ "\n");
+       		   	DisplayString("====================================================================== \n\n");
+    	         return _RddFileName;
+   		        }
 
 	void
 	InitializeOutput()
@@ -1579,9 +1600,9 @@ namespace OutputProcessor {
 		int write_stat;
 
 		OutputFileMeterDetails = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, "eplusout.mtd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, outputMtdFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "InitializeMeters: Could not open file \"eplusout.mtd\" for output (write)." );
+			ShowFatalError( "InitializeMeters: Could not open file "+outputMtdFile+" for output (write)." );
 		}
 
 	}
@@ -6692,7 +6713,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both " + outputEsoFile + " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptTS ) {
@@ -6705,7 +6726,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccTS ) {
@@ -6720,7 +6741,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both " + outputEsoFile + " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptHR ) {
@@ -6734,7 +6755,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both " + outputEsoFile + " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccHR ) {
@@ -6750,7 +6771,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), " "already on \"Output:Meter\". Will report to both " +outputEsoFile+ " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptDY ) {
@@ -6764,7 +6785,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccDY ) {
@@ -6780,7 +6801,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptMN ) {
@@ -6794,7 +6815,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccMN ) {
@@ -6810,7 +6831,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+" and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptSM ) {
@@ -6824,7 +6845,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+" and " +outputMtrFile );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccSM ) {
@@ -8257,31 +8278,31 @@ ProduceRDDMDD()
 
 	if ( ProduceReportVDD == ReportVDD_Yes ) {
 		OutputFileRVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, "eplusout.rdd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, outputRddFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputRddFile+" for output (write)." );
 		}
 		gio::write( OutputFileRVDD, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileRVDD, fmtA ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
 		OutputFileMVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, "eplusout.mdd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, outputMddFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputMddFile+" for output (write)." );
 		}
 		gio::write( OutputFileMVDD, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileMVDD, fmtA ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
 	} else if ( ProduceReportVDD == ReportVDD_IDF ) {
 		OutputFileRVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, "eplusout.rdd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, outputRddFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.rdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputRddFile+" for output (write)." );
 		}
 		gio::write( OutputFileRVDD, fmtA ) << "! Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileRVDD, fmtA ) << "! Output:Variable Objects (applicable to this run)";
 		OutputFileMVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, "eplusout.mdd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, outputMddFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file \"eplusout.mdd\" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputMddFile+" for output (write)." );
 		}
 		gio::write( OutputFileMVDD, fmtA ) << "! Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileMVDD, fmtA ) << "! Output:Meter Objects (applicable to this run)";
@@ -8479,7 +8500,7 @@ AddToOutputVariableList(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

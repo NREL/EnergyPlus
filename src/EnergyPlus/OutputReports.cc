@@ -9,12 +9,14 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputReports.hh>
 #include <DataDaylighting.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
+#include <DisplayRoutines.hh>
 #include <DataStringGlobals.hh>
 #include <DataSurfaceColors.hh>
 #include <DataSurfaces.hh>
@@ -25,7 +27,14 @@
 
 namespace EnergyPlus {
 
+using namespace CommandLineInterface;
 static gio::Fmt const fmtLD( "*" );
+
+std::string assignDxfFile(std::string& _DxfFileName){
+            DisplayString("== Module 'Output Reports'::Name of the output (dxf) file = " + _DxfFileName + "\n");
+            DisplayString("====================================================================== \n\n");
+            return _DxfFileName;
+        }
 
 void
 ReportSurfaces()
@@ -420,9 +429,9 @@ DXFOut(
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFile, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOut: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOut: Could not open file "+outputDxfFile+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -913,9 +922,9 @@ DXFOutLines( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFile, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutLines: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOutLines: Could not open file "+outputDxfFile+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -1340,9 +1349,9 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.dxf", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFile, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutWireFrame: Could not open file \"eplusout.dxf\" for output (write)." );
+		ShowFatalError( "DXFOutWireFrame: Could not open file "+outputDxfFile+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section

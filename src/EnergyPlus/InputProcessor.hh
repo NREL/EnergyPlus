@@ -413,6 +413,7 @@ namespace InputProcessor {
 	// Functions
     std::string assign(std::string& _FileName);
     std::string assignEFile(std::string& _EFileName);
+    std::string assignAuditFile(std::string& _AuditFileName);
     
 	void
 	ProcessInput();

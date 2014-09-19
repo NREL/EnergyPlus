@@ -4,8 +4,24 @@
 #include <string>
 namespace EnergyPlus{
 
-namespace options {
+namespace CommandLineInterface {
 
+ extern std::string outputAuditFile;
+ extern std::string outputBndFile;
+ extern std::string outputDxfFile;
+ extern std::string outputEioFile;
+ extern std::string outputEndFile;
+ extern std::string outputErrFile;
+ extern std::string outputEsoFile;
+ extern std::string outputMtdFile;
+ extern std::string outputMddFile;
+ extern std::string outputMtrFile;
+ extern std::string outputRddFile;
+ extern std::string outputShdFile;
+ extern std::string outputHtmFile;
+ extern std::string outputTabFile;
+ extern std::string outputTxtFile;
+ extern std::string outputXmlFile;
 
  // Process command line arguments
  int

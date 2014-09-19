@@ -38,6 +38,10 @@ namespace SimulationManager {
 	// Functions
     
     std::string assignWFile(std::string& _WFileName);
+    std::string assignBndFile(std::string& _BndFileName);
+    std::string assignEioFile(std::string& _EioFileName);
+    std::string assignEsoFile(std::string& _EsoFileName);
+    std::string assignMtrFile(std::string& _MtrFileName);
 
 	void
 	ManageSimulation();

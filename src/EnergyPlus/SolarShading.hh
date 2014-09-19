@@ -120,6 +120,7 @@ namespace SolarShading {
 	extern FArray1D< Real64 > YTEMP1; // Temporary 'Y' values for HC vertices of the overlap
 	extern int maxNumberOfFigures;
 
+	std::string assignShdFile(std::string& _ShdFileName);
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
 
 	// Types

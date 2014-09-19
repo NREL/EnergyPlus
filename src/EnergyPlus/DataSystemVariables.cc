@@ -4,6 +4,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <DataSystemVariables.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
@@ -33,6 +34,7 @@ namespace DataSystemVariables {
 	// na
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using DataStringGlobals::pathChar;
 	using DataStringGlobals::altpathChar;
@@ -185,7 +187,7 @@ namespace DataSystemVariables {
 		std::string::size_type pos;
 
 		if ( firstTime ) {
-			EchoInputFile = FindUnitNumber( "eplusout.audit" );
+			EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
 			get_environment_variable( cInputPath1, envinputpath1 );
 			if ( envinputpath1 != blank ) {
 				pos = index( envinputpath1, pathChar, true ); // look backwards for pathChar

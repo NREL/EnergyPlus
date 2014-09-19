@@ -10,6 +10,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <SolarShading.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>
@@ -80,6 +81,7 @@ namespace SolarShading {
 	// na
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataEnvironment;
@@ -207,6 +209,12 @@ namespace SolarShading {
 	// MODULE SUBROUTINES:
 
 	// Functions
+
+	std::string assignShdFile(std::string& _ShdFileName){
+	    	DisplayString("== Module 'Solar shading'::Name of the output (shd) file = " +_ShdFileName+ "\n");
+	    	DisplayString("====================================================================== \n\n");
+	            return _ShdFileName;
+	        }
 
 	void
 	InitSolarCalculations()

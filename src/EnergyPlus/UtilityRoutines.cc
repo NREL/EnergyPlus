@@ -14,6 +14,7 @@
 #include <UtilityRoutines.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
+#include <CommandLineInterface.hh>
 #include <DataEnvironment.hh>
 #include <DataErrorTracking.hh>
 #include <DataGlobals.hh>
@@ -38,6 +39,20 @@
 #include <Timer.h>
 
 namespace EnergyPlus {
+
+// Functions
+			std::string assignEndFile(std::string& _EndFileName){
+			            DisplayString("== Module 'Utility Routines'::Name of the output (end) file = " + _EndFileName + "\n");
+			            DisplayString("====================================================================== \n\n");
+			            return _EndFileName;
+			        }
+
+			std::string assignErrFile(std::string& _ErrFileName){
+						DisplayString("== Module 'Utility Routines'::Name of the output (err) file = " + _ErrFileName + "\n");
+					    DisplayString("====================================================================== \n\n");
+						return _ErrFileName;
+			        }
+
 
 void
 AbortEnergyPlus(
@@ -64,6 +79,7 @@ AbortEnergyPlus(
 	// na
 
 	// Using/Aliasing
+	using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataSystemVariables;
 	using namespace DataTimings;
@@ -212,9 +228,9 @@ AbortEnergyPlus(
 	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, CommandLineInterface::outputEndFile, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "AbortEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "AbortEnergyPlus: Could not open file "+ CommandLineInterface::outputEndFile +" for output (write)." );
 	}
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -444,9 +460,9 @@ EndEnergyPlus()
 	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, "eplusout.end", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, CommandLineInterface::outputEndFile, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "EndEnergyPlus: Could not open file \"eplusout.end\" for output (write)." );
+		DisplayString( "EndEnergyPlus: Could not open file " + CommandLineInterface::outputEndFile + " for output (write)." );
 	}
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
@@ -1597,10 +1613,10 @@ ShowErrorMessage(
 
 	if ( TotalErrors == 0 && ! ErrFileOpened ) {
 		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, "eplusout.err", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, CommandLineInterface::outputErrFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file \"eplusout.err\" for output (write)." );
+			ShowFatalError( "ShowErrorMessage: Could not open file "+CommandLineInterface::outputErrFile+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;

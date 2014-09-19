@@ -11,6 +11,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <SimulationManager.hh>
 #include <BranchInputManager.hh>
 #include <BranchNodeConnections.hh>
@@ -119,6 +120,8 @@ namespace SimulationManager {
 	// and internal Evolutionary Engineering documentation.
 
 	// Using/Aliasing
+
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataSizing;
@@ -152,11 +155,35 @@ namespace SimulationManager {
     std::string inputWeatherFile;
     
     std::string assignWFile(std::string& _WFileName){
-        std::cout<<"====================================================================== \n";
-        std::cout<<"== Module 'Manage Simulation'::Name of the weather file = "<<_WFileName<<std::endl;
-        std::cout<<"====================================================================== \n";
+    	DisplayString("====================================================================== \n");
+    	DisplayString("== Module 'Manage Simulation'::Name of the weather file = " + _WFileName +"\n");
+    	DisplayString("====================================================================== \n");
         return _WFileName;
     }
+
+    std::string assignBndFile(std::string& _BndFileName){
+        DisplayString("== Module 'Manage Simulation'::Name of the output (bnd) file = " + _BndFileName +"\n");
+        DisplayString("====================================================================== \n\n");
+        return _BndFileName;
+    }
+
+    std::string assignEioFile(std::string& _EioFileName){
+        DisplayString("== Module 'Manage Simulation'::Name of the output (eio) file = " + _EioFileName +"\n");
+        DisplayString("====================================================================== \n\n");
+        return _EioFileName;
+    }
+
+    std::string assignEsoFile(std::string& _EsoFileName){
+        DisplayString("== Module 'Manage Simulation'::Name of the output (eso) file = " + _EsoFileName +"\n");
+        DisplayString("====================================================================== \n\n");
+        return _EsoFileName;
+    }
+
+    std::string assignMtrFile(std::string& _MtrFileName){
+            DisplayString("== Module 'Manage Simulation'::Name of the output (mtr) file = " + _MtrFileName +"\n");
+            DisplayString("====================================================================== \n\n");
+            return _MtrFileName;
+        }
 
 	void
 	ManageSimulation()
@@ -1214,34 +1241,34 @@ namespace SimulationManager {
 		// FLOW:
 		OutputFileStandard = GetNewUnitNumber();
 		StdOutputRecordCount = 0;
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileStandard, "eplusout.eso", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileStandard, CommandLineInterface::outputEsoFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file \"eplusout.eso\" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+CommandLineInterface::outputEsoFile+" for output (write)." );
 		}
 		gio::write( OutputFileStandard, fmtA ) << "Program Version," + VerString;
 
 		// Open the Initialization Output File
 		OutputFileInits = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, "eplusout.eio", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileInits, outputEioFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file \"eplusout.eio\" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+outputEioFile+" for output (write)." );
 		}
 		gio::write( OutputFileInits, fmtA ) << "Program Version," + VerString;
 
 		// Open the Meters Output File
 		OutputFileMeters = GetNewUnitNumber();
 		StdMeterRecordCount = 0;
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileMeters, "eplusout.mtr", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileMeters, outputMtrFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file \"eplusout.mtr\" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+outputMtrFile+" for output (write)." );
 		}
 		gio::write( OutputFileMeters, fmtA ) << "Program Version," + VerString;
 
 		// Open the Branch-Node Details Output File
 		OutputFileBNDetails = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileBNDetails, "eplusout.bnd", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileBNDetails, outputBndFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file \"eplusout.bnd\" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+outputBndFile+" for output (write)." );
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
@@ -1321,7 +1348,7 @@ namespace SimulationManager {
 		std::string cepEnvSetThreads;
 		std::string cIDFSetThreads;
 
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
 		// Record some items on the audit file
 		gio::write( EchoInputFile, fmtLD ) << "NumOfRVariable=" << NumOfRVariable_Setup;
 		gio::write( EchoInputFile, fmtLD ) << "NumOfRVariable(Total)=" << NumTotalRVariable;

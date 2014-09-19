@@ -1963,7 +1963,7 @@ bool ezOptionParser::gotRequired(std::vector<std::string> & badOptions) {
   for(i=0; i < (long int)groups.size(); ++i) {
     OptionGroup *g = groups[i];
     // Simple case when required but user never set it.
-    if (g->isRequired && (!g->isSet)) {
+     if (g->isRequired && (!g->isSet)) {
       badOptions.push_back(*g->flags[0]);
       continue;
     }

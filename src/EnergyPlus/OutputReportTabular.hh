@@ -22,6 +22,10 @@ namespace OutputReportTabular {
 
     extern std::string outputFile;
     std::string assignOFile(std::string& _OFileName);
+    std::string assignHtmFile(std::string& _HtmFileName);
+    std::string assignTabFile(std::string& _TabFileName);
+    std::string assignTxtFile(std::string& _TxtFileName);
+    std::string assignXmlFile(std::string& _XmlFileName);
     
 	// Using/Aliasing
 

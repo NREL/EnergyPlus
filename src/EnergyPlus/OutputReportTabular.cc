@@ -14,6 +14,7 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <OutputReportTabular.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataCostEstimate.hh>
@@ -86,6 +87,7 @@ namespace OutputReportTabular {
 	//                                      |--> MonthlyTable --> MonthlyColumns
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace InputProcessor;
 	using DataGlobals::BigNumber;
@@ -413,6 +415,30 @@ namespace OutputReportTabular {
         return _OFileName;
     }
     
+    std::string assignHtmFile(std::string& _HtmFileName){
+    	DisplayString("== Module 'Output Report Tabular'::Name of the output (htm) file = " +_HtmFileName+ "\n");
+       	DisplayString("====================================================================== \n\n");
+       	return _HtmFileName;
+    }
+
+    std::string assignTabFile(std::string& _TabFileName){
+        	DisplayString("== Module 'Output Report Tabular'::Name of the output (tab) file = " +_TabFileName+ "\n");
+           	DisplayString("====================================================================== \n\n");
+           	return _TabFileName;
+        }
+
+    std::string assignTxtFile(std::string& _TxtFileName){
+        	DisplayString("== Module 'Output Report Tabular'::Name of the output (txt) file = " +_TxtFileName+ "\n");
+           	DisplayString("====================================================================== \n\n");
+           	return _TxtFileName;
+        }
+
+    std::string assignXmlFile(std::string& _XmlFileName){
+            DisplayString("== Module 'Output Report Tabular'::Name of the output (xml) file = " +_XmlFileName+ "\n");
+           	DisplayString("====================================================================== \n\n");
+           	return _XmlFileName;
+        }
+
 	void
 	UpdateTabularReports( int const IndexTypeKey ) // What kind of data to update (Zone, HVAC)
 	{
@@ -3131,9 +3157,9 @@ namespace OutputReportTabular {
 					gio::write( curFH, fmtA ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleTab ) {
 					DisplayString( "Writing tabular output file results using tab format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, "eplustbl.tab", flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputTabFile, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.tab\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTabFile+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "Program Version" + curDel + VerString;
 					gio::write( curFH, fmtA ) << "Tabular Output Report in Format: " + curDel + "Tab";
@@ -3147,9 +3173,9 @@ namespace OutputReportTabular {
 					gio::write( curFH, fmtA ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleHTML ) {
 					DisplayString( "Writing tabular output file results using HTML format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, "eplustbl.htm", flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputHtmFile, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.htm\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputHtmFile+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" "\"http://www.w3.org/TR/html4/loose.dtd\">";
 					gio::write( curFH, fmtA ) << "<html>";
@@ -3178,9 +3204,9 @@ namespace OutputReportTabular {
 					gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << "</b></p>";
 				} else if ( TableStyle( iStyle ) == tableStyleXML ) {
 					DisplayString( "Writing tabular output file results using XML format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, "eplustbl.xml", flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputXmlFile, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.xml\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputXmlFile+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "<?xml version=\"1.0\"?>";
 					gio::write( curFH, fmtA ) << "<EnergyPlusTabularReports>";
@@ -3199,9 +3225,9 @@ namespace OutputReportTabular {
 					gio::write( curFH );
 				} else {
 					DisplayString( "Writing tabular output file results using text format." );
-					{ IOFlags flags; flags.ACTION( "write" ); gio::open( curFH, "eplustbl.txt", flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "write" ); gio::open( curFH, outputTxtFile, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.txt\" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTxtFile+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "Program Version: " + VerString;
 					gio::write( curFH, fmtA ) << "Tabular Output Report in Format: " + curDel + "Fixed";
@@ -4809,6 +4835,7 @@ namespace OutputReportTabular {
 		//   report is added it can be added to the list here.
 
 		// Locals
+
 		int EchoInputFile; // found unit number for 'eplusout.audit'
 
 		FillWeatherPredefinedEntries();
@@ -4831,7 +4858,7 @@ namespace OutputReportTabular {
 				WriteTimeBinTables();
 			}
 		}
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyInputCount=" << MonthlyInputCount;
 		gio::write( EchoInputFile, fmtLD ) << "sizeMonthlyInput=" << sizeMonthlyInput;
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;

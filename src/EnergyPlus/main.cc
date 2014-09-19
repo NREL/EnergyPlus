@@ -215,7 +215,7 @@ main(int argc, const char * argv[])
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
 	// CLI module
-	using namespace options;
+	using namespace CommandLineInterface;
 
     int status = 0;
     status = ProcessArgs(argc, argv);
@@ -335,12 +335,12 @@ main(int argc, const char * argv[])
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	{ IOFlags flags; gio::inquire( "eplusout.end", flags ); FileExists = flags.exists(); }
+	{ IOFlags flags; gio::inquire( outputEndFile, flags ); FileExists = flags.exists(); }
 	if ( FileExists ) {
 		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, "eplusout.end", flags ); iostatus = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, outputEndFile, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file \"eplusout.end\" for input (read)." );
+			ShowFatalError( "EnergyPlus: Could not open file "+ outputEndFile +" for input (read)." );
 		}
 		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( LFN, flags ); }
 	}

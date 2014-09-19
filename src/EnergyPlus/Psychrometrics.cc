@@ -9,6 +9,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <Psychrometrics.hh>
 #include <DataEnvironment.hh>
 #include <DataPrecisionGlobals.hh>
@@ -50,6 +51,7 @@ namespace Psychrometrics {
 	// more research on hfg calc
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 #ifdef EP_psych_errors
 	using namespace DataGlobals;
@@ -220,7 +222,7 @@ namespace Psychrometrics {
 		Real64 AverageIterations;
 		std::string istring;
 
-		EchoInputFile = FindUnitNumber( "eplusout.audit" );
+		EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
 		if ( EchoInputFile == 0 ) return;
 		if ( any_gt( NumTimesCalled, 0 ) ) {
 			gio::write( EchoInputFile, fmtA ) << "RoutineName,#times Called,Avg Iterations";
