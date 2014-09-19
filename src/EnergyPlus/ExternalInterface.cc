@@ -1164,10 +1164,6 @@ namespace ExternalInterface {
 						// make the library call
 						retVal = fmiEPlusUnpack( &fullFileNameArr[0], &workingFolderArr[0], &lenFileName, &FMU( i ).Instance( j ).LenWorkingFolder );
 					
-						// post process in case args are used later
-						fullFileName( i ) = getStringFromCharArray( fullFileNameArr );
-						FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
-					
 						if ( retVal != 0 ) {
 							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
 							ShowContinueError( "unpack the FMU \"" + FMU( i ).Name + "\"." );
@@ -1175,6 +1171,7 @@ namespace ExternalInterface {
 							ErrorsFound = true;
 							StopExternalInterfaceIfError();
 						}
+
 					}
 
 					{
@@ -1225,7 +1222,7 @@ namespace ExternalInterface {
 						// determine the FMI version
 						// preprocess args for library call
 						auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
-						auto VersionNumArr( getCharArrayFromString( "   " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
+						auto VersionNumArr( getCharArrayFromString( "    " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
 					
 						// make the library call
 						retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
