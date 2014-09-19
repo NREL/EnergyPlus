@@ -262,9 +262,9 @@ namespace SolarShading {
 		if ( BeginSimFlag ) {
 
 			OutputFileShading = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileShading, "eplusout.shd", flags ); write_stat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileShading, outputShdFile, flags ); write_stat = flags.ios(); }
 			if ( write_stat != 0 ) {
-				ShowFatalError( "InitSolarCalculations: Could not open file \"eplustbl.shd\" for output (write)." );
+				ShowFatalError( "InitSolarCalculations: Could not open file "+outputShdFile+" for output (write)." );
 			}
 
 			if ( GetInputFlag ) {
