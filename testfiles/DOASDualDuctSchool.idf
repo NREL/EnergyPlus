@@ -4651,6 +4651,10 @@
     ALWAYS_ON,               !- Availability Schedule Name
     Main_Corridor Baseboard Heater Inlet Node Name,  !- Inlet Node Name
     Main_Corridor Baseboard Heater Outlet Node Name,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -5122,6 +5126,10 @@
     ALWAYS_ON,               !- Availability Schedule Name
     Lobby Baseboard Heater Inlet Node Name,  !- Inlet Node Name
     Lobby Baseboard Heater Outlet Node Name,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -5561,6 +5569,10 @@
     ALWAYS_ON,               !- Availability Schedule Name
     Mech Baseboard Heater Inlet Node Name,  !- Inlet Node Name
     Mech Baseboard Heater Outlet Node Name,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -5960,6 +5972,10 @@
     ALWAYS_ON,               !- Availability Schedule Name
     Bathrooms Baseboard Heater Inlet Node Name,  !- Inlet Node Name
     Bathrooms Baseboard Heater Outlet Node Name,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -6830,6 +6846,10 @@
     ALWAYS_ON,               !- Availability Schedule Name
     Offices Baseboard Heater Inlet Node Name,  !- Inlet Node Name
     Offices Baseboard Heater Outlet Node Name,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -7497,6 +7517,10 @@
     ALWAYS_ON,               !- Availability Schedule Name
     Media_Center Baseboard Heater Inlet Node Name,  !- Inlet Node Name
     Media_Center Baseboard Heater Outlet Node Name,  !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -7591,9 +7615,16 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   BranchList,
@@ -7911,9 +7942,16 @@
     0.0085,                  !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   BranchList,

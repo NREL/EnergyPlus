@@ -178,7 +178,7 @@ namespace PlantManager {
 				LoopSide = PlantCallingOrderInfo( HalfLoopNum ).LoopSide;
 				OtherSide = 3 - LoopSide; //will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
 
-				auto & this_loop( PlantLoop( LoopNum) );
+				auto & this_loop( PlantLoop( LoopNum ) );
 				auto & this_loop_side( this_loop.LoopSide( LoopSide ) );
 				auto & other_loop_side( this_loop.LoopSide( OtherSide ) );
 
@@ -436,14 +436,18 @@ namespace PlantManager {
 			LoadingScheme = Alpha( 14 );
 			if ( SameString( LoadingScheme, "Optimal" ) ) {
 				this_loop.LoadDistribution = OptimalLoading;
-			} else if ( SameString( LoadingScheme, "Sequential" ) ) {
+			} else if ( SameString( LoadingScheme, "SequentialLoad" ) ) {
 				this_loop.LoadDistribution = SequentialLoading;
-			} else if ( SameString( LoadingScheme, "Uniform" ) ) {
+			} else if ( SameString( LoadingScheme, "UniformLoad" ) ) {
 				this_loop.LoadDistribution = UniformLoading;
+			} else if ( SameString( LoadingScheme, "UniformPLR" ) ) {
+				this_loop.LoadDistribution = UniformPLRLoading;
+			} else if ( SameString( LoadingScheme, "SequentialUniformPLR" ) ) {
+				this_loop.LoadDistribution = SequentialUniformPLRLoading;
 			} else {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
 				ShowContinueError( "..." + cAlphaFieldNames( 14 ) + "=\"" + Alpha( 14 ) + "\"." );
-				ShowContinueError( "Will default to SequentialLoading." ); // TODO rename point
+				ShowContinueError( "Will default to SequentialLoad." ); // TODO rename point
 				this_loop.LoadDistribution = SequentialLoading;
 			}
 
@@ -1343,6 +1347,7 @@ namespace PlantManager {
 					// Map the inlet node to the splitter to a branch number
 					if ( TempLoop.Splitter( SplitNum - 1 ).Exists ) {
 						// Map the inlet node to the splitter to a branch number
+						SplitInBranch = false;
 						for ( BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum ) {
 							CompNum = TempLoop.Branch( BranchNum ).TotalComponents;
 							if ( TempLoop.Splitter( SplitNum - 1 ).NodeNumIn == TempLoop.Branch( BranchNum ).Comp( CompNum ).NodeNumOut ) {

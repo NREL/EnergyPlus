@@ -553,9 +553,26 @@ namespace WaterCoils {
 		{}
 
 	};
+	struct WaterCoilNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		WaterCoilNumericFieldData()
+		{}
+
+		// Member Constructor
+		WaterCoilNumericFieldData(
+			FArray1_string const & FieldNames // Name of the WaterCoil numeric field descriptions
+		) :
+			FieldNames( FieldNames )
+		{}
+	};
 
 	// Object Data
 	extern FArray1D< WaterCoilEquipConditions > WaterCoil;
+	extern FArray1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
 
 	// Functions
 
