@@ -80990,6 +80990,10 @@ LifeCycleCost:UsePriceEscalation,
         \required-field
         \type choice
         \key Electricity
+        \key ElectricityPurchased
+        \key ElectricityProduced
+        \key ElectricitySurplusSold
+        \key ElectricityNet
         \key NaturalGas
         \key Steam
         \key Gasoline
@@ -81132,6 +81136,10 @@ LifeCycleCost:UseAdjustment,
         \required-field
         \type choice
         \key Electricity
+        \key ElectricityPurchased
+        \key ElectricityProduced
+        \key ElectricitySurplusSold
+        \key ElectricityNet
         \key NaturalGas
         \key Steam
         \key Gasoline
