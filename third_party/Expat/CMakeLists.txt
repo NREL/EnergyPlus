@@ -18,6 +18,12 @@ if(WIN32)
   set(epexpat_SRCS ${epexpat_SRCS} lib/libexpat.def)
 endif(WIN32)
 
+IF( MSVC )
+  ADD_DEFINITIONS( "/w" )
+ELSE()
+  ADD_DEFINITIONS( "-w" )
+ENDIF()
+
 add_library(epexpat SHARED ${epexpat_SRCS})
 
 set_target_properties(
