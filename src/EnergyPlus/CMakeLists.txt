@@ -4,6 +4,7 @@ if(MSVC)
   add_definitions(/Za)
 endif()
 
+configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 
 SET( SRC
   Timer.h
@@ -137,7 +138,7 @@ SET( SRC
   DataShadowingCombinations.hh
   DataSizing.cc
   DataSizing.hh
-  DataStringGlobals.cc
+  "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc"
   DataStringGlobals.hh
   DataSurfaceColors.cc
   DataSurfaceColors.hh

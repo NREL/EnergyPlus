@@ -94,7 +94,8 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
 endif()
 
-install( FILES idd/Energy+.idd DESTINATION ./ )
+configure_file( idd/Energy+.idd.in "${CMAKE_BINARY_DIR}/Energy+.idd" )
+install( FILES "${CMAKE_BINARY_DIR}/Energy+.idd" DESTINATION ./ )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
