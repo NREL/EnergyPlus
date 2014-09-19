@@ -724,7 +724,7 @@ namespace ExternalInterface {
 						}
 					
 						// pass in the vectors as pointers to the first member of the vector
-						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec2[0], &realVarValueVec2[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec2[0], &realVarValueVec2[0], &FMU( i ).Instance( j ).NumOutputVariablesVariable, &FMU( i ).Instance( j ).Index );
 
 						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).ValueReference = valueReferenceVec2[x-1];
@@ -752,7 +752,7 @@ namespace ExternalInterface {
 						}
 					
 						// pass in the vectors as pointers to the first member of the vector
-						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec3[0], &realVarValueVec3[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec3[0], &realVarValueVec3[0], &FMU( i ).Instance( j ).NumOutputVariablesActuator, &FMU( i ).Instance( j ).Index );
 
 						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).ValueReference = valueReferenceVec3[x-1];
@@ -1530,7 +1530,7 @@ namespace ExternalInterface {
 							auto tempNameArr( getCharArrayFromString( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name ) );
 							int tempLength( len( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name ) );
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).ValueReference = getValueReferenceByNameFMUOutputVariables( &tempNameArr[0], &tempLength, &FMU( i ).Instance( j ).Index );
-							FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name = getStringFromCharArray( tempNameArr );
+							//FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name = getStringFromCharArray( tempNameArr );
 							
 							if ( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).ValueReference == -999 ) {
 								ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to get the value reference of the FMU output variable" );
