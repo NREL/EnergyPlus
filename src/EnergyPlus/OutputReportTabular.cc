@@ -410,8 +410,8 @@ namespace OutputReportTabular {
 	// Functions
     std::string outputFile;
     std::string assignOFile(std::string& _OFileName){
-        std::cout<<"== Module 'Output report tabular'::Name of the output file = "<<_OFileName<<std::endl;
-        std::cout<<"====================================================================== \n\n";
+    	DisplayString("== Module 'Output report tabular'::Name of the output file = "+_OFileName+ "\n");
+    	DisplayString("====================================================================== \n\n");
         return _OFileName;
     }
     
@@ -422,16 +422,16 @@ namespace OutputReportTabular {
     }
 
     std::string assignTabFile(std::string& _TabFileName){
-        	DisplayString("== Module 'Output Report Tabular'::Name of the output (tab) file = " +_TabFileName+ "\n");
-           	DisplayString("====================================================================== \n\n");
-           	return _TabFileName;
-        }
+        DisplayString("== Module 'Output Report Tabular'::Name of the output (tab) file = " +_TabFileName+ "\n");
+       	DisplayString("====================================================================== \n\n");
+       	return _TabFileName;
+    }
 
     std::string assignTxtFile(std::string& _TxtFileName){
-        	DisplayString("== Module 'Output Report Tabular'::Name of the output (txt) file = " +_TxtFileName+ "\n");
-           	DisplayString("====================================================================== \n\n");
-           	return _TxtFileName;
-        }
+    	DisplayString("== Module 'Output Report Tabular'::Name of the output (txt) file = " +_TxtFileName+ "\n");
+       	DisplayString("====================================================================== \n\n");
+       	return _TxtFileName;
+    }
 
     std::string assignXmlFile(std::string& _XmlFileName){
             DisplayString("== Module 'Output Report Tabular'::Name of the output (xml) file = " +_XmlFileName+ "\n");

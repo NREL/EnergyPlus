@@ -1,3 +1,5 @@
+//Standard C++ library
+#include <iostream>
 
 // CLI Headers
 #include <ezOptionParser.hpp>
@@ -110,7 +112,7 @@ ProcessArgs(int argc, const char * argv[])
 	    	   		}
 
 	    	   	if(!opt.isSet("-h") && !opt.isSet("-v") && !opt.isSet("-i") && !opt.isSet("-o") && !opt.isSet("-w") && !opt.isSet("-e")){
-	    	   		std::cout<<"Invalid option used. Exiting...\n";
+	    	   		DisplayString("Invalid option used. Exiting...\n");
 	    	   		return 1;
 	    	   	}
 
@@ -177,23 +179,35 @@ ProcessArgs(int argc, const char * argv[])
 
 	           inputEnergyFile = assignEFile(input_energyFile);
 
-	           std::string output_File = input_filename+"_"+input_weatherFile+".csv";
-	           std::string output_AuditFile = input_filename+"_"+input_weatherFile+".audit";
-	           std::string output_BndFile = input_filename+"_"+input_weatherFile+".bnd";
-	           std::string output_DxfFile = input_filename+"_"+input_weatherFile+".dxf";
-	           std::string output_EioFile = input_filename+"_"+input_weatherFile+".eio";
-	           std::string output_EndFile = input_filename+"_"+input_weatherFile+".end";
-	           std::string output_ErrFile = input_filename+"_"+input_weatherFile+".err";
-	           std::string output_EsoFile = input_filename+"_"+input_weatherFile+".eso";
-	           std::string output_MtdFile = input_filename+"_"+input_weatherFile+".mtd";
-	           std::string output_MddFile = input_filename+"_"+input_weatherFile+".mdd";
-	           std::string output_MtrFile = input_filename+"_"+input_weatherFile+".mtr";
-	           std::string output_RddFile = input_filename+"_"+input_weatherFile+".rdd";
-	           std::string output_ShdFile = input_filename+"_"+input_weatherFile+".shd";
-	           std::string output_HtmFile = input_filename+"_"+input_weatherFile+".htm";
-	           std::string output_TabFile = input_filename+"_"+input_weatherFile+".tab";
-	           std::string output_TxtFile = input_filename+"_"+input_weatherFile+".txt";
-	           std::string output_XmlFile = input_filename+"_"+input_weatherFile+".xml";
+	           std::string s = inputFileName;
+	           std::string ss = inputWeatherFile;
+	           std::string delim = ".";
+
+	           auto start = 0U;
+
+	           DisplayString("Name of the input file without extension = " + s.substr(start, s.size()-4) + "\n");
+	           DisplayString("Name of the input weather file without extension = " + ss.substr(start, ss.size()-4) + "\n");
+
+	           std::string fileName_input = s.substr(start, s.size()-4);
+	           std::string fileName_weather = ss.substr(start, ss.size()-4);
+
+	           std::string output_File = fileName_input+"_"+fileName_weather+".csv";
+	           std::string output_AuditFile = fileName_input+"_"+fileName_weather+".audit";
+	           std::string output_BndFile = fileName_input+"_"+fileName_weather+".bnd";
+	           std::string output_DxfFile = fileName_input+"_"+fileName_weather+".dxf";
+	           std::string output_EioFile = fileName_input+"_"+fileName_weather+".eio";
+	           std::string output_EndFile = fileName_input+"_"+fileName_weather+".end";
+	           std::string output_ErrFile = fileName_input+"_"+fileName_weather+".err";
+	           std::string output_EsoFile = fileName_input+"_"+fileName_weather+".eso";
+	           std::string output_MtdFile = fileName_input+"_"+fileName_weather+".mtd";
+	           std::string output_MddFile = fileName_input+"_"+fileName_weather+".mdd";
+	           std::string output_MtrFile = fileName_input+"_"+fileName_weather+".mtr";
+	           std::string output_RddFile = fileName_input+"_"+fileName_weather+".rdd";
+	           std::string output_ShdFile = fileName_input+"_"+fileName_weather+".shd";
+	           std::string output_HtmFile = fileName_input+"_"+fileName_weather+".htm";
+	           std::string output_TabFile = fileName_input+"_"+fileName_weather+".tab";
+	           std::string output_TxtFile = fileName_input+"_"+fileName_weather+".txt";
+	           std::string output_XmlFile = fileName_input+"_"+fileName_weather+".xml";
 
 	           if (opt.isSet("-o")) {
 	         	            std::ofstream output;
