@@ -27,7 +27,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/in.epw" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
-                "${SOURCE_DIR}/idd/Energy+.idd" 
+                "${BINARY_DIR}/Energy+.idd" 
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/Energy+.idd" )
 
 if(BUILD_FORTRAN)
