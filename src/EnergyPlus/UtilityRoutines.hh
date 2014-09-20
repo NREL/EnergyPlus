@@ -9,9 +9,6 @@
 
 namespace EnergyPlus {
 
-std::string assignEndFile(std::string& _EndFileName);
-std::string assignErrFile(std::string& _ErrFileName);
-
 void
 AbortEnergyPlus(
 	bool const NoIdf, // Set to true when "noidf" was found

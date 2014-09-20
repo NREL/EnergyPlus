@@ -152,38 +152,6 @@ namespace SimulationManager {
 	// MODULE SUBROUTINES:
 
 	// Functions
-    std::string inputWeatherFile;
-    
-    std::string assignWFile(std::string& _WFileName){
-    	DisplayString("====================================================================== \n");
-    	DisplayString("== Module 'Manage Simulation'::Name of the weather file = " + _WFileName +"\n");
-    	DisplayString("====================================================================== \n");
-        return _WFileName;
-    }
-
-    std::string assignBndFile(std::string& _BndFileName){
-        DisplayString("== Module 'Manage Simulation'::Name of the output (bnd) file = " + _BndFileName +"\n");
-        DisplayString("====================================================================== \n\n");
-        return _BndFileName;
-    }
-
-    std::string assignEioFile(std::string& _EioFileName){
-        DisplayString("== Module 'Manage Simulation'::Name of the output (eio) file = " + _EioFileName +"\n");
-        DisplayString("====================================================================== \n\n");
-        return _EioFileName;
-    }
-
-    std::string assignEsoFile(std::string& _EsoFileName){
-        DisplayString("== Module 'Manage Simulation'::Name of the output (eso) file = " + _EsoFileName +"\n");
-        DisplayString("====================================================================== \n\n");
-        return _EsoFileName;
-    }
-
-    std::string assignMtrFile(std::string& _MtrFileName){
-            DisplayString("== Module 'Manage Simulation'::Name of the output (mtr) file = " + _MtrFileName +"\n");
-            DisplayString("====================================================================== \n\n");
-            return _MtrFileName;
-        }
 
 	void
 	ManageSimulation()
@@ -285,8 +253,7 @@ namespace SimulationManager {
 
 		//  CHARACTER(len=70) :: tdstring
 		//  CHARACTER(len=138) :: tdstringlong
-        
-      
+
 		int EnvCount;
 
 		// Formats
@@ -468,8 +435,7 @@ namespace SimulationManager {
 				if ( WarmupFlag ) {
 					++NumOfWarmupDays;
 					cWarmupDay = TrimSigDigits( NumOfWarmupDays );
-				//	DisplayString( "Warming up {" + cWarmupDay + '}' );
-                    DisplayString( "Warming up {"+cWarmupDay+"}" );
+					DisplayString( "Warming up {" + cWarmupDay + '}' );
 				} else if ( DayOfSim == 1 ) {
 					DisplayString( "Starting Simulation at " + CurMnDy + " for " + EnvironmentName );
 					gio::write( OutputFileInits, Format_700 ) << NumOfWarmupDays;
@@ -1241,9 +1207,9 @@ namespace SimulationManager {
 		// FLOW:
 		OutputFileStandard = GetNewUnitNumber();
 		StdOutputRecordCount = 0;
-		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileStandard, CommandLineInterface::outputEsoFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( OutputFileStandard, outputEsoFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "OpenOutputFiles: Could not open file "+CommandLineInterface::outputEsoFile+" for output (write)." );
+			ShowFatalError( "OpenOutputFiles: Could not open file "+outputEsoFile+" for output (write)." );
 		}
 		gio::write( OutputFileStandard, fmtA ) << "Program Version," + VerString;
 
@@ -1348,7 +1314,7 @@ namespace SimulationManager {
 		std::string cepEnvSetThreads;
 		std::string cIDFSetThreads;
 
-		EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
+		EchoInputFile = FindUnitNumber( outputAuditFile );
 		// Record some items on the audit file
 		gio::write( EchoInputFile, fmtLD ) << "NumOfRVariable=" << NumOfRVariable_Setup;
 		gio::write( EchoInputFile, fmtLD ) << "NumOfRVariable(Total)=" << NumTotalRVariable;
@@ -2821,7 +2787,7 @@ Resimulate(
 }
 
 //     NOTICE
-//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

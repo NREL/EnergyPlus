@@ -187,7 +187,7 @@ namespace DataSystemVariables {
 		std::string::size_type pos;
 
 		if ( firstTime ) {
-			EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
+			EchoInputFile = FindUnitNumber( outputAuditFile );
 			get_environment_variable( cInputPath1, envinputpath1 );
 			if ( envinputpath1 != blank ) {
 				pos = index( envinputpath1, pathChar, true ); // look backwards for pathChar

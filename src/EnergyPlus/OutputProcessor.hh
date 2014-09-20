@@ -138,10 +138,6 @@ namespace OutputProcessor {
 
 	extern int MaxNumSubcategories;
 
-	 std::string assignMtdFile(std::string& _MtdFileName);
-	 std::string assignMddFile(std::string& _MddFileName);
-	 std::string assignRddFile(std::string& _RddFileName);
-
 	// All routines should be listed here whether private or not
 	//PUBLIC  ReallocateTVar
 	//PUBLIC  SetReportNow

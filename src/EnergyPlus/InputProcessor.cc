@@ -15,9 +15,6 @@
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
 
-//Standard C++ library
-#include <string>
-
 namespace EnergyPlus {
 
 namespace InputProcessor {
@@ -65,8 +62,7 @@ namespace InputProcessor {
 	using DataSystemVariables::SortedIDD;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
-    
-    
+
 	// Use statements for access to subroutines in other modules
 
 	// Data
@@ -92,8 +88,6 @@ namespace InputProcessor {
 	Real64 const DefAutoCalculateValue( AutoCalculate );
 	static gio::Fmt const fmtLD( "*" );
 	static gio::Fmt const fmtA( "(A)" );
-    std::string inputFileName;
-    std::string inputEnergyFile;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -172,25 +166,6 @@ namespace InputProcessor {
 	FArray1D< LineDefinition > IDFRecords; // All the objects read from the IDF
 	FArray1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
 
-    std::string assign(std::string& _FileName){
-        DisplayString("====================================================================== \n");
-        DisplayString("== Module 'Input Processor'::Name of the input file = " + _FileName + "\n");
-        return _FileName;
-    }
-    
-    std::string assignEFile(std::string& _EFileName){
-    	DisplayString("== Module 'Input Processor'::Name of the energy file = " + _EFileName + "\n");
-    	DisplayString("====================================================================== \n\n");
-        return _EFileName;
-    }
-    
-    std::string assignAuditFile(std::string& _AuditFileName){
-    	DisplayString("== Module 'Input Processor'::Name of the output (audit) file = " +_AuditFileName+ "\n");
-    	DisplayString("====================================================================== \n\n");
-            return _AuditFileName;
-        }
-
-    
 	// MODULE SUBROUTINES:
 	//*************************************************************************
 
@@ -252,14 +227,14 @@ namespace InputProcessor {
 		int endcol;
 		int write_stat;
 		int read_stat;
-        
+
 		InitSecretObjects();
 
 		EchoInputFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, CommandLineInterface::outputAuditFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) "+ CommandLineInterface::outputAuditFile + " ." );
-			ShowFatalError( "ProcessInput: Could not open file " + CommandLineInterface::outputAuditFile + " for output (write)." );
+			DisplayString( "Could not open (write) "+ outputAuditFile + " ." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFile + " for output (write)." );
 		}
 
 		{ IOFlags flags; gio::inquire( "eplusout.iperr", flags ); FileExists = flags.exists(); }
@@ -275,7 +250,7 @@ namespace InputProcessor {
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, "eplusout.iperr", flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Could not open (write) eplusout.iperr." );
-			ShowFatalError( "ProcessInput: Could not open file " + CommandLineInterface::outputAuditFile + " for output (write)." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFile + " for output (write)." );
 		}
 
 		//               FullName from StringGlobals is used to build file name with Path
@@ -652,7 +627,7 @@ namespace InputProcessor {
 				ErrorsFound = true;
 			}
 		} else {
-			ShowSevereError( "IP: Blank Sections not allowed.  Review " + CommandLineInterface::outputAuditFile + " file.", EchoInputFile );
+			ShowSevereError( "IP: Blank Sections not allowed.  Review " + outputAuditFile + " file.", EchoInputFile );
 			errFlag = true;
 			ErrorsFound = true;
 		}

@@ -474,7 +474,7 @@ namespace ScheduleManager {
 		Schedule( 0 ).ScheduleTypePtr = 0;
 		Schedule( 0 ).WeekSchedulePointer = 0;
 
-		UnitNumber = FindUnitNumber( CommandLineInterface::outputAuditFile );
+		UnitNumber = FindUnitNumber( outputAuditFile );
 		gio::write( UnitNumber, fmtLD ) << " Processing Schedule Input -- Start";
 
 		//!! Get Schedule Types

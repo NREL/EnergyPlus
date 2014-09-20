@@ -28,7 +28,6 @@
 #include <ExternalInterface.hh>
 #include <General.hh>
 #include <GeneralRoutines.hh>
-#include <InputProcessor.hh> //Added to pass inputEnergyFile (MS)
 #include <NodeInputManager.hh>
 #include <OutputReports.hh>
 #include <PlantManager.hh>
@@ -39,20 +38,6 @@
 #include <Timer.h>
 
 namespace EnergyPlus {
-
-// Functions
-			std::string assignEndFile(std::string& _EndFileName){
-			            DisplayString("== Module 'Utility Routines'::Name of the output (end) file = " + _EndFileName + "\n");
-			            DisplayString("====================================================================== \n\n");
-			            return _EndFileName;
-			        }
-
-			std::string assignErrFile(std::string& _ErrFileName){
-						DisplayString("== Module 'Utility Routines'::Name of the output (err) file = " + _ErrFileName + "\n");
-					    DisplayString("====================================================================== \n\n");
-						return _ErrFileName;
-			        }
-
 
 void
 AbortEnergyPlus(
@@ -183,12 +168,12 @@ AbortEnergyPlus(
 	strip( NumSevereDuringSizing );
 
 	if ( NoIDD ) {
-		DisplayString( "No EnergyPlus Data Dictionary (" +InputProcessor::inputEnergyFile+") was found.  It is possible " );
+		DisplayString( "No EnergyPlus Data Dictionary (" + inputEnergyFile+") was found.  It is possible " );
 		DisplayString( "you \"double-clicked\"EnergyPlus.exe rather than using one of the methods" );
 		DisplayString( "to run Energyplus as found in the GettingStarted document in the" );
 		DisplayString( "documentation folder.  Using EP-Launch may be best -- " );
 		DisplayString( "it provides extra help for new users." );
-		ShowMessage( "No EnergyPlus Data Dictionary (" +InputProcessor::inputEnergyFile+") was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
+		ShowMessage( "No EnergyPlus Data Dictionary (" + inputEnergyFile+") was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
 		ShowMessage( "rather than using one of the methods to run Energyplus as found in the GettingStarted document" );
 		ShowMessage( "in the documentation folder.  Using EP-Launch may be best -- it provides extra help for new users." );
 		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
@@ -228,9 +213,9 @@ AbortEnergyPlus(
 	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, CommandLineInterface::outputEndFile, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFile, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "AbortEnergyPlus: Could not open file "+ CommandLineInterface::outputEndFile +" for output (write)." );
+		DisplayString( "AbortEnergyPlus: Could not open file "+ outputEndFile +" for output (write)." );
 	}
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -383,6 +368,7 @@ EndEnergyPlus()
 	// na
 
 	// Using/Aliasing
+	using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataSystemVariables;
 	using namespace DataTimings;
@@ -460,9 +446,9 @@ EndEnergyPlus()
 	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, CommandLineInterface::outputEndFile, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFile, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "EndEnergyPlus: Could not open file " + CommandLineInterface::outputEndFile + " for output (write)." );
+		DisplayString( "EndEnergyPlus: Could not open file " + outputEndFile + " for output (write)." );
 	}
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
@@ -825,6 +811,7 @@ ShowFatalError(
 	// na
 
 	// Using/Aliasing
+	using namespace CommandLineInterface;
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
 
@@ -846,7 +833,7 @@ ShowFatalError(
 	ShowErrorMessage( " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2 );
 	DisplayString( "**FATAL:" + ErrorMessage );
 	if ( has( ErrorMessage, "in.idf missing" ) ) NoIdf = true;
-	if ( has( ErrorMessage, InputProcessor::inputEnergyFile +" missing" ) ) NoIDD = true;
+	if ( has( ErrorMessage, inputEnergyFile +" missing" ) ) NoIDD = true;
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
@@ -1587,6 +1574,7 @@ ShowErrorMessage(
 	// na
 
 	// Using/Aliasing
+	using namespace CommandLineInterface;
 	using DataStringGlobals::VerString;
 	using DataStringGlobals::IDDVerString;
 	using DataGlobals::DoingInputProcessing;
@@ -1613,10 +1601,10 @@ ShowErrorMessage(
 
 	if ( TotalErrors == 0 && ! ErrFileOpened ) {
 		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, CommandLineInterface::outputErrFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, outputErrFile, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file "+CommandLineInterface::outputErrFile+" for output (write)." );
+			ShowFatalError( "ShowErrorMessage: Could not open file "+outputErrFile+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;
@@ -1802,7 +1790,7 @@ ShowRecurringErrors()
 }
 
 //     NOTICE
-//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

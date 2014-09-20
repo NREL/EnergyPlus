@@ -210,12 +210,6 @@ namespace SolarShading {
 
 	// Functions
 
-	std::string assignShdFile(std::string& _ShdFileName){
-	    	DisplayString("== Module 'Solar shading'::Name of the output (shd) file = " +_ShdFileName+ "\n");
-	    	DisplayString("====================================================================== \n\n");
-	            return _ShdFileName;
-	        }
-
 	void
 	InitSolarCalculations()
 	{

@@ -222,7 +222,7 @@ namespace Psychrometrics {
 		Real64 AverageIterations;
 		std::string istring;
 
-		EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
+		EchoInputFile = FindUnitNumber( outputAuditFile );
 		if ( EchoInputFile == 0 ) return;
 		if ( any_gt( NumTimesCalled, 0 ) ) {
 			gio::write( EchoInputFile, fmtA ) << "RoutineName,#times Called,Avg Iterations";

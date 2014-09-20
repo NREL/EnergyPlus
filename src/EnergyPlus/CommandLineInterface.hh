@@ -18,10 +18,14 @@ namespace CommandLineInterface {
  extern std::string outputMtrFile;
  extern std::string outputRddFile;
  extern std::string outputShdFile;
+ extern std::string outputCsvFile;
  extern std::string outputHtmFile;
  extern std::string outputTabFile;
  extern std::string outputTxtFile;
  extern std::string outputXmlFile;
+ extern std::string inputFileName;
+ extern	std::string inputEnergyFile;
+ extern	std::string inputWeatherFile;
 
  // Process command line arguments
  int

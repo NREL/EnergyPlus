@@ -10,6 +10,7 @@
 #include <ObjexxFCL/Time_Date.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WeatherManager.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
@@ -25,7 +26,6 @@
 #include <OutputReportPredefined.hh>
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
-#include <SimulationManager.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 
@@ -57,6 +57,7 @@ namespace WeatherManager {
 	// USE STATEMENTS:
 	// Use statements for data only modules
 	// Using/Aliasing
+	using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataEnvironment;
@@ -4390,7 +4391,7 @@ Label903: ;
 
 		// FLOW:
 
-		{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); WeatherFileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( inputWeatherFile, flags ); WeatherFileExists = flags.exists(); }
 
 		if ( WeatherFileExists ) {
 			OpenEPlusWeatherFile( ErrorsFound, true );
@@ -4443,11 +4444,11 @@ Label903: ;
 		bool EPWOpen;
 		int unitnumber;
 
-		{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( inputWeatherFile, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 		WeatherFileUnitNumber = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, SimulationManager::inputWeatherFile, flags ); if ( flags.err() ) goto Label9999; }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( WeatherFileUnitNumber, inputWeatherFile, flags ); if ( flags.err() ) goto Label9999; }
 
 		if ( ProcessHeader ) {
 			// Read in Header Information
@@ -4531,7 +4532,7 @@ Label9999: ;
 
 		//  Make sure it's open
 
-		{ IOFlags flags; gio::inquire( SimulationManager::inputWeatherFile, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
+		{ IOFlags flags; gio::inquire( inputWeatherFile, flags ); unitnumber = flags.unit(); EPWOpen = flags.open(); }
 		if ( EPWOpen ) gio::close( unitnumber );
 
 	}
@@ -9467,7 +9468,7 @@ Label9998: ;
 
 	//     NOTICE
 
-	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

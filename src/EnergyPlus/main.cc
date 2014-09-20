@@ -217,12 +217,7 @@ main(int argc, const char * argv[])
 	// CLI module
 	using namespace CommandLineInterface;
 
-    int status = 0;
-    status = ProcessArgs(argc, argv);
-    if(status == 1 || status == -1)
-    	return 0;
-	//ProcessArgs(argc, argv);
-
+	ProcessArgs(argc, argv);
 
 // Enable floating point exceptions
 #ifndef NDEBUG

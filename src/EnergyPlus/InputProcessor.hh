@@ -89,9 +89,7 @@ namespace InputProcessor {
 	extern std::string CurrentFieldName; // Current Field Name (IDD)
 	extern FArray1D_string ObsoleteObjectsRepNames; // Array of Replacement names for Obsolete objects
 	extern std::string ReplacementName;
-    extern std::string inputFileName;
-    extern std::string inputEnergyFile;
-    
+
 	//Logical Variables for Module
 	extern bool OverallErrorFlag; // If errors found during parse of IDF, will fatal at end
 	extern bool EchoInputLine; // Usually True, if the IDD is backspaced, then is set to false, then back to true
@@ -409,12 +407,9 @@ namespace InputProcessor {
 	extern LineDefinition LineItem; // Description of current record
 	extern FArray1D< LineDefinition > IDFRecords; // All the objects read from the IDF
 	extern FArray1D< SecretObjects > RepObjects; // Secret Objects that could replace old ones
-   
+
 	// Functions
-    std::string assign(std::string& _FileName);
-    std::string assignEFile(std::string& _EFileName);
-    std::string assignAuditFile(std::string& _AuditFileName);
-    
+
 	void
 	ProcessInput();
 
@@ -872,7 +867,7 @@ namespace InputProcessor {
 
 	//     NOTICE
 
-	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

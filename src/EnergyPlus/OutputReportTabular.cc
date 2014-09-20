@@ -408,36 +408,6 @@ namespace OutputReportTabular {
 	static gio::Fmt const fmtA( "(A)" );
 
 	// Functions
-    std::string outputFile;
-    std::string assignOFile(std::string& _OFileName){
-    	DisplayString("== Module 'Output report tabular'::Name of the output file = "+_OFileName+ "\n");
-    	DisplayString("====================================================================== \n\n");
-        return _OFileName;
-    }
-    
-    std::string assignHtmFile(std::string& _HtmFileName){
-    	DisplayString("== Module 'Output Report Tabular'::Name of the output (htm) file = " +_HtmFileName+ "\n");
-       	DisplayString("====================================================================== \n\n");
-       	return _HtmFileName;
-    }
-
-    std::string assignTabFile(std::string& _TabFileName){
-        DisplayString("== Module 'Output Report Tabular'::Name of the output (tab) file = " +_TabFileName+ "\n");
-       	DisplayString("====================================================================== \n\n");
-       	return _TabFileName;
-    }
-
-    std::string assignTxtFile(std::string& _TxtFileName){
-    	DisplayString("== Module 'Output Report Tabular'::Name of the output (txt) file = " +_TxtFileName+ "\n");
-       	DisplayString("====================================================================== \n\n");
-       	return _TxtFileName;
-    }
-
-    std::string assignXmlFile(std::string& _XmlFileName){
-            DisplayString("== Module 'Output Report Tabular'::Name of the output (xml) file = " +_XmlFileName+ "\n");
-           	DisplayString("====================================================================== \n\n");
-           	return _XmlFileName;
-        }
 
 	void
 	UpdateTabularReports( int const IndexTypeKey ) // What kind of data to update (Zone, HVAC)
@@ -3141,9 +3111,9 @@ namespace OutputReportTabular {
 				curDel = del( iStyle );
 				if ( TableStyle( iStyle ) == tableStyleComma ) {
 					DisplayString( "Writing tabular output file results using comma format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputFile, flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputCsvFile, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file (" + outputFile + ") for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file (" + outputCsvFile + ") for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "Program Version:" + curDel + VerString;
 					gio::write( curFH, fmtLD ) << "Tabular Output Report in Format: " + curDel + "Comma";
@@ -4835,7 +4805,6 @@ namespace OutputReportTabular {
 		//   report is added it can be added to the list here.
 
 		// Locals
-
 		int EchoInputFile; // found unit number for 'eplusout.audit'
 
 		FillWeatherPredefinedEntries();
@@ -4858,7 +4827,7 @@ namespace OutputReportTabular {
 				WriteTimeBinTables();
 			}
 		}
-		EchoInputFile = FindUnitNumber( CommandLineInterface::outputAuditFile );
+		EchoInputFile = FindUnitNumber( outputAuditFile );
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyInputCount=" << MonthlyInputCount;
 		gio::write( EchoInputFile, fmtLD ) << "sizeMonthlyInput=" << sizeMonthlyInput;
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;

@@ -21,7 +21,6 @@
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
 #include <DataSystemVariables.hh>
-#include <DisplayRoutines.hh>
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -243,25 +242,7 @@ namespace OutputProcessor {
 	//  UpdateDataandReport
 	//  UpdateMeterReporting
 
-	// Function
-
-    std::string assignMtdFile(std::string& _MtdFileName){
-		    	DisplayString("== Module 'Output Processor'::Name of the output (mtd) file = " +_MtdFileName+ "\n");
-		    	DisplayString("====================================================================== \n\n");
-		    	return _MtdFileName;
-		        }
-
-    std::string assignMddFile(std::string& _MddFileName){
-    		   	DisplayString("== Module 'Output Processor'::Name of the output (mdd) file = " +_MddFileName+ "\n");
-    		   	DisplayString("====================================================================== \n\n");
-    	        return _MddFileName;
-    	        }
-
-    std::string assignRddFile(std::string& _RddFileName){
-        	    DisplayString("== Module 'Output Processor'::Name of the output (rdd) file = " +_RddFileName+ "\n");
-       		   	DisplayString("====================================================================== \n\n");
-    	         return _RddFileName;
-   		        }
+	// Functions
 
 	void
 	InitializeOutput()
@@ -8500,7 +8481,7 @@ AddToOutputVariableList(
 }
 
 //     NOTICE
-//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

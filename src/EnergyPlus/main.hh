@@ -1,7 +1,6 @@
 #ifndef main_hh_INCLUDED
 #define main_hh_INCLUDED
 
-using namespace std;
 // C++ Headers
 #include <string>
 

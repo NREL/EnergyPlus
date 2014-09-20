@@ -16,7 +16,6 @@
 #include <DataGlobals.hh>
 #include <DataHeatBalance.hh>
 #include <DataPrecisionGlobals.hh>
-#include <DisplayRoutines.hh>
 #include <DataStringGlobals.hh>
 #include <DataSurfaceColors.hh>
 #include <DataSurfaces.hh>
@@ -29,12 +28,6 @@ namespace EnergyPlus {
 
 using namespace CommandLineInterface;
 static gio::Fmt const fmtLD( "*" );
-
-std::string assignDxfFile(std::string& _DxfFileName){
-            DisplayString("== Module 'Output Reports'::Name of the output (dxf) file = " + _DxfFileName + "\n");
-            DisplayString("====================================================================== \n\n");
-            return _DxfFileName;
-        }
 
 void
 ReportSurfaces()

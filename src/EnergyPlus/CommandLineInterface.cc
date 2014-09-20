@@ -1,9 +1,10 @@
 //Standard C++ library
 #include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
 // CLI Headers
 #include <ezOptionParser.hpp>
-#include <stdio.h>
 
 // Project headers
 #include <CommandLineInterface.hh>
@@ -17,298 +18,160 @@
 #include <SimulationManager.hh>
 #include <SolarShading.hh>
 #include <UtilityRoutines.hh>
-using namespace ez;
 
 namespace EnergyPlus{
 
 namespace CommandLineInterface{
 
-using namespace DataStringGlobals;
-using namespace InputProcessor;
-using namespace SimulationManager;
-using namespace OutputReportTabular;
-using namespace OutputProcessor;
-using namespace SolarShading;
+	using namespace DataStringGlobals;
+	using namespace InputProcessor;
+	using namespace SimulationManager;
+	using namespace OutputReportTabular;
+	using namespace OutputProcessor;
+	using namespace SolarShading;
+	using namespace ez;
 
-std::string outputAuditFile;
-std::string outputBndFile;
-std::string outputDxfFile;
-std::string outputEioFile;
-std::string outputEndFile;
-std::string outputErrFile;
-std::string outputEsoFile;
-std::string outputMtdFile;
-std::string outputMddFile;
-std::string outputMtrFile;
-std::string outputRddFile;
-std::string outputShdFile;
-std::string outputHtmFile;
-std::string outputTabFile;
-std::string outputTxtFile;
-std::string outputXmlFile;
+	std::string outputAuditFile;
+	std::string outputBndFile;
+	std::string outputDxfFile;
+	std::string outputEioFile;
+	std::string outputEndFile;
+	std::string outputErrFile;
+	std::string outputEsoFile;
+	std::string outputMtdFile;
+	std::string outputMddFile;
+	std::string outputMtrFile;
+	std::string outputRddFile;
+	std::string outputShdFile;
+	std::string outputCsvFile;
+	std::string outputHtmFile;
+	std::string outputTabFile;
+	std::string outputTxtFile;
+	std::string outputXmlFile;
+	std::string inputFileName;
+	std::string inputEnergyFile;
+	std::string inputWeatherFile;
 
-void Usage(ezOptionParser& opt) {
-	std::string usage;
-	opt.getUsage(usage);
-	DisplayString(usage);
-};
+	int
+	ProcessArgs(int argc, const char * argv[])
+	{
+		ezOptionParser opt;
 
-int
-ProcessArgs(int argc, const char * argv[])
-{
-	 std::istream* instream;
-     std::string input_filename;
-     std::string input_weatherFile;
-     std::string input_energyFile;
+		opt.overview = VerString;
+		opt.example = "EnergyPlus -i InputFile.idf -e Energy+.idd -w WeatherFile.epw -o";
 
-     std::ifstream input;
-     std::ifstream input1;
-     std::ifstream input2;
+		opt.syntax = "EnergyPlus [options]";
 
+		opt.add("", 0, 0, 0, "Display this message", "-h", "--help");
 
-	 ezOptionParser opt;
+		opt.add("", 0, 0, 0, "Print version invormation", "-v", "--version");
 
-	    opt.overview =  "*******************************************\n";
-	    opt.overview += "Copyright (C) 1996-2014 \n"; // Add owners of copyright?
-	    opt.overview += "Web: www.energyplus.gov\n";
-	    opt.overview += VerString;
-	    opt.overview += "\n*******************************************\n";
-	    opt.syntax = "./EnergyPlus -i InputFile.idf -e Energy+.idd -w WeatherFile.epw -o OutFile.csv";
+		opt.add("in.idf", 0, 1, 0, "Input Definition File (IDF) file path (default \".\\in.idf\")", "-i", "--idf");
 
-	    opt.add("", 0, 1, 0, "Usage information displayed on top", "-h", "--help");
+		opt.add("in.epw", 0, 1, 0, "EnergyPlus Weather (EPW) file path (default \".\\in.epw\")", "-w", "--weather");
 
-	    opt.add("", 0, 1, 0, "Options to get version control", "-v", "--version");
+		opt.add("Energy+.idd", 0, 1, 0, "Input Data Dictionary (IDD) file path (default \".\\Energy+.idd\")", "-e", "--idd");
 
-	    opt.add("in.idf", 0, 1, 0, "Input file to process", "-i", "--input");
+		opt.add("", 0, 0, 0, "Rename output files to using the IDF and EPW file names", "-o", "--output");
 
-	    opt.add("in.epw", 0, 1, 0, "Input weather file to process", "-w", "--weather");
+		// Parse arguments
+		opt.parse(argc, argv);
 
-	    opt.add("Energy+.idd", 0, 1, 0, "Input energy file to process", "-e", "--energy");
+		// print arguments parsed (useful for debugging)
+		/*
+		std::string pretty;
 
-	    opt.add("eplustbl.csv", 0, 0, 0, "Output file", "-o", "--output");
+		opt.prettyPrint(pretty);
 
-	    std::string usage;
-	    opt.parse(argc, argv);
+		std::cout << pretty << std::endl;
+		*/
 
-		if (opt.isSet("-h")) {
-			opt.getUsage(usage);
-	        DisplayString(usage);
-			return 1;
+		std::string usage;
+		opt.getUsage(usage);
+
+		// Handle bad options
+		std::vector<std::string> badOptions;
+
+		if(!opt.gotExpected(badOptions)) {
+			for(int i=0; i < badOptions.size(); ++i) {
+				DisplayString("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+			}
+			DisplayString(usage);
+			exit(EXIT_FAILURE);
 		}
 
-	    if (opt.isSet("-v")) {
+		if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0 || opt.lastArgs.size() > 0){
+			for(int i=1; i < opt.firstArgs.size(); ++i) {
+				std::string arg(opt.firstArgs[i]->c_str());
+				DisplayString("ERROR: Invalid option: " + arg + "\n");
+			}
+			for(int i=0; i < opt.unknownArgs.size(); ++i) {
+				std::string arg(opt.unknownArgs[i]->c_str());
+				DisplayString("ERROR: Invalid option: " + arg + "\n");
+			}
+			for(int i=0; i < opt.lastArgs.size(); ++i) {
+				std::string arg(opt.lastArgs[i]->c_str());
+				DisplayString("ERROR: Invalid option: " + arg + "\n");
+			}
+			DisplayString(usage);
+			exit(EXIT_FAILURE);
+		}
+
+		if(!opt.gotRequired(badOptions)) {
+			for(int i=0; i < badOptions.size(); ++i) {
+				DisplayString("ERROR: Missing required option " + badOptions[i] + "\n");
+			}
+			DisplayString(usage);
+			exit(EXIT_FAILURE);
+		}
+
+		// Process arguments
+		if (opt.isSet("-h")) {
+			DisplayString(usage);
+			exit(EXIT_SUCCESS);
+		}
+
+		if (opt.isSet("-v")) {
 			DisplayString(VerString);
-			return 1;
-	    }
+			exit(EXIT_SUCCESS);
+		}
 
-	    Usage(opt); //Ugly at the moment
+		opt.get("-i")->getString(inputFileName);
 
-	    std::vector<std::string> badOptions;
-	    	   	 if(!opt.gotExpected(badOptions)) {
-	    	   		for(int i=0; i < badOptions.size(); ++i)
-	    				DisplayString("ERROR: Got unexpected number of arguments for option " + badOptions[i] + ".\n\n");
-	    	   		    DisplayString("Usage information displayed above. \n");
-	    	   			return 1;
-	    	   		}
+		opt.get("-w")->getString(inputWeatherFile);
 
-	    	   	if(!opt.isSet("-h") && !opt.isSet("-v") && !opt.isSet("-i") && !opt.isSet("-o") && !opt.isSet("-w") && !opt.isSet("-e")){
-	    	   		DisplayString("Invalid option used. Exiting...\n");
-	    	   		return 1;
-	    	   	}
+		opt.get("-e")->getString(inputEnergyFile);
 
-	    	   	if(!opt.gotRequired(badOptions)) {
-	    	   			for(int i=0; i < badOptions.size(); ++i)
-	    	   				std::cerr << "ERROR: Missing required option " << badOptions[i] << ".\n\n";
-	    	   			Usage(opt);
-	    	   			return 1;
-	    	   		}
+		std::string outputFilePrefix;
 
+		if (opt.isSet("-o")) {
+			outputFilePrefix =
+					inputFileName.substr(0, inputFileName.size()-4) + "_" +
+					inputWeatherFile.substr(0, inputWeatherFile.size()-4) + "_";
+		}
+		else {
+			outputFilePrefix = "eplus";
+		}
 
-	        if (opt.isSet("-i")) {
-	    		opt.get("-i")->getString(input_filename);
-	            input.open( input_filename.c_str() );
-	            instream = &input;
-	            DisplayString("\n\n====================================================================== \n");
-	            DisplayString("-- Input file request by the user = " + input_filename);
-	            if (!input) {
-	                DisplayString("\n -X- Error opening input file = " + input_filename + " -X- \n");
-	                DisplayString(" -X- Exiting -X- \n") ;
-	                return -1;
-	            }
-	        }
+		outputAuditFile = outputFilePrefix + "out.audit";
+		outputBndFile = outputFilePrefix + "out.bnd";
+		outputDxfFile = outputFilePrefix + "out.dxf";
+		outputEioFile = outputFilePrefix + "out.eio";
+		outputEndFile = outputFilePrefix + "out.end";
+		outputErrFile = outputFilePrefix + "out.err";
+		outputEsoFile = outputFilePrefix + "out.eso";
+		outputMtdFile = outputFilePrefix + "out.mtd";
+		outputMddFile = outputFilePrefix + "out.mdd";
+		outputMtrFile = outputFilePrefix + "out.mtr";
+		outputRddFile = outputFilePrefix + "out.rdd";
+		outputShdFile = outputFilePrefix + "out.shd";
+		outputCsvFile = outputFilePrefix + "tbl.csv";
+		outputHtmFile = outputFilePrefix + "tbl.htm";
+		outputTabFile = outputFilePrefix + "tbl.tab";
+		outputTxtFile = outputFilePrefix + "tbl.txt";
+		outputXmlFile = outputFilePrefix + "tbl.xml";
 
-	        if (opt.isSet("-w")) {
-	    		opt.get("-w")->getString(input_weatherFile);
-	            input1.open( input_weatherFile.c_str() );
-	            instream = &input1;
-	            DisplayString("====================================================================== \n");
-	            DisplayString("-- Weather file requested by the user = " + input_weatherFile + "\n");
-	            if (!input1) {
-	                DisplayString("\n -X- Error opening weather file =  " + input_weatherFile + " -X- \n");
-	                DisplayString(" -X- Exiting -X- \n");
-	                return -1;
-	            }
-	        }
-
-	        if (opt.isSet("-e")) {
-	    		opt.get("-e")->getString(input_energyFile);
-	            input2.open( input_energyFile.c_str() );
-	            instream = &input2;
-	            DisplayString("====================================================================== \n");
-	            DisplayString("-- Energy file requested by the user = " + input_energyFile + "\n");
-	            DisplayString("====================================================================== ");
-	            if (!input2) {
-	                DisplayString("\n -X- Error opening energy file =  " + input_energyFile + " -X- \n");
-	                DisplayString(" -X- Exiting -X- \n");
-	                return -1;
-	            }
-	        }
-
-	           if(input_filename.empty())
-	               input_filename = "in.idf";
-
-	           inputFileName = assign(input_filename);
-
-	           if(input_weatherFile.empty())
-	               input_weatherFile = "in.epw";
-
-	           inputWeatherFile = assignWFile(input_weatherFile);
-
-	           if(input_energyFile.empty())
-	               input_energyFile = "Energy+.idd";
-
-	           inputEnergyFile = assignEFile(input_energyFile);
-
-	           std::string s = inputFileName;
-	           std::string ss = inputWeatherFile;
-	           std::string delim = ".";
-
-	           auto start = 0U;
-
-	           DisplayString("Name of the input file without extension = " + s.substr(start, s.size()-4) + "\n");
-	           DisplayString("Name of the input weather file without extension = " + ss.substr(start, ss.size()-4) + "\n");
-
-	           std::string fileName_input = s.substr(start, s.size()-4);
-	           std::string fileName_weather = ss.substr(start, ss.size()-4);
-
-	           std::string output_File = fileName_input+"_"+fileName_weather+".csv";
-	           std::string output_AuditFile = fileName_input+"_"+fileName_weather+".audit";
-	           std::string output_BndFile = fileName_input+"_"+fileName_weather+".bnd";
-	           std::string output_DxfFile = fileName_input+"_"+fileName_weather+".dxf";
-	           std::string output_EioFile = fileName_input+"_"+fileName_weather+".eio";
-	           std::string output_EndFile = fileName_input+"_"+fileName_weather+".end";
-	           std::string output_ErrFile = fileName_input+"_"+fileName_weather+".err";
-	           std::string output_EsoFile = fileName_input+"_"+fileName_weather+".eso";
-	           std::string output_MtdFile = fileName_input+"_"+fileName_weather+".mtd";
-	           std::string output_MddFile = fileName_input+"_"+fileName_weather+".mdd";
-	           std::string output_MtrFile = fileName_input+"_"+fileName_weather+".mtr";
-	           std::string output_RddFile = fileName_input+"_"+fileName_weather+".rdd";
-	           std::string output_ShdFile = fileName_input+"_"+fileName_weather+".shd";
-	           std::string output_HtmFile = fileName_input+"_"+fileName_weather+".htm";
-	           std::string output_TabFile = fileName_input+"_"+fileName_weather+".tab";
-	           std::string output_TxtFile = fileName_input+"_"+fileName_weather+".txt";
-	           std::string output_XmlFile = fileName_input+"_"+fileName_weather+".xml";
-
-	           if (opt.isSet("-o")) {
-	         	            std::ofstream output;
-	         	            output.open( output_File.c_str() );
-	         	            DisplayString("====================================================================== \n");
-	         	            DisplayString("-- Output to be stored in file = " + output_File + "\n");
-	         	            DisplayString("====================================================================== ");
-	         	            if (!output) {
-	         	                DisplayString("\n -X- Error opening output file =  " + output_File + " -X- \n");
-	         	                DisplayString(" -X- Exiting -X- \n");
-	         	                return -1;
-	         	            }
-	         	        }
-
-	           if(output_File.empty())
-	               	   	   	   output_File = "eplustbl.csv";
-
-	           outputFile = assignOFile(output_File);
-
-	           if(output_AuditFile.empty())
-	        	   	   	   	   output_AuditFile = "eplusout.audit";
-
-	           outputAuditFile = assignAuditFile(output_AuditFile);
-
-	           if(output_BndFile.empty())
-	        	   	   	   	   output_BndFile = "eplusout.bnd";
-
-	           outputBndFile = assignBndFile(output_BndFile);
-
-	           if(output_DxfFile.empty())
-	           	        	   output_DxfFile = "eplusout.dxf";
-
-	           outputDxfFile = assignDxfFile(output_DxfFile);
-
-	           if(output_EioFile.empty())
-	           	           	   output_EioFile = "eplusout.eio";
-
-	           outputEioFile = assignEioFile(output_EioFile);
-
-	           if(output_EndFile.empty())
-	           	           	    output_EndFile = "eplusout.end";
-
-	           outputEndFile = assignEndFile(output_EndFile);
-
-	           if(output_ErrFile.empty())
-	           	           	    output_ErrFile = "eplusout.err";
-
-	           outputErrFile = assignErrFile(output_ErrFile);
-
-	           if(output_EsoFile.empty())
-	           	           	    output_EsoFile = "eplusout.eso";
-
-	           outputEsoFile = assignEsoFile(output_EsoFile);
-
-	           if(output_MtdFile.empty())
-	           	           	    output_MtdFile = "eplusout.mtd";
-
-	           outputMtdFile = assignMtdFile(output_MtdFile);
-
-	           if(output_MddFile.empty())
-	           	           	    output_MddFile = "eplusout.mdd";
-
-	           outputMddFile = assignMddFile(output_MddFile);
-
-	           if(output_MtrFile.empty())
-	           	           	    output_MtrFile = "eplusout.mtr";
-
-	           outputMtrFile = assignMtrFile(output_MtrFile);
-
-	           if(output_RddFile.empty())
-	           	           	    output_RddFile = "eplusout.rdd";
-
-	           outputRddFile = assignRddFile(output_RddFile);
-
-	           if(output_ShdFile.empty())
-	           	           	    output_ShdFile = "eplusout.shd";
-
-	           outputShdFile = assignShdFile(output_ShdFile);
-
-	           if(output_HtmFile.empty())
-	           	           	    output_HtmFile = "eplustbl.htm";
-
-	           outputHtmFile = assignHtmFile(output_HtmFile);
-
-	           if(output_TabFile.empty())
-	           	           	    output_TabFile = "eplustbl.tab";
-
-	           outputTabFile = assignTabFile(output_TabFile);
-
-	           if(output_TxtFile.empty())
-	           	           	    output_TxtFile = "eplustbl.txt";
-
-	           outputTxtFile = assignTxtFile(output_TxtFile);
-
-	           if(output_XmlFile.empty())
-	           	           	    output_XmlFile = "eplustbl.xml";
-
-	           outputXmlFile = assignXmlFile(output_XmlFile);
-
- return 0;
-	        /////////////////////////////////////////////////////
-}
+		return 0;
+	}
 } //namespace options
 } //EnergyPlus namespace

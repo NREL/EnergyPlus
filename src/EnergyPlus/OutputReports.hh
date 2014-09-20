@@ -9,8 +9,6 @@
 
 namespace EnergyPlus {
 
-std::string assignDxfFile(std::string& _DxfFileName);
-
 void
 ReportSurfaces();
 
