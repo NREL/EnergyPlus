@@ -50,6 +50,15 @@ if( BUILD_TESTING )
   endif()
 endif()
 
+if( ENABLE_REGRESSION_TESTING )
+  if (REGRESSION_SCRIPT_PATH STREQUAL "" OR REGRESSION_BASELINE_PATH STREQUAL "")
+    message( "Regression testing is enabled, but no script or baseline has been provided" )
+    set( DO_REGRESSION_TESTING OFF )
+  else()
+    set( DO_REGRESSION_TESTING ON )
+  endif()
+endif()
+
 # Not yet released by CMake, but is being developed
 # This will help us set the proper options for c++11 across various configurations
 #FIND_PACKAGE( CXXFeatures ) 
