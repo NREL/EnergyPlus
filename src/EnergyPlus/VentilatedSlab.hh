@@ -249,7 +249,7 @@ namespace VentilatedSlab {
 		Real64 ZoneInletTemp; // supply air temp
 		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
-
+		int HVACSizingIndex; // index of a HVACSizing object for a ventilator slab
 		// Default Constructor
 		VentilatedSlabData() :
 			SchedPtr( 0 ),
@@ -362,7 +362,8 @@ namespace VentilatedSlab {
 			ReturnAirTemp( 0.0 ),
 			FanOutletTemp( 0.0 ),
 			ZoneInletTemp( 0.0 ),
-			AvailStatus( 0 )
+			AvailStatus( 0 ),
+			HVACSizingIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -514,7 +515,8 @@ namespace VentilatedSlab {
 			Real64 const FanOutletTemp, // FanOutlet temp in degree C
 			Real64 const ZoneInletTemp, // supply air temp
 			std::string const & AvailManagerListName, // Name of an availability manager list object
-			int const AvailStatus
+			int const AvailStatus,
+			int const HVACSizingIndex // index of a HVACSizing object for a ventilator slab
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -663,13 +665,32 @@ namespace VentilatedSlab {
 			FanOutletTemp( FanOutletTemp ),
 			ZoneInletTemp( ZoneInletTemp ),
 			AvailManagerListName( AvailManagerListName ),
-			AvailStatus( AvailStatus )
+			AvailStatus( AvailStatus ),
+			HVACSizingIndex( HVACSizingIndex )
 		{}
 
 	};
 
+	struct VentSlabNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		VentSlabNumericFieldData()
+		{}
+
+		// Member Constructor
+		VentSlabNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< VentilatedSlabData > VentSlab;
+	extern FArray1D< VentSlabNumericFieldData > VentSlabNumericFields;
 
 	// Functions
 

@@ -3504,15 +3504,19 @@ namespace MixedAir {
 		ZoneOAMin = 0.0;
 		ZoneOAMax = 0.0;
 		ZoneContamControllerSched = 0.0;
-
+		
 		if ( AirLoopNum > 0 ) {
 			AirLoopEconoLockout = AirLoopControlInfo( AirLoopNum ).EconoLockout;
-			AirLoopCyclingFan = AirLoopControlInfo( AirLoopNum ).CyclingFan;
 			AirLoopNightVent = AirLoopControlInfo( AirLoopNum ).NightVent;
+			if( AirLoopControlInfo( AirLoopNum ).FanOpMode == CycFanCycCoil ) {
+				AirLoopCyclingFan = true;
+			} else {
+				AirLoopCyclingFan = false;
+			}
 		} else {
 			AirLoopEconoLockout = false;
-			AirLoopCyclingFan = false;
 			AirLoopNightVent = false;
+			AirLoopCyclingFan = false;
 		}
 
 		// Check for no flow

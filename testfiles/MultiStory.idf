@@ -903,7 +903,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Gnd West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   Zone,
@@ -1160,7 +1163,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Gnd Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   Zone,
@@ -1433,7 +1439,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Gnd East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -1717,7 +1726,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Mid West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   Zone,
@@ -1974,7 +1986,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Mid Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   Zone,
@@ -2247,7 +2262,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Mid East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -2531,7 +2549,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Top West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   Zone,
@@ -2788,7 +2809,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Top Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   Zone,
@@ -3061,7 +3085,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Top East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity{ W }
+    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
+    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
     0.95;                    !- Efficiency
 
   ScheduleTypeLimits,
