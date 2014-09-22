@@ -3803,15 +3803,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN1 Inlets,         !- Name
@@ -4125,15 +4117,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN3 Inlets,         !- Name
@@ -4447,15 +4431,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN5 Inlets,         !- Name
@@ -4769,15 +4745,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN7 Inlets,         !- Name
@@ -5091,15 +5059,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN9 Inlets,         !- Name
@@ -5413,15 +5373,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN11 Inlets,        !- Name
@@ -5735,15 +5687,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN13 Inlets,        !- Name
@@ -6057,15 +6001,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN15 Inlets,        !- Name
@@ -6379,15 +6315,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN17 Inlets,        !- Name
@@ -6701,15 +6629,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   NodeList,
     Zone ZN19 Inlets,        !- Name

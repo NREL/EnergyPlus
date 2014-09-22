@@ -377,9 +377,9 @@
                 CurArgs = CurArgs + 4
                 ! then shift the next 2 fields
                 OutArgs(27:28) = InArgs(20:21)
-                ! then add the final new fields
-                OutArgs(29:36) = ""
-                CurArgs = CurArgs + 8
+                ! although there are new fields added to the end, they dont need to be filled out, so dont worry about them
+                !OutArgs(29:36) = ""
+                !CurArgs = CurArgs + 8
                 
               CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER') ! DONE
                 nodiff = .false.
