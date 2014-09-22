@@ -30451,6 +30451,7 @@ Sizing:System,
       \units m3/s
       \minimum 0.0
       \autosizable
+      \default autosize
       \note Enter the design cooling capacity. Required field when the cooling design capacity method
       \note CoolingDesignCapacity.
  N22, \field Cooling Design Capacity Per Floor Area {W/m2}
@@ -30484,6 +30485,7 @@ Sizing:System,
       \units m3/s
       \minimum 0.0
       \autosizable
+      \default autosize
       \note Enter the design heating capacity. Required field when the heating design capacity method
       \note HeatingDesignCapacity.
  N25, \field Heating Design Capacity Per Floor Area {W/m2}
