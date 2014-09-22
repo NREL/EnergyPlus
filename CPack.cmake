@@ -102,6 +102,14 @@ if( UNIX )
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 endif()
 
+INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
+  PATTERN _* EXCLUDE
+  PATTERN *.ddy EXCLUDE
+  PATTERN ExampleFilesDoc.txt EXCLUDE
+  PATTERN ExampleFiles.xls EXCLUDE
+  PATTERN ExampleFiles-ObjectLink.xls EXCLUDE
+)
+
 # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
 install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
 install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/appguidemenu.pdf" "./Documentation")
