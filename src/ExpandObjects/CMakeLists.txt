@@ -29,4 +29,8 @@ else()
 endif()
   
 install(TARGETS ExpandObjects DESTINATION ./)
+install(CODE "
+  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
+  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/ExpandObjects${CMAKE_EXECUTABLE_SUFFIX}\")
+")
 

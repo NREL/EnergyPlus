@@ -15,3 +15,8 @@ SET_TARGET_PROPERTIES(parametricpreprocessor PROPERTIES
 )
 
 INSTALL( TARGETS parametricpreprocessor DESTINATION PreProcess/ParametricPreProcessor )
+install(CODE "
+  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
+  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/PreProcess/ParametricPreProcessor/parametricpreprocessor${CMAKE_EXECUTABLE_SUFFIX}\")
+")
+

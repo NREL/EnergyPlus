@@ -149,3 +149,22 @@ macro( ADD_CXX_RELEASE_DEFINITIONS NEWFLAGS )
   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${NEWFLAGS}")
 endmacro()
 
+function(fixup_executable EXECUTABLE_PATH )
+  include(GetPrerequisites)
+  get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
+
+  if(WIN32)
+    list(REVERSE PREREQUISITES)
+  endif()
+
+  foreach(PREREQ IN LISTS PREREQUISITES)
+      gp_resolve_item("" "${PREREQ}" "" "${LIBRARY_SEARCH_DIRECTORY}" resolved_item_var)
+      get_filename_component(BASE_PATH "${EXECUTABLE_PATH}" DIRECTORY)
+      execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${resolved_item_var}" "${BASE_PATH}")
+      if(APPLE)
+        get_filename_component(PREREQNAME "${resolved_item_var}" NAME)
+        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PREREQNAME}" "${EXECUTABLE_PATH}")
+      endif()
+  endforeach()
+endfunction()
+

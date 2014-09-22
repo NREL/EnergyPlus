@@ -35,3 +35,8 @@ SET_TARGET_PROPERTIES(Slab PROPERTIES
 )
 
 INSTALL( TARGETS Slab DESTINATION PreProcess/GrndTempCalc )
+install(CODE "
+  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
+  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/PreProcess/GrndTempCalc/Slab${CMAKE_EXECUTABLE_SUFFIX}\")
+")
+

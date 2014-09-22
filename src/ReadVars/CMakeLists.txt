@@ -9,4 +9,8 @@ SET(SRC ReadVarsESO.f90)
 ADD_EXECUTABLE( ReadVarsESO ${SRC} )
 
 install(TARGETS ReadVarsESO DESTINATION ./)
+install(CODE "
+  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
+  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/ReadVarsESO${CMAKE_EXECUTABLE_SUFFIX}\")
+")
 
