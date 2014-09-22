@@ -55056,7 +55056,7 @@ Pipe:Underground,
         \required-field
    A3,  \field Slab Location
         \required-field
-		\type choice
+        \type choice
         \key Ingrade
         \key Ongrade
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
