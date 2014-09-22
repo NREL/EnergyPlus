@@ -33724,7 +33724,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \type real
        \minimum 1.0
        \default 5.0
-       \units C
+       \units deltaC
   N5,  \field Maximum Steam Flow Rate
        \required-field
        \type real
