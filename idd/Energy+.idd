@@ -19975,7 +19975,6 @@ Daylighting:Controls,
   N7 , \field Z-Coordinate of Second Reference Point
        \units m
        \type real
-       \minimum 0.0
        \default 0.8
   N8 , \field Fraction of Zone Controlled by First Reference Point
        \type real
