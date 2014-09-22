@@ -94,6 +94,14 @@ INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Int
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw" DESTINATION "./WeatherData")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.stat" DESTINATION "./WeatherData")
 
+# scripts
+if( UNIX )
+  configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
+  install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
+  install(PROGRAMS scripts/runepmacro DESTINATION "./")
+  install(PROGRAMS scripts/runreadvars DESTINATION "./")
+endif()
+
 # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
 install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
 install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/appguidemenu.pdf" "./Documentation")
