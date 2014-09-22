@@ -55106,6 +55106,10 @@ Pipe:Underground,
         \note This field specifies the depth of the vertical insulation
    A10; \field Simulation Timestep
         \required-field
+        \type choice
+        \key Hourly
+        \key Timestep
+        \default Hourly
         \note This field specifies the domain simulation timestep.
 
 PipingSystem:Underground:Domain,
