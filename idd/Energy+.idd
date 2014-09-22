@@ -11735,7 +11735,7 @@ WindowProperty:FrameAndDivider,
          \note Obtained from WINDOW 5 or other 2-D calculation
     N5 , \field Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance
          \type real
-         \minimum 1.0
+         \minimum> 0.0
          \maximum 4.0
          \default 1.0
          \note Excludes air films; applies only to multipane windows
@@ -11807,7 +11807,7 @@ WindowProperty:FrameAndDivider,
          \note Obtained from WINDOW 5 or other 2-D calculation
     N15, \field Ratio of Divider-Edge Glass Conductance to Center-Of-Glass Conductance
          \type real
-         \minimum 1.0
+         \minimum> 0.0
          \maximum 4.0
          \default 1.0
          \note Excludes air films
@@ -30056,7 +30056,7 @@ DesignSpecification:ZoneHVAC:Sizing,
   A1, \field Name
       \required-field
       \type alpha
-      \reference   
+      \reference DesignSpecificationZoneHVACSizingName
   A2, \field Cooling Design Air Flow Method
       \type choice 
       \key None
@@ -30451,6 +30451,7 @@ Sizing:System,
       \units m3/s
       \minimum 0.0
       \autosizable
+      \default autosize
       \note Enter the design cooling capacity. Required field when the cooling design capacity method
       \note CoolingDesignCapacity.
  N22, \field Cooling Design Capacity Per Floor Area {W/m2}
@@ -30484,6 +30485,7 @@ Sizing:System,
       \units m3/s
       \minimum 0.0
       \autosizable
+      \default autosize
       \note Enter the design heating capacity. Required field when the heating design capacity method
       \note HeatingDesignCapacity.
  N25, \field Heating Design Capacity Per Floor Area {W/m2}
@@ -31240,15 +31242,14 @@ ZoneHVAC:IdealLoadsAirSystem,
        \default 0.65
   A16; \field Design Specification ZoneHVAC Sizing Object Name
        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-       \type object
-       \object-name DesignSpecificationZoneHVACSizingName   
+       \type object-list
+       \object-list DesignSpecificationZoneHVACSizingName   
 
 ZoneHVAC:FourPipeFanCoil,
         \memo Four pipe fan coil system. Forced-convection hydronic heating-cooling unit with
         \memo supply fan, hot water heating coil, chilled water cooling coil, and fixed-position
         \memo outdoor air mixer.
         \min-fields 24
-        \reference DesignSpecificationZoneHVACSizingName
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
@@ -31363,8 +31364,8 @@ ZoneHVAC:FourPipeFanCoil,
         \object-list SystemAvailabilityManagerLists
    A16; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
 
 
 ZoneHVAC:WindowAirConditioner,
@@ -31449,8 +31450,8 @@ ZoneHVAC:WindowAirConditioner,
         \object-list SystemAvailabilityManagerLists
    A14; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
 
    
 ZoneHVAC:PackagedTerminalAirConditioner,
@@ -31594,8 +31595,8 @@ ZoneHVAC:PackagedTerminalAirConditioner,
         \object-list SystemAvailabilityManagerLists
    A16; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:PackagedTerminalHeatPump,
         \memo Packaged terminal heat pump (PTHP). Forced-convection heating-cooling unit with
@@ -31780,8 +31781,8 @@ ZoneHVAC:PackagedTerminalHeatPump,
         \object-list SystemAvailabilityManagerLists
    A18; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
    
 ZoneHVAC:WaterToAirHeatPump,
         \memo Water-to-air heat pump. Forced-convection heating-cooling unit with supply fan,
@@ -31973,8 +31974,8 @@ ZoneHVAC:WaterToAirHeatPump,
         \note ConstantOnDemand results in 100% water flow whenever the coil is on, but is 0% whenever the coil has no load
    A20; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:Dehumidifier:DX,
         \memo This object calculates the performance of zone (room) air dehumidifiers.
@@ -32339,8 +32340,8 @@ ZoneHVAC:UnitVentilator,
         \object-list SystemAvailabilityManagerLists
    A20; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:UnitHeater,
         \memo Unit heater. Forced-convection heating-only unit with supply fan, heating coil
@@ -32426,8 +32427,8 @@ ZoneHVAC:UnitHeater,
         \object-list SystemAvailabilityManagerLists
    A12; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:EvaporativeCoolerUnit,
         \memo Zone evaporative cooler. Forced-convection cooling-only unit with supply fan,
@@ -32520,8 +32521,8 @@ ZoneHVAC:EvaporativeCoolerUnit,
         \object-list EvapCoolerNames
    A15; \field Design Specification ZoneHVAC Sizing Object Name
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-        \type object
-        \object-name DesignSpecificationZoneHVACSizingName
+        \type object-list
+        \object-list DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:OutdoorAirUnit,
        \memo The zone outdoor air unit models a single-zone dedicated outdoor air system (DOAS).
@@ -32871,8 +32872,8 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
        \object-list SystemAvailabilityManagerLists
   A16; \field Design Specification ZoneHVAC Sizing Object Name
        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-       \type object
-       \object-name DesignSpecificationZoneHVACSizingName
+       \type object-list
+       \object-list DesignSpecificationZoneHVACSizingName
 
 \group Zone HVAC Radiative/Convective Units
 
@@ -33724,7 +33725,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \type real
        \minimum 1.0
        \default 5.0
-       \units C
+       \units deltaC
   N5,  \field Maximum Steam Flow Rate
        \required-field
        \type real
@@ -35631,7 +35632,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
         \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
         \note determine from user specified heating capacity per floor area and zone floor area.
-        \n te FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+        \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
         \note determined from a user specified fraction and the auto-sized design heating capacity.
    N1 , \field Heating Design Capacity
         \type real
@@ -36211,7 +36212,7 @@ ZoneHVAC:HighTemperatureRadiant,
         \note HeatingDesignCapacity = > selected when the design heating capacity value or autosize
         \note is specified. CapacityPerFloorArea = > selected when the design heating capacity is
         \note determine from user specified heating capacity per floor area and zone floor area.
-        \n te FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
+        \note FractionOfAutosizedHeatingCapacity = > is selected when the design heating capacity is
         \note determined from a user specified fraction and the auto-sized design heating capacity.
    N1 , \field Heating Design Capacity
         \type real
@@ -37084,8 +37085,8 @@ ZoneHVAC:VentilatedSlab,
        \object-list SystemAvailabilityManagerLists
   A34; \field Design Specification ZoneHVAC Sizing Object Name
        \note Enter the name of a DesignSpecificationZoneHVACSizing object.
-       \type object
-       \object-name DesignSpecificationZoneHVACSizingName
+       \type object-list
+       \object-list DesignSpecificationZoneHVACSizingName
 
 ZoneHVAC:VentilatedSlab:SlabGroup,
         \memo This is used to allow the coordinate control of several ventilad slab system
@@ -39603,7 +39604,6 @@ Coil:Cooling:Water,
        \autosizable
        \default autosize
        \minimum 0
-       \ip-units gal/min
   N3 , \field Design Inlet Water Temperature
        \units C
        \autosizable
@@ -61162,11 +61162,14 @@ GroundHeatExchanger:Vertical,
         \minimum> 0.0
         \default 0.0005
   N16,  \field Number of Data Pairs of the G Function
+        \required-field
         \minimum> 0.0
         \maximum 100
   N17, \field G-Function Ln(T/Ts) Value 1
+       \required-field
        \type real
   N18, \field G-Function G Value 1
+       \required-field
        \type real
   N19, \field G-Function Ln(T/Ts) Value 2
        \type real
