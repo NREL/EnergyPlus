@@ -34,9 +34,5 @@ SET_TARGET_PROPERTIES(Slab PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-INSTALL( TARGETS Slab DESTINATION PreProcess/GrndTempCalc )
-install(CODE "
-  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
-  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/PreProcess/GrndTempCalc/Slab${CMAKE_EXECUTABLE_SUFFIX}\")
-")
+install_and_fixup_exe_target( Slab PreProcess/GrndTempCalc )
 

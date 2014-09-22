@@ -12,9 +12,5 @@ SET_TARGET_PROPERTIES(HVAC-Diagram PROPERTIES
   COMPILE_FLAGS "-std=legacy -ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-INSTALL( TARGETS HVAC-Diagram DESTINATION PostProcess )
-install(CODE "
-  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
-  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/PostProcess/HVAC-Diagram${CMAKE_EXECUTABLE_SUFFIX}\")
-")
+install_and_fixup_exe_target( HVAC-Diagram PostProcess )
 

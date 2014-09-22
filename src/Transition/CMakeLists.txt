@@ -74,9 +74,5 @@ SET_PROPERTY( TARGET "${LAST_NAME}"
 
 ENDFOREACH()
 
-INSTALL( TARGETS "${LAST_NAME}" DESTINATION PreProcess/IDFVersionUpdater )
-install(CODE "
-  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
-  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/PreProcess/IDFVersionUpdater/${LAST_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
-")
+install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
 

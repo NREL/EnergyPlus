@@ -8,9 +8,5 @@ SET(SRC ReadVarsESO.f90)
 
 ADD_EXECUTABLE( ReadVarsESO ${SRC} )
 
-install(TARGETS ReadVarsESO DESTINATION PostProcess)
-install(CODE "
-  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
-  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/PostProcess/ReadVarsESO${CMAKE_EXECUTABLE_SUFFIX}\")
-")
+install_and_fixup_exe_target( ReadVarsESO PostProcess )
 

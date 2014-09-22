@@ -31,9 +31,5 @@ SET_TARGET_PROPERTIES(Basement PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-INSTALL( TARGETS Basement DESTINATION PreProcess/GrndTempCalc )
-install(CODE "
-  include(\"${CMAKE_SOURCE_DIR}/cmake/ProjectMacros.cmake\")
-  fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/PreProcess/GrndTempCalc/Basement${CMAKE_EXECUTABLE_SUFFIX}\")
-")
+install_and_fixup_exe_target( Basement PreProcess/GrndTempCalc )
 

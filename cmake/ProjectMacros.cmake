@@ -168,3 +168,11 @@ function(fixup_executable EXECUTABLE_PATH )
   endforeach()
 endfunction()
 
+function(install_and_fixup_exe_target TARGET_NAME INSTALL_PATH)
+  install( TARGETS ${TARGET_NAME} DESTINATION ${INSTALL_PATH} )
+  install(CODE "
+    include(\"${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake\")
+    fixup_executable(\"\${CMAKE_INSTALL_PREFIX}/${INSTALL_PATH}/${TARGET_NAME}${CMAKE_EXECUTABLE_SUFFIX}\")
+  ")
+endfunction()
+
