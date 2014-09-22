@@ -54985,33 +54985,39 @@ Pipe:Underground,
         \default 0
 
   Site:GroundDomain,
+        \memo Ground coupled slab model for on-grade and
+        \memo in-grade cases with or without insulation.
    A1,  \field Name
         \required-field
    N1,  \field Ground Domain Depth
         \required-field
         \type real
-        \minimum> 0
         \units m
+        \minimum> 0.0
    N2,  \field Aspect Ratio
-        \required-field
         \type real
+        \default 1
    N3,  \field Perimeter Offset
         \required-field
         \type real
         \units m
-        \minimum>0
-   N4,  \field Soil Thermal Conductivity {W/m-K}
+        \minimum> 0.0
+   N4,  \field Soil Thermal Conductivity
         \required-field
         \type real
         \units W/m-K
-        \minimum> 0
-   N5,  \field Soil Density {kg/m3}
+        \minimum> 0.0
+   N5,  \field Soil Density
         \required-field
         \type real
-   N6,  \field Soil Specific Heat {J/kg-K}
+        \units kg/m3
+        \minimum> 0.0
+   N6,  \field Soil Specific Heat
         \required-field
         \type real
-   N7,  \field Soil Moisture Content Volume Fraction {percent}
+        \units J/kg-K
+        \minimum> 0.0
+   N7,  \field Soil Moisture Content Volume Fraction
         \type real
         \units percent
         \minimum 0
@@ -55052,27 +55058,30 @@ Pipe:Underground,
         \required-field
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
    A4,  \field Name of slab material
-        \field-optional
+        \note Only applicable for the in-grade case
    A5,  \field Horizontal Insulation
-        \required-optional
+        \required-field
         \note This field specifies the presence of insulation beneath the slab.
    A6,  \field Insulation Material
-        \note optional
         \note This field specifies the horizontal insulation material.
    A7,  \field Horizontal Insulation Extents
-        \field-optional
-        \note This field specifies whether the horizontal insulation fully insulates the surface or is perimeter only insulation
+        \note This field specifies whether the horizontal insulation fully insulates 
+        \note the surface or is perimeter only insulation
    N13, \field Perimeter Insulation Width
-        \field-optional
+        \type real
+        \units m
+        \minimum> 0.0
         \note This field specifies the width of the perimeter insulation
    A8,  \field Vertical Insulation
         \required-field
         \note This field specifies the presence of vertical insulation at the slab edge.
    A9,  \field Insulation Material
-        \note optional
         \note This field specifies the vertical insulation material.
    N14, \field Vertical Insulation Depth
-        \field-optional
+        \type real
+        \units m
+        \minimum> 0.0
+        \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
    A10; \field Simulation Timestep
         \required-field
