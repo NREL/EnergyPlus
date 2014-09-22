@@ -55060,7 +55060,7 @@ Pipe:Underground,
         \key Ingrade
         \key Ongrade
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
-   A4,  \field Name of Slab Material
+   A4,  \field Slab Material Name
         \type object-list
         \object-list MaterialName
         \note Only applicable for the in-grade case
@@ -55071,7 +55071,7 @@ Pipe:Underground,
         \default No
         \note This field specifies the presence of insulation beneath the slab.
         \note Only required for in-grade case.
-   A6,  \field Insulation Material
+   A6,  \field Horizontal Insulation Material Name
         \type object-list
         \object-list MaterialName
         \note This field specifies the horizontal insulation material.
@@ -55094,7 +55094,7 @@ Pipe:Underground,
         \key No
         \default No
         \note This field specifies the presence of vertical insulation at the slab edge.
-   A9,  \field Insulation Material
+   A9,  \field Vertical Insulation Material Name
         \type object-list
         \object-list MaterialName  
         \note This field specifies the vertical insulation material.
