@@ -30056,7 +30056,7 @@ DesignSpecification:ZoneHVAC:Sizing,
   A1, \field Name
       \required-field
       \type alpha
-      \reference   
+      \reference DesignSpecificationZoneHVACSizingName
   A2, \field Cooling Design Air Flow Method
       \type choice 
       \key None
@@ -31250,7 +31250,6 @@ ZoneHVAC:FourPipeFanCoil,
         \memo supply fan, hot water heating coil, chilled water cooling coil, and fixed-position
         \memo outdoor air mixer.
         \min-fields 24
-        \reference DesignSpecificationZoneHVACSizingName
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
