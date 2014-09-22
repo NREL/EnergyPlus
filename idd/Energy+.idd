@@ -61161,11 +61161,14 @@ GroundHeatExchanger:Vertical,
         \minimum> 0.0
         \default 0.0005
   N16,  \field Number of Data Pairs of the G Function
+        \required-field
         \minimum> 0.0
         \maximum 100
   N17, \field G-Function Ln(T/Ts) Value 1
+       \required-field
        \type real
   N18, \field G-Function G Value 1
+       \required-field
        \type real
   N19, \field G-Function Ln(T/Ts) Value 2
        \type real
