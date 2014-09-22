@@ -956,7 +956,13 @@ void XMLCALL handleData(void *context, const XML_Char *s, int len) {
     else {
         // continue existing string
         n = strlen(data) + len;
-        data = realloc(data, n+1);
+        char* tmpData;
+        tmpData = realloc(data, n+1);
+        if (!tmpData) {
+			printf("Couldnt allocate memory in xml_parser_cosim::handleData\n");
+			return;
+		}
+		data = tmpData;
         strncat(data, s, len);
         data[n] = '\0';
     }

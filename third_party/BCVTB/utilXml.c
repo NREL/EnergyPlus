@@ -292,11 +292,13 @@ int getepvariables( char*  const fileName,
     }
     else {
       if(j == 0) {
-        inputKeys = (char**) realloc(inputKeys, sizeof(char*) * (i+1) );
-        if(inputKeys == NULL) {
+        char** tmpInputKeys;
+        tmpInputKeys = (char**) realloc(inputKeys, sizeof(char*) * (i+1) );
+        if(tmpInputKeys == NULL) {
           fprintf(stderr, "Error: Memory allocation failed in 'utilXml.c'\n");
           return -1;
         }
+        inputKeys = tmpInputKeys;
         inputKeys[i] = NULL;
       }
           
@@ -427,11 +429,13 @@ int getepvariablesFMU( char*  const fileName,
     }
     else {
       if(j == 0) {
-        inputKeys = (char**) realloc(inputKeys, sizeof(char*) * (i+1) );
-        if(inputKeys == NULL) {
+        char** tmpInputKeys;
+        tmpInputKeys = (char**) realloc(inputKeys, sizeof(char*) * (i+1) );
+        if(tmpInputKeys == NULL) {
           fprintf(stderr, "Error: Memory allocation failed in 'utilXml.c'\n");
           return -1;
         }
+        inputKeys = tmpInputKeys;
         inputKeys[i] = NULL;
       }
           
@@ -602,11 +606,13 @@ getxmlvalues(char* const fileName,
     }
     else {
       j++;  
-      temp = (char*) realloc(temp, sizeof(char)*(j+1));
-      if(temp == NULL) {
+      char* thisTemp;
+      thisTemp = (char*) realloc(temp, sizeof(char)*(j+1));
+      if(thisTemp == NULL) {
         fprintf(stderr, "Error: Memory allocation failed in 'utilXml.c'.\n");
         return -1;
       }
+      temp = thisTemp;
       temp[j-1]=exp[i];
       temp[j]='\0';
       i++;
