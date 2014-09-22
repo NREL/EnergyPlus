@@ -11735,7 +11735,7 @@ WindowProperty:FrameAndDivider,
          \note Obtained from WINDOW 5 or other 2-D calculation
     N5 , \field Ratio of Frame-Edge Glass Conductance to Center-Of-Glass Conductance
          \type real
-         \minimum 1.0
+         \minimum> 0.0
          \maximum 4.0
          \default 1.0
          \note Excludes air films; applies only to multipane windows
