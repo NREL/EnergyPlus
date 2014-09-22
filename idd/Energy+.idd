@@ -55060,8 +55060,8 @@ Pipe:Underground,
    A4,  \field Name of slab material
         \note Only applicable for the in-grade case
    A5,  \field Horizontal Insulation
-        \required-field
         \note This field specifies the presence of insulation beneath the slab.
+        \note Only required for in-grade case.
    A6,  \field Insulation Material
         \note This field specifies the horizontal insulation material.
    A7,  \field Horizontal Insulation Extents
