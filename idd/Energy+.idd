@@ -39603,7 +39603,6 @@ Coil:Cooling:Water,
        \autosizable
        \default autosize
        \minimum 0
-       \ip-units gal/min
   N3 , \field Design Inlet Water Temperature
        \units C
        \autosizable
