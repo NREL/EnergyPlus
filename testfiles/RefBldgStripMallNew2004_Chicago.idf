@@ -4354,15 +4354,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_1:1,              !- AirLoop Name
@@ -4391,15 +4383,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_2:2,              !- AirLoop Name
@@ -4428,15 +4412,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_3:3,              !- AirLoop Name
@@ -4465,15 +4441,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_4:4,              !- AirLoop Name
@@ -4502,15 +4470,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_5:5,              !- AirLoop Name
@@ -4539,15 +4499,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_6:6,              !- AirLoop Name
@@ -4576,15 +4528,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_7:7,              !- AirLoop Name
@@ -4613,15 +4557,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_8:8,              !- AirLoop Name
@@ -4650,15 +4586,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Sizing:System,
     PSZ-AC_9:9,              !- AirLoop Name
@@ -4687,15 +4615,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   Controller:OutdoorAir,
     PSZ-AC_10:10_OA_Controller,  !- Name

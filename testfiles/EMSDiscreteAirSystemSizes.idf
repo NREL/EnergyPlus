@@ -5471,15 +5471,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_1:1 Availability Manager List,  !- Name
@@ -5755,15 +5747,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_2:2 Availability Manager List,  !- Name
@@ -6039,15 +6023,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_3:3 Availability Manager List,  !- Name
@@ -6323,15 +6299,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_4:4 Availability Manager List,  !- Name
@@ -6607,15 +6575,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_5:5 Availability Manager List,  !- Name
@@ -6891,15 +6851,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_6:6 Availability Manager List,  !- Name
@@ -7175,15 +7127,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_7:7 Availability Manager List,  !- Name
@@ -7459,15 +7403,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_8:8 Availability Manager List,  !- Name
@@ -7743,15 +7679,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_9:9 Availability Manager List,  !- Name
@@ -8027,15 +7955,7 @@
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
-    ,                        !- System Outdoor Air Method
-    ,                        !- Zone Maximum Outdoor Air Fraction {dimensionless}
-    ,                        !- Cooling Design Capacity Method
-    ,                        !- Cooling Design Capacity {W} {m3/s}
-    ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
-    ,                        !- Fraction of Autosized Cooling Design Capacity {-}
-    ,                        !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W} {m3/s}
-    ;                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_10:10 Availability Manager List,  !- Name

@@ -377,11 +377,11 @@
                 CurArgs = CurArgs + 4
                 ! then shift the next 2 fields
                 OutArgs(27:28) = InArgs(20:21)
-                ! then add the final new fields
-                OutArgs(29:36) = ""
-                CurArgs = CurArgs + 8
+                ! although there are new fields added to the end, they dont need to be filled out, so dont worry about them
+                !OutArgs(29:36) = ""
+                !CurArgs = CurArgs + 8
                 
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER') ! DONE
+              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-6
@@ -393,7 +393,7 @@
                 OutArgs(11:214) = InArgs(8:211)
                 CurArgs = CurArgs + 3                
                 
-              CASE('ZONEHVAC:HIGHTEMPERATURERADIANT') ! NOT DONE
+              CASE('ZONEHVAC:HIGHTEMPERATURERADIANT') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-3
@@ -405,7 +405,7 @@
                 OutArgs(8:216) = InArgs(5:213)
                 CurArgs = CurArgs + 3         
                 
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM') ! DONE
+              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-4
@@ -416,7 +416,7 @@
                 OutArgs(9:213) = InArgs(5:209)
                 CurArgs = CurArgs + 4      
                 
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC') ! DONE
+              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-6
@@ -428,7 +428,7 @@
                 OutArgs(7:209) = InArgs(4:206)
                 CurArgs = CurArgs + 3                
                 
-              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:WATER') ! DONE
+              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:WATER') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-4
@@ -439,7 +439,7 @@
                 OutArgs(9:11) = InArgs(5:7)
                 CurArgs = CurArgs + 4         
                 
-              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC') ! DONE
+              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-2
@@ -451,7 +451,7 @@
                 OutArgs(7) = InArgs(4)
                 CurArgs = CurArgs + 3            
                 
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW') ! DONE
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-7
@@ -468,7 +468,7 @@
                 CurArgs = CurArgs + 4
                 OutArgs(21:29) = InArgs(13:21)
                 
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC') ! DONE
+              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC') 
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 ! nothing for fields 1-4
