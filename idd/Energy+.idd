@@ -1725,6 +1725,259 @@ Site:GroundTemperature:Deep,
        \type real
        \default 16
 
+Site:GroundDomain,
+        \memo Ground coupled slab model for on-grade and
+        \memo in-grade cases with or without insulation.
+   A1,  \field Name
+        \required-field
+   N1,  \field Ground Domain Depth
+        \required-field
+        \type real
+        \units m
+        \minimum> 0.0
+   N2,  \field Aspect Ratio
+        \type real
+        \default 1
+   N3,  \field Perimeter Offset
+        \required-field
+        \type real
+        \units m
+        \minimum> 0.0
+   N4,  \field Soil Thermal Conductivity
+        \required-field
+        \type real
+        \units W/m-K
+        \minimum> 0.0
+   N5,  \field Soil Density
+        \required-field
+        \type real
+        \units kg/m3
+        \minimum> 0.0
+   N6,  \field Soil Specific Heat
+        \required-field
+        \type real
+        \units J/kg-K
+        \minimum> 0.0
+   N7,  \field Soil Moisture Content Volume Fraction
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8,  \field Soil Moisture Content Volume Fraction at Saturation
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9,  \field Kusuda-Achenbach Average Surface Temperature
+        \required-field
+        \type real
+        \units C
+        \note Annual average surface temperature.
+   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
+        \required-field
+        \type real
+        \units deltaC
+        \note Annual average surface temperature variation from average.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+        \required-field
+        \type real
+        \units days
+        \note The phase shift of minimum surface temperature, or the day
+        \note of the year when the minimum surface temperature occurs.
+   N12, \field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  The value roughly represents the following cases:
+        \note  = 0   : concrete or other solid, non-permeable ground surface material
+        \note  = 0.5 : short grass, much like a manicured lawn
+        \note  = 1   : standard reference state (12 cm grass)
+        \note  = 1.5 : wild growth
+   A2,  \field Slab Boundary Condition Model Name
+        \required-field
+        \type object-list
+        \object-list OSCMNames
+   A3,  \field Slab Location
+        \required-field
+        \type choice
+        \key InGrade
+        \key OnGrade
+        \note This field specifies whether the slab is located "in-grade" or "on-grade"
+   A4,  \field Slab Material Name
+        \type object-list
+        \object-list MaterialName
+        \note Only applicable for the in-grade case
+   A5,  \field Horizontal Insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note This field specifies the presence of insulation beneath the slab.
+        \note Only required for in-grade case.
+   A6,  \field Horizontal Insulation Material Name
+        \type object-list
+        \object-list MaterialName
+        \note This field specifies the horizontal insulation material.
+   A7,  \field Horizontal Insulation Extents
+        \type choice
+        \key Full
+        \key Perimeter
+        \default Full
+        \note This field specifies whether the horizontal insulation fully insulates 
+        \note the surface or is perimeter only insulation
+   N13, \field Perimeter Insulation Width
+        \type real
+        \units m
+        \minimum> 0.0
+        \note This field specifies the width of the underfloor perimeter insulation
+   A8,  \field Vertical Insulation
+        \required-field
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note This field specifies the presence of vertical insulation at the slab edge.
+   A9,  \field Vertical Insulation Material Name
+        \type object-list
+        \object-list MaterialName  
+        \note This field specifies the vertical insulation material.
+   N14, \field Vertical Insulation Depth
+        \type real
+        \units m
+        \minimum> 0.0
+        \note Only used when including vertical insulation
+        \note This field specifies the depth of the vertical insulation
+   A10; \field Simulation Timestep
+        \required-field
+        \type choice
+        \key Hourly
+        \key Timestep
+        \default Hourly
+        \note This field specifies the domain simulation timestep.
+
+Site:GroundDomain:Basement,
+        \memo The ground domain object for simulation.
+   A1,  \field Name
+        \required-field
+        \type alpha
+        \reference PipingSystemUndergroundDomainNames
+   N1,  \field Ground Domain Depth
+        \required-field
+        \type real
+        \units m
+        \minimum> 0
+        \note The depth from the top of the soil to the deep ground boundary of the domain
+   N2,  \field Aspect ratio
+        \required-field
+        \type real
+        \minimum> 0
+        \This defines the height to width ratio of the basement zone.
+   N3,  \field Perimeter Offset
+        \required-field
+        \type real
+        \units m
+        \minimum> 0
+        \The distance from the basement wall edge to the edge of the ground domain
+   N4, \field Soil Thermal Conductivity
+        \required-field
+        \type real
+        \units W/m-K
+        \minimum> 0
+   N5, \field Soil Density
+        \required-field
+        \type real
+        \units kg/m3
+        \minimum> 0
+   N6, \field Soil Specific Heat
+        \required-field
+        \type real
+        \units J/kg-K
+        \minimum> 0
+        \note This is a dry soil property, which is adjusted for freezing effects
+        \note   by the simulation algorithm.
+   N7, \field Soil Moisture Content Volume Fraction
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8, \field Soil Moisture Content Volume Fraction at Saturation
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9, \field Kusuda-Achenbach Average Surface Temperature
+        \required-field
+        \type real
+        \units C
+   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
+        \required-field
+        \type real
+        \units C
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+        \required-field
+        \type real
+        \units days
+   N12, \field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  
+   A2,  \field Name of Basement Floor Boundary Condition Model
+        \type object-list
+        \object-list OSCMNames
+   A3,  \field Basement Floor Material Name
+        \required-field
+        \type alpha		
+   A4,  \field This specifies whether Horizontal Insulation is present
+        \required-field
+        \note This field specifies the presence of insulation beneath the basement floor.
+   A5,  \field Name of horizontal insulation material
+        \optional-field
+        \type alpha
+   A6,  \field The type of horizontal insulation
+        \type choice
+        \key Perimeter
+        \key Full
+        \default Full
+        \note if Perimeter, then the following input is used
+        \note if No, then the following input is *ignored*
+   N13, \field Width of perimeter horizontal insulation
+        \type real
+        \units m
+   N14, \field Depth of Basement Wall In Ground Domain
+        \type real
+        \units m
+   A7,  \field Name of Basement Wall Boundary Condition Model
+        \type object-list
+        \object-list OSCMNames
+   A8,  \field Name of Basement Wall material
+        \required-field
+        \type alpha	
+   A9, \field This Domain includes vertical insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note if Yes, then the following input is used
+        \note if No, then the following input is *ignored*	
+   A10,  \field Name of Basement wall vertical insulation material
+        \required-field
+        \type alpha	
+   N15, \field Depth of vertical insulation from Grade
+        \type real
+        \units m
+   A11;  \field Simulation Interval - Timestep/Daily
+        \required-field
+        \type alpha
+
 Site:GroundReflectance,
         \memo Specifies the ground reflectance values used to calculate ground reflected solar.
         \memo The ground reflectance can be further modified when snow is on the ground
@@ -54989,219 +55242,6 @@ Pipe:Underground,
         \type real
         \minimum 0
         \default 0
-
-  Site:GroundDomain,
-   A1,  \field Name
-        \required-field
-   N1,  \field Ground Domain Depth
-        \required-field
-        \type real
-        \minimum> 0
-        \units m
-   N2,  \field Aspect Ratio
-        \required-field
-        \type real
-   N3,  \field Perimeter Offset
-        \required-field
-        \type real
-        \units m
-        \minimum>0
-   N4,  \field Soil Thermal Conductivity {W/m-K}
-        \required-field
-        \type real
-        \units W/m-K
-        \minimum> 0
-   N5,  \field Soil Density {kg/m3}
-        \required-field
-        \type real
-   N6,  \field Soil Specific Heat {J/kg-K}
-        \required-field
-        \type real
-   N7,  \field Soil Moisture Content Volume Fraction {percent}
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 30
-   N8,  \field Soil Moisture Content Volume Fraction at Saturation {percent}
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 50
-   N9,  \field Kusuda-Achenbach Average Surface Temperature {C}
-        \required-field
-        \type real
-        \units C
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-        \required-field
-        \type real
-        \units C
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-        \required-field
-        \type real
-        \units days
-   N12, \field Evapotranspiration Ground Cover Parameter
-        \type real
-        \minimum 0
-        \maximum 1.5
-        \default 0.4
-        \note This specifies the ground cover effects during evapotranspiration
-        \note  calculations.  The value roughly represents the following cases:
-        \note  = 0   : concrete or other solid, non-permeable ground surface material
-        \note  = 0.5 : short grass, much like a manicured lawn
-        \note  = 1   : standard reference state (12 cm grass)
-        \note  = 1.5 : wild growth
-   A2,  \field Name of  Slab Boundary Condition Model
-        \required-field
-   A3,  \field Slab Location
-        \required-field
-        \note This field specifies whether the slab is located "in-grade" or "on-grade"
-   A4, 	\field Name of slab material
-        \optional-field
-   A5,  \field Horizontal Insulation
-        \optional-field
-        \note This field specifies the presence of insulation beneath the slab.
-   A6,  \field Insulation Material
-        \optional-field
-        \note This field specifies the horizontal insulation material.
-   A7,  \field Horizontal Insulation Extents
-        \optional-field
-        \note This field specifies whether the horizontal insulation fully insulates the surface or is perimeter only insulation
-   N13, \field Perimeter Insulation Width
-        \optional-field
-        \note This field specifies the width of the perimeter insulation
-   A8,  \field Vertical Insulation
-        \required-field
-        \note This field specifies the presence of vertical insulation at the slab edge.
-   A9,  \field Insulation Material
-        \optional-field
-        \note This field specifies the vertical insulation material.
-   N14, \field Vertical Insulation Depth
-        \optional-field
-        \note This field specifies the depth of the vertical insulation		
-   A10; \field Simulation Timestep
-        \required-field
-        \note This field specifies the domain simulation timestep.
-
-Site:GroundDomain:Basement,
-        \memo The ground domain object for simulation.
-   A1,  \field Name
-        \required-field
-        \type alpha
-        \reference PipingSystemUndergroundDomainNames
-   N1,  \field Ground Domain Depth
-        \required-field
-        \type real
-        \units m
-        \minimum> 0
-        \note The depth from the top of the soil to the deep ground boundary of the domain
-   N2,  \field Aspect ratio
-        \required-field
-        \type real
-        \minimum> 0
-        \This defines the height to width ratio of the basement zone.
-   N3,  \field Perimeter Offset
-        \required-field
-        \type real
-        \units m
-        \minimum> 0
-        \The distance from the basement wall edge to the edge of the ground domain
-   N4, \field Soil Thermal Conductivity
-        \required-field
-        \type real
-        \units W/m-K
-        \minimum> 0
-   N5, \field Soil Density
-        \required-field
-        \type real
-        \units kg/m3
-        \minimum> 0
-   N6, \field Soil Specific Heat
-        \required-field
-        \type real
-        \units J/kg-K
-        \minimum> 0
-        \note This is a dry soil property, which is adjusted for freezing effects
-        \note   by the simulation algorithm.
-   N7, \field Soil Moisture Content Volume Fraction
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 30
-   N8, \field Soil Moisture Content Volume Fraction at Saturation
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 50
-   N9, \field Kusuda-Achenbach Average Surface Temperature
-        \required-field
-        \type real
-        \units C
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \required-field
-        \type real
-        \units C
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
-        \type real
-        \units days
-   N12, \field Evapotranspiration Ground Cover Parameter
-        \type real
-        \minimum 0
-        \maximum 1.5
-        \default 0.4
-        \note This specifies the ground cover effects during evapotranspiration
-        \note  calculations.  
-   A2,  \field Name of Basement Floor Boundary Condition Model
-        \type object-list
-        \object-list OSCMNames
-   A3,  \field Basement Floor Material Name
-        \required-field
-        \type alpha		
-   A4,  \field This specifies whether Horizontal Insulation is present
-        \required-field
-        \note This field specifies the presence of insulation beneath the basement floor.
-   A5,  \field Name of horizontal insulation material
-        \optional-field
-        \type alpha
-   A6,  \field The type of horizontal insulation
-        \type choice
-        \key Perimeter
-        \key Full
-        \default Full
-        \note if Perimeter, then the following input is used
-        \note if No, then the following input is *ignored*
-   N13, \field Width of perimeter horizontal insulation
-        \type real
-        \units m
-   N14, \field Depth of Basement Wall In Ground Domain
-        \type real
-        \units m
-   A7,  \field Name of Basement Wall Boundary Condition Model
-        \type object-list
-        \object-list OSCMNames
-   A8,  \field Name of Basement Wall material
-        \required-field
-        \type alpha	
-   A9, \field This Domain includes vertical insulation
-        \type choice
-        \key Yes
-        \key No
-        \default No
-        \note if Yes, then the following input is used
-        \note if No, then the following input is *ignored*	
-   A10,  \field Name of Basement wall vertical insulation material
-        \required-field
-        \type alpha	
-   N15, \field Depth of vertical insulation from Grade
-        \type real
-        \units m
-   A11;  \field Simulation Interval - Timestep/Daily
-        \required-field
-        \type alpha
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
