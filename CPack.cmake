@@ -102,46 +102,43 @@ endif()
 INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
   PATTERN _* EXCLUDE
   PATTERN *.ddy EXCLUDE
-  PATTERN ExampleFilesDoc.txt EXCLUDE
-  PATTERN ExampleFiles.xls EXCLUDE
-  PATTERN ExampleFiles-ObjectLink.xls EXCLUDE
 )
 
 # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/appguidemenu.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/devguidemenu.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/EngineeringReference.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/EPlusMainMenu.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/ExternalInterfaces_Application_Guide.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/GettingStarted.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/index.pdx" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/InputOutputReference.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/InterfaceDeveloper.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/ModuleDeveloper.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/OutputDetailsAndExamples.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/PlantApplicationGuide.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/ProgrammingStandard.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/Tips_and_Tricks_Using_EnergyPlus.pdf" "./Documentation")
-install_remote(FILES "https://github.com/NREL/EnergyPlusBuildSupport/blob/v8.2.0/docs/pdf/Using_EnergyPlus_for_Compliance.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/Acknowledgments.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/appguidemenu.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/AuxiliaryPrograms.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/devguidemenu.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/EMS_Application_Guide.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/EngineeringReference.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/EPlusMainMenu.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/ExternalInterfaces_Application_Guide.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/GettingStarted.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/index.pdx" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/InputOutputReference.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/InterfaceDeveloper.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/ModuleDeveloper.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/OutputDetailsAndExamples.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/PlantApplicationGuide.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/ProgrammingStandard.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/Tips_and_Tricks_Using_EnergyPlus.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/Using_EnergyPlus_for_Compliance.pdf" "./Documentation")
 
-# TODO Update these for 8.2.0
-install_remote(FILES "https://raw.githubusercontent.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Addressed_Issues-V8-1-0.html" "./")
+# TODO Remove version from file name or generate
+set( ADDRESSED_ISSUES Addressed_Issues-V8-2-0.html )
+set( ENHANCEMENT_LIST_ITEMS Enhancement_List_Items-V8-2-0.html )
+set( KNOWN_ISSUES Known_Issues-V8-2-0.html )
+set( RULES_XLS Rules8-1-0-to-8-2-0.xls )
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${ADDRESSED_ISSUES}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Bugreprt.txt" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Enhancement_List_Items-V8-1-0.html" "./")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${ENHANCEMENT_LIST_ITEMS}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ep.gif" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Known_Issues-V8-1-0.html" "./")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${KNOWN_ISSUES}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/license.txt" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ObjectStatus.xls" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/readme.html" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Rules8-0-0-to-8-1-0.xls" "./")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${RULES_XLS}" "PreProcess/IDFVersionUpdater/")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/VariableNameListAudit.xlsx" "./")
-
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ExampleFilesDoc.txt" "./ExampleFiles")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ExampleFiles-ObjectsLink.xls" "./ExampleFiles")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ExampleFiles.xls" "./ExampleFiles")
 
 configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
   "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake" @ONLY)

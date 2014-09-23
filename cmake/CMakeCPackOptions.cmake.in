@@ -8,36 +8,21 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   set(CPACK_NSIS_DEFINES "  !define MUI_STARTMENUPAGE_DEFAULTFOLDER \"${CPACK_PACKAGING_INSTALL_PREFIX}\"")
   set(CPACK_PACKAGING_INSTALL_PREFIX "")
 
-	set(CPACK_NSIS_CREATE_ICONS "
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\Addressed Issues V${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.lnk\" \"$INSTDIR\\Addressed_Issues-V${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}.html\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\EnergyPlus Documentation Main Menu.lnk\" \"$INSTDIR\\Documentation\\EPlusMainMenu.pdf\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\Enhancement List Items V${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.lnk\" \"$INSTDIR\\Enhancement_List_Items-V${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}.html\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\EP-Compare.lnk\" \"$INSTDIR\\PostProcess\\EP-Compare\\EP-Compare.exe\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\EPDrawGUI.lnk\" \"$INSTDIR\\PreProcess\\EPDraw\\EPDrawGUI.exe\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\EP-Launch.lnk\" \"$INSTDIR\\EP-Launch.exe\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\Example Files Summary Spreadsheet.lnk\" \"$INSTDIR\\ExampleFiles\\ExampleFiles.xls\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\ExampleFiles Link to Objects.lnk\" \"$INSTDIR\\ExampleFiles\\ExampleFiles-ObjectsLink.xls\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\IDFEditor.lnk\" \"$INSTDIR\\PreProcess\\IDFEditor\\IDFEditor.exe\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\IDFVersionUpdater.lnk\" \"$INSTDIR\\PreProcess\\IDFVersionUpdater\\IDFVersionUpdater.exe\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\Known Issues V${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.lnk\" \"$INSTDIR\\Known_Issues-V${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}.html\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\Readme Notes.lnk\" \"$INSTDIR\\readme.html\"
-  	  CreateShortCut \"$SMPROGRAMS\\$STARTMENU_FOLDER\\Weather Statistics and Conversions.lnk\" \"$INSTDIR\\PreProcess\\WeatherConverter\\Weather.exe\"
-  	")
-  	set(CPACK_NSIS_DELETE_ICONS "
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\Addressed Issues V${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\EnergyPlus Documentation Main Menu.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\Enhancement List Items V${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\EP-Compare.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\EPDrawGUI.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\EP-Launch.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\Example Files Summary Spreadsheet.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\ExampleFiles Link to Objects.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\IDFEditor.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\IDFVersionUpdater.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\Known Issues V${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\Readme Notes.lnk\"
-  	  Delete \"$SMPROGRAMS\\$MUI_TEMP\\Weather Statistics and Conversions.lnk\"
- 	")
+  set(CPACK_NSIS_MENU_LINKS
+    "@ADDRESSED_ISSUES@" "Addressed Issues V@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@"
+    "Documentation/EPlusMainMenu.pdf" "EnergyPlus Documentation Main Menu"
+    "@ENHANCEMENT_LIST_ITEMS@" "Enhancement List Items V@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@"
+    "PostProcess/EP-Compare/EP-Compare.exe" "EP-Compare" 
+    "PreProcess/EPDraw/EPDrawGUI.exe" "EPDrawGUI" 
+    "EP-Launch.exe" "EP-Launch"
+    "ExampleFiles/ExampleFiles.xls" "Example Files Summary Spreadsheet"
+    "ExampleFiles/ExampleFiles-ObjectsLink.xls" "ExampleFiles Link to Objects" 
+    "PreProcess/IDFEditor/IDFEditor.exe" "IDFEditor"
+    "PreProcess/IDFVersionUpdater/IDFVersionUpdater.exe" "IDFVersionUpdater"
+    "@KNOWN_ISSUES@" "Known Issues V@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@"
+    "readme.html" "Readme Notes" 
+    "PreProcess/WeatherConverter/Weather.exe" "Weather Statistics and Conversions" 
+  )
 endif()
 
 if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
