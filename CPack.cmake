@@ -11,9 +11,6 @@ include(cmake/TargetArch.cmake)
 target_architecture(TARGET_ARCH)
 set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION}-${CMAKE_SYSTEM_NAME}-${TARGET_ARCH}")
 set(CPACK_PACKAGING_INSTALL_PREFIX "/${CMAKE_PROJECT_NAME}-${CPACK_PACKAGE_VERSION_MAJOR}-${CPACK_PACKAGE_VERSION_MINOR}-${CPACK_PACKAGE_VERSION_PATCH}")
-if( APPLE )
-  set(CPACK_PACKAGE_DEFAULT_LOCATION /Applications)
-endif()
 
 if( win32 AND NOT unix )
   include(InstallRequiredSystemLibraries)
@@ -145,6 +142,10 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ExampleFilesDoc.txt" "./ExampleFiles")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ExampleFiles-ObjectsLink.xls" "./ExampleFiles")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ExampleFiles.xls" "./ExampleFiles")
+
+configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
+  "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake" @ONLY)
+set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_BINARY_DIR}/CMakeCPackOptions.cmake")
 
 INCLUDE(CPack)
 

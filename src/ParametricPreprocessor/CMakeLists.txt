@@ -14,5 +14,6 @@ SET_TARGET_PROPERTIES(parametricpreprocessor PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
 install_and_fixup_exe_target( parametricpreprocessor PreProcess/ParametricPreProcessor )
 
