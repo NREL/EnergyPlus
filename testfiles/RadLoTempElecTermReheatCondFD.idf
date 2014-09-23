@@ -1270,7 +1270,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     10000,                   !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     MeanAirTemperature,      !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
@@ -1283,7 +1283,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     10000,                   !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     MeanRadiantTemperature,  !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
@@ -1296,7 +1296,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     15000,                   !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     OperativeTemperature,    !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name

@@ -2157,16 +2157,16 @@
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    0,                       !- Cooling Design Air Flow Rate {m3/s} {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2} {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W} {m3/s-W}
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    0,                       !- Heating Design Air Flow Rate {m3/s} {m3/s}
-    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2} {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
-    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W} {m3/s-W}
+    0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 ! Single Chiller Supply
@@ -2782,9 +2782,9 @@
     SPACE1-1 Reheat Coil Steam Inlet,  !- Inlet Node Name
     SPACE1-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W}
+    Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     5,                       !- Degree of SubCooling {C}
     autosize,                !- Maximum Steam Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance
@@ -2803,9 +2803,9 @@
     SPACE3-1 Reheat Coil Steam Inlet,  !- Inlet Node Name
     SPACE3-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    ,                        !- Heating Design Capacity {W}
+    Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     5,                       !- Degree of SubCooling {C}
     autosize,                !- Maximum Steam Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance

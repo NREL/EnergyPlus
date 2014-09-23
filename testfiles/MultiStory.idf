@@ -906,7 +906,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1166,7 +1166,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1442,7 +1442,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -1729,7 +1729,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1989,7 +1989,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -2265,7 +2265,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -2552,7 +2552,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -2812,7 +2812,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -3088,7 +3088,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     AUTOSIZE,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ScheduleTypeLimits,

@@ -412,7 +412,8 @@
                 OutArgs(1:4) = InArgs(1:4)
                 ! the new field 5 is a switch and there wasn't an entry before, so leave 6 blank (autosize)
                 OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6:8) = ""
+                OutArgs(6) = 'Autosize'
+                OutArgs(7:8) = ''
                 OutArgs(9:213) = InArgs(5:209)
                 CurArgs = CurArgs + 4      
                 
@@ -435,7 +436,8 @@
                 OutArgs(1:4) = InArgs(1:4)
                 ! the new field 5 is a switch and there wasn't an entry before, so leave 6 blank (autosize)
                 OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6:8) = ""
+                OutArgs(6) = 'Autosize'
+                OutArgs(7:8) = ''
                 OutArgs(9:11) = InArgs(5:7)
                 CurArgs = CurArgs + 4         
                 
@@ -458,13 +460,15 @@
                 OutArgs(1:7) = InArgs(1:7)
                 ! the new field 8 is a switch and there wasn't an entry before, so leave 9 blank (autosize)
                 OutArgs(8) = 'HeatingDesignCapacity'
-                OutArgs(9:11) = ""
+                OutArgs(9) = 'Autosize'
+                OutArgs(10:11) = ''
                 CurArgs = CurArgs + 4
                 ! shift 8-12 to 12-16
                 OutArgs(12:16) = InArgs(8:12)
                 ! the new field 17 is a switch and there wasn't an entry before, so leave 18 blank (autosize)
                 OutArgs(17) = 'CoolingDesignCapacity'
-                OutArgs(18:20) = ""
+                OutArgs(18) = 'Autosize'
+                OutArgs(19:20) = ''
                 CurArgs = CurArgs + 4
                 OutArgs(21:29) = InArgs(13:21)
                 

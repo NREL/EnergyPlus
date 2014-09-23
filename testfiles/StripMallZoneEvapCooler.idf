@@ -4794,7 +4794,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4803,7 +4803,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4812,7 +4812,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4821,7 +4821,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4830,7 +4830,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4839,7 +4839,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4848,7 +4848,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4857,7 +4857,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4866,7 +4866,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
@@ -4875,7 +4875,7 @@
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
 ! ***SCHEDULES***
