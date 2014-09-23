@@ -23,6 +23,43 @@ if(CPACK_GENERATOR MATCHES "NSIS")
     "readme.html" "Readme Notes" 
     "PreProcess/WeatherConverter/Weather.exe" "Weather Statistics and Conversions" 
   )
+
+  set(CPACK_NSIS_PAGE_COMPONENTS "
+    !define MUI_FINISHPAGE_RUN
+    !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
+    !define MUI_FINISHPAGE_SHOWREADME \"$INSTDIR\\readme.html\"
+    !define MUI_FINISHPAGE_RUN_NOTCHECKED
+    !define MUI_FINISHPAGE_RUN_TEXT \"Associate *.idf, *.imf, and *.epg files with EP-Launch\"
+    !define MUI_FINISHPAGE_RUN_FUNCTION \"AssociateFiles\"
+
+    Function AssociateFiles
+      WriteRegStr HKCR \".idf\" \"\" \"EP-Launch.idf\"
+      WriteRegStr HKCR \"EP-Launch.idf\" \"\" `EnergyPlus Input Data File`
+      WriteRegStr HKCR \"EP-Launch.idf\\shell\" \"\" \"open\"
+      WriteRegStr HKCR \"EP-Launch.idf\\shell\\open\" \"\" `Open with EP-Launch`
+      WriteRegStr HKCR \"EP-Launch.idf\\shell\\open\\command\" \"\" `$INSTDIR\\EP-Launch.exe %1`
+      WriteRegStr HKCR \".imf\" \"\" \"EP-Launch.imf\"
+      WriteRegStr HKCR \"EP-Launch.imf\" \"\" `EnergyPlus Input Macro File`
+      WriteRegStr HKCR \"EP-Launch.imf\\shell\" \"\" \"open\"
+      WriteRegStr HKCR \"EP-Launch.imf\\shell\\open\" \"\" `Open with EP-Launch`
+      WriteRegStr HKCR \"EP-Launch.imf\\shell\\open\\command\" \"\" `$INSTDIR\\EP-Launch.exe %1`
+      WriteRegStr HKCR \".epg\" \"\" \"EP-Launch.epg\"
+      WriteRegStr HKCR \"EP-Launch.epg\" \"\" `EnergyPlus Group File`
+      WriteRegStr HKCR \"EP-Launch.epg\\shell\" \"\" \"open\"
+      WriteRegStr HKCR \"EP-Launch.epg\\shell\\open\" \"\" `Open with EP-Launch`
+      WriteRegStr HKCR \"EP-Launch.epg\\shell\\open\\command\" \"\" `$INSTDIR\\EP-Launch.exe %1`
+      WriteRegStr HKCR \".ddy\" \"\" \"IDFEditor.ddy\"
+      WriteRegStr HKCR \"IDFEditor.ddy\" \"\" `Location and Design Day Data`
+      WriteRegStr HKCR \"IDFEditor.ddy\\shell\" \"\" \"open\"
+      WriteRegStr HKCR \"IDFEditor.ddy\\shell\\open\" \"\" `Open with IDFEditor`
+      WriteRegStr HKCR \"IDFEditor.ddy\\shell\\open\\command\" \"\" `$INSTDIR\\PreProcess\\IDFEditor\\IDFEditor.exe %1`
+      WriteRegStr HKCR \".expidf\" \"\" \"IDFEditor.expidf\"
+      WriteRegStr HKCR \"IDFEditor.expidf\" \"\" `EnergyPlus Expand Objects Input Data File`
+      WriteRegStr HKCR \"IDFEditor.expidf\\shell\" \"\" \"open\"
+      WriteRegStr HKCR \"IDFEditor.expidf\\shell\\open\" \"\" `Open with IDFEditor`
+      WriteRegStr HKCR \"IDFEditor.expidf\\shell\\open\\command\" \"\" `$INSTDIR\\PreProcess\\IDFEditor\\IDFEditor.exe %1`
+    FunctionEnd
+  ")
 endif()
 
 if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
