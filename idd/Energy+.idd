@@ -1521,6 +1521,140 @@ Site:GroundTemperature:BuildingSurface,
        \type real
        \default 18
 
+Site:GroundDomain,
+        \memo Ground coupled slab model for on-grade and
+        \memo in-grade cases with or without insulation.
+   A1,  \field Name
+        \required-field
+   N1,  \field Ground Domain Depth
+        \required-field
+        \type real
+        \units m
+        \minimum> 0.0
+   N2,  \field Aspect Ratio
+        \type real
+        \default 1
+   N3,  \field Perimeter Offset
+        \required-field
+        \type real
+        \units m
+        \minimum> 0.0
+   N4,  \field Soil Thermal Conductivity
+        \required-field
+        \type real
+        \units W/m-K
+        \minimum> 0.0
+   N5,  \field Soil Density
+        \required-field
+        \type real
+        \units kg/m3
+        \minimum> 0.0
+   N6,  \field Soil Specific Heat
+        \required-field
+        \type real
+        \units J/kg-K
+        \minimum> 0.0
+   N7,  \field Soil Moisture Content Volume Fraction
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8,  \field Soil Moisture Content Volume Fraction at Saturation
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9,  \field Kusuda-Achenbach Average Surface Temperature
+        \required-field
+        \type real
+        \units C
+        \note Annual average surface temperature.
+   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
+        \required-field
+        \type real
+        \units C
+        \note Annual average surface temperature variation from average.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+        \required-field
+        \type real
+        \units days
+        \note The phase shift of minimum surface temperature, or the day
+        \note of the year when the minimum surface temperature occurs.
+   N12, \field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  The value roughly represents the following cases:
+        \note  = 0   : concrete or other solid, non-permeable ground surface material
+        \note  = 0.5 : short grass, much like a manicured lawn
+        \note  = 1   : standard reference state (12 cm grass)
+        \note  = 1.5 : wild growth
+   A2,  \field Slab Boundary Condition Model Name
+        \required-field
+        \type object-list
+        \object-list OSCMNames
+   A3,  \field Slab Location
+        \required-field
+        \type choice
+        \key Ingrade
+        \key Ongrade
+        \note This field specifies whether the slab is located "in-grade" or "on-grade"
+   A4,  \field Slab Material Name
+        \type object-list
+        \object-list MaterialName
+        \note Only applicable for the in-grade case
+   A5,  \field Horizontal Insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note This field specifies the presence of insulation beneath the slab.
+        \note Only required for in-grade case.
+   A6,  \field Horizontal Insulation Material Name
+        \type object-list
+        \object-list MaterialName
+        \note This field specifies the horizontal insulation material.
+   A7,  \field Horizontal Insulation Extents
+        \type choice
+        \key Full
+        \key Perimeter
+        \default Full
+        \note This field specifies whether the horizontal insulation fully insulates 
+        \note the surface or is perimeter only insulation
+   N13, \field Perimeter Insulation Width
+        \type real
+        \units m
+        \minimum> 0.0
+        \note This field specifies the width of the underfloor perimeter insulation
+   A8,  \field Vertical Insulation
+        \required-field
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note This field specifies the presence of vertical insulation at the slab edge.
+   A9,  \field Vertical Insulation Material Name
+        \type object-list
+        \object-list MaterialName  
+        \note This field specifies the vertical insulation material.
+   N14, \field Vertical Insulation Depth
+        \type real
+        \units m
+        \minimum> 0.0
+        \note Only used when including vertical insulation
+        \note This field specifies the depth of the vertical insulation
+   A10; \field Simulation Timestep
+        \required-field
+        \type choice
+        \key Hourly
+        \key Timestep
+        \default Hourly
+        \note This field specifies the domain simulation timestep.
+
 Site:GroundTemperature:FCfactorMethod,
        \memo These temperatures are specifically for underground walls and ground floors
        \memo defined with the C-factor and F-factor methods, and should be close to the
@@ -54983,140 +55117,6 @@ Pipe:Underground,
         \type real
         \minimum 0
         \default 0
-
-  Site:GroundDomain,
-        \memo Ground coupled slab model for on-grade and
-        \memo in-grade cases with or without insulation.
-   A1,  \field Name
-        \required-field
-   N1,  \field Ground Domain Depth
-        \required-field
-        \type real
-        \units m
-        \minimum> 0.0
-   N2,  \field Aspect Ratio
-        \type real
-        \default 1
-   N3,  \field Perimeter Offset
-        \required-field
-        \type real
-        \units m
-        \minimum> 0.0
-   N4,  \field Soil Thermal Conductivity
-        \required-field
-        \type real
-        \units W/m-K
-        \minimum> 0.0
-   N5,  \field Soil Density
-        \required-field
-        \type real
-        \units kg/m3
-        \minimum> 0.0
-   N6,  \field Soil Specific Heat
-        \required-field
-        \type real
-        \units J/kg-K
-        \minimum> 0.0
-   N7,  \field Soil Moisture Content Volume Fraction
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 30
-   N8,  \field Soil Moisture Content Volume Fraction at Saturation
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 50
-   N9,  \field Kusuda-Achenbach Average Surface Temperature
-        \required-field
-        \type real
-        \units C
-        \note Annual average surface temperature.
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \required-field
-        \type real
-        \units C
-        \note Annual average surface temperature variation from average.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
-        \type real
-        \units days
-        \note The phase shift of minimum surface temperature, or the day
-        \note of the year when the minimum surface temperature occurs.
-   N12, \field Evapotranspiration Ground Cover Parameter
-        \type real
-        \minimum 0
-        \maximum 1.5
-        \default 0.4
-        \note This specifies the ground cover effects during evapotranspiration
-        \note  calculations.  The value roughly represents the following cases:
-        \note  = 0   : concrete or other solid, non-permeable ground surface material
-        \note  = 0.5 : short grass, much like a manicured lawn
-        \note  = 1   : standard reference state (12 cm grass)
-        \note  = 1.5 : wild growth
-   A2,  \field Slab Boundary Condition Model Name
-        \required-field
-        \type object-list
-        \object-list OSCMNames
-   A3,  \field Slab Location
-        \required-field
-        \type choice
-        \key Ingrade
-        \key Ongrade
-        \note This field specifies whether the slab is located "in-grade" or "on-grade"
-   A4,  \field Slab Material Name
-        \type object-list
-        \object-list MaterialName
-        \note Only applicable for the in-grade case
-   A5,  \field Horizontal Insulation
-        \type choice
-        \key Yes
-        \key No
-        \default No
-        \note This field specifies the presence of insulation beneath the slab.
-        \note Only required for in-grade case.
-   A6,  \field Horizontal Insulation Material Name
-        \type object-list
-        \object-list MaterialName
-        \note This field specifies the horizontal insulation material.
-   A7,  \field Horizontal Insulation Extents
-        \type choice
-        \key Full
-        \key Perimeter
-        \default Full
-        \note This field specifies whether the horizontal insulation fully insulates 
-        \note the surface or is perimeter only insulation
-   N13, \field Perimeter Insulation Width
-        \type real
-        \units m
-        \minimum> 0.0
-        \note This field specifies the width of the underfloor perimeter insulation
-   A8,  \field Vertical Insulation
-        \required-field
-        \type choice
-        \key Yes
-        \key No
-        \default No
-        \note This field specifies the presence of vertical insulation at the slab edge.
-   A9,  \field Vertical Insulation Material Name
-        \type object-list
-        \object-list MaterialName  
-        \note This field specifies the vertical insulation material.
-   N14, \field Vertical Insulation Depth
-        \type real
-        \units m
-        \minimum> 0.0
-        \note Only used when including vertical insulation
-        \note This field specifies the depth of the vertical insulation
-   A10; \field Simulation Timestep
-        \required-field
-        \type choice
-        \key Hourly
-        \key Timestep
-        \default Hourly
-        \note This field specifies the domain simulation timestep.
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.
