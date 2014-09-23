@@ -505,14 +505,21 @@ namespace ExternalInterface {
 
 			StopExternalInterfaceIfError();
 
-			int lenXmlStr( maxVar * DataGlobals::MaxNameLength ); // Length of xml string ? Does getepvariables set this? If so don't initialize it or init to zero
-			xmlStrOut = "";
-			xmlStrOutTyp = "";
-			xmlStrInKey = "";
-			xmlStrIn = "";
-
+			// make a single length here for all strings to be passed to getepvariables
+			int lenXmlStr( maxVar * DataGlobals::MaxNameLength ); // Length of strings being passed to getepvariables
+			
+			// initialize all the strings to this length with blanks
+			xmlStrOut = std::string(lenXmlStr, ' ');
+			xmlStrOutTyp = std::string(lenXmlStr, ' ');
+			xmlStrInKey = std::string(lenXmlStr, ' ');
+			xmlStrIn = std::string(lenXmlStr, ' ');
+			xmlStrInKey = std::string(lenXmlStr, ' ');
+			
+			// then overwrite the input string with actual characters, but dont change the string length
+			std::string tmpxmlStrInKey = "schedule,variable,actuator\0";
+			xmlStrInKey.replace(0, tmpxmlStrInKey.length(), tmpxmlStrInKey);
+			
 			// Get input and output variables for EnergyPlus in sequence
-			xmlStrInKey = "schedule,variable,actuator\0";
 			// Check if simCfgFilNam exists.
 			{ IOFlags flags; gio::inquire( simCfgFilNam, flags ); simFileExist = flags.exists(); }
 			if ( simFileExist ) {
