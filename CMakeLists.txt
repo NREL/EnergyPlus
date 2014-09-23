@@ -4,7 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 1 )
-set( CMAKE_VERSION_PATCH 3 ) 
+set( CMAKE_VERSION_PATCH 6 ) 
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -50,6 +50,17 @@ if( BUILD_TESTING )
   endif()
 endif()
 
+if( ENABLE_REGRESSION_TESTING )
+  string(STRIP "${REGRESSION_SCRIPT_PATH}" REG_PATH_STRIPPED)
+  string(STRIP "${REGRESSION_BASELINE_PATH}" REG_BASELINE_STRIPPED)
+  if (REG_PATH_STRIPPED STREQUAL "" OR REG_BASELINE_STRIPPED STREQUAL "")
+    message( "Regression testing is enabled, but no script or baseline has been provided" )
+    set( DO_REGRESSION_TESTING OFF )
+  else()
+    set( DO_REGRESSION_TESTING ON )
+  endif()
+endif()
+
 # Not yet released by CMake, but is being developed
 # This will help us set the proper options for c++11 across various configurations
 #FIND_PACKAGE( CXXFeatures ) 
@@ -88,6 +99,10 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
 endif()
 
 install( FILES idd/Energy+.idd DESTINATION ./ )
