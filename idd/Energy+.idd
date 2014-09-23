@@ -55023,24 +55023,28 @@ Pipe:Underground,
         \minimum 0
         \maximum 100
         \default 30
-   N8,  \field Soil Moisture Content Volume Fraction at Saturation {percent}
+   N8,  \field Soil Moisture Content Volume Fraction at Saturation
         \type real
         \units percent
         \minimum 0
         \maximum 100
         \default 50
-   N9,  \field Kusuda-Achenbach Average Surface Temperature {C}
+   N9,  \field Kusuda-Achenbach Average Surface Temperature
         \required-field
         \type real
         \units C
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+        \note Annual average surface temperature.
+   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
         \required-field
         \type real
         \units C
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+        \note Annual average surface temperature variation from average.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
         \required-field
         \type real
         \units days
+        \note The phase shift of minimum surface temperature, or the day
+        \note of the year when the minimum surface temperature occurs.
    N12, \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -55052,8 +55056,10 @@ Pipe:Underground,
         \note  = 0.5 : short grass, much like a manicured lawn
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
-   A2,  \field Name of  Slab Boundary Condition Model
+   A2,  \field Slab Boundary Condition Model Name
         \required-field
+        \type object-list
+        \object-list OSCMNames
    A3,  \field Slab Location
         \required-field
         \type choice
@@ -55086,7 +55092,7 @@ Pipe:Underground,
         \type real
         \units m
         \minimum> 0.0
-        \note This field specifies the width of the perimeter insulation
+        \note This field specifies the width of the underfloor perimeter insulation
    A8,  \field Vertical Insulation
         \required-field
         \type choice
