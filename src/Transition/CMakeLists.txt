@@ -4,6 +4,9 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_2_0.f90" )
+
 SET(SRC
   Transition.f90
   DataGlobals.f90
@@ -49,6 +52,10 @@ list( APPEND VERSIONS 8_2_0 )
 IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
   SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
   SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+ENDIF()
+
+IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
 ENDIF()
 
 list( LENGTH VERSIONS VERSIONS_SIZE)
