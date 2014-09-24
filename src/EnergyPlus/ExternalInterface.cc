@@ -448,7 +448,7 @@ namespace ExternalInterface {
 
 		static bool firstCall( true ); // First time, input has been read
 
-		static std::string simCfgFilNam( "variables.cfg" );
+		std::string const simCfgFilNam("variables.cfg"); // variables configuration file
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j; // loop counters
@@ -525,7 +525,6 @@ namespace ExternalInterface {
 			if ( simFileExist ) {
 				
 				// preprocess the strings into char vectors before making the library call
-				auto simCfgFilNamArr( getCharArrayFromString( simCfgFilNam ) );
 				auto xmlStrOutTypArr( getCharArrayFromString( xmlStrOutTyp ) );
 				auto xmlStrOutArr( getCharArrayFromString( xmlStrOut ) );
 				auto xmlStrInKeyArr( getCharArrayFromString( xmlStrInKey ) );
@@ -533,9 +532,9 @@ namespace ExternalInterface {
 				
 				// now make the library call
 				if ( haveExternalInterfaceBCVTB ) {
-					retVal = getepvariables( &simCfgFilNamArr[0], &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr );
+					retVal = getepvariables(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
 				} else if ( haveExternalInterfaceFMUExport ) {
-					retVal = getepvariablesFMU( &simCfgFilNamArr[0], &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr );
+					retVal = getepvariablesFMU(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
 				} else {
 					//there should be no else condition at this point, however we'll still assign the error value for completeness
 					retVal = -1;
@@ -547,7 +546,6 @@ namespace ExternalInterface {
 				//xmlStrInKey = getStringFromCharArray( xmlStrInKeyArr );
 				xmlStrIn = getStringFromCharArray( xmlStrInArr );
 				
-				simCfgFilNamArr.clear();
 				xmlStrOutTypArr.clear();
 				xmlStrOutArr.clear();
 				xmlStrInKeyArr.clear();

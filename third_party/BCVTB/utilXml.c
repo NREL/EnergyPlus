@@ -238,7 +238,7 @@ void freeResource(char** strArr, int n){
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariables( char*  const fileName, 
+int getepvariables(const char *const fileName,
                     char*  const myOutputVarsName, 
                     char*  const myOutputVarsType, 
                     int*   const myNumOutputVars, 
@@ -252,11 +252,12 @@ int getepvariables( char*  const fileName,
   FILE * fd;
   XML_Parser p;
   int i, j, count, ret;
+
   ret = check_variable_cfg_Validate(fileName);
   if(-1 == ret) 
     return -1;
   
-  fd = fopen("variables.cfg", "r");
+  fd = fopen(fileName, "r");
   if(!fd){
     fprintf(stderr, "Error: Could not open file '%s' when getting EnergyPlus variables.\n", fileName);
     return -1;
@@ -375,7 +376,7 @@ int getepvariables( char*  const fileName,
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariablesFMU( char*  const fileName, 
+int getepvariablesFMU(const char *const fileName,
 					   char*  const myOutputVarsName, 
 					   char*  const myOutputVarsType, 
 					   int*   const myNumOutputVars, 
@@ -389,10 +390,10 @@ int getepvariablesFMU( char*  const fileName,
   FILE * fd;
   XML_Parser p;
   int i, j, count, ret;
+  
   //ret = check_variable_cfg_Validate(fileName);
   //if(-1 == ret) 
     //return -1;
-
   fd = fopen(fileName, "r");
   if(!fd){
     fprintf(stderr, "Error: Could not open file '%s' when getting EnergyPlus variables.\n", fileName);

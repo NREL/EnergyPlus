@@ -206,7 +206,7 @@ void freeResource(char** strArr, int n);
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariables( char*  const fileName, 
+int getepvariables(const char *const  fileName,
                     char*  const myOutputVarsName, 
                     char*  const myOutputVarsType, 
                     int*   const myNumOutputVars, 
@@ -235,7 +235,7 @@ int getepvariables( char*  const fileName,
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariablesFMU( char*  const fileName, 
+int getepvariablesFMU(const char *const fileName,
                     char*  const myOutputVarsName, 
                     char*  const myOutputVarsType, 
                     int*   const myNumOutputVars, 
