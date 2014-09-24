@@ -448,7 +448,7 @@ namespace ExternalInterface {
 
 		static bool firstCall( true ); // First time, input has been read
 
-		std::string const simCfgFilNam("variables.cfg"); // variables configuration file
+		std::string const simCfgFilNam("variables.cfg"); // Configuration file
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j; // loop counters
@@ -1351,21 +1351,17 @@ namespace ExternalInterface {
 				for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
 					// check whether the number of input variables in fmu is bigger than in the idf
 					if ( FMU( i ).Instance( j ).NumInputVariablesInFMU > FMU( i ).Instance( j ).NumInputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
+						ShowWarningError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is less than the number of input variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 					// check whether the number of input variables in fmu is less than in the idf
 					if ( FMU( i ).Instance( j ).NumInputVariablesInFMU < FMU( i ).Instance( j ).NumInputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
+						ShowWarningError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is bigger than the number of input variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 				}
 			}
@@ -1587,21 +1583,17 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).NumOutputVariablesInIDF = FMU( i ).Instance( j ).NumOutputVariablesSchedule + FMU( i ).Instance( j ).NumOutputVariablesVariable + FMU( i ).Instance( j ).NumOutputVariablesActuator;
 					// check whether the number of output variables in fmu is bigger than in the idf
 					if ( FMU( i ).Instance( j ).NumOutputVariablesInFMU > FMU( i ).Instance( j ).NumOutputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInIDF ) + ')' );
+						ShowWarningError( "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInIDF ) + ')' );
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is less than the number of output variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 					// check whether the number of output variables in fmu is less than in the idf
 					if ( FMU( i ).Instance( j ).NumOutputVariablesInFMU < FMU( i ).Instance( j ).NumOutputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInIDF ) + ')' );
+						ShowWarningError("InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInIDF) + ')');
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is bigger than the number of output variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 
 					DisplayString( "Number of inputs in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" = \"" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + "\"." );
