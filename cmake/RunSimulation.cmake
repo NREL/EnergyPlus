@@ -27,7 +27,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/in.epw" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
-                "${SOURCE_DIR}/idd/Energy+.idd" 
+                "${BINARY_DIR}/Energy+.idd" 
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/Energy+.idd" )
 
 if(BUILD_FORTRAN)
@@ -44,13 +44,13 @@ endif()
 
 
 if( WIN32 )
-  set(ECHO_CMD "echo.")
+  set(ECHO_CMD cmd /C echo.)
 else()
   set(ECHO_CMD "echo")
 endif()
 
 
-execute_process(COMMAND "${ECHO_CMD}"
+execute_process(COMMAND ${ECHO_CMD}
                 COMMAND "${ENERGYPLUS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
 
 
