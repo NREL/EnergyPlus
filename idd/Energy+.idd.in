@@ -29402,15 +29402,19 @@ HVACTemplate:Plant:ChilledWaterLoop,
   A21,\field Chilled Water Load Distribution Scheme
       \type choice
       \key Optimal
-      \key Sequential
-      \key Uniform
-      \default Sequential
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
+      \default SequentialLoad
   A22;\field Condenser Water Load Distribution Scheme
       \type choice
       \key Optimal
-      \key Sequential
-      \key Uniform
-      \default Sequential
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
+      \default SequentialLoad
 
 HVACTemplate:Plant:Chiller,
       \min-fields 7
@@ -29731,9 +29735,11 @@ HVACTemplate:Plant:HotWaterLoop,
   A13;\field Load Distribution Scheme
       \type choice
       \key Optimal
-      \key Sequential
-      \key Uniform
-      \default Sequential
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
+      \default SequentialLoad
 
 HVACTemplate:Plant:Boiler,
       \min-fields 7
@@ -29935,9 +29941,11 @@ HVACTemplate:Plant:MixedWaterLoop,
   A13;\field Load Distribution Scheme
       \type choice
       \key Optimal
-      \key Sequential
-      \key Uniform
-      \default Sequential
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
+      \default SequentialLoad
 
 \group HVAC Design Objects
 
@@ -33084,6 +33092,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \note of 0.063kg/s or 0.252kg/s, and the Rated Average Water Temperature between 32.2C and 115.6C.
   N4 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -33856,6 +33865,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \note HeatingDesignCapacity.
   N2 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -34628,6 +34638,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \note HeatingDesignCapacity.
   N2 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -35393,6 +35404,7 @@ ZoneHVAC:Baseboard:Convective:Water,
        \note HeatingDesignCapacity.
   N2 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -35449,6 +35461,7 @@ ZoneHVAC:Baseboard:Convective:Electric,
         \note HeatingDesignCapacity.
   N2 ,  \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
@@ -35529,6 +35542,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \note HeatingDesignCapacity.
    N4 , \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
@@ -35790,6 +35804,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \note HeatingDesignCapacity.
    N2 , \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
@@ -36369,6 +36384,7 @@ ZoneHVAC:HighTemperatureRadiant,
         \note HeatingDesignCapacity.
    N2 , \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
