@@ -10,7 +10,11 @@ function( install_remote TYPE SOURCE DESTINATION )
   get_filename_component(FILENAME ${SOURCE} NAME)
   set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/install_temp")
   install(CODE "
-    file(DOWNLOAD ${SOURCE} \"${OUTPUT_DIR}/${FILENAME}\")
+  file(DOWNLOAD ${SOURCE} \"${OUTPUT_DIR}/${FILENAME}\" STATUS status_var)
+  list(GET status_var 0 status)
+  if( NOT (status EQUAL 0) )
+    message(\"install_remote failed: ${SOURCE}\")
+  endif()
   ")
   install(${TYPE} "${OUTPUT_DIR}/${FILENAME}" DESTINATION ${DESTINATION})
   install(CODE "
