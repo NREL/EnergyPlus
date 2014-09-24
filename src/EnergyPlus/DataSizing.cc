@@ -60,8 +60,15 @@ namespace DataSizing {
 	int const NonCoincident( 1 );
 	int const Coincident( 2 );
 
+	// parameters for Cooling Peak Load TYpe
 	int const SensibleCoolingLoad( 1 );
 	int const TotalCoolingLoad( 2 );
+
+	// parameters for Central Cooling Capacity Control Method
+	int const VAV( 1 );
+	int const Bypass( 2 );
+	int const VT( 3 );
+	int const OnOff( 4 );
 
 	// paramters for supply air flow rate method
 	int const SupplyAirTemperature( 1 );

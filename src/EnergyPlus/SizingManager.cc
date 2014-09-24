@@ -1858,6 +1858,7 @@ namespace SizingManager {
 				ErrorsFound = true;
 			}}
 			SysSizInput( SysSizIndex ).CoolingPeakLoadType = SensibleCoolingLoad; // wfb
+			SysSizInput( SysSizIndex ).CoolCapControl = VAV; // wfb
 			{ auto const sizingOption( cAlphaArgs( 3 ) );
 			if ( sizingOption == "COINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = Coincident;

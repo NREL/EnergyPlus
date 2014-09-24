@@ -1551,6 +1551,48 @@ namespace ReportSizingManager {
 		}
 	}
 
+	void
+	GetCoilDesFlowT(
+		int CoolCapCtrl, // type of coil capacity control
+		int SysNum, // central air system index
+		Real64 & DesFlow, // returned design mass flow [kg/s]
+		Real64 & DesExitTemp // returned design coil exit temperature [kg/s]
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   September 2014
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function calculates the coil design air flow rate and exit temperature depending on the
+		// cooling capacity control method
+
+		// METHODOLOGY EMPLOYED:
+		// energy and mass flow balance
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace DataSizing;
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+
+		if ( CoolCapCtrl == VAV ) {
+			DesExitTemp = FinalSysSizing( SysNum ).CoolSupTemp;
+			DesFlow = FinalSysSizing( SysNum ).MassFlowAtCoolPeak;
+		}
+		else if ( CoolCapCtrl == OnOff ) {
+			DesExitTemp = FinalSysSizing( SysNum ).CoolSupTemp;
+			DesFlow = DataAirFlowUsedForSizing;
+		}
+		else if ( CoolCapCtrl == VT ) {
+
+		}
+	}
+
 	//     NOTICE
 
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

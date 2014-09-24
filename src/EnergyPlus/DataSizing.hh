@@ -53,6 +53,12 @@ namespace DataSizing {
 	extern int const SensibleCoolingLoad;
 	extern int const TotalCoolingLoad;
 
+	// parameters for Central Cooling Capacity Control Method
+	extern int const VAV;
+	extern int const Bypass;
+	extern int const VT;
+	extern int const OnOff;
+
 	// paramters for supply air flow rate method
 	extern int const SupplyAirTemperature;
 	extern int const TemperatureDifference;
@@ -1039,6 +1045,7 @@ namespace DataSizing {
 		bool OAAutoSized; // Set to true if design OA vol flow is set to 'autosize' in Sizing:System
 		// wfb
 		int CoolingPeakLoadType; //Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
+		int CoolCapControl; // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
 
 		// Default Constructor
 		SystemSizingInputData() :
@@ -1064,7 +1071,8 @@ namespace DataSizing {
 			SystemOAMethod( 0 ),
 			MaxZoneOAFraction( 0.0 ),
 			OAAutoSized( false ),
-			CoolingPeakLoadType( 0 ) // wfb
+			CoolingPeakLoadType( 0 ), // wfb
+			CoolCapControl( 0 ) // wfb
 		{}
 
 		// Member Constructor
@@ -1093,7 +1101,8 @@ namespace DataSizing {
 			Real64 const MaxZoneOAFraction, // maximum value of min OA for zones served by system
 			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
 			// wfb
-			int const CoolingPeakLoadType // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
+			int const CoolingPeakLoadType, // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
+			int const CoolCapControl // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
 		) :
 			AirPriLoopName( AirPriLoopName ),
 			AirLoopNum( AirLoopNum ),
@@ -1118,7 +1127,8 @@ namespace DataSizing {
 			SystemOAMethod( SystemOAMethod ),
 			MaxZoneOAFraction( MaxZoneOAFraction ),
 			OAAutoSized( OAAutoSized ),
-			CoolingPeakLoadType( CoolingPeakLoadType ) //wfb
+			CoolingPeakLoadType( CoolingPeakLoadType ), // wfb
+			CoolCapControl( CoolCapControl) // wfb
 		{}
 
 	};
@@ -1193,6 +1203,10 @@ namespace DataSizing {
 		//  (zone time step)
 		FArray1D< Real64 > CoolFlowSeq; // daily sequence of system cooling air mass flow rate
 		//  (zone time step)
+		FArray1D< Real64 > SumZoneCoolLoadSeq; // daily sequence of zones summed cooling load [W]
+		//  (zone time step)
+		FArray1D< Real64 > CoolZoneAvgTempSeq; // daily sequence of zones flow weighted average temperature [C]
+		//  (zone time step)
 		FArray1D< Real64 > SensCoolCapSeq; // daily sequence of system sensible cooling capacity
 		//  (zone time step)
 		FArray1D< Real64 > TotCoolCapSeq; // daily sequence of system total cooling capacity
@@ -1223,6 +1237,7 @@ namespace DataSizing {
 		// in Sizing:System
 		// wfb
 		int CoolingPeakLoadType; //Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
+		int CoolCapControl; // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
 
 		// Default Constructor
 		SystemSizingData() :
@@ -1287,7 +1302,8 @@ namespace DataSizing {
 			MaxZoneOAFraction( 0.0 ),
 			SysUncOA( 0.0 ),
 			OAAutoSized( false ),
-			CoolingPeakLoadType( 0 ) // wfb
+			CoolingPeakLoadType( 0 ), // wfb
+			CoolCapControl( 0 ) // wfb
 		{}
 
 		// Member Constructor
@@ -1354,6 +1370,8 @@ namespace DataSizing {
 			Real64 const DesCoolVolFlowMin, // design minimum system cooling flow rate [m3/s]
 			FArray1< Real64 > const & HeatFlowSeq, // daily sequence of system heating air mass flow rate
 			FArray1< Real64 > const & CoolFlowSeq, // daily sequence of system cooling air mass flow rate
+			FArray1< Real64 > const & SumZoneCoolLoadSeq, // daily sequence of zones summed cooling load [W]
+			FArray1< Real64 > const & CoolZoneAvgTempSeq, // daily sequence of zone average temperature [c]
 			FArray1< Real64 > const & SensCoolCapSeq, // daily sequence of system sensible cooling capacity
 			FArray1< Real64 > const & TotCoolCapSeq, // daily sequence of system total cooling capacity
 			FArray1< Real64 > const & HeatCapSeq, // daily sequence of system heating capacity [zone time step]
@@ -1371,7 +1389,8 @@ namespace DataSizing {
 			Real64 const SysUncOA, // uncorrected system outdoor air flow based on zone people and
 			bool const OAAutoSized, // Set to true if design OA vol flow is set to 'autosize'
 			// wfb
-			int const CoolingPeakLoadType // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
+			int const CoolingPeakLoadType, // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
+			int const CoolCapControl // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
 		) :
 			AirPriLoopName( AirPriLoopName ),
 			CoolDesDay( CoolDesDay ),
@@ -1435,6 +1454,8 @@ namespace DataSizing {
 			DesCoolVolFlowMin( DesCoolVolFlowMin ),
 			HeatFlowSeq( HeatFlowSeq ),
 			CoolFlowSeq( CoolFlowSeq ),
+			SumZoneCoolLoadSeq(SumZoneCoolLoadSeq ),
+			CoolZoneAvgTempSeq(CoolZoneAvgTempSeq ),
 			SensCoolCapSeq( SensCoolCapSeq ),
 			TotCoolCapSeq( TotCoolCapSeq ),
 			HeatCapSeq( HeatCapSeq ),
@@ -1451,7 +1472,8 @@ namespace DataSizing {
 			MaxZoneOAFraction( MaxZoneOAFraction ),
 			SysUncOA( SysUncOA ),
 			OAAutoSized( OAAutoSized ),
-			CoolingPeakLoadType( CoolingPeakLoadType ) //wfb
+			CoolingPeakLoadType( CoolingPeakLoadType ), // wfb
+			CoolCapControl( CoolCapControl ) // wfb
 		{}
 
 	};
