@@ -255,8 +255,8 @@ int getepvariables( char*  const fileName,
   ret = check_variable_cfg_Validate(fileName);
   if(-1 == ret) 
     return -1;
-
-  fd = fopen(fileName, "r");
+  
+  fd = fopen("variables.cfg", "r");
   if(!fd){
     fprintf(stderr, "Error: Could not open file '%s' when getting EnergyPlus variables.\n", fileName);
     return -1;

@@ -416,7 +416,7 @@ namespace ExternalInterface {
 			iSta = iEnd; // add one to skip ';'
 			iCol = str.find( ';', iSta );
 			if ( iCol != std::string::npos ) {
-				iEnd = iSta + iCol + 1;
+				iEnd = iCol + 1;
 			} else { // Use rest of string
 				iEnd = lenStr;
 			}
@@ -517,7 +517,7 @@ namespace ExternalInterface {
 			
 			// then overwrite the input string with actual characters, but dont change the string length
 			std::string tmpxmlStrInKey = "schedule,variable,actuator\0";
-			xmlStrInKey.replace(0, tmpxmlStrInKey.length(), tmpxmlStrInKey);
+			xmlStrInKey.replace(0, tmpxmlStrInKey.length()+1, tmpxmlStrInKey); // add +1 to length?
 			
 			// Get input and output variables for EnergyPlus in sequence
 			// Check if simCfgFilNam exists.
@@ -542,12 +542,17 @@ namespace ExternalInterface {
 				}
 				
 				// then postprocess the char vectors in case they are used after the fact
-				simCfgFilNam = getStringFromCharArray( simCfgFilNamArr );
 				xmlStrOutTyp = getStringFromCharArray( xmlStrOutTypArr );
 				xmlStrOut = getStringFromCharArray( xmlStrOutArr );
-				xmlStrInKey = getStringFromCharArray( xmlStrInKeyArr );
+				//xmlStrInKey = getStringFromCharArray( xmlStrInKeyArr );
 				xmlStrIn = getStringFromCharArray( xmlStrInArr );
 				
+				simCfgFilNamArr.clear();
+				xmlStrOutTypArr.clear();
+				xmlStrOutArr.clear();
+				xmlStrInKeyArr.clear();
+				xmlStrInArr.clear();
+
 				// handle errors when reading variables.cfg file
 				if ( retVal < 0 ) {
 					ShowSevereError( "ExternalInterface: Error when getting input and output variables for EnergyPlus," );
