@@ -1725,6 +1725,140 @@ Site:GroundTemperature:Deep,
        \type real
        \default 16
 
+Site:GroundDomain,
+        \memo Ground coupled slab model for on-grade and
+        \memo in-grade cases with or without insulation.
+   A1,  \field Name
+        \required-field
+   N1,  \field Ground Domain Depth
+        \required-field
+        \type real
+        \units m
+        \minimum> 0.0
+   N2,  \field Aspect Ratio
+        \type real
+        \default 1
+   N3,  \field Perimeter Offset
+        \required-field
+        \type real
+        \units m
+        \minimum> 0.0
+   N4,  \field Soil Thermal Conductivity
+        \required-field
+        \type real
+        \units W/m-K
+        \minimum> 0.0
+   N5,  \field Soil Density
+        \required-field
+        \type real
+        \units kg/m3
+        \minimum> 0.0
+   N6,  \field Soil Specific Heat
+        \required-field
+        \type real
+        \units J/kg-K
+        \minimum> 0.0
+   N7,  \field Soil Moisture Content Volume Fraction
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8,  \field Soil Moisture Content Volume Fraction at Saturation
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9,  \field Kusuda-Achenbach Average Surface Temperature
+        \required-field
+        \type real
+        \units C
+        \note Annual average surface temperature.
+   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
+        \required-field
+        \type real
+        \units deltaC
+        \note Annual average surface temperature variation from average.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
+        \required-field
+        \type real
+        \units days
+        \note The phase shift of minimum surface temperature, or the day
+        \note of the year when the minimum surface temperature occurs.
+   N12, \field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  The value roughly represents the following cases:
+        \note  = 0   : concrete or other solid, non-permeable ground surface material
+        \note  = 0.5 : short grass, much like a manicured lawn
+        \note  = 1   : standard reference state (12 cm grass)
+        \note  = 1.5 : wild growth
+   A2,  \field Slab Boundary Condition Model Name
+        \required-field
+        \type object-list
+        \object-list OSCMNames
+   A3,  \field Slab Location
+        \required-field
+        \type choice
+        \key InGrade
+        \key OnGrade
+        \note This field specifies whether the slab is located "in-grade" or "on-grade"
+   A4,  \field Slab Material Name
+        \type object-list
+        \object-list MaterialName
+        \note Only applicable for the in-grade case
+   A5,  \field Horizontal Insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note This field specifies the presence of insulation beneath the slab.
+        \note Only required for in-grade case.
+   A6,  \field Horizontal Insulation Material Name
+        \type object-list
+        \object-list MaterialName
+        \note This field specifies the horizontal insulation material.
+   A7,  \field Horizontal Insulation Extents
+        \type choice
+        \key Full
+        \key Perimeter
+        \default Full
+        \note This field specifies whether the horizontal insulation fully insulates 
+        \note the surface or is perimeter only insulation
+   N13, \field Perimeter Insulation Width
+        \type real
+        \units m
+        \minimum> 0.0
+        \note This field specifies the width of the underfloor perimeter insulation
+   A8,  \field Vertical Insulation
+        \required-field
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note This field specifies the presence of vertical insulation at the slab edge.
+   A9,  \field Vertical Insulation Material Name
+        \type object-list
+        \object-list MaterialName  
+        \note This field specifies the vertical insulation material.
+   N14, \field Vertical Insulation Depth
+        \type real
+        \units m
+        \minimum> 0.0
+        \note Only used when including vertical insulation
+        \note This field specifies the depth of the vertical insulation
+   A10; \field Simulation Timestep
+        \required-field
+        \type choice
+        \key Hourly
+        \key Timestep
+        \default Hourly
+        \note This field specifies the domain simulation timestep.
+
 Site:GroundReflectance,
         \memo Specifies the ground reflectance values used to calculate ground reflected solar.
         \memo The ground reflectance can be further modified when snow is on the ground
@@ -30081,7 +30215,7 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note value determined by the simulation. FlowPerCoolingCapacity => is selected when the supply 
       \note air volume is determined from user specified flow per Cooling Capacity and Cooling Capacity 
       \note determined by the simulation.
-  N1, \field Cooling Design Supply Air Flow Rate {m3/s}
+  N1, \field Cooling Design Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
@@ -30089,21 +30223,21 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note Enter the magnitude of supply air volume flow rate during cooling operation.
       \note Required field when Supply air Flow Rate Method During Cooling Operation is SupplyAirFlowRate.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N2, \field Cooling Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+  N2, \field Cooling Design Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate per total conditioned floor area.
       \note Required field when Supply air Flow Rate Method During Cooling Operation is FlowPerFloorArea.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.
-  N3, \field Fraction of Autosized Cooling Design Supply Air Flow Rate {-}
+  N3, \field Fraction of Autosized Cooling Design Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
       \note Required field when Supply air Flow Rate Method During Cooling Operation is 
       \note FractionOfAutosizedCoolingAirflow.
       \note This field may be blank if a cooling coil is not included in the Zone HVAC equipment.  
-  N4, \field Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+  N4, \field Cooling Design Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
@@ -30129,7 +30263,7 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note air flow rate value determined by the simulation. FractionOfAutosizedHeatingAirflow => is 
       \note selected when the supply air volume is determined from a user specified fraction and the 
       \note Autosized heating supply air flow rate value determined by the simulation.
-  N5, \field Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
+  N5, \field Supply Air Flow Rate When No Cooling or Heating is Required
       \type real
       \units m3/s
       \minimum 0.0
@@ -30137,20 +30271,20 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note Enter the magnitude of the supply air volume flow rate during when no cooling or heating 
       \note is required. Required field when Supply air Flow Rate Method When No Cooling or Heating
       \note is Required is SupplyAirFlowRate.   
-  N6, \field Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required  {m3/s-m2}
+  N6, \field Supply Air Flow Rate Per Floor Area When No Clg or Htg is Required
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the supply air volume flow rate per total floor area.
       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
       \note is FlowPerFloorArea.   
-  N7, \field Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required {-}
+  N7, \field Fraction of Design Cooling Supply Air Flow Rate When No Clg or Htg Required
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
       \note Required field when Supply air Flow Rate Method When No Cooling or Heating is Required 
       \note is FractionOfAutosizedCoolingAirflow.   
-  N8, \field Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required {-}
+  N8, \field Fraction of Design Heating Supply Air Flow Rate When No Clg or Htg Required
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
@@ -30174,7 +30308,7 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note value determined by the simulation. FlowPerHeatingCapacity => is selected when the supply 
       \note air volume is determined from user specified flow per Heating Capacity and Heating Capacity 
       \note determined by the simulation.
-  N9, \field Heating Design Supply Air Flow Rate {m3/s}
+  N9, \field Heating Design Supply Air Flow Rate
       \type real
       \units m3/s
       \minimum 0.0
@@ -30182,21 +30316,21 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note Enter the magnitude of the supply air volume flow rate during heating operation.
       \note Required field when Supply air Flow Rate Method During Heating Operation is SupplyAirFlowRate.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.  
- N10, \field Heating Design Supply Air Flow Rate Per Floor Area {m3/s-m2}
+ N10, \field Heating Design Supply Air Flow Rate Per Floor Area
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per total conditioned floor area.
       \note Required field when Supply air Flow Rate Method During Heating Operation is FlowPerFloorArea.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment. 
- N11, \field Fraction of Heating Design Supply Air Flow Rate {-}
+ N11, \field Fraction of Heating Design Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
       \note Required field when Supply air Flow Rate Method During Heating Operation is 
       \note FractionOfAutosizedHeatingAirflow.
       \note This field may be blank if a heating coil is not included in the Zone HVAC equipment.  
- N12, \field Heating Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+ N12, \field Heating Design Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
@@ -30219,19 +30353,20 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note capacity is determine from user specified cooling capacity per floor area and zone floor area.
       \note FractionOfAutosizedCoolingCapacity => is selected when the design cooling capacity is 
       \note determined from a user specified fraction and the auto-sized design cooling capacity.
- N13, \field Cooling Design Capacity {W}
+ N13, \field Cooling Design Capacity
       \type real
-      \units m3/s
+      \units W
       \minimum 0.0
       \autosizable
       \note Enter the design cooling capacity. Required field when the cooling design capacity method
       \note CoolingDesignCapacity.
- N14, \field Cooling Design Capacity Per Floor Area {W/m2}
+ N14, \field Cooling Design Capacity Per Floor Area
       \type real
+      \units W/m2
       \minimum 0.0
       \note Enter the cooling design capacity per zone floor area. Required field when the cooling design 
       \note capacity method field is CapacityPerFloorArea. 
- N15, \field Fraction of Autosized Cooling Design Capacity {-}
+ N15, \field Fraction of Autosized Cooling Design Capacity
       \type real
       \minimum 0.0
       \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
@@ -30251,19 +30386,20 @@ DesignSpecification:ZoneHVAC:Sizing,
       \note capacity is determine from user specified heating capacity per flow area and zone floor area.
       \note FractionOfAutosizedHeatingCapacity => is selected when the design heating capacity is 
       \note determined from a user specified fraction and the auto-sized design heating capacity
- N16, \field Heating Design Capacity {W}
+ N16, \field Heating Design Capacity
       \type real
-      \units m3/s
+      \units W
       \minimum 0.0
       \autosizable
       \note Enter the design heating capacity. Required field when the heating design capacity method
       \note HeatingDesignCapacity.
- N17, \field Heating Design Capacity Per Floor Area {W/m2}
+ N17, \field Heating Design Capacity Per Floor Area
       \type real
+      \units W/m2
       \minimum 0.0
       \note Enter the heating design capacity per zone floor area. Required field when the heating design 
       \note capacity method field is CapacityPerFloorArea. 
- N18; \field Fraction of Autosized Heating Design Capacity {-}
+ N18; \field Fraction of Autosized Heating Design Capacity
       \type real
       \minimum 0.0
       \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the 
@@ -30357,7 +30493,7 @@ Sizing:System,
       \key FractionOfAutosizedCoolingAirflow
       \key FlowPerCoolingCapacity
       \default DesignDay
- N11, \field Cooling Design Air Flow Rate {m3/s}
+ N11, \field Cooling Design Air Flow Rate
       \note This input is used if Cooling Design Air Flow Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
@@ -30365,19 +30501,19 @@ Sizing:System,
       \units m3/s
       \minimum 0
       \default 0
- N12, \field Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+ N12, \field Supply Air Flow Rate Per Floor Area During Cooling Operation
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the cooling supply air volume flow rate per total conditioned floor area.
       \note Required field when Supply air Flow Rate Method during cooling operation is FlowPerFloorArea.
- N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+ N13, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
       \note Required field when Supply air Flow Rate Method during cooling operation is 
       \note FractionOfAutosizedCoolingAirflow.
- N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
+ N14, \field Design Supply Air Flow Rate Per Unit Cooling Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
@@ -30393,7 +30529,7 @@ Sizing:System,
       \key FractionOfAutosizedCoolingAirflow
       \key FlowPerCoolingCapacity
       \default DesignDay
- N15, \field Heating Design Air Flow Rate {m3/s}
+ N15, \field Heating Design Air Flow Rate
       \note This input is used if Heating Design Air Flow Method is Flow/System
       \note This value will *not* be multiplied by any sizing factor or by zone multipliers.
       \note If using zone multipliers, this value must be large enough to serve the multiplied zones.
@@ -30401,25 +30537,25 @@ Sizing:System,
       \units m3/s
       \minimum 0
       \default 0
- N16, \field Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+ N16, \field Supply Air Flow Rate Per Floor Area During Heating Operation
       \type real
       \units m3/s-m2
       \minimum 0.0
       \note Enter the heating supply air volume flow rate per total conditioned floor area.
       \note Required field when Supply air Flow Rate Method during heating operation is FlowPerFloorArea.
- N17, \field Fraction of Autosized Design Heating Supply Air Flow Rate {-}
+ N17, \field Fraction of Autosized Design Heating Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the heating supply air flow rate.
       \note Required field when Supply air Flow Rate Method during heating operation is 
       \note FractionOfAutosizedHeatingAirflow.
- N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+ N18, \field Fraction of Autosized Design Cooling Supply Air Flow Rate
       \type real
       \minimum 0.0
       \note Enter the supply air volume flow rate as a fraction of the cooling supply air flow rate.
       \note Required field when Supply air Flow Rate Method during heating operation is 
       \note FractionOfAutosizedCoolingAirflow.
- N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
+ N19, \field Design Supply Air Flow Rate Per Unit Heating Capacity
       \type real
       \units m3/s-W
       \minimum 0.0
@@ -30452,20 +30588,21 @@ Sizing:System,
       \note served by an airloop. FractionOfAutosizedCoolingCapacity => is selected when the design 
       \note cooling capacity is determined from a user specified fraction and the auto-sized design 
       \note cooling capacity of the system.
- N21, \field Cooling Design Capacity {W}
+ N21, \field Cooling Design Capacity
       \type real
-      \units m3/s
+      \units W
       \minimum 0.0
       \autosizable
       \default autosize
       \note Enter the design cooling capacity. Required field when the cooling design capacity method
       \note CoolingDesignCapacity.
- N22, \field Cooling Design Capacity Per Floor Area {W/m2}
+ N22, \field Cooling Design Capacity Per Floor Area
       \type real
+      \units W/m2
       \minimum 0.0
       \note Enter the cooling design capacity per total floor area of cooled zones served by an airloop.
       \note Required field when the cooling design capacity method field is CapacityPerFloorArea. 
- N23, \field Fraction of Autosized Cooling Design Capacity {-}
+ N23, \field Fraction of Autosized Cooling Design Capacity
       \type real
       \minimum 0.0
       \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
@@ -30486,20 +30623,21 @@ Sizing:System,
       \note served by an airloop. FractionOfAutosizedHeatingCapacity => is selected when the design 
       \note heating capacity is determined from a user specified fraction and the auto-sized design 
       \note heating capacity of the system.
- N24, \field Heating Design Capacity {W}
+ N24, \field Heating Design Capacity
       \type real
-      \units m3/s
+      \units W
       \minimum 0.0
       \autosizable
       \default autosize
       \note Enter the design heating capacity. Required field when the heating design capacity method
       \note HeatingDesignCapacity.
- N25, \field Heating Design Capacity Per Floor Area {W/m2}
+ N25, \field Heating Design Capacity Per Floor Area
       \type real
+      \units W/m2
       \minimum 0.0
       \note Enter the heating design capacity per zone floor area. Required field when the heating design 
       \note capacity method field is CapacityPerFloorArea. 
- N26; \field Fraction of Autosized Heating Design Capacity {-}
+ N26; \field Fraction of Autosized Heating Design Capacity
       \type real
       \minimum 0.0
       \note Enter the fraction of auto-sized heating design capacity. Required field when capacity the 
@@ -32949,7 +33087,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
-  N5 , \field Fraction of Autosized Heating Design Capacity{ -}
+  N5 , \field Fraction of Autosized Heating Design Capacity
        \type real
        \minimum 0.0
        \default 1.0
@@ -33721,7 +33859,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
-  N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+  N3 , \field Fraction of Autosized Heating Design Capacity
        \type real
        \minimum 0.0
        \default 1.0
@@ -34493,7 +34631,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
-  N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+  N3 , \field Fraction of Autosized Heating Design Capacity
        \type real
        \minimum 0.0
        \default 1.0
@@ -35258,7 +35396,7 @@ ZoneHVAC:Baseboard:Convective:Water,
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
-  N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+  N3 , \field Fraction of Autosized Heating Design Capacity
        \type real
        \minimum 0.0
        \default 1.0
@@ -35314,7 +35452,7 @@ ZoneHVAC:Baseboard:Convective:Electric,
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
-  N3 ,  \field Fraction of Autosized Heating Design Capacity{ -}
+  N3 ,  \field Fraction of Autosized Heating Design Capacity
         \type real
         \minimum 0.0
         \default 1.0
@@ -35394,7 +35532,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
-   N5 , \field Fraction of Autosized Heating Design Capacity{ -}
+   N5 , \field Fraction of Autosized Heating Design Capacity
         \type real
         \minimum 0.0
         \default 1.0
@@ -35430,19 +35568,20 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \note served by the hydrolic unit. FractionOfAutosizedCoolingCapacity => is selected when the  
         \note design cooling capacity is determined from a user specified fraction and the auto-sized  
         \note design cooling capacity of the system.
-   N8 , \field Cooling Design Capacity {W}
+   N8 , \field Cooling Design Capacity
         \type real
-        \units m3/s
+        \units W
         \minimum 0.0
         \autosizable
         \note Enter the design cooling capacity. Required field when the cooling design capacity method
         \note CoolingDesignCapacity.
-   N9 , \field Cooling Design Capacity Per Floor Area {W/m2}
+   N9 , \field Cooling Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the cooling design capacity per total floor area of cooled zones served by the unit.
         \note Required field when the cooling design capacity method field is CapacityPerFloorArea. 
-   N10, \field Fraction of Autosized Cooling Design Capacity {-}
+   N10, \field Fraction of Autosized Cooling Design Capacity
         \type real
         \minimum 0.0
         \note Enter the fraction of auto-sized cooling design capacity. Required field when the cooling 
@@ -35654,7 +35793,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
-   N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+   N3 , \field Fraction of Autosized Heating Design Capacity
         \type real
         \minimum 0.0
         \default 1.0
@@ -36233,7 +36372,7 @@ ZoneHVAC:HighTemperatureRadiant,
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
-   N3 , \field Fraction of Autosized Heating Design Capacity{ -}
+   N3 , \field Fraction of Autosized Heating Design Capacity
         \type real
         \minimum 0.0
         \default 1.0
@@ -54989,100 +55128,6 @@ Pipe:Underground,
         \type real
         \minimum 0
         \default 0
-
-  Site:GroundDomain,
-   A1,  \field Name
-        \required-field
-   N1,  \field Ground Domain Depth
-        \required-field
-        \type real
-        \minimum> 0
-        \units m
-   N2,  \field Aspect Ratio
-        \required-field
-        \type real
-   N3,  \field Perimeter Offset
-        \required-field
-        \type real
-        \units m
-        \minimum>0
-   N4,  \field Soil Thermal Conductivity {W/m-K}
-        \required-field
-        \type real
-        \units W/m-K
-        \minimum> 0
-   N5,  \field Soil Density {kg/m3}
-        \required-field
-        \type real
-   N6,  \field Soil Specific Heat {J/kg-K}
-        \required-field
-        \type real
-   N7,  \field Soil Moisture Content Volume Fraction {percent}
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 30
-   N8,  \field Soil Moisture Content Volume Fraction at Saturation {percent}
-        \type real
-        \units percent
-        \minimum 0
-        \maximum 100
-        \default 50
-   N9,  \field Kusuda-Achenbach Average Surface Temperature {C}
-        \required-field
-        \type real
-        \units C
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-        \required-field
-        \type real
-        \units C
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-        \required-field
-        \type real
-        \units days
-   N12, \field Evapotranspiration Ground Cover Parameter
-        \type real
-        \minimum 0
-        \maximum 1.5
-        \default 0.4
-        \note This specifies the ground cover effects during evapotranspiration
-        \note  calculations.  The value roughly represents the following cases:
-        \note  = 0   : concrete or other solid, non-permeable ground surface material
-        \note  = 0.5 : short grass, much like a manicured lawn
-        \note  = 1   : standard reference state (12 cm grass)
-        \note  = 1.5 : wild growth
-   A2,  \field Name of  Slab Boundary Condition Model
-        \required-field
-   A3,  \field Slab Location
-        \required-field
-        \note This field specifies whether the slab is located "in-grade" or "on-grade"
-   A4,  \field Name of slab material
-        \field-optional
-   A5,  \field Horizontal Insulation
-        \required-optional
-        \note This field specifies the presence of insulation beneath the slab.
-   A6,  \field Insulation Material
-        \note optional
-        \note This field specifies the horizontal insulation material.
-   A7,  \field Horizontal Insulation Extents
-        \field-optional
-        \note This field specifies whether the horizontal insulation fully insulates the surface or is perimeter only insulation
-   N13, \field Perimeter Insulation Width
-        \field-optional
-        \note This field specifies the width of the perimeter insulation
-   A8,  \field Vertical Insulation
-        \required-field
-        \note This field specifies the presence of vertical insulation at the slab edge.
-   A9,  \field Insulation Material
-        \note optional
-        \note This field specifies the vertical insulation material.
-   N14, \field Vertical Insulation Depth
-        \field-optional
-        \note This field specifies the depth of the vertical insulation
-   A10; \field Simulation Timestep
-        \required-field
-        \note This field specifies the domain simulation timestep.
 
 PipingSystem:Underground:Domain,
         \memo The ground domain object for underground piping system simulation.

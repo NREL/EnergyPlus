@@ -2109,15 +2109,15 @@
     0.008,                   !- Central Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
+    0,                       !- Cooling Design Air Flow Rate {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
+    0,                       !- Heating Design Air Flow Rate {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
-    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate {-}
-    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate {-}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
@@ -2202,9 +2202,9 @@
     87.78,                   !- Rated Average Water Temperature {C}
     0.063,                   !- Rated Water Mass Flow Rate {Kg/s}
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Water Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance
     0.3,                     !- Fraction Radiant
@@ -2224,9 +2224,9 @@
     82.22,                   !- Rated Average Water Temperature {C}
     0.063,                   !- Rated Water Mass Flow Rate {Kg/s}
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    autosize,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Water Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance
     0.3,                     !- Fraction Radiant
