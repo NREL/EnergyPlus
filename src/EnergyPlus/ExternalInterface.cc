@@ -448,7 +448,7 @@ namespace ExternalInterface {
 
 		static bool firstCall( true ); // First time, input has been read
 		std::string const simCfgFilNam("variables.cfg"); // Configuration file
-		std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by
+		std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j; // loop counters
