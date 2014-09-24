@@ -1162,7 +1162,7 @@ namespace ReportSizingManager {
 								}
 								} else if ( CurDuctType == Cooling ) {
 								if ( SameString ( CompType, "COIL:HEATING:WATER" ) ) {
-									if (FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0) {
+									if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
 										AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 									} else {
 										AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
@@ -1466,18 +1466,18 @@ namespace ReportSizingManager {
 							DesVolFlow = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
 						} else {
 							if ( CurDuctType == Main ) {
-								if (FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
+								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
 									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								} else {
 									DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 								}
-							} else if (CurDuctType == Cooling) {
-								if (FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0) {
+							} else if ( CurDuctType == Cooling ) {
+								if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
 									DesVolFlow = FinalSysSizing( CurSysNum ).SysAirMinFlowRat*FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 								} else {
 									DesVolFlow = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 								}
-							} else if (CurDuctType == Heating) {
+							} else if ( CurDuctType == Heating ) {
 								DesVolFlow = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
 							} else if ( CurDuctType == Other ) {
 								DesVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
@@ -1592,7 +1592,7 @@ namespace ReportSizingManager {
 								AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
 							}
 						} else if ( CurDuctType == Cooling ) {
-							if (FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0) {
+							if ( FinalSysSizing( CurSysNum ).SysAirMinFlowRat > 0.0 ) {
 								AutosizeDes = FinalSysSizing( CurSysNum ).SysAirMinFlowRat * FinalSysSizing( CurSysNum ).DesCoolVolFlow;
 							} else {
 								AutosizeDes = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
@@ -1842,7 +1842,7 @@ namespace ReportSizingManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright Â© 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
