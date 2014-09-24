@@ -7061,7 +7061,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
     CALL SetIfBlank(fldValStart + hwpDemandBypassOff, 'Yes')
     CALL SetIfBlank(fldValStart + hwpFluidTypeOff, 'Water')
     CALL SetIfBlank(fldValStart + hwpDesDeltaTOff, '11.0')
-    CALL SetIfBlank(fldValStart + hwpLdDistSchmOff, 'Sequential')
+    CALL SetIfBlank(fldValStart + hwpLdDistSchmOff, 'SequentialLoad')
   END IF
 END IF
 END SUBROUTINE
@@ -7148,8 +7148,8 @@ ELSEIF (prelimCount .EQ. 1) THEN
     CALL SetIfBlank(fldValStart + cwpCndDemandBypassOff, 'Yes')
     CALL SetIfBlank(fldValStart + cwpFluidTypeOff, 'Water')
     CALL SetIfBlank(fldValStart + cwpDesDeltaTOff, '6.67')
-    CALL SetIfBlank(fldValStart + cwpChwLdDistSchmOff, 'Sequential')
-    CALL SetIfBlank(fldValStart + cwpCndLdDistSchmOff, 'Sequential')
+    CALL SetIfBlank(fldValStart + cwpChwLdDistSchmOff, 'SequentialLoad')
+    CALL SetIfBlank(fldValStart + cwpCndLdDistSchmOff, 'SequentialLoad')
   END IF
 END IF
 END SUBROUTINE
@@ -7548,7 +7548,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
     CALL SetIfBlank(fldValStart + mwpDemandBypassOff, 'Yes')
     CALL SetIfBlank(fldValStart + mwpFluidTypeOff, 'Water')
     CALL SetIfBlank(fldValStart + mwpDesDeltaTOff, '5.6')
-    CALL SetIfBlank(fldValStart + mwpLdDistSchmOff, 'Sequential')
+    CALL SetIfBlank(fldValStart + mwpLdDistSchmOff, 'SequentialLoad')
   END IF
 END IF
 END SUBROUTINE
@@ -9069,7 +9069,10 @@ DO iZone = 1, numCompactZoneVAV
       CALL AddToObjFld('Outlet Node Name', base + vzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + vzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + vzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -9098,7 +9101,10 @@ DO iZone = 1, numCompactZoneVAV
       ELSE
         CALL AddToObjFld('Availability Schedule Name', base + vzBaseboardAvailSchedNameOff,'')
       END IF
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + vzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + vzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -9574,7 +9580,10 @@ DO iZone = 1, numCompactZoneFPVAV
       CALL AddToObjFld('Outlet Node Name', base + fpvzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + fpvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + fpvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -9603,7 +9612,10 @@ DO iZone = 1, numCompactZoneFPVAV
       ELSE
         CALL AddToObjFld('Availability Schedule Name', base + fpvzBaseboardAvailSchedNameOff,'')
       END IF
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + fpvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + fpvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -10013,7 +10025,10 @@ DO iZone = 1, numCompactZoneHCVAV
       CALL AddToObjFld('Outlet Node Name', base + hcvzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + hcvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + hcvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -10042,7 +10057,10 @@ DO iZone = 1, numCompactZoneHCVAV
       ELSE
         CALL AddToObjFld('Availability Schedule Name', base + hcvzBaseboardAvailSchedNameOff,'')
       END IF
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + hcvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + hcvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -10316,8 +10334,17 @@ DO iSys = 1, numCompactSysVAV
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + vsSupplyMaxRateOff,' ')
   END IF
+  ! New fields for v8.2 next three rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
   CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
   CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
+  ! New fields for v8.2 next four rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
   CALL AddToObjStr('System Outdoor Air Method','ZoneSum')
   CALL AddToObjStr('Zone Maximum Outdoor Air Fraction','1',.true.)
   !AIR PRIMARY LOOP ~ line 184
@@ -11729,8 +11756,17 @@ DO iSys = 1, numCompactSysPVAV
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + pvavsSupplyMaxRateOff,' ')
   END IF
+  ! New fields for v8.2 next three rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
   CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
   CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
+  ! New fields for v8.2 next four rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
   CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   !Object ==> AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
@@ -13509,7 +13545,10 @@ DO iZone = 1, numCompactZoneUnit
       CALL AddToObjFld('Outlet Node Name', base + uzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + uzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + uzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -13538,7 +13577,10 @@ DO iZone = 1, numCompactZoneUnit
       ELSE
         CALL AddToObjFld('Availability Schedule Name', base + uzBaseboardAvailSchedNameOff,'')
       END IF
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + uzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + uzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -13706,14 +13748,32 @@ DO iSys = 1, numCompactSysUnit
   IF (isSupplyMaxRateAutosize) THEN
     CALL AddToObjStr('Cooling Design Air Flow Method','DesignDay')
     CALL AddToObjStr('Cooling Design Air Flow Rate {m3/s}','0')
+    ! New fields for v8.2 next three rows
+    CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+    CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+    CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
     CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
     CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
+    ! New fields for v8.2 next four rows
+    CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+    CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+    CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+    CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
     CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   ELSE
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + usSupplyMaxRateOff,' ')
+    ! New fields for v8.2 next three rows
+    CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+    CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+    CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
     CALL AddToObjStr('Heating Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Heating Design Air Flow Rate {m3/s}', base + usSupplyMaxRateOff,' ')
+    ! New fields for v8.2 next four rows
+    CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+    CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+    CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+    CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
     CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   END IF
   !AIR PRIMARY LOOP
@@ -14772,15 +14832,23 @@ DO iSys = 1, numCompactSysUnitHP
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + uhpsSupplyCoolFlowRateOff,' ')
   END IF
+  ! New fields for v8.2 next three rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
   IF (isSupplyHeatRateAutosize) THEN
     CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
     CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
-    CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   ELSE
     CALL AddToObjStr('Heating Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Heating Design Air Flow Rate {m3/s}', base + uhpsSupplyHeatFlowRateOff,' ')
-    CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   END IF
+  ! New fields for v8.2 next four rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
+  CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   !Object ==> AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + uhpsAirHandlerNameOff,' ')
@@ -15901,15 +15969,23 @@ DO iSys = 1, numCompactSysUnitarySystem
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + ussSupplyCoolFlowRateOff,' ')
   END IF
+  ! New fields for v8.2 next three rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
   IF (isSupplyHeatRateAutosize) THEN
     CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
     CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
-    CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   ELSE
     CALL AddToObjStr('Heating Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Heating Design Air Flow Rate {m3/s}', base + ussSupplyHeatFlowRateOff,' ')
-    CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   END IF
+  ! New fields for v8.2 next four rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
+  CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   !Object ==> AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + ussAirHandlerNameOff,' ')
@@ -18938,7 +19014,10 @@ DO iZone = 1, numCompactZoneConstVol
       CALL AddToObjFld('Outlet Node Name', base + cvzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + cvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + cvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -18963,7 +19042,10 @@ DO iZone = 1, numCompactZoneConstVol
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + cvzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + cvzBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + cvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + cvzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -19221,8 +19303,17 @@ DO iSys = 1, numCompactSysConstVol
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + cvsSupplyRateOff,' ')
   END IF
+  ! New fields for v8.2 next three rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
   CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
   CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
+  ! New fields for v8.2 next four rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
   CALL AddToObjStr('System Outdoor Air Method','ZoneSum')
   CALL AddToObjStr('Zone Maximum Outdoor Air Fraction','1',.true.)
 
@@ -20618,7 +20709,10 @@ DO iZone = 1, numCompactZoneDualDuct
       CALL AddToObjFld('Outlet Node Name', base + ddzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + ddzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + ddzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -20643,7 +20737,10 @@ DO iZone = 1, numCompactZoneDualDuct
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + ddzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + ddzBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + ddzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + ddzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -21040,8 +21137,17 @@ DO iSys = 1, numCompactSysDualDuct
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + ddsSupplyMaxRateOff,' ')
   END IF
+  ! New fields for v8.2 next three rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
   CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
   CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
+  ! New fields for v8.2 next four rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
   CALL AddToObjStr('System Outdoor Air Method','ZoneSum')
   CALL AddToObjStr('Zone Maximum Outdoor Air Fraction','1',.true.)
   !AIR PRIMARY LOOP ~ line 184
@@ -22896,7 +23002,10 @@ DO iZone = 1, numCompactZoneVRF
       CALL AddToObjFld('Outlet Node Name', base + vrfzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + vrfzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + vrfzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -22921,7 +23030,10 @@ DO iZone = 1, numCompactZoneVRF
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + vrfzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + vrfzBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + vrfzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + vrfzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -23908,7 +24020,10 @@ DO iZone = 1, numCompactFanCoil
       CALL AddToObjFld('Outlet Node Name', base + fczNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + fczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + fczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -23933,7 +24048,10 @@ DO iZone = 1, numCompactFanCoil
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + fczNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + fczBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + fczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + fczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -24472,7 +24590,10 @@ DO iZone = 1, numCompactBaseboard
       CALL AddToObjFld('Outlet Node Name', base + bbzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + bbzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + bbzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -24497,7 +24618,10 @@ DO iZone = 1, numCompactBaseboard
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + bbzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + bbzBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + bbzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + bbzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -25069,7 +25193,10 @@ DO iZone = 1, numCompactPTAC
       CALL AddToObjFld('Outlet Node Name', base + ptaczNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + ptaczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + ptaczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -25094,7 +25221,10 @@ DO iZone = 1, numCompactPTAC
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + ptaczNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + ptaczBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + ptaczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + ptaczBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -25768,7 +25898,10 @@ DO iZone = 1, numCompactPTHP
       CALL AddToObjFld('Outlet Node Name', base + pthpzNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + pthpzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + pthpzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -25793,7 +25926,10 @@ DO iZone = 1, numCompactPTHP
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + pthpzNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + pthpzBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + pthpzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + pthpzBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -26262,10 +26398,6 @@ INTEGER,PARAMETER :: ftPropyleneGlycol40 = 7
 INTEGER,PARAMETER :: ftPropyleneGlycol50 = 8
 INTEGER,PARAMETER :: ftPropyleneGlycol60 = 9
 INTEGER,PARAMETER :: ftSteam = 10
-          ! parameters for load distribution scheme
-INTEGER,PARAMETER :: ldsOptimal = 1
-INTEGER,PARAMETER :: ldsSequential = 2
-INTEGER,PARAMETER :: ldsUniform = 3
 
           ! INTERFACE BLOCK SPECIFICATIONS
           !    na
@@ -26288,7 +26420,6 @@ INTEGER :: boilerBase
 INTEGER :: iStr
 INTEGER :: setPtResetType=0
 INTEGER :: fluidType=0
-INTEGER :: loadDistScheme=0
 INTEGER :: lastBranch=0
 INTEGER :: lastSupplyBranch=0
 INTEGER :: numBoilersThisLoop=0
@@ -26350,11 +26481,14 @@ ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:HotWaterLoop in the Fluid Type field')
 END IF
 IF (SameString(FldVal(base + hwpLdDistSchmOff),'Sequential')) THEN
-  loadDistScheme = ldsSequential
+  FldVal(base + hwpLdDistSchmOff) = 'SequentialLoad'
+ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'SequentialLoad')) THEN
 ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'Optimal')) THEN
-  loadDistScheme = ldsOptimal
 ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'Uniform')) THEN
-  loadDistScheme = ldsUniform
+  FldVal(base + hwpLdDistSchmOff) = 'UniformLoad'
+ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'UniformLoad')) THEN
+ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'UniformPLR')) THEN
+ELSEIF (SameString(FldVal(base + hwpLdDistSchmOff),'SequentialUniformPLR')) THEN
 ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:HotWaterLoop in the Load Distribution Scheme field')
 END IF
@@ -26447,13 +26581,7 @@ CALL AddToObjFld('Demand Side Inlet Node Name', base + hwpNameOff,' HW Demand In
 CALL AddToObjFld('Demand Side Outlet Node Name', base + hwpNameOff,' HW Demand Outlet')
 CALL AddToObjFld('Demand Side Branch List Name', base + hwpNameOff,' HW Demand Side Branches')
 CALL AddToObjFld('Demand Side Connector List Name', base + hwpNameOff,' HW Demand Side Connectors')
-IF (loadDistScheme .EQ. ldsOptimal) THEN
-  CALL AddToObjStr('Load Distribution Scheme','Optimal')
-ELSEIF (loadDistScheme .EQ. ldsUniform) THEN
-  CALL AddToObjStr('Load Distribution Scheme','Uniform')
-ELSE
-  CALL AddToObjStr('Load Distribution Scheme','Sequential')
-ENDIF
+CALL AddToObjFld('Load Distribution Scheme', base + hwpLdDistSchmOff,'')
 IF (isMaxOutTempBlank) THEN
   CALL AddToObjStr('AvailabilityManagerAssignmentList','')
 ELSE
@@ -28298,10 +28426,6 @@ INTEGER,PARAMETER :: ftPropyleneGlycol30 = 6
 INTEGER,PARAMETER :: ftPropyleneGlycol40 = 7
 INTEGER,PARAMETER :: ftPropyleneGlycol50 = 8
 INTEGER,PARAMETER :: ftPropyleneGlycol60 = 9
-          ! parameters for load distribution scheme
-INTEGER,PARAMETER :: ldsOptimal = 1
-INTEGER,PARAMETER :: ldsSequential = 2
-INTEGER,PARAMETER :: ldsUniform = 3
 
 
           ! INTERFACE BLOCK SPECIFICATIONS
@@ -28334,8 +28458,6 @@ LOGICAL :: isCndDemandBypassYes
 LOGICAL :: isMinOutTempBlank
 INTEGER :: setPtResetType=0
 INTEGER :: fluidType=0
-INTEGER :: chwLoadDistScheme=0
-INTEGER :: cndLoadDistScheme=0
 INTEGER :: lastBranch=0
 INTEGER :: numTowersThisLoop=0
 LOGICAL :: isChwPrimPumpHeader
@@ -28434,20 +28556,26 @@ ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:ChilledWaterLoop in the Fluid Type field')
 END IF
 IF (SameString(FldVal(base + cwpChwLdDistSchmOff),'Sequential')) THEN
-  chwLoadDistScheme = ldsSequential
+  FldVal(base + cwpChwLdDistSchmOff) = 'SequentialLoad'
+ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'SequentialLoad')) THEN
 ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'Optimal')) THEN
-  chwLoadDistScheme = ldsOptimal
 ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'Uniform')) THEN
-  chwLoadDistScheme = ldsUniform
+  FldVal(base + cwpChwLdDistSchmOff) = 'UniformLoad'
+ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'UniformLoad')) THEN
+ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'UniformPLR')) THEN
+ELSEIF (SameString(FldVal(base + cwpChwLdDistSchmOff),'SequentialUniformPLR')) THEN
 ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:ChilledWaterLoop in the Chilled Water Load Distribution Scheme field')
 END IF
 IF (SameString(FldVal(base + cwpCndLdDistSchmOff),'Sequential')) THEN
-  cndLoadDistScheme = ldsSequential
+  FldVal(base + cwpCndLdDistSchmOff) = 'SequentialLoad'
+ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'SequentialLoad')) THEN
 ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'Optimal')) THEN
-  cndLoadDistScheme = ldsOptimal
 ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'Uniform')) THEN
-  cndLoadDistScheme = ldsUniform
+  FldVal(base + cwpCndLdDistSchmOff) = 'UniformLoad'
+ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'UniformLoad')) THEN
+ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'UniformPLR')) THEN
+ELSEIF (SameString(FldVal(base + cwpCndLdDistSchmOff),'SequentialUniformPLR')) THEN
 ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:ChilledWaterLoop in the Condenser Water Load Distribution Scheme field')
 END IF
@@ -28567,13 +28695,7 @@ CALL AddToObjFld('Demand Side Inlet Node Name', base + cwpNameOff,' ChW Demand I
 CALL AddToObjFld('Demand Side Outlet Node Name', base + cwpNameOff,' ChW Demand Outlet')
 CALL AddToObjFld('Demand Side Branch List Name', base + cwpNameOff,' ChW Demand Side Branches')
 CALL AddToObjFld('Demand Side Connector List Name', base + cwpNameOff,' ChW Demand Side Connectors')
-IF (chwLoadDistScheme .EQ. ldsOptimal) THEN
-  CALL AddToObjStr('Load Distribution Scheme','Optimal')
-ELSEIF (chwLoadDistScheme .EQ. ldsUniform) THEN
-  CALL AddToObjStr('Load Distribution Scheme','Uniform')
-ELSE
-  CALL AddToObjStr('Load Distribution Scheme','Sequential')
-ENDIF
+CALL AddToObjFld('Load Distribution Scheme', base + cwpChwLdDistSchmOff,'')
 IF (isMinOutTempBlank) THEN
   CALL AddToObjStr('AvailabilityManagerAssignmentList','')
 ELSE
@@ -29203,13 +29325,7 @@ IF (isChillerWithWaterCooled) THEN
   CALL AddToObjFld('Demand Side Outlet Node Name', base + cwpNameOff,' CndW Demand Outlet')
   CALL AddToObjFld('Condenser Demand Side Branch List Name', base + cwpNameOff,' CndW Demand Side Branches')
   CALL AddToObjFld('Condenser Demand Side Connector List Name', base + cwpNameOff,' CndW Demand Side Connectors')
-  IF (cndLoadDistScheme .EQ. ldsOptimal) THEN
-    CALL AddToObjStr('Load Distribution Scheme','Optimal',.TRUE.)
-  ELSEIF (cndLoadDistScheme .EQ. ldsUniform) THEN
-    CALL AddToObjStr('Load Distribution Scheme','Uniform',.TRUE.)
-  ELSE
-    CALL AddToObjStr('Load Distribution Scheme','Sequential',.TRUE.)
-  ENDIF
+  CALL AddToObjFld('Load Distribution Scheme', base + cwpCndLdDistSchmOff,'',.TRUE.)
   IF (isCwpCndOperDefault) THEN
     !CONDENSER OPERATION SCHEMES ~ line 270
     CALL CreateNewObj('CondenserEquipmentOperationSchemes')
@@ -30176,7 +30292,10 @@ DO iZone = 1, numCompactWaterAirHP
       CALL AddToObjFld('Outlet Node Name', base + wahpNameOff,' Baseboard HW Outlet')
       CALL AddToObjStr('Rated Average Water Temperature {C}','87.78')
       CALL AddToObjStr('Rated Water Mass Flow Rate {m3/s}','0.063')
-      CALL AddToObjFld('Rated Capacity {W}', base + wahpBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + wahpBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Maximum Water Flow Rate','autosize')
       CALL AddToObjStr('Convergence Tolerance','0.001')
       CALL AddToObjStr('Fraction Radiant','0.0')
@@ -30201,7 +30320,10 @@ DO iZone = 1, numCompactWaterAirHP
       CALL CreateNewObj('ZoneHVAC:Baseboard:Convective:Electric')
       CALL AddToObjFld('Name', base + wahpNameOff,' Baseboard Heat')
       CALL AddToObjFld('Availability Schedule Name', base + wahpBaseboardAvailSchedNameOff,'')
-      CALL AddToObjFld('Nominal Capacity of the BaseBoard {W}', base + wahpBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Method','HeatingDesignCapacity')
+      CALL AddToObjFld('Heating Design Capacity {W}', base + wahpBaseboardCapOff,'')
+      CALL AddToObjStr('Heating Design Capacity Per Floor Area {W/m2}','')
+      CALL AddToObjStr('Fraction of Autosized Heating Design Capacity','')
       CALL AddToObjStr('Efficiency','1',.TRUE.)
   END SELECT
 END DO
@@ -30246,10 +30368,6 @@ INTEGER,PARAMETER :: ftPropyleneGlycol40 = 7
 INTEGER,PARAMETER :: ftPropyleneGlycol50 = 8
 INTEGER,PARAMETER :: ftPropyleneGlycol60 = 9
 INTEGER,PARAMETER :: ftSteam = 10
-          ! parameters for load distribution scheme
-INTEGER,PARAMETER :: ldsOptimal = 1
-INTEGER,PARAMETER :: ldsSequential = 2
-INTEGER,PARAMETER :: ldsUniform = 3
 
           ! INTERFACE BLOCK SPECIFICATIONS
           !    na
@@ -30273,7 +30391,6 @@ LOGICAL :: isSupplyBypassYes
 LOGICAL :: isDemandBypassYes
 INTEGER :: PumpConfig
 INTEGER :: fluidType=0
-INTEGER :: loadDistScheme=0
 INTEGER :: lastBranch=0
 INTEGER :: lastSupplyBranch=0
 INTEGER :: numBoilersThisLoop=0
@@ -30333,11 +30450,14 @@ ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:MixedWaterLoop in the Fluid Type field')
 END IF
 IF (SameString(FldVal(base + mwpLdDistSchmOff),'Sequential')) THEN
-  loadDistScheme = ldsSequential
+  FldVal(base + mwpLdDistSchmOff) = 'SequentialLoad'
+ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'SequentialLoad')) THEN
 ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'Optimal')) THEN
-  loadDistScheme = ldsOptimal
 ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'Uniform')) THEN
-  loadDistScheme = ldsUniform
+  FldVal(base + mwpLdDistSchmOff) = 'UniformLoad'
+ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'UniformLoad')) THEN
+ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'UniformPLR')) THEN
+ELSEIF (SameString(FldVal(base + mwpLdDistSchmOff),'SequentialUniformPLR')) THEN
 ELSE
   CALL WriteError('Invalid choice in HVACTemplate:Plant:MixedWaterLoop in the Load Distribution Scheme field')
 END IF
@@ -30466,13 +30586,7 @@ CALL AddToObjFld('Demand Side Inlet Node Name', base + mwpNameOff,' Mixed Demand
 CALL AddToObjFld('Demand Side Outlet Node Name', base + mwpNameOff,' Mixed Demand Outlet')
 CALL AddToObjFld('Demand Side Branch List Name', base + mwpNameOff,' Mixed Demand Side Branches')
 CALL AddToObjFld('Demand Side Connector List Name', base + mwpNameOff,' Mixed Demand Side Connectors')
-IF (loadDistScheme .EQ. ldsOptimal) THEN
-  CALL AddToObjStr('Load Distribution Scheme','Optimal')
-ELSEIF (loadDistScheme .EQ. ldsUniform) THEN
-  CALL AddToObjStr('Load Distribution Scheme','Uniform')
-ELSE
-  CALL AddToObjStr('Load Distribution Scheme','Sequential')
-ENDIF
+CALL AddToObjFld('Load Distribution Scheme', base + mwpLdDistSchmOff,'')
 CALL AddToObjStr('AvailabilityManagerAssignmentList','')
 CALL AddToObjStr('Plant Loop Demand Calculation Scheme','DualSetPointDeadband',.TRUE.)
 IF (isMwpOperTypeDefault) THEN
@@ -31333,16 +31447,28 @@ DO iSys = 1, numCompactDedOutAir
   IF (isSupplyFlowRateAutosize) THEN
     CALL AddToObjStr('Cooling Design Air Flow Method','DesignDay')
     CALL AddToObjStr('Cooling Design Air Flow Rate {m3/s}','0')
+    ! New fields for v8.2 next three rows
+    CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+    CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+    CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
     CALL AddToObjStr('Heating Design Air Flow Method','DesignDay')
     CALL AddToObjStr('Heating Design Air Flow Rate {m3/s}','0')
-    CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   ELSE
     CALL AddToObjStr('Cooling Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Cooling Design Air Flow Rate {m3/s}', base + doasSupplyRateOff,' ')
+    ! New fields for v8.2 next three rows
+    CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}','')
+    CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+    CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}','')
     CALL AddToObjStr('Heating Design Air Flow Method','Flow/System')
     CALL AddToObjFld('Heating Design Air Flow Rate {m3/s}', base + doasSupplyRateOff,' ')
-    CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   END IF
+  ! New fields for v8.2 next four rows
+  CALL AddToObjStr('Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}','')
+  CALL AddToObjStr('Fraction of Autosized Design Heating Supply Air Flow Rate','')
+  CALL AddToObjStr('Fraction of Autosized Design Cooling Supply Air Flow Rate','')
+  CALL AddToObjStr('Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}','')
+  CALL AddToObjStr('System Outdoor Air Method','ZoneSum',.true.)
   !***AirLoopHVAC
   CALL CreateNewObj('AirLoopHVAC')
   CALL AddToObjFld('Name', base + doasNameOff,' ')
