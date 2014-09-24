@@ -309,7 +309,7 @@
                   EXIT
                 ENDIF
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1)='8.2'
+                OutArgs(1)='${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}'
                 nodiff=.false.
 
 !    !!!    Changes for this version
