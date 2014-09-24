@@ -447,14 +447,13 @@ namespace ExternalInterface {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		static bool firstCall( true ); // First time, input has been read
-
 		std::string const simCfgFilNam("variables.cfg"); // Configuration file
+		std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j; // loop counters
 		std::string xmlStrOut; // xml values in string, separated by ';'
 		std::string xmlStrOutTyp; // xml values in string, separated by ';'
-		std::string xmlStrInKey; // xml values in string, separated by ';'
 		std::string xmlStrIn; // xml values in string, separated by ';'
 		std::string xmlStrInTyp; // xml values in string, separated by ';'
 		static int nOutVal; // Number of output values (E+ -> ExternalInterface)
@@ -511,13 +510,7 @@ namespace ExternalInterface {
 			// initialize all the strings to this length with blanks
 			xmlStrOut = std::string(lenXmlStr, ' ');
 			xmlStrOutTyp = std::string(lenXmlStr, ' ');
-			xmlStrInKey = std::string(lenXmlStr, ' ');
 			xmlStrIn = std::string(lenXmlStr, ' ');
-			xmlStrInKey = std::string(lenXmlStr, ' ');
-			
-			// then overwrite the input string with actual characters, but dont change the string length
-			std::string tmpxmlStrInKey = "schedule,variable,actuator\0";
-			xmlStrInKey.replace(0, tmpxmlStrInKey.length()+1, tmpxmlStrInKey); // add +1 to length?
 			
 			// Get input and output variables for EnergyPlus in sequence
 			// Check if simCfgFilNam exists.
@@ -527,14 +520,13 @@ namespace ExternalInterface {
 				// preprocess the strings into char vectors before making the library call
 				auto xmlStrOutTypArr( getCharArrayFromString( xmlStrOutTyp ) );
 				auto xmlStrOutArr( getCharArrayFromString( xmlStrOut ) );
-				auto xmlStrInKeyArr( getCharArrayFromString( xmlStrInKey ) );
 				auto xmlStrInArr( getCharArrayFromString( xmlStrIn ) );
 				
 				// now make the library call
 				if ( haveExternalInterfaceBCVTB ) {
-					retVal = getepvariables(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
+					retVal = getepvariables(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
 				} else if ( haveExternalInterfaceFMUExport ) {
-					retVal = getepvariablesFMU(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
+					retVal = getepvariablesFMU(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
 				} else {
 					//there should be no else condition at this point, however we'll still assign the error value for completeness
 					retVal = -1;
@@ -543,12 +535,10 @@ namespace ExternalInterface {
 				// then postprocess the char vectors in case they are used after the fact
 				xmlStrOutTyp = getStringFromCharArray( xmlStrOutTypArr );
 				xmlStrOut = getStringFromCharArray( xmlStrOutArr );
-				//xmlStrInKey = getStringFromCharArray( xmlStrInKeyArr );
 				xmlStrIn = getStringFromCharArray( xmlStrInArr );
 				
 				xmlStrOutTypArr.clear();
 				xmlStrOutArr.clear();
-				xmlStrInKeyArr.clear();
 				xmlStrInArr.clear();
 
 				// handle errors when reading variables.cfg file

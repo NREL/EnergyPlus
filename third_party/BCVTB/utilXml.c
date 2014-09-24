@@ -238,16 +238,16 @@ void freeResource(char** strArr, int n){
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariables(const char *const fileName,
-                    char*  const myOutputVarsName, 
-                    char*  const myOutputVarsType, 
-                    int*   const myNumOutputVars, 
-                    char*  const myInputKeys, 
-                    int*   const myNumInputKeys, 
-                    char*  const myInputVars, 
-                    int*   const myNumInputVars,
-                    int*   const myInputVarsType,
-                    int*   const myStrLen){
+int getepvariables(const char*	const fileName,
+                    char*		const myOutputVarsName, 
+                    char*		const myOutputVarsType, 
+                    int*		const myNumOutputVars, 
+					const char*	const myInputKeys,
+                    int*		const myNumInputKeys, 
+                    char*		const myInputVars, 
+                    int*		const myNumInputVars,
+                    int*		const myInputVarsType,
+                    int*		const myStrLen){
 
   FILE * fd;
   XML_Parser p;
@@ -376,16 +376,16 @@ int getepvariables(const char *const fileName,
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariablesFMU(const char *const fileName,
-					   char*  const myOutputVarsName, 
-					   char*  const myOutputVarsType, 
-					   int*   const myNumOutputVars, 
-					   char*  const myInputKeys, 
-					   int*   const myNumInputKeys, 
-				       char*  const myInputVars, 
-					   int*   const myNumInputVars,
-					   int*   const myInputVarsType,
-					   int*   const myStrLen){
+int getepvariablesFMU(const char*	const fileName,
+					   char*		const myOutputVarsName, 
+					   char*		const myOutputVarsType, 
+					   int*			const myNumOutputVars, 
+					   const char*	const myInputKeys,
+					   int*			const myNumInputKeys, 
+				       char*		const myInputVars, 
+					   int*			const myNumInputVars,
+					   int*			const myInputVarsType,
+					   int*			const myStrLen){
 
   FILE * fd;
   XML_Parser p;
