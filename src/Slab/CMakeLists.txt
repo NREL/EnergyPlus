@@ -25,6 +25,8 @@ ELSE()  # Windows
     # Set release flags to be empty
     SET(CMAKE_Fortran_FLAGS_RELEASE "")
     SET(CMAKE_Fortran_FLAGS "/nologo /debug:minimal /O2 /Oy- /assume:buffered_io /noaltparam /fpscomp:nolibs /fpe:0 /fp:fast=2  /traceback /check:uninit /libs:static /threads /c /assume:protect-parens /Qprec-div /Qprec-sqrt /Qvec-")
+  ELSE()
+    SET(CMAKE_Fortran_FLAGS "-static")
   ENDIF()
 ENDIF()
 

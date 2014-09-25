@@ -161,10 +161,6 @@ function(fixup_executable EXECUTABLE_PATH )
   include(GetPrerequisites)
   get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
 
-  if(WIN32)
-    list(REVERSE PREREQUISITES)
-  endif()
-
   foreach(PREREQ IN LISTS PREREQUISITES)
       gp_resolve_item("" "${PREREQ}" "" "${LIBRARY_SEARCH_DIRECTORY}" resolved_item_var)
       get_filename_component(BASE_PATH "${EXECUTABLE_PATH}" DIRECTORY)

@@ -10,6 +10,10 @@ set(SRC
 
 add_executable( convertESOMTR ${SRC} )
 
+if( WIN32 )
+  set(CMAKE_Fortran_FLAGS "-static")
+endif()
+
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
 install_and_fixup_exe_target( convertESOMTR PreProcess/GrndTempCalc )
 
