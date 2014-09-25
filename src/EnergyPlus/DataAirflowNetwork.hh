@@ -169,6 +169,7 @@ namespace DataAirflowNetwork {
 		int OpenFactorErrCount; // Large opening error count at Open factor > 1.0
 		int OpenFactorErrIndex; // Large opening error error index at Open factor > 1.0
 		std::string InitType; // Initialization flag type:
+		bool TExtHeightDep; // Choice of height dependence of external node temperature
 		// "ZeroNodePressures", or "LinearInitializationMethod"
 
 		// Default Constructor
@@ -189,7 +190,8 @@ namespace DataAirflowNetwork {
 			ExtLargeOpeningErrIndex( 0 ),
 			OpenFactorErrCount( 0 ),
 			OpenFactorErrIndex( 0 ),
-			InitType( "ZeroNodePressures" )
+			InitType( "ZeroNodePressures" ),
+			TExtHeightDep( false )
 		{}
 
 		// Member Constructor
@@ -215,7 +217,8 @@ namespace DataAirflowNetwork {
 			int const ExtLargeOpeningErrIndex, // Exterior large opening error index during HVAC system operation
 			int const OpenFactorErrCount, // Large opening error count at Open factor > 1.0
 			int const OpenFactorErrIndex, // Large opening error error index at Open factor > 1.0
-			std::string const & InitType // Initialization flag type:
+			std::string const & InitType, // Initialization flag type:
+			bool const TExtHeightDep // Choice of height dependence of external node temperature
 		) :
 			AirflowNetworkSimuName( AirflowNetworkSimuName ),
 			Control( Control ),
@@ -238,7 +241,8 @@ namespace DataAirflowNetwork {
 			ExtLargeOpeningErrIndex( ExtLargeOpeningErrIndex ),
 			OpenFactorErrCount( OpenFactorErrCount ),
 			OpenFactorErrIndex( OpenFactorErrIndex ),
-			InitType( InitType )
+			InitType( InitType ),
+			TExtHeightDep( TExtHeightDep )
 		{}
 
 	};

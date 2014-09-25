@@ -363,7 +363,8 @@ namespace DataHVACGlobals {
 		FArray1D_int AvailManagerType; // type of availability manager
 		FArray1D_int AvailManagerNum; // index for availability manager
 		int ZoneNum; // cycle off time (in SimTimeSteps)
-		bool Input;
+		bool Input; // starts off as true to initialize zone equipment availability manager data
+		int Count; // initialize twice to ensure zone equipment availability manager list name has been read in
 
 		// Default Constructor
 		DefineZoneCompAvailMgrs() :
@@ -372,7 +373,8 @@ namespace DataHVACGlobals {
 			StartTime( 0 ),
 			StopTime( 0 ),
 			ZoneNum( 0 ),
-			Input( true )
+			Input( true ),
+			Count ( 0  )
 		{}
 
 		// Member Constructor
@@ -386,7 +388,8 @@ namespace DataHVACGlobals {
 			FArray1_int const & AvailManagerType, // type of availability manager
 			FArray1_int const & AvailManagerNum, // index for availability manager
 			int const ZoneNum, // cycle off time (in SimTimeSteps)
-			bool const Input
+			bool const Input,
+			int const Count
 		) :
 			NumAvailManagers( NumAvailManagers ),
 			AvailStatus( AvailStatus ),
@@ -397,7 +400,8 @@ namespace DataHVACGlobals {
 			AvailManagerType( AvailManagerType ),
 			AvailManagerNum( AvailManagerNum ),
 			ZoneNum( ZoneNum ),
-			Input( Input )
+			Input( Input ),
+			Count ( Count )
 		{}
 
 	};

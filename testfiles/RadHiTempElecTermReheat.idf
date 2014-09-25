@@ -2116,7 +2116,10 @@
     Zone 1 Radiant Heater,   !- Name
     RadiantPanelAvailSched,  !- Availability Schedule Name
     West Zone,               !- Zone Name
-    10000,                   !- Maximum Power Input {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    10000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     Electricity,             !- Fuel Type
     1.0,                     !- Combustion Efficiency
     0.80,                    !- Fraction of Input Converted to Radiant Energy
@@ -2141,7 +2144,10 @@
     Zone 2 Radiant Heater,   !- Name
     RadiantPanelAvailSched,  !- Availability Schedule Name
     EAST ZONE,               !- Zone Name
-    10000,                   !- Maximum Power Input {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    10000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     Electricity,             !- Fuel Type
     1.0,                     !- Combustion Efficiency
     0.80,                    !- Fraction of Input Converted to Radiant Energy
@@ -2166,7 +2172,10 @@
     Zone 3 Radiant Heater,   !- Name
     RadiantPanelAvailSched,  !- Availability Schedule Name
     NORTH ZONE,              !- Zone Name
-    15000,                   !- Maximum Power Input {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    15000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     Electricity,             !- Fuel Type
     1.0,                     !- Combustion Efficiency
     0.80,                    !- Fraction of Input Converted to Radiant Energy

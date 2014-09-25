@@ -2113,7 +2113,10 @@
     RadiantPanelAvailSched,  !- Availability Schedule Name
     West Zone,               !- Zone Name
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
-    10000,                   !- Maximum Electrical Power to Panel {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    10000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     MeanAirTemperature,      !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
@@ -2123,7 +2126,10 @@
     RadiantPanelAvailSched,  !- Availability Schedule Name
     EAST ZONE,               !- Zone Name
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
-    10000,                   !- Maximum Electrical Power to Panel {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    10000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     MeanRadiantTemperature,  !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name
@@ -2133,7 +2139,10 @@
     RadiantPanelAvailSched,  !- Availability Schedule Name
     NORTH ZONE,              !- Zone Name
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
-    15000,                   !- Maximum Electrical Power to Panel {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    15000,                   !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Fraction of Autosized Heating Design Capacity
     OperativeTemperature,    !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
     Radiant Heating Setpoints;  !- Heating Setpoint Temperature Schedule Name

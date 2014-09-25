@@ -781,11 +781,13 @@ namespace WaterCoils {
 		using General::Iterate;
 		using General::SafeDivide;
 		using DataSizing::AutoSize;
+		using DataSizing::CurSysNum;
 		using namespace OutputReportPredefined;
 		using DataPlant::ScanPlantLoopsForObject;
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using namespace FaultsManager;
+		using DataAirSystems::PrimaryAirSystem;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1170,6 +1172,9 @@ namespace WaterCoils {
 
 					// Total Coil Load from Inlet and Outlet Air States.
 					WaterCoil( CoilNum ).DesTotWaterCoilLoad = WaterCoil( CoilNum ).DesAirMassFlowRate * ( DesInletAirEnth - DesOutletAirEnth );
+					if ( CurSysNum > 0 ) {
+						WaterCoil( CoilNum ).DesTotWaterCoilLoad = WaterCoil( CoilNum ).DesTotWaterCoilLoad + PrimaryAirSystem( CurSysNum ).FanDesCoolLoad;
+					}
 
 					// Enthalpy of Water at Intlet design conditions
 					Cp = GetSpecificHeatGlycol( PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidName, WaterCoil( CoilNum ).DesInletWaterTemp, PlantLoop( WaterCoil( CoilNum ).WaterLoopNum ).FluidIndex, RoutineName );
