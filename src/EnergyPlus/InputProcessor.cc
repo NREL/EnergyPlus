@@ -231,50 +231,50 @@ namespace InputProcessor {
 		InitSecretObjects();
 
 		EchoInputFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( EchoInputFile, outputAuditFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) "+ outputAuditFile + " ." );
-			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFile + " for output (write)." );
+			DisplayString( "Could not open (write) "+ outputAuditFileName + " ." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
 		}
 
 		{ IOFlags flags; gio::inquire( "eplusout.iperr", flags ); FileExists = flags.exists(); }
 		if ( FileExists ) {
 			CacheIPErrorFile = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, "eplusout.iperr", flags ); read_stat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); read_stat = flags.ios(); }
 			if ( read_stat != 0 ) {
-				ShowFatalError( "EnergyPlus: Could not open file \"eplusout.iperr\" for input (read)." );
+				ShowFatalError( "EnergyPlus: Could not open file "+outputIperrFileName+" for input (read)." );
 			}
 			{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( CacheIPErrorFile, flags ); }
 		}
 		CacheIPErrorFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, "eplusout.iperr", flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			DisplayString( "Could not open (write) eplusout.iperr." );
-			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFile + " for output (write)." );
+			DisplayString( "Could not open (write) "+outputIperrFileName );
+			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
 		}
 
 		//               FullName from StringGlobals is used to build file name with Path
 		if ( len( ProgramPath ) == 0 ) {
-			FullName = inputEnergyFile;
+			FullName = inputIddFileName;
 		} else {
-			FullName = ProgramPath + inputEnergyFile;
+			FullName = ProgramPath + inputIddFileName;
 		}
 		{ IOFlags flags; gio::inquire( FullName, flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
 			DisplayString( "Missing " + FullName );
-			ShowFatalError( "ProcessInput: " + inputEnergyFile + " missing. Program terminates. Fullname = " + FullName );
+			ShowFatalError( "ProcessInput: " + inputIddFileName + " missing. Program terminates. Fullname = " + FullName );
 		}
 		IDDFile = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, FullName, flags ); read_stat = flags.ios(); }
 		if ( read_stat != 0 ) {
-			DisplayString( "Could not open (read) " + inputEnergyFile );
-			ShowFatalError( "ProcessInput: Could not open file " + inputEnergyFile + " for input (read)." );
+			DisplayString( "Could not open (read) " + inputIddFileName );
+			ShowFatalError( "ProcessInput: Could not open file " + inputIddFileName + " for input (read)." );
 		}
 		gio::read( IDDFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: " + inputEnergyFile + " appears to be a Unicode or binary file." );
+				ShowSevereError( "ProcessInput: " + inputIddFileName + " appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
 				ShowFatalError( "Program terminates due to previous condition." );
 			}
@@ -283,7 +283,7 @@ namespace InputProcessor {
 		NumLines = 0;
 
 		DoingInputProcessing = true;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary ("+inputEnergyFile+") File -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary ("+inputIddFileName+") File -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
 
@@ -313,7 +313,7 @@ namespace InputProcessor {
 		}
 
 		ProcessingIDD = false;
-		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary ("+inputEnergyFile+") File -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary ("+inputIddFileName+") File -- Complete";
 
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
@@ -325,23 +325,23 @@ namespace InputProcessor {
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (inputFileName) -- Start";
 
-		{ IOFlags flags; gio::inquire( inputFileName, flags ); FileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( inputIdfFileName, flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
-			DisplayString( "Missing " + CurrentWorkingFolder + inputFileName );
-			ShowFatalError( "ProcessInput: " + inputFileName + " missing. Program terminates." );
+			DisplayString( "Missing " + CurrentWorkingFolder + inputIdfFileName );
+			ShowFatalError( "ProcessInput: " + inputIdfFileName + " missing. Program terminates." );
 		}
 
 		IDFFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, inputFileName, flags ); read_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, inputIdfFileName, flags ); read_stat = flags.ios(); }
 		if ( read_stat != 0 ) {
-			DisplayString( "Could not open (read)" + inputFileName );
+			DisplayString( "Could not open (read)" + inputIdfFileName );
 			ShowFatalError( "ProcessInput: Could not open file \"in.idf\" for input (read)." );
 		}
 		gio::read( IDFFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: " + inputFileName +" appears to be a Unicode or binary file." );
+				ShowSevereError( "ProcessInput: " + inputIdfFileName +" appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
 				ShowFatalError( "Program terminates due to previous condition." );
 			}
@@ -627,7 +627,7 @@ namespace InputProcessor {
 				ErrorsFound = true;
 			}
 		} else {
-			ShowSevereError( "IP: Blank Sections not allowed.  Review " + outputAuditFile + " file.", EchoInputFile );
+			ShowSevereError( "IP: Blank Sections not allowed.  Review " + outputAuditFileName + " file.", EchoInputFile );
 			errFlag = true;
 			ErrorsFound = true;
 		}

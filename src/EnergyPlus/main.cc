@@ -330,22 +330,22 @@ main(int argc, const char * argv[])
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	{ IOFlags flags; gio::inquire( outputEndFile, flags ); FileExists = flags.exists(); }
+	{ IOFlags flags; gio::inquire( outputEndFileName, flags ); FileExists = flags.exists(); }
 	if ( FileExists ) {
 		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, outputEndFile, flags ); iostatus = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, outputEndFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file "+ outputEndFile +" for input (read)." );
+			ShowFatalError( "EnergyPlus: Could not open file "+ outputEndFileName +" for input (read)." );
 		}
 		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( LFN, flags ); }
 	}
 
-	{ IOFlags flags; gio::inquire( "Energy+.ini", flags ); EPlusINI = flags.exists(); }
+	{ IOFlags flags; gio::inquire( EnergyPlusIniFileName, flags ); EPlusINI = flags.exists(); }
 	if ( EPlusINI ) {
 		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, "Energy+.ini", flags ); iostatus = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file \"Energy+.ini\" for input (read)." );
+			ShowFatalError( "EnergyPlus: Could not open file "+EnergyPlusIniFileName+" for input (read)." );
 		}
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
 		// Relying on compiler to supply full path name here
@@ -360,12 +360,12 @@ main(int argc, const char * argv[])
 
 		gio::close( LFN );
 	} else {
-		DisplayString( "Missing Energy+.ini" );
+		DisplayString( "Missing " +EnergyPlusIniFileName );
 		ProgramPath = "";
 		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, "Energy+.ini", flags ); iostatus = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file \"Energy+.ini\" for output (write)." );
+			ShowFatalError( "EnergyPlus: Could not open file "+EnergyPlusIniFileName+" for output (write)." );
 		}
 		// Relying on compiler to supply full path name here
 		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
@@ -384,7 +384,7 @@ main(int argc, const char * argv[])
 	DisplayString( VerString );
 
 	OutputFileDebug = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, "eplusout.dbg", flags ); iostatus = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, outputDbgFileName, flags ); iostatus = flags.ios(); }
 	if ( iostatus != 0 ) {
 		ShowFatalError( "EnergyPlus: Could not open file \"eplusout.dbg\" for output (write)." );
 	}

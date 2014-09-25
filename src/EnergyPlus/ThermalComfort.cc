@@ -2468,14 +2468,14 @@ namespace ThermalComfort {
 		}
 
 		if ( initiate && weathersimulation ) {
-			{ IOFlags flags; gio::inquire( "in.stat", flags ); statFileExists = flags.exists(); }
-			{ IOFlags flags; gio::inquire( inputWeatherFile, flags ); epwFileExists = flags.exists(); }
+			{ IOFlags flags; gio::inquire( inStatFileName, flags ); statFileExists = flags.exists(); }
+			{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); epwFileExists = flags.exists(); }
 			readStat = 0;
 			if ( statFileExists ) {
 				statFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, "in.stat", flags ); readStat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, inStatFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file \"in.stat\" for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file "+inStatFileName+" for input (read)." );
 				}
 				while ( readStat == 0 ) {
 					{ IOFlags flags; gio::read( statFile, fmtA, flags ) >> lineIn; readStat = flags.ios(); }
@@ -2494,9 +2494,9 @@ namespace ThermalComfort {
 				useStatData = true;
 			} else if ( epwFileExists ) {
 				epwFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, inputWeatherFile, flags ); readStat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, inputWeatherFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file " + inputWeatherFile+ " for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveASH55: Could not open file " + inputWeatherFileName+ " for input (read)." );
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
 					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }
@@ -2720,13 +2720,13 @@ namespace ThermalComfort {
 		}
 
 		if ( initiate && weathersimulation ) {
-			{ IOFlags flags; gio::inquire( inputWeatherFile, flags ); epwFileExists = flags.exists(); }
+			{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); epwFileExists = flags.exists(); }
 			readStat = 0;
 			if ( epwFileExists ) {
 				epwFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, inputWeatherFile, flags ); readStat = flags.ios(); }
+				{ IOFlags flags; flags.ACTION( "READ" ); gio::open( epwFile, inputWeatherFileName, flags ); readStat = flags.ios(); }
 				if ( readStat != 0 ) {
-					ShowFatalError( "CalcThermalComfortAdaptiveCEN15251: Could not open file "+inputWeatherFile+" for input (read)." );
+					ShowFatalError( "CalcThermalComfortAdaptiveCEN15251: Could not open file "+inputWeatherFileName+" for input (read)." );
 				}
 				for ( i = 1; i <= 9; ++i ) { // Headers
 					{ IOFlags flags; gio::read( epwFile, fmtA, flags ); readStat = flags.ios(); }

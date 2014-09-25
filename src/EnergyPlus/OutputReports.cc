@@ -232,9 +232,9 @@ LinesOut( std::string const & option )
 	optiondone = true;
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.sln", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputSlnFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "LinesOut: Could not open file \"eplusout.sln\" for output (write)." );
+		ShowFatalError( "LinesOut: Could not open file "+ outputSlnFileName +" for output (write)." );
 	}
 
 	if ( option != "IDF" ) {
@@ -422,9 +422,9 @@ DXFOut(
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFile, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOut: Could not open file "+outputDxfFile+" for output (write)." );
+		ShowFatalError( "DXFOut: Could not open file "+outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -915,9 +915,9 @@ DXFOutLines( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFile, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutLines: Could not open file "+outputDxfFile+" for output (write)." );
+		ShowFatalError( "DXFOutLines: Could not open file "+outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -1342,9 +1342,9 @@ DXFOutWireFrame( std::string const & ColorScheme )
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFile, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDxfFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "DXFOutWireFrame: Could not open file "+outputDxfFile+" for output (write)." );
+		ShowFatalError( "DXFOutWireFrame: Could not open file "+outputDxfFileName+" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Start of Entities section
@@ -2118,9 +2118,9 @@ CostInfoOut()
 
 	unit = GetNewUnitNumber();
 	// .sci = surface cost info
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.sci", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputSciFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "CostInfoOut: Could not open file \"eplusout.sci\" for output (write)." );
+		ShowFatalError( "CostInfoOut: Could not open file "+outputSciFileName+" for output (write)." );
 	}
 	gio::write( unit, fmtLD ) << TotSurfaces << int( count( uniqueSurf ) );
 	gio::write( unit, fmtLD ) << "data for surfaces useful for cost information";
@@ -2247,9 +2247,9 @@ VRMLOut(
 	}
 
 	unit = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.wrl", flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputWrlFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		ShowFatalError( "VRMLOut: Could not open file \"eplusout.wrl\" for output (write)." );
+		ShowFatalError( "VRMLOut: Could not open file "+ outputWrlFileName +" for output (write)." );
 	}
 
 	gio::write( unit, Format_702 ); // Beginning

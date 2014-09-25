@@ -12,6 +12,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <DaylightingManager.hh>
 #include <DataBSDFWindow.hh>
 #include <DataDaylighting.hh>
@@ -91,6 +92,7 @@ namespace DaylightingManager {
 	// DLUMEF      DayltgLuminousEfficacy          WeatherManager     WeatherManager
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataGlobals;
 	using namespace DataHeatBalance;
@@ -684,9 +686,9 @@ namespace DaylightingManager {
 		// open a new file eplusout.dfs for saving the daylight factors
 		if ( CreateDFSReportFile ) {
 			OutputFileDFS = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDFS, "eplusout.dfs", flags ); write_stat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDFS, outputDfsFileName, flags ); write_stat = flags.ios(); }
 			if ( write_stat != 0 ) {
-				ShowFatalError( "CalcDayltgCoefficients: Could not open file \"eplusout.dfs\" for output (write)." );
+				ShowFatalError( "CalcDayltgCoefficients: Could not open file "+outputDfsFileName+" for output (write)." );
 			} else {
 				gio::write( OutputFileDFS, fmtA ) << "This file contains daylight factors for all exterior windows of daylight zones.";
 				gio::write( OutputFileDFS, fmtA ) << "If only one reference point the last 4 columns in the data will be zero.";
@@ -4048,7 +4050,7 @@ namespace DaylightingManager {
 		int TotDaylightingDElight; // Total Daylighting:DElight inputs
 		Real64 dLatitude; // double for argument passing
 		int iErrorFlag; // Error Flag for warning/errors returned from DElight
-		int iDElightErrorFile; // Unit number for reading DElight Error File (eplusout.delightdfdmp)
+		int iDElightErrorFile; // Unit number for reading DElight Error File (eplusout.delightdfdmp or outputDelightFile)
 		int iReadStatus; // Error File Read Status
 		std::string cErrorLine; // Each DElight Error line can be up to 210 characters long
 		std::string cErrorMsg; // Each DElight Error Message can be up to 200 characters long
@@ -4190,7 +4192,7 @@ namespace DaylightingManager {
 			if ( iErrorFlag != 0 ) {
 				// Open DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, "eplusout.delightdfdmp", flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightFileName, flags ); }
 
 				// Sequentially read lines in DElight Daylight Factors Error File
 				// and process them using standard EPlus warning/error handling calls
@@ -4231,7 +4233,7 @@ namespace DaylightingManager {
 			} else {
 				// Open, Close, and Delete DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, "eplusout.delightdfdmp", flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
 			SetupDElightOutput4EPlus();
@@ -9324,13 +9326,13 @@ namespace DaylightingManager {
 			IllumMap( MapNum ).UnitNo = GetNewUnitNumber();
 			MapNoString = RoundSigDigits( MapNum );
 			if ( MapColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, "eplusmap.tab" + MapNoString, flags ); if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, outputMapTabFileName + MapNoString, flags ); if ( flags.err() ) goto Label901; }
 				CommaDelimited = false;
 			} else if ( MapColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, "eplusmap.csv" + MapNoString, flags ); if ( flags.err() ) goto Label902; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, outputMapCsvFileName + MapNoString, flags ); if ( flags.err() ) goto Label902; }
 				CommaDelimited = true;
 			} else {
-				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, "eplusmap.txt" + MapNoString, flags ); if ( flags.err() ) goto Label903; }
+				{ IOFlags flags; flags.ACTION( "readwrite" ); flags.STATUS( "UNKNOWN" ); gio::open( IllumMap( MapNum ).UnitNo, outputMapTxtFileName + MapNoString, flags ); if ( flags.err() ) goto Label903; }
 				CommaDelimited = false;
 			}
 
@@ -9436,15 +9438,15 @@ namespace DaylightingManager {
 		return;
 
 Label901: ;
-		ShowFatalError( "ReportIllumMap: Could not open file \"eplusmap.tab" + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ outputMapTabFileName + MapNoString + "\" for output (write)." );
 		return;
 
 Label902: ;
-		ShowFatalError( "ReportIllumMap: Could not open file \"eplusmap.csv" + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ outputMapCsvFileName + MapNoString + "\" for output (write)." );
 		return;
 
 Label903: ;
-		ShowFatalError( "ReportIllumMap: Could not open file \"eplusmap.txt" + MapNoString + "\" for output (write)." );
+		ShowFatalError( "ReportIllumMap: Could not open file "+ outputMapTxtFileName + MapNoString + "\" for output (write)." );
 
 	}
 
@@ -9500,11 +9502,11 @@ Label903: ;
 
 			// Write map header
 			if ( MapColSep == CharTab ) {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, "eplusmap.tab", flags ); if ( flags.err() ) goto Label901; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, outputMapTabFileName, flags ); if ( flags.err() ) goto Label901; }
 			} else if ( MapColSep == CharComma ) {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, "eplusmap.csv", flags ); if ( flags.err() ) goto Label902; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, outputMapCsvFileName, flags ); if ( flags.err() ) goto Label902; }
 			} else {
-				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, "eplusmap.txt", flags ); if ( flags.err() ) goto Label903; }
+				{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "UNKNOWN" ); gio::open( MapOutputFile, outputMapTxtFileName, flags ); if ( flags.err() ) goto Label903; }
 			}
 
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
@@ -9540,15 +9542,15 @@ Label903: ;
 		return;
 
 Label901: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file \"eplusmap.tab\" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+outputMapTabFileName+" for output (write)." );
 		return;
 
 Label902: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file \"eplusmap.csv\" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+outputMapCsvFileName+" for output (write)." );
 		return;
 
 Label903: ;
-		ShowFatalError( "CloseReportIllumMaps: Could not open file \"eplusmap.txt\" for output (write)." );
+		ShowFatalError( "CloseReportIllumMaps: Could not open file "+outputMapTxtFileName+" for output (write)." );
 
 	}
 

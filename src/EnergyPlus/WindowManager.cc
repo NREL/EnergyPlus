@@ -9,6 +9,7 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include <CommandLineInterface.hh>
 #include <WindowManager.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataBSDFWindow.hh>
@@ -69,6 +70,7 @@ namespace WindowManager {
 	// for DOE-2, Lawrence Berkeley National Laboratory, Jan. 1996.
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using namespace DataEnvironment;
 	using namespace DataHeatBalance;
@@ -7692,7 +7694,7 @@ namespace WindowManager {
 
 		if ( PrintTransMap ) {
 			ScreenTransUnitNo = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, "eplusscreen.csv", flags ); if ( flags.err() ) goto Label99999; }
+			{ IOFlags flags; flags.ACTION( "write" ); flags.STATUS( "unknown" ); gio::open( ScreenTransUnitNo, outputScreenCsvFileName, flags ); if ( flags.err() ) goto Label99999; }
 			//  WRITE(ScreenTransUnitNo,*)' '
 			for ( ScreenNum = 1; ScreenNum <= NumSurfaceScreens; ++ScreenNum ) {
 				MatNum = SurfaceScreens( ScreenNum ).MaterialNumber;

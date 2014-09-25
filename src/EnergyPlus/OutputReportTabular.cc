@@ -3111,9 +3111,9 @@ namespace OutputReportTabular {
 				curDel = del( iStyle );
 				if ( TableStyle( iStyle ) == tableStyleComma ) {
 					DisplayString( "Writing tabular output file results using comma format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputCsvFile, flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputTblCsvFileName, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file (" + outputCsvFile + ") for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file (" + outputTblCsvFileName + ") for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "Program Version:" + curDel + VerString;
 					gio::write( curFH, fmtLD ) << "Tabular Output Report in Format: " + curDel + "Comma";
@@ -3127,9 +3127,9 @@ namespace OutputReportTabular {
 					gio::write( curFH, fmtA ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleTab ) {
 					DisplayString( "Writing tabular output file results using tab format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputTabFile, flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputTblTabFileName, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTabFile+" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTblTabFileName+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "Program Version" + curDel + VerString;
 					gio::write( curFH, fmtA ) << "Tabular Output Report in Format: " + curDel + "Tab";
@@ -3143,9 +3143,9 @@ namespace OutputReportTabular {
 					gio::write( curFH, fmtA ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleHTML ) {
 					DisplayString( "Writing tabular output file results using HTML format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputHtmFile, flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputTblHtmFileName, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputHtmFile+" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTblHtmFileName+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" "\"http://www.w3.org/TR/html4/loose.dtd\">";
 					gio::write( curFH, fmtA ) << "<html>";
@@ -3174,9 +3174,9 @@ namespace OutputReportTabular {
 					gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << "</b></p>";
 				} else if ( TableStyle( iStyle ) == tableStyleXML ) {
 					DisplayString( "Writing tabular output file results using XML format." );
-					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputXmlFile, flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, outputTblXmlFileName, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputXmlFile+" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTblXmlFileName+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "<?xml version=\"1.0\"?>";
 					gio::write( curFH, fmtA ) << "<EnergyPlusTabularReports>";
@@ -3195,9 +3195,9 @@ namespace OutputReportTabular {
 					gio::write( curFH );
 				} else {
 					DisplayString( "Writing tabular output file results using text format." );
-					{ IOFlags flags; flags.ACTION( "write" ); gio::open( curFH, outputTxtFile, flags ); write_stat = flags.ios(); }
+					{ IOFlags flags; flags.ACTION( "write" ); gio::open( curFH, outputTblTxtFileName, flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
-						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTxtFile+" for output (write)." );
+						ShowFatalError( "OpenOutputTabularFile: Could not open file "+outputTblTxtFileName+" for output (write)." );
 					}
 					gio::write( curFH, fmtA ) << "Program Version: " + VerString;
 					gio::write( curFH, fmtA ) << "Tabular Output Report in Format: " + curDel + "Fixed";
@@ -4827,7 +4827,7 @@ namespace OutputReportTabular {
 				WriteTimeBinTables();
 			}
 		}
-		EchoInputFile = FindUnitNumber( outputAuditFile );
+		EchoInputFile = FindUnitNumber( outputAuditFileName );
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyInputCount=" << MonthlyInputCount;
 		gio::write( EchoInputFile, fmtLD ) << "sizeMonthlyInput=" << sizeMonthlyInput;
 		gio::write( EchoInputFile, fmtLD ) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
@@ -4943,7 +4943,7 @@ namespace OutputReportTabular {
 		bool coolingDesignlinepassed;
 		bool desConditionlinepassed;
 
-		{ IOFlags flags; gio::inquire( "in.stat", flags ); fileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( inStatFileName, flags ); fileExists = flags.exists(); }
 		readStat = 0;
 		isASHRAE = false;
 		iscalc = false;
@@ -4956,9 +4956,9 @@ namespace OutputReportTabular {
 		lineTypeinterim = 0;
 		if ( fileExists ) {
 			statFile = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, "in.stat", flags ); readStat = flags.ios(); }
+			{ IOFlags flags; flags.ACTION( "READ" ); gio::open( statFile, inStatFileName, flags ); readStat = flags.ios(); }
 			if ( readStat != 0 ) {
-				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file \"in.stat\" for input (read)." );
+				ShowFatalError( "FillWeatherPredefinedEntries: Could not open file "+inStatFileName+" for input (read)." );
 			}
 			IOFlags flags;
 			while ( readStat == 0 ) { //end of file, or error

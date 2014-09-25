@@ -9,6 +9,7 @@
 
 // EnergyPlus Headers
 #include <AirflowNetworkSolver.hh>
+#include <CommandLineInterface.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
 #include <DataEnvironment.hh>
@@ -54,6 +55,7 @@ namespace AirflowNetworkSolver {
 	// USE STATEMENTS:
 
 	// Using/Aliasing
+    using namespace CommandLineInterface;
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::Pi;
 	using DataGlobals::DegToRadians;
@@ -217,7 +219,7 @@ namespace AirflowNetworkSolver {
 		LIST = 0;
 		if ( LIST >= 1 ) {
 			Unit21 = GetNewUnitNumber();
-			gio::open( Unit21, "eplusADS.out" );
+			gio::open( Unit21, outputAdsFileName );
 		}
 
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
@@ -242,7 +244,7 @@ namespace AirflowNetworkSolver {
 		// Write an ouput file used for AIRNET input
 		if ( LIST >= 5 ) {
 			Unit11 = GetNewUnitNumber();
-			gio::open( Unit11, "eplusADS.inp" );
+			gio::open( Unit11, eplusADSFileName );
 			for ( i = 1; i <= NetworkNumOfNodes; ++i ) {
 				gio::write( Unit11, Format_901 ) << i << AirflowNetworkNodeData( i ).NodeTypeNum << AirflowNetworkNodeData( i ).NodeHeight << TZ( i ) << PZ( i );
 			}

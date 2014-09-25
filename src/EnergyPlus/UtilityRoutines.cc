@@ -168,12 +168,12 @@ AbortEnergyPlus(
 	strip( NumSevereDuringSizing );
 
 	if ( NoIDD ) {
-		DisplayString( "No EnergyPlus Data Dictionary (" + inputEnergyFile+") was found.  It is possible " );
+		DisplayString( "No EnergyPlus Data Dictionary (" + inputIddFileName+") was found.  It is possible " );
 		DisplayString( "you \"double-clicked\"EnergyPlus.exe rather than using one of the methods" );
 		DisplayString( "to run Energyplus as found in the GettingStarted document in the" );
 		DisplayString( "documentation folder.  Using EP-Launch may be best -- " );
 		DisplayString( "it provides extra help for new users." );
-		ShowMessage( "No EnergyPlus Data Dictionary (" + inputEnergyFile+") was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
+		ShowMessage( "No EnergyPlus Data Dictionary (" + inputIddFileName+") was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
 		ShowMessage( "rather than using one of the methods to run Energyplus as found in the GettingStarted document" );
 		ShowMessage( "in the documentation folder.  Using EP-Launch may be best -- it provides extra help for new users." );
 		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
@@ -213,9 +213,9 @@ AbortEnergyPlus(
 	ShowMessage( "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFile, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "AbortEnergyPlus: Could not open file "+ outputEndFile +" for output (write)." );
+		DisplayString( "AbortEnergyPlus: Could not open file "+ outputEndFileName +" for output (write)." );
 	}
 	gio::write( tempfl, fmtLD ) << "EnergyPlus Terminated--Fatal Error Detected. " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 
@@ -446,9 +446,9 @@ EndEnergyPlus()
 	ShowMessage( "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed );
 	DisplayString( "EnergyPlus Run Time=" + Elapsed );
 	tempfl = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFile, flags ); write_stat = flags.ios(); }
+	{ IOFlags flags; flags.ACTION( "write" ); gio::open( tempfl, outputEndFileName, flags ); write_stat = flags.ios(); }
 	if ( write_stat != 0 ) {
-		DisplayString( "EndEnergyPlus: Could not open file " + outputEndFile + " for output (write)." );
+		DisplayString( "EndEnergyPlus: Could not open file " + outputEndFileName + " for output (write)." );
 	}
 	gio::write( tempfl, fmtA ) << "EnergyPlus Completed Successfully-- " + NumWarnings + " Warning; " + NumSevere + " Severe Errors; Elapsed Time=" + Elapsed;
 	gio::close( tempfl );
@@ -832,8 +832,9 @@ ShowFatalError(
 
 	ShowErrorMessage( " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2 );
 	DisplayString( "**FATAL:" + ErrorMessage );
-	if ( has( ErrorMessage, "in.idf missing" ) ) NoIdf = true;
-	if ( has( ErrorMessage, inputEnergyFile +" missing" ) ) NoIDD = true;
+
+	if ( has( ErrorMessage, inputIdfFileName +" missing" ) ) NoIdf = true;
+	if ( has( ErrorMessage, inputIddFileName +" missing" ) ) NoIDD = true;
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
@@ -1586,7 +1587,6 @@ ShowErrorMessage(
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	static gio::Fmt const ErrorFormat( "(2X,A)" );
 	static gio::Fmt const fmtA( "(A)" );
-
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
 
@@ -1601,10 +1601,10 @@ ShowErrorMessage(
 
 	if ( TotalErrors == 0 && ! ErrFileOpened ) {
 		StandardErrorOutput = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, outputErrFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( StandardErrorOutput, outputErrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Trying to display error: \"" + ErrorMessage + "\"" );
-			ShowFatalError( "ShowErrorMessage: Could not open file "+outputErrFile+" for output (write)." );
+			ShowFatalError( "ShowErrorMessage: Could not open file "+outputErrFileName+" for output (write)." );
 		}
 		gio::write( StandardErrorOutput, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		ErrFileOpened = true;

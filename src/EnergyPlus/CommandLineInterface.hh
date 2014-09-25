@@ -6,26 +6,49 @@ namespace EnergyPlus{
 
 namespace CommandLineInterface {
 
- extern std::string outputAuditFile;
- extern std::string outputBndFile;
- extern std::string outputDxfFile;
- extern std::string outputEioFile;
- extern std::string outputEndFile;
- extern std::string outputErrFile;
- extern std::string outputEsoFile;
- extern std::string outputMtdFile;
- extern std::string outputMddFile;
- extern std::string outputMtrFile;
- extern std::string outputRddFile;
- extern std::string outputShdFile;
- extern std::string outputCsvFile;
- extern std::string outputHtmFile;
- extern std::string outputTabFile;
- extern std::string outputTxtFile;
- extern std::string outputXmlFile;
- extern std::string inputFileName;
- extern	std::string inputEnergyFile;
- extern	std::string inputWeatherFile;
+ extern std::string outputAuditFileName;
+ extern std::string outputBndFileName;
+ extern std::string outputDxfFileName;
+ extern std::string outputEioFileName;
+ extern std::string outputEndFileName;
+ extern std::string outputErrFileName;
+ extern std::string outputEsoFileName;
+ extern std::string outputMtdFileName;
+ extern std::string outputMddFileName;
+ extern std::string outputMtrFileName;
+ extern std::string outputRddFileName;
+ extern std::string outputShdFileName;
+ extern std::string outputTblCsvFileName;
+ extern std::string outputTblHtmFileName;
+ extern std::string outputTblTabFileName;
+ extern std::string outputTblTxtFileName;
+ extern std::string outputTblXmlFileName;
+ extern std::string inputIdfFileName;
+ extern	std::string inputIddFileName;
+ extern	std::string inputWeatherFileName;
+ extern std::string outputAdsFileName;
+ extern std::string outputDfsFileName;
+ extern std::string outputDelightFileName;
+ extern std::string outputMapTabFileName;
+ extern std::string outputMapCsvFileName;
+ extern std::string outputMapTxtFileName;
+ extern std::string outputEddFileName;
+ extern std::string outputIperrFileName;
+ extern std::string outputDbgFileName;
+ extern std::string outputSlnFileName;
+ extern std::string outputSciFileName;
+ extern std::string outputWrlFileName;
+ extern std::string outputZszCsvFileName;
+ extern std::string outputZszTabFileName;
+ extern std::string outputZszTxtFileName;
+ extern std::string outputSszCsvFileName;
+ extern std::string outputSszTabFileName;
+ extern std::string outputSszTxtFileName;
+ extern std::string outputScreenCsvFileName;
+ extern std::string EnergyPlusIniFileName;
+ extern std::string inStatFileName;
+ extern std::string TarcogIterationsFileName;
+ extern std::string eplusADSFileName;
 
  // Process command line arguments
  int

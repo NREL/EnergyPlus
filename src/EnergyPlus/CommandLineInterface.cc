@@ -31,26 +31,49 @@ namespace CommandLineInterface{
 	using namespace SolarShading;
 	using namespace ez;
 
-	std::string outputAuditFile;
-	std::string outputBndFile;
-	std::string outputDxfFile;
-	std::string outputEioFile;
-	std::string outputEndFile;
-	std::string outputErrFile;
-	std::string outputEsoFile;
-	std::string outputMtdFile;
-	std::string outputMddFile;
-	std::string outputMtrFile;
-	std::string outputRddFile;
-	std::string outputShdFile;
-	std::string outputCsvFile;
-	std::string outputHtmFile;
-	std::string outputTabFile;
-	std::string outputTxtFile;
-	std::string outputXmlFile;
-	std::string inputFileName;
-	std::string inputEnergyFile;
-	std::string inputWeatherFile;
+	std::string outputAuditFileName;
+	std::string outputBndFileName;
+	std::string outputDxfFileName;
+	std::string outputEioFileName;
+	std::string outputEndFileName;
+	std::string outputErrFileName;
+	std::string outputEsoFileName;
+	std::string outputMtdFileName;
+	std::string outputMddFileName;
+	std::string outputMtrFileName;
+	std::string outputRddFileName;
+	std::string outputShdFileName;
+	std::string outputTblCsvFileName;
+	std::string outputTblHtmFileName;
+	std::string outputTblTabFileName;
+	std::string outputTblTxtFileName;
+	std::string outputTblXmlFileName;
+	std::string inputIdfFileName;
+	std::string inputIddFileName;
+	std::string inputWeatherFileName;
+	std::string outputAdsFileName;
+	std::string outputDfsFileName;
+	std::string outputDelightFileName;
+	std::string outputMapTabFileName;
+	std::string outputMapCsvFileName;
+	std::string outputMapTxtFileName;
+	std::string outputEddFileName;
+	std::string outputIperrFileName;
+	std::string outputDbgFileName;
+	std::string outputSlnFileName;
+	std::string outputSciFileName;
+	std::string outputWrlFileName;
+	std::string outputZszCsvFileName;
+	std::string outputZszTabFileName;
+	std::string outputZszTxtFileName;
+	std::string outputSszCsvFileName;
+	std::string outputSszTabFileName;
+	std::string outputSszTxtFileName;
+	std::string outputScreenCsvFileName;
+	std::string EnergyPlusIniFileName;
+	std::string inStatFileName;
+	std::string TarcogIterationsFileName;
+	std::string eplusADSFileName;
 
 	int
 	ProcessArgs(int argc, const char * argv[])
@@ -89,12 +112,70 @@ namespace CommandLineInterface{
 		std::string usage;
 		opt.getUsage(usage);
 
+		opt.get("-i")->getString(inputIdfFileName);
+
+		opt.get("-w")->getString(inputWeatherFileName);
+
+		opt.get("-e")->getString(inputIddFileName);
+
+		std::string outputFilePrefix;
+
+		if (opt.isSet("-o")) {
+				outputFilePrefix = inputIdfFileName.substr(0, inputIdfFileName.size()-4) + "_" +
+							       inputWeatherFileName.substr(0, inputWeatherFileName.size()-4) + "_";
+			}
+			else {
+				outputFilePrefix = "eplus";
+			}
+
+		outputAuditFileName = outputFilePrefix + "out.audit";
+		outputBndFileName = outputFilePrefix + "out.bnd";
+		outputDxfFileName = outputFilePrefix + "out.dxf";
+		outputEioFileName = outputFilePrefix + "out.eio";
+		outputEndFileName = outputFilePrefix + "out.end";
+		outputErrFileName = outputFilePrefix + "out.err";
+		outputEsoFileName = outputFilePrefix + "out.eso";
+		outputMtdFileName = outputFilePrefix + "out.mtd";
+		outputMddFileName = outputFilePrefix + "out.mdd";
+		outputMtrFileName = outputFilePrefix + "out.mtr";
+		outputRddFileName = outputFilePrefix + "out.rdd";
+		outputShdFileName = outputFilePrefix + "out.shd";
+		outputTblCsvFileName = outputFilePrefix + "tbl.csv";
+		outputTblHtmFileName = outputFilePrefix + "tbl.htm";
+		outputTblTabFileName = outputFilePrefix + "tbl.tab";
+		outputTblTxtFileName = outputFilePrefix + "tbl.txt";
+		outputTblXmlFileName = outputFilePrefix + "tbl.xml";
+		outputAdsFileName = outputFilePrefix + "ADS.out";
+		outputDfsFileName = outputFilePrefix + "out.dfs";
+		outputDelightFileName = outputFilePrefix + "out.delightdfdmp";
+		outputMapTabFileName = outputFilePrefix + "map.tab";
+		outputMapCsvFileName = outputFilePrefix + "map.csv";
+		outputMapTxtFileName = outputFilePrefix + "map.txt";
+		outputEddFileName = outputFilePrefix + "out.edd";
+		outputIperrFileName = outputFilePrefix + "out.iperr";
+		outputDbgFileName = outputFilePrefix + "out.dbg";
+		outputSlnFileName = outputFilePrefix + "out.sln";
+		outputSciFileName = outputFilePrefix + "out.sci";
+		outputWrlFileName = outputFilePrefix + "out.wrl";
+		outputZszCsvFileName = outputFilePrefix + "zsz.csv";
+		outputZszTabFileName = outputFilePrefix + "zsz.tab";
+		outputZszTxtFileName = outputFilePrefix + "zsz.txt";
+	    outputSszCsvFileName = outputFilePrefix + "ssz.csv";
+		outputSszTabFileName = outputFilePrefix + "ssz.tab";
+		outputSszTxtFileName = outputFilePrefix + "ssz.txt";
+		outputScreenCsvFileName = outputFilePrefix + "screen.csv";
+		EnergyPlusIniFileName = "Energy+.ini";
+		inStatFileName = "in.stat";
+		TarcogIterationsFileName = "TarcogIterations.dbg";
+		eplusADSFileName = "eplusADS.inp";
+
+
 		// Handle bad options
 		std::vector<std::string> badOptions;
 
 		if(!opt.gotExpected(badOptions)) {
 			for(int i=0; i < badOptions.size(); ++i) {
-				DisplayString("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+				ShowFatalError("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
 			}
 			DisplayString(usage);
 			exit(EXIT_FAILURE);
@@ -103,15 +184,15 @@ namespace CommandLineInterface{
 		if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0 || opt.lastArgs.size() > 0){
 			for(int i=1; i < opt.firstArgs.size(); ++i) {
 				std::string arg(opt.firstArgs[i]->c_str());
-				DisplayString("ERROR: Invalid option: " + arg + "\n");
+				ShowFatalError("ERROR: Invalid option first arg: " + arg + "\n");
 			}
 			for(int i=0; i < opt.unknownArgs.size(); ++i) {
 				std::string arg(opt.unknownArgs[i]->c_str());
-				DisplayString("ERROR: Invalid option: " + arg + "\n");
+				ShowFatalError("ERROR: Invalid option unknown arg: " + arg + "\n");
 			}
 			for(int i=0; i < opt.lastArgs.size(); ++i) {
 				std::string arg(opt.lastArgs[i]->c_str());
-				DisplayString("ERROR: Invalid option: " + arg + "\n");
+				ShowFatalError("ERROR: Invalid option last arg: " + arg + "\n");
 			}
 			DisplayString(usage);
 			exit(EXIT_FAILURE);
@@ -119,13 +200,13 @@ namespace CommandLineInterface{
 
 		if(!opt.gotRequired(badOptions)) {
 			for(int i=0; i < badOptions.size(); ++i) {
-				DisplayString("ERROR: Missing required option " + badOptions[i] + "\n");
+				ShowFatalError("ERROR: Missing required option " + badOptions[i] + "\n");
 			}
 			DisplayString(usage);
 			exit(EXIT_FAILURE);
 		}
 
-		// Process arguments
+		// Process standard arguments
 		if (opt.isSet("-h")) {
 			DisplayString(usage);
 			exit(EXIT_SUCCESS);
@@ -135,41 +216,6 @@ namespace CommandLineInterface{
 			DisplayString(VerString);
 			exit(EXIT_SUCCESS);
 		}
-
-		opt.get("-i")->getString(inputFileName);
-
-		opt.get("-w")->getString(inputWeatherFile);
-
-		opt.get("-e")->getString(inputEnergyFile);
-
-		std::string outputFilePrefix;
-
-		if (opt.isSet("-o")) {
-			outputFilePrefix =
-					inputFileName.substr(0, inputFileName.size()-4) + "_" +
-					inputWeatherFile.substr(0, inputWeatherFile.size()-4) + "_";
-		}
-		else {
-			outputFilePrefix = "eplus";
-		}
-
-		outputAuditFile = outputFilePrefix + "out.audit";
-		outputBndFile = outputFilePrefix + "out.bnd";
-		outputDxfFile = outputFilePrefix + "out.dxf";
-		outputEioFile = outputFilePrefix + "out.eio";
-		outputEndFile = outputFilePrefix + "out.end";
-		outputErrFile = outputFilePrefix + "out.err";
-		outputEsoFile = outputFilePrefix + "out.eso";
-		outputMtdFile = outputFilePrefix + "out.mtd";
-		outputMddFile = outputFilePrefix + "out.mdd";
-		outputMtrFile = outputFilePrefix + "out.mtr";
-		outputRddFile = outputFilePrefix + "out.rdd";
-		outputShdFile = outputFilePrefix + "out.shd";
-		outputCsvFile = outputFilePrefix + "tbl.csv";
-		outputHtmFile = outputFilePrefix + "tbl.htm";
-		outputTabFile = outputFilePrefix + "tbl.tab";
-		outputTxtFile = outputFilePrefix + "tbl.txt";
-		outputXmlFile = outputFilePrefix + "tbl.xml";
 
 		return 0;
 	}

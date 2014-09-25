@@ -1581,9 +1581,9 @@ namespace OutputProcessor {
 		int write_stat;
 
 		OutputFileMeterDetails = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, outputMtdFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMeterDetails, outputMtdFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "InitializeMeters: Could not open file "+outputMtdFile+" for output (write)." );
+			ShowFatalError( "InitializeMeters: Could not open file "+outputMtdFileName+" for output (write)." );
 		}
 
 	}
@@ -6694,7 +6694,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both " + outputEsoFile + " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both " + outputEsoFileName + " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptTS ) {
@@ -6707,7 +6707,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both "+outputEsoFileName+ " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccTS ) {
@@ -6722,7 +6722,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both " + outputEsoFile + " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both " + outputEsoFileName + " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptHR ) {
@@ -6736,7 +6736,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both " + outputEsoFile + " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both " + outputEsoFileName + " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccHR ) {
@@ -6752,7 +6752,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), " "already on \"Output:Meter\". Will report to both " +outputEsoFile+ " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), " "already on \"Output:Meter\". Will report to both " +outputEsoFileName+ " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptDY ) {
@@ -6766,7 +6766,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both "+outputEsoFileName+ " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccDY ) {
@@ -6782,7 +6782,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both "+outputEsoFileName+ " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptMN ) {
@@ -6796,7 +6796,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+ " and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both "+outputEsoFileName+ " and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccMN ) {
@@ -6812,7 +6812,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+" and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both "+outputEsoFileName+" and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptSM ) {
@@ -6826,7 +6826,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both "+outputEsoFile+" and " +outputMtrFile );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both "+outputEsoFileName+" and " +outputMtrFileName );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccSM ) {
@@ -8259,31 +8259,31 @@ ProduceRDDMDD()
 
 	if ( ProduceReportVDD == ReportVDD_Yes ) {
 		OutputFileRVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, outputRddFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, outputRddFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputRddFile+" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputRddFileName+" for output (write)." );
 		}
 		gio::write( OutputFileRVDD, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileRVDD, fmtA ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
 		OutputFileMVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, outputMddFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, outputMddFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputMddFile+" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputMddFileName+" for output (write)." );
 		}
 		gio::write( OutputFileMVDD, fmtA ) << "Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileMVDD, fmtA ) << "Var Type (reported time step),Var Report Type,Variable Name [Units]";
 	} else if ( ProduceReportVDD == ReportVDD_IDF ) {
 		OutputFileRVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, outputRddFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileRVDD, outputRddFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputRddFile+" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputRddFileName+" for output (write)." );
 		}
 		gio::write( OutputFileRVDD, fmtA ) << "! Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileRVDD, fmtA ) << "! Output:Variable Objects (applicable to this run)";
 		OutputFileMVDD = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, outputMddFile, flags ); write_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileMVDD, outputMddFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
-			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputMddFile+" for output (write)." );
+			ShowFatalError( "ProduceRDDMDD: Could not open file "+outputMddFileName+" for output (write)." );
 		}
 		gio::write( OutputFileMVDD, fmtA ) << "! Program Version," + VerString + ',' + IDDVerString;
 		gio::write( OutputFileMVDD, fmtA ) << "! Output:Meter Objects (applicable to this run)";
