@@ -7,7 +7,11 @@ include(CMakeParseArguments)
 # DESTINATION is the absolute or relative destination which will be passed to 
 # the built in install command after the SOURCE is downloaded to a temporary location
 function( install_remote TYPE SOURCE DESTINATION )
-  get_filename_component(FILENAME ${SOURCE} NAME)
+  if( DEFINED ARGV3 )
+    set(FILENAME "${ARGV3}")
+  else()
+    get_filename_component(FILENAME ${SOURCE} NAME)
+  endif()
   set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/install_temp")
   install(CODE "
   file(DOWNLOAD ${SOURCE} \"${OUTPUT_DIR}/${FILENAME}\" STATUS status_var)
