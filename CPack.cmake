@@ -20,6 +20,10 @@ if( WIN32 AND NOT UNIX )
   endif()
 endif()
 
+configure_file(cmake/license.in.txt "${CMAKE_BINARY_DIR}/license.txt" @ONLY)
+install(FILES "${CMAKE_BINARY_DIR}/license.txt" DESTINATION "./")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_BINARY_DIR}/license.txt")
+
 # Install files that are in the current repo
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/AirCooledChiller.idf" DESTINATION "./DataSets")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/datasets/ASHRAE_2005_HOF_Materials.idf" DESTINATION "./DataSets")
@@ -135,7 +139,6 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${ENHANCEMENT_LIST_ITEMS}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ep.gif" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${KNOWN_ISSUES}" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/license.txt" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ObjectStatus.xls" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/readme.html" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${RULES_XLS}" "PreProcess/IDFVersionUpdater/")
