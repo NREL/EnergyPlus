@@ -8,6 +8,10 @@ SET(SRC
   ParametricPreprocessor.f90  
 ) 
 
+if( WIN32 )
+  set(CMAKE_Fortran_FLAGS "-static")
+endif()
+
 ADD_EXECUTABLE( parametricpreprocessor ${SRC} )
 
 SET_TARGET_PROPERTIES(parametricpreprocessor PROPERTIES

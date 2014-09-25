@@ -52,10 +52,12 @@ list( APPEND VERSIONS 8_2_0 )
 IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
   SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
   SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
 ENDIF()
 
 IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
-  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp")
+  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp ")
+  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -libs:static")
 ENDIF()
 
 list( LENGTH VERSIONS VERSIONS_SIZE)

@@ -6,6 +6,10 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 
 SET(SRC HVAC-Diagram-Main.f90) 
 
+if( WIN32 )
+  set(CMAKE_Fortran_FLAGS "-static")
+endif()
+
 ADD_EXECUTABLE( HVAC-Diagram ${SRC} )
 
 SET_TARGET_PROPERTIES(HVAC-Diagram PROPERTIES
