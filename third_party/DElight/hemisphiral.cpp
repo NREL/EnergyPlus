@@ -36,6 +36,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <strstream>
 #include <string>
 #include <vector>
+#include <algorithm> // for min/max
 using namespace std;
 
 // BGLincludes

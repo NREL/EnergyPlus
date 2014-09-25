@@ -33,6 +33,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm> // for min/max
 using namespace std;
 
 // BGLincludes

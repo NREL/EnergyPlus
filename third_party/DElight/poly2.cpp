@@ -31,6 +31,7 @@
 #include <sstream>
 #include <strstream>
 #include <iostream>
+#include <algorithm> // for min/max
 using namespace std;
 
 // writewndo() Error handler include

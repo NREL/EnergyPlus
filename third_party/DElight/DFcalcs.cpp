@@ -50,6 +50,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <map>
 #include <cstring>
 #include <string>
+#include <algorithm> // for min/max
 using namespace std;
 
 // BGL includes

@@ -48,7 +48,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <fstream>
 #include <cstring>
 #include <limits>
-
+#include <algorithm> // for min/max
 using namespace std;
 
 // BGL includes

@@ -49,6 +49,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <vector>
 #include <map>
 #include <limits>
+#include <algorithm> // for min/max
 using namespace std;
 
 // BGL includes

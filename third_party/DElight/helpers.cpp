@@ -42,6 +42,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <limits>
 #include <stdlib.h>
 #include <string>
+#include <algorithm> // for min/max
 using namespace std;
 
 // BGLincludes

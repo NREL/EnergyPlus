@@ -47,6 +47,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <string>
 #include <map>
 #include <vector>
+#include <algorithm> // for min/max
 using namespace std;
 
 // BGLincludes

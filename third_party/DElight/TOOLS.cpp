@@ -49,6 +49,7 @@ WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <limits>
 #include <ctime>
 #include <cstdlib>
+#include <algorithm> // for min/max
 
 using namespace std;
 
