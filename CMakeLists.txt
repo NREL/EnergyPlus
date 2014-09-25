@@ -108,7 +108,6 @@ if( BUILD_FORTRAN )
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_BINARY_DIR}/Energy+.idd" )
-install( FILES "${CMAKE_BINARY_DIR}/Energy+.idd" DESTINATION ./ )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
