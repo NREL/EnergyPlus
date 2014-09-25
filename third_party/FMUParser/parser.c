@@ -62,12 +62,15 @@ int callparser(const char* fmuFilNam, const char* tmpPat){
   filNam = malloc(length*sizeof(char)); 
   if(filNam == NULL) {
     printError("Can not allocate memory for filName\n");
+    free(tmp);
     return -1;
   }
 
   ext = malloc(length*sizeof(char)); 
   if(ext == NULL) {
     printError("Can not allocate memory for ext\n");
+    free(filNam);
+    free(tmp);
     return -1;
   }
 
@@ -251,11 +254,13 @@ int main(int argc, char* argv[]){
         // Copy the fmufilNam without extension as objNam 
         if(strncpy(objNam, fmuFilNam, length)==NULL) { 
           printError("Can not get name \"objNam\" for new folder.\n");
+          free(objNam);
           return -1;
         }
 
         if(strcat(objNam, "\0")==NULL) {
           printError("Can not add ending for objNam.\n");
+          free(objNam);
           return -1;
         }
         printfDebug("objNam = \"%s\"\n", objNam);

@@ -702,6 +702,8 @@ namespace AirflowNetworkBalanceManager {
 			SimObjectError = true;
 		}
 
+		if ( !lAlphaBlanks( 8 ) && SameString( Alphas( 8 ), "Yes" ) ) AirflowNetworkSimu.TExtHeightDep = true;
+
 		if ( SimObjectError ) {
 			ShowFatalError( RoutineName + "Errors found getting " + CurrentModuleObject + " object." " Previous error(s) cause program termination." );
 		}
@@ -3363,7 +3365,7 @@ namespace AirflowNetworkBalanceManager {
 
 		// Assign node reference height
 		for ( i = 1; i <= AirflowNetworkNumOfNodes; ++i ) {
-			AirflowNetworkNodeData( i ).NodeHeight = 0.0;
+			if ( !AirflowNetworkSimu.TExtHeightDep ) AirflowNetworkNodeData( i ).NodeHeight = 0.0;
 			ZoneNum = AirflowNetworkNodeData( i ).EPlusZoneNum;
 			if ( ZoneNum > 0 ) {
 				if ( WorldCoordSystem ) {

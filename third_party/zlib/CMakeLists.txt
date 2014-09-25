@@ -143,6 +143,12 @@ ENDIF(MSVC)
 
 add_library(miniziplib STATIC ${ZLIB_SRCS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS} ${minizip_src})
 
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 AND MSVC )
+  set_target_properties(miniziplib PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x64")
+else()
+  set_target_properties(miniziplib PROPERTIES STATIC_LIBRARY_FLAGS "/machine:x86")
+endif()
+
 #IF( NOT APPLE )
 #INSTALL(TARGETS miniziplib
 #  RUNTIME DESTINATION bin 

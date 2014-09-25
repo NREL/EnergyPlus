@@ -153,9 +153,7 @@ Enu getEnumValue(void* element, Att a, ValueStatus* vs) {
         }
     }
     id = checkEnumValue(value);
-    // following line is commented due to the compiler warning:
-    // comparison of constant -1 with expression of type 'Enu' is always false [-Wtautological-constant-out-of-range-compare]
-    //if (id==-1) *vs = valueIllegal;
+    if (id==-1) *vs = valueIllegal;
     return id;
 }
 
@@ -378,11 +376,7 @@ static int checkPeek(Elm e) {
         XML_StopParser(parser, XML_FALSE);
         return 0; // error
     }
-    // following line is commented due to the compiler warning:
-    // comparison of constant -1 with expression of type 'Elm' is always false [-Wtautological-constant-out-of-range-compare]
-    // the condition is always false, therefore the first part of the ternary will never be hit, therefore just return the else side
-    //return e==ANY_TYPE ? 1 : checkElementType(stackPeek(stack), e);
-    return checkElementType(stackPeek(stack), e);
+    return e==ANY_TYPE ? 1 : checkElementType(stackPeek(stack), e);
 }
 
 // Returns NULL to indicate error
@@ -466,10 +460,7 @@ static void XMLCALL startElement(void *context, const char *elm, const char **at
     void* e;
     int size;
     el = checkElement(elm);
-    // following line is commented due to the following compiler warning:
-    // comparison of constant -1 with expression of type 'Elm' is always false [-Wtautological-constant-out-of-range-compare]
-    // since it will always be false, we'll never return here
-    //if (el==-1) return; // error
+    if (el==-1) return; // error
     skipData = (el != elm_Name); // skip element content for all elements but Name
     switch(getAstNodeType(el)){
         case astElement: size = sizeof(Element); break;
@@ -676,9 +667,7 @@ static void XMLCALL endElement(void *context, const char *elm) {
                  stackPush(stack, name);
                  break;
             }
-        // following switch case is commented because of compiler warning:
-        // case value not in enumerated type 'Elm' [-Wswitch]
-        //case -1: return; // illegal element error
+        case -1: return; // illegal element error
         default: // must be a leaf Element
                  assert(getAstNodeType(el)==astElement);
                  break;
@@ -710,7 +699,13 @@ void XMLCALL handleData(void *context, const XML_Char *s, int len) {
     else {
         // continue existing string
         n = strlen(data) + len;
-        data = realloc(data, n+1);
+        char* tmpData;
+        tmpData = realloc(data, n+1);
+        if (!tmpData) {
+			printf("Couldnt allocate memory in xml_parser_cosim::handleData\n");
+			return;
+		}
+		data = tmpData;
         strncat(data, s, len);
         data[n] = '\0';
     }

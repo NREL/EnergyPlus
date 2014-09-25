@@ -206,16 +206,16 @@ void freeResource(char** strArr, int n);
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariables( char*  const fileName, 
-                    char*  const myOutputVarsName, 
-                    char*  const myOutputVarsType, 
-                    int*   const myNumOutputVars, 
-                    char*  const myInputKeys, 
-                    int*   const myNumInputKeys, 
-                    char*  const myInputVars, 
-                    int*   const myNumInputVars,
-                    int*   const myInputVarsType,
-                    int*   const myStrLen);
+int getepvariables(const char*	const  fileName,
+                    char*		const myOutputVarsName, 
+                    char*		const myOutputVarsType, 
+                    int*		const myNumOutputVars, 
+					const char*	const myInputKeys,
+                    int*		const myNumInputKeys, 
+                    char*		const myInputVars, 
+                    int*		const myNumInputVars,
+                    int*		const myInputVarsType,
+                    int*		const myStrLen);
 
 ////////////////////////////////////////////////////////////////
 ///  This method will return the input and output variable for EnergyPlus
@@ -235,16 +235,16 @@ int getepvariables( char*  const fileName,
 ///
 ////////////////////////////////////////////////////////////////
 
-int getepvariablesFMU( char*  const fileName, 
-                    char*  const myOutputVarsName, 
-                    char*  const myOutputVarsType, 
-                    int*   const myNumOutputVars, 
-                    char*  const myInputKeys, 
-                    int*   const myNumInputKeys, 
-                    char*  const myInputVars, 
-                    int*   const myNumInputVars,
-                    int*   const myInputVarsType,
-                    int*   const myStrLen);
+int getepvariablesFMU(const char*	const fileName,
+                    char*			const myOutputVarsName, 
+                    char*			const myOutputVarsType, 
+                    int*			const myNumOutputVars, 
+					const char*		const myInputKeys,
+                    int*			const myNumInputKeys, 
+                    char*			const myInputVars, 
+                    int*			const myNumInputVars,
+                    int*			const myInputVarsType,
+                    int*			const myStrLen);
 
 ////////////////////////////////////////////////////////////////
 /// Stack operation, this function will pop one element from stack

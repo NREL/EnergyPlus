@@ -416,7 +416,7 @@ namespace ExternalInterface {
 			iSta = iEnd; // add one to skip ';'
 			iCol = str.find( ';', iSta );
 			if ( iCol != std::string::npos ) {
-				iEnd = iSta + iCol + 1;
+				iEnd = iCol + 1;
 			} else { // Use rest of string
 				iEnd = lenStr;
 			}
@@ -447,14 +447,13 @@ namespace ExternalInterface {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		static bool firstCall( true ); // First time, input has been read
-
-		static std::string simCfgFilNam( "variables.cfg" );
+		std::string const simCfgFilNam("variables.cfg"); // Configuration file
+		std::string const xmlStrInKey("schedule,variable,actuator\0"); // xml values in string, separated by ','
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int i, j; // loop counters
 		std::string xmlStrOut; // xml values in string, separated by ';'
 		std::string xmlStrOutTyp; // xml values in string, separated by ';'
-		std::string xmlStrInKey; // xml values in string, separated by ';'
 		std::string xmlStrIn; // xml values in string, separated by ';'
 		std::string xmlStrInTyp; // xml values in string, separated by ';'
 		static int nOutVal; // Number of output values (E+ -> ExternalInterface)
@@ -505,39 +504,43 @@ namespace ExternalInterface {
 
 			StopExternalInterfaceIfError();
 
-			int lenXmlStr( maxVar * DataGlobals::MaxNameLength ); // Length of xml string ? Does getepvariables set this? If so don't initialize it or init to zero
-			xmlStrOut = "";
-			xmlStrOutTyp = "";
-			xmlStrInKey = "";
-			xmlStrIn = "";
-
+			// make a single length here for all strings to be passed to getepvariables
+			int lenXmlStr( maxVar * DataGlobals::MaxNameLength ); // Length of strings being passed to getepvariables
+			
+			// initialize all the strings to this length with blanks
+			xmlStrOut = std::string(lenXmlStr, ' ');
+			xmlStrOutTyp = std::string(lenXmlStr, ' ');
+			xmlStrIn = std::string(lenXmlStr, ' ');
+			
 			// Get input and output variables for EnergyPlus in sequence
-			xmlStrInKey = "schedule,variable,actuator\0";
 			// Check if simCfgFilNam exists.
 			{ IOFlags flags; gio::inquire( simCfgFilNam, flags ); simFileExist = flags.exists(); }
 			if ( simFileExist ) {
 				
 				// preprocess the strings into char vectors before making the library call
-				auto simCfgFilNamArr( getCharArrayFromString( simCfgFilNam ) );
 				auto xmlStrOutTypArr( getCharArrayFromString( xmlStrOutTyp ) );
 				auto xmlStrOutArr( getCharArrayFromString( xmlStrOut ) );
-				auto xmlStrInKeyArr( getCharArrayFromString( xmlStrInKey ) );
 				auto xmlStrInArr( getCharArrayFromString( xmlStrIn ) );
 				
 				// now make the library call
 				if ( haveExternalInterfaceBCVTB ) {
-					retVal = getepvariables( &simCfgFilNamArr[0], &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr );
+					retVal = getepvariables(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
 				} else if ( haveExternalInterfaceFMUExport ) {
-					retVal = getepvariablesFMU( &simCfgFilNamArr[0], &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, &xmlStrInKeyArr[0], &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr );
+					retVal = getepvariablesFMU(simCfgFilNam.c_str(), &xmlStrOutTypArr[0], &xmlStrOutArr[0], &nOutVal, xmlStrInKey.c_str(), &nInKeys, &xmlStrInArr[0], &nInpVar, inpVarTypes.data_, &lenXmlStr);
+				} else {
+					//there should be no else condition at this point, however we'll still assign the error value for completeness
+					retVal = -1;
 				}
 				
 				// then postprocess the char vectors in case they are used after the fact
-				simCfgFilNam = getStringFromCharArray( simCfgFilNamArr );
 				xmlStrOutTyp = getStringFromCharArray( xmlStrOutTypArr );
 				xmlStrOut = getStringFromCharArray( xmlStrOutArr );
-				xmlStrInKey = getStringFromCharArray( xmlStrInKeyArr );
 				xmlStrIn = getStringFromCharArray( xmlStrInArr );
 				
+				xmlStrOutTypArr.clear();
+				xmlStrOutArr.clear();
+				xmlStrInArr.clear();
+
 				// handle errors when reading variables.cfg file
 				if ( retVal < 0 ) {
 					ShowSevereError( "ExternalInterface: Error when getting input and output variables for EnergyPlus," );
@@ -690,7 +693,7 @@ namespace ExternalInterface {
 						// generate vectors here first
 						std::vector<unsigned int> valueReferenceVec;
 						std::vector<Real64> realVarValueVec;
-						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
 							valueReferenceVec.push_back( FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).ValueReference );
 							realVarValueVec.push_back( FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).RealVarValue );
 						}
@@ -698,7 +701,7 @@ namespace ExternalInterface {
 						// pass in the vectors as pointers to the first member of the vector
 						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec[0], &realVarValueVec[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
 						
-						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
 							FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).ValueReference = valueReferenceVec[x-1];
 							FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).RealVarValue = realVarValueVec[x-1];
 						}
@@ -718,15 +721,15 @@ namespace ExternalInterface {
 						
 						std::vector<unsigned int> valueReferenceVec2;
 						std::vector<Real64> realVarValueVec2;
-						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
 							valueReferenceVec2.push_back( FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).ValueReference );
 							realVarValueVec2.push_back( FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).RealVarValue );
 						}
 					
 						// pass in the vectors as pointers to the first member of the vector
-						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec2[0], &realVarValueVec2[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec2[0], &realVarValueVec2[0], &FMU( i ).Instance( j ).NumOutputVariablesVariable, &FMU( i ).Instance( j ).Index );
 
-						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).ValueReference = valueReferenceVec2[x-1];
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).RealVarValue = realVarValueVec2[x-1];
 						}
@@ -746,15 +749,15 @@ namespace ExternalInterface {
 						// generate vectors here first
 						std::vector<unsigned int> valueReferenceVec3;
 						std::vector<Real64> realVarValueVec3;
-						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
 							valueReferenceVec3.push_back( FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).ValueReference );
 							realVarValueVec3.push_back( FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).RealVarValue );
 						}
 					
 						// pass in the vectors as pointers to the first member of the vector
-						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec3[0], &realVarValueVec3[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
+						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec3[0], &realVarValueVec3[0], &FMU( i ).Instance( j ).NumOutputVariablesActuator, &FMU( i ).Instance( j ).Index );
 
-						for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).ValueReference = valueReferenceVec3[x-1];
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).RealVarValue = realVarValueVec3[x-1];
 						}
@@ -802,12 +805,12 @@ namespace ExternalInterface {
 					
 					// generate vectors here first
 					std::vector<unsigned int> valueReferenceVec4;
-					for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
+					for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
 						valueReferenceVec4.push_back( FMU( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
 					}
 					
 					std::vector<Real64> rtsValueVec4;
-					for ( int x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+					for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
 						rtsValueVec4.push_back( FMU( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
 					}
 					
@@ -1156,92 +1159,98 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).LenWorkingFolder = FMU( i ).Instance( j ).WorkingFolder.length();
 					// unpack fmus
 					// preprocess arguments for library call
-					auto fullFileNameArr( getCharArrayFromString( fullFileName( i ) ) );
-					auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
-					int lenFileName( len( fullFileName( i ) ) );
+					{
+						auto fullFileNameArr( getCharArrayFromString( fullFileName( i ) ) );
+						auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
+						int lenFileName( len( fullFileName( i ) ) );
 					
-					// make the library call
-					retVal = fmiEPlusUnpack( &fullFileNameArr[0], &workingFolderArr[0], &lenFileName, &FMU( i ).Instance( j ).LenWorkingFolder );
+						// make the library call
+						retVal = fmiEPlusUnpack( &fullFileNameArr[0], &workingFolderArr[0], &lenFileName, &FMU( i ).Instance( j ).LenWorkingFolder );
 					
-					// post process in case args are used later
-					fullFileName( i ) = getStringFromCharArray( fullFileNameArr );
-					FMU( i ).Instance( j ).WorkingFolder = getStringFromCharArray( workingFolderArr );
-					
-					if ( retVal != 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "unpack the FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "Check if the FMU exists. Also check if the FMU folder is not write protected." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( retVal != 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "unpack the FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "Check if the FMU exists. Also check if the FMU folder is not write protected." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
+
 					}
 
-					// determine modelID and modelGUID of all FMU instances
-					// preprocess arguments for library call
-					workingFolderArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder );
+					{
+						// determine modelID and modelGUID of all FMU instances
+						// preprocess arguments for library call
+						auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
 					
-					// make the library call
-					FMU( i ).Instance( j ).Index = model_ID_GUID( &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).NumInputVariablesInFMU, &FMU( i ).Instance( j ).NumOutputVariablesInFMU );
+						// make the library call
+						FMU( i ).Instance( j ).Index = model_ID_GUID( &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).NumInputVariablesInFMU, &FMU( i ).Instance( j ).NumOutputVariablesInFMU );
 					
-					if ( FMU( i ).Instance( j ).Index < 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "get the model ID and model GUID" );
-						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "Check if modelDescription.xml exists in the folder where the FMU has been unpacked." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( FMU( i ).Instance( j ).Index < 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "get the model ID and model GUID" );
+							ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "Check if modelDescription.xml exists in the folder where the FMU has been unpacked." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 					}
 
-					// get the path to the binaries
-					// preprocess args for library call
-					FMU(i).Instance(j).WorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder + "                                                                                           ";
-					auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
+					{
+						// get the path to the binaries
+						// preprocess args for library call
+						auto workingFolderArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder ) );
+						FMU(i).Instance(j).WorkingFolder_wLib = FMU(i).Instance(j).WorkingFolder + "                                                                                           ";
+						auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
 
-					// make the library call
-					retValfmiPathLib = addLibPathCurrentWorkingFolder( &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).Index );
+						// make the library call
+						retValfmiPathLib = addLibPathCurrentWorkingFolder( &workingFolderWithLibArr[0], &workingFolderArr[0], &FMU( i ).Instance( j ).LenWorkingFolder, &FMU( i ).Instance( j ).Index );
 					
-					// post process args in case they are used later
-					FMU( i ).Instance( j ).WorkingFolder_wLib = getStringFromCharArray( workingFolderWithLibArr );
+						// post process args in case they are used later
+						FMU( i ).Instance( j ).WorkingFolder_wLib = trim(getStringFromCharArray( workingFolderWithLibArr ));
 					
-					if ( retValfmiPathLib != 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "get the path to the binaries of instance" );
-						ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "Check if binaries folder exists where the FMU has been unpacked." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( retValfmiPathLib != 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "get the path to the binaries of instance" );
+							ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "Check if binaries folder exists where the FMU has been unpacked." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
+
+						// get the length of the working folder with libraries
+						FMU( i ).Instance( j ).LenWorkingFolder_wLib = FMU( i ).Instance( j ).WorkingFolder_wLib.length();
 					}
 
-					// get the length of the working folder with libraries
-					FMU( i ).Instance( j ).LenWorkingFolder_wLib = FMU( i ).Instance( j ).WorkingFolder_wLib.length();
+					{
+						// determine the FMI version
+						// preprocess args for library call
+						auto workingFolderWithLibArr( getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib ) );
+						auto VersionNumArr( getCharArrayFromString( "    " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
+					
+						// make the library call
+						retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
+					
+						// post process in case args are used later
+						FMU( i ).Instance( j ).fmiVersionNumber = getStringFromCharArray( VersionNumArr );
+					
+						if ( retValfmiVersion != 0 ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
+							ShowContinueError( "load FMI functions library of instance" );
+							ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "\"" + FMU( i ).Instance( j ).fmiVersionNumber + "\"." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 
-					// determine the FMI version
-					// preprocess args for library call
-					workingFolderWithLibArr = getCharArrayFromString( FMU( i ).Instance( j ).WorkingFolder_wLib );
-					auto VersionNumArr( getCharArrayFromString( "   " ) ); // the version should only be 3 characters long, since for now we only handle "1.0"
-					
-					// make the library call
-					retValfmiVersion = getfmiEPlusVersion(&workingFolderWithLibArr[0], &FMU(i).Instance(j).LenWorkingFolder_wLib, &VersionNumArr[0], &FMU(i).Instance(j).Index);
-					
-					// post process in case args are used later
-					FMU( i ).Instance( j ).fmiVersionNumber = getStringFromCharArray( VersionNumArr );
-					
-					if ( retValfmiVersion != 0 ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to" );
-						ShowContinueError( "load FMI functions library of instance" );
-						ShowContinueError( "\"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "\"" + FMU( i ).Instance( j ).fmiVersionNumber + "\"." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
-					}
-
-					if ( FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) != "1.0" ) {
-						ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when getting version" );
-						ShowContinueError( "number of instance \"" + FMU( i ).Instance( j ).Name + "\"" );
-						ShowContinueError( "of FMU \"" + FMU( i ).Name + "\"." );
-						ShowContinueError( "The version number found (\"" + FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) + "\")" );
-						ShowContinueError( "differs from version 1.0 which is currently supported." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
+						if ( FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) != "1.0" ) {
+							ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when getting version" );
+							ShowContinueError( "number of instance \"" + FMU( i ).Instance( j ).Name + "\"" );
+							ShowContinueError( "of FMU \"" + FMU( i ).Name + "\"." );
+							ShowContinueError( "The version number found (\"" + FMU( i ).Instance( j ).fmiVersionNumber.substr( 0, 3 ) + "\")" );
+							ShowContinueError( "differs from version 1.0 which is currently supported." );
+							ErrorsFound = true;
+							StopExternalInterfaceIfError();
+						}
 					}
 
 				}
@@ -1332,21 +1341,17 @@ namespace ExternalInterface {
 				for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
 					// check whether the number of input variables in fmu is bigger than in the idf
 					if ( FMU( i ).Instance( j ).NumInputVariablesInFMU > FMU( i ).Instance( j ).NumInputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
+						ShowWarningError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is less than the number of input variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 					// check whether the number of input variables in fmu is less than in the idf
 					if ( FMU( i ).Instance( j ).NumInputVariablesInFMU < FMU( i ).Instance( j ).NumInputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
+						ShowWarningError( "InitExternalInterfaceFMUImport: The number of input variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + ')' );
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is bigger than the number of input variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 				}
 			}
@@ -1524,7 +1529,7 @@ namespace ExternalInterface {
 							auto tempNameArr( getCharArrayFromString( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name ) );
 							int tempLength( len( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name ) );
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).ValueReference = getValueReferenceByNameFMUOutputVariables( &tempNameArr[0], &tempLength, &FMU( i ).Instance( j ).Index );
-							FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name = getStringFromCharArray( tempNameArr );
+							//FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).Name = getStringFromCharArray( tempNameArr );
 							
 							if ( FMU( i ).Instance( j ).fmuOutputVariableActuator( k ).ValueReference == -999 ) {
 								ShowSevereError( "ExternalInterface/InitExternalInterfaceFMUImport: Error when trying to get the value reference of the FMU output variable" );
@@ -1568,21 +1573,17 @@ namespace ExternalInterface {
 					FMU( i ).Instance( j ).NumOutputVariablesInIDF = FMU( i ).Instance( j ).NumOutputVariablesSchedule + FMU( i ).Instance( j ).NumOutputVariablesVariable + FMU( i ).Instance( j ).NumOutputVariablesActuator;
 					// check whether the number of output variables in fmu is bigger than in the idf
 					if ( FMU( i ).Instance( j ).NumOutputVariablesInFMU > FMU( i ).Instance( j ).NumOutputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInIDF ) + ')' );
+						ShowWarningError( "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInIDF ) + ')' );
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is less than the number of output variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 					// check whether the number of output variables in fmu is less than in the idf
 					if ( FMU( i ).Instance( j ).NumOutputVariablesInFMU < FMU( i ).Instance( j ).NumOutputVariablesInIDF ) {
-						ShowSevereError( "InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInIDF ) + ')' );
+						ShowWarningError("InitExternalInterfaceFMUImport: The number of output variables defined in input file (" + TrimSigDigits(FMU(i).Instance(j).NumOutputVariablesInIDF) + ')');
 						ShowContinueError( "of instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" is bigger than the number of output variables" );
 						ShowContinueError( "in the modelDescription file (" + TrimSigDigits( FMU( i ).Instance( j ).NumOutputVariablesInFMU ) + ")." );
 						ShowContinueError( "Check the input file and the modelDescription file again." );
-						ErrorsFound = true;
-						StopExternalInterfaceIfError();
 					}
 
 					DisplayString( "Number of inputs in instance \"" + FMU( i ).Instance( j ).Name + "\" of FMU \"" + FMU( i ).Name + "\" = \"" + TrimSigDigits( FMU( i ).Instance( j ).NumInputVariablesInIDF ) + "\"." );
@@ -1592,6 +1593,13 @@ namespace ExternalInterface {
 			StopExternalInterfaceIfError();
 			FirstCallIni = false;
 		}
+	}
+
+	std::string trim(std::string const& str)
+	{
+		std::size_t first = str.find_first_not_of(' ');
+		std::size_t last = str.find_last_not_of(' ');
+		return str.substr(first, last - first + 1);
 	}
 
 	Real64
@@ -1824,12 +1832,12 @@ namespace ExternalInterface {
 						for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
 							
 							std::vector< unsigned int > valRefVec;
-							for ( int x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
+							for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
 								valRefVec.push_back( FMU( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
 							}
 							
 							std::vector< Real64 > rtsValVec;
-							for ( int x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+							for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
 								rtsValVec.push_back( FMU( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
 							}
 							
@@ -1876,11 +1884,11 @@ namespace ExternalInterface {
 						
 						// make vectors first
 						std::vector< unsigned int > valRefVec;
-						for ( int x = 1; x <= size( FMUTemp( i ).Instance( j ).fmuInputVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMUTemp( i ).Instance( j ).fmuInputVariable ); x++ ) {
 							valRefVec.push_back( FMUTemp( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
 						}
 						std::vector< Real64 > rtsValVec;
-						for ( int x = 1; x <= size( FMUTemp( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMUTemp( i ).Instance( j ).eplusOutputVariable ); x++ ) {
 							rtsValVec.push_back( FMUTemp( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
 						}
 						

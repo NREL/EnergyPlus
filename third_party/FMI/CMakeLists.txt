@@ -23,6 +23,12 @@ SET(SRC
 
 ADD_LIBRARY( epfmiimport SHARED ${SRC} )
 
+IF( MSVC )
+  ADD_DEFINITIONS( "/w" )
+ELSE()
+  ADD_DEFINITIONS( "-w" )
+ENDIF()
+
 TARGET_LINK_LIBRARIES( epfmiimport epexpat miniziplib )
 
 INSTALL( TARGETS epfmiimport 

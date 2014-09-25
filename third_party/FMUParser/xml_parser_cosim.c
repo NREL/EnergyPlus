@@ -716,11 +716,11 @@ static void XMLCALL startElement(void *context, const char *elm, const char **at
     int size;
     el = checkElement(elm);  //Get the index of element
     printfDebug("startElement():%s\n", elm);
-    printfDebug("*** starting element %s\n", elmNames[el]);
     if (el==-1) { 
       printDebug("Error!"); 
       return; // error
     }
+    printfDebug("*** starting element %s\n", elmNames[el]);
     skipData = (el != elm_Name); // skip element content for all elements but Name
 
     switch(getAstNodeType(el)){
@@ -956,7 +956,13 @@ void XMLCALL handleData(void *context, const XML_Char *s, int len) {
     else {
         // continue existing string
         n = strlen(data) + len;
-        data = realloc(data, n+1);
+        char* tmpData;
+        tmpData = realloc(data, n+1);
+        if (!tmpData) {
+			printf("Couldnt allocate memory in xml_parser_cosim::handleData\n");
+			return;
+		}
+		data = tmpData;
         strncat(data, s, len);
         data[n] = '\0';
     }

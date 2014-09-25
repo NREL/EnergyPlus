@@ -75,9 +75,11 @@ int delete(char* tmpPat){
 	if ( system(cmd) != 0 ){	
 	//if(rmdir(tmpPat) != 0)
 	  printError("Fail to delete the temporary files");
+	  free(cmd);
 	  return -1;
 	}
 	printDebug("Deleted temporary files");
+	free(cmd);
 	return 0;
 }
 
@@ -97,6 +99,7 @@ char *getTmpPath(const char *nam, int length)
   // Define the temporary folder
   if(strncpy(tmpPat, nam, length) == NULL){
     printError("Fail to allocate memory for temp dir.\n");
+    free(tmpPat);
     return NULL;    
   }
   if(WINDOWS) strcat(tmpPat, "\\");

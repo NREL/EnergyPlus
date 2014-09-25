@@ -219,7 +219,7 @@ int isLargeFile(const char* filename)
 
     pos = ftello64(pFile);
 
-                printf("File : %s is %lld bytes\n", filename, pos);
+                printf("File : %s is %lld bytes\n", filename, (long)pos);
 
     if(pos >= 0xffffffff)
      largeFile = 1;

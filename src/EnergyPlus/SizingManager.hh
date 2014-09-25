@@ -65,6 +65,9 @@ namespace SizingManager {
 	GetZoneAirDistribution();
 
 	void
+	GetZoneHVACSizing();
+
+	void
 	GetSizingParams();
 
 	void

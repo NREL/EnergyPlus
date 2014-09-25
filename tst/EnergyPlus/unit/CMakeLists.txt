@@ -27,8 +27,6 @@ if(CMAKE_HOST_UNIX)
   endif()
 endif()
 
-
-
 # Executable name will be EnergyPlus_tests
 # Execute EnergyPlus_tests --help for options using gtest runner
 # Execute EnergyPlus_tests with no arguments to run all tests

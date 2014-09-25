@@ -924,6 +924,9 @@ fmiInteger addLibPathCurrentWorkingFolder(
 		}
 		else {
 			printf("Error: FMU does not contain binaries folder for this operating system.");
+			free(trimfmuWorkingFolder);
+			free(librPath_w32);
+			free(librPath_w64);
 			return -1;
 		}
 #endif
@@ -964,6 +967,9 @@ fmiInteger addLibPathCurrentWorkingFolder(
 		}
 		else {
 			printf("Error: FMU does not contain binaries folder for this operating system.");
+			free(trimfmuWorkingFolder);
+			free(librPath_l32);
+			free(librPath_l64);
 			return -1;
 		}
 #endif
@@ -1036,6 +1042,7 @@ fmiInteger model_ID_GUID(char* fmuWorkingFolder,
 		// check whether modelDescription exists or not
 		if (!fmuInstances[_c->index]->modelDescription) {
 			printf("Error: failed to get the modelDescription in fmiGetModelID!\n");
+			free(trimfmuWorkingFolder);
 			return -1;
 		}
 		// get the modelID of the FMU
@@ -1043,6 +1050,7 @@ fmiInteger model_ID_GUID(char* fmuWorkingFolder,
 
 		if (!fmuInstances[_c->index]->modelID) {
 			printf("Error: failed to get modelID in fmiGetModelID!\n");
+			free(trimfmuWorkingFolder);
 			return -1;
 		}
 
@@ -1051,6 +1059,7 @@ fmiInteger model_ID_GUID(char* fmuWorkingFolder,
 
 		if (!fmuInstances[_c->index]->modelGUID) {
 			printf("Error: failed to get modelGUID in fmiGetModelGUID!\n");
+			free(trimfmuWorkingFolder);
 			return -1;
 		}
 

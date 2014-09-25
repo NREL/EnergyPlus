@@ -513,6 +513,7 @@ int establishclientsocket(const char *const docname){
 #ifdef NDEBUG  
     fprintf(f1, "Error: Could not obtain socket port number. Return value = %d.\n", portNo);
 #endif
+    free(hostname);
     return portNo;
   }
 #ifdef NDEBUG  
