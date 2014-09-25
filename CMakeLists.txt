@@ -77,12 +77,23 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
+INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/zlib )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/gtest/include/ SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
+INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 
+# E+ required libraries
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
+ADD_SUBDIRECTORY(third_party/BCVTB)
+ADD_SUBDIRECTORY(third_party/Expat)
+ADD_SUBDIRECTORY(third_party/FMI)
+ADD_SUBDIRECTORY(third_party/zlib)
+IF(NOT APPLE )
+  ADD_SUBDIRECTORY(third_party/FMUParser)
+ENDIF()
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_TESTING )

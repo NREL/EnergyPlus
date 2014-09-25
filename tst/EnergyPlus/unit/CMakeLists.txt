@@ -16,6 +16,9 @@ set( test_dependencies
   EnergyPlusLib
   objexx
   sqlite
+  bcvtb 
+  epexpat 
+  epfmiimport 
 )
 
 if(CMAKE_HOST_UNIX)
@@ -23,7 +26,6 @@ if(CMAKE_HOST_UNIX)
     list(APPEND test_dependencies dl )
   endif()
 endif()
-
 
 # Executable name will be EnergyPlus_tests
 # Execute EnergyPlus_tests --help for options using gtest runner
