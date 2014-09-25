@@ -7033,7 +7033,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
     !check if loop exist but system doesn't
     IF ((numCompactSysVAV .EQ. 0) .AND. (numCompactFanCoil .EQ. 0) .AND.  &
         (numCompactZoneUnit .EQ. 0) .AND. (numCompactPTAC .EQ. 0) .AND. &
-         (numCompactPTHP .EQ. 0) .AND. (numCompactWaterAirHP .EQ. 0) .AND. &
+         (numCompactPTHP .EQ. 0) .AND. (numCompactWaterAirHP .EQ. 0) .AND. (numCompactSysVRF .EQ. 0) .AND.&
          (numCompactDedOutAir .EQ. 0) .AND. (numCompactSysPVAV .EQ. 0) .AND. &
          (numCompactSysUnitHP .EQ. 0) .AND. (numCompactSysConstVol .EQ. 0) .AND. &
          (numCompactSysDualDuct .EQ. 0) .AND. ((numCompactSysUnitarySystem .EQ. 0) .AND. numCompactBaseBoard .EQ. 0)) THEN
@@ -7043,7 +7043,7 @@ ELSEIF (prelimCount .EQ. 1) THEN
                       'or HVACTemplate:System:PackagedVAV or HVACTemplate:System:DedicatedOutdoorAir' // &
                       'or HVACTemplate:System:ConstantVolume or HVACTemplate:System:DualDuct' // &
                       'or HVACTemplate:Zone:Baseboard or HVACTemplate:System:UnitarySystem' // &
-                      'if a HVACTemplate:Plant:HotWaterLoop is defined.')
+                      'or HVACTemplate:System:VRF if a HVACTemplate:Plant:HotWaterLoop is defined.')
     END IF
     !fill in defaults
     CALL SetIfBlank(fldValStart + hwpPumpControlTypeOff, 'Intermittent')
