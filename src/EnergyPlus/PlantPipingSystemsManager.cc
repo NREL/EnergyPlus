@@ -1671,9 +1671,6 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 			
-			
-			
-			
 			//get some convergence tolerances, minimum/maximum are enforced by the IP, along with default values if user left them blank
 			PipingSystemDomains( DomainNum ).SimControls.Convergence_CurrentToPrevIteration = 0.001;
 			PipingSystemDomains( DomainNum ).SimControls.MaxIterationsPerTS = 250;
@@ -1827,6 +1824,13 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Extents.Xmax = Domain( BasementCtr ).PerimeterOffset + PipingSystemDomains( DomainNum ).BasementZone.Width / 2 + PipingSystemDomains( DomainNum ).BasementWallThickness;
 			PipingSystemDomains( DomainNum ).Extents.Ymax = Domain( BasementCtr ).Depth;
 			PipingSystemDomains( DomainNum ).Extents.Zmax = Domain( BasementCtr ).PerimeterOffset + PipingSystemDomains( DomainNum ).BasementZone.Width / 2 + PipingSystemDomains( DomainNum ).BasementWallThickness;
+
+			// Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical partition thickness.
+			if ( PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness > PipingSystemDomains( DomainNum ).BasementZone.Width / 2.0 + PipingSystemDomains( DomainNum ).BasementWallThickness
+				|| PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness > PipingSystemDomains( DomainNum ).BasementZone.Width /2.0 + PipingSystemDomains( DomainNum ).BasementWallThickness ){
+				ShowSevereError( "PipingSystems:" + RoutineName + ": Perimeter Horizontal Insulation Width is too high compared to basement floor dimensions" );
+				ShowFatalError( "Preceding error(s) cause program termination." );
+			}
 
 			//******* We'll first set up the domain ********
 			PipingSystemDomains( DomainNum ).IsActuallyPartOfAHorizontalTrench = false;
@@ -4782,7 +4786,7 @@ namespace PlantPipingSystemsManager {
 				SideXWallInsideLocation = PipingSystemDomains( DomainNum ).PerimeterOffset + PipingSystemDomains( DomainNum ).BasementWallThickness - InterfaceCellWidth / 2.0;
 				if (PipingSystemDomains(DomainNum).HorizInsPresentFlag && !PipingSystemDomains(DomainNum).FullHorizInsPresent){
 					//Insulation Edge X direction
-					SideXInsulationLocation = SideXLocation + PipingSystemDomains(DomainNum).HorizInsWidth;
+					SideXInsulationLocation = PipingSystemDomains( DomainNum ).PerimeterOffset + PipingSystemDomains( DomainNum ).HorizInsWidth - InterfaceCellWidth / 2.0;
 				}
 				if ( !allocated( PipingSystemDomains( DomainNum ).Partitions.X ) ) {
 					if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
@@ -4905,7 +4909,7 @@ namespace PlantPipingSystemsManager {
 				SideZWallInsideLocation = PipingSystemDomains( DomainNum ).PerimeterOffset + PipingSystemDomains( DomainNum ).BasementWallThickness - InterfaceCellWidth / 2.0;
 				if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag && !PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
 					//Insulation Edge Z direction
-					SideZInsulationLocation = SideZLocation + PipingSystemDomains( DomainNum ).HorizInsWidth;
+					SideZInsulationLocation = PipingSystemDomains( DomainNum ).PerimeterOffset + PipingSystemDomains( DomainNum ).HorizInsWidth - InterfaceCellWidth / 2.0;
 				}
 				if ( !allocated( PipingSystemDomains( DomainNum ).Partitions.Z ) ) {
 					if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
@@ -6005,7 +6009,7 @@ namespace PlantPipingSystemsManager {
 									}
 									//Perimeter insulation
 									else{
-										if ( CellXIndex < InsulationXIndex || CellZIndex < InsulationZIndex ){
+										if ( CellXIndex <= InsulationXIndex || CellZIndex <= InsulationZIndex ){
 											CellType = CellType_HorizInsulation;
 										}
 									}
