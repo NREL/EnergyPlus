@@ -263,6 +263,7 @@ namespace DataPlant {
 	extern int const TypeOf_PackagedTESCoolingCoil;
 	extern int const TypeOf_CoolingTower_VarSpdMerkel;
 	extern int const TypeOf_Baseboard_Rad_Conv_Water;
+	extern int const TypeOf_CoolingPanel_Simple;
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;

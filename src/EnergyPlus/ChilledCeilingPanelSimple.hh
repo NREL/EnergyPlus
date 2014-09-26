@@ -18,6 +18,18 @@ namespace CoolingPanelSimple {
 	//MODULE PARAMETER DEFINITIONS
 
 	extern std::string const cCMO_CoolingPanel_Simple;
+	// Control types:
+	extern int const MATControl; // Controls system using mean air temperature
+	extern int const MRTControl; // Controls system using mean radiant temperature
+	extern int const OperativeControl; // Controls system using operative temperature
+	extern int const ODBControl; // Controls system using outside air dry-bulb temperature
+	extern int const OWBControl; // Controls system using outside air wet-bulb temperature
+	extern int const ZoneTotalLoadControl; // Controls system using remaining zone total load
+	extern int const ZoneConvectiveLoadControl; // Controls system using remaining zone convective load
+	// Condensation control types:
+	extern int const CondCtrlNone; // Condensation control--none, so system never shuts down
+	extern int const CondCtrlSimpleOff; // Condensation control--simple off, system shuts off when condensation predicted
+	extern int const CondCtrlVariedOff; // Condensation control--variable off, system modulates to keep running if possible
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -53,15 +65,19 @@ namespace CoolingPanelSimple {
 		int TotSurfToDistrib;
 		int ControlCompTypeNum;
 		int CompErrIndex;
-		Real64 AirMassFlowRate;
-		Real64 AirMassFlowRateStd;
-		Real64 WaterTempAvg;
+		int ControlType;
+		std::string ColdSetptSched;
+		int ColdSetptSchedPtr;
+		int CondCtrlType;
+		Real64 CondDewPtDeltaT;
+		Real64 ColdThrottlRange;
+		Real64 RatedWaterTemp;
 		Real64 RatedCapacity;
 		Real64 UA;
 		Real64 Offset;
 		Real64 WaterMassFlowRate;
 		Real64 WaterMassFlowRateMax;
-		Real64 WaterMassFlowRateStd;
+		Real64 RatedWaterFlowRate;
 		Real64 WaterVolFlowRateMax;
 		Real64 WaterInletTempStd;
 		Real64 WaterInletTemp;
@@ -69,11 +85,7 @@ namespace CoolingPanelSimple {
 		Real64 WaterOutletTempStd;
 		Real64 WaterOutletTemp;
 		Real64 WaterOutletEnthalpy;
-		Real64 AirInletTempStd;
-		Real64 AirInletTemp;
-		Real64 AirOutletTemp;
-		Real64 AirInletHumRat;
-		Real64 AirOutletTempStd;
+		Real64 RatedZoneAirTemp;
 		Real64 FracRadiant;
 		Real64 FracConvect;
 		Real64 FracDistribPerson;
@@ -104,15 +116,18 @@ namespace CoolingPanelSimple {
 			TotSurfToDistrib( 0 ),
 			ControlCompTypeNum( 0 ),
 			CompErrIndex( 0 ),
-			AirMassFlowRate( 0.0 ),
-			AirMassFlowRateStd( 0.0 ),
-			WaterTempAvg( 0.0 ),
+			ControlType( 0 ),
+			ColdThrottlRange( 0.0 ),
+			ColdSetptSchedPtr( 0 ),
+			CondCtrlType( 0 ),
+		    CondDewPtDeltaT( 0.0 ),
+			RatedWaterTemp( 0.0 ),
 			RatedCapacity( 0.0 ),
 			UA( 0.0 ),
 			Offset( 0.0 ),
 			WaterMassFlowRate( 0.0 ),
 			WaterMassFlowRateMax( 0.0 ),
-			WaterMassFlowRateStd( 0.0 ),
+			RatedWaterFlowRate( 0.0 ),
 			WaterVolFlowRateMax( 0.0 ),
 			WaterInletTempStd( 0.0 ),
 			WaterInletTemp( 0.0 ),
@@ -120,11 +135,7 @@ namespace CoolingPanelSimple {
 			WaterOutletTempStd( 0.0 ),
 			WaterOutletTemp( 0.0 ),
 			WaterOutletEnthalpy( 0.0 ),
-			AirInletTempStd( 0.0 ),
-			AirInletTemp( 0.0 ),
-			AirOutletTemp( 0.0 ),
-			AirInletHumRat( 0.0 ),
-			AirOutletTempStd( 0.0 ),
+			RatedZoneAirTemp( 0.0 ),
 			FracRadiant( 0.0 ),
 			FracConvect( 0.0 ),
 			FracDistribPerson( 0.0 ),
@@ -159,15 +170,19 @@ namespace CoolingPanelSimple {
 			int const TotSurfToDistrib,
 			int const ControlCompTypeNum,
 			int const CompErrIndex,
-			Real64 const AirMassFlowRate,
-			Real64 const AirMassFlowRateStd,
-			Real64 const WaterTempAvg,
+			int const ControlType,
+			std::string const ColdSetptSched,
+			int const ColdSetptSchedPtr,
+			Real64 const ColdThrottlRange,
+			int const CondCtrlType,
+			Real64 const CondDewPtDeltaT,
+			Real64 const RatedWaterTemp,
 			Real64 const RatedCapacity,
 			Real64 const UA,
 			Real64 const Offset,
 			Real64 const WaterMassFlowRate,
 			Real64 const WaterMassFlowRateMax,
-			Real64 const WaterMassFlowRateStd,
+			Real64 const RatedWaterFlowRate,
 			Real64 const WaterVolFlowRateMax,
 			Real64 const WaterInletTempStd,
 			Real64 const WaterInletTemp,
@@ -175,11 +190,7 @@ namespace CoolingPanelSimple {
 			Real64 const WaterOutletTempStd,
 			Real64 const WaterOutletTemp,
 			Real64 const WaterOutletEnthalpy,
-			Real64 const AirInletTempStd,
-			Real64 const AirInletTemp,
-			Real64 const AirOutletTemp,
-			Real64 const AirInletHumRat,
-			Real64 const AirOutletTempStd,
+			Real64 const RatedZoneAirTemp,
 			Real64 const FracRadiant,
 			Real64 const FracConvect,
 			Real64 const FracDistribPerson,
@@ -212,15 +223,19 @@ namespace CoolingPanelSimple {
 			TotSurfToDistrib( TotSurfToDistrib ),
 			ControlCompTypeNum( ControlCompTypeNum ),
 			CompErrIndex( CompErrIndex ),
-			AirMassFlowRate( AirMassFlowRate ),
-			AirMassFlowRateStd( AirMassFlowRateStd ),
-			WaterTempAvg( WaterTempAvg ),
+			ControlType( ControlType ),
+			ColdThrottlRange( ColdThrottlRange ),
+			ColdSetptSched( ColdSetptSched ),
+			ColdSetptSchedPtr( ColdSetptSchedPtr ),
+			CondCtrlType( CondCtrlType ),
+			CondDewPtDeltaT( CondDewPtDeltaT ),
+			RatedWaterTemp( RatedWaterTemp ),
 			RatedCapacity( RatedCapacity ),
 			UA( UA ),
 			Offset( Offset ),
 			WaterMassFlowRate( WaterMassFlowRate ),
 			WaterMassFlowRateMax( WaterMassFlowRateMax ),
-			WaterMassFlowRateStd( WaterMassFlowRateStd ),
+			RatedWaterFlowRate( RatedWaterFlowRate ),
 			WaterVolFlowRateMax( WaterVolFlowRateMax ),
 			WaterInletTempStd( WaterInletTempStd ),
 			WaterInletTemp( WaterInletTemp ),
@@ -228,11 +243,7 @@ namespace CoolingPanelSimple {
 			WaterOutletTempStd( WaterOutletTempStd ),
 			WaterOutletTemp( WaterOutletTemp ),
 			WaterOutletEnthalpy( WaterOutletEnthalpy ),
-			AirInletTempStd( AirInletTempStd ),
-			AirInletTemp( AirInletTemp ),
-			AirOutletTemp( AirOutletTemp ),
-			AirInletHumRat( AirInletHumRat ),
-			AirOutletTempStd( AirOutletTempStd ),
+			RatedZoneAirTemp( RatedZoneAirTemp ),
 			FracRadiant( FracRadiant ),
 			FracConvect( FracConvect ),
 			FracDistribPerson( FracDistribPerson ),

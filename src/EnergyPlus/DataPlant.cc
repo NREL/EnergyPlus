@@ -274,7 +274,7 @@ namespace DataPlant {
 	int const TypeOf_UnitarySystemRecovery( 87 );
 	int const TypeOf_PackagedTESCoolingCoil( 88 );
 	int const TypeOf_CoolingTower_VarSpdMerkel( 89 );
-    int const TypeOf_ChilledCeilingPanel_Simple( 90 );
+    int const TypeOf_CoolingPanel_Simple( 90 );
 
 	// Parameters for General Equipment Types
 	int const NumGeneralEquipTypes( 23 );
