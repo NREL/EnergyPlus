@@ -98,17 +98,10 @@ INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Int
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.epw" DESTINATION "./WeatherData")
 INSTALL(FILES "${CMAKE_SOURCE_DIR}/weather/USA_VA_Sterling-Washington.Dulles.Intl.AP.724030_TMY3.stat" DESTINATION "./WeatherData")
 
-# scripts
-if( UNIX )
-  configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
-  install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
-  install(PROGRAMS scripts/runepmacro DESTINATION "./")
-  install(PROGRAMS scripts/runreadvars DESTINATION "./")
-endif()
-
 INSTALL( DIRECTORY testfiles/ DESTINATION ExampleFiles/
   PATTERN _* EXCLUDE
   PATTERN *.ddy EXCLUDE
+  PATTERN CMakeLists.txt EXCLUDE
 )
 
 # remote files.  All of these should eventually be generated from content in the EnergyPlusTeam project.
@@ -144,7 +137,7 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${KNOWN_ISSUES}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ObjectStatus.xls" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/readme.html" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${RULES_XLS}" "PreProcess/IDFVersionUpdater/")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${RULES_XLS}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Report%20Variables%208-1-0-009%20to%208-2-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-1-0-009 to 8-2-0.csv")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
 install( FILES "${CMAKE_BINARY_DIR}/Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/" RENAME "V${CMAKE_VERSION_MAJOR}-${CMAKE_VERSION_MINOR}-${CMAKE_VERSION_PATCH}-Energy+.idd" )
@@ -225,6 +218,7 @@ if( WIN32 )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater%20Libs/Appearance%20Pak.dll" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/" "Appearance Pak.dll")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater%20Libs/Shell.dll" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater.exe" "PreProcess/IDFVersionUpdater/")
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Windows/EPMacro" "./")
 endif()
 
 if( APPLE )
@@ -250,6 +244,26 @@ if( APPLE )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Resources/EP-Compare.icns" "PostProcess/EP-Compare/EP-Compare.app/Contents/Resources/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/GraphHints.csv" "PostProcess/EP-Compare/")
   install_remote_plist("https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Info.plist" "PostProcess/EP-Compare/EP-Compare.app/Contents/" "epcompare")
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Mac/EPMacro" "./")
+  configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
+  install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
+  install(PROGRAMS scripts/runepmacro DESTINATION "./")
+  install(PROGRAMS scripts/runreadvars DESTINATION "./")
+endif()
+
+if( UNIX AND NOT APPLE )
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare" "PostProcess/EP-Compare/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/EHInterfaces5001.so" "PostProcess/EP-Compare/EP-Compare Libs/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/EHObjectArray5001.so" "PostProcess/EP-Compare/EP-Compare Libs/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/EHObjectCollection5001.so" "PostProcess/EP-Compare/EP-Compare Libs/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/EHTreeView4301.so" "PostProcess/EP-Compare/EP-Compare Libs/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/libMBSChartDirector5Plugin16042.so" "PostProcess/EP-Compare/EP-Compare Libs/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/libRBAppearancePak.so" "PostProcess/EP-Compare/EP-Compare Libs/")
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Linux/EPMacro" "./")
+  configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
+  install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
+  install(PROGRAMS scripts/runepmacro DESTINATION "./")
+  install(PROGRAMS scripts/runreadvars DESTINATION "./")
 endif()
 
 configure_file("${CMAKE_SOURCE_DIR}/cmake/CMakeCPackOptions.cmake.in"
