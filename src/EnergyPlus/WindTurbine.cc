@@ -619,7 +619,7 @@ namespace WindTurbine {
 		std::string::size_type lnPtr; // scan pointer for Line input
 		int mon; // loop counter
 		bool wsStatFound; // logical noting that wind stats were found
-		bool fileExists; // true if inStatFileName file exists
+		bool fileExists; // true if Stat file exists
 		bool warningShown; // true if the <365 warning has already been shown
 		std::string lineIn;
 		FArray1D< Real64 > MonthWS( 12 );

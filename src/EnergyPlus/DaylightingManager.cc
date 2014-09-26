@@ -4050,7 +4050,7 @@ namespace DaylightingManager {
 		int TotDaylightingDElight; // Total Daylighting:DElight inputs
 		Real64 dLatitude; // double for argument passing
 		int iErrorFlag; // Error Flag for warning/errors returned from DElight
-		int iDElightErrorFile; // Unit number for reading DElight Error File (eplusout.delightdfdmp or outputDelightFile)
+		int iDElightErrorFile; // Unit number for reading DElight Error File
 		int iReadStatus; // Error File Read Status
 		std::string cErrorLine; // Each DElight Error line can be up to 210 characters long
 		std::string cErrorMsg; // Each DElight Error Message can be up to 200 characters long
