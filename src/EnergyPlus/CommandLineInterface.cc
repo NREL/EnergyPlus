@@ -2,9 +2,14 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <libproc.h>
+#include <unistd.h>
 
 // CLI Headers
 #include <ezOptionParser.hpp>
+//#include <io.cpccFileSystemMini.h>
 
 // Project headers
 #include <CommandLineInterface.hh>
@@ -75,6 +80,22 @@ namespace CommandLineInterface{
 	std::string TarcogIterationsFileName;
 	std::string eplusADSFileName;
 
+	std::string
+	returnFileName( std::string const& filename )
+	{
+	    return {std::find_if(filename.rbegin(), filename.rend(), [](char c) { return c == pathChar; }).base(),
+	    	  	filename.end()-4};
+	}
+
+	std::string
+	returnDirPathName( std::string const& filename )
+	{
+		std::string::const_reverse_iterator pivot = std::find( filename.rbegin(), filename.rend(), pathChar );
+			    return pivot == filename.rend()
+			        ? filename
+			        : std::string( filename.begin(), pivot.base() - 1 );
+	}
+
 	int
 	ProcessArgs(int argc, const char * argv[])
 	{
@@ -87,7 +108,7 @@ namespace CommandLineInterface{
 
 		opt.add("", 0, 0, 0, "Display this message", "-h", "--help");
 
-		opt.add("", 0, 0, 0, "Print version invormation", "-v", "--version");
+		opt.add("", 0, 0, 0, "Print version information", "-v", "--version");
 
 		opt.add("in.idf", 0, 1, 0, "Input Definition File (IDF) file path (default \".\\in.idf\")", "-i", "--idf");
 
@@ -101,16 +122,16 @@ namespace CommandLineInterface{
 		opt.parse(argc, argv);
 
 		// print arguments parsed (useful for debugging)
-		/*
-		std::string pretty;
 
+		/*std::string pretty;
 		opt.prettyPrint(pretty);
+		std::cout << pretty << std::endl;*/
 
-		std::cout << pretty << std::endl;
-		*/
-
-		std::string usage;
+		std::string usage, idfFileNameOnly, idfDirPathName;
+		std::string weatherFileNameOnly, weatherDirPathName;
 		opt.getUsage(usage);
+
+		std::string outputFilePrefix;
 
 		opt.get("-i")->getString(inputIdfFileName);
 
@@ -118,15 +139,18 @@ namespace CommandLineInterface{
 
 		opt.get("-e")->getString(inputIddFileName);
 
-		std::string outputFilePrefix;
+		idfFileNameOnly = returnFileName(inputIdfFileName);
+		idfDirPathName = returnDirPathName(inputIdfFileName);
 
-		if (opt.isSet("-o")) {
-				outputFilePrefix = inputIdfFileName.substr(0, inputIdfFileName.size()-4) + "_" +
-							       inputWeatherFileName.substr(0, inputWeatherFileName.size()-4) + "_";
-			}
-			else {
-				outputFilePrefix = "eplus";
-			}
+		weatherFileNameOnly = returnFileName(inputWeatherFileName);
+		weatherDirPathName = returnDirPathName(inputWeatherFileName);
+
+	//	std::cout<<"\n Name of the file = "<<idfFileNameOnly<<'\t'<<" and directory path name = "<<idfDirPathName<<std::endl;
+	//  std::cout<<"\n Name of the file = "<<weatherFileNameOnly<<'\t'<<" and directory path name = "<<weatherDirPathName<<std::endl;
+
+	    if (opt.isSet("-o")) outputFilePrefix = idfFileNameOnly + "_" + weatherFileNameOnly + "_";
+
+	    else outputFilePrefix = "eplus";
 
 		outputAuditFileName = outputFilePrefix + "out.audit";
 		outputBndFileName = outputFilePrefix + "out.bnd";
@@ -160,22 +184,20 @@ namespace CommandLineInterface{
 		outputZszCsvFileName = outputFilePrefix + "zsz.csv";
 		outputZszTabFileName = outputFilePrefix + "zsz.tab";
 		outputZszTxtFileName = outputFilePrefix + "zsz.txt";
-	    outputSszCsvFileName = outputFilePrefix + "ssz.csv";
+		outputSszCsvFileName = outputFilePrefix + "ssz.csv";
 		outputSszTabFileName = outputFilePrefix + "ssz.tab";
 		outputSszTxtFileName = outputFilePrefix + "ssz.txt";
 		outputScreenCsvFileName = outputFilePrefix + "screen.csv";
 		EnergyPlusIniFileName = "Energy+.ini";
 		inStatFileName = "in.stat";
 		TarcogIterationsFileName = "TarcogIterations.dbg";
-		eplusADSFileName = "eplusADS.inp";
-
+		eplusADSFileName = idfDirPathName+"eplusADS.inp";
 
 		// Handle bad options
 		std::vector<std::string> badOptions;
-
 		if(!opt.gotExpected(badOptions)) {
 			for(int i=0; i < badOptions.size(); ++i) {
-				ShowFatalError("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+					ShowFatalError("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
 			}
 			DisplayString(usage);
 			exit(EXIT_FAILURE);
@@ -217,7 +239,10 @@ namespace CommandLineInterface{
 			exit(EXIT_SUCCESS);
 		}
 
+
 		return 0;
 	}
-} //namespace options
+  } //namespace options
 } //EnergyPlus namespace
+
+
