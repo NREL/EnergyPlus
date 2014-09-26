@@ -169,9 +169,8 @@ namespace WaterManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::BeginTimeStepFlag;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
-
+		// na
+		
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
@@ -186,18 +185,13 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
+		
 		if ( ! ( AnyWaterSystemsInModel ) ) return;
-
-		//  IF (BeginTimeStepFlag .OR. FirstTimeStepSysFlag) Then
-		// calls do updating that would be needed at end of final iteration
-		// and at the beginning of the timestep.
 
 		UpdateWaterManager();
 
 		UpdatePrecipitation();
 		UpdateIrrigation();
-
-		//  ENDIF
 
 	}
 
@@ -1733,7 +1727,9 @@ namespace WaterManager {
 			WaterStorage( TankNum ).VdotFromTank = 0.0;
 			WaterStorage( TankNum ).VdotToTank = 0.0;
 			if ( WaterStorage( TankNum ).NumWaterDemands > 0 ) {
-				WaterStorage( TankNum ).VdotRequestDemand = 0.0;
+				// don't reset the requested demand, it is up to the other components to update it themselves
+				//WaterStorage( TankNum ).VdotRequestDemand = 0.0;
+				// the available demand is calculated here in the calc routine, so its fine to initialize it
 				WaterStorage( TankNum ).VdotAvailDemand = 0.0;
 			}
 			WaterStorage( TankNum ).VdotOverflow = 0.0;
