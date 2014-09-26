@@ -26,6 +26,23 @@ function( install_remote TYPE SOURCE DESTINATION )
   ")
 endfunction()
 
+# Similar to install_remote but explicitly for MacOSX plist files.
+# This function will configure a unique bundle id based on build number
+# so that packages will not try to relocate the .app to an older version location.
+function( install_remote_plist SOURCE DESTINATION APP_NAME )
+  install(CODE "
+    file(DOWNLOAD \"${SOURCE}\" 
+      \"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" 
+    )
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER \"gov.nrel.energyplus.${CMAKE_VERSION_BUILD}.${APP_NAME}\")
+    configure_file(\"${CMAKE_BINARY_DIR}/install_temp/Info.in.plist\" \"${CMAKE_BINARY_DIR}/install_temp/Info.plist\")
+  ")
+  install(FILES "${CMAKE_BINARY_DIR}/install_temp/Info.plist" DESTINATION "${DESTINATION}")
+  install(CODE "
+    file(REMOVE_RECURSE \"${CMAKE_BINARY_DIR}/install_temp\")
+  ")
+endfunction()
+
 # Add google tests macro
 macro(ADD_GOOGLE_TESTS executable)
   foreach ( source ${ARGN} )
