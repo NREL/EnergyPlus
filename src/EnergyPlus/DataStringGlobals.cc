@@ -67,7 +67,7 @@ namespace DataStringGlobals {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	std::string ProgramPath; // Path for Program from EnergyPlusIniFileName
+	std::string ProgramPath; // Path for Program from INI file
 	std::string CurrentWorkingFolder; // Current working directory for run
 	std::string FullName; // Full name of file to open, including path
 	std::string IDDVerString; // Version information from the IDD (line 1)

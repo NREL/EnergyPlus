@@ -123,10 +123,10 @@ namespace CommandLineInterface{
 		if (opt.isSet("-o")) {
 				outputFilePrefix = inputIdfFileName.substr(0, inputIdfFileName.size()-4) + "_" +
 							       inputWeatherFileName.substr(0, inputWeatherFileName.size()-4) + "_";
-			}
-			else {
-				outputFilePrefix = "eplus";
-			}
+		}
+		else {
+			outputFilePrefix = "eplus";
+		}
 
 		outputAuditFileName = outputFilePrefix + "out.audit";
 		outputBndFileName = outputFilePrefix + "out.bnd";
