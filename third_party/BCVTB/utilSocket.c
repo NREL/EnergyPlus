@@ -107,7 +107,11 @@ derivative works thereof, in binary and source code form.
 ///
 ///////////////////////////////////////////////////////
 #include <fcntl.h>
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 #include "utilSocket.h"
 #include "utilXml.h"
 // Global variable to check for FMUExport case
