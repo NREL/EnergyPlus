@@ -11427,7 +11427,7 @@ namespace HVACUnitarySystem {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
 		int UnitarySysNum; // index to Unitary System
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 CycRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11473,7 +11473,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11532,7 +11532,7 @@ namespace HVACUnitarySystem {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
 		int UnitarySysNum; // index to Unitary System
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 CycRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11591,7 +11591,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11648,7 +11648,7 @@ namespace HVACUnitarySystem {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
 		int UnitarySysNum; // index to Unitary System
-		Real64 OutletAirHumRat; // outlet air humidity ratio
+		Real64 OutletAirHumRat( 0.0 ); // outlet air humidity ratio
 		Real64 CycRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11693,7 +11693,7 @@ namespace HVACUnitarySystem {
 			OutletAirHumRat = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).HumRat;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirHumRat;
@@ -11749,7 +11749,7 @@ namespace HVACUnitarySystem {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 SpeedRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11804,7 +11804,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11863,7 +11863,7 @@ namespace HVACUnitarySystem {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 SpeedRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11933,7 +11933,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11990,7 +11990,7 @@ namespace HVACUnitarySystem {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
-		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
+		Real64 OutletAirHumRat( 0.0 ); // outlet air humidity ratio [kg/kg]
 		Real64 SpeedRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -12037,7 +12037,7 @@ namespace HVACUnitarySystem {
 			OutletAirHumRat = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).HumRat;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirHumRat;

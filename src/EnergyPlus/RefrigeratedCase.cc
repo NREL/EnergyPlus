@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -7883,11 +7884,11 @@ namespace RefrigeratedCase {
 		static std::string TypeName;
 		static std::string ErrIntro;
 		int PlantInletNode( 0 ); //Autodesk:Init
-		int PlantOutletNode;
+		int PlantOutletNode( 0 );
 		int PlantLoopIndex( 0 ); //Autodesk:Init
-		int PlantLoopSideIndex;
-		int PlantBranchIndex;
-		int PlantCompIndex;
+		int PlantLoopSideIndex( 0 );
+		int PlantBranchIndex( 0 );
+		int PlantCompIndex( 0 );
 		int Num( 0 ); // local index //Autodesk:Init
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -8006,6 +8007,8 @@ namespace RefrigeratedCase {
 			HighFlowWarnIndex = Condenser( Num ).HighFlowWarnIndex;
 			HighTempWarnIndex = Condenser( Num ).HighTempWarnIndex;
 			HighInletWarnIndex = Condenser( Num ).HighInletWarnIndex;
+		} else {
+			assert( false );
 		}}
 
 		// Current condenser is water cooled
@@ -11780,6 +11783,7 @@ namespace RefrigeratedCase {
 			//  TotalLoad = RefrigerationLoad + DistPipeHeatGain  + ReceiverHeatGain &
 			//           + TotalPumpPower*Secondary(SecondaryNum)%PumpPowertoHeat
 			FinalRateCoils( DeRate, SecondarySystem, SecondaryNum, TotalLoad, MaxLoad ); //assign case credits for coils on this loop
+			//Bug TotalCoolingLoad not set but used below
 		} // no air coils on secondary loop
 		Secondary( SecondaryNum ).PumpPowerTotal = TotalPumpPower;
 		Secondary( SecondaryNum ).PumpElecEnergyTotal = TotalPumpPower * LocalTimeStep * SecInHour;

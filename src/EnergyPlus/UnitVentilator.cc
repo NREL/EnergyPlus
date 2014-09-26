@@ -3216,7 +3216,7 @@ namespace UnitVentilator {
 		// na
 
 		// Return value
-		Real64 Residuum; // Result (force to 0)
+		Real64 Residuum( 0.0 ); // Result (force to 0)
 
 		// Argument array dimensioning
 

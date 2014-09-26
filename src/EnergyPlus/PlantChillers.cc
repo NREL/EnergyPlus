@@ -5312,7 +5312,7 @@ namespace PlantChillers {
 		Real64 RL;
 		Real64 RL2;
 
-		Real64 FuelEnergyIn; // (EFUEL) Amount of Fuel Energy Required to run gas turbine
+		Real64 FuelEnergyIn( 0.0 ); // (EFUEL) Amount of Fuel Energy Required to run gas turbine
 		Real64 ExhaustFlow( 0.0 ); // (FEX) Exhaust Gas Flow Rate cubic meters per second
 		Real64 ExhaustTemp( 0.0 ); // (TEX) Exhaust Gas Temperature in C
 		Real64 QHeatRecLube; // (ELUBE) Recoverable Lube Oil Energy (W)

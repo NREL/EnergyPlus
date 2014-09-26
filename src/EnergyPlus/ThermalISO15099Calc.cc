@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -2090,7 +2091,7 @@ namespace ThermalISO15099Calc {
 		Real64 gr;
 		Real64 RaCrit;
 		Real64 RaL;
-		Real64 Gnui;
+		Real64 Gnui( 0.0 );
 
 		if ( wsi > 0.0 ) { // main IF
 			{ auto const SELECT_CASE_var( ibc );
@@ -2136,6 +2137,8 @@ namespace ThermalISO15099Calc {
 				Gnui = 0.56 * root_4( RaL * std::sin( tiltr ) );
 			} else if ( ( 179.0 < tilt ) && ( tilt <= 180.0 ) ) {
 				Gnui = 0.58 * std::pow( RaL, 1 / 3.0 );
+			} else {
+				assert( false );
 			} // end if no. 1
 			//   write(*,*) ' RaL   ', RaL, '   RaCrit', RaCrit
 			//   write(*,*)'   Nusselt Number   ',Gnui
@@ -2572,7 +2575,7 @@ namespace ThermalISO15099Calc {
 		hhat.dim( maxlay3 );
 
 		// Locals
-		Real64 hc_NOSD;
+		Real64 hc_NOSD( 0.0 );
 		Real64 hc_0;
 		Real64 hc_1;
 		Real64 hc_alpha;
@@ -2612,6 +2615,8 @@ namespace ThermalISO15099Calc {
 				hc_NOSD = hout - hrout;
 			} else if ( ( ibc( 1 ) == 2 ) && ( index == 1 ) ) {
 				hc_NOSD = hout;
+			} else {
+				assert( false );
 			}
 			if ( hc_NOSD < 0 ) {
 				nperr = 9;

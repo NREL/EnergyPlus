@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -874,7 +875,7 @@ namespace Boilers {
 		Real64 BoilerMinPLR; // boiler minimum part load ratio
 		Real64 TheorFuelUse; // Theoretical (stoichiometric) fuel use
 		Real64 OperPLR; // operating part load ratio
-		Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference
+		Real64 BoilerDeltaTemp( 0.0 ); // C - boiler inlet to outlet temperature difference
 		Real64 TempUpLimitBout; // C - boiler high temperature limit
 		int BoilerInletNode; // Boiler inlet node number
 		int BoilerOutletNode; // Boiler outlet node number
@@ -939,6 +940,8 @@ namespace Boilers {
 					BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPointLo - Node( BoilerInletNode ).Temp;
+				} else {
+					assert( false );
 				}}
 
 				BoilerOutletTemp = BoilerDeltaTemp + Node( BoilerInletNode ).Temp;

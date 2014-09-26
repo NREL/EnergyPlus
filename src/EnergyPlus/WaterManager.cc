@@ -1,3 +1,6 @@
+// C++ Headers
+#include <cassert>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
@@ -1512,7 +1515,7 @@ namespace WaterManager {
 		// see DataWater.f90
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 LossFactor;
+		Real64 LossFactor( 0.0 );
 		Real64 VdotAvail;
 
 		//If (.NOT.(IsRain)) Then ! is it raining now? No don't use this flag since precip schedule might differ from weather file
@@ -1532,6 +1535,8 @@ namespace WaterManager {
 				LossFactor = RainCollector( RainColNum ).LossFactor;
 			} else if ( SELECT_CASE_var == ScheduledRainLossFactor ) {
 				LossFactor = GetCurrentScheduleValue( RainCollector( RainColNum ).LossFactorSchedID );
+			} else {
+				assert( false );
 			}}
 
 			VdotAvail = RainFall.CurrentRate * RainCollector( RainColNum ).HorizArea * ( 1.0 - LossFactor );
