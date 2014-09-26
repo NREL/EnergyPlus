@@ -15,5 +15,6 @@ if( WIN32 )
 endif()
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
-install_and_fixup_exe_target( convertESOMTR PreProcess/GrndTempCalc )
+install_and_fixup_exe_target(convertESOMTR "PostProcess/convertESOMTRpgm/")
+install(FILES "convert.txt" DESTINATION "PostProcess/convertESOMTRpgm/")
 
