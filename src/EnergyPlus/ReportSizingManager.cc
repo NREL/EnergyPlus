@@ -1555,6 +1555,7 @@ namespace ReportSizingManager {
 	GetCoilDesFlowT(
 		int CoolCapCtrl, // type of coil capacity control
 		int SysNum, // central air system index
+		Real64 CpAir, // specific heat to be used in calculations [J/kgC]
 		Real64 & DesFlow, // returned design mass flow [kg/s]
 		Real64 & DesExitTemp // returned design coil exit temperature [kg/s]
 	)
@@ -1577,8 +1578,16 @@ namespace ReportSizingManager {
 
 		// Using/Aliasing
 		using namespace DataSizing;
+		using DataEnvironment::StdRhoAir;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int DDAtPeak; // index of design day at peak load
+		int TimeStepAtPeak; // time step index for peak load
+		Real64 ZoneCoolLoadSum; // sum of zone cooling loads at the peak [W]
+		Real64 AvgZoneTemp; // average zone temperature [C]
+		Real64 AvgSupTemp; // average supply temperature for bypass control [C]
+		Real64 TotFlow; // total flow for bypass control [kg/s]
+		Real64 MixTemp; // mixed air temperature at the peak [C]
 
 		if ( CoolCapCtrl == VAV ) {
 			DesExitTemp = FinalSysSizing( SysNum ).CoolSupTemp;
@@ -1586,10 +1595,42 @@ namespace ReportSizingManager {
 		}
 		else if ( CoolCapCtrl == OnOff ) {
 			DesExitTemp = FinalSysSizing( SysNum ).CoolSupTemp;
-			DesFlow = DataAirFlowUsedForSizing;
+			DesFlow = StdRhoAir * DataAirFlowUsedForSizing;
 		}
 		else if ( CoolCapCtrl == VT ) {
-
+			if ( FinalSysSizing( SysNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
+				DDAtPeak = SysSizPeakDDNum( SysNum ).SensCoolPeakDD;
+				TimeStepAtPeak = SysSizPeakDDNum( SysNum ).TimeStepAtSensCoolPk( DDAtPeak );
+				ZoneCoolLoadSum = CalcSysSizing( SysNum ).SumZoneCoolLoadSeq( TimeStepAtPeak );
+				AvgZoneTemp = CalcSysSizing( SysNum ).CoolZoneAvgTempSeq( TimeStepAtPeak );
+			}
+			else if ( FinalSysSizing( SysNum ).CoolingPeakLoadType == TotalCoolingLoad ) {
+				DDAtPeak = SysSizPeakDDNum( SysNum ).TotCoolPeakDD;
+				TimeStepAtPeak = SysSizPeakDDNum( SysNum ).TimeStepAtTotCoolPk( DDAtPeak );
+				ZoneCoolLoadSum = CalcSysSizing( SysNum ).SumZoneCoolLoadSeq( TimeStepAtPeak );
+				AvgZoneTemp = CalcSysSizing( SysNum ).CoolZoneAvgTempSeq( TimeStepAtPeak );
+			}
+			DesExitTemp = AvgZoneTemp - ZoneCoolLoadSum / ( StdRhoAir * CpAir * FinalSysSizing( SysNum ).DesCoolVolFlow );
+			DesFlow = StdRhoAir * FinalSysSizing( SysNum ).DesCoolVolFlow;
+		}
+		else if ( CoolCapCtrl == Bypass ) {
+			if ( FinalSysSizing( SysNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
+				DDAtPeak = SysSizPeakDDNum( SysNum ).SensCoolPeakDD;
+				TimeStepAtPeak = SysSizPeakDDNum( SysNum ).TimeStepAtSensCoolPk( DDAtPeak );
+				ZoneCoolLoadSum = CalcSysSizing( SysNum ).SumZoneCoolLoadSeq( TimeStepAtPeak );
+				AvgZoneTemp = CalcSysSizing( SysNum ).CoolZoneAvgTempSeq( TimeStepAtPeak );
+			}
+			else if ( FinalSysSizing( SysNum ).CoolingPeakLoadType == TotalCoolingLoad ) {
+				DDAtPeak = SysSizPeakDDNum( SysNum ).TotCoolPeakDD;
+				TimeStepAtPeak = SysSizPeakDDNum( SysNum ).TimeStepAtTotCoolPk( DDAtPeak );
+				ZoneCoolLoadSum = CalcSysSizing( SysNum ).SumZoneCoolLoadSeq( TimeStepAtPeak );
+				AvgZoneTemp = CalcSysSizing( SysNum ).CoolZoneAvgTempSeq( TimeStepAtPeak );
+			}
+			AvgSupTemp = AvgZoneTemp - ZoneCoolLoadSum / ( StdRhoAir * CpAir * FinalSysSizing( SysNum ).DesCoolVolFlow );
+			TotFlow = StdRhoAir * FinalSysSizing( SysNum ).DesCoolVolFlow;
+			MixTemp = CalcSysSizing( SysNum ).MixTempAtCoolPeak;
+			DesExitTemp = FinalSysSizing( SysNum ).CoolSupTemp;
+			DesFlow = TotFlow * ( ( MixTemp - AvgSupTemp ) / ( MixTemp - DesExitTemp ) );
 		}
 	}
 
