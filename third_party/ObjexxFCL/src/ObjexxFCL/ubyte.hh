@@ -39,6 +39,13 @@ public: // Creation
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
+	// short Constructor
+	inline
+	explicit
+	ubyte( short int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
 	// int Constructor
 	inline
 	explicit
@@ -53,10 +60,45 @@ public: // Creation
 	 b_( static_cast< unsigned char >( i ) )
 	{}
 
+	// long Constructor
+	inline
+	explicit
+	ubyte( unsigned long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// long Constructor
+	inline
+	explicit
+	ubyte( long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// long long Constructor
+	inline
+	explicit
+	ubyte( unsigned long long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// long long Constructor
+	inline
+	explicit
+	ubyte( long long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
 	// char Constructor
 	inline
 	explicit
 	ubyte( unsigned char const c ) :
+	 b_( c )
+	{}
+
+	// char Constructor
+	inline
+	explicit
+	ubyte( char const c ) :
 	 b_( c )
 	{}
 

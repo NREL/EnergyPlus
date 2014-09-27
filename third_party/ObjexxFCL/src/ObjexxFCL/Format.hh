@@ -676,7 +676,7 @@ public: // Output Methods
 	std::ostream &
 	output_no_arg( std::ostream & stream, std::streampos & pos, std::string const & ter = LF )
 	{
-		out( stream, pos, ter );
+		out_pos( stream, pos, ter );
 		return stream;
 	}
 
@@ -684,10 +684,10 @@ public: // Output Methods
 	template< typename T >
 	inline
 	std::ostream &
-	output_val( std::ostream & stream, std::streampos & pos, T const & t )
+	output_val( std::ostream & stream, std::streampos & pos, T const & t, std::string const & ter = LF )
 	{
 		output_pad( stream, pos );
-		out( stream, t );
+		out( stream, t, ter );
 		pos = stream.tellp(); // After writing a value the current stream position is also the virtual position
 		return stream;
 	}
@@ -700,22 +700,26 @@ public: // Output Methods
 		output_pad( stream, pos );
 	}
 
-	// Spacing and Reversion Linefeed String
+	// Spacing and Reversion Linefeed String for a Non-Spacer
 	std::string
-	spc( bool const is_spacer = false );
+	spc( std::string const & ter );
+
+	// Spacing and Reversion Linefeed String for a Spacer
+	std::string
+	spc_spacer( std::string const & ter );
 
 	// Output
 	inline
 	virtual
 	void
-	out( std::ostream &, std::streampos &, std::string const & )
+	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{} // Default implementation
 
 	// Output
 	inline
 	virtual
 	void
-	out( std::ostream & stream, bool const )
+	out( std::ostream & stream, bool const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -724,7 +728,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, byte const & )
+	out( std::ostream & stream, byte const &, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -733,7 +737,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, ubyte const & )
+	out( std::ostream & stream, ubyte const &, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -742,7 +746,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, short int const )
+	out( std::ostream & stream, short int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -751,7 +755,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, unsigned short int const )
+	out( std::ostream & stream, unsigned short int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -760,7 +764,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, int const )
+	out( std::ostream & stream, int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -769,7 +773,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, unsigned int const )
+	out( std::ostream & stream, unsigned int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -778,7 +782,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, long int const )
+	out( std::ostream & stream, long int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -787,7 +791,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, unsigned long int const )
+	out( std::ostream & stream, unsigned long int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -796,7 +800,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, long long int const )
+	out( std::ostream & stream, long long int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -805,7 +809,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, unsigned long long int const )
+	out( std::ostream & stream, unsigned long long int const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -814,7 +818,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, float const )
+	out( std::ostream & stream, float const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -823,7 +827,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, double const )
+	out( std::ostream & stream, double const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -832,7 +836,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, long double const )
+	out( std::ostream & stream, long double const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -841,7 +845,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, char const )
+	out( std::ostream & stream, char const, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -849,16 +853,16 @@ public: // Output Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, char const * s ) // Non-virtual forwarding wrapper
+	out( std::ostream & stream, char const * s, std::string const & ter ) // Non-virtual forwarding wrapper
 	{
-		return out( stream, std::string( s ) );
+		return out( stream, std::string( s ), ter );
 	}
 
 	// Output
 	inline
 	virtual
 	void
-	out( std::ostream & stream, std::string const & )
+	out( std::ostream & stream, std::string const &, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -867,7 +871,7 @@ public: // Output Methods
 	inline
 	virtual
 	void
-	out( std::ostream & stream, Fstring const & )
+	out( std::ostream & stream, Fstring const &, std::string const & )
 	{ // Default implementation
 		io_err( stream );
 	}
@@ -1802,10 +1806,10 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, std::streampos & pos, std::string const & )
+	out_pos( std::ostream & stream, std::streampos & pos, std::string const & ter )
 	{
 		output_pad( stream, pos );
-		stream << spc() << s_;
+		stream << spc( ter ) << s_;
 		pos = stream.tellp();
 	}
 
@@ -1869,10 +1873,10 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, std::streampos & pos, std::string const & )
+	out_pos( std::ostream & stream, std::streampos & pos, std::string const & ter )
 	{
 		output_pad( stream, pos );
-		stream << spc() << s_;
+		stream << spc( ter ) << s_;
 		pos = stream.tellp();
 	}
 
@@ -2176,7 +2180,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & por, std::string const & )
+	out_pos( std::ostream &, std::streampos & por, std::string const & )
 	{
 		por += n_;
 	}
@@ -2283,10 +2287,10 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, std::streampos & pos, std::string const & ter )
+	out_pos( std::ostream & stream, std::streampos & pos, std::string const & ter )
 	{
 		output_pad( stream, pos );
-		stream << spc() << ter;
+		stream << spc( ter ) << ter;
 		pos = stream.tellp();
 	}
 
@@ -2344,7 +2348,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos &, std::string const & )
+	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{
 		colon_terminated() = true;
 	}
@@ -2394,7 +2398,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos &, std::string const & )
+	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{
 		non_advancing() = true;
 	}
@@ -2454,7 +2458,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & pos, std::string const & )
+	out_pos( std::ostream &, std::streampos & pos, std::string const & )
 	{
 		pos = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
 	}
@@ -2518,7 +2522,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & pos, std::string const & )
+	out_pos( std::ostream &, std::streampos & pos, std::string const & )
 	{
 		pos -= n_;
 	}
@@ -2582,7 +2586,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos & pos, std::string const & )
+	out_pos( std::ostream &, std::streampos & pos, std::string const & )
 	{
 		pos += n_;
 	}
@@ -2786,122 +2790,122 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, bool const b )
+	out( std::ostream & stream, bool const b, std::string const & ter )
 	{
-		write_val_reinterpret( stream, b ); // Bit rep of LOGICAL(4) .TRUE. value varies across compilers: Intel Fortran it is FFFFFFFF and on GFortran it is 01000000
+		write_val_reinterpret( stream, b, ter ); // Bit rep of LOGICAL(4) .TRUE. value varies across compilers: Intel Fortran it is FFFFFFFF and on GFortran it is 01000000
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, byte const & b )
+	out( std::ostream & stream, byte const & b, std::string const & ter )
 	{
-		write_val_reinterpret( stream, b );
+		write_val_reinterpret( stream, b, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, ubyte const & b )
+	out( std::ostream & stream, ubyte const & b, std::string const & ter )
 	{
-		write_val_reinterpret( stream, b );
+		write_val_reinterpret( stream, b, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, short int const i )
+	out( std::ostream & stream, short int const i, std::string const & ter )
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned short int const i )
+	out( std::ostream & stream, unsigned short int const i, std::string const & ter )
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, int const i )
+	out( std::ostream & stream, int const i , std::string const & ter)
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned int const i )
+	out( std::ostream & stream, unsigned int const i, std::string const & ter )
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, long int const i )
+	out( std::ostream & stream, long int const i, std::string const & ter )
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long int const i )
+	out( std::ostream & stream, unsigned long int const i, std::string const & ter )
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, long long int const i )
+	out( std::ostream & stream, long long int const i, std::string const & ter )
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long long int const i )
+	out( std::ostream & stream, unsigned long long int const i, std::string const & ter )
 	{
-		write_val_reinterpret( stream, i );
+		write_val_reinterpret( stream, i, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, float const v )
+	out( std::ostream & stream, float const v, std::string const & ter )
 	{
-		write_val_reinterpret( stream, v );
+		write_val_reinterpret( stream, v, ter );
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, double const v )
+	out( std::ostream & stream, double const v, std::string const & ter )
 	{
-		write_val_reinterpret( stream, v );
+		write_val_reinterpret( stream, v, ter);
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v )
+	out( std::ostream & stream, long double const v, std::string const & ter )
 	{
-		write_val_reinterpret( stream, v );
-	}
-
-	// Output
-	inline
-	void
-	out( std::ostream & stream, char const c )
-	{
-		stream << spc() << std::string( ( has_w() && ( w_ > 1ul ) ? w_ - 1ul : 0ul ), ' ' ) << c;
+		write_val_reinterpret( stream, v, ter );
 	}
 
 	// Output
 	inline
 	void
-	out( std::ostream & stream, std::string const & s )
+	out( std::ostream & stream, char const c, std::string const & ter )
+	{
+		stream << spc( ter ) << std::string( ( has_w() && ( w_ > 1ul ) ? w_ - 1ul : 0ul ), ' ' ) << c;
+	}
+
+	// Output
+	inline
+	void
+	out( std::ostream & stream, std::string const & s, std::string const & ter )
 	{
 		std::string::size_type const l( s.length() );
-		stream << spc() << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s;
+		stream << spc( ter ) << std::string( ( has_w() && ( w_ > l ) ? w_ - l : 0ul ), ' ' ) << s;
 	}
 
 	// Output
 	void
-	out( std::ostream & stream, Fstring const & );
+	out( std::ostream & stream, Fstring const &, std::string const & ter );
 
 private: // Methods
 
@@ -2928,7 +2932,7 @@ private: // Methods
 	template< typename T >
 	inline
 	void
-	write_val_reinterpret( std::ostream & stream, T const & t )
+	write_val_reinterpret( std::ostream & stream, T const & t, std::string const & ter )
 	{
 		Size const w( TraitsA< T >::w() );
 		Size const ww( wid( w ) );
@@ -2936,13 +2940,13 @@ private: // Methods
 		std::string s( ww, ' ' );
 		void const * vp( &t );
 		s.replace( 0, wt, reinterpret_cast< c_cstring >( vp ), wt );
-		stream << spc() << s;
+		stream << spc( ter ) << s;
 	}
 
 	// Write bool Value Reinterpreted as String to Stream: Override to Treat bool as 4 Byte Equivalent of LOGICAL(4)
 	inline
 	void
-	write_val_reinterpret( std::ostream & stream, bool const b )
+	write_val_reinterpret( std::ostream & stream, bool const b, std::string const & ter )
 	{
 		Size const w( TraitsA< bool >::w() );
 		Size const ww( wid( w ) );
@@ -2957,7 +2961,7 @@ private: // Methods
 			s.replace( 0, l, reinterpret_cast< c_cstring >( vp ), l );
 			s.replace( l, n, n, '\0' );
 		}
-		stream << spc() << s;
+		stream << spc( ter ) << s;
 	}
 
 	// Width for I/O
@@ -3042,9 +3046,9 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream & stream, bool const b )
+	out( std::ostream & stream, bool const b, std::string const & ter )
 	{
-		stream << spc() << std::string( has_w() && ( w_ > 0ul ) ? w_ - 1ul : 0ul, ' ' ) << ( b ? 'T' : 'F' );
+		stream << spc( ter ) << std::string( has_w() && ( w_ > 0ul ) ? w_ - 1ul : 0ul, ' ' ) << ( b ? 'T' : 'F' );
 	}
 
 private: // Methods
@@ -3279,7 +3283,7 @@ protected: // Methods
 	read_int( std::istream & stream, T & t ) const
 	{
 		std::string const s( blank_process( read( stream, wid( TraitsI< T >::w() ) ) ) );
-		t = read_int_base( stream, s );
+		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
 	// Read Integer from Stream and Reinterpret as Type T
@@ -3397,43 +3401,43 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, byte const & b );
+	out( std::ostream & stream, byte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, ubyte const & b );
+	out( std::ostream & stream, ubyte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, short int const i );
+	out( std::ostream & stream, short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned short int const i );
+	out( std::ostream & stream, unsigned short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, int const i );
+	out( std::ostream & stream, int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned int const i );
+	out( std::ostream & stream, unsigned int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long int const i );
+	out( std::ostream & stream, long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long int const i );
+	out( std::ostream & stream, unsigned long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long long int const i );
+	out( std::ostream & stream, long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long long int const i );
+	out( std::ostream & stream, unsigned long long int const i, std::string const & ter );
 
 protected: // Methods
 
@@ -3617,43 +3621,43 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, byte const & b );
+	out( std::ostream & stream, byte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, ubyte const & b );
+	out( std::ostream & stream, ubyte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, short int const i );
+	out( std::ostream & stream, short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned short int const i );
+	out( std::ostream & stream, unsigned short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, int const i );
+	out( std::ostream & stream, int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned int const i );
+	out( std::ostream & stream, unsigned int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long int const i );
+	out( std::ostream & stream, long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long int const i );
+	out( std::ostream & stream, unsigned long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long long int const i );
+	out( std::ostream & stream, long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long long int const i );
+	out( std::ostream & stream, unsigned long long int const i, std::string const & ter );
 
 protected: // Methods
 
@@ -3664,7 +3668,7 @@ protected: // Methods
 	read_binary( std::istream & stream, T & t ) const
 	{
 		std::string const s( blank_process( read( stream, wid( TraitsB< T >::w() ) ) ) );
-		t = read_int_base( stream, s );
+		t = static_cast< T >( read_int_base( stream, s ) );
 	}
 
 	// Read Binary from Stream and Reinterpret as Type T
@@ -3742,43 +3746,43 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, byte const & b );
+	out( std::ostream & stream, byte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, ubyte const & b );
+	out( std::ostream & stream, ubyte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, short int const i );
+	out( std::ostream & stream, short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned short int const i );
+	out( std::ostream & stream, unsigned short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, int const i );
+	out( std::ostream & stream, int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned int const i );
+	out( std::ostream & stream, unsigned int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long int const i );
+	out( std::ostream & stream, long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long int const i );
+	out( std::ostream & stream, unsigned long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long long int const i );
+	out( std::ostream & stream, long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long long int const i );
+	out( std::ostream & stream, unsigned long long int const i, std::string const & ter );
 
 protected: // Methods
 
@@ -3847,43 +3851,43 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, byte const & b );
+	out( std::ostream & stream, byte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, ubyte const & b );
+	out( std::ostream & stream, ubyte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, short int const i );
+	out( std::ostream & stream, short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned short int const i );
+	out( std::ostream & stream, unsigned short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, int const i );
+	out( std::ostream & stream, int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned int const i );
+	out( std::ostream & stream, unsigned int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long int const i );
+	out( std::ostream & stream, long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long int const i );
+	out( std::ostream & stream, unsigned long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long long int const i );
+	out( std::ostream & stream, long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long long int const i );
+	out( std::ostream & stream, unsigned long long int const i, std::string const & ter );
 
 protected: // Methods
 
@@ -3964,7 +3968,7 @@ public: // Methods
 	// Output
 	inline
 	void
-	out( std::ostream &, std::streampos &, std::string const & )
+	out_pos( std::ostream &, std::streampos &, std::string const & )
 	{
 		P() = k_; // Set P scaling
 	}
@@ -4169,8 +4173,8 @@ protected: // Methods
 		std::string const s( blank_process( read_float( stream, wid( TraitsF< T >::w() ) ) ) );
 		if ( is_type< T >( s ) ) {
 			t = type_of< T >( s );
-			if ( ( d_ > 0ul ) && ( t != T( 0 ) ) && ( ! has( s, '.' ) ) ) t /= std::pow( T( 10 ), d_ ); // Apply implied decimal point
-			if ( ( P() != 0 ) && ( t != T( 0 ) ) && ( ! has_exponent( s ) ) ) t /= std::pow( T( 10 ), P() ); // Apply scaling
+			if ( ( d_ > 0ul ) && ( t != T( 0 ) ) && ( ! has( s, '.' ) ) ) t /= static_cast< T >( std::pow( T( 10 ), d_ ) ); // Apply implied decimal point
+			if ( ( P() != 0 ) && ( t != T( 0 ) ) && ( ! has_exponent( s ) ) ) t /= static_cast< T >( std::pow( T( 10 ), P() ) ); // Apply scaling
 		} else { // Bad input
 			t = 0;
 			io_err( stream );
@@ -4234,8 +4238,8 @@ protected: // Methods
 	val_of( std::string const & s ) const
 	{
 		F v( number_of< F >( s ) );
-		if ( ( d_ > 0ul ) && ( v != F( 0 ) ) && ( ! has( s, '.' ) ) ) v /= std::pow( F( 10 ), d_ ); // Apply implied decimal point
-		if ( ( P() != 0 ) && ( v != F( 0 ) ) && ( ! has_exponent( s ) ) ) v /= std::pow( F( 10 ), P() ); // Apply scaling
+		if ( ( d_ > 0ul ) && ( v != F( 0 ) ) && ( ! has( s, '.' ) ) ) v /= static_cast< F >( std::pow( F( 10 ), d_ ) ); // Apply implied decimal point
+		if ( ( P() != 0 ) && ( v != F( 0 ) ) && ( ! has_exponent( s ) ) ) v /= static_cast< F >( std::pow( F( 10 ), P() ) ); // Apply scaling
 		return v;
 	}
 
@@ -4288,15 +4292,15 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, float const v );
+	out( std::ostream & stream, float const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, double const v );
+	out( std::ostream & stream, double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v );
+	out( std::ostream & stream, long double const v, std::string const & ter );
 
 }; // FormatF
 
@@ -4508,55 +4512,55 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, byte const & b );
+	out( std::ostream & stream, byte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, ubyte const & b );
+	out( std::ostream & stream, ubyte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, short int const i );
+	out( std::ostream & stream, short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned short int const i );
+	out( std::ostream & stream, unsigned short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, int const i );
+	out( std::ostream & stream, int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned int const i );
+	out( std::ostream & stream, unsigned int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long int const i );
+	out( std::ostream & stream, long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long int const i );
+	out( std::ostream & stream, unsigned long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long long int const i );
+	out( std::ostream & stream, long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long long int const i );
+	out( std::ostream & stream, unsigned long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, float const v );
+	out( std::ostream & stream, float const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, double const v );
+	out( std::ostream & stream, double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v );
+	out( std::ostream & stream, long double const v, std::string const & ter );
 
 protected: // Methods
 
@@ -4619,15 +4623,15 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, float const v );
+	out( std::ostream & stream, float const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, double const v );
+	out( std::ostream & stream, double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v );
+	out( std::ostream & stream, long double const v, std::string const & ter );
 
 }; // FormatE
 
@@ -4673,15 +4677,15 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, float const v );
+	out( std::ostream & stream, float const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, double const v );
+	out( std::ostream & stream, double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v );
+	out( std::ostream & stream, long double const v, std::string const & ter );
 
 }; // FormatEN
 
@@ -4727,15 +4731,15 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, float const v );
+	out( std::ostream & stream, float const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, double const v );
+	out( std::ostream & stream, double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v );
+	out( std::ostream & stream, long double const v, std::string const & ter );
 
 }; // FormatES
 
@@ -4781,15 +4785,15 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, float const v );
+	out( std::ostream & stream, float const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, double const v );
+	out( std::ostream & stream, double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v );
+	out( std::ostream & stream, long double const v, std::string const & ter );
 
 }; // FormatD
 
@@ -5010,71 +5014,71 @@ public: // Methods
 
 	// Output
 	void
-	out( std::ostream & stream, bool const b );
+	out( std::ostream & stream, bool const b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, byte const & b );
+	out( std::ostream & stream, byte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, ubyte const & b );
+	out( std::ostream & stream, ubyte const & b, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, short int const i );
+	out( std::ostream & stream, short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned short int const i );
+	out( std::ostream & stream, unsigned short int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, int const i );
+	out( std::ostream & stream, int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned int const i );
+	out( std::ostream & stream, unsigned int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long int const i );
+	out( std::ostream & stream, long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long int const i );
+	out( std::ostream & stream, unsigned long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long long int const i );
+	out( std::ostream & stream, long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, unsigned long long int const i );
+	out( std::ostream & stream, unsigned long long int const i, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, float const v );
+	out( std::ostream & stream, float const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, double const v );
+	out( std::ostream & stream, double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, long double const v );
+	out( std::ostream & stream, long double const v, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, char const c );
+	out( std::ostream & stream, char const c, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, std::string const & s );
+	out( std::ostream & stream, std::string const & s, std::string const & ter );
 
 	// Output
 	void
-	out( std::ostream & stream, Fstring const & s );
+	out( std::ostream & stream, Fstring const & s, std::string const & ter );
 
 protected: // Methods
 

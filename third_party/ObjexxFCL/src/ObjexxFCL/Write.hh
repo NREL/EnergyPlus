@@ -136,7 +136,7 @@ public: // Operators
 			while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to arg-based format
 				active = active->next();
 			}
-			if ( stream() && active && active->uses_arg() && active->output_val( stream(), pos(), t ) ) { // Output arg using active format
+			if ( stream() && active && active->uses_arg() && active->output_val( stream(), pos(), t, ter_ ) ) { // Output arg using active format
 				reverts_ = format()->reverts();
 				active = active->next();
 				while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && format()->not_colon_terminated() && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to next arg-based format if not : terminated

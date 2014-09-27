@@ -46,6 +46,20 @@ public: // Creation
 	 b_( static_cast< signed char >( i ) )
 	{}
 
+	// long Constructor
+	inline
+	explicit
+	byte( long int const i ) :
+	 b_( static_cast< signed char >( i ) )
+	{}
+
+	// long long Constructor
+	inline
+	explicit
+	byte( long long int const i ) :
+	 b_( static_cast< signed char >( i ) )
+	{}
+
 	// char Constructor
 	inline
 	explicit
