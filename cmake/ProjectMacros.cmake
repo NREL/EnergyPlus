@@ -6,6 +6,9 @@ include(CMakeParseArguments)
 # SOURCE should be a url where the function will attempt to download from
 # DESTINATION is the absolute or relative destination which will be passed to 
 # the built in install command after the SOURCE is downloaded to a temporary location
+# If a fourth argument is provided it will be used for the file's install name.
+# If a fifth argument is provided and "TRUE" the file will be saved to the temporary
+# location at ${CMAKE_BINARY_DIR}/install_temp.
 function( install_remote TYPE SOURCE DESTINATION )
   if( DEFINED ARGV3 )
     set(FILENAME "${ARGV3}")
@@ -21,9 +24,11 @@ function( install_remote TYPE SOURCE DESTINATION )
   endif()
   ")
   install(${TYPE} "${OUTPUT_DIR}/${FILENAME}" DESTINATION ${DESTINATION})
-  install(CODE "
-    file(REMOVE_RECURSE \"${OUTPUT_DIR}\")
-  ")
+  if(NOT ARGV4)
+    install(CODE "
+      file(REMOVE \"${OUTPUT_DIR}/${FILENAME}\")
+    ")
+  endif()
 endfunction()
 
 # Similar to install_remote but explicitly for MacOSX plist files.
@@ -39,7 +44,7 @@ function( install_remote_plist SOURCE DESTINATION APP_NAME )
   ")
   install(FILES "${CMAKE_BINARY_DIR}/install_temp/Info.plist" DESTINATION "${DESTINATION}")
   install(CODE "
-    file(REMOVE_RECURSE \"${CMAKE_BINARY_DIR}/install_temp\")
+    file(REMOVE_RECURSE \"${CMAKE_BINARY_DIR}/install_temp/Info.plist\")
   ")
 endfunction()
 

@@ -1,4 +1,6 @@
-set( CPACK_PACKAGE_VENDOR "US Department of Energy" )
+set( CPACK_PACKAGE_VENDOR "NREL" )
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/Modules")
 
 set(CPACK_PACKAGE_VERSION_MAJOR "${CMAKE_VERSION_MAJOR}" )
 set(CPACK_PACKAGE_VERSION_MINOR "${CMAKE_VERSION_MINOR}" )
@@ -136,7 +138,7 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ep.gif" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${KNOWN_ISSUES}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/ObjectStatus.xls" "./")
-install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/readme.html" "./")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/readme.html" "./" "readme.html" TRUE)
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/${RULES_XLS}" "./")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Report%20Variables%208-1-0-009%20to%208-2-0.csv" "PreProcess/IDFVersionUpdater/" "Report Variables 8-1-0-009 to 8-2-0.csv")
 install(FILES "${CMAKE_SOURCE_DIR}/idd/V8-1-0-Energy+.idd" DESTINATION "PreProcess/IDFVersionUpdater/")
@@ -222,6 +224,24 @@ if( WIN32 )
 endif()
 
 if( APPLE )
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/MacOS/EP-Launch%20Lite" "EP-Launch Lite.app/Contents/MacOS/" "EP-Launch Lite")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/PkgInfo" "EP-Launch Lite.app/Contents/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Resources/EnergyPlus.icns" "EP-Launch Lite.app/Contents/Resources/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Resources/English.lproj/InfoPlist.strings" "EP-Launch Lite.app/Contents/Resources/English.lproj/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Resources/English.lproj/MainMenu.nib" "EP-Launch Lite.app/Contents/Resources/English.lproj/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Resources/ep-small.gif" "EP-Launch Lite.app/Contents/Resources/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Resources/Scripts/Application.scpt" "EP-Launch Lite.app/Contents/Resources/Scripts/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Resources/Scripts/Content%20Controller.scpt" "EP-Launch Lite.app/Contents/Resources/Scripts/" "Content Controller.scpt")
+  install_remote_plist("https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Info.plist" "EP-Launch Lite.app/Contents/" "eplaunchlite")
+
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/Uninstall%20EnergyPlus.app/Contents/MacOS/applet" "Uninstall EnergyPlus.app/Contents/MacOS/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/Uninstall%20EnergyPlus.app/Contents/PkgInfo" "Uninstall EnergyPlus.app/Contents/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/Uninstall%20EnergyPlus.app/Contents/Resources/applet.icns" "Uninstall EnergyPlus.app/Contents/Resources/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/Uninstall%20EnergyPlus.app/Contents/Resources/applet.rsrc" "Uninstall EnergyPlus.app/Contents/Resources/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/Uninstall%20EnergyPlus.app/Contents/Resources/description.rtfd/TXT.rtf" "Uninstall EnergyPlus.app/Contents/Resources/description.rtfd/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/Uninstall%20EnergyPlus.app/Contents/Resources/Scripts/main.scpt" "Uninstall EnergyPlus.app/Contents/Resources/Scripts/")
+  install_remote_plist("https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/Uninstall%20EnergyPlus.app/Contents/Info.plist" "Uninstall EnergyPlus.app/Contents/" "epuninstall")
+
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Frameworks/\\#CoreClasses.rbx_0.dylib" "PostProcess/EP-Compare/EP-Compare.app/Contents/Frameworks/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Frameworks/\\#CoreClasses.rbx_1.dylib" "PostProcess/EP-Compare/EP-Compare.app/Contents/Frameworks/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Frameworks/\\#CoreClasses.rbx_5.dylib" "PostProcess/EP-Compare/EP-Compare.app/Contents/Frameworks/")
@@ -244,11 +264,14 @@ if( APPLE )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Resources/EP-Compare.icns" "PostProcess/EP-Compare/EP-Compare.app/Contents/Resources/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/GraphHints.csv" "PostProcess/EP-Compare/")
   install_remote_plist("https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Info.plist" "PostProcess/EP-Compare/EP-Compare.app/Contents/" "epcompare")
+
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Mac/EPMacro" "./")
+
   configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
+
 endif()
 
 if( UNIX AND NOT APPLE )
@@ -259,7 +282,9 @@ if( UNIX AND NOT APPLE )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/EHTreeView4301.so" "PostProcess/EP-Compare/EP-Compare Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/libMBSChartDirector5Plugin16042.so" "PostProcess/EP-Compare/EP-Compare Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/libRBAppearancePak.so" "PostProcess/EP-Compare/EP-Compare Libs/")
+
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Linux/EPMacro" "./")
+
   configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
