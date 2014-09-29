@@ -25,6 +25,8 @@ ELSE()  # Windows
     # Set release flags to be empty
     SET(CMAKE_Fortran_FLAGS_RELEASE "")
     SET(CMAKE_Fortran_FLAGS "/nologo /debug:minimal /O2 /Oy- /assume:buffered_io /noaltparam /fpscomp:nolibs /fpe:0 /fp:fast=2  /traceback /check:uninit /libs:static /threads /c /assume:protect-parens /Qprec-div /Qprec-sqrt /Qvec-")
+  ELSE()
+    SET(CMAKE_Fortran_FLAGS "-static")
   ENDIF()
 ENDIF()
 
@@ -34,4 +36,7 @@ SET_TARGET_PROPERTIES(Slab PROPERTIES
   COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
-INSTALL( TARGETS Slab DESTINATION PreProcess/GrndTempCalc )
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+install_and_fixup_exe_target( Slab PreProcess/GrndTempCalc )
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../idd/SlabGHT.idd" DESTINATION "PostProcess/convertESOMTRpgm/")
+
