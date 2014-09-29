@@ -63,9 +63,9 @@ if( ENABLE_REGRESSION_TESTING )
   endif()
 endif()
 
-# Not yet released by CMake, but is being developed
-# This will help us set the proper options for c++11 across various configurations
-#FIND_PACKAGE( CXXFeatures ) 
+if( UNIX AND NOT APPLE )
+  set(CMAKE_INSTALL_RPATH "$ORIGIN")
+endif()
 
 if (MSVC)
   if (CMAKE_C_COMPILER_VERSION VERSION_LESS "18.00.30723")
