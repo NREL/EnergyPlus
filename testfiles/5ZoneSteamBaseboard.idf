@@ -2783,9 +2783,9 @@
     SPACE1-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    5,                       !- Degree of SubCooling {C}
+    5,                       !- Degree of SubCooling {deltaC}
     autosize,                !- Maximum Steam Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance
     0.3,                     !- Fraction Radiant
@@ -2804,9 +2804,9 @@
     SPACE3-1 Reheat Coil Steam Outlet,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    5,                       !- Degree of SubCooling {C}
+    5,                       !- Degree of SubCooling {deltaC}
     autosize,                !- Maximum Steam Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance
     0.3,                     !- Fraction Radiant
