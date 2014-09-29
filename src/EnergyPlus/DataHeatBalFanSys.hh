@@ -36,6 +36,7 @@ namespace DataHeatBalFanSys {
 	extern FArray1D< Real64 > QHWBaseboardToPerson; // Sum of radiant gains to people from hot water baseboard heaters
 	extern FArray1D< Real64 > QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
 	extern FArray1D< Real64 > QElecBaseboardToPerson; // Sum of radiant gains to people from electric baseboard heaters
+	extern FArray1D< Real64 > QCoolingPanelToPerson; // Sum of radiant losses to people from cooling panels
 	//Zone air drybulb conditions variables
 	extern FArray1D< Real64 > ZTAV; // Zone Air Temperature Averaged over the Zone Time step
 	extern FArray1D< Real64 > MAT; // MEAN AIR TEMPARATURE (C)
@@ -130,6 +131,8 @@ namespace DataHeatBalFanSys {
 	// of steam baseboard heaters
 	extern FArray1D< Real64 > QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
 	// of electric baseboard heaters
+	extern FArray1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
+	// of simple cooling panels
 	extern FArray1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
 	extern FArray1D< Real64 > RadSysTiHBToutCoef; // Inside heat balance coefficient that modifies Toutside
 	extern FArray1D< Real64 > RadSysTiHBQsrcCoef; // Inside heat balance coefficient that modifies source/sink

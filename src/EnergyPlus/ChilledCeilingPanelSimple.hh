@@ -70,6 +70,7 @@ namespace CoolingPanelSimple {
 		int ColdSetptSchedPtr;
 		int CondCtrlType;
 		Real64 CondDewPtDeltaT;
+		int CondErrIndex;
 		Real64 ColdThrottlRange;
 		Real64 RatedWaterTemp;
 		Real64 RatedCapacity;
@@ -121,6 +122,7 @@ namespace CoolingPanelSimple {
 			ColdSetptSchedPtr( 0 ),
 			CondCtrlType( 0 ),
 		    CondDewPtDeltaT( 0.0 ),
+			CondErrIndex( 0 ),
 			RatedWaterTemp( 0.0 ),
 			RatedCapacity( 0.0 ),
 			UA( 0.0 ),
@@ -176,6 +178,7 @@ namespace CoolingPanelSimple {
 			Real64 const ColdThrottlRange,
 			int const CondCtrlType,
 			Real64 const CondDewPtDeltaT,
+			int const CondErrIndex,
 			Real64 const RatedWaterTemp,
 			Real64 const RatedCapacity,
 			Real64 const UA,
@@ -229,6 +232,7 @@ namespace CoolingPanelSimple {
 			ColdSetptSchedPtr( ColdSetptSchedPtr ),
 			CondCtrlType( CondCtrlType ),
 			CondDewPtDeltaT( CondDewPtDeltaT ),
+			CondErrIndex( CondErrIndex ),
 			RatedWaterTemp( RatedWaterTemp ),
 			RatedCapacity( RatedCapacity ),
 			UA( UA ),
@@ -315,7 +319,6 @@ namespace CoolingPanelSimple {
 
 	void
 	UpdateCoolingPanelPlantConnection(
-		int const CoolingPanelTypeNum, // type index
 		std::string const & CoolingPanelName, // component name
 		int const EquipFlowCtrl, // Flow control mode for the equipment
 		int const LoopNum, // Plant loop index for where called from

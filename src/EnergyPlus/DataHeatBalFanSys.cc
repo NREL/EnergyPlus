@@ -44,6 +44,7 @@ namespace DataHeatBalFanSys {
 	FArray1D< Real64 > QHWBaseboardToPerson; // Sum of radiant gains to people from hot water baseboard heaters
 	FArray1D< Real64 > QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
 	FArray1D< Real64 > QElecBaseboardToPerson; // Sum of radiant gains to people from electric baseboard heaters
+	FArray1D< Real64 > QCoolingPanelToPerson; // Sum of radiant losses to people from cooling panels
 	//Zone air drybulb conditions variables
 	FArray1D< Real64 > ZTAV; // Zone Air Temperature Averaged over the Zone Time step
 	FArray1D< Real64 > MAT; // MEAN AIR TEMPARATURE (C)
@@ -138,6 +139,8 @@ namespace DataHeatBalFanSys {
 	// of steam baseboard heaters
 	FArray1D< Real64 > QElecBaseboardSurf; // Current radiant heat flux at a surface due to the presence
 	// of electric baseboard heaters
+	FArray1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
+	// of simple cooling panels
 	FArray1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
 	FArray1D< Real64 > RadSysTiHBToutCoef; // Inside heat balance coefficient that modifies Toutside
 	FArray1D< Real64 > RadSysTiHBQsrcCoef; // Inside heat balance coefficient that modifies source/sink
@@ -187,7 +190,7 @@ namespace DataHeatBalFanSys {
 	FArray1D< ZoneComfortControlsFangerData > ZoneComfortControlsFanger;
 
 	//     NOTICE
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
