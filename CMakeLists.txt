@@ -66,6 +66,9 @@ endif()
 #FIND_PACKAGE( CXXFeatures ) 
 
 if (MSVC)
+  if (CMAKE_C_COMPILER_VERSION VERSION_LESS "18.00.30723")
+    message(FATAL_ERROR "Visual Studio 2013 Update 3 or Greater Required")
+  endif()
   set(gtest_force_shared_crt ON)
 endif()
 
