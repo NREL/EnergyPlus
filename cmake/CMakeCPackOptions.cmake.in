@@ -61,6 +61,13 @@ if(CPACK_GENERATOR MATCHES "NSIS")
       WriteRegStr HKCR \"IDFEditor.expidf\\shell\\open\\command\" \"\" `$INSTDIR\\PreProcess\\IDFEditor\\IDFEditor.exe %1`
     FunctionEnd
   ")
+
+  set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+    WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"AutoCheck\" \"True\"
+    WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"CheckURL\" \"http://energyplus.gov/update/epupdate.htm\"
+    StrCpy $0 \"#@CPACK_PACKAGE_VERSION_MAJOR@.@CPACK_PACKAGE_VERSION_MINOR@.@CPACK_PACKAGE_VERSION_PATCH@-@CPACK_PACKAGE_VERSION_BUILD@\"
+    WriteRegStr HKEY_CURRENT_USER \"Software\\VB and VBA Program Settings\\EP-Launch\\UpdateCheck\" \"LastAnchor\" $0
+  ")
 endif()
 
 if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
