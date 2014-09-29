@@ -1,4 +1,4 @@
-set( CPACK_PACKAGE_VENDOR "NREL" )
+set( CPACK_PACKAGE_VENDOR "US Department of Energy" )
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/Modules")
 
