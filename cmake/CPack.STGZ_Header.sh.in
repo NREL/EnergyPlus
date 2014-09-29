@@ -59,9 +59,9 @@ echo "Extracting, please wait..."
 use_new_tail_syntax="-n"
 tail $use_new_tail_syntax +1 "$0" 2>&1 > /dev/null || use_new_tail_syntax=""
 
-mkdir -p "${install_directory}/${package_name}"
+mkdir -p "${install_directory}"
 
-tail $use_new_tail_syntax +###CPACK_HEADER_LENGTH### "$0" | gunzip | (cd "${install_directory}/${package_name}" && tar xf -) || exit 1 "Problem unpacking the @CPACK_PACKAGE_FILE_NAME@"
+tail $use_new_tail_syntax +###CPACK_HEADER_LENGTH### "$0" | gunzip | (cd "${install_directory}" && tar xf -) || exit 1 "Problem unpacking the @CPACK_PACKAGE_FILE_NAME@"
 
 echo "Unpacking to directory ${install_directory} was successful."
 
