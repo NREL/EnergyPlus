@@ -2118,7 +2118,7 @@
     West Zone,               !- Zone Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     10000,                   !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     Electricity,             !- Fuel Type
     1.0,                     !- Combustion Efficiency
@@ -2146,7 +2146,7 @@
     EAST ZONE,               !- Zone Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     10000,                   !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     Electricity,             !- Fuel Type
     1.0,                     !- Combustion Efficiency
@@ -2174,7 +2174,7 @@
     NORTH ZONE,              !- Zone Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     15000,                   !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     Electricity,             !- Fuel Type
     1.0,                     !- Combustion Efficiency

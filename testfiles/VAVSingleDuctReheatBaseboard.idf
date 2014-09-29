@@ -2038,7 +2038,7 @@
     Zone 1 Reheat Water Outlet Node,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     500.,                    !- U-Factor Times Area Value {W/K}
     0.0013,                  !- Maximum Water Flow Rate {m3/s}

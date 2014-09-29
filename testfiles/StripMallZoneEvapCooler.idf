@@ -4793,7 +4793,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4802,7 +4802,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4811,7 +4811,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4820,7 +4820,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4829,7 +4829,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4838,7 +4838,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4847,7 +4847,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4856,7 +4856,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4865,7 +4865,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
@@ -4874,7 +4874,7 @@
     ALWAYS_ON,               !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 

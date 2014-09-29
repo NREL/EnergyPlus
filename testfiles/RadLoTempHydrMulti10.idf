@@ -1646,7 +1646,7 @@
     MeanAirTemperature,      !- Temperature Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     0.0002,                  !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
