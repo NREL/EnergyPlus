@@ -220,7 +220,7 @@ if( WIN32 )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater%20Libs/Appearance%20Pak.dll" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/" "Appearance Pak.dll")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater%20Libs/Shell.dll" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Win/IDFVersionUpdater.exe" "PreProcess/IDFVersionUpdater/")
-  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Windows/EPMacro" "./")
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Windows/EPMacro.exe" "./")
 endif()
 
 if( APPLE )
