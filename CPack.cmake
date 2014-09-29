@@ -224,6 +224,7 @@ if( WIN32 )
 endif()
 
 if( APPLE )
+  set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/MacOS/EP-Launch%20Lite" "EP-Launch Lite.app/Contents/MacOS/" "EP-Launch Lite")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/PkgInfo" "EP-Launch Lite.app/Contents/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/Mac/EP-Launch_Lite/build/Release/EP-Launch%20Lite.app/Contents/Resources/EnergyPlus.icns" "EP-Launch Lite.app/Contents/Resources/")

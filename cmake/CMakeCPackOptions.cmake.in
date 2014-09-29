@@ -72,7 +72,6 @@ if(CPACK_GENERATOR MATCHES "NSIS")
 endif()
 
 if("${CPACK_GENERATOR}" STREQUAL "PackageMaker")
-  set(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications")
   set(CPACK_PACKAGE_RELOCATABLE false)
   set( CPACK_PACKAGE_VENDOR "usdoe" )
   configure_file(@CMAKE_SOURCE_DIR@/cmake/CPack.Info.plist.in.in "@CMAKE_BINARY_DIR@/Modules/CPack.Info.plist.in")
