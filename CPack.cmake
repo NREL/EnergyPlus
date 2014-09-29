@@ -266,6 +266,7 @@ if( APPLE )
   install_remote_plist("https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Mac/EP-Compare.app/Contents/Info.plist" "PostProcess/EP-Compare/EP-Compare.app/Contents/" "epcompare")
 
   install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EPMacro/Mac/EPMacro" "./")
+  install_remote(PROGRAMS "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/release/Mac/EnergyPlus%20Quick%20Start%20Guide.pdf" "./" "EnergyPlus Quick Start Guide.pdf")
 
   configure_file(scripts/runenergyplus.in "${CMAKE_BINARY_DIR}/scripts/runenergyplus" @ONLY)
   install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/runenergyplus" DESTINATION "./")
