@@ -272,6 +272,8 @@ if( APPLE )
   install(PROGRAMS scripts/runepmacro DESTINATION "./")
   install(PROGRAMS scripts/runreadvars DESTINATION "./")
 
+  configure_file("${PROJECT_SOURCE_DIR}/cmake/darwinpostflight.sh.in" ${CMAKE_BINARY_DIR}/darwinpostflight.sh)
+  set(CPACK_POSTFLIGHT_SCRIPT "${CMAKE_BINARY_DIR}/darwinpostflight.sh")
 endif()
 
 if( UNIX AND NOT APPLE )
