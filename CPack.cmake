@@ -303,7 +303,7 @@ if( UNIX AND NOT APPLE )
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/libMBSChartDirector5Plugin16042.so" "PostProcess/EP-Compare/EP-Compare Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/EP-Compare/Run-Linux/EP-Compare%20Libs/libRBAppearancePak.so" "PostProcess/EP-Compare/EP-Compare Libs/")
 
-  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater%20Libs/libAppearance%20Pak.so" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
+  install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater%20Libs/libAppearancePak.so" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater%20Libs/libRBShell.so" "PreProcess/IDFVersionUpdater/IDFVersionUpdater Libs/")
   install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/bin/IDFVersionUpdater/Run-Linux/IDFVersionUpdater" "PreProcess/IDFVersionUpdater/")
     
