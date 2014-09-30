@@ -11,6 +11,7 @@
 #include <ZoneEquipmentManager.hh>
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
+#include <ChilledCeilingPanelSimple.hh>
 #include <CoolTower.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
@@ -2567,6 +2568,7 @@ namespace ZoneEquipmentManager {
 		using SteamBaseboardRadiator::SimSteamBaseboard;
 		using BaseboardRadiator::SimBaseboard;
 		using BaseboardElectric::SimElectricBaseboard;
+		using CoolingPanelSimple::SimCoolingPanel;
 		using SplitterComponent::SimAirLoopSplitter;
 		using FanCoilUnits::SimFanCoilUnit;
 		using Fans::SimulateFanComponents;
@@ -2826,6 +2828,13 @@ namespace ZoneEquipmentManager {
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
 					LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
+				} else if ( SELECT_CASE_var == LoTempRadiant_Num ) { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow', 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
+					// 'ZoneHVAC:LowTemperatureRadiant:Electric'
+					SimCoolingPanel( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+
+					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
+					LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
+					
 				} else if ( SELECT_CASE_var == HiTempRadiant_Num ) { // 'ZoneHVAC:HighTemperatureRadiant'
 					SimHighTempRadiantSystem( PrioritySimOrder( EquipTypeNum ).EquipName, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 					LatOutputProvided = 0.0; // This baseboard currently sends its latent heat gain directly to predictor/corrector
@@ -5041,7 +5050,7 @@ namespace ZoneEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

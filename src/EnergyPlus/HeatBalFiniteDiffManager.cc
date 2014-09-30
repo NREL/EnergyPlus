@@ -103,6 +103,7 @@ namespace HeatBalFiniteDiffManager {
 	using DataHeatBalFanSys::QHWBaseboardSurf;
 	using DataHeatBalFanSys::QSteamBaseboardSurf;
 	using DataHeatBalFanSys::QElecBaseboardSurf;
+	using DataHeatBalFanSys::QCoolingPanelSurf;
 	using DataEnvironment::SkyTemp;
 	using DataEnvironment::IsRain;
 	using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
@@ -2201,6 +2202,7 @@ namespace HeatBalFiniteDiffManager {
 		using DataHeatBalFanSys::QHWBaseboardSurf;
 		using DataHeatBalFanSys::QSteamBaseboardSurf;
 		using DataHeatBalFanSys::QElecBaseboardSurf;
+		using DataHeatBalFanSys::QCoolingPanelSurf;
 		using DataSurfaces::HeatTransferModel_CondFD;
 
 		// Argument array dimensioning
@@ -2224,6 +2226,7 @@ namespace HeatBalFiniteDiffManager {
 		Real64 QHWBaseboardSurfFD; // Current radiant heat flux at a surface due to the presence of hot water baseboard heaters
 		Real64 QSteamBaseboardSurfFD; // Current radiant heat flux at a surface due to the presence of steam baseboard heaters
 		Real64 QElecBaseboardSurfFD; // Current radiant heat flux at a surface due to the presence of electric baseboard heaters
+		Real64 QCoolingPanelSurfFD; // Current radiant heat flux at a surface due to the presence of simple cooling panels
 		Real64 QRadThermInFD; // Thermal radiation absorbed on inside surfaces
 		Real64 DelX;
 		Real64 const IterDampConst( 5.0 ); // Damping constant for inside surface temperature iterations. Only used for massless (R-value only) Walls
@@ -2260,6 +2263,7 @@ namespace HeatBalFiniteDiffManager {
 		QHWBaseboardSurfFD = QHWBaseboardSurf( Surf );
 		QSteamBaseboardSurfFD = QSteamBaseboardSurf( Surf );
 		QElecBaseboardSurfFD = QElecBaseboardSurf( Surf );
+		QCoolingPanelSurfFD = QCoolingPanelSurf( Surf );
 		QRadThermInFD = QRadThermInAbs( Surf );
 
 		//Boundary Conditions from Simulation for Interior
@@ -2301,10 +2305,10 @@ namespace HeatBalFiniteDiffManager {
 
 				if ( Surface( Surf ).ExtBoundCond > 0 && i == 1 ) { //this is for an adiabatic partition
 
-					TDT( i ) = ( NetLWRadToSurfFD * Rlayer + QHtRadSysSurfFD * Rlayer + QHWBaseboardSurfFD * Rlayer + QSteamBaseboardSurfFD * Rlayer + QElecBaseboardSurfFD * Rlayer + QRadSWInFD * Rlayer + QRadThermInFD * Rlayer + TDT( i + 1 ) + hconvi * Rlayer * Tia + TDreport( i ) * IterDampConst * Rlayer ) / ( 1.0 + hconvi * Rlayer + IterDampConst * Rlayer );
+					TDT( i ) = ( NetLWRadToSurfFD * Rlayer + QHtRadSysSurfFD * Rlayer + QCoolingPanelSurfFD * Rlayer + QHWBaseboardSurfFD * Rlayer + QSteamBaseboardSurfFD * Rlayer + QElecBaseboardSurfFD * Rlayer + QRadSWInFD * Rlayer + QRadThermInFD * Rlayer + TDT( i + 1 ) + hconvi * Rlayer * Tia + TDreport( i ) * IterDampConst * Rlayer ) / ( 1.0 + hconvi * Rlayer + IterDampConst * Rlayer );
 
 				} else { // regular wall
-					TDT( i ) = ( NetLWRadToSurfFD * Rlayer + QHtRadSysSurfFD * Rlayer + QHWBaseboardSurfFD * Rlayer + QSteamBaseboardSurfFD * Rlayer + QElecBaseboardSurfFD * Rlayer + QRadSWInFD * Rlayer + QRadThermInFD * Rlayer + TDT( i - 1 ) + hconvi * Rlayer * Tia + TDreport( i ) * IterDampConst * Rlayer ) / ( 1.0 + hconvi * Rlayer + IterDampConst * Rlayer );
+					TDT( i ) = ( NetLWRadToSurfFD * Rlayer + QHtRadSysSurfFD * Rlayer + QCoolingPanelSurfFD * Rlayer + QHWBaseboardSurfFD * Rlayer + QSteamBaseboardSurfFD * Rlayer + QElecBaseboardSurfFD * Rlayer + QRadSWInFD * Rlayer + QRadThermInFD * Rlayer + TDT( i - 1 ) + hconvi * Rlayer * Tia + TDreport( i ) * IterDampConst * Rlayer ) / ( 1.0 + hconvi * Rlayer + IterDampConst * Rlayer );
 				}
 
 				if ( ( TDT( i ) > MaxSurfaceTempLimit ) || ( TDT( i ) < MinSurfaceTempLimit ) ) {
@@ -2338,20 +2342,20 @@ namespace HeatBalFiniteDiffManager {
 
 					if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
 						// Adams-Moulton second order
-						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * pow_2( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i + 1 ) + Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * pow_2( DelX ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QCoolingPanelSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * pow_2( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i + 1 ) + Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * pow_2( DelX ) * RhoS );
 
 					} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 						// Adams-Moulton First order
-						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( 2.0 * Delt * DelX * hconvi + 2.0 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QCoolingPanelSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( 2.0 * Delt * DelX * hconvi + 2.0 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
 					}}
 
 				} else { // for regular or interzone walls
 					{ auto const SELECT_CASE_var( CondFDSchemeType );
 
 					if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
-						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * pow_2( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i - 1 ) + Delt * kt * TDT( i - 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * pow_2( DelX ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QCoolingPanelSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * pow_2( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i - 1 ) + Delt * kt * TDT( i - 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * pow_2( DelX ) * RhoS );
 					} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
-						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i - 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( 2.0 * Delt * DelX * hconvi + 2.0 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QCoolingPanelSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i - 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( 2.0 * Delt * DelX * hconvi + 2.0 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
 					}}
 				}
 
@@ -2367,7 +2371,7 @@ namespace HeatBalFiniteDiffManager {
 
 		} //  End of Regular node or SigmaR SigmaC option
 
-		QNetSurfInside = -( NetLWRadToSurfFD + QHtRadSysSurfFD + QRadSWInFD + QRadThermInFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + hconvi * ( -TDT( i ) + Tia ) );
+		QNetSurfInside = -( NetLWRadToSurfFD + QHtRadSysSurfFD + QRadSWInFD + QRadThermInFD + QCoolingPanelSurfFD + QHWBaseboardSurfFD + QSteamBaseboardSurfFD + QElecBaseboardSurfFD + hconvi * ( -TDT( i ) + Tia ) );
 		// note -- no change ref: CR8575
 		//feb2012  QNetSurfInside=NetLWRadToSurfFD + QHtRadSysSurfFD + QRadSWInFD + QRadThermInFD + QHWBaseboardSurfFD  + &
 		//feb2012             QSteamBaseboardSurfFD+QElecBaseboardSurfFD+hconvi*(-TDT(I) + Tia)
@@ -2493,7 +2497,7 @@ namespace HeatBalFiniteDiffManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

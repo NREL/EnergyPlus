@@ -123,7 +123,7 @@ namespace CoolingPanelSimple {
 	// Functions
 
 	void
-	SimCoolingPanelSimple(
+	SimCoolingPanel(
 		std::string const & EquipName,
 		int const ActualZoneNum,
 		int const ControlledZoneNum,
