@@ -7,7 +7,7 @@
 
 !- =========== ALL OBJECTS IN CLASS: VERSION ===========
 
-! Basement.idf
+! BasementWithInsulation.idf
 ! Basic File Description:
 ! This input file exemplifies the use of the PipingSystem:Underground
 ! collection of objects to perform the simulation of foundation heat
@@ -437,7 +437,7 @@ Zone,
     0.9,                     !- Thermal Absorptance
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
-	
+
 !***********************************************************
 !********* BASEMENT SURFACE MATERIALS/CONSTRUCTIONS ***********
 !***********************************************************
@@ -543,36 +543,36 @@ GlobalGeometryRules,
     CounterClockWise, !- Vertex Entry Direction
     Relative; !- Coordinate System
  
-!***********************************************************
+!***************************************************************
 !************* GROUND/BASEMENT DOMAIN **************************
-!***********************************************************
-Site:GroundDomain:Basement,
-	CoupledBasement,         !- Name
-	8,                       !- Ground Domain Depth {m}
-	1,                       !- Aspect ratio {m}
-	5,                       !- Perimeter offset {m}
-	1.8,                     !- Soil Thermal Conductivity {W/m-K}
-	3200,                    !- Soil Density {kg/m3}
-	836, 					 !- Soil Specific Heat {J/kg-K}
-	30,						 !- Soil Moisture Content Volume Fraction {percent}
-	50, 					 !- Soil Moisture Content Volume Fraction at Saturation {percent}
-	15.5, 						 !- Kusuda-Achenbach Average Surface Temperature {C}
-	12.8, 						 !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-	17.3, 						 !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-	1,						 !- Evapotranspiration Ground Cover Parameter
-	BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
-	Basement Floor Material-GroundSide, !- Basement Floor Material Name
-	Yes,					 !- Basement Horizontal Underfloor Insulation Present (Yes/No)
-	Basement Insulation,	 !- Basement Horizontal Insulation Underfloor Material Name
-	Perimeter, 				 !- Full Horizontal or Perimeter Only (Full/Perimeter)
-	1, 						 !- Perimeter width (m)
-	2.5,                     !- Depth of Basement Wall In Ground Domain {m}
-	BasementWallOSCM,        !- Name of Basement Floor Boundary Condition Model
-	Basement Wall Material-GroundSide,	!- Basement Wall Material Name;
-	Yes,					 !- Basement Wall Vertical Insulation Present(Yes/No)
-	Basement Insulation, 	 !- Basement Wall Vertical Insulation Material Name
-	2.3,					 !- Vertical insulation depth from surface (m)
-	Hourly;				 !- Domain Update interval. (Timestep, Hourly);
+!***************************************************************
+  Site:GroundDomain:Basement,
+    CoupledBasement,         !- Name
+    8,                       !- Ground Domain Depth {m}
+    1,                       !- Aspect ratio {m}
+    5,                       !- Perimeter offset {m}
+    1.8,                     !- Soil Thermal Conductivity {W/m-K}
+    3200,                    !- Soil Density {kg/m3}
+    836,                     !- Soil Specific Heat {J/kg-K}
+    30,                      !- Soil Moisture Content Volume Fraction {percent}
+    50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
+    15.5,                    !- Kusuda-Achenbach Average Surface Temperature {C}
+    12.8,                    !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+    17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    1,                       !- Evapotranspiration Ground Cover Parameter
+    BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
+    Basement Floor Material-GroundSide,   !- Basement Floor Material Name
+    Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
+    Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
+    Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
+    1,                       !- Perimeter width (m)
+    2.5,                     !- Depth of Basement Wall In Ground Domain {m}
+    BasementWallOSCM,        !- Name of Basement Floor Boundary Condition Model
+    Basement Wall Material-GroundSide,    !- Basement Wall Material Name;
+    Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
+    Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
+    2.3,                     !- Vertical insulation depth from surface (m)
+    Hourly;                  !- Domain Update interval. (Timestep, Hourly);
 
 !***********************************************************
 !****** OUTPUT CONTROLS ************************************
@@ -593,14 +593,13 @@ OutputControl:Table:Style,
 
 !- =========== ALL OBJECTS IN CLASS: OUTPUT:VARIABLE ===========
 
-Output:Variable,*,Zone Coupled Basement Wall Heat Flux,hourly;
-Output:Variable,*,Zone Coupled Basement Floor Heat Flux,hourly;
-Output:Variable,*, Surface Other Side Conditions Modeled Convection Air Temperature, hourly; 
-Output:Variable,*, Surface Average Face Conduction Heat Transfer Rate per Area, hourly; 
-Output:Variable,*,Zone Air Temperature,hourly;
-Output:Variable,*,Zone Air System Sensible Heating Rate,hourly; !- HVAC Average [W]
-Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly; !- HVAC Average [W]
-
+  Output:Variable,*,Zone Coupled Basement Wall Heat Flux,hourly;
+  Output:Variable,*,Zone Coupled Basement Floor Heat Flux,hourly;
+  Output:Variable,*, Surface Other Side Conditions Modeled Convection Air Temperature, hourly; 
+  Output:Variable,*, Surface Average Face Conduction Heat Transfer Rate per Area, hourly; 
+  Output:Variable,*,Zone Air Temperature,hourly;
+  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly; !- HVAC Average [W]
+  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly; !- HVAC Average [W]
 
 ScheduleTypeLimits,
   HVACTemplate Any Number; !- Name
