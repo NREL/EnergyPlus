@@ -125,6 +125,8 @@ install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/ProgrammingStandard.pdf" "./Documentation")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/Tips_and_Tricks_Using_EnergyPlus.pdf" "./Documentation")
 install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/Using_EnergyPlus_for_Compliance.pdf" "./Documentation")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/index/index.idx" "./Documentation/index/")
+install_remote(FILES "https://raw.github.com/NREL/EnergyPlusBuildSupport/v8.2.0/docs/pdf/index/index1.idx" "./Documentation/index/")
 
 # TODO Remove version from file name or generate
 # These files names are stored in variables because they also appear as start menu shortcuts later.
