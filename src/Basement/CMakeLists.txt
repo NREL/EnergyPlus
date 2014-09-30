@@ -35,4 +35,5 @@ SET_TARGET_PROPERTIES(Basement PROPERTIES
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
 install_and_fixup_exe_target( Basement PreProcess/GrndTempCalc )
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../idd/BasementGHT.idd" DESTINATION "PreProcess/GrndTempCalc/")
 
