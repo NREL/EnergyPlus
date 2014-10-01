@@ -4430,6 +4430,8 @@ namespace HeatBalanceManager {
 		QSteamBaseboardToPerson = 0.0;
 		QElecBaseboardToPerson.allocate( NumOfZones );
 		QElecBaseboardToPerson = 0.0;
+		QCoolingPanelToPerson.allocate( NumOfZones );
+		QCoolingPanelToPerson = 0.0;
 		XMAT.allocate( NumOfZones );
 		XMAT = 23.0;
 		XM2T.allocate( NumOfZones );
@@ -8059,7 +8061,7 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
