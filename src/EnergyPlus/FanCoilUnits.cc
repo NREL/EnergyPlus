@@ -1743,34 +1743,42 @@ namespace FanCoilUnits {
 
 				// get the maximum output of the fcu
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
-				// calculate the PLR, if load greater than output, PLR = 1 (output = max)
-				if ( QUnitOutMax != 0.0 ) PLR = std::abs( QZnReq / QUnitOutMax );
-				if ( PLR > 1.0 ) PLR = 1.0;
 
-				// adjust the PLR to meet the cooling load calling Calc4PipeFanCoil repeatedly with the PLR adjusted
-				while ( std::abs( Error ) > ControlOffset && std::abs( AbsError ) > SmallLoad && Iter < MaxIterCycl && PLR != 1.0 ) {
-					// the water flow rate is at the maximum flow rate time the PLR
-					//    Node(FanCoil(FanCoilNum)%ColdControlNode)%MassFlowRate = PLR * FanCoil(FanCoilNum)%MaxColdWaterFlow
+				if ( QUnitOutMax < 0.0 ) { // protect against QUnitOutMax = 0 (no water flow, plant off, etc.)
+					// calculate the PLR, if load greater than output, PLR = 1 (output = max)
+					PLR = std::abs( QZnReq / QUnitOutMax );
+					if ( PLR > 1.0 ) PLR = 1.0;
+
+					// adjust the PLR to meet the cooling load calling Calc4PipeFanCoil repeatedly with the PLR adjusted
+					while ( std::abs( Error ) > ControlOffset && std::abs( AbsError ) > SmallLoad && Iter < MaxIterCycl && PLR != 1.0 ) {
+						// the water flow rate is at the maximum flow rate time the PLR
+						//    Node(FanCoil(FanCoilNum)%ColdControlNode)%MassFlowRate = PLR * FanCoil(FanCoilNum)%MaxColdWaterFlow
+						mdot = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
+						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
+						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
+						Error = ( QZnReq - QUnitOut ) / QZnReq;
+						AbsError = QZnReq - QUnitOut;
+						DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
+						PLR += Relax * DelPLR;
+						PLR = max( 0.0, min( 1.0, PLR ) );
+						++Iter;
+						if ( Iter == 32) Relax = 0.5;
+						if ( Iter == 65 ) Relax = 0.25;
+						if ( Iter > 70 && PLR == 0.0 && DelPLR < 0.0 ) Error = 0.0; // exit loop if PLR = 0
+					}
+
+					// warning if not converged
+					if ( Iter > ( MaxIterCycl - 1 ) ) {
+						if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
+							ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
+							ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
+						}
+						ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
+					}
+				} else {
+					PLR = 1.0;
 					mdot = PLR * FanCoil( FanCoilNum ).MaxColdWaterFlow;
 					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).ColdControlNode, FanCoil( FanCoilNum ).ColdPlantOutletNode, FanCoil( FanCoilNum ).CWLoopNum, FanCoil( FanCoilNum ).CWLoopSide, FanCoil( FanCoilNum ).CWBranchNum, FanCoil( FanCoilNum ).CWCompNum );
-					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
-					Error = ( QZnReq - QUnitOut ) / QZnReq;
-					AbsError = QZnReq - QUnitOut;
-					DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
-					PLR += Relax * DelPLR;
-					PLR = max( 0.0, min( 1.0, PLR ) );
-					++Iter;
-					if ( Iter == 32 ) Relax = 0.5;
-					if ( Iter == 65 ) Relax = 0.25;
-				}
-
-				// warning if not converged
-				if ( Iter > ( MaxIterCycl - 1 ) ) {
-					if ( FanCoil( FanCoilNum ).MaxIterIndexC == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the cooling convergence tolerance." );
-						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
-					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexC );
 				}
 
 				// at the end calculate output with adjusted PLR
@@ -1789,39 +1797,42 @@ namespace FanCoilUnits {
 				// get the maximum output of the fcu
 				Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOutMax );
 				// calculate the PLR, if load greater than output, PLR = 1 (output = max)
-				if ( QUnitOutMax != 0.0 ) {
+				if ( QUnitOutMax > 0.0 ) { // protect against QUnitOutMax = 0 (no water flow, plant off, etc.)
 					PLR = std::abs( QZnReq / QUnitOutMax );
+					if ( PLR > 1.0 ) PLR = 1.0;
+
+					// adjust the PLR to meet the heating load calling Calc4PipeFanCoil repeatedly with the PLR adjusted
+					while ( std::abs( Error ) > ControlOffset && std::abs( AbsError ) > SmallLoad && Iter < MaxIterCycl && PLR != 1.0 ) {
+						// the water flow rate is at the maximum flow rate time the PLR
+						//    Node(FanCoil(FanCoilNum)%HotControlNode)%MassFlowRate = PLR * FanCoil(FanCoilNum)%MaxHotWaterFlow
+
+						mdot = PLR * FanCoil( FanCoilNum ).MaxHotWaterFlow;
+						SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
+
+						Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
+						Error = ( QZnReq - QUnitOut ) / QZnReq;
+						AbsError = QZnReq - QUnitOut;
+						DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
+						PLR += Relax * DelPLR;
+						PLR = max( 0.0, min( 1.0, PLR ) );
+						++Iter;
+						if ( Iter == 32 ) Relax = 0.5;
+						if ( Iter == 65 ) Relax = 0.25;
+						if ( Iter > 70 && PLR == 0.0 && DelPLR < 0.0 ) Error = 0.0; // exit loop if PLR = 0
+					}
+
+					// warning if not converged
+					if ( Iter > ( MaxIterCycl - 1 ) ) {
+						if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
+							ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
+							ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
+						}
+						ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
+					}
 				} else {
 					PLR = 1.0;
-				}
-				if ( PLR > 1.0 ) PLR = 1.0;
-
-				// adjust the PLR to meet the heating load calling Calc4PipeFanCoil repeatedly with the PLR adjusted
-				while ( std::abs( Error ) > ControlOffset && std::abs( AbsError ) > SmallLoad && Iter < MaxIterCycl && PLR != 1.0 ) {
-					// the water flow rate is at the maximum flow rate time the PLR
-					//    Node(FanCoil(FanCoilNum)%HotControlNode)%MassFlowRate = PLR * FanCoil(FanCoilNum)%MaxHotWaterFlow
-
 					mdot = PLR * FanCoil( FanCoilNum ).MaxHotWaterFlow;
 					SetComponentFlowRate( mdot, FanCoil( FanCoilNum ).HotControlNode, FanCoil( FanCoilNum ).HotPlantOutletNode, FanCoil( FanCoilNum ).HWLoopNum, FanCoil( FanCoilNum ).HWLoopSide, FanCoil( FanCoilNum ).HWBranchNum, FanCoil( FanCoilNum ).HWCompNum );
-
-					Calc4PipeFanCoil( FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR );
-					Error = ( QZnReq - QUnitOut ) / QZnReq;
-					AbsError = QZnReq - QUnitOut;
-					DelPLR = ( QZnReq - QUnitOut ) / QUnitOutMax;
-					PLR += Relax * DelPLR;
-					PLR = max( 0.0, min( 1.0, PLR ) );
-					++Iter;
-					if ( Iter == 32 ) Relax = 0.5;
-					if ( Iter == 65 ) Relax = 0.25;
-				}
-
-				// warning if not converged
-				if ( Iter > ( MaxIterCycl - 1 ) ) {
-					if ( FanCoil( FanCoilNum ).MaxIterIndexH == 0 ) {
-						ShowWarningMessage( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\" -- Exceeded max iterations while adjusting cycling fan" " sensible runtime to meet the zone load within the heating convergence tolerance." );
-						ShowContinueErrorTimeStamp( "Iterations=" + TrimSigDigits( MaxIterCycl ) );
-					}
-					ShowRecurringWarningErrorAtEnd( "ZoneHVAC:FourPipeFanCoil=\"" + FanCoil( FanCoilNum ).Name + "\"  -- Exceeded max iterations error (sensible runtime) continues...", FanCoil( FanCoilNum ).MaxIterIndexH );
 				}
 
 				// at the end calculate output with adjusted PLR

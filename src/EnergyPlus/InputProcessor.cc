@@ -2882,7 +2882,7 @@ namespace InputProcessor {
 		bool & BlankLine,
 		int & InputLineLength,
 		bool & EndofFile,
-		bool MinMax,
+		bool & MinMax,
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		std::string & MinMaxString,
 		Real64 & Value,

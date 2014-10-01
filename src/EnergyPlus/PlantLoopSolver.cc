@@ -2229,17 +2229,39 @@ namespace PlantLoopSolver {
 				//DSU? didn't take the time to figure out what this should be... SplitterFlowIn = SplitterInletFlow(SplitNum)
 				// 1) apportion flow based on requested fraction of total
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
+					
 					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
 					ThisBranchRequest = DetermineBranchFlowRequest( LoopNum, LoopSideNum, SplitterBranchOut );
 					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
-					if ( ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Active ) || ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) ) {
+					auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
+				
+					if ( ( this_splitter_outlet_branch.ControlType == ControlType_Active ) || ( this_splitter_outlet_branch.ControlType == ControlType_SeriesActive ) ) {
+						
+						// since we are calculating this fraction based on the total parallel request calculated above, we must mimic the logic to make sure the math works every time
+						// that means we must make the variable speed pump correction here as well.
+						for ( CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter ) {
+
+							auto & this_comp( this_splitter_outlet_branch.Comp( CompCounter ) );
+
+							//if this isn't a variable speed pump then just keep cycling
+							if ( ( this_comp.TypeOf_Num != TypeOf_PumpVariableSpeed ) && ( this_comp.TypeOf_Num != TypeOf_PumpBankVariableSpeed ) ) {
+								continue;
+							}
+
+							CompInletNode = this_comp.NodeNumIn;
+							ThisBranchRequest = max( ThisBranchRequest, Node( CompInletNode ).MassFlowRateRequest );
+
+						}
+						
 						ThisBranchRequestFrac = ThisBranchRequest / TotParallelBranchFlowReq;
 						//    FracFlow = Node(FirstNodeOnBranch)%MassFlowRate/TotParallelBranchFlowReq
 						//    Node(FirstNodeOnBranch)%MassFlowRate = MIN((FracFlow * Node(FirstNodeOnBranch)%MassFlowRate),FlowRemaining)
 						Node( FirstNodeOnBranch ).MassFlowRate = ThisBranchRequestFrac * ThisLoopSideFlow;
 						PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
+						
 					}
+					
 				}
 
 				// 1b) check if flow all apportioned

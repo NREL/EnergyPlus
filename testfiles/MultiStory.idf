@@ -904,9 +904,9 @@
     Gnd West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1164,9 +1164,9 @@
     Gnd Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1440,9 +1440,9 @@
     Gnd East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -1727,9 +1727,9 @@
     Mid West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1987,9 +1987,9 @@
     Mid Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -2263,9 +2263,9 @@
     Mid East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -2550,9 +2550,9 @@
     Top West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -2810,9 +2810,9 @@
     Top Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -3086,9 +3086,9 @@
     Top East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    AUTOSIZE,                !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ScheduleTypeLimits,
