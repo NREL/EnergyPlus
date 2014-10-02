@@ -35,12 +35,11 @@ option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 # Not yet released by CMake, but is being developed
 # This will help us set the proper options for c++11 across various configurations
 #FIND_PACKAGE( CXXFeatures ) 
-#added by Geof
-SET(CMAKE_CXX_FLAGS_DEBUG "-ggdb -pg -O0 -DNDEBUG") #changed from Og
-SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-ggdb -pg -O3 -DNDEBUG")
-SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-SET(CMAKE_CXX_COMPILER "g++-4.8")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+if (MSVC)
+  set(gtest_force_shared_crt ON)
+endif()
+
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
@@ -86,8 +85,3 @@ if( BUILD_PACKAGE )
   include(CPack.cmake)
 endif()
 
-# MESSAGE("CMake build type is: ${CMAKE_BUILD_TYPE}")
-# MESSAGE("CMake CXX flags: ${FLAGS}")
-IF(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-	SET(CMAKE_LDD_FLAGS "-pg")
-ENDIF()
