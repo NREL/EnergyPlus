@@ -86,11 +86,6 @@ namespace CommandLineInterface{
 	std::string dirPathName;
 	bool readVarsValue;
 
-	void myterminate () {
-	  std::cerr << "terminate handler called\n";
-	  abort();  // forces abnormal termination
-	}
-
 	std::string
 	returnFileName( std::string const& filename )
 	{
@@ -202,9 +197,9 @@ namespace CommandLineInterface{
 		opt.get("-e")->getString(inputIddFileName);
 
 		opt.get("-d")->getString(dirPathName);
-		std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
+	//	std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
 
-		mkpath(dirPathName);
+	//	mkpath(dirPathName);
 
 		idfFileNameWextn = returnFileName(inputIdfFileName);
 
@@ -218,7 +213,8 @@ namespace CommandLineInterface{
 		std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
 
 		 if (opt.isSet("-o"))
-			 outputFilePrefix = dirPathName + idfFileNameOnly + "_" + weatherFileNameOnly + "_";
+			// outputFilePrefix = dirPathName + idfFileNameOnly + "_" + weatherFileNameOnly + "_";
+			 outputFilePrefix = idfFileNameOnly + "_" + weatherFileNameOnly + "_";
 		else
 			outputFilePrefix = dirPathName + "eplus";
 
