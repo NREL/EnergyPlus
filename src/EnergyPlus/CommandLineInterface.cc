@@ -9,7 +9,6 @@
 #include <libproc.h>
 #include <unistd.h>
 #include <exception>
-#include <locale>
 
 // CLI Headers
 #include <ezOptionParser.hpp>
@@ -84,8 +83,8 @@ namespace CommandLineInterface{
 	std::string TarcogIterationsFileName;
 	std::string eplusADSFileName;
 	std::string outputFilePrefix;
+	std::string dirPathName;
 	bool readVarsValue;
-	bool outputValue;
 
 	void myterminate () {
 	  std::cerr << "terminate handler called\n";
@@ -125,6 +124,36 @@ namespace CommandLineInterface{
 	}
 
 
+	bool mkpath( std::string path )
+	{
+	    bool bSuccess = false;
+	    int nRC = ::mkdir( path.c_str(), 0775 );
+	    if( nRC == -1 )
+	    {
+	        switch( errno )
+	        {
+	            case ENOENT:
+	                //parent didn't exist, try to create it
+	                if( mkpath( path.substr(0, path.find_last_of('/')) ) )
+	                    //Now, try to create again.
+	                    bSuccess = 0 == ::mkdir( path.c_str(), 0775 );
+	                else
+	                    bSuccess = false;
+	                break;
+	            case EEXIST:
+	                //Done!
+	                bSuccess = true;
+	                break;
+	            default:
+	                bSuccess = false;
+	                break;
+	        }
+	    }
+	    else
+	        bSuccess = true;
+	    return bSuccess;
+	}
+
 	int
 	ProcessArgs(int argc, const char * argv[])
 	{
@@ -132,7 +161,7 @@ namespace CommandLineInterface{
 		ezOptionParser opt;
 
 		opt.overview = VerString;
-		opt.example = "EnergyPlus -i InputFile.idf -e Energy+.idd -w WeatherFile.epw -o";
+		opt.example = "EnergyPlus -i InputFile.idf -e Energy+.idd -w WeatherFile.epw -d DirPathName -o -r ";
 
 		opt.syntax = "EnergyPlus [options]";
 
@@ -149,6 +178,8 @@ namespace CommandLineInterface{
 		opt.add("", 0, 0, 0, "Rename output files to using the IDF and EPW file names", "-o", "--output");
 
 		opt.add("", 0, 0, 0, "Option to run readVARS", "-r", "--readVARS");
+
+		opt.add("", 0, 1, 0, "Output directory pathname (default \".\\pwd\")", "-d", "--dirname");
 
 		// Parse arguments
 		opt.parse(argc, argv);
@@ -170,11 +201,15 @@ namespace CommandLineInterface{
 
 		opt.get("-e")->getString(inputIddFileName);
 
+		opt.get("-d")->getString(dirPathName);
+		std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
+
+		mkpath(dirPathName);
+
 		idfFileNameWextn = returnFileName(inputIdfFileName);
 
 		std::string idfFileNameOnly = idfFileNameWextn.substr(0,idfFileNameWextn.size()-4);
 
-		std::cout<<"File name only = "<<idfFileNameWextn<<'\t'<<idfFileNameOnly<<std::endl;
 		idfDirPathName = returnDirPathName(inputIdfFileName);
 
 		weatherFileNameWextn = returnFileName(inputWeatherFileName);
@@ -182,15 +217,10 @@ namespace CommandLineInterface{
 
 		std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
 
-	    outputValue = false;
-		 if (opt.isSet("-o")){
-			 outputValue = true;
-			 outputFilePrefix = idfFileNameOnly + "_" + weatherFileNameOnly + "_";
-		 }
-		else {
-			outputValue = false;
-			outputFilePrefix = "eplus";
-		}
+		 if (opt.isSet("-o"))
+			 outputFilePrefix = dirPathName + idfFileNameOnly + "_" + weatherFileNameOnly + "_";
+		else
+			outputFilePrefix = dirPathName + "eplus";
 
 		 readVarsValue = false;
 		 if (opt.isSet("-r")){

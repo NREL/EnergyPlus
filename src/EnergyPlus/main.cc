@@ -415,39 +415,35 @@ main(int argc, const char * argv[])
 	std::ofstream ifile;
 	std::ofstream nfile;
 
-	if(outputValue) {
-		std::string esoFileName = outputFilePrefix + "out.eso";
-		std::string csvFileName = outputFilePrefix + "out.csv";
-		ifile.open("eplusout.rvi");
-		ifile <<esoFileName+"\n";
-		ifile <<csvFileName+"\n";
-		ifile.close();
+	std::string esoFileName = outputFilePrefix + "out.eso";
+	std::string csvFileName = outputFilePrefix + "out.csv";
+	ifile.open("eplusout.rvi");
+	ifile <<esoFileName+"\n";
+	ifile <<csvFileName+"\n";
+	ifile.close();
 
-		std::string mtrFileName = outputFilePrefix + "out.mtr";
-		std::string mtrCsvFileName = outputFilePrefix + "mtr.csv";
-		nfile.open("eplusout.mvi");
-		nfile <<mtrFileName+"\n";
-		nfile <<mtrCsvFileName+"\n";
-		nfile.close();
-	}
-	else {
-		ifile.open("eplusout.rvi");
-		ifile <<"eplusout.eso\n";
-		ifile <<"eplusout.csv\n";
-		ifile.close();
-
-		nfile.open("eplusout.mvi");
-		nfile <<"eplusout.mtr\n";
-		nfile <<"eplusmtr.csv\n";
-		nfile.close();
-	}
+	std::string mtrFileName = outputFilePrefix + "out.mtr";
+	std::string mtrCsvFileName = outputFilePrefix + "mtr.csv";
+	nfile.open("eplusout.mvi");
+	nfile <<mtrFileName+"\n";
+	nfile <<mtrCsvFileName+"\n";
+	nfile.close();
 
     if(readVarsValue) {
 	    std::string forReadVARS = "./ReadVarsESO";
 	    //system(forReadVARS.c_str()); //Without passing any arguments
 	    system("./ReadVarsESO eplusout.rvi unlimited");
 	    system("./ReadVarsESO eplusout.mvi unlimited");
+	   }
+
+    std::string HVACfilename= "eplusout.bnd";
+    std::ifstream mfile(HVACfilename.c_str());
+    if (mfile.good()){
+
     }
+
+
+
 
 	EndEnergyPlus();
     

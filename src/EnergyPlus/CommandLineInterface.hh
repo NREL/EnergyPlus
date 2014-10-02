@@ -52,8 +52,8 @@ namespace CommandLineInterface {
  extern std::string weatherFileNameOnly;
  extern std::string idfFileNameOnly;
  extern std::string outputFilePrefix;
+ extern std::string dirPathName;
  extern bool readVarsValue;
- extern bool outputValue;
 
  // Process command line arguments
  int
