@@ -197,7 +197,7 @@ namespace CommandLineInterface{
 		opt.get("-e")->getString(inputIddFileName);
 
 		opt.get("-d")->getString(dirPathName);
-	//	std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
+		std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
 
 	//	mkpath(dirPathName);
 
@@ -311,13 +311,13 @@ namespace CommandLineInterface{
 			exit(EXIT_SUCCESS);
 		}
 
-		struct stat st;
+	/*	struct stat st;
 		if(stat(idfDirPathName.c_str(),&st) == 0)
 				DisplayString(idfDirPathName + " is a valid (idf) directory.\n");
 	    	else {
 	    		ShowFatalError(idfDirPathName + " is not a valid (idf) directory. \n");
 		    	exit(EXIT_FAILURE);
-	    	}
+	    	}*/
 
 		std::string extIdfFileName = returnFileExtension(inputIdfFileName);
 		if(extIdfFileName == "")
