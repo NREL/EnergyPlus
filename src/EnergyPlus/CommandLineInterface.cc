@@ -326,10 +326,10 @@ namespace CommandLineInterface{
 					DisplayString("Name of the extension = "+ extIdfFileName + " \n");*/
 
 	    std::string extEpwfFileName = returnFileExtension(inputWeatherFileName);
-		if(extEpwfFileName == "")
+		/*if(extEpwfFileName == "")
 			DisplayString("no file extension in " + extEpwfFileName + " \n");
  			else
- 				DisplayString("Name of the extension = "+ extEpwfFileName + " \n");
+ 				DisplayString("Name of the extension = "+ extEpwfFileName + " \n");*/
 
 	    if (extIdfFileName != "idf"){
 	    	ShowFatalError("ERROR: Only idf files are allowed with [option] '-i' \n");
