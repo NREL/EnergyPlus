@@ -197,7 +197,7 @@ namespace CommandLineInterface{
 		opt.get("-e")->getString(inputIddFileName);
 
 		opt.get("-d")->getString(dirPathName);
-		std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
+	//	std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
 
 	//	mkpath(dirPathName);
 
@@ -320,10 +320,10 @@ namespace CommandLineInterface{
 	    	}*/
 
 		std::string extIdfFileName = returnFileExtension(inputIdfFileName);
-		if(extIdfFileName == "")
+	/*	if(extIdfFileName == "")
 					DisplayString("no file extension in " + idfFileNameOnly + " \n");
 			else
-					DisplayString("Name of the extension = "+ extIdfFileName + " \n");
+					DisplayString("Name of the extension = "+ extIdfFileName + " \n");*/
 
 	    std::string extEpwfFileName = returnFileExtension(inputWeatherFileName);
 		if(extEpwfFileName == "")
