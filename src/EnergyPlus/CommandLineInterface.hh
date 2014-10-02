@@ -49,6 +49,11 @@ namespace CommandLineInterface {
  extern std::string inStatFileName;
  extern std::string TarcogIterationsFileName;
  extern std::string eplusADSFileName;
+ extern std::string weatherFileNameOnly;
+ extern std::string idfFileNameOnly;
+ extern std::string outputFilePrefix;
+ extern bool readVarsValue;
+ extern bool outputValue;
 
  // Process command line arguments
  int

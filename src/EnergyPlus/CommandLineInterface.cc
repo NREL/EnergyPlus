@@ -1,4 +1,6 @@
 //Standard C++ library
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +8,8 @@
 #include <errno.h>
 #include <libproc.h>
 #include <unistd.h>
+#include <exception>
+#include <locale>
 
 // CLI Headers
 #include <ezOptionParser.hpp>
@@ -79,12 +83,21 @@ namespace CommandLineInterface{
 	std::string inStatFileName;
 	std::string TarcogIterationsFileName;
 	std::string eplusADSFileName;
+	std::string outputFilePrefix;
+	bool readVarsValue;
+	bool outputValue;
+
+	void myterminate () {
+	  std::cerr << "terminate handler called\n";
+	  abort();  // forces abnormal termination
+	}
 
 	std::string
 	returnFileName( std::string const& filename )
 	{
-	    return {std::find_if(filename.rbegin(), filename.rend(), [](char c) { return c == pathChar; }).base(),
-	    	  	filename.end()-4};
+		return {std::find_if(filename.rbegin(), filename.rend(),
+		                         [](char c) { return c == pathChar; }).base(),
+		            filename.end()};
 	}
 
 	std::string
@@ -96,9 +109,26 @@ namespace CommandLineInterface{
 			        : std::string( filename.begin(), pivot.base() - 1 );
 	}
 
+	std::string
+	returnFileExtension(const std::string& filename){
+		std::string ext = "";
+
+			for(int i=0; i<filename.length(); i++){
+				if(filename[i] == '.'){
+					for(int j = i+1; j<filename.length(); j++){
+						ext += filename[j];
+					}
+					return ext;
+				}
+			}
+			return ext;
+	}
+
+
 	int
 	ProcessArgs(int argc, const char * argv[])
 	{
+		std::locale::global(std::locale(""));
 		ezOptionParser opt;
 
 		opt.overview = VerString;
@@ -118,6 +148,8 @@ namespace CommandLineInterface{
 
 		opt.add("", 0, 0, 0, "Rename output files to using the IDF and EPW file names", "-o", "--output");
 
+		opt.add("", 0, 0, 0, "Option to run readVARS", "-r", "--readVARS");
+
 		// Parse arguments
 		opt.parse(argc, argv);
 
@@ -127,30 +159,43 @@ namespace CommandLineInterface{
 		opt.prettyPrint(pretty);
 		std::cout << pretty << std::endl;*/
 
-		std::string usage, idfFileNameOnly, idfDirPathName;
-		std::string weatherFileNameOnly, weatherDirPathName;
+		std::string usage, idfFileNameWextn, idfDirPathName;
+		std::string weatherFileNameWextn, weatherDirPathName;
+
 		opt.getUsage(usage);
 
-		std::string outputFilePrefix;
-
-		opt.get("-i")->getString(inputIdfFileName);
+	    opt.get("-i")->getString(inputIdfFileName);
 
 		opt.get("-w")->getString(inputWeatherFileName);
 
 		opt.get("-e")->getString(inputIddFileName);
 
-		idfFileNameOnly = returnFileName(inputIdfFileName);
+		idfFileNameWextn = returnFileName(inputIdfFileName);
+
+		std::string idfFileNameOnly = idfFileNameWextn.substr(0,idfFileNameWextn.size()-4);
+
+		std::cout<<"File name only = "<<idfFileNameWextn<<'\t'<<idfFileNameOnly<<std::endl;
 		idfDirPathName = returnDirPathName(inputIdfFileName);
 
-		weatherFileNameOnly = returnFileName(inputWeatherFileName);
+		weatherFileNameWextn = returnFileName(inputWeatherFileName);
 		weatherDirPathName = returnDirPathName(inputWeatherFileName);
 
-	//	std::cout<<"\n Name of the file = "<<idfFileNameOnly<<'\t'<<" and directory path name = "<<idfDirPathName<<std::endl;
-	//  std::cout<<"\n Name of the file = "<<weatherFileNameOnly<<'\t'<<" and directory path name = "<<weatherDirPathName<<std::endl;
+		std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
 
-	    if (opt.isSet("-o")) outputFilePrefix = idfFileNameOnly + "_" + weatherFileNameOnly + "_";
+	    outputValue = false;
+		 if (opt.isSet("-o")){
+			 outputValue = true;
+			 outputFilePrefix = idfFileNameOnly + "_" + weatherFileNameOnly + "_";
+		 }
+		else {
+			outputValue = false;
+			outputFilePrefix = "eplus";
+		}
 
-	    else outputFilePrefix = "eplus";
+		 readVarsValue = false;
+		 if (opt.isSet("-r")){
+			 readVarsValue = true;
+		 }
 
 		outputAuditFileName = outputFilePrefix + "out.audit";
 		outputBndFileName = outputFilePrefix + "out.bnd";
@@ -197,9 +242,18 @@ namespace CommandLineInterface{
 		std::vector<std::string> badOptions;
 		if(!opt.gotExpected(badOptions)) {
 			for(int i=0; i < badOptions.size(); ++i) {
-					ShowFatalError("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+				ShowFatalError("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
 			}
 			DisplayString(usage);
+			exit(EXIT_FAILURE);
+		}
+
+		if(!opt.gotRequired(badOptions)) {
+			DisplayString(usage);
+			for(int i=0; i < badOptions.size(); ++i) {
+				ShowFatalError("ERROR: Missing required option " + badOptions[i] + "\n");
+			}
+
 			exit(EXIT_FAILURE);
 		}
 
@@ -220,14 +274,6 @@ namespace CommandLineInterface{
 			exit(EXIT_FAILURE);
 		}
 
-		if(!opt.gotRequired(badOptions)) {
-			for(int i=0; i < badOptions.size(); ++i) {
-				ShowFatalError("ERROR: Missing required option " + badOptions[i] + "\n");
-			}
-			DisplayString(usage);
-			exit(EXIT_FAILURE);
-		}
-
 		// Process standard arguments
 		if (opt.isSet("-h")) {
 			DisplayString(usage);
@@ -239,6 +285,35 @@ namespace CommandLineInterface{
 			exit(EXIT_SUCCESS);
 		}
 
+		struct stat st;
+		if(stat(idfDirPathName.c_str(),&st) == 0)
+				DisplayString(idfDirPathName + " is a valid (idf) directory.\n");
+	    	else {
+	    		ShowFatalError(idfDirPathName + " is not a valid (idf) directory. \n");
+		    	exit(EXIT_FAILURE);
+	    	}
+
+		std::string extIdfFileName = returnFileExtension(inputIdfFileName);
+		if(extIdfFileName == "")
+					DisplayString("no file extension in " + idfFileNameOnly + " \n");
+			else
+					DisplayString("Name of the extension = "+ extIdfFileName + " \n");
+
+	    std::string extEpwfFileName = returnFileExtension(inputWeatherFileName);
+		if(extEpwfFileName == "")
+			DisplayString("no file extension in " + extEpwfFileName + " \n");
+ 			else
+ 				DisplayString("Name of the extension = "+ extEpwfFileName + " \n");
+
+	    if (extIdfFileName != "idf"){
+	    	ShowFatalError("ERROR: Only idf files are allowed with [option] '-i' \n");
+		   	exit(EXIT_FAILURE);
+	    }
+
+	    if (opt.isSet("-w") && extEpwfFileName != "epw"){
+	    	ShowFatalError("ERROR: Only epw files are allowed with [option] '-w' \n");
+		    exit(EXIT_FAILURE);
+	    }
 
 		return 0;
 	}
