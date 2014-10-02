@@ -932,7 +932,7 @@ namespace TranspiredCollector {
 			HExt = 0.0;
 			LocalWindArr( ThisSurf ) = Surface( SurfPtr ).WindSpeed;
 			InitExteriorConvectionCoeff( SurfPtr, HMovInsul, Roughness, AbsExt, TempExt, HExt, HSkyARR( ThisSurf ), HGroundARR( ThisSurf ), HAirARR( ThisSurf ) );
-			ConstrNum =  DataSurfaces::Construction[ SurfPtr  - 1];
+			ConstrNum =  DataSurfaces::Construction[ SurfPtr  - 1 ];
 			AbsThermSurf = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermal;
 			TsoK = TH( SurfPtr, 1, 1 ) + KelvinConv;
 			TscollK = UTSC( UTSCNum ).TcollLast + KelvinConv;

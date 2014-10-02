@@ -32,9 +32,9 @@ namespace DataViewFactorInformation {
 
   struct ReSurface {
   public:
-    ReSurface(): zone( 0 ), temperature( 23.0),
-								 emissivity( 0), isWindow( false ), globalIndex( 0), 
-								 zoneIndex( 0){}
+    ReSurface(): zone( 0 ), temperature( 23.0 ),
+								 emissivity( 0 ), isWindow( false ), globalIndex( 0 ), 
+								 zoneIndex( 0 ){}
     int zone; //compiles with &&, but chokes on it running at InitInteriorRadExchange assigning zone
     inline const int&
     operator ()( bool global = true ){ return global ? globalIndex : zoneIndex;}
@@ -123,7 +123,7 @@ namespace DataViewFactorInformation {
 	    F( zone.F ), // View Factors
 	    ScriptF( zone.ScriptF ), // Hottel's Script F
 	    Area( zone.Area ), // Surface area
-			Emissivity( zone.Emissivity ), // Surface emissivity
+	    Emissivity( zone.Emissivity ), // Surface emissivity
 	    Azimuth( zone.Azimuth ), // Azimuth angle of the surface ( in degrees)
 	    Tilt( zone.Tilt ), // Tilt angle of the surface (in degrees)
 	    SurfacePtr( zone.SurfacePtr ), // Surface ALLOCATABLE (to Surface derived type)
@@ -179,25 +179,25 @@ namespace DataViewFactorInformation {
 			std::vector<ReSurface>::iterator& surfBegin,
 			std::vector<ReSurface>::iterator& surfEnd
 		) :
-			Name( Name ),
-			NumOfSurfaces( NumOfSurfaces ),
-			F( F ),
-			ScriptF( ScriptF ),
-			Area( Area ),
-			Emissivity( Emissivity ),
-			Azimuth( Azimuth ),
-			Tilt( Tilt ),
-			SurfacePtr( SurfacePtr ),
-			Class( Class ),
-			owner( owner ),
-		        shadeChanged( shadeChanged ),
-	                surfBegin( surfBegin ),
-	                surfEnd( surfEnd ),
-								 surfaces( *this )
-			{
-				bool r = ready;
-				this->ready = r;
-			}  
+		Name( Name ),
+	    NumOfSurfaces( NumOfSurfaces ),
+	    F( F ),
+	    ScriptF( ScriptF ),
+	    Area( Area ),
+	    Emissivity( Emissivity ),
+	    Azimuth( Azimuth ),
+	    Tilt( Tilt ),
+	    SurfacePtr( SurfacePtr ),
+	    Class( Class ),
+	    owner( owner ),
+	    shadeChanged( shadeChanged ),
+	    surfBegin( surfBegin ),
+	    surfEnd( surfEnd ),
+	    surfaces( *this )
+	  {
+	    bool r = ready;
+	    this->ready = r;
+	  }  
 	};
 
 	// Object Data

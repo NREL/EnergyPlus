@@ -478,10 +478,10 @@ namespace VentilatedSlab {
 					//                         CurrentModuleObject//' in Zone='//TRIM(cAlphaArgs(3)))
 					//        ErrorsFound=.TRUE.
 					//      END IF
-					if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1] == 0 ) continue; // invalid construction, detected earlier
-					if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1] ).SourceSinkPresent ) {
+					if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] == 0 ) continue; // invalid construction, detected earlier
+					if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).SourceSinkPresent ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name  + "\"." );
-						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1] ).Name + "\"." );
+						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).Name + "\"." );
 						ErrorsFound = true;
 					}
 				}
@@ -494,10 +494,10 @@ namespace VentilatedSlab {
 						ShowContinueError( "Surface in Zone=" + Zone( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + ' ' + CurrentModuleObject + " in Zone=" + cAlphaArgs( 3 ) );
 						ErrorsFound = true;
 					}
-					if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1] == 0 ) continue; // invalid construction, detected earlier
-					if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1] ).SourceSinkPresent ) {
+					if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] == 0 ) continue; // invalid construction, detected earlier
+					if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).SourceSinkPresent ) {
 						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
-						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1] ).Name + "\"." );
+						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).Name + "\"." );
 						ErrorsFound = true;
 					}
 				}
@@ -518,7 +518,7 @@ namespace VentilatedSlab {
 					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
 					ErrorsFound = true;
 				} else if ( ! CheckScheduleValueMinMax( VentSlab( Item ).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range [0,1]." );
+					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range [0,1 ]." );
 					ErrorsFound = true;
 				}
 			} else if ( SELECT_CASE_var == "FIXEDAMOUNT" ) {
@@ -2868,7 +2868,7 @@ namespace VentilatedSlab {
 					// linking the inlet air temperature to the heat source/sink to the radiant system.
 					// The coefficients are based on the Constant Flow Radiation System.
 
-					ConstrNum = Construction[ SurfNum  - 1];
+					ConstrNum = Construction[ SurfNum  - 1 ];
 
 					Ca = RadSysTiHBConstCoef( SurfNum );
 					Cb = RadSysTiHBToutCoef( SurfNum );
@@ -3098,7 +3098,7 @@ namespace VentilatedSlab {
 					// linking the inlet air temperature to the heat source/sink to the radiant system.
 					// The coefficients are based on the Constant Flow Radiation System.
 
-					ConstrNum = Construction[ SurfNum  - 1];
+					ConstrNum = Construction[ SurfNum  - 1 ];
 
 					Ca = RadSysTiHBConstCoef( SurfNum );
 					Cb = RadSysTiHBToutCoef( SurfNum );
@@ -3740,13 +3740,13 @@ namespace VentilatedSlab {
 		// FLOW:
 		SumHATsurf = 0.0;
 
-		for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
 			Area = Surface( SurfNum ).Area;
 
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
-				if ( SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == IntBlindOn ) {
+				if ( SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntBlindOn ) {
 					// The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
 					Area += SurfaceWindow( SurfNum ).DividerArea;
 				}
@@ -3756,7 +3756,7 @@ namespace VentilatedSlab {
 					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * SurfaceWindow( SurfNum ).FrameTempSurfIn;
 				}
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntShadeOn && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() != IntBlindOn ) {
+				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() != IntShadeOn && SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() != IntBlindOn ) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
 					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
 				}

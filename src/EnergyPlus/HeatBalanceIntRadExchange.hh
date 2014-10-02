@@ -34,9 +34,10 @@ namespace HeatBalanceIntRadExchange {
 	// na
 
 	// MODULE VARIABLE DECLARATIONS:
-	extern int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
-        extern std::vector< size_t > LoadBalanceVector;
-        extern std::forward_list< EppPerformance::genPerTArray* > WriteVectors;
+  extern int count;
+  //  extern int MaxNumOfZoneSurfaces; // Max saved to get large enough space for user input view factors
+  extern std::vector< size_t > LoadBalanceVector;
+  extern std::forward_list< EppPerformance::genPerTArray* > WriteVectors;
   extern std::vector<std::pair< std::vector< ReSurface >::iterator,
 			       std::vector< ReSurface >::iterator >> threadSurfIterators;
 
@@ -54,7 +55,7 @@ namespace HeatBalanceIntRadExchange {
 
         inline 
 	std::vector< ReSurface >::iterator surfBegin(int tid, int ZoneToResimulate){
-	  if(tid != -1){
+	  if( tid != -1 ){
 	    return threadSurfIterators[tid].first;
 	  }else{
 	    return ZoneInfo[ ZoneToResimulate - 1 ].surfBegin;
@@ -64,9 +65,9 @@ namespace HeatBalanceIntRadExchange {
         inline 
 	std::vector< ReSurface >::iterator surfEnd(int tid, int ZoneToResimulate){
 	  if(tid != -1){
-	    return threadSurfIterators[tid].second;
+	    return threadSurfIterators[ tid ].second;
 	  }else{
-	    return ZoneInfo[ ZoneToResimulate - 1].surfEnd;
+	    return ZoneInfo[ ZoneToResimulate - 1 ].surfEnd;
 	  }
 	}
 
@@ -76,18 +77,18 @@ namespace HeatBalanceIntRadExchange {
         //our collection once InitInteriorRadExchange has been called
         template<typename T>
         EppPerformance::perTArray< T >&
-	GetHBREWriteVector(size_t size){
+	GetHBREWriteVector( size_t size ){
 	  using namespace EppPerformance;
 	  perTArray< T > *retVal;
 	  if(LoadBalanceVector.size() == Perf_Thread_Count){
-	    retVal =  new perTArray< T >(Perf_Thread_Count,   
-						      LoadBalanceVector);
+	    retVal =  new perTArray< T >( Perf_Thread_Count,   
+						      LoadBalanceVector );
 	    assert(size <= std::accumulate(LoadBalanceVector.begin(), LoadBalanceVector.end(), std::plus<size_t>()));
 				    
 	  }else{
 	    size_t cellSize = size / Perf_Thread_Count;
 	    if (cellSize * Perf_Thread_Count < size)
-	      cellSize = (cellSize + 1) * Perf_Thread_Count / Perf_Thread_Count;
+	      cellSize = ( cellSize + 1 ) * Perf_Thread_Count / Perf_Thread_Count;
 	    retVal = new perTArray< T >(Perf_Thread_Count, cellSize);
 	  }
 	  WriteVectors.push_front(retVal);
@@ -98,8 +99,8 @@ namespace HeatBalanceIntRadExchange {
 	
 
         void
-	DoCalcInteriorRadExchange(const int SurfIterations, const int ZoneToResimulate,
-		       const int tid = -1);
+	DoCalcInteriorRadExchange( const int SurfIterations, const int ZoneToResimulate,
+		       const int tid = -1 );
 
 	void
 	CalcInteriorRadExchange(

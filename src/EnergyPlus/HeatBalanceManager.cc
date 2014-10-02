@@ -4339,7 +4339,8 @@ namespace HeatBalanceManager {
 			MaxLoadZoneRpt = 0.0;
 			CountWarmupDayPoints = 0;
 
-			for(auto& srw : DataSurfaces::SurfaceRadiantWin) srw.EffInsSurfTemp = 23.0;
+			for(auto& srw : DataSurfaces::SurfaceRadiantWin){ srw.EffInsSurfTemp = 23.0; srw.ThetaFace = 296.15;}
+			
 
 		}
 

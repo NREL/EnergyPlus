@@ -2489,11 +2489,11 @@ namespace DataSurfaces {
 	// Functions
 
 	  //zone and surf are 0 based indices
-	inline void 
-	setShadingFlag(int val, int zone, int surf){
-	  SurfaceRadiantWin[ surf ].setShadingFlag(val);
-	  DataViewFactorInformation::ZoneInfo[ zone ].shadeChanged = true;
-	}
+	// inline void 
+	// setShadingFlag(int val, int zone, int surf){
+	//   SurfaceRadiantWin[ surf ].setShadingFlag(val);
+	//   DataViewFactorInformation::ZoneInfo[ zone ].shadeChanged = true;
+	// }
 
 	std::string
 	cSurfaceClass( int const ClassNo );

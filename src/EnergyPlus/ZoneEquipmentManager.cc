@@ -3689,7 +3689,7 @@ namespace ZoneEquipmentManager {
 				WinGapTtoRA = 0.0;
 				WinGapFlowTtoRA = 0.0;
 
-				for ( SurfNum = ZoneSpecs[ ActualZoneNum  - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ ActualZoneNum  - 1].SurfaceLast; ++SurfNum ) {
+				for ( SurfNum = ZoneSpecs[ ActualZoneNum  - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ ActualZoneNum  - 1 ].SurfaceLast; ++SurfNum ) {
 					if ( SurfaceWindow( SurfNum ).AirflowThisTS > 0.0 && SurfaceWindow( SurfNum ).AirflowDestination == AirFlowWindow_Destination_ReturnAir ) {
 						FlowThisTS = PsyRhoAirFnPbTdbW( OutBaroPress, SurfaceWindow( SurfNum ).TAirflowGapOutlet, Node( ZoneNode ).HumRat ) * SurfaceWindow( SurfNum ).AirflowThisTS * Surface( SurfNum ).Width;
 						WinGapFlowToRA += FlowThisTS;

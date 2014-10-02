@@ -39,6 +39,9 @@ Utility::getProcElementCount(){
 
 void
 Utility::doDataDump(){
+  //delme
+  return;
+  //end delme
   using namespace EnergyPlus::DataHeatBalance;
   using namespace EnergyPlus::DataSurfaces;
   using namespace EnergyPlus::DataHeatBalSurface;
@@ -51,8 +54,10 @@ Utility::doDataDump(){
 	}else{
 		++numhit;
 	}
-  std::ofstream file;
-  file.open("data_dump.txt");
+  static std::ofstream file;
+  if (!file.is_open()){
+      file.open("data_dump.txt");
+  }
 
 	// file << "HeatBalanceIntRadExchange::LoadBalanceVector" << std::endl;
 	// for(auto i : EnergyPlus::HeatBalanceIntRadExchange::LoadBalanceVector){
@@ -113,15 +118,44 @@ Utility::doDataDump(){
   //   file << c << std::endl;
   // }
 
-  file << "NetLWRadToSurf" << std::endl;
-  for(auto r : NetLWRadToSurf){
-    file << r << std::endl;
+  static int counter = 0;
+
+  if (counter > 125){
+    return;
   }
 
-  file << "IRfromParentZone" << std::endl;
-  for(auto ir : IRfromParentZone){
-    file << ir << std::endl;
+  // file << "Iteration " << counter << " of IRfromParentZone" << std::endl;
+  // for(auto ir : IRfromParentZone){
+  //   file << ir << std::endl;
+  // }
+
+  // file << std::endl;
+
+  // file << "Iteration " << counter << " of NetLWRadToSurf" << std::endl;
+  // for(auto r : NetLWRadToSurf){
+  //   file << r << std::endl;
+  // }
+  for(auto& z: ZoneInfo){
+    for(auto& s: z.surfaces){
+      int construct = Construction[ s() ];
+      file << "count " << counter << " rec surf: " << s() << std::endl;
+      file << " temp: " << s.temperature << " emis: "
+	   << s.emissivity << " surfCount: " << z.NumOfSurfaces << std::endl;
+      file << " is window " << s.isWindow << " is TDD Dif " << 
+	(SurfaceRadiantWin[ s() ].OriginalClass == SurfaceClass_TDD_Diffuser) <<
+	" is WindowTypeEQL " << Construct( Construction[ s() ] ).WindowTypeEQL << 
+	" shadeFlag IntShadeOn " << (SurfaceRadiantWin[ s() ].getShadingFlag() == IntShadeOn) 
+	   << " shadeFlag IntBlindOn " << (SurfaceRadiantWin[ s() ].getShadingFlag() == IntBlindOn) << std::endl;
+      file << " script_f: ";
+      for(auto snd : z.surfaces){
+	file << snd(false) << "::" << z.ScriptF(s(false) + 1, snd(false) + 1) << ":";
+      }
+      file << std::endl;
+    }
   }
+
   file.flush();
+  counter++;
+
 }
 }

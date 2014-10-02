@@ -5969,7 +5969,7 @@ namespace ConvectionCoefficients {
 		} else if ( SELECT_CASE_var == HcExt_UserCurve ) {
 			CalcUserDefinedOutsideHcModel( SurfNum, Surface( SurfNum ).OutConvHfUserCurveIndex, Hf );
 		} else if ( SELECT_CASE_var == HcExt_SparrowWindward ) {
-			ConstructNum = Construction[ SurfNum  - 1];
+			ConstructNum = Construction[ SurfNum  - 1 ];
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				SurfWindSpeed = 0.; // No wind exposure
 			} else if ( Surface( SurfNum ).Class == SurfaceClass_Window && SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag() == ExtShadeOn ) {
@@ -6446,8 +6446,8 @@ namespace ConvectionCoefficients {
 
 			//Calculate Grashof, Reynolds, and Richardson numbers for the zone
 			//Grashof for zone air based on largest delta T between surfaces and zone height
-			Tmin = minval( TH( {ZoneSpecs[ ZoneNum  - 1].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1].SurfaceLast}, 1, 2 ) );
-			Tmax = maxval( TH( {ZoneSpecs[ ZoneNum  - 1].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1].SurfaceLast}, 1, 2 ) );
+			Tmin = minval( TH( {ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast}, 1, 2 ) );
+			Tmax = maxval( TH( {ZoneSpecs[ ZoneNum  - 1 ].SurfaceFirst,ZoneSpecs[ ZoneNum  - 1 ].SurfaceLast}, 1, 2 ) );
 			GrH = ( g * ( Tmax - Tmin ) * pow_3( Zone( ZoneNum ).CeilingHeight ) ) / ( ( MAT( ZoneNum ) + KelvinConv ) * pow_2( v ) );
 
 			// Reynolds number = Vdot supply / v * cube root of zone volume (Goldstein and Noveselac 2010)

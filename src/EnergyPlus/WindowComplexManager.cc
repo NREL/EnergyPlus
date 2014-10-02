@@ -259,7 +259,7 @@ namespace WindowComplexManager {
 		WindowList.allocate( TotSurfaces ); //Temporary allocation
 		WindowStateList.allocate( TotSurfaces, TotComplexFenStates ); //Temporary allocation
 		SfLoop: for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
-			IConst = Construction[ ISurf  - 1];
+			IConst = Construction[ ISurf  - 1 ];
 			if ( ! ( ConstrWin[ IConst  - 1 ].TypeIsWindow && ( Construct( IConst ).WindowTypeBSDF ) ) ) continue; //Only BSDF windows
 			//Simon Check: Thermal construction removed
 			//ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
@@ -1289,11 +1289,11 @@ namespace WindowComplexManager {
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			ComplexFenInZone = false;
-			for ( SurfNum = ZoneSpecs[ZoneNum - 1].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1].SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
 				if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) ComplexFenInZone = true;
 			}
 			if ( ComplexFenInZone ) {
-				NumSurfInZone = ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1;
+				NumSurfInZone = ZoneSpecs[ZoneNum - 1 ].SurfaceLast - ZoneSpecs[ZoneNum - 1 ].SurfaceFirst + 1;
 				if ( MaxBkSurf < NumSurfInZone ) MaxBkSurf = NumSurfInZone;
 			}
 		}
@@ -3334,9 +3334,9 @@ namespace WindowComplexManager {
 		CalcSHGC = 0;
 
 		if ( CalcCondition == noCondition ) {
-			ConstrNum = Construction[ SurfNum  - 1];
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			SurfNumAdj = Surface( SurfNum ).ExtBoundCond;
-			ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag();
+			ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag();
 		}
 
 		TotGlassLay = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
@@ -3491,7 +3491,7 @@ namespace WindowComplexManager {
 			// outdoor wind speed
 			if ( ! Surface( SurfNum ).ExtWind ) {
 				wso = 0.0; // No wind exposure
-				//ELSE IF (Surface(SurfNum)%Class == SurfaceClass_Window .AND. SurfaceRadiantWin[SurfNum - 1].getShadingFlag() == ExtShadeOn) THEN
+				//ELSE IF (Surface(SurfNum)%Class == SurfaceClass_Window .AND. SurfaceRadiantWin[SurfNum - 1 ].getShadingFlag() == ExtShadeOn) THEN
 				//  wso =  0.0  ! Assume zero wind speed at outside glass surface of window with exterior shade
 			} else {
 				wso = Surface( SurfNum ).WindSpeed;
@@ -3554,8 +3554,8 @@ namespace WindowComplexManager {
 				PoissonsRat( IGlass ) = Material( LayPtr ).PoissonsRatio;
 			} else if ( Material( LayPtr ).Group == ComplexWindowShade ) {
 				if ( CalcCondition == noCondition ) {
-				  if ( Lay == 1 ) SurfaceRadiantWin[ SurfNum  - 1].setShadingFlag( ExtShadeOn );
-				  if ( Lay == TotLay ) SurfaceRadiantWin[ SurfNum  - 1].setShadingFlag( IntShadeOn );
+				  if ( Lay == 1 ) SurfaceRadiantWin[ SurfNum  - 1 ].setShadingFlag( ExtShadeOn );
+				  if ( Lay == TotLay ) SurfaceRadiantWin[ SurfNum  - 1 ].setShadingFlag( IntShadeOn );
 				}
 				++IGlass;
 				TempInt = Material( LayPtr ).ComplexShadePtr;
@@ -3666,7 +3666,7 @@ namespace WindowComplexManager {
 		asol = 0.0;
 		// direct solar radiation
 		if ( CalcCondition == noCondition ) {
-			ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag();
+			ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag();
 			dir = QRadSWOutIncident( SurfNum ) + QS( Surface( SurfNum ).Zone ); // TODO, check , !
 			//                  currently using Exterior beam plus diffuse solar incident on surface
 			//                  plus zone short wave.  CHECK
@@ -3688,7 +3688,7 @@ namespace WindowComplexManager {
 
 			// Instead of doing temperature guess get solution from previous iteration.  That should be much better than guess
 			for ( k = 1; k <= 2 * nlayer; ++k ) {
-				theta( k ) = SurfaceRadiantWin[ SurfNum  - 1].ThetaFace( k );
+				theta( k ) = SurfaceRadiantWin[ SurfNum  - 1 ].ThetaFace( k );
 			}
 
 		}
@@ -3874,7 +3874,7 @@ namespace WindowComplexManager {
 
 			// Correct WinHeatGain for interior diffuse shortwave (solar and shortwave from lights) transmitted
 			// back out window
-			ConstrNum = Construction[ SurfNum  - 1];
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			//ConstrNumSh = Surface(SurfNum)%ShadedConstruction
 			//IF(SurfaceWindow(SurfNum)%StormWinFlag==1) THEN
 			//  ConstrNum = Surface(SurfNum)%StormWinConstruction
@@ -3885,7 +3885,7 @@ namespace WindowComplexManager {
 			//ELSE IF(ShadeFlag==IntShadeOn .OR. ShadeFlag==ExtShadeOn) THEN
 			//  TransDiff = Construct(ConstrNum)%TransDiff
 			//ELSE IF(ShadeFlag==IntBlindOn .OR. ShadeFlag==ExtBlindOn .OR.ShadeFlag==BGBlindOn) THEN
-			//  TransDiff = InterpSlatAng(SurfaceRadiantWin[SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum - 1].MovableSlats, &
+			//  TransDiff = InterpSlatAng(SurfaceRadiantWin[SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum - 1 ].MovableSlats, &
 			//                             Construct(ConstrNumSh)%BlTransDiff)
 			//ELSE IF(ShadeFlag == SwitchableGlazing) THEN
 			//  TransDiff = InterpSW(SurfaceWindow(SurfNum)%SwitchingFactor,Construct(ConstrNum)%TransDiff, &
@@ -3927,14 +3927,14 @@ namespace WindowComplexManager {
 				RhoGlassIR = 1 - EpsGlassIR;
 
 				EffShBlEmiss = EpsShadeIR * ( 1. + RhoGlassIR * TauShadeIR / ( 1. - RhoGlassIR * RhoShadeIR ) );
-				SurfaceRadiantWin[ SurfNum  - 1].EffShBlindEmiss = EffShBlEmiss;
+				SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss = EffShBlEmiss;
 				EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1. - RhoGlassIR * RhoShadeIR );
-				SurfaceRadiantWin[ SurfNum  - 1].EffGlassEmiss = EffGlEmiss;
-				//  EffShBlEmiss = InterpSlatAng(SurfaceRadiantWin[SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum - 1].MovableSlats, &
-				//                    SurfaceRadiantWin[SurfNum - 1].EffShBlindEmiss)
-				//  EffGlEmiss   = InterpSlatAng(SurfaceRadiantWin[SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum - 1].MovableSlats, &
-				//                    SurfaceRadiantWin[SurfNum - 1].EffGlassEmiss)
-				SurfaceRadiantWin[ SurfNum -1].EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( theta( 2 * ngllayer ) - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
+				SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss = EffGlEmiss;
+				//  EffShBlEmiss = InterpSlatAng(SurfaceRadiantWin[SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum - 1 ].MovableSlats, &
+				//                    SurfaceRadiantWin[SurfNum - 1 ].EffShBlindEmiss)
+				//  EffGlEmiss   = InterpSlatAng(SurfaceRadiantWin[SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum - 1 ].MovableSlats, &
+				//                    SurfaceRadiantWin[SurfNum - 1 ].EffGlassEmiss)
+				SurfaceRadiantWin[ SurfNum -1 ].EffInsSurfTemp = ( EffShBlEmiss * SurfInsideTemp + EffGlEmiss * ( theta( 2 * ngllayer ) - KelvinConv ) ) / ( EffShBlEmiss + EffGlEmiss );
 				//ELSE
 				//  SurfInsideTemp = theta(2*ngllayer) - TKelvin
 				//END IF

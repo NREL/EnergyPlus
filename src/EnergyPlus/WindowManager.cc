@@ -525,7 +525,7 @@ namespace WindowManager {
 				} else { // Interior shade
 					EpsGlIR = Material( Construct( ConstrNum ).LayerPoint( TotLay - 1 ) ).AbsorpThermalBack;
 				}
-				RhoGlIR = max( 0.0, 1. - EpsGlIR );
+				RhoGlIR = max( 0.0, 1.0 - EpsGlIR );
 				Construct( ConstrNum ).ShadeAbsorpThermal = EpsShIR * ( 1.0 + TauShIR * RhoGlIR / ( 1.0 - RhoShIR * RhoGlIR ) );
 				if ( IntShade ) ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal *= TauShIR / ( 1.0 - RhoShIR * RhoGlIR );
 			}
@@ -1296,7 +1296,7 @@ namespace WindowManager {
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
-			if ( ! ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
+			if ( ! ConstrWin[ Construction[ SurfNum  - 1 ]  - 1 ].TypeIsWindow ) continue;
 			if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) continue; //Irrelevant for Complex Fen
 			if ( Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) continue; // not required
 			ConstrNumSh = SurfaceWindow( SurfNum ).ShadedConstruction;
@@ -1323,15 +1323,15 @@ namespace WindowManager {
 						TauShIR = Material( ShadeLayPtr ).TransThermal;
 						EpsShIR = Material( ShadeLayPtr ).AbsorpThermal;
 						RhoShIR = max( 0.0, 1.0 - TauShIR - EpsShIR );
-						SurfaceRadiantWin[ SurfNum  - 1].EffShBlindEmiss( 1 ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
-						SurfaceRadiantWin[ SurfNum  - 1].EffGlassEmiss( 1 ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss( 1 ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss( 1 ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
 					}
 					if ( IntBlind ) {
 						TauShIR = Blind( BlNum ).IRFrontTrans( ISlatAng );
 						EpsShIR = Blind( BlNum ).IRBackEmiss( ISlatAng );
 						RhoShIR = max( 0.0, 1.0 - TauShIR - EpsShIR );
-						SurfaceRadiantWin[ SurfNum  - 1].EffShBlindEmiss( ISlatAng ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
-						SurfaceRadiantWin[ SurfNum  - 1].EffGlassEmiss( ISlatAng ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss( ISlatAng ) = EpsShIR * ( 1.0 + RhoGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR ) );
+						SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss( ISlatAng ) = EpsGlIR * TauShIR / ( 1.0 - RhoGlIR * RhoShIR );
 					}
 					// Loop over remaining slat angles only if blind with movable slats
 					if ( IntShade ) break; // Loop over remaining slat angles only if blind
@@ -1343,9 +1343,9 @@ namespace WindowManager {
 		} // End of surface loop
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			if ( Construction[ SurfNum  - 1] <= 0 ) continue;
-			if ( ! ConstrWin[ Construction[ SurfNum  - 1]  - 1 ].TypeIsWindow ) continue;
-			ConstrNum = Construction[ SurfNum  - 1];
+			if ( Construction[ SurfNum  - 1 ] <= 0 ) continue;
+			if ( ! ConstrWin[ Construction[ SurfNum  - 1 ]  - 1 ].TypeIsWindow ) continue;
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			// Total thickness of glazing system (used in calculation of inside reveal reflection/absorption
 			SurfaceWindow( SurfNum ).TotGlazingThickness = 0.0;
 			for ( LayNum = 1; LayNum <= Construct( ConstrNum ).TotLayers; ++LayNum ) {
@@ -1545,7 +1545,7 @@ namespace WindowManager {
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			SurfaceWindow( SurfNum ).SolarDiffusing = false;
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window && Surface( SurfNum ).ExtBoundCond == ExternalEnvironment && Surface( SurfNum ).StormWinConstruction == 0 ) {
-				ConstrNum = Construction[ SurfNum  - 1];
+				ConstrNum = Construction[ SurfNum  - 1 ];
 				MatNum = Construct( ConstrNum ).LayerPoint( Construct( ConstrNum ).TotLayers );
 				if ( Material( MatNum ).SolarDiffusing ) {
 					if ( Surface( SurfNum ).WindowShadingControlPtr == 0 ) {
@@ -2103,13 +2103,13 @@ namespace WindowManager {
 			//Simon: Complex fenestration state works only with tarcog
 			CalcComplexWindowThermal( SurfNum, temp, HextConvCoeff, SurfInsideTemp, SurfOutsideTemp, SurfOutsideEmiss, noCondition );
 
-			ConstrNum = Construction[ SurfNum  - 1];
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			TotGlassLay = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 			hcout = HextConvCoeff;
 			ngllayer = Construct( ConstrNum ).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
 			// Simon: need to transfer surface temperatures because of frames calculation
 			for ( i = 1; i <= 2 * Construct( ConstrNum ).TotSolidLayers; ++i ) {
-				thetas( i ) = SurfaceRadiantWin[ SurfNum - 1].ThetaFace( i );
+				thetas( i ) = SurfaceRadiantWin[ SurfNum - 1 ].ThetaFace( i );
 			}
 			hcout = HextConvCoeff;
 
@@ -2142,7 +2142,7 @@ namespace WindowManager {
 
 		} else { // regular window, not BSDF, not EQL Window
 
-			ConstrNum = Construction[ SurfNum  - 1];
+			ConstrNum = Construction[ SurfNum  - 1 ];
 			if ( window.StormWinFlag > 0 ) ConstrNum = surface.StormWinConstruction;
 
 			// Added for thermochromic windows
@@ -2174,7 +2174,7 @@ namespace WindowManager {
 						iMinDT = minloc( deltaTemp, deltaTemp > 0.0 );
 						// Use the new TC window construction
 						ConstrNum = IDConst( iMinDT( 1 ) );
-						Construction[ SurfNum  - 1] = ConstrNum;
+						Construction[ SurfNum  - 1 ] = ConstrNum;
 						window.SpecTemp = Material( Construct( ConstrNum ).TCLayer ).SpecTemp;
 					}
 				}
@@ -2186,7 +2186,7 @@ namespace WindowManager {
 			TotGlassLay = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
 			ngllayer = TotGlassLay;
 			nglface = 2 * ngllayer;
-			ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1].getShadingFlag();
+			ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag();
 			tilt = surface.Tilt;
 			tiltr = tilt * DegToRadians;
 			SurfNumAdj = surface.ExtBoundCond;
@@ -7315,6 +7315,7 @@ namespace WindowManager {
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
 				if ( ! ConstrWin[ ThisNum  - 1 ].TypeIsWindow ) continue;
+				if ( Construct( ThisNum ).WindowTypeEQL ) continue; // skip if equivalent layer window
 
 				// Calculate for ASHRAE winter and summer conditions: (1)nominal center-of-glass conductance,
 				// (2) solar heat gain coefficient (SHGC), including inside and outside air films,

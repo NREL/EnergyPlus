@@ -1804,7 +1804,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 	}
 
 	for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
-		gio::write( unit, Format_703 ) << "Zone_Surfaces" << trim( Zone( ZoneNum ).Name ) << ( ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1 );
+		gio::write( unit, Format_703 ) << "Zone_Surfaces" << Zone( ZoneNum ).Name << ( ZoneSpecs[ZoneNum - 1].SurfaceLast - ZoneSpecs[ZoneNum - 1].SurfaceFirst + 1 );
 		for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 			if ( Surface( surf ).Zone != ZoneNum ) continue;
 			SolarDiffusing = "";

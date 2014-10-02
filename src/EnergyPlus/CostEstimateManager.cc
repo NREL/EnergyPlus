@@ -641,7 +641,7 @@ namespace CostEstimateManager {
 							uniqueSurfMask( surf ) = false;
 						}
 					}
-					if ( DataSurfaces::Construction[ surf  - 1] == 0 ) { //throw out others for now
+					if ( DataSurfaces::Construction[ surf  - 1 ] == 0 ) { //throw out others for now
 						uniqueSurfMask( surf ) = false;
 					}
 					if ( Surface( surf ).Zone > 0 ) {

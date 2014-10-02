@@ -715,7 +715,7 @@ namespace DataHeatBalance {
 		for ( Layer = 1; Layer <= TotLayers; ++Layer ) {
 			MaterNum = Construct( ConstrNum ).LayerPoint( Layer );
 			if ( MaterNum == 0 ) continue; // error -- has been caught will stop program later
-			if ( Material( MaterNum ).Group == WindowGlass || Material( MaterNum ).Group == WindowGas || Material( MaterNum ).Group == WindowGasMixture || Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind || Material( MaterNum ).Group == Screen || Material( MaterNum ).Group == WindowSimpleGlazing || Material( MaterNum ).Group == ComplexWindowShade || Material( MaterNum ).Group == ComplexWindowGap ) ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
+			if ( Material( MaterNum ).Group == WindowGlass || Material( MaterNum ).Group == WindowGas || Material( MaterNum ).Group == WindowGasMixture || Material( MaterNum ).Group == Shade || Material( MaterNum ).Group == WindowBlind || Material( MaterNum ).Group == Screen || Material( MaterNum ).Group == WindowSimpleGlazing || Material( MaterNum ).Group == ComplexWindowShade || Material( MaterNum ).Group == ComplexWindowGap  || Material( MaterNum ).Group == GlassEquivalentLayer || Material( MaterNum ).Group == ShadeEquivalentLayer || Material( MaterNum ).Group == DrapeEquivalentLayer || Material( MaterNum ).Group == ScreenEquivalentLayer || Material( MaterNum ).Group == BlindEquivalentLayer || Material( MaterNum ).Group == GapEquivalentLayer) ConstrWin[ ConstrNum  - 1 ].TypeIsWindow = true;
 		}
 
 		if ( InsideMaterNum == 0 ) return;
@@ -775,6 +775,12 @@ namespace DataHeatBalance {
 				ConstrWin[ ConstrNum  - 1 ].TotGlassLayers = TotGlassLayers;
 				Construct( ConstrNum ).TotSolidLayers = TotGlassLayers + TotShadeLayers;
 				ConstrWin[ ConstrNum  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
+				Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermalFront;
+				return;
+			}
+
+			if ( Construct( ConstrNum ).WindowTypeEQL ) {
+				ConstrWin[ ConstrNum - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( InsideLayer ) ).AbsorpThermalBack;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( 1 ) ).AbsorpThermalFront;
 				return;
 			}
@@ -1744,7 +1750,7 @@ namespace DataHeatBalance {
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted7
+	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
 	//     list of contributors, see "Notice" located in EnergyPlus.f90.
