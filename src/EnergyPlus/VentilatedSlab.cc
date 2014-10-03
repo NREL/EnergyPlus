@@ -2226,8 +2226,8 @@ namespace VentilatedSlab {
 			SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
 		} else if ( SELECT_CASE_var == DPTZControl ) {
 			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
-
 		} else { // Should never get here
+			SetPointTemp = 0.0; // Suppress uninitialized warning
 			ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
 			ShowFatalError( "Preceding condition causes termination." );
 		}}

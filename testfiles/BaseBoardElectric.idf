@@ -1206,27 +1206,27 @@
     Zone1Baseboard,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    5000.0,                  !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    5000,                    !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
-  
+
   ZoneHVAC:Baseboard:Convective:Electric,
     Zone2Baseboard,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    5000.0,                  !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    5000,                    !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     Zone3Baseboard,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
-    5000.0,                  !- Heating Design Capacity{ W }
-    ,                        !- Heating Design Capacity Per Floor Area{ W / m2 }
-    ,                        !- Fraction of Autosized Heating Design Capacity{ -}
+    5000,                    !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========

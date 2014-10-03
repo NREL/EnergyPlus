@@ -71,8 +71,8 @@ namespace DataStringGlobals {
 	std::string CurrentWorkingFolder; // Current working directory for run
 	std::string FullName; // Full name of file to open, including path
 	std::string IDDVerString; // Version information from the IDD (line 1)
-	std::string VerString( "EnergyPlus, Version 8.2" ); // String that represents version information
-	std::string MatchVersion( "8.2.0" ); // String to be matched by Version object
+	std::string VerString( "EnergyPlus, Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}-${CMAKE_VERSION_BUILD}" ); // String that represents version information
+	std::string MatchVersion( "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" ); // String to be matched by Version object
 	std::string CurrentDateTime; // For printing current date and time at start of run
 
 	//     NOTICE

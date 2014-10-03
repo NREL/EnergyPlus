@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -4026,7 +4027,7 @@ namespace EconomicTariff {
 		FArray1D< Real64 > offsetVals( MaxNumMonths );
 		FArray1D< Real64 > seasonFromMask( MaxNumMonths );
 		FArray1D< Real64 > seasonToMask( MaxNumMonths );
-		bool isMonthly;
+		bool isMonthly( false );
 		FArray1D< Real64 > adjSeasonal( MaxNumMonths );
 		FArray1D< Real64 > adjPeak( MaxNumMonths );
 		FArray1D< Real64 > maxAdjBase( MaxNumMonths );
@@ -4083,6 +4084,8 @@ namespace EconomicTariff {
 		} else if ( SELECT_CASE_var == seasonMonthly ) {
 			seasonFromMask = 1.0; //all months are 1
 			isMonthly = true;
+		} else {
+			assert( false );
 		}}
 		// find proper season to mask
 		{ auto const SELECT_CASE_var( ratchet( indexInChg ).seasonTo );

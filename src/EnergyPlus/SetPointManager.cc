@@ -6529,7 +6529,7 @@ namespace SetPointManager {
 							RunSubOptCondEntTemp = false;
 							RunFinalOptCondEntTemp = true;
 						} else {
-							CondWaterSetPoint = CondWaterSetPoint;
+							//CondWaterSetPoint = CondWaterSetPoint; // Self-assignment commented out
 							TotEnergyPre = 0.0;
 							RunOptCondEntTemp = false;
 							RunSubOptCondEntTemp = false;

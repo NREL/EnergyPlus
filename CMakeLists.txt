@@ -2,9 +2,11 @@ Project(EnergyPlus)
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
+set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
+
 set( CMAKE_VERSION_MAJOR 8 )
-set( CMAKE_VERSION_MINOR 1 )
-set( CMAKE_VERSION_PATCH 6 ) 
+set( CMAKE_VERSION_MINOR 2 )
+set( CMAKE_VERSION_PATCH 1 ) 
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -61,14 +63,16 @@ if( ENABLE_REGRESSION_TESTING )
   endif()
 endif()
 
-# Not yet released by CMake, but is being developed
-# This will help us set the proper options for c++11 across various configurations
-#FIND_PACKAGE( CXXFeatures ) 
-
-if (MSVC)
-  set(gtest_force_shared_crt ON)
+if( UNIX AND NOT APPLE )
+  set(CMAKE_INSTALL_RPATH "$ORIGIN")
 endif()
 
+if (MSVC)
+  if (CMAKE_C_COMPILER_VERSION VERSION_LESS "18.00.30723")
+    message(FATAL_ERROR "Visual Studio 2013 Update 3 or Greater Required")
+  endif()
+  set(gtest_force_shared_crt ON)
+endif()
 
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
@@ -112,23 +116,35 @@ if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
-  cmake_add_fortran_subdirectory(src/Transition PROJECT Transition NO_EXTERNAL_INSTALL )
+  set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
+  cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
+  cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
 endif()
 
-install( FILES idd/Energy+.idd DESTINATION ./ )
+configure_file( idd/Energy+.idd.in "${CMAKE_BINARY_DIR}/Energy+.idd" )
 
 if( BUILD_PACKAGE )
   set(CPACK_INSTALL_CMAKE_PROJECTS
     "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
   )
 
+  set(EPLUS_BUILDSUPPORT_REPO 
+    "RootOfEnergyPlusBuildSupportRepo" CACHE PATH "Enter the root of the EnergyPlusBuildSupport repo"
+  )
+  
   if( BUILD_FORTRAN )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Transition/;Transition;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Basement/;Basement;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/HVAC-Diagram/;HVAC-Diagram;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ParametricPreprocessor/;ParametricPreprocessor;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Slab/;Slab;ALL;/")
+    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ConvertESOMTR/;ConvertESOMTR;ALL;/")
   endif()
 
   include(CPack.cmake)
