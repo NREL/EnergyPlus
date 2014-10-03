@@ -518,17 +518,22 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
-ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
-ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
+ADD_LIBRARY(energypluslib STATIC ${SRC})
+ADD_EXECUTABLE(energyplus main.cc main.hh)
 
-#TARGET_LINK_LIBRARIES( EnergyPlus DElight )
-TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
+#TARGET_LINK_LIBRARIES( energyplus DElight )
+TARGET_LINK_LIBRARIES( energyplus energypluslib objexx sqlite bcvtb epexpat epfmiimport )
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)
-    TARGET_LINK_LIBRARIES( EnergyPlus dl )
+    TARGET_LINK_LIBRARIES( energyplus dl )
   endif()
 endif()
 
+if(UNIX AND NOT APPLE)
+  ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E chdir "${CMAKE_BINARY_DIR}/Products/" ln -s "energyplus" "EnergyPlus"
+  ) 
+endif()
 
-INSTALL( TARGETS EnergyPlus DESTINATION ./ )
+INSTALL( TARGETS energyplus DESTINATION ./ )
