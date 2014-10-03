@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -1385,8 +1386,8 @@ namespace EvaporativeCoolers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		std::string CompName;
-		Real64 FullOutput;
-		Real64 ReqOutput;
+		Real64 FullOutput( 0.0 );
+		Real64 ReqOutput( 0.0 );
 		int InletNode;
 		int OutletNode;
 		int ControlNode;
@@ -1427,6 +1428,8 @@ namespace EvaporativeCoolers {
 				// now reinit after test call
 				InitEvapCooler( EvapCoolNum );
 
+			} else {
+				assert( false );
 			}}
 
 			// Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput

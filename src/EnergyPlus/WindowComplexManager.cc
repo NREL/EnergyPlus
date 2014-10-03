@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <cstdint>
 
@@ -2874,7 +2875,7 @@ namespace WindowComplexManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Cost; // Temp for cos theta
+		Real64 Cost( 0.0 ); // Temp for cos theta
 		Real64 Sint; // Temp for sin theta
 		Real64 Psi; // Temp for phi before rotation adjustment
 		Real64 RdotX; // Temp variable for manipulating .dot. produt
@@ -2972,6 +2973,8 @@ namespace WindowComplexManager {
 			} else {
 				Phi = Psi;
 			}
+		} else {
+			assert( false );
 		}}
 		if ( std::abs( Cost ) < rTinyValue ) Cost = 0.0;
 		if ( Cost < 0.0 ) Theta = Pi - Theta; //This signals ray out of hemisphere

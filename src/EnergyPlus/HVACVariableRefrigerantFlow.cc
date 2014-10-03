@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -496,7 +497,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 TotHeatEIRTempModFac; // heating EIRFT curve output
 		Real64 InletAirWetBulbC; // coil inlet air wet-bulb temperature (C)
 		Real64 InletAirDryBulbC; // coil inlet air dry-bulb temperature (C)
-		Real64 CondInletTemp; // condenser inlet air temperature (C)
+		Real64 CondInletTemp( 0.0 ); // condenser inlet air temperature (C)
 		Real64 CondInletHumRat; // condenser inlet air humidity ratio (kg/kg)
 		Real64 OutdoorDryBulb; // outdoor dry-bulb temperature (C)
 		Real64 OutdoorHumRat; // outdoor humidity ratio (kg/kg)
@@ -639,6 +640,8 @@ namespace HVACVariableRefrigerantFlow {
 		} else if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
 			CondInletTemp = OutdoorDryBulb; // node inlet temp from above
 			CondWaterMassFlow = VRF( VRFCond ).WaterCondenserDesignMassFlow;
+		} else {
+			assert( false );
 		}
 		VRF( VRFCond ).CondenserInletTemp = CondInletTemp;
 

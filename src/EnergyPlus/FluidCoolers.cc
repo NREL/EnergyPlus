@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -749,7 +750,7 @@ namespace FluidCoolers {
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool OneTimeFlagForEachFluidCooler;
 		bool FatalError;
-		int TypeOf_Num;
+		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;
 		int BranchIndex;
@@ -774,6 +775,8 @@ namespace FluidCoolers {
 				TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
 			} else if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_TwoSpeed ) {
 				TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
+			} else {
+				assert( false );
 			}
 
 			// Locate the tower on the plant loops for later usage

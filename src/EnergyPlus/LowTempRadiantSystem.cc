@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -2574,6 +2575,7 @@ namespace LowTempRadiantSystem {
 		} else if ( SELECT_CASE_var == CoolingMode ) {
 			WaterNodeIn = HydrRadSys( RadSysNum ).ColdWaterInNode;
 		} else {
+			WaterNodeIn = 0; // Suppress uninitialized warning
 			ShowSevereError( "Illegal low temperature radiant system operating mode" );
 			ShowContinueError( "Occurs in Radiant System=" + HydrRadSys( RadSysNum ).Name );
 			ShowFatalError( "Preceding condition causes termination." );
@@ -3018,6 +3020,7 @@ namespace LowTempRadiantSystem {
 			} else if ( SELECT_CASE_var == OWBControl ) {
 				SetPointTemp = Zone( ZoneNum ).OutWetBulbTemp;
 			} else { // Should never get here
+				SetPointTemp = 0.0; // Suppress uninitialized warning
 				ShowSevereError( "Illegal control type in low temperature radiant system: " + CFloRadSys( RadSysNum ).Name );
 				ShowFatalError( "Preceding condition causes termination." );
 			}}
@@ -4095,10 +4098,10 @@ namespace LowTempRadiantSystem {
 		Real64 BypassMassFlow; // Local bypass for a constant flow radiant system (could have recirculation and/or bypass)
 		Real64 CpWater; // Specific heat of water
 		int RadSurfNum; // DO loop counter for radiant surfaces in the system
-		int SurfNum; // Surface index number for the current radiant system
+		int SurfNum( 0 ); // Surface index number for the current radiant system
 		int WaterInletNode; // Node number for the water side inlet of the radiant system
 		Real64 TotalHeatSource; // Total heat source or sink for a particular radiant system (sum of all surface source/sinks)
-		int TotRadSurfaces; // Total number of radiant surfaces in this system
+		int TotRadSurfaces( 0 ); // Total number of radiant surfaces in this system
 		Real64 WaterMassFlow; // Flow rate of water in the radiant system
 		int WaterOutletNode; // Node number for the water side outlet of the radiant system
 		Real64 ZoneMult; // Zone multiplier
@@ -4112,6 +4115,8 @@ namespace LowTempRadiantSystem {
 			TotRadSurfaces = CFloRadSys( RadSysNum ).NumOfSurfaces;
 		} else if ( SELECT_CASE_var == ElectricSystem ) {
 			TotRadSurfaces = ElecRadSys( RadSysNum ).NumOfSurfaces;
+		} else {
+			assert( false );
 		}}
 
 		for ( RadSurfNum = 1; RadSurfNum <= TotRadSurfaces; ++RadSurfNum ) {
@@ -4123,6 +4128,8 @@ namespace LowTempRadiantSystem {
 				SurfNum = CFloRadSys( RadSysNum ).SurfacePtr( RadSurfNum );
 			} else if ( SELECT_CASE_var == ElectricSystem ) {
 				SurfNum = ElecRadSys( RadSysNum ).SurfacePtr( RadSurfNum );
+			} else {
+				assert( false );
 			}}
 
 			if ( LastSysTimeElapsed( SurfNum ) == SysTimeElapsed ) {
@@ -4462,7 +4469,7 @@ namespace LowTempRadiantSystem {
 		Real64 NuD;
 		Real64 ReD;
 		Real64 NTU;
-		Real64 CpWater;
+		Real64 CpWater( 0.0 );
 		Real64 Kactual;
 		Real64 MUactual;
 		Real64 PRactual;
@@ -4500,6 +4507,8 @@ namespace LowTempRadiantSystem {
 				CpWater = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( HydrRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else if ( SELECT_CASE_var1 == CoolingMode ) {
 				CpWater = GetSpecificHeatGlycol( PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidName, Temperature, PlantLoop( HydrRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
+			} else {
+				assert( false );
 			}}
 		} else if ( SELECT_CASE_var == ConstantFlowSystem ) {
 			{ auto const SELECT_CASE_var1( OperatingMode );
@@ -4508,7 +4517,11 @@ namespace LowTempRadiantSystem {
 				CpWater = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidName, Temperature, PlantLoop( CFloRadSys( RadSysNum ).HWLoopNum ).FluidIndex, RoutineName );
 			} else if ( SELECT_CASE_var1 == CoolingMode ) {
 				CpWater = GetSpecificHeatGlycol( PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CFloRadSys( RadSysNum ).CWLoopNum ).FluidIndex, RoutineName );
+			} else {
+				assert( false );
 			}}
+		} else {
+			assert( false );
 		}}
 
 		// Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)

@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -2238,8 +2239,8 @@ namespace ManageElectricPower {
 		Real64 NormalizedPower;
 		int InvertNum;
 		int StorNum;
-		Real64 tmpEffic;
-		Real64 tempACpower;
+		Real64 tmpEffic( 0.0 );
+		Real64 tempACpower( 0.0 );
 
 		//model inverters
 		InvertNum = ElecLoadCenter( LoadCenterNum ).InverterModelNum;
@@ -2301,6 +2302,8 @@ namespace ManageElectricPower {
 					tmpEffic = Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 5 ) + ( ( NormalizedPower - 0.75 ) / ( 1.0 - 0.75 ) ) * ( Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 6 ) - Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 5 ) );
 				} else if ( NormalizedPower >= 1.0 ) {
 					tmpEffic = Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 6 );
+				} else {
+					assert( false );
 				}
 
 				Inverter( InvertNum ).Efficiency = max( tmpEffic, 0.0 );
@@ -2333,6 +2336,8 @@ namespace ManageElectricPower {
 
 				tempACpower = Inverter( InvertNum ).Efficiency * Inverter( InvertNum ).DCPowerIn;
 
+			} else {
+				assert( false );
 			}}
 
 			Inverter( InvertNum ).ACPowerOut = tempACpower;

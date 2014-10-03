@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -4238,8 +4239,8 @@ namespace WaterThermalTanks {
 		int HPWaterOutletNode; // HP condenser water outlet node number
 		int InletAirMixerNode; // HP inlet node number after inlet mixing damper
 		int OutletAirSplitterNode; // HP outlet node number before outlet mixing damper
-		Real64 HPInletDryBulbTemp; // HPWH's air inlet dry-bulb temperature, C
-		Real64 HPInletHumRat; // HPWH's air inlet humidity ratio, kg/kg
+		Real64 HPInletDryBulbTemp( 0.0 ); // HPWH's air inlet dry-bulb temperature, C
+		Real64 HPInletHumRat( 0.0 ); // HPWH's air inlet humidity ratio, kg/kg
 		Real64 HPInletRelHum; // HPWH's air inlet relative humidity
 		Real64 DeadBandTemp; // Minimum tank temperature (SetPointTemp - DeadBandDeltaTemp) (C)
 		//  LOGICAL,SAVE        :: ZoneEquipmentListChecked = .FALSE.  ! True after the Zone Equipment List has been checked for items
@@ -4813,6 +4814,8 @@ namespace WaterThermalTanks {
 				Node( HPAirInletNode ).Enthalpy = PsyHFnTdbW( HPInletDryBulbTemp, HPInletHumRat );
 				Node( HPAirInletNode ).Press = OutBaroPress;
 
+			} else {
+				assert( false );
 			}}
 
 			MdotAir = HPWaterHeater( HPNum ).OperatingAirFlowRate * PsyRhoAirFnPbTdbW( OutBaroPress, HPInletDryBulbTemp, HPInletHumRat );
@@ -6711,8 +6714,8 @@ namespace WaterThermalTanks {
 		Real64 AvailSchedule; // HP compressor availability schedule
 		Real64 SetPointTemp; // HP set point temperature (cut-out temperature, C)
 		Real64 DeadBandTempDiff; // HP dead band temperature difference (C)
-		Real64 TankTemp; // tank temperature before simulation, C
-		Real64 NewTankTemp; // tank temperature after simulation, C
+		Real64 TankTemp( 0.0 ); // tank temperature before simulation, C
+		Real64 NewTankTemp( 0.0 ); // tank temperature after simulation, C
 		Real64 CpAir; // specific heat of air, kJ/kg/K
 		Real64 MdotWater; // mass flow rate of condenser water, kg/s
 		Real64 OutletAirSplitterSch; // output of outlet air splitter schedule
@@ -6726,7 +6729,7 @@ namespace WaterThermalTanks {
 		int OutletAirSplitterNode; // HP outlet air splitter node number
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int HPNum; // Index to heat pump water heater
-		int SolFla; // Flag of RegulaFalsi solver
+		int SolFla( 0 ); // Flag of RegulaFalsi solver
 		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		Real64 HPMinTemp; // used for error messages, C
 		std::string HPMinTempChar; // used for error messages
@@ -6832,6 +6835,8 @@ namespace WaterThermalTanks {
 			TankTemp = WaterThermalTank( WaterThermalTankNum ).SavedTankTemp;
 		} else if ( SELECT_CASE_var == StratifiedWaterHeater ) {
 			TankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( HPNum ).ControlSensorLocation );
+		} else {
+			assert( false );
 		}}
 		HPWaterHeater( HPNum ).Mode = HPWaterHeater( HPNum ).SaveMode;
 
@@ -6901,6 +6906,8 @@ namespace WaterThermalTanks {
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par );
 				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
 					SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par );
+				} else {
+					assert( false );
 				}}
 				if ( SolFla == -1 ) {
 					gio::write( IterNum, fmtLD ) << MaxIte;
@@ -6973,6 +6980,8 @@ namespace WaterThermalTanks {
 			} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
 				CalcWaterThermalTankStratified( WaterThermalTankNum );
 				NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( HPNum ).ControlSensorLocation );
+			} else {
+				assert( false );
 			}}
 
 			//         reset the tank's internal heating element capacity
@@ -7349,10 +7358,10 @@ namespace WaterThermalTanks {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CurrentMode;
-		Real64 MassFlowRequest;
+		Real64 MassFlowRequest( 0.0 );
 		bool NeedsHeat;
 		bool NeedsCool;
-		Real64 FlowResult;
+		Real64 FlowResult( 0.0 );
 		bool ScheduledAvail;
 		Real64 AltSetpointTemp;
 		Real64 AltDeadBandTemp;
@@ -7450,6 +7459,8 @@ namespace WaterThermalTanks {
 					MassFlowRequest = WaterThermalTank( WaterThermalTankNum ).PlantUseMassFlowRateMax;
 				} else if ( WaterThermalTankSide == SourceSide ) {
 					MassFlowRequest = WaterThermalTank( WaterThermalTankNum ).PlantSourceMassFlowRateMax;
+				} else {
+					assert( false );
 				}
 			}
 
@@ -7497,6 +7508,8 @@ namespace WaterThermalTanks {
 					} else {
 						FlowResult = 0.0;
 					}
+				} else {
+					assert( false );
 				}
 			} else {
 				FlowResult = 0.0;

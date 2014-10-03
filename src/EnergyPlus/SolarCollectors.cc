@@ -1073,12 +1073,12 @@ namespace SolarCollectors {
 				if ( ( -FpULTest / mCpA ) < 700.0 ) {
 					FlowMod = mCpA * ( 1.0 - std::exp( -FpULTest / mCpA ) );
 				} else { // avoid EXP(too large #)
-					FlowMod = FlowMod;
+					//FlowMod = FlowMod; // Self-assignment commented out
 				}
 				if ( ( -FpULTest / mCpATest ) < 700.0 ) {
 					FlowMod /= ( mCpATest * ( 1.0 - std::exp( -FpULTest / mCpATest ) ) );
 				} else {
-					FlowMod = FlowMod;
+					//FlowMod = FlowMod; // Self-assignment commented out
 				}
 
 				// Calculate fluid heat gain (or loss)

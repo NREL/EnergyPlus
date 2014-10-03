@@ -194,7 +194,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // Flag first time, input is fetched
-		int SurfaceGHENum; // index in local derived types
+		int SurfaceGHENum( 0 ); // index in local derived types
 
 		// check for input
 		if ( GetInputFlag ) {
