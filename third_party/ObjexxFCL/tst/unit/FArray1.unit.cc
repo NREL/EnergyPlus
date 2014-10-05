@@ -833,6 +833,82 @@ TEST( FArray1Test, Redimension )
 	EXPECT_EQ( 17, B( 2 ) );
 	EXPECT_EQ( 33, B( 3 ) );
 	EXPECT_EQ( 44, B( 4 ) );
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 1, 5 }, 2 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 5, A.u() );
+		EXPECT_TRUE( eq( A, 1 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 2, 4 }, 2 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_TRUE( eq( A, 1 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { -2, 0 }, 2 );
+		EXPECT_EQ( -2, A.l() );
+		EXPECT_EQ( 0, A.u() );
+		EXPECT_TRUE( eq( A, 2 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 7, 9 }, 2 );
+		EXPECT_EQ( 7, A.l() );
+		EXPECT_EQ( 9, A.u() );
+		EXPECT_TRUE( eq( A, 2 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 4 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 1, A( 2 ) );
+		EXPECT_EQ( 2, A( 3 ) );
+		EXPECT_EQ( 2, A( 4 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 2 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 2, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 1, A( 2 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 1 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 1, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { 2, 4 }, 2 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 1, A( 2 ) );
+		EXPECT_EQ( 2, A( 3 ) );
+		EXPECT_EQ( 2, A( 4 ) );
+	}
 }
 
 TEST( FArray1Test, Swap )

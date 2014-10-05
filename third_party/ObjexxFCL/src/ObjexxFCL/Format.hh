@@ -230,6 +230,15 @@ public: // Properties
 		return false;
 	}
 
+	// FormatLD?
+	inline
+	virtual
+	bool
+	is_FormatLD() const
+	{ // Default implementation
+		return false;
+	}
+
 	// List-Directed?
 	inline
 	virtual
@@ -1482,6 +1491,14 @@ public: // Assignment
 	}
 
 public: // Properties
+
+	// List-Directed?
+	inline
+	bool
+	is_list_directed() const
+	{
+		return format()->is_FormatLD(); // Format containing only * is considered list-directed
+	}
 
 	// P Scaling State
 	inline
@@ -4844,6 +4861,14 @@ public: // Properties
 	inline
 	bool
 	uses_arg() const
+	{
+		return true;
+	}
+
+	// FormatLD?
+	inline
+	bool
+	is_FormatLD() const
 	{
 		return true;
 	}

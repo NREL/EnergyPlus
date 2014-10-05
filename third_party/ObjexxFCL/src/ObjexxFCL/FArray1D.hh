@@ -1527,7 +1527,6 @@ public: // Modifier
 		I_.assign_no_notify( I );
 		dimension_real();
 		initialize();
-		initialize();
 		notify();
 		return *this;
 	}
@@ -1622,15 +1621,34 @@ public: // Modifier
 	FArray1D &
 	redimension( IR const & I, T const & t )
 	{
-		FArray1D o( I, t );
 		if ( dimensions_initialized() ) {
-			if ( o.dimensions_initialized() ) { // Copy array data where overlap
-				int const b( std::max( I.l(), l() ) ), e( std::min( I.u(), u() ) );
-				for ( int i = b; i <= e; ++i ) {
-					o( i ) = operator ()( i );
+			if ( I.initialized() ) {
+				FArray1D o( I );
+				auto const l_( l() );
+				auto const I_l_( I.l() );
+				auto const l_max_( std::max( l_, I_l_ ) );
+				auto const u_( u() );
+				auto const I_u_( I.u() );
+				auto const u_min_( std::min( u_, I_u_ ) );
+				if ( I_l_ < l_ ) {
+					for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) { // Fill new lower elements
+						o( i ) = t;
+					}
 				}
+				if ( l_max_ <= u_min_ ) { // Ranges overlap
+					for ( int i = l_max_; i <= u_min_; ++i ) { // Copy array data in overlap
+						o( i ) = operator ()( i );
+					}
+				}
+				if ( u_ < I_u_ ) {
+					for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) { // Fill new upper elements
+						o( i ) = t;
+					}
+				}
+				return swap( o );
 			}
 		}
+		FArray1D o( I, t );
 		return swap( o );
 	}
 
@@ -1658,15 +1676,35 @@ public: // Modifier
 	FArray1D &
 	redimension( FArray1< U > const & a, T const & t )
 	{
-		FArray1D o( a.I(), t );
+		auto const & I( a.I() );
 		if ( dimensions_initialized() ) {
-			if ( o.dimensions_initialized() ) { // Copy array data where overlap
-				int const b( std::max( a.l(), l() ) ), e( std::min( a.u(), u() ) );
-				for ( int i = b; i <= e; ++i ) {
-					o( i ) = operator ()( i );
+			if ( I.initialized() ) {
+				FArray1D o( I );
+				auto const l_( l() );
+				auto const I_l_( I.l() );
+				auto const l_max_( std::max( l_, I_l_ ) );
+				auto const u_( u() );
+				auto const I_u_( I.u() );
+				auto const u_min_( std::min( u_, I_u_ ) );
+				if ( I_l_ < l_ ) {
+					for ( int i = I_l_, e = std::min( l_ - 1, I_u_ ); i <= e; ++i ) { // Fill new lower elements
+						o( i ) = t;
+					}
 				}
+				if ( l_max_ <= u_min_ ) { // Ranges overlap
+					for ( int i = l_max_; i <= u_min_; ++i ) { // Copy array data in overlap
+						o( i ) = operator ()( i );
+					}
+				}
+				if ( u_ < I_u_ ) {
+					for ( int i = std::max( u_ + 1, I_l_ ); i <= I_u_; ++i ) { // Fill new upper elements
+						o( i ) = t;
+					}
+				}
+				return swap( o );
 			}
 		}
+		FArray1D o( I, t );
 		return swap( o );
 	}
 

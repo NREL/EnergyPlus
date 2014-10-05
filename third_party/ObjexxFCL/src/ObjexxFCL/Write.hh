@@ -129,18 +129,23 @@ public: // Operators
 	typename std::enable_if< ! std::is_base_of< BArray, T >::value, WriteBase & >::type // Force array overload selection for array types
 	operator <<( T const & t )
 	{
-		if ( stream() && format() ) {
-			reverts_ = format()->reverts();
-			Format * active( format()->current() );
-			std::string const & ter_( ter() );
-			while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to arg-based format
-				active = active->next();
-			}
-			if ( stream() && active && active->uses_arg() && active->output_val( stream(), pos(), t, ter_ ) ) { // Output arg using active format
-				reverts_ = format()->reverts();
-				active = active->next();
-				while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts_ ) && format()->not_colon_terminated() && active->output_no_arg( stream(), pos(), ter_ ) ) { // Outputs up to next arg-based format if not : terminated
+		auto & stream_( stream() );
+		if ( stream_ ) {
+			auto const format_( format() );
+			if ( format_ ) {
+				auto & pos_( pos() );
+				reverts_ = format_->reverts();
+				Format * active( format_->current() );
+				std::string const & ter_( ter() );
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output_no_arg( stream_, pos_, ter_ ) ) { // Outputs up to arg-based format
 					active = active->next();
+				}
+				if ( stream_ && active && active->uses_arg() && active->output_val( stream_, pos_, t, ter_ ) ) { // Output arg using active format
+					reverts_ = format_->reverts();
+					active = active->next();
+					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && format_->not_colon_terminated() && active->output_no_arg( stream_, pos_, ter_ ) ) { // Outputs up to next arg-based format if not : terminated
+						active = active->next();
+					}
 				}
 			}
 		}
@@ -154,15 +159,19 @@ public: // Operators
 	WriteBase &
 	operator <<( std::complex< T > const & t )
 	{
-		if ( stream() && format() ) {
-			bool const ld( format()->is_list_directed() );
-			if ( ld ) stream() << '(';
-			*this << t.real(); // Fortran uses separate format descriptors for real and imag
-			if ( ld && stream() ) stream() << ',';
-			*this << t.imag(); // Fortran uses separate format descriptors for real and imag
-			if ( ld && stream() ) stream() << ')';
+		auto & stream_( stream() );
+		if ( stream_ ) {
+			auto const format_( format() );
+			if ( format_ ) {
+				bool const ld( format_->is_list_directed() );
+				if ( ld ) stream_ << '(';
+				*this << t.real(); // Fortran uses separate format descriptors for real and imag
+				if ( ld && stream_ ) stream_ << ',';
+				*this << t.imag(); // Fortran uses separate format descriptors for real and imag
+				if ( ld && stream_ ) stream_ << ')';
+			}
 		}
-		pos() = stream().tellp();
+		pos() = stream_.tellp();
 		status_set();
 		return *this;
 	}
@@ -173,10 +182,11 @@ public: // Operators
 	WriteBase &
 	operator <<( FArray< T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( typename FArray< T >::size_type i = 0; i < t.size(); ++i ) {
 				*this << t[ i ];
-				if ( ! stream() ) break;
+				if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -189,10 +199,11 @@ public: // Operators
 	WriteBase &
 	operator <<( FArray1S< T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this << t( i );
-				if ( ! stream() ) break;
+				if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -205,12 +216,13 @@ public: // Operators
 	WriteBase &
 	operator <<( FArray2S< T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					*this << t( i1, i2 );
-					if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -223,14 +235,15 @@ public: // Operators
 	WriteBase &
 	operator <<( FArray3S< T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
 						*this << t( i1, i2, i3 );
-						if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -243,16 +256,17 @@ public: // Operators
 	WriteBase &
 	operator <<( FArray4S< T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
 						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
 							*this << t( i1, i2, i3, i4 );
-							if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -265,18 +279,19 @@ public: // Operators
 	WriteBase &
 	operator <<( FArray5S< T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
 						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
 							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
 								*this << t( i1, i2, i3, i4, i5 );
-								if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -289,7 +304,8 @@ public: // Operators
 	WriteBase &
 	operator <<( FArray6S< T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
@@ -297,12 +313,12 @@ public: // Operators
 							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
 								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
 									*this << t( i1, i2, i3, i4, i5, i6 );
-									if ( ! stream() ) break;
-								} if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -315,10 +331,11 @@ public: // Operators
 	WriteBase &
 	operator <<( MArray1< A, T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i = 1, e = t.u(); i <= e; ++i ) {
 				*this << t( i );
-				if ( ! stream() ) break;
+				if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -331,12 +348,13 @@ public: // Operators
 	WriteBase &
 	operator <<( MArray2< A, T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					*this << t( i1, i2 );
-					if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -349,14 +367,15 @@ public: // Operators
 	WriteBase &
 	operator <<( MArray3< A, T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
 						*this << t( i1, i2, i3 );
-						if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -369,16 +388,17 @@ public: // Operators
 	WriteBase &
 	operator <<( MArray4< A, T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
 						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
 							*this << t( i1, i2, i3, i4 );
-							if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -391,18 +411,19 @@ public: // Operators
 	WriteBase &
 	operator <<( MArray5< A, T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
 						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
 							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
 								*this << t( i1, i2, i3, i4, i5 );
-								if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -415,7 +436,8 @@ public: // Operators
 	WriteBase &
 	operator <<( MArray6< A, T > const & t )
 	{
-		if ( stream() && format() ) {
+		auto & stream_( stream() );
+		if ( stream_ && format() ) {
 			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
 				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
 					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
@@ -423,12 +445,12 @@ public: // Operators
 							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
 								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
 									*this << t( i1, i2, i3, i4, i5, i6 );
-									if ( ! stream() ) break;
-								} if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
 			}
 		}
 		status_set();
@@ -440,8 +462,9 @@ public: // Operators
 	WriteBase &
 	operator <<( std::ostream & (*pf)( std::ostream & ) )
 	{
-		if ( stream() ) stream() << pf;
-		pos() = stream().tellp();
+		auto & stream_( stream() );
+		if ( stream_ ) stream_ << pf;
+		pos() = stream_.tellp();
 		status_set();
 		return *this;
 	}
@@ -451,8 +474,9 @@ public: // Operators
 	WriteBase &
 	operator <<( std::basic_ios< char > & (*pf)( std::basic_ios< char > & ) )
 	{
-		if ( stream() ) stream() << pf;
-		pos() = stream().tellp();
+		auto & stream_( stream() );
+		if ( stream_ ) stream_ << pf;
+		pos() = stream_.tellp();
 		status_set();
 		return *this;
 	}
