@@ -1063,6 +1063,8 @@ namespace PlantLoopEquip {
 
 			} else if ( SELECT_CASE_var1 == TypeOf_Baseboard_Rad_Conv_Water ) {
 
+			} else if ( SELECT_CASE_var1 == TypeOf_CoolingPanel_Simple ) {
+				
 			} else if ( SELECT_CASE_var1 == TypeOf_LowTempRadiant_VarFlow ) {
 
 			} else if ( SELECT_CASE_var1 == TypeOf_LowTempRadiant_ConstFlow ) {
@@ -1170,7 +1172,7 @@ namespace PlantLoopEquip {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -218,7 +218,7 @@ namespace CoolingPanelSimple {
 			{ auto const SELECT_CASE_var( CoolingPanel( CoolingPanelNum ).EquipType );
 
 			if ( SELECT_CASE_var == TypeOf_CoolingPanel_Simple ) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-				ControlCompOutput( CoolingPanel( CoolingPanelNum ).EquipID, cCMO_CoolingPanel_Simple, CoolingPanelNum, FirstHVACIteration, QZnReq, CoolingPanel( CoolingPanelNum ).WaterInletNode, MaxWaterFlow, MinWaterFlow, CoolingPanel( CoolingPanelNum ).Offset, CoolingPanel( CoolingPanelNum ).ControlCompTypeNum, CoolingPanel( CoolingPanelNum ).CompErrIndex, _, _, _, _, _, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum );
+				CalcCoolingPanel( CoolingPanelNum );
 			} else {
 				ShowSevereError( "SimCoolingPanelSimple: Errors in CoolingPanel=" + CoolingPanel( CoolingPanelNum ).EquipID );
 				ShowContinueError( "Invalid or unimplemented equipment type=" + TrimSigDigits( CoolingPanel( CoolingPanelNum ).EquipType ) );
@@ -522,8 +522,8 @@ namespace CoolingPanelSimple {
 
 			AllFracsSummed = CoolingPanel( CoolingPanelNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= CoolingPanel( CoolingPanelNum ).TotSurfToDistrib; ++SurfNum ) {
-				CoolingPanel( CoolingPanelNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 6 );
-				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 6 ), Surface.Name(), TotSurfaces );
+				CoolingPanel( CoolingPanelNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 7 );
+				CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface.Name(), TotSurfaces );
 				CoolingPanel( CoolingPanelNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 9 );
 				if ( CoolingPanel( CoolingPanelNum ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + cCMO_CoolingPanel_Simple + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 6 ) + "=\"" + cAlphaArgs( SurfNum + 6 ) + "\" invalid - not found." );
@@ -564,14 +564,14 @@ namespace CoolingPanelSimple {
 		for ( CoolingPanelNum = 1; CoolingPanelNum <= NumCoolingPanels; ++CoolingPanelNum ) {
 			// CurrentModuleObject='ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 			SetupOutputVariable( "Cooling Panel Total Cooling Rate [W]", CoolingPanel( CoolingPanelNum ).TotPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-
 			SetupOutputVariable( "Cooling Panel Convective Cooling Rate [W]", CoolingPanel( CoolingPanelNum ).ConvPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 			SetupOutputVariable( "Cooling Panel Radiant Cooling Rate [W]", CoolingPanel( CoolingPanelNum ).RadPower, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Total Heating Energy [J]", CoolingPanel( CoolingPanelNum ).TotEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
 
+			SetupOutputVariable( "Cooling Panel Total Cooling Energy [J]", CoolingPanel( CoolingPanelNum ).TotEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID, _, "ENERGYTRANSFER", "COOLINGPANEL", _, "System" );
 			SetupOutputVariable( "Cooling Panel Convective Cooling Energy [J]", CoolingPanel( CoolingPanelNum ).ConvEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
 			SetupOutputVariable( "Cooling Panel Radiant Cooling Energy [J]", CoolingPanel( CoolingPanelNum ).RadEnergy, "System", "Sum", CoolingPanel( CoolingPanelNum ).EquipID );
-			SetupOutputVariable( "Cooling Panel Chilled Water Mass Flow Rate [kg/s]", CoolingPanel( CoolingPanelNum ).WaterMassFlowRate, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
+
+			SetupOutputVariable( "Cooling Panel Water Mass Flow Rate [kg/s]", CoolingPanel( CoolingPanelNum ).WaterMassFlowRate, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 			SetupOutputVariable( "Cooling Panel Water Inlet Temperature [C]", CoolingPanel( CoolingPanelNum ).WaterInletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 			SetupOutputVariable( "Cooling Panel Water Outlet Temperature [C]", CoolingPanel( CoolingPanelNum ).WaterOutletTemp, "System", "Average", CoolingPanel( CoolingPanelNum ).EquipID );
 		}
@@ -664,6 +664,28 @@ namespace CoolingPanelSimple {
 			MyEnvrnFlag = true;
 			MyOneTimeFlag = false;
 			SetLoopIndexFlag = true;
+			
+			// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
+			Cp = 4120.0; // Just an approximation, don't need to get an exact number
+			MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
+			MDotXCp = Cp * MDot;
+			Qrated = CoolingPanel( CoolingPanelNum ).RatedCapacity;
+			Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
+			Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
+			if ( Tinletr >= Tzoner ) {
+				ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
+				ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
+				ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
+				CoolingPanel( CoolingPanelNum ).UA = 1.0;
+			} else {
+				CoolingPanel( CoolingPanelNum ).UA = -MDotXCp * log( 1.0 - ( std::abs(Qrated) / ( MDotXCp * std::abs( Tinletr - Tzoner ) ) ) );
+				if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
+					ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( CoolingPanelNum ).EquipID + "] has a zero or negative calculated UA value." );
+					ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
+					ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
+				}
+			}
+
 		}
 
 		if ( CoolingPanel( CoolingPanelNum ).ZonePtr <= 0 ) CoolingPanel( CoolingPanelNum ).ZonePtr = ZoneEquipConfig( ControlledZoneNumSub ).ActualZoneNum;
@@ -687,30 +709,6 @@ namespace CoolingPanelSimple {
 				SetLoopIndexFlag( CoolingPanelNum ) = false;
 			}
 		}
-
-		// Do the Begin Simulation initializations
-		// These initializations are mainly the calculation of the UA value for the heat exchanger formulation of the simple cooling panel
-		if ( BeginSimFlag ) {
-			Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, CoolingPanel( CoolingPanelNum ).RatedWaterTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
-			MDot = CoolingPanel( CoolingPanelNum ).RatedWaterFlowRate;
-			MDotXCp = Cp * MDot;
-			Qrated = CoolingPanel( CoolingPanelNum ).RatedCapacity;
-			Tinletr = CoolingPanel( CoolingPanelNum ).RatedWaterTemp;
-			Tzoner = CoolingPanel( CoolingPanelNum ).RatedZoneAirTemp;
-			if ( Tinletr <= Tzoner ) {
-				ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( Loop ).EquipID + "] has a rated water temperature that is higher than the rated zone temperature." );
-				ShowContinueError( "Such a situation would not lead to cooling and thus the rated water or zone temperature or both should be adjusted." );
-				ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
-				CoolingPanel( CoolingPanelNum ).UA = 1.0;
-			} else {
-				CoolingPanel( CoolingPanelNum ).UA = MDotXCp * log( 1.0 - ( Qrated / ( MDotXCp * ( Tinletr - Tzoner ) ) ) );
-				if ( CoolingPanel( CoolingPanelNum ).UA <= 0.0 ) {
-					ShowSevereError( "InitCoolingPanel: Unit=[" + cCMO_CoolingPanel_Simple + ',' + CoolingPanel( Loop ).EquipID + "] has a zero or negative calculated UA value." );
-					ShowContinueError( "This is not allowed.  Please check the rated input parameters for this device to ensure that the values are correct." );
-					ShowFatalError( "InitCoolingPanel: Program terminated for previous conditions." );
-				}
-			}
-		}
 		
 		// Do the Begin Environment initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( CoolingPanelNum ) ) {
@@ -723,7 +721,7 @@ namespace CoolingPanelSimple {
 
 			InitComponentNodes( 0.0, CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax, CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterOutletNode, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum, CoolingPanel( CoolingPanelNum ).CompNum );
 
-			Node( WaterInletNode ).Temp = 60.0;
+			Node( WaterInletNode ).Temp = 7.0;
 
 			Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, Node( WaterInletNode ).Temp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
 
@@ -774,8 +772,7 @@ namespace CoolingPanelSimple {
 
 	void
 	CalcCoolingPanel(
-		int & CoolingPanelNum,
-		Real64 & LoadMet
+		int & CoolingPanelNum
 	)
 	{
 		// SUBROUTINE INFORMATION:
@@ -856,6 +853,7 @@ namespace CoolingPanelSimple {
 		Real64 FullOnTempCool;
 		Real64 MassFlowFrac;
 		Real64 DewPointTemp;
+		Real64 LoadMet;
 		bool CoolingPanelOn;
 		bool ModifiedWaterInletTemp;
 
@@ -864,11 +862,10 @@ namespace CoolingPanelSimple {
 		QZnReq = ZoneSysEnergyDemand( ZoneNum ).RemainingOutputReqToCoolSP;
 		WaterInletTemp = CoolingPanel( CoolingPanelNum ).WaterInletTemp;
 		WaterOutletTemp = WaterInletTemp;
-		WaterMassFlowRate = Node( CoolingPanel( CoolingPanelNum ).WaterInletNode ).MassFlowRate;
-		WaterMassFlowRateMax = Node( CoolingPanel( CoolingPanelNum ).WaterInletNode ).MassFlowRateMax;
+		WaterMassFlowRateMax = CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax;
 		Xr = CoolingPanel( CoolingPanelNum ).FracRadiant;
 
-		if ( ( GetCurrentScheduleValue( CoolingPanel( CoolingPanelNum ).SchedPtr ) > 0 ) && ( WaterMassFlowRate > 0.0 ) ) {
+		if ( GetCurrentScheduleValue( CoolingPanel( CoolingPanelNum ).SchedPtr ) > 0 ) {
 			CoolingPanelOn = true;
 		} else {
 			CoolingPanelOn = false;
@@ -876,6 +873,8 @@ namespace CoolingPanelSimple {
 		// Calculate the "zone" temperature for determining the output of the cooling panel
 		Tzone = Xr * MRT( ZoneNum ) + ( (1.0 - Xr ) * MAT( ZoneNum ) );
 
+		// Logical controls: if the WaterInletTemperature is higher than Tzone, do not run the panel
+		if ( WaterInletTemp >= Tzone ) CoolingPanelOn = false;
 		
 		// Condensation Controls based on dewpoint temperature of the zone.
 		// The assumption here is that condensation might take place if the inlet water temperature
@@ -928,7 +927,7 @@ namespace CoolingPanelSimple {
 		
 		if ( ( CoolingPanel( CoolingPanelNum ).ControlType == ZoneTotalLoadControl ) || ( CoolingPanel( CoolingPanelNum ).ControlType == ZoneConvectiveLoadControl ) ) {
 	
-			if ( QZnReq > SmallLoad && ! CurDeadBandOrSetback( ZoneNum ) && ( CoolingPanelOn ) ) {
+			if ( QZnReq < -SmallLoad && ! CurDeadBandOrSetback( ZoneNum ) && ( CoolingPanelOn ) ) {
 
 				Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
 
@@ -1023,11 +1022,20 @@ namespace CoolingPanelSimple {
 		}
 		
 		if ( CoolingPanelOn ) {
-			
 			SetComponentFlowRate( WaterMassFlowRate, CoolingPanel( CoolingPanelNum ).WaterInletNode, CoolingPanel( CoolingPanelNum ).WaterOutletNode, CoolingPanel( CoolingPanelNum ).LoopNum, CoolingPanel( CoolingPanelNum ).LoopSideNum, CoolingPanel( CoolingPanelNum ).BranchNum, CoolingPanel( CoolingPanelNum ).CompNum );
+			if ( WaterMassFlowRate <= 0.0 ) CoolingPanelOn = false;
+		}
+		
+		if ( CoolingPanelOn ) {
 			// Now simulate the system...
-			CoolingPanelCool = exp( 1.0 - (CoolingPanel( CoolingPanelNum ).UA / (WaterMassFlowRate * Cp) ) ) * WaterMassFlowRate * Cp * ( WaterInletTemp - Tzone );
 			Cp = GetSpecificHeatGlycol( PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidName, WaterInletTemp, PlantLoop( CoolingPanel( CoolingPanelNum ).LoopNum ).FluidIndex, RoutineName );
+			Effectiveness = 1.0 - exp( -CoolingPanel( CoolingPanelNum ).UA / (WaterMassFlowRate * Cp) );
+			if ( Effectiveness <= 0.0 ) {
+				Effectiveness = 0.0;
+			} else if ( Effectiveness >= 1.0 ) {
+				Effectiveness = 1.0;
+			}
+			CoolingPanelCool = ( Effectiveness ) * WaterMassFlowRate * Cp * ( WaterInletTemp - Tzone );
 			WaterOutletTemp = CoolingPanel( CoolingPanelNum ).WaterInletTemp - ( CoolingPanelCool / ( WaterMassFlowRate * Cp ) );
 			RadHeat = CoolingPanelCool * CoolingPanel( CoolingPanelNum ).FracRadiant;
 			CoolingPanelSource( CoolingPanelNum ) = RadHeat;
@@ -1149,6 +1157,10 @@ namespace CoolingPanelSimple {
 		SafeCopyPlantNode( WaterInletNode, WaterOutletNode );
 		Node( WaterOutletNode ).Temp = CoolingPanel( CoolingPanelNum ).WaterOutletTemp;
 		Node( WaterOutletNode ).Enthalpy = CoolingPanel( CoolingPanelNum ).WaterOutletEnthalpy;
+		Node( WaterInletNode ).MassFlowRate = CoolingPanel( CoolingPanelNum ).WaterMassFlowRate;
+		Node( WaterOutletNode ).MassFlowRate = CoolingPanel( CoolingPanelNum ).WaterMassFlowRate;
+		Node( WaterInletNode ).MassFlowRateMax = CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax;
+		Node( WaterOutletNode ).MassFlowRateMax = CoolingPanel( CoolingPanelNum ).WaterMassFlowRateMax;
 
 	}
 

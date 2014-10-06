@@ -2869,6 +2869,9 @@ namespace OutputProcessor {
 		} else if ( endUseMeter == "BASEBOARD" || endUseMeter == "BASEBOARDS" ) {
 			EndUse = "Baseboard";
 
+		} else if ( endUseMeter == "COOLINGPANEL" || endUseMeter == "COOLINGPANELS" ) {
+			EndUse = "CoolingPanel";
+			
 		} else if ( endUseMeter == "HEATREJECTION" || endUseMeter == "HEAT REJECTION" ) {
 			EndUse = "HeatRejection";
 
@@ -8479,7 +8482,7 @@ AddToOutputVariableList(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

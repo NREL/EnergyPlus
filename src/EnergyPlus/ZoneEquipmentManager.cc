@@ -2828,8 +2828,7 @@ namespace ZoneEquipmentManager {
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;
 					LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
-				} else if ( SELECT_CASE_var == LoTempRadiant_Num ) { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow', 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
-					// 'ZoneHVAC:LowTemperatureRadiant:Electric'
+				} else if ( SELECT_CASE_var == CoolingPanel_Num ) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
 					SimCoolingPanel( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, ControlledZoneNum, FirstHVACIteration, SysOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
 					NonAirSystemResponse( ActualZoneNum ) += SysOutputProvided;

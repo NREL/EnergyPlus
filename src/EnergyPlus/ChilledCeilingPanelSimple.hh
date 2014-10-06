@@ -298,8 +298,7 @@ namespace CoolingPanelSimple {
 
 	void
 	CalcCoolingPanel(
-		int & CoolingPanelNum,
-		Real64 & LoadMet
+		int & CoolingPanelNum
 	);
 
 	void
