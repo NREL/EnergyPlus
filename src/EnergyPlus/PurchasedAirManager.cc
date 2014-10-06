@@ -1028,8 +1028,8 @@ namespace PurchasedAirManager {
 		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
 		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
 		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-		Real64 CoolingAirVolFlowDes; // cooling supply air flow rate
-		Real64 HeatingAirVolFlowDes; // heating supply air flow rate
+		Real64 CoolingAirVolFlowDes( 0.0 ); // cooling supply air flow rate
+		Real64 HeatingAirVolFlowDes( 0.0 ); // heating supply air flow rate
 
 		IsAutoSize = false;
 		MaxHeatVolFlowRateDes = 0.0;

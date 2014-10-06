@@ -1,4 +1,5 @@
 !IDD_Version ${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}
+!IDD_BUILD ${CMAKE_VERSION_BUILD}
 ! **************************************************************************
 ! This file is the Input Data Dictionary (IDD) for EnergyPlus.
 ! The IDD defines the syntax and data model for each type of input "Object."
@@ -29536,17 +29537,27 @@ HVACTemplate:Plant:ChilledWaterLoop,
       \note Leave blank for no limit.
       \units C
   A21,\field Chilled Water Load Distribution Scheme
+      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
       \key Sequential
       \key Uniform
-      \default Sequential
+      \default SequentialLoad
   A22;\field Condenser Water Load Distribution Scheme
+      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
       \key Sequential
       \key Uniform
-      \default Sequential
+      \default SequentialLoad
 
 HVACTemplate:Plant:Chiller,
       \min-fields 7
@@ -29865,11 +29876,16 @@ HVACTemplate:Plant:HotWaterLoop,
       \note Leave blank for no limit.
       \units C
   A13;\field Load Distribution Scheme
+      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
       \key Sequential
       \key Uniform
-      \default Sequential
+      \default SequentialLoad
 
 HVACTemplate:Plant:Boiler,
       \min-fields 7
@@ -30069,11 +30085,16 @@ HVACTemplate:Plant:MixedWaterLoop,
       \units deltaC
       \default 5.6
   A13;\field Load Distribution Scheme
+      \note Sequential=SequentialLoad, Uniform=UniformLoad, retained here for compatibility
       \type choice
       \key Optimal
+      \key SequentialLoad
+      \key UniformLoad
+      \key UniformPLR
+      \key SequentialUniformPLR
       \key Sequential
       \key Uniform
-      \default Sequential
+      \default SequentialLoad
 
 \group HVAC Design Objects
 
@@ -30544,7 +30565,7 @@ DesignSpecification:ZoneHVAC:Sizing,
 Sizing:System,
       \memo Specifies the input needed to perform sizing calculations for a central forced air
       \memo system design air flow, heating capacity, and cooling capacity.
-      \min-fields 20
+      \min-fields 27
   A1, \field AirLoop Name
       \required-field
       \type object-list
@@ -32626,7 +32647,7 @@ ZoneHVAC:UnitVentilator,
 ZoneHVAC:UnitHeater,
         \memo Unit heater. Forced-convection heating-only unit with supply fan, heating coil
         \memo (gas, electric, hot water, or steam) and fixed-position outdoor air mixer.
-        \min-fields 10
+        \min-fields 11
    A1 , \field Name
         \required-field
    A2 , \field Availability Schedule Name
@@ -33161,7 +33182,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
        \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
        \memo groups to the end of the list
-       \min-fields 9
+       \min-fields 12
   A1,  \field Name
        \required-field
   A2,  \field Availability Schedule Name
@@ -33220,6 +33241,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \note of 0.063kg/s or 0.252kg/s, and the Rated Average Water Temperature between 32.2C and 115.6C.
   N4 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -33951,7 +33973,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Water,
        \maximum 1
 
 ZoneHVAC:Baseboard:RadiantConvective:Steam,
-       \min-fields 7
+       \min-fields 11
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
        \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
        \memo groups to the end of the list
@@ -33992,6 +34014,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \note HeatingDesignCapacity.
   N2 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -34729,7 +34752,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Steam,
        \maximum 1
 
 ZoneHVAC:Baseboard:RadiantConvective:Electric,
-       \min-fields 5
+       \min-fields 8
        \extensible:2 - repeat last two fields, remembering to remove ; from "inner" fields.
        \memo The number of surfaces can be expanded beyond 100, if necessary, by adding more
        \memo groups to the end of the list
@@ -34764,6 +34787,7 @@ ZoneHVAC:Baseboard:RadiantConvective:Electric,
        \note HeatingDesignCapacity.
   N2 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -35529,6 +35553,7 @@ ZoneHVAC:Baseboard:Convective:Water,
        \note HeatingDesignCapacity.
   N2 , \field Heating Design Capacity Per Floor Area
        \type real
+       \units W/m2
        \minimum 0.0
        \note Enter the heating design capacity per zone floor area.Required field when the heating design
        \note capacity method field is CapacityPerFloorArea.
@@ -35585,6 +35610,7 @@ ZoneHVAC:Baseboard:Convective:Electric,
         \note HeatingDesignCapacity.
   N2 ,  \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
@@ -35604,7 +35630,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \memo Low temperature hydronic radiant heating and/or cooling system embedded in a building
         \memo surface (wall, ceiling, or floor). Controlled by varying the hot or chilled water
         \memo flow to the unit.
-   \min-fields 21
+   \min-fields 29
    A1 , \field Name
        \required-field
    A2 , \field Availability Schedule Name
@@ -35665,6 +35691,7 @@ ZoneHVAC:LowTemperatureRadiant:VariableFlow,
         \note HeatingDesignCapacity.
    N4 , \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
@@ -35926,6 +35953,7 @@ ZoneHVAC:LowTemperatureRadiant:Electric,
         \note HeatingDesignCapacity.
    N2 , \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.
@@ -36505,6 +36533,7 @@ ZoneHVAC:HighTemperatureRadiant,
         \note HeatingDesignCapacity.
    N2 , \field Heating Design Capacity Per Floor Area
         \type real
+        \units W/m2
         \minimum 0.0
         \note Enter the heating design capacity per zone floor area.Required field when the heating design
         \note capacity method field is CapacityPerFloorArea.

@@ -4437,9 +4437,9 @@ namespace WindowManager {
 		static FArray1D< Real64 > kdpdown( 10 );
 		Real64 kmix; // For accumulating conductance of gas mixture
 		Real64 mumix; // For accumulating viscosity of gas mixture
-		Real64 visc; // Dynamic viscosity of mixture at tmean (g/m-s)
-		Real64 cp; // Specific heat of mixture at tmean (J/m3-K)
-		Real64 dens; // Density of mixture at tmean (kg/m3)
+		Real64 visc( 0.0 ); // Dynamic viscosity of mixture at tmean (g/m-s)
+		Real64 cp( 0.0 ); // Specific heat of mixture at tmean (J/m3-K)
+		Real64 dens( 0.0 ); // Density of mixture at tmean (kg/m3)
 		Real64 cpmixm; // Gives cp when divided by molmix
 		Real64 phimup; // Numerator factor
 		Real64 downer; // Denominator factor
@@ -4535,6 +4535,8 @@ namespace WindowManager {
 			dens = rhomix;
 			cp = cpmixm / molmix;
 
+		} else {
+			assert( false );
 		} // End of check if single or multiple gases in gap
 
 		pr = cp * visc / con;
@@ -5022,8 +5024,8 @@ namespace WindowManager {
 		Real64 ReflectCurveFH; // average of curves F and H
 		Real64 TransCurveBDCD; // average of curves B, D, C, and D (again)
 		Real64 ReflectCurveBDCD; // average of curves B, D, C, and D (again)
-		Real64 TransTmp; // temporary value for normalized transmission (carry out of if blocks)
-		Real64 ReflectTmp; // temporary value for normalized reflectance (carry out of if blocks)
+		Real64 TransTmp( 0.0 ); // temporary value for normalized transmission (carry out of if blocks)
+		Real64 ReflectTmp( 0.0 ); // temporary value for normalized reflectance (carry out of if blocks)
 		Real64 testval; // temporary value for calculations
 		Real64 tmp1; // temporary value for calculations
 		Real64 tmp2; // temporary value for calculations
@@ -5248,7 +5250,11 @@ namespace WindowManager {
 					TransTmp = TransCurveD;
 					ReflectTmp = ReflectCurveD;
 
+				} else {
+					assert( false );
 				}
+			} else {
+				assert( false );
 			}
 
 			if ( cs == 1.0 ) { // at 0 deg incident, TransTmp should be 1.0

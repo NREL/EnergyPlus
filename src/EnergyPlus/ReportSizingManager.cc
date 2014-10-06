@@ -1447,8 +1447,8 @@ namespace ReportSizingManager {
 						} else {
 							NominalCapacityDes = 0.0;
 						}
+						AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedCoolingCapacity; //Fixed Moved up 1 line inside block per Richard Raustad
 					} // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
-					AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedCoolingCapacity;
 				} else if (SizingType == HeatingCapacitySizing) {
 				    DataFracOfAutosizedHeatingCapacity = 1.0;
 					if (CurOASysNum > 0) {

@@ -8400,7 +8400,7 @@ namespace DaylightingManager {
 		int SolBmIndex;
 		int NTrnBasis;
 		int iTrnElem;
-		Real64 WindowSolidAngleDaylightPoint;
+		Real64 WindowSolidAngleDaylightPoint( 0.0 );
 		Real64 XR;
 		Real64 YR;
 		Real64 PosFac;
@@ -8423,6 +8423,8 @@ namespace DaylightingManager {
 			WindowSolidAngleDaylightPoint = SurfaceWindow( iWin ).SolidAngAtRefPtWtd( iRefPoint );
 		} else if ( SELECT_CASE_var == CalledForMapPoint ) {
 			WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd()( LoopWin, iRefPoint );
+		} else {
+			assert( false ); // Bad CalledFrom argument
 		}}
 
 		if ( WindowSolidAngleDaylightPoint < 1e-6 ) return;

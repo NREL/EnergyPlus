@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <vector>
 
@@ -2738,7 +2739,7 @@ namespace PlantCondLoopOperation {
 		Real64 ActualMdot;
 		Real64 TempIn;
 		Real64 CurSpecHeat;
-		Real64 TempSetPt;
+		Real64 TempSetPt( 0.0 );
 		Real64 CompMinLoad;
 		Real64 CompMaxLoad;
 		Real64 CompOptLoad;
@@ -2800,9 +2801,11 @@ namespace PlantCondLoopOperation {
 				} else { // deadband
 					TempSetPt = TempIn;
 				}
-
+			} else {
+				assert( false );
 			}
-
+		} else {
+			assert( false );
 		}}
 
 		if ( TempSetPt == SensedNodeFlagValue ) {
@@ -2959,7 +2962,7 @@ namespace PlantCondLoopOperation {
 		using DataEnvironment::OutDewPointTemp;
 
 		// Return value
-		Real64 FindRangeVariable;
+		Real64 FindRangeVariable( 0.0 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2991,8 +2994,9 @@ namespace PlantCondLoopOperation {
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutDewPointTemp;
+		} else {
+			assert( false );
 		}} // OperationScheme
-		//Autodesk:Return Check/enforce that one of these CASEs holds or add a default case to assure return value is set
 
 		return FindRangeVariable;
 

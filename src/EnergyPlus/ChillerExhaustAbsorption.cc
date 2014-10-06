@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -1190,7 +1191,7 @@ namespace ChillerExhaustAbsorption {
 		Real64 lExhaustAirHumRat;
 		// other local variables
 		Real64 ChillDeltaTemp; // chilled water temperature difference
-		Real64 ChillSupplySetPointTemp;
+		Real64 ChillSupplySetPointTemp( 0.0 );
 		Real64 calcCondTemp; // the condenser temperature used for curve calculation
 		// either return or supply depending on user input
 		static Real64 oldCondSupplyTemp( 0.0 ); // save the last iteration value of leaving condenser water temperature
@@ -1278,6 +1279,8 @@ namespace ChillerExhaustAbsorption {
 			ChillSupplySetPointTemp = Node( lChillSupplyNodeNum ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			ChillSupplySetPointTemp = Node( lChillSupplyNodeNum ).TempSetPointHi;
+		} else {
+			assert( false );
 		}}
 		ChillDeltaTemp = std::abs( lChillReturnTemp - ChillSupplySetPointTemp );
 		lExhaustInTemp = Node( lExhaustAirInletNodeNum ).Temp;
@@ -1634,7 +1637,7 @@ namespace ChillerExhaustAbsorption {
 		Real64 lExhaustAirHumRat;
 		// other local variables
 		Real64 HeatDeltaTemp; // hot water temperature difference
-		Real64 HeatSupplySetPointTemp;
+		Real64 HeatSupplySetPointTemp( 0.0 );
 		int LoopNum;
 		int LoopSideNum;
 		Real64 Cp_HW; // local fluid specific heat for hot water
@@ -1708,6 +1711,8 @@ namespace ChillerExhaustAbsorption {
 			HeatSupplySetPointTemp = Node( lHeatSupplyNodeNum ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			HeatSupplySetPointTemp = Node( lHeatSupplyNodeNum ).TempSetPointLo;
+		} else {
+			assert( false );
 		}}
 		HeatDeltaTemp = std::abs( lHotWaterReturnTemp - HeatSupplySetPointTemp );
 

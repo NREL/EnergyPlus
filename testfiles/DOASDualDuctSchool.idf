@@ -4653,7 +4653,7 @@
     Main_Corridor Baseboard Heater Outlet Node Name,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
@@ -5128,7 +5128,7 @@
     Lobby Baseboard Heater Outlet Node Name,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
@@ -5571,7 +5571,7 @@
     Mech Baseboard Heater Outlet Node Name,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
@@ -5974,7 +5974,7 @@
     Bathrooms Baseboard Heater Outlet Node Name,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
@@ -6848,7 +6848,7 @@
     Offices Baseboard Heater Outlet Node Name,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}
@@ -7519,7 +7519,7 @@
     Media_Center Baseboard Heater Outlet Node Name,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     AUTOSIZE,                !- U-Factor Times Area Value {W/K}
     AUTOSIZE,                !- Maximum Water Flow Rate {m3/s}

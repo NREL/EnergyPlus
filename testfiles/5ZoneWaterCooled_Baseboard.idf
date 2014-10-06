@@ -2203,7 +2203,7 @@
     0.063,                   !- Rated Water Mass Flow Rate {Kg/s}
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Water Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance
@@ -2225,7 +2225,7 @@
     0.063,                   !- Rated Water Mass Flow Rate {Kg/s}
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- Maximum Water Flow Rate {m3/s}
     0.001,                   !- Convergence Tolerance

@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -202,7 +203,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum; // index of packaged terminal heat pump being simulated
+		int PTUnitNum( 0 ); // index of packaged terminal heat pump being simulated
 
 		Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
 		Real64 QZnReq; // load to be met by zone equipment
@@ -233,6 +234,7 @@ namespace PackagedTerminalHeatPump {
 			} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 				PTUnitNum = CompIndex + NumPTHP + NumPTAC;
 			} else {
+				assert( false );
 			}}
 			if ( PTUnitNum > NumPTUs || PTUnitNum < 1 ) {
 				ShowFatalError( "SimPackagedTerminalUnit:  Invalid CompIndex passed=" + TrimSigDigits( PTUnitNum ) + ", Number of Units=" + TrimSigDigits( NumPTUs ) + ", Entered Unit name=" + CompName );
@@ -5055,7 +5057,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5079,6 +5081,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5132,7 +5135,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5156,6 +5159,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5211,7 +5215,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5233,6 +5237,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5293,7 +5298,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5315,6 +5320,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {

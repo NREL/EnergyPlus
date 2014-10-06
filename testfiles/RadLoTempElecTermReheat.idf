@@ -2115,7 +2115,7 @@
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     10000,                   !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     MeanAirTemperature,      !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
@@ -2128,7 +2128,7 @@
     Zn002:Flr001,            !- Surface Name or Radiant Surface Group Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     10000,                   !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     MeanRadiantTemperature,  !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}
@@ -2141,7 +2141,7 @@
     Zn003:Flr001,            !- Surface Name or Radiant Surface Group Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     15000,                   !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     OperativeTemperature,    !- Temperature Control Type
     2.0,                     !- Heating Throttling Range {deltaC}

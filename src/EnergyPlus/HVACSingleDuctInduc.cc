@@ -516,7 +516,7 @@ namespace HVACSingleDuctInduc {
 		Real64 rho; // local fluid density
 		int HWOutletNode; // local node index for hot water coil's outlet node
 		int CWOutletNode; // local node index for cold water coil's outlet node
-		bool errFlag;
+		bool errFlag( false );
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
