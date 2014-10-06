@@ -5596,20 +5596,20 @@
     0.2,                     !- Minimum Value of x
     1.00;                    !- Maximum Value of x
 
-  Curve:Biquadratic,
+Curve:Biquadratic,
     Discharge-SHR-fT,        !- Name
-    -76.3312028672366,       !- Coefficient1 Constant
-    3.69083877577677,        !- Coefficient2 x
-    0.00402614182268047,     !- Coefficient3 x**2
-    3.120670734078,          !- Coefficient4 y
-    -0.00297662635327143,    !- Coefficient5 y**2
-    -0.148603418986272,      !- Coefficient6 x*y
-    24.44,                   !- Minimum Value of x
-    26.67,                   !- Maximum Value of x
-    29.44,                   !- Minimum Value of y
-    46.1,                    !- Maximum Value of y
-    0.2,                     !- Minimum Curve Output
-    1.0,                     !- Maximum Curve Output
+    -3.129846005,            !- Coefficient1 Constant
+    0.108185126,             !- Coefficient2 x
+    0,                       !- Coefficient3 x**2
+    0.235966025,             !- Coefficient4 y
+    0,                       !- Coefficient5 y**2
+    -0.008227635,            !- Coefficient6 x*y
+    16.1,                    !- Minimum Value of x {BasedOnField A2}
+    23.9,                    !- Maximum Value of x {BasedOnField A2}
+    23.9,                    !- Minimum Value of y {BasedOnField A3}
+    29.4,                    !- Maximum Value of y {BasedOnField A3}
+    0.2,                     !- Minimum Curve Output {BasedOnField A4}
+    2.0,                     !- Maximum Curve Output {BasedOnField A4}
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
