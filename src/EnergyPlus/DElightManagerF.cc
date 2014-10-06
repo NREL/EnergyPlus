@@ -19,7 +19,7 @@ namespace DElightManagerF {
 
 	// Do nothing except show fatal error when calls are made to DElight subroutines.
 	// Fatal errors will only be generated when a user include DElight objects in the input IDF.
-	// This module replaces DElightManagerF.f90 when building EnergyPlus without the DElight LIB and DLL.
+	// This module replaces DElightManagerF.cc when building EnergyPlus without the DElight LIB and DLL.
 
 	// METHODOLOGY EMPLOYED:
 
@@ -381,7 +381,7 @@ namespace DElightManagerF {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
