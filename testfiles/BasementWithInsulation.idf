@@ -595,8 +595,8 @@ OutputControl:Table:Style,
 
   Output:Variable,*,Zone Coupled Basement Wall Heat Flux,hourly;
   Output:Variable,*,Zone Coupled Basement Floor Heat Flux,hourly;
-  Output:Variable,*, Surface Other Side Conditions Modeled Convection Air Temperature, hourly; 
-  Output:Variable,*, Surface Average Face Conduction Heat Transfer Rate per Area, hourly; 
+  Output:Variable,*,Surface Other Side Conditions Modeled Convection Air Temperature, hourly; 
+  Output:Variable,*,Surface Average Face Conduction Heat Transfer Rate per Area, hourly; 
   Output:Variable,*,Zone Air Temperature,hourly;
   Output:Variable,*,Zone Air System Sensible Heating Rate,hourly; !- HVAC Average [W]
   Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly; !- HVAC Average [W]
