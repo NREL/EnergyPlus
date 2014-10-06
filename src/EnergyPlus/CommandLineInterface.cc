@@ -84,7 +84,12 @@ namespace CommandLineInterface{
 	std::string eplusADSFileName;
 	std::string outputFilePrefix;
 	std::string dirPathName;
+	std::string idfFileNameOnly;
+	std::string exePath;
+	std::string prefixOutName;
+
 	bool readVarsValue;
+	bool prefixValue;
 
 	std::string
 	returnFileName( std::string const& filename )
@@ -118,35 +123,27 @@ namespace CommandLineInterface{
 			return ext;
 	}
 
-
-	bool mkpath( std::string path )
+	int
+	mkpath(std::string s,mode_t mode)
 	{
-	    bool bSuccess = false;
-	    int nRC = ::mkdir( path.c_str(), 0775 );
-	    if( nRC == -1 )
-	    {
-	        switch( errno )
-	        {
-	            case ENOENT:
-	                //parent didn't exist, try to create it
-	                if( mkpath( path.substr(0, path.find_last_of('/')) ) )
-	                    //Now, try to create again.
-	                    bSuccess = 0 == ::mkdir( path.c_str(), 0775 );
-	                else
-	                    bSuccess = false;
-	                break;
-	            case EEXIST:
-	                //Done!
-	                bSuccess = true;
-	                break;
-	            default:
-	                bSuccess = false;
-	                break;
+	    size_t pre=0,pos;
+	    std::string dir;
+	    int mdret;
+
+	    if(s[s.size()-1]!=pathChar){
+	        // force trailing / so we can handle everything in loop
+	        s+=pathChar;
+	    }
+
+	    while((pos=s.find_first_of(pathChar,pre))!=std::string::npos){
+	        dir=s.substr(0,pos++);
+	        pre=pos;
+	        if(dir.size()==0) continue; // if leading / first time is 0 length
+	        if((mdret=mkdir(dir.c_str(),mode)) && errno!=EEXIST){
+	            return mdret;
 	        }
 	    }
-	    else
-	        bSuccess = true;
-	    return bSuccess;
+	    return mdret;
 	}
 
 	int
@@ -156,25 +153,25 @@ namespace CommandLineInterface{
 		ezOptionParser opt;
 
 		opt.overview = VerString;
-		opt.example = "EnergyPlus -i InputFile.idf -e Energy+.idd -w WeatherFile.epw -d DirPathName -o -r ";
+		opt.example = "EnergyPlus -i custom.idd -w weather.epw -d output/ -p prefix -r input.idf";
 
-		opt.syntax = "EnergyPlus [options]";
+		opt.syntax = "EnergyPlus [options] [input file]";
 
 		opt.add("", 0, 0, 0, "Display this message", "-h", "--help");
 
-		opt.add("", 0, 0, 0, "Print version information", "-v", "--version");
+		opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
-		opt.add("in.idf", 0, 1, 0, "Input Definition File (IDF) file path (default \".\\in.idf\")", "-i", "--idf");
+		opt.add("in.idf", 0, 1, 0, "Input data file path (default in.idf)", "");
 
-		opt.add("in.epw", 0, 1, 0, "EnergyPlus Weather (EPW) file path (default \".\\in.epw\")", "-w", "--weather");
+		opt.add("in.epw", 0, 1, 0, "Weather file path (default in.epw)", "-w", "--weather");
 
-		opt.add("Energy+.idd", 0, 1, 0, "Input Data Dictionary (IDD) file path (default \".\\Energy+.idd\")", "-e", "--idd");
+		opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default Energy+.idd in executable directory)", "-i", "--idd");
 
-		opt.add("", 0, 0, 0, "Rename output files to using the IDF and EPW file names", "-o", "--output");
+		opt.add("", 0, 1, 0, "Prefix for output files (default same as input file name)", "-p", "--prefix");
 
-		opt.add("", 0, 0, 0, "Option to run readVARS", "-r", "--readVARS");
+		opt.add("", 0, 0, 0, "Run ReadVarsESO to generate time-series CSV", "-r", "--readvars");
 
-		opt.add("", 0, 1, 0, "Output directory pathname (default \".\\pwd\")", "-d", "--dirname");
+		opt.add("", 0, 1, 0, "Output directory (default current working directory)", "-d", "--dir");
 
 		// Parse arguments
 		opt.parse(argc, argv);
@@ -190,157 +187,179 @@ namespace CommandLineInterface{
 
 		opt.getUsage(usage);
 
-	    opt.get("-i")->getString(inputIdfFileName);
+		//To check the path of EnergyPlus
+        char executable_path[100];
+        realpath(argv[0], executable_path);
+        std::string mystring = std::string(executable_path);
+        exePath = returnDirPathName( mystring );
 
 		opt.get("-w")->getString(inputWeatherFileName);
 
-		opt.get("-e")->getString(inputIddFileName);
+		opt.get("-i")->getString(inputIddFileName);
 
 		opt.get("-d")->getString(dirPathName);
-	//	std::cout<<"Directory pathname = "<<dirPathName<<std::endl;
 
-	//	mkpath(dirPathName);
+		/////////// For weather filename only (incase needed) ///////////////////
+		//weatherFileNameWextn = returnFileName(inputWeatherFileName);
+		//weatherDirPathName = returnDirPathName(inputWeatherFileName);
+		//std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
 
-		idfFileNameWextn = returnFileName(inputIdfFileName);
+		std::vector<std::string> badOptions;
+		if(!opt.gotExpected(badOptions)) {
+			for(int i=0; i < badOptions.size(); ++i) {
+				DisplayString("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+				DisplayString(usage);
+			//	ShowFatalError("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+				}
+			exit(EXIT_FAILURE);
+		}
 
-		std::string idfFileNameOnly = idfFileNameWextn.substr(0,idfFileNameWextn.size()-4);
-
-		idfDirPathName = returnDirPathName(inputIdfFileName);
-
-		weatherFileNameWextn = returnFileName(inputWeatherFileName);
-		weatherDirPathName = returnDirPathName(inputWeatherFileName);
-
-		std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
-
-		 if (opt.isSet("-o"))
-			// outputFilePrefix = dirPathName + idfFileNameOnly + "_" + weatherFileNameOnly + "_";
-			 outputFilePrefix = idfFileNameOnly + "_" + weatherFileNameOnly + "_";
-		else
-			outputFilePrefix = dirPathName + "eplus";
+		if(!opt.gotRequired(badOptions)) {
+			for(int i=0; i < badOptions.size(); ++i) {
+				DisplayString("\nERROR: Missing required option " + badOptions[i] + "\n");
+				DisplayString(usage);
+			//	ShowFatalError("\nERROR: Missing required option " + badOptions[i] + "\n");
+				}
+			exit(EXIT_FAILURE);
+		}
 
 		 readVarsValue = false;
 		 if (opt.isSet("-r")){
 			 readVarsValue = true;
 		 }
 
-		outputAuditFileName = outputFilePrefix + "out.audit";
-		outputBndFileName = outputFilePrefix + "out.bnd";
-		outputDxfFileName = outputFilePrefix + "out.dxf";
-		outputEioFileName = outputFilePrefix + "out.eio";
-		outputEndFileName = outputFilePrefix + "out.end";
-		outputErrFileName = outputFilePrefix + "out.err";
-		outputEsoFileName = outputFilePrefix + "out.eso";
-		outputMtdFileName = outputFilePrefix + "out.mtd";
-		outputMddFileName = outputFilePrefix + "out.mdd";
-		outputMtrFileName = outputFilePrefix + "out.mtr";
-		outputRddFileName = outputFilePrefix + "out.rdd";
-		outputShdFileName = outputFilePrefix + "out.shd";
-		outputTblCsvFileName = outputFilePrefix + "tbl.csv";
-		outputTblHtmFileName = outputFilePrefix + "tbl.htm";
-		outputTblTabFileName = outputFilePrefix + "tbl.tab";
-		outputTblTxtFileName = outputFilePrefix + "tbl.txt";
-		outputTblXmlFileName = outputFilePrefix + "tbl.xml";
-		outputAdsFileName = outputFilePrefix + "ADS.out";
-		outputDfsFileName = outputFilePrefix + "out.dfs";
-		outputDelightFileName = outputFilePrefix + "out.delightdfdmp";
-		outputMapTabFileName = outputFilePrefix + "map.tab";
-		outputMapCsvFileName = outputFilePrefix + "map.csv";
-		outputMapTxtFileName = outputFilePrefix + "map.txt";
-		outputEddFileName = outputFilePrefix + "out.edd";
-		outputIperrFileName = outputFilePrefix + "out.iperr";
-		outputDbgFileName = outputFilePrefix + "out.dbg";
-		outputSlnFileName = outputFilePrefix + "out.sln";
-		outputSciFileName = outputFilePrefix + "out.sci";
-		outputWrlFileName = outputFilePrefix + "out.wrl";
-		outputZszCsvFileName = outputFilePrefix + "zsz.csv";
-		outputZszTabFileName = outputFilePrefix + "zsz.tab";
-		outputZszTxtFileName = outputFilePrefix + "zsz.txt";
-		outputSszCsvFileName = outputFilePrefix + "ssz.csv";
-		outputSszTabFileName = outputFilePrefix + "ssz.tab";
-		outputSszTxtFileName = outputFilePrefix + "ssz.txt";
-		outputScreenCsvFileName = outputFilePrefix + "screen.csv";
-		EnergyPlusIniFileName = "Energy+.ini";
-		inStatFileName = "in.stat";
-		TarcogIterationsFileName = "TarcogIterations.dbg";
-		eplusADSFileName = idfDirPathName+"eplusADS.inp";
+		 // Process standard arguments
+		 if (opt.isSet("-h")) {
+			DisplayString(usage);
+			exit(EXIT_SUCCESS);
+	    	}
+
+ 		if (opt.isSet("-v")) {
+ 			DisplayString(VerString);
+			exit(EXIT_SUCCESS);
+ 		 }
+
+ 		if(opt.lastArgs.size() > 0 && opt.lastArgs.size() < 2){
+ 			for(int i=0; i < opt.lastArgs.size(); ++i) {
+ 				std::string arg(opt.lastArgs[i]->c_str());
+				inputIdfFileName = arg;
+ 				DisplayString("Input file to process: " + inputIdfFileName +"\n");
+
+ 				struct stat s;
+ 				if( stat(arg.c_str(),&s) != 0 )	{
+ 					char resolved_path[100];
+ 					realpath(arg.c_str(), resolved_path);
+ 					printf("\n%s\n", resolved_path);
+ 					DisplayString(" is not a valid path. \n" );
+ 					exit(EXIT_FAILURE);
+ 					}
+ 				}
+ 			}
+
+ 		if(opt.lastArgs.size() > 1){
+			for(int i=1; i < opt.lastArgs.size(); ++i) {
+				std::string arg(opt.lastArgs[i]->c_str());
+ 				DisplayString("ERROR: Invalid option last arg: " + arg + "\n");
+ 				DisplayString(usage);
+				DisplayString("ERROR: Invalid option last arg: " + arg + "\n");
+			}
+ 			exit(EXIT_FAILURE);
+ 		}
+
+ 		if(inputIdfFileName.empty())
+ 			inputIdfFileName = "in.idf";
+
+ 		idfFileNameWextn = returnFileName(inputIdfFileName);
+
+ 		idfFileNameOnly = idfFileNameWextn.substr(0,idfFileNameWextn.size()-4);
+ 		idfDirPathName = returnDirPathName(inputIdfFileName);
+
+ 		opt.get("-p")->getString(prefixOutName);
+ 		prefixValue = false;
+ 		if(opt.isSet("-p"))
+ 			prefixValue = true;
+
+
+ 		if (opt.isSet("-d") ){
+ 			struct stat sb = {0};
+
+ 			if (stat(dirPathName.c_str(), &sb) == -1) {
+ 				int mkdirretval;
+ 				    mkdirretval=mkpath(dirPathName,0755);
+ 			}
+
+ 			if(dirPathName[dirPathName.size()-1]!=pathChar){
+ 				// force trailing / so we can handle everything in loop
+ 				dirPathName+=pathChar;
+ 			}
+
+ 			if(prefixValue)
+ 			  	outputFilePrefix = dirPathName + prefixOutName + "_";
+ 		    else
+ 			 	outputFilePrefix = dirPathName + idfFileNameOnly + "_";
+
+ 		}
+ 		else
+ 			outputFilePrefix = "eplus";
+
+ 		outputAuditFileName = outputFilePrefix + "out.audit";
+ 		outputBndFileName = outputFilePrefix + "out.bnd";
+ 		outputDxfFileName = outputFilePrefix + "out.dxf";
+ 		outputEioFileName = outputFilePrefix + "out.eio";
+ 		outputEndFileName = outputFilePrefix + "out.end";
+ 		outputErrFileName = outputFilePrefix + "out.err";
+ 		outputEsoFileName = outputFilePrefix + "out.eso";
+ 		outputMtdFileName = outputFilePrefix + "out.mtd";
+ 		outputMddFileName = outputFilePrefix + "out.mdd";
+ 		outputMtrFileName = outputFilePrefix + "out.mtr";
+ 		outputRddFileName = outputFilePrefix + "out.rdd";
+ 		outputShdFileName = outputFilePrefix + "out.shd";
+ 		outputTblCsvFileName = outputFilePrefix + "tbl.csv";
+ 		outputTblHtmFileName = outputFilePrefix + "tbl.htm";
+ 		outputTblTabFileName = outputFilePrefix + "tbl.tab";
+ 		outputTblTxtFileName = outputFilePrefix + "tbl.txt";
+ 		outputTblXmlFileName = outputFilePrefix + "tbl.xml";
+ 		outputAdsFileName = outputFilePrefix + "ADS.out";
+ 		outputDfsFileName = outputFilePrefix + "out.dfs";
+ 		outputDelightFileName = outputFilePrefix + "out.delightdfdmp";
+ 	    outputMapTabFileName = outputFilePrefix + "map.tab";
+ 		outputMapCsvFileName = outputFilePrefix + "map.csv";
+ 		outputMapTxtFileName = outputFilePrefix + "map.txt";
+ 		outputEddFileName = outputFilePrefix + "out.edd";
+ 		outputIperrFileName = outputFilePrefix + "out.iperr";
+ 		outputSlnFileName = outputFilePrefix + "out.sln";
+ 		outputSciFileName = outputFilePrefix + "out.sci";
+ 		outputWrlFileName = outputFilePrefix + "out.wrl";
+ 		outputZszCsvFileName = outputFilePrefix + "zsz.csv";
+ 		outputZszTabFileName = outputFilePrefix + "zsz.tab";
+ 		outputZszTxtFileName = outputFilePrefix + "zsz.txt";
+ 		outputSszCsvFileName = outputFilePrefix + "ssz.csv";
+ 		outputSszTabFileName = outputFilePrefix + "ssz.tab";
+ 		outputSszTxtFileName = outputFilePrefix + "ssz.txt";
+ 		outputScreenCsvFileName = outputFilePrefix + "screen.csv";
+ 		outputDbgFileName = outputFilePrefix + ".dbg";
+ 		EnergyPlusIniFileName = "Energy+.ini";
+ 		inStatFileName = "in.stat";
+        TarcogIterationsFileName = "TarcogIterations.dbg";
+        eplusADSFileName = idfDirPathName+"eplusADS.inp";
+
 
 		// Handle bad options
-		std::vector<std::string> badOptions;
-		if(!opt.gotExpected(badOptions)) {
-			for(int i=0; i < badOptions.size(); ++i) {
-				ShowFatalError("ERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
-			}
-			DisplayString(usage);
-			exit(EXIT_FAILURE);
-		}
-
-		if(!opt.gotRequired(badOptions)) {
-			DisplayString(usage);
-			for(int i=0; i < badOptions.size(); ++i) {
-				ShowFatalError("ERROR: Missing required option " + badOptions[i] + "\n");
-			}
-
-			exit(EXIT_FAILURE);
-		}
-
-		if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0 || opt.lastArgs.size() > 0){
+		if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0){
 			for(int i=1; i < opt.firstArgs.size(); ++i) {
 				std::string arg(opt.firstArgs[i]->c_str());
-				ShowFatalError("ERROR: Invalid option first arg: " + arg + "\n");
+				DisplayString("\nERROR: Invalid option first arg: " + arg + "\n");
+				DisplayString(usage);
+				ShowFatalError("\nERROR: Invalid option first arg: " + arg + "\n");
 			}
 			for(int i=0; i < opt.unknownArgs.size(); ++i) {
 				std::string arg(opt.unknownArgs[i]->c_str());
+				DisplayString("ERROR: Invalid option unknown arg: " + arg + "\n");
+				DisplayString(usage);
 				ShowFatalError("ERROR: Invalid option unknown arg: " + arg + "\n");
 			}
-			for(int i=0; i < opt.lastArgs.size(); ++i) {
-				std::string arg(opt.lastArgs[i]->c_str());
-				ShowFatalError("ERROR: Invalid option last arg: " + arg + "\n");
-			}
-			DisplayString(usage);
 			exit(EXIT_FAILURE);
 		}
-
-		// Process standard arguments
-		if (opt.isSet("-h")) {
-			DisplayString(usage);
-			exit(EXIT_SUCCESS);
-		}
-
-		if (opt.isSet("-v")) {
-			DisplayString(VerString);
-			exit(EXIT_SUCCESS);
-		}
-
-	/*	struct stat st;
-		if(stat(idfDirPathName.c_str(),&st) == 0)
-				DisplayString(idfDirPathName + " is a valid (idf) directory.\n");
-	    	else {
-	    		ShowFatalError(idfDirPathName + " is not a valid (idf) directory. \n");
-		    	exit(EXIT_FAILURE);
-	    	}*/
-
-		std::string extIdfFileName = returnFileExtension(inputIdfFileName);
-	/*	if(extIdfFileName == "")
-					DisplayString("no file extension in " + idfFileNameOnly + " \n");
-			else
-					DisplayString("Name of the extension = "+ extIdfFileName + " \n");*/
-
-	    std::string extEpwfFileName = returnFileExtension(inputWeatherFileName);
-		/*if(extEpwfFileName == "")
-			DisplayString("no file extension in " + extEpwfFileName + " \n");
- 			else
- 				DisplayString("Name of the extension = "+ extEpwfFileName + " \n");*/
-
-	    if (extIdfFileName != "idf"){
-	    	ShowFatalError("ERROR: Only idf files are allowed with [option] '-i' \n");
-		   	exit(EXIT_FAILURE);
-	    }
-
-	    if (opt.isSet("-w") && extEpwfFileName != "epw"){
-	    	ShowFatalError("ERROR: Only epw files are allowed with [option] '-w' \n");
-		    exit(EXIT_FAILURE);
-	    }
-
 		return 0;
 	}
   } //namespace options

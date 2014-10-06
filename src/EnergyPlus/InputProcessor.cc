@@ -237,7 +237,7 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
 		}
 
-		{ IOFlags flags; gio::inquire( "eplusout.iperr", flags ); FileExists = flags.exists(); }
+		{ IOFlags flags; gio::inquire( outputIperrFileName, flags ); FileExists = flags.exists(); }
 		if ( FileExists ) {
 			CacheIPErrorFile = GetNewUnitNumber();
 			{ IOFlags flags; flags.ACTION( "read" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); read_stat = flags.ios(); }
@@ -335,7 +335,7 @@ namespace InputProcessor {
 		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, inputIdfFileName, flags ); read_stat = flags.ios(); }
 		if ( read_stat != 0 ) {
 			DisplayString( "Could not open (read)" + inputIdfFileName );
-			ShowFatalError( "ProcessInput: Could not open file \"in.idf\" for input (read)." );
+			ShowFatalError( "ProcessInput: Could not open file "+ inputIdfFileName +" for input (read)." );
 		}
 		gio::read( IDFFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
@@ -374,7 +374,7 @@ namespace InputProcessor {
 		IDFRecordsGotten.allocate( NumIDFRecords );
 		IDFRecordsGotten = false;
 
-		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File ("+inputIdfFileName+") -- Complete";
 		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
 		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;

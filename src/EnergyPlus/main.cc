@@ -367,7 +367,7 @@ main(int argc, const char * argv[])
 		gio::close( LFN );
 	} else {
 		DisplayString( "Missing " +EnergyPlusIniFileName );
-		ProgramPath = "";
+		ProgramPath = exePath + pathChar;
 		LFN = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
@@ -392,7 +392,7 @@ main(int argc, const char * argv[])
 	OutputFileDebug = GetNewUnitNumber();
 	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, outputDbgFileName, flags ); iostatus = flags.ios(); }
 	if ( iostatus != 0 ) {
-		ShowFatalError( "EnergyPlus: Could not open file \"eplusout.dbg\" for output (write)." );
+		ShowFatalError( "EnergyPlus: Could not open file "+outputDbgFileName+" for output (write)." );
 	}
 
 	//Call ProcessInput to produce the IDF file which is read by all of the
@@ -417,33 +417,29 @@ main(int argc, const char * argv[])
 
 	std::string esoFileName = outputFilePrefix + "out.eso";
 	std::string csvFileName = outputFilePrefix + "out.csv";
-	ifile.open("eplusout.rvi");
+	std::string RVIfile = idfFileNameOnly + ".rvi";
+	ifile.open(RVIfile.c_str());
 	ifile <<esoFileName+"\n";
 	ifile <<csvFileName+"\n";
 	ifile.close();
 
 	std::string mtrFileName = outputFilePrefix + "out.mtr";
 	std::string mtrCsvFileName = outputFilePrefix + "mtr.csv";
-	nfile.open("eplusout.mvi");
+	std::string MVIfile = idfFileNameOnly + ".mvi";
+	nfile.open(MVIfile.c_str());
 	nfile <<mtrFileName+"\n";
 	nfile <<mtrCsvFileName+"\n";
 	nfile.close();
 
+	std::string ReadVars = "ReadVarsESO";
+	std::string Total = "./"+ReadVars+" "+RVIfile+" "+"unlimited";
+	std::string Total1 = "./"+ReadVars+" "+MVIfile+" "+"unlimited";
+
+
     if(readVarsValue) {
-	    std::string forReadVARS = "./ReadVarsESO";
-	    //system(forReadVARS.c_str()); //Without passing any arguments
-	    system("./ReadVarsESO eplusout.rvi unlimited");
-	    system("./ReadVarsESO eplusout.mvi unlimited");
+	    system(Total.c_str());
+	    system(Total1.c_str());
 	   }
-
-    std::string HVACfilename= "eplusout.bnd";
-    std::ifstream mfile(HVACfilename.c_str());
-    if (mfile.good()){
-
-    }
-
-
-
 
 	EndEnergyPlus();
     
