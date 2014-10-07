@@ -53,10 +53,11 @@ namespace CommandLineInterface {
  extern std::string idfFileNameOnly;
  extern std::string outputFilePrefix;
  extern std::string dirPathName;
+ extern std::string exePathName;
+ extern std::string prefixOutName;
+
  extern bool readVarsValue;
  extern bool prefixValue;
- extern std::string exePath;
- extern std::string prefixOutName;
 
  // Process command line arguments
  int

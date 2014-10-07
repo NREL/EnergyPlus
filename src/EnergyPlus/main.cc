@@ -45,7 +45,7 @@ main(int argc, const char * argv[])
 
 	//      NOTICE
 
-	//      Copyright © 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//      Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -120,11 +120,11 @@ main(int argc, const char * argv[])
 	//      (Conjunction Of Multizone Infiltration Specialists) developed by a multinational, multi-institutional
 	//      effort under the auspices of the International Energy Agency's Buildings and Community Systems Agreement
 	//      working group focusing on multizone air flow modeling (Annex 23) and now administered by the Swiss Federal
-	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Überlandstrasse 129, CH-8600 Dübendorf,
+	//      Laboratories for Materials Testing and Research (EMPA), Division 175, ï¿½berlandstrasse 129, CH-8600 Dï¿½bendorf,
 	//      Switzerland.
 
 	//      The EnergyPlus v1.2 model for displacement ventilation and cross-ventilation was developed
-	//      by Guilherme Carrilho da Graça and Paul Linden of the Department of Mechanical and Aerospace
+	//      by Guilherme Carrilho da Graï¿½a and Paul Linden of the Department of Mechanical and Aerospace
 	//      Engineering, University of California, San Diego.
 
 	//      The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department
@@ -366,8 +366,8 @@ main(int argc, const char * argv[])
 
 		gio::close( LFN );
 	} else {
-		DisplayString( "Missing " +EnergyPlusIniFileName );
-		ProgramPath = exePath + pathChar;
+		DisplayString( "Missing " + EnergyPlusIniFileName );
+		ProgramPath =  exePathName + pathChar;
 		LFN = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
@@ -432,8 +432,8 @@ main(int argc, const char * argv[])
 	nfile.close();
 
 	std::string ReadVars = "ReadVarsESO";
-	std::string Total = "./"+ReadVars+" "+RVIfile+" "+"unlimited";
-	std::string Total1 = "./"+ReadVars+" "+MVIfile+" "+"unlimited";
+	std::string Total = "./"+ReadVars+" "+RVIfile+" unlimited";
+	std::string Total1 = "./"+ReadVars+" "+MVIfile+" unlimited";
 
 
     if(readVarsValue) {

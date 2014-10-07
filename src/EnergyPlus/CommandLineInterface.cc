@@ -85,7 +85,7 @@ namespace CommandLineInterface{
 	std::string outputFilePrefix;
 	std::string dirPathName;
 	std::string idfFileNameOnly;
-	std::string exePath;
+	std::string exePathName;
 	std::string prefixOutName;
 
 	bool readVarsValue;
@@ -190,8 +190,8 @@ namespace CommandLineInterface{
 		//To check the path of EnergyPlus
         char executable_path[100];
         realpath(argv[0], executable_path);
-        std::string mystring = std::string(executable_path);
-        exePath = returnDirPathName( mystring );
+        std::string exePath = std::string(executable_path);
+        exePathName = returnDirPathName(exePath);
 
 		opt.get("-w")->getString(inputWeatherFileName);
 
@@ -199,29 +199,11 @@ namespace CommandLineInterface{
 
 		opt.get("-d")->getString(dirPathName);
 
-		/////////// For weather filename only (incase needed) ///////////////////
+		/////////// For weather filename only (incase needed) ////////////////
 		//weatherFileNameWextn = returnFileName(inputWeatherFileName);
 		//weatherDirPathName = returnDirPathName(inputWeatherFileName);
 		//std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
-
-		std::vector<std::string> badOptions;
-		if(!opt.gotExpected(badOptions)) {
-			for(int i=0; i < badOptions.size(); ++i) {
-				DisplayString("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
-				DisplayString(usage);
-			//	ShowFatalError("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
-				}
-			exit(EXIT_FAILURE);
-		}
-
-		if(!opt.gotRequired(badOptions)) {
-			for(int i=0; i < badOptions.size(); ++i) {
-				DisplayString("\nERROR: Missing required option " + badOptions[i] + "\n");
-				DisplayString(usage);
-			//	ShowFatalError("\nERROR: Missing required option " + badOptions[i] + "\n");
-				}
-			exit(EXIT_FAILURE);
-		}
+        //////////////////////////////////////////////////////////////////////
 
 		 readVarsValue = false;
 		 if (opt.isSet("-r")){
@@ -243,14 +225,13 @@ namespace CommandLineInterface{
  			for(int i=0; i < opt.lastArgs.size(); ++i) {
  				std::string arg(opt.lastArgs[i]->c_str());
 				inputIdfFileName = arg;
- 				DisplayString("Input file to process: " + inputIdfFileName +"\n");
 
  				struct stat s;
  				if( stat(arg.c_str(),&s) != 0 )	{
  					char resolved_path[100];
  					realpath(arg.c_str(), resolved_path);
- 					printf("\n%s\n", resolved_path);
- 					DisplayString(" is not a valid path. \n" );
+ 					std::string idfPath = std::string(resolved_path);
+ 					DisplayString(idfPath +" is not a valid path. \n" );
  					exit(EXIT_FAILURE);
  					}
  				}
@@ -261,7 +242,6 @@ namespace CommandLineInterface{
 				std::string arg(opt.lastArgs[i]->c_str());
  				DisplayString("ERROR: Invalid option last arg: " + arg + "\n");
  				DisplayString(usage);
-				DisplayString("ERROR: Invalid option last arg: " + arg + "\n");
 			}
  			exit(EXIT_FAILURE);
  		}
@@ -343,8 +323,26 @@ namespace CommandLineInterface{
         TarcogIterationsFileName = "TarcogIterations.dbg";
         eplusADSFileName = idfDirPathName+"eplusADS.inp";
 
+        // Handle bad options
+        std::vector<std::string> badOptions;
+        if(!opt.gotExpected(badOptions)) {
+   			for(int i=0; i < badOptions.size(); ++i) {
+   				DisplayString("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+        		DisplayString(usage);
+   				ShowFatalError("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+   			}
+       		exit(EXIT_FAILURE);
+   		}
 
-		// Handle bad options
+        if(!opt.gotRequired(badOptions)) {
+   			for(int i=0; i < badOptions.size(); ++i) {
+   				DisplayString("\nERROR: Missing required option " + badOptions[i] + "\n");
+        		DisplayString(usage);
+   				ShowFatalError("\nERROR: Missing required option " + badOptions[i] + "\n");
+   			}
+      		exit(EXIT_FAILURE);
+   		}
+
 		if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0){
 			for(int i=1; i < opt.firstArgs.size(); ++i) {
 				std::string arg(opt.firstArgs[i]->c_str());

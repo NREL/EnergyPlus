@@ -265,7 +265,7 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: " + inputIddFileName + " missing. Program terminates. Fullname = " + FullName );
 		}
 		IDDFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, FullName, flags ); read_stat = flags.ios(); }
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, FullName, flags ); read_stat = flags.ios();}
 		if ( read_stat != 0 ) {
 			DisplayString( "Could not open (read) " + inputIddFileName );
 			ShowFatalError( "ProcessInput: Could not open file " + inputIddFileName + " for input (read)." );
