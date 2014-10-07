@@ -153,9 +153,9 @@ namespace CommandLineInterface{
 		ezOptionParser opt;
 
 		opt.overview = VerString;
-		opt.example = "EnergyPlus -i custom.idd -w weather.epw -d output/ -p prefix -r input.idf";
+		opt.example = "energyplus -i custom.idd -w weather.epw -d output/ -p prefix -r input.idf";
 
-		opt.syntax = "EnergyPlus [options] [input file]";
+		opt.syntax = "energyplus [options] [input file]";
 
 		opt.add("", 0, 0, 0, "Display this message", "-h", "--help");
 
