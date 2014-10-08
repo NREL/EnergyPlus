@@ -5,6 +5,7 @@ Site Outdoor Air Wetbulb Temperature
 Zone Air Temperature
 Zone Mean Air Temperature
 Zone Mean Radiant Temperature
+Surface Inside Face Temperature
 Hydronic Low Temp Radiant Heating Power
 Zone Radiant HVAC Heating Energy
 Hydronic Low Temp Radiant Cooling Power
@@ -17,3 +18,4 @@ Zone Thermal Comfort Fanger Model PMV
 Zone Thermal Comfort Pierce Model Thermal Sensation Index
 Zone Thermal Comfort KSU Model Thermal Sensation Vote
 0
+

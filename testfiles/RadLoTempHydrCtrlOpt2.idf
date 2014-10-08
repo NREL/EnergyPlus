@@ -1931,25 +1931,25 @@
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    MeanAirTemperature,      !- Temperature Control Type
+    SurfaceTemperature,      !- Temperature Control Type
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
-    0.00008,                 !- Maximum Hot Water Flow {m3/s}
+    0.00004,                 !- Maximum Hot Water Flow {m3/s}
     West Zone Radiant Water Inlet Node,  !- Heating Water Inlet Node Name
     West Zone Radiant Water Outlet Node,  !- Heating Water Outlet Node Name
     2.0,                     !- Heating Control Throttling Range {deltaC}
-    Radiant Heating Setpoints,  !- Heating Control Temperature Schedule Name
+    Radiant Heating Setpoints 2,  !- Heating Control Temperature Schedule Name
     CoolingDesignCapacity,   !- Cooling Design Capacity Method
     Autosize,                !- Cooling Design Capacity {W}
     ,                        !- Cooling Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Cooling Design Capacity
-    0.0012,                  !- Maximum Cold Water Flow {m3/s}
+    0.00004,                  !- Maximum Cold Water Flow {m3/s}
     Zone 1 Cooling Water Inlet Node,  !- Cooling Water Inlet Node Name
     Zone 1 Cooling Water Outlet Node,  !- Cooling Water Outlet Node Name
     2.0,                     !- Cooling Control Throttling Range {deltaC}
-    Radiant Cooling Setpoints,  !- Cooling Control Temperature Schedule Name
+    Radiant Cooling Setpoints 2,  !- Cooling Control Temperature Schedule Name
     ,                        !- Condensation Control Type
     ,                        !- Condensation Control Dewpoint Offset {C}
     ,                        !- Number of Circuits
@@ -2044,6 +2044,8 @@
   Output:Variable,*,District Cooling Rate,timestep;
 
   Output:Variable,*,District Heating Rate,timestep;
+
+  Output:Variable,Zn001:Flr001,Surface Inside Face Temperature, timestep;
 
   Output:Variable,*,Zone Thermal Comfort Fanger Model PMV,timestep;
 
@@ -2201,7 +2203,7 @@
     Until: 24:00,1.00;       !- Field 3
 
   Schedule:Compact,
-    RADIANT HEATING SETPOINTS,  !- Name
+ RADIANT HEATING SETPOINTS,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
@@ -2210,9 +2212,37 @@
     Until: 24:00,12.00;      !- Field 7
 
   Schedule:Compact,
+    RADIANT HEATING SETPOINTS 2,  !- Name
+    TEMPERATURE,             !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,26.00,      !- Field 3
+    Through: 9/30,           !- Field 4
+    For: Alldays,            !- Field 5
+    Until: 24:00,10.00,      !- Field 6
+    Through: 12/31,          !- Field 7
+    For: Alldays,            !- Field 8
+    Until: 24:00,26.00;      !- Field 9
+
+
+  Schedule:Compact,
+    RADIANT COOLING SETPOINTS 2,  !- Name
+    TEMPERATURE,             !- Schedule Type Limits Name
+    Through: 3/31,           !- Field 1
+    For: Alldays,            !- Field 2
+    Until: 24:00,40.00,      !- Field 3
+    Through: 9/30,           !- Field 4
+    For: Alldays,            !- Field 5
+    Until: 24:00,20.00,      !- Field 6
+    Through: 12/31,          !- Field 7
+    For: Alldays,            !- Field 8
+    Until: 24:00,40.00;      !- Field 9
+
+  Schedule:Compact,
     RADIANT COOLING SETPOINTS,  !- Name
     TEMPERATURE,             !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Alldays,            !- Field 2
     Until: 24:00,26.00;      !- Field 3
+
 

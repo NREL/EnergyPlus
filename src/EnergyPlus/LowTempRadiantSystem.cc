@@ -133,6 +133,7 @@ namespace LowTempRadiantSystem {
 	int const OperativeControl( 3 ); // Controls system using operative temperature
 	int const ODBControl( 4 ); // Controls system using outside air dry-bulb temperature
 	int const OWBControl( 5 ); // Controls system using outside air wet-bulb temperature
+	int const SurfTempControl( 6 ); // Controls system using surface temperature
 	// Condensation control types:
 	int const CondCtrlNone( 0 ); // Condensation control--none, so system never shuts down
 	int const CondCtrlSimpleOff( 1 ); // Condensation control--simple off, system shuts off when condensation predicted
@@ -366,6 +367,7 @@ namespace LowTempRadiantSystem {
 		static std::string const OperativeTemperature( "OperativeTemperature" );
 		static std::string const OutsideAirDryBulbTemperature( "OutdoorDryBulbTemperature" );
 		static std::string const OutsideAirWetBulbTemperature( "OutdoorWetBulbTemperature" );
+		static std::string const SurfaceTemperature( "SurfaceTemperature" );
 		static std::string const RoutineName( "GetLowTempRadiantSystem: " ); // include trailing blank space
 		static std::string const Off( "Off" );
 		static std::string const SimpleOff( "SimpleOff" );
@@ -605,6 +607,8 @@ namespace LowTempRadiantSystem {
 				HydrRadSys( Item ).ControlType = ODBControl;
 			} else if ( SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
 				HydrRadSys( Item ).ControlType = OWBControl;
+			} else if ( SameString( Alphas( 5 ), SurfaceTemperature ) ) {
+				HydrRadSys( Item ).ControlType = SurfTempControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFields( 5 ) + " =" + Alphas( 5 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -941,6 +945,8 @@ namespace LowTempRadiantSystem {
 				CFloRadSys( Item ).ControlType = ODBControl;
 			} else if ( SameString( Alphas( 5 ), OutsideAirWetBulbTemperature ) ) {
 				CFloRadSys( Item ).ControlType = OWBControl;
+			} else if ( SameString( Alphas( 5 ), SurfaceTemperature ) ) {
+				CFloRadSys( Item ).ControlType = SurfTempControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFields( 5 ) + " =" + Alphas( 5 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -1243,6 +1249,8 @@ namespace LowTempRadiantSystem {
 				ElecRadSys( Item ).ControlType = ODBControl;
 			} else if ( SameString( Alphas( 6 ), OutsideAirWetBulbTemperature ) ) {
 				ElecRadSys( Item ).ControlType = OWBControl;
+			} else if ( SameString( Alphas( 6 ), SurfaceTemperature ) ) {
+				ElecRadSys( Item ).ControlType = SurfTempControl;
 			} else {
 				ShowWarningError( "Invalid " + cAlphaFields( 6 ) + " = " + Alphas( 6 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -2325,6 +2333,7 @@ namespace LowTempRadiantSystem {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using PlantUtilities::SetComponentFlowRate;
 		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using DataHeatBalSurface::TH;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2393,6 +2402,12 @@ namespace LowTempRadiantSystem {
 				ControlTemp = Zone( ZoneNum ).OutDryBulbTemp;
 			} else if ( SELECT_CASE_var == OWBControl ) {
 				ControlTemp = Zone( ZoneNum ).OutWetBulbTemp;
+			} else if ( SELECT_CASE_var == SurfTempControl ) {
+				ControlTemp = 0.0;
+				for ( SurfNum = 1; SurfNum <= HydrRadSys( RadSysNum ).NumOfSurfaces; ++SurfNum ) {
+					SurfNum2 = HydrRadSys( RadSysNum ).SurfacePtr( SurfNum );
+					ControlTemp += TH( SurfNum2 , 1, 2 ) * HydrRadSys( RadSysNum ).SurfaceFlowFrac( SurfNum );
+				}
 			} else { // Should never get here
 				ControlTemp = MAT( ZoneNum );
 				ShowSevereError( "Illegal control type in low temperature radiant system: " + HydrRadSys( RadSysNum ).Name );
@@ -2958,6 +2973,7 @@ namespace LowTempRadiantSystem {
 		using ScheduleManager::GetCurrentScheduleValue;
 		using General::TrimSigDigits;
 		using PlantUtilities::SetComponentFlowRate;
+		using DataHeatBalSurface::TH;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3019,6 +3035,12 @@ namespace LowTempRadiantSystem {
 				SetPointTemp = Zone( ZoneNum ).OutDryBulbTemp;
 			} else if ( SELECT_CASE_var == OWBControl ) {
 				SetPointTemp = Zone( ZoneNum ).OutWetBulbTemp;
+			} else if ( SELECT_CASE_var == SurfTempControl ) {
+				SetPointTemp = 0.0;
+				for ( SurfNum = 1; SurfNum <= CFloRadSys( RadSysNum ).NumOfSurfaces; ++SurfNum ) {
+					SurfNum2 = CFloRadSys( RadSysNum ).SurfacePtr( SurfNum );
+					SetPointTemp += TH( SurfNum2 , 1, 2 ) * CFloRadSys( RadSysNum ).SurfaceFlowFrac( SurfNum );
+				}
 			} else { // Should never get here
 				SetPointTemp = 0.0; // Suppress uninitialized warning
 				ShowSevereError( "Illegal control type in low temperature radiant system: " + CFloRadSys( RadSysNum ).Name );
@@ -3940,6 +3962,7 @@ namespace LowTempRadiantSystem {
 		using DataHVACGlobals::SmallLoad;
 		using namespace DataZoneEnergyDemands;
 		using ScheduleManager::GetCurrentScheduleValue;
+		using DataHeatBalSurface::TH;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3962,6 +3985,7 @@ namespace LowTempRadiantSystem {
 		int RadSurfNum; // number of surface that is the radiant system
 		Real64 SetPtTemp; // Setpoint temperature [C]
 		int SurfNum; // intermediate variable for surface number in Surface derived type
+		int SurfNum2; // intermediate variable for surface pointers
 		int ZoneNum; // number of zone being served
 
 		// FLOW:
@@ -3997,6 +4021,12 @@ namespace LowTempRadiantSystem {
 				ControlTemp = Zone( ZoneNum ).OutDryBulbTemp;
 			} else if ( SELECT_CASE_var == OWBControl ) {
 				ControlTemp = Zone( ZoneNum ).OutWetBulbTemp;
+			} else if ( SELECT_CASE_var == SurfTempControl ) {
+				ControlTemp = 0.0;
+				for ( SurfNum = 1; SurfNum <= ElecRadSys( RadSysNum ).NumOfSurfaces; ++SurfNum ) {
+					SurfNum2 = ElecRadSys( RadSysNum ).SurfacePtr( SurfNum );
+					ControlTemp += TH( SurfNum2 , 1, 2 ) * ElecRadSys( RadSysNum ).SurfacePowerFrac( SurfNum );
+				}
 			} else { // Should never get here
 				ControlTemp = MAT( ZoneNum );
 				ShowSevereError( "Illegal control type in low temperature radiant system: " + ElecRadSys( RadSysNum ).Name );
@@ -4879,7 +4909,7 @@ namespace LowTempRadiantSystem {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
