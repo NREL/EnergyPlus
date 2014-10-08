@@ -2597,7 +2597,6 @@ namespace PlantPipingSystemsManager {
 			SetupOutputVariable( "Zone Coupled Basement Floor Temperature [C]", PipingSystemDomains( DomainNum ).BasementFloorTemp, "Zone", "Average", PipingSystemDomains( DomainNum ).Name );
 		}
 
-
 	}
 
 	void
