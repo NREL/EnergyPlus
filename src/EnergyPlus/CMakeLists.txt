@@ -517,9 +517,14 @@ SET( SRC
 )
 
 ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
-ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
+if ( MAKE_ENERGYPLUS_LIBRARY )
+  ADD_LIBRARY(EnergyPlus SHARED main.cc main.hh)
+  ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+else()
+  ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
+endif()
 
-#TARGET_LINK_LIBRARIES( EnergyPlus DElight )
 TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
 
 if(CMAKE_HOST_UNIX)

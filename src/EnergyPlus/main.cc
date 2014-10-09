@@ -29,8 +29,17 @@
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 
+#ifdef __unix__
+#include <unistd.h>
+#endif
+
+#ifdef MAKE_ENERGYPLUS_LIBRARY
+void
+EnergyPlusPgm( std::string filepath )
+#else
 int
 main()
+#endif
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
@@ -241,6 +250,10 @@ main()
 	int iostatus;
 	bool FileExists;
 
+#ifdef MAKE_ENERGYPLUS_LIBRARY
+	IsDLL = true;
+#endif
+
 	//                           INITIALIZE VARIABLES
 	Time_Start = epElapsedTime();
 #ifdef EP_Detailed_Timings
@@ -372,6 +385,12 @@ main()
 		gio::write( LFN, EPlusiniFormat ) << "program" << ProgramPath;
 		gio::close( LFN );
 	}
+
+#ifdef MAKE_ENERGYPLUS_LIBRARY
+	int status = chdir(filepath.c_str());
+	ProgramPath = filepath + pathChar;
+#endif
+
 	TestAllPaths = true;
 
 	DisplayString( "EnergyPlus Starting" );
@@ -402,6 +421,26 @@ main()
 
 	EndEnergyPlus();
 }
+
+#ifdef MAKE_ENERGYPLUS_LIBRARY
+void StoreProgressCallback( void ( *f )( int ) )
+{
+	using namespace EnergyPlus::DataGlobals;
+	//using DataGlobals::IsProgressCallback;
+	//using DataGlobals::fProgressPtr;
+	IsProgressCallback = true;
+	fProgressPtr = f;
+}
+void StoreMessageCallback( void ( *f )( std::string ) )
+{
+	using namespace EnergyPlus::DataGlobals;
+	//using DataGlobals::IsMessageCallback;
+	//using DataGlobals::fMessagePtr;
+	IsMessageCallback = true;
+	fMessagePtr = f;
+}
+#endif
+
 
 void
 CreateCurrentDateTimeString( std::string & CurrentDateTimeString )

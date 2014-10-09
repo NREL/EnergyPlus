@@ -149,6 +149,14 @@ namespace DataGlobals {
 	extern bool ShowDecayCurvesInEIO; // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
 
+	extern bool IsDLL;
+	extern bool IsProgressCallback;
+	extern bool IsMessageCallback;
+	extern bool IsProgramFatalCallback;
+	extern int Progress; 
+	extern void ( *fProgressPtr )( int );
+	extern void ( *fMessagePtr )( std::string );
+
 } // DataGlobals
 
 } // EnergyPlus

@@ -8,6 +8,7 @@
 #include <DisplayRoutines.hh>
 #include <DataGlobals.hh>
 #include <DataSystemVariables.hh>
+#include <sstream>
 
 namespace EnergyPlus {
 
@@ -32,6 +33,9 @@ DisplayString( std::string const & String ) // String to be displayed
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
+	using DataGlobals::IsDLL;
+	using DataGlobals::IsMessageCallback;
+	using DataGlobals::fMessagePtr;
 	using DataSystemVariables::DeveloperFlag;
 
 	// Locals
@@ -47,6 +51,11 @@ DisplayString( std::string const & String ) // String to be displayed
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
+
+	if (IsDLL && IsMessageCallback)
+	{
+		fMessagePtr(String);
+	}
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << '\n';
@@ -79,7 +88,10 @@ DisplayNumberAndString(
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
 	using DataSystemVariables::DeveloperFlag;
-
+	using DataGlobals::IsDLL;
+	using DataGlobals::IsMessageCallback;
+	using DataGlobals::fMessagePtr;
+	
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -92,7 +104,13 @@ DisplayNumberAndString(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+	if (IsDLL && IsMessageCallback)
+	{
+		std::stringstream sstm;
+		sstm << String << " " << Number;
+		fMessagePtr( sstm.str() );
+	}
+	
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << ' ' << Number << '\n';
 }
@@ -122,6 +140,9 @@ DisplaySimDaysProgress( // This doesn't do anything!
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
+	using DataGlobals::IsDLL;
+	using DataGlobals::IsProgressCallback;
+	using DataGlobals::fProgressPtr;
 	using DataSystemVariables::DeveloperFlag;
 
 	// Locals
@@ -138,6 +159,11 @@ DisplaySimDaysProgress( // This doesn't do anything!
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	static int percent( 0 ); // Current percent progress
+
+	if (IsDLL && IsProgressCallback)
+	{
+		fProgressPtr( percent );
+	}
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	if ( TotalSimDays > 0 ) {

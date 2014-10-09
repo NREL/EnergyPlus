@@ -5,6 +5,8 @@
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 
+#include <string>
+
 namespace EnergyPlus {
 
 namespace DataGlobals {
@@ -171,6 +173,14 @@ namespace DataGlobals {
 	bool doLoadComponentPulseNow( false ); // true for the time step that is the "pulse" for the load component report
 	bool ShowDecayCurvesInEIO( false ); // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	bool AnySlabsInModel ( false ); // true if there are any zone-coupled ground domains in the input file
+
+	bool IsDLL( false ); // set to true if running as a DLL
+	bool IsProgressCallback( false ); // set to true if a progress callback function is to be called (only if running as a DLL)
+	bool IsMessageCallback( false ); // set to true if a message callback function is to be called (only if running as a DLL)
+	bool IsProgramFatalCallback( false ); // set to true if a program fatal callback function is to be called (only if running as a DLL)
+	int Progress( 0 ); // current progress (0-100)
+	void ( *fProgressPtr )( int );
+	void ( *fMessagePtr )( std::string );
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

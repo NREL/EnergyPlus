@@ -21,5 +21,13 @@
 		std::string & DataOut // Output from the retrieval
 	);
 
+#ifdef MAKE_ENERGYPLUS_LIBRARY
+	void
+	StoreProgressCallback( void ( *f )( int ) );
+
+	void
+	StoreMessageCallback( void ( *f )( std::string ) );
+
+#endif
 
 #endif
