@@ -1177,10 +1177,4 @@ int closeipc(int* sockfd){
 }
 
 
-int main( int argc, const char* argv[] )
-{
-  fprintf(stderr, "Calling establ...'\n");
-  //  establishclientsocket("socket.cfg");
-}
-
 
