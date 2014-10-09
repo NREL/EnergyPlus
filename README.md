@@ -14,8 +14,7 @@ This is the EnergyPlus Development Repository.
 The transition to Github is still underway.  The wiki is still in flux as the final structure is formed.  There is valuable information there, but note it may change at any time.  The repository itself shouldn't change structure drastically, but note that like the information on the wiki, it could change at any time.
 
 # Contributing Development
-
-As this is a public repository, you are free to fork it to your own Github account.  If you actively do development that you'd like to contribute back, be sure to do work in a separate branch than develop, and provide a pull request when the code is ready.  There will be a paperwork step before the EnergyPlus development team is able to do the code review and eventually merge into the main development line.
+EnergyPlus is an open-source project and the EnergyPlus team accepts contributions to EnergyPlus source, utilities, test files, documentation, and other materials distributed with the program.  If you actively do development that you'd like to contribute back to the project, be sure to visit <<DOE link to contributors webpage>> to learn more.
 
 # Building Installer Packages
 
