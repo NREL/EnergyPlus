@@ -12,20 +12,20 @@ import glob
 import csv
 
 # defaults here
-source_dir = "/home/elee/EnergyPlus/GitHub/EnergyPlusTeam/src/EnergyPlus"
+source_dir = "C:\ResearchProjects\EnergyPlus\GitHub\EnergyPlusTeamBranch\src\EnergyPlus" #"/home/elee/EnergyPlus/GitHub/EnergyPlusTeam/src/EnergyPlus"
 output_file = "SetupOutputVariableCalls.csv"
 
-if len(sys.ARGV) == 0:
+if len(sys.argv) == 1:
 	pass
-elif len(sys.ARGV) == 2:
-	source_dir = sys.ARGV[0]
-	output_file = sys.ARGV[1]
+elif len(sys.argv) == 3:
+	source_dir = sys.argv[1]
+	output_file = sys.argv[2]
 else:
 	print("Bad usage, either zero or two command line arguments are required")
 	print("If using zero arguments, the defaults hardwired in the script are used")
 	print("If using two arguments, the first is the source dir to find .cc files, and the second is the output csv file")
 	sys.exit(1)
-
+	
 def do_initial_line_trimming(working_line):
 	# trim leading/trailing whitespace
 	working_line = working_line.strip()
