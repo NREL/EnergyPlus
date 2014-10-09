@@ -426,16 +426,12 @@ main()
 void StoreProgressCallback( void ( *f )( int ) )
 {
 	using namespace EnergyPlus::DataGlobals;
-	//using DataGlobals::IsProgressCallback;
-	//using DataGlobals::fProgressPtr;
 	IsProgressCallback = true;
 	fProgressPtr = f;
 }
 void StoreMessageCallback( void ( *f )( std::string ) )
 {
 	using namespace EnergyPlus::DataGlobals;
-	//using DataGlobals::IsMessageCallback;
-	//using DataGlobals::fMessagePtr;
 	IsMessageCallback = true;
 	fMessagePtr = f;
 }

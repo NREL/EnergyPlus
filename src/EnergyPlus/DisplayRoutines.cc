@@ -160,17 +160,17 @@ DisplaySimDaysProgress( // This doesn't do anything!
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	static int percent( 0 ); // Current percent progress
 
-	if (IsDLL && IsProgressCallback)
-	{
-		fProgressPtr( percent );
-	}
-
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	if ( TotalSimDays > 0 ) {
-		percent = nint( ( CurrentSimDay / TotalSimDays ) * 100.0 );
+		percent = nint( ( ( float ) CurrentSimDay / ( float ) TotalSimDays ) * 100.0 );
 		percent = min( percent, 100 );
 	} else {
 		percent = 0;
+	}
+
+	if (IsDLL && IsProgressCallback)
+	{
+		fProgressPtr( percent );
 	}
 
 }
