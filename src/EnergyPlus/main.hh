@@ -22,6 +22,10 @@
 	);
 
 #ifdef MAKE_ENERGYPLUS_LIBRARY
+
+	void
+	EnergyPlusPgm( std::string filepath );
+
 	void
 	StoreProgressCallback( void ( *f )( int ) );
 
