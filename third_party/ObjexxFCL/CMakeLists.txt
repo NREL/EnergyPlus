@@ -6,7 +6,9 @@ endif()
 
 if ( MAKE_ENERGYPLUS_LIBRARY )
   ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  if (UNIX)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  endif()
 endif()
 
 set(src

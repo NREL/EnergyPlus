@@ -7,6 +7,11 @@
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 
+#ifdef _WIN32
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT 
+#endif
 
 	// Functions
 
@@ -23,13 +28,13 @@
 
 #ifdef MAKE_ENERGYPLUS_LIBRARY
 
-	void
+	void EXPORT
 	EnergyPlusPgm( std::string filepath );
 
-	void
+	void EXPORT
 	StoreProgressCallback( void ( *f )( int ) );
 
-	void
+	void EXPORT
 	StoreMessageCallback( void ( *f )( std::string ) );
 
 #endif

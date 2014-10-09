@@ -33,8 +33,17 @@
 #include <unistd.h>
 #endif
 
+#ifdef _WIN32
+#include <stdlib.h>
+#include <direct.h>
+
+#define EXPORT __declspec(dllexport)
+#else
+#define EXPORT 
+#endif
+
 #ifdef MAKE_ENERGYPLUS_LIBRARY
-void
+void EXPORT
 EnergyPlusPgm( std::string filepath )
 #else
 int
@@ -387,7 +396,12 @@ main()
 	}
 
 #ifdef MAKE_ENERGYPLUS_LIBRARY
+#ifdef __unix__
 	int status = chdir(filepath.c_str());
+#endif
+#ifdef _WIN32
+	int status = _chdir(filepath.c_str());
+#endif
 	ProgramPath = filepath + pathChar;
 #endif
 
@@ -423,13 +437,13 @@ main()
 }
 
 #ifdef MAKE_ENERGYPLUS_LIBRARY
-void StoreProgressCallback( void ( *f )( int ) )
+void EXPORT StoreProgressCallback(void(*f)(int))
 {
 	using namespace EnergyPlus::DataGlobals;
 	IsProgressCallback = true;
 	fProgressPtr = f;
 }
-void StoreMessageCallback( void ( *f )( std::string ) )
+void EXPORT StoreMessageCallback(void(*f)(std::string))
 {
 	using namespace EnergyPlus::DataGlobals;
 	IsMessageCallback = true;

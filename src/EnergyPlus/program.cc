@@ -16,5 +16,5 @@ int main()
 	std::cout << "Hello, world" << std::endl;
 	StoreMessageCallback(message_callback_handler);
 	StoreProgressCallback(progress_callback_handler);
-	EnergyPlusPgm("/tmp/runfolder");
+	EnergyPlusPgm("C:\\tmp\\runfolder");
 }
