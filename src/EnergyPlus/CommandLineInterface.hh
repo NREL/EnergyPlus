@@ -55,9 +55,12 @@ namespace CommandLineInterface {
  extern std::string dirPathName;
  extern std::string exePathName;
  extern std::string prefixOutName;
+ extern std::string inputIMFFileName;
 
  extern bool readVarsValue;
  extern bool prefixValue;
+ extern bool expandObjValue;
+ extern bool EPMacroValue;
 
  // Process command line arguments
  int

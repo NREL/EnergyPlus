@@ -36,7 +36,6 @@
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 
-
 int
 main(int argc, const char * argv[])
 {
@@ -432,13 +431,13 @@ main(int argc, const char * argv[])
 	nfile.close();
 
 	std::string ReadVars = "ReadVarsESO";
-	std::string Total = "./"+ReadVars+" "+RVIfile+" unlimited";
-	std::string Total1 = "./"+ReadVars+" "+MVIfile+" unlimited";
+	std::string ReadVarsRVI = "./"+ReadVars+" "+RVIfile+" unlimited";
+	std::string ReadVarsMVI = "./"+ReadVars+" "+MVIfile+" unlimited";
 
 
     if(readVarsValue) {
-	    system(Total.c_str());
-	    system(Total1.c_str());
+	    system(ReadVarsRVI.c_str());
+	    system(ReadVarsMVI.c_str());
 	   }
 
 	EndEnergyPlus();

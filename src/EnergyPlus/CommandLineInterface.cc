@@ -6,13 +6,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <libproc.h>
 #include <unistd.h>
-#include <exception>
 
 // CLI Headers
 #include <ezOptionParser.hpp>
-//#include <io.cpccFileSystemMini.h>
 
 // Project headers
 #include <CommandLineInterface.hh>
@@ -87,9 +84,19 @@ namespace CommandLineInterface{
 	std::string idfFileNameOnly;
 	std::string exePathName;
 	std::string prefixOutName;
+	std::string inputIMFFileName;
 
 	bool readVarsValue;
 	bool prefixValue;
+	bool expandObjValue;
+	bool EPMacroValue;
+
+
+	bool fileExist(const std::string& filename)
+		{
+		    std::ifstream infile(filename);
+		    return infile.good();
+		}
 
 	std::string
 	returnFileName( std::string const& filename )
@@ -113,7 +120,7 @@ namespace CommandLineInterface{
 		std::string ext = "";
 
 			for(int i=0; i<filename.length(); i++){
-				if(filename[i] == '.'){
+				if(filename[i] == '.' || filename[i] == '=' || filename[i] == ' '){
 					for(int j = i+1; j<filename.length(); j++){
 						ext += filename[j];
 					}
@@ -149,7 +156,25 @@ namespace CommandLineInterface{
 	int
 	ProcessArgs(int argc, const char * argv[])
 	{
-		std::locale::global(std::locale(""));
+
+		std::string weatherEquals;
+		std::string weatherLongOption;
+		std::ifstream input;
+		std::istream* instream;
+
+		for ( int i = 1; i < argc; ++i ) {
+				std::string inputArg( argv[ i ] );
+				if(inputArg.substr(0,9) == "--weather"){
+					weatherLongOption = inputArg.substr(0,9);
+					inputWeatherFileName = returnFileExtension(inputArg);
+					argv[i] = weatherLongOption.c_str();
+					weatherEquals = weatherLongOption + "=";
+				}
+		}
+
+		if(weatherLongOption.empty())
+			weatherLongOption = "--weather=";
+
 		ezOptionParser opt;
 
 		opt.overview = VerString;
@@ -163,7 +188,7 @@ namespace CommandLineInterface{
 
 		opt.add("in.idf", 0, 1, 0, "Input data file path (default in.idf)", "");
 
-		opt.add("in.epw", 0, 1, 0, "Weather file path (default in.epw)", "-w", "--weather");
+		opt.add("in.epw", 0, 1, 0, "Weather file path (default in.epw)", "-w", "--weather", "--weather=");
 
 		opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default Energy+.idd in executable directory)", "-i", "--idd");
 
@@ -171,35 +196,43 @@ namespace CommandLineInterface{
 
 		opt.add("", 0, 0, 0, "Run ReadVarsESO to generate time-series CSV", "-r", "--readvars");
 
+		opt.add("", 0, 0, 0, "Run ExpandObjects", "-e", "--expandObj");
+
+		opt.add("", 0, 1, 0, "Run EPMacro", "-ep", "--epMacro");
+
 		opt.add("", 0, 1, 0, "Output directory (default current working directory)", "-d", "--dir");
 
 		// Parse arguments
 		opt.parse(argc, argv);
 
 		// print arguments parsed (useful for debugging)
-
-		/*std::string pretty;
-		opt.prettyPrint(pretty);
-		std::cout << pretty << std::endl;*/
+		//std::string pretty;
+		//opt.prettyPrint(pretty);
+		//std::cout << pretty << std::endl;
 
 		std::string usage, idfFileNameWextn, idfDirPathName;
 		std::string weatherFileNameWextn, weatherDirPathName;
-
 		opt.getUsage(usage);
 
 		//To check the path of EnergyPlus
-        char executable_path[100];
-        realpath(argv[0], executable_path);
-        std::string exePath = std::string(executable_path);
-        exePathName = returnDirPathName(exePath);
+		char executable_path[100];
+		realpath(argv[0], executable_path);
+		std::string exePath = std::string(executable_path);
+		exePathName = returnDirPathName(exePath);
 
-		opt.get("-w")->getString(inputWeatherFileName);
+		if(inputWeatherFileName.empty())
+				inputWeatherFileName = "in.epw";
+
+		instream = &input;
+		input.open( inputWeatherFileName.c_str() );
 
 		opt.get("-i")->getString(inputIddFileName);
 
 		opt.get("-d")->getString(dirPathName);
 
-		/////////// For weather filename only (incase needed) ////////////////
+		opt.get("-ep")->getString(inputIMFFileName);
+
+		/////////// For weather filename only (in case needed) ////////////////
 		//weatherFileNameWextn = returnFileName(inputWeatherFileName);
 		//weatherDirPathName = returnDirPathName(inputWeatherFileName);
 		//std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
@@ -259,6 +292,13 @@ namespace CommandLineInterface{
  		if(opt.isSet("-p"))
  			prefixValue = true;
 
+ 		expandObjValue = false;
+ 		if(opt.isSet("-e"))
+ 			expandObjValue = true;
+
+ 		EPMacroValue = false;
+ 		if(opt.isSet("-ep"))
+ 			EPMacroValue = true;
 
  		if (opt.isSet("-d") ){
  			struct stat sb = {0};
@@ -327,20 +367,24 @@ namespace CommandLineInterface{
         std::vector<std::string> badOptions;
         if(!opt.gotExpected(badOptions)) {
    			for(int i=0; i < badOptions.size(); ++i) {
+   				if(badOptions[i] != "-w"){
    				DisplayString("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
         		DisplayString(usage);
    				ShowFatalError("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
+   				exit(EXIT_FAILURE);
+   				}
    			}
-       		exit(EXIT_FAILURE);
    		}
 
         if(!opt.gotRequired(badOptions)) {
    			for(int i=0; i < badOptions.size(); ++i) {
+   				if(badOptions[i] != "-w"){
    				DisplayString("\nERROR: Missing required option " + badOptions[i] + "\n");
         		DisplayString(usage);
    				ShowFatalError("\nERROR: Missing required option " + badOptions[i] + "\n");
+   				exit(EXIT_FAILURE);
+   				}
    			}
-      		exit(EXIT_FAILURE);
    		}
 
 		if(opt.firstArgs.size() > 1 || opt.unknownArgs.size() > 0){
@@ -358,6 +402,71 @@ namespace CommandLineInterface{
 			}
 			exit(EXIT_FAILURE);
 		}
+
+	/*	std::string ExpandObjects = "ExpandObjects";
+		std::string runExpandObjects = "./"+ExpandObjects;
+	    if(expandObjValue)
+		   system(runExpandObjects.c_str());
+
+	    std::string expandIdfFile = "expanded.idf";
+	    bool expandIdfFileExist = fileExist(expandIdfFile);
+	    if(expandIdfFileExist) {
+	    	std::string expidfFileName = outputFilePrefix + ".expidf";
+	    	std::ifstream  src(expandIdfFile.c_str());
+	    	std::ofstream  dst(expidfFileName.c_str());
+	    	dst << src.rdbuf();
+	    	remove(idfFileNameOnly.c_str());
+	    	link(expidfFileName.c_str(), idfFileNameOnly.c_str());
+	    }
+	    else
+		std::cout<<"ExpandObjects file does not exist. \n";
+
+	    bool imfFileExist = fileExist(inputIMFFileName);
+	    std::string defaultIMFFileName = "in.imf";
+
+	    if(imfFileExist)
+	    	link(inputIMFFileName.c_str(), defaultIMFFileName.c_str());
+
+	    std::string outIDFFileName = "out.idf";
+	    remove(outIDFFileName.c_str());
+	    std::string outAuditFileName = "audit.out";
+	    remove(outAuditFileName.c_str());
+	    std::string epmdetFileName = outputFilePrefix+".epmdet";
+	    remove(epmdetFileName.c_str());
+	    std::string epmidfFileName = outputFilePrefix+".epmidf";
+	    remove(epmidfFileName.c_str());
+
+	    std::string EPMacroexe = "EPMacro";
+	    std::string runEPMacro = "./"+EPMacroexe;
+	    if(EPMacroValue){
+	    	system(runEPMacro.c_str());
+	   	   std::cout<<"Running EPMacro...\n";
+
+	   	   bool AuditFileExist = fileExist(outAuditFileName);
+	   	   if(AuditFileExist){
+	   		   std::string epmdetFileName = outputFilePrefix + ".epmdet";
+	   		   std::ifstream  src(outAuditFileName.c_str());
+	   		   std::ofstream  dst(epmdetFileName.c_str());
+	   		   dst << src.rdbuf();
+	   	   }
+
+	   	   bool outFileExist = fileExist(outIDFFileName);
+	   	   if(outFileExist){
+	   		   std::string epmidfFileName = outputFilePrefix + ".epmidf";
+	   		   std::ifstream  src(outIDFFileName.c_str());
+	   		   std::ofstream  dst(epmidfFileName.c_str());
+	   		   dst << src.rdbuf();
+	   		   link(epmidfFileName.c_str(), idfFileNameOnly.c_str());
+	   		   DisplayString("Input file: " + inputIMFFileName + "\n");
+	   	   }
+	   	   else{
+	   		   ShowFatalError("EPMacro did not produce "+ outIDFFileName + "with "+ inputIMFFileName +"\n");
+	   		   exit(EXIT_FAILURE);
+	   	   }
+	   }*/
+
+
+
 		return 0;
 	}
   } //namespace options
