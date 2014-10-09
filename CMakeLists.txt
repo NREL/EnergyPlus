@@ -144,6 +144,6 @@ if( BUILD_PACKAGE )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ConvertESOMTR/;ConvertESOMTR;ALL;/")
   endif()
 
-  include(CPack.cmake)
+  include(cmake/Install.cmake)
 endif()
 
