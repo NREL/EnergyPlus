@@ -17,9 +17,9 @@ The transition to Github is still underway.  The wiki is still in flux as the fi
 
 As this is a public repository, you are free to fork it to your own Github account.  If you actively do development that you'd like to contribute back, be sure to do work in a separate branch than develop, and provide a pull request when the code is ready.  There will be a paperwork step before the EnergyPlus development team is able to do the code review and eventually merge into the main development line.
 
-# Building Packages
+# Building Installer Packages
 
-A separate, still private repository, contains many binary pieces that are eventually included in the installer packages.  These are being transitioned to build from source where possible, in which case they will end up in this repository along with the other source.  During this transition period, packages won't easily be buildable by external developers.  If you are in need of building an installer, consult the development team through the Helpdesk for assistance.
+Buildling an installer package is simply a matter of compiling the "Package" target.  On Windows you must have the NSIS tool installed first.  On Mac you must install PackageMaker.  Once the appropriate packaging tool is installed, use the CMake interface to turn on the "BUILD\_PACKAGE" option and regenerate the project.  A separate repository contains many binary pieces that are downloaded during the process of compilling the installer.  These are being transitioned to build from source where possible, in which case they will end up in this repository along with the other source.  Because this content is automatically downloaded from a separate GitHub repository during the packaging process, you will need to have an internet connection while generating an installer.  The completed installer package will be copied into the root of the build directory.
 
 # Building EnergyPlus
 
@@ -51,4 +51,16 @@ These instructions were written around Ubuntu, but should be valid for other Deb
 
 ## Mac
 
+These instructions were written for Mac OS X Version 10.9.  Newer versions of OS X are expected to work, but not yet tested.  Older versions of Mac OS X may work with some tweaking of the project configuration, but are not supported at this time.
+
+1. Install Xcode which is available on the App Store.
+2. Install CMake from http://www.cmake.org/download/.
+3. Launch CMake.app and click the "Browse Source" button, then select the directory where the source is located.
+4. Make a new directory at the root of the source tree called build.
+5. In CMake.app "Browse Build" and select the new build directory.
+5. Press Configure.
+6. When prompted to specify the generator choose "Unix Makefiles" and default native compilers.
+6. Press Generate.
+7. Using the command line interface of Terminal.app navigate to the build directory.
+8. Type make -j N, where N is the number of precess you'd like to employ to build the project.
 
