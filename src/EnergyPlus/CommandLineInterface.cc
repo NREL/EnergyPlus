@@ -153,27 +153,33 @@ namespace CommandLineInterface{
 	    return mdret;
 	}
 
+	std::string EqualsToSpace(std::string text)
+	{
+	    std::replace(text.begin(), text.end(), '=', ' ');
+	    return text;
+	}
+
 	int
 	ProcessArgs(int argc, const char * argv[])
 	{
-
-		std::string weatherEquals;
-		std::string weatherLongOption;
-		std::ifstream input;
-		std::istream* instream;
+		std::ifstream inputW, inputIDD;
+		std::istream* instreamW;
+		std::istream* instreamIDD;
 
 		for ( int i = 1; i < argc; ++i ) {
 				std::string inputArg( argv[ i ] );
-				if(inputArg.substr(0,9) == "--weather"){
-					weatherLongOption = inputArg.substr(0,9);
-					inputWeatherFileName = returnFileExtension(inputArg);
+				if(inputArg.substr(0,10) == "--weather="){
+					std::string weatherLongOption = EqualsToSpace(inputArg.substr(0,10));
 					argv[i] = weatherLongOption.c_str();
-					weatherEquals = weatherLongOption + "=";
+					inputWeatherFileName = returnFileExtension(inputArg);
+				}
+
+				if(inputArg.substr(0,6) == "--idd="){
+					std::string iddLongOption = EqualsToSpace(inputArg.substr(0,6));
+					argv[i] = iddLongOption.c_str();
+					inputIddFileName = returnFileExtension(inputArg);
 				}
 		}
-
-		if(weatherLongOption.empty())
-			weatherLongOption = "--weather=";
 
 		ezOptionParser opt;
 
@@ -186,11 +192,15 @@ namespace CommandLineInterface{
 
 		opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
-		opt.add("in.idf", 0, 1, 0, "Input data file path (default in.idf)", "");
+	//	opt.add("in.idf", 0, 1, 0, "Input data file path (default in.idf)", "");
 
-		opt.add("in.epw", 0, 1, 0, "Weather file path (default in.epw)", "-w", "--weather", "--weather=");
+		opt.add("in.epw", 0, 1, 0, "Weather file path (default in.epw)", "-w", "--weather");
+
+		opt.add("", 0, 0, 0, "Weather file path", "--weather ");
 
 		opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default Energy+.idd in executable directory)", "-i", "--idd");
+
+		opt.add("", 0, 0, 0, "Input data dictionary path", "--idd ");
 
 		opt.add("", 0, 1, 0, "Prefix for output files (default same as input file name)", "-p", "--prefix");
 
@@ -221,22 +231,20 @@ namespace CommandLineInterface{
 		exePathName = returnDirPathName(exePath);
 
 		if(inputWeatherFileName.empty())
-				inputWeatherFileName = "in.epw";
+			inputWeatherFileName = "in.epw";
 
-		instream = &input;
-		input.open( inputWeatherFileName.c_str() );
+		instreamW = &inputW;
+		inputW.open( inputWeatherFileName.c_str() );
 
-		opt.get("-i")->getString(inputIddFileName);
+		if(inputIddFileName.empty())
+			inputIddFileName = "Energy+.idd";
+
+		instreamIDD = &inputIDD;
+		inputIDD.open( inputIddFileName.c_str() );
 
 		opt.get("-d")->getString(dirPathName);
 
 		opt.get("-ep")->getString(inputIMFFileName);
-
-		/////////// For weather filename only (in case needed) ////////////////
-		//weatherFileNameWextn = returnFileName(inputWeatherFileName);
-		//weatherDirPathName = returnDirPathName(inputWeatherFileName);
-		//std::string weatherFileNameOnly = weatherFileNameWextn.substr(0,weatherFileNameWextn.size()-4);
-        //////////////////////////////////////////////////////////////////////
 
 		 readVarsValue = false;
 		 if (opt.isSet("-r")){
@@ -264,7 +272,7 @@ namespace CommandLineInterface{
  					char resolved_path[100];
  					realpath(arg.c_str(), resolved_path);
  					std::string idfPath = std::string(resolved_path);
- 					DisplayString(idfPath +" is not a valid path. \n" );
+ 					DisplayString("ERROR: "+ idfPath +" is not a valid path. \n" );
  					exit(EXIT_FAILURE);
  					}
  				}
@@ -309,7 +317,6 @@ namespace CommandLineInterface{
  			}
 
  			if(dirPathName[dirPathName.size()-1]!=pathChar){
- 				// force trailing / so we can handle everything in loop
  				dirPathName+=pathChar;
  			}
 
@@ -367,23 +374,19 @@ namespace CommandLineInterface{
         std::vector<std::string> badOptions;
         if(!opt.gotExpected(badOptions)) {
    			for(int i=0; i < badOptions.size(); ++i) {
-   				if(badOptions[i] != "-w"){
    				DisplayString("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
         		DisplayString(usage);
    				ShowFatalError("\nERROR: Unexpected number of arguments for option " + badOptions[i] + "\n");
    				exit(EXIT_FAILURE);
-   				}
    			}
    		}
 
         if(!opt.gotRequired(badOptions)) {
    			for(int i=0; i < badOptions.size(); ++i) {
-   				if(badOptions[i] != "-w"){
    				DisplayString("\nERROR: Missing required option " + badOptions[i] + "\n");
         		DisplayString(usage);
    				ShowFatalError("\nERROR: Missing required option " + badOptions[i] + "\n");
    				exit(EXIT_FAILURE);
-   				}
    			}
    		}
 
@@ -405,21 +408,22 @@ namespace CommandLineInterface{
 
 	/*	std::string ExpandObjects = "ExpandObjects";
 		std::string runExpandObjects = "./"+ExpandObjects;
-	    if(expandObjValue)
+	    if(expandObjValue) {
 		   system(runExpandObjects.c_str());
 
-	    std::string expandIdfFile = "expanded.idf";
-	    bool expandIdfFileExist = fileExist(expandIdfFile);
-	    if(expandIdfFileExist) {
-	    	std::string expidfFileName = outputFilePrefix + ".expidf";
-	    	std::ifstream  src(expandIdfFile.c_str());
-	    	std::ofstream  dst(expidfFileName.c_str());
-	    	dst << src.rdbuf();
-	    	remove(idfFileNameOnly.c_str());
-	    	link(expidfFileName.c_str(), idfFileNameOnly.c_str());
-	    }
-	    else
-		std::cout<<"ExpandObjects file does not exist. \n";
+		   std::string expandIdfFile = "expanded.idf";
+		   bool expandIdfFileExist = fileExist(expandIdfFile);
+		   if(expandIdfFileExist) {
+			   std::string expidfFileName = outputFilePrefix + ".expidf";
+			   std::ifstream  src(expandIdfFile.c_str());
+			   std::ofstream  dst(expidfFileName.c_str());
+			   dst << src.rdbuf();
+			   remove(idfFileNameOnly.c_str());
+			   link(expidfFileName.c_str(), idfFileNameOnly.c_str());
+		   }
+		   else
+			   std::cout<<"ExpandObjects file does not exist. \n";
+	    	}
 
 	    bool imfFileExist = fileExist(inputIMFFileName);
 	    std::string defaultIMFFileName = "in.imf";
