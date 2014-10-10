@@ -1732,31 +1732,31 @@ Site:GroundDomain:Slab,
    A1,  \field Name
         \required-field
    N1,  \field Ground Domain Depth
-        \required-field
         \type real
+        \default 10
         \units m
         \minimum> 0.0
    N2,  \field Aspect Ratio
         \type real
         \default 1
    N3,  \field Perimeter Offset
-        \required-field
         \type real
+        \default 5
         \units m
         \minimum> 0.0
-   N4,  \field Soil Thermal Conductivity
-        \required-field
+   N4, \field Soil Thermal Conductivity
         \type real
+        \default 1.5
         \units W/m-K
         \minimum> 0.0
-   N5,  \field Soil Density
-        \required-field
+   N5, \field Soil Density
         \type real
+        \default 2800
         \units kg/m3
         \minimum> 0.0
-   N6,  \field Soil Specific Heat
-        \required-field
+   N6, \field Soil Specific Heat
         \type real
+        \default 850
         \units J/kg-K
         \minimum> 0.0
    N7,  \field Soil Moisture Content Volume Fraction
@@ -1771,22 +1771,25 @@ Site:GroundDomain:Slab,
         \minimum 0
         \maximum 100
         \default 50
-   N9,  \field Kusuda-Achenbach Average Surface Temperature
-        \required-field
+   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
         \type real
         \units C
-        \note Annual average surface temperature.
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \required-field
+        \note Annual average ground surface temperature.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
         \type real
         \units deltaC
-        \note Annual average surface temperature variation from average.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
+        \note Annual average ground surface temperature variation from average.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
         \type real
         \units days
-        \note The phase shift of minimum surface temperature, or the day
-        \note of the year when the minimum surface temperature occurs.
+        \note The phase shift of minimum ground surface temperature, or the day
+        \note of the year when the minimum ground surface temperature occurs.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
    N12, \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -1809,6 +1812,7 @@ Site:GroundDomain:Slab,
         \key OnGrade
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
    A4,  \field Slab Material Name
+        \required-field
         \type object-list
         \object-list MaterialName
         \note Only applicable for the in-grade case
@@ -1836,7 +1840,6 @@ Site:GroundDomain:Slab,
         \minimum> 0.0
         \note This field specifies the width of the underfloor perimeter insulation
    A8,  \field Vertical Insulation
-        \required-field
         \type choice
         \key Yes
         \key No
@@ -1853,12 +1856,11 @@ Site:GroundDomain:Slab,
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
    A10; \field Simulation Timestep
-        \required-field
         \type choice
         \key Hourly
         \key Timestep
         \default Hourly
-        \note This field specifies the domain simulation timestep.
+        \note This field specifies the ground domain simulation timestep.
 
 Site:GroundDomain:Basement,
         \memo Ground-coupled basement model for simulating basements
@@ -1866,34 +1868,34 @@ Site:GroundDomain:Basement,
    A1,  \field Name
         \required-field
    N1,  \field Ground Domain Depth
-        \required-field
         \type real
+        \default 10
         \units m
         \minimum> 0.0
         \note The depth from ground surface to the deep ground boundary of the domain.
-   N2,  \field Aspect ratio
+   N2,  \field Aspect Ratio
         \type real
         \default 1
         \This defines the height to width ratio of the basement zone.
    N3,  \field Perimeter Offset
-        \required-field
         \type real
+        \default 5
         \units m
         \minimum> 0.0
         \The distance from the basement wall edge to the edge of the ground domain
-   N4, \field Soil Thermal Conductivity
-        \required-field
+   N4,  \field Soil Thermal Conductivity
         \type real
+        \default 1.5
         \units W/m-K
         \minimum> 0.0
-   N5, \field Soil Density
-        \required-field
+   N5,  \field Soil Density
         \type real
+        \default 2800
         \units kg/m3
         \minimum> 0.0
-   N6, \field Soil Specific Heat
-        \required-field
+   N6,  \field Soil Specific Heat
         \type real
+        \default 850
         \units J/kg-K
         \minimum> 0.0
    N7, \field Soil Moisture Content Volume Fraction
@@ -1908,22 +1910,25 @@ Site:GroundDomain:Basement,
         \minimum 0
         \maximum 100
         \default 50
-   N9, \field Kusuda-Achenbach Average Surface Temperature
-        \required-field
+   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
         \type real
         \units C
-        \note Annual average surface temperature.
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \required-field
+        \note Annual average ground surface temperature.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
         \type real
         \units deltaC
-        \note Annual average surface temperature variation from average.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
+        \note Annual average ground surface temperature variation from average.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
         \type real
         \units days
-        \note The phase shift of minimum surface temperature, or the day
-        \note of the year when the minimum surface temperature occurs.
+        \note The phase shift of minimum ground surface temperature, or the day
+        \note of the year when the minimum ground surface temperature occurs.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
    N12, \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -1936,6 +1941,7 @@ Site:GroundDomain:Basement,
         \note  = 1   : standard reference state (12 cm grass)
         \note  = 1.5 : wild growth
    A2,  \field Basement Floor Boundary Condition Model Name
+        \required-field
         \type object-list
         \object-list OSCMNames
    A3,  \field Basement Floor Material Name
@@ -1943,14 +1949,13 @@ Site:GroundDomain:Basement,
         \type object-list
         \object-list MaterialName
    A4,  \field Horizontal Insulation
-        \required-field
         \type choice
         \key Yes
         \key No
         \note This field specifies the presence of insulation beneath the basement floor.
    A5,  \field Horizontal Insulation Material Name
-        \type option-list
-        \option-list MaterialName
+        \type object-list
+        \object-list MaterialName
    A6,  \field Horizontal Insulation Extents
         \type choice
         \key Perimeter
@@ -1967,8 +1972,10 @@ Site:GroundDomain:Basement,
    N14, \field Basement Wall Depth
         \type real
         \units m
+        \minimum> 0.0
         \note Depth measured from ground surface.
    A7,  \field Basement Wall Boundary Condition Model Name
+        \required-field
         \type object-list
         \object-list OSCMNames
    A8,  \field Basement Wall Material Name
@@ -1981,15 +1988,14 @@ Site:GroundDomain:Basement,
         \key No
         \default No
    A10, \field Basement Wall Vertical Insulation Material Name
-        \required-field
         \type object-list
         \object-list MaterialName
    N15, \field Vertical Insulation Depth
         \type real
         \units m
+        \minimum> 0.0
         \note Depth measured from the ground surface.
    A11; \field Simulation Timestep
-        \required-field
         \type choice
         \key Timestep
         \key Hourly
