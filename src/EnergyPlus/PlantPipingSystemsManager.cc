@@ -69,7 +69,7 @@ namespace PlantPipingSystemsManager {
 	std::string const ObjName_Circuit( "PipingSystem:Underground:PipeCircuit" );
 	std::string const ObjName_Segment( "PipingSystem:Underground:PipeSegment" );
 	std::string const ObjName_HorizTrench( "GroundHeatExchanger:HorizontalTrench" );
-	std::string const ObjName_ZoneCoupled_Slab( "Site:GroundDomain" );
+	std::string const ObjName_ZoneCoupled_Slab( "Site:GroundDomain:Slab" );
 	std::string const ObjName_ZoneCoupled_Basement( "Site:GroundDomain:Basement" );
 
 	// MODULE INTERFACE DEFINITIONS:

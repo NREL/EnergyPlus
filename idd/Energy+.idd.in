@@ -1726,7 +1726,7 @@ Site:GroundTemperature:Deep,
        \type real
        \default 16
 
-Site:GroundDomain,
+Site:GroundDomain:Slab,
         \memo Ground-coupled slab model for on-grade and
         \memo in-grade cases with or without insulation.
    A1,  \field Name

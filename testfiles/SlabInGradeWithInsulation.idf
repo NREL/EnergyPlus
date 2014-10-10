@@ -456,7 +456,7 @@ SurfaceProperty:OtherSideConditionsModel,
 !***********************************************************
 !************* GROUND/SLAB DOMAIN **************************
 !***********************************************************
-  Site:GroundDomain,
+  Site:GroundDomain:Slab,
     CoupledSlab, !- Name
 	5, !- Ground Domain Depth {m}
     1, !- Aspect Ratio
