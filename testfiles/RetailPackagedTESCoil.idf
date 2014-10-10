@@ -5604,12 +5604,12 @@
     0.235966025,             !- Coefficient4 y
     0,                       !- Coefficient5 y**2
     -0.008227635,            !- Coefficient6 x*y
-    16.1,                    !- Minimum Value of x {BasedOnField A2}
-    23.9,                    !- Maximum Value of x {BasedOnField A2}
-    23.9,                    !- Minimum Value of y {BasedOnField A3}
-    29.4,                    !- Maximum Value of y {BasedOnField A3}
-    0.2,                     !- Minimum Curve Output {BasedOnField A4}
-    2.0,                     !- Maximum Curve Output {BasedOnField A4}
+    16.1,                    !- Minimum Value of x
+    23.9,                    !- Maximum Value of x
+    23.9,                    !- Minimum Value of y
+    29.4,                    !- Maximum Value of y
+    0.2,                     !- Minimum Curve Output
+    2.0,                     !- Maximum Curve Output
     Temperature,             !- Input Unit Type for X
     Temperature,             !- Input Unit Type for Y
     Dimensionless;           !- Output Unit Type
