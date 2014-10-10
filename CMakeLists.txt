@@ -10,6 +10,14 @@ set( CMAKE_VERSION_PATCH 2 )
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
+
+if(NOT GIT_FOUND)
+  find_program(GIT_EXECUTABLE git HINTS "$ENV{LOCALAPPDATA}/Programs/git/bin")
+  if (NOT GIT_EXECUTABLE_NOTFOUND)
+    set(GIT_FOUND TRUE)
+  endif()
+endif()
+
 if(GIT_FOUND)
   execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
                   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
