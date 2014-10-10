@@ -61,6 +61,7 @@ namespace CommandLineInterface {
  extern bool prefixValue;
  extern bool expandObjValue;
  extern bool EPMacroValue;
+ extern bool DDOnlySimulation;
 
  // Process command line arguments
  int

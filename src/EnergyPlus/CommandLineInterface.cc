@@ -86,10 +86,10 @@ std::string exePathName;
 std::string prefixOutName;
 std::string inputIMFFileName;
 
-bool readVarsValue;
-bool prefixValue;
-bool expandObjValue;
-bool EPMacroValue;
+bool readVarsValue(false);
+bool prefixValue(false);
+bool expandObjValue(false);
+bool EPMacroValue(false);
 
 
 bool fileExist(const std::string& filename)
@@ -191,8 +191,6 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
-	//	opt.add("in.idf", 0, 1, 0, "Input data file path (default in.idf)", "");
-
 	opt.add("in.epw", 0, 1, 0, "Weather file path (default in.epw)", "-w", "--weather");
 
 	opt.add("", 0, 0, 0, "Weather file path", "--weather ");
@@ -206,6 +204,8 @@ ProcessArgs(int argc, const char * argv[])
 	opt.add("", 0, 0, 0, "Run ReadVarsESO to generate time-series CSV", "-r", "--readvars");
 
 	opt.add("", 0, 0, 0, "Run ExpandObjects", "-e", "--expandObj");
+
+	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-dd", "--ddonly");
 
 	opt.add("", 0, 1, 0, "Run EPMacro", "-ep", "--epMacro");
 
@@ -245,7 +245,6 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-ep")->getString(inputIMFFileName);
 
-	readVarsValue = false;
 	if (opt.isSet("-r")){
 		readVarsValue = true;
 	}
@@ -295,15 +294,13 @@ ProcessArgs(int argc, const char * argv[])
 	idfDirPathName = returnDirPathName(inputIdfFileName);
 
 	opt.get("-p")->getString(prefixOutName);
-	prefixValue = false;
+
 	if(opt.isSet("-p"))
 		prefixValue = true;
 
-	expandObjValue = false;
 	if(opt.isSet("-e"))
 		expandObjValue = true;
 
-	EPMacroValue = false;
 	if(opt.isSet("-ep"))
 		EPMacroValue = true;
 
@@ -405,7 +402,7 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	/*if(expandObjValue) {
+	if(expandObjValue) {
 		std::string runExpandObjects = "./ExpandObjects";
 		system(runExpandObjects.c_str());
 
@@ -421,7 +418,7 @@ ProcessArgs(int argc, const char * argv[])
 		}
 		//else
 			// DisplayString("ExpandObjects file does not exist. \n");
-	}*/
+	}
 
 	if(EPMacroValue){
 		bool imfFileExist = fileExist(inputIMFFileName);

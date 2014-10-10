@@ -259,6 +259,7 @@ main(int argc, const char * argv[])
 #endif
 	CreateCurrentDateTimeString( CurrentDateTime );
 	VerString += "," + CurrentDateTime;
+
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
 
