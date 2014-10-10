@@ -262,12 +262,16 @@ main(int argc, const char * argv[])
 
 	get_environment_variable( DDOnlyEnvVar, cEnvValue );
 	DDOnly = env_var_on( cEnvValue ); // Yes or True
+	if(DDOnlySimulation)
+		DDOnly = true;
 
 	get_environment_variable( ReverseDDEnvVar, cEnvValue );
 	ReverseDD = env_var_on( cEnvValue ); // Yes or True
 
 	get_environment_variable( FullAnnualSimulation, cEnvValue );
 	FullAnnualRun = env_var_on( cEnvValue ); // Yes or True
+	if(AnnualSimulation)
+		FullAnnualRun = true;
 
 	get_environment_variable( cDisplayAllWarnings, cEnvValue );
 	DisplayAllWarnings = env_var_on( cEnvValue ); // Yes or True

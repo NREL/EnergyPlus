@@ -15,6 +15,7 @@
 #include <CommandLineInterface.hh>
 #include <DisplayRoutines.hh>
 #include <DataStringGlobals.hh>
+#include <DataSystemVariables.hh>
 #include <EnergyPlus.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -29,6 +30,7 @@ namespace EnergyPlus{
 namespace CommandLineInterface{
 
 using namespace DataStringGlobals;
+using namespace DataSystemVariables;
 using namespace InputProcessor;
 using namespace SimulationManager;
 using namespace OutputReportTabular;
@@ -90,7 +92,8 @@ bool readVarsValue(false);
 bool prefixValue(false);
 bool expandObjValue(false);
 bool EPMacroValue(false);
-
+bool DDOnlySimulation(false);
+bool AnnualSimulation(false);
 
 bool fileExist(const std::string& filename)
 {
@@ -164,6 +167,8 @@ ProcessArgs(int argc, const char * argv[])
 	std::ifstream inputW, inputIDD;
 	std::istream* instreamW;
 	std::istream* instreamIDD;
+	bool annSimulation;
+	bool ddSimulation;
 
 	for ( int i = 1; i < argc; ++i ) {
 		std::string inputArg( argv[ i ] );
@@ -178,6 +183,12 @@ ProcessArgs(int argc, const char * argv[])
 			argv[i] = iddLongOption.c_str();
 			inputIddFileName = returnFileExtension(inputArg);
 		}
+
+		if(inputArg == "-a")
+			annSimulation = true;
+
+		if(inputArg == "-dd")
+			ddSimulation = true;
 	}
 
 	ezOptionParser opt;
@@ -205,7 +216,9 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Run ExpandObjects", "-e", "--expandObj");
 
-	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-dd", "--ddonly");
+	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-dd", "--designday");
+
+	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-a", "--annual");
 
 	opt.add("", 0, 1, 0, "Run EPMacro", "-ep", "--epMacro");
 
@@ -245,8 +258,16 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-ep")->getString(inputIMFFileName);
 
-	if (opt.isSet("-r")){
+	if (opt.isSet("-r"))
 		readVarsValue = true;
+
+
+	if (opt.isSet("-dd"))
+			DDOnlySimulation = true;
+
+	if(!(annSimulation && ddSimulation)){
+		if (opt.isSet("-a"))
+			AnnualSimulation = true;
 	}
 
 	// Process standard arguments
