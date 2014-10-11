@@ -1,0 +1,3 @@
+Date/Time,Electricity:Facility [J](Monthly),Electricity:Building [J](Monthly),InteriorLights:Electricity [J](Monthly),Electricity:Plant [J](Monthly),Electricity:Facility [J](RunPeriod),Electricity:Building [J](RunPeriod),InteriorLights:Electricity [J](RunPeriod),Electricity:Plant [J](RunPeriod) 
+January,531700820.135999,358900820.135999,95313248.1359999,172800000.,531700820.135999,358900820.135999,95313248.1359999,172800000. 
+July,995856506.318778,358900820.135999,95313248.1359999,636955686.182778,995856506.318778,358900820.135999,95313248.1359999,636955686.182778 

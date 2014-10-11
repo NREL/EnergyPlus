@@ -32743,6 +32743,7 @@ ZoneHVAC:OutdoorAirUnit,
        \type choice
        \key NeutralControl
        \key TemperatureControl
+       \key HumidityControl
        \default NeutralControl
    A10, \field High Air Control Temperature Schedule Name
        \note Air and control temperatures for cooling. If outdoor air temperature

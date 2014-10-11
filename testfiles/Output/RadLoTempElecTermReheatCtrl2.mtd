@@ -1,0 +1,558 @@
+
+ Meters for 6,EAST ZONE LIGHTS 1:Lights Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:EAST ZONE [J]
+  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity:Zone:EAST ZONE [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+
+ Meters for 67,NORTH ZONE LIGHTS 1:Lights Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:NORTH ZONE [J]
+  OnMeter=InteriorLights:Electricity [J]
+  OnMeter=InteriorLights:Electricity:Zone:NORTH ZONE [J]
+  OnMeter=GeneralLights:InteriorLights:Electricity [J]
+
+ Meters for 88,WEST ZONE ELECEQ 1:Electric Equipment Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:WEST ZONE [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:WEST ZONE [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 129,EAST ZONE ELECEQ 1:Electric Equipment Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:EAST ZONE [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:EAST ZONE [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 140,NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Building [J]
+  OnMeter=Electricity:Zone:NORTH ZONE [J]
+  OnMeter=InteriorEquipment:Electricity [J]
+  OnMeter=InteriorEquipment:Electricity:Zone:NORTH ZONE [J]
+  OnMeter=General:InteriorEquipment:Electricity [J]
+
+ Meters for 158,WEST ZONE:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:WEST ZONE [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:WEST ZONE [J]
+
+ Meters for 209,WEST ZONE:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:WEST ZONE [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:WEST ZONE [J]
+
+ Meters for 234,EAST ZONE:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:EAST ZONE [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:EAST ZONE [J]
+
+ Meters for 255,EAST ZONE:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:EAST ZONE [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:EAST ZONE [J]
+
+ Meters for 270,NORTH ZONE:Zone Air System Sensible Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:NORTH ZONE [J]
+  OnMeter=Heating:EnergyTransfer [J]
+  OnMeter=Heating:EnergyTransfer:Zone:NORTH ZONE [J]
+
+ Meters for 291,NORTH ZONE:Zone Air System Sensible Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Building [J]
+  OnMeter=EnergyTransfer:Zone:NORTH ZONE [J]
+  OnMeter=Cooling:EnergyTransfer [J]
+  OnMeter=Cooling:EnergyTransfer:Zone:NORTH ZONE [J]
+
+ Meters for 313,REHEAT COIL ZONE 1:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 334,REHEAT COIL ZONE 1:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 365,REHEAT COIL ZONE 2:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 366,REHEAT COIL ZONE 2:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 367,REHEAT COIL ZONE 3:Heating Coil Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 368,REHEAT COIL ZONE 3:Heating Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopHeatingDemand:Facility [J]
+  OnMeter=PlantLoopHeatingDemand:HVAC [J]
+  OnMeter=HeatingCoils:PlantLoopHeatingDemand [J]
+
+ Meters for 369,DETAILED COOLING COIL:Cooling Coil Total Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=CoolingCoils:EnergyTransfer [J]
+
+ Meters for 380,DETAILED COOLING COIL:Cooling Coil Source Side Heat Transfer Energy [J]
+  OnMeter=PlantLoopCoolingDemand:Facility [J]
+  OnMeter=PlantLoopCoolingDemand:HVAC [J]
+  OnMeter=CoolingCoils:PlantLoopCoolingDemand [J]
+
+ Meters for 414,ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Heating:Electricity [J]
+
+ Meters for 436,ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 438,ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Heating:Electricity [J]
+
+ Meters for 440,ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 442,ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Heating:Electricity [J]
+
+ Meters for 444,ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Heating Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:HVAC [J]
+  OnMeter=HeatingCoils:EnergyTransfer [J]
+
+ Meters for 446,SUPPLY FAN 1:Fan Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:HVAC [J]
+  OnMeter=Fans:Electricity [J]
+  OnMeter=General:Fans:Electricity [J]
+
+ Meters for 467,Whole Building:Facility Total Purchased Electric Energy [J]
+  OnMeter=ElectricityPurchased:Facility [J]
+  OnMeter=ElectricityPurchased:Plant [J]
+  OnMeter=Cogeneration:ElectricityPurchased [J]
+
+ Meters for 498,Whole Building:Facility Total Surplus Electric Energy [J]
+  OnMeter=ElectricitySurplusSold:Facility [J]
+  OnMeter=ElectricitySurplusSold:Plant [J]
+  OnMeter=Cogeneration:ElectricitySurplusSold [J]
+
+ Meters for 529,Whole Building:Facility Net Purchased Electric Energy [J]
+  OnMeter=ElectricityNet:Facility [J]
+  OnMeter=ElectricityNet:Plant [J]
+  OnMeter=Cogeneration:ElectricityNet [J]
+
+ Meters for 560,LITTLE CHILLER:Chiller Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Cooling:Electricity [J]
+
+ Meters for 581,LITTLE CHILLER:Chiller Evaporator Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Plant [J]
+  OnMeter=Chillers:EnergyTransfer [J]
+
+ Meters for 602,LITTLE CHILLER:Chiller Condenser Heat Transfer Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Plant [J]
+  OnMeter=HeatRejection:EnergyTransfer [J]
+
+ Meters for 613,BIG CHILLER:Chiller Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Cooling:Electricity [J]
+
+ Meters for 614,BIG CHILLER:Chiller Evaporator Cooling Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Plant [J]
+  OnMeter=Chillers:EnergyTransfer [J]
+
+ Meters for 615,BIG CHILLER:Chiller Condenser Heat Transfer Energy [J]
+  OnMeter=EnergyTransfer:Facility [J]
+  OnMeter=EnergyTransfer:Plant [J]
+  OnMeter=HeatRejection:EnergyTransfer [J]
+
+ Meters for 616,PURCHASED HEATING:District Heating Hot Water Energy [J]
+  OnMeter=DistrictHeating:Facility [J]
+  OnMeter=DistrictHeating:Plant [J]
+  OnMeter=Heating:DistrictHeating [J]
+
+ Meters for 648,PURCHASED COOLING:District Cooling Chilled Water Energy [J]
+  OnMeter=DistrictCooling:Facility [J]
+  OnMeter=DistrictCooling:Plant [J]
+  OnMeter=Cooling:DistrictCooling [J]
+
+ Meters for 680,BIG TOWER:Cooling Tower Fan Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=HeatRejection:Electricity [J]
+
+ Meters for 691,BIG TOWER:Cooling Tower Make Up Water Volume [m3]
+  OnMeter=Water:Facility [m3]
+  OnMeter=Water:Plant [m3]
+  OnMeter=HeatRejection:Water [m3]
+
+ Meters for 722,BIG TOWER:Cooling Tower Make Up Mains Water Volume [m3]
+  OnMeter=MainsWater:Facility [m3]
+  OnMeter=MainsWater:Plant [m3]
+  OnMeter=HeatRejection:MainsWater [m3]
+
+ Meters for 753,CIRC PUMP:Pump Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Pumps:Electricity [J]
+
+ Meters for 764,COND CIRC PUMP:Pump Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Pumps:Electricity [J]
+
+ Meters for 765,HW CIRC PUMP:Pump Electric Energy [J]
+  OnMeter=Electricity:Facility [J]
+  OnMeter=Electricity:Plant [J]
+  OnMeter=Pumps:Electricity [J]
+
+ Meters for 769,Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass [kg]
+  OnMeter=Carbon Equivalent:Facility [kg]
+  OnMeter=CarbonEquivalentEmissions:Carbon Equivalent [kg]
+
+ Meters for 790,Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass [kg]
+  OnMeter=Carbon Equivalent:Facility [kg]
+  OnMeter=CarbonEquivalentEmissions:Carbon Equivalent [kg]
+
+ Meters for 791,Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass [kg]
+  OnMeter=Carbon Equivalent:Facility [kg]
+  OnMeter=CarbonEquivalentEmissions:Carbon Equivalent [kg]
+
+ For Meter=Electricity:Facility [J], ResourceType=Electricity, contents are:
+  EAST ZONE LIGHTS 1:Lights Electric Energy
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+  ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  SUPPLY FAN 1:Fan Electric Energy
+  LITTLE CHILLER:Chiller Electric Energy
+  BIG CHILLER:Chiller Electric Energy
+  BIG TOWER:Cooling Tower Fan Electric Energy
+  CIRC PUMP:Pump Electric Energy
+  COND CIRC PUMP:Pump Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
+
+ For Meter=Electricity:Building [J], ResourceType=Electricity, Group=Building, contents are:
+  EAST ZONE LIGHTS 1:Lights Electric Energy
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=Electricity:Zone:EAST ZONE [J], ResourceType=Electricity, Group=Zone, contents are:
+  EAST ZONE LIGHTS 1:Lights Electric Energy
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=InteriorLights:Electricity [J], ResourceType=Electricity, EndUse=InteriorLights, contents are:
+  EAST ZONE LIGHTS 1:Lights Electric Energy
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
+
+ For Meter=InteriorLights:Electricity:Zone:EAST ZONE [J], ResourceType=Electricity, EndUse=InteriorLights, Group=Zone, contents are:
+  EAST ZONE LIGHTS 1:Lights Electric Energy
+
+ For Meter=GeneralLights:InteriorLights:Electricity [J], ResourceType=Electricity, EndUse=InteriorLights, contents are:
+  EAST ZONE LIGHTS 1:Lights Electric Energy
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
+
+ For Meter=Electricity:Zone:NORTH ZONE [J], ResourceType=Electricity, Group=Zone, contents are:
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=InteriorLights:Electricity:Zone:NORTH ZONE [J], ResourceType=Electricity, EndUse=InteriorLights, Group=Zone, contents are:
+  NORTH ZONE LIGHTS 1:Lights Electric Energy
+
+ For Meter=Electricity:Zone:WEST ZONE [J], ResourceType=Electricity, Group=Zone, contents are:
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=InteriorEquipment:Electricity [J], ResourceType=Electricity, EndUse=InteriorEquipment, contents are:
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:WEST ZONE [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=General:InteriorEquipment:Electricity [J], ResourceType=Electricity, EndUse=InteriorEquipment, contents are:
+  WEST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:EAST ZONE [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  EAST ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=InteriorEquipment:Electricity:Zone:NORTH ZONE [J], ResourceType=Electricity, EndUse=InteriorEquipment, Group=Zone, contents are:
+  NORTH ZONE ELECEQ 1:Electric Equipment Electric Energy
+
+ For Meter=EnergyTransfer:Facility [J], ResourceType=EnergyTransfer, contents are:
+  WEST ZONE:Zone Air System Sensible Heating Energy
+  WEST ZONE:Zone Air System Sensible Cooling Energy
+  EAST ZONE:Zone Air System Sensible Heating Energy
+  EAST ZONE:Zone Air System Sensible Cooling Energy
+  NORTH ZONE:Zone Air System Sensible Heating Energy
+  NORTH ZONE:Zone Air System Sensible Cooling Energy
+  REHEAT COIL ZONE 1:Heating Coil Heating Energy
+  REHEAT COIL ZONE 2:Heating Coil Heating Energy
+  REHEAT COIL ZONE 3:Heating Coil Heating Energy
+  DETAILED COOLING COIL:Cooling Coil Total Cooling Energy
+  ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+  ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+  ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+  LITTLE CHILLER:Chiller Evaporator Cooling Energy
+  LITTLE CHILLER:Chiller Condenser Heat Transfer Energy
+  BIG CHILLER:Chiller Evaporator Cooling Energy
+  BIG CHILLER:Chiller Condenser Heat Transfer Energy
+
+ For Meter=EnergyTransfer:Building [J], ResourceType=EnergyTransfer, Group=Building, contents are:
+  WEST ZONE:Zone Air System Sensible Heating Energy
+  WEST ZONE:Zone Air System Sensible Cooling Energy
+  EAST ZONE:Zone Air System Sensible Heating Energy
+  EAST ZONE:Zone Air System Sensible Cooling Energy
+  NORTH ZONE:Zone Air System Sensible Heating Energy
+  NORTH ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:WEST ZONE [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  WEST ZONE:Zone Air System Sensible Heating Energy
+  WEST ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Heating, contents are:
+  WEST ZONE:Zone Air System Sensible Heating Energy
+  EAST ZONE:Zone Air System Sensible Heating Energy
+  NORTH ZONE:Zone Air System Sensible Heating Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:WEST ZONE [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  WEST ZONE:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Cooling, contents are:
+  WEST ZONE:Zone Air System Sensible Cooling Energy
+  EAST ZONE:Zone Air System Sensible Cooling Energy
+  NORTH ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:WEST ZONE [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  WEST ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:EAST ZONE [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  EAST ZONE:Zone Air System Sensible Heating Energy
+  EAST ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:EAST ZONE [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  EAST ZONE:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:EAST ZONE [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  EAST ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:Zone:NORTH ZONE [J], ResourceType=EnergyTransfer, Group=Zone, contents are:
+  NORTH ZONE:Zone Air System Sensible Heating Energy
+  NORTH ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=Heating:EnergyTransfer:Zone:NORTH ZONE [J], ResourceType=EnergyTransfer, EndUse=Heating, Group=Zone, contents are:
+  NORTH ZONE:Zone Air System Sensible Heating Energy
+
+ For Meter=Cooling:EnergyTransfer:Zone:NORTH ZONE [J], ResourceType=EnergyTransfer, EndUse=Cooling, Group=Zone, contents are:
+  NORTH ZONE:Zone Air System Sensible Cooling Energy
+
+ For Meter=EnergyTransfer:HVAC [J], ResourceType=EnergyTransfer, Group=HVAC, contents are:
+  REHEAT COIL ZONE 1:Heating Coil Heating Energy
+  REHEAT COIL ZONE 2:Heating Coil Heating Energy
+  REHEAT COIL ZONE 3:Heating Coil Heating Energy
+  DETAILED COOLING COIL:Cooling Coil Total Cooling Energy
+  ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+  ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+  ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+
+ For Meter=HeatingCoils:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=HeatingCoils, contents are:
+  REHEAT COIL ZONE 1:Heating Coil Heating Energy
+  REHEAT COIL ZONE 2:Heating Coil Heating Energy
+  REHEAT COIL ZONE 3:Heating Coil Heating Energy
+  ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+  ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+  ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Heating Energy
+
+ For Meter=PlantLoopHeatingDemand:Facility [J], ResourceType=PlantLoopHeatingDemand, contents are:
+  REHEAT COIL ZONE 1:Heating Coil Source Side Heat Transfer Energy
+  REHEAT COIL ZONE 2:Heating Coil Source Side Heat Transfer Energy
+  REHEAT COIL ZONE 3:Heating Coil Source Side Heat Transfer Energy
+
+ For Meter=PlantLoopHeatingDemand:HVAC [J], ResourceType=PlantLoopHeatingDemand, Group=HVAC, contents are:
+  REHEAT COIL ZONE 1:Heating Coil Source Side Heat Transfer Energy
+  REHEAT COIL ZONE 2:Heating Coil Source Side Heat Transfer Energy
+  REHEAT COIL ZONE 3:Heating Coil Source Side Heat Transfer Energy
+
+ For Meter=HeatingCoils:PlantLoopHeatingDemand [J], ResourceType=PlantLoopHeatingDemand, EndUse=HeatingCoils, contents are:
+  REHEAT COIL ZONE 1:Heating Coil Source Side Heat Transfer Energy
+  REHEAT COIL ZONE 2:Heating Coil Source Side Heat Transfer Energy
+  REHEAT COIL ZONE 3:Heating Coil Source Side Heat Transfer Energy
+
+ For Meter=CoolingCoils:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=CoolingCoils, contents are:
+  DETAILED COOLING COIL:Cooling Coil Total Cooling Energy
+
+ For Meter=PlantLoopCoolingDemand:Facility [J], ResourceType=PlantLoopCoolingDemand, contents are:
+  DETAILED COOLING COIL:Cooling Coil Source Side Heat Transfer Energy
+
+ For Meter=PlantLoopCoolingDemand:HVAC [J], ResourceType=PlantLoopCoolingDemand, Group=HVAC, contents are:
+  DETAILED COOLING COIL:Cooling Coil Source Side Heat Transfer Energy
+
+ For Meter=CoolingCoils:PlantLoopCoolingDemand [J], ResourceType=PlantLoopCoolingDemand, EndUse=CoolingCoils, contents are:
+  DETAILED COOLING COIL:Cooling Coil Source Side Heat Transfer Energy
+
+ For Meter=Electricity:HVAC [J], ResourceType=Electricity, Group=HVAC, contents are:
+  ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  SUPPLY FAN 1:Fan Electric Energy
+
+ For Meter=Heating:Electricity [J], ResourceType=Electricity, EndUse=Heating, contents are:
+  ZONE 1 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  ZONE 2 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+  ZONE 3 RADIANT FLOOR:Zone Radiant HVAC Electric Energy
+
+ For Meter=Fans:Electricity [J], ResourceType=Electricity, EndUse=Fans, contents are:
+  SUPPLY FAN 1:Fan Electric Energy
+
+ For Meter=General:Fans:Electricity [J], ResourceType=Electricity, EndUse=Fans, contents are:
+  SUPPLY FAN 1:Fan Electric Energy
+
+ For Meter=ElectricityPurchased:Facility [J], ResourceType=ElectricityPurchased, contents are:
+  Whole Building:Facility Total Purchased Electric Energy
+
+ For Meter=ElectricityPurchased:Plant [J], ResourceType=ElectricityPurchased, Group=Plant, contents are:
+  Whole Building:Facility Total Purchased Electric Energy
+
+ For Meter=Cogeneration:ElectricityPurchased [J], ResourceType=ElectricityPurchased, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Total Purchased Electric Energy
+
+ For Meter=ElectricitySurplusSold:Facility [J], ResourceType=ElectricitySurplusSold, contents are:
+  Whole Building:Facility Total Surplus Electric Energy
+
+ For Meter=ElectricitySurplusSold:Plant [J], ResourceType=ElectricitySurplusSold, Group=Plant, contents are:
+  Whole Building:Facility Total Surplus Electric Energy
+
+ For Meter=Cogeneration:ElectricitySurplusSold [J], ResourceType=ElectricitySurplusSold, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Total Surplus Electric Energy
+
+ For Meter=ElectricityNet:Facility [J], ResourceType=ElectricityNet, contents are:
+  Whole Building:Facility Net Purchased Electric Energy
+
+ For Meter=ElectricityNet:Plant [J], ResourceType=ElectricityNet, Group=Plant, contents are:
+  Whole Building:Facility Net Purchased Electric Energy
+
+ For Meter=Cogeneration:ElectricityNet [J], ResourceType=ElectricityNet, EndUse=Cogeneration, contents are:
+  Whole Building:Facility Net Purchased Electric Energy
+
+ For Meter=Electricity:Plant [J], ResourceType=Electricity, Group=Plant, contents are:
+  LITTLE CHILLER:Chiller Electric Energy
+  BIG CHILLER:Chiller Electric Energy
+  BIG TOWER:Cooling Tower Fan Electric Energy
+  CIRC PUMP:Pump Electric Energy
+  COND CIRC PUMP:Pump Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
+
+ For Meter=Cooling:Electricity [J], ResourceType=Electricity, EndUse=Cooling, contents are:
+  LITTLE CHILLER:Chiller Electric Energy
+  BIG CHILLER:Chiller Electric Energy
+
+ For Meter=EnergyTransfer:Plant [J], ResourceType=EnergyTransfer, Group=Plant, contents are:
+  LITTLE CHILLER:Chiller Evaporator Cooling Energy
+  LITTLE CHILLER:Chiller Condenser Heat Transfer Energy
+  BIG CHILLER:Chiller Evaporator Cooling Energy
+  BIG CHILLER:Chiller Condenser Heat Transfer Energy
+
+ For Meter=Chillers:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=Chillers, contents are:
+  LITTLE CHILLER:Chiller Evaporator Cooling Energy
+  BIG CHILLER:Chiller Evaporator Cooling Energy
+
+ For Meter=HeatRejection:EnergyTransfer [J], ResourceType=EnergyTransfer, EndUse=HeatRejection, contents are:
+  LITTLE CHILLER:Chiller Condenser Heat Transfer Energy
+  BIG CHILLER:Chiller Condenser Heat Transfer Energy
+
+ For Meter=DistrictHeating:Facility [J], ResourceType=DistrictHeating, contents are:
+  PURCHASED HEATING:District Heating Hot Water Energy
+
+ For Meter=DistrictHeating:Plant [J], ResourceType=DistrictHeating, Group=Plant, contents are:
+  PURCHASED HEATING:District Heating Hot Water Energy
+
+ For Meter=Heating:DistrictHeating [J], ResourceType=DistrictHeating, EndUse=Heating, contents are:
+  PURCHASED HEATING:District Heating Hot Water Energy
+
+ For Meter=DistrictCooling:Facility [J], ResourceType=DistrictCooling, contents are:
+  PURCHASED COOLING:District Cooling Chilled Water Energy
+
+ For Meter=DistrictCooling:Plant [J], ResourceType=DistrictCooling, Group=Plant, contents are:
+  PURCHASED COOLING:District Cooling Chilled Water Energy
+
+ For Meter=Cooling:DistrictCooling [J], ResourceType=DistrictCooling, EndUse=Cooling, contents are:
+  PURCHASED COOLING:District Cooling Chilled Water Energy
+
+ For Meter=HeatRejection:Electricity [J], ResourceType=Electricity, EndUse=HeatRejection, contents are:
+  BIG TOWER:Cooling Tower Fan Electric Energy
+
+ For Meter=Water:Facility [m3], ResourceType=Water, contents are:
+  BIG TOWER:Cooling Tower Make Up Water Volume
+
+ For Meter=Water:Plant [m3], ResourceType=Water, Group=Plant, contents are:
+  BIG TOWER:Cooling Tower Make Up Water Volume
+
+ For Meter=HeatRejection:Water [m3], ResourceType=Water, EndUse=HeatRejection, contents are:
+  BIG TOWER:Cooling Tower Make Up Water Volume
+
+ For Meter=MainsWater:Facility [m3], ResourceType=MainsWater, contents are:
+  BIG TOWER:Cooling Tower Make Up Mains Water Volume
+
+ For Meter=MainsWater:Plant [m3], ResourceType=MainsWater, Group=Plant, contents are:
+  BIG TOWER:Cooling Tower Make Up Mains Water Volume
+
+ For Meter=HeatRejection:MainsWater [m3], ResourceType=MainsWater, EndUse=HeatRejection, contents are:
+  BIG TOWER:Cooling Tower Make Up Mains Water Volume
+
+ For Meter=Pumps:Electricity [J], ResourceType=Electricity, EndUse=Pumps, contents are:
+  CIRC PUMP:Pump Electric Energy
+  COND CIRC PUMP:Pump Electric Energy
+  HW CIRC PUMP:Pump Electric Energy
+
+ For Meter=Carbon Equivalent:Facility [kg], ResourceType=Carbon Equivalent, contents are:
+  Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass
+
+ For Meter=CarbonEquivalentEmissions:Carbon Equivalent [kg], ResourceType=Carbon Equivalent, EndUse=CarbonEquivalentEmissions, contents are:
+  Site:Environmental Impact Total N2O Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CH4 Emissions Carbon Equivalent Mass
+  Site:Environmental Impact Total CO2 Emissions Carbon Equivalent Mass

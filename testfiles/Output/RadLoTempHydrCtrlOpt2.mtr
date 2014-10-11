@@ -1,0 +1,39 @@
+Program Version,EnergyPlus, Version 8.2.1-27b6d52898, YMD=2014.10.07 20:26
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Meters Requested
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Meters Requested
+5,1,Cumulative Days of Simulation[] ! When Run Period Meters Requested
+12,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+22,9,Electricity:Building [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+42,9,InteriorLights:Electricity [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+526,9,Electricity:Plant [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+13,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+23,11,Electricity:Building [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+43,11,InteriorLights:Electricity [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+527,11,Electricity:Plant [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+End of Data Dictionary
+1,CHICAGO ANN HTG 99% CONDNS DB,  41.98, -87.92,  -6.00, 201.00
+4,1, 1
+12,531700820.135999,1270290.006,21,19,20,6998926.32,21, 9,10
+22,358900820.135999,70290.006,21, 1,10,5798926.32,21, 9,10
+42,95313248.1359999,70290.006,21, 1,10,1405800.12,21, 8,10
+526,172800000.,1200000.,21, 9,20,1200000.,21, 1,10
+5,1
+13,531700820.135999,1270290.006, 1,21,19,20,6998926.32, 1,21, 9,10
+23,358900820.135999,70290.006, 1,21, 1,10,5798926.32, 1,21, 9,10
+43,95313248.1359999,70290.006, 1,21, 1,10,1405800.12, 1,21, 8,10
+527,172800000.,1200000., 1,21, 9,20,1200000., 1,21, 1,10
+1,CHICAGO ANN CLG 1% CONDNS DB=>MWB,  41.98, -87.92,  -6.00, 201.00
+4,1, 7
+12,995856506.318778,3490259.4433036,21, 5,60,15010515.0805161,21,10,30
+22,358900820.135999,70290.006,21, 1,10,5798926.32,21, 9,10
+42,95313248.1359999,70290.006,21, 1,10,1405800.12,21, 8,10
+526,636955686.182778,3400654.63445895,21, 8,20,9211588.76051606,21,10,30
+5,1
+13,995856506.318778,3490259.4433036, 7,21, 5,60,15010515.0805161, 7,21,10,30
+23,358900820.135999,70290.006, 7,21, 1,10,5798926.32, 7,21, 9,10
+43,95313248.1359999,70290.006, 7,21, 1,10,1405800.12, 7,21, 8,10
+527,636955686.182778,3400654.63445895, 7,21, 8,20,9211588.76051606, 7,21,10,30
+End of Data
+ Number of Records Written=          16

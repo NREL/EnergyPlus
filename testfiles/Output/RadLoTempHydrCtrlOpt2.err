@@ -1,0 +1,42 @@
+Program Version,EnergyPlus, Version 8.2.1-27b6d52898, YMD=2014.10.07 20:26,IDD_Version 8.2.1
+   ** Warning ** Version: in IDF="8.2" not the same as expected="8.2.1"
+   ** Warning ** CheckUsedConstructions: There are 1 nominally unused constructions in input.
+   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ************* No node connection errors were found.
+   ************* Beginning Simulation
+   ** Warning ** ZoneHVAC:LowTemperatureRadiant:VariableFlow [EAST ZONE RADIANT FLOOR]
+   **   ~~~   ** Surface [ZN002:FLR001] temperature below dew-point temperature--potential for condensation exists
+   **   ~~~   ** Flow to the radiant system will be shut-off to avoid condensation
+   **   ~~~   ** Predicted radiant system surface temperature = 12.35
+   **   ~~~   ** Zone dew-point temperature + safety delta T= 12.47
+   **   ~~~   **  Environment=CHICAGO ANN CLG 1% CONDNS DB=>MWB, at Simulation time=07/21 15:20 - 15:30
+   **   ~~~   ** Note that a 1.0000 C safety was chosen in the input for the shut-off criteria
+   **   ~~~   ** Note also that this affects all surfaces that are part of this radiant system
+   ************* Simulation Error Summary *************
+   *************
+   ************* ===== Recurring Error Summary =====
+   ************* The following recurring error messages occurred.
+   *************
+   *************  ** Warning ** ZoneHVAC:LowTemperatureRadiant:VariableFlow [EAST ZONE RADIANT FLOOR] condensation shut-off occurrence continues.
+   *************  **   ~~~   **   This error occurred 6 total times;
+   *************  **   ~~~   **   during Warmup 0 times;
+   *************  **   ~~~   **   during Sizing 0 times.
+   *************  **   ~~~   **   Max=12.260424 C  Min=11.465955 C
+   *************
+   *************
+   ************* ===== Final Error Summary =====
+   ************* The following error categories occurred.  Consider correcting or noting.
+   ************* Nominally Unused Constructions
+   ************* ..The nominally unused constructions warning is provided to alert you to potential conditions that can cause
+   ************* ..extra time during simulation. Each construction is calculated by the algorithm indicated in the HeatBalanceAlgorithm
+   ************* ..object. You may remove the constructions indicated (when you use the DisplayExtraWarnings option).
+   *************
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 8 Warning; 0 Severe Errors; Elapsed Time=00hr 00min 14.00sec

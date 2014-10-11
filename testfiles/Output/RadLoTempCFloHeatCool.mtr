@@ -1,0 +1,50 @@
+Program Version,EnergyPlus, Version 8.2.1-27b6d52898, YMD=2014.10.07 20:48
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Meters Requested
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Meters Requested
+5,1,Cumulative Days of Simulation[] ! When Run Period Meters Requested
+10,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+20,9,Electricity:Building [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+40,9,InteriorLights:Electricity [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+423,9,Electricity:Plant [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+11,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+21,11,Electricity:Building [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+41,11,InteriorLights:Electricity [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+424,11,Electricity:Plant [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+End of Data Dictionary
+1,CHICAGO ANN HTG 99% CONDNS DB,  41.98, -87.92,  -6.00, 201.00
+4,1, 1
+10,405420513.094844,396816.001758333,21,19,60,6125768.35579158,21,17,10
+20,358900820.135999,70290.006,21, 1,10,5798926.32,21, 9,10
+40,95313248.1359999,70290.006,21, 1,10,1405800.12,21, 8,10
+423,46519692.9588442,157017.618064875,21, 9,10,326842.035791582,21,17,10
+5,1
+11,405420513.094844,396816.001758333, 1,21,19,60,6125768.35579158, 1,21,17,10
+21,358900820.135999,70290.006, 1,21, 1,10,5798926.32, 1,21, 9,10
+41,95313248.1359999,70290.006, 1,21, 1,10,1405800.12, 1,21, 8,10
+424,46519692.9588442,157017.618064875, 1,21, 9,10,326842.035791582, 1,21,17,10
+1,CHICAGO ANN CLG 1% CONDNS DRY,  41.98, -87.92,  -6.00, 201.00
+4,1, 7
+10,722597264.982961,70290.006,21, 3,40,10123960.4681919,21,17,60
+20,358900820.135999,70290.006,21, 1,10,5798926.32,21, 9,10
+40,95313248.1359999,70290.006,21, 1,10,1405800.12,21, 8,10
+423,363696444.846961,0.0,21, 3,40,4331408.35950234,21,18,20
+5,1
+11,722597264.982961,70290.006, 7,21, 3,40,10123960.4681919, 7,21,17,60
+21,358900820.135999,70290.006, 7,21, 1,10,5798926.32, 7,21, 9,10
+41,95313248.1359999,70290.006, 7,21, 1,10,1405800.12, 7,21, 8,10
+424,363696444.846961,0.0, 7,21, 3,40,4331408.35950234, 7,21,18,20
+1,CHICAGO ANN CLG 1% CONDNS DB=>MWB,  41.98, -87.92,  -6.00, 201.00
+4,1, 7
+10,669528836.9413,281160.024,21, 7,20,9166677.1509769,21,17,30
+20,358900820.135999,70290.006,21, 1,10,5798926.32,21, 9,10
+40,95313248.1359999,70290.006,21, 1,10,1405800.12,21, 8,10
+423,310628016.805299,0.0,21, 7,20,3931932.50405372,21,18,50
+5,1
+11,669528836.9413,281160.024, 7,21, 7,20,9166677.1509769, 7,21,17,30
+21,358900820.135999,70290.006, 7,21, 1,10,5798926.32, 7,21, 9,10
+41,95313248.1359999,70290.006, 7,21, 1,10,1405800.12, 7,21, 8,10
+424,310628016.805299,0.0, 7,21, 7,20,3931932.50405372, 7,21,18,50
+End of Data
+ Number of Records Written=          24

@@ -1,0 +1,57 @@
+Program Version,EnergyPlus, Version 8.2.1-27b6d52898, YMD=2014.10.07 20:48,IDD_Version 8.2.1
+   ** Warning ** Version: in IDF="8.2" not the same as expected="8.2.1"
+   ** Warning ** CheckUsedConstructions: There are 1 nominally unused constructions in input.
+   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;
+   ** Warning ** Check input. Calc Pump Efficiency=8.62% which is less than 50%, for pump in radiant system NORTH ZONE RADIANT FLOOR
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ************* No node connection errors were found.
+   ************* Beginning Simulation
+   ** Warning ** ZoneHVAC:LowTemperatureRadiant:ConstantFlow [WEST ZONE RADIANT FLOOR]
+   **   ~~~   ** Surface [ZN001:FLR001] temperature below dew-point temperature--potential for condensation exists
+   **   ~~~   ** Flow to the radiant system will be shut-off to avoid condensation
+   **   ~~~   ** Predicted radiant system surface temperature = 22.48
+   **   ~~~   ** Zone dew-point temperature + safety delta T= 23.31
+   **   ~~~   **  Environment=CHICAGO ANN CLG 1% CONDNS DB=>MWB, at Simulation time=07/21 00:00 - 00:10
+   **   ~~~   ** Note that a 1.0000 C safety was chosen in the input for the shut-off criteria
+   **   ~~~   ** Note also that this affects all surfaces that are part of this radiant system
+   ** Warning ** ZoneHVAC:LowTemperatureRadiant:ConstantFlow [EAST ZONE RADIANT FLOOR]
+   **   ~~~   ** Surface [ZN002:FLR001] temperature below dew-point temperature--potential for condensation exists
+   **   ~~~   ** Flow to the radiant system will be shut-off to avoid condensation
+   **   ~~~   ** Predicted radiant system surface temperature = 22.16
+   **   ~~~   ** Zone dew-point temperature + safety delta T= 22.20
+   **   ~~~   **  Environment=CHICAGO ANN CLG 1% CONDNS DB=>MWB, at Simulation time=07/21 00:00 - 00:05
+   **   ~~~   ** Note that a 0.0000 C safety was chosen in the input for the shut-off criteria
+   **   ~~~   ** Note also that this affects all surfaces that are part of this radiant system
+   ************* Simulation Error Summary *************
+   *************
+   ************* ===== Recurring Error Summary =====
+   ************* The following recurring error messages occurred.
+   *************
+   *************  ** Warning ** ZoneHVAC:LowTemperatureRadiant:ConstantFlow [WEST ZONE RADIANT FLOOR] condensation shut-off occurrence continues.
+   *************  **   ~~~   **   This error occurred 340 total times;
+   *************  **   ~~~   **   during Warmup 0 times;
+   *************  **   ~~~   **   during Sizing 0 times.
+   *************  **   ~~~   **   Max=29.228987 C  Min=20.057405 C
+   *************
+   *************  ** Warning ** ZoneHVAC:LowTemperatureRadiant:ConstantFlow [EAST ZONE RADIANT FLOOR] condensation shut-off occurrence continues.
+   *************  **   ~~~   **   This error occurred 340 total times;
+   *************  **   ~~~   **   during Warmup 0 times;
+   *************  **   ~~~   **   during Sizing 0 times.
+   *************  **   ~~~   **   Max=29.220871 C  Min=20.06155 C
+   *************
+   *************
+   ************* ===== Final Error Summary =====
+   ************* The following error categories occurred.  Consider correcting or noting.
+   ************* Nominally Unused Constructions
+   ************* ..The nominally unused constructions warning is provided to alert you to potential conditions that can cause
+   ************* ..extra time during simulation. Each construction is calculated by the algorithm indicated in the HeatBalanceAlgorithm
+   ************* ..object. You may remove the constructions indicated (when you use the DisplayExtraWarnings option).
+   *************
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 683 Warning; 0 Severe Errors; Elapsed Time=00hr 00min 19.00sec
