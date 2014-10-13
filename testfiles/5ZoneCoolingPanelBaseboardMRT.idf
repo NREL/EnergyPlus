@@ -3,7 +3,7 @@
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
-! 5ZoneCoolingPanelBaseboardMRT.idf
+! 5ZoneCoolingPanelBaseboardMRT.idf 
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Controls to a relative humidity set point with a chilled water coil and a simple controller
@@ -3850,4 +3850,5 @@
   Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
 
   Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+
 
