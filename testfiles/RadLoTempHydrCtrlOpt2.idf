@@ -1931,7 +1931,7 @@
     Zn001:Flr001,            !- Surface Name or Radiant Surface Group Name
     0.012,                   !- Hydronic Tubing Inside Diameter {m}
     400.0,                   !- Hydronic Tubing Length {m}
-    SurfaceTemperature,      !- Temperature Control Type
+    SurfaceTemperature,      !- Temperature Control Type 
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
     ,                        !- Heating Design Capacity Per Floor Area {W/m2}
