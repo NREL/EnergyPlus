@@ -254,10 +254,10 @@ namespace InputProcessor {
 		}
 
 		//               FullName from StringGlobals is used to build file name with Path
-		if ( len( ProgramPath ) == 0 ) {
+		if ( len( ProgramPath ) == 0 || iddArgSet) {
 			FullName = inputIddFileName;
 		} else {
-			FullName = ProgramPath + inputIddFileName;
+			FullName = ProgramPath + "Energy+.idd";
 		}
 		{ IOFlags flags; gio::inquire( FullName, flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {

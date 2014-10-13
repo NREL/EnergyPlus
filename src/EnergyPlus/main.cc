@@ -222,8 +222,6 @@ main(int argc, const char * argv[])
 	// CLI module
 	using namespace CommandLineInterface;
 
-	ProcessArgs(argc, argv);
-
 // Enable floating point exceptions
 #ifndef NDEBUG
 #ifdef __unix__
@@ -257,6 +255,10 @@ main(int argc, const char * argv[])
 #ifdef EP_Detailed_Timings
 	epStartTime( "EntireRun=" );
 #endif
+
+	// Process command line arguments
+	ProcessArgs(argc, argv);
+
 	CreateCurrentDateTimeString( CurrentDateTime );
 	VerString += "," + CurrentDateTime;
 
@@ -371,7 +373,7 @@ main(int argc, const char * argv[])
 		gio::close( LFN );
 	} else {
 		DisplayString( "Missing " + EnergyPlusIniFileName );
-		ProgramPath =  exePathName + pathChar;
+		ProgramPath =  "";
 		LFN = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
 		if ( iostatus != 0 ) {
@@ -416,33 +418,33 @@ main(int argc, const char * argv[])
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
-	std::ofstream ifile;
-	std::ofstream nfile;
-
-	std::string esoFileName = outputFilePrefix + "out.eso";
-	std::string csvFileName = outputFilePrefix + "out.csv";
-	std::string RVIfile = idfFileNameOnly + ".rvi";
-	ifile.open(RVIfile.c_str());
-	ifile <<esoFileName+"\n";
-	ifile <<csvFileName+"\n";
-	ifile.close();
-
-	std::string mtrFileName = outputFilePrefix + "out.mtr";
-	std::string mtrCsvFileName = outputFilePrefix + "mtr.csv";
-	std::string MVIfile = idfFileNameOnly + ".mvi";
-	nfile.open(MVIfile.c_str());
-	nfile <<mtrFileName+"\n";
-	nfile <<mtrCsvFileName+"\n";
-	nfile.close();
-
-	std::string ReadVars = "ReadVarsESO";
-	std::string ReadVarsRVI = "./"+ReadVars+" "+RVIfile+" unlimited";
-	std::string ReadVarsMVI = "./"+ReadVars+" "+MVIfile+" unlimited";
-
-
     if(readVarsValue) {
+    	std::ofstream ifile;
+    	std::ofstream nfile;
+
+    	std::string RVIfile = idfFileNameOnly + ".rvi";
+    	ifile.open(RVIfile.c_str());
+    	ifile << outputEsoFileName + "\n";
+    	ifile << outputCsvFileName + "\n";
+    	ifile.close();
+
+    	std::string MVIfile = idfFileNameOnly + ".mvi";
+    	nfile.open(MVIfile.c_str());
+    	nfile << outputMtrFileName + "\n";
+    	nfile << outputMtrCsvFileName + "\n";
+    	nfile.close();
+
+    	std::string ReadVars = "ReadVarsESO";
+    	std::string ReadVarsRVI = exePathName + ReadVars + " " + RVIfile + " unlimited";
+    	std::string ReadVarsMVI = exePathName + ReadVars + " " + MVIfile + " unlimited";
+
 	    system(ReadVarsRVI.c_str());
 	    system(ReadVarsMVI.c_str());
+
+	    remove(RVIfile.c_str());
+	    remove(MVIfile.c_str());
+	    rename("readvars.audit", outputRvauditFileName.c_str());
+
 	   }
 
 	EndEnergyPlus();
