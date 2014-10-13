@@ -30,16 +30,12 @@
 #include <UtilityRoutines.hh>
 
 #ifdef __unix__
-#include <unistd.h>
-#endif
-
-#ifdef _WIN32
-#include <stdlib.h>
-#include <direct.h>
-
-#define EXPORT __declspec(dllexport)
-#else
-#define EXPORT 
+ #include <unistd.h>
+ #define EXPORT 
+#elif _WIN32
+ #include <stdlib.h>
+ #include <direct.h>
+ #define EXPORT __declspec(dllexport)
 #endif
 
 #ifdef MAKE_ENERGYPLUS_LIBRARY
@@ -398,8 +394,7 @@ main()
 #ifdef MAKE_ENERGYPLUS_LIBRARY
 #ifdef __unix__
 	int status = chdir(filepath.c_str());
-#endif
-#ifdef _WIN32
+#elif _WIN32
 	int status = _chdir(filepath.c_str());
 #endif
 	ProgramPath = filepath + pathChar;

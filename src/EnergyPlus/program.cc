@@ -11,10 +11,17 @@ void progress_callback_handler(int progress)
 	std::cout << "Progress: " << progress << std::endl;
 }
 
-int main() 
+int main( int argc, char* argv[] ) 
 {
-	std::cout << "Hello, world" << std::endl;
+	std::cout << "Using EnergyPlus as a library." << std::endl;
 	StoreMessageCallback(message_callback_handler);
 	StoreProgressCallback(progress_callback_handler);
-	EnergyPlusPgm("C:\\tmp\\runfolder");
+	
+	if ( argc < 2)
+	{
+		std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
+		return 1;
+	} else {
+		EnergyPlusPgm( argv[1] );
+	}
 }

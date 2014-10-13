@@ -123,13 +123,6 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
 endif()
 
-if ( MAKE_ENERGYPLUS_LIBRARY )
-  ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
-  if (UNIX)  
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-  endif()
-endif()
-
 configure_file( idd/Energy+.idd.in "${CMAKE_BINARY_DIR}/Energy+.idd" )
 
 if( BUILD_PACKAGE )
