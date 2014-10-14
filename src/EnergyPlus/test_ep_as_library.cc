@@ -3,12 +3,12 @@
 
 void message_callback_handler(std::string message)
 {
-	std::cout << "HiMessage: " << message << std::endl;
+	std::cout << "EnergyPlusLibrary (message): " << message << std::endl;
 }
 
 void progress_callback_handler(int progress)
 {
-	std::cout << "Progress: " << progress << std::endl;
+	std::cout << "EnergyPlusLibrary (progress): " << progress << std::endl;
 }
 
 int main( int argc, char* argv[] ) 

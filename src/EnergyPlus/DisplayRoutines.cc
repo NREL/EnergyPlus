@@ -52,9 +52,9 @@ DisplayString( std::string const & String ) // String to be displayed
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
 
-	if (IsDLL && IsMessageCallback)
+	if ( IsDLL && IsMessageCallback )
 	{
-		fMessagePtr(String);
+		fMessagePtr( String );
 	}
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
@@ -104,7 +104,7 @@ DisplayNumberAndString(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	if (IsDLL && IsMessageCallback)
+	if ( IsDLL && IsMessageCallback )
 	{
 		std::stringstream sstm;
 		sstm << String << " " << Number;
@@ -168,7 +168,7 @@ DisplaySimDaysProgress( // This doesn't do anything!
 		percent = 0;
 	}
 
-	if (IsDLL && IsProgressCallback)
+	if ( IsDLL && IsProgressCallback )
 	{
 		fProgressPtr( percent );
 	}

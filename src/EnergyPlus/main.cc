@@ -392,12 +392,23 @@ main()
 	}
 
 #ifdef MAKE_ENERGYPLUS_LIBRARY
-#ifdef __unix__
-	int status = chdir(filepath.c_str());
-#elif _WIN32
-	int status = _chdir(filepath.c_str());
-#endif
-	ProgramPath = filepath + pathChar;
+ #ifdef __unix__
+	int status = chdir( filepath.c_str() );
+ #elif _WIN32
+	int status = _chdir( filepath.c_str() );
+ #endif
+	if ( status != 0 ) {
+		// couldn't change working directory for some reason; abort
+		DisplayString( "EnergyPlus Shared Library Message: Couldn't change working directory, aborting" );
+		return;
+	}
+	if ( filepath.back() == pathChar ) {
+		// filepath already has the path delimiter at the end
+		ProgramPath = filepath;
+	} else {
+		// filepath didn't have a delimiter; add it
+		ProgramPath = filepath + pathChar;
+	}
 #endif
 
 	TestAllPaths = true;
