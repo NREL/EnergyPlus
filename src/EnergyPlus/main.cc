@@ -418,7 +418,7 @@ main(int argc, const char * argv[])
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
 
-    if(readVarsValue) {
+    if(runReadVars) {
     	std::ofstream ifile;
     	std::ofstream nfile;
 
@@ -445,7 +445,7 @@ main(int argc, const char * argv[])
 	    remove(MVIfile.c_str());
 	    rename("readvars.audit", outputRvauditFileName.c_str());
 
-	   }
+	}
 
 	EndEnergyPlus();
     

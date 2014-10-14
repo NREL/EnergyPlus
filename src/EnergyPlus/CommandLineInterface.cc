@@ -7,6 +7,7 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <mach-o/dyld.h>
 
 // CLI Headers
 #include <ezOptionParser.hpp>
@@ -85,17 +86,10 @@ std::string outputCsvFileName;
 std::string outputMtrCsvFileName;
 std::string outputRvauditFileName;
 
-std::string outputFilePrefix;
-std::string dirPathName;
 std::string idfFileNameOnly;
 std::string exePathName;
-std::string prefixOutName;
-std::string inputIMFFileName;
 
-bool readVarsValue(false);
-bool prefixValue(false);
-bool expandObjValue(false);
-bool EPMacroValue(false);
+bool runReadVars(false);
 bool DDOnlySimulation(false);
 bool AnnualSimulation(false);
 bool iddArgSet(false);
@@ -107,20 +101,17 @@ bool fileExist(const std::string& filename)
 }
 
 std::string
-returnFileName( std::string const& filename )
+returnFileName( std::string const& filepath )
 {
-	return {std::find_if(filename.rbegin(), filename.rend(),
-			[](char c) { return c == pathChar; }).base(),
-			filename.end()};
+	int pathCharPosition = filepath.find_last_of(pathChar);
+	return filepath.substr(pathCharPosition + 1, filepath.size() - 1);
 }
 
 std::string
-returnDirPathName( std::string const& filename )
+returnDirPath( std::string const& filepath )
 {
-	std::string::const_reverse_iterator pivot = std::find( filename.rbegin(), filename.rend(), pathChar );
-	return pivot == filename.rend()
-			? filename
-					: std::string( filename.begin(), pivot.base() - 1 );
+	int pathCharPosition = filepath.find_last_of(pathChar);
+	return filepath.substr(0, pathCharPosition + 1);
 }
 
 // Not currently used
@@ -170,7 +161,7 @@ ProcessArgs(int argc, const char * argv[])
 	bool annSimulation;
 	bool ddSimulation;
 
-	// Expand longname options using "=" sign into two arguments
+	// Expand long-name options using "=" sign into two arguments
 	std::vector<std::string> arguments;
 	int wildCardPosition = 2;
 
@@ -219,9 +210,9 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--designday");
 
-	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-a", "--annual");
+	opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
 
-	opt.add("", 0, 1, 0, "Run EPMacro", "-m", "--epmacro");
+	opt.add("", 0, 0, 0, "Run EPMacro", "-m", "--epmacro");
 
 	opt.add("", 0, 1, 0, "Output directory (default current working directory)", "-d", "--dir");
 
@@ -233,14 +224,16 @@ ProcessArgs(int argc, const char * argv[])
 	//opt.prettyPrint(pretty);
 	//std::cout << pretty << std::endl;
 
-	std::string usage, idfFileNameWextn, idfDirPathName;
-	std::string weatherFileNameWextn, weatherDirPathName;
+	std::string usage, idfDirPathName;
 	opt.getUsage(usage);
 
 	//To check the path of EnergyPlus
-	char executable_path[100];
-	realpath(argv[0], executable_path);
-	exePathName = returnDirPathName(std::string(executable_path)) + pathChar;
+	char executableAbsolutePath[1024];
+	char executableRelativePath[1024];
+	uint32_t pathSize = sizeof(executableRelativePath);
+	_NSGetExecutablePath(executableRelativePath, &pathSize);
+	realpath(executableRelativePath, executableAbsolutePath);
+	exePathName = returnDirPath(std::string(executableAbsolutePath));
 
 	opt.get("-w")->getString(inputWeatherFileName);
 
@@ -251,16 +244,15 @@ ProcessArgs(int argc, const char * argv[])
 	else
 		inputIddFileName = exePathName + inputIddFileName;
 
+	std::string dirPathName;
+
 	opt.get("-d")->getString(dirPathName);
 
-	opt.get("-m")->getString(inputIMFFileName);
-
-	if (opt.isSet("-r"))
-		readVarsValue = true;
+	runReadVars = opt.isSet("-r");
 
 	DDOnlySimulation = opt.isSet("-D");
 
-	AnnualSimulation = opt.isSet("-a") && !DDOnlySimulation;
+	AnnualSimulation = opt.isSet("-a");
 
 	// Process standard arguments
 	if (opt.isSet("-h")) {
@@ -302,21 +294,15 @@ ProcessArgs(int argc, const char * argv[])
 	if(inputIdfFileName.empty())
 		inputIdfFileName = "in.idf";
 
-	idfFileNameWextn = returnFileName(inputIdfFileName);
+	idfFileNameOnly = removeFileExtension(returnFileName(inputIdfFileName));
+	idfDirPathName = returnDirPath(inputIdfFileName);
 
-	idfFileNameOnly = removeFileExtension(idfFileNameWextn);
-	idfDirPathName = returnDirPathName(inputIdfFileName);
+	bool runExpandObjects(false);
+	bool runEPMacro(false);
 
-	opt.get("-p")->getString(prefixOutName);
+	runExpandObjects = opt.isSet("-x");
 
-	if(opt.isSet("-p"))
-		prefixValue = true;
-
-	if(opt.isSet("-x"))
-		expandObjValue = true;
-
-	if(opt.isSet("-m"))
-		EPMacroValue = true;
+	runEPMacro = opt.isSet("-m");
 
 	if (opt.isSet("-d") ){
 		struct stat sb = {0};
@@ -331,8 +317,12 @@ ProcessArgs(int argc, const char * argv[])
 		}
 	}
 
-	if(prefixValue)
+	std::string outputFilePrefix;
+	if(opt.isSet("-p")) {
+		std::string prefixOutName;
+		opt.get("-p")->getString(prefixOutName);
 		outputFilePrefix = dirPathName + prefixOutName + "-";
+	}
 	else if (argc > 1)
 		outputFilePrefix = dirPathName + idfFileNameOnly + "-";
 	else
@@ -421,56 +411,35 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if(EPMacroValue){
-		bool imfFileExist = fileExist(inputIMFFileName);
-		std::string defaultIMFFileName = "in.imf";
-
-		if(imfFileExist){
-			symlink(inputIMFFileName.c_str(), defaultIMFFileName.c_str());
-
-			std::string outIDFFileName = "out.idf";
-			remove(outIDFFileName.c_str());
-			std::string outAuditFileName = "audit.out";
-			remove(outAuditFileName.c_str());
-			std::string epmdetFileName = outputFilePrefix+".epmdet";
-			remove(epmdetFileName.c_str());
-			std::string epmidfFileName = outputFilePrefix+".epmidf";
-			remove(epmidfFileName.c_str());
-
-			std::string runEPMacro = exePathName + "EPMacro";
-
-			system(runEPMacro.c_str());
-			std::cout<<"Running EPMacro...\n";
-
-			bool AuditFileExist = fileExist(outAuditFileName);
-			if(AuditFileExist){
-				std::string epmdetFileName = outputFilePrefix + ".epmdet";
-				std::ifstream  src(outAuditFileName.c_str());
-				std::ofstream  dst(epmdetFileName.c_str());
-				dst << src.rdbuf();
-			}
-
-			bool outFileExist = fileExist(outIDFFileName);
-			if(outFileExist){
-				std::string epmidfFileName = outputFilePrefix + ".epmidf";
-				std::ifstream  src(outIDFFileName.c_str());
-				std::ofstream  dst(epmidfFileName.c_str());
-				dst << src.rdbuf();
-				symlink(epmidfFileName.c_str(), inputIdfFileName.c_str());
-				DisplayString("Input file: " + inputIMFFileName + "\n");
-			}
-			else{
-				ShowFatalError("EPMacro did not produce "+ outIDFFileName + "with "+ inputIMFFileName +"\n");
-				exit(EXIT_FAILURE);
-			}
-		}
+	// Error for cases where both design-day and annual simulation switches are set
+	if (DDOnlySimulation && AnnualSimulation) {
+		ShowFatalError("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.\n");
 	}
 
-	if(expandObjValue) {
+	bool inputFileNamedIn = (idfFileNameOnly == "in");
+
+	if(runEPMacro){
+		if (!inputFileNamedIn)
+			symlink(inputIdfFileName.c_str(), "in.imf");
+		std::string runEPMacro = exePathName + "EPMacro";
+		DisplayString("Running EPMacro...");
+		system(runEPMacro.c_str());
+		if (!inputFileNamedIn)
+			remove("in.imf");
+		std::string outputEpmdetFileName = outputFilePrefix + "out.epmdet";
+		rename("audit.out",outputEpmdetFileName.c_str());
+		std::string outputEpmidfFileName = outputFilePrefix + "out.epmidf";
+		rename("out.idf",outputEpmidfFileName.c_str());
+	    inputIdfFileName = outputEpmidfFileName;
+	}
+
+	if(runExpandObjects) {
 		std::string runExpandObjects = exePathName + "ExpandObjects";
-		symlink(inputIdfFileName.c_str(), "in.idf");
+		if (!inputFileNamedIn)
+			symlink(inputIdfFileName.c_str(), "in.idf");
 		system(runExpandObjects.c_str());
-		remove("in.idf");
+		if (!inputFileNamedIn)
+			remove("in.idf");
 		remove("expandedidf.err");
 		std::string outputExpidfFileName = outputFilePrefix + "out.expidf";
 	    rename("expanded.idf", outputExpidfFileName.c_str());
