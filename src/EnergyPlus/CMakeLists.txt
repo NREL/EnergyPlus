@@ -516,16 +516,24 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
+# The static library is always included
 ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
+
+# If we are building E+ as a shared library (for GUIs), need to treat it differently
 if ( MAKE_ENERGYPLUS_LIBRARY )
+  # Add the library itself
   ADD_LIBRARY(EnergyPlus SHARED main.cc main.hh)
+  # Include the preprocessor DEF so the library pieces are built
   ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
+  # On Unix, the shared library needs position independent code
   if (UNIX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   endif()
-  ADD_EXECUTABLE(Test test_ep_as_library.cc)
-  TARGET_LINK_LIBRARIES( Test EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
+  # Also add a test executable to demonstrate how to link against this library and call it
+  ADD_EXECUTABLE(TestEnergyPlusAsLibrary test_ep_as_library.cc)
+  TARGET_LINK_LIBRARIES( TestEnergyPlusAsLibrary EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
 else()
+  # If we aren't building E+ as a shared library, just build it as an executable
   ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
 endif()
 
