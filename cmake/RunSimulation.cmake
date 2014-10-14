@@ -33,6 +33,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
 if(BUILD_FORTRAN)
   # ExpandObjects (and other preprocessors) as necessary
   find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/")
+  message("Executing ExpandObjects from ${EXPANDOBJECTS_EXE}")
   execute_process(COMMAND "${EXPANDOBJECTS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
   if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf")
     if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
