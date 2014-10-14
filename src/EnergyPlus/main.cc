@@ -443,13 +443,17 @@ main()
 }
 
 #ifdef MAKE_ENERGYPLUS_LIBRARY
-void EXPORT StoreProgressCallback(void(*f)(int))
+void
+EXPORT
+StoreProgressCallback( void( *f )( int ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	IsProgressCallback = true;
 	fProgressPtr = f;
 }
-void EXPORT StoreMessageCallback(void(*f)(std::string))
+void
+EXPORT
+StoreMessageCallback( void( *f )( std::string ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	IsMessageCallback = true;
