@@ -33,7 +33,6 @@
  #include <unistd.h>
  #define EXPORT 
 #elif _WIN32
- #include <stdlib.h>
  #include <direct.h>
  #define EXPORT __declspec(dllexport)
 #endif
