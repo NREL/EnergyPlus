@@ -61,7 +61,7 @@ if(BUILD_FORTRAN)
       message("Couldn't find parametric preprocessor output file, attempting to continue with original in.idf")
     
     endif ()
-    
+
   endif ()
       
   # ExpandObjects (and other preprocessors) as necessary
@@ -75,7 +75,6 @@ if(BUILD_FORTRAN)
     endif()
     file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
   endif()
-  
 endif()
 
 
