@@ -253,19 +253,8 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
 		}
 
-		//               FullName from StringGlobals is used to build file name with Path
-		if ( len( ProgramPath ) == 0 || iddArgSet) {
-			FullName = inputIddFileName;
-		} else {
-			FullName = ProgramPath + "Energy+.idd";
-		}
-		{ IOFlags flags; gio::inquire( FullName, flags ); FileExists = flags.exists(); }
-		if ( ! FileExists ) {
-			DisplayString( "Missing " + FullName );
-			ShowFatalError( "ProcessInput: " + inputIddFileName + " missing. Program terminates. Fullname = " + FullName );
-		}
 		IDDFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, FullName, flags ); read_stat = flags.ios();}
+		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, inputIddFileName, flags ); read_stat = flags.ios();}
 		if ( read_stat != 0 ) {
 			DisplayString( "Could not open (read) " + inputIddFileName );
 			ShowFatalError( "ProcessInput: Could not open file " + inputIddFileName + " for input (read)." );
@@ -324,12 +313,6 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (inputFileName) -- Start";
-
-		{ IOFlags flags; gio::inquire( inputIdfFileName, flags ); FileExists = flags.exists(); }
-		if ( ! FileExists ) {
-			DisplayString( "Missing " + CurrentWorkingFolder + inputIdfFileName );
-			ShowFatalError( "ProcessInput: " + inputIdfFileName + " missing. Program terminates." );
-		}
 
 		IDFFile = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, inputIdfFileName, flags ); read_stat = flags.ios(); }

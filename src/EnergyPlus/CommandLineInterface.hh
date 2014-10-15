@@ -55,16 +55,25 @@ namespace CommandLineInterface {
 
  extern std::string weatherFileNameOnly;
  extern std::string idfFileNameOnly;
- extern std::string exePathName;
+ extern std::string exeDirectory;
 
  extern bool runReadVars;
  extern bool DDOnlySimulation;
  extern bool AnnualSimulation;
- extern bool iddArgSet;
 
  // Process command line arguments
  int
  ProcessArgs( int argc, const char * argv[] );
+
+ void
+ ReadINIFile(
+ 	int const UnitNumber, // Unit number of the opened INI file
+ 	std::string const & Heading, // Heading for the parameters ('[heading]')
+ 	std::string const & KindofParameter, // Kind of parameter to be found (String)
+ 	std::string & DataOut // Output from the retrieval
+ );
+
  }
+
 }
 #endif

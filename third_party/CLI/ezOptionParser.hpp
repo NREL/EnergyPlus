@@ -1781,11 +1781,11 @@ void ezOptionParser::getUsage(std::string & usage, int width, Layout layout) {
   usage.append("\n\n");
   usage.append("USAGE: ");
   usage.append(syntax);
-  usage.append("\n\nOPTIONS:\n\n");
+  usage.append("\n\nOPTIONS:\n");
   getUsageDescriptions(usage, width, layout);
 
   if (!example.empty()) {
-    usage.append("EXAMPLES:\n\n");
+    usage.append("\nEXAMPLE: ");
     usage.append(example);
   }
   
@@ -1828,7 +1828,7 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
     opts.append( *groups[k]->flags[j] );
     
     if (groups[k]->expectArgs) {
-      opts.append(" ARG");
+      opts.append("=[ARG]");
       
       if (groups[k]->delim) {
         opts.append("1[");

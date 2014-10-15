@@ -46,10 +46,7 @@ extern "C" {
 namespace EnergyPlus {
 
 void
-AbortEnergyPlus(
-	bool const NoIdf, // Set to true when "noidf" was found
-	bool const NoIDD // Set to true when "noidd" was found
-)
+AbortEnergyPlus()
 {
 
 	// SUBROUTINE INFORMATION:
@@ -172,31 +169,6 @@ AbortEnergyPlus(
 	strip( NumWarningsDuringSizing );
 	NumSevereDuringSizing = RoundSigDigits( TotalSevereErrorsDuringSizing );
 	strip( NumSevereDuringSizing );
-
-	if ( NoIDD ) {
-		DisplayString( "No EnergyPlus Data Dictionary (" + inputIddFileName+") was found.  It is possible " );
-		DisplayString( "you \"double-clicked\"EnergyPlus.exe rather than using one of the methods" );
-		DisplayString( "to run Energyplus as found in the GettingStarted document in the" );
-		DisplayString( "documentation folder.  Using EP-Launch may be best -- " );
-		DisplayString( "it provides extra help for new users." );
-		ShowMessage( "No EnergyPlus Data Dictionary (" + inputIddFileName+") was found. It is possible you \"double-clicked\" EnergyPlus.exe " );
-		ShowMessage( "rather than using one of the methods to run Energyplus as found in the GettingStarted document" );
-		ShowMessage( "in the documentation folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
-
-	if ( NoIdf ) {
-		DisplayString( "No input file (in.idf) was found.  It is possible you \"double-clicked\"" );
-		DisplayString( "EnergyPlus.exe rather than using one of the methods to run Energyplus" );
-		DisplayString( "as found in the GettingStarted document in the documentation folder." );
-		DisplayString( "Using EP-Launch may be best -- it provides extra help for new users." );
-		ShowMessage( "No input file (in.idf) was found.  It is possible you \"double-clicked\" EnergyPlus.exe rather than" );
-		ShowMessage( "using one of the methods to run Energyplus as found in the GettingStarted document in the documentation" );
-		ShowMessage( "folder.  Using EP-Launch may be best -- it provides extra help for new users." );
-		{ IOFlags flags; flags.ADVANCE( "NO" ); gio::write( OutFmt, flags ); }
-		gio::read( "*" );
-	}
 
 	// catch up with timings if in middle
 	Time_Finish = epElapsedTime();
@@ -833,21 +805,17 @@ ShowFatalError(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static bool NoIdf( false );
-	static bool NoIDD( false );
 
 	ShowErrorMessage( " **  Fatal  ** " + ErrorMessage, OutUnit1, OutUnit2 );
 	DisplayString( "**FATAL:" + ErrorMessage );
 
-	if ( has( ErrorMessage, inputIdfFileName +" missing" ) ) NoIdf = true;
-	if ( has( ErrorMessage, inputIddFileName +" missing" ) ) NoIDD = true;
 	ShowErrorMessage( " ...Summary of Errors that led to program termination:", OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Reference severe error count=" + RoundSigDigits( TotalSevereErrors ), OutUnit1, OutUnit2 );
 	ShowErrorMessage( " ..... Last severe error=" + LastSevereError, OutUnit1, OutUnit2 );
 	if ( sqlite && sqlite->writeOutputToSQLite() ) {
 		sqlite->createSQLiteErrorRecord( 1, 2, ErrorMessage, 1 );
 	}
-	AbortEnergyPlus( NoIdf, NoIDD );
+	AbortEnergyPlus();
 
 }
 

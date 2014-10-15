@@ -233,8 +233,6 @@ main(int argc, const char * argv[])
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
 	// in "DataGlobals.f90"
-	gio::Fmt const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
-	std::string const BlankString;
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -243,12 +241,7 @@ main(int argc, const char * argv[])
 	// na
 
 	// PROGRAM LOCAL VARIABLE DECLARATIONS:
-	int LFN; // Unit Number for reads
-	bool EPlusINI;
-	std::string::size_type TempIndx;
 	static std::string cEnvValue;
-	int iostatus;
-	bool FileExists;
 
 	//                           INITIALIZE VARIABLES
 	Time_Start = epElapsedTime();
@@ -342,67 +335,10 @@ main(int argc, const char * argv[])
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
-	{ IOFlags flags; gio::inquire( outputEndFileName, flags ); FileExists = flags.exists(); }
-	if ( FileExists ) {
-		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, outputEndFileName, flags ); iostatus = flags.ios(); }
-		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file "+ outputEndFileName +" for input (read)." );
-		}
-		{ IOFlags flags; flags.DISPOSE( "delete" ); gio::close( LFN, flags ); }
-	}
-
-	{ IOFlags flags; gio::inquire( EnergyPlusIniFileName, flags ); EPlusINI = flags.exists(); }
-	if ( EPlusINI ) {
-		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
-		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file "+EnergyPlusIniFileName+" for input (read)." );
-		}
-		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
-		// Relying on compiler to supply full path name here
-		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == std::string::npos ) {
-			CurrentWorkingFolder = "";
-		} else {
-			CurrentWorkingFolder.erase( TempIndx + 1 );
-		}
-		//       Get directories from ini file
-		ReadINIFile( LFN, "program", "dir", ProgramPath );
-
-		gio::close( LFN );
-	} else {
-		DisplayString( "Missing " + EnergyPlusIniFileName );
-		ProgramPath =  "";
-		LFN = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "write" ); gio::open( LFN, EnergyPlusIniFileName, flags ); iostatus = flags.ios(); }
-		if ( iostatus != 0 ) {
-			ShowFatalError( "EnergyPlus: Could not open file "+EnergyPlusIniFileName+" for output (write)." );
-		}
-		// Relying on compiler to supply full path name here
-		{ IOFlags flags; gio::inquire( LFN, flags ); CurrentWorkingFolder = flags.name(); }
-		TempIndx = index( CurrentWorkingFolder, pathChar, true );
-		if ( TempIndx == std::string::npos ) {
-			CurrentWorkingFolder = "";
-		} else {
-			CurrentWorkingFolder.erase( TempIndx + 1 );
-		}
-		gio::write( LFN, EPlusiniFormat ) << "program" << ProgramPath;
-		gio::close( LFN );
-	}
 	TestAllPaths = true;
 
 	DisplayString( "EnergyPlus Starting" );
 	DisplayString( VerString );
-
-	OutputFileDebug = GetNewUnitNumber();
-	{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileDebug, outputDbgFileName, flags ); iostatus = flags.ios(); }
-	if ( iostatus != 0 ) {
-		ShowFatalError( "EnergyPlus: Could not open file "+outputDbgFileName+" for output (write)." );
-	}
-
-	//Call ProcessInput to produce the IDF file which is read by all of the
-	// Get input routines in the rest of the simulation
 
 	ProcessInput();
 
@@ -419,24 +355,33 @@ main(int argc, const char * argv[])
 	ReportOrphanSchedules();
 
     if(runReadVars) {
-    	std::ofstream ifile;
-    	std::ofstream nfile;
-
     	std::string RVIfile = idfFileNameOnly + ".rvi";
-    	ifile.open(RVIfile.c_str());
-    	ifile << outputEsoFileName + "\n";
-    	ifile << outputCsvFileName + "\n";
-    	ifile.close();
-
     	std::string MVIfile = idfFileNameOnly + ".mvi";
-    	nfile.open(MVIfile.c_str());
-    	nfile << outputMtrFileName + "\n";
-    	nfile << outputMtrCsvFileName + "\n";
-    	nfile.close();
+    	int fileUnitNumber;
+    	int iostatus;
+    	gio::Fmt const readvarsFmt( "(A)" );
+
+    	fileUnitNumber = GetNewUnitNumber();
+    	{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
+    	if ( iostatus != 0 ) {
+    		ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
+    	}
+    	gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
+    	gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
+    	gio::close( fileUnitNumber );
+
+    	fileUnitNumber = GetNewUnitNumber();
+    	{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
+    	if ( iostatus != 0 ) {
+    		ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
+    	}
+    	gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
+    	gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
+    	gio::close( fileUnitNumber );
 
     	std::string ReadVars = "ReadVarsESO";
-    	std::string ReadVarsRVI = exePathName + ReadVars + " " + RVIfile + " unlimited";
-    	std::string ReadVarsMVI = exePathName + ReadVars + " " + MVIfile + " unlimited";
+    	std::string ReadVarsRVI = exeDirectory + ReadVars + " " + RVIfile + " unlimited";
+    	std::string ReadVarsMVI = exeDirectory + ReadVars + " " + MVIfile + " unlimited";
 
 	    system(ReadVarsRVI.c_str());
 	    system(ReadVarsMVI.c_str());
@@ -508,150 +453,3 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 
 }
 
-void
-ReadINIFile(
-	int const UnitNumber, // Unit number of the opened INI file
-	std::string const & Heading, // Heading for the parameters ('[heading]')
-	std::string const & KindofParameter, // Kind of parameter to be found (String)
-	std::string & DataOut // Output from the retrieval
-)
-{
-
-	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Linda K. Lawrie
-	//       DATE WRITTEN   September 1997
-	//       MODIFIED       na
-	//       RE-ENGINEERED  na
-
-	// PURPOSE OF THIS SUBROUTINE:
-	// This routine reads the .ini file and retrieves
-	// the path names for the files from it.
-
-	// METHODOLOGY EMPLOYED:
-	// Duplicate the kind of reading the Windows "GetINISetting" would
-	// do.
-
-	// REFERENCES:
-	// na
-
-	// Using/Aliasing
-	using namespace EnergyPlus;
-	using namespace DataStringGlobals;
-	using namespace DataSystemVariables;
-
-	// Locals
-	// SUBROUTINE ARGUMENT DEFINITIONS:
-
-	// SUBROUTINE PARAMETER DEFINITIONS:
-
-	// INTERFACE BLOCK SPECIFICATIONS
-	// na
-
-	// DERIVED TYPE DEFINITIONS
-	// na
-
-	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	static std::string LINE;
-	static std::string LINEOut;
-	std::string Param;
-	std::string::size_type ILB;
-	std::string::size_type IRB;
-	std::string::size_type IEQ;
-	std::string::size_type IPAR;
-	std::string::size_type IPOS;
-	std::string::size_type ILEN;
-	int ReadStat;
-	bool EndofFile;
-	bool Found;
-	bool NewHeading;
-
-	// Formats
-	static gio::Fmt const Format_700( "(A)" );
-
-	DataOut = "           ";
-
-	// I tried ADJUSTL(TRIM(KindofParameter)) and got an internal compiler error
-
-	Param = KindofParameter;
-	strip( Param );
-	ILEN = len( Param );
-	gio::rewind( UnitNumber );
-	EndofFile = false;
-	Found = false;
-	NewHeading = false;
-
-	while ( ! EndofFile && ! Found ) {
-		{ IOFlags flags; gio::read( UnitNumber, Format_700, flags ) >> LINE; ReadStat = flags.ios(); }
-		if ( ReadStat < GoodIOStatValue ) {
-			EndofFile = true;
-			break;
-		}
-
-		if ( len( LINE ) == 0 ) continue; // Ignore Blank Lines
-
-		ConvertCaseToLower( LINE, LINEOut ); // Turn line into lower case
-		//        LINE=LINEOut
-
-		if ( ! has( LINEOut, Heading ) ) continue;
-
-		//                                  See if [ and ] are on line
-		ILB = index( LINEOut, '[' );
-		IRB = index( LINEOut, ']' );
-		if ( ILB == std::string::npos && IRB == std::string::npos ) continue;
-		if ( ! has( LINEOut, '[' + Heading + ']' ) ) continue; // Must be really correct heading line
-
-		//                                  Heading line found, now looking for Kind
-		while ( ! EndofFile && ! NewHeading ) {
-			{ IOFlags flags; gio::read( UnitNumber, Format_700, flags ) >> LINE; ReadStat = flags.ios(); }
-			if ( ReadStat < GoodIOStatValue ) {
-				EndofFile = true;
-				break;
-			}
-			strip( LINE );
-
-			if ( len( LINE ) == 0 ) continue; // Ignore Blank Lines
-
-			ConvertCaseToLower( LINE, LINEOut ); // Turn line into lower case
-			//         LINE=LINEOut
-
-			ILB = index( LINEOut, '[' );
-			IRB = index( LINEOut, ']' );
-			NewHeading = ( ILB != std::string::npos && IRB != std::string::npos );
-
-			//                                  Should be a parameter line
-			//                                  KindofParameter = string
-			IEQ = index( LINEOut, '=' );
-			IPAR = index( LINEOut, Param );
-			if ( IEQ == std::string::npos ) continue;
-			if ( IPAR == std::string::npos ) continue;
-			if ( IPAR != 0 ) continue;
-			if ( ! has( LINEOut, Param + '=' ) ) continue; // needs to be param=
-
-			//                                  = found and parameter found.
-			if ( IPAR > IEQ ) continue;
-
-			//                                  parameter = found
-			//                                  Set output string to start with non-blank character
-
-			DataOut = stripped( LINE.substr( IEQ + 1 ) );
-			Found = true;
-			break;
-
-		}
-
-	}
-
-	if ( Param == "dir" ) {
-		IPOS = len( DataOut );
-		if ( IPOS != 0 ) {
-			// Non-blank make sure last position is valid path character
-			//  (Set in DataStringGlobals)
-
-			if ( DataOut[ IPOS - 1 ] != pathChar ) {
-				DataOut += pathChar;
-			}
-
-		}
-	}
-
-}
