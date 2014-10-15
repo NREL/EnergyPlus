@@ -492,7 +492,10 @@ IF (BUILD_FORTRAN)
     ADD_SIMULATION_TEST(IDF_FILE LBuilding-G090.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
     ADD_SIMULATION_TEST(IDF_FILE LBuilding-G180.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
     ADD_SIMULATION_TEST(IDF_FILE LBuilding-G270.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+    # Parametric preprocessor files
     ADD_SIMULATION_TEST(IDF_FILE LBuildingAppGRotPar.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+    ADD_SIMULATION_TEST(IDF_FILE 1ZoneParameterAspect.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+    ADD_SIMULATION_TEST(IDF_FILE ParametricInsulation-5ZoneAirCooled.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ENDIF ()
 
 ## Files to handle specially
@@ -501,8 +504,6 @@ ENDIF ()
 
 ## Other files that won't run in the current state
 ##   Parametric preprocessor files
-#ADD_SIMULATION_TEST(IDF_FILE 1ZoneParameterAspect.idf)
-#ADD_SIMULATION_TEST(IDF_FILE ParametricInsulation-5ZoneAirCooled.idf)
 ##   External dataset files
 #ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_1.idf)
 #ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_2.idf)
