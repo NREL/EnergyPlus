@@ -537,8 +537,7 @@ else()
   ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
 endif()
 
-#TARGET_LINK_LIBRARIES( EnergyPlus DElight )
-TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
+TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight)
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)
