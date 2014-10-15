@@ -1402,6 +1402,8 @@ namespace WeatherManager {
 			}
 			ThisDay += 7 * ( DST.EnDay - 1 );
 			if ( ThisDay > ActEndDayOfMonth( DST.EnMon ) ) {
+				ActEndMonth = 0; // Suppress uninitialized warning
+				ActEndDay = 0; // Suppress uninitialized warning
 				ShowSevereError( RoutineName + "Determining DST: DST End Date, Nth Day of Month, not enough Nths" );
 				ErrorsFound = true;
 			} else {

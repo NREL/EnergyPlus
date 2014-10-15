@@ -2000,6 +2000,11 @@ namespace DesiccantDehumidifiers {
 
 				ShowFatalError( "Invalid performance model in desiccant dehumidifier = " + TrimSigDigits( DesicDehum( DesicDehumNum ).PerformanceModel_Num ) );
 
+				// Suppress uninitialized warnings
+				ProcAirOutTemp = 0.0;
+				SpecRegenEnergy = 0.0;
+				RegenAirVel = 0.0;
+
 			}} // Performance Model Part B
 
 			ProcAirOutTemp = ( 1 - PartLoad ) * ProcAirInTemp + ( PartLoad ) * ProcAirOutTemp;
