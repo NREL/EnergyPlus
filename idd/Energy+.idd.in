@@ -1812,7 +1812,6 @@ Site:GroundDomain:Slab,
         \key OnGrade
         \note This field specifies whether the slab is located "in-grade" or "on-grade"
    A4,  \field Slab Material Name
-        \required-field
         \type object-list
         \object-list MaterialName
         \note Only applicable for the in-grade case
