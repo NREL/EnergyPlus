@@ -1,5 +1,5 @@
 #include <iostream>
-#include "main.hh"
+#include "EnergyPlusPgm.hh"
 
 void message_callback_handler(std::string message)
 {

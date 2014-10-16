@@ -50,7 +50,7 @@ DisplayString( std::string const & String ) // String to be displayed
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
 
-	fMessagePtr(String);
+	if ( fMessagePtr ) fMessagePtr(String);
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << '\n';
@@ -99,7 +99,7 @@ DisplayNumberAndString(
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	std::stringstream sstm;
 	sstm << String << " " << Number;
-	fMessagePtr( sstm.str() );
+	if ( fMessagePtr ) fMessagePtr( sstm.str() );
 	
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << ' ' << Number << '\n';
@@ -156,7 +156,7 @@ DisplaySimDaysProgress( // This doesn't do anything!
 		percent = 0;
 	}
 
-	fProgressPtr( percent );
+	if ( fProgressPtr ) fProgressPtr( percent );
 
 }
 
