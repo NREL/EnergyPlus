@@ -1778,14 +1778,14 @@ OptionGroup * ezOptionParser::get(const char * name) {
 void ezOptionParser::getUsage(std::string & usage, int width, Layout layout) {
 
   usage.append(overview);
-  usage.append("\n\n");
-  usage.append("USAGE: ");
+  usage.append("\n");
+  usage.append("Usage: ");
   usage.append(syntax);
-  usage.append("\n\nOPTIONS:\n");
+  usage.append("\nOptions:\n");
   getUsageDescriptions(usage, width, layout);
 
   if (!example.empty()) {
-    usage.append("\nEXAMPLE: ");
+    usage.append("Example: ");
     usage.append(example);
   }
   
@@ -1818,7 +1818,7 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
     k = stringPtrToIndexMap[stringPtrs[i]];
     opts.clear();
     for(j=0; j < groups[k]->flags.size()-1; ++j) {
-      opts.append(*groups[k]->flags[j]);
+      opts.append("  " + *groups[k]->flags[j]);
       opts.append(", ");
       
       if ((long int)opts.size() > width)
@@ -1828,7 +1828,7 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
     opts.append( *groups[k]->flags[j] );
     
     if (groups[k]->expectArgs) {
-      opts.append("=[ARG]");
+      opts.append(" ARG");
       
       if (groups[k]->delim) {
         opts.append("1[");

@@ -4192,7 +4192,7 @@ namespace DaylightingManager {
 			if ( iErrorFlag != 0 ) {
 				// Open DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightFileName, flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightDfdmpFileName, flags ); }
 
 				// Sequentially read lines in DElight Daylight Factors Error File
 				// and process them using standard EPlus warning/error handling calls
@@ -4233,7 +4233,7 @@ namespace DaylightingManager {
 			} else {
 				// Open, Close, and Delete DElight Daylight Factors Error File for reading
 				iDElightErrorFile = GetNewUnitNumber();
-				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightFileName, flags ); }
+				{ IOFlags flags; flags.ACTION( "READWRITE" ); gio::open( iDElightErrorFile, outputDelightDfdmpFileName, flags ); }
 				{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( iDElightErrorFile, flags ); }
 			}
 			SetupDElightOutput4EPlus();

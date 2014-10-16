@@ -28,7 +28,10 @@ namespace CommandLineInterface {
  extern	std::string inputWeatherFileName;
  extern std::string outputAdsFileName;
  extern std::string outputDfsFileName;
- extern std::string outputDelightFileName;
+ extern std::string outputDelightInFileName;
+ extern std::string outputDelightOutFileName;
+ extern std::string outputDelightEldmpFileName;
+ extern std::string outputDelightDfdmpFileName;
  extern std::string outputMapTabFileName;
  extern std::string outputMapCsvFileName;
  extern std::string outputMapTxtFileName;
@@ -45,6 +48,8 @@ namespace CommandLineInterface {
  extern std::string outputSszTabFileName;
  extern std::string outputSszTxtFileName;
  extern std::string outputScreenCsvFileName;
+ extern std::string outputSqlFileName;
+ extern std::string outputSqliteErrFileName;
  extern std::string EnergyPlusIniFileName;
  extern std::string inStatFileName;
  extern std::string TarcogIterationsFileName;

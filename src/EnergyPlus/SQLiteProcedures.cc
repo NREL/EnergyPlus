@@ -1,6 +1,7 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
+#include "CommandLineInterface.hh"
 #include "SQLiteProcedures.hh"
 #include "DataGlobals.hh"
 #include "DataStringGlobals.hh"
@@ -40,7 +41,7 @@ SQLite::SQLite()
 	m_writeTabularDataToSQLite(false),
 	m_sqlDBTimeIndex(0),
 	m_db(nullptr),
-	m_dbName("eplusout.sql"),
+	m_dbName(CommandLineInterface::outputSqlFileName),
 	m_reportVariableDataInsertStmt(nullptr),
 	m_reportVariableExtendedDataInsertStmt(nullptr),
 	m_timeIndexInsertStmt(nullptr),
@@ -108,12 +109,12 @@ SQLite::SQLite()
 	if( m_writeOutputToSQLite ) {
 		int rc = -1;
 		bool ok = true;
-		m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
+		m_errorStream.open(CommandLineInterface::outputSqliteErrFileName, std::ofstream::out | std::ofstream::trunc);
 
 		// Test if we can write to the sqlite error file
 		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
 		if( m_errorStream.is_open() ) {
-			m_errorStream << "SQLite3 message, sqlite.err open for processing!" << std::endl;
+			m_errorStream << "SQLite3 message, " + CommandLineInterface::outputSqliteErrFileName + " open for processing!" << std::endl;
 		} else {
 			ok = false;
 		}

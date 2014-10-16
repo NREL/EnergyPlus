@@ -250,7 +250,7 @@ namespace InputProcessor {
 		{ IOFlags flags; flags.ACTION( "write" ); gio::open( CacheIPErrorFile, outputIperrFileName, flags ); write_stat = flags.ios(); }
 		if ( write_stat != 0 ) {
 			DisplayString( "Could not open (write) "+outputIperrFileName );
-			ShowFatalError( "ProcessInput: Could not open file " + outputAuditFileName + " for output (write)." );
+			ShowFatalError( "ProcessInput: Could not open file " + outputIperrFileName + " for output (write)." );
 		}
 
 		IDDFile = GetNewUnitNumber();

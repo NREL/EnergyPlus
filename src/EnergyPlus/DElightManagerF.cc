@@ -10,6 +10,7 @@
 
 // EnergyPlus Headers
 #include <DElightManagerF.hh>
+#include <CommandLineInterface.hh>
 #include <DataDaylighting.hh>
 #include <DataDElight.hh>
 #include <DataEnvironment.hh>
@@ -81,6 +82,7 @@ namespace DElightManagerF {
 		// This subroutine creates a DElight input file from EnergyPlus processed input.
 
 		// USE STATEMENTS:
+		using namespace CommandLineInterface;
 		using namespace DataGlobals; // Gives access to too many things to keep track of
 		using namespace DataHeatBalance; // Gives access to Building, Zone(izone)%var and Lights(ilights) data
 		using namespace DataEnvironment; // Gives access to Site data
@@ -184,11 +186,10 @@ namespace DElightManagerF {
 		// Open a file for writing DElight input from EnergyPlus data
 		unit = GetNewUnitNumber();
 
-		// Hardwire file name to eplusout.delightin in the current working directory
 		{ 
-			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, "eplusout.delightin", flags ); 
+			IOFlags flags; flags.ACTION( "write" ); gio::open( unit, outputDelightInFileName, flags );
 			if ( flags.err() ) {
-				ShowFatalError( "DElightInputGenerator: Could not open file \"eplusout.delightin\" for output (write)." );
+				ShowFatalError( "DElightInputGenerator: Could not open file \""+ outputDelightInFileName + "\" for output (write)." );
 			}
 		}
 

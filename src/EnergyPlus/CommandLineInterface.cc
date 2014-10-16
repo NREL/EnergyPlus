@@ -66,7 +66,10 @@ std::string inputIddFileName;
 std::string inputWeatherFileName;
 std::string outputAdsFileName;
 std::string outputDfsFileName;
-std::string outputDelightFileName;
+std::string outputDelightInFileName;
+std::string outputDelightOutFileName;
+std::string outputDelightEldmpFileName;
+std::string outputDelightDfdmpFileName;
 std::string outputMapTabFileName;
 std::string outputMapCsvFileName;
 std::string outputMapTxtFileName;
@@ -83,6 +86,8 @@ std::string outputSszCsvFileName;
 std::string outputSszTabFileName;
 std::string outputSszTxtFileName;
 std::string outputScreenCsvFileName;
+std::string outputSqlFileName;
+std::string outputSqliteErrFileName;
 std::string EnergyPlusIniFileName;
 std::string inStatFileName;
 std::string TarcogIterationsFileName;
@@ -211,24 +216,28 @@ ProcessArgs(int argc, const char * argv[])
 		cStrArgs.push_back(arguments[i].c_str());
 	}
 
+	int argCount = cStrArgs.size();
+
+	bool legacyMode = (argCount == 1);
+
+	// Define options
 	ezOptionParser opt;
 
 	opt.overview = VerString;
-	opt.example = "energyplus -w weather.epw -o output -r input.idf";
 
 	opt.syntax = "energyplus [options] [input file]";
 
 	opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
 
-	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--designday");
+	opt.add("", 0, 1, 0, "Output directory path (default: current working directory)", "-d", "--output-directory");
+
+	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
 
 	opt.add("", 0, 0, 0, "Display help information", "-h", "--help");
 
 	opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
 
 	opt.add("", 0, 0, 0, "Run EPMacro", "-m", "--epmacro");
-
-	opt.add("", 0, 1, 0, "Output directory path (default: current working directory)", "-o", "--output-directory");
 
 	opt.add("", 0, 1, 0, "Prefix for output file names (default: same as input file name)", "-p", "--output-prefix");
 
@@ -238,12 +247,14 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("in.epw", 0, 1, 0, "Weather file path (default: in.epw)", "-w", "--weather");
 
-	opt.add("", 0, 0, 0, "Run ExpandObjects", "-x", "--expand");
+	opt.add("", 0, 0, 0, "Run ExpandObjects", "-x", "--expandobjects");
+
+	opt.example = "energyplus -w weather.epw -d output -r input.idf";
 
 	std::string errorFollowUp = "Type 'energyplus --help' for usage.";
 
 	// Parse arguments
-	opt.parse(cStrArgs.size(), &cStrArgs[0]);
+	opt.parse(argCount, &cStrArgs[0]);
 
 	// print arguments parsed (useful for debugging)
 	/*std::string pretty;
@@ -260,12 +271,12 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.get("-i")->getString(inputIddFileName);
 
-	if (!opt.isSet("-i") && argc > 1)
+	if (!opt.isSet("-i") && !legacyMode)
 		inputIddFileName = exeDirectory + inputIddFileName;
 
 	std::string dirPathName;
 
-	opt.get("-o")->getString(dirPathName);
+	opt.get("-d")->getString(dirPathName);
 
 	runReadVars = opt.isSet("-r");
 
@@ -303,7 +314,7 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if(opt.lastArgs.size() == 0 && argc > 0){
+	if(opt.lastArgs.size() == 0 && !legacyMode){
 		DisplayString("ERROR: No input file provided.");
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
@@ -320,7 +331,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	runEPMacro = opt.isSet("-m");
 
-	if (opt.isSet("-o") ){
+	if (opt.isSet("-d") ){
 		struct stat sb = {0};
 
 		if (stat(dirPathName.c_str(), &sb) == -1) {
@@ -337,59 +348,119 @@ ProcessArgs(int argc, const char * argv[])
 	if(opt.isSet("-p")) {
 		std::string prefixOutName;
 		opt.get("-p")->getString(prefixOutName);
-		outputFilePrefix = dirPathName + prefixOutName + "-";
+		outputFilePrefix = dirPathName + prefixOutName;
 	}
-	else if (argc > 1)
-		outputFilePrefix = dirPathName + idfFileNameOnly + "-";
+	else if (!legacyMode)
+		outputFilePrefix = dirPathName + idfFileNameOnly;
 	else
 		outputFilePrefix = dirPathName + "eplus";
 
-	// EnergyPlus files
-	outputAuditFileName = outputFilePrefix + "out.audit";
-	outputBndFileName = outputFilePrefix + "out.bnd";
-	outputDxfFileName = outputFilePrefix + "out.dxf";
-	outputEioFileName = outputFilePrefix + "out.eio";
-	outputEndFileName = outputFilePrefix + "out.end";
-	outputErrFileName = outputFilePrefix + "out.err";
-	outputEsoFileName = outputFilePrefix + "out.eso";
-	outputMtdFileName = outputFilePrefix + "out.mtd";
-	outputMddFileName = outputFilePrefix + "out.mdd";
-	outputMtrFileName = outputFilePrefix + "out.mtr";
-	outputRddFileName = outputFilePrefix + "out.rdd";
-	outputShdFileName = outputFilePrefix + "out.shd";
-	outputTblCsvFileName = outputFilePrefix + "tbl.csv";
-	outputTblHtmFileName = outputFilePrefix + "tbl.htm";
-	outputTblTabFileName = outputFilePrefix + "tbl.tab";
-	outputTblTxtFileName = outputFilePrefix + "tbl.txt";
-	outputTblXmlFileName = outputFilePrefix + "tbl.xml";
-	outputAdsFileName = outputFilePrefix + "ADS.out";
-	outputDfsFileName = outputFilePrefix + "out.dfs";
-	outputDelightFileName = outputFilePrefix + "out.delightdfdmp";
-	outputMapTabFileName = outputFilePrefix + "map.tab";
-	outputMapCsvFileName = outputFilePrefix + "map.csv";
-	outputMapTxtFileName = outputFilePrefix + "map.txt";
-	outputEddFileName = outputFilePrefix + "out.edd";
-	outputIperrFileName = outputFilePrefix + "out.iperr";
-	outputSlnFileName = outputFilePrefix + "out.sln";
-	outputSciFileName = outputFilePrefix + "out.sci";
-	outputWrlFileName = outputFilePrefix + "out.wrl";
-	outputZszCsvFileName = outputFilePrefix + "zsz.csv";
-	outputZszTabFileName = outputFilePrefix + "zsz.tab";
-	outputZszTxtFileName = outputFilePrefix + "zsz.txt";
-	outputSszCsvFileName = outputFilePrefix + "ssz.csv";
-	outputSszTabFileName = outputFilePrefix + "ssz.tab";
-	outputSszTxtFileName = outputFilePrefix + "ssz.txt";
-	outputScreenCsvFileName = outputFilePrefix + "screen.csv";
-	outputDbgFileName = outputFilePrefix + "out.dbg";
-	EnergyPlusIniFileName = "Energy+.ini";
-	inStatFileName = weatherFilePathWithoutExtension + ".stat";
-	TarcogIterationsFileName = "TarcogIterations.dbg";
-	eplusADSFileName = idfDirPathName+"eplusADS.inp";
+	if (legacyMode)	{
+		// EnergyPlus files
+		outputAuditFileName = outputFilePrefix + "out.audit";
+		outputBndFileName = outputFilePrefix + "out.bnd";
+		outputDxfFileName = outputFilePrefix + "out.dxf";
+		outputEioFileName = outputFilePrefix + "out.eio";
+		outputEndFileName = outputFilePrefix + "out.end";
+		outputErrFileName = outputFilePrefix + "out.err";
+		outputEsoFileName = outputFilePrefix + "out.eso";
+		outputMtdFileName = outputFilePrefix + "out.mtd";
+		outputMddFileName = outputFilePrefix + "out.mdd";
+		outputMtrFileName = outputFilePrefix + "out.mtr";
+		outputRddFileName = outputFilePrefix + "out.rdd";
+		outputShdFileName = outputFilePrefix + "out.shd";
+		outputTblCsvFileName = outputFilePrefix + "tbl.csv";
+		outputTblHtmFileName = outputFilePrefix + "tbl.htm";
+		outputTblTabFileName = outputFilePrefix + "tbl.tab";
+		outputTblTxtFileName = outputFilePrefix + "tbl.txt";
+		outputTblXmlFileName = outputFilePrefix + "tbl.xml";
+		outputAdsFileName = outputFilePrefix + "ADS.out";
+		outputDfsFileName = outputFilePrefix + "out.dfs";
+		outputDelightInFileName = "eplusout.delightin";
+		outputDelightOutFileName = "eplusout.delightout";
+		outputDelightEldmpFileName = "eplusout.delighteldmp";
+		outputDelightDfdmpFileName = "eplusout.delightdfdmp";
+		outputMapTabFileName = outputFilePrefix + "map.tab";
+		outputMapCsvFileName = outputFilePrefix + "map.csv";
+		outputMapTxtFileName = outputFilePrefix + "map.txt";
+		outputEddFileName = outputFilePrefix + "out.edd";
+		outputIperrFileName = outputFilePrefix + "out.iperr";
+		outputSlnFileName = outputFilePrefix + "out.sln";
+		outputSciFileName = outputFilePrefix + "out.sci";
+		outputWrlFileName = outputFilePrefix + "out.wrl";
+		outputZszCsvFileName = outputFilePrefix + "zsz.csv";
+		outputZszTabFileName = outputFilePrefix + "zsz.tab";
+		outputZszTxtFileName = outputFilePrefix + "zsz.txt";
+		outputSszCsvFileName = outputFilePrefix + "ssz.csv";
+		outputSszTabFileName = outputFilePrefix + "ssz.tab";
+		outputSszTxtFileName = outputFilePrefix + "ssz.txt";
+		outputScreenCsvFileName = outputFilePrefix + "screen.csv";
+		outputSqlFileName = outputFilePrefix + "out.sql";
+		outputSqliteErrFileName = dirPathName + "sqlite.err";
+		outputDbgFileName = outputFilePrefix + "out.dbg";
+		EnergyPlusIniFileName = "Energy+.ini";
+		inStatFileName = weatherFilePathWithoutExtension + ".stat";
+		TarcogIterationsFileName = "TarcogIterations.dbg";
+		eplusADSFileName = idfDirPathName+"eplusADS.inp";
 
-	// Readvars files
-	outputCsvFileName = outputFilePrefix + "out.csv";
-	outputMtrCsvFileName = outputFilePrefix + "mtr.csv";
-	outputRvauditFileName = outputFilePrefix + "out.rvaudit";
+		// Readvars files
+		outputCsvFileName = outputFilePrefix + "out.csv";
+		outputMtrCsvFileName = outputFilePrefix + "mtr.csv";
+		outputRvauditFileName = outputFilePrefix + "out.rvaudit";
+	}
+	else {
+		// EnergyPlus files
+		outputAuditFileName = outputFilePrefix + ".audit";
+		outputBndFileName = outputFilePrefix + ".bnd";
+		outputDxfFileName = outputFilePrefix + ".dxf";
+		outputEioFileName = outputFilePrefix + ".eio";
+		outputEndFileName = outputFilePrefix + ".end";
+		outputErrFileName = outputFilePrefix + ".err";
+		outputEsoFileName = outputFilePrefix + ".eso";
+		outputMtdFileName = outputFilePrefix + ".mtd";
+		outputMddFileName = outputFilePrefix + ".mdd";
+		outputMtrFileName = outputFilePrefix + ".mtr";
+		outputRddFileName = outputFilePrefix + ".rdd";
+		outputShdFileName = outputFilePrefix + ".shd";
+		outputTblCsvFileName = outputFilePrefix + "Table.csv";
+		outputTblHtmFileName = outputFilePrefix + "Table.htm";
+		outputTblTabFileName = outputFilePrefix + "Table.tab";
+		outputTblTxtFileName = outputFilePrefix + "Table.txt";
+		outputTblXmlFileName = outputFilePrefix + "Table.xml";
+		outputAdsFileName = outputFilePrefix + "ADS.out";
+		outputDfsFileName = outputFilePrefix + ".dfs";
+		outputDelightInFileName = "eplusout.delightin";
+		outputDelightOutFileName = "eplusout.delightout";
+		outputDelightEldmpFileName = "eplusout.delighteldmp";
+		outputDelightDfdmpFileName = "eplusout.delightdfdmp";
+		outputMapTabFileName = outputFilePrefix + "Map.tab";
+		outputMapCsvFileName = outputFilePrefix + "Map.csv";
+		outputMapTxtFileName = outputFilePrefix + "Map.txt";
+		outputEddFileName = outputFilePrefix + ".edd";
+		outputIperrFileName = outputFilePrefix + ".iperr";
+		outputSlnFileName = outputFilePrefix + ".sln";
+		outputSciFileName = outputFilePrefix + ".sci";
+		outputWrlFileName = outputFilePrefix + ".wrl";
+		outputZszCsvFileName = outputFilePrefix + "Zsz.csv";
+		outputZszTabFileName = outputFilePrefix + "Zsz.tab";
+		outputZszTxtFileName = outputFilePrefix + "Zsz.txt";
+		outputSszCsvFileName = outputFilePrefix + "Ssz.csv";
+		outputSszTabFileName = outputFilePrefix + "Ssz.tab";
+		outputSszTxtFileName = outputFilePrefix + "Ssz.txt";
+		outputScreenCsvFileName = outputFilePrefix + "Screen.csv";
+		outputSqlFileName = outputFilePrefix + ".sql";
+		outputSqliteErrFileName = outputFilePrefix + "SQLite.err";
+		outputDbgFileName = outputFilePrefix + ".dbg";
+		EnergyPlusIniFileName = "Energy+.ini";
+		inStatFileName = weatherFilePathWithoutExtension + ".stat";
+		TarcogIterationsFileName = "TarcogIterations.dbg";
+		eplusADSFileName = idfDirPathName+"eplusADS.inp";
+
+		// Readvars files
+		outputCsvFileName = outputFilePrefix + ".csv";
+		outputMtrCsvFileName = outputFilePrefix + "Meter.csv";
+		outputRvauditFileName = outputFilePrefix + ".rvaudit";
+	}
 
 	// Handle bad options
 	std::vector<std::string> badOptions;
