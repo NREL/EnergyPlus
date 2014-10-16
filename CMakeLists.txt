@@ -6,10 +6,18 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 2 )
-set( CMAKE_VERSION_PATCH 1 ) 
+set( CMAKE_VERSION_PATCH 2 ) 
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
+
+if(NOT GIT_FOUND)
+  find_program(GIT_EXECUTABLE git HINTS "$ENV{LOCALAPPDATA}/Programs/git/bin")
+  if (NOT GIT_EXECUTABLE_NOTFOUND)
+    set(GIT_FOUND TRUE)
+  endif()
+endif()
+
 if(GIT_FOUND)
   execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
                   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -101,9 +109,12 @@ ADD_SUBDIRECTORY(third_party/BCVTB)
 ADD_SUBDIRECTORY(third_party/Expat)
 ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
+ADD_SUBDIRECTORY(third_party/DElight)
 IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
+
+# of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_TESTING )
@@ -123,13 +134,6 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/Slab PROJECT Slab NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ConvertESOMTR PROJECT ConvertESOMTR NO_EXTERNAL_INSTALL )
-endif()
-
-if ( MAKE_ENERGYPLUS_LIBRARY )
-  ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
-  if (UNIX)  
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-  endif()
 endif()
 
 configure_file( idd/Energy+.idd.in "${CMAKE_BINARY_DIR}/Energy+.idd" )
@@ -154,6 +158,6 @@ if( BUILD_PACKAGE )
     list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ConvertESOMTR/;ConvertESOMTR;ALL;/")
   endif()
 
-  include(CPack.cmake)
+  include(cmake/Install.cmake)
 endif()
 

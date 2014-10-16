@@ -519,7 +519,7 @@ SET( SRC
 )
 
 add_library( EnergyPlusLib SHARED ${SRC} )
-target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
+target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight )
 if(UNIX AND NOT APPLE)
   target_link_libraries( EnergyPlusLib dl )
 endif()
