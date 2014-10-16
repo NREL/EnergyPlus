@@ -503,7 +503,6 @@ ENDIF ()
 #ADD_SIMULATION_TEST(IDF_FILE EMSTestMathAndKill.idf)
 
 ## Other files that won't run in the current state
-##   Parametric preprocessor files
 ##   External dataset files
 #ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_1.idf)
 #ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_2.idf)
