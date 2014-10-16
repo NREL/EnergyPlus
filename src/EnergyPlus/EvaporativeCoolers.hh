@@ -41,6 +41,15 @@ namespace EvaporativeCoolers {
 	extern FArray1D_bool CheckZoneEvapUnitName;
 	extern bool GetInputZoneEvapUnit;
 
+	// Indirect Evaporative Coolers Research Special Operating Modes
+	extern int EvapCoolerRDDOperatingMode; // the indirect evaporative cooler Research Special operating mode variable
+	extern int const None; // the indirect evaporative cooler Research Special is scheduled off or turned off
+	extern int const DryModulated; // the evaporative cooler Research Special is modulated in Dry Mode
+	extern int const DryFull; // the evaporative cooler Research Special is run in full capacity in Dry Mode
+	extern int const DryWetModulated; // the evaporative cooler Research Special is modulated in Dry Mode or wet Mode 
+	extern int const WetModulated; // the evaporative cooler Research Special is modulated in wet Mode
+	extern int const WetFull; // the evaporative cooler Research Special is run in full capacity in Wet Mode
+
 	// SUBROUTINE SPECIFICATIONS FOR MODULE EvapCoolers
 
 	// Types
@@ -67,6 +76,7 @@ namespace EvaporativeCoolers {
 		int InletNode;
 		int OutletNode;
 		int SecondaryInletNode; // This is usually OA node feeding into the purge/secondary side
+		int SecondaryOutletNode; // This outlet node of the secondary side and ilet to the secondary fan 
 		int TertiaryInletNode; // This node is used to run building exhaust into purge side.
 		Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
 		Real64 InletMassFlowRateMaxAvail;
@@ -84,6 +94,11 @@ namespace EvaporativeCoolers {
 		Real64 SecInletHumRat;
 		Real64 SecInletEnthalpy;
 		Real64 SecInletPressure;
+		Real64 SecOutletTemp; // secondary air outlet node drybulb temperature
+		Real64 SecOuletWetBulbTemp; // secondarr air outlet node wetbulb temperature
+		Real64 SecOutletHumRat; // secondarr air outlet node humidity ratio
+		Real64 SecOutletEnthalpy; // secondarr air outlet node enthalpy
+		Real64 SecOutletMassFlowRate; // Mass Flow through the secondary air side [kg/Sec]
 		Real64 PadDepth;
 		Real64 PadArea;
 		Real64 RecircPumpPower;
@@ -116,6 +131,22 @@ namespace EvaporativeCoolers {
 		Real64 DesiredOutletTemp; // setpoint manager should set this
 		Real64 PartLoadFract; // reduces cooling performance and associated fan power
 		int DewPointBoundFlag; // report when indirect research special cooler is bound by dewpoint
+		Real64 MinOATDBEvapCooler; // Minimum outdoor air operating dry-bulb temperature for evaporative cooler
+		Real64 MaxOATDBEvapCooler; // Maximum outdoor air operating dry-bulb temperature for evaporative cooler
+		bool EvapCoolerOperationControlFlag; // turns the evap cooler on/off depending on the outdoor air temperature min and max limits 
+		Real64 MaxOATWBEvapCooler; // Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
+		Real64 DryCoilMaxEfficiency; // Cooler Drybulb Design Effectiveness
+		Real64 IndirectFanPower; // Secondary Fan Design Power
+		Real64 FanSizingSpecificPower; // secondary fan sizing specific power in W/(m3/s)
+		Real64 RecircPumpSizingFactor; // water pump power sizing factor W/(m3/s) air
+		Real64 IndirectVolFlowScalingFactor; // secondary air flow sizing Factor
+		int WetbulbEffecCurveIndex; // wetbulb effectiveness modifier curve name as a function of flow fraction
+		int DrybulbEffecCurveIndex; // drybulb effectiveness modifier curve name as a function of flow fraction
+		int FanPowerModifierCurveIndex; // secondary fan power modifier curve name as a function of flow fraction
+		int PumpPowerModifierCurveIndex; // recirculating pump power modifier curve name as a function of flow fraction
+		int IECOperatingStatus; // operating mode status of indirect evaporative cooler research special (0: Off, 1: Dry, 2: Wet)
+		int IterationLimit; // used for Used for RegulaFalsi recurring error message error -1
+		int IterationFailed; // Used for RegulaFalsi recurring error message error -2
 		// rather than wetbulb-depression approach
 
 		// Default Constructor
@@ -136,6 +167,7 @@ namespace EvaporativeCoolers {
 			InletNode( 0 ),
 			OutletNode( 0 ),
 			SecondaryInletNode( 0 ),
+			SecondaryOutletNode( 0 ),
 			TertiaryInletNode( 0 ),
 			InletMassFlowRate( 0.0 ),
 			InletMassFlowRateMaxAvail( 0.0 ),
@@ -153,6 +185,11 @@ namespace EvaporativeCoolers {
 			SecInletHumRat( 0.0 ),
 			SecInletEnthalpy( 0.0 ),
 			SecInletPressure( 0.0 ),
+			SecOutletTemp( 0.0 ),
+			SecOuletWetBulbTemp( 0.0 ),
+			SecOutletHumRat( 0.0 ),
+			SecOutletEnthalpy( 0.0 ),
+			SecOutletMassFlowRate( 0.0 ),
 			PadDepth( 0.0 ),
 			PadArea( 0.0 ),
 			RecircPumpPower( 0.0 ),
@@ -183,7 +220,23 @@ namespace EvaporativeCoolers {
 			EvapControlNodeNum( 0 ),
 			DesiredOutletTemp( 0.0 ),
 			PartLoadFract( 0.0 ),
-			DewPointBoundFlag( 0 )
+			DewPointBoundFlag( 0 ),
+			MinOATDBEvapCooler( 0.0 ),
+			MaxOATDBEvapCooler( 0.0 ),
+			EvapCoolerOperationControlFlag( false ),
+			MaxOATWBEvapCooler( 0.0 ),
+			DryCoilMaxEfficiency( 0.0 ),
+			IndirectFanPower( 0.0 ),
+			FanSizingSpecificPower( 0.0 ),
+			RecircPumpSizingFactor( 0.0 ),
+			IndirectVolFlowScalingFactor( 0.0 ),
+			WetbulbEffecCurveIndex( 0 ),
+			DrybulbEffecCurveIndex( 0 ),
+			FanPowerModifierCurveIndex( 0 ),
+			PumpPowerModifierCurveIndex( 0 ),
+			IECOperatingStatus( 0 ),
+			IterationLimit( 0 ),
+			IterationFailed( 0 )
 		{}
 
 		// Member Constructor
@@ -207,6 +260,7 @@ namespace EvaporativeCoolers {
 			int const InletNode,
 			int const OutletNode,
 			int const SecondaryInletNode, // This is usually OA node feeding into the purge/secondary side
+			int const SecondaryOutletNode, // This outlet node of the secondary side and ilet to the secondary fan 
 			int const TertiaryInletNode, // This node is used to run building exhaust into purge side.
 			Real64 const InletMassFlowRate, // Inlet is primary process air node at inlet to cooler
 			Real64 const InletMassFlowRateMaxAvail,
@@ -224,6 +278,11 @@ namespace EvaporativeCoolers {
 			Real64 const SecInletHumRat,
 			Real64 const SecInletEnthalpy,
 			Real64 const SecInletPressure,
+			Real64 const SecOutletTemp, // secondary air outlet node drybulb temperature
+			Real64 const SecOuletWetBulbTemp, // secondarr air outlet node wetbulb temperature
+			Real64 const SecOutletHumRat, // secondarr air outlet node humidity ratio
+			Real64 const SecOutletEnthalpy, // secondarr air outlet node enthalpy
+			Real64 const SecOutletMassFlowRate, // Mass Flow through the secondary air side [kg/Sec]
 			Real64 const PadDepth,
 			Real64 const PadArea,
 			Real64 const RecircPumpPower,
@@ -255,7 +314,23 @@ namespace EvaporativeCoolers {
 			int const EvapControlNodeNum, // need to control to avoid over cooling
 			Real64 const DesiredOutletTemp, // setpoint manager should set this
 			Real64 const PartLoadFract, // reduces cooling performance and associated fan power
-			int const DewPointBoundFlag // report when indirect research special cooler is bound by dewpoint
+			int const DewPointBoundFlag, // report when indirect research special cooler is bound by dewpoint
+			Real64 const MinOATDBEvapCooler, // Minimum outdoor air operating dry-bulb temperature for evaporative cooler
+			Real64 const MaxOATDBEvapCooler, // Maximum outdoor air operating dry-bulb temperature for evaporative cooler
+			bool const EvapCoolerOperationControlFlag, // turns the evap cooler on/off depending on the outdoor air temperature min and max limits 
+			Real64 const MaxOATWBEvapCooler, // Evaporative Operation Maximum Limit Outdoor Wetbulb Temperature
+			Real64 const DryCoilMaxEfficiency, // Cooler Drybulb Design Effectiveness
+			Real64 const IndirectFanPower, // Secondary Fan Design Power
+			Real64 const FanSizingSpecificPower, // Secondary Fan Sizing Specific Power in W/(m3/s)
+			Real64 const RecircPumpSizingFactor, // Water Pump Power Sizing Factor W/(m3/s) air
+			Real64 const IndirectVolFlowScalingFactor, // secondary air flow sizing Factor
+			int const WetbulbEffecCurveIndex, // wetbulb effectiveness modifier curve name as a function of flow fraction
+			int const DrybulbEffecCurveIndex, // drybulb effectiveness modifier curve name as a function of flow fraction
+			int const FanPowerModifierCurveIndex, // secondary fan power modifier curve name as a function of flow fraction
+			int const PumpPowerModifierCurveIndex, // recirculating pump power modifier curve name as a function of flow fraction
+			int const IECOperatingStatus, // operating mode status of indirect evaporative cooler research special (0: Off, 1: Dry, 2: Wet)
+			int const IterationLimit, // used for Used for RegulaFalsi recurring error message counter
+			int const IterationFailed // Used for RegulaFalsi recurring error message error -2
 		) :
 			EvapCoolerName( EvapCoolerName ),
 			EquipIndex( EquipIndex ),
@@ -276,6 +351,7 @@ namespace EvaporativeCoolers {
 			InletNode( InletNode ),
 			OutletNode( OutletNode ),
 			SecondaryInletNode( SecondaryInletNode ),
+			SecondaryOutletNode( SecondaryOutletNode ),
 			TertiaryInletNode( TertiaryInletNode ),
 			InletMassFlowRate( InletMassFlowRate ),
 			InletMassFlowRateMaxAvail( InletMassFlowRateMaxAvail ),
@@ -293,6 +369,11 @@ namespace EvaporativeCoolers {
 			SecInletHumRat( SecInletHumRat ),
 			SecInletEnthalpy( SecInletEnthalpy ),
 			SecInletPressure( SecInletPressure ),
+			SecOutletTemp( SecOutletTemp ),
+			SecOuletWetBulbTemp( SecOuletWetBulbTemp ),
+			SecOutletHumRat( SecOutletHumRat ),
+			SecOutletEnthalpy( SecOutletEnthalpy ),
+			SecOutletMassFlowRate( SecOutletMassFlowRate ),
 			PadDepth( PadDepth ),
 			PadArea( PadArea ),
 			RecircPumpPower( RecircPumpPower ),
@@ -324,7 +405,23 @@ namespace EvaporativeCoolers {
 			EvapControlNodeNum( EvapControlNodeNum ),
 			DesiredOutletTemp( DesiredOutletTemp ),
 			PartLoadFract( PartLoadFract ),
-			DewPointBoundFlag( DewPointBoundFlag )
+			DewPointBoundFlag( DewPointBoundFlag ),
+			MinOATDBEvapCooler( MinOATDBEvapCooler ),
+			MaxOATDBEvapCooler( MaxOATDBEvapCooler ),
+			EvapCoolerOperationControlFlag( EvapCoolerOperationControlFlag ),
+			MaxOATWBEvapCooler( MaxOATWBEvapCooler ),
+			DryCoilMaxEfficiency( DryCoilMaxEfficiency ),
+			IndirectFanPower( IndirectFanPower ),
+			FanSizingSpecificPower( FanSizingSpecificPower ),
+			RecircPumpSizingFactor( RecircPumpSizingFactor ),
+			IndirectVolFlowScalingFactor( IndirectVolFlowScalingFactor ),
+			WetbulbEffecCurveIndex( WetbulbEffecCurveIndex ),
+			DrybulbEffecCurveIndex( DrybulbEffecCurveIndex ),
+			FanPowerModifierCurveIndex( FanPowerModifierCurveIndex ),
+			PumpPowerModifierCurveIndex( PumpPowerModifierCurveIndex ),
+			IECOperatingStatus( IECOperatingStatus ),
+			IterationLimit( IterationLimit ),
+			IterationFailed( IterationFailed )
 		{}
 
 	};
@@ -650,6 +747,49 @@ namespace EvaporativeCoolers {
 
 	void
 	CalcResearchSpecialPartLoad( int & EvapCoolNum );
+
+	void
+	CalcIndirectResearchSpecialEvapCoolerAdvanced( int const EvapCoolNum,
+	Real64 const InletDryBulbTempSec,
+	Real64 const InletWetBulbTempSec,
+	Real64 const InletDewPointTempSec,
+	Real64 const InletHumRatioSec );
+
+	void
+	CalcSecondaryAirOutletCondition( int const  EvapCoolNum,
+	int const OperatingMode,
+	Real64 const AirMassFlowSec,
+	Real64 const EDBTSec,
+	Real64 const EWBTSec,
+	Real64 const EHumRatSec,
+	Real64 const QHXTotal, 
+	Real64 & QHXLatent );
+
+	void
+	CalcIndirectRDDEvapCoolerOutletTemp( int const EvapCoolNum, 
+	int const DryOrWetOperatingMode,
+	Real64 const AirMassFlowSec,
+	Real64 const EDBTSec,
+	Real64 const EWBTSec,
+	Real64 const EHumRatSec );
+
+	Real64
+	CalcEvapCoolRDDSecFlowResidual( Real64 const AirMassFlowSec,
+	Optional< FArray1S< Real64 > const > Par = _ //Par( 6 ) is desired temperature C
+	);
+	
+	//Real64
+	//CalcEvapCoolRDDSecHumRatioResidual(
+	//Real64 const SecOutletHumRatio, // secondary air outlet humidity ratio
+	//Optional< FArray1S< Real64 > const > Par // Par( 7 ) is desired outlet temperature of Evap Cooler
+	//);
+
+	Real64
+	IndEvapCoolerPower(
+	int const EvapCoolIndex, // Unit index
+	int const DryWetMode, // dry or wet operating mode of evaporator cooler
+	Real64 const FlowRatio // secondary air flow fraction
+	);
 
 	void
 	CalcIndirectResearchSpecialEvapCooler( int const EvapCoolNum );

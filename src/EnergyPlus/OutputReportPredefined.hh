@@ -80,6 +80,17 @@ namespace OutputReportPredefined {
 	extern int pdchDXCoolCoilEERIP; // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
 	extern int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
 
+	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
+	extern int pdchDXCoolCoilTestClass; // Standard Rated Test Class Number
+	extern int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
+	extern int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
+	extern int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
+	extern int pdchDXCoolCoilElecPowerB; // Standard Rated Electric Power [W], Test B
+	extern int pdchDXCoolCoilNetCapSIC; // Standard Rated (Net) Cooling Capacity [W], Test C
+	extern int pdchDXCoolCoilElecPowerC; // Standard Rated Electric Power [W], Test C
+	extern int pdchDXCoolCoilNetCapSID; // Standard Rated (Net) Cooling Capacity [W], Test D
+	extern int pdchDXCoolCoilElecPowerD; // Standard Rated Electric Power [W], Test D
+
 	// VAV DX Cooling Ratings Details
 	extern int pdstVAVDXCoolCoil; // details for Packaged VAV rating under AHRI 340/360
 	extern int pdchVAVDXCoolCoilType;
