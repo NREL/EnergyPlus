@@ -97,6 +97,7 @@ std::string outputMtrCsvFileName;
 std::string outputRvauditFileName;
 
 std::string idfFileNameOnly;
+std::string idfDirPathName;
 std::string exeDirectory;
 
 bool runReadVars(false);
@@ -261,7 +262,7 @@ ProcessArgs(int argc, const char * argv[])
 	opt.prettyPrint(pretty);
 	std::cout << pretty << std::endl;*/
 
-	std::string usage, idfDirPathName;
+	std::string usage;
 	opt.getUsage(usage);
 
 	// Set path of EnergyPlus program path

@@ -355,29 +355,39 @@ main(int argc, const char * argv[])
 	ReportOrphanSchedules();
 
     if(runReadVars) {
-    	std::string RVIfile = idfFileNameOnly + ".rvi";
-    	std::string MVIfile = idfFileNameOnly + ".mvi";
+    	std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
+    	std::string MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
+
     	int fileUnitNumber;
     	int iostatus;
+    	bool rviFileExists;
+    	bool mviFileExists;
+
     	gio::Fmt const readvarsFmt( "(A)" );
 
-    	fileUnitNumber = GetNewUnitNumber();
-    	{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
-    	if ( iostatus != 0 ) {
-    		ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
+    	{ IOFlags flags; gio::inquire( RVIfile, flags ); rviFileExists = flags.exists(); }
+    	if (!rviFileExists) {
+			fileUnitNumber = GetNewUnitNumber();
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, RVIfile, flags ); iostatus = flags.ios(); }
+			if ( iostatus != 0 ) {
+				ShowFatalError( "EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write)." );
+			}
+			gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
+			gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
+			gio::close( fileUnitNumber );
     	}
-    	gio::write( fileUnitNumber, readvarsFmt ) << outputEsoFileName;
-    	gio::write( fileUnitNumber, readvarsFmt ) << outputCsvFileName;
-    	gio::close( fileUnitNumber );
 
-    	fileUnitNumber = GetNewUnitNumber();
-    	{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
-    	if ( iostatus != 0 ) {
-    		ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
+    	{ IOFlags flags; gio::inquire( MVIfile, flags ); mviFileExists = flags.exists(); }
+    	if (!mviFileExists) {
+			fileUnitNumber = GetNewUnitNumber();
+			{ IOFlags flags; flags.ACTION( "write" ); gio::open( fileUnitNumber, MVIfile, flags ); iostatus = flags.ios(); }
+			if ( iostatus != 0 ) {
+				ShowFatalError( "EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write)." );
+			}
+			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
+			gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
+			gio::close( fileUnitNumber );
     	}
-    	gio::write( fileUnitNumber, readvarsFmt ) << outputMtrFileName;
-    	gio::write( fileUnitNumber, readvarsFmt ) << outputMtrCsvFileName;
-    	gio::close( fileUnitNumber );
 
     	std::string ReadVars = "ReadVarsESO";
     	std::string ReadVarsRVI = exeDirectory + ReadVars + " " + RVIfile + " unlimited";
@@ -386,8 +396,12 @@ main(int argc, const char * argv[])
 	    system(ReadVarsRVI.c_str());
 	    system(ReadVarsMVI.c_str());
 
-	    remove(RVIfile.c_str());
-	    remove(MVIfile.c_str());
+	    if (!rviFileExists)
+	    	remove(RVIfile.c_str());
+
+	    if (!mviFileExists)
+	    	remove(MVIfile.c_str());
+
 	    rename("readvars.audit", outputRvauditFileName.c_str());
 
 	}

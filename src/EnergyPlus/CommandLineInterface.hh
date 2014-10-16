@@ -59,6 +59,7 @@ namespace CommandLineInterface {
  extern std::string outputRvauditFileName;
 
  extern std::string weatherFileNameOnly;
+ extern std::string idfDirPathName;
  extern std::string idfFileNameOnly;
  extern std::string exeDirectory;
 
