@@ -28,6 +28,7 @@
 #include <DataSystemVariables.hh>
 #include <DataTimings.hh>
 #include <DisplayRoutines.hh>
+#include <FileSystem.hh>
 #include <FluidProperties.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
@@ -213,14 +214,14 @@ main(int argc, const char * argv[])
 	using DataEnvironment::IgnoreBeamRadiation;
 	using DataEnvironment::IgnoreDiffuseRadiation;
 	// routine modules
+	using namespace CommandLineInterface;
+	using namespace FileSystem;
 	using namespace InputProcessor;
 	using namespace OutputProcessor;
 	using namespace SimulationManager;
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
-	// CLI module
-	using namespace CommandLineInterface;
 
 // Enable floating point exceptions
 #ifndef NDEBUG
@@ -393,16 +394,16 @@ main(int argc, const char * argv[])
     	std::string ReadVarsRVI = exeDirectory + ReadVars + " " + RVIfile + " unlimited";
     	std::string ReadVarsMVI = exeDirectory + ReadVars + " " + MVIfile + " unlimited";
 
-	    system(ReadVarsRVI.c_str());
-	    system(ReadVarsMVI.c_str());
+    	systemCall(ReadVarsRVI);
+    	systemCall(ReadVarsMVI);
 
 	    if (!rviFileExists)
-	    	remove(RVIfile.c_str());
+	    	removeFile(RVIfile.c_str());
 
 	    if (!mviFileExists)
-	    	remove(MVIfile.c_str());
+	    	removeFile(MVIfile.c_str());
 
-	    rename("readvars.audit", outputRvauditFileName.c_str());
+	    moveFile("readvars.audit", outputRvauditFileName);
 
 	}
 

@@ -1,14 +1,3 @@
-//Standard C++ library
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <mach-o/dyld.h>
-
 // CLI Headers
 #include <ezOptionParser.hpp>
 
@@ -22,6 +11,7 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <EnergyPlus.hh>
+#include <FileSystem.hh>
 #include <InputProcessor.hh>
 #include <OutputProcessor.hh>
 #include <OutputReportTabular.hh>
@@ -37,6 +27,7 @@ namespace CommandLineInterface{
 using namespace DataGlobals;
 using namespace DataStringGlobals;
 using namespace DataSystemVariables;
+using namespace FileSystem;
 using namespace InputProcessor;
 using namespace SimulationManager;
 using namespace OutputReportTabular;
@@ -103,87 +94,6 @@ std::string exeDirectory;
 bool runReadVars(false);
 bool DDOnlySimulation(false);
 bool AnnualSimulation(false);
-
-bool
-fileExist(const std::string& filename)
-{
-	std::ifstream infile(filename);
-	return infile.good();
-}
-
-std::string
-returnFileName( std::string const& filepath )
-{
-	int pathCharPosition = filepath.find_last_of(pathChar);
-	return filepath.substr(pathCharPosition + 1, filepath.size() - 1);
-}
-
-std::string
-returnDirPath( std::string const& filepath )
-{
-	int pathCharPosition = filepath.find_last_of(pathChar);
-	return filepath.substr(0, pathCharPosition + 1);
-}
-
-std::string
-returnAbsolutePath( std::string const& filepath )
-{
-	char absolutePath[1024];
-	realpath(filepath.c_str(), absolutePath);
-	return std::string(absolutePath);
-}
-
-std::string
-returnProgramPath()
-{
-	char executableRelativePath[1024];
-	uint32_t pathSize = sizeof(executableRelativePath);
-	_NSGetExecutablePath(executableRelativePath, &pathSize);
-
-	return std::string(executableRelativePath);
-}
-
-
-// Not currently used
-std::string
-returnFileExtension(const std::string& filename){
-	int extensionPosition = filename.find_last_of(".");
-	return filename.substr(extensionPosition + 1, filename.size() - 1);
-}
-
-std::string
-removeFileExtension(const std::string& filename){
-	int extensionPosition = filename.find_last_of(".");
-	return filename.substr(0, extensionPosition);
-}
-
-int
-mkpath(std::string s,mode_t mode)
-{
-	size_t pre=0,pos;
-	std::string dir;
-	int mdret;
-
-	if(s[s.size()-1]!=pathChar){
-		s+=pathChar;
-	}
-
-	while((pos=s.find_first_of(pathChar,pre))!=std::string::npos){
-		dir=s.substr(0,pos++);
-		pre=pos;
-		if(dir.size()==0) continue; // if leading / first time is 0 length
-		if((mdret=mkdir(dir.c_str(),mode)) && errno!=EEXIST){
-			return mdret;
-		}
-	}
-	return mdret;
-}
-
-std::string EqualsToSpace(std::string text)
-{
-	std::replace(text.begin(), text.end(), '=', ' ');
-	return text;
-}
 
 int
 ProcessArgs(int argc, const char * argv[])
@@ -266,7 +176,7 @@ ProcessArgs(int argc, const char * argv[])
 	opt.getUsage(usage);
 
 	// Set path of EnergyPlus program path
-	exeDirectory = returnDirPath(returnAbsolutePath(returnProgramPath()));
+	exeDirectory = getDirectoryPath(getAbsolutePath(getProgramPath()));
 
 	opt.get("-w")->getString(inputWeatherFileName);
 
@@ -320,8 +230,8 @@ ProcessArgs(int argc, const char * argv[])
 		DisplayString(errorFollowUp);
 		exit(EXIT_FAILURE);
 	}
-	idfFileNameOnly = removeFileExtension(returnFileName(inputIdfFileName));
-	idfDirPathName = returnDirPath(inputIdfFileName);
+	idfFileNameOnly = removeFileExtension(getFileName(inputIdfFileName));
+	idfDirPathName = getDirectoryPath(inputIdfFileName);
 
 	std::string weatherFilePathWithoutExtension = removeFileExtension(inputWeatherFileName);
 
@@ -333,18 +243,16 @@ ProcessArgs(int argc, const char * argv[])
 	runEPMacro = opt.isSet("-m");
 
 	if (opt.isSet("-d") ){
-		struct stat sb = {0};
-
-		if (stat(dirPathName.c_str(), &sb) == -1) {
-			int mkdirretval;
-			mkdirretval=mkpath(dirPathName,0755);
-		}
-
+		// Add the trailing path character if necessary
 		if(dirPathName[dirPathName.size()-1]!=pathChar){
 			dirPathName+=pathChar;
 		}
+
+		// Create directory if it doesn't already exist
+		makeDirectory(dirPathName);
 	}
 
+	// File naming scheme
 	std::string outputFilePrefix;
 	if(opt.isSet("-p")) {
 		std::string prefixOutName;
@@ -355,6 +263,13 @@ ProcessArgs(int argc, const char * argv[])
 		outputFilePrefix = dirPathName + idfFileNameOnly;
 	else
 		outputFilePrefix = dirPathName + "eplus";
+
+
+	std::string outputEpmdetFileName;
+	std::string outputEpmidfFileName;
+
+	std::string outputExpidfFileName;
+	std::string outputExperrFileName;
 
 	if (legacyMode)	{
 		// EnergyPlus files
@@ -408,6 +323,14 @@ ProcessArgs(int argc, const char * argv[])
 		outputCsvFileName = outputFilePrefix + "out.csv";
 		outputMtrCsvFileName = outputFilePrefix + "mtr.csv";
 		outputRvauditFileName = outputFilePrefix + "out.rvaudit";
+
+		// EPMacro files
+		outputEpmdetFileName = outputFilePrefix + "out.epmdet";
+		outputEpmidfFileName = outputFilePrefix + "out.epmidf";
+
+		// ExpandObjects files
+		outputExpidfFileName = outputFilePrefix + "out.expidf";
+		outputExperrFileName = outputFilePrefix + "out.experr";
 	}
 	else {
 		// EnergyPlus files
@@ -461,6 +384,14 @@ ProcessArgs(int argc, const char * argv[])
 		outputCsvFileName = outputFilePrefix + ".csv";
 		outputMtrCsvFileName = outputFilePrefix + "Meter.csv";
 		outputRvauditFileName = outputFilePrefix + ".rvaudit";
+
+		// EPMacro files
+		outputEpmdetFileName = outputFilePrefix + ".epmdet";
+		outputEpmidfFileName = outputFilePrefix + ".epmidf";
+
+		// ExpandObjects files
+		outputExpidfFileName = outputFilePrefix + ".expidf";
+		outputExperrFileName = outputFilePrefix + ".experr";
 	}
 
 	// Handle bad options
@@ -536,17 +467,17 @@ ProcessArgs(int argc, const char * argv[])
 	// Check if specified files exist
 	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		ShowFatalError( "EnergyPlus: Could not find input data dictionary: " + returnAbsolutePath(inputIddFileName) + "." );
+		ShowFatalError( "EnergyPlus: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
 	}
 
 	{ IOFlags flags; gio::inquire( inputIdfFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		ShowFatalError( "EnergyPlus: Could not find input data file: " + returnAbsolutePath(inputIdfFileName) + "." );
+		ShowFatalError( "EnergyPlus: Could not find input data file: " + getAbsolutePath(inputIdfFileName) + "." );
 	}
 
 	{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		ShowFatalError( "EnergyPlus: Could not find weather file: " + returnAbsolutePath(inputWeatherFileName) + "." );
+		ShowFatalError( "EnergyPlus: Could not find weather file: " + getAbsolutePath(inputWeatherFileName) + "." );
 	}
 
 	OutputFileDebug = GetNewUnitNumber();
@@ -556,33 +487,41 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	// Preprocessors (These will likely move to a new file)
-	bool inputFileNamedIn = (idfFileNameOnly == "in");
-
 	if(runEPMacro){
+		bool inputFileNamedIn =
+				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.imf"));
+
 		if (!inputFileNamedIn)
-			symlink(inputIdfFileName.c_str(), "in.imf");
-		std::string runEPMacro = exeDirectory + "EPMacro";
+			linkFile(inputIdfFileName.c_str(), "in.imf");
+		std::string epMacroCommand = exeDirectory + "EPMacro";
 		DisplayString("Running EPMacro...");
-		system(runEPMacro.c_str());
+		systemCall(epMacroCommand);
 		if (!inputFileNamedIn)
-			remove("in.imf");
-		std::string outputEpmdetFileName = outputFilePrefix + "out.epmdet";
-		rename("audit.out",outputEpmdetFileName.c_str());
-		std::string outputEpmidfFileName = outputFilePrefix + "out.epmidf";
-		rename("out.idf",outputEpmidfFileName.c_str());
+			removeFile("in.imf");
+		moveFile("audit.out",outputEpmdetFileName);
+		moveFile("out.idf",outputEpmidfFileName);
 	    inputIdfFileName = outputEpmidfFileName;
 	}
 
 	if(runExpandObjects) {
-		std::string runExpandObjects = exeDirectory + "ExpandObjects";
+		bool inputFileNamedIn =
+				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.idf"));
+
+		bool iddFileNamedEnergy =
+				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
+
+		std::string expandObjectsCommand = exeDirectory + "ExpandObjects";
 		if (!inputFileNamedIn)
-			symlink(inputIdfFileName.c_str(), "in.idf");
-		system(runExpandObjects.c_str());
+			linkFile(inputIdfFileName.c_str(), "in.idf");
+		if (!iddFileNamedEnergy)
+			linkFile(inputIddFileName,"Energy+.idd");
+		systemCall(expandObjectsCommand);
 		if (!inputFileNamedIn)
-			remove("in.idf");
-		remove("expandedidf.err");
-		std::string outputExpidfFileName = outputFilePrefix + "out.expidf";
-	    rename("expanded.idf", outputExpidfFileName.c_str());
+			removeFile("in.idf");
+		if (!iddFileNamedEnergy)
+			removeFile("Energy+.idd");
+		moveFile("expandedidf.err", outputExperrFileName);
+		moveFile("expanded.idf", outputExpidfFileName);
 	    inputIdfFileName = outputExpidfFileName;
 	}
 
