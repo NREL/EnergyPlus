@@ -143,6 +143,7 @@ ADD_SIMULATION_TEST(IDF_FILE DaylightingDeviceShelf.idf EPW_FILE USA_IL_Chicago-
 ADD_SIMULATION_TEST(IDF_FILE DaylightingDeviceTubular.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DesiccantCVRh.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DesiccantCVRhZoneRHCtrl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE DesiccantCVRhZoneRHCtrl_AddedAutosize.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DesiccantDehumidifierWithCompanionCoil.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DirectIndirectEvapCoolers.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DirectIndirectEvapCoolersVSAS.idf EPW_FILE USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw)
