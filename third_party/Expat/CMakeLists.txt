@@ -14,9 +14,9 @@ lib/xmltok_impl.c
 lib/xmltok_ns.c
 )
 
-if(WIN32)
+if(MSVC)
   set(epexpat_SRCS ${epexpat_SRCS} lib/libexpat.def)
-endif(WIN32)
+endif(MSVC)
 
 IF( MSVC )
   ADD_DEFINITIONS( "/w" )
