@@ -194,6 +194,8 @@ SET( SRC
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
   EnergyPlus.hh
+  EnergyPlusPgm.hh
+  EnergyPlusPgm.cc
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
   EvaporativeFluidCoolers.cc
@@ -516,26 +518,29 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
-ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
-if ( MAKE_ENERGYPLUS_LIBRARY )
-  ADD_LIBRARY(EnergyPlus SHARED main.cc main.hh)
-  ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
-  if (UNIX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-  endif()
-  ADD_EXECUTABLE(Test program.cc)
-  TARGET_LINK_LIBRARIES( Test EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
-else()
-  ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
+add_library( EnergyPlusLib SHARED ${SRC} )
+target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( EnergyPlusLib dl )
+endif()
+set_target_properties(
+  EnergyPlusLib
+  PROPERTIES
+  INSTALL_NAME_DIR "@executable_path"
+)
+install( TARGETS EnergyPlusLib 
+  RUNTIME DESTINATION ./ 
+  LIBRARY DESTINATION ./ 
+)
+
+add_executable( EnergyPlus main.cc )
+target_link_libraries( EnergyPlus EnergyPlusLib )
+install( TARGETS EnergyPlus DESTINATION ./ )
+
+if( BUILD_TESTING )
+  add_executable( EnergyPlusLib_tests program.cc )
+  target_link_libraries( EnergyPlusLib_tests EnergyPlusLib )
+  # Currently the EnergyPlusLib_tests runner does not exit. Give it an idf and supporting files so that it will run.
+  # add_test( NAME integration.EnergyPlusLib_tests COMMAND EnergyPlusLib_tests WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" )
 endif()
 
-TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
-
-if(CMAKE_HOST_UNIX)
-  if(NOT APPLE)
-    TARGET_LINK_LIBRARIES( EnergyPlus dl )
-  endif()
-endif()
-
-
-INSTALL( TARGETS EnergyPlus DESTINATION ./ )

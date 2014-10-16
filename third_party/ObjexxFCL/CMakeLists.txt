@@ -4,11 +4,8 @@ if(MSVC)
   ADD_DEFINITIONS("-Za") # Disables MS language extensions
 endif()
 
-if ( MAKE_ENERGYPLUS_LIBRARY )
-  ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
-  if (UNIX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-  endif()
+if (UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 
 set(src

@@ -33,8 +33,6 @@ DisplayString( std::string const & String ) // String to be displayed
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
-	using DataGlobals::IsDLL;
-	using DataGlobals::IsMessageCallback;
 	using DataGlobals::fMessagePtr;
 	using DataSystemVariables::DeveloperFlag;
 
@@ -52,10 +50,7 @@ DisplayString( std::string const & String ) // String to be displayed
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
 
-	if (IsDLL && IsMessageCallback)
-	{
-		fMessagePtr(String);
-	}
+	fMessagePtr(String);
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << '\n';
@@ -88,8 +83,6 @@ DisplayNumberAndString(
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
 	using DataSystemVariables::DeveloperFlag;
-	using DataGlobals::IsDLL;
-	using DataGlobals::IsMessageCallback;
 	using DataGlobals::fMessagePtr;
 	
 	// Locals
@@ -104,12 +97,9 @@ DisplayNumberAndString(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	if (IsDLL && IsMessageCallback)
-	{
-		std::stringstream sstm;
-		sstm << String << " " << Number;
-		fMessagePtr( sstm.str() );
-	}
+	std::stringstream sstm;
+	sstm << String << " " << Number;
+	fMessagePtr( sstm.str() );
 	
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << ' ' << Number << '\n';
@@ -140,8 +130,6 @@ DisplaySimDaysProgress( // This doesn't do anything!
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
-	using DataGlobals::IsDLL;
-	using DataGlobals::IsProgressCallback;
 	using DataGlobals::fProgressPtr;
 	using DataSystemVariables::DeveloperFlag;
 
@@ -168,10 +156,7 @@ DisplaySimDaysProgress( // This doesn't do anything!
 		percent = 0;
 	}
 
-	if (IsDLL && IsProgressCallback)
-	{
-		fProgressPtr( percent );
-	}
+	fProgressPtr( percent );
 
 }
 

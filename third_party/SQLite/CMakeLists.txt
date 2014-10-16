@@ -12,11 +12,8 @@ SET(SRC
   sqlite3.c
 ) 
 
-if ( MAKE_ENERGYPLUS_LIBRARY )
-  ADD_DEFINITIONS( " -DMAKE_ENERGYPLUS_LIBRARY " )
-  if (UNIX)
-    ADD_DEFINITIONS( " -fPIC " )
-  endif()
+if (UNIX)
+  ADD_DEFINITIONS( " -fPIC " )
 endif()
 
 ADD_LIBRARY( sqlite ${SRC} )
