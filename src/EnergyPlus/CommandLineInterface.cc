@@ -140,7 +140,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
 
-	opt.add("", 0, 1, 0, "Output directory path (default: current working directory)", "-d", "--output-directory");
+	opt.add("", 0, 1, 0, "Output directory path (default: INPUTFILE-output)", "-d", "--output-directory");
 
 	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
 
@@ -150,7 +150,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Run EPMacro", "-m", "--epmacro");
 
-	opt.add("", 0, 1, 0, "Prefix for output file names (default: same as input file name)", "-p", "--output-prefix");
+	opt.add("", 0, 1, 0, "Prefix for output file names (default: ep)", "-p", "--output-prefix");
 
 	opt.add("", 0, 0, 0, "Run ReadVarsESO", "-r", "--readvars");
 
@@ -160,7 +160,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Run ExpandObjects", "-x", "--expandobjects");
 
-	opt.example = "energyplus -w weather.epw -d output -r input.idf";
+	opt.example = "energyplus -w weather.epw -r input.idf";
 
 	std::string errorFollowUp = "Type 'energyplus --help' for usage.";
 
@@ -246,6 +246,12 @@ ProcessArgs(int argc, const char * argv[])
 		// Create directory if it doesn't already exist
 		makeDirectory(dirPathName);
 	}
+	else if (!legacyMode)
+	{
+		dirPathName = idfFileNameOnly + "-output" + pathChar;
+		// Create directory if it doesn't already exist
+		makeDirectory(dirPathName);
+	}
 
 	// File naming scheme
 	std::string outputFilePrefix;
@@ -255,7 +261,7 @@ ProcessArgs(int argc, const char * argv[])
 		outputFilePrefix = dirPathName + prefixOutName;
 	}
 	else if (!legacyMode)
-		outputFilePrefix = dirPathName + idfFileNameOnly;
+		outputFilePrefix = dirPathName + "ep";
 	else
 		outputFilePrefix = dirPathName + "eplus";
 
@@ -341,34 +347,34 @@ ProcessArgs(int argc, const char * argv[])
 		outputMtrFileName = outputFilePrefix + ".mtr";
 		outputRddFileName = outputFilePrefix + ".rdd";
 		outputShdFileName = outputFilePrefix + ".shd";
-		outputTblCsvFileName = outputFilePrefix + "Table.csv";
-		outputTblHtmFileName = outputFilePrefix + "Table.htm";
-		outputTblTabFileName = outputFilePrefix + "Table.tab";
-		outputTblTxtFileName = outputFilePrefix + "Table.txt";
-		outputTblXmlFileName = outputFilePrefix + "Table.xml";
-		outputAdsFileName = outputFilePrefix + "ADS.out";
+		outputTblCsvFileName = outputFilePrefix + "-table.csv";
+		outputTblHtmFileName = outputFilePrefix + "-table.htm";
+		outputTblTabFileName = outputFilePrefix + "-table.tab";
+		outputTblTxtFileName = outputFilePrefix + "-table.txt";
+		outputTblXmlFileName = outputFilePrefix + "-table.xml";
+		outputAdsFileName = outputFilePrefix + "-ads.out";
 		outputDfsFileName = outputFilePrefix + ".dfs";
 		outputDelightInFileName = "eplusout.delightin";
 		outputDelightOutFileName = "eplusout.delightout";
 		outputDelightEldmpFileName = "eplusout.delighteldmp";
 		outputDelightDfdmpFileName = "eplusout.delightdfdmp";
-		outputMapTabFileName = outputFilePrefix + "Map.tab";
-		outputMapCsvFileName = outputFilePrefix + "Map.csv";
-		outputMapTxtFileName = outputFilePrefix + "Map.txt";
+		outputMapTabFileName = outputFilePrefix + "-map.tab";
+		outputMapCsvFileName = outputFilePrefix + "-map.csv";
+		outputMapTxtFileName = outputFilePrefix + "-map.txt";
 		outputEddFileName = outputFilePrefix + ".edd";
 		outputIperrFileName = outputFilePrefix + ".iperr";
 		outputSlnFileName = outputFilePrefix + ".sln";
 		outputSciFileName = outputFilePrefix + ".sci";
 		outputWrlFileName = outputFilePrefix + ".wrl";
-		outputZszCsvFileName = outputFilePrefix + "Zsz.csv";
-		outputZszTabFileName = outputFilePrefix + "Zsz.tab";
-		outputZszTxtFileName = outputFilePrefix + "Zsz.txt";
-		outputSszCsvFileName = outputFilePrefix + "Ssz.csv";
-		outputSszTabFileName = outputFilePrefix + "Ssz.tab";
-		outputSszTxtFileName = outputFilePrefix + "Ssz.txt";
-		outputScreenCsvFileName = outputFilePrefix + "Screen.csv";
+		outputZszCsvFileName = outputFilePrefix + "-zsz.csv";
+		outputZszTabFileName = outputFilePrefix + "-zsz.tab";
+		outputZszTxtFileName = outputFilePrefix + "-zsz.txt";
+		outputSszCsvFileName = outputFilePrefix + "-ssz.csv";
+		outputSszTabFileName = outputFilePrefix + "-ssz.tab";
+		outputSszTxtFileName = outputFilePrefix + "-ssz.txt";
+		outputScreenCsvFileName = outputFilePrefix + "-screen.csv";
 		outputSqlFileName = outputFilePrefix + ".sql";
-		outputSqliteErrFileName = outputFilePrefix + "SQLite.err";
+		outputSqliteErrFileName = outputFilePrefix + "-sqlite.err";
 		outputDbgFileName = outputFilePrefix + ".dbg";
 		EnergyPlusIniFileName = "Energy+.ini";
 		inStatFileName = weatherFilePathWithoutExtension + ".stat";
