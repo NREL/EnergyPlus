@@ -30,15 +30,42 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
                 "${BINARY_DIR}/Energy+.idd" 
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/Energy+.idd" )
 
-if(BUILD_FORTRAN)
+# Read the file contents to check for special cases
+file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" IDF_CONTENT)
 
-  # Will want to add EPMacro here eventually
+# Handle setting up datasets files first
+string( FIND "${IDF_CONTENT}" "Window5DataFile.dat" WINDOW_RESULT )
+if ( "${WINDOW_RESULT}" GREATER -1 )
+  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
+  file( COPY "${SOURCE_DIR}/datasets/Window5DataFile.dat" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
+endif ()
+
+# Handle setting up TDV dataset files next
+string(FIND "${IDF_CONTENT}" "TDV" TDV_RESULT)
+if ( "${TDV_RESULT}" GREATER -1 )
+  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
+  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/TDV" )
+  file( COPY "${SOURCE_DIR}/datasets/TDV/" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/TDV/" )
+endif ()
+
+# Handle setting up External Interface FMU-import files next
+# Note we only have FMUs for Win32 in the repo, this should be improved
+string(FIND "${IDF_CONTENT}" "ExternalInterface:" EXTINT_RESULT)
+if ( "${EXTINT_RESULT}" GREATER -1 )
+  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets" )
+  file( MAKE_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/FMUs" )
+  file( COPY "${SOURCE_DIR}/datasets/FMUs/" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/FMUs/" )
+endif ()
+
+if(BUILD_FORTRAN)
+  
+  # EPMacro should run here first
+  
+  # Ground heat transfer objects
   
   # Parametric preprocessor next
-  file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" IDF_CONTENT)
-  string(TOLOWER $IDF_CONTENT idf_content_lower)
-  string(FIND "${idf_content_lower}" "parametric:" PAR_RESULT)
-  if ( NOT $PAR_RESULT EQUAL -1 )
+  string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
+  if ( "${PAR_RESULT}" GREATER -1 )
     find_program(PARAMETRIC_EXE parametricpreprocessor PATHS "${BINARY_DIR}/Products/" 
       NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
     message("Executing ParametricPreprocessor from ${PARAMETRIC_EXE}")
@@ -63,6 +90,14 @@ if(BUILD_FORTRAN)
     endif ()
 
   endif ()
+  
+  # Need to copy in Slab/Basement IDDs before ExpandObjects if relevant for this file
+ # string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Control" GHT_RESULT)
+ # if ( "${GHT_RESULT}" GREATER -1 )
+ #   file ( COPY "${SOURCE_DIR}/idd/SlabGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+ #   file ( COPY "${SOURCE_DIR}/idd/BasementGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+ #   file ( COPY "${BINARY_DIR}/Products/Slab" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+ # endif ()
       
   # ExpandObjects (and other preprocessors) as necessary
   find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/" 
