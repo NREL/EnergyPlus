@@ -61,8 +61,7 @@ if(BUILD_FORTRAN)
   
   # EPMacro should run here first
   
-  # Ground heat transfer objects
-  
+    
   # Parametric preprocessor next
   string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
   if ( "${PAR_RESULT}" GREATER -1 )
@@ -89,28 +88,54 @@ if(BUILD_FORTRAN)
     
     endif ()
 
-  endif ()
-  
-  # Need to copy in Slab/Basement IDDs before ExpandObjects if relevant for this file
- # string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Control" GHT_RESULT)
- # if ( "${GHT_RESULT}" GREATER -1 )
- #   file ( COPY "${SOURCE_DIR}/idd/SlabGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
- #   file ( COPY "${SOURCE_DIR}/idd/BasementGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
- #   file ( COPY "${BINARY_DIR}/Products/Slab" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
- # endif ()
-      
+  endif () # parametric preprocessor definitions detected
+        
   # ExpandObjects (and other preprocessors) as necessary
   find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/" 
     NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   message("Executing ExpandObjects from ${EXPANDOBJECTS_EXE}")
   execute_process(COMMAND "${EXPANDOBJECTS_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+  
   if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf")
+  
+    # Copy the expanded idf into in.idf, which could be updated with ground stuff as well
     if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
         file(REMOVE "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
     endif()
     file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/expanded.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
-  endif()
-endif()
+
+    # i f we have an expanded.idf, then ExpandObjects must have found something
+    # it is possible this includes ground heat transfer objects, so run them here if needed
+    # Need to copy in Slab/Basement IDDs before ExpandObjects if relevant for this file
+    string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Slab" SLAB_RESULT)
+    if ( "${SLAB_RESULT}" GREATER -1 )
+      file ( COPY "${SOURCE_DIR}/idd/SlabGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+      # Find and run slab
+      find_program(SLAB_EXE Slab PATHS "${BINARY_DIR}/Products/" 
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+      message("Executing Slab from ${SLAB_EXE}")
+      execute_process(COMMAND "${SLAB_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+      # Then copy slab results into the expanded file
+      file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/SLABSurfaceTemps.TXT" SLAB_CONTENTS)
+      file(APPEND "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" "${SLAB_CONTENTS}")
+    endif ()
+    
+    string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Basement" BASEMENT_RESULT)
+    if ( "${BASEMENT_RESULT}" GREATER -1 )
+      file ( COPY "${SOURCE_DIR}/idd/BasementGHT.idd" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+      # Find and run basement
+      find_program(BASEMENT_EXE Basement PATHS "${BINARY_DIR}/Products/" 
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+      message("Executing Basement from ${BASEMENT_EXE}")
+      execute_process(COMMAND "${BASEMENT_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+      # Then copy basement results into the expanded file
+      file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/EPObjects.TXT" BASEMENT_CONTENTS)
+      file(APPEND "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" "${BASEMENT_CONTENTS}")
+    endif ()
+
+  endif() # expand objects found something and created expanded.idf
+  
+endif() # build fortran
 
 
 if( WIN32 )

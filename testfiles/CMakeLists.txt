@@ -14,6 +14,8 @@ ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolledResLayers.idf EPW_FILE 94810-1956.
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_DD2009.idf EPW_FILE 94810-1953-1957.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_DDChanges.idf EPW_FILE 94810-1953-1957.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_FCfactor_Slab_UGWall.idf EPW_FILE 94810-1953-1957.epw)
+ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneWith14ControlledHeat-CoolPanels.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 4ZoneWithShading_Simple_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 4ZoneWithShading_Simple_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
@@ -52,6 +54,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneReturnFan.idf EPW_FILE USA_IL_Chicago-OHare.In
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSteamBaseboard.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSupRetPlenRAB.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSupRetPlenVSATU.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5ZoneTDV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed_DCV_MaxZd.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed_DCV_MultiPath.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -462,11 +465,6 @@ ADD_SIMULATION_TEST(IDF_FILE _SmallOffice_Dulles.idf EPW_FILE USA_IL_Chicago-OHa
 ADD_SIMULATION_TEST(IDF_FILE _VAVSingleDuctConstFlowBoiler_otherfuel.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE gasAbsorptionChillerHeater.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 
-# External dataset files
-ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_1.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_2.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE 5ZoneTDV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-
 # External interface files -- note we only have Windows 32-bit FMUs
 if ( MSVC AND ("${CMAKE_SIZEOF_VOID_P}" EQUAL "4") )
   ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-actuator.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -505,6 +503,6 @@ IF (BUILD_FORTRAN)
     ADD_SIMULATION_TEST(IDF_FILE 1ZoneParameterAspect.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
     ADD_SIMULATION_TEST(IDF_FILE ParametricInsulation-5ZoneAirCooled.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
     # Basement/slab dependent files
-    #ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooledWithSlab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-    #ADD_SIMULATION_TEST(IDF_FILE LgOffVAVusingBasement.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+    ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooledWithSlab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+    ADD_SIMULATION_TEST(IDF_FILE LgOffVAVusingBasement.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ENDIF ()
