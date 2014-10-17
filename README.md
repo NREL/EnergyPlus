@@ -1,4 +1,4 @@
-EnergyPlusTeam
+EnergyPlus
 ==================
 
 This is the EnergyPlus Development Repository.  
