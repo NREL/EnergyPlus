@@ -5,12 +5,6 @@
 #endif
 #endif
 
-//Standard C++ library
-#include <iostream>
-#include <unistd.h>
-#include <fstream>
-// CLI Headers
-
 // ObjexxFCL Headers
 #include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/FArray1D.hh>
@@ -45,7 +39,7 @@ main(int argc, const char * argv[])
 
 	//      NOTICE
 
-	//      Copyright � 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
+	//      Copyright (c) 1996-2014 The Board of Trustees of the University of Illinois and The Regents of the
 	//      University of California through Ernest Orlando Lawrence Berkeley National Laboratory.  All rights
 	//      reserved.
 
@@ -120,11 +114,11 @@ main(int argc, const char * argv[])
 	//      (Conjunction Of Multizone Infiltration Specialists) developed by a multinational, multi-institutional
 	//      effort under the auspices of the International Energy Agency's Buildings and Community Systems Agreement
 	//      working group focusing on multizone air flow modeling (Annex 23) and now administered by the Swiss Federal
-	//      Laboratories for Materials Testing and Research (EMPA), Division 175, �berlandstrasse 129, CH-8600 D�bendorf,
+	//      Laboratories for Materials Testing and Research (EMPA), Division 175, Uberlandstrasse 129, CH-8600 Dubendorf,
 	//      Switzerland.
 
 	//      The EnergyPlus v1.2 model for displacement ventilation and cross-ventilation was developed
-	//      by Guilherme Carrilho da Gra�a and Paul Linden of the Department of Mechanical and Aerospace
+	//      by Guilherme Carrilho da Graca and Paul Linden of the Department of Mechanical and Aerospace
 	//      Engineering, University of California, San Diego.
 
 	//      The EnergyPlus models for UFAD served zones were developed by Anna Liu and Paul Linden at the Department
@@ -390,12 +384,11 @@ main(int argc, const char * argv[])
 			gio::close( fileUnitNumber );
     	}
 
-    	std::string ReadVars = "ReadVarsESO";
-    	std::string ReadVarsRVI = exeDirectory + ReadVars + " " + RVIfile + " unlimited";
-    	std::string ReadVarsMVI = exeDirectory + ReadVars + " " + MVIfile + " unlimited";
+    	std::string readVarsRviCommand = "\"" + exeDirectory + "ReadVarsESO\"" + " " + RVIfile + " unlimited";
+    	std::string readVarsMviCommand = "\"" + exeDirectory + "ReadVarsESO\"" + " " + MVIfile + " unlimited";
 
-    	systemCall(ReadVarsRVI);
-    	systemCall(ReadVarsMVI);
+    	systemCall(readVarsRviCommand);
+    	systemCall(readVarsMviCommand);
 
 	    if (!rviFileExists)
 	    	removeFile(RVIfile.c_str());
@@ -408,7 +401,7 @@ main(int argc, const char * argv[])
 	}
 
 	EndEnergyPlus();
-    
+
     return 0;
 }
 

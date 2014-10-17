@@ -493,7 +493,7 @@ ProcessArgs(int argc, const char * argv[])
 
 		if (!inputFileNamedIn)
 			linkFile(inputIdfFileName.c_str(), "in.imf");
-		std::string epMacroCommand = exeDirectory + "EPMacro";
+		std::string epMacroCommand = "\"" + exeDirectory + "EPMacro\"";
 		DisplayString("Running EPMacro...");
 		systemCall(epMacroCommand);
 		if (!inputFileNamedIn)
@@ -510,7 +510,7 @@ ProcessArgs(int argc, const char * argv[])
 		bool iddFileNamedEnergy =
 				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 
-		std::string expandObjectsCommand = exeDirectory + "ExpandObjects";
+		std::string expandObjectsCommand = "\"" + exeDirectory + "ExpandObjects\"";
 		if (!inputFileNamedIn)
 			linkFile(inputIdfFileName.c_str(), "in.idf");
 		if (!iddFileNamedEnergy)

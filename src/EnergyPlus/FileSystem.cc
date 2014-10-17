@@ -6,7 +6,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#endif
+
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #endif
@@ -41,7 +47,11 @@ std::string
 getAbsolutePath( std::string const& filePath )
 {
 	char absolutePath[1024];
+#ifdef _WIN32
+	GetFullPathName(filePath.c_str(), sizeof(absolutePath), absolutePath, NULL);
+#else
 	realpath(filePath.c_str(), absolutePath);
+#endif
 	return std::string(absolutePath);
 }
 
@@ -49,11 +59,14 @@ std::string
 getProgramPath()
 {
 	char executableRelativePath[1024];
+
 #ifdef __APPLE__
 	uint32_t pathSize = sizeof(executableRelativePath);
 	_NSGetExecutablePath(executableRelativePath, &pathSize);
 #elif __linux__
 	readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
+#elif _WIN32
+	GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif
 
 	return std::string(executableRelativePath);
@@ -84,7 +97,11 @@ makeDirectory(std::string directoryName)
 		}
 	}
 	else { // directory does not already exist
+#ifdef _WIN32
+		CreateDirectory(directoryName.c_str(), NULL);
+#else
 		mkdir(directoryName.c_str(), 0755);
+#endif
 	}
 }
 
@@ -108,7 +125,11 @@ removeFile(std::string fileName)
 void
 linkFile(std::string fileName, std::string link)
 {
+#ifdef _WIN32
+	CopyFile(fileName.c_str(), link.c_str(), false);
+#else
 	symlink(fileName.c_str(), link.c_str());
+#endif
 }
 
 }
