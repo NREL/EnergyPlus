@@ -5,6 +5,7 @@
 #include <ObjexxFCL/FArray1S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlusAPI.hh>
 #include <EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -26,6 +27,7 @@ namespace SortAndStringUtilities {
 	// Functions
 
 	void
+	ENERGYPLUSLIB_API
 	SetupAndSort(
 		FArray1S_string Alphas, // Alphas to be sorted
 		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted

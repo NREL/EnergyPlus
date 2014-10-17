@@ -196,6 +196,7 @@ SET( SRC
   EnergyPlus.hh
   EnergyPlusPgm.hh
   EnergyPlusPgm.cc
+  EnergyPlusAPI.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
   EvaporativeFluidCoolers.cc
@@ -535,7 +536,11 @@ install( TARGETS EnergyPlusLib
 
 add_executable( EnergyPlus main.cc )
 target_link_libraries( EnergyPlus EnergyPlusLib )
-install( TARGETS EnergyPlus DESTINATION ./ )
+
+set_target_properties(EnergyPlus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(EnergyPlusLib PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+
+install( TARGETS EnergyPlus EnergyPlusLib DESTINATION ./ )
 
 if( BUILD_TESTING )
   add_executable( EnergyPlusLib_tests test_ep_as_library.cc )

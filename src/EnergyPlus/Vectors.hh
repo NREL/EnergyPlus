@@ -6,6 +6,7 @@
 #include <ObjexxFCL/FArray1S.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlusAPI.hh>
 #include <EnergyPlus.hh>
 #include <DataVectorTypes.hh>
 
@@ -29,6 +30,7 @@ namespace Vectors {
 	// Functions
 
 	Real64
+	ENERGYPLUSLIB_API
 	AreaPolygon(
 		int const n,
 		FArray1A< Vector > p
@@ -44,9 +46,10 @@ namespace Vectors {
 	VecNegate( Vector const & vec );
 
 	Vector
+	ENERGYPLUSLIB_API
 	VecNormalize( Vector const & vec );
 
-	void
+	void ENERGYPLUSLIB_API
 	VecRound(
 		Vector & vec,
 		Real64 const roundto

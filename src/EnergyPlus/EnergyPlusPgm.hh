@@ -1,14 +1,10 @@
 #ifndef EnergyPlusPgm_hh_INCLUDED
 #define EnergyPlusPgm_hh_INCLUDED
 
+#include <EnergyPlusAPI.hh>
+
 // C++ Headers
 #include <string>
-
-#ifdef _WIN32
-#define EXPORT __declspec(dllexport)
-#else
-#define EXPORT 
-#endif
 
 	// Functions
 
@@ -23,13 +19,13 @@
 		std::string & DataOut // Output from the retrieval
 	);
 
-	void EXPORT
+	void ENERGYPLUSLIB_API
 	EnergyPlusPgm( std::string filepath = std::string() );
 
-	void EXPORT
+	void ENERGYPLUSLIB_API
 	StoreProgressCallback( void ( *f )( int ) );
 
-	void EXPORT
+	void ENERGYPLUSLIB_API
 	StoreMessageCallback( void ( *f )( std::string ) );
 
 #endif
