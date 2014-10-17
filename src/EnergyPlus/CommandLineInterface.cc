@@ -212,7 +212,7 @@ ProcessArgs(int argc, const char * argv[])
 			inputIdfFileName = arg;
 		}
 	}
-	if(inputIdfFileName.empty())
+	if(opt.lastArgs.size() == 0)
 		inputIdfFileName = "in.idf";
 
 	if(opt.lastArgs.size() > 1){
@@ -225,11 +225,6 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if(opt.lastArgs.size() == 0 && !legacyMode){
-		DisplayString("ERROR: No input file provided.");
-		DisplayString(errorFollowUp);
-		exit(EXIT_FAILURE);
-	}
 	idfFileNameOnly = removeFileExtension(getFileName(inputIdfFileName));
 	idfDirPathName = getDirectoryPath(inputIdfFileName);
 
@@ -467,17 +462,25 @@ ProcessArgs(int argc, const char * argv[])
 	// Check if specified files exist
 	{ IOFlags flags; gio::inquire( inputIddFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		ShowFatalError( "EnergyPlus: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
+		DisplayString("ERROR: Could not find input data dictionary: " + getAbsolutePath(inputIddFileName) + "." );
+		DisplayString(errorFollowUp);
+		exit(EXIT_FAILURE);
 	}
 
 	{ IOFlags flags; gio::inquire( inputIdfFileName, flags ); FileExists = flags.exists(); }
 	if ( ! FileExists ) {
-		ShowFatalError( "EnergyPlus: Could not find input data file: " + getAbsolutePath(inputIdfFileName) + "." );
+		DisplayString("ERROR: Could not find input data file: " + getAbsolutePath(inputIdfFileName) + "." );
+		DisplayString(errorFollowUp);
+		exit(EXIT_FAILURE);
 	}
 
-	{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); FileExists = flags.exists(); }
-	if ( ! FileExists ) {
-		ShowFatalError( "EnergyPlus: Could not find weather file: " + getAbsolutePath(inputWeatherFileName) + "." );
+	if (opt.isSet("-w")) {
+		{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); FileExists = flags.exists(); }
+		if ( ! FileExists ) {
+			DisplayString("ERROR: Could not find weather file: " + getAbsolutePath(inputWeatherFileName) + "." );
+			DisplayString(errorFollowUp);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	OutputFileDebug = GetNewUnitNumber();

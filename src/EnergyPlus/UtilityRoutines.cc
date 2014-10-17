@@ -90,7 +90,6 @@ AbortEnergyPlus()
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
 	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const OutFmt( "('Press ENTER to continue after reading above message>')" );
 	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
