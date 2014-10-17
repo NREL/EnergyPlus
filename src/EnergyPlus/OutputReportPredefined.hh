@@ -81,7 +81,8 @@ namespace OutputReportPredefined {
 	extern int pdchDXCoolCoilIEERIP; // IEER value in IP unit at AHRI std. 340/360 conditions
 
 	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
-	extern int pdchDXCoolCoilTestClass; // Standard Rated Test Class Number
+	extern int pdstDXCoolCoil2;
+	//extern int pdchDXCoolCoilTestClass; // Standard Rated Test Class Number
 	extern int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
 	extern int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
 	extern int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B

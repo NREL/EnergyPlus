@@ -727,7 +727,8 @@ namespace StandardRatings {
 		Optional< Real64 const > MinOATCompressor, // Minimum OAT for heat pump compressor operation [C] //Autodesk:OPTIONAL Used without PRESENT check
 		Optional< Real64 const > OATempCompressorOn, // The outdoor temperature when the compressor is automatically turned //Autodesk:OPTIONAL Used without PRESENT check
 		Optional_bool_const OATempCompressorOnOffBlank, // Flag used to determine low temperature cut out factor //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const DefrostControl // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_int_const DefrostControl, // defrost control; 1=timed, 2=on-demand //Autodesk:OPTIONAL Used without PRESENT check
+		Optional_bool_const ASHRAE127StdRprt // true if user wishes to report ASHRAE 127 standard ratings
 	)
 	{
 
@@ -920,11 +921,10 @@ namespace StandardRatings {
 			// Writes the net rated cooling capacity, SEER, EER and IEER values to the EIO file and standard tabular output tables
 			ReportDXCoilRating( DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated( 1 ), SEER * ConvFromSIToIP, EER, EER * ConvFromSIToIP, IEER * ConvFromSIToIP, NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF * ConvFromSIToIP, RegionNum );
 
-			// temporarily commented until issues with table formt is resolved 
-			//DXCoolingCoilDataCenterStandardRatings( DXCoilName, DXCoilType, CapFTempCurveIndex( 1 ), CapFFlowCurveIndex( 1 ), EIRFTempCurveIndex( 1 ), EIRFFlowCurveIndex( 1 ), PLFFPLRCurveIndex( 1 ), RatedTotalCapacity( 1 ), RatedCOP( 1 ), RatedAirVolFlowRate( 1 ), FanPowerPerEvapAirFlowRateFromInput( 1 ), NetTotCoolingCapRated, TotElectricPowerRated );
-			//
-			//ReportDXCoolCoilDataCenterApplication( DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated );
-
+			if ( ASHRAE127StdRprt ) {
+				DXCoolingCoilDataCenterStandardRatings( DXCoilName, DXCoilType, CapFTempCurveIndex( 1 ), CapFFlowCurveIndex( 1 ), EIRFTempCurveIndex( 1 ), EIRFFlowCurveIndex( 1 ), PLFFPLRCurveIndex( 1 ), RatedTotalCapacity( 1 ), RatedCOP( 1 ), RatedAirVolFlowRate( 1 ), FanPowerPerEvapAirFlowRateFromInput( 1 ), NetTotCoolingCapRated, TotElectricPowerRated );			
+				ReportDXCoolCoilDataCenterApplication( DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated );
+			}
 		} else if ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) { // Coil:Heating:DX:SingleSpeed
 
 			CheckCurveLimitsForStandardRatings( DXCoilName, DXCoilType, DXCoilType_Num, CapFTempCurveIndex( 1 ), CapFFlowCurveIndex( 1 ), EIRFTempCurveIndex( 1 ), EIRFFlowCurveIndex( 1 ), PLFFPLRCurveIndex( 1 ) );
@@ -2226,8 +2226,8 @@ namespace StandardRatings {
 		static std::string CompNameNew;
 
 		// Formats
-		static gio::Fmt const Format_101( "('! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Class, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, ','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric Power Test D {W} ')" );
-		static gio::Fmt const Format_102( "(' DX Cooling Coil Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
+		static gio::Fmt const Format_101( "('! <DX Cooling Coil ASHRAE 127 Standard Rating Information>, Component Type, Component Name, Class, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, ','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric Power Test D {W} ')" );
+		static gio::Fmt const Format_102( "(' DX Cooling Coil ASHRAE 127 Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
 
 
 		{ auto const SELECT_CASE_var( CompTypeNum );
@@ -2241,12 +2241,10 @@ namespace StandardRatings {
 			for ( ClassNum = 1; ClassNum <= 4; ++ClassNum ) {			
 				Num = ( ClassNum - 1 ) * 4;
 				ClassName = "Class " + RoundSigDigits(ClassNum);
-				//CompNameNew = CompName + RoundSigDigits( ClassNum );
-				CompNameNew = RoundSigDigits( ClassNum );
+				CompNameNew = CompName + "(" + ClassName + ")";
 				gio::write( OutputFileInits, Format_102 ) << CompType << CompName << ClassName << RoundSigDigits( NetCoolingCapRated( Num + 1 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 1 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 2 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 2 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 3 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 3 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 4 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 4 ), 1 );
+				PreDefTableEntry( pdchDXCoolCoilType, CompName, CompType );
 				PreDefTableEntry( pdchDXCoolCoilType, CompNameNew, CompType );
-				//PreDefTableEntry( pdchDXCoolCoilTestClass, CompNameNew, RoundSigDigits( ClassNum ) );
-				PreDefTableEntry( pdchDXCoolCoilTestClass, CompNameNew, ClassName );
 				PreDefTableEntry( pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits( NetCoolingCapRated( Num + 1 ), 1 ) );
 				PreDefTableEntry( pdchDXCoolCoilElecPowerA, CompNameNew, RoundSigDigits( TotElectricPowerRated( Num + 1 ), 1 ) );
 				PreDefTableEntry( pdchDXCoolCoilNetCapSIB, CompNameNew, RoundSigDigits( NetCoolingCapRated( Num + 2 ), 1 ) );
@@ -2255,7 +2253,7 @@ namespace StandardRatings {
 				PreDefTableEntry( pdchDXCoolCoilElecPowerC, CompNameNew, RoundSigDigits( TotElectricPowerRated( Num + 3 ), 1 ) );
 				PreDefTableEntry( pdchDXCoolCoilNetCapSID, CompNameNew, RoundSigDigits( NetCoolingCapRated( Num + 4 ), 1 ) );
 				PreDefTableEntry( pdchDXCoolCoilElecPowerD, CompNameNew, RoundSigDigits( TotElectricPowerRated( Num + 4 ), 1 ) );
-				addFootNoteSubTable( pdstDXCoolCoil, "Standard Ratings for Room Unitary Air Conditioners DX Cooling Coils per ANSI/ASHRAE Standard 127-2012." );
+				addFootNoteSubTable( pdstDXCoolCoil2, "ANSI/ASHRAE Standard 127 includes supply fan heat effect and electric power." );
 			}
 
 		} else {

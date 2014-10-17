@@ -40167,14 +40167,21 @@ Coil:Cooling:DX:SingleSpeed,
        \note wb = entering wet-bulb temperature seen by the DX cooling coil (C)
        \note db = entering dry-bulb temperature seen by the DX cooling coil (C)
        \note entering temperature can be outside air or pretreated air.
-  A16; \field Sensible Heat Ratio Function of Flow Fraction Curve Name
+  A16, \field Sensible Heat Ratio Function of Flow Fraction Curve Name
        \type object-list
        \object-list QuadraticCubicCurves
        \note Table:OneIndependentVariable object can also be used
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
        \note ff = fraction of the full load flow
-
+  A17; \field Report ASHRAE Standard 127 Performance Ratings
+       \type choice
+       \key Yes
+       \key No
+       \default No
+       \note when this input field is specified as Yes then the program calculates the net cooling 
+       \note capacity and total electric power input of DX cooling coils per ANSI/ASHRAE 127.
+   
 Coil:Cooling:DX:TwoSpeed,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), two-speed (or variable-speed). Requires two sets of performance
