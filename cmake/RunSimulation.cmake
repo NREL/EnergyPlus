@@ -15,12 +15,13 @@ else()
 endif()
 
 get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
+get_filename_component(IDF_EXT "${IDF_FILE}" EXT)
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${BINARY_DIR}/testfiles/${IDF_NAME}" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
                 "${SOURCE_DIR}/testfiles/${IDF_FILE}" 
-                "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" )
+                "${BINARY_DIR}/testfiles/${IDF_NAME}/in${IDF_EXT}" )
 
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy 
                 "${SOURCE_DIR}/weather/${EPW_FILE}" 
@@ -31,7 +32,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" -E copy
                 "${BINARY_DIR}/testfiles/${IDF_NAME}/Energy+.idd" )
 
 # Read the file contents to check for special cases
-file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf" IDF_CONTENT)
+file(READ "${BINARY_DIR}/testfiles/${IDF_NAME}/in${IDF_EXT}" IDF_CONTENT)
 
 # Handle setting up datasets files first
 string( FIND "${IDF_CONTENT}" "Window5DataFile.dat" WINDOW_RESULT )
@@ -58,9 +59,22 @@ if ( "${EXTINT_RESULT}" GREATER -1 )
 endif ()
 
 if(BUILD_FORTRAN)
-  
   # EPMacro should run here first
-  
+  if( "${IDF_EXT}" STREQUAL ".imf" )
+    if( UNIX AND NOT APPLE )
+      find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Linux" 
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    elseif( APPLE )
+      find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Mac" 
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    else() # windows
+      find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Windows" 
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    endif()
+    message("Executing EPMacro from ${EPMACRO_EXE}")
+    execute_process(COMMAND "${EPMACRO_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+    file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/out.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
+  endif()
     
   # Parametric preprocessor next
   string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
