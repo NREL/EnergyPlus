@@ -10,11 +10,13 @@ This is the EnergyPlus Development Repository.
  - For support questions, plese utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
 
 # Caution
-
 The transition to Github is still underway.  The wiki is still in flux as the final structure is formed.  There is valuable information there, but note it may change at any time.  The repository itself shouldn't change structure drastically, but note that like the information on the wiki, it could change at any time.
 
+# Releases
+Although iteration (pre-)releases will be posted to this repository during a development cycle, users should currently avoid these for active development, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.  If a release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will likely accompany this type of release.
+
 # Contributing Development
-EnergyPlus is an open-source project and the EnergyPlus team accepts contributions to EnergyPlus source, utilities, test files, documentation, and other materials distributed with the program.  If you actively do development that you'd like to contribute back to the project, be sure to visit <<DOE link to contributors webpage>> to learn more.
+EnergyPlus is an open-source project and the EnergyPlus team accepts contributions to EnergyPlus source, utilities, test files, documentation, and other materials distributed with the program.  If you actively do development that you'd like to contribute back to the project, you might start with a ticket on the Helpdesk to engage a developer to learn more.
 
 # Building Installer Packages
 
@@ -36,7 +38,7 @@ The C++ code in EnergyPlus utilizes many C++11 features, and so a modern compile
 6. Check the configuration settings, keeping them default should suffice, and click Generate.
 7. Browse to the build folder and there will be a Visual Studio solution file you can click on, and it will include multiple projects for each build target.  You should be able to build the E+ target directly.
 8. The solution will include the ZERO_CHECK project as the default target to run when you execute, so when you are ready to debug, manually set the default target to EnergyPlus.
-9. In the EnergyPlus and EnergyPlusLib projects: right click on each project and select Properties. Under Configuration Properties select Debugging. In the Enviroment field, enter "_NO_DEBUG_HEAP=1", without quote marks.
+9. In the EnergyPlus and EnergyPlusLib projects: right click on each project and select Properties. Under Configuration Properties select Debugging. In the Enviroment field, enter ```_NO_DEBUG_HEAP=1```, without quote marks.  The debug heap in Visual Studio doesn't play nicely with the input processor in EnergyPlus, and for debug builds, skipping this will result in a _very_ long IDD reading time.
 
 ## Linux
 
