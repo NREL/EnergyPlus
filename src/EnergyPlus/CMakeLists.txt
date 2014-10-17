@@ -533,7 +533,7 @@ endif()
 
 if(UNIX AND NOT APPLE)
   ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E chdir "${CMAKE_BINARY_DIR}/Products/" ln -s "energyplus" "EnergyPlus"
+  COMMAND cd \"${CMAKE_BINARY_DIR}/Products/\"\;if [ ! -f EnergyPlus ]\; then ln -s energyplus EnergyPlus\;fi
   ) 
 endif()
 

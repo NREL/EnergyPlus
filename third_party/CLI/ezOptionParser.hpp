@@ -1924,7 +1924,7 @@ void ezOptionParser::getUsageDescriptions(std::string & usage, int width, Layout
         usage.append("\n");
       }
 
-      if (this->doublespace) usage.append("\n");    
+      //if (this->doublespace) usage.append("\n");
       
       for(cIter=desc.begin(); cIter != desc.end(); ++cIter)    
         delete *cIter;

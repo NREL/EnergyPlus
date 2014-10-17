@@ -7,8 +7,9 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#ifdef __APPLE__
 #include <mach-o/dyld.h>
-
+#endif
 
 // EnergyPlus Headers
 #include <DataStringGlobals.hh>
@@ -47,8 +48,12 @@ std::string
 getProgramPath()
 {
 	char executableRelativePath[1024];
+#ifdef __APPLE__
 	uint32_t pathSize = sizeof(executableRelativePath);
 	_NSGetExecutablePath(executableRelativePath, &pathSize);
+#elif __linux__
+	readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
+#endif
 
 	return std::string(executableRelativePath);
 }
