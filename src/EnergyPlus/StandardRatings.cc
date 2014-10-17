@@ -903,9 +903,8 @@ namespace StandardRatings {
 		static Real64 NetHeatingCapRatedHighTemp( 0.0 ); // Net Rated heating capacity at high temp [W]
 		static Real64 NetHeatingCapRatedLowTemp( 0.0 ); // Net Rated heating capacity at low temp [W]
 		FArray1D< Real64 > NetCoolingCapRated( ns ); // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
-
-		FArray1D< Real64 > NetTotCoolingCapRated( 16 );
-		FArray1D< Real64 > TotElectricPowerRated( 16 );
+		FArray1D< Real64 > NetTotCoolingCapRated( 16 ); // net total cooling capacity of DX Coils for the sixteen ASHRAE Std 127 Test conditions
+		FArray1D< Real64 > TotElectricPowerRated( 16 ); // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
 
 		NetCoolingCapRated = 0.0;
 
@@ -921,9 +920,10 @@ namespace StandardRatings {
 			// Writes the net rated cooling capacity, SEER, EER and IEER values to the EIO file and standard tabular output tables
 			ReportDXCoilRating( DXCoilType, DXCoilName, DXCoilType_Num, NetCoolingCapRated( 1 ), SEER * ConvFromSIToIP, EER, EER * ConvFromSIToIP, IEER * ConvFromSIToIP, NetHeatingCapRatedHighTemp, NetHeatingCapRatedLowTemp, HSPF * ConvFromSIToIP, RegionNum );
 
-			DXCoolingCoilDataCenterStandardRatings( DXCoilName, DXCoilType, CapFTempCurveIndex( 1 ), CapFFlowCurveIndex( 1 ), EIRFTempCurveIndex( 1 ), EIRFFlowCurveIndex( 1 ), PLFFPLRCurveIndex( 1 ), RatedTotalCapacity( 1 ), RatedCOP( 1 ), RatedAirVolFlowRate( 1 ), FanPowerPerEvapAirFlowRateFromInput( 1 ), NetTotCoolingCapRated, TotElectricPowerRated );
-			
-			ReportDXCoolCoilDataCenterApplication( DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated );
+			// temporarily commented until issues with table formt is resolved 
+			//DXCoolingCoilDataCenterStandardRatings( DXCoilName, DXCoilType, CapFTempCurveIndex( 1 ), CapFFlowCurveIndex( 1 ), EIRFTempCurveIndex( 1 ), EIRFFlowCurveIndex( 1 ), PLFFPLRCurveIndex( 1 ), RatedTotalCapacity( 1 ), RatedCOP( 1 ), RatedAirVolFlowRate( 1 ), FanPowerPerEvapAirFlowRateFromInput( 1 ), NetTotCoolingCapRated, TotElectricPowerRated );
+			//
+			//ReportDXCoolCoilDataCenterApplication( DXCoilType, DXCoilName, DXCoilType_Num, NetTotCoolingCapRated, TotElectricPowerRated );
 
 		} else if ( SELECT_CASE_var == CoilDX_HeatingEmpirical ) { // Coil:Heating:DX:SingleSpeed
 
