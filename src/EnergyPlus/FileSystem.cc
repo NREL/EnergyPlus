@@ -12,8 +12,9 @@
 #endif
 
 // EnergyPlus Headers
-#include <DataStringGlobals.hh>
 #include <FileSystem.hh>
+#include <DataStringGlobals.hh>
+#include <DisplayRoutines.hh>
 
 
 namespace EnergyPlus{
@@ -75,7 +76,12 @@ makeDirectory(std::string directoryName)
 {
 	struct stat info;
 
-	if ( info.st_mode & S_IFDIR ){ // directory already exists
+	if ( stat(getAbsolutePath(directoryName).c_str(), &info) == 0){ // path already exists
+		if ( !(info.st_mode & S_IFDIR) )
+		{
+			DisplayString("ERROR: " + getAbsolutePath(directoryName) + " is not a directory.");
+			exit(EXIT_FAILURE);
+		}
 	}
 	else { // directory does not already exist
 		mkdir(directoryName.c_str(), 0755);
