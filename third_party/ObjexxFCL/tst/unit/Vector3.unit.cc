@@ -72,6 +72,15 @@ TEST( Vector3Test, InitializerList )
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
 	EXPECT_EQ( 17, v.z );
+	EXPECT_EQ( 33, v.x1() );
+	EXPECT_EQ( 52, v.x2() );
+	EXPECT_EQ( 17, v.x3() );
+	EXPECT_EQ( 33, v[ 0 ] );
+	EXPECT_EQ( 52, v[ 1 ] );
+	EXPECT_EQ( 17, v[ 2 ] );
+	EXPECT_EQ( 33, v( 1 ) );
+	EXPECT_EQ( 52, v( 2 ) );
+	EXPECT_EQ( 17, v( 3 ) );
 	v = { 44, 55, 66 };
 	EXPECT_EQ( 44, v.x );
 	EXPECT_EQ( 55, v.y );

@@ -570,7 +570,7 @@ public: // Subscript
 	T const &
 	operator ()( size_type const i ) const
 	{
-		assert( i <= 2 );
+		assert( ( 1 <= i ) && ( i <= 3 ) );
 		return ( i == 1 ? x : ( i == 2 ? y : z ) );
 	}
 
@@ -579,7 +579,7 @@ public: // Subscript
 	T &
 	operator ()( size_type const i )
 	{
-		assert( i <= 2 );
+		assert( ( 1 <= i ) && ( i <= 3 ) );
 		return ( i == 1 ? x : ( i == 2 ? y : z ) );
 	}
 
@@ -746,20 +746,52 @@ public: // Properties: General
 		);
 	}
 
-	// Data
+	// Alias for Element 1
 	inline
-	T const *
-	data() const
+	T const &
+	x1() const
 	{
-		return &x;
+		return x;
 	}
 
-	// Data
+	// Alias for Element 1
 	inline
-	T *
-	data()
+	T &
+	x1()
 	{
-		return &x;
+		return x;
+	}
+
+	// Alias for Element 2
+	inline
+	T const &
+	x2() const
+	{
+		return y;
+	}
+
+	// Alias for Element 2
+	inline
+	T &
+	x2()
+	{
+		return y;
+	}
+
+	// Alias for Element 3
+	inline
+	T const &
+	x3() const
+	{
+		return z;
+	}
+
+	// Alias for Element 3
+	inline
+	T &
+	x3()
+	{
+		return z;
 	}
 
 public: // Modifiers
@@ -1675,24 +1707,7 @@ private: // Methods
 
 public: // Data
 
-	// Coordinates: Alternate names provided in unions
-#pragma pack(push,1) // For use via data pointer
-	union {
-		T x;
-		T x1;
-		T x_1;
-	};
-	union {
-		T y;
-		T x2;
-		T x_2;
-	};
-	union {
-		T z;
-		T x3;
-		T x_3;
-	};
-#pragma pack(pop)
+	T x, y, z; // Elements
 
 }; // Vector3
 

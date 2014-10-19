@@ -513,7 +513,7 @@ public: // Subscript
 	T &
 	operator []( size_type const i )
 	{
-		assert( i <= 2 );
+		assert( i <= 1 );
 		return ( i == 0 ? x : y );
 	}
 
@@ -522,7 +522,7 @@ public: // Subscript
 	T const &
 	operator ()( size_type const i ) const
 	{
-		assert( i <= 2 );
+		assert( ( 1 <= i ) && ( i <= 2 ) );
 		return ( i == 1 ? x : y );
 	}
 
@@ -531,7 +531,7 @@ public: // Subscript
 	T &
 	operator ()( size_type const i )
 	{
-		assert( i <= 2 );
+		assert( ( 1 <= i ) && ( i <= 2 ) );
 		return ( i == 1 ? x : y );
 	}
 
@@ -694,20 +694,36 @@ public: // Properties: General
 		return ( x * v.y ) - ( y * v.x );
 	}
 
-	// Data
+	// Alias for Element 1
 	inline
-	T const *
-	data() const
+	T const &
+	x1() const
 	{
-		return &x;
+		return x;
 	}
 
-	// Data
+	// Alias for Element 1
 	inline
-	T *
-	data()
+	T &
+	x1()
 	{
-		return &x;
+		return x;
+	}
+
+	// Alias for Element 2
+	inline
+	T const &
+	x2() const
+	{
+		return y;
+	}
+
+	// Alias for Element 2
+	inline
+	T &
+	x2()
+	{
+		return y;
 	}
 
 public: // Modifiers
@@ -1476,9 +1492,9 @@ public: // Friends
 	T
 	angle( Vector2 const & a, Vector2 const & b )
 	{
-		T const axb( a.cross( b ) );
+		T const axb( std::abs( a.cross( b ) ) );
 		T const adb( a.dot( b ) );
-		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( std::abs( axb ), adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
+		return ( ( axb != T( 0 ) ) || ( adb != T( 0 ) ) ? bump_up_angle( std::atan2( axb, adb ) ) : T( 0 ) ); // More accurate than dot-based for angles near 0 and Pi
 	}
 
 	// Angle abc Formed by Three Vector2s (in Radians on [0,pi])
@@ -1618,19 +1634,7 @@ private: // Methods
 
 public: // Data
 
-	// Coordinates: Alternate names provided in unions
-#pragma pack(push,1) // For use via data pointer
-	union {
-		T x;
-		T x1;
-		T x_1;
-	};
-	union {
-		T y;
-		T x2;
-		T x_2;
-	};
-#pragma pack(pop)
+	T x, y; // Elements
 
 }; // Vector2
 

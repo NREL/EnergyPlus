@@ -21,6 +21,7 @@
 // C++ Headers
 #include <array>
 #include <cmath>
+#include <string>
 #include <vector>
 
 using namespace ObjexxFCL;
@@ -60,6 +61,12 @@ TEST( Vector2Test, InitializerList )
 	Vector2_int v( { 33, 52 } );
 	EXPECT_EQ( 33, v.x );
 	EXPECT_EQ( 52, v.y );
+	EXPECT_EQ( 33, v.x1() );
+	EXPECT_EQ( 52, v.x2() );
+	EXPECT_EQ( 33, v[ 0 ] );
+	EXPECT_EQ( 52, v[ 1 ] );
+	EXPECT_EQ( 33, v( 1 ) );
+	EXPECT_EQ( 52, v( 2 ) );
 	v = { 44, 55 };
 	EXPECT_EQ( 44, v.x );
 	EXPECT_EQ( 55, v.y );
@@ -302,4 +309,16 @@ TEST( Vector2Test, BinaryOperations )
 	Vector2_double const midpoint( mid( v, w ) );
 	EXPECT_DOUBLE_EQ( original.x, midpoint.x );
 	EXPECT_DOUBLE_EQ( original.y, midpoint.y );
+}
+
+TEST( Vector2Test, String )
+{
+	std::string const X( "X" );
+	Vector2_string v( X );
+	EXPECT_EQ( X, v.x );
+	EXPECT_EQ( X, v.y );
+	Vector2_string w;
+	w = v;
+	EXPECT_EQ( X, w.x );
+	EXPECT_EQ( X, w.y );
 }
