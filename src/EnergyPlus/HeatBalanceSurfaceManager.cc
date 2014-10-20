@@ -62,6 +62,7 @@
 #include <ScheduleManager.hh>
 #include <SolarShading.hh>
 #include <SteamBaseboardRadiator.hh>
+#include <SwimmingPool.hh>
 #include <ThermalComfort.hh>
 #include <UtilityRoutines.hh>
 #include <WindowEquivalentLayer.hh>
@@ -4992,6 +4993,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	using DataSizing::CurOverallSimDay;
 	using namespace DataTimings;
 	using WindowEquivalentLayer::EQLWindowOutsideEffectiveEmiss;
+	using SwimmingPool::SimSwimmingPool;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5250,10 +5252,11 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 
 			// Perform heat balance on the inside face of the surface ...
 			// The following are possibilities here:
-			//   (a) the surface is a partition, in which case the temperature of both sides are the same
-			//   (b) standard (or interzone) opaque surface with no movable insulation, normal heat balance equation
-			//   (c) standard (or interzone) window: call to CalcWindowHeatBalance to get window layer temperatures
-			//   (d) standard opaque surface with movable insulation, special two-part equation
+			//   (a) the surface is a pool (no movable insulation, no source/sink, only CTF solution algorithm)
+			//   (b) the surface is a partition, in which case the temperature of both sides are the same
+			//   (c) standard (or interzone) opaque surface with no movable insulation, normal heat balance equation
+			//   (d) standard (or interzone) window: call to CalcWindowHeatBalance to get window layer temperatures
+			//   (e) standard opaque surface with movable insulation, special two-part equation
 			// In the surface calculation there are the following Algorithm types for opaque surfaces that
 			// do not have movable insulation:
 			//   (a) the regular CTF calc (SolutionAlgo = UseCTF)
@@ -5262,7 +5265,24 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			//   (d) the HAMT calc (solutionalgo = UseHAMT).
 
 			auto & zone( Zone( ZoneNum ) );
-			if ( surface.ExtBoundCond == SurfNum && surface.Class != SurfaceClass_Window ) {
+			if ( surface.IsPool ) {
+				// This surface is a pool, first check solution method and presence of movable insulation or radiant source/sink
+				if ( ( surface.HeatTransferAlgorithm == HeatTransferModel_CTF ) && ( surface.MaterialMovInsulInt <= 0 ) && ( ! Construct( ConstrNum ).SourceSinkPresent ) ) {
+					SimSwimmingPool( SurfNum, TempSurfIn( SurfNum ), RefAirTemp( SurfNum ), IterDampConst, TempInsOld( SurfNum ) );
+					TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum );
+				} else {
+					// Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
+					if ( surface.HeatTransferAlgorithm /= HeatTransferModel_CTF ) {
+						ShowFatalError( surface.Name + " is a pool and is attempting to use a non-CTF solution algorithm.  This is not allowed.  Use the CTF solution algorithm for this surface." );
+					}
+					if ( surface.MaterialMovInsulInt > 0 ) {
+						ShowFatalError( surface.Name + " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface." );
+					}
+					if ( Construct( ConstrNum ).SourceSinkPresent ) {
+						ShowFatalError( surface.Name + " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface." );
+					}
+				}
+			} else if ( surface.ExtBoundCond == SurfNum && surface.Class != SurfaceClass_Window ) {
 				//CR6869 -- let Window HB take care of it      IF (Surface(SurfNum)%ExtBoundCond == SurfNum) THEN
 				// Surface is a partition
 				if ( surface.HeatTransferAlgorithm == HeatTransferModel_CTF || surface.HeatTransferAlgorithm == HeatTransferModel_EMPD ) { // Regular CTF Surface and/or EMPD surface
@@ -6240,7 +6260,7 @@ GatherComponentLoadsSurfAbsFact()
 // *****************************************************************************
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

@@ -63,6 +63,7 @@ namespace SwimmingPool {
 		Real64 CurCoverConvFac; // Current pool cover convective factor
 		Real64 CurCoverSWRadFac; // Current pool cover short-wavelength radiation factor
 		Real64 CurCoverLWRadFac; // Current pool cover long-wavelength radiation factor
+		Real64 RadConvertToConvect; // LW and SW radiation converted to convective gain by pool cover
 		Real64 MiscPowerFactor; // Pool miscellaneous power equipment consumption coefficient in W/(kg/s)
 		std::string SetPtTempSchedName; // Schedule name for water setpoint temperature
 		int SetPtTempSchedPtr; // Schedule pointer for water setpoint temperature
@@ -111,6 +112,7 @@ namespace SwimmingPool {
 			CurCoverConvFac( 0.0 ),
 			CurCoverSWRadFac( 0.0 ),
 			CurCoverLWRadFac( 0.0 ),
+			RadConvertToConvect( 0.0 ),
 			MiscPowerFactor( 0.0 ),
 			SetPtTempSchedPtr( 0 ),
 			CurSetPtTemp( 23.0 ),
@@ -165,6 +167,7 @@ namespace SwimmingPool {
 			Real64 const CurCoverConvFac, // Current pool cover convective factor
 			Real64 const CurCoverSWRadFac, // Current pool cover short-wavelength radiation factor
 			Real64 const CurCoverLWRadFac, // Current pool cover long-wavelength radiation factor
+			Real64 const RadConvertToConvect, // LW and SW radiation converted to convective gain by pool cover
 			Real64 const MiscPowerFactor, // Pool miscellaneous power equipment consumption coefficient in W/(kg/s)
 			std::string const SetPtTempSchedName, // Schedule name for water setpoint temperature
 			int const SetPtTempSchedPtr, // Schedule pointer for water setpoint temperature
@@ -218,6 +221,7 @@ namespace SwimmingPool {
 			CurCoverConvFac( CurCoverConvFac ),
 			CurCoverSWRadFac( CurCoverSWRadFac ),
 			CurCoverLWRadFac( CurCoverLWRadFac ),
+			RadConvertToConvect( RadConvertToConvect ),
 			MiscPowerFactor( MiscPowerFactor ),
 			SetPtTempSchedName( SetPtTempSchedName ),
 			SetPtTempSchedPtr( SetPtTempSchedPtr ),
@@ -247,14 +251,15 @@ namespace SwimmingPool {
 
 	void
 	SimSwimmingPool(
-		std::string const & CompName, // name of the low temperature radiant system
-		int & CompIndex
+		int const SurfNum,
+		Real64 & TempSurfIn,
+		Real64 const RefAirTemp,
+		Real64 const IterDampConst,
+		Real64 const TempInsOld
 	);
 
 	void
-	GetSwimmingPool(
-		bool const ErrorsFound
-	);
+	GetSwimmingPool();
 
 	void
 	InitSwimmingPool(
@@ -263,7 +268,12 @@ namespace SwimmingPool {
 
 	void
 	CalcSwimmingPool(
-		int const PoolNum // Index of the swimming pool under consideration within the derived types
+		int const PoolNum, // Index of the swimming pool under consideration within the derived types
+		int const SurfNum,
+		Real64 & TempSurfIn,
+		Real64 const RefAirTemp,
+		Real64 const IterDampConst,
+		Real64 const TempInsOld
 	);
 
 	void

@@ -12,6 +12,7 @@
 #include <SwimmingPool.hh>
 #include <BranchNodeConnections.hh>
 #include <DataBranchAirLoopPlant.hh>
+#include <DataConversions.hh>
 #include <DataEnvironment.hh>
 #include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
@@ -95,7 +96,11 @@ namespace SwimmingPool {
 
 	void
 	SimSwimmingPool (
-		int & SurfNum
+		int const SurfNum,
+		Real64 & TempSurfIn,
+		Real64 const RefAirTemp,
+		Real64 const IterDampConst,
+		Real64 const TempInsOld
 	)
 	{
 
@@ -134,12 +139,11 @@ namespace SwimmingPool {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // First time, input is "gotten"
-		static bool ErrorsFound( false ); // Set to true if something goes wrong
 		int PoolNum; // Pool number index
 
 		// FLOW:
 		if ( GetInputFlag ) {
-			GetSwimmingPool( ErrorsFound );
+			GetSwimmingPool;
 			GetInputFlag = false;
 		}
 
@@ -151,7 +155,7 @@ namespace SwimmingPool {
 
 		InitSwimmingPool( PoolNum );
 		
-		CalcSwimmingPool( PoolNum );
+		CalcSwimmingPool( PoolNum, SurfNum, TempSurfIn, RefAirTemp, IterDampConst, TempInsOld );
 		
 		UpdateSwimmingPool( PoolNum );
 
@@ -160,9 +164,7 @@ namespace SwimmingPool {
 	}
 
 	void
-	GetSwimmingPool(
-		bool ErrorsFound
-	)
+	GetSwimmingPool( )
 	{
 		
 		// SUBROUTINE INFORMATION:
@@ -220,6 +222,7 @@ namespace SwimmingPool {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static bool ErrorsFound( false ); // Set to true if something goes wrong
 		std::string CurrentModuleObject; // for ease in getting objects
 		FArray1D_string Alphas; // Alpha items for object
 		FArray1D_string cAlphaFields; // Alpha field names
@@ -346,7 +349,7 @@ namespace SwimmingPool {
 				Pool( Item ).CoverEvapFactor = MinCoverFactor;
 			} else if ( Pool( Item).CoverEvapFactor > MaxCoverFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has an evaporation cover factor greater than one." );
-				ShowContinueError( "The evaporation cover factor has been reset to zero." );
+				ShowContinueError( "The evaporation cover factor has been reset to one." );
 				Pool( Item ).CoverEvapFactor = MaxCoverFactor;
 			}
 			
@@ -357,7 +360,7 @@ namespace SwimmingPool {
 				Pool( Item ).CoverConvFactor = MinCoverFactor;
 			} else if ( Pool( Item).CoverConvFactor > MaxCoverFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has a convection cover factor greater than one." );
-				ShowContinueError( "The convection cover factor has been reset to zero." );
+				ShowContinueError( "The convection cover factor has been reset to one." );
 				Pool( Item ).CoverConvFactor = MaxCoverFactor;
 			}
 
@@ -368,7 +371,7 @@ namespace SwimmingPool {
 				Pool( Item ).CoverSWRadFactor = MinCoverFactor;
 			} else if ( Pool( Item).CoverSWRadFactor > MaxCoverFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has a short-wavelength radiation cover factor greater than one." );
-				ShowContinueError( "The short-wavelength radiation cover factor has been reset to zero." );
+				ShowContinueError( "The short-wavelength radiation cover factor has been reset to one." );
 				Pool( Item ).CoverSWRadFactor = MaxCoverFactor;
 			}
 			
@@ -379,7 +382,7 @@ namespace SwimmingPool {
 				Pool( Item ).CoverLWRadFactor = MinCoverFactor;
 			} else if ( Pool( Item).CoverLWRadFactor > MaxCoverFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has a long-wavelength radiation cover factor greater than one." );
-				ShowContinueError( "The long-wavelength radiation cover factor has been reset to zero." );
+				ShowContinueError( "The long-wavelength radiation cover factor has been reset to one." );
 				Pool( Item ).CoverLWRadFactor = MaxCoverFactor;
 			}
 			
@@ -485,7 +488,6 @@ namespace SwimmingPool {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::NumOfZones;
 		using DataGlobals::BeginEnvrnFlag;
 		using DataGlobals::AnyPlantInModel;
 		using DataLoopNode::Node;
@@ -503,6 +505,8 @@ namespace SwimmingPool {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "InitSwimmingPool" );
+		Real64 const MinActivityFactor = 0.0; // Minimum value for activity factor
+		Real64 const MaxActivityFactor = 10.0; // Maximum value for activity factor (realistically)
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -528,7 +532,7 @@ namespace SwimmingPool {
 				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
 					ScanPlantLoopsForObject( Pool( PoolNum ).Name, TypeOf_SwimmingPool_Indoor, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum, _, _, _, Pool( PoolNum ).WaterInletNode, _, errFlag );
 					if ( errFlag ) {
-						ShowFatalError( "InitSwimmingPool: Program terminated due to previous condition(s)." );
+						ShowFatalError( RoutineName + ": Program terminated due to previous condition(s)." );
 					}
 				}
 				MyPlantScanFlagPool( PoolNum ) = false;
@@ -561,10 +565,20 @@ namespace SwimmingPool {
 
 		// get the schedule values for different scheduled parameters
 		if ( Pool( PoolNum ).ActivityFactorSchedPtr > 0 ) {
-			Pool( PoolNum ).ActivityFactorSchedPtr = GetCurrentScheduleValue( Pool( PoolNum ).CoverSchedPtr );
+			Pool( PoolNum ).CurActivityFactor = GetCurrentScheduleValue( Pool( PoolNum ).ActivityFactorSchedPtr );
+			if ( Pool( PoolNum ).CurActivityFactor < MinActivityFactor ) {
+				Pool( PoolNum ).CurActivityFactor = MinActivityFactor;
+				ShowWarningError( RoutineName + ": Swimming Pool =\"" + Pool( PoolNum ).Name  + " Activity Factor Schedule =\"" + Pool( PoolNum ).ActivityFactorSchedName + " has a negative value.  This is not allowed." );
+				ShowContinueError( "The activity factor has been reset to zero." );
+			}
+			if ( Pool( PoolNum ).CurActivityFactor > MaxActivityFactor ) {
+				Pool( PoolNum ).CurActivityFactor = 1.0;
+				ShowWarningError( RoutineName + ": Swimming Pool =\"" + Pool( PoolNum ).Name  + " Activity Factor Schedule =\"" + Pool( PoolNum ).ActivityFactorSchedName + " has a value larger than 10.  This is not allowed." );
+				ShowContinueError( "The activity factor has been reset to unity." );
+			}
 		} else {
 			// default is activity factor of 1.0
-			Pool( PoolNum ).ActivityFactorSchedPtr = 1.0;
+			Pool( PoolNum ).CurActivityFactor = 1.0;
 		}
 
 		Pool( PoolNum ).CurSetPtTemp = GetCurrentScheduleValue( Pool( PoolNum ).SetPtTempSchedPtr );
@@ -580,14 +594,14 @@ namespace SwimmingPool {
 		if ( Pool( PoolNum ).PeopleHeatGainSchedPtr > 0 ) {
 			HeatGainPerPerson = GetCurrentScheduleValue( Pool(PoolNum).PeopleHeatGainSchedPtr );
 			if ( HeatGainPerPerson < 0.0 ) {
-				ShowWarningError( RoutineName + " Swimming Pool =\"" + Pool( PoolNum ).Name  + " Heat Gain Schedule =\"" + Pool( PoolNum ).PeopleHeatGainSchedName + " has a negative value.  This is not allowed." );
+				ShowWarningError( RoutineName + ": Swimming Pool =\"" + Pool( PoolNum ).Name  + " Heat Gain Schedule =\"" + Pool( PoolNum ).PeopleHeatGainSchedName + " has a negative value.  This is not allowed." );
 				ShowContinueError( "The heat gain per person has been reset to zero." );
 				HeatGainPerPerson = 0.0;
 			}
 			if ( Pool( PoolNum ).PeopleSchedPtr > 0 ) {
 				PeopleModifier = GetCurrentScheduleValue( Pool( PoolNum ).PeopleSchedPtr );
 				if ( PeopleModifier < 0.0 ) {
-					ShowWarningError( RoutineName + " Swimming Pool =\"" + Pool( PoolNum ).Name  + " People Schedule =\"" + Pool( PoolNum ).PeopleSchedName + " has a negative value.  This is not allowed." );
+					ShowWarningError( RoutineName + ": Swimming Pool =\"" + Pool( PoolNum ).Name  + " People Schedule =\"" + Pool( PoolNum ).PeopleSchedName + " has a negative value.  This is not allowed." );
 					ShowContinueError( "The number of people has been reset to zero." );
 					PeopleModifier = 0.0;
 				}
@@ -626,7 +640,12 @@ namespace SwimmingPool {
 
 	void
 	CalcSwimmingPool(
-		int const PoolNum // number of the swimming pool
+		int const PoolNum, // number of the swimming pool
+		int const SurfNum,
+		Real64 & TempSurfIn,
+		Real64 const RefAirTemp,
+		Real64 const IterDampConst,
+		Real64 const TempInsOld
 	)
 	{
 
@@ -642,10 +661,12 @@ namespace SwimmingPool {
 		// METHODOLOGY EMPLOYED:
 		// The swimming pool is modeled as a SURFACE to get access to all of the existing
 		// surface related algorithms.  This subroutine mainly models the components of the
-		// swimming pool so that information can be passed to the heat balance.  The heat
-		// balance will use this information to obtain a proper heat balance based on the
-		// swimming pool model.
-
+		// swimming pool so that information can be used in a standard surface heat balance.
+		// The pool is assumed to be located at the inside surface face with a possible cover
+		// affecting the heat balance.  The pool model takes the form of an equation solving
+		// for the inside surface temperature which is assumed to be the same as the pool
+		// water temperature.
+		
 		// REFERENCES:
 		//  1. ASHRAE (2011). 2011 ASHRAE Handbook – HVAC Applications. Atlanta: American Society of Heating,
 		//     Refrigerating and Air-Conditioning Engineers, Inc., p.5.6-5.9.
@@ -656,22 +677,29 @@ namespace SwimmingPool {
 		//     Indoor Swimming Pools. ASHRAE Transactions 99(2), p.864-874.
 
 		// Using/Aliasing
-		using namespace DataZoneEnergyDemands;
-		using DataHeatBalance::MRT;
-		using DataHeatBalance::Zone;
-		using DataHeatBalance::ZoneData;
 		using DataHeatBalFanSys::MAT;
-		using DataHVACGlobals::SmallLoad;
-		using DataLoopNode::Node;
+		using DataHeatBalFanSys::ZoneAirHumRatAvg;
 		using ScheduleManager::GetCurrentScheduleValue;
-		using PlantUtilities::SetComponentFlowRate;
-		using DataBranchAirLoopPlant::MassFlowTolerance;
+		using DataConversions::CFA;
+		using DataConversions::CFMF;
+		using Psychrometrics::PsyPsatFnTemp;
+		using Psychrometrics::PsyRhFnTdbWPb;
+		using Psychrometrics::PsyHfgAirFnWTdb;
+		using DataEnvironment::OutBaroPress;
+		using DataHeatBalance::QRadThermInAbs;
+		using DataHeatBalSurface::NetLWRadToSurf;
+		using DataHeatBalFanSys::QHTRadSysSurf;
+		using DataHeatBalFanSys::QHWBaseboardSurf;
+		using DataHeatBalFanSys::QSteamBaseboardSurf;
+		using DataHeatBalFanSys::QElecBaseboardSurf;
+		using DataHeatBalSurface::QRadSWInAbs;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "CalcSwimmingPool" );
+		static Real64 const CFinHg( 0.00029613 ); // Multiple pressure in Pa by this constant to get inches of Hg
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -680,10 +708,45 @@ namespace SwimmingPool {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 HConvIn; // convection coefficient for pool
+		Real64 EvapRate; // evaporation rate for pool in kg/s
+		Real64 EvapEnergyLossPerArea; // energy effect of evaporation rate per unit area in W/m2
+		Real64 PSatPool; // saturation pressure at pool water temperature
+		Real64 PParAir; // partial pressure of vapor of zone air
+		int ZoneNum; // index to zone array
+		Real64 LWtotal; // total flux from long-wavelength radiation to surface
+		Real64 LWsum; // summation of all long-wavelenth radiation going to surface
+		Real64 SWtotal; // total flux from short-wavelength radiation to surface
+		
 
 		// FLOW:
 		// initialize local variables
+		
+		// Standard Heat Balance Equation:
+		//		TempSurfInTmp( SurfNum ) = ( CTFConstInPart( SurfNum ) + QRadThermInAbs( SurfNum ) + QRadSWInAbs( SurfNum ) + HConvIn( SurfNum ) * RefAirTemp( SurfNum ) + NetLWRadToSurf( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) + IterDampConst * TempInsOld( SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TH11 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn( SurfNum ) + IterDampConst ); // Constant part of conduction eq (history terms) | LW radiation from internal sources | SW radiation from internal sources | Convection from surface to zone air | Net radiant exchange with other zone surfaces | Heat source/sink term for radiant systems | (if there is one present) | Radiant flux from high temp radiant heater | Radiant flux from a hot water baseboard heater | Radiant flux from a steam baseboard heater | Radiant flux from an electric baseboard heater | Iterative damping term (for stability) | Current conduction from | the outside surface | Coefficient for conduction (current time) | Convection and damping term
 
+		// Convection coefficient calculation
+		HConvIn = 0.22 * std::pow( abs( Pool( PoolNum ).PoolWaterTemp - RefAirTemp ), 1.0 / 3.0 ) * Pool( PoolNum ).CurCoverConvFac;
+
+		// Evaporation calculation:
+		// Evaporation Rate (lb/h) = 0.1 * Area (ft2) * Activity Factor * (Psat,pool - Ppar,air) (in Hg)
+		// So evaporation rate, area, and pressures have to be converted to standard E+ units (kg/s, m2, and Pa, respectively)
+		// Evaporation Rate per Area = Evaporation Rate * Heat of Vaporization / Area of Surface
+		PSatPool = PsyPsatFnTemp( Pool( PoolNum ).PoolWaterTemp, RoutineName );
+		ZoneNum = Surface( SurfNum ).Zone;
+		PParAir = PsyPsatFnTemp( MAT( ZoneNum ), RoutineName ) * PsyRhFnTdbWPb( MAT( ZoneNum ), ZoneAirHumRatAvg( ZoneNum ), OutBaroPress );
+		if ( PSatPool < PParAir ) PSatPool = PParAir;
+		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
+		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
+
+		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
+		// to the air directly and added to the zone air heat balance
+		LWsum = ( QRadThermInAbs( SurfNum ) +  NetLWRadToSurf( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) );
+		LWtotal = Pool( PoolNum ).CurCoverLWRadFac * LWsum;
+		SWtotal = Pool( PoolNum ).CurCoverSWRadFac * QRadSWInAbs( SurfNum );
+		Pool( PoolNum ).RadConvertToConvect = ( ( 1.0 - Pool( PoolNum ).CurCoverLWRadFac ) * LWsum ) + ( ( 1.0 - Pool( PoolNum ).CurCoverSWRadFac ) * QRadSWInAbs( SurfNum ) );
+
+	
 	}
 
 	void
@@ -734,6 +797,8 @@ namespace SwimmingPool {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		// FLOW:
+		
+		// Don't forget to total up convective gains to various zones from pool cover!
 
 	}
 
