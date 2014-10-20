@@ -897,6 +897,7 @@ namespace OutputReportPredefined {
 
 		// for DX Cooling Coil ASHRAE 127-12 Report
 		pdstDXCoolCoil2 = newPreDefSubTable( pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report" );
+
 		pdchDXCoolCoilType = newPreDefColumn( pdstDXCoolCoil2, "DX Cooling Coil Type" );
 		//pdchDXCoolCoilTestClass = newPreDefColumn( pdstDXCoolCoil, "Application Class" );
 		pdchDXCoolCoilNetCapSIA = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test A [W]" );

@@ -2226,8 +2226,8 @@ namespace StandardRatings {
 		static std::string CompNameNew;
 
 		// Formats
-		static gio::Fmt const Format_101( "('! <DX Cooling Coil ASHRAE 127 Standard Rating Information>, Component Type, Component Name, Class, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, ','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric Power Test D {W} ')" );
-		static gio::Fmt const Format_102( "(' DX Cooling Coil ASHRAE 127 Standard Rating Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
+		static gio::Fmt const Format_101( "('! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, ','Rated Net Cooling Capacity Test A {W}, ','Rated Total Electric Power Test A {W}, ','Rated Net Cooling Capacity Test B {W}, ','Rated Total Electric Power Test B {W}, ','Rated Net Cooling Capacity Test C {W}, ','Rated Total Electric Power Test C {W}, ','Rated Net Cooling Capacity Test D {W}, ','Rated Total Electric Power Test D {W} ')" );
+		static gio::Fmt const Format_102( "(' DX Cooling Coil ASHRAE 127 Standard Ratings Information, ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A,', ',A)" );
 
 
 		{ auto const SELECT_CASE_var( CompTypeNum );
@@ -2237,13 +2237,12 @@ namespace StandardRatings {
 				gio::write( OutputFileInits, Format_101 );
 				MyCoolOneTimeFlag = false;
 			}
-
 			for ( ClassNum = 1; ClassNum <= 4; ++ClassNum ) {			
 				Num = ( ClassNum - 1 ) * 4;
 				ClassName = "Class " + RoundSigDigits(ClassNum);
 				CompNameNew = CompName + "(" + ClassName + ")";
 				gio::write( OutputFileInits, Format_102 ) << CompType << CompName << ClassName << RoundSigDigits( NetCoolingCapRated( Num + 1 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 1 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 2 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 2 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 3 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 3 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 4 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 4 ), 1 );
-				PreDefTableEntry( pdchDXCoolCoilType, CompName, CompType );
+				//PreDefTableEntry( pdchDXCoolCoilType, CompName, CompType );
 				PreDefTableEntry( pdchDXCoolCoilType, CompNameNew, CompType );
 				PreDefTableEntry( pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits( NetCoolingCapRated( Num + 1 ), 1 ) );
 				PreDefTableEntry( pdchDXCoolCoilElecPowerA, CompNameNew, RoundSigDigits( TotElectricPowerRated( Num + 1 ), 1 ) );
