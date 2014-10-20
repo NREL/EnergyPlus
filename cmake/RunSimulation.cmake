@@ -58,24 +58,33 @@ if ( "${EXTINT_RESULT}" GREATER -1 )
   file( COPY "${SOURCE_DIR}/datasets/FMUs/" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/DataSets/FMUs/" )
 endif ()
 
-if(BUILD_FORTRAN)
-  # EPMacro should run here first
-  if( "${IDF_EXT}" STREQUAL ".imf" )
-    if( UNIX AND NOT APPLE )
-      find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Linux" 
-        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-    elseif( APPLE )
-      find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Mac" 
-        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-    else() # windows
-      find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Windows" 
-        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-    endif()
-    message("Executing EPMacro from ${EPMACRO_EXE}")
-    execute_process(COMMAND "${EPMACRO_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
-    file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/out.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
+# EPMacro should run here first
+if( "${IDF_EXT}" STREQUAL ".imf" )
+  # first bring in all imf files into the run folder
+  file( GLOB SRC_IMF_FILES "${SOURCE_DIR}/testfiles/*.imf" )
+  foreach( IMF_FILE ${SRC_IMF_FILES} )
+    file( COPY "${IMF_FILE}" DESTINATION "${BINARY_DIR}/testfiles/${IDF_NAME}/" )
+  endforeach()
+  # find the appropriate macro file
+  if( UNIX AND NOT APPLE )
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Linux" 
+      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+  elseif( APPLE )
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Mac" 
+      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+  else() # windows
+    find_program(EPMACRO_EXE EPMacro PATHS "${SOURCE_DIR}/bin/EPMacro/Windows" 
+      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
   endif()
+  # execute EPMacro and rename the idf file
+  message("Executing EPMacro from ${EPMACRO_EXE}")
+  execute_process(COMMAND "${EPMACRO_EXE}" WORKING_DIRECTORY "${BINARY_DIR}/testfiles/${IDF_NAME}")
+  file(RENAME "${BINARY_DIR}/testfiles/${IDF_NAME}/out.idf" "${BINARY_DIR}/testfiles/${IDF_NAME}/in.idf")
+endif()
     
+
+if(BUILD_FORTRAN)
+
   # Parametric preprocessor next
   string(FIND "${IDF_CONTENT}" "Parametric:" PAR_RESULT)
   if ( "${PAR_RESULT}" GREATER -1 )
