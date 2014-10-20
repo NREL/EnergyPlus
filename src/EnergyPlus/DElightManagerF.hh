@@ -11,49 +11,50 @@ namespace EnergyPlus {
 
 namespace DElightManagerF {
 
-	// Functions
+	void
+	DElightInputGenerator();
 
 	void
 	GenerateDElightDaylightCoefficients(
-		Real64 & dBldgLat,
+		Real64 & dLatitude,
 		int & iErrorFlag
 	);
 
 	void
-	DElightDaylightCoefficients(
-		Real64 & dBldgLat,
-		int & iErrorFlag
+	CheckForGeometricTransform(
+		bool & doTransform,
+		Real64 & OldAspectRatio,
+		Real64 & NewAspectRatio
 	);
-
-	void
-	DElightElecLtgCtrl(
-		int const iNameLength,
-		std::string const & cZoneName,
-		Real64 const dBldgLat,
-		Real64 const dHISKF,
-		Real64 const dHISUNF,
-		Real64 const dCloudFraction,
-		Real64 const dSOLCOSX,
-		Real64 const dSOLCOSY,
-		Real64 const dSOLCOSZ,
-		Real64 const pdPowerReducFac,
-		int const iErrorFlag
-	);
-
-	void
-	DElightFreeMemory();
-
-	void
-	DElightOutputGenerator( int & iOutputFlag );
-
-	void
-	DElightInputGenerator();
 
 	void
 	SetupDElightOutput4EPlus();
 
 	std::string
-	ReplaceBlanksWithUnderscores( std::string const & InputString ); // Input String
+	ReplaceBlanksWithUnderscores(
+		std::string const & InputString
+	); 
+
+	void 
+	DElightElecLtgCtrl(
+		int iNameLength,
+		std::string cZoneName, 
+		Real64 dBldgLat, 
+		Real64 dHISKF, 
+		Real64 dHISUNF, 
+		Real64 dCloudFraction, 
+		Real64 dSOLCOSX, 
+		Real64 dSOLCOSY, 
+		Real64 dSOLCOSZ,
+		Real64 & pdPowerReducFac,
+		int piErrorFlag
+	);
+
+	std::vector< char >
+	getCharArrayFromString( std::string const & originalString );
+
+	std::string
+	getStringFromCharArray( std::vector< char > const & originalCharArray );
 
 	//     NOTICE
 
@@ -78,7 +79,7 @@ namespace DElightManagerF {
 
 	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
-} // DElightManagerF
+} // DELIGHTMANAGERF
 
 } // EnergyPlus
 

@@ -502,7 +502,7 @@ namespace EvaporativeCoolers {
 		cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
-			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
