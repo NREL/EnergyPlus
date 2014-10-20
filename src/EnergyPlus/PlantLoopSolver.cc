@@ -27,6 +27,8 @@
 #include <Pumps.hh>
 #include <UtilityRoutines.hh>
 
+#define reduce_allocations
+
 namespace EnergyPlus {
 
 namespace PlantLoopSolver {
@@ -1110,6 +1112,7 @@ namespace PlantLoopSolver {
 		static int LastLoopSideNum( -1 );
 		static int LastFirstBranchNum( -1 );
 		static int LastLastBranchNum( -1 );
+		static int LastNumBranchesInRegion( -1 );
 
 		//~ Indexing variables
 		int BranchCounter; // ~ This contains the index for the %Branch(:) structure
@@ -1147,10 +1150,13 @@ namespace PlantLoopSolver {
 		// We only need to reallocate the accessible array and reset the LastComponentSimulated if
 		//  either is currently NOT allocated, or if we are coming into this routine with a
 		//  new simulation region.  Otherwise leave it alone and save computation time
-		if ( ( ! allocated( AccessibleBranches ) ) || ( ! allocated( LastComponentSimulated ) ) || ( LoopNum != LastLoopNum ) || ( LoopSideNum != LastLoopSideNum ) || ( FirstBranchNum != LastFirstBranchNum ) || ( LastBranchNum != LastLastBranchNum ) || ( present( StartingNewLoopSidePass ) ) ) { //we need to reallocate the accessible branch array
 
-			// How many will we need?
-			NumBranchesInRegion = LastBranchNum - FirstBranchNum + 1;
+		// Split allocation from initialization and allocate only if arrays need to grow. 
+
+		// How many will we need?
+		NumBranchesInRegion = LastBranchNum - FirstBranchNum + 1;
+
+		if ( ( ! allocated( AccessibleBranches ) ) || ( ! allocated( LastComponentSimulated ) ) || ( LastNumBranchesInRegion < NumBranchesInRegion ) ) { //we need to reallocate the accessible branch array
 
 			// Release the memory for the arrays to reset
 			if ( allocated( AccessibleBranches ) ) AccessibleBranches.deallocate();
@@ -1159,7 +1165,13 @@ namespace PlantLoopSolver {
 			// Reallocate for the number of locations we have available
 			AccessibleBranches.allocate( NumBranchesInRegion );
 			LastComponentSimulated.allocate( NumBranchesInRegion );
-			LastComponentSimulated = 0;
+
+			LastNumBranchesInRegion = NumBranchesInRegion;
+		}
+
+		if ( ( LoopNum != LastLoopNum ) || ( LoopSideNum != LastLoopSideNum ) || ( FirstBranchNum != LastFirstBranchNum ) || ( LastBranchNum != LastLastBranchNum ) || ( present( StartingNewLoopSidePass ) ) ) { //we need to reinitialize the accessible branch array
+
+		        LastComponentSimulated = 0;
 
 			BranchIndex = 0;
 			for ( BranchCounter = FirstBranchNum; BranchCounter <= LastBranchNum; ++BranchCounter ) {
@@ -1168,7 +1180,6 @@ namespace PlantLoopSolver {
 				AccessibleBranches( BranchIndex ).LoopSideNum = LoopSideNum;
 				AccessibleBranches( BranchIndex ).BranchNum = BranchCounter;
 			}
-
 		}
 
 		// Store the arguments for the next call

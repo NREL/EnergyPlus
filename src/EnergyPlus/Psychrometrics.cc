@@ -17,13 +17,7 @@
 
 namespace EnergyPlus {
 
-#ifdef EP_nocache_Psychrometrics
-#undef EP_cache_PsyTwbFnTdbWPb
-#undef EP_cache_PsyPsatFnTemp
-#else
-#define EP_cache_PsyTwbFnTdbWPb
-#define EP_cache_PsyPsatFnTemp
-#endif
+#define EP_psych_cache
 #define EP_psych_errors
 
 namespace Psychrometrics {
@@ -84,27 +78,20 @@ namespace Psychrometrics {
 	int const iPsyRhFnTdbRhovLBnd0C( 13 );
 	int const iPsyTwbFnTdbWPb_cache( 18 );
 	int const iPsyPsatFnTemp_cache( 19 );
-	int const NumPsychMonitors( 19 ); // Parameterization of Number of psychrometric routines that
+	int const iPsyTsatFnPb_cache( 20 );
+	int const iPsyWFnTdbTwbPb_cache( 21 );
+	int const NumPsychMonitors( 21 ); // Parameterization of Number of psychrometric routines that
 	std::string const blank_string;
 #ifdef EP_psych_stats
-	FArray1D_string const PsyRoutineNames( NumPsychMonitors, { "PsyTdpFnTdbTwbPb", "PsyRhFnTdbWPb", "PsyTwbFnTdbWPb", "PsyVFnTdbWPb", "PsyWFnTdpPb", "PsyWFnTdbH", "PsyWFnTdbTwbPb", "PsyWFnTdbRhPb", "PsyPsatFnTemp", "PsyTsatFnHPb", "PsyTsatFnPb", "PsyRhFnTdbRhov", "PsyRhFnTdbRhovLBnd0C", "PsyTwbFnTdbWPb", "PsyTwbFnTdbWPb", "PsyWFnTdbTwbPb", "PsyTsatFnPb", "PsyTwbFnTdbWPb_cache", "PsyPsatFnTemp_cache" } ); // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
+  FArray1D_string const PsyRoutineNames( NumPsychMonitors, { "PsyTdpFnTdbTwbPb", "PsyRhFnTdbWPb", "PsyTwbFnTdbWPb", "PsyVFnTdbWPb", "PsyWFnTdpPb", "PsyWFnTdbH", "PsyWFnTdbTwbPb", "PsyWFnTdbRhPb", "PsyPsatFnTemp", "PsyTsatFnHPb", "PsyTsatFnPb", "PsyRhFnTdbRhov", "PsyRhFnTdbRhovLBnd0C", "PsyTwbFnTdbWPb", "PsyTwbFnTdbWPb", "PsyWFnTdbTwbPb", "PsyTsatFnPb", "PsyTwbFnTdbWPb_cache", "PsyPsatFnTemp_cache", "PsyTsatFnPb_cache", "PsyWFnTdbTwbPb_cache" } ); // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
 
-	FArray1D_bool const PsyReportIt( NumPsychMonitors, { true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, true, true } ); // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
+  FArray1D_bool const PsyReportIt( NumPsychMonitors, { true, true, true, true, true, true, true, true, true, true, true, true, true, false, false, false, false, true, true, true, true } ); // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
 #endif
 
 #ifndef EP_psych_errors
 	Real64 const KelvinConv( 273.15 );
 #endif
 
-#ifdef EP_cache_PsyTwbFnTdbWPb
-	int const twbcache_size( 1024 * 1024 );
-	int const twbprecision_bits( 20 );
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-	int const psatcache_size( 1024 * 1024 );
-	int const psatprecision_bits( 24 ); // 28  // 24  // 32
-	Int64 const psatcache_mask( psatcache_size - 1 );
-#endif
 
 	// MODULE VARIABLE DECLARATIONS:
 	// na
@@ -116,14 +103,6 @@ namespace Psychrometrics {
 #ifdef EP_psych_stats
 	FArray1D< Int64 > NumTimesCalled( NumPsychMonitors, NumPsychMonitors * 0 );
 	FArray1D_int NumIterations( NumPsychMonitors, NumPsychMonitors * 0 );
-#endif
-
-	// Object Data
-#ifdef EP_cache_PsyTwbFnTdbWPb
-	FArray1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-	FArray1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
 #endif
 
 	// Subroutine Specifications for the Module
@@ -166,14 +145,6 @@ namespace Psychrometrics {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-		cached_Twb.allocate( {0,twbcache_size} );
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-		cached_Psat.allocate( {0,psatcache_size} );
-#endif
-
 	}
 
 	void
@@ -307,113 +278,20 @@ namespace Psychrometrics {
 			}
 		}
 	}
-#endif
+#endif // EP_psych_errors
 
-#ifdef EP_cache_PsyTwbFnTdbWPb
-
-	Real64
-	PsyTwbFnTdbWPb(
-		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const W, // humidity ratio
-		Real64 const Pb, // barometric pressure {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda Lawrie/Amir Roth
-		//       DATE WRITTEN   August 2011
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Provide a "cache" of results for the given arguments and wetbulb (twb) output result.
-
-		// METHODOLOGY EMPLOYED:
-		// Use grid shifting and masking to provide hash into the cache. Use Equivalence to
-		// make Fortran ignore "types".
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		Real64 Twb_result; // result=> Temperature Wet-Bulb {C}
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		Int64 const Grid_Shift( ( 64 - 12 - twbprecision_bits ) );
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Int64 Tdb_tag;
-		Int64 W_tag;
-		Int64 Pb_tag;
-		Int64 hash;
-		Real64 Tdb_tag_r;
-		Real64 W_tag_r;
-		Real64 Pb_tag_r;
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyTwbFnTdbWPb_cache );
-#endif
-
-		Tdb_tag = TRANSFER( Tdb, Tdb_tag );
-		W_tag = TRANSFER( W, W_tag );
-		Pb_tag = TRANSFER( Pb, Pb_tag );
-
-		Tdb_tag = bit::bit_shift( Tdb_tag, -Grid_Shift );
-		W_tag = bit::bit_shift( W_tag, -Grid_Shift );
-		Pb_tag = bit::bit_shift( Pb_tag, -Grid_Shift );
-		hash = bit::bit_and( bit::bit_xor( Tdb_tag, bit::bit_xor( W_tag, Pb_tag ) ), Int64( twbcache_size - 1 ) );
-
-		if ( cached_Twb( hash ).iTdb != Tdb_tag || cached_Twb( hash ).iW != W_tag || cached_Twb( hash ).iPb != Pb_tag ) {
-			cached_Twb( hash ).iTdb = Tdb_tag;
-			cached_Twb( hash ).iW = W_tag;
-			cached_Twb( hash ).iPb = Pb_tag;
-
-			Tdb_tag_r = TRANSFER( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
-			W_tag_r = TRANSFER( bit::bit_shift( W_tag, Grid_Shift ), W_tag_r );
-			Pb_tag_r = TRANSFER( bit::bit_shift( Pb_tag, Grid_Shift ), Pb_tag_r );
-
-			cached_Twb( hash ).Twb = PsyTwbFnTdbWPb_raw( Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom );
-		}
-
-		//  Twbresult_last = cached_Twb(hash)%Twb
-		//  Twb_result = Twbresult_last
-		Twb_result = cached_Twb( hash ).Twb;
-
-		return Twb_result;
-
-	}
 
 	Real64
+#ifdef EP_psych_cache
 	PsyTwbFnTdbWPb_raw(
-		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const dW, // humidity ratio
-		Real64 const Patm, // barometric pressure {Pascals}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-
-#else
-
-	Real64
+#else // !EP_psych_cache
 	PsyTwbFnTdbWPb(
+#endif // EP_psych_cache
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
 		Real64 const Patm, // barometric pressure {Pascals}
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
-#endif
 	{
 
 		// FUNCTION INFORMATION:
@@ -493,7 +371,7 @@ namespace Psychrometrics {
 				ShowRecurringWarningErrorAtEnd( "Temperature out of range [-100. to 200.] (PsyTwbFnTdbWPb)", iPsyErrIndex( iPsyTwbFnTdbWPb ), TDB, TDB, _, "C", "C" );
 			}
 		}
-#endif
+#endif // EP_psych_errors
 
 		W = dW;
 		if ( W < 0.0 ) {
@@ -515,7 +393,7 @@ namespace Psychrometrics {
 					ShowRecurringWarningErrorAtEnd( "Entered Humidity Ratio invalid (PsyTwbFnTdbWPb)", iPsyErrIndex( iPsyTwbFnTdbWPb2 ), W, W, _, "[]", "[]" );
 				}
 			}
-#endif
+#endif // EP_psych_errors
 			W = 1.0e-5;
 		}
 
@@ -612,6 +490,119 @@ namespace Psychrometrics {
 		return TWB;
 	}
 
+#ifdef EP_psych_cache
+	Real64
+	PsyTwbFnTdbWPb(
+		Real64 const Tdb, // dry-bulb temperature {C}
+		Real64 const W, // humidity ratio
+		Real64 const Pb, // barometric pressure {Pascals}
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie/Amir Roth
+		//       DATE WRITTEN   August 2011
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Provide a "cache" of results for the given arguments and wetbulb (twb) output result.
+
+		// METHODOLOGY EMPLOYED:
+		// Use grid shifting and masking to provide hash into the cache. Use Equivalence to
+		// make Fortran ignore "types".
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		Real64 Twb_result; // result=> Temperature Wet-Bulb {C}
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		int const cache_size( 1024 * 1024 );
+		int const precision_bits( 20 );
+		Int64 const shift( ( 64 - 12 - precision_bits ) );
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		struct cached_twb_t
+		{
+			// Members
+		  	Int64 iTdb;
+		  	Int64 iW;
+		  	Int64 iPb;
+		  	Real64 Twb;
+
+		  	// Default Constructor
+		  	cached_twb_t() : iTdb( 0 ), iW( 0 ), iPb( 0 ), Twb( 0.0 ) {}
+
+		  	// Member Constructor
+		  	cached_twb_t(
+				Int64 const iTdb,
+			       	Int64 const iW,
+			       	Int64 const iPb,
+			       	Real64 const Twb
+			       	) : iTdb( iTdb ), iW( iW ), iPb( iPb ), Twb( Twb ) {}
+
+		};
+		
+		static FArray1D< cached_twb_t > cache; // DIMENSION(0:twbcache_size)
+		static bool cache_init = false;
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Int64 Tdb_tag;
+		Int64 W_tag;
+		Int64 Pb_tag;
+		Int64 hash;
+		Real64 Tdb_tag_r;
+		Real64 W_tag_r;
+		Real64 Pb_tag_r;
+
+#ifdef EP_psych_stats
+		++NumTimesCalled( iPsyTwbFnTdbWPb_cache );
+#endif
+
+		if (!cache_init)
+		  {
+		    cache.allocate( { 0, cache_size } );
+		    cache_init = true;
+		  }
+
+		Tdb_tag = (*reinterpret_cast<const Int64 *>( &Tdb )) >> shift;
+		W_tag = (*reinterpret_cast<const Int64 *>( &W )) >> shift;
+		Pb_tag = (*reinterpret_cast<const Int64 *>( &Pb )) >> shift;
+
+		hash = ( (Tdb_tag ^ W_tag ^ Pb_tag ) & Int64( cache_size - 1 ) );
+
+		if ( cache( hash ).iTdb != Tdb_tag || cache( hash ).iW != W_tag || cache( hash ).iPb != Pb_tag ) {
+			cache( hash ).iTdb = Tdb_tag;
+			cache( hash ).iW = W_tag;
+			cache( hash ).iPb = Pb_tag;
+
+			Tdb_tag <<= shift;
+			W_tag <<= shift;
+			Pb_tag <<= shift;
+			Tdb_tag_r = *reinterpret_cast<Real64 *>( &Tdb_tag );
+			W_tag_r = *reinterpret_cast<Real64 *>( &W_tag );
+			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
+
+			cache( hash ).Twb = PsyTwbFnTdbWPb_raw( Tdb_tag_r, W_tag_r, Pb_tag_r, CalledFrom );
+		}
+		return cache( hash ).Twb;
+
+	}
+#endif // EP_psych_cache
+
 #ifdef EP_psych_errors
 	void
 	PsyVFnTdbWPb_error(
@@ -671,22 +662,15 @@ namespace Psychrometrics {
 	}
 #endif
 
-#ifdef EP_cache_PsyPsatFnTemp
-
 	Real64
+#ifdef EP_psych_cache
 	PsyPsatFnTemp_raw(
-		Real64 const T, // dry-bulb temperature {C}
-		std::string const & CalledFrom // routine this function was called from (error messages)
-	)
-
-#else
-
-	Real64
+#else // !EP_psych_cache
 	PsyPsatFnTemp(
+#endif // EP_psych_cache
 		Real64 const T, // dry-bulb temperature {C}
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
-#endif
 	{
 		// FUNCTION INFORMATION:
 		//       AUTHOR         George Shih
@@ -773,7 +757,7 @@ namespace Psychrometrics {
 			Real64 const C12( -0.14452093e-7 ); // Coefficient for TKel >= KelvinConvK
 			Real64 const C13( 6.5459673 ); // Coefficient for TKel >= KelvinConvK
 			Pascal = std::exp( C8 / Tkel + C9 + Tkel * ( C10 + Tkel * ( C11 + Tkel * C12 ) ) + C13 * std::log( Tkel ) );
-#else
+#else // !EP_IF97
 			//Table 34 in IF97
 			Real64 const N1( 0.11670521452767e04 );
 			Real64 const N2( -0.72421316703206e06 );
@@ -792,7 +776,7 @@ namespace Psychrometrics {
 			Real64 const B = N3 * phi2 + N4 * phi + N5;
 			Real64 const C = N6 * phi2 + N7 * phi + N8;
 			Pascal = 1000000.0 * pow_4( ( 2.0 * C ) / ( -B + std::sqrt( ( B * B ) - 4.0 * A * C ) ) );
-#endif
+#endif // EP_IF97
 			// If above 200C, set value of Pressure corresponding to Saturation Temperature of 200C.
 		} else { // Tkel >= 173.15 // Tkel >= KelvinConv // Tkel > 473.15
 			Pascal = 1555000.0;
@@ -800,6 +784,83 @@ namespace Psychrometrics {
 
 		return Pascal;
 	}
+
+#ifdef EP_psych_cache
+	Real64
+	PsyPsatFnTemp(
+		Real64 const T, // dry-bulb temperature {C}
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Linda Lawrie/Amir Roth
+		//       DATE WRITTEN   March 2013
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Provide a "cache" of results for the given argument (T) and pressure (Pascal) output result.
+
+		// METHODOLOGY EMPLOYED:
+		// Use grid shifting and masking to provide hash into the cache. Use Equivalence to
+		// make Fortran ignore "types".
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		int const cache_size( 64 * 1024 );
+		int const precision_bits( 24 ); // 28  // 24  // 32
+		Int64 const shift = (64 - 12 - precision_bits); 
+
+		struct cached_t
+		{
+			// Members
+			Int64 iTdb;
+			Real64 Psat;
+
+			// Default Constructor
+			cached_t() : iTdb( -1000 ), Psat( 0.0 ) {}
+
+		// Member Constructor
+		cached_t(
+			Int64 const iTdb,
+			Real64 const Psat
+		) : iTdb( iTdb ), Psat( Psat ){}
+
+		};
+
+
+#ifdef EP_psych_stats
+		++NumTimesCalled( iPsyPsatFnTemp_cache );
+#endif
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		static FArray1D< cached_t > cache; // DIMENSION(0:cache_size)
+		static bool cache_init = false;		
+
+		Int64 Tdb_tag;
+		Int64 hash;
+		Real64 Tdb_tag_r;
+
+		if (!cache_init) 
+		{
+			cache.allocate( { 0, cache_size } );
+			cache_init = true;
+		}
+
+		Tdb_tag = (*reinterpret_cast<const Int64 *>( &T )) >> shift;
+		hash = Tdb_tag & Int64(cache_size - 1);
+
+		if ( cache( hash ).iTdb != Tdb_tag ) {
+			cache( hash ).iTdb = Tdb_tag;
+
+			Tdb_tag <<= shift;
+			Tdb_tag_r = *reinterpret_cast<Real64 *>( &Tdb_tag );
+			cache( hash ).Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
+		}
+
+		return cache( hash ).Psat; // saturation pressure {Pascals}
+	}
+#endif // EP_psych_cache
+
 
 #ifdef EP_psych_errors
 	void
@@ -893,7 +954,11 @@ namespace Psychrometrics {
 #endif
 
 	Real64
+#ifdef EP_psych_cache
+	PsyTsatFnHPb_raw(
+#else // !EP_psych_cache
 	PsyTsatFnHPb(
+#endif // EP_psych_cache
 		Real64 const H, // enthalpy {J/kg}
 		Real64 const PB, // barometric pressure {Pascals}
 		std::string const & CalledFrom // routine this function was called from (error messages)
@@ -1083,6 +1148,109 @@ Label170: ;
 
 	}
 
+#ifdef EP_psych_cache
+	Real64
+	PsyTsatFnHPb(
+		Real64 const H, // enthalpy {J/kg}
+		Real64 const Pb, // barometric pressure {Pascals}
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Amir Roth
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Caching wrapper for PsyTsatFnHPb
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+
+		// USE STATEMENTS:
+
+		// Return value
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		int const cache_size( 64 * 1024 );
+		int const precision_bits( 24 ); // 28  // 24  // 32
+		int const shift = 64 - 12 - precision_bits;
+
+		struct cached_t
+		{	
+			// Members
+			Int64 iH;
+			Int64 iPb;
+			Real64 Tsat;
+
+			// Default Constructor
+			cached_t() : iH ( 0 ), iPb( -1000 ), Tsat( 0.0 ) {}
+
+			// Member Constructor
+			cached_t(
+				Int64 const iH,
+				Int64 const iPb,
+				Real64 const Tsat
+				) : iH ( iH ), iPb( iPb ), Tsat( Tsat ) {}
+
+		};
+
+		static FArray1D< cached_t > cache; // DIMENSION(0:tsatcache_size)
+		static bool cache_init = false;
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Int64 H_tag;
+		Int64 Pb_tag;
+		Int64 hash;
+		Real64 H_tag_r;
+		Real64 Pb_tag_r;
+
+#ifdef EP_psych_stats
+		++NumTimesCalled( iPsyTsatFnHPb_cache );
+#endif // EP_psych_stats
+
+		if (!cache_init)
+		{
+			cache.allocate( { 0, cache_size } );
+			cache_init = true;
+		}
+
+		H_tag = (*reinterpret_cast<const Int64 *>( &H )) >> shift;
+		Pb_tag = (*reinterpret_cast<const Int64 *>( &Pb )) >> shift;
+
+		hash = ( H_tag ^ Pb_tag) & Int64( cache_size - 1 );
+
+		if ( cache( hash ).iH != H_tag || cache( hash ).iPb != Pb_tag ) {
+			cache( hash ).iH = H_tag;
+			cache( hash ).iPb = Pb_tag;
+
+			H_tag <<= shift;
+			Pb_tag <<= shift;
+			H_tag_r = *reinterpret_cast<Real64 *>( &H_tag );
+			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
+
+			cache( hash ).Tsat = PsyTsatFnHPb_raw( H_tag_r, Pb_tag_r, CalledFrom );
+		}
+		return cache( hash ).Tsat;
+	}
+#endif // EP_psych_cache
+
 #ifdef EP_psych_errors
 	void
 	PsyRhFnTdbRhov_error(
@@ -1229,7 +1397,11 @@ Label170: ;
 #endif
 
 	Real64
+#ifdef EP_psych_cache
+	PsyTsatFnPb_raw(
+#else // !EP_psych_cache
 	PsyTsatFnPb(
+#endif // EP_psych_cache
 		Real64 const Press, // barometric pressure {Pascals}
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
@@ -1391,6 +1563,267 @@ Label170: ;
 		return Temp;
 
 	}
+
+#ifdef EP_psych_cache
+	Real64
+	PsyTsatFnPb(
+		Real64 const Pb, // barometric pressure {Pascals}
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Amir Roth
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Provide a "cache" of results for the given arguments and Tsat output result.
+
+		// METHODOLOGY EMPLOYED:
+		// Use grid shifting and masking to provide hash into the cache. Use Equivalence to
+		// make Fortran ignore "types".
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		int const cache_size( 64 * 1024 );
+		int const precision_bits( 24 ); // 28  // 24  // 32
+		int const shift = 64 - 12 - precision_bits;
+
+		struct cached_t
+		{	
+			// Members
+			Int64 iPb;
+			Real64 Tsat;
+
+			// Default Constructor
+			cached_t() : iPb( -1000 ), Tsat( 0.0 ) {}
+
+			// Member Constructor
+			cached_t(
+				Int64 const iPb,
+				Real64 const Tsat
+				) : iPb( iPb ),	Tsat( Tsat ) {}
+
+		};
+
+		static FArray1D< cached_t > cache; // DIMENSION(0:tsatcache_size)
+		static bool cache_init = false;
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Int64 Pb_tag;
+		Int64 hash;
+		Real64 Pb_tag_r;
+
+#ifdef EP_psych_stats
+		++NumTimesCalled( iPsyTsatFnPb_cache );
+#endif // EP_psych_stats
+
+		if (!cache_init)
+		{
+			cache.allocate( { 0, cache_size } );
+			cache_init = true;
+		}
+
+		Pb_tag = (*reinterpret_cast<const Int64 *>( &Pb )) >> shift;
+		hash = Pb_tag & Int64( cache_size - 1 );
+
+		if ( cache( hash ).iPb != Pb_tag ) {
+			cache( hash ).iPb = Pb_tag;
+
+			Pb_tag <<= shift;
+			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
+
+			cache( hash ).Tsat = PsyTsatFnPb_raw( Pb_tag_r, CalledFrom );
+		}
+		return cache( hash ).Tsat;
+	}
+#endif // EP_psych_cache
+
+	Real64
+#ifdef EP_psych_cache
+	PsyWFnTdbTwbPb_raw(
+#else // !EP_psych_cache
+	PsyWFnTdbTwbPb(
+#endif // EP_psych_cache
+		Real64 const TDB, // dry-bulb temperature {C}
+		Real64 const TWBin, // wet-bulb temperature {C}
+		Real64 const PB, // barometric pressure {Pascals}
+		std::string const & CalledFrom// routine this function was called from (error messages)
+			   )
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         George Shih
+		//       DATE WRITTEN   May 1976
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function provides the humidity ratio from dry-bulb temperature,
+		// wet-bulb temperature and barometric pressure.
+
+		// REFERENCES:
+		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQ 22,35
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "PsyWFnTdbTwbPb" );
+
+#ifdef EP_psych_stats
+		++NumTimesCalled( iPsyWFnTdbTwbPb );
+#endif
+
+		Real64 TWB( TWBin ); // test wet-bulb temperature
+
+		// Validity check
+		if ( TWB > TDB ) {
+#ifdef EP_psych_errors
+			if ( TWB > TDB + 0.01 ) PsyWFnTdbTwbPb_temperature_error( TDB, TWB, PB, CalledFrom );
+#endif
+			TWB = TDB;
+		}
+
+		// Calculation
+		Real64 const PWET( PsyPsatFnTemp( TWB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) ) ); // Pressure at wet-bulb temperature {Pascals}
+		Real64 const WET( 0.62198 * PWET / ( PB - PWET ) ); // Humidity ratio at wet-bulb temperature
+		Real64 const W( ( ( 2501.0 - 2.381 * TWB ) * WET - ( TDB - TWB ) ) / ( 2501.0 + 1.805 * TDB - 4.186 * TWB ) ); // humidity ratio
+
+		// Validity check
+		if ( W < 0.0 ) {
+#ifdef EP_psych_errors
+			PsyWFnTdbTwbPb_humidity_error( TDB, TWB, PB, W, CalledFrom );
+#endif
+			return PsyWFnTdbRhPb( TDB, 0.0001, PB, CalledFrom );
+		} else {
+			return W;
+		}
+	}
+
+
+#ifdef EP_psych_cache
+	Real64
+	PsyWFnTdbTwbPb(
+		Real64 const Tdb, // dry-bulb temperature {C}
+		Real64 const Twb, // wet-bulb temperature {C}
+		Real64 const Pb, // barometric pressure {Pascals}
+		std::string const & CalledFrom // routine this function was called from (error messages)
+			   )
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Amir Roth
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// Caching wrapper for PsyWFnTdbTwbPb
+
+		// REFERENCES:
+		// na
+
+		// FUNCTION PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "PsyWFnTdbTwbPb_cached" );
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETER DEFINITIONS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		int const cache_size( 64 * 1024 );
+		int const precision_bits( 24 ); // 28  // 24  // 32
+		int const shift = 64 - 12 - precision_bits;
+
+		struct cached_t
+		{	
+			// Members
+			Int64 iTdb;
+			Int64 iTwb;   
+			Int64 iPb;
+			Real64 W;
+
+			// Default Constructor
+			cached_t() : iTdb( 0 ), iTwb( 0 ), iPb( 0 ), W( 0.0 ) {}
+
+			// Member Constructor
+			cached_t(
+				Int64 const iTdb,
+				Int64 const iTwb,
+				Int64 const iPb,
+				Real64 const W
+				) : iTdb( iTdb ), iTwb( iTwb ), iPb( iPb ), W( W ) {}
+
+		};
+
+		static FArray1D< cached_t > cache; // DIMENSION(0:tsatcache_size)
+		static bool cache_init = false;
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Int64 Tdb_tag;
+		Int64 Twb_tag;
+		Int64 Pb_tag;
+		Int64 hash;
+		Real64 Tdb_tag_r;
+		Real64 Twb_tag_r;
+		Real64 Pb_tag_r;
+
+#ifdef EP_psych_stats
+		++NumTimesCalled( iPsyTsatFnPb_cache );
+#endif // EP_psych_stats
+
+		if (!cache_init)
+		{
+			cache.allocate( { 0, cache_size } );
+			cache_init = true;
+		}
+
+		Tdb_tag = (*reinterpret_cast<const Int64 *>( &Tdb )) >> shift;
+		Twb_tag = (*reinterpret_cast<const Int64 *>( &Twb )) >> shift;
+		Pb_tag = (*reinterpret_cast<const Int64 *>( &Pb )) >> shift;
+
+		hash = (Tdb_tag ^ Twb_tag ^ Pb_tag) & Int64( cache_size - 1 );
+
+		if ( cache( hash ).iTdb != Tdb_tag || cache( hash ).iTwb != Twb_tag || cache( hash ).iPb != Pb_tag ) {
+			cache( hash ).iTdb = Tdb_tag;
+			cache( hash ).iTwb = Twb_tag;
+			cache( hash ).iPb = Pb_tag;
+
+			Tdb_tag <<= shift;
+			Twb_tag <<= shift;
+			Pb_tag <<= shift;
+
+			Tdb_tag_r = *reinterpret_cast<Real64 *>( &Tdb_tag );
+			Twb_tag_r = *reinterpret_cast<Real64 *>( &Twb_tag );
+			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
+
+			cache( hash ).W = PsyWFnTdbTwbPb_raw( Tdb_tag_r, Twb_tag_r, Pb_tag_r, CalledFrom );
+		}
+		return cache( hash ).W;
+	}
+#endif // EP_psych_cache
 
 	//     NOTICE
 

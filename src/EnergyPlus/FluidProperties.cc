@@ -7,6 +7,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/bit.hh>
 
 // EnergyPlus Headers
 #include <FluidProperties.hh>
@@ -14,6 +15,8 @@
 #include <General.hh>
 #include <InputProcessor.hh>
 #include <UtilityRoutines.hh>
+
+#define EP_cache_GetSpecificHeatGlycol
 
 namespace EnergyPlus {
 
@@ -112,6 +115,37 @@ namespace FluidProperties {
 	FArray1D< FluidPropsGlycolRawData > GlyRawData;
 	FArray1D< FluidPropsGlycolData > GlycolData;
 	FArray1D< FluidPropsGlycolErrors > GlycolErrorTracking;
+
+  	struct cached_glycol_cp_t
+	{
+		// Members
+		int GlycolIndex;
+		Int64 iTemp;
+		Real64 Cp;
+
+		// Default Constructor
+		cached_glycol_cp_t() :
+			GlycolIndex( -1 ),
+			iTemp( -1000 ),
+			Cp( 0.0 )
+		{}
+
+		// Member Constructor
+		cached_glycol_cp_t(
+			int const GlycolIndex,
+			Int64 const iTemp,
+			Real64 const Cp
+		) :
+			GlycolIndex( GlycolIndex ),
+			iTemp( iTemp ),
+			Cp( Cp )
+		{}
+
+	};
+
+	static int const glycol_cp_cache_size( 64 * 1024 );
+	static int const glycol_cp_precision_bits( 20 );
+	static FArray1D< cached_glycol_cp_t > cached_Glycol_Cp; 
 
 	// Data Initializer Forward Declarations
 	// See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
@@ -1898,6 +1932,8 @@ namespace FluidProperties {
 		if ( DebugReportGlycols ) ReportAndTestGlycols();
 		if ( DebugReportRefrigerants ) ReportAndTestRefrigerants();
 
+		// Initialize Glycol Specific Heat cache
+		cached_Glycol_Cp.allocate( {0, glycol_cp_cache_size} );
 	}
 
 	// Use FArray initializers to mimic the complex initialization of the original
@@ -4695,7 +4731,11 @@ namespace FluidProperties {
 	//*****************************************************************************
 
 	Real64
+#ifdef EP_cache_GetSpecificHeatGlycol
+	GetSpecificHeatGlycol_raw(
+#else // !EP_cache_GetSpecificHeatGlycol
 	GetSpecificHeatGlycol(
+#endif // EP_cache_SpecificHeatGlycol				  
 		std::string const & Glycol, // carries in substance name
 		Real64 const Temperature, // actual temperature given as input
 		int & GlycolIndex, // Index to Glycol Properties
@@ -4837,6 +4877,75 @@ namespace FluidProperties {
 		return ReturnValue;
 
 	}
+
+#ifdef EP_cache_GetSpecificHeatGlycol
+	Real64
+	GetSpecificHeatGlycol(
+		std::string const & Glycol, // carries in substance name
+		Real64 const Temperature, // actual temperature given as input
+		int & GlycolIndex, // Index to Glycol Properties
+		std::string const & CalledFrom // routine this function was called from (error messages)
+	)
+	{
+
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Amir Roth
+		//       DATE WRITTEN   Octoboer 2014
+		//       MODIFIED       N/A
+		//       RE-ENGINEERED  N/A
+
+		// PURPOSE OF THIS FUNCTION:
+		// Caching wrapper for GetSpecificHeatGlycol.
+
+		// METHODOLOGY EMPLOYED:
+		// Combine glycol index and temperature into a hash function to find cached 
+		// specific heat entry.
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		Real64 Cp; // Value for function
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// FUNCTION PARAMETERS:
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Int64 const Grid_Shift( ( 64 - 12 - glycol_cp_precision_bits ) );
+
+		Int64 Temp_tag;
+		Int64 hash;
+		Real64 Temp_tag_r;
+
+		Temp_tag = TRANSFER( Temperature, Temp_tag );
+		Temp_tag = bit::bit_shift( Temp_tag, -Grid_Shift );
+		hash = bit::bit_and( bit::bit_xor(Temp_tag, Int64(GlycolIndex)), Int64( glycol_cp_cache_size - 1 ) );
+
+		if ( cached_Glycol_Cp(hash).GlycolIndex != GlycolIndex || cached_Glycol_Cp( hash ).iTemp != Temp_tag) {
+			cached_Glycol_Cp( hash ).GlycolIndex = GlycolIndex;
+			cached_Glycol_Cp( hash ).iTemp = Temp_tag;
+
+			Temp_tag_r = TRANSFER( bit::bit_shift( Temp_tag, Grid_Shift ), Temp_tag_r );
+			cached_Glycol_Cp( hash ).Cp = GetSpecificHeatGlycol_raw( Glycol, Temp_tag_r, GlycolIndex, CalledFrom );
+		}
+
+		Cp = cached_Glycol_Cp( hash ).Cp;
+
+		return Cp;
+
+	}
+#endif // EP_cache_SpecificHeatGlycol				  
 
 	//*****************************************************************************
 
