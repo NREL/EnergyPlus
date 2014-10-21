@@ -1679,11 +1679,11 @@ namespace PlantPipingSystemsManager {
 			//additional evapotranspiration parameter, min/max validated by IP
 			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 12 );
 
-			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = 2;
+			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = 3;
 			PipingSystemDomains( DomainNum ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = 2;
+			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = 3;
 			PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = 2;
+			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = 3;
 			PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
 
 
@@ -7607,7 +7607,12 @@ namespace PlantPipingSystemsManager {
 			if ( SELECT_CASE_var == CellType_BasementWall ) {
 				// Get the average basement wall heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains( DomainNum ).WallHeatFlux;
-				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
+
+				if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex ){
+					Numerator += Beta * HeatFlux * Width( cell ) * Height( cell );
+				} else if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex ){
+					Numerator += Beta * HeatFlux * Depth( cell ) * Height( cell );
+				}
 
 			}
 			if ( SELECT_CASE_var == CellType_BasementFloor ) {
