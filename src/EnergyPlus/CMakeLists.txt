@@ -543,9 +543,9 @@ set_target_properties(EnergyPlusLib PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 install( TARGETS EnergyPlus EnergyPlusLib DESTINATION ./ )
 
 if( BUILD_TESTING )
-  add_executable( EnergyPlusLib_tests test_ep_as_library.cc )
-  target_link_libraries( EnergyPlusLib_tests EnergyPlusLib )
-  # Currently the EnergyPlusLib_tests runner does not exit. Give it an idf and supporting files so that it will run.
-  # add_test( NAME integration.EnergyPlusLib_tests COMMAND EnergyPlusLib_tests WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" )
+  add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
+  target_link_libraries( TestEnergyPlusCallbacks EnergyPlusLib )
+  # Currently the TestEnergyPlusCallbacks runner does not exit. Give it an idf and supporting files so that it will run.
+  # add_test( NAME integration.TestEnergyPlusCallbacks COMMAND TestEnergyPlusCallbacks WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" )
 endif()
 
