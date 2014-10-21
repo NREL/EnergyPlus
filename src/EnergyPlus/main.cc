@@ -1,3 +1,7 @@
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 // C++ Headers
 #ifndef NDEBUG
 #ifdef __unix__
@@ -28,6 +32,7 @@
 #include <ScheduleManager.hh>
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
+
 
 int
 main()
@@ -218,6 +223,12 @@ main()
 #ifdef __unix__
 	feenableexcept( FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW );
 #endif
+#endif
+
+#ifdef _WIN32
+	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 #endif
 
 	// Locals
