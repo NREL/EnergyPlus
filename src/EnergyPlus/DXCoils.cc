@@ -1403,7 +1403,7 @@ namespace DXCoils {
 			if ( DXCoil( DXCoilNum ).SHRFTemp( 1 ) > 0 && DXCoil( DXCoilNum ).SHRFFlow( 1 ) > 0 ) {
 				DXCoil( DXCoilNum ).UserSHRCurveExists = true;
 			}
-			// get User Input floag for ASHRAE Standard 127 Standard Ratings Reporting
+			// get User Input flag for ASHRAE Standard 127 Standard Ratings Reporting
 			if ( lAlphaBlanks( 17 ) ) {
 				DXCoil( DXCoilNum ).ASHRAE127StdRprt = false;
 			} else {

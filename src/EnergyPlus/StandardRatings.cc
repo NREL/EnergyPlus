@@ -2242,7 +2242,6 @@ namespace StandardRatings {
 				ClassName = "Class " + RoundSigDigits(ClassNum);
 				CompNameNew = CompName + "(" + ClassName + ")";
 				gio::write( OutputFileInits, Format_102 ) << CompType << CompName << ClassName << RoundSigDigits( NetCoolingCapRated( Num + 1 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 1 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 2 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 2 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 3 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 3 ), 1 ) << RoundSigDigits( NetCoolingCapRated( Num + 4 ), 1 ) << RoundSigDigits( TotElectricPowerRated( Num + 4 ), 1 );
-				//PreDefTableEntry( pdchDXCoolCoilType, CompName, CompType );
 				PreDefTableEntry( pdchDXCoolCoilType, CompNameNew, CompType );
 				PreDefTableEntry( pdchDXCoolCoilNetCapSIA, CompNameNew, RoundSigDigits( NetCoolingCapRated( Num + 1 ), 1 ) );
 				PreDefTableEntry( pdchDXCoolCoilElecPowerA, CompNameNew, RoundSigDigits( TotElectricPowerRated( Num + 1 ), 1 ) );

@@ -91,7 +91,6 @@ namespace OutputReportPredefined {
 
 	// DX Cooling Coil subtable per ANSI/ASHRAE Std 127 for Tests A, B, C and D
 	int pdstDXCoolCoil2;
-	//int pdchDXCoolCoilTestClass; // Standard Rated Test Class Number
 	int pdchDXCoolCoilNetCapSIA; // Standard Rated (Net) Cooling Capacity [W], Test A
 	int pdchDXCoolCoilElecPowerA; // Standard Rated Electric Power [W], Test A
 	int pdchDXCoolCoilNetCapSIB; // Standard Rated (Net) Cooling Capacity [W], Test B
@@ -897,9 +896,7 @@ namespace OutputReportPredefined {
 
 		// for DX Cooling Coil ASHRAE 127-12 Report
 		pdstDXCoolCoil2 = newPreDefSubTable( pdrEquip, "DX Cooling Coil ASHRAE 127 Standard Ratings Report" );
-
 		pdchDXCoolCoilType = newPreDefColumn( pdstDXCoolCoil2, "DX Cooling Coil Type" );
-		//pdchDXCoolCoilTestClass = newPreDefColumn( pdstDXCoolCoil, "Application Class" );
 		pdchDXCoolCoilNetCapSIA = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test A [W]" );
 		pdchDXCoolCoilElecPowerA = newPreDefColumn( pdstDXCoolCoil2, "Rated Electric Power Test A [W]" );
 		pdchDXCoolCoilNetCapSIB = newPreDefColumn( pdstDXCoolCoil2, "Rated Net Cooling Capacity Test B [W]" );

@@ -553,7 +553,6 @@ namespace EvaporativeCoolers {
 			} else {
 				EvapCond( EvapCoolNum ).SecondaryOutletNode = GetOnlySingleNode( cAlphaArgs( 10 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 2, ObjectIsNotParent );
 			}
-			//TestCompSet( cCurrentModuleObject, cAlphaArgs( 1 ), cAlphaArgs( 9 ), cAlphaArgs( 10 ), "Evap Secondary Air Nodes" );
 
 			EvapCond( EvapCoolNum ).EvapControlNodeNum = GetOnlySingleNode( cAlphaArgs( 11 ), ErrorsFound, cCurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 
@@ -691,9 +690,10 @@ namespace EvaporativeCoolers {
 					EvapCond( EvapCoolNum ).EvapCoolerOperationControlFlag = false;
 				}
 			}
-
 			EvapCond( EvapCoolNum ).WetbulbEffecCurveIndex = GetCurveIndex( cAlphaArgs( 3 ) );
 			EvapCond( EvapCoolNum ).PumpPowerModifierCurveIndex = GetCurveIndex( cAlphaArgs( 4 ) );
+
+			SetupOutputVariable( "Evaporative Cooler Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 		}
 
 		if ( ErrorsFound ) {
@@ -702,7 +702,6 @@ namespace EvaporativeCoolers {
 
 		for ( EvapCoolNum = 1; EvapCoolNum <= NumEvapCool; ++EvapCoolNum ) {
 			// Setup Report variables for the Evap Coolers
-			SetupOutputVariable( "Evaporative Cooler Stage Effectiveness []", EvapCond( EvapCoolNum ).StageEff, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 			SetupOutputVariable( "Evaporative Cooler Electric Energy [J]", EvapCond( EvapCoolNum ).EvapCoolerEnergy, "System", "Sum", EvapCond( EvapCoolNum ).EvapCoolerName, _, "Electric", "Cooling", _, "System" );
 			SetupOutputVariable( "Evaporative Cooler Electric Power [W]", EvapCond( EvapCoolNum ).EvapCoolerPower, "System", "Average", EvapCond( EvapCoolNum ).EvapCoolerName );
 			// this next report variable is setup differently depending on how the water should be metered here.
@@ -775,8 +774,6 @@ namespace EvaporativeCoolers {
 		int ControlNode;
 		int OutNode;
 		int EvapUnitNum;
-		Real64 InletNodeTDB; // evaporative cooler inlet node drybulb temperature
-		Real64 InletNodeTWB; // evaporative cooler inlet node drybulb temperature
 		static bool MySetPointCheckFlag( true );
 		static bool MyOneTimeFlag( true );
 		static bool localSetPointCheck( false );
@@ -2535,8 +2532,6 @@ namespace EvaporativeCoolers {
 		// na
 
 		// Using/Aliasing
-		//using DataEnvironment::OutDryBulbTemp;
-		//using DataEnvironment::OutWetBulbTemp;
 		using CurveManager::CurveValue;
 
 		// Locals
