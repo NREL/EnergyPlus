@@ -5268,7 +5268,7 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 			if ( surface.IsPool ) {
 				// This surface is a pool, first check solution method and presence of movable insulation or radiant source/sink
 				if ( ( surface.HeatTransferAlgorithm == HeatTransferModel_CTF ) && ( surface.MaterialMovInsulInt <= 0 ) && ( ! Construct( ConstrNum ).SourceSinkPresent ) ) {
-					SimSwimmingPool( SurfNum, TempSurfIn( SurfNum ), RefAirTemp( SurfNum ), IterDampConst, TempInsOld( SurfNum ) );
+					SimSwimmingPool( SurfNum, TempSurfInTmp( SurfNum ), RefAirTemp( SurfNum ), IterDampConst, TempInsOld( SurfNum ) );
 					TempSurfIn( SurfNum ) = TempSurfInTmp( SurfNum );
 				} else {
 					// Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink

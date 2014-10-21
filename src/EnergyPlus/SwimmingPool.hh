@@ -74,7 +74,8 @@ namespace SwimmingPool {
 		std::string PeopleHeatGainSchedName; // Name of people heat gain schedule
 		int PeopleHeatGainSchedPtr; // People heat gain schedule index
 		Real64 PeopleHeatGain; // Current heat gain from people
-		
+		int GlycolIndex; // index in fluid property routines for water
+		Real64 WaterMass; // pool water mass
 		// Report data
 		Real64 PoolWaterTemp; // Average pool water temperature
 		Real64 WaterInletTemp; // water inlet temperature
@@ -120,6 +121,8 @@ namespace SwimmingPool {
 			PeopleSchedPtr( 0 ),
 			PeopleHeatGainSchedPtr( 0 ),
 			PeopleHeatGain( 0.0 ),
+			GlycolIndex( 0 ),
+			WaterMass( 0.0 ),
 			PoolWaterTemp( 23.0 ),
 			WaterInletTemp( 0.0 ),
 			WaterOutletTemp( 0.0 ),
@@ -178,6 +181,8 @@ namespace SwimmingPool {
 			std::string const PeopleHeatGainSchedName, // Name of people heat gain schedule
 			int const PeopleHeatGainSchedPtr, // People heat gain schedule index
 			Real64 const PeopleHeatGain, // Current people heat gain for the pool
+			int const GlycolIndex, // index in fluid property routines for water
+			Real64 const WaterMass, // pool water mass
 			// Report data
 			Real64 const PoolWaterTemp, // Average pool water temperature
 			Real64 const WaterInletTemp, // water inlet temperature
@@ -232,6 +237,8 @@ namespace SwimmingPool {
 			PeopleHeatGainSchedName( PeopleHeatGainSchedName ),
 			PeopleHeatGainSchedPtr( PeopleHeatGainSchedPtr ),
 			PeopleHeatGain( PeopleHeatGain ),
+			GlycolIndex( GlycolIndex ),
+			WaterMass( WaterMass ),
 			PoolWaterTemp( PoolWaterTemp ),
 			WaterInletTemp( WaterInletTemp ),
 			WaterOutletTemp( WaterOutletTemp ),

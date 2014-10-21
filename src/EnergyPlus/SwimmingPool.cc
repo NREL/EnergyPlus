@@ -551,6 +551,7 @@ namespace SwimmingPool {
 			Pool( PoolNum ).WaterOutletTemp = 0.0;
 			Pool( PoolNum ).WaterMassFlowRate = 0.0;
 			Pool( PoolNum ).PeopleHeatGain = 0.0;
+			Pool( PoolNum ).WaterMass = Surface( Pool( PoolNum ).SurfacePtr ).Area * Pool( PoolNum ).AvgDepth * GetDensityGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
 			
 			if ( ! MyPlantScanFlagPool( PoolNum ) ) {
 				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
@@ -562,7 +563,8 @@ namespace SwimmingPool {
 		// initialize the flow rate for the component on the plant side (this follows standard procedure for other components like low temperature radiant systems)
 		mdot = 0.0;
 		SetComponentFlowRate( mdot, Pool( PoolNum ).WaterInletNode, Pool( PoolNum ).WaterOutletNode, Pool( PoolNum ).HWLoopNum, Pool( PoolNum ).HWLoopSide, Pool( PoolNum ).HWBranchNum, Pool( PoolNum ).HWCompNum );
-
+		Pool( PoolNum ).WaterInletTemp = Node( Pool( PoolNum ).WaterInletNode ).Temp;
+		
 		// get the schedule values for different scheduled parameters
 		if ( Pool( PoolNum ).ActivityFactorSchedPtr > 0 ) {
 			Pool( PoolNum ).CurActivityFactor = GetCurrentScheduleValue( Pool( PoolNum ).ActivityFactorSchedPtr );
@@ -693,7 +695,14 @@ namespace SwimmingPool {
 		using DataHeatBalFanSys::QSteamBaseboardSurf;
 		using DataHeatBalFanSys::QElecBaseboardSurf;
 		using DataHeatBalSurface::QRadSWInAbs;
-
+		using FluidProperties::GetSpecificHeatGlycol;
+		using DataHeatBalSurface::TH;
+		using DataSurfaces::Surface;
+		using DataGlobals::TimeStepZone;
+		using DataGlobals::SecInHour;
+		using DataHeatBalance::Construct;
+		using DataHeatBalSurface::CTFConstInPart;
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -717,6 +726,13 @@ namespace SwimmingPool {
 		Real64 LWtotal; // total flux from long-wavelength radiation to surface
 		Real64 LWsum; // summation of all long-wavelenth radiation going to surface
 		Real64 SWtotal; // total flux from short-wavelength radiation to surface
+		Real64 Cp; // specific heat of pool water
+		Real64 TH11; // current outside surface temperature
+		Real64 TH22; // previous pool water temperature
+		int ConstrNum; // construction number index
+		Real64 MCpOverTimeStep; // intermediate variable (pool mass * Cp of water / zone time step)
+		Real64 MdotCpTin; // intermediate variable (mass flow rate * Cp of water * temperature of inlet water from plant loop)
+		Real64 MdotCpTmuw; // intermediate variable (mass flow rate * Cp of water * temperature of makeup water replacing what evaporated)
 		
 
 		// FLOW:
@@ -746,7 +762,19 @@ namespace SwimmingPool {
 		SWtotal = Pool( PoolNum ).CurCoverSWRadFac * QRadSWInAbs( SurfNum );
 		Pool( PoolNum ).RadConvertToConvect = ( ( 1.0 - Pool( PoolNum ).CurCoverLWRadFac ) * LWsum ) + ( ( 1.0 - Pool( PoolNum ).CurCoverSWRadFac ) * QRadSWInAbs( SurfNum ) );
 
-	
+		// Get an estimate of the pool water specific heat
+		Cp = GetSpecificHeatGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
+
+		TH22 = TH( SurfNum, 2, 2 ); // inside surface temperature at the previous time step equals the old pool water temperature
+		TH11 = TH( SurfNum, 1, 1 ); // outside surface temperature at the current time step
+		ConstrNum = Surface( SurfNum ).Construction;
+		MCpOverTimeStep = Pool( PoolNum ).WaterMass * Cp / ( TimeStepZone * SecInHour );
+		MdotCpTmuw = EvapRate * Cp * Pool( PoolNum ).CurMakeupWaterTemp;
+		MdotCpTin = Pool( PoolNum ).WaterMassFlowRate * Cp * Pool( PoolNum ).WaterInletTemp;
+
+		// Now calculate the inside surface temperature which is the same thing as calculating the pool water temperature
+		// Constant part of conduction eq (history terms) | LW radiation from various sources | SW radiation from internal sources | Pool water evaporation | Convection from pool to zone air | Iterative damping term (for stability) | Current conduction from the outside surface | (divided by) | Coefficient for conduction (current time) | Convection and damping term
+		TempSurfIn = ( CTFConstInPart( SurfNum ) + LWtotal + SWtotal + EvapEnergyLossPerArea + HConvIn * RefAirTemp + IterDampConst * TempInsOld + Construct( ConstrNum ).CTFCross( 0 ) * TH11 ) / ( Construct( ConstrNum ).CTFInside( 0 ) + HConvIn + IterDampConst );
 	}
 
 	void
