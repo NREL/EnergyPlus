@@ -179,7 +179,7 @@ namespace HeatingCoils {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CoilNum; // The HeatingCoil that you are currently loading input into
+		int CoilNum( 0 ); // The HeatingCoil that you are currently loading input into
 		Real64 QCoilActual2; // coil load actually delivered returned from specific coil
 		int OpMode; // fan operating mode
 		Real64 PartLoadFrac; // part-load fraction of heating coil
@@ -2846,7 +2846,7 @@ namespace HeatingCoils {
 		bool GetCoilErrFlag;
 		bool SuppressWarning;
 		int NumCoil;
-		int CoilNum;
+		int CoilNum( 0 );
 
 		// Obtains and Allocates HeatingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered

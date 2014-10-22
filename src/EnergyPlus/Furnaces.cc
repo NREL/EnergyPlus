@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -280,7 +281,7 @@ namespace Furnaces {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FurnaceNum; // Furnace number
 		static bool GetInputFlag( true ); // Logical to allow "GetInput" only once per simulation
-		Real64 HeatCoilLoad; // Zone heating coil load
+		Real64 HeatCoilLoad( 0.0 ); // Zone heating coil load
 		Real64 ReheatCoilLoad; // Load to be met by the reheat coil (if high humidity control)
 		Real64 ZoneLoad; // Control zone sensible load
 		Real64 MoistureLoad; // Control zone latent load
@@ -545,11 +546,14 @@ namespace Furnaces {
 				SimVariableSpeedHP( FurnaceNum, FirstHVACIteration, ZoneLoad, MoistureLoad, OnOffAirFlowRatio );
 
 			} else if ( Furnace( FurnaceNum ).WatertoAirHPType == WatertoAir_VarSpeedLooUpTable ) {
-
+				HeatCoilLoad = 0.0; // Added: Used below
+			} else {
+				assert( false ); //? If all possible states covered by if conditions change to HeatCoilLoad = 0.0;
 			}
 
 		} else {
 			// will never get here, all system types are simulated above
+			assert( false );
 
 		}}
 
@@ -569,7 +573,7 @@ namespace Furnaces {
 		if ( Furnace( FurnaceNum ).OpMode == CycFanCycCoil ) {
 			AirLoopFlow( AirLoopNum ).FanPLR = Furnace( FurnaceNum ).FanPartLoadRatio;
 		} else {
-			AirLoopFlow( AirLoopNum ).FanPLR = 0.0; // 0 means don't include PLR in OA calc's.
+			AirLoopFlow( AirLoopNum ).FanPLR = 1.0; // 1 means constant fan does not cycle.
 		}
 
 		// Report the current Furnace output

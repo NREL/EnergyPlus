@@ -1,5 +1,7 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -2044,11 +2046,15 @@ namespace PlantCondLoopOperation {
 		//       MODIFIED       na
 		//       RE-ENGINEERED  July 2010
 		//                      Sept 2010 B. Griffith, retain actual sign of load values
+		//						July 2014 M. Mitchell, added SequentialUniformPLR and UniformPLR schemes
 
 		// PURPOSE OF THIS SUBROUTINE: This subroutine distributes the load
 		// to plant equipment according to one of two distribution schemes:
 		//     OPTIMAL    = 1
-		//     SEQUENTIAL = 2
+		//     SEQUENTIALLOAD = 2
+		//     UNIFORMLOAD  = 3
+		//     UNIFORMPLR = 4
+		//     SEQUENTIALUNIFORMPLR = 5
 		// METHODOLOGY EMPLOYED:
 		// na
 		// REFERENCES:
@@ -2070,6 +2076,11 @@ namespace PlantCondLoopOperation {
 		Real64 DivideLoad;
 		Real64 UniformLoad;
 		Real64 NewLoad;
+		Real64 PlantCapacity;
+		Real64 MinCompPLR;
+		Real64 LargestMinCompPLR;
+		Real64 PlantPLR;
+		Real64 CompLoad;
 		int LoadFlag;
 
 		int BranchNum;
@@ -2081,9 +2092,22 @@ namespace PlantCondLoopOperation {
 		auto & this_loop( PlantLoop( LoopNum ) );
 		auto & this_loopside( this_loop.LoopSide( LoopSideNum ) );
 		auto & this_equiplist( this_loop.OpScheme( CurSchemePtr ).EquipList( ListPtr ) );
-
+		
+		struct LoadPLRPoint {
+			Real64 plant_capacity_to_this_point;
+			Real64 largest_min_plr_to_this_point;
+			LoadPLRPoint( Real64 capacity, Real64 plr ) {
+				plant_capacity_to_this_point = capacity;
+				largest_min_plr_to_this_point = plr;
+			}
+		};
+		std::vector< LoadPLRPoint > accrued_load_plr_values;
+						
 		// load local variables
 		NumCompsOnList = this_equiplist.NumComps;
+
+		//Allocate array once
+		accrued_load_plr_values.reserve( NumCompsOnList );
 		RemLoopDemand = LoopDemand;
 		if ( NumCompsOnList <= 0 ) return;
 		//set flag to specify optimal or sequential loading of equipment
@@ -2093,9 +2117,9 @@ namespace PlantCondLoopOperation {
 			//no load to distribute
 		} else {
 
-			{ auto const SELECT_CASE_var( LoadFlag );
-			if ( SELECT_CASE_var == OptimalLoading ) { // LoadFlag=1 indicates "optimal" load distribution
-				//OPTIMAL DISTRIBUTION SCHEME
+			//OPTIMAL DISTRIBUTION SCHEME
+			switch ( LoadFlag ) {
+			case OptimalLoading: 
 				//step 1: load all machines to optimal PLR
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2104,7 +2128,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 					// create a reference to the component itself
-					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2137,7 +2161,7 @@ namespace PlantCondLoopOperation {
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
                         // create a reference to the component itself
-                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+                        auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 
@@ -2158,7 +2182,7 @@ namespace PlantCondLoopOperation {
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 						// create a reference to the component itself
-						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 						DivideLoad = this_component.MaxLoad - std::abs( this_component.MyLoad );
@@ -2168,10 +2192,12 @@ namespace PlantCondLoopOperation {
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 					}
 				}
-
-				//SEQUENTIAL DISTRIBUTION SCHEME
-			} else if ( SELECT_CASE_var == SequentialLoading ) { // LoadFlag=2 indicates "sequential" load distribution
-
+				
+				break;
+			
+			//SEQUENTIALLOAD DISTRIBUTION SCHEME
+			case SequentialLoading: 
+				
 				// step 1: Load machines in list order
 				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
 
@@ -2179,7 +2205,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 					// create a reference to the component itself
-					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 
@@ -2202,8 +2228,10 @@ namespace PlantCondLoopOperation {
 					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0; //CR8631 don't just exit or %MyLoad on second device isn't reset
 				}
 
-				//UNIFORM DISTRIBUTION SCHEME
-			} else if ( SELECT_CASE_var == UniformLoading ) { // LoadFlag=3 indicates "uniform" load distribution
+				break;
+
+			//UNIFORMLOAD DISTRIBUTION SCHEME
+			case UniformLoading: 
 
 				// step 1: distribute load equally to all machines
 				UniformLoad = std::abs( RemLoopDemand ) / NumCompsOnList;
@@ -2213,7 +2241,7 @@ namespace PlantCondLoopOperation {
 					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 					// create a reference to the component itself
-					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 					if ( ! this_component.Available ) continue;
 					if ( this_component.MaxLoad > 0.0 ) {
@@ -2242,7 +2270,7 @@ namespace PlantCondLoopOperation {
 						CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 						// create a reference to the component itself
-						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+						auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 						if ( ! this_component.Available ) continue;
 						ChangeInLoad = min( this_component.MaxLoad - std::abs( this_component.MyLoad ), std::abs( RemLoopDemand ) );
@@ -2252,7 +2280,194 @@ namespace PlantCondLoopOperation {
 						if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;
 					}
 				}
-			}}
+
+				break;
+
+			// UNIFORMPLR LOAD DISTRIBUTION SCHEME
+			case UniformPLRLoading:
+				// Get total plant capacity and remove last component from list if load is less
+				// than plant capacity at min PLR
+				PlantCapacity = 0.0;
+				PlantPLR = 0.0;
+				MinCompPLR = 0.0;
+				LargestMinCompPLR = 0.0;
+				
+				// Determine PlantCapacity and LargestMinCompPLR
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+
+					if ( ! this_component.Available ) continue;
+
+					PlantCapacity += this_component.MaxLoad;
+
+					if ( this_component.MaxLoad < SmallLoad ){
+						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
+						MinCompPLR = 0.0;
+					} else {
+						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+					}
+						
+					//Set LargestMinCompPLR to largest MinCompPLR
+					LargestMinCompPLR = max( LargestMinCompPLR, MinCompPLR );
+
+					//Update the array
+					accrued_load_plr_values.push_back( LoadPLRPoint( PlantCapacity, LargestMinCompPLR ) );
+				}
+
+				// work backwards from full capacity down to 1 unit on
+				for ( int i = accrued_load_plr_values.size() - 1; i >= 0; --i ) {
+					
+					// if i == 0 then we need to take that as the resulting value
+					if ( i == 0 ) {
+						PlantCapacity = accrued_load_plr_values[i].plant_capacity_to_this_point;
+						LargestMinCompPLR = accrued_load_plr_values[i].largest_min_plr_to_this_point;
+						break;
+					
+					// if the capacity is greater than the demand, just store the latest values and continue
+					} else if ( std::abs( RemLoopDemand ) < ( accrued_load_plr_values[i].largest_min_plr_to_this_point * accrued_load_plr_values[i].plant_capacity_to_this_point ) ) {
+						PlantCapacity = accrued_load_plr_values[i].plant_capacity_to_this_point;
+						LargestMinCompPLR = accrued_load_plr_values[i].largest_min_plr_to_this_point;
+						continue;
+					
+					// if the capacity is less than the demand, accept the last values from the previous iteration and exit
+					} else {
+						break;
+						
+					}
+				}
+
+				// Determine PLR for uniform PLR loading of all equipment
+				if ( PlantCapacity > 0.0 ) {
+					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
+				} else {
+					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
+				} 
+
+				// Distribute load to each machine
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+					
+					CompLoad = 0.0;
+
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+					// create a reference to the component itself
+					auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+
+					if ( ! this_component.Available ) continue;
+
+					CompLoad = PlantPLR * this_component.MaxLoad;
+					
+					if ( this_component.MaxLoad > 0.0 ) {
+						ChangeInLoad = min( std::abs( RemLoopDemand ), CompLoad );
+					} else {
+						// this is for some components like cooling towers don't have well defined MaxLoad
+						ChangeInLoad = std::abs( RemLoopDemand );
+					}
+				
+					AdjustChangeInLoadForLastStageUpperRangeLimit( LoopNum, CurSchemePtr, ListPtr, ChangeInLoad );
+
+					AdjustChangeInLoadByEMSControls( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					AdjustChangeInLoadByHowServed( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					ChangeInLoad = max( 0.0, ChangeInLoad );
+
+					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
+			
+					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
+					
+					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
+				}
+
+				break;
+
+			// SEQUENTIALUNIFORMPLR LOAD DISTRIBUTION SCHEME
+			case SequentialUniformPLRLoading:
+				
+				PlantCapacity = 0.0;
+				PlantPLR = 0.0;
+				MinCompPLR = 0.0;
+				LargestMinCompPLR = 0.0;
+		
+				// Determine PlantCapacity and LargestMinCompPLR
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+					
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+
+					if ( ! this_component.Available ) continue;
+
+					PlantCapacity += this_component.MaxLoad;
+
+					if ( this_component.MaxLoad < SmallLoad ){
+						ShowWarningMessage( "Plant component " + this_component.Name + " has zero available capacity. Check component controls." );
+						MinCompPLR = 0.0;
+					} else {
+						MinCompPLR = this_component.MinLoad/this_component.MaxLoad;
+					}
+
+					//Set LargestMinCompPLR to largest MinCompPLR
+					if ( MinCompPLR > LargestMinCompPLR ) LargestMinCompPLR = MinCompPLR;
+
+					if ( std::abs( RemLoopDemand ) <= PlantCapacity ) {
+						break;
+					}
+				}
+
+				// Determine PLR for uniform PLR loading of all equipment
+				if ( PlantCapacity > 0.0 ) {
+					PlantPLR = min( 1.0, std::abs( RemLoopDemand ) / PlantCapacity );
+				} else {
+					ShowWarningError( "Zero available plant capacity for Plant Loop = " + PlantLoop( LoopNum ).Name );
+				} 
+
+				// Distribute load to each machine
+				for ( CompIndex = 1; CompIndex <= NumCompsOnList; ++CompIndex ) {
+					
+					CompLoad = 0.0;
+
+					BranchNum = this_equiplist.Comp( CompIndex ).BranchNumPtr;
+					CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
+
+                    // create a reference to the component itself
+                    auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
+
+					if ( ! this_component.Available ) continue;
+
+					CompLoad = PlantPLR * this_component.MaxLoad;
+					
+					if ( this_component.MaxLoad > 0.0 ) {
+						ChangeInLoad = min( std::abs( RemLoopDemand ), CompLoad );
+					} else {
+						// this is for some components like cooling towers don't have well defined MaxLoad
+						ChangeInLoad = std::abs( RemLoopDemand );
+					}
+				
+					AdjustChangeInLoadForLastStageUpperRangeLimit( LoopNum, CurSchemePtr, ListPtr, ChangeInLoad );
+
+					AdjustChangeInLoadByEMSControls( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					AdjustChangeInLoadByHowServed( LoopNum, LoopSideNum, BranchNum, CompNum, ChangeInLoad );
+
+					ChangeInLoad = max( 0.0, ChangeInLoad );
+
+					this_component.MyLoad = sign( ChangeInLoad, RemLoopDemand );
+					
+					RemLoopDemand -= sign( ChangeInLoad, RemLoopDemand );
+					
+					if ( std::abs( RemLoopDemand ) < SmallLoad ) RemLoopDemand = 0.0;				
+				}
+
+			}
 
 		} // load is small check
 
@@ -2263,7 +2478,7 @@ namespace PlantCondLoopOperation {
 			CompNum = this_equiplist.Comp( CompIndex ).CompNumPtr;
 
 			// create a reference to the component itself
-			auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ));
+			auto & this_component( this_loopside.Branch( BranchNum ).Comp( CompNum ) );
 
 			if ( std::abs( this_component.MyLoad ) < SmallLoad ) {
 				this_component.ON = false;
@@ -2524,7 +2739,7 @@ namespace PlantCondLoopOperation {
 		Real64 ActualMdot;
 		Real64 TempIn;
 		Real64 CurSpecHeat;
-		Real64 TempSetPt;
+		Real64 TempSetPt( 0.0 );
 		Real64 CompMinLoad;
 		Real64 CompMaxLoad;
 		Real64 CompOptLoad;
@@ -2586,9 +2801,11 @@ namespace PlantCondLoopOperation {
 				} else { // deadband
 					TempSetPt = TempIn;
 				}
-
+			} else {
+				assert( false );
 			}
-
+		} else {
+			assert( false );
 		}}
 
 		if ( TempSetPt == SensedNodeFlagValue ) {
@@ -2745,7 +2962,7 @@ namespace PlantCondLoopOperation {
 		using DataEnvironment::OutDewPointTemp;
 
 		// Return value
-		Real64 FindRangeVariable;
+		Real64 FindRangeVariable( 0.0 );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2777,8 +2994,9 @@ namespace PlantCondLoopOperation {
 			ReferenceNodeNum = PlantLoop( LoopNum ).OpScheme( CurSchemePtr ).ReferenceNodeNumber;
 			NodeTemperature = Node( ReferenceNodeNum ).Temp;
 			FindRangeVariable = NodeTemperature - OutDewPointTemp;
+		} else {
+			assert( false );
 		}} // OperationScheme
-		//Autodesk:Return Check/enforce that one of these CASEs holds or add a default case to assure return value is set
 
 		return FindRangeVariable;
 

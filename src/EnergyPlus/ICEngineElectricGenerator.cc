@@ -713,6 +713,7 @@ namespace ICEngineElectricGenerator {
 			}
 		} else {
 			QExhaustRec = 0.0;
+			//Bug ExhaustStackTemp not set but used below
 		}
 
 		QTotalHeatRecovered = QExhaustRec + QLubeOilRec + QJacketRec;

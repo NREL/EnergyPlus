@@ -1,3 +1,6 @@
+// C++ Headers
+#include <cassert>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -178,7 +181,7 @@ namespace PlantManager {
 				LoopSide = PlantCallingOrderInfo( HalfLoopNum ).LoopSide;
 				OtherSide = 3 - LoopSide; //will give us 1 if LoopSide is 2, or 2 if LoopSide is 1
 
-				auto & this_loop( PlantLoop( LoopNum) );
+				auto & this_loop( PlantLoop( LoopNum ) );
 				auto & this_loop_side( this_loop.LoopSide( LoopSide ) );
 				auto & other_loop_side( this_loop.LoopSide( OtherSide ) );
 
@@ -436,14 +439,18 @@ namespace PlantManager {
 			LoadingScheme = Alpha( 14 );
 			if ( SameString( LoadingScheme, "Optimal" ) ) {
 				this_loop.LoadDistribution = OptimalLoading;
-			} else if ( SameString( LoadingScheme, "Sequential" ) ) {
+			} else if ( SameString( LoadingScheme, "SequentialLoad" ) ) {
 				this_loop.LoadDistribution = SequentialLoading;
-			} else if ( SameString( LoadingScheme, "Uniform" ) ) {
+			} else if ( SameString( LoadingScheme, "UniformLoad" ) ) {
 				this_loop.LoadDistribution = UniformLoading;
+			} else if ( SameString( LoadingScheme, "UniformPLR" ) ) {
+				this_loop.LoadDistribution = UniformPLRLoading;
+			} else if ( SameString( LoadingScheme, "SequentialUniformPLR" ) ) {
+				this_loop.LoadDistribution = SequentialUniformPLRLoading;
 			} else {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alpha( 1 ) + "\", Invalid choice." );
 				ShowContinueError( "..." + cAlphaFieldNames( 14 ) + "=\"" + Alpha( 14 ) + "\"." );
-				ShowContinueError( "Will default to SequentialLoading." ); // TODO rename point
+				ShowContinueError( "Will default to SequentialLoad." ); // TODO rename point
 				this_loop.LoadDistribution = SequentialLoading;
 			}
 
@@ -2975,7 +2982,7 @@ namespace PlantManager {
 		Real64 MaxSizFac;
 		Real64 BranchSizFac;
 		Real64 NumBrSizFac;
-		Real64 FluidDensity; // local value from glycol routine
+		Real64 FluidDensity( 0.0 ); // local value from glycol routine
 		bool Finalize;
 
 		Finalize = OkayToFinish;
@@ -3108,6 +3115,8 @@ namespace PlantManager {
 			FluidDensity = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, InitConvTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 		} else if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
 			FluidDensity = GetSatDensityRefrig( fluidNameSteam, 100.0, 1.0, PlantLoop( LoopNum ).FluidIndex, RoutineName );
+		} else {
+			assert( false );
 		}
 
 		PlantLoop( LoopNum ).Mass = PlantLoop( LoopNum ).Volume * FluidDensity;

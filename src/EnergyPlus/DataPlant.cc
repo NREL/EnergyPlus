@@ -43,9 +43,7 @@ namespace DataPlant {
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
 	// Parameters for use in Load Distribution Schemes
-	int const OptimalLoading( 1 ); // Optimal Load Distribution Scheme
-	int const SequentialLoading( 2 ); // sequential Distribution Scheme
-	int const UniformLoading( 3 ); // sequential Distribution Scheme
+
 
 	// Parameters for scheme types
 	// Used in TYPE(OperationData)%OpSchemeType

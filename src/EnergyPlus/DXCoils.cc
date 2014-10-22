@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -2102,12 +2103,12 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 10 ) ); // convert curve name to number
-			if ( SameString( Alphas( 11 ), "ReverseCycle" ) ) {
+			if ( SameString( Alphas( 11 ), "ReverseCycle" ) && SameString( Alphas( 12 ), "OnDemand" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 10 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
 						ShowContinueError( "...required " + cAlphaFields( 10 ) + " is blank." );
-						ShowContinueError( "...field is required because " + cAlphaFields( 11 ) + " is \"ReverseCycle\"." );
+						ShowContinueError( "...field is required because " + cAlphaFields( 11 ) + " is \"ReverseCycle\" and " + cAlphaFields( 12 ) + " is \"OnDemand\"." );
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", invalid" );
 						ShowContinueError( "...not found " + cAlphaFields( 10 ) + "=\"" + Alphas( 10 ) + "\"." );
@@ -2182,14 +2183,14 @@ namespace DXCoils {
 
 			//Set defrost time period
 			DXCoil( DXCoilNum ).DefrostTime = Numbers( 10 );
-			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == 1 ) {
+			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == Timed ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 10 ) + " = 0.0 for defrost control = TIMED." );
 			}
 
 			//Set defrost capacity (for resistive defrost)
 			DXCoil( DXCoilNum ).DefrostCapacity = Numbers( 11 );
-			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == 2 ) {
+			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == Resistive ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 11 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
@@ -3759,7 +3760,7 @@ namespace DXCoils {
 
 			// Only required for reverse cycle heat pumps
 			DXCoil( DXCoilNum ).DefrostEIRFT = GetCurveIndex( Alphas( 5 ) ); // convert curve name to number
-			if ( SameString( Alphas( 6 ), "ReverseCycle" ) ) {
+			if ( SameString( Alphas( 6 ), "ReverseCycle" ) && SameString( Alphas( 7 ), "OnDemand" ) ) {
 				if ( DXCoil( DXCoilNum ).DefrostEIRFT == 0 ) {
 					if ( lAlphaBlanks( 5 ) ) {
 						ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", missing" );
@@ -3812,14 +3813,14 @@ namespace DXCoils {
 
 			//Set defrost time period
 			DXCoil( DXCoilNum ).DefrostTime = Numbers( 6 );
-			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == 1 ) {
+			if ( DXCoil( DXCoilNum ).DefrostTime == 0.0 && DXCoil( DXCoilNum ).DefrostControl == Timed ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 5 ) + " = 0.0 for defrost control = TIMED." );
 			}
 
 			//Set defrost capacity (for resistive defrost)
 			DXCoil( DXCoilNum ).DefrostCapacity = Numbers( 7 );
-			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == 2 ) {
+			if ( DXCoil( DXCoilNum ).DefrostCapacity == 0.0 && DXCoil( DXCoilNum ).DefrostStrategy == OnDemand ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + DXCoil( DXCoilNum ).Name + "\", " );
 				ShowContinueError( "..." + cNumericFields( 7 ) + " = 0.0 for defrost strategy = RESISTIVE." );
 			}
@@ -7955,7 +7956,7 @@ Label50: ;
 		Real64 FullLoadOutAirHumRat; // outlet humidity ratio at full load
 		Real64 FullLoadOutAirTemp; // outlet air temperature at full load [C]
 		Real64 FullLoadOutAirRH; // outlet air relative humidity at full load
-		Real64 EIRTempModFac; // EIR modifier (function of entering drybulb, outside drybulb) depending on the
+		Real64 EIRTempModFac( 0.0 ); // EIR modifier (function of entering drybulb, outside drybulb) depending on the
 		// type of curve
 		Real64 DefrostEIRTempModFac; // EIR modifier for defrost (function of entering wetbulb, outside drybulb)
 		Real64 EIRFlowModFac; // EIR modifier (function of actual supply air flow vs rated flow)
@@ -8118,7 +8119,7 @@ Label50: ;
 
 				if ( FractionalDefrostTime > 0.0 ) {
 					// Calculate defrost adjustment factors depending on defrost control strategy
-					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
+					if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
 						LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 );
 						DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 						DXCoil( DXCoilNum ).DefrostPower = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).RatedTotCap( Mode ) / 1.01667 ) * FractionalDefrostTime;
@@ -8174,6 +8175,8 @@ Label50: ;
 					EIRTempModFac = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( Mode ), OutdoorDryBulb );
 				} else if ( DXCoil( DXCoilNum ).EIRTempModFacCurveType( 1 ) == BiQuadratic ) {
 					EIRTempModFac = CurveValue( DXCoil( DXCoilNum ).EIRFTemp( Mode ), InletAirDryBulbTemp, OutdoorDryBulb );
+				} else {
+					assert( false );
 				}
 				EIRFlowModFac = CurveValue( DXCoil( DXCoilNum ).EIRFFlow( Mode ), AirMassFlowRatio );
 			} else {
@@ -8871,7 +8874,7 @@ Label50: ;
 		using DataEnvironment::StdRhoAir;
 
 		// Return value
-		Real64 CBF; // the result - the coil bypass factor
+		Real64 CBF( 0.0 ); // the result - the coil bypass factor
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -9000,6 +9003,7 @@ Label50: ;
 			}
 			ShowContinueErrorTimeStamp( "" );
 			CBFErrors = true;
+			CBF = 0.0; //? Added: Is this what should be returned
 		} else {
 
 			//   First guess for Tadp is outlet air dew point
@@ -10099,7 +10103,7 @@ Label50: ;
 		Real64 CrankcaseHeatingPower; // Power due to crank case heater
 		Real64 AirVolumeFlowRate; // Air volume flow rate across the heating coil
 		Real64 VolFlowperRatedTotCap; // Air volume flow rate divided by rated total heating capacity
-		Real64 TotCapTempModFac; // Total capacity modifier as a function ot temperature
+		Real64 TotCapTempModFac( 0.0 ); // Total capacity modifier as a function ot temperature
 		Real64 TotCapFlowModFac; // Total capacity modifier as a function of flow ratio
 		Real64 OutdoorCoilT; // Outdoor coil temperature
 		Real64 OutdoorCoildw; // Outdoor coil delta w assuming coil temperature of OutdoorCoilT
@@ -10115,7 +10119,7 @@ Label50: ;
 		Real64 FullLoadOutAirTemp; // Outlet temperature at full load
 		Real64 FullLoadOutAirRH; // Outler relative humidity at full load
 		Real64 OutletAirTemp; // Supply ari temperature
-		Real64 EIRTempModFac; // EIR modifier as a function of temperature
+		Real64 EIRTempModFac( 0.0 ); // EIR modifier as a function of temperature
 		Real64 EIRFlowModFac; // EIR modifier as a function of airflow ratio
 		Real64 WasteHeatLS; // Waste heat at low speed
 		Real64 WasteHeatHS; // Waste heat at high speed
@@ -10230,6 +10234,8 @@ Label50: ;
 					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumLS ), OutdoorDryBulb );
 				} else if ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNumLS ) == BiQuadratic ) {
 					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumLS ), InletAirDryBulbTemp, OutdoorDryBulb );
+				} else {
+					assert( false );
 				}
 				//  Get total capacity modifying factor (function of mass flow) for off-rated conditions
 				TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumLS ), AirMassFlowRatioLS );
@@ -10240,6 +10246,8 @@ Label50: ;
 					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumHS ), OutdoorDryBulb );
 				} else if ( DXCoil( DXCoilNum ).MSTotCapTempModFacCurveType( SpeedNumHS ) == BiQuadratic ) {
 					TotCapTempModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFTemp( SpeedNumHS ), InletAirDryBulbTemp, OutdoorDryBulb );
+				} else {
+					assert( false );
 				}
 				//  Get total capacity modifying factor (function of mass flow) for off-rated conditions
 				TotCapFlowModFac = CurveValue( DXCoil( DXCoilNum ).MSCCapFFlow( SpeedNumHS ), AirMassFlowRatioHS );
@@ -10254,6 +10262,8 @@ Label50: ;
 					EIRTempModFac = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( SpeedNumLS ), OutdoorDryBulb );
 				} else if ( DXCoil( DXCoilNum ).MSEIRTempModFacCurveType( SpeedNumLS ) == BiQuadratic ) {
 					EIRTempModFac = CurveValue( DXCoil( DXCoilNum ).MSEIRFTemp( SpeedNumLS ), InletAirDryBulbTemp, OutdoorDryBulb );
+				} else {
+					assert( false );
 				}
 				EIRFlowModFac = CurveValue( DXCoil( DXCoilNum ).MSEIRFFlow( SpeedNumLS ), AirMassFlowRatioLS );
 				EIRLS = 1.0 / DXCoil( DXCoilNum ).MSRatedCOP( SpeedNumLS ) * EIRTempModFac * EIRFlowModFac;
@@ -10297,7 +10307,7 @@ Label50: ;
 
 					if ( FractionalDefrostTime > 0.0 ) {
 						// Calculate defrost adjustment factors depending on defrost control strategy
-						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
+						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
 							DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 							LoadDueToDefrostLS = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ) / 1.01667 );
 							DefrostPowerLS = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).MSRatedTotCap( SpeedNumLS ) / 1.01667 ) * FractionalDefrostTime;
@@ -10460,7 +10470,7 @@ Label50: ;
 
 					if ( FractionalDefrostTime > 0.0 ) {
 						// Calculate defrost adjustment factors depending on defrost control strategy
-						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle ) {
+						if ( DXCoil( DXCoilNum ).DefrostStrategy == ReverseCycle && DXCoil( DXCoilNum ).DefrostControl == OnDemand ) {
 							LoadDueToDefrost = ( 0.01 * FractionalDefrostTime ) * ( 7.222 - OutdoorDryBulb ) * ( DXCoil( DXCoilNum ).MSRatedTotCap( 1 ) / 1.01667 );
 							DefrostEIRTempModFac = CurveValue( DXCoil( DXCoilNum ).DefrostEIRFT, max( 15.555, InletAirWetBulbC ), max( 15.555, OutdoorDryBulb ) );
 							DXCoil( DXCoilNum ).DefrostPower = DefrostEIRTempModFac * ( DXCoil( DXCoilNum ).MSRatedTotCap( 1 ) / 1.01667 ) * FractionalDefrostTime;

@@ -1449,7 +1449,7 @@ namespace EconomicLifeCycleCost {
 			{ auto const SELECT_CASE_var( CashFlow( iCashFlow ).SourceKind );
 			if ( SELECT_CASE_var == skResource ) {
 				//only for real fuels purchased such as electricity, natural gas, etc..
-				if ( ( CashFlow( iCashFlow ).Resource ) >= iRT_Electricity && ( CashFlow( iCashFlow ).Resource <= iRT_ResidualOil ) ) {
+				if ((CashFlow(iCashFlow).Resource) >= iRT_Electricity && (CashFlow(iCashFlow).Resource <= iRT_ElectricitySurplusSold)) {
 					CashFlow( iCashFlow ).pvKind = pvkEnergy;
 				} else {
 					CashFlow( iCashFlow ).pvKind = pvkNonEnergy;
@@ -1539,7 +1539,10 @@ namespace EconomicLifeCycleCost {
 			}}
 		}
 		// sum by category
-		for ( iCashFlow = countOfCostCat + 1; iCashFlow <= numCashFlow; ++iCashFlow ) {
+		for ( int i = 1; i <= countOfCostCat; ++i ) {
+			CashFlow(i).presentValue = 0; //initialize value to zero before summing in next for loop
+		}
+		for (iCashFlow = countOfCostCat + 1; iCashFlow <= numCashFlow; ++iCashFlow) {
 			curCategory = CashFlow( iCashFlow ).Category;
 			if ( ( curCategory <= countOfCostCat ) && ( curCategory >= 1 ) ) {
 				CashFlow( curCategory ).presentValue += CashFlow( iCashFlow ).presentValue;

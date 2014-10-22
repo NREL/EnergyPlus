@@ -456,7 +456,7 @@ namespace PlantPressureSystem {
 		Real64 NodeTemperature; // Nodal temperature {C}
 		Real64 NodeDensity; // Nodal density {kg/m3}
 		Real64 NodeViscosity; // Nodal viscosity, assuming mu here (dynamic viscosity)
-		Real64 BranchDeltaPress; // Pressure drop for component, {Pa}
+		Real64 BranchDeltaPress( 0.0 ); // Pressure drop for component, {Pa}
 		static int ErrorCounter( 0 ); // For proper error handling
 
 		//Exit early if need be

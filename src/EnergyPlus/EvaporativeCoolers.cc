@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -12,6 +13,7 @@
 #include <DataContaminantBalance.hh>
 #include <DataEnvironment.hh>
 #include <DataGlobalConstants.hh>
+#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataIPShortCuts.hh>
@@ -112,6 +114,7 @@ namespace EvaporativeCoolers {
 	// Object Data
 	FArray1D< EvapConditions > EvapCond;
 	FArray1D< ZoneEvapCoolerUnitStruct > ZoneEvapUnit;
+	FArray1D< ZoneEvapCoolerUnitFieldData > ZoneEvapCoolerUnitFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -499,7 +502,7 @@ namespace EvaporativeCoolers {
 		cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
-			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -1383,8 +1386,8 @@ namespace EvaporativeCoolers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		std::string CompName;
-		Real64 FullOutput;
-		Real64 ReqOutput;
+		Real64 FullOutput( 0.0 );
+		Real64 ReqOutput( 0.0 );
 		int InletNode;
 		int OutletNode;
 		int ControlNode;
@@ -1425,6 +1428,8 @@ namespace EvaporativeCoolers {
 				// now reinit after test call
 				InitEvapCooler( EvapCoolNum );
 
+			} else {
+				assert( false );
 			}}
 
 			// Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
@@ -2077,6 +2082,10 @@ namespace EvaporativeCoolers {
 		using DataHVACGlobals::FanType_SimpleOnOff;
 		using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
 		using BranchNodeConnections::SetUpCompSets;
+		using DataSizing::NumZoneHVACSizing;
+		using DataSizing::ZoneHVACSizing;
+		using DataZoneEquipment::ZoneEquipConfig;
+		using DataGlobals::NumOfZones;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2111,6 +2120,8 @@ namespace EvaporativeCoolers {
 		bool errFlag;
 		Real64 FanVolFlow;
 		int UnitLoop;
+		int CtrlZone; // index to loop counter
+		int NodeNum; // index to loop counter
 
 		if ( GetInputEvapComponentsFlag ) {
 			GetEvapInput();
@@ -2142,9 +2153,15 @@ namespace EvaporativeCoolers {
 			CheckZoneEvapUnitName.allocate( NumZoneEvapUnits );
 			CheckZoneEvapUnitName = true;
 			ZoneEvapUnit.allocate( NumZoneEvapUnits );
+			ZoneEvapCoolerUnitFields.allocate( NumZoneEvapUnits );
 
 			for ( UnitLoop = 1; UnitLoop <= NumZoneEvapUnits; ++UnitLoop ) {
 				GetObjectItem( CurrentModuleObject, UnitLoop, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+				
+				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames.allocate( NumNumbers );
+				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = "";
+				ZoneEvapCoolerUnitFields( UnitLoop ).FieldNames = cNumericFields;
+
 				IsNotOK = false;
 				IsBlank = false;
 				VerifyName( Alphas( 1 ), ZoneEvapUnit.Name(), UnitLoop - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -2166,7 +2183,6 @@ namespace EvaporativeCoolers {
 
 				if ( ! lAlphaBlanks( 3 ) ) {
 					ZoneEvapUnit( UnitLoop ).AvailManagerListName = Alphas( 3 );
-					ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitLoop ).AvailManagerListName = Alphas( 3 );
 				}
 
 				ZoneEvapUnit( UnitLoop ).OAInletNodeNum = GetOnlySingleNode( Alphas( 4 ), ErrorsFound, CurrentModuleObject, Alphas( 1 ), NodeType_Air, NodeConnectionType_OutsideAir, 1, ObjectIsParent );
@@ -2211,6 +2227,17 @@ namespace EvaporativeCoolers {
 					ShowContinueError( "invalid choice found " + cAlphaFields( 9 ) + "=\"" + Alphas( 9 ) + "\"." );
 					ErrorsFound = true;
 				}}
+
+				// get the zone numer served by the zoneHVAC evaporative cooler
+				for ( CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone ) {
+					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled) continue;
+					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
+						if ( ZoneEvapUnit( UnitLoop ).UnitOutletNodeNum == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							ZoneEvapUnit( UnitLoop ).ZonePtr = CtrlZone;
+							break;
+						}
+					}
+				}
 
 				{ auto const SELECT_CASE_var( Alphas( 10 ) );
 				if ( SELECT_CASE_var == "ZONETEMPERATUREDEADBANDONOFFCYCLING" ) {
@@ -2293,6 +2320,16 @@ namespace EvaporativeCoolers {
 					} else {
 						ShowSevereError( CurrentModuleObject + "=\"" + ZoneEvapUnit( UnitLoop ).Name + "\" invalid data." );
 						ShowContinueError( "missing input for " + cAlphaFields( 14 ) );
+						ErrorsFound = true;
+					}
+				}
+
+				ZoneEvapUnit( UnitLoop ).HVACSizingIndex = 0;
+				if ( !lAlphaBlanks( 15 ) ) {
+					ZoneEvapUnit( UnitLoop ).HVACSizingIndex = FindItemInList(Alphas( 15 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+					if ( ZoneEvapUnit( UnitLoop ).HVACSizingIndex == 0 ) {
+						ShowSevereError( cAlphaFields( 15 ) + " = " + Alphas( 15 ) + " not found." );
+						ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + ZoneEvapUnit( UnitLoop ).Name );
 						ErrorsFound = true;
 					}
 				}
@@ -2389,6 +2426,7 @@ namespace EvaporativeCoolers {
 		using DataGlobals::HourOfDay;
 		using DataZoneEquipment::ZoneEquipInputsFilled;
 		using DataZoneEquipment::CheckZoneEquipmentList;
+		using DataZoneEquipment::ZoneEvaporativeCoolerUnit_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataHVACGlobals::ZoneComp;
 		using DataHVACGlobals::SysTimeElapsed;
@@ -2414,6 +2452,7 @@ namespace EvaporativeCoolers {
 		static bool MyOneTimeFlag( true ); // one time flag
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool MyFanFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		bool errFlag;
 		int Loop;
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
@@ -2426,12 +2465,18 @@ namespace EvaporativeCoolers {
 			MyEnvrnFlag = true;
 			MyFanFlag.allocate( NumZoneEvapUnits );
 			MyFanFlag = true;
+			MyZoneEqFlag.allocate ( NumZoneEvapUnits );
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( ZoneEvapUnit( UnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( UnitNum ).ZoneNum = ZoneNum;
-			ZoneEvapUnit( UnitNum ).FanAvailStatus = ZoneComp( ZoneEvapUnit( UnitNum ).ZoneEquipType ).ZoneCompAvailMgrs( UnitNum ).AvailStatus;
+			if ( MyZoneEqFlag( UnitNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitNum ).AvailManagerListName = ZoneEvapUnit( UnitNum ).AvailManagerListName;
+				ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( UnitNum ) = false;
+			}
+			ZoneEvapUnit( UnitNum ).FanAvailStatus = ZoneComp( ZoneEvaporativeCoolerUnit_Num ).ZoneCompAvailMgrs( UnitNum ).AvailStatus;
 		}
 
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
@@ -2464,14 +2509,12 @@ namespace EvaporativeCoolers {
 		if ( ZoneEvapUnit( UnitNum ).FanAvailSchedPtr > 0 ) {
 			// include fan is not available, then unit is not available
 			if ( ( GetCurrentScheduleValue( ZoneEvapUnit( UnitNum ).FanAvailSchedPtr ) > 0.0 ) && ( GetCurrentScheduleValue( ZoneEvapUnit( UnitNum ).AvailSchedIndex ) > 0.0 ) ) {
-				// .AND. ( ZoneComp(ZoneEvapUnit(UnitNum)%ZoneEquipType)%ZoneCompAvailMgrs(UnitNum)%AvailStatus) ) THEN
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = true;
 			} else {
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = false;
 			}
 		} else {
 			if ( GetCurrentScheduleValue( ZoneEvapUnit( UnitNum ).AvailSchedIndex ) > 0.0 ) {
-				//.AND. ( ZoneComp(ZoneEvapUnit(UnitNum)%ZoneEquipType)%ZoneCompAvailMgrs(UnitNum)%AvailStatus) )THEN
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = true;
 			} else {
 				ZoneEvapUnit( UnitNum ).UnitIsAvailable = false;
@@ -2556,7 +2599,7 @@ namespace EvaporativeCoolers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         B. Griffith
 		//       DATE WRITTEN   July 2013
-		//       MODIFIED       na
+		//       MODIFIED       August 2014 Bereket Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -2570,16 +2613,19 @@ namespace EvaporativeCoolers {
 
 		// Using/Aliasing
 		using ReportSizingManager::ReportSizingOutput;
-		using DataSizing::AutoSize;
-		using DataSizing::CurZoneEqNum;
-		using DataSizing::FinalZoneSizing;
+		using ReportSizingManager::RequestSizing;
+		using namespace DataSizing;
 		using DataHVACGlobals::SmallAirVolFlow;
+		using DataHVACGlobals::SystemAirflowSizing;
+		using DataHVACGlobals::CoolingAirflowSizing;
+		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName("SizeZoneEvaporativeCoolerUnit: "); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2588,19 +2634,94 @@ namespace EvaporativeCoolers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		// na
+		std::string CompName; // component name
+		std::string CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 1; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
+		int SAFMethod(0); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+		int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
-		if ( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate == AutoSize ) {
+		DataScalableSizingON = false;
+		ZoneHeatingOnlyFan = false;
+		ZoneCoolingOnlyFan = false;
 
-			if ( CurZoneEqNum > 0 ) {
-				CheckZoneSizing( "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit( UnitNum ).Name );
-				ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-				if ( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate < SmallAirVolFlow ) {
-					ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate = 0.0;
+		CompType = "ZoneHVAC:EvaporativeCoolerUnit";
+		CompName = ZoneEvapUnit( UnitNum ).Name;
+		DataZoneNumber = ZoneEvapUnit( UnitNum ).ZonePtr;
+		SizingMethod = CoolingAirflowSizing;
+		FieldNum = 1; // N1 , \field Maximum Supply Air Flow Rate
+		PrintFlag = true;
+		SizingString = ZoneEvapCoolerUnitFields(UnitNum).FieldNames(FieldNum) + " [m3/s]";
+
+		if (CurZoneEqNum > 0) {
+
+			if ( ZoneEvapUnit( UnitNum ).HVACSizingIndex > 0) {
+				ZoneCoolingOnlyFan = true;
+				zoneHVACIndex = ZoneEvapUnit( UnitNum ).HVACSizingIndex;
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
+							PrintFlag = false;
+						}
+					} else if ( SAFMethod == FlowPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					}
+					else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate = TempSize;
+				} else if ( SAFMethod == FlowPerCoolingCapacity ) {
+					SizingMethod = CoolingCapacitySizing;
+					TempSize = AutoSize;
+					PrintFlag = false;
+					DataScalableSizingON = true;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+					if ( ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					DataCapacityUsedForSizing = TempSize;
+					DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					SizingMethod = CoolingAirflowSizing;
+					PrintFlag = true;
+					TempSize = AutoSize;
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate = TempSize;
 				}
-				ReportSizingOutput( "ZoneHVAC:EvaporativeCoolerUnit", ZoneEvapUnit( UnitNum ).Name, "Design Supply Air Flow Rate [m3/s]", ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate );
+				DataScalableSizingON = false;
+				ZoneCoolingOnlyFan = false;
+			} else {
+				// no scalble sizing method has been specified. Sizing proceeds using the method
+				// specified in the zoneHVAC object 
+				// N1 , \field Maximum Supply Air Flow Rate
+				ZoneCoolingOnlyFan = true;				
+				if ( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate > 0.0) {
+					 PrintFlag = false;
+				}
+				TempSize = ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate;
+				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+				ZoneEvapUnit(UnitNum).DesignAirVolumeFlowRate = TempSize;
+				ZoneCoolingOnlyFan = false;
 			}
-
 		}
 
 	}

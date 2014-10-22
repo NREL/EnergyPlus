@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -204,7 +205,7 @@ namespace IceThermalStorage {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		Real64 DemandMdot;
 		Real64 TempIn;
-		Real64 TempSetPt;
+		Real64 TempSetPt( 0.0 );
 		Real64 MyLoad2;
 		Real64 MaxCap;
 		Real64 MinCap;
@@ -310,6 +311,8 @@ namespace IceThermalStorage {
 				TempSetPt = Node( OutletNodeNum ).TempSetPoint;
 			} else if ( SELECT_CASE_var1 == DualSetPointDeadBand ) {
 				TempSetPt = Node( OutletNodeNum ).TempSetPointHi;
+			} else {
+				assert( false );
 			}}
 			DemandMdot = IceStorage( IceNum ).DesignMassFlowRate;
 
@@ -444,7 +447,7 @@ namespace IceThermalStorage {
 		int NodeNumOut; // Plant loop outlet node number for component
 		Real64 Qstar; // Current load on the ice storage unit [non-dimensional]
 		Real64 TempIn; // Inlet temperature to component (from plant loop) [C]
-		Real64 TempSetPt; // Setpoint temperature defined by loop controls [C]
+		Real64 TempSetPt( 0.0 ); // Setpoint temperature defined by loop controls [C]
 		Real64 ToutNew; // Updated outlet temperature from the tank [C]
 		Real64 ToutOld; // Tank outlet temperature from the last iteration [C]
 		Real64 Cp; // local plant fluid specific heat
@@ -460,6 +463,8 @@ namespace IceThermalStorage {
 			TempSetPt = Node( NodeNumOut ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			TempSetPt = Node( NodeNumOut ).TempSetPointHi;
+		} else {
+			assert( false );
 		}}
 
 		IterNum = 0;
@@ -1793,6 +1798,7 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 		using DataGlobals::NumOfTimeStepInHour;
@@ -1802,7 +1808,7 @@ namespace IceThermalStorage {
 		using DataPlant::DualSetPointDeadBand;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetComponentFlowRate;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1899,7 +1905,7 @@ namespace IceThermalStorage {
 			Qice = max( Qice, -MaxCap );
 
 			// Calculate leaving water temperature
-			if ( ( Qice >= 0.0 ) || ( XCurIceFrac <= 0.0 ) ) {
+			if ( ( Qice >= 0.0 ) || ( XCurIceFrac <= 0.0 ) || ( ITSMassFlowRate < MassFlowTolerance ) ) {
 				ITSOutletTemp = ITSInletTemp;
 				DeltaTemp = 0.0;
 				Qice = 0.0;
@@ -1948,7 +1954,7 @@ namespace IceThermalStorage {
 
 		// Locals
 		Real64 ITSInletTemp;
-		Real64 ITSOutletTemp;
+		Real64 ITSOutletTemp( 0.0 );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1974,6 +1980,8 @@ namespace IceThermalStorage {
 			ITSOutletTemp = Node( OutletNodeNum ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			ITSOutletTemp = Node( OutletNodeNum ).TempSetPointHi;
+		} else {
+			assert( false );
 		}}
 
 		LogTerm = ( ITSInletTemp - FreezTemp ) / ( ITSOutletTemp - FreezTemp );
