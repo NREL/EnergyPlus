@@ -1,3 +1,9 @@
+// FMI-Related Headers
+extern "C" {
+#include <FMI/main.h>
+}
+
+
 // C++ Headers
 #include <cstdlib>
 #include <iostream>

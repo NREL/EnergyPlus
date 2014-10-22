@@ -178,7 +178,7 @@ namespace DataSystemVariables {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool FileExist;
+		bool FileExist( false ); // initialize to false, then override to true if present
 		static int EchoInputFile; // found unit number for "eplusout.audit"
 		static bool firstTime( true );
 		std::string InputFileName; // save for changing out path characters

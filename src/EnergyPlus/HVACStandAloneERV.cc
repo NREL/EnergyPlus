@@ -546,7 +546,6 @@ namespace HVACStandAloneERV {
 
 			if ( ! lAlphaBlanks( 7 ) ) {
 				StandAloneERV( StandAloneERVNum ).AvailManagerListName = Alphas( 7 );
-				ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).AvailManagerListName = Alphas( 7 );
 			}
 
 			// Read supply and exhaust air flow rates
@@ -1034,6 +1033,7 @@ namespace HVACStandAloneERV {
 		Real64 RhoAir; // air density at SupInNode, standard conditions (dry air @ 20C,actual elevation pressure)
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyEnvrnFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // loop counter
 
@@ -1042,14 +1042,20 @@ namespace HVACStandAloneERV {
 
 			MyEnvrnFlag.allocate( NumStandAloneERVs );
 			MySizeFlag.allocate( NumStandAloneERVs );
+			MyZoneEqFlag.allocate ( NumStandAloneERVs );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( StandAloneERVNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).AvailManagerListName = StandAloneERV( StandAloneERVNum ).AvailManagerListName;
+				ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( StandAloneERVNum ) = false;
+			}
 			StandAloneERV( StandAloneERVNum ).AvailStatus = ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).AvailStatus;
 		}
 

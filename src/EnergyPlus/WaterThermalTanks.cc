@@ -6733,8 +6733,8 @@ namespace WaterThermalTanks {
 		std::string IterNum; // Max number of iterations for warning message
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
-		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
-		int loopIter; // iteration loop counter
+//		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
+//		int loopIter; // iteration loop counter
 
 		// FLOW:
 		// initialize local variables
@@ -6852,8 +6852,11 @@ namespace WaterThermalTanks {
 			Node( HPWaterInletNode ).MassFlowRate = MdotWater;
 			WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
 
-			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-			for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
+//			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
+			// It turns out that the water tank delta T increases each iteration and water mass flow decreases each iteration causing the HPWH to incorrectly report results.
+			// commenting out for now. A similar loop exists several lines down.
+//			for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
 				CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
 				//       Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
 				//       If HPWH is ever allowed to vary fan speed, this next sub should be called.
@@ -6864,7 +6867,7 @@ namespace WaterThermalTanks {
 				//           move the full load outlet temperature rate to the water heater structure variables
 				//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
 				WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = Node( HPWaterInletNode ).Temp + CondenserDeltaT;
-				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
+//				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
 
 				//           this CALL does not update node temps, must use WaterThermalTank variables
 				// select tank type
@@ -6877,9 +6880,9 @@ namespace WaterThermalTanks {
 					NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( HPNum ).ControlSensorLocation );
 				}}
 				Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
-				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
-				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-			}
+//				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
+//				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+//			}
 
 			//         if tank temperature is greater than set point, calculate a PLR needed to exactly reach the set point
 			if ( NewTankTemp > SetPointTemp ) {
@@ -6997,8 +7000,8 @@ namespace WaterThermalTanks {
 
 				Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
 
-				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-				for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
+//				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+//				for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
 					CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
 					//         Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
 					//         If HPWH is ever allowed to vary fan speed, this next sub should be called.
@@ -7018,9 +7021,9 @@ namespace WaterThermalTanks {
 						NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( HPNum ).ControlSensorLocation );
 					}}
 					Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
-					if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
-					HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-				}
+//					if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
+//					HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+//				}
 
 				//           if tank temperature is greater than set point, calculate a PLR needed to exactly reach the set point
 				if ( NewTankTemp > SetPointTemp ) {

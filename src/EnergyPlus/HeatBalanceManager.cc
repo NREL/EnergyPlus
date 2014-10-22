@@ -1060,10 +1060,10 @@ namespace HeatBalanceManager {
 
 		gio::write(OutputFileInits, Format_732);
 		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-			gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1);
+			gio::write(OutputFileInits, Format_733) << "Yes";
 		}
 		else {
-			gio::write(OutputFileInits, Format_733) << "No" << "N/A";
+			gio::write(OutputFileInits, Format_733) << "No";
 		}
 
 	}
@@ -6659,11 +6659,9 @@ Label1000: ;
 				}
 			} else {
 				if ( SchedPtr != 0 ) {
-					ZoneScheduled = ZoneScheduled;
 					ZoneUnscheduled = false;
 				} else {
 					ZoneScheduled = false;
-					ZoneUnscheduled = ZoneUnscheduled;
 				}
 			}
 
