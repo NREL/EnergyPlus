@@ -67,6 +67,12 @@
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
 
+//delme 
+extern "C" {
+#include <signal.h>
+}
+//end delme
+
 namespace EnergyPlus {
 
 namespace HeatBalanceSurfaceManager {
@@ -4019,6 +4025,12 @@ namespace HeatBalanceSurfaceManager {
 
 		// SHIFT TEMPERATURE AND FLUX HISTORIES:
 		// SHIFT AIR TEMP AND FLUX SHIFT VALUES WHEN AT BOTTOM OF ARRAY SPACE.
+		//DELME geof
+		static int del_count = 0;
+		if(del_count < 125){
+		  std::cout << "count: " << del_count << std::endl;
+		}
+		//end DELME
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) { // Loop through all (heat transfer) surfaces...
 			auto const & surface( Surface( SurfNum ) );
 
@@ -4082,6 +4094,11 @@ namespace HeatBalanceSurfaceManager {
 				QHM[ l22 ] = QInt1( SurfNum );
 				QsrcHistM( SurfNum, 2 ) = Qsrc1( SurfNum );
 
+				//DELME by geof
+				if(del_count < 125){
+				  std::cout << SurfNum << "::" << THM[ l21 ] << ":";
+				}
+				  //end DELME
 				TH[ l21 ] = THM[ l21 ];
 				TH[ l22 ] = THM( SurfNum, 2, 2 );
 				TsrcHist( SurfNum, 2 ) = TsrcHistM( SurfNum, 2 );
@@ -4130,6 +4147,11 @@ namespace HeatBalanceSurfaceManager {
 				auto const l21( TH.index( SurfNum, 2, 1 ) ); // Linear index
 				auto const l22( TH.index( SurfNum, 2, 2 ) ); // Linear index
 				TH[ l21 ] = THM[ l21 ] - ( THM[ l21 ] - TempExt1( SurfNum ) ) * sum_steps;
+				//DELME by geof
+				if( del_count < 125 ){
+				  std::cout << SurfNum << "::" << TH[ l21 ] << ":";
+				}
+				  //end DELME
 				TH[ l22 ] = THM[ l22 ] - ( THM[ l22 ] - TempInt1( SurfNum ) ) * sum_steps;
 				QH[ l21 ] = QHM[ l21 ] - ( QHM[ l21 ] - QExt1( SurfNum ) ) * sum_steps;
 				QH[ l22 ] = QHM[ l22 ] - ( QHM[ l22 ] - QInt1( SurfNum ) ) * sum_steps;
@@ -4146,6 +4168,12 @@ namespace HeatBalanceSurfaceManager {
 
 		} // ...end of loop over all (heat transfer) surfaces
 
+		//DELME geof
+		if(del_count < 125){
+		  std::cout << std::endl;
+		  del_count++;
+		}
+		//end DELME
 	}
 
 	void
@@ -5063,6 +5091,13 @@ CalcHeatBalanceInsideSurf( Optional_int_const ZoneToResimulate ) // if passed in
 	static int WarmupSurfTemp;
 	bool PartialResimulate;
 	static int TimeStepInDay( 0 ); // time step number
+
+	//debug section (delme)
+	using namespace HeatBalanceIntRadExchange;
+	if (HeatBalanceIntRadExchange::count == 123){
+		raise(SIGINT);
+	}
+	//end debug
 
 	// FLOW:
 	if ( firstTime ) {
