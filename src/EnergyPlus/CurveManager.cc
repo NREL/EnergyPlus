@@ -1810,7 +1810,7 @@ namespace CurveManager {
 			// create curve objects when regression analysis is required
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
-				if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) ) {
+				if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) || ( SELECT_CASE_var == Exponent ) ) {
 					TempArray1.allocate( size( PerfCurveTableData( TableNum ).X1 ) );
 					TempArray1 = PerfCurveTableData( TableNum ).X1;
 					TempArray2.allocate( size( PerfCurveTableData( TableNum ).Y ) );

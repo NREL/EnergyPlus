@@ -1,3 +1,6 @@
+// C++ Headers
+#include <cassert>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
@@ -169,9 +172,8 @@ namespace WaterManager {
 		// na
 
 		// Using/Aliasing
-		using DataGlobals::BeginTimeStepFlag;
-		using DataHVACGlobals::FirstTimeStepSysFlag;
-
+		// na
+		
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
@@ -186,18 +188,13 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
+		
 		if ( ! ( AnyWaterSystemsInModel ) ) return;
-
-		//  IF (BeginTimeStepFlag .OR. FirstTimeStepSysFlag) Then
-		// calls do updating that would be needed at end of final iteration
-		// and at the beginning of the timestep.
 
 		UpdateWaterManager();
 
 		UpdatePrecipitation();
 		UpdateIrrigation();
-
-		//  ENDIF
 
 	}
 
@@ -1518,7 +1515,7 @@ namespace WaterManager {
 		// see DataWater.f90
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 LossFactor;
+		Real64 LossFactor( 0.0 );
 		Real64 VdotAvail;
 
 		//If (.NOT.(IsRain)) Then ! is it raining now? No don't use this flag since precip schedule might differ from weather file
@@ -1538,6 +1535,8 @@ namespace WaterManager {
 				LossFactor = RainCollector( RainColNum ).LossFactor;
 			} else if ( SELECT_CASE_var == ScheduledRainLossFactor ) {
 				LossFactor = GetCurrentScheduleValue( RainCollector( RainColNum ).LossFactorSchedID );
+			} else {
+				assert( false );
 			}}
 
 			VdotAvail = RainFall.CurrentRate * RainCollector( RainColNum ).HorizArea * ( 1.0 - LossFactor );
@@ -1733,7 +1732,9 @@ namespace WaterManager {
 			WaterStorage( TankNum ).VdotFromTank = 0.0;
 			WaterStorage( TankNum ).VdotToTank = 0.0;
 			if ( WaterStorage( TankNum ).NumWaterDemands > 0 ) {
-				WaterStorage( TankNum ).VdotRequestDemand = 0.0;
+				// don't reset the requested demand, it is up to the other components to update it themselves
+				//WaterStorage( TankNum ).VdotRequestDemand = 0.0;
+				// the available demand is calculated here in the calc routine, so its fine to initialize it
 				WaterStorage( TankNum ).VdotAvailDemand = 0.0;
 			}
 			WaterStorage( TankNum ).VdotOverflow = 0.0;

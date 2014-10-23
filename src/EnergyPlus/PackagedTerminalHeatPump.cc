@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -13,6 +14,7 @@
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -148,6 +150,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	FArray1D< PTUnitData > PTUnit;
+	FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name 
 
 	// Functions
 
@@ -200,7 +203,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum; // index of packaged terminal heat pump being simulated
+		int PTUnitNum( 0 ); // index of packaged terminal heat pump being simulated
 
 		Real64 OnOffAirFlowRatio; // ratio of compressor ON airflow to average airflow over timestep
 		Real64 QZnReq; // load to be met by zone equipment
@@ -231,6 +234,7 @@ namespace PackagedTerminalHeatPump {
 			} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 				PTUnitNum = CompIndex + NumPTHP + NumPTAC;
 			} else {
+				assert( false );
 			}}
 			if ( PTUnitNum > NumPTUs || PTUnitNum < 1 ) {
 				ShowFatalError( "SimPackagedTerminalUnit:  Invalid CompIndex passed=" + TrimSigDigits( PTUnitNum ) + ", Number of Units=" + TrimSigDigits( NumPTUs ) + ", Entered Unit name=" + CompName );
@@ -502,6 +506,7 @@ namespace PackagedTerminalHeatPump {
 		using InputProcessor::VerifyName;
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using FluidProperties::GetSatDensityRefrig;
@@ -529,6 +534,8 @@ namespace PackagedTerminalHeatPump {
 		using DataHVACGlobals::WaterConstant;
 		using DataHVACGlobals::WaterConstantOnDemand;
 		using SingleDuct::GetATMixer;
+		using DataSizing::NumZoneHVACSizing;
+		using DataSizing::ZoneHVACSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -633,7 +640,8 @@ namespace PackagedTerminalHeatPump {
 		// allocate the data structures
 		if ( NumPTUs > 0 ) {
 			PTUnit.allocate( NumPTUs );
-			CheckEquipName.allocate( NumPTUs );
+			CheckEquipName.allocate( NumPTUs );		
+			PTUnitUNumericFields.allocate( NumPTUs );
 		}
 		CheckEquipName = true;
 
@@ -656,6 +664,11 @@ namespace PackagedTerminalHeatPump {
 			GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex;
+
+			PTUnitUNumericFields( PTUnitNum ).FieldNames.allocate( NumNumbers );
+			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
+			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -1054,6 +1067,7 @@ namespace PackagedTerminalHeatPump {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
 							ZoneNodeNotFound = false;
 							break;
 						}
@@ -1156,6 +1170,16 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 17 );
 			}
 
+			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
+			if ( ! lAlphaBlanks( 18 )) {
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 18 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
+					ShowSevereError( cAlphaFields( 18 ) + " = " + Alphas( 18 ) + " not found.");
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ErrorsFound = true;
+				}
+			}
+
 			//   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
 			//                              UseCompressorOffFlow = operate at value specified by user
 			//   AirFlowControl only valid if fan opmode = ContFanCycCoil
@@ -1255,6 +1279,11 @@ namespace PackagedTerminalHeatPump {
 			GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex + NumPTHP;
+
+			PTUnitUNumericFields( PTUnitNum ).FieldNames.allocate( NumNumbers );
+			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
+			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -1596,6 +1625,7 @@ namespace PackagedTerminalHeatPump {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
 							ZoneNodeNotFound = false;
 							break;
 						}
@@ -1667,6 +1697,7 @@ namespace PackagedTerminalHeatPump {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							PTUnit(PTUnitNum).ZonePtr = CtrlZone;
 							ZoneNodeNotFound = false;
 							break;
 						}
@@ -1692,6 +1723,17 @@ namespace PackagedTerminalHeatPump {
 			if ( ! lAlphaBlanks( 15 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 15 );
 			}
+			
+			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
+			if ( ! lAlphaBlanks( 16 ) ) {
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				if ( PTUnit( PTUnitNum ).HVACSizingIndex == 0) {
+					ShowSevereError( cAlphaFields( 16 ) + " = " + Alphas( 16 ) + " not found." );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ErrorsFound = true;
+				}
+			}
+
 			//   set air flow control mode, UseCompressorOnFlow = operate at last cooling or heating air flow requested when compressor is off
 			//                              UseCompressorOffFlow = operate at value specified by user
 			//   AirFlowControl only valid if fan opmode = ContFanCycCoil
@@ -1783,6 +1825,11 @@ namespace PackagedTerminalHeatPump {
 			GetObjectItem( CurrentModuleObject, PTUnitIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			PTUnitNum = PTUnitIndex + NumPTHP + NumPTAC;
+
+			PTUnitUNumericFields( PTUnitNum ).FieldNames.allocate( NumNumbers );
+			PTUnitUNumericFields( PTUnitNum ).FieldNames = "";
+			PTUnitUNumericFields( PTUnitNum ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), PTUnit.Name(), PTUnitNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -2127,6 +2174,16 @@ namespace PackagedTerminalHeatPump {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 18 );
 			}
 
+			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
+			if ( ! lAlphaBlanks( 20 ) ) {
+				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 20 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				if (PTUnit( PTUnitNum ).HVACSizingIndex == 0 ) {
+					ShowSevereError( cAlphaFields( 20 ) + " = " + Alphas( 20 ) + " not found." );
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + PTUnit( PTUnitNum ).Name );
+					ErrorsFound = true;
+				}
+			}
+
 			// Get AirTerminal mixer data
 			GetATMixer( PTUnit( PTUnitNum ).Name, PTUnit( PTUnitNum ).ATMixerName, PTUnit( PTUnitNum ).ATMixerIndex, PTUnit( PTUnitNum ).ATMixerType, PTUnit( PTUnitNum ).ATMixerPriNode, PTUnit( PTUnitNum ).ATMixerSecNode, PTUnit( PTUnitNum ).ATMixerOutNode );
 			if ( PTUnit( PTUnitNum ).ATMixerType == ATMixer_InletSide || PTUnit( PTUnitNum ).ATMixerType == ATMixer_SupplySide ) {
@@ -2182,6 +2239,7 @@ namespace PackagedTerminalHeatPump {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 						if ( PTUnit( PTUnitNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							PTUnit( PTUnitNum ).ZonePtr = CtrlZone;
 							ZoneNodeNotFound = false;
 							break;
 						}
@@ -3443,6 +3501,7 @@ namespace PackagedTerminalHeatPump {
 		//       DATE WRITTEN   July 2005
 		//       MODIFIED       Bo Shen, ORNL, March 2012, added variable-speed water-source heat pump
 		//                      August 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B. Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -3457,9 +3516,17 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// Using/Aliasing
+		using namespace DataSizing;
 		using WaterCoils::SetCoilDesFlow;
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
+		using DataHVACGlobals::SystemAirflowSizing;
+		using DataHVACGlobals::CoolingAirflowSizing;
+		using DataHVACGlobals::HeatingAirflowSizing;
+		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		bool IsAutoSize; // Indicator to autosize
@@ -3479,9 +3546,10 @@ namespace PackagedTerminalHeatPump {
 		Real64 MaxSATSupHeatUser; // Hardsized supply air temperature of supplemental heater for reporting
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName("SizePTUnit: "); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3492,6 +3560,18 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		bool ErrorsFound;
 		bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
+
+
+		std::string CompName; // component name
+		std::string CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
+		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		ErrorsFound = false;
 		IsAutoSize = false;
@@ -3510,114 +3590,207 @@ namespace PackagedTerminalHeatPump {
 		MaxSATSupHeatDes = 0.0;
 		MaxSATSupHeatUser = 0.0;
 
-		if ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
-		if ( CurZoneEqNum > 0 ) {
-			CheckThisZoneForSizing( CurZoneEqNum, SizingDesRunThisZone );
-			if ( ! IsAutoSize && ! SizingDesRunThisZone ) { // Simulation continue
-				if ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow > 0.0 ) {
-					ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "User-Specified Supply Air Flow Rate During Cooling Operation [m3/s]", PTUnit( PTUnitNum ).MaxCoolAirVolFlow );
-				}
-			} else {
-				CheckZoneSizing( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name );
-				MaxCoolAirVolFlowDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-				if ( MaxCoolAirVolFlowDes < SmallAirVolFlow ) {
-					MaxCoolAirVolFlowDes = 0.0;
-				}
-				if ( IsAutoSize ) {
-					PTUnit( PTUnitNum ).MaxCoolAirVolFlow = MaxCoolAirVolFlowDes;
-					ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "Design Size Supply Air Flow Rate During Cooling Operation [m3/s]", MaxCoolAirVolFlowDes );
-				} else {
-					if ( PTUnit( PTUnitNum ).MaxCoolAirVolFlow > 0.0 && MaxCoolAirVolFlowDes > 0.0 && SizingDesRunThisZone ) {
-						MaxCoolAirVolFlowUser = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
-						ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "Design Size Supply Air Flow Rate During Cooling Operation [m3/s]", MaxCoolAirVolFlowDes, "User-Specified Supply Air Flow Rate During Cooling Operation [m3/s]", MaxCoolAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxCoolAirVolFlowDes - MaxCoolAirVolFlowUser ) / MaxCoolAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizePTUnit: Potential issue with equipment sizing for " + PTUnit( PTUnitNum ).UnitType + ' ' + PTUnit( PTUnitNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Flow Rate During Cooling Operation of " + RoundSigDigits( MaxCoolAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate During Cooling Operation of " + RoundSigDigits( MaxCoolAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
-				}
-			}
-		}
+		DataFracOfAutosizedCoolingAirflow = 1.0;
+		DataFracOfAutosizedHeatingAirflow = 1.0;
+		DataFracOfAutosizedCoolingCapacity = 1.0;
+		DataFracOfAutosizedHeatingCapacity = 1.0;
 
-		IsAutoSize = false;
-		if ( PTUnit( PTUnitNum ).MaxHeatAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
-		if ( CurZoneEqNum > 0 ) {
-			CheckThisZoneForSizing( CurZoneEqNum, SizingDesRunThisZone );
-			if ( ! IsAutoSize && ! SizingDesRunThisZone ) { // Simulation continue
-				if ( PTUnit( PTUnitNum ).MaxHeatAirVolFlow > 0.0 ) {
-					ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "User-Specified Supply Air Flow Rate During Heating Operation [m3/s]", PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
-				}
-			} else {
-				CheckZoneSizing( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name );
-				MaxHeatAirVolFlowDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-				if ( MaxHeatAirVolFlowDes < SmallAirVolFlow ) {
-					MaxHeatAirVolFlowDes = 0.0;
-				}
-				if ( IsAutoSize ) {
-					PTUnit( PTUnitNum ).MaxHeatAirVolFlow = MaxHeatAirVolFlowDes;
-					ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "Design Size Supply Air Flow Rate During Heating Operation [m3/s]", MaxHeatAirVolFlowDes );
-				} else {
-					if ( PTUnit( PTUnitNum ).MaxHeatAirVolFlow > 0.0 && MaxHeatAirVolFlowDes > 0.0 && SizingDesRunThisZone ) {
-						MaxHeatAirVolFlowUser = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
-						ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "Design Size Supply Air Flow Rate During Heating Operation [m3/s]", MaxHeatAirVolFlowDes, "User-Specified Supply Air Flow Rate During Heating Operation [m3/s]", MaxHeatAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxHeatAirVolFlowDes - MaxHeatAirVolFlowUser ) / MaxHeatAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizePTUnit: Potential issue with equipment sizing for " + PTUnit( PTUnitNum ).UnitType + ' ' + PTUnit( PTUnitNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Flow Rate During Heating Operation of " + RoundSigDigits( MaxHeatAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate During Heating Operation of " + RoundSigDigits( MaxHeatAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
-				}
-			}
-		}
-
-		IsAutoSize = false;
-		if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
+		DataScalableSizingON = false;
+		DataScalableCapSizingON = false;
+		CompType = PTUnit( PTUnitNum ).UnitType;
+		CompName = PTUnit( PTUnitNum ).Name;
+		DataZoneNumber = PTUnit( PTUnitNum ).ZonePtr;
 
 		if ( CurZoneEqNum > 0 ) {
-			CheckThisZoneForSizing( CurZoneEqNum, SizingDesRunThisZone );
-			if ( ! IsAutoSize && ! SizingDesRunThisZone ) { // Simulation continue
-				if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow > 0.0 ) {
-					ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "User-Specified Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow );
+			if ( PTUnit( PTUnitNum ).HVACSizingIndex > 0 ) {
+				zoneHVACIndex = PTUnit( PTUnitNum ).HVACSizingIndex;
+				SizingMethod = CoolingAirflowSizing;
+				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
+				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
+				PrintFlag = true;
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ) {
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						} 
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ) {
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+					}
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					PTUnit( PTUnitNum ).MaxCoolAirVolFlow = TempSize;
+				} else if ( SAFMethod == FlowPerCoolingCapacity ) {
+					SizingMethod = CoolingCapacitySizing;
+					TempSize = AutoSize;
+					PrintFlag = false;
+					DataScalableSizingON = true;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+					if ( ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+					}
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DataAutosizedCoolingCapacity = TempSize;
+					DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					SizingMethod = CoolingAirflowSizing;
+					PrintFlag = true;
+					TempSize = AutoSize;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					PTUnit( PTUnitNum ).MaxCoolAirVolFlow = TempSize;
 				}
-			} else {
-				CheckZoneSizing( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name );
-				MaxNoCoolHeatAirVolFlowDes = min( PTUnit( PTUnitNum ).MaxCoolAirVolFlow, PTUnit( PTUnitNum ).MaxHeatAirVolFlow );
-				if ( MaxNoCoolHeatAirVolFlowDes < SmallAirVolFlow ) {
-					MaxNoCoolHeatAirVolFlowDes = 0.0;
-				}
-				if ( IsAutoSize ) {
-					PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = MaxNoCoolHeatAirVolFlowDes;
-					ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "Design Size Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", MaxNoCoolHeatAirVolFlowDes );
-				} else {
-					if ( PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow > 0.0 && MaxNoCoolHeatAirVolFlowDes > 0.0 && SizingDesRunThisZone ) {
-						MaxNoCoolHeatAirVolFlowUser = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow;
-						ReportSizingOutput( PTUnit( PTUnitNum ).UnitType, PTUnit( PTUnitNum ).Name, "Design Size Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", MaxNoCoolHeatAirVolFlowDes, "User-Specified Supply Air Flow Rate When No Cooling or Heating is Needed [m3/s]", MaxNoCoolHeatAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxNoCoolHeatAirVolFlowDes - MaxNoCoolHeatAirVolFlowUser ) / MaxNoCoolHeatAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizePTUnit: Potential issue with equipment sizing for " + PTUnit( PTUnitNum ).UnitType + ' ' + PTUnit( PTUnitNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Flow Rate When No Cooling or Heating is Needed of " + RoundSigDigits( MaxNoCoolHeatAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate When No Cooling or Heating is Needed of " + RoundSigDigits( MaxNoCoolHeatAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
+
+				SizingMethod = HeatingAirflowSizing;
+				FieldNum = 2; //N2, \field Supply Air Flow Rate During Heating Operation
+				PrintFlag = true;
+				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ) {
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ) {
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+					}
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					PTUnit( PTUnitNum ).MaxHeatAirVolFlow = TempSize;
+				} else if ( SAFMethod == FlowPerHeatingCapacity ) {
+					SizingMethod = HeatingCapacitySizing;
+					TempSize = AutoSize;
+					PrintFlag = false;
+					DataScalableSizingON = true;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					if ( ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity ) {
+						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+					}
+					DataAutosizedHeatingCapacity = TempSize;
+					DataFlowPerHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+					SizingMethod = HeatingAirflowSizing;
+					PrintFlag = true;
+					TempSize = AutoSize;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					PTUnit( PTUnitNum ).MaxHeatAirVolFlow = TempSize;
+				}
+				
+				SizingMethod = SystemAirflowSizing;
+				FieldNum = 3; //N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
+				PrintFlag = true;
+				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow || SAFMethod == FractionOfAutosizedHeatingAirflow ) {					
+					if ( SAFMethod == SupplyAirFlowRate ) {
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ) {
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ) {
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+					}
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = TempSize;
+				}
+
+				// initialize capacity sizing variables: cooling
+				SizingMethod = CoolingCapacitySizing;
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+					if ( CapSizingMethod == CoolingDesignCapacity ) {
+						if ( ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+						}
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
+						DataScalableCapSizingON = true;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+						DataScalableCapSizingON = true;
 					}
 				}
+
+				// initialize capacity sizing variables: heating
+				SizingMethod = HeatingCapacitySizing;
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+					if ( CapSizingMethod == HeatingDesignCapacity ) {
+						if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+						}
+					} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+					}
+				}
+			} else {
+				// no scalble sizing method has been specified. Sizing proceeds using the method
+				// specified in the zoneHVAC object 
+
+				PrintFlag = true;
+				SizingMethod = CoolingAirflowSizing;
+				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
+				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
+				TempSize = PTUnit( PTUnitNum ).MaxCoolAirVolFlow;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				PTUnit( PTUnitNum ).MaxCoolAirVolFlow = TempSize;
+
+				SizingMethod = HeatingAirflowSizing;
+				FieldNum = 2; //N2, \field Supply Air Flow Rate During Heating Operation
+				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
+				TempSize = PTUnit( PTUnitNum ).MaxHeatAirVolFlow;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				PTUnit( PTUnitNum ).MaxHeatAirVolFlow = TempSize;
+
+				SizingMethod = SystemAirflowSizing;
+				FieldNum = 3; //N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
+				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
+				TempSize = PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				PTUnit( PTUnitNum ).MaxNoCoolHeatAirVolFlow = TempSize;
 			}
 		}
 
@@ -4884,7 +5057,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -4908,6 +5081,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -4961,7 +5135,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -4985,6 +5159,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5040,7 +5215,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5062,6 +5237,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {
@@ -5122,7 +5298,7 @@ namespace PackagedTerminalHeatPump {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int PTUnitNum;
+		int PTUnitNum( 0 );
 
 		if ( GetPTUnitInputFlag ) {
 			GetPTUnit();
@@ -5144,6 +5320,7 @@ namespace PackagedTerminalHeatPump {
 		} else if ( SELECT_CASE_var == PkgTermHPWaterToAir_Num ) {
 			PTUnitNum = PTUnitCompIndex + NumPTHP + NumPTAC;
 		} else {
+			assert( false );
 		}}
 
 		if ( PTUnitNum > 0 && PTUnitNum <= NumPTUs ) {

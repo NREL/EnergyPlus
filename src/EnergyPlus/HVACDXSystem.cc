@@ -1014,7 +1014,7 @@ namespace HVACDXSystem {
 						//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//           do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//           run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
@@ -1266,7 +1266,7 @@ namespace HVACDXSystem {
 						//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//           do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc * 2.0 ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//           run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc * 2.0 ) {
@@ -1640,7 +1640,7 @@ namespace HVACDXSystem {
 						//            IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//            do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//            If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//            run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
@@ -1835,7 +1835,7 @@ namespace HVACDXSystem {
 						//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//           do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//           run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
@@ -2017,7 +2017,7 @@ namespace HVACDXSystem {
 							//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 							//           do not run the compressor
 							if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-								PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+								//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 								//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 								//           run the compressor at PartLoadFrac = 1.
 							} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {

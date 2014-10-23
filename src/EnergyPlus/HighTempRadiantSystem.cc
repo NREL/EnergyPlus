@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -112,6 +113,7 @@ namespace HighTempRadiantSystem {
 
 	// Object Data
 	FArray1D< HighTempRadiantSystemData > HighTempRadSys;
+	FArray1D< HighTempRadSysNumericFieldData > HighTempRadSysNumericFields;
 
 	// Functions
 
@@ -235,6 +237,12 @@ namespace HighTempRadiantSystem {
 		using InputProcessor::VerifyName;
 		using InputProcessor::GetObjectDefMaxArgs;
 		using ScheduleManager::GetScheduleIndex;
+		using General::TrimSigDigits;
+		using DataSizing::AutoSize;
+		using DataSizing::FinalZoneSizing;
+		using DataSizing::HeatingDesignCapacity;
+		using DataSizing::CapacityPerFloorArea;
+		using DataSizing::FractionOfAutosizedHeatingCapacity;
 		using namespace DataIPShortCuts;
 
 		// Locals
@@ -249,6 +257,10 @@ namespace HighTempRadiantSystem {
 		Real64 const MinThrottlingRange( 0.5 ); // Smallest throttling range allowed in degrees Celsius
 		//  INTEGER,          PARAMETER :: MaxDistribSurfaces = 20    ! Maximum number of surfaces that a radiant heater can radiate to
 		static std::string const RoutineName( "GetHighTempRadiantSystem: " ); // include trailing blank space
+		int const iHeatCAPMAlphaNum( 4 ); // get input index to High Temperature Radiant system heating capacity sizing method
+		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to High Temperature Radiant system heating capacity
+		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to High Temperature Radiant system heating capacity per floor area sizing
+		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to High Temperature Radiant system heating capacity sizing as fraction of autozized heating capacity
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -273,6 +285,7 @@ namespace HighTempRadiantSystem {
 
 		HighTempRadSys.allocate( NumOfHighTempRadSys );
 		CheckEquipName.allocate( NumOfHighTempRadSys );
+		HighTempRadSysNumericFields.allocate( NumOfHighTempRadSys );
 		CheckEquipName = true;
 
 		// extensible object, do not need max args because using IPShortCuts
@@ -282,6 +295,10 @@ namespace HighTempRadiantSystem {
 		for ( Item = 1; Item <= NumOfHighTempRadSys; ++Item ) {
 
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			HighTempRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
+			HighTempRadSysNumericFields( Item ).FieldNames = "";
+			HighTempRadSysNumericFields( Item ).FieldNames = cNumericFieldNames;
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -312,72 +329,132 @@ namespace HighTempRadiantSystem {
 				ErrorsFound = true;
 			}
 
-			HighTempRadSys( Item ).MaxPowerCapac = rNumericArgs( 1 );
+			//HighTempRadSys( Item ).MaxPowerCapac = rNumericArgs( 1 );
 
-			if ( SameString( cAlphaArgs( 4 ), cNaturalGas ) ) {
+
+			// Determine High Temp Radiant heating design capacity sizing method
+			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+				HighTempRadSys( Item ).HeatingCapMethod = HeatingDesignCapacity;
+
+				if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
+					HighTempRadSys( Item ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
+					if ( HighTempRadSys( Item ).ScaledHeatingCapacity < 0.0 && HighTempRadSys( Item ).ScaledHeatingCapacity != AutoSize ) {
+						ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys( Item ).Name );
+						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatDesignCapacityNumericNum ), 7 ) );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys( Item ).Name );
+					ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
+					ErrorsFound = true;
+				}
+			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+				HighTempRadSys( Item ).HeatingCapMethod = CapacityPerFloorArea;
+				if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
+					HighTempRadSys( Item ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
+					if ( HighTempRadSys( Item ).ScaledHeatingCapacity <= 0.0 ) {
+						ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys( Item ).Name );
+						ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatCapacityPerFloorAreaNumericNum ), 7 ) );
+						ErrorsFound = true;
+					} else if ( HighTempRadSys( Item ).ScaledHeatingCapacity == AutoSize ) {
+						ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys(Item).Name);
+						ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) + " = Autosize" );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys( Item ).Name );
+					ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
+					ErrorsFound = true;
+				}
+			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ) {
+				HighTempRadSys( Item ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
+					HighTempRadSys( Item ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
+					if ( HighTempRadSys( Item ).ScaledHeatingCapacity < 0.0 ) {
+						ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys( Item ).Name );
+						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatFracOfAutosizedCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum ), 7 ) );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys( Item ).Name );
+					ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatFracOfAutosizedCapacityNumericNum ) );
+					ErrorsFound = true;
+				}
+			} else {
+				ShowSevereError( cCurrentModuleObject + " = " + HighTempRadSys( Item ).Name );
+				ShowContinueError( "Illegal " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+				ErrorsFound = true;
+			}
+
+			if ( SameString( cAlphaArgs( 5 ), cNaturalGas ) ) {
 				HighTempRadSys( Item ).HeaterType = Gas;
-			} else if ( SameString( cAlphaArgs( 4 ), cElectricity ) ) {
+			} else if ( SameString( cAlphaArgs( 5 ), cElectricity ) ) {
 				HighTempRadSys( Item ).HeaterType = Electric;
-			} else if ( SameString( cAlphaArgs( 4 ), cGas ) ) {
+			} else if ( SameString( cAlphaArgs( 5 ), cGas ) ) {
 				HighTempRadSys( Item ).HeaterType = Gas;
-			} else if ( SameString( cAlphaArgs( 4 ), cElectric ) ) {
+			} else if ( SameString( cAlphaArgs( 5 ), cElectric ) ) {
 				HighTempRadSys( Item ).HeaterType = Electric;
 			} else {
-				ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + " = " + cAlphaArgs( 4 ) );
+				ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
 			if ( HighTempRadSys( Item ).HeaterType == Gas ) {
-				HighTempRadSys( Item ).CombustionEffic = rNumericArgs( 2 );
+				HighTempRadSys( Item ).CombustionEffic = rNumericArgs( 4 );
 				// Limit the combustion efficiency to between zero and one...
 				if ( HighTempRadSys( Item ).CombustionEffic < MinCombustionEffic ) {
 					HighTempRadSys( Item ).CombustionEffic = MinCombustionEffic;
-					ShowWarningError( cNumericFieldNames( 2 ) + " was less than the allowable minimum, reset to minimum value." );
+					ShowWarningError( cNumericFieldNames( 4 ) + " was less than the allowable minimum, reset to minimum value." );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 				if ( HighTempRadSys( Item ).CombustionEffic > MaxCombustionEffic ) {
 					HighTempRadSys( Item ).CombustionEffic = MaxCombustionEffic;
-					ShowWarningError( cNumericFieldNames( 2 ) + " was greater than the allowable maximum, reset to maximum value." );
+					ShowWarningError( cNumericFieldNames( 4 ) + " was greater than the allowable maximum, reset to maximum value." );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 			} else {
 				HighTempRadSys( Item ).CombustionEffic = MaxCombustionEffic; // No inefficiency in the heater
 			}
 
-			HighTempRadSys( Item ).FracRadiant = rNumericArgs( 3 );
+			HighTempRadSys( Item ).FracRadiant = rNumericArgs( 5 );
 			if ( HighTempRadSys( Item ).FracRadiant < MinFraction ) {
 				HighTempRadSys( Item ).FracRadiant = MinFraction;
-				ShowWarningError( cNumericFieldNames( 3 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowWarningError( cNumericFieldNames( 5 ) + " was less than the allowable minimum, reset to minimum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracRadiant > MaxFraction ) {
 				HighTempRadSys( Item ).FracRadiant = MaxFraction;
-				ShowWarningError( cNumericFieldNames( 3 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowWarningError( cNumericFieldNames( 5 ) + " was greater than the allowable maximum, reset to maximum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
-			HighTempRadSys( Item ).FracLatent = rNumericArgs( 4 );
+			HighTempRadSys( Item ).FracLatent = rNumericArgs( 6 );
 			if ( HighTempRadSys( Item ).FracLatent < MinFraction ) {
 				HighTempRadSys( Item ).FracLatent = MinFraction;
-				ShowWarningError( cNumericFieldNames( 4 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowWarningError( cNumericFieldNames( 6 ) + " was less than the allowable minimum, reset to minimum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracLatent > MaxFraction ) {
 				HighTempRadSys( Item ).FracLatent = MaxFraction;
-				ShowWarningError( cNumericFieldNames( 4 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowWarningError( cNumericFieldNames( 6 ) + " was greater than the allowable maximum, reset to maximum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
-			HighTempRadSys( Item ).FracLost = rNumericArgs( 5 );
+			HighTempRadSys( Item ).FracLost = rNumericArgs( 7 );
 			if ( HighTempRadSys( Item ).FracLost < MinFraction ) {
 				HighTempRadSys( Item ).FracLost = MinFraction;
-				ShowWarningError( cNumericFieldNames( 5 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowWarningError( cNumericFieldNames( 7 ) + " was less than the allowable minimum, reset to minimum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracLost > MaxFraction ) {
 				HighTempRadSys( Item ).FracLost = MaxFraction;
-				ShowWarningError( cNumericFieldNames( 5 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowWarningError( cNumericFieldNames( 7 ) + " was greater than the allowable maximum, reset to maximum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
@@ -393,54 +470,54 @@ namespace HighTempRadiantSystem {
 			}
 
 			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 5 ), cMATControl ) ) {
+			if ( SameString( cAlphaArgs( 6 ), cMATControl ) ) {
 				HighTempRadSys( Item ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 5 ), cMRTControl ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), cMRTControl ) ) {
 				HighTempRadSys( Item ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 5 ), cOperativeControl ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), cOperativeControl ) ) {
 				HighTempRadSys( Item ).ControlType = OperativeControl;
-			} else if ( SameString( cAlphaArgs( 5 ), cMATSPControl ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), cMATSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = MATSPControl;
-			} else if ( SameString( cAlphaArgs( 5 ), cMRTSPControl ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), cMRTSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = MRTSPControl;
-			} else if ( SameString( cAlphaArgs( 5 ), cOperativeSPControl ) ) {
+			} else if ( SameString( cAlphaArgs( 6 ), cOperativeSPControl ) ) {
 				HighTempRadSys( Item ).ControlType = OperativeSPControl;
 			} else {
-				ShowWarningError( "Invalid " + cAlphaFieldNames( 5 ) + " = " + cAlphaArgs( 5 ) );
+				ShowWarningError( "Invalid " + cAlphaFieldNames( 6 ) + " = " + cAlphaArgs( 6 ) );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Control reset to OPERATIVE control for this " + cCurrentModuleObject );
 				HighTempRadSys( Item ).ControlType = OperativeControl;
 			}
 
-			HighTempRadSys( Item ).ThrottlRange = rNumericArgs( 6 );
+			HighTempRadSys( Item ).ThrottlRange = rNumericArgs( 8 );
 			if ( HighTempRadSys( Item ).ThrottlRange < MinThrottlingRange ) {
 				HighTempRadSys( Item ).ThrottlRange = 1.0;
-				ShowWarningError( cNumericFieldNames( 6 ) + " is below the minimum allowed." );
+				ShowWarningError( cNumericFieldNames( 8 ) + " is below the minimum allowed." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ShowContinueError( "Thus, the throttling range value has been reset to 1.0" );
 			}
 
-			HighTempRadSys( Item ).SetptSched = cAlphaArgs( 6 );
-			HighTempRadSys( Item ).SetptSchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) );
-			if ( ( HighTempRadSys( Item ).SetptSchedPtr == 0 ) && ( ! lAlphaFieldBlanks( 6 ) ) ) {
-				ShowSevereError( cAlphaFieldNames( 6 ) + " not found: " + cAlphaArgs( 6 ) );
+			HighTempRadSys( Item ).SetptSched = cAlphaArgs( 7 );
+			HighTempRadSys( Item ).SetptSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) );
+			if ( ( HighTempRadSys( Item ).SetptSchedPtr == 0 ) && ( ! lAlphaFieldBlanks( 7 ) ) ) {
+				ShowSevereError( cAlphaFieldNames( 7 ) + " not found: " + cAlphaArgs( 7 ) );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				ErrorsFound = true;
 			}
 
-			HighTempRadSys( Item ).FracDistribPerson = rNumericArgs( 7 );
+			HighTempRadSys( Item ).FracDistribPerson = rNumericArgs( 9 );
 			if ( HighTempRadSys( Item ).FracDistribPerson < MinFraction ) {
 				HighTempRadSys( Item ).FracDistribPerson = MinFraction;
-				ShowWarningError( cNumericFieldNames( 7 ) + " was less than the allowable minimum, reset to minimum value." );
+				ShowWarningError( cNumericFieldNames( 9 ) + " was less than the allowable minimum, reset to minimum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 			if ( HighTempRadSys( Item ).FracDistribPerson > MaxFraction ) {
 				HighTempRadSys( Item ).FracDistribPerson = MaxFraction;
-				ShowWarningError( cNumericFieldNames( 7 ) + " was greater than the allowable maximum, reset to maximum value." );
+				ShowWarningError( cNumericFieldNames( 9 ) + " was greater than the allowable maximum, reset to maximum value." );
 				ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 			}
 
-			HighTempRadSys( Item ).TotSurfToDistrib = NumNumbers - 7;
+			HighTempRadSys( Item ).TotSurfToDistrib = NumNumbers - 9;
 			//    IF (HighTempRadSys(Item)%TotSurfToDistrib > MaxDistribSurfaces) THEN
 			//      CALL ShowSevereError('Trying to distribute radiant energy to too many surfaces for heater '//TRIM(cAlphaArgs(1)))
 			//      CALL ShowContinueError('Occurs for '//TRIM(cCurrentModuleObject)//' = '//TRIM(cAlphaArgs(1)))
@@ -452,9 +529,9 @@ namespace HighTempRadiantSystem {
 
 			AllFracsSummed = HighTempRadSys( Item ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= HighTempRadSys( Item ).TotSurfToDistrib; ++SurfNum ) {
-				HighTempRadSys( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 6 );
-				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 6 ), Surface.Name(), TotSurfaces );
-				HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 7 );
+				HighTempRadSys( Item ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 7 );
+				HighTempRadSys( Item ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 7 ), Surface.Name(), TotSurfaces );
+				HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 9 );
 				// Error trap for surfaces that do not exist or surfaces not in the zone the radiant heater is in
 				if ( HighTempRadSys( Item ).SurfacePtr( SurfNum ) == 0 ) {
 					ShowSevereError( RoutineName + "Invalid Surface name = " + HighTempRadSys( Item ).SurfaceName( SurfNum ) );
@@ -468,12 +545,12 @@ namespace HighTempRadiantSystem {
 				// Error trap for fractions that are out of range
 				if ( HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) < MinFraction ) {
 					HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = MinFraction;
-					ShowWarningError( cNumericFieldNames( SurfNum + 7 ) + " was less than the allowable minimum, reset to minimum value." );
+					ShowWarningError( cNumericFieldNames( SurfNum + 9 ) + " was less than the allowable minimum, reset to minimum value." );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 				if ( HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) > MaxFraction ) {
 					HighTempRadSys( Item ).FracDistribToSurf( SurfNum ) = MaxFraction;
-					ShowWarningError( cNumericFieldNames( SurfNum + 7 ) + " was greater than the allowable maximum, reset to maximum value." );
+					ShowWarningError( cNumericFieldNames( SurfNum + 9 ) + " was greater than the allowable maximum, reset to maximum value." );
 					ShowContinueError( "Occurs for " + cCurrentModuleObject + " = " + cAlphaArgs( 1 ) );
 				}
 
@@ -634,6 +711,7 @@ namespace HighTempRadiantSystem {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   February 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B. Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -648,14 +726,17 @@ namespace HighTempRadiantSystem {
 
 		// Using/Aliasing
 		using namespace DataSizing;
+		using ReportSizingManager::RequestSizing;
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
+		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeHighTempRadiantSystem" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -668,45 +749,62 @@ namespace HighTempRadiantSystem {
 		Real64 MaxPowerCapacUser; // User hard-sized maximum capacity for reproting
 		bool IsAutoSize; // Indicator to autosizing nominal capacity
 
+		std::string CompName; // component name
+		std::string CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 1; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+
 		IsAutoSize = false;
 		MaxPowerCapacDes = 0.0;
 		MaxPowerCapacUser = 0.0;
-
-		if ( HighTempRadSys( RadSysNum ).MaxPowerCapac == AutoSize ) {
-			IsAutoSize = true;
-		}
+		DataScalableCapSizingON = false;
 
 		if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation should continue
-				if ( HighTempRadSys( RadSysNum ).MaxPowerCapac > 0.0 ) {
-					ReportSizingOutput( "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys( RadSysNum ).Name, "User-Specified Maximum Power Input [W]", HighTempRadSys( RadSysNum ).MaxPowerCapac );
-				}
-			} else { // AutoSize or hard-size with sizing run
-				CheckZoneSizing( "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys( RadSysNum ).Name );
-				if ( ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) >= SmallLoad ) {
-					MaxPowerCapacDes = ( CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor ) / ( HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
-				} else {
-					MaxPowerCapacDes = 0.0;
-				}
-				if ( IsAutoSize ) {
-					HighTempRadSys( RadSysNum ).MaxPowerCapac = MaxPowerCapacDes;
-					ReportSizingOutput( "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys( RadSysNum ).Name, "Design Size Maximum Power Input [W]", MaxPowerCapacDes );
-				} else { // Hard-size with sizing data
-					if ( HighTempRadSys( RadSysNum ).MaxPowerCapac > 0.0 && MaxPowerCapacDes > 0.0 ) {
-						MaxPowerCapacUser = HighTempRadSys( RadSysNum ).MaxPowerCapac;
-						ReportSizingOutput( "ZoneHVAC:HighTemperatureRadiant", HighTempRadSys( RadSysNum ).Name, "Design Size Maximum Power Input [W]", MaxPowerCapacDes, "User-Specified Maximum Power Input [W]", MaxPowerCapacUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxPowerCapacDes - MaxPowerCapacUser ) / MaxPowerCapacUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeHighTempRadiantSystem: Potential issue with equipment sizing for " "ZoneHVAC:HighTemperatureRadiant = \"" + HighTempRadSys( RadSysNum ).Name + "\"." );
-								ShowContinueError( "User-Specified Maximum Power Input of " + RoundSigDigits( MaxPowerCapacUser, 2 ) + " [W]" );
-								ShowContinueError( "differs from Design Size Maximum Power Input of " + RoundSigDigits( MaxPowerCapacDes, 2 ) + " [W]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
+
+			CompType = "ZoneHVAC:HighTemperatureRadiant";
+			CompName = HighTempRadSys( RadSysNum ).Name;
+			DataFracOfAutosizedHeatingCapacity = 1.0;
+			DataZoneNumber = HighTempRadSys( RadSysNum ).ZonePtr;
+			SizingMethod = HeatingCapacitySizing;
+			FieldNum = 1;
+			PrintFlag = true;
+			SizingString = HighTempRadSysNumericFields( RadSysNum ).FieldNames( FieldNum ) + " [W]";
+			CapSizingMethod = HighTempRadSys( RadSysNum ).HeatingCapMethod;
+			ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+			if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+
+				if ( CapSizingMethod == HeatingDesignCapacity ) {
+					if ( HighTempRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
+						CheckZoneSizing( CompType, CompName );						
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
+					} else {
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
 					}
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+				} else if ( CapSizingMethod == CapacityPerFloorArea ) {
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+					DataScalableCapSizingON = true;
+				} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+					CheckZoneSizing( CompType, CompName );
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					DataFracOfAutosizedHeatingCapacity = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
+					TempSize = AutoSize;
+					DataScalableCapSizingON = true;
+				} else {
+					TempSize = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
 				}
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
 			}
+		
 		}
 
 	}
@@ -872,7 +970,7 @@ namespace HighTempRadiantSystem {
 		int IterNum; // iteration number
 		Real64 SetPtTemp; // Setpoint temperature [C]
 		int ZoneNum; // number of zone being served
-		Real64 ZoneTemp; // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
+		Real64 ZoneTemp( 0.0 ); // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
 
 		// FLOW:
 		// initialize local variables
@@ -904,6 +1002,8 @@ namespace HighTempRadiantSystem {
 				ZoneTemp = MRT( ZoneNum );
 			} else if ( SELECT_CASE_var == OperativeSPControl ) {
 				ZoneTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+			} else {
+				assert( false );
 			}}
 
 			if ( ZoneTemp < ( SetPtTemp - TempConvToler ) ) {

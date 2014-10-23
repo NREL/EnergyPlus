@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -188,6 +189,7 @@ namespace HVACVariableRefrigerantFlow {
 	FArray1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
 	FArray1D< VRFTerminalUnitEquipment > VRFTU; // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
 	FArray1D< TerminalUnitListData > TerminalUnitList; // zoneTerminalUnitList object
+	FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name 
 
 	// Utility routines for module
 	// na
@@ -495,7 +497,7 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 TotHeatEIRTempModFac; // heating EIRFT curve output
 		Real64 InletAirWetBulbC; // coil inlet air wet-bulb temperature (C)
 		Real64 InletAirDryBulbC; // coil inlet air dry-bulb temperature (C)
-		Real64 CondInletTemp; // condenser inlet air temperature (C)
+		Real64 CondInletTemp( 0.0 ); // condenser inlet air temperature (C)
 		Real64 CondInletHumRat; // condenser inlet air humidity ratio (kg/kg)
 		Real64 OutdoorDryBulb; // outdoor dry-bulb temperature (C)
 		Real64 OutdoorHumRat; // outdoor humidity ratio (kg/kg)
@@ -638,6 +640,8 @@ namespace HVACVariableRefrigerantFlow {
 		} else if ( VRF( VRFCond ).CondenserType == WaterCooled ) {
 			CondInletTemp = OutdoorDryBulb; // node inlet temp from above
 			CondWaterMassFlow = VRF( VRFCond ).WaterCondenserDesignMassFlow;
+		} else {
+			assert( false );
 		}
 		VRF( VRFCond ).CondenserInletTemp = CondInletTemp;
 
@@ -1189,6 +1193,8 @@ namespace HVACVariableRefrigerantFlow {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataZoneEquipment::VRFTerminalUnit_Num;
 		using DataSizing::AutoSize;
+		using DataSizing::NumZoneHVACSizing;
+		using DataSizing::ZoneHVACSizing;
 
 		//    USE DataIPShortCuts
 
@@ -1288,6 +1294,7 @@ namespace HVACVariableRefrigerantFlow {
 			VRFTU.allocate( NumVRFTU );
 			CheckEquipName.allocate( NumVRFTU );
 			CheckEquipName = true;
+			VRFTUNumericFields.allocate( NumVRFTU );
 		}
 
 		if ( NumVRFCond > 0 ) {
@@ -1356,6 +1363,7 @@ namespace HVACVariableRefrigerantFlow {
 		cCurrentModuleObject = "AirConditioner:VariableRefrigerantFlow";
 		for ( VRFNum = 1; VRFNum <= NumVRFCond; ++VRFNum ) {
 			GetObjectItem( cCurrentModuleObject, VRFNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), VRF.Name(), VRFNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -2081,6 +2089,11 @@ namespace HVACVariableRefrigerantFlow {
 			HCoilOutletNodeNum = 0;
 
 			GetObjectItem( cCurrentModuleObject, VRFTUNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			VRFTUNumericFields( VRFTUNum ).FieldNames.allocate(NumNums);
+			VRFTUNumericFields( VRFTUNum ).FieldNames = "";
+			VRFTUNumericFields( VRFTUNum ).FieldNames = cNumericFieldNames;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), VRFTU.Name(), VRFTUNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -2384,6 +2397,18 @@ namespace HVACVariableRefrigerantFlow {
 			}
 			VRFTU( VRFTUNum ).ParasiticElec = rNumericArgs( 8 );
 			VRFTU( VRFTUNum ).ParasiticOffElec = rNumericArgs( 9 );
+
+
+			VRFTU( VRFTUNum ).HVACSizingIndex = 0;
+			if ( ! lAlphaFieldBlanks( 16 ) ) {
+				VRFTU( VRFTUNum ).HVACSizingIndex = FindItemInList( cAlphaArgs( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
+				if ( VRFTU( VRFTUNum ).HVACSizingIndex == 0 ) {
+					ShowSevereError( cAlphaFieldNames( 16 ) + " = " + cAlphaArgs( 16 ) + " not found." );
+					ShowContinueError( "Occurs in " + cCurrentModuleObject + " = " + VRFTU( VRFTUNum).Name );
+					ErrorsFound = true;
+				}
+			}
+
 
 			// Add TU to component sets array
 			SetUpCompSets( cCurrentModuleObject, VRFTU( VRFTUNum ).Name, cFanTypes( FanType_Num ), FanName, NodeID( FanInletNodeNum ), NodeID( FanOutletNodeNum ) );
@@ -3757,6 +3782,7 @@ namespace HVACVariableRefrigerantFlow {
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   August 2010
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
+		//                      B Nigusse, FSEC, added scalable sizing 
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -3776,9 +3802,17 @@ namespace HVACVariableRefrigerantFlow {
 		using ReportSizingManager::ReportSizingOutput;
 		using General::RoundSigDigits;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
+		using ReportSizingManager::RequestSizing;
+		using DataHVACGlobals::SystemAirflowSizing;
+		using DataHVACGlobals::CoolingAirflowSizing;
+		using DataHVACGlobals::HeatingAirflowSizing;
+		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
+		static std::string const RoutineName("SizeVRF: "); // include trailing blank space
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -3829,6 +3863,17 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 EvapCondPumpPowerDes; // Autosized evaporative condenser pump power for reporting
 		Real64 EvapCondPumpPowerUser; // Hardsized evaporative condenser pump power for reporting
 
+		std::string CompName; // component name
+		std::string CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag = true; // TRUE when sizing information is reported in the eio file
+		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
+		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+
 		// Formats
 		static gio::Fmt const Format_990( "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping Correction Factor')" );
 		static gio::Fmt const Format_991( "(' VRF System Information',6(', ',A))" );
@@ -3859,6 +3904,13 @@ namespace HVACVariableRefrigerantFlow {
 		EvapCondAirVolFlowRateUser = 0.0;
 		EvapCondPumpPowerDes = 0.0;
 		EvapCondPumpPowerUser = 0.0;
+		
+		DataScalableSizingON = false;
+		DataScalableCapSizingON = false;
+		DataFracOfAutosizedCoolingAirflow = 1.0;
+		DataFracOfAutosizedHeatingAirflow = 1.0;
+		DataFracOfAutosizedCoolingCapacity = 1.0;
+		DataFracOfAutosizedHeatingCapacity = 1.0;
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
@@ -3867,153 +3919,249 @@ namespace HVACVariableRefrigerantFlow {
 			MyOneTimeFlag = false;
 		}
 
-		if ( VRFTU( VRFTUNum ).MaxCoolAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
+		CompType = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
+		CompName = VRFTU( VRFTUNum ).Name;
 		if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-				if ( VRFTU( VRFTUNum ).MaxCoolAirVolFlow > 0.0 ) {
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "User-Specified Supply Air Flow Rate During Cooling Operation [m3/s]", VRFTU( VRFTUNum ).MaxCoolAirVolFlow );
-				}
-			} else {
-				CheckZoneSizing( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name );
-				MaxCoolAirVolFlowDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-				if ( MaxCoolAirVolFlowDes < SmallAirVolFlow ) {
-					MaxCoolAirVolFlowDes = 0.0;
+			if ( VRFTU( VRFTUNum ).HVACSizingIndex > 0 ) {
+				zoneHVACIndex = VRFTU( VRFTUNum ).HVACSizingIndex;
+				DataZoneNumber = VRFTU( VRFTUNum ).ZoneNum;
+
+				SizingMethod = CoolingAirflowSizing;
+				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
+				PrintFlag = true;
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					VRFTU( VRFTUNum ).MaxCoolAirVolFlow = TempSize;
+				} else if ( SAFMethod == FlowPerCoolingCapacity ) {
+					SizingMethod = CoolingCapacitySizing;
+					TempSize = AutoSize;
+					PrintFlag = false;
+					DataScalableSizingON = true;
+					DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
+					if ( ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					DataAutosizedCoolingCapacity = TempSize;
+					DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					SizingMethod = CoolingAirflowSizing;
+					PrintFlag = true;
+					TempSize = AutoSize;
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					VRFTU( VRFTUNum ).MaxCoolAirVolFlow = TempSize;
 				}
 
-				if ( IsAutoSize ) {
-					VRFTU( VRFTUNum ).MaxCoolAirVolFlow = MaxCoolAirVolFlowDes;
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate During Cooling Operation [m3/s]", MaxCoolAirVolFlowDes );
-				} else {
-					if ( VRFTU( VRFTUNum ).MaxCoolAirVolFlow > 0.0 && MaxCoolAirVolFlowDes > 0.0 ) {
-						MaxCoolAirVolFlowUser = VRFTU( VRFTUNum ).MaxCoolAirVolFlow;
-						ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate During Cooling Operation [m3/s]", MaxCoolAirVolFlowDes, "User-Specified Supply Air Flow Rate During Cooling Operation [m3/s]", MaxCoolAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxCoolAirVolFlowDes - MaxCoolAirVolFlowUser ) / MaxCoolAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVRF: Potential issue with equipment sizing for " + cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + ' ' + VRFTU( VRFTUNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Flow Rate During Cooling Operation of " + RoundSigDigits( MaxCoolAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate During Cooling Operation of " + RoundSigDigits( MaxCoolAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
+				SizingMethod = HeatingAirflowSizing;
+				FieldNum = 3; //N3, \field Supply Air Flow Rate During Heating Operation
+				PrintFlag = true;
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if (ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					VRFTU( VRFTUNum ).MaxHeatAirVolFlow = TempSize;
+				} else if ( SAFMethod == FlowPerHeatingCapacity ) {
+					SizingMethod = HeatingCapacitySizing;
+					TempSize = AutoSize;
+					PrintFlag = false;
+					DataScalableSizingON = true;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+					if ( ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod == FractionOfAutosizedHeatingCapacity ) {
+						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					DataAutosizedHeatingCapacity = TempSize;
+					DataFlowPerHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+					SizingMethod = HeatingAirflowSizing;
+					PrintFlag = true;
+					TempSize = AutoSize;
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					VRFTU( VRFTUNum ).MaxHeatAirVolFlow = TempSize;
+				}
+
+				SizingMethod = CoolingAirflowSizing;
+				FieldNum = 2; //N2, \field Supply Air Flow Rate When No Cooling is Needed
+				PrintFlag = true;
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( ( SAFMethod == SupplyAirFlowRate ) || ( SAFMethod == FlowPerFloorArea ) || ( SAFMethod == FractionOfAutosizedHeatingAirflow ) || ( SAFMethod == FractionOfAutosizedCoolingAirflow ) ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if (ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow = TempSize;
+				}
+
+				SizingMethod = HeatingAirflowSizing;
+				FieldNum = 4; //N4, \field Supply Air Flow Rate When No Heating is Needed
+				PrintFlag = true;
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames(FieldNum) + " [m3/s]";
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod(SizingMethod) = SAFMethod;
+				if ( ( SAFMethod == SupplyAirFlowRate ) || ( SAFMethod == FlowPerFloorArea ) || ( SAFMethod == FractionOfAutosizedHeatingAirflow ) || ( SAFMethod == FractionOfAutosizedCoolingAirflow ) ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if (ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if  (SAFMethod == FractionOfAutosizedHeatingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
+					}
+					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+					VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow = TempSize;
+				}
+
+				// initialize capacity sizing variables: cooling
+				SizingMethod = CoolingCapacitySizing;
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+					if ( CapSizingMethod == HeatingDesignCapacity ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+						}
+					} else if (CapSizingMethod == CapacityPerFloorArea){
+						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
+						DataScalableCapSizingON = true;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+						DataScalableCapSizingON = true;
 					}
 				}
-			}
-		}
 
-		IsAutoSize = false;
-		if ( VRFTU( VRFTUNum ).MaxHeatAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
-		if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-				if ( VRFTU( VRFTUNum ).MaxHeatAirVolFlow > 0.0 ) {
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "User-Specified Supply Air Flow Rate During Heating Operation [m3/s]", VRFTU( VRFTUNum ).MaxHeatAirVolFlow );
-				}
-			} else {
-				CheckZoneSizing( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name );
-				MaxHeatAirVolFlowDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-				if ( MaxHeatAirVolFlowDes < SmallAirVolFlow ) {
-					MaxHeatAirVolFlowDes = 0.0;
-				}
-
-				if ( IsAutoSize ) {
-					VRFTU( VRFTUNum ).MaxHeatAirVolFlow = MaxHeatAirVolFlowDes;
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate During Heating Operation [m3/s]", MaxHeatAirVolFlowDes );
-				} else {
-					if ( VRFTU( VRFTUNum ).MaxHeatAirVolFlow > 0.0 && MaxHeatAirVolFlowDes > 0.0 ) {
-						MaxHeatAirVolFlowUser = VRFTU( VRFTUNum ).MaxHeatAirVolFlow;
-						ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate During Heating Operation [m3/s]", MaxHeatAirVolFlowDes, "User-Specified Supply Air Flow Rate During Heating Operation [m3/s]", MaxHeatAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxHeatAirVolFlowDes - MaxHeatAirVolFlowUser ) / MaxHeatAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVRF: Potential issue with equipment sizing for" + cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + ' ' + VRFTU( VRFTUNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Flow Rate During Heating Operation of " + RoundSigDigits( MaxHeatAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate During Heating Operation of " + RoundSigDigits( MaxHeatAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
+				// initialize capacity sizing variables: heating
+				SizingMethod = HeatingCapacitySizing;
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+					if ( CapSizingMethod == HeatingDesignCapacity ){
+						if (ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0) {
+							ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
 						}
+					} else if ( CapSizingMethod == CapacityPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+						DataScalableCapSizingON = true;
+					} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+						DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+						DataScalableCapSizingON = true;
 					}
 				}
-			}
-		}
-
-		IsAutoSize = false;
-		if ( VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
-		if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-				if ( VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow > 0.0 ) {
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "User-Specified Supply Air Flow Rate When No Cooling is Needed [m3/s]", VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow );
-				}
 			} else {
-				CheckZoneSizing( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name );
-				MaxNoCoolAirVolFlowDes = VRFTU( VRFTUNum ).MaxCoolAirVolFlow;
-				if ( MaxNoCoolAirVolFlowDes < SmallAirVolFlow ) {
-					MaxNoCoolAirVolFlowDes = 0.0;
-				}
+				// no scalble sizing method has been specified. Sizing proceeds using the method
+				// specified in the zoneHVAC object 
 
-				if ( IsAutoSize ) {
-					VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow = MaxNoCoolAirVolFlowDes;
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate  When No Cooling is Needed [m3/s]", MaxNoCoolAirVolFlowDes );
-				} else {
-					if ( VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow > 0.0 && MaxNoCoolAirVolFlowDes > 0.0 ) {
-						MaxNoCoolAirVolFlowUser = VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow;
-						ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate  When No Cooling is Needed [m3/s]", MaxNoCoolAirVolFlowDes, "User-Specified Supply Air Flow Rate  When No Cooling is Needed [m3/s]", MaxNoCoolAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxNoCoolAirVolFlowDes - MaxNoCoolAirVolFlowUser ) / MaxNoCoolAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVRF: Potential issue with equipment sizing for " + cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + ' ' + VRFTU( VRFTUNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Flow Rate  When No Cooling is Needed of " + RoundSigDigits( MaxNoCoolAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate  When No Cooling is Needed of " + RoundSigDigits( MaxNoCoolAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
-				}
+				PrintFlag = true;
+
+				SizingMethod = CoolingAirflowSizing;
+				FieldNum = 1; // N1, \field Supply Air Flow Rate During Cooling Operation
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames(FieldNum) + " [m3/s]";
+				TempSize = VRFTU( VRFTUNum ).MaxCoolAirVolFlow;
+				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+				VRFTU( VRFTUNum ).MaxCoolAirVolFlow = TempSize;
+
+				FieldNum = 3; //N3, \field Supply Air Flow Rate During Heating Operation
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SizingMethod = HeatingAirflowSizing;
+				TempSize = VRFTU( VRFTUNum ).MaxHeatAirVolFlow;
+				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+				VRFTU( VRFTUNum ).MaxHeatAirVolFlow = TempSize;
+
+				FieldNum = 2; //N2, \field Supply Air Flow Rate When No Cooling is Needed
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SizingMethod = SystemAirflowSizing;
+				TempSize = VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow;
+				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+				VRFTU( VRFTUNum ).MaxNoCoolAirVolFlow = TempSize;
+
+				FieldNum = 4; //N4, \field Supply Air Flow Rate When No Heating is Needed
+				SizingString = VRFTUNumericFields( VRFTUNum ).FieldNames( FieldNum ) + " [m3/s]";
+				SizingMethod = SystemAirflowSizing;
+				TempSize = VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow;
+				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+				VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow = TempSize;
 			}
 		}
-
-		IsAutoSize = false;
-		if ( VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
-		if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-				if ( VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow > 0.0 ) {
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "User-Specified Supply Air Flow Rate When No Heating is Needed [m3/s]", VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow );
-				}
-			} else {
-				CheckZoneSizing( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name );
-				MaxNoHeatAirVolFlowDes = VRFTU( VRFTUNum ).MaxHeatAirVolFlow;
-				if ( MaxNoHeatAirVolFlowDes < SmallAirVolFlow ) {
-					MaxNoHeatAirVolFlowDes = 0.0;
-				}
-
-				if ( IsAutoSize ) {
-					VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow = MaxNoHeatAirVolFlowDes;
-					ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate  When No Heating is Needed [m3/s]", MaxNoHeatAirVolFlowDes );
-				} else {
-					if ( VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow > 0.0 && MaxNoHeatAirVolFlowDes > 0.0 ) {
-						MaxNoHeatAirVolFlowUser = VRFTU( VRFTUNum ).MaxNoHeatAirVolFlow;
-						ReportSizingOutput( cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ), VRFTU( VRFTUNum ).Name, "Design Size Supply Air Flow Rate  When No Heating is Needed [m3/s]", MaxNoHeatAirVolFlowDes, "User-Specified Supply Air Flow Rate  When No Heating is Needed [m3/s]", MaxNoHeatAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxNoHeatAirVolFlowDes - MaxNoHeatAirVolFlowUser ) / MaxNoHeatAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVRF: Potential issue with equipment sizing for " + cVRFTUTypes( VRFTU( VRFTUNum ).VRFTUType_Num ) + ' ' + VRFTU( VRFTUNum ).Name );
-								ShowContinueError( "User-Specified Supply Air Flow Rate  When No Heating is Needed of " + RoundSigDigits( MaxNoHeatAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Supply Air Flow Rate  When No Heating is Needed of " + RoundSigDigits( MaxNoHeatAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
-				}
-			}
-		}
-
 		IsAutoSize = false;
 		if ( VRFTU( VRFTUNum ).CoolOutAirVolFlow == AutoSize ) {
 			IsAutoSize = true;
@@ -4123,6 +4271,10 @@ namespace HVACVariableRefrigerantFlow {
 					}
 				}
 			}
+		}
+
+		if ( CurZoneEqNum > 0 ) {
+			ZoneEqSizing( CurZoneEqNum ).AirVolFlow = max( VRFTU( VRFTUNum ).MaxCoolAirVolFlow, VRFTU( VRFTUNum ).MaxHeatAirVolFlow );
 		}
 
 		if ( CheckVRFCombinationRatio( VRFCond ) ) {

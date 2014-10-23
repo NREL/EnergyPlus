@@ -560,7 +560,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Main Zone Baseboard,     !- Name
     System Availability Schedule,  !- Availability Schedule Name
-    8000,                    !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    8000,                    !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneControl:Thermostat,

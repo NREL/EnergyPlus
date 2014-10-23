@@ -1302,7 +1302,7 @@ namespace SolarShading {
 		Real64 CircumSolarFac; // Ratio of cosine of incidence angle to cosine of zenith angle
 		Real64 KappaZ3; // Intermediate variable
 		Real64 ViewFactorSkyGeom; // Geometrical sky view factor
-		Real64 static cosine_tolerance( 0.0001 );
+		Real64 const cosine_tolerance( 0.0001 );
 			
 		// FLOW:
 #ifdef EP_Count_Calls

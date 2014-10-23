@@ -2117,8 +2117,15 @@
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:PLANT ===========
@@ -2197,7 +2204,10 @@
   ZoneHVAC:Baseboard:RadiantConvective:Electric,
     SPACE2-1 Baseboard,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97,                    !- Efficiency
     0.2,                     !- Fraction Radiant
     0.3,                     !- Fraction of Radiant Energy Incident on People
@@ -2215,7 +2225,10 @@
   ZoneHVAC:Baseboard:RadiantConvective:Electric,
     SPACE4-1 Baseboard,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97,                    !- Efficiency
     0.2,                     !- Fraction Radiant
     0.3,                     !- Fraction of Radiant Energy Incident on People
