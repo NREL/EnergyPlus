@@ -7609,9 +7609,9 @@ namespace PlantPipingSystemsManager {
 				HeatFlux = PipingSystemDomains( DomainNum ).WallHeatFlux;
 
 				if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex ){
-					Numerator += Beta * HeatFlux * Width( cell ) * Height( cell );
-				} else if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex ){
 					Numerator += Beta * HeatFlux * Depth( cell ) * Height( cell );
+				} else if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex ){
+					Numerator += Beta * HeatFlux * Width( cell ) * Height( cell );
 				}
 
 			}
