@@ -517,6 +517,48 @@ namespace HeatBalanceManager {
 	}
 
 	void
+	SetPreConstructionInputParameters()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets parameters that need to be established before any heat balance inputs are read
+
+		int NumAlpha;
+		int NumNumber;
+		int IOStat;
+
+		// Get all the construction objects to determine the max layers and use this as the value for DataHeatBalance::MaxSolidWinLayers
+		// The variable MaxSolidWinLayers is initialized to zero to immediately catch any issues with timing of this routine
+
+		// Construction:WindowDataFile objects are (at least based on SearchWindow5DataFile()) restricted to quadruple pane, so start by setting it up to 4 if they are present
+		if ( GetNumObjectsFound( "Construction:WindowDataFile" ) > 0 ) {
+			MaxSolidWinLayers = max( MaxSolidWinLayers, 4 );
+		}
+
+		// Construction:ComplexFenestrationState have a limit of 5 layers, so set it up to 5 if they are present
+		if ( GetNumObjectsFound( "Construction:ComplexFenestrationState" ) > 0 ) {
+			MaxSolidWinLayers = max( MaxSolidWinLayers, 5 );
+		}
+
+		// then process the rest of the relevant constructions
+		// construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor, Construction:InternalSource
+		for ( auto constructName : { "Construction", "Construction:WindowEquivalentLayer" } ) {
+			int numConstructions( GetNumObjectsFound( constructName ) );
+			for ( int constructionNum = 1; constructionNum <= numConstructions; ++ constructionNum ) {
+				GetObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+				int numLayersInThisConstruct( NumAlpha - 1 );
+				MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
+			}
+		}
+
+	}
+
+	void
 	GetProjectControlData( bool & ErrorsFound ) // Set to true if errors detected during getting data
 	{
 

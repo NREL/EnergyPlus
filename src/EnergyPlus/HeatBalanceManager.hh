@@ -125,6 +125,9 @@ namespace HeatBalanceManager {
 	CheckValidSimulationObjects();
 
 	void
+	SetPreConstructionInputParameters();
+
+	void
 	GetProjectControlData( bool & ErrorsFound ); // Set to true if errors detected during getting data
 
 	void
