@@ -21,9 +21,9 @@ namespace IceThermalStorage {
 
 	extern int const IceStorageType_Simple;
 	extern int const IceStorageType_Detailed;
-    
-    extern int const CurveType_QuadraticLinear;
-    extern int const CurveType_CubicLinear;
+
+	extern int const CurveType_QuadraticLinear;
+	extern int const CurveType_CubicLinear;
 
 	extern int const DetIceInsideMelt; // Inside melt system--charge starting with bare coil
 	extern int const DetIceOutsideMelt; // Outside melt system--charge from existing ice layer on coil
@@ -218,11 +218,11 @@ namespace IceThermalStorage {
 		Real64 DesignMassFlowRate;
 		int MapNum; // Number to Map structure
 		std::string DischargeCurveType; // Type of discharging equation entered by user (QuadraticLinear or CubicLinear)
-        int DischargeCurveTypeNum;      // Integer version of discharging curve type
+		int DischargeCurveTypeNum;      // Integer version of discharging curve type
 		std::string DischargeCurveName; // Curve name for discharging (used to find the curve index)
 		int DischargeCurveNum; // Curve index for discharging
 		std::string ChargeCurveType; // Type of charging equation entered by user (QuadraticLinear or CubicLinear)
-        int ChargeCurveTypeNum;      // Integer version of charging curve type
+		int ChargeCurveTypeNum;      // Integer version of charging curve type
 		std::string ChargeCurveName; // Curve name for charging (used to find the curve index)
 		int ChargeCurveNum; // Curve index for charging
 		Real64 CurveFitTimeStep; // Time step used to generate performance data [hours]
@@ -313,11 +313,11 @@ namespace IceThermalStorage {
 			Real64 const DesignMassFlowRate,
 			int const MapNum, // Number to Map structure
 			std::string const & DischargeCurveType, // Type of discharging equation entered by user (QuadraticLinear or CubicLinear)
-            int const DischargeCurveTypeNum, // integer version of previous variable
+			int const DischargeCurveTypeNum, // integer version of previous variable
 			std::string const & DischargeCurveName, // Curve name for discharging (used to find the curve index)
 			int const DischargeCurveNum, // Curve index for discharging
 			std::string const & ChargeCurveType, // Type of charging equation entered by user (QuadraticLinear or CubicLinear)
-            int const ChargeCurveTypeNum,        // integer version of previous variable
+			int const ChargeCurveTypeNum,        // integer version of previous variable
 			std::string const & ChargeCurveName, // Curve name for charging (used to find the curve index)
 			int const ChargeCurveNum, // Curve index for charging
 			Real64 const CurveFitTimeStep, // Time step used to generate performance data [hours]
@@ -361,11 +361,11 @@ namespace IceThermalStorage {
 			DesignMassFlowRate( DesignMassFlowRate ),
 			MapNum( MapNum ),
 			DischargeCurveType( DischargeCurveType ),
-            DischargeCurveTypeNum( DischargeCurveTypeNum ),
+			DischargeCurveTypeNum( DischargeCurveTypeNum ),
 			DischargeCurveName( DischargeCurveName ),
 			DischargeCurveNum( DischargeCurveNum ),
 			ChargeCurveType( ChargeCurveType ),
-            ChargeCurveTypeNum( ChargeCurveTypeNum ),
+			ChargeCurveTypeNum( ChargeCurveTypeNum ),
 			ChargeCurveName( ChargeCurveName ),
 			ChargeCurveNum( ChargeCurveNum ),
 			CurveFitTimeStep( CurveFitTimeStep ),

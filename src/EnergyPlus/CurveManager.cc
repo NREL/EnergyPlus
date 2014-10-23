@@ -37,7 +37,7 @@ namespace CurveManager {
 	//                       RR added exponential curve
 	//                      May 2009 Brent griffith add EMS actuator registry and override (for custom equations)
 	//                      August 2010, Richard Raustad, FSEC, added Table:* objects
-    //                      August 2014, Rick Strand, added a curve type (cubic-linear)
+	//                      August 2014, Rick Strand, added a curve type (cubic-linear)
 	//                      Future Improvements:
 	//                       1) Merge TableData and TableLookup arrays. Care is needed here since the
 	//                          Table:OneIndependentVariable (and Two) use different data patterns.
@@ -104,7 +104,7 @@ namespace CurveManager {
 	int const ExponentialDecay( 18 );
 	int const DoubleExponentialDecay( 19 );
 	int const QuadLinear( 20 );
-    int const CubicLinear( 21 );
+	int const CubicLinear( 21 );
 
 	// Interpolation Types
 	int const LinearInterpolationOfTable( 1 );
@@ -143,10 +143,10 @@ namespace CurveManager {
 	int const CurveType_ExponentialDecay( 19 );
 	int const CurveType_DoubleExponentialDecay( 20 );
 	int const CurveType_QuadLinear( 21 );
-    int const CurveType_CubicLinear( 22 );
+	int const CurveType_CubicLinear( 22 );
 
 	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear",
-        "Curve:CubicLinear" } );
+		"Curve:CubicLinear" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -357,7 +357,7 @@ namespace CurveManager {
 		int NumQuartic; // Number of quartic (4th order polynomial) objects in the input data file
 		int NumQuad; // Number of quadratic curve objects in the input data file
 		int NumQuadLinear; // Number of quadratic linear curve objects in the input data file
-        int NumCubicLinear; // Number of cubic linear curve objects in the input file
+		int NumCubicLinear; // Number of cubic linear curve objects in the input file
 		int NumQLinear; // Number of quad linear curve objects in the input data file
 		int NumLinear; // Number of linear curve objects in the input data file
 		int NumBicubic; // Number of bicubic curve objects in the input data file
@@ -437,8 +437,8 @@ namespace CurveManager {
 		NumTwoVarTab = GetNumObjectsFound( "Table:TwoIndependentVariables" );
 
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
-                    NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
-                    NumExpDecay + NumDoubleExpDecay + NumQLinear; //cpw22Aug2010, rks26Aug2014
+					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
+					NumExpDecay + NumDoubleExpDecay + NumQLinear; 
 
 		// intermediate count for one and two variable performance tables
 		NumTables = NumOneVarTab + NumTwoVarTab;
@@ -855,8 +855,7 @@ namespace CurveManager {
 			}
 		}
 
-		
-        // Loop over linear curves and load data
+		// Loop over linear curves and load data
 		CurrentModuleObject = "Curve:Linear";
 		for ( CurveIndex = 1; CurveIndex <= NumLinear; ++CurveIndex ) {
 			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
@@ -2448,8 +2447,7 @@ namespace CurveManager {
 				if ( ( SELECT_CASE_var1 == Linear ) || ( SELECT_CASE_var1 == Quadratic ) || ( SELECT_CASE_var1 == Cubic ) || ( SELECT_CASE_var1 == Quartic ) || ( SELECT_CASE_var1 == Exponent ) || ( SELECT_CASE_var1 == FuncPressDrop ) ) {
 					// CurrentModuleObject='Curve:Linear/Quadratic/Cubic/Quartic/Exponent/Functional:PressureDrop'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-				} else if ( ( SELECT_CASE_var1 == BiQuadratic ) || ( SELECT_CASE_var1 == QuadraticLinear ) || ( SELECT_CASE_var1 == BiCubic ) ||
-                            ( SELECT_CASE_var1 == CubicLinear ) ) {
+				} else if ( ( SELECT_CASE_var1 == BiQuadratic ) || ( SELECT_CASE_var1 == QuadraticLinear ) || ( SELECT_CASE_var1 == BiCubic ) || ( SELECT_CASE_var1 == CubicLinear ) ) {
 					// CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic/CubicLinear'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
@@ -3533,8 +3531,8 @@ Label999: ;
 		} else if ( SELECT_CASE_var == QuadraticLinear ) {
 			CurveValue = ( Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * Curve.Coeff3 ) ) + ( Curve.Coeff4 + V1 * ( Curve.Coeff5 + V1 * Curve.Coeff6 ) ) * V2;
 		} else if ( SELECT_CASE_var == CubicLinear ) {
-            CurveValue = ( Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * ( Curve.Coeff3 + V1 * Curve.Coeff4 ) ) ) + ( Curve.Coeff5 + V1 * Curve.Coeff6 ) * V2;
-        } else if ( SELECT_CASE_var == BiCubic ) {
+			CurveValue = ( Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * ( Curve.Coeff3 + V1 * Curve.Coeff4 ) ) ) + ( Curve.Coeff5 + V1 * Curve.Coeff6 ) * V2;
+		} else if ( SELECT_CASE_var == BiCubic ) {
 			CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 + V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 + V1 * V2 * V2 * Curve.Coeff10;
 		} else if ( SELECT_CASE_var == TriQuadratic ) {
 			auto const & Tri2ndOrder( Curve.Tri2ndOrder( 1 ) );
@@ -4234,7 +4232,7 @@ Label999: ;
 		} else if ( SELECT_CASE_var == QuadraticLinear ) {
 			MatrixSize = 6;
 			StrCurve = "QuadraticLinear";
-        } else {
+		} else {
 			return;
 		}}
 
@@ -4886,7 +4884,7 @@ Label999: ;
 				GetCurveType = "BIQUADRATIC";
 			} else if ( SELECT_CASE_var == QuadraticLinear ) {
 				GetCurveType = "QUADRATICLINEAR";
-            } else if ( SELECT_CASE_var == CubicLinear ) {
+			} else if ( SELECT_CASE_var == CubicLinear ) {
 				GetCurveType = "CUBICLINEAR";
 			} else if ( SELECT_CASE_var == BiCubic ) {
 				GetCurveType = "BICUBIC";
