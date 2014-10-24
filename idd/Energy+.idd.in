@@ -49036,7 +49036,6 @@ UnitarySystemPerformance:HeatPump:Multispeed,
   N3 , \field Speed 1 Supply Air Flow Ratio During Heating Operation
        \required-field
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \begin-extensible
@@ -49047,7 +49046,6 @@ UnitarySystemPerformance:HeatPump:Multispeed,
   N4 , \field Speed 1 Supply Air Flow Ratio During Cooling Operation
        \required-field
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \note Used only for Multi speed coils
@@ -49056,7 +49054,6 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note at this speed to the maximum air flow rate.
   N5 , \field Speed 2 Supply Air Flow Ratio During Heating Operation
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \note Used only for Multi speed coils
@@ -49065,16 +49062,14 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note at this speed to the maximum air flow rate.
   N6 , \field Speed 2 Supply Air Flow Ratio During Cooling Operation
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \note Used only for Multi speed coils
-       \note Enter the lowest operating supply air flow ratio during cooling
+       \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
   N7 , \field Speed 3 Supply Air Flow Ratio During Heating Operation
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \note Used only for Multi speed coils
@@ -49083,16 +49078,14 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note at this speed to the maximum air flow rate.
   N8 , \field Speed 3 Supply Air Flow Ratio During Cooling Operation
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \note Used only for Multi speed coils
-       \note Enter the lowest operating supply air flow ratio during cooling
+       \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
   N9 , \field Speed 4 Supply Air Flow Ratio During Heating Operation
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \note Used only for Multi speed coils
@@ -49101,11 +49094,10 @@ UnitarySystemPerformance:HeatPump:Multispeed,
        \note at this speed to the maximum air flow rate.
   N10; \field Speed 4 Supply Air Flow Ratio During Cooling Operation
        \type real
-       \units m3/s
        \autosizable
        \minimum> 0
        \note Used only for Multi speed coils
-       \note Enter the lowest operating supply air flow ratio during cooling
+       \note Enter the next highest operating supply air flow ratio during cooling
        \note operation or specify autosize. This value is the ratio of air flow
        \note at this speed to the maximum air flow rate.
 
