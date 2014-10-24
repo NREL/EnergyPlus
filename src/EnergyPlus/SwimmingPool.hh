@@ -22,6 +22,14 @@ namespace SwimmingPool {
 	// Standard, run-of-the-mill variables...
 	extern int NumSwimmingPools; // Number of swimming pools
 	extern FArray1D< int > SurfaceToPoolIndex; // Average source over the time step for a particular radiant surface
+	extern FArray1D< Real64 > QPoolSrcAvg; // Average source over the time step for a particular pool
+	extern FArray1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
+	extern FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	// Record keeping variables used to calculate QPoolSrcAvg locally
+	extern FArray1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
+	extern FArray1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
+	extern FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	extern FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
 
 	// Types
 
@@ -81,6 +89,8 @@ namespace SwimmingPool {
 		Real64 WaterInletTemp; // water inlet temperature
 		Real64 WaterOutletTemp; // water outlet temperature
 		Real64 WaterMassFlowRate; // water mass flow rate
+		Real64 MakeUpWaterMassFlowRate; // makeup water flow rate (addition to the pool)
+		Real64 MakeUpWaterMass; // makeup water mass added to pool
 		Real64 HeatPower; // heating sent to pool in Watts
 		Real64 HeatEnergy; // heating sent to pool in Joules
 		Real64 MiscEquipPower; // power for miscellaneous pool equipment in Watts
@@ -127,6 +137,8 @@ namespace SwimmingPool {
 			WaterInletTemp( 0.0 ),
 			WaterOutletTemp( 0.0 ),
 			WaterMassFlowRate( 0.0 ),
+			MakeUpWaterMassFlowRate( 0.0 ),
+			MakeUpWaterMass( 0.0 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			MiscEquipPower( 0.0 ),
@@ -156,7 +168,7 @@ namespace SwimmingPool {
 			int const ActivityFactorSchedPtr, // Activity factor schedule pointer
 			Real64 const CurActivityFactor, // Current activity factor
 			std::string const MakeupWaterSupplyName, // Name of make-up water source
-			std::string const MakeupWaterSupplySchedName, //Name of make-up water supply schedule
+			std::string const MakeupWaterSupplySchedName, // Name of make-up water supply schedule
 			int const MakeupWaterSupplySchedPtr, // Index to schedule for make-up water
 			Real64 const CurMakeupWaterTemp, // Current makeup water temperature
 			std::string const CoverSchedName, // Pool cover schedule name
@@ -187,7 +199,9 @@ namespace SwimmingPool {
 			Real64 const PoolWaterTemp, // Average pool water temperature
 			Real64 const WaterInletTemp, // water inlet temperature
 			Real64 const WaterOutletTemp, // water outlet temperature
-			Real64 const WaterMassFlowRate, // water mass flow rate
+			Real64 const WaterMassFlowRate, // water mass flow rate from loop
+			Real64 const MakeUpWaterMassFlowRate, // makeup water flow rate (addition to the pool)
+			Real64 const MakeUpWaterMass, // makeup water mass added to pool
 			Real64 const HeatPower, // heating sent to pool in Watts
 			Real64 const HeatEnergy, // heating sent to pool in Joules
 			Real64 const MiscEquipPower, // power for miscellaneous pool equipment in Watts
@@ -243,6 +257,8 @@ namespace SwimmingPool {
 			WaterInletTemp( WaterInletTemp ),
 			WaterOutletTemp( WaterOutletTemp ),
 			WaterMassFlowRate( WaterMassFlowRate ),
+			MakeUpWaterMassFlowRate( MakeUpWaterMassFlowRate ),
+			MakeUpWaterMass( MakeUpWaterMass ),
 			HeatPower( HeatPower ),
 			HeatEnergy( HeatEnergy ),
 			MiscEquipPower( MiscEquipPower ),
@@ -258,11 +274,7 @@ namespace SwimmingPool {
 
 	void
 	SimSwimmingPool(
-		int const SurfNum,
-		Real64 & TempSurfIn,
-		Real64 const RefAirTemp,
-		Real64 const IterDampConst,
-		Real64 const TempInsOld
+		bool const FirstHVACIteration
 	);
 
 	void
@@ -270,17 +282,13 @@ namespace SwimmingPool {
 
 	void
 	InitSwimmingPool(
+		bool const FirstHVACIteration, // true during the first HVAC iteration
 		int const PoolNum // Index of the swimming pool under consideration within the derived types
 	);
 
 	void
 	CalcSwimmingPool(
-		int const PoolNum, // Index of the swimming pool under consideration within the derived types
-		int const SurfNum,
-		Real64 & TempSurfIn,
-		Real64 const RefAirTemp,
-		Real64 const IterDampConst,
-		Real64 const TempInsOld
+		int const PoolNum // Index of the swimming pool under consideration within the derived types
 	);
 
 	void
@@ -289,9 +297,13 @@ namespace SwimmingPool {
 	);
 
 	void
-	ReportSwimmingPool(
-		int const PoolNum // Index of the swimming pool under consideration within the derived types
-	);
+	UpdatePoolSourceValAvg( bool & SwimmingPoolOn ); // .TRUE. if the swimming pool has "run" this zone time step
+	
+	Real64
+	SumHATsurf( int const ZoneNum ); // Zone number
+	
+	void
+	ReportSwimmingPool( );
 
 	//     NOTICE
 

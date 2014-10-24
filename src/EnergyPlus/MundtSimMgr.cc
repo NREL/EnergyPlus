@@ -406,6 +406,7 @@ namespace MundtSimMgr {
 		using DataHeatBalFanSys::MCPI;
 		using DataHeatBalFanSys::MAT;
 		using DataHeatBalFanSys::SumConvHTRadSys;
+		using DataHeatBalFanSys::SumConvPool;
 		using DataHeatBalFanSys::SysDepZoneLoadsLagged;
 		using DataHeatBalFanSys::NonAirSystemResponse;
 		using DataHeatBalSurface::TempSurfIn;
@@ -495,7 +496,7 @@ namespace MundtSimMgr {
 		}
 		// determine heat gains
 		SumAllInternalConvectionGains( ZoneNum, ConvIntGain );
-		ConvIntGain += SumConvHTRadSys( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
+		ConvIntGain += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
@@ -950,7 +951,7 @@ namespace MundtSimMgr {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

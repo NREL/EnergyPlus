@@ -1066,7 +1066,7 @@ namespace UFADManager {
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone );
-		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum );
+		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, RetAirGains );
 			ConvGainsUpSubzone += RetAirGains;
@@ -1486,7 +1486,7 @@ namespace UFADManager {
 
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone );
-		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum );
+		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, RetAirGains );
 			ConvGainsUpSubzone += RetAirGains;
@@ -1794,7 +1794,7 @@ namespace UFADManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

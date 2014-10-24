@@ -3355,7 +3355,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// Calculate hourly humidity ratio from infiltration + humidity added from latent load
 			// to determine system added/subtracted moisture.
-			LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum );
+			LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum ) + SumLatentPool( ZoneNum );
 
 			SysTimeStepInSeconds = SecInHour * TimeStepSys;
 
@@ -4194,7 +4194,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		// Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
-		LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum );
+		LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum )  + SumLatentPool( ZoneNum );
 
 		SysTimeStepInSeconds = SecInHour * TimeStepSys;
 
@@ -4469,7 +4469,7 @@ namespace ZoneTempPredictorCorrector {
 		// Sum all convective internal gains: SumIntGain
 
 		SumAllInternalConvectionGains( ZoneNum, SumIntGain );
-		SumIntGain += SumConvHTRadSys( ZoneNum );
+		SumIntGain += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
@@ -4888,7 +4888,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		// non air system response.
-		SumNonAirSystem = NonAirSystemResponse( ZoneNum ) + SumConvHTRadSys( ZoneNum );
+		SumNonAirSystem = NonAirSystemResponse( ZoneNum ) + SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 
 		// Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
 		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
@@ -5832,7 +5832,7 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

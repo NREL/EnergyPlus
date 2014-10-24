@@ -832,7 +832,7 @@ namespace CrossVentMgr {
 		}
 
 		SumAllInternalConvectionGains( ZoneNum, ConvGains );
-		ConvGains += SumConvHTRadSys( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
+		ConvGains += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum ) + SysDepZoneLoadsLagged( ZoneNum ) + NonAirSystemResponse( ZoneNum ) / ZoneMult;
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very low or zero)
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {

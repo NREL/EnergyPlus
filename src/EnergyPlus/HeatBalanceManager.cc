@@ -4422,6 +4422,10 @@ namespace HeatBalanceManager {
 		SumConvHTRadSys = 0.0;
 		SumLatentHTRadSys.allocate( NumOfZones );
 		SumLatentHTRadSys = 0.0;
+		SumConvPool.allocate( NumOfZones );
+		SumConvPool = 0.0;
+		SumLatentPool.allocate( NumOfZones );
+		SumLatentPool = 0.0;
 		QHTRadSysToPerson.allocate( NumOfZones );
 		QHTRadSysToPerson = 0.0;
 		QHWBaseboardToPerson.allocate( NumOfZones );
@@ -8057,7 +8061,7 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
