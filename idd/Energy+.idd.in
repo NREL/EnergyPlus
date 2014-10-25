@@ -37481,6 +37481,87 @@ ZoneHVAC:VentilatedSlab:SlabGroup,
    A41  ; \field Slab Outlet Node Name for Surface 10
           \type node
 
+\group Zone HVAC Swimming Pools
+
+SwimmingPool:Indoor,
+  A1,  \field Name
+       \required-field
+       \type alpha
+  A2,  \field Surface Name
+       \required-field
+       \note To be matched with a construction in this input file
+       \type object-list
+       \object-list ConstructionNames
+       \reference SurfaceNames
+       \reference SurfAndSubSurfNames
+       \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
+       \reference OutFaceEnvNames
+       \reference AllHeatTranAngFacNames
+       \reference RadGroupAndSurfNames
+       \reference SurfGroupAndHTSurfNames
+       \reference AllShadingAndHTSurfNames
+  N1,  \field Average Depth
+       \required-field
+       \type real
+       \units m
+  A3,  \field Activity Factor Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+  A4,  \field Make-up Water Supply Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames  
+  A5,  \field Cover Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+  N2,  \field Cover Evaporation Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N3,  \field Cover Convection Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N4,  \field Cover Short-Wavelength Radiation Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N5,  \field Cover Long-Wavelength Radiation Factor
+       \required-field
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  A6,  \field Pool Water Inlet Node
+       \required-field
+       \type node
+  A7,  \field Pool Water Outlet Node
+       \required-field
+       \type node
+  N6,  \field Pool Miscellaneous Equipment Power
+       \units W/(kg/s of pool water flow)
+       \type real
+       \minimum 0.0
+  A8,  \field Setpoint Temperature Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+  N7,  \field Maximum Number of People
+       \required-field
+       \minimum 0.0
+  A9,  \field People Schedule
+       \type object-list
+       \object-list ScheduleNames
+  A10; \field People Heat Gain Schedule
+       \type object-list
+       \object-list ScheduleNames
+
 \group Zone HVAC Air Loop Terminal Units
 
 AirTerminal:SingleDuct:Uncontrolled,
@@ -91564,4 +91645,5 @@ Output:PreprocessorMessage,
         \retaincase
    A12; \field Message Line 10
         \retaincase
+
 
