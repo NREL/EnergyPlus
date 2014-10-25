@@ -694,6 +694,15 @@ namespace SwimmingPool {
 		// once cover schedule value is established, define the current values of the cover heat transfer factors
 		if ( Pool( PoolNum ).CoverSchedPtr > 0 ) {
 			Pool( PoolNum ).CurCoverSchedVal = GetCurrentScheduleValue( Pool( PoolNum ).CoverSchedPtr );
+			if ( Pool( PoolNum ).CurCoverSchedVal > 1.0 ) {
+				ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool( PoolNum ).Name  + " Cover Schedule =\"" + Pool( PoolNum ).CoverSchedName + " has a value greater than 1.0 (100%).  This is not allowed." );
+				ShowContinueError( "The cover has been reset to one or fully covered." );
+				Pool( PoolNum ).CurCoverSchedVal = 1.0;
+			} else if ( Pool( PoolNum ).CurCoverSchedVal < 0.0 ) {
+				ShowWarningError(RoutineName + ": Swimming Pool =\"" + Pool( PoolNum ).Name  + " Cover Schedule =\"" + Pool( PoolNum ).CoverSchedName + " has a negative value.  This is not allowed." );
+				ShowContinueError( "The cover has been reset to zero or uncovered." );
+				Pool( PoolNum ).CurCoverSchedVal = 0.0;
+			}
 		} else {
 			// default is NO pool cover
 			Pool( PoolNum ).CurCoverSchedVal = 0.0;
