@@ -91,7 +91,7 @@ namespace SwimmingPool {
 	FArray1D< Real64 > HeatTransCoefsAvg; // Average denominator term over the time step for a particular pool
 	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
 	// Record keeping variables used to calculate QRadSysSrcAvg locally
-	FArray1D< Real64 > LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+	FArray1D< Real64 > LastQPoolSrc; // Need to keep the last value in case we are still iterating
 	FArray1D< Real64 > LastHeatTransCoefs; // Need to keep the last value in case we are still iterating
 	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
 	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
@@ -581,8 +581,10 @@ namespace SwimmingPool {
 			QPoolSrcAvg = 0.0;
 			HeatTransCoefsAvg.allocate( TotSurfaces );
 			HeatTransCoefsAvg = 0.0;
-			LastQRadSysSrc.allocate( TotSurfaces );
-			LastQRadSysSrc = 0.0;
+			LastQPoolSrc.allocate( TotSurfaces );
+			LastQPoolSrc = 0.0;
+			LastHeatTransCoefs.allocate( TotSurfaces );
+			LastHeatTransCoefs = 0.0;
 			LastSysTimeElapsed.allocate( TotSurfaces );
 			LastSysTimeElapsed = 0.0;
 			LastTimeStepSys.allocate( TotSurfaces );
@@ -594,6 +596,7 @@ namespace SwimmingPool {
 			QPoolSrcAvg = 0.0;
 			HeatTransCoefsAvg = 0.0;
 			LastQPoolSrc = 0.0;
+			LastHeatTransCoefs = 0.0;
 			LastSysTimeElapsed = 0.0;
 			LastTimeStepSys = 0.0;
 			MyEnvrnFlagGeneral = false;
