@@ -486,7 +486,7 @@ namespace SwimmingPool {
 		// Set up the output variables for swimming pools
 		for ( Item = 1; Item <= NumSwimmingPools; ++Item ) {
 			SetupOutputVariable( "Indoor Pool Makeup Water Rate [m3/s]", Pool( Item ).MakeUpWaterMassFlowRate, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterMass, "System", "Sum", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Makeup Water Volume [m3]", Pool( Item ).MakeUpWaterMass, "System", "Sum", Pool( Item ).Name, _, "MainsWater", "Heating", _, "System");
 			SetupOutputVariable( "Indoor Pool Makeup Water Temperature [C]", Pool( Item ).CurMakeupWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Water Temperature [C]", Pool( Item ).PoolWaterTemp, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Inlet Water Temperature [C]", Pool( Item ).WaterInletTemp, "System", "Average", Pool( Item ).Name );
@@ -494,7 +494,7 @@ namespace SwimmingPool {
 			SetupOutputVariable( "Indoor Pool Miscellaneous Equipment Power [W]", Pool( Item ).MiscEquipPower, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Miscellaneous Equipment Energy [J]", Pool( Item ).MiscEquipEnergy, "System", "Sum", Pool( Item ).Name);
 			SetupOutputVariable( "Indoor Pool Water Heating Rate [W]", Pool( Item ).HeatPower, "System", "Average", Pool( Item ).Name );
-			SetupOutputVariable( "Indoor Pool Water Heating Energy [J]", Pool( Item ).HeatEnergy, "System", "Sum", Pool( Item ).Name);
+			SetupOutputVariable( "Indoor Pool Water Heating Energy [J]", Pool( Item ).HeatEnergy, "System", "Sum", Pool( Item ).Name, _, "ENERGYTRANSFER", "HEATINGCOILS", _, "System" );
 			SetupOutputVariable( "Indoor Pool Radiant to Convection by Cover [W]", Pool( Item ).RadConvertToConvect, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool People Heat Gain [W]", Pool( Item ).PeopleHeatGain, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Current Activity Factor []", Pool( Item ).CurActivityFactor, "System", "Average", Pool( Item ).Name );
