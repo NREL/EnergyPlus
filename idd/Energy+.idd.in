@@ -37544,7 +37544,11 @@ SwimmingPool:Indoor,
   A7,  \field Pool Water Outlet Node
        \required-field
        \type node
-  N6,  \field Pool Miscellaneous Equipment Power
+  N6,  \field Pool Heating System Water Maximum Flow Rate
+       \type real
+       \units m3/s
+       \minimum 0.0
+  N7,  \field Pool Miscellaneous Equipment Power
        \units W/(kg/s of pool water flow)
        \type real
        \minimum 0.0
@@ -37552,7 +37556,7 @@ SwimmingPool:Indoor,
        \required-field
        \type object-list
        \object-list ScheduleNames
-  N7,  \field Maximum Number of People
+  N8,  \field Maximum Number of People
        \required-field
        \minimum 0.0
   A9,  \field People Schedule

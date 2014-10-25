@@ -250,6 +250,7 @@ namespace SwimmingPool {
 		bool IsBlank; // Flag for blank name
 		FArray1D_bool lAlphaBlanks; // Logical array, alpha field input BLANK = .TRUE.
 		FArray1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+		int SurfNum; // Surface number
 
 		// FLOW:
 		// Initializations and allocations
@@ -297,7 +298,13 @@ namespace SwimmingPool {
 			Pool( Item ).Name = Alphas( 1 );
 
 			Pool( Item ).SurfaceName = Alphas( 2 );
-			Pool( Item ).SurfacePtr = FindItemInList( Pool( Item ).SurfaceName, SurfList.Name(), NumOfSurfaceLists );
+			Pool( Item ).SurfacePtr = 0;
+			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+				if ( SameString( Surface( SurfNum ).Name, Pool( Item ).SurfaceName ) ) {
+					Pool( Item ).SurfacePtr = SurfNum;
+					break;
+				}
+			}
 			if ( Pool( Item ).SurfacePtr <= 0 ) {
 				ShowSevereError( RoutineName + "Invalid " + cAlphaFields( 2 ) + " = " + Alphas( 2 ) );
 				ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + Alphas( 1 ) );
@@ -308,7 +315,7 @@ namespace SwimmingPool {
 				ShowContinueError( "A single surface can only be a radiant system, a ventilated slab, or a pool.  It CANNOT be more than one of these." );
 				ErrorsFound = true;
 				// Something present that is not allowed for a swimming pool (non-CTF algorithm, movable insulation, or radiant source/sink
-			} else if ( Surface( Pool( Item ).SurfacePtr ).HeatTransferAlgorithm /= HeatTransferModel_CTF ) {
+			} else if ( Surface( Pool( Item ).SurfacePtr ).HeatTransferAlgorithm != HeatTransferModel_CTF ) {
 				ShowSevereError( Surface( Pool( Item ).SurfacePtr ).Name + " is a pool and is attempting to use a non-CTF solution algorithm.  This is not allowed.  Use the CTF solution algorithm for this surface." );
 				ErrorsFound = true;
 			} else if ( Surface( Pool( Item ).SurfacePtr).Class == SurfaceClass_Window ) {
@@ -325,12 +332,13 @@ namespace SwimmingPool {
 				Surface( Pool( Item ).SurfacePtr ).IsPool = true;
 				SurfaceToPoolIndex( Pool( Item ).SurfacePtr ) = Item;
 				// Check to make sure pool surface is a floor
-				if ( Surface( Pool( Item ).SurfacePtr).Class /= SurfaceClass_Floor ) {
+				if ( Surface( Pool( Item ).SurfacePtr).Class != SurfaceClass_Floor ) {
 					ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " contains a surface name that is NOT a floor." );
 					ShowContinueError( "A swimming pool must be associated with a surface that is a FLOOR.  Association with other surface types is not permitted.");
 					ErrorsFound = true;
 				}
 			}
+			Pool( Item ).ZonePtr = Surface( Pool( Item ).SurfacePtr ).Zone;
 
 			Pool( Item ).AvgDepth = Numbers( 1 );
 			if ( Pool( Item ).AvgDepth < MinDepth ) {
@@ -417,8 +425,9 @@ namespace SwimmingPool {
 			if ( ( ! lAlphaBlanks( 6 ) ) || ( ! lAlphaBlanks( 7 ) ) ) {
 				TestCompSet( CurrentModuleObject, Alphas( 1 ), Alphas( 6 ), Alphas( 7 ), "Hot Water Nodes" );
 			}
+			Pool( Item ).WaterVolFlowMax = Numbers( 6 );
 
-			Pool( Item ).MiscPowerFactor = Numbers( 6 );
+			Pool( Item ).MiscPowerFactor = Numbers( 7 );
 			if ( Pool( Item ).MiscPowerFactor < MinPowerFactor ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " has a miscellaneous power factor less than zero." );
 				ShowContinueError( "The miscellaneous power factor has been reset to zero." );
@@ -438,7 +447,7 @@ namespace SwimmingPool {
 				ErrorsFound = true;
 			}
 			
-			Pool( Item ).MaxNumOfPeople = Numbers( 7 );
+			Pool( Item ).MaxNumOfPeople = Numbers( 8 );
 			if ( Pool( Item ).MaxNumOfPeople < 0.0 ) {
 				ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + " was entered with negative people.  This is not allowed." );
 				ShowContinueError( "The number of people has been reset to zero." );
@@ -490,7 +499,8 @@ namespace SwimmingPool {
 			SetupOutputVariable( "Indoor Pool People Heat Gain [W]", Pool( Item ).PeopleHeatGain, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Current Activity Factor []", Pool( Item ).CurActivityFactor, "System", "Average", Pool( Item ).Name );
 			SetupOutputVariable( "Indoor Pool Current Cover Factor []", Pool( Item ).CurCoverSchedVal, "System", "Average", Pool( Item ).Name );
-
+			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Rate [W]", Pool( Item ).EvapHeatLossRate, "System", "Average", Pool( Item ).Name );
+			SetupOutputVariable( "Indoor Pool Evaporative Heat Loss Energy [J]", Pool( Item ).EvapEnergyLoss, "System", "Sum", Pool( Item ).Name);
 		}
 
 	}
@@ -558,11 +568,15 @@ namespace SwimmingPool {
 		Real64 PeopleModifier;
 		int ZoneNum;
 		int SurfNum;
+		Real64 Density;
 
 		// FLOW:
 
 		if ( MyOneTimeFlag ) {
 			MyOneTimeFlag = false;
+			MyPlantScanFlagPool.allocate( NumSwimmingPools );
+			MyPlantScanFlagPool = true;
+
 			if ( MyPlantScanFlagPool( PoolNum ) && allocated( PlantLoop ) ) {
 				errFlag = false;
 				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
@@ -614,7 +628,9 @@ namespace SwimmingPool {
 			Pool( PoolNum ).WaterOutletTemp = 0.0;
 			Pool( PoolNum ).WaterMassFlowRate = 0.0;
 			Pool( PoolNum ).PeopleHeatGain = 0.0;
-			Pool( PoolNum ).WaterMass = Surface( Pool( PoolNum ).SurfacePtr ).Area * Pool( PoolNum ).AvgDepth * GetDensityGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
+			Density =GetDensityGlycol( "WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
+			Pool( PoolNum ).WaterMass = Surface( Pool( PoolNum ).SurfacePtr ).Area * Pool( PoolNum ).AvgDepth * Density;
+			Pool( PoolNum ).WaterMassFlowRateMax = Pool( PoolNum ).WaterVolFlowMax * Density;
 			
 			if ( ! MyPlantScanFlagPool( PoolNum ) ) {
 				if ( Pool( PoolNum ).WaterInletNode > 0 ) {
@@ -787,6 +803,7 @@ namespace SwimmingPool {
 		using DataSurfaces::Surface;
 		using DataGlobals::TimeStepZone;
 		using DataGlobals::SecInHour;
+		using DataHVACGlobals::TimeStepSys;
 		using DataHeatBalance::Construct;
 		using DataHeatBalSurface::CTFConstInPart;
 		using DataHeatBalFanSys::QPoolSurfNumerator;
@@ -853,6 +870,7 @@ namespace SwimmingPool {
 		EvapRate = ( 0.1 * ( Surface( SurfNum ).Area / CFA ) * Pool( PoolNum ).CurActivityFactor * ( ( PSatPool - PParAir ) * CFinHg ) ) * CFMF * Pool( PoolNum ).CurCoverEvapFac;
 		Pool( PoolNum ).MakeUpWaterMassFlowRate = EvapRate;
 		EvapEnergyLossPerArea = -EvapRate *  PsyHfgAirFnWTdb( ZoneAirHumRatAvg( ZoneNum ), MAT( ZoneNum ) ) / Surface( SurfNum ).Area;
+		Pool( PoolNum ).EvapHeatLossRate = EvapEnergyLossPerArea * Surface( SurfNum ).Area;
 
 		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
 		// to the air directly and added to the zone air heat balance
@@ -877,7 +895,7 @@ namespace SwimmingPool {
 		
 		CondTerms = CTFConstInPart( SurfNum ) + Construct( ConstrNum ).CTFCross( 0 ) * TH11 - Construct( ConstrNum ).CTFInside( 0 ) * TInSurf;
 		ConvTerm = HConvIn * ( MAT( ZoneNum ) - TInSurf );
-		PoolMassTerm = Pool( PoolNum ).WaterMass * Cp * ( TH22 - TInSurf ) / ( TimeStepZone * SecInHour ) / Surface( SurfNum ).Area;
+		PoolMassTerm = Pool( PoolNum ).WaterMass * Cp * ( TH22 - TInSurf ) / ( TimeStepSys * SecInHour ) / Surface( SurfNum ).Area; // Use TimeStepSys here because this is a calculation for how much heat to add at the system time step and it is not a surface heat balance being done at the zone time step level
 		MUWTerm = EvapRate * Cp * ( Tmuw - TInSurf ) / Surface( SurfNum ).Area;
 		if ( TLoopInletTemp <= TInSurf ) {
 			CpDeltaTi = 0.0;
@@ -885,9 +903,10 @@ namespace SwimmingPool {
 			CpDeltaTi = 1.0 / ( Cp * ( TInSurf - TLoopInletTemp ) );
 		}
 		// Now calculate the requested mass flow rate from the plant loop to achieve the proper pool temperature
-		MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain + PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
-		if ( MassFlowRate > Node( Pool( PoolNum ).WaterInletNode ).MassFlowRateMaxAvail ) {
-			MassFlowRate = Node( Pool( PoolNum ).WaterInletNode ).MassFlowRateMaxAvail;
+		// old equation using surface heat balance form: MassFlowRate = CpDeltaTi * ( CondTerms + ConvTerm + SWtotal + LWtotal + PeopleGain + PoolMassTerm + MUWTerm + EvapEnergyLossPerArea );
+		MassFlowRate = ( Pool( PoolNum ).WaterMass / ( TimeStepSys * SecInHour ) ) * ( ( TInSurf - TH22 ) / ( TLoopInletTemp - TInSurf ) );
+		if ( MassFlowRate > Pool( PoolNum ).WaterMassFlowRateMax ) {
+			MassFlowRate = Pool( PoolNum ).WaterMassFlowRateMax;
 		} else if ( MassFlowRate < 0.0 ) {
 			MassFlowRate = 0.0;
 		}
@@ -1204,10 +1223,14 @@ namespace SwimmingPool {
 			// Now the power consumption of miscellaneous equipment
 			Pool( PoolNum ).MiscEquipPower = Pool( PoolNum ).MiscPowerFactor * Pool( PoolNum ).WaterMassFlowRate;
 			
+			// Also the radiant exchange converted to convection by the pool cover
+			Pool( PoolNum ).RadConvertToConvectRep = Pool( PoolNum ).RadConvertToConvect * Surface( SurfNum ).Area;
+			
 			// Finally calculate the summed up report variables
 			Pool( PoolNum ).MiscEquipEnergy = Pool( PoolNum ).MiscEquipPower * TimeStepSys * SecInHour;
 			Pool( PoolNum ).HeatEnergy = Pool( PoolNum ).HeatPower * TimeStepSys * SecInHour;
 			Pool( PoolNum ).MakeUpWaterMass = Pool( PoolNum ).MakeUpWaterMassFlowRate * TimeStepSys * SecInHour;
+			Pool( PoolNum ).EvapEnergyLoss = Pool( PoolNum ).EvapHeatLossRate * TimeStepSys * SecInHour;
 			
 		}
 		

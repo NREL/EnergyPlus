@@ -51,6 +51,7 @@ namespace SwimmingPool {
 		int HWBranchNum;
 		int HWCompNum;
 		Real64 WaterVolFlowMax; // maximum water flow rate for pool, m3/s
+		Real64 WaterMassFlowRateMax; // maximum water mass flow rate for pool, kg/s
 		Real64 AvgDepth; // average depth of the pool, m
 		Real64 ActivityFactor; // Activity factor for the pool
 		std::string ActivityFactorSchedName; // Activity factor schedule name
@@ -71,7 +72,7 @@ namespace SwimmingPool {
 		Real64 CurCoverConvFac; // Current pool cover convective factor
 		Real64 CurCoverSWRadFac; // Current pool cover short-wavelength radiation factor
 		Real64 CurCoverLWRadFac; // Current pool cover long-wavelength radiation factor
-		Real64 RadConvertToConvect; // LW and SW radiation converted to convective gain by pool cover
+		Real64 RadConvertToConvect; // LW and SW radiation converted to convective gain by pool cover in W/m2
 		Real64 MiscPowerFactor; // Pool miscellaneous power equipment consumption coefficient in W/(kg/s)
 		std::string SetPtTempSchedName; // Schedule name for water setpoint temperature
 		int SetPtTempSchedPtr; // Schedule pointer for water setpoint temperature
@@ -95,6 +96,9 @@ namespace SwimmingPool {
 		Real64 HeatEnergy; // heating sent to pool in Joules
 		Real64 MiscEquipPower; // power for miscellaneous pool equipment in Watts
 		Real64 MiscEquipEnergy; // energy for miscellaneous pool equipment in Joules
+		Real64 RadConvertToConvectRep; //LW and SW radiation converted to convective gain by pool cover (reporting) in W
+		Real64 EvapHeatLossRate; // Heat lost due to evaporation of pool water as a rate in Watts
+		Real64 EvapEnergyLoss; // Energy lost due to evaporation in Joules
 
 		// Default Constructor
 		SwimmingPoolData() :
@@ -107,6 +111,7 @@ namespace SwimmingPool {
 			HWBranchNum( 0 ),
 			HWCompNum( 0 ),
 			WaterVolFlowMax( 0.0 ),
+			WaterMassFlowRateMax( 0.0 ),
 			AvgDepth( 0.0 ),
 			ActivityFactor( 0.0 ),
 			ActivityFactorSchedPtr( 0 ),
@@ -142,8 +147,10 @@ namespace SwimmingPool {
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			MiscEquipPower( 0.0 ),
-			MiscEquipEnergy( 0.0 )
-
+			MiscEquipEnergy( 0.0 ),
+			RadConvertToConvectRep( 0.0 ),
+			EvapHeatLossRate( 0.0 ),
+			EvapEnergyLoss( 0.0 )
 		{}
 
 		// Member Constructor
@@ -162,6 +169,7 @@ namespace SwimmingPool {
 			int const HWBranchNum,
 			int const HWCompNum,
 			Real64 const WaterVolFlowMax, // maximum water flow rate for pool, m3/s
+			Real64 const WaterMassFlowRateMax, // maximum water mass flow rate for pool, kg/s
 			Real64 const AvgDepth, // average depth of the pool, m
 			Real64 const ActivityFactor, // Activity factor for the pool
 			std::string const ActivityFactorSchedName, // Activity factor schedule name
@@ -205,7 +213,10 @@ namespace SwimmingPool {
 			Real64 const HeatPower, // heating sent to pool in Watts
 			Real64 const HeatEnergy, // heating sent to pool in Joules
 			Real64 const MiscEquipPower, // power for miscellaneous pool equipment in Watts
-			Real64 const MiscEquipEnergy // energy for miscellaneous pool equipment in Joules
+			Real64 const MiscEquipEnergy, // energy for miscellaneous pool equipment in Joules
+			Real64 const RadConvertToConvectRep, //LW and SW radiation converted to convective gain by pool cover (reporting) in W
+			Real64 const EvapHeatLossRate, // Heat lost due to evaporation of pool water
+			Real64 const EvapEnergyLoss // Energy lost due to evaporation in Joules
 		) :
 			Name( Name ),
 			SurfaceName( SurfaceName ),
@@ -220,6 +231,7 @@ namespace SwimmingPool {
 			HWBranchNum( HWBranchNum ),
 			HWCompNum( HWCompNum ),
 			WaterVolFlowMax( WaterVolFlowMax ),
+			WaterMassFlowRateMax( WaterMassFlowRateMax ),
 			AvgDepth( AvgDepth ),
 			ActivityFactor( ActivityFactor ),
 			ActivityFactorSchedName( ActivityFactorSchedName ),
@@ -262,8 +274,10 @@ namespace SwimmingPool {
 			HeatPower( HeatPower ),
 			HeatEnergy( HeatEnergy ),
 			MiscEquipPower( MiscEquipPower ),
-			MiscEquipEnergy( MiscEquipEnergy )
-		
+			MiscEquipEnergy( MiscEquipEnergy ),
+			RadConvertToConvectRep( RadConvertToConvectRep ),
+			EvapHeatLossRate( EvapHeatLossRate ),
+			EvapEnergyLoss( EvapEnergyLoss )
 		{}
 	};
 
