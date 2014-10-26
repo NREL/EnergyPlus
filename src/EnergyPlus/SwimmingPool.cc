@@ -220,11 +220,11 @@ namespace SwimmingPool {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSwimmingPool: " ); // include trailing blank space
-		int const MinCoverFactor( 0.0 ); // minimum value for cover factors
-		int const MaxCoverFactor( 1.0 ); // maximum value for cover factors
-		int const MinDepth( 0.05 ); // minimum average pool depth (to avoid obvious input errors)
-		int const MaxDepth( 10.0 ); // maximum average pool depth (to avoid obvious input errors)
-		int const MinPowerFactor( 0.0 ); // minimum power factor for miscellaneous equipment
+		Real64 const MinCoverFactor( 0.0 ); // minimum value for cover factors
+		Real64 const MaxCoverFactor( 1.0 ); // maximum value for cover factors
+		Real64 const MinDepth( 0.05 ); // minimum average pool depth (to avoid obvious input errors)
+		Real64 const MaxDepth( 10.0 ); // maximum average pool depth (to avoid obvious input errors)
+		Real64 const MinPowerFactor( 0.0 ); // minimum power factor for miscellaneous equipment
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
