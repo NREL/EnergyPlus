@@ -6872,7 +6872,6 @@ namespace WaterThermalTanks {
 				//           move the full load outlet temperature rate to the water heater structure variables
 				//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
 				WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = Node( HPWaterInletNode ).Temp + CondenserDeltaT;
-				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
 
 				//           this CALL does not update node temps, must use WaterThermalTank variables
 				// select tank type
