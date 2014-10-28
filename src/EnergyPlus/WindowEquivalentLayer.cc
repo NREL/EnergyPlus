@@ -4264,6 +4264,7 @@ namespace WindowEquivalentLayer {
 					YD = YA;
 					XE = 0.0;
 					YE = YD;
+					//Bug XF, YF not set but used below (XE, YE are set but NOT used)
 				} else {
 					if ( ( PHI + OMEGA ) < 0.0 ) {
 						XC = -XC;
@@ -4337,6 +4338,7 @@ namespace WindowEquivalentLayer {
 						YD = YA;
 						XE = 0.0;
 						YE = YD;
+						//Bug XF, YF not set but used below (XE, YE are set but NOT used)
 					} else {
 						if ( ( PHI + OMEGA ) < 0.0 ) {
 							XC = -XC;

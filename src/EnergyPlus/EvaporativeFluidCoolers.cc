@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -1022,7 +1023,7 @@ namespace EvaporativeFluidCoolers {
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool OneTimeFlagForEachEvapFluidCooler;
-		int TypeOf_Num;
+		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;
 		int BranchIndex;
@@ -1048,6 +1049,8 @@ namespace EvaporativeFluidCoolers {
 				TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
 			} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
 				TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
+			} else {
+				assert( false );
 			}
 			ErrorsFound = false;
 			// Locate the tower on the plant loops for later usage

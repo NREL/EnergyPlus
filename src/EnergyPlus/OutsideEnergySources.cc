@@ -403,7 +403,7 @@ namespace OutsideEnergySources {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TempTypeFlag;
+		int TempTypeFlag( 0 );
 		static Real64 TempPlantMdot( 0.0 ); // local copy of plant flow
 		int LoopNum;
 		int LoopSideNum;

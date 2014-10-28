@@ -4,6 +4,10 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products" )
 
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_2_0.f90" )
+configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_2_0.f90" )
+
 SET(SRC
   Transition.f90
   DataGlobals.f90
@@ -47,8 +51,20 @@ list( APPEND VERSIONS 8_1_0 )
 list( APPEND VERSIONS 8_2_0 )
 
 IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
-  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
-  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+  IF( WIN32 )
+    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -static")
+  ELSE()
+    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+    SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -ffree-line-length-none")
+  ENDIF()
+ENDIF()
+
+
+IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fpp ")
+  SET(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -libs:static")
 ENDIF()
 
 list( LENGTH VERSIONS VERSIONS_SIZE)
@@ -67,11 +83,16 @@ STRING( REPLACE _ - NEW-VERSION ${NEW_VERSION} )
 
 SET(LAST_NAME "Transition-V${OLD-VERSION}-to-V${NEW-VERSION}" )
 
+SET(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
 ADD_EXECUTABLE( "${LAST_NAME}" ${SRC} )
 SET_PROPERTY( TARGET "${LAST_NAME}"
               PROPERTY COMPILE_DEFINITIONS V${NEW_VERSION} )
 
 ENDFOREACH()
 
-INSTALL( TARGETS "${LAST_NAME}" DESTINATION PreProcess/IDFVersionUpdater )
+include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
+install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater )
+if( APPLE )
+  install_and_fixup_exe_target( "${LAST_NAME}" PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/Contents/MacOS/ )
+endif()
 

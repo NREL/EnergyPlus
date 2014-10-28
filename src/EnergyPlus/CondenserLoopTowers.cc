@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -1898,7 +1899,7 @@ namespace CondenserLoopTowers {
 				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume Flow Rate [m3/s]", SimpleTowerReport( TowerNum ).TankSupplyVdot, "System", "Average", SimpleTower( TowerNum ).Name );
 				SetupOutputVariable( "Cooling Tower Storage Tank Water Volume [m3]", SimpleTowerReport( TowerNum ).TankSupplyVol, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
 				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume Flow Rate [m3/s]", SimpleTowerReport( TowerNum ).StarvedMakeUpVdot, "System", "Average", SimpleTower( TowerNum ).Name );
-				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume [m3]", SimpleTowerReport( TowerNum ).StarvedMakeUpVol, "System", "Sum", SimpleTower( TowerNum ).Name, _, "Water", "HeatRejection", _, "Plant" );
+				SetupOutputVariable( "Cooling Tower Starved Storage Tank Water Volume [m3]", SimpleTowerReport( TowerNum ).StarvedMakeUpVol, "System", "Sum", SimpleTower( TowerNum ).Name );
 				SetupOutputVariable( "Cooling Tower Make Up Mains Water Volume [m3]", SimpleTowerReport( TowerNum ).StarvedMakeUpVol, "System", "Sum", SimpleTower( TowerNum ).Name, _, "MainsWater", "HeatRejection", _, "Plant" );
 			} else { // tower water from mains and gets metered
 				SetupOutputVariable( "Cooling Tower Make Up Water Volume Flow Rate [m3/s]", SimpleTowerReport( TowerNum ).MakeUpVdot, "System", "Average", SimpleTower( TowerNum ).Name );
@@ -2039,7 +2040,7 @@ namespace CondenserLoopTowers {
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool OneTimeFlagForEachTower;
 		//  LOGICAL                                 :: FatalError
-		int TypeOf_Num;
+		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;
 		int BranchIndex;
@@ -2067,6 +2068,8 @@ namespace CondenserLoopTowers {
 				TypeOf_Num = TypeOf_CoolingTower_VarSpd;
 			} else if ( SimpleTower( TowerNum ).TowerType_Num == CoolingTower_VariableSpeedMerkel ) {
 				TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
+			} else {
+				assert( false );
 			}
 
 			// Locate the tower on the plant loops for later usage
@@ -2201,9 +2204,9 @@ namespace CondenserLoopTowers {
 		Real64 Twb; // tower inlet air wet-bulb temperature [C]
 		Real64 Tr; // tower range temperature [C]
 		Real64 Ta; // tower approach temperature [C]
-		Real64 WaterFlowRatio; // tower water flow rate ratio found during model calibration
+		Real64 WaterFlowRatio( 0.0 ); // tower water flow rate ratio found during model calibration
 		Real64 MaxWaterFlowRateRatio; // maximum water flow rate ratio which yields desired approach temp
-		Real64 WaterFlowRateRatio; // tower water flow rate ratio
+		Real64 WaterFlowRateRatio( 0.0 ); // tower water flow rate ratio
 		Real64 Tapproach; // temporary tower approach temp variable [C]
 		Real64 ModelWaterFlowRatioMax; // maximum water flow rate ratio used for model calibration
 		Real64 FlowRateRatioStep; // flow rate ratio to determine maximum water flow rate ratio during calibration
@@ -3021,7 +3024,7 @@ namespace CondenserLoopTowers {
 								ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
 							}
 						} else {
-							tmpNomTowerCap = 0.0;
+							tmpNomTowerCap = rho = Cp = 0.0; // rho and Cp added: Used below
 							if ( PlantSizesOkayToFinalize ) {
 								SimpleTower( TowerNum ).TowerNominalCapacity = tmpNomTowerCap;
 								ReportSizingOutput( SimpleTower( TowerNum ).TowerType, SimpleTower( TowerNum ).Name, "Nominal Capacity [W]", SimpleTower( TowerNum ).TowerNominalCapacity );
@@ -3029,6 +3032,7 @@ namespace CondenserLoopTowers {
 						}
 
 					} else {
+						tmpNomTowerCap = rho = Cp = 0.0; // Suppress uninitialized warnings
 						ShowSevereError( "Autosizing error for cooling tower object = " + SimpleTower( TowerNum ).Name );
 						ShowFatalError( "Autosizing of cooling tower nominal capacity requires a loop Sizing:Plant object." );
 					}
@@ -4091,7 +4095,7 @@ namespace CondenserLoopTowers {
 		Real64 OutletWaterTempON; // Outlet water temperature with fan ON at maximum fan speed (C)
 		Real64 OutletWaterTempMIN; // Outlet water temperature with fan at minimum speed (C)
 		Real64 CpWater; // Specific heat of water
-		Real64 TempSetPoint; // Outlet water temperature setpoint (C)
+		Real64 TempSetPoint( 0.0 ); // Outlet water temperature setpoint (C)
 		Real64 FanCurveValue; // Output of fan power as a func of air flow rate ratio curve
 		Real64 AirDensity; // Density of air [kg/m3]
 		Real64 AirMassFlowRate; // Mass flow rate of air [kg/s]
@@ -4170,6 +4174,8 @@ namespace CondenserLoopTowers {
 			TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			TempSetPoint = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TempSetPointHi;
+		} else {
+			assert( false );
 		}}
 
 		Tr = Node( WaterInletNode ).Temp - TempSetPoint;
@@ -4566,7 +4572,7 @@ namespace CondenserLoopTowers {
 		int SolFla; // Flag of solver
 		FArray1D< Real64 > Par( 4 ); // Parameter array for regula falsi solver
 		Real64 Tr; // range temperature which results in an energy balance
-		Real64 TempSetPoint; // local temporary for loop setpoint
+		Real64 TempSetPoint( 0.0 ); // local temporary for loop setpoint
 
 		//   determine tower outlet water temperature
 		Par( 1 ) = TowerNum; // Index to cooling tower
@@ -4588,6 +4594,8 @@ namespace CondenserLoopTowers {
 				TempSetPoint = PlantLoop( SimpleTower( TowerNum ).LoopNum ).LoopSide( SimpleTower( TowerNum ).LoopSideNum ).TempSetPoint;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				TempSetPoint = PlantLoop( SimpleTower( TowerNum ).LoopNum ).LoopSide( SimpleTower( TowerNum ).LoopSideNum ).TempSetPointHi;
+			} else {
+				assert( false );
 			}}
 			if ( SimpleTowerInlet( TowerNum ).WaterTemp > ( TempSetPoint + VSTower( SimpleTower( TowerNum ).VSTower ).MaxRangeTemp ) ) { // run flat out
 				OutletWaterTemp = SimpleTowerInlet( TowerNum ).WaterTemp - VSTower( SimpleTower( TowerNum ).VSTower ).MaxRangeTemp;
