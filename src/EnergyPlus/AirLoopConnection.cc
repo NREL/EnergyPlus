@@ -577,9 +577,8 @@ namespace AirLoopConnection {
 		Real64 Sensible;
 		Real64 Latent;
 		Real64 Total;
-		Real64 MinHumRat;
-		Real64 MaxTemp;
-		
+		Real64 DeltaHumRat;
+		Real64 DeltaT;
 
 		// FLOW:
 		// initialize some local variables
@@ -604,19 +603,24 @@ namespace AirLoopConnection {
 		// Calculate the sensible, latent, and total energy change rate to the air as it passes through the component (zone)
 		InletEnthalpy = Node( InNodeNum ).Enthalpy;
 		OutletEnthalpy = Node( OutNodeNum ).Enthalpy;
-		MinHumRat = min( Node( InNodeNum ).HumRat,  Node( OutNodeNum ).HumRat );
-		MaxTemp = max( Node( InNodeNum ).Temp, Node( OutNodeNum ).Temp );
-		MidpointEnthalpy = PsyHFnTdbW( MaxTemp, MinHumRat );
-		if ( Node( InNodeNum ).HumRat < Node( OutNodeNum ).HumRat ) {
-			// difference between inlet enthalpy and midpoint enthalpy is sensible since both are at the same humidity ratio
+		Total = OutletEnthalpy - InletEnthalpy;
+		DeltaHumRat = Node( OutNodeNum ).HumRat - Node( InNodeNum ).HumRat;
+		DeltaT = Node( OutNodeNum ).Temp - Node( InNodeNum ).Temp;
+		if ( DeltaT == 0.0 ) {
+			Sensible = 0.0;
+			Latent = Total;
+		} else if ( DeltaHumRat == 0.0 ) {
+			Latent = 0.0;
+			Sensible = Total;
+		} else if ( DeltaT > 0.0 ) {
+			MidpointEnthalpy = PsyHFnTdbW( Node( OutNodeNum ).Temp, Node( InNodeNum ).HumRat );
 			Sensible = MidpointEnthalpy - InletEnthalpy;
 			Latent = OutletEnthalpy - MidpointEnthalpy;
-		} else {
-			// difference between outlet enthalpy and midpoint enthalpy is sensible since both are at the same humidity ratio
-			Sensible = OutletEnthalpy - MidpointEnthalpy;
+		} else { // ( DeltaHumRat > 0.0 )
+			MidpointEnthalpy = PsyHFnTdbW( Node( InNodeNum ).Temp, Node( OutNodeNum ).HumRat );
 			Latent = MidpointEnthalpy - InletEnthalpy;
+			Sensible = OutletEnthalpy - MidpointEnthalpy;
 		}
-		Total = OutletEnthalpy - InletEnthalpy;
 		if ( Total >= 0.0 ) {
 			AirLoopCon( CompIndex ).TotHeatRate = Total;
 			AirLoopCon( CompIndex ).TotCoolRate = 0.0;
