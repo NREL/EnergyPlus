@@ -9,6 +9,7 @@
 
 // EnergyPlus Headers
 #include <ZoneEquipmentManager.hh>
+#include <AirLoopConnection.hh>
 #include <BaseboardElectric.hh>
 #include <BaseboardRadiator.hh>
 #include <CoolTower.hh>
@@ -2603,6 +2604,7 @@ namespace ZoneEquipmentManager {
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::Mixing;
 		using DataHeatBalance::ZoneAirMassFlow;
+		using AirLoopConnection::SimAirLoopConnection;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2662,6 +2664,10 @@ namespace ZoneEquipmentManager {
 
 					SimAirZonePlenum( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), ZoneSupplyPlenum_Type, SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ), FirstHVACIteration, FirstCall, SupPathInletChanged );
 
+				} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Type ) { // 'ZoneHVAC:AirLoopComponent'
+					
+					SimAirLoopConnection( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ) );
+					
 				} else {
 					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );
 					ShowContinueError( "Invalid Supply Air Path Component=" + SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) );
@@ -2889,6 +2895,9 @@ namespace ZoneEquipmentManager {
 				} else if ( SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num ) {
 					SimZoneEvaporativeCoolerUnit( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
+				} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Num ) {
+					SimAirLoopConnection( PrioritySimOrder( EquipTypeNum ).EquipName, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+					
 				} else {
 
 				}}
@@ -2963,6 +2972,10 @@ namespace ZoneEquipmentManager {
 
 					SimAirZonePlenum( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), ZoneSupplyPlenum_Type, SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ), FirstHVACIteration, FirstCall, SupPathInletChanged );
 
+				} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Type ) { // 'ZoneHVAC:AirLoopComponent'
+					
+					SimAirLoopConnection( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ) );
+					
 				} else {
 					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );
 					ShowContinueError( "Invalid Supply Air Path Component=" + SupplyAirPath( SupplyAirPathNum ).ComponentType( CompNum ) );
@@ -5046,7 +5059,7 @@ namespace ZoneEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

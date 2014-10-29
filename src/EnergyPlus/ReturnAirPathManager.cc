@@ -4,6 +4,7 @@
 
 // EnergyPlus Headers
 #include <ReturnAirPathManager.hh>
+#include <AirLoopConnection.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
@@ -49,6 +50,7 @@ namespace ReturnAirPathManager {
 	using DataZoneEquipment::NumReturnAirPaths;
 	using DataZoneEquipment::ZoneMixer_Type;
 	using DataZoneEquipment::ZoneReturnPlenum_Type;
+	using DataZoneEquipment::ZoneAirLoopConnection_Type;
 
 	// Use statements for access to subroutines in other modules
 
@@ -184,6 +186,7 @@ namespace ReturnAirPathManager {
 						}
 						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ZoneMixer" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
 						if ( SameString( cAlphaArgs( Counter ), "AirLoopHVAC:ReturnPlenum" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
+						if ( SameString( cAlphaArgs( Counter ), "ZoneHVAC:AirLoopConnection" ) ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneAirLoopConnection_Type;
 					} else {
 						ShowSevereError( "Unhandled component type in AirLoopHVAC:ReturnPath of " + cAlphaArgs( Counter ) );
 						ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath = " + ReturnAirPath( PathNum ).Name );
@@ -240,6 +243,7 @@ namespace ReturnAirPathManager {
 		// Using/Aliasing
 		using MixerComponent::SimAirMixer;
 		using ZonePlenum::SimAirZonePlenum;
+		using AirLoopConnection::SimAirLoopConnection;
 		using DataAirflowNetwork::SimulateAirflowNetwork;
 		using DataAirflowNetwork::AirflowNetworkFanActivated;
 		using DataAirflowNetwork::AirflowNetworkControlMultizone;
@@ -262,6 +266,10 @@ namespace ReturnAirPathManager {
 
 				SimAirZonePlenum( ReturnAirPath( ReturnAirPathNum ).ComponentName( ComponentNum ), ZoneReturnPlenum_Type, ReturnAirPath( ReturnAirPathNum ).ComponentIndex( ComponentNum ) );
 
+			} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Type ) { // 'ZoneHVAC:AirLoopConnection'
+				
+				SimAirLoopConnection( ReturnAirPath( ReturnAirPathNum ).ComponentName( ComponentNum ), ReturnAirPath( ReturnAirPathNum ).ComponentIndex( ComponentNum ) );
+				
 			} else {
 				ShowSevereError( "Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath( ReturnAirPathNum ).ComponentType( ComponentNum ) );
 				ShowContinueError( "Occurs in AirLoopHVAC:ReturnPath =" + ReturnAirPath( ReturnAirPathNum ).Name );
@@ -292,7 +300,7 @@ namespace ReturnAirPathManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

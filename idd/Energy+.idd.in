@@ -32689,6 +32689,18 @@ ZoneHVAC:EvaporativeCoolerUnit,
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
 
+ZoneHVAC:AirLoopConnection,
+   A1, \field Name
+       \required-field
+   A2, \field Air Loop Inlet Node Name
+       \required-field
+   A3, \field Air Loop Outlet Node Name
+       \required-field
+   A4, \field Zone Air Inlet Node Name
+       \required-field
+   A5; \field Zone Air Outlet Node Name
+       \required-field
+
 ZoneHVAC:OutdoorAirUnit,
        \memo The zone outdoor air unit models a single-zone dedicated outdoor air system (DOAS).
        \memo Forced-convection 100% outdoor air unit with supply fan and optional equipment
@@ -52401,7 +52413,8 @@ AirLoopHVAC:SupplyPlenum,
 
 AirLoopHVAC:SupplyPath,
        \extensible:2 Just duplicate last two fields and comments (changing numbering, please)
-       \memo A supply path can only contain AirLoopHVAC:ZoneSplitter and AirLoopHVAC:SupplyPlenum objects
+       \memo A supply path can only contain AirLoopHVAC:ZoneSplitter, AirLoopHVAC:SupplyPlenum,
+       \memo or ZoneHVAC:AirLoopConnection objects
        \memo which may be in series or parallel.
    A1, \field Name
        \required-field
@@ -52416,6 +52429,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
    A4, \field Component 1 Name
        \required-field
        \type object-list
@@ -52424,6 +52438,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
    A6, \field Component 2 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52431,6 +52446,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
    A8, \field Component 3 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52438,6 +52454,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A10, \field Component 4 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52445,6 +52462,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A12, \field Component 5 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52452,6 +52470,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A14, \field Component 6 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52459,6 +52478,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A16, \field Component 7 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52466,6 +52486,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A18, \field Component 8 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52473,6 +52494,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A20, \field Component 9 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52480,6 +52502,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A22, \field Component 10 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52487,6 +52510,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A24, \field Component 11 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52494,6 +52518,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A26, \field Component 12 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52501,6 +52526,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A28, \field Component 13 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52508,6 +52534,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A30, \field Component 14 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52515,6 +52542,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A32, \field Component 15 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52522,6 +52550,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A34, \field Component 16 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52529,6 +52558,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A36, \field Component 17 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52536,6 +52566,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A38, \field Component 18 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52543,6 +52574,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A40, \field Component 19 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52550,6 +52582,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A42, \field Component 20 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52557,6 +52590,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A44, \field Component 21 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52564,6 +52598,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A46, \field Component 22 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52571,6 +52606,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A48, \field Component 23 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52578,6 +52614,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A50, \field Component 24 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -52585,6 +52622,7 @@ AirLoopHVAC:SupplyPath,
        \type choice
        \key AirLoopHVAC:ZoneSplitter
        \key AirLoopHVAC:SupplyPlenum
+       \key ZoneHVAC:AirLoopConnection
   A52; \field Component 25 Name
        \type object-list
        \object-list SupplyPathComponentNames
@@ -53109,7 +53147,7 @@ AirLoopHVAC:ReturnPlenum,
 AirLoopHVAC:ReturnPath,
        \extensible:2 Just duplicate last two fields and comments (changing numbering, please)
        \memo A return air path can only contain one AirLoopHVAC:ZoneMixer
-       \memo and one or more AirLoopHVAC:ReturnPlenum objects.
+       \memo and one or more AirLoopHVAC:ReturnPlenum  or ZoneHVAC:AirLoopConnection objects.
    A1, \field Name
        \required-field
        \reference ZoneReturnAirPaths
@@ -53122,6 +53160,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
    A4, \field Component 1 Name
        \required-field
        \type object-list
@@ -53130,6 +53169,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
    A6, \field Component 2 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53137,6 +53177,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
    A8, \field Component 3 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53144,6 +53185,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A10, \field Component 4 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53151,6 +53193,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A12, \field Component 5 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53158,6 +53201,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A14, \field Component 6 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53165,6 +53209,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A16, \field Component 7 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53172,6 +53217,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A18, \field Component 8 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53179,6 +53225,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A20, \field Component 9 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53186,6 +53233,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A22, \field Component 10 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53193,6 +53241,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A24, \field Component 11 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53200,6 +53249,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A26, \field Component 12 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53207,6 +53257,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A28, \field Component 13 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53214,6 +53265,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A30, \field Component 14 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53221,6 +53273,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A32, \field Component 15 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53228,6 +53281,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A34, \field Component 16 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53235,6 +53289,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A36, \field Component 17 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53242,6 +53297,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A38, \field Component 18 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53249,6 +53305,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A40, \field Component 19 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53256,6 +53313,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A42, \field Component 20 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53263,6 +53321,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A44, \field Component 21 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53270,6 +53329,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A46, \field Component 22 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53277,6 +53337,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A48, \field Component 23 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53284,6 +53345,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A50, \field Component 24 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -53291,6 +53353,7 @@ AirLoopHVAC:ReturnPath,
        \type choice
        \key AirLoopHVAC:ZoneMixer
        \key AirLoopHVAC:ReturnPlenum
+       \key ZoneHVAC:AirLoopConnection
   A52; \field Component 25 Name
        \type object-list
        \object-list ReturnPathComponentNames
@@ -91556,4 +91619,5 @@ Output:PreprocessorMessage,
         \retaincase
    A12; \field Message Line 10
         \retaincase
+
 

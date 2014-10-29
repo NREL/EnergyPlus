@@ -12,6 +12,8 @@ SET( SRC
   AirflowNetworkBalanceManager.hh
   AirflowNetworkSolver.cc
   AirflowNetworkSolver.hh
+  AirLoopConnection.cc
+  AirLoopConnection.hh
   BaseboardElectric.cc
   BaseboardElectric.hh
   BaseboardRadiator.cc

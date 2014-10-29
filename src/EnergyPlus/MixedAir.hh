@@ -58,6 +58,7 @@ namespace MixedAir {
 	extern int const DXHeatPumpSystem;
 	extern int const Coil_UserDefined;
 	extern int const UnitarySystem;
+	extern int const ZoneAirLoopConnection;
 
 	extern int const ControllerSimple;
 	extern int const ControllerOutsideAir;
@@ -938,7 +939,7 @@ namespace MixedAir {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

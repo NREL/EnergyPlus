@@ -10,6 +10,7 @@
 
 // EnergyPlus Headers
 #include <SimAirServingZones.hh>
+#include <AirLoopConnection.hh>
 #include <BranchInputManager.hh>
 #include <DataAirLoop.hh>
 #include <DataAirSystems.hh>
@@ -138,6 +139,7 @@ namespace SimAirServingZones {
 	int const Fan_ComponentModel( 25 ); // cpw22Aug2010 (new)
 	int const DXHeatPumpSystem( 26 );
 	int const CoilUserDefined( 27 );
+	int const ZoneAirLoopConnect( 28 );
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -1190,6 +1192,9 @@ namespace SimAirServingZones {
 						ShowContinueError( "...This component may only be referenced by a parent component " "such as AirLoopHVAC:Unitary:Furnace:HeatCool or similar." );
 						ErrorsFound = true;
 
+					} else if ( componentType == "ZONEHVAC:AIRLOOPCONNECTION" ) {
+						PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).CompType_Num = ZoneAirLoopConnect;
+						
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = \"" + PrimaryAirSystem( AirSysNum ).Name + "\"." );
 						ShowContinueError( "..Invalid Air Loop Component Type = \"" + PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp( CompNum ).TypeOf + "\"." );
@@ -2802,6 +2807,7 @@ namespace SimAirServingZones {
 		using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
 		using HVACMultiSpeedHeatPump::SimMSHeatPump;
 		using UserDefinedComponents::SimCoilUserDefined;
+		using AirLoopConnection::SimAirLoopConnection;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2922,6 +2928,9 @@ namespace SimAirServingZones {
 			// Ducts
 		} else if ( SELECT_CASE_var == Duct ) { // 'Duct'
 			SimDuct( CompName, FirstHVACIteration, CompIndex );
+		
+		} else if ( SELECT_CASE_var == ZoneAirLoopConnect ){ // 'ZoneHVAC:AirLoopComponent'
+			SimAirLoopConnection( CompName, CompIndex );			
 
 		} else {
 
@@ -6171,7 +6180,7 @@ namespace SimAirServingZones {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

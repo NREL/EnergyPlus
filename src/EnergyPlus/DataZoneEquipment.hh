@@ -30,6 +30,7 @@ namespace DataZoneEquipment {
 	extern int const ZoneSupplyPlenum_Type;
 	extern int const ZoneMixer_Type;
 	extern int const ZoneReturnPlenum_Type;
+	extern int const ZoneAirLoopConnection_Type;
 
 	// Start zone equip objects
 	// list units that are valid for zone system availability managers first
@@ -62,6 +63,7 @@ namespace DataZoneEquipment {
 	extern int const RefrigerationAirChillerSet_Num;
 	extern int const UserDefinedZoneHVACForcedAir_Num;
 	extern int const ZoneUnitarySystem_Num; // AirloopHVAC:UnitarySystem configured as zone equipment
+	extern int const ZoneAirLoopConnection_Num; // Zone as a generic (passive) component on an air loop or within the zone equipment
 	extern int const TotalNumZoneEquipType;
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
@@ -890,7 +892,7 @@ namespace DataZoneEquipment {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

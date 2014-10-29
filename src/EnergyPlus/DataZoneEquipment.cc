@@ -46,6 +46,7 @@ namespace DataZoneEquipment {
 	int const ZoneSupplyPlenum_Type( 2 );
 	int const ZoneMixer_Type( 3 );
 	int const ZoneReturnPlenum_Type( 4 );
+	int const ZoneAirLoopConnection_Type( 5 );
 
 	// Start zone equip objects
 	// list units that are valid for zone system availability managers first
@@ -78,7 +79,8 @@ namespace DataZoneEquipment {
 	int const RefrigerationAirChillerSet_Num( 27 );
 	int const UserDefinedZoneHVACForcedAir_Num( 28 );
 	int const ZoneUnitarySystem_Num( 29 ); // AirloopHVAC:UnitarySystem configured as zone equipment
-	int const TotalNumZoneEquipType( 29 );
+	int const ZoneAirLoopConnection_Num( 30 ); // ZoneHVAC:AirLoopConnection
+	int const TotalNumZoneEquipType( 30 );
 	// **NOTE**... if you add another zone equipment object, then increment
 	// TotalNumZoneEquipType above to match the total number of zone equipment types
 	// End zone equip objects
@@ -587,6 +589,8 @@ namespace DataZoneEquipment {
 
 					} else if ( SELECT_CASE_var == "ZONEHVAC:EVAPORATIVECOOLERUNIT" ) {
 						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneEvaporativeCoolerUnit_Num;
+					} else if ( SELECT_CASE_var == "ZONEHVAC:AIRLOOPCONNECTION" ) {
+						ZoneEquipList( ControlledZoneNum ).EquipType_Num( ZoneEquipTypeNum ) = ZoneAirLoopConnection_Num;
 					} else {
 						ShowSevereError( RoutineName + CurrentModuleObject + " = " + ZoneEquipList( ControlledZoneNum ).Name );
 						ShowContinueError( "..Invalid Equipment Type = " + ZoneEquipList( ControlledZoneNum ).EquipType( ZoneEquipTypeNum ) );
@@ -739,7 +743,7 @@ namespace DataZoneEquipment {
 
 			for ( CompNum = 1; CompNum <= SupplyAirPath( PathNum ).NumOfComponents; ++CompNum ) {
 
-				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) ) {
+				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) || ( AlphArray( Counter ) == "ZONEHVAC:AIRLOOPCONNECTION" ) ) {
 
 					SupplyAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
 					SupplyAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
@@ -749,11 +753,11 @@ namespace DataZoneEquipment {
 					SupplyAirPath( PathNum ).PlenumIndex( CompNum ) = 0;
 					if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSplitter_Type;
 					if ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSupplyPlenum_Type;
-
+					if ( AlphArray( Counter ) == "ZONEHVAC:AIRLOOPCONNECTION" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneAirLoopConnection_Type;
 				} else {
 					ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + SupplyAirPath( PathNum ).Name + "\"" );
 					ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
-					ShowContinueError( "Must be \"AirLoopHVAC:ZoneSplitter\" or \"AirLoopHVAC:SupplyPlenum\"" );
+					ShowContinueError( "Must be \"AirLoopHVAC:ZoneSplitter\" or \"AirLoopHVAC:SupplyPlenum\" or \"ZoneHVAC:AirLoopConnection\"" );
 					ErrorsFound = true;
 				}
 
@@ -793,7 +797,7 @@ namespace DataZoneEquipment {
 
 			for ( CompNum = 1; CompNum <= ReturnAirPath( PathNum ).NumOfComponents; ++CompNum ) {
 
-				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ) {
+				if ( ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) || ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) || ( AlphArray( Counter ) == "ZONEHVAC:AIRLOOPCONNECTION" ) ) {
 
 					ReturnAirPath( PathNum ).ComponentType( CompNum ) = AlphArray( Counter );
 					ReturnAirPath( PathNum ).ComponentName( CompNum ) = AlphArray( Counter + 1 );
@@ -805,10 +809,11 @@ namespace DataZoneEquipment {
 					}
 					if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONEMIXER" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneMixer_Type;
 					if ( AlphArray( Counter ) == "AIRLOOPHVAC:RETURNPLENUM" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneReturnPlenum_Type;
+					if ( AlphArray( Counter ) == "ZONEHVAC:AIRLOOPCONNECTION" ) ReturnAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneAirLoopConnection_Type;
 				} else {
 					ShowSevereError( RoutineName + cAlphaFields( 1 ) + "=\"" + ReturnAirPath( PathNum ).Name + "\"" );
 					ShowContinueError( "Unhandled component type =\"" + AlphArray( Counter ) + "\"." );
-					ShowContinueError( "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\"" );
+					ShowContinueError( "Must be \"AirLoopHVAC:ZoneMixer\" or \"AirLoopHVAC:ReturnPlenum\" or \"ZoneHVAC:AirLoopConnection\" ");
 					ErrorsFound = true;
 				}
 
@@ -1347,7 +1352,7 @@ namespace DataZoneEquipment {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

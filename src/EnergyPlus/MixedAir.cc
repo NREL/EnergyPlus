@@ -9,6 +9,7 @@
 
 // EnergyPlus Headers
 #include <MixedAir.hh>
+#include <AirLoopConnection.hh>
 #include <BranchNodeConnections.hh>
 #include <CurveManager.hh>
 #include <DataAirLoop.hh>
@@ -151,6 +152,7 @@ namespace MixedAir {
 	int const DXHeatPumpSystem( 19 );
 	int const Coil_UserDefined( 20 );
 	int const UnitarySystem( 21 );
+	int const ZoneAirLoopConnection( 22 );
 
 	int const ControllerSimple( 1 );
 	int const ControllerOutsideAir( 2 );
@@ -462,6 +464,7 @@ namespace MixedAir {
 		using HVACUnitarySystem::SimUnitarySystem;
 		using HVACUnitarySystem::GetUnitarySystemOAHeatCoolCoil;
 		using HVACUnitarySystem::CheckUnitarySysCoilInOASysExists;
+		using AirLoopConnection::SimAirLoopConnection;
 
 		// Locals
 		// SUBROUTINE ARGUMENTS:
@@ -598,6 +601,11 @@ namespace MixedAir {
 				SimEvapCooler( CompName, CompIndex );
 			}
 
+			// ZoneHVAC:AirLoopConnection
+		} else if ( SELECT_CASE_var == ZoneAirLoopConnection ) { // 'ZoneHVAC:AirLoopConnection'
+			if ( Sim ) {
+				SimAirLoopConnection( CompName, CompIndex );
+			}
 		} else {
 			ShowFatalError( "Invalid Outside Air Component=" + CompType );
 
@@ -1063,6 +1071,11 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = EvapCooler;
 				} else if ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) {
 					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = EvapCooler;
+					
+					// Zone as Generic HVAC Component
+				} else if ( SELECT_CASE_var == "ZONEHVAC:AIRLOOPCONNECTION" ) {
+					OutsideAirSys( OASysNum ).ComponentType_Num( CompNum ) = ZoneAirLoopConnection;
+
 				} else {
 					ShowSevereError( CurrentModuleObject + " = \"" + AlphArray( 1 ) + "\" invalid " "Outside Air Component=\"" + OutsideAirSys( OASysNum ).ComponentType( CompNum ) + "\"." );
 					ErrorsFound = true;
@@ -6426,7 +6439,7 @@ namespace MixedAir {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
