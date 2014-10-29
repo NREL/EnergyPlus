@@ -6,7 +6,7 @@ set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} 
 
 set( CMAKE_VERSION_MAJOR 8 )
 set( CMAKE_VERSION_MINOR 2 )
-set( CMAKE_VERSION_PATCH 2 ) 
+set( CMAKE_VERSION_PATCH 3 ) 
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -103,9 +103,12 @@ ADD_SUBDIRECTORY(third_party/BCVTB)
 ADD_SUBDIRECTORY(third_party/Expat)
 ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
+ADD_SUBDIRECTORY(third_party/DElight)
 IF(NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
+
+# of course E+ itself
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_TESTING )

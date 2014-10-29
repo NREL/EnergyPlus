@@ -38,6 +38,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneDDCycOnOne.idf EPW_FILE USA_IL_Chicago-OHare.I
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneDesignInputCoolingCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneDetailedIceStorage.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneDetailedIceStorage2.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5ZoneDetailedIceStorageCubicLinear.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneEconomicsTariffAndLifeCycleCosts.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneElectricBaseboard.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneEndUses.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -131,6 +132,9 @@ ADD_SIMULATION_TEST(IDF_FILE CrossVent_1Zone_AirflowNetwork.idf EPW_FILE USA_CA_
 ADD_SIMULATION_TEST(IDF_FILE CrossVent_1Zone_AirflowNetwork_with2CrossflowJets.idf EPW_FILE USA_CA_San.Francisco.Intl.AP.724940_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE CustomSolarVisibleSpectrum_RefBldgSmallOfficeNew2004_Chicago.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DDAutoSize.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE DElight-Detailed-Comparison.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE DElightCFSLightShelf.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE DElightCFSWindow.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DOASDXCOIL_wADPBFMethod.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DOASDualDuctSchool.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE DOAToFanCoilInlet.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -489,7 +493,10 @@ IF (BUILD_FORTRAN)
     ADD_SIMULATION_TEST(IDF_FILE LBuilding-G090.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
     ADD_SIMULATION_TEST(IDF_FILE LBuilding-G180.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
     ADD_SIMULATION_TEST(IDF_FILE LBuilding-G270.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+    # Parametric preprocessor dependent files
     ADD_SIMULATION_TEST(IDF_FILE LBuildingAppGRotPar.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
+    ADD_SIMULATION_TEST(IDF_FILE 1ZoneParameterAspect.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+    ADD_SIMULATION_TEST(IDF_FILE ParametricInsulation-5ZoneAirCooled.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ENDIF ()
 
 ## Files to handle specially
@@ -497,9 +504,6 @@ ENDIF ()
 #ADD_SIMULATION_TEST(IDF_FILE EMSTestMathAndKill.idf)
 
 ## Other files that won't run in the current state
-##   Parametric preprocessor files
-#ADD_SIMULATION_TEST(IDF_FILE 1ZoneParameterAspect.idf)
-#ADD_SIMULATION_TEST(IDF_FILE ParametricInsulation-5ZoneAirCooled.idf)
 ##   External dataset files
 #ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_1.idf)
 #ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled_win_2.idf)
@@ -507,10 +511,6 @@ ENDIF ()
 ##   Slab/basement preprocessor
 #ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooledWithSlab.idf)
 #ADD_SIMULATION_TEST(IDF_FILE LgOffVAVusingBasement.idf)
-##   DeLight library dependence
-#ADD_SIMULATION_TEST(IDF_FILE DElight-Detailed-Comparison.idf)
-#ADD_SIMULATION_TEST(IDF_FILE DElightCFSLightShelf.idf)
-#ADD_SIMULATION_TEST(IDF_FILE DElightCFSWindow.idf)
 ##   External interface library dependence
 #ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-actuator.idf)
 #ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-actuator.idf)
