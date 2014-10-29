@@ -136,7 +136,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.overview = VerString;
 
-	opt.syntax = "energyplus [options] [input file]";
+	opt.syntax = "energyplus [options] [input-file]";
 
 	opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
 
