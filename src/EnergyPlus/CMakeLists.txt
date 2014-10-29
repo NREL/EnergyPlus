@@ -533,8 +533,8 @@ endif()
 
 if(UNIX AND NOT APPLE)
   ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
-  COMMAND cd \"${CMAKE_BINARY_DIR}/Products/\"\;if [ ! -f EnergyPlus ]\; then ln -s energyplus EnergyPlus\;fi
-  ) 
+  COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
+  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus") 
 endif()
 
 INSTALL( TARGETS energyplus DESTINATION ./ )
