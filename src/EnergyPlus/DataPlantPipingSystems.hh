@@ -22,9 +22,9 @@ namespace DataPlantPipingSystems {
 	extern int const PartitionType_Pipe;
 	extern int const PartitionType_Slab;
 	extern int const PartitionType_XSide;
-	extern int const PartitionType_XSideWallInside;
+	extern int const PartitionType_XSideWall;
 	extern int const PartitionType_ZSide;
-	extern int const PartitionType_ZSideWallInside;
+	extern int const PartitionType_ZSideWall;
 	extern int const PartitionType_FloorInside;
 	extern int const PartitionType_UnderFloor;
 	extern int const PartitionType_HorizInsXSide;
@@ -39,9 +39,9 @@ namespace DataPlantPipingSystems {
 	extern int const RegionType_YDirection;
 	extern int const RegionType_ZDirection;
 	extern int const RegionType_XSide;
-	extern int const RegionType_XSideWallInside;
+	extern int const RegionType_XSideWall;
 	extern int const RegionType_ZSide;
-	extern int const RegionType_ZSideWallInside;
+	extern int const RegionType_ZSideWall;
 	extern int const RegionType_FloorInside;
 	extern int const RegionType_UnderFloor;
 	extern int const RegionType_HorizInsXSide;
@@ -75,8 +75,9 @@ namespace DataPlantPipingSystems {
 	extern int const CellType_HorizInsulation;
 	extern int const CellType_VertInsulation;
 	extern int const CellType_ZoneGroundInterface;
-	extern int const CellType_BasementWallGeneral;
-	extern int const CellType_BasementFloorGeneral;
+	extern int const CellType_BasementWallInsu;
+	extern int const CellType_BasementFloorInsu;
+
 
 	// DERIVED TYPE DEFINITIONS:
 

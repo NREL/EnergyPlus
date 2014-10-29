@@ -41,9 +41,9 @@ namespace DataPlantPipingSystems {
 	int const PartitionType_Pipe( -3 );
 	int const PartitionType_Slab( -4 );
 	int const PartitionType_XSide( -5 );
-	int const PartitionType_XSideWallInside( -6 );
+	int const PartitionType_XSideWall( -6 );
 	int const PartitionType_ZSide( -7 );
-	int const PartitionType_ZSideWallInside( -8 );
+	int const PartitionType_ZSideWall( -8 );
 	int const PartitionType_FloorInside( -9 );
 	int const PartitionType_UnderFloor( -10 );
 	int const PartitionType_HorizInsXSide( 11 );
@@ -57,9 +57,9 @@ namespace DataPlantPipingSystems {
 	int const RegionType_YDirection( -5 );
 	int const RegionType_ZDirection( -6 );
 	int const RegionType_XSide( -7 );
-	int const RegionType_XSideWallInside( -8 );
+	int const RegionType_XSideWall( -8 );
 	int const RegionType_ZSide( -9 );
-	int const RegionType_ZSideWallInside( -10 );
+	int const RegionType_ZSideWall( -10 );
 	int const RegionType_FloorInside( -11 );
 	int const RegionType_UnderFloor( -12 );
 	int const RegionType_HorizInsXSide( -13 );
@@ -93,8 +93,8 @@ namespace DataPlantPipingSystems {
 	int const CellType_HorizInsulation( -12 );
 	int const CellType_VertInsulation( -13 );
 	int const CellType_ZoneGroundInterface( -14 );
-	int const CellType_BasementWallGeneral( -15 );
-	int const CellType_BasementFloorGeneral( -16 );
+	int const CellType_BasementWallInsu( -15 );
+	int const CellType_BasementFloorInsu( -16 );
 
 	// DERIVED TYPE DEFINITIONS:
 

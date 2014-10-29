@@ -310,6 +310,16 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
+	bool
+		IsInRange_BasementModel(
+		Real64 const r,
+		Real64 const lower,
+		Real64 const upper
+		);
+
+	//*********************************************************************************************!
+
+	//*********************************************************************************************!
 
 	Real64
 	Real_ConstrainTo(
@@ -639,6 +649,7 @@ namespace PlantPipingSystemsManager {
 
 	int
 	CreateRegionListCount(
+		int const DomainNum,
 		FArray1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		bool const PartitionsExist
@@ -868,6 +879,13 @@ namespace PlantPipingSystemsManager {
 		int const CellType
 	);
 
+	Real64
+		GetAverageInterfaceTemp(
+		int const DomainNum,
+		int const CellType,
+		int const CellType2
+		);
+	
 	//*********************************************************************************************!
 
 	//*********************************************************************************************!
