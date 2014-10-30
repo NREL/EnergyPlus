@@ -12,6 +12,7 @@
 
 // EnergyPlus Headers
 #include <GeneralRoutines.hh>
+#include <AirLoopConnection.hh>
 #include <BaseboardRadiator.hh>
 #include <ConvectionCoefficients.hh>
 #include <DataAirLoop.hh>
@@ -1438,6 +1439,8 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	using InputProcessor::SameString;
 	using InputProcessor::MakeUPPERCase;
 	using InputProcessor::GetNumObjectsFound;
+	using AirLoopConnection::GetAirLoopConnectionNodeNums;
+	using AirLoopConnection::GetAirLoopConnectionNum;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1465,6 +1468,8 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	int Count1;
 	int Count2;
 	int WAirLoop;
+	int ALCInletNode;
+	int ALCOutletNode;
 
 	// Formats
 	static gio::Fmt const Format_700( "('! <#Supply Air Paths>,<Number of Supply Air Paths>')" );
@@ -1561,6 +1566,14 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 					}
 				}
 
+			} else if ( SELECT_CASE_var == "ZONEHVAC:AIRLOOPCONNECTION" ) {
+				GetAirLoopConnectionNum( SupplyAirPath( BCount ).ComponentIndex( Count ), SupplyAirPath( BCount ).ComponentName( Count ) );
+				GetAirLoopConnectionNodeNums( SupplyAirPath( BCount ).ComponentIndex( Count ), ALCInletNode, ALCOutletNode );
+				gio::write( ChrOut, fmtLD ) << 1;
+				gio::write( OutputFileBNDetails, Format_701 ) << "     #Outlet Nodes on Supply Air Path Component," + stripped( ChrOut );
+				gio::write( ChrOut, fmtLD ) << 1;
+				gio::write( OutputFileBNDetails, Format_701 ) << "     Supply Air Path Component Nodes," + stripped( ChrOut ) + ',' + SupplyAirPath( BCount ).ComponentType( Count ) + ',' + SupplyAirPath( BCount ).ComponentName( Count ) + ',' + NodeID( ALCInletNode ) + ',' + NodeID( ALCOutletNode ) + ',' + PrimaryAirLoopName;
+			
 			} else {
 				ShowSevereError( "Invalid Component Type in Supply Air Path=" + SupplyAirPath( BCount ).ComponentType( Count ) );
 				ErrFound = true;
@@ -2063,7 +2076,7 @@ TestReturnAirPathIntegrity(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted

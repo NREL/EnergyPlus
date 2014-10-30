@@ -755,6 +755,7 @@ namespace DataZoneEquipment {
 		FArray1D_int ComponentIndex;
 		FArray1D_int SplitterIndex;
 		FArray1D_int PlenumIndex;
+		FArray1D_int ZoneIndex;
 		int NumOutletNodes;
 		FArray1D_int OutletNode;
 		int NumNodes;
@@ -780,6 +781,7 @@ namespace DataZoneEquipment {
 			FArray1_int const & ComponentIndex,
 			FArray1_int const & SplitterIndex,
 			FArray1_int const & PlenumIndex,
+			FArray1_int const & ZoneIndex,
 			int const NumOutletNodes,
 			FArray1_int const & OutletNode,
 			int const NumNodes,
@@ -795,6 +797,7 @@ namespace DataZoneEquipment {
 			ComponentIndex( ComponentIndex ),
 			SplitterIndex( SplitterIndex ),
 			PlenumIndex( PlenumIndex ),
+			ZoneIndex( ZoneIndex ),
 			NumOutletNodes( NumOutletNodes ),
 			OutletNode( OutletNode ),
 			NumNodes( NumNodes ),

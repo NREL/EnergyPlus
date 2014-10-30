@@ -167,6 +167,24 @@ namespace AirLoopConnection {
 		int const & CompIndex
 	);
 
+	void
+	GetAirLoopConnectionNum(
+		int & ConnectNum, // index number in air loop connection derived type
+		std::string const CompName // name of air loop connection passed in
+	);
+
+	void
+	GetAirLoopConnectionNodeNums(
+		int const ConnectNum, // index number in air loop connection derived type
+		int & InletNode, // inlet node for component
+		int & OutletNode // outlet node for component
+	);
+
+	void
+	FoundAirLoopConnection(
+		int const InletNodeNum, // index number in air loop connection derived type
+		bool & FoundAMatch // set to true if we find a air loop connection that has this inlet node number
+	);
 
 	//     NOTICE
 

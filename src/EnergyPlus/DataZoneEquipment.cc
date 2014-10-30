@@ -738,6 +738,7 @@ namespace DataZoneEquipment {
 			SupplyAirPath( PathNum ).ComponentIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
 			SupplyAirPath( PathNum ).SplitterIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
 			SupplyAirPath( PathNum ).PlenumIndex.allocate( SupplyAirPath( PathNum ).NumOfComponents );
+			SupplyAirPath( PathNum ).ZoneIndex.allocate( SupplyAirPath(PathNum ).NumOfComponents );
 
 			Counter = 3;
 
@@ -751,6 +752,7 @@ namespace DataZoneEquipment {
 					SupplyAirPath( PathNum ).ComponentIndex( CompNum ) = 0;
 					SupplyAirPath( PathNum ).SplitterIndex( CompNum ) = 0;
 					SupplyAirPath( PathNum ).PlenumIndex( CompNum ) = 0;
+					SupplyAirPath( PathNum ).ZoneIndex( CompNum ) = 0;
 					if ( AlphArray( Counter ) == "AIRLOOPHVAC:ZONESPLITTER" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSplitter_Type;
 					if ( AlphArray( Counter ) == "AIRLOOPHVAC:SUPPLYPLENUM" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneSupplyPlenum_Type;
 					if ( AlphArray( Counter ) == "ZONEHVAC:AIRLOOPCONNECTION" ) SupplyAirPath( PathNum ).ComponentType_Num( CompNum ) = ZoneAirLoopConnection_Type;

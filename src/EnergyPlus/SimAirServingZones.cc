@@ -1304,6 +1304,9 @@ namespace SimAirServingZones {
 		using DataContaminantBalance::OutdoorGC;
 		using General::FindNumberInList;
 		using Fans::GetFanIndex;
+		using AirLoopConnection::GetAirLoopConnectionNum;
+		using AirLoopConnection::GetAirLoopConnectionNodeNums;
+		using AirLoopConnection::FoundAirLoopConnection;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
@@ -1348,6 +1351,10 @@ namespace SimAirServingZones {
 		int SupAirPathNum; // specific supply air path index
 		int SplitterNum; // Zone equip splitter index
 		int PlenumNum; // supply plenum index
+		int AirLoopConnectionNum; // zone (air loop connection) index
+		int AirLoopConnectionInletNodeNum; // inlet node number from air loop connection object
+		int AirLoopConnectionOutletNodeNum; // outlet node number from air loop connection object
+		bool FoundAnAirLoopConnect; // set to true when an air loop connection with the right inlet node number is found
 		int CtrlZoneNum; // Controlled zone index
 		int ZoneInNum; // zone inlet index
 		int NumZonesCool; // number of zones in system supplied with cooling
@@ -1434,6 +1441,16 @@ namespace SimAirServingZones {
 						}
 						SupplyAirPath( SupAirPath ).PlenumIndex( CompNum ) = PlenumNum;
 						NumAllSupAirPathNodes += ZoneSupPlenCond( PlenumNum ).NumOutletNodes + 1;
+					} else if ( SameString( SupplyAirPath( SupAirPath ).ComponentType( CompNum ), "ZoneHVAC:AirLoopConnection" ) ) {
+						AirLoopConnectionNum = 0;
+						GetAirLoopConnectionNum( AirLoopConnectionNum, SupplyAirPath( SupAirPath ).ComponentName( CompNum ) );
+						if ( AirLoopConnectionNum == 0 ) {
+							ShowSevereError( "ZoneHVAC:AirLoopConnection not found=" + SupplyAirPath( SupAirPath ).ComponentName( CompNum ) );
+							ShowContinueError( "Occurs in AirLoopHVAC:SupplyPath=" + SupplyAirPath( SupAirPath ).Name );
+							ErrorsFound = true;
+						}
+						SupplyAirPath( SupAirPath ).ZoneIndex( CompNum ) = AirLoopConnectionNum;
+						NumAllSupAirPathNodes += 2;
 					}
 				}
 				SupNode.allocate( NumAllSupAirPathNodes );
@@ -1444,6 +1461,7 @@ namespace SimAirServingZones {
 				for ( CompNum = 1; CompNum <= SupplyAirPath( SupAirPath ).NumOfComponents; ++CompNum ) {
 					SplitterNum = SupplyAirPath( SupAirPath ).SplitterIndex( CompNum );
 					PlenumNum = SupplyAirPath( SupAirPath ).PlenumIndex( CompNum );
+					AirLoopConnectionNum = SupplyAirPath( SupAirPath ).ZoneIndex( CompNum );
 					if ( SplitterNum > 0 ) {
 						++SupAirPathNodeNum;
 						SupNode( SupAirPathNodeNum ) = SplitterCond( SplitterNum ).InletNode;
@@ -1470,6 +1488,20 @@ namespace SimAirServingZones {
 							SupNode( SupAirPathNodeNum ) = ZoneSupPlenCond( PlenumNum ).OutletNode( PlenumOutNum );
 							SupNodeType( SupAirPathNodeNum ) = 0;
 						}
+					} else if ( AirLoopConnectionNum > 0 ) {
+						++SupAirPathNodeNum;
+						AirLoopConnectionInletNodeNum = 0;
+						AirLoopConnectionOutletNodeNum = 0;
+						GetAirLoopConnectionNodeNums( AirLoopConnectionNum, AirLoopConnectionInletNodeNum, AirLoopConnectionOutletNodeNum );
+						SupNode( SupAirPathNodeNum ) = AirLoopConnectionInletNodeNum;
+						if ( CompNum == 1 ) {
+							SupNodeType( SupAirPathNodeNum ) = PathInlet;
+						} else {
+							SupNodeType( SupAirPathNodeNum ) = CompInlet;
+						}
+						++SupAirPathNodeNum;
+						SupNode( SupAirPathNodeNum ) = AirLoopConnectionOutletNodeNum;
+						SupNodeType( SupAirPathNodeNum ) = 0;
 					}
 				}
 
@@ -1642,6 +1674,13 @@ namespace SimAirServingZones {
 							ZoneAirDistUnitInletsLoop_exit: ;
 							ControlledZoneLoop_loop: ;
 						}
+						// So far, no matches have been found if we get to this point.  However, we could be
+						// encountering a air loop connection component.  If that is the case, we are okay.  So,
+						// send the outlet node number to the air loop connection module and see if any of them
+						// have an inlet node that matches.  If yes, then we have found a "connection".
+						FoundAnAirLoopConnect = false;
+						FoundAirLoopConnection( SupplyAirPath( SupAirPathNum ).OutletNode( SupAirPathOutNodeNum ), FoundAnAirLoopConnect );
+						if ( FoundAnAirLoopConnect ) FoundSupPathZoneConnect = true;
 						ControlledZoneLoop_exit: ;
 
 						//If the supply air path is not connected to either a heating or a cooling air distribution

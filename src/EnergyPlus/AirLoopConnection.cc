@@ -107,13 +107,11 @@ namespace AirLoopConnection {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool GetInputFlag( true ); // First time, input is "gotten"
 		int SysNum;
 
 		// FLOW:
-		if ( GetInputFlag ) {
+		if ( ! allocated( AirLoopCon ) ) {
 			GetAirLoopConnection( );
-			GetInputFlag = false;
 		}
 
 		// Find the correct air loop connection component
@@ -653,6 +651,171 @@ namespace AirLoopConnection {
 
 	}
 
+	void
+	GetAirLoopConnectionNum(
+		int & ConnectNum, // index number in air loop connection derived type
+		std::string const CompName // name of air loop connection passed in
+	)
+	{
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   October 2104
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// Main routine for the air loop connection.
+		
+		// METHODOLOGY EMPLOYED:
+		// Standard EnergyPlus methodology (get, init, calc, update,
+		// report, etc. as needed)
+		
+		// REFERENCES:
+		// na
+		
+		// Using/Aliasing
+		using InputProcessor::SameString;
+		using General::TrimSigDigits;
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		std::string RoutineName( "SimAirLoopConnection: ");
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int SysNum;
+		
+		// FLOW:
+		if ( ! allocated( AirLoopCon ) ) {
+			GetAirLoopConnection( );
+		}
+		
+		for ( SysNum = 1; SysNum <= NumOfAirLoopConnections; ++SysNum ) {
+			if ( SameString( CompName, AirLoopCon( SysNum ).Name ) ) {
+				ConnectNum = SysNum;
+				break;
+			}
+		}
+		
+	}
+	
+	void
+	GetAirLoopConnectionNodeNums(
+		int const ConnectNum, // index number in air loop connection derived type
+		int & InletNode, // inlet node for component
+		int & OutletNode // outlet node for component
+	)
+	{
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   October 2104
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// Main routine for the air loop connection.
+		
+		// METHODOLOGY EMPLOYED:
+		// Standard EnergyPlus methodology (get, init, calc, update,
+		// report, etc. as needed)
+		
+		// REFERENCES:
+		// na
+		
+		// Using/Aliasing
+		// na
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		// na
+		
+		// FLOW:
+		if ( ! allocated( AirLoopCon ) ) {
+			GetAirLoopConnection( );
+		}
+		
+		if ( ( ConnectNum <= 0 ) || ( ConnectNum > NumOfAirLoopConnections ) ) {
+			ShowFatalError( "Illegal ZoneHVAC:AirLoopConnection index found in GetAirLoopConnectionNodeNums");
+		}
+		InletNode = AirLoopCon( ConnectNum ).AirLoopInletNodeNum;
+		OutletNode = AirLoopCon( ConnectNum ).AirLoopOutletNodeNum;
+		if ( ( InletNode <= 0 ) || ( OutletNode <= 0 ) ) {
+			ShowFatalError("Node number for either the ZoneHVAC:AirLoopConnection inlet or outlet node is zero.  This should not happen." );
+		}
+		
+	}
+	
+	void
+	FoundAirLoopConnection(
+		int const InletNodeNum, // index number in air loop connection derived type
+		bool & FoundAMatch // set to true if we find a air loop connection that has this inlet node number
+	)
+	{
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   October 2104
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// Main routine for the air loop connection.
+		
+		// METHODOLOGY EMPLOYED:
+		// Standard EnergyPlus methodology (get, init, calc, update,
+		// report, etc. as needed)
+		
+		// REFERENCES:
+		// na
+		
+		// Using/Aliasing
+		// na
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Item;
+		
+		// FLOW:
+
+		for ( Item = 1; Item <= NumOfAirLoopConnections; ++Item ) {
+			if ( InletNodeNum == AirLoopCon( Item ).AirLoopInletNodeNum ) {
+				FoundAMatch = true;
+				break;
+			}
+		}
+	}
+	
 	//     NOTICE
 
 	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
