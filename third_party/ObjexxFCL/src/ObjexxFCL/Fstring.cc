@@ -20,10 +20,10 @@ namespace ObjexxFCL {
 
 	// Move Constructor
 	Fstring::Fstring( Fstring && s ) :
-		len_( s.len_ ),
-		str_( nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( s.len_ ),
+	 str_( nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		if ( s.sub_ ) { // Copy
 			if ( len_ > 0u ) {
@@ -40,140 +40,140 @@ namespace ObjexxFCL {
 
 	// string Constructor
 	Fstring::Fstring( std::string const & s ) :
-		len_( s.length() ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( s.length() ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		s.copy( str_, len_ );
 	}
 
 	// cstring Constructor
 	Fstring::Fstring( c_cstring const s ) :
-		len_( std::strlen( s ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( std::strlen( s ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memcpy( str_, s, len_ );
 	}
 
 	// char Constructor
 	Fstring::Fstring( char const c ) :
-		len_( 1 ),
-		str_( new char[ 1 ] ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( 1 ),
+	 str_( new char[ 1 ] ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		str_[ 0 ] = c;
 	}
 
 	// signed char Constructor
 	Fstring::Fstring( signed char const c ) :
-		len_( 1 ),
-		str_( new char[ 1 ] ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( 1 ),
+	 str_( new char[ 1 ] ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		str_[ 0 ] = static_cast< char >( c );
 	}
 
 	// unsigned char Constructor
 	Fstring::Fstring( unsigned char const c ) :
-		len_( 1 ),
-		str_( new char[ 1 ] ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( 1 ),
+	 str_( new char[ 1 ] ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		str_[ 0 ] = static_cast< char >( c );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( short int const len ) :
-		len_( static_cast< size_type >( std::max( static_cast< int >( len ), 0 ) ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( std::max( static_cast< int >( len ), 0 ) ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( int const len ) :
-		len_( static_cast< size_type >( std::max( len, 0 ) ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( std::max( len, 0 ) ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( long int const len ) :
-		len_( static_cast< size_type >( std::max( len, 0l ) ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( std::max( len, 0l ) ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( long long int const len ) :
-		len_( static_cast< size_type >( std::max( len, 0ll ) ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( std::max( len, 0ll ) ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( unsigned short int const len ) :
-		len_( static_cast< size_type >( len ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( len ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( unsigned int const len ) :
-		len_( static_cast< size_type >( len ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( len ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( unsigned long int const len ) :
-		len_( static_cast< size_type >( len ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( len ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length Constructor
 	Fstring::Fstring( unsigned long long int const len ) :
-		len_( static_cast< size_type >( len ) ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( static_cast< size_type >( len ) ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 	}
 
 	// Length + Fstring Constructor
 	Fstring::Fstring( size_type const len, Fstring const & s ) :
-		len_( len ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( len ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		if ( len_ > s.len_ ) {
 			if ( s.len_ > 0u ) std::memcpy( str_, s.str_, s.len_ );
@@ -185,10 +185,10 @@ namespace ObjexxFCL {
 
 	// Length + string Constructor
 	Fstring::Fstring( size_type const len, std::string const & s ) :
-		len_( len ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( len ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		size_type const s_len( s.length() );
 		if ( len_ > s_len ) {
@@ -201,10 +201,10 @@ namespace ObjexxFCL {
 
 	// Length + cstring Constructor
 	Fstring::Fstring( size_type const len, c_cstring const s ) :
-		len_( len ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( len ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		size_type const s_len( std::strlen( s ) );
 		if ( len_ > s_len ) {
@@ -217,20 +217,20 @@ namespace ObjexxFCL {
 
 	// Length + Fill char Constructor
 	Fstring::Fstring( size_type const len, char const c ) :
-		len_( len ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( len ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, c, len_ );
 	}
 
 	// Length + Initializer Constructor
 	Fstring::Fstring( size_type const len, InitializerFunction init ) :
-		len_( len ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( len ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memset( str_, ' ', len_ );
 		init( *this );

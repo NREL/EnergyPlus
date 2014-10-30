@@ -16,6 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/IOFlags.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <cstdio>
@@ -27,7 +28,7 @@ using namespace ObjexxFCL::gio;
 TEST( GioTest, BasicLF )
 {
 	IOFlags flags;
-	int unit1( gio::get_unit() );
+	int unit1( get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	std::string const name1( "GioTestLF.txt" );
 	inquire( name1, flags );
@@ -64,7 +65,7 @@ TEST( GioTest, BasicLF )
 TEST( GioTest, BasicCRLF )
 {
 	IOFlags flags;
-	int unit1( gio::get_unit() );
+	int unit1( get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	std::string const name1( "GioTestCRLF.txt" );
 	flags.ter_crlf();
@@ -99,7 +100,7 @@ TEST( GioTest, BasicCRLF )
 TEST( GioTest, BasicEOF )
 {
 	IOFlags flags;
-	int unit1( gio::get_unit() );
+	int unit1( get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	std::string const name1( "GioTestBasicEOF.txt" );
 	flags.ter_lf();
@@ -137,7 +138,7 @@ TEST( GioTest, BasicEOF )
 TEST( GioTest, InquireByName )
 {
 	IOFlags flags;
-	int unit1( gio::get_unit() );
+	int unit1( get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	std::string const name1( "GioTestInquireByName.txt" );
 	flags.ter_lf();
@@ -170,7 +171,7 @@ TEST( GioTest, InquireByNameNotExist )
 TEST( GioTest, AsIsOn )
 {
 	IOFlags flags;
-	int unit1( gio::get_unit() );
+	int unit1( get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	EXPECT_TRUE( flags.asis() );
 	std::string const name1( "GioTestAsIsOn.txt" );
@@ -197,7 +198,7 @@ TEST( GioTest, AsIsOn )
 TEST( GioTest, AsIsOff )
 {
 	IOFlags flags;
-	int unit1( gio::get_unit() );
+	int unit1( get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	EXPECT_TRUE( flags.asis() );
 	std::string const name1( "GioTestAsIsOff.txt" );
@@ -224,7 +225,7 @@ TEST( GioTest, AsIsOff )
 TEST( GioTest, EndOfFile )
 {
 	IOFlags flags;
-	int unit1( gio::get_unit() );
+	int unit1( get_unit() );
 	EXPECT_TRUE( unit1 > 0 );
 	std::string const name1( "GioTestEndOfFile.txt" );
 	flags.ter_lf();
@@ -250,4 +251,24 @@ TEST( GioTest, EndOfFile )
 	close( unit1, flags );
 	inquire( name1, flags );
 	EXPECT_FALSE( flags.exists() ); // File should be deleted
+}
+
+TEST( GioTest, Flush )
+{
+	int unit1( get_unit() );
+	EXPECT_TRUE( unit1 > 0 );
+	std::string const name1( "GioTestFlush.txt" );
+	open( unit1, name1 );
+	write( unit1, "(A)" ) << "Line 1";
+	flush( unit1 ); // Doesn't test flush but checks that it does no harm
+	write( unit1, "(A)" ) << "Line 2";
+	rewind( unit1 );
+	std::string line;
+	read( unit1, "(A)" ) >> line;
+	EXPECT_EQ( "Line 1", line );
+	read( unit1, "(A)" ) >> line;
+	EXPECT_EQ( "Line 2", line );
+	IOFlags flags;
+	flags.del_on(); // Enable deletion
+	close( unit1, flags );
 }
