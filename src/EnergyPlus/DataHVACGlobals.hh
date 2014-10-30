@@ -287,6 +287,47 @@ namespace DataHVACGlobals {
 	extern bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	extern bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
 
+	extern int const NumZoneHVACTerminalTypes;
+	extern FArray1D_string const ccZoneHVACTerminalTypes;
+	extern FArray1D_string const ZoneHVACTerminalTypes;
+	extern int const ZoneEquipTypeOf_VariableRefrigerantFlow;
+	extern int const ZoneEquipTypeOf_EnergyRecoveryVentilator;
+	extern int const ZoneEquipTypeOf_FourPipeFanCoil;
+	extern int const ZoneEquipTypeOf_OutdoorAirUnit;
+	extern int const ZoneEquipTypeOf_PackagedTerminalAirConditioner;
+	extern int const ZoneEquipTypeOf_PackagedTerminalHeatPump;
+	extern int const ZoneEquipTypeOf_UnitHeater;
+	extern int const ZoneEquipTypeOf_UnitVentilator;
+	extern int const ZoneEquipTypeOf_VentilatedSlab;
+	extern int const ZoneEquipTypeOf_WaterToAirHeatPump;
+	extern int const ZoneEquipTypeOf_WindowAirConditioner;
+	extern int const ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric;
+	extern int const ZoneEquipTypeOf_BaseboardRadiantConvectiveWater;
+	extern int const ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam;
+	extern int const ZoneEquipTypeOf_BaseboardConvectiveElectric;
+	extern int const ZoneEquipTypeOf_BaseboardConvectiveWater;
+	extern int const ZoneEquipTypeOf_HighTemperatureRadiant;
+	extern int const ZoneEquipTypeOf_DehumidifierDX;
+	extern int const ZoneEquipTypeOf_IdealLoadsAirSystem;
+	extern int const ZoneEquipTypeOf_RefrigerationChillerSet;
+	extern int const ZoneEquipTypeOf_FanZoneExhaust;
+	extern int const ZoneEquipTypeOf_WaterHeaterHeatPump;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled;
+	extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
+	extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAV;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat;
+	extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam;
+	extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir;
+	extern int const ZoneEquipTypeOf_AirLoopHVACReturnAir;
+
 	// Types
 
 	struct ComponentSetPtData

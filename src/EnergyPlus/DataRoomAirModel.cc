@@ -42,7 +42,8 @@ namespace DataRoomAirModel {
 	int const RoomAirModel_UCSDCV( 5 ); // UCSD-CV
 	int const RoomAirModel_UCSDUFI( 6 ); // UCSD UFAD interior zone model
 	int const RoomAirModel_UCSDUFE( 7 ); // UCSD UFAD interior zone model
-	FArray1D_string const ChAirModel( {0,7}, { "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE" } );
+	int const RoomAirModel_AirflowNetwork( 8 ); // Room Air model using AirflowNetwork
+	FArray1D_string const ChAirModel( { 0, 8 }, { "*Invalid*", "UserDefined", "Mixing", "Mundt", "UCSD_DV", "UCSD_CV", "UCSD_UFI", "UCSD_UFE", "AirflowNetwork" } );
 
 	// Parameters to indicate air temperature coupling scheme
 	int const DirectCoupling( 1 ); // direct coupling scheme
@@ -55,6 +56,7 @@ namespace DataRoomAirModel {
 	int const CeilingAirNode( 3 ); // air node at ceiling (for Mundt Model)
 	int const MundtRoomAirNode( 4 ); // air node for vertical walls (for Mundt Model)
 	int const ReturnAirNode( 10 ); // air node for return (for Mundt and Rees&Haves Models)
+	int const AirflowNetworkRoomAirNode( 11 ); // air node for airflow network based room air model
 	int const PlumeAirNode1( 2 ); // air node for plume load (for Rees&Haves Model)
 	int const PlumeAirNode2( 3 ); // air node for plume load (for Rees&Haves Model)
 	int const PlumeAirNode3( 4 ); // air node for plume load (for Rees&Haves Model)
@@ -111,6 +113,7 @@ namespace DataRoomAirModel {
 
 	// MODULE VARIABLE DECLARATIONS:
 	int TotNumOfAirNodes( 0 );
+	int TotNumOfRoomAFNNodes( 0 );
 	FArray1D_int TotNumOfZoneAirNodes;
 	FArray1D< Real64 > ConvectiveFloorSplit;
 	FArray1D< Real64 > InfiltratFloorSplit;
@@ -233,6 +236,7 @@ namespace DataRoomAirModel {
 	int NumSurfaceMapping( 0 ); // count of generic surface map patterns in input
 
 	bool UserDefinedUsed( false ); // true if user-defined model used anywhere
+	bool RoomAirflowNetworkModelUsed( false ); // true if RoomAirflownetwork modei is used
 	// End User-defined patterns
 
 	// Object Data
@@ -246,6 +250,10 @@ namespace DataRoomAirModel {
 	FArray1D< CVDVParameters > SurfParametersCVDV; // Surface parameters
 	FArray1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
 	FArray1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
+//	FArray1D< AirflowLinkagesInfoNestedStruct > link; // added AitflowNetwork linkage info
+//	FArray1D< RoomAirflowNetworkNodeInternalGainsStruct > IntGain; // added intenral gain component
+//	FArray1D< RoomAirflowNetworkHVACStruct > HVAC; // added HVAC system 
+	FArray1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info 
 
 	//**********************************************************************************************
 

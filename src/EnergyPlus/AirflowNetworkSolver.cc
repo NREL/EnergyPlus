@@ -68,6 +68,7 @@ namespace AirflowNetworkSolver {
 	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using Psychrometrics::PsyHFnTdbW;
+	using Psychrometrics::PsyRhoAirFnPbTdbW;
 	using namespace DataAirflowNetwork;
 
 	// Data
@@ -1221,7 +1222,12 @@ namespace AirflowNetworkSolver {
 
 		// FLOW:
 		// Crack standard condition from given inputs
-		Corr = MultizoneSurfaceData( i ).Factor;
+		if ( i > NetworkNumOfLinks - NumOfLinksIntraZone ) {
+			Corr = 1.0;
+		}
+		else {
+			Corr = MultizoneSurfaceData( i ).Factor;
+		}
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
 		RhozNorm = PsyRhoAirFnPbTdbW( MultizoneSurfaceCrackData( CompNum ).StandardP, MultizoneSurfaceCrackData( CompNum ).StandardT, MultizoneSurfaceCrackData( CompNum ).StandardW );
 		VisczNorm = 1.71432e-5 + 4.828e-8 * MultizoneSurfaceCrackData( CompNum ).StandardT;
@@ -4578,10 +4584,12 @@ Label999: ;
 
 		for ( i = 1; i <= Nl; ++i ) {
 			// Check surface tilt
-			if ( AirflowNetworkLinkageData( i ).DetOpenNum > 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).Tilt < 90 ) {
-				Hfl( i ) = Surface( MultizoneSurfaceData( i ).SurfNum ).SinTilt;
+			if ( i <= Nl - NumOfLinksIntraZone ) { //Revised by L.Gu, on 9 / 29 / 10
+				if ( AirflowNetworkLinkageData( i ).DetOpenNum > 0 && Surface( MultizoneSurfaceData( i ).SurfNum ).Tilt < 90 ) {
+					Hfl( i ) = Surface( MultizoneSurfaceData( i ).SurfNum ).SinTilt;
+				}
 			}
-			// Initialisation
+			// Initialization
 			From = AirflowNetworkLinkageData( i ).NodeNums( 1 );
 			To = AirflowNetworkLinkageData( i ).NodeNums( 2 );
 			if ( AirflowNetworkNodeData( From ).EPlusZoneNum > 0 && AirflowNetworkNodeData( To ).EPlusZoneNum > 0 ) {
