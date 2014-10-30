@@ -2666,7 +2666,7 @@ namespace ZoneEquipmentManager {
 
 				} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Type ) { // 'ZoneHVAC:AirLoopComponent'
 					
-					SimAirLoopConnection( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ) );
+					SimAirLoopConnection( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ), FirstCall );
 					
 				} else {
 					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );
@@ -2682,8 +2682,6 @@ namespace ZoneEquipmentManager {
 			DirectAirAndAirTerminalWarningIssued.allocate( NumOfZones );
 			DirectAirAndAirTerminalWarningIssued = false;
 		}
-
-		FirstCall = false;
 
 		// Loop over all the primary air loop; simulate their components (equipment)
 		// and controllers
@@ -2896,7 +2894,7 @@ namespace ZoneEquipmentManager {
 					SimZoneEvaporativeCoolerUnit( PrioritySimOrder( EquipTypeNum ).EquipName, ActualZoneNum, SysOutputProvided, LatOutputProvided, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
 
 				} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Num ) {
-					SimAirLoopConnection( PrioritySimOrder( EquipTypeNum ).EquipName, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ) );
+					SimAirLoopConnection( PrioritySimOrder( EquipTypeNum ).EquipName, ZoneEquipList( CurZoneEqNum ).EquipIndex( EquipPtr ), FirstCall );
 					
 				} else {
 
@@ -2953,6 +2951,7 @@ namespace ZoneEquipmentManager {
 
 		//This is the call to the Supply Air Path after the components are simulated to update
 		//  the path inlets
+		FirstCall = false;
 
 		// Process supply air path components in reverse order
 		for ( SupplyAirPathNum = 1; SupplyAirPathNum <= NumSupplyAirPaths; ++SupplyAirPathNum ) {
@@ -2974,7 +2973,7 @@ namespace ZoneEquipmentManager {
 
 				} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Type ) { // 'ZoneHVAC:AirLoopComponent'
 					
-					SimAirLoopConnection( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ) );
+					SimAirLoopConnection( SupplyAirPath( SupplyAirPathNum ).ComponentName( CompNum ), SupplyAirPath( SupplyAirPathNum ).ComponentIndex( CompNum ), FirstCall );
 					
 				} else {
 					ShowSevereError( "Error found in Supply Air Path=" + SupplyAirPath( SupplyAirPathNum ).Name );

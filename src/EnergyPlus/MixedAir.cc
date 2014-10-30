@@ -604,7 +604,7 @@ namespace MixedAir {
 			// ZoneHVAC:AirLoopConnection
 		} else if ( SELECT_CASE_var == ZoneAirLoopConnection ) { // 'ZoneHVAC:AirLoopConnection'
 			if ( Sim ) {
-				SimAirLoopConnection( CompName, CompIndex );
+				SimAirLoopConnection( CompName, CompIndex, true );
 			}
 		} else {
 			ShowFatalError( "Invalid Outside Air Component=" + CompType );

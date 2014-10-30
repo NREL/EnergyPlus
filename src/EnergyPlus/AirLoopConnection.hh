@@ -140,7 +140,8 @@ namespace AirLoopConnection {
 	void
 	SimAirLoopConnection(
 		std::string const & CompName, // name of the low temperature radiant system
-		int CompIndex
+		int CompIndex,
+		bool const & FirstCall
 	);
 
 	void
@@ -153,7 +154,8 @@ namespace AirLoopConnection {
 
 	void
 	CalcAirLoopConnection(
-		int const & CompIndex
+		int const & CompIndex,
+		bool const & FirstCall
 	);
 
 	void

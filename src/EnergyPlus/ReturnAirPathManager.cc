@@ -268,7 +268,7 @@ namespace ReturnAirPathManager {
 
 			} else if ( SELECT_CASE_var == ZoneAirLoopConnection_Type ) { // 'ZoneHVAC:AirLoopConnection'
 				
-				SimAirLoopConnection( ReturnAirPath( ReturnAirPathNum ).ComponentName( ComponentNum ), ReturnAirPath( ReturnAirPathNum ).ComponentIndex( ComponentNum ) );
+				SimAirLoopConnection( ReturnAirPath( ReturnAirPathNum ).ComponentName( ComponentNum ), ReturnAirPath( ReturnAirPathNum ).ComponentIndex( ComponentNum ), true );
 				
 			} else {
 				ShowSevereError( "Invalid AirLoopHVAC:ReturnPath Component=" + ReturnAirPath( ReturnAirPathNum ).ComponentType( ComponentNum ) );

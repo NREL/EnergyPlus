@@ -10,6 +10,7 @@
 
 // EnergyPlus Headers
 #include <AirLoopConnection.hh>
+#include <DataContaminantBalance.hh>
 #include <DataHeatBalance.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -70,7 +71,8 @@ namespace AirLoopConnection {
 	void
 	SimAirLoopConnection(
 		std::string const & CompName, // name of the air loop connection
-		int CompIndex // number of the air loop connection
+		int CompIndex, // number of the air loop connection
+		bool const & FirstCall // true for first pass through (forward simulation)
 	)
 	{
 
@@ -133,7 +135,7 @@ namespace AirLoopConnection {
 
 		InitAirLoopConnection( CompIndex );
 
-		CalcAirLoopConnection( CompIndex );
+		CalcAirLoopConnection( CompIndex, FirstCall );
 		
 		UpdateAirLoopConnection( CompIndex );
 
@@ -428,7 +430,8 @@ namespace AirLoopConnection {
 
 	void
 	CalcAirLoopConnection(
-		int const & CompIndex // Index for the air loop connection under consideration within the derived types
+		int const & CompIndex, // Index for the air loop connection under consideration within the derived types
+		bool const & FirstCall
 	)
 	{
 
@@ -454,6 +457,7 @@ namespace AirLoopConnection {
 
 		// Using/Aliasing
 		using DataLoopNode::Node;
+		using DataContaminantBalance::Contaminant;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -471,15 +475,45 @@ namespace AirLoopConnection {
 		
 		// FLOW:
 
-		// Transfer information from the air loop inlet node to the zone inlet node
-		Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ) = Node( AirLoopCon( CompIndex ).AirLoopInletNodeNum );
-		
-		// Pass the flow rate through (zone is a passive element) to make sure we have a mass balance on this air stream
-		Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRate = Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ).MassFlowRate;
+		if ( FirstCall ) {
+			// Forward pass through various equipment...
+			// Transfer information from the air loop inlet node to the zone inlet node
+			Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ) = Node ( AirLoopCon( CompIndex ).AirLoopInletNodeNum );
+			
+			// Pass the flow rate through (zone is a passive element) to make sure we have a mass balance on this air stream
+			Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRate = Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ).MassFlowRate;
+			Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRateMaxAvail = Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ).MassFlowRateMaxAvail;
+			Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRateMinAvail = Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ).MassFlowRateMinAvail;
 
-		// Transfer information from the zone outlet node to the air loop outlet node
-		Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ) = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum );
-		
+			
+			// Transfer information from the zone outlet node to the air loop outlet node
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Temp = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Temp;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRate = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRate;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMaxAvail = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRateMaxAvail;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMinAvail = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRateMinAvail;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).HumRat = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).HumRat;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Enthalpy = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Enthalpy;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Quality = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Temp;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Press = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Press;
+			if ( Contaminant.CO2Simulation ) {
+				Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).CO2 = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).CO2;
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).GenContam = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).GenContam;
+			}
+		} else {
+			// Backward pass for when the supply path transfers flow rates backwards through things
+			Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRate = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRate;
+			Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRateMaxAvail = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMaxAvail;
+			Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRateMinAvail = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMinAvail;
+			Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ).MassFlowRate = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRate;
+			Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ).MassFlowRateMaxAvail = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMaxAvail;
+			Node( AirLoopCon( CompIndex ).ZoneInletNodeNum ).MassFlowRateMinAvail = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMinAvail;
+			Node( AirLoopCon( CompIndex ).AirLoopInletNodeNum ).MassFlowRate = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRate;
+			Node( AirLoopCon( CompIndex ).AirLoopInletNodeNum ).MassFlowRateMaxAvail = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMaxAvail;
+			Node( AirLoopCon( CompIndex ).AirLoopInletNodeNum ).MassFlowRateMinAvail = Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMinAvail;
+		}
+			
 	}
 
 	void

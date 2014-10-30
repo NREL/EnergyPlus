@@ -2969,7 +2969,7 @@ namespace SimAirServingZones {
 			SimDuct( CompName, FirstHVACIteration, CompIndex );
 		
 		} else if ( SELECT_CASE_var == ZoneAirLoopConnect ){ // 'ZoneHVAC:AirLoopComponent'
-			SimAirLoopConnection( CompName, CompIndex );			
+			SimAirLoopConnection( CompName, CompIndex, true );
 
 		} else {
 
