@@ -11,6 +11,7 @@
 // EnergyPlus Headers
 #include <HVACManager.hh>
 #include <AirflowNetworkBalanceManager.hh>
+#include <AirLoopConnection.hh>
 //#include <CoolTower.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataAirLoop.hh>
@@ -1454,6 +1455,7 @@ namespace HVACManager {
 		using DataPlant::FlowUnlocked;
 		using DataPlant::FlowLocked;
 		using DataPlant::AnyPlantLoopSidesNeedSim;
+		using AirLoopConnection::CheckZoneOutletVsCompOutlet;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1564,7 +1566,7 @@ namespace HVACManager {
 						SimZoneEquipment = true;
 					}
 				}
-
+				CheckZoneOutletVsCompOutlet( SimAirLoops );
 			}
 
 			RepIterAir += IterAir;
@@ -2641,7 +2643,7 @@ namespace HVACManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -185,9 +185,14 @@ namespace AirLoopConnection {
 	void
 	FoundAirLoopConnection(
 		int const InletNodeNum, // index number in air loop connection derived type
-		bool & FoundAMatch // set to true if we find a air loop connection that has this inlet node number
+		bool & FoundAMatch // set to true if we find an air loop connection that has this inlet node number
 	);
 
+	void
+	CheckZoneOutletVsCompOutlet(
+		bool & SimAgain // set to true if the air loop needs to be resimulated
+	);
+	
 	//     NOTICE
 
 	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois

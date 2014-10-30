@@ -849,6 +849,66 @@ namespace AirLoopConnection {
 			}
 		}
 	}
+
+	void
+	CheckZoneOutletVsCompOutlet(
+		bool & SimAgain // set to true if the air loop needs to be resimulated
+	)
+	{
+		
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   October 2104
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+		
+		// PURPOSE OF THIS SUBROUTINE:
+		// Checks to see if the zone outlet is still the same temperature as the
+		// component outlet.  If not, there is a zone on the air loop and we need
+		// to resimulate it because the zone has changed conditions.
+		
+		// METHODOLOGY EMPLOYED:
+		// If no components, return without doing anything.
+		// If there are connection components, see if the zone temperature has
+		// changed.  If it has, resimulate the air loop.
+		
+		// REFERENCES:
+		// na
+		
+		// Using/Aliasing
+		using DataLoopNode::Node;
+		
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		Real64 const MaxAllowedTempDiff = 0.01; // in degrees C
+		
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+		
+		// DERIVED TYPE DEFINITIONS
+		// na
+		
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int Item;
+		Real64 ZoneOutTemp;
+		Real64 CompOutTemp;
+		
+		// FLOW:
+		
+		if ( NumOfAirLoopConnections > 0 ) {
+			for ( Item = 1; Item <= NumOfAirLoopConnections; ++Item ) {
+				ZoneOutTemp = Node( AirLoopCon( Item ).ZoneOutletNodeNum ).Temp;
+				CompOutTemp = Node( AirLoopCon( Item ).AirLoopOutletNodeNum ).Temp;
+				if ( abs( ZoneOutTemp - CompOutTemp ) > MaxAllowedTempDiff ) {
+					SimAgain = true;
+					break;
+				}
+			}
+		}
+	}
+	
 	
 	//     NOTICE
 
