@@ -1468,8 +1468,6 @@ namespace PlantPipingSystemsManager {
 			int MonthOfMinSurfTemp;
 			Real64 HorizInsWidth;
 			Real64 VertInsDepth;
-			//std::string BasementFloorMaterial;
-			//std::string BasementWallMaterial;
 			std::string HorizInsMaterial;
 			std::string VertInsMaterial;
 			bool UseGroundTempDataForKusuda;
@@ -1496,8 +1494,6 @@ namespace PlantPipingSystemsManager {
 				int const MonthOfMinSurfTemp,
 				Real64 const HorizInsWidth,
 				Real64 const VertInsDepth,
-				//std::string const & BasementFloorMaterial,
-				//std::string const & BasementWallMaterial,
 				std::string const & HorizInsMaterial,
 				std::string const & VertInsMaterial,
 				bool const UseGroundTempDataForKusuda
@@ -1511,8 +1507,6 @@ namespace PlantPipingSystemsManager {
 				MonthOfMinSurfTemp( MonthOfMinSurfTemp ),
 				HorizInsWidth( HorizInsWidth ),
 				VertInsDepth( VertInsDepth ),
-				//BasementFloorMaterial( BasementFloorMaterial ),
-				//BasementWallMaterial( BasementWallMaterial ),
 				HorizInsMaterial( HorizInsMaterial ),
 				VertInsMaterial( VertInsMaterial ),
 				UseGroundTempDataForKusuda( UseGroundTempDataForKusuda )
@@ -1776,36 +1770,6 @@ namespace PlantPipingSystemsManager {
 				ShowFatalError( "Preceding error causes program termination." );
 			}
 
-			////Get basement floor and walls material properties
-			////First the floor
-			//Domain( BasementCtr ).BasementFloorMaterial = cAlphaArgs( 3 );
-			//PipingSystemDomains( DomainNum ).BasementFloorMaterialNum = FindItemInList( cAlphaArgs( 3 ), Material.Name(), TotMaterials );
-			//if ( PipingSystemDomains( DomainNum ).BasementFloorMaterialNum == 0 ) {
-			//	ShowSevereError( "Invalid " + cAlphaFieldNames( 3 ) + "=" + cAlphaArgs( 3 ) );
-			//	ShowContinueError( "Found in " + PipingSystemDomains( DomainNum ).Name );
-			//	ErrorsFound = true;
-			//}
-			//else {
-			//	PipingSystemDomains( DomainNum ).BasementFloorThickness = Material( PipingSystemDomains( DomainNum ).BasementFloorMaterialNum ).Thickness;
-			//	PipingSystemDomains( DomainNum ).BasementFloorProperties.Density = Material( PipingSystemDomains( DomainNum ).BasementFloorMaterialNum ).Density;
-			//	PipingSystemDomains( DomainNum ).BasementFloorProperties.SpecificHeat = Material( PipingSystemDomains( DomainNum ).BasementFloorMaterialNum ).SpecHeat;
-			//	PipingSystemDomains( DomainNum ).BasementFloorProperties.Conductivity = Material( PipingSystemDomains( DomainNum ).BasementFloorMaterialNum ).Conductivity;
-			//}
-			////Then the walls
-			//Domain( BasementCtr ).BasementWallMaterial = cAlphaArgs( 8 );
-			//PipingSystemDomains( DomainNum ).BasementWallMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material.Name(), TotMaterials );
-			//if ( PipingSystemDomains( DomainNum ).BasementWallMaterialNum == 0 ) {
-			//	ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
-			//	ShowContinueError( "Found in " + PipingSystemDomains( DomainNum ).Name );
-			//	ErrorsFound = true;
-			//}
-			//else {
-			//	PipingSystemDomains( DomainNum ).BasementWallThickness = Material( PipingSystemDomains( DomainNum ).BasementWallMaterialNum ).Thickness;
-			//	PipingSystemDomains( DomainNum ).BasementWallProperties.Density = Material( PipingSystemDomains( DomainNum ).BasementWallMaterialNum ).Density;
-			//	PipingSystemDomains( DomainNum ).BasementWallProperties.SpecificHeat = Material( PipingSystemDomains( DomainNum ).BasementWallMaterialNum ).SpecHeat;
-			//	PipingSystemDomains( DomainNum ).BasementWallProperties.Conductivity = Material( PipingSystemDomains( DomainNum ).BasementWallMaterialNum ).Conductivity;
-			//}
-			//
 			//Domain perimeter offset
 			PipingSystemDomains( DomainNum ).PerimeterOffset = Domain( BasementCtr ).PerimeterOffset;
 
@@ -1846,7 +1810,7 @@ namespace PlantPipingSystemsManager {
 			// setup output variables
 			SetupZoneCoupledOutputVariables( BasementCtr );
 
-			//Add error-handling for perimeter insulation width
+			//Add error-handling for vertical insulation depth
 
 		}
 
@@ -4592,43 +4556,43 @@ namespace PlantPipingSystemsManager {
 		//'***** LAYOUT MESH REGIONS *****'
 		//Zone-coupled slab  models
 		if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) {
-			RegionListCount = CreateRegionListCount(DomainNum, XPartitionRegions, PipingSystemDomains(DomainNum).Extents.Xmax, XPartitionsExist);
+			RegionListCount = CreateRegionListCount( XPartitionRegions, PipingSystemDomains(DomainNum).Extents.Xmax, XPartitionsExist);
 			XRegions.allocate( { 0, RegionListCount - 1 } );
 			XRegions = CreateRegionList( DomainNum, XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, RegionType_XDirection, RegionListCount - 1, XPartitionsExist, _, _, PipingSystemDomains( DomainNum ).XIndex, PipingSystemDomains( DomainNum ).XWallIndex, PipingSystemDomains( DomainNum ).InsulationXIndex );
 
-			RegionListCount = CreateRegionListCount(DomainNum, YPartitionRegions, PipingSystemDomains(DomainNum).Extents.Ymax, YPartitionsExist);
+			RegionListCount = CreateRegionListCount( YPartitionRegions, PipingSystemDomains(DomainNum).Extents.Ymax, YPartitionsExist);
 			YRegions.allocate( { 0, RegionListCount - 1 } );
 			YRegions = CreateRegionList( DomainNum, YPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Ymax, RegionType_YDirection, RegionListCount - 1, YPartitionsExist, _, _, _, _, _, PipingSystemDomains( DomainNum ).YIndex, PipingSystemDomains( DomainNum ).YFloorIndex, PipingSystemDomains( DomainNum ).InsulationYIndex );
 
-			RegionListCount = CreateRegionListCount(DomainNum, ZPartitionRegions, PipingSystemDomains(DomainNum).Extents.Zmax, ZPartitionsExist);
+			RegionListCount = CreateRegionListCount( ZPartitionRegions, PipingSystemDomains(DomainNum).Extents.Zmax, ZPartitionsExist);
 			ZRegions.allocate( { 0, RegionListCount - 1 } );
 			ZRegions = CreateRegionList( DomainNum, ZPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Zmax, RegionType_ZDirection, RegionListCount - 1, ZPartitionsExist, _, _, _, _, _, _, _, _, PipingSystemDomains( DomainNum ).ZIndex, PipingSystemDomains( DomainNum ).ZWallIndex, PipingSystemDomains( DomainNum ).InsulationZIndex );
 
 		}
 		 else if (PipingSystemDomains(DomainNum).IsZoneCoupledSlab ){
-			 RegionListCount = CreateRegionListCount(DomainNum, XPartitionRegions, PipingSystemDomains(DomainNum).Extents.Xmax, XPartitionsExist);
+			 RegionListCount = CreateRegionListCount( XPartitionRegions, PipingSystemDomains(DomainNum).Extents.Xmax, XPartitionsExist);
 			XRegions.allocate( { 0, RegionListCount - 1 } );
 			XRegions = CreateRegionList( DomainNum, XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, RegionType_XDirection, RegionListCount - 1, XPartitionsExist, _, _, PipingSystemDomains( DomainNum ).XIndex, _, PipingSystemDomains( DomainNum ).InsulationXIndex );
 
-			RegionListCount = CreateRegionListCount(DomainNum, YPartitionRegions, PipingSystemDomains(DomainNum).Extents.Ymax, YPartitionsExist);
+			RegionListCount = CreateRegionListCount( YPartitionRegions, PipingSystemDomains(DomainNum).Extents.Ymax, YPartitionsExist);
 			YRegions.allocate( { 0, RegionListCount - 1 } );
 			YRegions = CreateRegionList( DomainNum, YPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Ymax, RegionType_YDirection, RegionListCount - 1, YPartitionsExist, _, _, _, _, _, PipingSystemDomains( DomainNum ).YIndex, _, PipingSystemDomains( DomainNum ).InsulationYIndex );
 
-			RegionListCount = CreateRegionListCount(DomainNum, ZPartitionRegions, PipingSystemDomains(DomainNum).Extents.Zmax, ZPartitionsExist);
+			RegionListCount = CreateRegionListCount( ZPartitionRegions, PipingSystemDomains(DomainNum).Extents.Zmax, ZPartitionsExist);
 			ZRegions.allocate( { 0, RegionListCount - 1 } );
 			ZRegions = CreateRegionList( DomainNum, ZPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Zmax, RegionType_ZDirection, RegionListCount - 1, ZPartitionsExist, _, _, _, _, _, _, _, _, PipingSystemDomains( DomainNum ).ZIndex, _, PipingSystemDomains( DomainNum ).InsulationZIndex );
 
 		} else{
-			 RegionListCount = CreateRegionListCount(DomainNum,XPartitionRegions, PipingSystemDomains(DomainNum).Extents.Xmax, XPartitionsExist);
+			RegionListCount = CreateRegionListCount(XPartitionRegions, PipingSystemDomains(DomainNum).Extents.Xmax, XPartitionsExist);
 			XRegions.allocate( {0,RegionListCount - 1} );
 
 			XRegions = CreateRegionList( DomainNum, XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, RegionType_XDirection, RegionListCount - 1, XPartitionsExist, PipingSystemDomains( DomainNum ).BasementZone.BasementWallXIndex );
 
-			RegionListCount = CreateRegionListCount(DomainNum, YPartitionRegions, PipingSystemDomains(DomainNum).Extents.Ymax, YPartitionsExist);
+			RegionListCount = CreateRegionListCount( YPartitionRegions, PipingSystemDomains(DomainNum).Extents.Ymax, YPartitionsExist);
 			YRegions.allocate( {0,RegionListCount - 1} );
 			YRegions = CreateRegionList( DomainNum, YPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Ymax, RegionType_YDirection, RegionListCount - 1, YPartitionsExist, _, PipingSystemDomains( DomainNum ).BasementZone.BasementFloorYIndex );
 
-			RegionListCount = CreateRegionListCount(DomainNum,ZPartitionRegions, PipingSystemDomains(DomainNum).Extents.Zmax, ZPartitionsExist);
+			RegionListCount = CreateRegionListCount(ZPartitionRegions, PipingSystemDomains(DomainNum).Extents.Zmax, ZPartitionsExist);
 			ZRegions.allocate( {0,RegionListCount - 1} );
 			ZRegions = CreateRegionList( DomainNum, ZPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Zmax, RegionType_ZDirection, RegionListCount - 1, ZPartitionsExist );
 		}
@@ -5351,7 +5315,6 @@ namespace PlantPipingSystemsManager {
 
 	int
 	CreateRegionListCount(
-		int const DomainNum,
 		FArray1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		bool const PartitionsExist
@@ -5374,12 +5337,13 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// USE STATEMENTS:
-		// na
+		
 
 		// Return value
 		int RetVal;
 
 		// Argument array dimensioning
+		using DataGlobals::AnyBasementsInModel;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5391,7 +5355,7 @@ namespace PlantPipingSystemsManager {
 		if ( PartitionsExist ) {
 			for ( Index = lbound( ThesePartitionRegions, 1 ); Index <= ubound( ThesePartitionRegions, 1 ); ++Index ) {
 				//Coupled-basement model has adjacent partitions: ThesePartitionRegions(0) and ThesePartitionRegions(1). Do not add a region to the left of ThesePartitionRegions(1).-SA
-				if (PipingSystemDomains(DomainNum).HasCoupledBasement && (Index == 0 || Index == 2)){
+				if (AnyBasementsInModel && (Index == 0 || Index == 2)){
 					//'add a mesh region to the "left" of the partition
 					++RetVal;
 				}

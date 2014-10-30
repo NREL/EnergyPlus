@@ -649,7 +649,6 @@ namespace PlantPipingSystemsManager {
 
 	int
 	CreateRegionListCount(
-		int const DomainNum,
 		FArray1D< GridRegion > const & ThesePartitionRegions,
 		Real64 const DirExtentMax,
 		bool const PartitionsExist
