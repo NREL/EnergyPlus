@@ -102,19 +102,24 @@ ProcessArgs(int argc, const char * argv[])
 	bool ddSimulation;
 
 	// Expand long-name options using "=" sign into two arguments
+	// and expand multiple short options into separate arguments
 	std::vector<std::string> arguments;
-	int wildCardPosition = 2;
 
 	for ( int i = 0; i < argc; ++i ) {
 
 		std::string inputArg( argv[ i ] );
 
-		int beginningPosition = inputArg.find("--");
-		int endingPosition = inputArg.find("=");
+		int doubleDashPosition = inputArg.find("--");
+		int equalsPosition = inputArg.find("=");
 
-		if (beginningPosition == 0 && endingPosition != std::string::npos){
-			arguments.push_back(inputArg.substr(0,endingPosition));
-			arguments.push_back(inputArg.substr(endingPosition + 1,inputArg.size() - 1));
+		if (doubleDashPosition == 0 && equalsPosition != std::string::npos){
+			arguments.push_back(inputArg.substr(0,equalsPosition));
+			arguments.push_back(inputArg.substr(equalsPosition + 1,inputArg.size() - 1));
+		}
+		else if (inputArg.substr(0,1) == '-' && inputArg.substr(1,1) != '-' && inputArg.size() > 2){
+			for (int c = 1; c < inputArg.size(); ++c){
+				arguments.push_back("-" + inputArg.substr(c,1));
+			}
 		}
 		else
 			arguments.push_back(inputArg);
@@ -215,14 +220,29 @@ ProcessArgs(int argc, const char * argv[])
 	if(opt.lastArgs.size() == 0)
 		inputIdfFileName = "in.idf";
 
+	std::vector<std::string> badOptions;
 	if(opt.lastArgs.size() > 1){
-		DisplayString("ERROR: Multiple input files specified:");
+		bool invalidOptionFound = false;
 		for(int i=0; i < opt.lastArgs.size(); ++i) {
 			std::string arg(opt.lastArgs[i]->c_str());
-			DisplayString("  Input file #" + std::to_string(i+1) +  ": " + arg);
+			if (arg.substr(0,1) == "-"){
+				invalidOptionFound = true;
+				DisplayString("ERROR: Invalid option: " + arg);
+			}
 		}
-		DisplayString(errorFollowUp);
-		exit(EXIT_FAILURE);
+		if (invalidOptionFound){
+			DisplayString(errorFollowUp);
+			exit(EXIT_FAILURE);
+		}
+		else {
+			DisplayString("ERROR: Multiple input files specified:");
+			for(int i=0; i < opt.lastArgs.size(); ++i) {
+				std::string arg(opt.lastArgs[i]->c_str());
+				DisplayString("  Input file #" + std::to_string(i+1) +  ": " + arg);
+			}
+			DisplayString(errorFollowUp);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	idfFileNameOnly = removeFileExtension(getFileName(inputIdfFileName));
@@ -396,7 +416,6 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	// Handle bad options
-	std::vector<std::string> badOptions;
 	if(!opt.gotExpected(badOptions)) {
 		for(int i=0; i < badOptions.size(); ++i) {
 			DisplayString("ERROR: Unexpected number of arguments for option " + badOptions[i]);
