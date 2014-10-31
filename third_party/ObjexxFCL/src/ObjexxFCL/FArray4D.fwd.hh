@@ -20,7 +20,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename > class FArray4D;
 class byte;
 class ubyte;

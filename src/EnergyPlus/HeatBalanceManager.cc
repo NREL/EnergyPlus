@@ -517,6 +517,47 @@ namespace HeatBalanceManager {
 	}
 
 	void
+	SetPreConstructionInputParameters()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets parameters that need to be established before any heat balance inputs are read
+
+		int NumAlpha;
+		int NumNumber;
+		int IOStat;
+
+		// Get all the construction objects to determine the max layers and use this as the value for DataHeatBalance::MaxSolidWinLayers
+		// The variable MaxSolidWinLayers is initialized to zero to immediately catch any issues with timing of this routine
+
+		// start by setting this to 5; it will satisfy the regular window constructions (Construction) and the Window5 files (Construction:WindowDataFile)
+		MaxSolidWinLayers = 7;
+
+		// Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
+		if ( GetNumObjectsFound( "Construction:ComplexFenestrationState" ) > 0 ) {
+			MaxSolidWinLayers = max( MaxSolidWinLayers, 10 );
+		}
+
+		// then process the rest of the relevant constructions
+		std::string constructName( "Construction:WindowEquivalentLayer" );
+		int numConstructions( GetNumObjectsFound( constructName ) );
+		for ( int constructionNum = 1; constructionNum <= numConstructions; ++ constructionNum ) {
+			GetObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			int numLayersInThisConstruct( NumAlpha - 1 );
+			MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
+		}
+		
+		// construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor, Construction:InternalSource
+		
+
+	}
+
+	void
 	GetProjectControlData( bool & ErrorsFound ) // Set to true if errors detected during getting data
 	{
 

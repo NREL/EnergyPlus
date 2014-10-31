@@ -837,7 +837,9 @@ namespace MixedAir {
 		ControllerLists.allocate( NumControllerLists );
 
 		for ( Item = 1; Item <= NumControllerLists; ++Item ) {
-
+			
+			// create a reference for convenience
+			auto & thisControllerList( ControllerLists( Item ) );
 			GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 			IsNotOK = false;
 			IsBlank = false;
@@ -846,19 +848,32 @@ namespace MixedAir {
 				ErrorsFound = true;
 				if ( IsBlank ) AlphArray( 1 ) = "xxxxx";
 			}
-			ControllerLists( Item ).Name = AlphArray( 1 );
+			thisControllerList.Name = AlphArray( 1 );
 			IsNotOK = false;
 			IsBlank = false;
-			ControllerLists( Item ).NumControllers = ( NumAlphas - 1 ) / 2;
-			ControllerLists( Item ).ControllerType.allocate( ControllerLists( Item ).NumControllers );
-			ControllerLists( Item ).ControllerType = "";
-			ControllerLists( Item ).ControllerName.allocate( ControllerLists( Item ).NumControllers );
-			ControllerLists( Item ).ControllerName = "";
+			thisControllerList.NumControllers = ( NumAlphas - 1 ) / 2;
+			thisControllerList.ControllerType.allocate( thisControllerList.NumControllers );
+			thisControllerList.ControllerType = "";
+			thisControllerList.ControllerName.allocate( thisControllerList.NumControllers );
+			thisControllerList.ControllerName = "";
 			AlphaNum = 2;
-			for ( CompNum = 1; CompNum <= ControllerLists( Item ).NumControllers; ++CompNum ) {
+			for ( CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum ) {
 				if ( SameString( AlphArray( AlphaNum ), "Controller:WaterCoil" ) || SameString( AlphArray( AlphaNum ), "Controller:OutdoorAir" ) ) {
-					ControllerLists( Item ).ControllerType( CompNum ) = AlphArray( AlphaNum );
-					ControllerLists( Item ).ControllerName( CompNum ) = AlphArray( AlphaNum + 1 );
+					thisControllerList.ControllerType( CompNum ) = AlphArray( AlphaNum );
+					thisControllerList.ControllerName( CompNum ) = AlphArray( AlphaNum + 1 );
+					// loop over all previous controller lists to check if this controllers is also present on previous controllers
+					for ( int previousListNum = 1; previousListNum < Item; ++previousListNum ) {
+						// loop over each of the controllers listed for this list
+						auto & previousList( ControllerLists( previousListNum ) );
+						for ( int PreviousListControllerNum = 1; PreviousListControllerNum <= previousList.NumControllers; ++PreviousListControllerNum ) {
+							if ( ( previousList.ControllerType( PreviousListControllerNum ) == thisControllerList.ControllerType( CompNum ) ) && ( previousList.ControllerName( PreviousListControllerNum ) == thisControllerList.ControllerName( CompNum ) ) ) {
+								ShowSevereError( "Controller instance repeated in multiple " + CurrentModuleObject + " objects" );
+								ShowContinueError( "Found in " + CurrentModuleObject + " = " + thisControllerList.Name );
+								ShowContinueError( "Also found in " + CurrentModuleObject + " = " + previousList.Name );
+								ErrorsFound = true;
+							}
+						}
+					}
 				} else {
 					ShowSevereError( "For " + CurrentModuleObject + "=\"" + AlphArray( 1 ) + "\" invalid " + cAlphaFields( AlphaNum ) );
 					ShowContinueError( "...entered=\"" + AlphArray( AlphaNum ) + "\", should be Controller:WaterCoil " " or Controller:OutdoorAir." );

@@ -19,7 +19,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class IOFlags;
 class Stream;
 

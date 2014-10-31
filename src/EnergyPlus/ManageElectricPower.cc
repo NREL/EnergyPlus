@@ -3688,8 +3688,8 @@ namespace ManageElectricPower {
 		// na
 
 		// Argument array dimensioning
-		A.dim( {0,dim} );
-		B.dim( {0,dim} );
+		A.dim( {1,dim} );
+		B.dim( {1,dim} );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
