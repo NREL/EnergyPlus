@@ -56971,6 +56971,7 @@ Chiller:Electric:ReformulatedEIR,
        \required-field
        \type object-list
        \object-list BicubicCurves
+       \note Table:OneIndependentVariable object can also be used
        \object-list ChillerPartLoadWithLiftCurves
        \note two types of part-load curves are available: BicubicCurves or ChillerPartLoadWithLiftCurves
        \note Type 1: BicubicCurves; 
