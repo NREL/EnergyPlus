@@ -11,8 +11,6 @@
 #include <DataGlobals.hh>
 #include <DataLoopNode.hh>
 
-#include <EnergyPlusAPI.hh>
-
 namespace EnergyPlus {
 
 namespace DataPlant {
@@ -39,7 +37,7 @@ namespace DataPlant {
 	// Used in TYPE(OperationData)%OpSchemeType
 	// As in PlantLoop(:)%OpScheme(:)%OpSchemeType
 	// Also in PlantLoop()LoopSide()Branch()Comp()%CurOpSchemeType
-	extern int const ENERGYPLUSLIB_API UnknownStatusOpSchemeType;
+	extern int const UnknownStatusOpSchemeType;
 	extern int const NoControlOpSchemeType; // Scheme Type placeholder for items such as pipes
 	extern int const LoadRBOpSchemeType; // Scheme Type for Load Range Based Operation (Deprecated)
 	extern int const HeatingRBOpSchemeType; // Scheme Type for Heating Load Range Based Operation
@@ -80,7 +78,7 @@ namespace DataPlant {
 
 	// Parameters for loop flow request priority,
 	//     used in logic to deal with Node%MassFlowRequest for determining overall loop flow rate
-	extern int const ENERGYPLUSLIB_API LoopFlowStatus_Unknown; // component's status is not yet set
+	extern int const LoopFlowStatus_Unknown; // component's status is not yet set
 	extern int const LoopFlowStatus_NeedyAndTurnsLoopOn; // component is a "winner" for loop flow requests
 	// active valve inside component that modulates flow
 	//  gets the loop going under most conditions
@@ -93,7 +91,7 @@ namespace DataPlant {
 
 	//Parameters for component character wrt how load gets met (or not)
 	//  used in %HowLoadServed to facilitate load dispatch logic
-	extern int const ENERGYPLUSLIB_API HowMet_Unknown; // not yet set
+	extern int const HowMet_Unknown; // not yet set
 	extern int const HowMet_NoneDemand; // does not meet a load, demand component
 	extern int const HowMet_PassiveCap; // Passive machine, does what conditions allow but
 	extern int const HowMet_ByNominalCap; // MaxLoad, MinLoad, OptLoad should work
@@ -312,7 +310,7 @@ namespace DataPlant {
 	//  REAL(r64) :: mdotPriRequest     ! primary total flow request
 	//END TYPE TwoWayCommonPipeData
 
-	extern int const ENERGYPLUSLIB_API NumConvergenceHistoryTerms;
+	extern int const NumConvergenceHistoryTerms;
 	extern FArray1D< Real64 > const ConvergenceHistoryARR;
 	extern Real64 const sum_ConvergenceHistoryARR;
 	extern Real64 const square_sum_ConvergenceHistoryARR;
@@ -333,7 +331,7 @@ namespace DataPlant {
 	extern int NumPlantPipes; // Total number of plant pipes
 	extern int NumCondPipes; // Total number of condenser pipes
 	extern Real64 EconLoadMet; // Load met by Economizer
-	extern int ENERGYPLUSLIB_API TotNumLoops; // number of plant and condenser loops
+	extern int TotNumLoops; // number of plant and condenser loops
 	extern int TotNumHalfLoops; // number of half loops (2 * TotNumLoops)
 	extern bool PlantSizeNotComplete;
 	extern bool PlantSizesOkayToFinalize; // true if plant sizing is finishing and can save results
@@ -2290,7 +2288,7 @@ namespace DataPlant {
 
 	// Object Data
 	extern FArray1D< PipeData > Pipe;
-	extern FArray1D< PlantLoopData > ENERGYPLUSLIB_API PlantLoop;
+	extern FArray1D< PlantLoopData > PlantLoop;
 	extern FArray1D< PlantAvailMgrData > PlantAvailMgr;
 	extern FArray1D< ReportVars > PlantReport;
 	extern FArray1D< ReportLoopData > VentRepPlantSupplySide;
@@ -2328,11 +2326,9 @@ namespace DataPlant {
 	);
 
 	bool
-	ENERGYPLUSLIB_API
 	AnyPlantLoopSidesNeedSim();
 
 	void
-	ENERGYPLUSLIB_API
 	SetAllPlantSimFlagsToValue( bool const Value );
 
 	int

@@ -6,7 +6,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
-#include <EnergyPlusAPI.hh>
 #include <DataGlobals.hh>
 
 namespace EnergyPlus {
@@ -52,7 +51,7 @@ namespace DataLoopNode {
 	extern bool const ObjectIsNotParent;
 	extern bool const IncrementFluidStreamYes;
 	extern bool const IncrementFluidStreamNo;
-	extern Real64 const ENERGYPLUSLIB_API SensedNodeFlagValue;
+	extern Real64 const SensedNodeFlagValue;
 	extern Real64 const SensedLoadFlagValue;
 
 	// DERIVED TYPE DEFINITIONS:

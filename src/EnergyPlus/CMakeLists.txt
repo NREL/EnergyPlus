@@ -1,5 +1,8 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
+# public API headers go in the src/EnergyPlus/public folder
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
+
 if(MSVC)
 #  add_definitions(/Za)
 endif()
@@ -194,9 +197,6 @@ SET( SRC
   ElectricBaseboardRadiator.cc
   ElectricBaseboardRadiator.hh
   EnergyPlus.hh
-  EnergyPlusPgm.hh
-  EnergyPlusPgm.cc
-  EnergyPlusAPI.hh
   EvaporativeCoolers.cc
   EvaporativeCoolers.hh
   EvaporativeFluidCoolers.cc
@@ -519,11 +519,20 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
-add_library( EnergyPlusLib SHARED ${SRC} )
-target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight )
+# first we will create a static library of EnergyPlus
+# this will be linked statically to create the DLL and also the unit tests
+add_library( EnergyPlusCore STATIC ${SRC} )
+target_link_libraries( EnergyPlusCore objexx sqlite bcvtb epexpat epfmiimport DElight )
 if(UNIX AND NOT APPLE)
-  target_link_libraries( EnergyPlusLib dl )
+  target_link_libraries( EnergyPlusCore dl )
 endif()
+
+# second we will create the shared library that is actually packaged with EnergyPlus
+add_library( EnergyPlusLib SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+if (UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
+target_link_libraries( EnergyPlusLib EnergyPlusCore )
 set_target_properties(
   EnergyPlusLib
   PROPERTIES
