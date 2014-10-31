@@ -483,9 +483,7 @@
                 OutArgs(7:8) = ""
                 OutArgs(9:11) = InArgs(6:8)
                 CurArgs = CurArgs + 3     
-                
->>>>>>> develop:src/Transition/CreateNewIDFUsingRulesV8_2_0.in.f90
-                
+                                
     !!!   Changes for report variables, meters, tables -- update names
 
               CASE('OUTPUT:VARIABLE')
