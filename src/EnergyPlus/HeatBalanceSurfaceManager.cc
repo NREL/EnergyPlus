@@ -14,6 +14,7 @@
 // EnergyPlus Headers
 #include <HeatBalanceSurfaceManager.hh>
 #include <ConvectionCoefficients.hh>
+#include <ChilledCeilingPanelSimple.hh>
 #include <DataAirflowNetwork.hh>
 #include <DataDaylighting.hh>
 #include <DataDaylightingDevices.hh>
@@ -3829,6 +3830,7 @@ namespace HeatBalanceSurfaceManager {
 		using HWBaseboardRadiator::UpdateBBRadSourceValAvg;
 		using SteamBaseboardRadiator::UpdateBBSteamRadSourceValAvg;
 		using ElectricBaseboardRadiator::UpdateBBElecRadSourceValAvg;
+		using CoolingPanelSimple::UpdateCoolingPanelSourceValAvg;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3849,6 +3851,7 @@ namespace HeatBalanceSurfaceManager {
 		bool HWBaseboardSysOn; // .TRUE. if a water baseboard heater is running
 		bool SteamBaseboardSysOn; // .TRUE. if a steam baseboard heater is running
 		bool ElecBaseboardSysOn; // .TRUE. if a steam baseboard heater is running
+		bool CoolingPanelSysOn; // true if a simple cooling panel is running
 
 		// FLOW:
 		UpdateRadSysSourceValAvg( LowTempRadSysOn );
@@ -3856,8 +3859,9 @@ namespace HeatBalanceSurfaceManager {
 		UpdateBBRadSourceValAvg( HWBaseboardSysOn );
 		UpdateBBSteamRadSourceValAvg( SteamBaseboardSysOn );
 		UpdateBBElecRadSourceValAvg( ElecBaseboardSysOn );
+		UpdateCoolingPanelSourceValAvg( CoolingPanelSysOn );
 
-		if ( LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn ) {
+		if ( LowTempRadSysOn || HighTempRadSysOn || HWBaseboardSysOn || SteamBaseboardSysOn || ElecBaseboardSysOn || CoolingPanelSysOn ) {
 			// Solve the zone heat balance 'Detailed' solution
 			// Call the outside and inside surface heat balances
 			CalcHeatBalanceOutsideSurf();

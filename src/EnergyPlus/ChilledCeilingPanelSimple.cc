@@ -1167,7 +1167,7 @@ namespace CoolingPanelSimple {
 	}
 
 	void
-	UpdateCoolingPanelRadSourceValAvg( bool & CoolingPanelSysOn ) // .TRUE. if the radiant system has run this zone time step
+	UpdateCoolingPanelSourceValAvg( bool & CoolingPanelSysOn ) // .TRUE. if the radiant system has run this zone time step
 	{
 
 		// SUBROUTINE INFORMATION:
