@@ -15,7 +15,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Omit;
 
 } // ObjexxFCL

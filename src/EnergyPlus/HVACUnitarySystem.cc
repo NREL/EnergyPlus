@@ -3664,6 +3664,7 @@ namespace HVACUnitarySystem {
 		FArray1D_string cAlphaFields; // Alpha field names
 		FArray1D_string cNumericFields; // Numeric field names
 		std::string CurrentModuleObject; // for ease in getting objects
+		std::string UnitarySysHeatPumpPerformanceObjectType; // Used for warning messages
 		std::string CoolingCoilType; // Used in mining function calls
 		std::string CoolingCoilName; // Used in mining function calls
 		std::string HeatingCoilType; // Used in mining function calls
@@ -3823,6 +3824,7 @@ namespace HVACUnitarySystem {
 
 		// Get the data for the DesignSpecification object
 		CurrentModuleObject = "UnitarySystemPerformance:HeatPump:Multispeed";
+		UnitarySysHeatPumpPerformanceObjectType = CurrentModuleObject;
 		DesignSpecMSHP.allocate( NumDesignSpecMultiSpeedHP );
 
 		for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
@@ -6535,7 +6537,7 @@ namespace HVACUnitarySystem {
 
 				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "... Cooling coil object type requires valid number of speeds for cooling to be specified" );
+					ShowContinueError( "... Cooling coil object type requires valid " + UnitarySysHeatPumpPerformanceObjectType + " for cooling to be specified with number of speeds > 0" );
 					ErrorsFound = true;
 				}
 			}
@@ -6546,7 +6548,7 @@ namespace HVACUnitarySystem {
 
 				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "... Heating coil object type requires valid number of speeds for heating to be specified" );
+					ShowContinueError( "... Heating coil object type requires valid " + UnitarySysHeatPumpPerformanceObjectType + " for heating to be specified with number of speeds > 0" );
 					ErrorsFound = true;
 				}
 			}

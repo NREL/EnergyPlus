@@ -37,7 +37,7 @@ public: // Creation
 	// Constructor (Implicit): Clips Exponent to Valid Range
 	inline
 	ChunkExponent( T const exponent ) :
-		exponent_( std::min( exponent, static_cast< T >( std::numeric_limits< T >::digits - 1 ) ) )
+	 exponent_( std::min( exponent, static_cast< T >( std::numeric_limits< T >::digits - 1 ) ) )
 	{}
 
 	// Destructor
