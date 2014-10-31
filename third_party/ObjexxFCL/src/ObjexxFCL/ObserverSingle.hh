@@ -30,14 +30,14 @@ protected: // Creation
 	// Default Constructor
 	inline
 	ObserverSingle() :
-		observer_p_( nullptr )
+	 observer_p_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	ObserverSingle( ObserverSingle const & ) :
-		Observer(),
-		observer_p_( nullptr )
+	 Observer(),
+	 observer_p_( nullptr )
 	{}
 
 public: // Creation
@@ -56,7 +56,7 @@ protected: // Assignment
 	inline
 	void
 	operator =( ObserverSingle const & )
-	{}
+	{} // observer_p_ is identity, not value, state and is intentionally not assigned
 
 public: // Subject Inspector
 

@@ -21,7 +21,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename > class SetWrapper;
 
 // ObserverMulti: Combined Subject + Multi Observer Abstract Base Class
@@ -37,14 +37,14 @@ protected: // Creation
 	// Default Constructor
 	inline
 	ObserverMulti() :
-		observers_p_( nullptr )
+	 observers_p_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	ObserverMulti( ObserverMulti const & ) :
-		Observer(),
-		observers_p_( nullptr )
+	 Observer(),
+	 observers_p_( nullptr )
 	{}
 
 public: // Creation
@@ -59,7 +59,7 @@ protected: // Assignment
 	inline
 	void
 	operator =( ObserverMulti const & )
-	{}
+	{} // observers_p_ is identity, not value, state and is intentionally not assigned
 
 public: // Subject Inspector
 

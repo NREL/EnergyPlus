@@ -34,8 +34,8 @@ public: // Creation
 	// Copy Constructor
 	inline
 	DimensionExpressionRef( DimensionExpressionRef const & exp ) :
-		Super(),
-		dim_p_( exp.dim_p_ )
+	 Super(),
+	 dim_p_( exp.dim_p_ )
 	{
 		assert( dim_p_ );
 	}
@@ -44,7 +44,7 @@ public: // Creation
 	inline
 	explicit
 	DimensionExpressionRef( Dimension const & dim ) :
-		dim_p_( &dim )
+	 dim_p_( &dim )
 	{}
 
 	// Clone
