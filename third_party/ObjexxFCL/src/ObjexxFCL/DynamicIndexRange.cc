@@ -18,9 +18,9 @@ namespace ObjexxFCL {
 
 	// Dimension and Unbounded Upper Index Constructor
 	DynamicIndexRange::DynamicIndexRange( Dimension const & l_dim, Star const s ) :
-		IndexRange( l_dim.zvalue(), s ),
-		l_dim_p_( l_dim.reference_copy() ),
-		u_dim_p_( new Dimension( *l_dim_p_ - 2 ) ) // Stays unbounded until upper index changed
+	 IndexRange( l_dim.zvalue(), s ),
+	 l_dim_p_( l_dim.reference_copy() ),
+	 u_dim_p_( new Dimension( *l_dim_p_ - 2 ) ) // Stays unbounded until upper index changed
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -29,9 +29,9 @@ namespace ObjexxFCL {
 
 	// Expression and Unbounded Upper Index Constructor
 	DynamicIndexRange::DynamicIndexRange( Expression const & l_exp, Star const s ) :
-		IndexRange( l_exp.zvalue(), s ),
-		l_dim_p_( new Dimension( l_exp ) ),
-		u_dim_p_( new Dimension( *l_dim_p_ - 2 ) ) // Stays unbounded until upper index changed
+	 IndexRange( l_exp.zvalue(), s ),
+	 l_dim_p_( new Dimension( l_exp ) ),
+	 u_dim_p_( new Dimension( *l_dim_p_ - 2 ) ) // Stays unbounded until upper index changed
 	{
 		assert( legal_dynamic() );
 		size_dynamic();

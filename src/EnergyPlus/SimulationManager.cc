@@ -1,3 +1,9 @@
+// FMI-Related Headers
+extern "C" {
+#include <FMI/main.h>
+}
+
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -275,6 +281,7 @@ namespace SimulationManager {
 		CheckForMisMatchedEnvironmentSpecifications();
 		CheckForRequestedReporting();
 		SetPredefinedTables();
+		SetPreConstructionInputParameters(); //establish array bounds for constructions early
 
 		SetupTimePointers( "Zone", TimeStepZone ); // Set up Time pointer for HB/Zone Simulation
 		SetupTimePointers( "HVAC", TimeStepSys );

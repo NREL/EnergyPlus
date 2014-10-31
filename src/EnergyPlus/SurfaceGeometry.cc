@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -8406,7 +8407,7 @@ namespace SurfaceGeometry {
 		//  REAL(r64) testval
 		//  INTEGER ploop
 		//  INTEGER vloop
-		int ThisShape;
+		int ThisShape( 0 );
 		bool BaseSurface; // True if a base surface or a detached shading surface
 		Real64 ThisSurfAz;
 		Real64 ThisSurfTilt;
@@ -8530,6 +8531,8 @@ namespace SurfaceGeometry {
 					ThisShape = TriangularWindow;
 				} else if ( Surface( ThisSurf ).Sides == 3 && Surface( ThisSurf ).Class == SurfaceClass_Door ) {
 					ThisShape = TriangularDoor;
+				} else {
+					assert( false );
 				}
 
 			} else { //  this is a shadowing subsurface

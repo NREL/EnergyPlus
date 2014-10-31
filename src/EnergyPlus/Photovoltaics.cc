@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -786,6 +787,7 @@ namespace Photovoltaics {
 				PVarray( thisPV ).SimplePVModule.PVEfficiency = Eff;
 
 			} else {
+				Eff = 0.0; // Suppress uninitialized warning
 				ShowSevereError( "caught bad Mode in Generator:Photovoltaic:Simple use FIXED or SCHEDULED efficiency mode" );
 			}}
 
@@ -1242,7 +1244,7 @@ namespace Photovoltaics {
 		Real64 PA;
 		int CC;
 		int K;
-		Real64 CellTemp; // cell temperature in Kelvin
+		Real64 CellTemp( 0.0 ); // cell temperature in Kelvin
 		Real64 CellTempC; // cell temperature in degrees C
 		static bool firstTime( true );
 		//unused1208  INTEGER :: thisZone
@@ -1348,7 +1350,9 @@ namespace Photovoltaics {
 				GetExtVentedCavityTsColl( PVarray( PVnum ).ExtVentCavPtr, CellTemp );
 				CellTemp += KelvinConv;
 			} else if ( SELECT_CASE_var == iPVTSolarCollectorCellIntegration ) {
-				// get PVT model result for cell temp..
+				// get PVT model result for cell temp.. //Bug CellTemp not set but used below
+			} else {
+				assert( false );
 			}}
 
 			PVarray( PVnum ).TRNSYSPVcalc.Insolation = 0.0;
@@ -1652,7 +1656,7 @@ namespace Photovoltaics {
 		using General::RoundSigDigits;
 
 		// Return value
-		Real64 FUN;
+		Real64 FUN( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1713,7 +1717,7 @@ namespace Photovoltaics {
 		using General::RoundSigDigits;
 
 		// Return value
-		Real64 FI;
+		Real64 FI( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -1773,7 +1777,7 @@ namespace Photovoltaics {
 		using General::RoundSigDigits;
 
 		// Return value
-		Real64 FV;
+		Real64 FV( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:

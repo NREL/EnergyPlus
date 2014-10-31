@@ -18,6 +18,7 @@
 #include <cassert>
 #include <cstddef>
 #include <limits>
+#include <type_traits>
 #include <utility>
 
 namespace ObjexxFCL {
@@ -59,17 +60,17 @@ public: // Creation
 	// Default Constructor
 	inline
 	Chunk() :
-		size_( 0u ),
-		capacity_( 0u ),
-		data_( nullptr )
+	 size_( 0u ),
+	 capacity_( 0u ),
+	 data_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	Chunk( Chunk const & c ) :
-		size_( c.size_ ),
-		capacity_( size_ ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( c.size_ ),
+	 capacity_( size_ ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = c.data_[ i ];
@@ -77,13 +78,13 @@ public: // Creation
 	}
 
 	// Copy Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	Chunk( Chunk< U > const & c ) :
-		size_( c.size_ ),
-		capacity_( size_ ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( c.size_ ),
+	 capacity_( size_ ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = T( c.data_[ i ] );
@@ -94,20 +95,20 @@ public: // Creation
 	inline
 	explicit
 	Chunk( size_type const size ) :
-		size_( size ),
-		capacity_( size_ ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( size ),
+	 capacity_( size_ ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{}
 
 	// Size + Uniform Value Constructor
 	inline
 	Chunk(
-		size_type const size,
-		T const & value
+	 size_type const size,
+	 T const & value
 	) :
-		size_( size ),
-		capacity_( size_ ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( size ),
+	 capacity_( size_ ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = value;
@@ -142,7 +143,7 @@ public: // Assignment
 	}
 
 	// Copy Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Chunk &
 	operator =( Chunk< U > const & c )
@@ -162,8 +163,8 @@ public: // Assignment
 	inline
 	Chunk &
 	assign(
-		size_type const size,
-		T const & value
+	 size_type const size,
+	 T const & value
 	)
 	{
 		if ( size_ != size ) {
@@ -202,7 +203,7 @@ public: // Assignment
 	}
 
 	// += Chunk Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Chunk &
 	operator +=( Chunk< U > const & c )
@@ -215,7 +216,7 @@ public: // Assignment
 	}
 
 	// -= Chunk Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Chunk &
 	operator -=( Chunk< U > const & c )
@@ -421,8 +422,8 @@ public: // Modifier
 	inline
 	Chunk &
 	resize(
-		size_type const size,
-		T const & value
+	 size_type const size,
+	 T const & value
 	)
 	{
 		if ( size_ != size ) {
@@ -462,8 +463,8 @@ public: // Modifier
 	inline
 	Chunk &
 	non_preserving_resize(
-		size_type const size,
-		T const & value
+	 size_type const size,
+	 T const & value
 	)
 	{
 		if ( size_ != size ) {
