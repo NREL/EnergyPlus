@@ -6737,6 +6737,7 @@ namespace WaterThermalTanks {
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
 		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
+        Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
 		int loopIter; // iteration loop counter
 
 		// FLOW:
@@ -6858,6 +6859,7 @@ namespace WaterThermalTanks {
 			WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
 
 			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+            HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
 			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
 			// It turns out that the water tank delta T increases each iteration and water mass flow decreases each iteration causing the HPWH to incorrectly report results.
 			// commenting out for now. A similar loop exists several lines down.
@@ -6871,7 +6873,7 @@ namespace WaterThermalTanks {
 
 				//           move the full load outlet temperature rate to the water heater structure variables
 				//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
-				WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = Node( HPWaterInletNode ).Temp + CondenserDeltaT;
+				WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
 
 				//           this CALL does not update node temps, must use WaterThermalTank variables
 				// select tank type
@@ -6885,7 +6887,6 @@ namespace WaterThermalTanks {
 				}}
 				Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
 				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
-                if ( NewTankTemp > SetPointTemp ) break;
 				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
 			}
 
@@ -7010,6 +7011,7 @@ namespace WaterThermalTanks {
 				Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
 
 				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+                HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
 				for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
 					CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
 					//         Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
@@ -7017,7 +7019,7 @@ namespace WaterThermalTanks {
 					//         CALL CalcDOE2DXCoil(DXCoilNum, HPPartLoadRatio, FirstHVACIteration,PartLoadRatio, FanOpMode)
 					//         (possibly with an iteration loop to converge on a solution)
 					CondenserDeltaT = Node( HPWaterOutletNode ).Temp - Node( HPWaterInletNode ).Temp;
-					WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = Node( HPWaterInletNode ).Temp + CondenserDeltaT;
+					WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
 
 					//             this CALL does not update node temps, must use WaterThermalTank variables
 					// select tank type
@@ -7031,7 +7033,6 @@ namespace WaterThermalTanks {
 					}}
 					Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
 					if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
-                    if ( NewTankTemp > SetPointTemp ) break;
 					HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
 				}
 
