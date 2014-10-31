@@ -31,19 +31,19 @@ public: // Creation
 	// Default Constructor
 	inline
 	Fmt() :
-		format_( nullptr )
+	 format_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	Fmt( Fmt const & fmt ) :
-		format_( fmt.format_ ? fmt.format_->clone() : nullptr )
+	 format_( fmt.format_ ? fmt.format_->clone() : nullptr )
 	{}
 
 	// String Constructor
 	inline
 	Fmt( std::string const & format_string ) :
-		format_( FormatFactory::create( format_string ) )
+	 format_( FormatFactory::create( format_string ) )
 	{}
 
 	// Destructor

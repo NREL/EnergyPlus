@@ -29,28 +29,42 @@ public: // Creation
 	// Default Constructor
 	inline
 	byte() :
-		b_( 0 )
+	 b_( static_cast< signed char >( 0 ) )
 	{}
 
 	// short Constructor
 	inline
 	explicit
 	byte( short int const i ) :
-		b_( i )
+	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// int Constructor
 	inline
 	explicit
 	byte( int const i ) :
-		b_( i )
+	 b_( static_cast< signed char >( i ) )
+	{}
+
+	// long Constructor
+	inline
+	explicit
+	byte( long int const i ) :
+	 b_( static_cast< signed char >( i ) )
+	{}
+
+	// long long Constructor
+	inline
+	explicit
+	byte( long long int const i ) :
+	 b_( static_cast< signed char >( i ) )
 	{}
 
 	// char Constructor
 	inline
 	explicit
 	byte( signed char const c ) :
-		b_( c )
+	 b_( c )
 	{}
 
 	// Destructor
@@ -74,7 +88,7 @@ public: // Assignment
 	byte &
 	operator =( short int const i )
 	{
-		b_ = i;
+		b_ = static_cast< signed char >( i );
 		return *this;
 	}
 
@@ -371,9 +385,9 @@ public: // I/O
 	operator >>( std::istream & stream, byte & b )
 	{
 		if ( stream ) {
-			short int s;
-			stream >> s;
-			b.b_ = s;
+			short int i;
+			stream >> i;
+			b.b_ = static_cast< signed char >( i );
 		}
 		return stream;
 	}

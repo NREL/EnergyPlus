@@ -29,35 +29,77 @@ public: // Creation
 	// Default Constructor
 	inline
 	ubyte() :
-		b_( 0 )
+	 b_( static_cast< unsigned char >( 0 ) )
 	{}
 
 	// short Constructor
 	inline
 	explicit
 	ubyte( unsigned short int const i ) :
-		b_( i )
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// short Constructor
+	inline
+	explicit
+	ubyte( short int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// int Constructor
 	inline
 	explicit
 	ubyte( unsigned int const i ) :
-		b_( i )
+	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// int Constructor
 	inline
 	explicit
 	ubyte( int const i ) :
-		b_( static_cast< unsigned short int >( i ) )
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// long Constructor
+	inline
+	explicit
+	ubyte( unsigned long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// long Constructor
+	inline
+	explicit
+	ubyte( long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// long long Constructor
+	inline
+	explicit
+	ubyte( unsigned long long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
+	{}
+
+	// long long Constructor
+	inline
+	explicit
+	ubyte( long long int const i ) :
+	 b_( static_cast< unsigned char >( i ) )
 	{}
 
 	// char Constructor
 	inline
 	explicit
 	ubyte( unsigned char const c ) :
-		b_( c )
+	 b_( c )
+	{}
+
+	// char Constructor
+	inline
+	explicit
+	ubyte( char const c ) :
+	 b_( c )
 	{}
 
 	// Destructor
@@ -81,7 +123,7 @@ public: // Assignment
 	ubyte &
 	operator =( unsigned short int const i )
 	{
-		b_ = i;
+		b_ = static_cast< unsigned char >( i );
 		return *this;
 	}
 
@@ -117,7 +159,7 @@ public: // Assignment
 	ubyte &
 	operator /=( unsigned short int const i )
 	{
-		assert( i != 0 );
+		assert( i != 0u );
 		b_ /= i;
 		return *this;
 	}
@@ -177,7 +219,7 @@ public: // Math
 	ubyte
 	operator -() const
 	{
-		return ubyte( -static_cast< int >( b_ ) );
+		return ubyte( static_cast< unsigned char const >( -static_cast< short int const >( b_ ) ) );
 	}
 
 	// ubyte + ubyte
@@ -378,9 +420,9 @@ public: // I/O
 	operator >>( std::istream & stream, ubyte & b )
 	{
 		if ( stream ) {
-			unsigned short int s;
-			stream >> s;
-			b.b_ = s;
+			unsigned short int i;
+			stream >> i;
+			b.b_ = static_cast< unsigned char >( i );
 		}
 		return stream;
 	}

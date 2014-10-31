@@ -17,6 +17,7 @@
 #include <ObjexxFCL/ChunkVector.hh>
 #include <ObjexxFCL/ChunkVector.io.hh>
 #include <ObjexxFCL/TypeTraits.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <limits>

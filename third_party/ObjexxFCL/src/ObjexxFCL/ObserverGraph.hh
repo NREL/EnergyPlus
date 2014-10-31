@@ -20,7 +20,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Observer;
 
 // Types
