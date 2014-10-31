@@ -190,7 +190,8 @@ namespace AirLoopConnection {
 
 	void
 	CheckZoneOutletVsCompOutlet(
-		bool & SimAgain // set to true if the air loop needs to be resimulated
+		bool & SimAgain, // set to true if the air loop needs to be resimulated
+		bool & SimAgain2 // set to true if the air loop needs to be resimulated
 	);
 	
 	//     NOTICE

@@ -2,11 +2,11 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneAsGenHVACAfterZoneConfig.idf
+! 5ZoneAsGenHVACAfterReturnPlenumConfig.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-!                          outside air stream controlled to preheat and precool setpoints.  One zone has no HVAC but rather sits at the exit of another zone and is thus only conditioned by the air passed through it.
+!                          outside air stream controlled to preheat and precool setpoints.  One zone has no HVAC but rather sits at the exit of the return path after the other zone outlets are mixed and is thus only conditioned by the air passed through it.  In this case the ?mixer? is a return plenum.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
@@ -2098,12 +2098,12 @@ Sizing:Zone,
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
                      ,       !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Air Loop In;    !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
     SPACE2-1 Eq,             !- Zone Conditioning Equipment List Name
-    SPACE2-1 In Node,       !- Zone Air Inlet Node or NodeList Name
+    SPACE2-1 In Node,        !- Zone Air Inlet Node or NodeList Name
     ,                        !- Zone Air Exhaust Node or NodeList Name
     SPACE2-1 Node,           !- Zone Air Node Name
     SPACE2-1 Out Node;       !- Zone Return Air Node Name
@@ -2406,16 +2406,16 @@ Coil:Heating:Water,
 
   AirLoopHVAC:ReturnPath,
     ReturnAirPath1,          !- Name
-    PLENUM-1 Out Node,       !- Return Air Path Outlet Node Name
-    ZoneHVAC:AirLoopConnection, ! Ð Component 1 Object Type
-    SPACE2-1,                !- Component 1 Object Name
-    AirLoopHVAC:ReturnPlenum,!- Component 2 Object Type
-    Return-Plenum-1;         !- Component 2 Name
+    SPACE2-1 Air Loop Out,   !- Return Air Path Outlet Node Name
+    AirLoopHVAC:ReturnPlenum,!- Component 1 Object Type
+    Return-Plenum-1,         !- Component 1 Name
+    ZoneHVAC:AirLoopConnection, !- Component 2 Object Type
+    SPACE2-1;                !- Component 2 Object Name
 
   ZoneHVAC:AirLoopConnection,
     SPACE2-1,                !- Name
     SPACE2-1 Air Loop In,    !- Air Loop Inlet Node
-    SPACE2-1 Air Loop Out,   !- Air Loop Outlet Noe
+    SPACE2-1 Air Loop Out,   !- Air Loop Outlet Node
     SPACE2-1 In Node,        !- Inlet Node Name
     SPACE2-1 Out Node;       !- Outlet Node Name
 
@@ -2423,9 +2423,9 @@ Coil:Heating:Water,
     Return-Plenum-1,         !- Name
     PLENUM-1,                !- Zone Name
     PLENUM-1 Node,           !- Zone Node Name
-    PLENUM-1 Out Node,       !- Outlet Node Name
+    SPACE2-1 Air Loop In,       !- Outlet Node Name
     ,                        !- Induced Air Outlet Node or NodeList Name
-    SPACE2-1 Air Loop Out,   !- Inlet 1 Node Name
+    SPACE1-1 Out Node,       !- Inlet 1 Node Name
     SPACE3-1 Out Node,       !- Inlet 3 Node Name
     SPACE4-1 Out Node,       !- Inlet 4 Node Name
     SPACE5-1 Out Node;       !- Inlet 5 Node Name
@@ -2452,7 +2452,7 @@ Coil:Heating:Water,
     VAV Sys 1 Branches,      !- Branch List Name
     ,                        !- Connector List Name
     VAV Sys 1 Inlet Node,    !- Supply Side Inlet Node Name
-    PLENUM-1 Out Node,       !- Demand Side Outlet Node Name
+    SPACE2-1 Air Loop Out,   !- Demand Side Outlet Node Name
     Zone Eq In Node,         !- Demand Side Inlet Node Names
     VAV Sys 1 Outlet Node;   !- Supply Side Outlet Node Names
 

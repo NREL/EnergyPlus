@@ -852,7 +852,8 @@ namespace AirLoopConnection {
 
 	void
 	CheckZoneOutletVsCompOutlet(
-		bool & SimAgain // set to true if the air loop needs to be resimulated
+		bool & SimAgain, // set to true if the air loop needs to be resimulated
+		bool & SimAgain2 // set to true if the air loop needs to be resimulated
 	)
 	{
 		
@@ -903,6 +904,7 @@ namespace AirLoopConnection {
 				CompOutTemp = Node( AirLoopCon( Item ).AirLoopOutletNodeNum ).Temp;
 				if ( abs( ZoneOutTemp - CompOutTemp ) > MaxAllowedTempDiff ) {
 					SimAgain = true;
+					SimAgain2 = true;
 					break;
 				}
 			}

@@ -2098,7 +2098,7 @@ Sizing:Zone,
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
                      ,       !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Air Loop In;    !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2407,15 +2407,13 @@ Coil:Heating:Water,
   AirLoopHVAC:ReturnPath,
     ReturnAirPath1,          !- Name
     PLENUM-1 Out Node,       !- Return Air Path Outlet Node Name
-    ZoneHVAC:AirLoopConnection, ! Ð Component 1 Object Type
-    SPACE2-1,                !- Component 1 Object Name
-    AirLoopHVAC:ReturnPlenum,!- Component 2 Object Type
-    Return-Plenum-1;         !- Component 2 Name
+    AirLoopHVAC:ReturnPlenum,!- Component 1 Object Type
+    Return-Plenum-1;         !- Component 1 Name
 
   ZoneHVAC:AirLoopConnection,
     SPACE2-1,                !- Name
-    SPACE2-1 Air Loop In,    !- Air Loop Inlet Node
-    SPACE2-1 Air Loop Out,   !- Air Loop Outlet Noe
+    OA Heating Coil 1 Air Outlet Node,    !- Air Loop Inlet Node
+    SPACE2-1 Air Loop Out,   !- Air Loop Outlet Node
     SPACE2-1 In Node,        !- Inlet Node Name
     SPACE2-1 Out Node;       !- Outlet Node Name
 
@@ -2425,7 +2423,7 @@ Coil:Heating:Water,
     PLENUM-1 Node,           !- Zone Node Name
     PLENUM-1 Out Node,       !- Outlet Node Name
     ,                        !- Induced Air Outlet Node or NodeList Name
-    SPACE2-1 Air Loop Out,   !- Inlet 1 Node Name
+    SPACE1-1 Out Node,       !- Inlet 1 Node Name
     SPACE3-1 Out Node,       !- Inlet 3 Node Name
     SPACE4-1 Out Node,       !- Inlet 4 Node Name
     SPACE5-1 Out Node;       !- Inlet 5 Node Name
@@ -2433,12 +2431,12 @@ Coil:Heating:Water,
   AirLoopHVAC:SupplyPath,
     Zone Supply Air Path 1,  !- Name
     Zone Eq In Node,         !- Supply Air Path Inlet Node Name
-    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
+    AirLoopHVAC:ZoneSplitter, !- Component 1 Object Type
     Zone Supply Air Splitter 1;  !- Component 1 Name
 
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter 1,  !- Name
-    Zone Eq In Node,         !- Inlet Node Name
+    Zone Eq In Node,   !- Inlet Node Name
     SPACE1-1 ATU In Node,    !- Outlet 1 Node Name
     SPACE3-1 ATU In Node,    !- Outlet 3 Node Name
     SPACE4-1 ATU In Node,    !- Outlet 4 Node Name
@@ -2490,16 +2488,16 @@ Coil:Heating:Water,
     Mixed Air Node 1,        !- Component 2 Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- Component 2 Outlet Node Name
     PASSIVE,                 !- Component 2 Branch Control Type
-    Coil:Heating:Water,      !- Component 3 Object Type
-    Main Heating Coil 1,     !- Component 3 Name
-    Main Cooling Coil 1 Outlet Node,  !- Component 3 Inlet Node Name
-    Main Heating Coil 1 Outlet Node,  !- Component 3 Outlet Node Name
-    PASSIVE,                 !- Component 3 Branch Control Type
-    Fan:VariableVolume,      !- Component 4 Object Type
-    Supply Fan 1,            !- Component 4 Name
-    Main Heating Coil 1 Outlet Node,  !- Component 4 Inlet Node Name
-    VAV Sys 1 Outlet Node,   !- Component 4 Outlet Node Name
-    ACTIVE;                  !- Component 4 Branch Control Type
+Coil:Heating:Water,      !- Component 4 Object Type
+    Main Heating Coil 1,     !- Component 4 Name
+    Main Cooling Coil 1 Outlet Node,   !- Component 4 Inlet Node Name
+    Main Heating Coil 1 Outlet Node,  !- Component 4 Outlet Node Name
+    PASSIVE,                 !- Component 4 Branch Control Type
+    Fan:VariableVolume,      !- Component 5 Object Type
+    Supply Fan 1,            !- Component 5 Name
+    Main Heating Coil 1 Outlet Node,  !- Component 5 Inlet Node Name
+    VAV Sys 1 Outlet Node,   !- Component 5 Outlet Node Name
+    ACTIVE;                  !- Component 5 Branch Control Type
 
   AirLoopHVAC:OutdoorAirSystem,
     OA Sys 1,                !- Name
@@ -2554,7 +2552,7 @@ Coil:Heating:Water,
     autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
     OA Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name
     OA Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name
-    OA Heating Coil 1 Air Outlet Node,  !- Air Inlet Node Name
+    SPACE2-1 Air Loop Out,  !- Air Inlet Node Name
     OA Mixing Box 1 Inlet Node,  !- Air Outlet Node Name
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow;               !- Heat Exchanger Configuration
@@ -2676,8 +2674,8 @@ Coil:Heating:Water,
     Temperature,             !- Control Variable
     Normal,                  !- Action
     FLOW,                    !- Actuator Variable
-    Main Heating Coil 1 Outlet Node,  !- Sensor Node Name
-    Main Heating Coil 1 Water Inlet Node,  !- Actuator Node Name
+    Main Heating Coil 1 Outlet Node,      !- Sensor Node Name
+    Main Heating Coil 1 Water Inlet Node, !- Actuator Node Name
     0.002,                   !- Controller Convergence Tolerance {deltaC}
     autosize,                !- Maximum Actuated Flow {m3/s}
     0.0;                     !- Minimum Actuated Flow {m3/s}

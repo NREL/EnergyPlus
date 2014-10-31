@@ -1566,7 +1566,7 @@ namespace HVACManager {
 						SimZoneEquipment = true;
 					}
 				}
-				CheckZoneOutletVsCompOutlet( SimAirLoops );
+				CheckZoneOutletVsCompOutlet( SimAirLoops, SimZoneEquipment );
 			}
 
 			RepIterAir += IterAir;

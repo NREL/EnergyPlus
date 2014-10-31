@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneAsGenHVACAfterZoneConfig.idf
+! 5ZoneAsGenHVACAfterZoneTwiceConfig.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
@@ -1776,37 +1776,6 @@
     0.0;                     !- Outdoor Air Flow per Zone {m3/s}
 
 Sizing:Zone,
-    SPACE3-1,                !- Zone or ZoneList Name
-    SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
-    14.,                     !- Zone Cooling Design Supply Air Temperature {C}
-    ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-    SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
-    50.,                     !- Zone Heating Design Supply Air Temperature {C}
-    ,                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-    0.009,                   !- Zone Cooling Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    0.004,                   !- Zone Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
-    SZ DSOA SPACE3-1,        !- Design Specification Outdoor Air Object Name
-    0.0,                     !- Zone Heating Sizing Factor
-    0.0,                     !- Zone Cooling Sizing Factor
-    DesignDayWithLimit,      !- Cooling Design Air Flow Method
-    ,                        !- Cooling Design Air Flow Rate {m3/s}
-    ,                        !- Cooling Minimum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Cooling Minimum Air Flow {m3/s}
-    ,                        !- Cooling Minimum Air Flow Fraction
-    DesignDay,               !- Heating Design Air Flow Method
-    ,                        !- Heating Design Air Flow Rate {m3/s}
-    ,                        !- Heating Maximum Air Flow per Zone Floor Area {m3/s-m2}
-    ,                        !- Heating Maximum Air Flow {m3/s}
-    ;                        !- Heating Maximum Air Flow Fraction
-
-  DesignSpecification:OutdoorAir,
-    SZ DSOA SPACE3-1,        !- Name
-    sum,                     !- Outdoor Air Method
-    0.00236,                 !- Outdoor Air Flow per Person {m3/s-person}
-    0.000305,                !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}
-    0.0;                     !- Outdoor Air Flow per Zone {m3/s}
-
-  Sizing:Zone,
     SPACE4-1,                !- Zone or ZoneList Name
     SupplyAirTemperature,    !- Zone Cooling Design Supply Air Temperature Input Method
     14.,                     !- Zone Cooling Design Supply Air Temperature {C}
@@ -2144,17 +2113,6 @@ Sizing:Zone,
     DualSetPoint;            !- Control 3 Name
 
   ZoneControl:Thermostat,
-    SPACE3-1 Control,        !- Name
-    SPACE3-1,                !- Zone or ZoneList Name
-    Zone Control Type Sched, !- Control Type Schedule Name
-    ThermostatSetpoint:SingleCooling,  !- Control 1 Object Type
-    CoolingSetPoint,         !- Control 1 Name
-    ThermostatSetpoint:SingleHeating,  !- Control 2 Object Type
-    HeatingSetpoint,         !- Control 2 Name
-    ThermostatSetpoint:DualSetpoint,  !- Control 3 Object Type
-    DualSetPoint;            !- Control 3 Name
-
-  ZoneControl:Thermostat,
     SPACE4-1 Control,        !- Name
     SPACE4-1,                !- Zone or ZoneList Name
     Zone Control Type Sched, !- Control Type Schedule Name
@@ -2213,8 +2171,8 @@ Sizing:Zone,
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
-    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
-    SPACE3-1 ATU,            !- Zone Equipment 1 Name
+    ZoneHVAC:AirLoopConnection,  !- Zone Equipment 1 Object Type
+    SPACE3-1,                !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1;                       !- Zone Equipment 1 Heating or No-Load Sequence
 
@@ -2237,12 +2195,6 @@ Sizing:Zone,
     SPACE1-1 In Node,        !- Air Distribution Unit Outlet Node Name
     AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
     SPACE1-1 VAV Reheat;     !- Air Terminal Name
-
-ZoneHVAC:AirDistributionUnit,
-    SPACE3-1 ATU,            !- Name
-    SPACE3-1 In Node,        !- Air Distribution Unit Outlet Node Name
-    AirTerminal:SingleDuct:VAV:Reheat,  !- Air Terminal Object Type
-    SPACE3-1 VAV Reheat;     !- Air Terminal Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE4-1 ATU,            !- Name
@@ -2271,26 +2223,6 @@ ZoneHVAC:AirDistributionUnit,
     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
     SPACE1-1 In Node,        !- Air Outlet Node Name
-    0.001,                   !- Convergence Tolerance
-    NORMAL,                  !- Damper Heating Action
-    AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
-    AUTOCALCULATE;           !- Maximum Flow Fraction During Reheat
-
-AirTerminal:SingleDuct:VAV:Reheat,
-    SPACE3-1 VAV Reheat,     !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
-    SPACE3-1 Zone Coil Air In Node,  !- Damper Air Outlet Node Name
-    SPACE3-1 ATU In Node,    !- Air Inlet Node Name
-    autosize,                !- Maximum Air Flow Rate {m3/s}
-    Constant,                !- Zone Minimum Air Flow Input Method
-    0.3,                     !- Constant Minimum Air Flow Fraction
-    ,                        !- Fixed Minimum Air Flow Rate {m3/s}
-    ,                        !- Minimum Air Flow Fraction Schedule Name
-    Coil:Heating:Water,      !- Reheat Coil Object Type
-    SPACE3-1 Zone Coil,      !- Reheat Coil Name
-    autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}
-    0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}
-    SPACE3-1 In Node,        !- Air Outlet Node Name
     0.001,                   !- Convergence Tolerance
     NORMAL,                  !- Damper Heating Action
     AUTOCALCULATE,           !- Maximum Flow per Zone Floor Area During Reheat {m3/s-m2}
@@ -2353,23 +2285,6 @@ AirTerminal:SingleDuct:VAV:Reheat,
     32.2,                    !- Rated Outlet Air Temperature {C}
     ;                        !- Rated Ratio for Air and Water Convection
 
-Coil:Heating:Water,
-    SPACE3-1 Zone Coil,      !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
-    autosize,                !- U-Factor Times Area Value {W/K}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
-    SPACE3-1 Zone Coil Water In Node,  !- Water Inlet Node Name
-    SPACE3-1 Zone Coil Water Out Node,  !- Water Outlet Node Name
-    SPACE3-1 Zone Coil Air In Node,  !- Air Inlet Node Name
-    SPACE3-1 In Node,        !- Air Outlet Node Name
-    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
-    82.2,                    !- Rated Inlet Water Temperature {C}
-    16.6,                    !- Rated Inlet Air Temperature {C}
-    71.1,                    !- Rated Outlet Water Temperature {C}
-    32.2,                    !- Rated Outlet Air Temperature {C}
-    ;                        !- Rated Ratio for Air and Water Convection
-
   Coil:Heating:Water,
     SPACE4-1 Zone Coil,      !- Name
     ReheatCoilAvailSched,    !- Availability Schedule Name
@@ -2407,10 +2322,12 @@ Coil:Heating:Water,
   AirLoopHVAC:ReturnPath,
     ReturnAirPath1,          !- Name
     PLENUM-1 Out Node,       !- Return Air Path Outlet Node Name
-    ZoneHVAC:AirLoopConnection, ! Ð Component 1 Object Type
+    ZoneHVAC:AirLoopConnection, !- Component 1 Object Type
     SPACE2-1,                !- Component 1 Object Name
-    AirLoopHVAC:ReturnPlenum,!- Component 2 Object Type
-    Return-Plenum-1;         !- Component 2 Name
+    ZoneHVAC:AirLoopConnection, !- Component 2 Object Type
+    SPACE3-1,                !- Component 2 Object Name
+    AirLoopHVAC:ReturnPlenum,!- Component 3 Object Type
+    Return-Plenum-1;         !- Component 4 Name
 
   ZoneHVAC:AirLoopConnection,
     SPACE2-1,                !- Name
@@ -2419,14 +2336,20 @@ Coil:Heating:Water,
     SPACE2-1 In Node,        !- Inlet Node Name
     SPACE2-1 Out Node;       !- Outlet Node Name
 
+  ZoneHVAC:AirLoopConnection,
+    SPACE3-1,                !- Name
+    SPACE2-1 Air Loop Out,   !- Air Loop Inlet Node
+    SPACE3-1 Air Loop Out,   !- Air Loop Outlet Noe
+    SPACE3-1 In Node,        !- Inlet Node Name
+    SPACE3-1 Out Node;       !- Outlet Node Name
+
   AirLoopHVAC:ReturnPlenum,
     Return-Plenum-1,         !- Name
     PLENUM-1,                !- Zone Name
     PLENUM-1 Node,           !- Zone Node Name
     PLENUM-1 Out Node,       !- Outlet Node Name
     ,                        !- Induced Air Outlet Node or NodeList Name
-    SPACE2-1 Air Loop Out,   !- Inlet 1 Node Name
-    SPACE3-1 Out Node,       !- Inlet 3 Node Name
+    SPACE3-1 Air Loop Out,   !- Inlet 3 Node Name
     SPACE4-1 Out Node,       !- Inlet 4 Node Name
     SPACE5-1 Out Node;       !- Inlet 5 Node Name
 
@@ -2440,7 +2363,6 @@ Coil:Heating:Water,
     Zone Supply Air Splitter 1,  !- Name
     Zone Eq In Node,         !- Inlet Node Name
     SPACE1-1 ATU In Node,    !- Outlet 1 Node Name
-    SPACE3-1 ATU In Node,    !- Outlet 3 Node Name
     SPACE4-1 ATU In Node,    !- Outlet 4 Node Name
     SPACE5-1 ATU In Node;    !- Outlet 5 Node Name
 
@@ -2809,7 +2731,6 @@ Coil:Heating:Water,
     Heating Demand Side Branches,  !- Name
     Heating Demand Inlet Branch,  !- Branch 1 Name
     SPACE1-1 Reheat Branch,  !- Branch 2 Name
-    SPACE3-1 Reheat Branch,  !- Branch 4 Name
     SPACE4-1 Reheat Branch,  !- Branch 5 Name
     SPACE5-1 Reheat Branch,  !- Branch 6 Name
     OA Heating Coil Branch,  !- Branch 7 Name
@@ -2862,16 +2783,6 @@ Coil:Heating:Water,
     SPACE1-1 Zone Coil,      !- Component 1 Name
     SPACE1-1 Zone Coil Water In Node,  !- Component 1 Inlet Node Name
     SPACE1-1 Zone Coil Water Out Node,  !- Component 1 Outlet Node Name
-    ACTIVE;                  !- Component 1 Branch Control Type
-
-  Branch,
-    SPACE3-1 Reheat Branch,  !- Name
-    0,                       !- Maximum Flow Rate {m3/s}
-    ,                        !- Pressure Drop Curve Name
-    Coil:Heating:Water,      !- Component 1 Object Type
-    SPACE3-1 Zone Coil,      !- Component 1 Name
-    SPACE3-1 Zone Coil Water In Node,  !- Component 1 Inlet Node Name
-    SPACE3-1 Zone Coil Water Out Node,  !- Component 1 Outlet Node Name
     ACTIVE;                  !- Component 1 Branch Control Type
 
   Branch,
@@ -2933,7 +2844,6 @@ Coil:Heating:Water,
     Heating Demand Splitter, !- Name
     Heating Demand Inlet Branch,  !- Inlet Branch Name
     SPACE1-1 Reheat Branch,  !- Outlet Branch 1 Name
-    SPACE3-1 Reheat Branch,  !- Outlet Branch 3 Name
     SPACE4-1 Reheat Branch,  !- Outlet Branch 4 Name
     SPACE5-1 Reheat Branch,  !- Outlet Branch 5 Name
     OA Heating Coil Branch,  !- Outlet Branch 6 Name
@@ -2944,7 +2854,6 @@ Coil:Heating:Water,
     Heating Demand Mixer,    !- Name
     Heating Demand Outlet Branch,  !- Outlet Branch Name
     SPACE1-1 Reheat Branch,  !- Inlet Branch 1 Name
-    SPACE3-1 Reheat Branch,  !- Inlet Branch 3 Name
     SPACE4-1 Reheat Branch,  !- Inlet Branch 4 Name
     SPACE5-1 Reheat Branch,  !- Inlet Branch 5 Name
     OA Heating Coil Branch,  !- Inlet Branch 6 Name

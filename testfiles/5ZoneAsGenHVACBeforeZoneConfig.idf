@@ -2098,7 +2098,7 @@ Sizing:Zone,
     SPACE1-1 In Node,        !- Zone Air Inlet Node or NodeList Name
                      ,       !- Zone Air Exhaust Node or NodeList Name
     SPACE1-1 Node,           !- Zone Air Node Name
-    SPACE2-1 Air Loop In;    !- Zone Return Air Node Name
+    SPACE1-1 Out Node;       !- Zone Return Air Node Name
 
   ZoneHVAC:EquipmentConnections,
     SPACE2-1,                !- Zone Name
@@ -2407,15 +2407,13 @@ Coil:Heating:Water,
   AirLoopHVAC:ReturnPath,
     ReturnAirPath1,          !- Name
     PLENUM-1 Out Node,       !- Return Air Path Outlet Node Name
-    ZoneHVAC:AirLoopConnection, ! Ð Component 1 Object Type
-    SPACE2-1,                !- Component 1 Object Name
-    AirLoopHVAC:ReturnPlenum,!- Component 2 Object Type
-    Return-Plenum-1;         !- Component 2 Name
+    AirLoopHVAC:ReturnPlenum,!- Component 1 Object Type
+    Return-Plenum-1;         !- Component 1 Name
 
   ZoneHVAC:AirLoopConnection,
     SPACE2-1,                !- Name
     SPACE2-1 Air Loop In,    !- Air Loop Inlet Node
-    SPACE2-1 Air Loop Out,   !- Air Loop Outlet Noe
+    SPACE1-1 ATU In Node,    !- Air Loop Outlet Node
     SPACE2-1 In Node,        !- Inlet Node Name
     SPACE2-1 Out Node;       !- Outlet Node Name
 
@@ -2425,7 +2423,7 @@ Coil:Heating:Water,
     PLENUM-1 Node,           !- Zone Node Name
     PLENUM-1 Out Node,       !- Outlet Node Name
     ,                        !- Induced Air Outlet Node or NodeList Name
-    SPACE2-1 Air Loop Out,   !- Inlet 1 Node Name
+    SPACE1-1 Out Node,       !- Inlet 1 Node Name
     SPACE3-1 Out Node,       !- Inlet 3 Node Name
     SPACE4-1 Out Node,       !- Inlet 4 Node Name
     SPACE5-1 Out Node;       !- Inlet 5 Node Name
@@ -2433,13 +2431,15 @@ Coil:Heating:Water,
   AirLoopHVAC:SupplyPath,
     Zone Supply Air Path 1,  !- Name
     Zone Eq In Node,         !- Supply Air Path Inlet Node Name
-    AirLoopHVAC:ZoneSplitter,!- Component 1 Object Type
-    Zone Supply Air Splitter 1;  !- Component 1 Name
+    AirLoopHVAC:ZoneSplitter, !- Component 1 Object Type
+    Zone Supply Air Splitter 1,  !- Component 1 Name
+    ZoneHVAC:AirLoopConnection, !- Component 2 Object Type
+    SPACE2-1;
 
   AirLoopHVAC:ZoneSplitter,
     Zone Supply Air Splitter 1,  !- Name
     Zone Eq In Node,         !- Inlet Node Name
-    SPACE1-1 ATU In Node,    !- Outlet 1 Node Name
+    SPACE2-1 Air Loop In,    !- Outlet 1 Node Name
     SPACE3-1 ATU In Node,    !- Outlet 3 Node Name
     SPACE4-1 ATU In Node,    !- Outlet 4 Node Name
     SPACE5-1 ATU In Node;    !- Outlet 5 Node Name
