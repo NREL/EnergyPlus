@@ -493,7 +493,7 @@ namespace AirLoopConnection {
 			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).MassFlowRateMinAvail = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).MassFlowRateMinAvail;
 			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).HumRat = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).HumRat;
 			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Enthalpy = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Enthalpy;
-			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Quality = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Temp;
+			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Quality = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Quality;
 			Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).Press = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).Press;
 			if ( Contaminant.CO2Simulation ) {
 				Node( AirLoopCon( CompIndex ).AirLoopOutletNodeNum ).CO2 = Node( AirLoopCon( CompIndex ).ZoneOutletNodeNum ).CO2;
