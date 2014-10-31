@@ -1994,12 +1994,16 @@ Site:GroundDomain:Basement,
         \units m
         \minimum> 0.0
         \note Depth measured from the ground surface.
-   A11; \field Simulation Timestep
+   A11, \field Simulation Timestep
         \type choice
         \key Timestep
         \key Hourly
         \default Hourly
         \note This field specifies the basement domain simulation interval.
+   N16; \field Mesh Density Parameter
+        \type integer
+        \default 3
+        \minimum 2
 
 Site:GroundReflectance,
         \memo Specifies the ground reflectance values used to calculate ground reflected solar.

@@ -572,7 +572,8 @@ GlobalGeometryRules,
     Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.3,                     !- Vertical insulation depth from surface (m)
-    Hourly;                  !- Domain Update interval. (Timestep, Hourly);
+    Hourly,                  !- Domain Update interval (Timestep, Hourly)
+    3;                       !- Mesh Density Parameter
 
 !***********************************************************
 !****** OUTPUT CONTROLS ************************************
