@@ -280,23 +280,16 @@ namespace SteamCoils {
 		NumSteamCoils = NumStmHeat;
 		if ( NumSteamCoils > 0 ) {
 			SteamCoil.allocate( NumSteamCoils );
-			CheckEquipName.allocate( NumSteamCoils );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumSteamCoils, true );
 		}
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		NumArray.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		// Get the data for steam heating coils
 		for ( StmHeatNum = 1; StmHeatNum <= NumStmHeat; ++StmHeatNum ) {

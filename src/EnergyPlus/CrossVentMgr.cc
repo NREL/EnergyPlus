@@ -186,8 +186,7 @@ namespace CrossVentMgr {
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.allocate( NumOfZones );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumOfZones, true );
 			MyOneTimeFlag = false;
 		}
 

@@ -161,7 +161,6 @@ namespace OutAirNodeManager {
 		int CurSize;
 		int NextFluidStreamNum; // Fluid stream index (all outside air inlet nodes need a unique fluid stream number)
 		FArray1D_int TmpNums;
-		FArray1D_int TmpNums1;
 		std::string CurrentModuleObject; // Object type for getting and error messages
 		FArray1D_string Alphas; // Alpha input items for object
 		FArray1D_string cAlphaFields; // Alpha field names
@@ -181,12 +180,10 @@ namespace OutAirNodeManager {
 
 		ListSize = 0;
 		CurSize = 100;
-		TmpNums.allocate( CurSize );
-		TmpNums = 0;
+		TmpNums.dimension( CurSize, 0 );
 
 		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-		NodeNums.allocate( NumParams );
-		NodeNums = 0;
+		NodeNums.dimension( NumParams, 0 );
 
 		GetObjectDefMaxArgs( "OutdoorAir:NodeList", TotalArgs, NumAlphas, NumNums );
 		MaxNums = max( MaxNums, NumNums );
@@ -196,17 +193,11 @@ namespace OutAirNodeManager {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		if ( NumOutAirInletNodeLists > 0 ) {
 			// Loop over all outside air inlet nodes in the input and count them
@@ -230,14 +221,7 @@ namespace OutAirNodeManager {
 						if ( ! any_eq( TmpNums, NodeNums( NodeNum ) ) ) {
 							++ListSize;
 							if ( ListSize > CurSize ) {
-								TmpNums1.allocate( CurSize + 100 );
-								TmpNums1( {1,CurSize} ) = TmpNums( {1,CurSize} );
-								TmpNums1( {CurSize + 1,CurSize + 100} ) = 0;
-								TmpNums.deallocate();
-								CurSize += 100;
-								TmpNums.allocate( CurSize );
-								TmpNums = TmpNums1;
-								TmpNums1.deallocate();
+								TmpNums.redimension( CurSize += 100, 0 );
 							}
 							TmpNums( ListSize ) = NodeNums( NodeNum );
 						}
@@ -277,14 +261,7 @@ namespace OutAirNodeManager {
 				if ( ! any_eq( TmpNums, NodeNums( 1 ) ) ) {
 					++ListSize;
 					if ( ListSize > CurSize ) {
-						TmpNums1.allocate( CurSize + 100 );
-						TmpNums1( {1,CurSize} ) = TmpNums( {1,CurSize} );
-						TmpNums1( {CurSize + 1,CurSize + 100} ) = 0;
-						TmpNums.deallocate();
-						CurSize += 100;
-						TmpNums.allocate( CurSize );
-						TmpNums = TmpNums1;
-						TmpNums1.deallocate();
+						TmpNums.redimension( CurSize += 100, 0 );
 					}
 					TmpNums( ListSize ) = NodeNums( 1 );
 				} else { // Duplicates are a problem
@@ -306,18 +283,8 @@ namespace OutAirNodeManager {
 
 		if ( ListSize > 0 ) {
 			NumOutsideAirNodes = ListSize;
-			OutsideAirNodeList.allocate( ListSize );
 			OutsideAirNodeList = TmpNums( {1,ListSize} );
 		}
-		TmpNums.deallocate();
-
-		Alphas.deallocate();
-		cAlphaFields.deallocate();
-		cNumericFields.deallocate();
-		Numbers.deallocate();
-		lAlphaBlanks.deallocate();
-		lNumericBlanks.deallocate();
-
 	}
 
 	void
@@ -510,22 +477,12 @@ namespace OutAirNodeManager {
 		}
 
 		if ( NodeNumber > 0 ) {
-			if ( ! Okay ) {
-				// Add new outside air node to list
-				TmpNums.allocate( NumOutsideAirNodes + 1 );
-				if ( NumOutsideAirNodes > 0 ) {
-					TmpNums( {1,NumOutsideAirNodes} ) = OutsideAirNodeList;
-					OutsideAirNodeList.deallocate();
-				} else {
-					TmpNums( {1,1} ) = NodeNumber;
-				}
-				++NumOutsideAirNodes;
-				OutsideAirNodeList.allocate( NumOutsideAirNodes );
-				OutsideAirNodeList = TmpNums;
+			if ( ! Okay ) { // Add new outside air node to list
+				OutsideAirNodeList.redimension( ++NumOutsideAirNodes );
 				OutsideAirNodeList( NumOutsideAirNodes ) = NodeNumber;
+				TmpNums = OutsideAirNodeList;
 				//register new node..
 				GetNodeNums( NodeID( NodeNumber ), DummyNumber, TmpNums, errFlag, NodeType_Air, "OutdoorAir:Node", "OutdoorAir:Node", NodeConnectionType_OutsideAir, NumOutsideAirNodes, ObjectIsNotParent, IncrementFluidStreamYes );
-				TmpNums.deallocate();
 				if ( Node( NodeNumber ).Height < 0.0 ) {
 					Node( NodeNumber ).OutAirDryBulb = OutDryBulbTemp;
 					Node( NodeNumber ).OutAirWetBulb = OutWetBulbTemp;

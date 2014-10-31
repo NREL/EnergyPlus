@@ -122,7 +122,7 @@ namespace WindowAC {
 
 	// Object Data
 	FArray1D< WindACData > WindAC;
-	FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name 
+	FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
 
 	// Functions
 
@@ -331,24 +331,17 @@ namespace WindowAC {
 		NumWindAC = NumWindACCyc;
 		// allocate the data structures
 		WindAC.allocate( NumWindAC );
-		CheckEquipName.allocate( NumWindAC );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumWindAC, true );
 		WindACNumericFields.allocate( NumWindAC );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// loop over window AC units; get and load the input data
 		for ( WindACIndex = 1; WindACIndex <= NumWindACCyc; ++WindACIndex ) {
@@ -966,7 +959,7 @@ namespace WindowAC {
 				}
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 				// N1 , \field Maximum Supply Air Flow Rate
 				SizingMethod = SystemAirflowSizing;
 				FieldNum = 1;

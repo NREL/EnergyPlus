@@ -357,17 +357,11 @@ namespace VentilatedSlab {
 		SteamMessageNeeded = true;
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// make sure data is gotten for surface lists
 		BaseNum = GetNumberOfSurfListVentSlab();
@@ -376,8 +370,7 @@ namespace VentilatedSlab {
 		// Allocate the local derived type and do one-time initializations for all parts of it
 
 		VentSlab.allocate( NumOfVentSlabs );
-		CheckEquipName.allocate( NumOfVentSlabs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumOfVentSlabs, true );
 		VentSlabNumericFields.allocate( NumOfVentSlabs );
 
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) { // Begin looping over the entire ventilated slab systems found in the input file...
@@ -1156,16 +1149,11 @@ namespace VentilatedSlab {
 			MySizeFlag.allocate( NumOfVentSlabs );
 			MyPlantScanFlag.allocate( NumOfVentSlabs );
 			MyZoneEqFlag.allocate ( NumOfVentSlabs );
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QRadSysSrcAvg.allocate( TotSurfaces );
-			QRadSysSrcAvg = 0.0;
-			LastQRadSysSrc.allocate( TotSurfaces );
-			LastQRadSysSrc = 0.0;
-			LastSysTimeElapsed.allocate( TotSurfaces );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( TotSurfaces );
-			LastTimeStepSys = 0.0;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QRadSysSrcAvg.dimension( TotSurfaces, 0.0 );
+			LastQRadSysSrc.dimension( TotSurfaces, 0.0 );
+			LastSysTimeElapsed.dimension( TotSurfaces, 0.0 );
+			LastTimeStepSys.dimension( TotSurfaces, 0.0 );
 
 			// Initialize total areas for all radiant systems
 			for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
@@ -1605,7 +1593,7 @@ namespace VentilatedSlab {
 			VentSlab( Item ).MaxAirVolFlow = max( CoolingAirVolFlowScalable, HeatingAirVolFlowScalable );
 		} else {
 			// no scalble sizing method has been specified. Sizing proceeds using the method
-			// specified in the zoneHVAC object 
+			// specified in the zoneHVAC object
 			// N1 , \field Maximum Supply Air Flow Rate
 			SizingMethod = SystemAirflowSizing;
 			FieldNum = 1;

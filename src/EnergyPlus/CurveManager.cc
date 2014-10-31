@@ -145,8 +145,7 @@ namespace CurveManager {
 	int const CurveType_QuadLinear( 21 );
 	int const CurveType_CubicLinear( 22 );
 
-	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear",
-		"Curve:CubicLinear" } );
+	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear", "Curve:CubicLinear" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -1811,7 +1810,6 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 				if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) || ( SELECT_CASE_var == Exponent ) ) {
-					TempArray1.allocate( size( PerfCurveTableData( TableNum ).X1 ) );
 					TempArray1 = PerfCurveTableData( TableNum ).X1;
 					TempArray2.allocate( size( PerfCurveTableData( TableNum ).Y ) );
 					for ( VarIndex = 1; VarIndex <= isize( PerfCurveTableData( TableNum ).Y ); ++VarIndex ) {
@@ -2057,9 +2055,7 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 				if ( ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-					TempArray1.allocate( size( TableData( TableNum ).X1 ) );
 					TempArray1 = TableData( TableNum ).X1;
-					TempArray3.allocate( size( TableData( TableNum ).X2 ) );
 					TempArray3 = TableData( TableNum ).X2;
 					TempArray2.allocate( size( TableData( TableNum ).Y ) );
 					for ( VarIndex = 1; VarIndex <= isize( TableData( TableNum ).Y ); ++VarIndex ) {
@@ -4255,8 +4251,7 @@ Label999: ;
 			return;
 		}
 
-		Results.allocate( MatrixSize );
-		Results = 0.0;
+		Results.dimension( MatrixSize, 0.0 );
 		A.allocate( MatrixSize, MatrixSize );
 		//   ' Sum data
 		N = 0;
@@ -5640,7 +5635,7 @@ Label999: ;
 
 	//     NOTICE
 
-	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

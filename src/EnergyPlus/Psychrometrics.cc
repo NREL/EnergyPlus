@@ -1334,11 +1334,12 @@ Label170: ;
 			Real64 X1; // Previous value of independent variable in ITERATE
 			Real64 Y1; // Previous value of dependent variable in ITERATE
 			Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
+			bool const CalledFrom_empty( CalledFrom.empty() );
 			int icvg; // Iteration convergence flag
 			for ( iter = 1; iter <= itmax; ++iter ) {
 
 				// Calculate saturation pressure for estimated boiling temperature
-				pSat = PsyPsatFnTemp( tSat, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
+				pSat = PsyPsatFnTemp( tSat, ( CalledFrom_empty ? RoutineName : CalledFrom ) );
 
 				// Compare with specified pressure and update estimate of temperature
 				error = Press - pSat;

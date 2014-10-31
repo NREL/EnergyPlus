@@ -326,8 +326,7 @@ namespace ChillerExhaustAbsorption {
 		ExhaustAbsorber.allocate( NumExhaustAbsorbers );
 
 		ExhaustAbsorberReport.allocate( NumExhaustAbsorbers );
-		CheckEquipName.allocate( NumExhaustAbsorbers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumExhaustAbsorbers, true );
 
 		//LOAD ARRAYS
 
@@ -580,8 +579,7 @@ namespace ChillerExhaustAbsorption {
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
 			MyPlantScanFlag.allocate( NumExhaustAbsorbers );
-			MyEnvrnFlag.allocate( NumExhaustAbsorbers );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumExhaustAbsorbers, true );
 			MyOneTimeFlag = false;
 			MyPlantScanFlag = true;
 		}

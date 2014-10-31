@@ -256,8 +256,7 @@ namespace InternalHeatGains {
 		ZoneIntEEuse.allocate( NumOfZones );
 		RefrigCaseCredit.allocate( NumOfZones );
 
-		RepVarSet.allocate( NumOfZones );
-		RepVarSet = true;
+		RepVarSet.dimension( NumOfZones, true );
 
 		// Determine argument length of objects gotten by this routine
 		MaxAlpha = -100;

@@ -809,17 +809,11 @@ namespace OutputReportPredefined {
 
 	// Object Data
 	extern FArray1D< reportNameType > reportName;
-	extern FArray1D< reportNameType > reportNameCopy;
 	extern FArray1D< SubTableType > subTable;
-	extern FArray1D< SubTableType > subTableCopy;
 	extern FArray1D< ColumnTagType > columnTag;
-	extern FArray1D< ColumnTagType > columnTagCopy;
 	extern FArray1D< TableEntryType > tableEntry;
-	extern FArray1D< TableEntryType > tableEntryCopy;
 	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntryCopy;
 	extern FArray1D< ShadowRelateType > ShadowRelate;
-	extern FArray1D< ShadowRelateType > ShadowRelateCopy;
 
 	// Functions
 

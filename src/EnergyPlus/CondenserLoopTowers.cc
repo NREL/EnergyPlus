@@ -449,8 +449,7 @@ namespace CondenserLoopTowers {
 		SimpleTower.allocate( NumSimpleTowers );
 		SimpleTowerReport.allocate( NumSimpleTowers );
 		SimpleTowerInlet.allocate( NumSimpleTowers );
-		CheckEquipName.allocate( NumSimpleTowers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSimpleTowers, true );
 		// Allocate variable-speed tower structure with data specific to this type
 		if ( NumVariableSpeedTowers > 0 ) {
 			VSTower.allocate( NumVariableSpeedTowers );

@@ -189,7 +189,7 @@ namespace HVACVariableRefrigerantFlow {
 	FArray1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
 	FArray1D< VRFTerminalUnitEquipment > VRFTU; // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
 	FArray1D< TerminalUnitListData > TerminalUnitList; // zoneTerminalUnitList object
-	FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name 
+	FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Utility routines for module
 	// na
@@ -1277,23 +1277,16 @@ namespace HVACVariableRefrigerantFlow {
 			MaxNumbers = max( MaxNumbers, NumNums );
 		}
 		cAlphaArgs.allocate( MaxAlphas );
-		cAlphaArgs = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = "";
-		lAlphaFieldBlanks.allocate( MaxAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxAlphas, false );
 		cNumericFieldNames.allocate( MaxNumbers );
-		cNumericFieldNames = "";
-		lNumericFieldBlanks.allocate( MaxNumbers );
-		lNumericFieldBlanks = false;
-		rNumericArgs.allocate( MaxNumbers );
-		rNumericArgs = 0.0;
+		lNumericFieldBlanks.dimension( MaxNumbers, false );
+		rNumericArgs.dimension( MaxNumbers, 0.0 );
 
 		NumVRFTU = NumVRFCTU;
 		if ( NumVRFTU > 0 ) {
 			VRFTU.allocate( NumVRFTU );
-			CheckEquipName.allocate( NumVRFTU );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumVRFTU, true );
 			VRFTUNumericFields.allocate( NumVRFTU );
 		}
 
@@ -2091,7 +2084,6 @@ namespace HVACVariableRefrigerantFlow {
 			GetObjectItem( cCurrentModuleObject, VRFTUNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			VRFTUNumericFields( VRFTUNum ).FieldNames.allocate(NumNums);
-			VRFTUNumericFields( VRFTUNum ).FieldNames = "";
 			VRFTUNumericFields( VRFTUNum ).FieldNames = cNumericFieldNames;
 
 			IsNotOK = false;
@@ -3782,7 +3774,7 @@ namespace HVACVariableRefrigerantFlow {
 		//       AUTHOR         Richard Raustad, FSEC
 		//       DATE WRITTEN   August 2010
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
-		//                      B Nigusse, FSEC, added scalable sizing 
+		//                      B Nigusse, FSEC, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -3904,7 +3896,7 @@ namespace HVACVariableRefrigerantFlow {
 		EvapCondAirVolFlowRateUser = 0.0;
 		EvapCondPumpPowerDes = 0.0;
 		EvapCondPumpPowerUser = 0.0;
-		
+
 		DataScalableSizingON = false;
 		DataScalableCapSizingON = false;
 		DataFracOfAutosizedCoolingAirflow = 1.0;
@@ -3914,8 +3906,7 @@ namespace HVACVariableRefrigerantFlow {
 
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			CheckVRFCombinationRatio.allocate( NumVRFCond );
-			CheckVRFCombinationRatio = true;
+			CheckVRFCombinationRatio.dimension( NumVRFCond, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -4129,7 +4120,7 @@ namespace HVACVariableRefrigerantFlow {
 				}
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 
 				PrintFlag = true;
 
@@ -5974,13 +5965,9 @@ namespace HVACVariableRefrigerantFlow {
 		int MinOutputIndex; // index to TU with lowest load
 		Real64 MinOutput; // used when finding TU "max" capacity limit
 		Real64 RemainingCapacity; // decrement capacity counter to find limiting TU capacity [W]
-		FArray1D< Real64 > Temp; // temporarary array for processing terminal units
-		FArray1D< Real64 > Temp2; // temporarary array for processing terminal units
+		FArray1D< Real64 > Temp( NumTUInList, CapArray ); // temporary array for processing terminal units
+		FArray1D< Real64 > Temp2( NumTUInList, Temp ); // temporary array for processing terminal units
 
-		Temp.allocate( NumTUInList );
-		Temp2.allocate( NumTUInList );
-		Temp = CapArray;
-		Temp2 = Temp;
 		RemainingCapacity = TotalCapacity;
 
 		// sort TU capacity from lowest to highest
@@ -6008,9 +5995,6 @@ namespace HVACVariableRefrigerantFlow {
 				break;
 			}
 		}
-
-		Temp.deallocate();
-		Temp2.deallocate();
 
 	}
 

@@ -257,8 +257,7 @@ namespace MicroCHPElectricGenerator {
 			}
 
 			MicroCHPParamInput.allocate( NumMicroCHPParams );
-			CheckEquipName.allocate( NumMicroCHPParams );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumMicroCHPParams, true );
 
 			for ( CHPParamNum = 1; CHPParamNum <= NumMicroCHPParams; ++CHPParamNum ) {
 				GetObjectItem( cCurrentModuleObject, CHPParamNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );

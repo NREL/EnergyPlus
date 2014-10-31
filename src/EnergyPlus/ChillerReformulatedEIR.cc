@@ -934,8 +934,7 @@ namespace ChillerReformulatedEIR {
 		static gio::Fmt const Format_531( "('Curve Output  = ',11(F7.2))" );
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumElecReformEIRChillers );
-			MyFlag = true;
+			MyFlag.dimension( NumElecReformEIRChillers, true );
 			MyOneTimeFlag = false;
 		}
 

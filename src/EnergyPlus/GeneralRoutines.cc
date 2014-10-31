@@ -107,7 +107,6 @@ ControlCompOutput(
 	using BaseboardRadiator::SimHWConvective;
 	using Psychrometrics::PsyCpAirFnWTdb;
 	using VentilatedSlab::CalcVentilatedSlabComps;
-	using InputProcessor::MakeUPPERCase;
 	using General::TrimSigDigits;
 	using General::RoundSigDigits;
 	using SteamBaseboardRadiator::CalcSteamBaseboard;
@@ -1010,18 +1009,12 @@ CalcPassiveExteriorBaffleGap(
 
 	//loop through underlying surfaces and collect needed data
 	NumSurfs = size( SurfPtrARR );
-	HSkyARR.allocate( NumSurfs );
-	HSkyARR = 0.0;
-	HGroundARR.allocate( NumSurfs );
-	HGroundARR = 0.0;
-	HAirARR.allocate( NumSurfs );
-	HAirARR = 0.0;
-	LocalWindArr.allocate( NumSurfs );
-	LocalWindArr = 0.0;
-	HPlenARR.allocate( NumSurfs );
-	HPlenARR = 0.0;
-	HExtARR.allocate( NumSurfs );
-	HExtARR = 0.0;
+	HSkyARR.dimension( NumSurfs, 0.0 );
+	HGroundARR.dimension( NumSurfs, 0.0 );
+	HAirARR.dimension( NumSurfs, 0.0 );
+	LocalWindArr.dimension( NumSurfs, 0.0 );
+	HPlenARR.dimension( NumSurfs, 0.0 );
+	HExtARR.dimension( NumSurfs, 0.0 );
 
 	for ( ThisSurf = 1; ThisSurf <= NumSurfs; ++ThisSurf ) {
 		SurfPtr = SurfPtrARR( ThisSurf );
@@ -1601,12 +1594,9 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 
 	// now the reverse.  is every zone splitter and supply plenum on supply air path
-	FoundSupplyPlenum.allocate( NumZoneSupplyPlenums );
-	FoundSupplyPlenum = false;
-	FoundZoneSplitter.allocate( NumSplitters );
-	FoundZoneSplitter = false;
+	FoundSupplyPlenum.dimension( NumZoneSupplyPlenums, false );
+	FoundZoneSplitter.dimension( NumSplitters, false );
 	FoundNames.allocate( NumZoneSupplyPlenums );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumZoneSupplyPlenums; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumSupplyAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= SupplyAirPath( BCount ).NumOfComponents; ++Count ) {
@@ -1625,7 +1615,6 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	}
 	FoundNames.deallocate();
 	FoundNames.allocate( NumSplitters );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumSplitters; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumSupplyAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= SupplyAirPath( BCount ).NumOfComponents; ++Count ) {
@@ -1983,12 +1972,9 @@ TestReturnAirPathIntegrity(
 	}
 
 	// now the reverse.  is every zone Mixer and Return plenum on Return air path
-	FoundReturnPlenum.allocate( NumZoneReturnPlenums );
-	FoundReturnPlenum = false;
-	FoundZoneMixer.allocate( NumMixers );
-	FoundZoneMixer = false;
+	FoundReturnPlenum.dimension( NumZoneReturnPlenums, false );
+	FoundZoneMixer.dimension( NumMixers, false );
 	FoundNames.allocate( NumZoneReturnPlenums );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumZoneReturnPlenums; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumReturnAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= ReturnAirPath( BCount ).NumOfComponents; ++Count ) {
@@ -2007,7 +1993,6 @@ TestReturnAirPathIntegrity(
 	}
 	FoundNames.deallocate();
 	FoundNames.allocate( NumMixers );
-	FoundNames = "";
 	for ( Count1 = 1; Count1 <= NumMixers; ++Count1 ) {
 		for ( BCount = 1; BCount <= NumReturnAirPaths; ++BCount ) {
 			for ( Count = 1; Count <= ReturnAirPath( BCount ).NumOfComponents; ++Count ) {

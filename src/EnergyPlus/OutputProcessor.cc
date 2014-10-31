@@ -140,7 +140,6 @@ namespace OutputProcessor {
 	int InstMeterCacheSize( 1000 ); // the maximum size of the instant meter cache used in GetInstantMeterValue
 	int InstMeterCacheSizeInc( 1000 ); // the increment for the instant meter cache used in GetInstantMeterValue
 	FArray1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
-	FArray1D_int InstMeterCacheCopy; // for dynamic array resizing
 	int InstMeterCacheLastUsed( 0 ); // the last item in the instant meter cache used
 
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -581,14 +580,7 @@ namespace OutputProcessor {
 			if ( ! Dup ) {
 				++NumExtraVars;
 				if ( NumExtraVars == NumReportList ) {
-					TmpReportList.allocate( NumReportList );
-					TmpReportList = 0;
-					TmpReportList( {1,NumReportList} ) = ReportList;
-					ReportList.deallocate();
-					NumReportList += 100;
-					ReportList.allocate( NumReportList );
-					ReportList = TmpReportList;
-					TmpReportList.deallocate();
+					ReportList.redimension( NumReportList += 100, 0 );
 				}
 				ReportList( NumExtraVars ) = Loop;
 			}
@@ -665,14 +657,7 @@ namespace OutputProcessor {
 			if ( ! Dup ) {
 				++NumExtraVars;
 				if ( NumExtraVars == NumReportList ) {
-					TmpReportList.allocate( NumReportList );
-					TmpReportList = 0;
-					TmpReportList( {1,NumReportList} ) = ReportList;
-					ReportList.deallocate();
-					NumReportList += 100;
-					ReportList.allocate( NumReportList );
-					ReportList = TmpReportList;
-					TmpReportList.deallocate();
+					ReportList.redimension( NumReportList += 100, 0 );
 				}
 				ReportList( NumExtraVars ) = Loop;
 			}
@@ -1036,173 +1021,6 @@ namespace OutputProcessor {
 		}}
 
 		String = StrOut;
-
-	}
-
-	void
-	ReallocateIntegerArray(
-		FArray1D_int & Array,
-		int & ArrayMax, // Current and resultant dimension for Array
-		int const ArrayInc // increment for redimension
-	)
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   March 2008
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine reallocates (preserving data) an Integer array
-		// for the output processor.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Argument array dimensioning
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_int NewArray;
-
-		NewArray.allocate( ArrayMax + ArrayInc );
-		NewArray = 0;
-
-		if ( ArrayMax > 0 ) {
-			NewArray( {1,ArrayMax} ) = Array( {1,ArrayMax} );
-		}
-		Array.deallocate();
-		ArrayMax += ArrayInc;
-		Array.allocate( ArrayMax );
-		Array = NewArray;
-		NewArray.deallocate();
-
-	}
-
-	void
-	ReallocateRVar()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   December 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine reallocates (preserving data) the Real Variable
-		// structure for the output processor.
-
-		// METHODOLOGY EMPLOYED:
-		// Using the current value of MaxRVariable, this routine allocates
-		// the new dimension for the arrays xxx, xxxx, and RealVariables structure.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
-		FArray1D< RealVariableType > Types;
-
-		Types.allocate( MaxRVariable + RVarAllocInc );
-
-		if ( MaxRVariable > 0 ) {
-			Types( {1,MaxRVariable} ) = RVariableTypes( {1,MaxRVariable} );
-		}
-		RVariableTypes.deallocate();
-		MaxRVariable += RVarAllocInc;
-		RVariableTypes.allocate( MaxRVariable );
-		RVariableTypes = Types;
-		Types.deallocate();
-
-	}
-
-	void
-	ReallocateIVar()
-	{
-
-		// SUBROUTINE INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   December 1998
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine performs a "reallocate" on the Integer Report
-		// Variable structure.
-
-		// METHODOLOGY EMPLOYED:
-		// na
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Locals
-		// SUBROUTINE ARGUMENT DEFINITIONS:
-		// na
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
-		// Object Data
-		FArray1D< IntegerVariableType > Types;
-
-		Types.allocate( MaxIVariable + IVarAllocInc );
-
-		if ( MaxIVariable > 0 ) {
-			Types( {1,MaxIVariable} ) = IVariableTypes( {1,MaxIVariable} );
-		}
-		IVariableTypes.deallocate();
-		MaxIVariable += IVarAllocInc;
-		IVariableTypes.allocate( MaxIVariable );
-		IVariableTypes = Types;
-		Types.deallocate();
 
 	}
 
@@ -1703,11 +1521,9 @@ namespace OutputProcessor {
 		int iKey1;
 		bool MeterCreated;
 		FArray1D_int VarsOnCustomMeter;
-		FArray1D_int TempVarsOnCustomMeter;
 		int MaxVarsOnCustomMeter;
 		int NumVarsOnCustomMeter;
 		FArray1D_int VarsOnSourceMeter;
-		FArray1D_int TempVarsOnSourceMeter;
 		int MaxVarsOnSourceMeter;
 		int NumVarsOnSourceMeter;
 		int iOnMeter;
@@ -1799,14 +1615,7 @@ namespace OutputProcessor {
 						for ( iKey = 1; iKey <= KeyCount; ++iKey ) {
 							++NumVarsOnCustomMeter;
 							if ( NumVarsOnCustomMeter > MaxVarsOnCustomMeter ) {
-								MaxVarsOnCustomMeter += 100;
-								TempVarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								TempVarsOnCustomMeter( {1,MaxVarsOnCustomMeter - 100} ) = VarsOnCustomMeter;
-								TempVarsOnCustomMeter( {MaxVarsOnCustomMeter - 100 + 1,MaxVarsOnCustomMeter} ) = 0;
-								VarsOnCustomMeter.deallocate();
-								VarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								VarsOnCustomMeter = TempVarsOnCustomMeter;
-								TempVarsOnCustomMeter.deallocate();
+								VarsOnCustomMeter.redimension( MaxVarsOnCustomMeter += 100, 0 );
 							}
 							VarsOnCustomMeter( NumVarsOnCustomMeter ) = IndexesForKeyVar( iKey );
 							iOnMeter = 1;
@@ -1820,14 +1629,7 @@ namespace OutputProcessor {
 							if ( NamesOfKeys( iKey ) != cAlphaArgs( fldIndex ) ) continue;
 							++NumVarsOnCustomMeter;
 							if ( NumVarsOnCustomMeter > MaxVarsOnCustomMeter ) {
-								MaxVarsOnCustomMeter += 100;
-								TempVarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								TempVarsOnCustomMeter( {1,MaxVarsOnCustomMeter - 100} ) = VarsOnCustomMeter;
-								TempVarsOnCustomMeter( {MaxVarsOnCustomMeter - 100 + 1,MaxVarsOnCustomMeter} ) = 0;
-								VarsOnCustomMeter.deallocate();
-								VarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								VarsOnCustomMeter = TempVarsOnCustomMeter;
-								TempVarsOnCustomMeter.deallocate();
+								VarsOnCustomMeter.redimension( MaxVarsOnCustomMeter += 100, 0 );
 							}
 							VarsOnCustomMeter( NumVarsOnCustomMeter ) = IndexesForKeyVar( iKey );
 							iOnMeter = 1;
@@ -1853,14 +1655,7 @@ namespace OutputProcessor {
 						if ( ! any_eq( VarMeterArrays( iOnMeter ).OnMeters, WhichMeter ) ) continue;
 						++NumVarsOnCustomMeter;
 						if ( NumVarsOnCustomMeter > MaxVarsOnCustomMeter ) {
-							MaxVarsOnCustomMeter += 100;
-							TempVarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-							TempVarsOnCustomMeter( {1,MaxVarsOnCustomMeter - 100} ) = VarsOnCustomMeter;
-							TempVarsOnCustomMeter( {MaxVarsOnCustomMeter - 100 + 1,MaxVarsOnCustomMeter} ) = 0;
-							VarsOnCustomMeter.deallocate();
-							VarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-							VarsOnCustomMeter = TempVarsOnCustomMeter;
-							TempVarsOnCustomMeter.deallocate();
+							VarsOnCustomMeter.redimension( MaxVarsOnCustomMeter += 100, 0 );
 						}
 						VarsOnCustomMeter( NumVarsOnCustomMeter ) = VarMeterArrays( iOnMeter ).RepVariable;
 					}
@@ -1936,14 +1731,7 @@ namespace OutputProcessor {
 				if ( any_eq( VarMeterArrays( iKey ).OnMeters, WhichMeter ) ) {
 					++NumVarsOnSourceMeter;
 					if ( NumVarsOnSourceMeter > MaxVarsOnSourceMeter ) {
-						MaxVarsOnSourceMeter += 100;
-						TempVarsOnSourceMeter.allocate( MaxVarsOnSourceMeter );
-						TempVarsOnSourceMeter( {1,MaxVarsOnSourceMeter - 100} ) = VarsOnSourceMeter;
-						TempVarsOnSourceMeter( {MaxVarsOnSourceMeter - 100 + 1,MaxVarsOnSourceMeter} ) = 0;
-						VarsOnSourceMeter.deallocate();
-						VarsOnSourceMeter.allocate( MaxVarsOnSourceMeter );
-						VarsOnSourceMeter = TempVarsOnSourceMeter;
-						TempVarsOnSourceMeter.deallocate();
+						VarsOnSourceMeter.redimension( MaxVarsOnSourceMeter += 100, 0 );
 					}
 					VarsOnSourceMeter( NumVarsOnSourceMeter ) = VarMeterArrays( iKey ).RepVariable;
 					continue;
@@ -1952,14 +1740,7 @@ namespace OutputProcessor {
 				if ( any_eq( VarMeterArrays( iKey ).OnCustomMeters, WhichMeter ) ) {
 					++NumVarsOnSourceMeter;
 					if ( NumVarsOnSourceMeter > MaxVarsOnSourceMeter ) {
-						MaxVarsOnSourceMeter += 100;
-						TempVarsOnSourceMeter.allocate( MaxVarsOnSourceMeter );
-						TempVarsOnSourceMeter( {1,MaxVarsOnSourceMeter - 100} ) = VarsOnSourceMeter;
-						TempVarsOnSourceMeter( {MaxVarsOnSourceMeter - 100 + 1,MaxVarsOnSourceMeter} ) = 0;
-						VarsOnSourceMeter.deallocate();
-						VarsOnSourceMeter.allocate( MaxVarsOnSourceMeter );
-						VarsOnSourceMeter = TempVarsOnSourceMeter;
-						TempVarsOnSourceMeter.deallocate();
+						VarsOnSourceMeter.redimension( MaxVarsOnSourceMeter += 100, 0 );
 					}
 					VarsOnSourceMeter( NumVarsOnSourceMeter ) = VarMeterArrays( iKey ).RepVariable;
 					continue;
@@ -2025,14 +1806,7 @@ namespace OutputProcessor {
 						for ( iKey = 1; iKey <= KeyCount; ++iKey ) {
 							++NumVarsOnCustomMeter;
 							if ( NumVarsOnCustomMeter > MaxVarsOnCustomMeter ) {
-								MaxVarsOnCustomMeter += 100;
-								TempVarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								TempVarsOnCustomMeter( {1,MaxVarsOnCustomMeter - 100} ) = VarsOnCustomMeter;
-								TempVarsOnCustomMeter( {MaxVarsOnCustomMeter - 100 + 1,MaxVarsOnCustomMeter} ) = 0;
-								VarsOnCustomMeter.deallocate();
-								VarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								VarsOnCustomMeter = TempVarsOnCustomMeter;
-								TempVarsOnCustomMeter.deallocate();
+								VarsOnCustomMeter.redimension( MaxVarsOnCustomMeter += 100, 0 );
 							}
 							VarsOnCustomMeter( NumVarsOnCustomMeter ) = IndexesForKeyVar( iKey );
 							iOnMeter = 1;
@@ -2046,14 +1820,7 @@ namespace OutputProcessor {
 							if ( NamesOfKeys( iKey ) != cAlphaArgs( fldIndex ) ) continue;
 							++NumVarsOnCustomMeter;
 							if ( NumVarsOnCustomMeter > MaxVarsOnCustomMeter ) {
-								MaxVarsOnCustomMeter += 100;
-								TempVarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								TempVarsOnCustomMeter( {1,MaxVarsOnCustomMeter - 100} ) = VarsOnCustomMeter;
-								TempVarsOnCustomMeter( {MaxVarsOnCustomMeter - 100 + 1,MaxVarsOnCustomMeter} ) = 0;
-								VarsOnCustomMeter.deallocate();
-								VarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-								VarsOnCustomMeter = TempVarsOnCustomMeter;
-								TempVarsOnCustomMeter.deallocate();
+								VarsOnCustomMeter.redimension( MaxVarsOnCustomMeter += 100, 0 );
 							}
 							VarsOnCustomMeter( NumVarsOnCustomMeter ) = IndexesForKeyVar( iKey );
 							iOnMeter = 1;
@@ -2084,14 +1851,7 @@ namespace OutputProcessor {
 						if ( ! ( testa || testb ) ) continue;
 						++NumVarsOnCustomMeter;
 						if ( NumVarsOnCustomMeter > MaxVarsOnCustomMeter ) {
-							MaxVarsOnCustomMeter += 100;
-							TempVarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-							TempVarsOnCustomMeter( {1,MaxVarsOnCustomMeter - 100} ) = VarsOnCustomMeter;
-							TempVarsOnCustomMeter( {MaxVarsOnCustomMeter - 100 + 1,MaxVarsOnCustomMeter} ) = 0;
-							VarsOnCustomMeter.deallocate();
-							VarsOnCustomMeter.allocate( MaxVarsOnCustomMeter );
-							VarsOnCustomMeter = TempVarsOnCustomMeter;
-							TempVarsOnCustomMeter.deallocate();
+							VarsOnCustomMeter.redimension( MaxVarsOnCustomMeter += 100, 0 );
 						}
 						VarsOnCustomMeter( NumVarsOnCustomMeter ) = VarMeterArrays( iOnMeter ).RepVariable;
 					}
@@ -2385,14 +2145,9 @@ namespace OutputProcessor {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
-		bool errFlag;
-
-		// Object Data
-		FArray1D< MeterType > TempMeters;
 
 		// Make sure this isn't already in the list of meter names
-
+		int Found;
 		if ( NumEnergyMeters > 0 ) {
 			Found = FindItemInList( Name, EnergyMeters.Name(), NumEnergyMeters );
 		} else {
@@ -2400,17 +2155,7 @@ namespace OutputProcessor {
 		}
 
 		if ( Found == 0 ) {
-			if ( NumEnergyMeters > 0 ) {
-				TempMeters.allocate( NumEnergyMeters );
-				TempMeters( {1,NumEnergyMeters} ) = EnergyMeters;
-				EnergyMeters.deallocate();
-			}
-			EnergyMeters.allocate( NumEnergyMeters + 1 );
-			if ( NumEnergyMeters > 0 ) {
-				EnergyMeters( {1,NumEnergyMeters} ) = TempMeters;
-				TempMeters.deallocate();
-			}
-			++NumEnergyMeters;
+			EnergyMeters.redimension( ++NumEnergyMeters );
 			EnergyMeters( NumEnergyMeters ).Name = Name;
 			EnergyMeters( NumEnergyMeters ).ResourceType = ResourceType;
 			EnergyMeters( NumEnergyMeters ).EndUse = EndUse;
@@ -2473,6 +2218,7 @@ namespace OutputProcessor {
 			ShowFatalError( "Requested to Add Meter which was already present=" + Name );
 		}
 		if ( ! ResourceType.empty() ) {
+			bool errFlag;
 			DetermineMeterIPUnits( EnergyMeters( NumEnergyMeters ).RT_forIPUnits, ResourceType, MtrUnits, errFlag );
 			if ( errFlag ) {
 				ShowContinueError( "..on Meter=\"" + Name + "\"." );
@@ -2534,10 +2280,6 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
-
-		// Object Data
-		FArray1D< MeterArrayType > TempMeterArrays;
 
 		if ( SameString( Group, "Building" ) ) {
 			ValidateNStandardizeMeterTitles( MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound, ZoneName );
@@ -2545,22 +2287,12 @@ namespace OutputProcessor {
 			ValidateNStandardizeMeterTitles( MtrUnits, ResourceType, EndUse, EndUseSub, Group, ErrorsFound );
 		}
 
-		if ( NumVarMeterArrays > 0 ) {
-			TempMeterArrays.allocate( NumVarMeterArrays );
-			TempMeterArrays( {1,NumVarMeterArrays} ) = VarMeterArrays;
-			VarMeterArrays.deallocate();
-		}
-		VarMeterArrays.allocate( NumVarMeterArrays + 1 );
-		if ( NumVarMeterArrays > 0 ) {
-			VarMeterArrays( {1,NumVarMeterArrays} ) = TempMeterArrays;
-			TempMeterArrays.deallocate();
-		}
-		++NumVarMeterArrays;
+		VarMeterArrays.redimension( ++NumVarMeterArrays );
 		MeterArrayPtr = NumVarMeterArrays;
 		VarMeterArrays( NumVarMeterArrays ).NumOnMeters = 0;
 		VarMeterArrays( NumVarMeterArrays ).RepVariable = RepVarNum;
 		VarMeterArrays( NumVarMeterArrays ).OnMeters = 0;
-		Found = FindItem( ResourceType + ":Facility", EnergyMeters.Name(), NumEnergyMeters );
+		int Found = FindItem( ResourceType + ":Facility", EnergyMeters.Name(), NumEnergyMeters );
 		if ( Found != 0 ) {
 			++VarMeterArrays( NumVarMeterArrays ).NumOnMeters;
 			VarMeterArrays( NumVarMeterArrays ).OnMeters( VarMeterArrays( NumVarMeterArrays ).NumOnMeters ) = Found;
@@ -2645,8 +2377,6 @@ namespace OutputProcessor {
 		// na
 
 		// Using/Aliasing
-		using InputProcessor::FindItem;
-		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2661,47 +2391,19 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D_int TempOnCustomMeters;
-
-		// Object Data
-		FArray1D< MeterArrayType > TempMeterArrays;
 
 		if ( MeterArrayPtr == 0 ) {
-			if ( NumVarMeterArrays > 0 ) {
-				TempMeterArrays.allocate( NumVarMeterArrays );
-				TempMeterArrays( {1,NumVarMeterArrays} ) = VarMeterArrays;
-				VarMeterArrays.deallocate();
-			}
-			VarMeterArrays.allocate( NumVarMeterArrays + 1 );
-			if ( NumVarMeterArrays > 0 ) {
-				VarMeterArrays( {1,NumVarMeterArrays} ) = TempMeterArrays;
-				TempMeterArrays.deallocate();
-			}
-			++NumVarMeterArrays;
+			VarMeterArrays.redimension( ++NumVarMeterArrays );
 			MeterArrayPtr = NumVarMeterArrays;
 			VarMeterArrays( NumVarMeterArrays ).NumOnMeters = 0;
 			VarMeterArrays( NumVarMeterArrays ).RepVariable = RepVarNum;
 			VarMeterArrays( NumVarMeterArrays ).OnMeters = 0;
 			VarMeterArrays( NumVarMeterArrays ).OnCustomMeters.allocate( 1 );
 			VarMeterArrays( NumVarMeterArrays ).NumOnCustomMeters = 1;
-			VarMeterArrays( NumVarMeterArrays ).OnCustomMeters( VarMeterArrays( NumVarMeterArrays ).NumOnCustomMeters ) = MeterIndex;
-		} else {
-			// MeterArrayPtr set
-			if ( VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters > 0 ) {
-				TempOnCustomMeters.allocate( VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters + 1 );
-				TempOnCustomMeters( {1,VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters} ) = VarMeterArrays( MeterArrayPtr ).OnCustomMeters;
-				VarMeterArrays( MeterArrayPtr ).OnCustomMeters.deallocate();
-				++VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters;
-				VarMeterArrays( MeterArrayPtr ).OnCustomMeters.allocate( VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters );
-				VarMeterArrays( MeterArrayPtr ).OnCustomMeters = TempOnCustomMeters;
-				VarMeterArrays( MeterArrayPtr ).OnCustomMeters( VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters ) = MeterIndex;
-				TempOnCustomMeters.deallocate();
-			} else {
-				VarMeterArrays( MeterArrayPtr ).OnCustomMeters.allocate( 1 );
-				VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters = 1;
-				VarMeterArrays( MeterArrayPtr ).OnCustomMeters( VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters ) = MeterIndex;
-			}
+		} else { // MeterArrayPtr set
+			VarMeterArrays( MeterArrayPtr ).OnCustomMeters.redimension( ++VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters );
 		}
+		VarMeterArrays( MeterArrayPtr ).OnCustomMeters( VarMeterArrays( MeterArrayPtr ).NumOnCustomMeters ) = MeterIndex;
 
 	}
 
@@ -3986,13 +3688,11 @@ namespace OutputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		bool Found;
 		int EndUseNum;
 		int EndUseSubNum;
 		int NumSubs;
-		FArray1D_string SubcategoryNameTemp;
 
-		Found = false;
+		bool Found = false;
 		for ( EndUseNum = 1; EndUseNum <= NumEndUses; ++EndUseNum ) {
 			if ( SameString( EndUseCategory( EndUseNum ).Name, EndUseName ) ) {
 
@@ -4007,17 +3707,7 @@ namespace OutputProcessor {
 				if ( ! Found ) {
 					// Add the subcategory by reallocating the array
 					NumSubs = EndUseCategory( EndUseNum ).NumSubcategories;
-					if ( NumSubs > 0 ) {
-						SubcategoryNameTemp.allocate( NumSubs );
-						SubcategoryNameTemp = EndUseCategory( EndUseNum ).SubcategoryName;
-						EndUseCategory( EndUseNum ).SubcategoryName.deallocate();
-					}
-
-					EndUseCategory( EndUseNum ).SubcategoryName.allocate( NumSubs + 1 );
-					if ( NumSubs > 0 ) {
-						EndUseCategory( EndUseNum ).SubcategoryName( {1,NumSubs} ) = SubcategoryNameTemp( {1,NumSubs} );
-						SubcategoryNameTemp.deallocate();
-					}
+					EndUseCategory( EndUseNum ).SubcategoryName.redimension( NumSubs + 1 );
 
 					EndUseCategory( EndUseNum ).NumSubcategories = NumSubs + 1;
 					EndUseCategory( EndUseNum ).SubcategoryName( NumSubs + 1 ) = EndUseSubName;
@@ -4118,7 +3808,7 @@ namespace OutputProcessor {
 			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
 
 		} else {
-			if ( sqlite->writeOutputToSQLite() ) 
+			if ( sqlite->writeOutputToSQLite() )
 			{
 				std::stringstream ss;
 				ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
@@ -6322,7 +6012,6 @@ GenOutputVariablesAuditReport()
 	using namespace DataPrecisionGlobals;
 	using namespace OutputProcessor;
 	using DataGlobals::DisplayAdvancedReportVariables;
-	using InputProcessor::MakeUPPERCase;
 
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -6637,8 +6326,7 @@ UpdateMeterReporting()
 		ShowFatalError( "UpdateMeterReporting: Previous Meter Specification errors cause program termination." );
 	}
 
-	MeterValue.allocate( NumEnergyMeters );
-	MeterValue = 0.0;
+	MeterValue.dimension( NumEnergyMeters, 0.0 );
 
 }
 
@@ -6892,30 +6580,18 @@ GetMeterIndex( std::string const & MeterName )
 	static bool FirstCall( true );
 	int Found;
 
-	if ( FirstCall ) {
+	if ( FirstCall || ( NumValidMeters != NumEnergyMeters ) ) {
 		NumValidMeters = NumEnergyMeters;
 		ValidMeterNames.allocate( NumValidMeters );
-		iValidMeterNames.allocate( NumValidMeters );
-		iValidMeterNames = 0;
 		for ( Found = 1; Found <= NumValidMeters; ++Found ) {
 			ValidMeterNames( Found ) = MakeUPPERCase( EnergyMeters( Found ).Name );
 		}
+		iValidMeterNames.allocate( NumValidMeters );
+		SetupAndSort( ValidMeterNames, iValidMeterNames );
 		FirstCall = false;
-		SetupAndSort( ValidMeterNames, iValidMeterNames );
-	} else if ( NumValidMeters != NumEnergyMeters ) {
-		ValidMeterNames.deallocate();
-		iValidMeterNames.deallocate();
-		NumValidMeters = NumEnergyMeters;
-		ValidMeterNames.allocate( NumValidMeters );
-		iValidMeterNames.allocate( NumValidMeters );
-		iValidMeterNames = 0;
-		for ( Found = 1; Found <= NumValidMeters; ++Found ) {
-			ValidMeterNames( Found ) = MakeUPPERCase( EnergyMeters( Found ).Name );
-		}
-		SetupAndSort( ValidMeterNames, iValidMeterNames );
 	}
 
-	MeterIndex = FindItemInSortedList( MakeUPPERCase( MeterName ), ValidMeterNames, NumValidMeters );
+	MeterIndex = FindItemInSortedList( MeterName, ValidMeterNames, NumValidMeters );
 	if ( MeterIndex != 0 ) MeterIndex = iValidMeterNames( MeterIndex );
 
 	return MeterIndex;
@@ -7051,7 +6727,7 @@ GetInstantMeterValue(
 	using namespace OutputProcessor;
 
 	// Return value
-	Real64 InstantMeterValue;
+	Real64 InstantMeterValue( 0.0 );
 
 	// Locals
 	// FUNCTION ARGUMENT DEFINITIONS:
@@ -7066,63 +6742,64 @@ GetInstantMeterValue(
 	// na
 
 	// FUNCTION LOCAL VARIABLE DECLARATIONS:
-	int Loop;
-	int Meter;
 
-	InstantMeterValue = 0.0;
 	//      EnergyMeters(Meter)%TSValue=EnergyMeters(EnergyMeters(Meter)%SourceMeter)%TSValue-MeterValue(Meter)
 
-	if ( MeterNumber == 0 ) {
-		InstantMeterValue = 0.0;
-	} else if ( EnergyMeters( MeterNumber ).TypeOfMeter != MeterType_CustomDec ) {
+	if ( MeterNumber == 0 ) return InstantMeterValue;
+
+	auto & energy_meter( EnergyMeters( MeterNumber ) );
+	auto & cache_beg( energy_meter.InstMeterCacheStart );
+	auto & cache_end( energy_meter.InstMeterCacheEnd );
+	if ( energy_meter.TypeOfMeter != MeterType_CustomDec ) {
 		// section added to speed up the execution of this routine
 		// instead of looping through all the VarMeterArrays to see if a RVariableType is used for a
 		// specific meter, create a list of all the indexes for RVariableType that are used for that
 		// meter.
-		if ( EnergyMeters( MeterNumber ).InstMeterCacheStart == 0 ) { //not yet added to the cache
-			for ( Loop = 1; Loop <= NumVarMeterArrays; ++Loop ) {
-				for ( Meter = 1; Meter <= VarMeterArrays( Loop ).NumOnMeters; ++Meter ) {
-					if ( VarMeterArrays( Loop ).OnMeters( Meter ) == MeterNumber ) {
+		if ( cache_beg == 0 ) { // not yet added to the cache
+			for ( int Loop = 1; Loop <= NumVarMeterArrays; ++Loop ) {
+				auto const & var_meter_on( VarMeterArrays( Loop ).OnMeters );
+				for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnMeters; Meter <= Meter_end; ++Meter ) {
+					if ( var_meter_on( Meter ) == MeterNumber ) {
 						IncrementInstMeterCache();
-						EnergyMeters( MeterNumber ).InstMeterCacheEnd = InstMeterCacheLastUsed;
-						if ( EnergyMeters( MeterNumber ).InstMeterCacheStart == 0 ) {
-							EnergyMeters( MeterNumber ).InstMeterCacheStart = InstMeterCacheLastUsed;
-						}
+						cache_end = InstMeterCacheLastUsed;
+						if ( cache_beg == 0 ) cache_beg = InstMeterCacheLastUsed;
 						InstMeterCache( InstMeterCacheLastUsed ) = VarMeterArrays( Loop ).RepVariable;
 						break;
 					}
 				}
-				for ( Meter = 1; Meter <= VarMeterArrays( Loop ).NumOnCustomMeters; ++Meter ) {
-					if ( VarMeterArrays( Loop ).OnCustomMeters( Meter ) == MeterNumber ) {
+				auto const & var_meter_on_custom( VarMeterArrays( Loop ).OnCustomMeters );
+				for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnCustomMeters; Meter <= Meter_end; ++Meter ) {
+					if ( var_meter_on_custom( Meter ) == MeterNumber ) {
 						IncrementInstMeterCache();
-						EnergyMeters( MeterNumber ).InstMeterCacheEnd = InstMeterCacheLastUsed;
-						if ( EnergyMeters( MeterNumber ).InstMeterCacheStart == 0 ) {
-							EnergyMeters( MeterNumber ).InstMeterCacheStart = InstMeterCacheLastUsed;
-						}
+						cache_end = InstMeterCacheLastUsed;
+						if ( cache_beg == 0 ) cache_beg = InstMeterCacheLastUsed;
 						InstMeterCache( InstMeterCacheLastUsed ) = VarMeterArrays( Loop ).RepVariable;
 						break;
 					}
 				} // End Number of Meters Loop
 			}
 		}
-		for ( Loop = EnergyMeters( MeterNumber ).InstMeterCacheStart; Loop <= EnergyMeters( MeterNumber ).InstMeterCacheEnd; ++Loop ) {
-			RVar >>= RVariableTypes( InstMeterCache( Loop ) ).VarPtr;
-			//Separate the Zone variables from the HVAC variables using IndexType
-			if ( RVariableTypes( InstMeterCache( Loop ) ).IndexType == IndexType ) {
-				//Add to the total all of the appropriate variables
+		for ( int Loop = cache_beg; Loop <= cache_end; ++Loop ) {
+			auto & r_var_loop( RVariableTypes( InstMeterCache( Loop ) ) );
+			RVar >>= r_var_loop.VarPtr;
+			// Separate the Zone variables from the HVAC variables using IndexType
+			if ( r_var_loop.IndexType == IndexType ) {
+				// Add to the total all of the appropriate variables
 				InstantMeterValue += RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
 			}
 		}
 	} else { // MeterType_CustomDec
 		// Get Source Meter value
-		//Loop through all report meters to find correct report variables to add to instant meter total
-		for ( Loop = 1; Loop <= NumVarMeterArrays; ++Loop ) {
+		// Loop through all report meters to find correct report variables to add to instant meter total
+		for ( int Loop = 1; Loop <= NumVarMeterArrays; ++Loop ) {
+			auto & r_var_loop( RVariableTypes( VarMeterArrays( Loop ).RepVariable ) );
 
-			for ( Meter = 1; Meter <= VarMeterArrays( Loop ).NumOnMeters; ++Meter ) {
-				if ( VarMeterArrays( Loop ).OnMeters( Meter ) == EnergyMeters( MeterNumber ).SourceMeter ) {
-					RVar >>= RVariableTypes( VarMeterArrays( Loop ).RepVariable ).VarPtr;
+			auto const & var_meter_on( VarMeterArrays( Loop ).OnMeters );
+			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnMeters; Meter <= Meter_end; ++Meter ) {
+				if ( var_meter_on( Meter ) == energy_meter.SourceMeter ) {
+					RVar >>= r_var_loop.VarPtr;
 					//Separate the Zone variables from the HVAC variables using IndexType
-					if ( RVariableTypes( VarMeterArrays( Loop ).RepVariable ).IndexType == IndexType ) {
+					if ( r_var_loop.IndexType == IndexType ) {
 						//Add to the total all of the appropriate variables
 						InstantMeterValue += RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
 						break;
@@ -7130,12 +6807,13 @@ GetInstantMeterValue(
 				}
 			}
 
-			for ( Meter = 1; Meter <= VarMeterArrays( Loop ).NumOnCustomMeters; ++Meter ) {
-				if ( VarMeterArrays( Loop ).OnCustomMeters( Meter ) == EnergyMeters( MeterNumber ).SourceMeter ) {
-					RVar >>= RVariableTypes( VarMeterArrays( Loop ).RepVariable ).VarPtr;
-					//Separate the Zone variables from the HVAC variables using IndexType
-					if ( RVariableTypes( VarMeterArrays( Loop ).RepVariable ).IndexType == IndexType ) {
-						//Add to the total all of the appropriate variables
+			auto const & var_meter_on_custom( VarMeterArrays( Loop ).OnCustomMeters );
+			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnCustomMeters; Meter <= Meter_end; ++Meter ) {
+				if ( var_meter_on_custom( Meter ) == energy_meter.SourceMeter ) {
+					RVar >>= r_var_loop.VarPtr;
+					// Separate the Zone variables from the HVAC variables using IndexType
+					if ( r_var_loop.IndexType == IndexType ) {
+						// Add to the total all of the appropriate variables
 						InstantMeterValue += RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
 						break;
 					}
@@ -7143,26 +6821,29 @@ GetInstantMeterValue(
 			}
 
 		} // End Number of Meters Loop
-		for ( Loop = 1; Loop <= NumVarMeterArrays; ++Loop ) {
+		for ( int Loop = 1; Loop <= NumVarMeterArrays; ++Loop ) {
+			auto & r_var_loop( RVariableTypes( VarMeterArrays( Loop ).RepVariable ) );
 
-			for ( Meter = 1; Meter <= VarMeterArrays( Loop ).NumOnMeters; ++Meter ) {
-				if ( VarMeterArrays( Loop ).OnMeters( Meter ) == MeterNumber ) {
-					RVar >>= RVariableTypes( VarMeterArrays( Loop ).RepVariable ).VarPtr;
-					//Separate the Zone variables from the HVAC variables using IndexType
-					if ( RVariableTypes( VarMeterArrays( Loop ).RepVariable ).IndexType == IndexType ) {
-						//Add to the total all of the appropriate variables
+			auto const & var_meter_on( VarMeterArrays( Loop ).OnMeters );
+			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnMeters; Meter <= Meter_end; ++Meter ) {
+				if ( var_meter_on( Meter ) == MeterNumber ) {
+					RVar >>= r_var_loop.VarPtr;
+					// Separate the Zone variables from the HVAC variables using IndexType
+					if ( r_var_loop.IndexType == IndexType ) {
+						// Add to the total all of the appropriate variables
 						InstantMeterValue -= RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
 						break;
 					}
 				}
 			}
 
-			for ( Meter = 1; Meter <= VarMeterArrays( Loop ).NumOnCustomMeters; ++Meter ) {
-				if ( VarMeterArrays( Loop ).OnCustomMeters( Meter ) == MeterNumber ) {
-					RVar >>= RVariableTypes( VarMeterArrays( Loop ).RepVariable ).VarPtr;
-					//Separate the Zone variables from the HVAC variables using IndexType
-					if ( RVariableTypes( VarMeterArrays( Loop ).RepVariable ).IndexType == IndexType ) {
-						//Add to the total all of the appropriate variables
+			auto const & var_meter_on_custom( VarMeterArrays( Loop ).OnCustomMeters );
+			for ( int Meter = 1, Meter_end = VarMeterArrays( Loop ).NumOnCustomMeters; Meter <= Meter_end; ++Meter ) {
+				if ( var_meter_on_custom( Meter ) == MeterNumber ) {
+					RVar >>= r_var_loop.VarPtr;
+					// Separate the Zone variables from the HVAC variables using IndexType
+					if ( r_var_loop.IndexType == IndexType ) {
+						// Add to the total all of the appropriate variables
 						InstantMeterValue -= RVar().Which * RVar().ZoneMult * RVar().ZoneListMult;
 						break;
 					}
@@ -7198,23 +6879,13 @@ IncrementInstMeterCache()
 	using namespace OutputProcessor;
 
 	if ( ! allocated( InstMeterCache ) ) {
-		InstMeterCache.allocate( InstMeterCacheSizeInc );
-		InstMeterCache = 0; //zero the entire array
+		InstMeterCache.dimension( InstMeterCacheSizeInc, 0 ); //zero the entire array
 		InstMeterCacheLastUsed = 1;
 	} else {
 		++InstMeterCacheLastUsed;
-		// if larger then current size then make a temporary array of the same
-		// type and put stuff into it while reallocating the main array
+		// if larger than current size grow the array
 		if ( InstMeterCacheLastUsed > InstMeterCacheSize ) {
-			InstMeterCacheCopy.allocate( InstMeterCacheSize );
-			InstMeterCacheCopy = InstMeterCache;
-			InstMeterCache.deallocate();
-			// increment by cachesize
-			InstMeterCache.allocate( InstMeterCacheSize + InstMeterCacheSizeInc );
-			InstMeterCache = 0;
-			InstMeterCache( {1,InstMeterCacheSize} ) = InstMeterCacheCopy;
-			InstMeterCacheCopy.deallocate();
-			InstMeterCacheSize += InstMeterCacheSizeInc;
+			InstMeterCache.redimension( InstMeterCacheSize += InstMeterCacheSizeInc, 0 );
 		}
 	}
 }
@@ -7668,25 +7339,21 @@ GetVariableKeyCountandType(
 		keyVarIndexes.allocate( curKeyVarIndexLimit );
 		numVarNames = NumVariablesForOutput;
 		varNames.allocate( numVarNames );
-		ivarNames.allocate( numVarNames );
-		ivarNames = 0;
 		for ( Loop = 1; Loop <= NumVariablesForOutput; ++Loop ) {
 			varNames( Loop ) = MakeUPPERCase( DDVariableTypes( Loop ).VarNameOnly );
 		}
+		ivarNames.allocate( numVarNames );
 		SetupAndSort( varNames, ivarNames );
 		InitFlag = false;
 	}
 
 	if ( numVarNames != NumVariablesForOutput ) {
-		varNames.deallocate();
-		ivarNames.deallocate();
 		numVarNames = NumVariablesForOutput;
 		varNames.allocate( numVarNames );
-		ivarNames.allocate( numVarNames );
-		ivarNames = 0;
 		for ( Loop = 1; Loop <= NumVariablesForOutput; ++Loop ) {
 			varNames( Loop ) = MakeUPPERCase( DDVariableTypes( Loop ).VarNameOnly );
 		}
+		ivarNames.allocate( numVarNames );
 		SetupAndSort( varNames, ivarNames );
 	}
 
@@ -7725,7 +7392,7 @@ GetVariableKeyCountandType(
 					if ( ! Duplicate ) {
 						++numKeys;
 						if ( numKeys > curKeyVarIndexLimit ) {
-							ReallocateIntegerArray( keyVarIndexes, curKeyVarIndexLimit, 500 );
+							keyVarIndexes.redimension( curKeyVarIndexLimit += 500, 0 );
 						}
 						keyVarIndexes( numKeys ) = Loop;
 						varAvgSum = DDVariableTypes( ivarNames( VFound ) ).StoreType;
@@ -7752,7 +7419,7 @@ GetVariableKeyCountandType(
 				if ( ! Duplicate ) {
 					++numKeys;
 					if ( numKeys > curKeyVarIndexLimit ) {
-						ReallocateIntegerArray( keyVarIndexes, curKeyVarIndexLimit, 500 );
+						keyVarIndexes.redimension( curKeyVarIndexLimit += 500, 0 );
 					}
 					keyVarIndexes( numKeys ) = Loop;
 					varAvgSum = DDVariableTypes( ivarNames( VFound ) ).StoreType;
@@ -8290,7 +7957,6 @@ ProduceRDDMDD()
 	VariableNames.allocate( NumVariablesForOutput );
 	VariableNames( {1,NumVariablesForOutput} ) = DDVariableTypes( {1,NumVariablesForOutput} ).VarNameOnly();
 	iVariableNames.allocate( NumVariablesForOutput );
-	iVariableNames = 0;
 
 	if ( SortByName ) {
 		SetupAndSort( VariableNames, iVariableNames );
@@ -8334,23 +8000,15 @@ ProduceRDDMDD()
 		}
 	}
 
-	VariableNames.deallocate();
-	iVariableNames.deallocate();
-
 	//  Now EnergyMeter variables
+	VariableNames.allocate( NumEnergyMeters );
+	iVariableNames.allocate( NumEnergyMeters );
 	if ( SortByName ) {
-		VariableNames.allocate( NumEnergyMeters );
 		for ( Item = 1; Item <= NumEnergyMeters; ++Item ) {
 			VariableNames( Item ) = EnergyMeters( Item ).Name;
 		}
-		iVariableNames.allocate( NumEnergyMeters );
-		iVariableNames = 0;
 		SetupAndSort( VariableNames, iVariableNames );
 	} else {
-		VariableNames.allocate( NumEnergyMeters );
-		iVariableNames.allocate( NumEnergyMeters );
-		iVariableNames = 0;
-
 		for ( Item = 1; Item <= NumEnergyMeters; ++Item ) {
 			VariableNames( Item ) = EnergyMeters( Item ).Name;
 			iVariableNames( Item ) = Item;
@@ -8417,13 +8075,8 @@ AddToOutputVariableList(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-	int dup; // for duplicate variable name
-	int dup2; // for duplicate variable name
 
-	// Object Data
-	FArray1D< VariableTypeForDDOutput > tmpDDVariableTypes; // Variable Types structure (temp for reallocate)
-
-	dup = 0;
+	int dup = 0;// for duplicate variable name
 	if ( NumVariablesForOutput > 0 ) {
 		dup = FindItemInList( VarName, DDVariableTypes.VarNameOnly(), NumVariablesForOutput );
 	} else {
@@ -8433,13 +8086,7 @@ AddToOutputVariableList(
 	if ( dup == 0 ) {
 		++NumVariablesForOutput;
 		if ( NumVariablesForOutput > MaxVariablesForOutput ) {
-			tmpDDVariableTypes.allocate( MaxVariablesForOutput );
-			tmpDDVariableTypes( {1,MaxVariablesForOutput} ) = DDVariableTypes( {1,MaxVariablesForOutput} );
-			DDVariableTypes.deallocate();
-			DDVariableTypes.allocate( MaxVariablesForOutput + LVarAllocInc );
-			DDVariableTypes( {1,MaxVariablesForOutput} ) = tmpDDVariableTypes( {1,MaxVariablesForOutput} );
-			tmpDDVariableTypes.deallocate();
-			MaxVariablesForOutput += LVarAllocInc;
+			DDVariableTypes.redimension( MaxVariablesForOutput += LVarAllocInc );
 		}
 		DDVariableTypes( NumVariablesForOutput ).IndexType = IndexType;
 		DDVariableTypes( NumVariablesForOutput ).StoreType = StateType;
@@ -8447,7 +8094,7 @@ AddToOutputVariableList(
 		DDVariableTypes( NumVariablesForOutput ).VarNameOnly = VarName;
 		DDVariableTypes( NumVariablesForOutput ).UnitsString = UnitsString;
 	} else if ( UnitsString != DDVariableTypes( dup ).UnitsString ) { // not the same as first units
-		dup2 = 0;
+		int dup2 = 0;// for duplicate variable name
 		while ( DDVariableTypes( dup ).Next != 0 ) {
 			if ( UnitsString != DDVariableTypes( DDVariableTypes( dup ).Next ).UnitsString ) {
 				dup = DDVariableTypes( dup ).Next;
@@ -8459,13 +8106,7 @@ AddToOutputVariableList(
 		if ( dup2 == 0 ) {
 			++NumVariablesForOutput;
 			if ( NumVariablesForOutput > MaxVariablesForOutput ) {
-				tmpDDVariableTypes.allocate( MaxVariablesForOutput );
-				tmpDDVariableTypes( {1,MaxVariablesForOutput} ) = DDVariableTypes( {1,MaxVariablesForOutput} );
-				DDVariableTypes.deallocate();
-				DDVariableTypes.allocate( MaxVariablesForOutput + LVarAllocInc );
-				DDVariableTypes( {1,MaxVariablesForOutput} ) = tmpDDVariableTypes( {1,MaxVariablesForOutput} );
-				tmpDDVariableTypes.deallocate();
-				MaxVariablesForOutput += LVarAllocInc;
+				DDVariableTypes.redimension( MaxVariablesForOutput += LVarAllocInc );
 			}
 			DDVariableTypes( NumVariablesForOutput ).IndexType = IndexType;
 			DDVariableTypes( NumVariablesForOutput ).StoreType = StateType;

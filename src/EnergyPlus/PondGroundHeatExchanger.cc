@@ -293,8 +293,7 @@ namespace PondGroundHeatExchanger {
 
 		PondGHE.allocate( NumOfPondGHEs );
 		PondGHEReport.allocate( NumOfPondGHEs );
-		CheckEquipName.allocate( NumOfPondGHEs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumOfPondGHEs, true );
 
 		// record fluid prop index for water
 		WaterIndex = FindGlycol( fluidNameWater );

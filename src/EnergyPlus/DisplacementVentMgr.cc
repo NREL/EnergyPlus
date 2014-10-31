@@ -184,8 +184,7 @@ namespace DisplacementVentMgr {
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.allocate( NumOfZones );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumOfZones, true );
 			HeightFloorSubzoneTop = 0.2;
 			ThickOccupiedSubzoneMin = 0.2;
 			HeightIntMassDefault = 2.0;

@@ -255,22 +255,15 @@ namespace Humidifiers {
 		NumHumidifiers = NumElecSteamHums;
 		// allocate the data array
 		Humidifier.allocate( NumHumidifiers );
-		CheckEquipName.allocate( NumHumidifiers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumHumidifiers, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// loop over electric steam humidifiers and load the input data
 		for ( HumidifierIndex = 1; HumidifierIndex <= NumElecSteamHums; ++HumidifierIndex ) {

@@ -150,7 +150,7 @@ namespace PackagedTerminalHeatPump {
 
 	// Object Data
 	FArray1D< PTUnitData > PTUnit;
-	FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name 
+	FArray1D< PTUnitNumericFieldData > PTUnitUNumericFields; // holds VRF TU numeric input fields character field name
 
 	// Functions
 
@@ -624,23 +624,17 @@ namespace PackagedTerminalHeatPump {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 		NumPTUs = NumPTHP + NumPTAC + NumPTWSHP;
 
 		// allocate the data structures
 		if ( NumPTUs > 0 ) {
 			PTUnit.allocate( NumPTUs );
-			CheckEquipName.allocate( NumPTUs );		
+			CheckEquipName.allocate( NumPTUs );
 			PTUnitUNumericFields.allocate( NumPTUs );
 		}
 		CheckEquipName = true;
@@ -1723,7 +1717,7 @@ namespace PackagedTerminalHeatPump {
 			if ( ! lAlphaBlanks( 15 ) ) {
 				PTUnit( PTUnitNum ).AvailManagerListName = Alphas( 15 );
 			}
-			
+
 			PTUnit( PTUnitNum ).HVACSizingIndex = 0;
 			if ( ! lAlphaBlanks( 16 ) ) {
 				PTUnit( PTUnitNum ).HVACSizingIndex = FindItemInList( Alphas( 16 ), ZoneHVACSizing.Name(), NumZoneHVACSizing );
@@ -3547,7 +3541,7 @@ namespace PackagedTerminalHeatPump {
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
-		
+
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName("SizePTUnit: "); // include trailing blank space
 
@@ -3615,7 +3609,7 @@ namespace PackagedTerminalHeatPump {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-						} 
+						}
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
@@ -3695,14 +3689,14 @@ namespace PackagedTerminalHeatPump {
 					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 					PTUnit( PTUnitNum ).MaxHeatAirVolFlow = TempSize;
 				}
-				
+
 				SizingMethod = SystemAirflowSizing;
 				FieldNum = 3; //N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
 				PrintFlag = true;
 				SizingString = PTUnitUNumericFields( PTUnitNum ).FieldNames( FieldNum ) + " [m3/s]";
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).NoCoolHeatSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
-				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow || SAFMethod == FractionOfAutosizedHeatingAirflow ) {					
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
 					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxNoCoolHeatAirVolFlow;
@@ -3768,7 +3762,7 @@ namespace PackagedTerminalHeatPump {
 				}
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 
 				PrintFlag = true;
 				SizingMethod = CoolingAirflowSizing;

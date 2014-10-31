@@ -1272,16 +1272,20 @@ namespace WindowManager {
 					Construct( ConstrNum ).AbsBeamBackCoef( IGlass, {1,6} ) = CoeffsCurveFit;
 				}
 
-				// To check goodness of fit
+				// To check goodness of fit //Tuned
+				auto const & solBeamCoef( Construct( ConstrNum ).TransSolBeamCoef );
+				auto const & visBeamCoef( Construct( ConstrNum ).TransVisBeamCoef );
 				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
 					tsolPhiFit( IPhi ) = 0.0;
 					tvisPhiFit( IPhi ) = 0.0;
 					Phi = double( IPhi - 1 ) * 10.0;
 					CosPhi = std::cos( Phi * DegToRadians );
 					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
+					Real64 cos_pow( 1.0 );
 					for ( CoefNum = 1; CoefNum <= 6; ++CoefNum ) {
-						tsolPhiFit( IPhi ) += Construct( ConstrNum ).TransSolBeamCoef( CoefNum ) * std::pow( CosPhi, CoefNum );
-						tvisPhiFit( IPhi ) += Construct( ConstrNum ).TransVisBeamCoef( CoefNum ) * std::pow( CosPhi, CoefNum );
+						cos_pow *= CosPhi;
+						tsolPhiFit( IPhi ) += solBeamCoef( CoefNum ) * cos_pow;
+						tvisPhiFit( IPhi ) += visBeamCoef( CoefNum ) * cos_pow;
 					}
 				}
 			}
@@ -5385,7 +5389,7 @@ namespace WindowManager {
 				rfp = 0.5 * ( rfp1 + rfp2 );
 				tmp9 = -abb;
 				if ( tmp9 != 0.0 ) {
-					expmabbdivcgb = std::exp( ( tmp9 / cgb ) );
+					expmabbdivcgb = std::exp( tmp9 / cgb );
 				} else {
 					expmabbdivcgb = 0.0;
 				}
@@ -8776,9 +8780,7 @@ Label99999: ;
 
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
 			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
@@ -8805,9 +8807,7 @@ Label99999: ;
 
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
-			cAlphaArgs = "";
-			rNumericArgs.allocate( NumNumbers );
-			rNumericArgs = 0.0;
+			rNumericArgs.dimension( NumNumbers, 0.0 );
 
 			iSolarSpectrum = 0;
 			iVisibleSpectrum = 0;

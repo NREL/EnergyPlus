@@ -155,7 +155,6 @@ namespace SolarShading {
 	extern FArray1D< SurfaceErrorTracking > TrackTooManyFigures;
 	extern FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
 	extern FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
-	extern FArray1D< SurfaceErrorTracking > TempSurfErrorTracking;
 
 	// Functions
 

@@ -567,22 +567,15 @@ namespace HVACControllers {
 
 		ControllerProps.allocate( NumControllers );
 		RootFinders.allocate( NumControllers );
-		CheckEquipName.allocate( NumControllers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumControllers, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		NumArray.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		// Now find and load all of the simple controllers.
 		if ( NumSimpleControllers > 0 ) {

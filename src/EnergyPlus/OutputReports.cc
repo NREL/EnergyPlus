@@ -2099,8 +2099,7 @@ CostInfoOut()
 	}
 
 	// need to determine unique surfacs... some surfaces are shared by zones and hence doubled
-	uniqueSurf.allocate( TotSurfaces );
-	uniqueSurf = true;
+	uniqueSurf.dimension( TotSurfaces, true );
 
 	for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 		if ( Surface( surf ).ExtBoundCond > 0 ) {

@@ -738,8 +738,7 @@ namespace ConductionTransferFunctionCalc {
 					for ( ir = 1; ir <= rcmax; ++ir ) {
 						IdenMatrix( ir, ir ) = 1.0;
 					}
-					e.allocate( rcmax );
-					e = 0.0;
+					e.dimension( rcmax, 0.0 );
 					Gamma1.allocate( rcmax, 3 );
 					Gamma1 = 0.0;
 					Gamma2.allocate( rcmax, 3 );

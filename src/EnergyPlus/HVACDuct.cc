@@ -203,8 +203,7 @@ namespace HVACDuct {
 		cCurrentModuleObject = "Duct";
 		NumDucts = GetNumObjectsFound( cCurrentModuleObject );
 		Duct.allocate( NumDucts );
-		CheckEquipName.allocate( NumDucts );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDucts, true );
 
 		for ( DuctNum = 1; DuctNum <= NumDucts; ++DuctNum ) {
 			GetObjectItem( cCurrentModuleObject, DuctNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -270,8 +269,7 @@ namespace HVACDuct {
 		// do one time initializations
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			MyEnvrnFlag.allocate( NumDucts );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumDucts, true );
 
 			MyOneTimeFlag = false;
 

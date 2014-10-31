@@ -714,13 +714,10 @@ namespace OutputReportTabular {
 	extern FArray1D< BinStatisticsType > BinStatistics;
 	extern FArray1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
 	extern FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
-	extern FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInputCopy;
 	extern FArray1D< MonthlyInputType > MonthlyInput;
-	extern FArray1D< MonthlyInputType > MonthlyInputCopy;
 	extern FArray1D< MonthlyTablesType > MonthlyTables;
 	extern FArray1D< MonthlyColumnsType > MonthlyColumns;
 	extern FArray1D< TOCEntriesType > TOCEntries;
-	extern FArray1D< TOCEntriesType > CopyOfTOCEntries;
 	extern FArray1D< UnitConvType > UnitConv;
 
 	// Functions

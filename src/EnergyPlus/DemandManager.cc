@@ -377,10 +377,8 @@ namespace DemandManager {
 		NumDemandManagerList = GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumDemandManagerList > 0 ) {
-			AlphArray.allocate( NumAlphas );
-			AlphArray = BlankString;
-			NumArray.allocate( NumNums );
-			NumArray = 0.0;
+			AlphArray.dimension( NumAlphas, BlankString );
+			NumArray.dimension( NumNums, 0.0 );
 
 			DemandManagerList.allocate( NumDemandManagerList );
 
@@ -638,10 +636,8 @@ namespace DemandManager {
 		NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats;
 
 		if ( NumDemandMgr > 0 ) {
-			AlphArray.allocate( MaxAlphas );
-			AlphArray = BlankString;
-			NumArray.allocate( MaxNums );
-			NumArray = 0.0;
+			AlphArray.dimension( MaxAlphas, BlankString );
+			NumArray.dimension( MaxNums, 0.0 );
 
 			DemandMgr.allocate( NumDemandMgr );
 

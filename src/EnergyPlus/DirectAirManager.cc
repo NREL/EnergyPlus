@@ -228,8 +228,7 @@ namespace DirectAirManager {
 		if ( NumDirectAir > 0 ) {
 
 			DirectAir.allocate( NumDirectAir );
-			CheckEquipName.allocate( NumDirectAir );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumDirectAir, true );
 
 			for ( DirectAirNum = 1; DirectAirNum <= NumDirectAir; ++DirectAirNum ) {
 				DirectAir( DirectAirNum ).cObjectName = cCurrentModuleObject; // push Object Name into data array

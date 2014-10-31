@@ -1479,23 +1479,10 @@ StoreRecurringErrorMessage(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-	// Object Data
-	FArray1D< RecurringErrorData > TempRecurringErrors;
-
 	// If Index is zero, then assign next available index and reallocate array
 	if ( ErrorMsgIndex == 0 ) {
-		++NumRecurringErrors;
+		RecurringErrors.redimension( ++NumRecurringErrors );
 		ErrorMsgIndex = NumRecurringErrors;
-		if ( NumRecurringErrors == 1 ) {
-			RecurringErrors.allocate( NumRecurringErrors );
-		} else if ( NumRecurringErrors > 1 ) {
-			TempRecurringErrors.allocate( NumRecurringErrors );
-			TempRecurringErrors( {1,NumRecurringErrors - 1} ) = RecurringErrors( {1,NumRecurringErrors - 1} );
-			RecurringErrors.deallocate();
-			RecurringErrors.allocate( NumRecurringErrors );
-			RecurringErrors = TempRecurringErrors;
-			TempRecurringErrors.deallocate();
-		}
 		// The message string only needs to be stored once when a new recurring message is created
 		RecurringErrors( ErrorMsgIndex ).Message = ErrorMessage;
 		RecurringErrors( ErrorMsgIndex ).Count = 1;

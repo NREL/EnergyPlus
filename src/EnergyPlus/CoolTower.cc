@@ -200,17 +200,11 @@ namespace CoolTower {
 		// Initializations and allocations
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		NumCoolTowers = GetNumObjectsFound( CurrentModuleObject );
 
@@ -463,7 +457,7 @@ namespace CoolTower {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ZoneNum; // Number of zone being served
 		int CoolTowerNum; // Number of coolter being served
-		static FArray1D< Real64 > CVF; // Design flow rate in m3/s
+		Real64 CVF_ZoneNum; // Design flow rate in m3/s
 		Real64 AirMassFlowRate; // Actual air mass flow rate in kg/s
 		Real64 AirSpecHeat; // Specific heat of air
 		Real64 AirDensity; // Density of air
@@ -477,9 +471,6 @@ namespace CoolTower {
 		Real64 OutletTemp; // Dry bulb temperature of air at the cooltower outlet
 		Real64 IntHumRat; // Humidity ratio of initialized air
 
-		// Allocate the CVF array
-		if ( ! allocated( CVF ) ) CVF.allocate( NumOfZones );
-		CVF = 0.0;
 		MCPTC = 0.0;
 		MCPC = 0.0;
 		CTMFL = 0.0;
@@ -552,16 +543,16 @@ namespace CoolTower {
 				OutletHumRat = ( InletHumRat * ( AirMassFlowRate + ( CoolTowerSys( CoolTowerNum ).ActualWaterFlowRate * RhoWater ) ) ) / AirMassFlowRate;
 				AirSpecHeat = PsyCpAirFnWTdb( OutletHumRat, OutletTemp );
 				AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutletTemp, OutletHumRat ); // Outlet air density
-				CVF( ZoneNum ) = CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate * GetCurrentScheduleValue( CoolTowerSys( CoolTowerNum ).SchedPtr );
-				MCPC( ZoneNum ) = CVF( ZoneNum ) * AirDensity * AirSpecHeat;
+				CVF_ZoneNum = CoolTowerSys( CoolTowerNum ).ActualAirVolFlowRate * GetCurrentScheduleValue( CoolTowerSys( CoolTowerNum ).SchedPtr );
+				MCPC( ZoneNum ) = CVF_ZoneNum * AirDensity * AirSpecHeat;
 				MCPTC( ZoneNum ) = MCPC( ZoneNum ) * OutletTemp;
 				CTMFL( ZoneNum ) = MCPC( ZoneNum ) / AirSpecHeat;
 
 				CoolTowerSys( CoolTowerNum ).SenHeatPower = MCPC( ZoneNum ) * std::abs( ZT( ZoneNum ) - OutletTemp );
-				CoolTowerSys( CoolTowerNum ).LatHeatPower = CVF( ZoneNum ) * std::abs( ZoneAirHumRat( ZoneNum ) - OutletHumRat );
+				CoolTowerSys( CoolTowerNum ).LatHeatPower = CVF_ZoneNum * std::abs( ZoneAirHumRat( ZoneNum ) - OutletHumRat );
 				CoolTowerSys( CoolTowerNum ).OutletTemp = OutletTemp;
 				CoolTowerSys( CoolTowerNum ).OutletHumRat = OutletHumRat;
-				CoolTowerSys( CoolTowerNum ).AirVolFlowRate = CVF( ZoneNum );
+				CoolTowerSys( CoolTowerNum ).AirVolFlowRate = CVF_ZoneNum;
 				CoolTowerSys( CoolTowerNum ).AirMassFlowRate = CTMFL( ZoneNum );
 				CoolTowerSys( CoolTowerNum ).AirVolFlowRateStd = CTMFL( ZoneNum ) / StdRhoAir;
 				CoolTowerSys( CoolTowerNum ).InletDBTemp = Zone( ZoneNum ).OutDryBulbTemp;

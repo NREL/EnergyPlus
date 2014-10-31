@@ -382,17 +382,11 @@ namespace ScheduleManager {
 		MaxAlps = max( MaxAlps, NumAlphas );
 
 		Alphas.allocate( MaxAlps ); // Maximum Alphas possible
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlps );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums ); // Maximum Numbers possible
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlps );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 ); // Maximum Numbers possible
+		lAlphaBlanks.dimension( MaxAlps, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// Prescan to determine extra day and week schedules due to compact schedule input
 		AddWeekSch = 0;
@@ -415,11 +409,8 @@ namespace ScheduleManager {
 			Numbers.deallocate();
 			lNumericBlanks.deallocate();
 			cNumericFields.allocate( MaxNums );
-			cNumericFields = "";
-			Numbers.allocate( MaxNums ); // Maximum Numbers possible
-			Numbers = 0.0;
-			lNumericBlanks.allocate( MaxNums );
-			lNumericBlanks = true;
+			Numbers.dimension( MaxNums, 0.0 ); // Maximum Numbers possible
+			lNumericBlanks.dimension( MaxNums, true );
 		}
 		// add week and day schedules for each FILE:COMMA schedule
 		AddWeekSch += NumCommaFileSchedules * 366; //number of days/year because need a week for each day

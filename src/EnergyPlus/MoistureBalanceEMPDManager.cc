@@ -194,8 +194,7 @@ namespace MoistureBalanceEMPDManager {
 		}
 
 		// Ensure at least one interior EMPD surface for each zone
-		EMPDzone.allocate( NumOfZones );
-		EMPDzone = false;
+		EMPDzone.dimension( NumOfZones, false );
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf || Surface( SurfNum ).Class == SurfaceClass_Window ) continue; // Heat transfer surface only and not a window
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_EMPD ) continue;

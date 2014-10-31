@@ -5163,7 +5163,6 @@ Label9999: ;
 		int LocalLeapYearAdd;
 
 		// Object Data
-		FArray1D< EnvironmentData > TempEnvironment; // Environment data
 
 		// FLOW:
 		RP = GetNumObjectsFound( "RunPeriod" );
@@ -5519,17 +5518,8 @@ Label9999: ;
 		}
 
 		if ( TotRunPers == 0 && FullAnnualRun ) {
-			RunPeriodInput.deallocate();
 			ShowWarningError( "No Run Periods input but Full Annual Simulation selected.  Adding Run Period to 1/1 through 12/31." );
-			++NumOfEnvrn;
-			TempEnvironment.allocate( NumOfEnvrn );
-			if ( NumOfEnvrn > 1 ) {
-				TempEnvironment( {1,NumOfEnvrn - 1} ) = Environment( {1,NumOfEnvrn - 1} );
-			}
-			Environment.deallocate();
-			Environment.allocate( NumOfEnvrn );
-			Environment = TempEnvironment;
-			TempEnvironment.deallocate();
+			Environment.redimension( ++NumOfEnvrn );
 			Environment( NumOfEnvrn ).KindOfEnvrn = ksRunPeriodWeather;
 			TotRunPers = 1;
 			WeathSimReq = true;
@@ -6213,16 +6203,11 @@ Label9999: ;
 		DDSkyTempScheduleValues.allocate( TotDesDays, 24, NumOfTimeStepInHour );
 		DDSkyTempScheduleValues = 0.0;
 
-		SPSiteDryBulbRangeModScheduleValue.allocate( TotDesDays );
-		SPSiteDryBulbRangeModScheduleValue = 0.0;
-		SPSiteHumidityConditionScheduleValue.allocate( TotDesDays );
-		SPSiteHumidityConditionScheduleValue = 0.0;
-		SPSiteBeamSolarScheduleValue.allocate( TotDesDays );
-		SPSiteBeamSolarScheduleValue = 0.0;
-		SPSiteDiffuseSolarScheduleValue.allocate( TotDesDays );
-		SPSiteDiffuseSolarScheduleValue = 0.0;
-		SPSiteSkyTemperatureScheduleValue.allocate( TotDesDays );
-		SPSiteSkyTemperatureScheduleValue = 0.0;
+		SPSiteDryBulbRangeModScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteHumidityConditionScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteBeamSolarScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteDiffuseSolarScheduleValue.dimension( TotDesDays, 0.0 );
+		SPSiteSkyTemperatureScheduleValue.dimension( TotDesDays, 0.0 );
 
 		if ( ReverseDD && TotDesDays <= 1 ) {
 			ShowSevereError( "GetDesignDayData: Reverse Design Day requested but # Design Days <=1" );

@@ -55,13 +55,6 @@ namespace DataAirSystems {
 	FArray1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
 	FArray1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
 	FArray1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
-	FArray1D< ConnectionPoint > TempDemandSideConnect;
-	FArray1D< ConnectZoneComp > TempZoneCompToPlant; // Connections between loops
-	FArray1D< ConnectZoneSubComp > TempZoneSubCompToPlant; // Connections between loops
-	FArray1D< ConnectZoneSubSubComp > TempZoneSubSubCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysComp > TempAirSysCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysSubComp > TempAirSysSubCompToPlant; // Connections between loops
-	FArray1D< ConnectAirSysSubSubComp > TempAirSysSubSubCompToPlant; // Connections between loops
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois

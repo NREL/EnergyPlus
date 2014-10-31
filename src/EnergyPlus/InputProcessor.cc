@@ -2,6 +2,7 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <InputProcessor.hh>
@@ -290,13 +291,10 @@ namespace InputProcessor {
 		ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
 		if ( SortedIDD ) {
 			iListOfObjects.allocate( NumObjectDefs );
-			iListOfObjects = 0;
 			SetupAndSort( ListOfObjects, iListOfObjects );
 		}
-		ObjectStartRecord.allocate( NumObjectDefs );
-		ObjectStartRecord = 0;
-		ObjectGotCount.allocate( NumObjectDefs );
-		ObjectGotCount = 0;
+		ObjectStartRecord.dimension( NumObjectDefs, 0 );
+		ObjectGotCount.dimension( NumObjectDefs, 0 );
 
 		gio::close( IDDFile );
 
@@ -356,20 +354,13 @@ namespace InputProcessor {
 		gio::close( IDFFile );
 
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaFieldNames = BlankString;
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaArgs = BlankString;
-		lAlphaFieldBlanks.allocate( MaxAlphaIDFDefArgsFound );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxAlphaIDFDefArgsFound, false );
 		cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		cNumericFieldNames = BlankString;
-		rNumericArgs.allocate( MaxNumericIDFDefArgsFound );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumericIDFDefArgsFound );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumericIDFDefArgsFound, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumericIDFDefArgsFound, false );
 
-		IDFRecordsGotten.allocate( NumIDFRecords );
-		IDFRecordsGotten = false;
+		IDFRecordsGotten.dimension( NumIDFRecords, false );
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Complete";
 		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
@@ -504,15 +495,10 @@ namespace InputProcessor {
 		std::string::size_type Pos; // Test of scanning position on the current input line
 		bool BlankLine;
 
-		// Object Data
-		FArray1D< SectionsDefinition > TempSectionDef; // Like SectionDef, used during Re-allocation
-		FArray1D< ObjectsDefinition > TempObjectDef; // Like ObjectDef, used during Re-allocation
-
 		MaxSectionDefs = SectionDefAllocInc;
 		MaxObjectDefs = ObjectDefAllocInc;
 
 		SectionDef.allocate( MaxSectionDefs );
-
 		ObjectDef.allocate( MaxObjectDefs );
 
 		NumObjectDefs = 0;
@@ -538,24 +524,12 @@ namespace InputProcessor {
 				if ( InputLine[ Pos ] == ';' ) {
 					AddSectionDef( InputLine.substr( 0, Pos ), ErrorsFound );
 					if ( NumSectionDefs == MaxSectionDefs ) {
-						TempSectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-						TempSectionDef( {1,MaxSectionDefs} ) = SectionDef;
-						SectionDef.deallocate();
-						SectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-						SectionDef = TempSectionDef;
-						TempSectionDef.deallocate();
-						MaxSectionDefs += SectionDefAllocInc;
+						SectionDef.redimension( MaxSectionDefs += SectionDefAllocInc );
 					}
 				} else {
 					AddObjectDefandParse( InputLine.substr( 0, Pos ), Pos, EndofFile, ErrorsFound );
 					if ( NumObjectDefs == MaxObjectDefs ) {
-						TempObjectDef.allocate( MaxObjectDefs + ObjectDefAllocInc );
-						TempObjectDef( {1,MaxObjectDefs} ) = ObjectDef;
-						ObjectDef.deallocate();
-						ObjectDef.allocate( MaxObjectDefs + ObjectDefAllocInc );
-						ObjectDef = TempObjectDef;
-						TempObjectDef.deallocate();
-						MaxObjectDefs += ObjectDefAllocInc;
+						ObjectDef.redimension( MaxObjectDefs += ObjectDefAllocInc );
 					}
 				}
 
@@ -688,15 +662,10 @@ namespace InputProcessor {
 		bool BlankLine; // True when this line is "blank" (may have comment characters as first character on line)
 		static FArray1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha,
 		// False is numeric, saved in ObjectDef when done
-		static FArray1D_bool TempAN; // Array (ref: AlphaOrNumeric) for re-allocation procedure
 		static FArray1D_bool RequiredFields; // Array of argument required fields
-		static FArray1D_bool TempRqF; // Array (ref: RequiredFields) for re-allocation procedure
 		static FArray1D_bool AlphRetainCase; // Array of argument for retain case
-		static FArray1D_bool TempRtC; // Array (ref: AlphRetainCase) for re-allocation procedure
 		static FArray1D_string AlphFieldChecks; // Array with alpha field names
-		static FArray1D_string TempAFC; // Array (ref: AlphFieldChecks) for re-allocation procedure
 		static FArray1D_string AlphFieldDefaults; // Array with alpha field defaults
-		static FArray1D_string TempAFD; // Array (ref: AlphFieldDefaults) for re-allocation procedure
 		bool MinMax; // Set to true when MinMax field has been found by ReadInputLine
 		bool Default; // Set to true when Default field has been found by ReadInputLine
 		bool AutoSize; // Set to true when Autosizable field has been found by ReadInputLine
@@ -833,48 +802,14 @@ namespace InputProcessor {
 					RetainCaseFlag = false;
 
 					if ( Count > MaxANArgs ) { // Reallocation
-						TempAN.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						TempAN = false;
-						TempAN( {0,MaxANArgs} ) = AlphaOrNumeric;
-						AlphaOrNumeric.deallocate();
-						TempRqF.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						TempRqF = false;
-						TempRqF( {0,MaxANArgs} ) = RequiredFields;
-						RequiredFields.deallocate();
-						TempRtC.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						TempRtC = false;
-						TempRtC( {0,MaxANArgs} ) = AlphRetainCase;
-						AlphRetainCase.deallocate();
-						TempChecks.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempChecks( {1,MaxANArgs} ) = NumRangeChecks( {1,MaxANArgs} );
-						NumRangeChecks.deallocate();
-						TempAFC.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFC = BlankString;
-						TempAFC( {1,MaxANArgs} ) = AlphFieldChecks;
-						AlphFieldChecks.deallocate();
-						TempAFD.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFD = BlankString;
-						TempAFD( {1,MaxANArgs} ) = AlphFieldDefaults;
-						AlphFieldDefaults.deallocate();
-						AlphaOrNumeric.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						AlphaOrNumeric = TempAN;
-						TempAN.deallocate();
-						RequiredFields.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						RequiredFields = TempRqF;
-						TempRqF.deallocate();
-						AlphRetainCase.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						AlphRetainCase = TempRtC;
-						TempRtC.deallocate();
-						NumRangeChecks.allocate( MaxANArgs + ANArgsDefAllocInc );
-						NumRangeChecks = TempChecks;
-						TempChecks.deallocate();
-						AlphFieldChecks.allocate( MaxANArgs + ANArgsDefAllocInc );
-						AlphFieldChecks = TempAFC;
-						TempAFC.deallocate();
-						AlphFieldDefaults.allocate( MaxANArgs + ANArgsDefAllocInc );
-						AlphFieldDefaults = TempAFD;
-						TempAFD.deallocate();
-						MaxANArgs += ANArgsDefAllocInc;
+						int const newANArgs( MaxANArgs + ANArgsDefAllocInc );
+						AlphaOrNumeric.redimension( {0,newANArgs}, false );
+						RequiredFields.redimension( {0,newANArgs}, false );
+						AlphRetainCase.redimension( {0,newANArgs}, false );
+						NumRangeChecks.redimension( newANArgs );
+						AlphFieldChecks.redimension( newANArgs );
+						AlphFieldDefaults.redimension( newANArgs );
+						MaxANArgs = newANArgs;
 					}
 
 					TargetChar = InputLine[ CurPos + Pos ];
@@ -1039,17 +974,9 @@ namespace InputProcessor {
 		ObjectDef( NumObjectDefs ).NumParams = Count; // Also the total of ObjectDef(..)%NumAlpha+ObjectDef(..)%NumNumeric
 		ObjectDef( NumObjectDefs ).MinNumFields = MinimumNumberOfFields;
 		if ( ObsoleteObject ) {
-			TempAFD.allocate( NumObsoleteObjects + 1 );
-			if ( NumObsoleteObjects > 0 ) {
-				TempAFD( {1,NumObsoleteObjects} ) = ObsoleteObjectsRepNames;
-			}
-			TempAFD( NumObsoleteObjects + 1 ) = ReplacementName;
-			ObsoleteObjectsRepNames.deallocate();
-			++NumObsoleteObjects;
-			ObsoleteObjectsRepNames.allocate( NumObsoleteObjects );
-			ObsoleteObjectsRepNames = TempAFD;
+			ObsoleteObjectsRepNames.redimension( ++NumObsoleteObjects );
+			ObsoleteObjectsRepNames( NumObsoleteObjects ) = ReplacementName;
 			ObjectDef( NumObjectDefs ).ObsPtr = NumObsoleteObjects;
-			TempAFD.deallocate();
 		}
 		if ( RequiredObject ) {
 			ObjectDef( NumObjectDefs ).RequiredObject = true;
@@ -1215,10 +1142,6 @@ namespace InputProcessor {
 		bool BlankLine;
 		std::string::size_type Pos;
 
-		// Object Data
-		FArray1D< FileSectionsDefinition > TempSectionsonFile; // Used during reallocation procedure
-		FArray1D< LineDefinition > TempIDFRecords; // Used during reallocation procedure
-
 		MaxIDFRecords = ObjectsIDFAllocInc;
 		NumIDFRecords = 0;
 		MaxIDFSections = SectionsIDFAllocInc;
@@ -1240,24 +1163,12 @@ namespace InputProcessor {
 				if ( InputLine[ Pos ] == ';' ) {
 					ValidateSection( InputLine.substr( 0, Pos ), NumLines );
 					if ( NumIDFSections == MaxIDFSections ) {
-						TempSectionsonFile.allocate( MaxIDFSections + SectionsIDFAllocInc );
-						TempSectionsonFile( {1,MaxIDFSections} ) = SectionsOnFile;
-						SectionsOnFile.deallocate();
-						SectionsOnFile.allocate( MaxIDFSections + SectionsIDFAllocInc );
-						SectionsOnFile = TempSectionsonFile;
-						TempSectionsonFile.deallocate();
-						MaxIDFSections += SectionsIDFAllocInc;
+						SectionsOnFile.redimension( MaxIDFSections += SectionsIDFAllocInc );
 					}
 				} else {
 					ValidateObjectandParse( InputLine.substr( 0, Pos ), Pos, EndofFile );
 					if ( NumIDFRecords == MaxIDFRecords ) {
-						TempIDFRecords.allocate( MaxIDFRecords + ObjectsIDFAllocInc );
-						TempIDFRecords( {1,MaxIDFRecords} ) = IDFRecords;
-						IDFRecords.deallocate();
-						IDFRecords.allocate( MaxIDFRecords + ObjectsIDFAllocInc );
-						IDFRecords = TempIDFRecords;
-						TempIDFRecords.deallocate();
-						MaxIDFRecords += ObjectsIDFAllocInc;
+						IDFRecords.redimension( MaxIDFRecords += ObjectsIDFAllocInc );
 					}
 				}
 			} else {
@@ -1327,9 +1238,6 @@ namespace InputProcessor {
 		int Found;
 		int OFound;
 
-		// Object Data
-		FArray1D< SectionsDefinition > TempSectionDef; // Like SectionDef, used during Re-allocation
-
 		SqueezedSection = MakeUPPERCase( stripped( ProposedSection ) );
 		if ( len( stripped( ProposedSection ) ) > static_cast< std::string::size_type >( MaxSectionNameLength ) ) {
 			ShowWarningError( "IP: Section length exceeds maximum, will be truncated=" + ProposedSection, EchoInputFile );
@@ -1348,13 +1256,7 @@ namespace InputProcessor {
 				if ( OFound != 0 ) {
 					AddRecordFromSection( OFound );
 				} else if ( NumSectionDefs == MaxSectionDefs ) {
-					TempSectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-					TempSectionDef( {1,MaxSectionDefs} ) = SectionDef;
-					SectionDef.deallocate();
-					SectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-					SectionDef = TempSectionDef;
-					TempSectionDef.deallocate();
-					MaxSectionDefs += SectionDefAllocInc;
+					SectionDef.redimension( MaxSectionDefs += SectionDefAllocInc );
 				}
 				++NumSectionDefs;
 				SectionDef( NumSectionDefs ).Name = SqueezedSection;
@@ -1888,12 +1790,12 @@ namespace InputProcessor {
 			IDFRecords( NumIDFRecords ).NumAlphas = LineItem.NumAlphas;
 			IDFRecords( NumIDFRecords ).ObjectDefPtr = LineItem.ObjectDefPtr;
 			IDFRecords( NumIDFRecords ).Alphas.allocate( LineItem.NumAlphas );
-			IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
-			IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
-			IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
 			IDFRecords( NumIDFRecords ).Alphas = LineItem.Alphas( {1,LineItem.NumAlphas} );
+			IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
 			IDFRecords( NumIDFRecords ).AlphBlank = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
+			IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
 			IDFRecords( NumIDFRecords ).Numbers = LineItem.Numbers( {1,LineItem.NumNumbers} );
+			IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
 			IDFRecords( NumIDFRecords ).NumBlank = LineItem.NumBlank( {1,LineItem.NumNumbers} );
 			if ( LineItem.NumNumbers > 0 ) {
 				for ( Count = 1; Count <= LineItem.NumNumbers; ++Count ) {
@@ -3175,20 +3077,10 @@ namespace InputProcessor {
 		int NumNewParams;
 		int NumExtendFields;
 		int NumParams;
-		int Loop;
 		int Count;
-		int Item;
 		//  LOGICAL :: MaxArgsChanged
-		FArray1D_bool AorN;
-		FArray1D_bool TempLogical;
-		FArray1D< Real64 > TempReals;
-		FArray1D_string TempFieldCharacter;
-		FArray1D_string TempCharacter;
 		std::string charout;
 		static std::string CurObject;
-
-		// Object Data
-		FArray1D< RangeCheckDef > TempChecks;
 
 		gio::write( EchoInputFile, fmtA ) << "Attempting to auto-extend object=" + ObjectDef( ObjectNum ).Name;
 		if ( CurObject != ObjectDef( ObjectNum ).Name ) {
@@ -3202,92 +3094,46 @@ namespace InputProcessor {
 		Count = NumParams - ObjectDef( ObjectNum ).ExtensibleNum + 1;
 		//  MaxArgsChanged=.FALSE.
 
-		AorN.allocate( ObjectDef( ObjectNum ).ExtensibleNum );
-		AorN = false;
-		for ( Loop = NumParams; Loop >= Count; --Loop ) {
-			if ( ObjectDef( ObjectNum ).AlphaOrNumeric( Loop ) ) {
+		FArray1D_bool AorN( ObjectDef( ObjectNum ).ExtensibleNum, false );
+		for ( int Loop = Count, Item = 1; Loop <= NumParams; ++Loop, ++Item ) {
+			bool const AON_Loop( ObjectDef( ObjectNum ).AlphaOrNumeric( Loop ) );
+			if ( AON_Loop ) {
 				++NumAlphaField;
 			} else {
 				++NumNumericField;
 			}
-		}
-		Item = 0;
-		for ( Loop = Count; Loop <= NumParams; ++Loop ) {
-			++Item;
-			AorN( Item ) = ObjectDef( ObjectNum ).AlphaOrNumeric( Loop );
+			AorN( Item ) = AON_Loop;
 		}
 		NumNewAlphas = NumAlphaField * NewAlloc;
 		NumNewNumerics = NumNumericField * NewAlloc;
 		NumNewParams = NumParams + NumNewAlphas + NumNewNumerics;
 		NumExtendFields = NumAlphaField + NumNumericField;
-		TempLogical.allocate( NumNewParams );
-		TempLogical( {1,NumParams} ) = ObjectDef( ObjectNum ).AlphaOrNumeric;
-		TempLogical( {NumParams + 1,NumNewParams} ) = false;
-		ObjectDef( ObjectNum ).AlphaOrNumeric.deallocate();
-		ObjectDef( ObjectNum ).AlphaOrNumeric.allocate( NumNewParams );
-		ObjectDef( ObjectNum ).AlphaOrNumeric = TempLogical;
-		TempLogical.deallocate();
-		for ( Loop = NumParams + 1; Loop <= NumNewParams; Loop += NumExtendFields ) {
+		ObjectDef( ObjectNum ).AlphaOrNumeric.redimension( NumNewParams, false );
+		for ( int Loop = NumParams + 1; Loop <= NumNewParams; Loop += NumExtendFields ) {
 			ObjectDef( ObjectNum ).AlphaOrNumeric( {Loop,Loop+NumExtendFields-1} ) = AorN;
 		}
 		AorN.deallocate(); // done with this object AorN array.
 
 		// required fields -- can't be extended and required.
-		TempLogical.allocate( NumNewParams );
-		TempLogical( {1,NumParams} ) = ObjectDef( ObjectNum ).ReqField;
-		TempLogical( {NumParams + 1,NumNewParams} ) = false;
-		ObjectDef( ObjectNum ).ReqField.deallocate();
-		ObjectDef( ObjectNum ).ReqField.allocate( NumNewParams );
-		ObjectDef( ObjectNum ).ReqField = TempLogical;
-		TempLogical.deallocate();
+		ObjectDef( ObjectNum ).ReqField.redimension( NumNewParams, false );
 
-		TempLogical.allocate( NumNewParams );
-		TempLogical( {1,NumParams} ) = ObjectDef( ObjectNum ).AlphRetainCase;
-		TempLogical( {NumParams + 1,NumNewParams} ) = false;
-		ObjectDef( ObjectNum ).AlphRetainCase.deallocate();
-		ObjectDef( ObjectNum ).AlphRetainCase.allocate( NumNewParams );
-		ObjectDef( ObjectNum ).AlphRetainCase = TempLogical;
-		TempLogical.deallocate();
+		ObjectDef( ObjectNum ).AlphRetainCase.redimension( NumNewParams, false );
 
 		if ( NumAlphaField > 0 ) {
-			TempFieldCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			TempFieldCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldChks;
-			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
-			ObjectDef( ObjectNum ).AlphFieldChks.deallocate();
-			ObjectDef( ObjectNum ).AlphFieldChks.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			ObjectDef( ObjectNum ).AlphFieldChks = TempFieldCharacter;
-			TempFieldCharacter.deallocate();
-			for ( Loop = ObjectDef( ObjectNum ).NumAlpha + 1; Loop <= ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas; ++Loop ) {
+			ObjectDef( ObjectNum ).AlphFieldChks.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
+			for ( int Loop = ObjectDef( ObjectNum ).NumAlpha + 1, Loop_end = ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas; Loop <= Loop_end; ++Loop ) {
 				++ObjectDef( ObjectNum ).LastExtendAlpha;
 				charout = IPTrimSigDigits( ObjectDef( ObjectNum ).LastExtendAlpha );
 				ObjectDef( ObjectNum ).AlphFieldChks( Loop ) = "Extended Alpha Field " + charout;
 			}
 
-			TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldDefs;
-			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
-			ObjectDef( ObjectNum ).AlphFieldDefs.deallocate();
-			ObjectDef( ObjectNum ).AlphFieldDefs.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			ObjectDef( ObjectNum ).AlphFieldDefs = TempCharacter;
-			TempCharacter.deallocate();
+			ObjectDef( ObjectNum ).AlphFieldDefs.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 
 			if ( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas > MaxAlphaArgsFound ) {
 				// must redimension LineItem args
-				TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = LineItem.Alphas;
-				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
-				LineItem.Alphas.deallocate();
-				LineItem.Alphas.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				LineItem.Alphas = TempCharacter;
-				TempCharacter.deallocate();
+				LineItem.Alphas.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 
-				TempLogical.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				TempLogical( {1,ObjectDef( ObjectNum ).NumAlpha} ) = LineItem.AlphBlank;
-				TempLogical( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = true;
-				LineItem.AlphBlank.deallocate();
-				LineItem.AlphBlank.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				LineItem.AlphBlank = TempLogical;
-				TempLogical.deallocate();
+				LineItem.AlphBlank.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas, true );
 
 				MaxAlphaArgsFound = ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas;
 				//      MaxArgsChanged=.TRUE.
@@ -3296,13 +3142,8 @@ namespace InputProcessor {
 		}
 
 		if ( NumNumericField > 0 ) {
-			TempChecks.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-			TempChecks( {1,ObjectDef( ObjectNum ).NumNumeric} ) = ObjectDef( ObjectNum ).NumRangeChks;
-			ObjectDef( ObjectNum ).NumRangeChks.deallocate();
-			ObjectDef( ObjectNum ).NumRangeChks.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-			ObjectDef( ObjectNum ).NumRangeChks = TempChecks;
-			TempChecks.deallocate();
-			for ( Loop = ObjectDef( ObjectNum ).NumNumeric + 1; Loop <= ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics; ++Loop ) {
+			ObjectDef( ObjectNum ).NumRangeChks.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
+			for ( int Loop = ObjectDef( ObjectNum ).NumNumeric + 1, Loop_end = ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics; Loop <= Loop_end; ++Loop ) {
 				ObjectDef( ObjectNum ).NumRangeChks( Loop ).FieldNumber = Loop;
 				++ObjectDef( ObjectNum ).LastExtendNum;
 				charout = IPTrimSigDigits( ObjectDef( ObjectNum ).LastExtendNum );
@@ -3311,21 +3152,9 @@ namespace InputProcessor {
 
 			if ( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics > MaxNumericArgsFound ) {
 				// must redimension LineItem args
-				TempReals.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				TempReals( {1,ObjectDef( ObjectNum ).NumNumeric} ) = LineItem.Numbers;
-				TempReals( {ObjectDef( ObjectNum ).NumNumeric + 1,ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics} ) = 0.0;
-				LineItem.Numbers.deallocate();
-				LineItem.Numbers.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				LineItem.Numbers = TempReals;
-				TempReals.deallocate();
+				LineItem.Numbers.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics, 0.0 );
 
-				TempLogical.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				TempLogical( {1,ObjectDef( ObjectNum ).NumNumeric} ) = LineItem.NumBlank;
-				TempLogical( {ObjectDef( ObjectNum ).NumNumeric + 1,ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics} ) = true;
-				LineItem.NumBlank.deallocate();
-				LineItem.NumBlank.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				LineItem.NumBlank = TempLogical;
-				TempLogical.deallocate();
+				LineItem.NumBlank.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics, true );
 
 				MaxNumericArgsFound = ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics;
 				//      MaxArgsChanged=.TRUE.
@@ -3623,9 +3452,7 @@ namespace InputProcessor {
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up a string in a similar list of
 		// items and returns the index of the item in the list, if
-		// found.  This routine is not case insensitive and doesn't need
-		// for most inputs -- they are automatically turned to UPPERCASE.
-		// If you need case insensitivity use FindItem.
+		// found.  This routine is case insensitive.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -4511,18 +4338,14 @@ namespace InputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		FArray1D_string OrphanObjectNames;
-		FArray1D_string OrphanNames;
 		int Count;
 		int Found;
 		int ObjFound;
 		int NumOrphObjNames;
 		bool potentialOrphanedSpecialObjects( false );
 
-		OrphanObjectNames.allocate( NumIDFRecords );
-		OrphanNames.allocate( NumIDFRecords );
-		OrphanObjectNames = BlankString;
-		OrphanNames = BlankString;
+		FArray1D_string OrphanObjectNames( NumIDFRecords );
+		FArray1D_string OrphanNames( NumIDFRecords );
 		NumOrphObjNames = 0;
 
 		for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
@@ -4542,7 +4365,7 @@ namespace InputProcessor {
 					OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
 					// To avoid looking up potential things later when they *definitely* aren't there, we'll trap for specific flags here first
 					//  and set the potential flag.  If the potential flag is false, nothing else is looked up later to save time
-					if ( OrphanObjectNames( NumOrphObjNames ).substr( 0, 1 ) == "Z" ) {
+					if ( ( ! potentialOrphanedSpecialObjects ) && ( ! OrphanObjectNames( NumOrphObjNames ).empty() )  && ( OrphanObjectNames( NumOrphObjNames )[ 0 ] == 'Z' ) ) {
 						potentialOrphanedSpecialObjects = true;
 					}
 					if ( ObjectDef( ObjFound ).NameAlpha1 ) {
@@ -4577,8 +4400,8 @@ namespace InputProcessor {
 		//  - objects that start with "ZONEHVAC:"
 		if ( potentialOrphanedSpecialObjects ) {
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanObjectNames( Count ).substr( 0, 9 ) == "ZONEHVAC:" ) {
-					ShowSevereError( "Orphaned ZoneHVAC object found.  This object was never referenced in the idf, and was not used." );
+				if ( has_prefix( OrphanObjectNames( Count ), "ZONEHVAC:" ) ) {
+					ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the idf, and was not used." );
 					ShowContinueError( " -- Object type: " + OrphanObjectNames( Count ) );
 					ShowContinueError( " -- Object name: " + OrphanNames( Count ) );
 				}
@@ -4941,13 +4764,13 @@ namespace InputProcessor {
 		IDFRecords( NumIDFRecords ).NumAlphas = LineItem.NumAlphas;
 		IDFRecords( NumIDFRecords ).ObjectDefPtr = LineItem.ObjectDefPtr;
 		IDFRecords( NumIDFRecords ).Alphas.allocate( LineItem.NumAlphas );
+		IDFRecords( NumIDFRecords ).Alphas = LineItem.Alphas( {1,LineItem.NumAlphas} );
 		IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
+		IDFRecords( NumIDFRecords ).AlphBlank = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
 		IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
+		IDFRecords( NumIDFRecords ).Numbers = LineItem.Numbers( {1,LineItem.NumNumbers} );
 		IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
-		IDFRecords( NumIDFRecords ).Alphas( {1,LineItem.NumAlphas} ) = LineItem.Alphas( {1,LineItem.NumAlphas} );
-		IDFRecords( NumIDFRecords ).AlphBlank( {1,LineItem.NumAlphas} ) = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
-		IDFRecords( NumIDFRecords ).Numbers( {1,LineItem.NumNumbers} ) = LineItem.Numbers( {1,LineItem.NumNumbers} );
-		IDFRecords( NumIDFRecords ).NumBlank( {1,LineItem.NumNumbers} ) = LineItem.NumBlank( {1,LineItem.NumNumbers} );
+		IDFRecords( NumIDFRecords ).NumBlank = LineItem.NumBlank( {1,LineItem.NumNumbers} );
 		if ( LineItem.NumNumbers > 0 ) {
 			for ( Count = 1; Count <= LineItem.NumNumbers; ++Count ) {
 				if ( ObjectDef( Which ).NumRangeChks( Count ).MinMaxChk && ! LineItem.NumBlank( Count ) ) {
@@ -5339,12 +5162,7 @@ namespace InputProcessor {
 		}
 
 		if ( NumConsideredOutputVariables > 0 ) {
-			TempOutputVariablesForSimulation.allocate( NumConsideredOutputVariables );
-			TempOutputVariablesForSimulation( {1,NumConsideredOutputVariables} ) = OutputVariablesForSimulation( {1,NumConsideredOutputVariables} );
-			OutputVariablesForSimulation.deallocate();
-			OutputVariablesForSimulation.allocate( NumConsideredOutputVariables );
-			OutputVariablesForSimulation( {1,NumConsideredOutputVariables} ) = TempOutputVariablesForSimulation( {1,NumConsideredOutputVariables} );
-			TempOutputVariablesForSimulation.deallocate();
+			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
 			MaxConsideredOutputVariables = NumConsideredOutputVariables;
 		}
 
@@ -5974,14 +5792,7 @@ namespace InputProcessor {
 		// na
 
 		// up allocation by OutputVarAllocInc
-		TempOutputVariablesForSimulation.allocate( MaxConsideredOutputVariables + OutputVarAllocInc );
-		TempOutputVariablesForSimulation( {1,NumConsideredOutputVariables} ) = OutputVariablesForSimulation( {1,NumConsideredOutputVariables} );
-		OutputVariablesForSimulation.deallocate();
-		MaxConsideredOutputVariables += OutputVarAllocInc;
-		OutputVariablesForSimulation.allocate( MaxConsideredOutputVariables );
-		OutputVariablesForSimulation( {1,MaxConsideredOutputVariables} ) = TempOutputVariablesForSimulation( {1,MaxConsideredOutputVariables} );
-		TempOutputVariablesForSimulation.deallocate();
-
+		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
 	}
 
 	void

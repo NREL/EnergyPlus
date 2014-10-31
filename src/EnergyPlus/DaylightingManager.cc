@@ -4361,8 +4361,7 @@ namespace DaylightingManager {
 
 		IllumMap.allocate( TotIllumMaps );
 		IllumMapCalc.allocate( TotIllumMaps );
-		ZoneMapCount.allocate( NumOfZones );
-		ZoneMapCount = 0;
+		ZoneMapCount.dimension( NumOfZones, 0 );
 
 		if ( TotIllumMaps > 0 ) {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
@@ -4812,8 +4811,7 @@ namespace DaylightingManager {
 
 		}
 
-		ZoneMsgDone.allocate( NumOfZones );
-		ZoneMsgDone = false;
+		ZoneMsgDone.dimension( NumOfZones, false );
 		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 			if ( IllumMap( MapNum ).Zone == 0 ) continue;
 			if ( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylightType != DetailedDaylighting && ! ZoneMsgDone( IllumMap( MapNum ).Zone ) ) {
@@ -4925,8 +4923,7 @@ namespace DaylightingManager {
 		static bool firstTime( true );
 
 		if ( firstTime ) {
-			CheckTDDZone.allocate( NumOfZones );
-			CheckTDDZone = true;
+			CheckTDDZone.dimension( NumOfZones, true );
 			firstTime = false;
 		}
 
@@ -8137,25 +8134,19 @@ namespace DaylightingManager {
 
 		if ( ! allocated( FLSK ) ) FLSK.allocate( NTrnBasis, 4 );
 		FLSK = 0.0;
-		if ( ! allocated( FLSU ) ) FLSU.allocate( NTrnBasis );
-		FLSU = 0.0;
-		if ( ! allocated( FLSUdisk ) ) FLSUdisk.allocate( NTrnBasis );
-		FLSUdisk = 0.0;
+		if ( ! allocated( FLSU ) ) FLSU.dimension( NTrnBasis, 0.0 );
+		if ( ! allocated( FLSUdisk ) ) FLSUdisk.dimension( NTrnBasis, 0.0 );
 
 		if ( ! allocated( FirstFluxSK ) ) FirstFluxSK.allocate( NTrnBasis, 4 );
 		FirstFluxSK = 0.0;
-		if ( ! allocated( FirstFluxSU ) ) FirstFluxSU.allocate( NTrnBasis );
-		FirstFluxSU = 0.0;
-		if ( ! allocated( FirstFluxSUdisk ) ) FirstFluxSUdisk.allocate( NTrnBasis );
-		FirstFluxSUdisk = 0.0;
+		if ( ! allocated( FirstFluxSU ) ) FirstFluxSU.dimension( NTrnBasis, 0.0 );
+		if ( ! allocated( FirstFluxSUdisk ) ) FirstFluxSUdisk.dimension( NTrnBasis, 0.0 );
 
 		NIncBasis = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.NBasis;
 		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
 		ElementLuminanceSky = 0.0;
-		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.allocate( NIncBasis );
-		ElementLuminanceSun = 0.0;
-		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.allocate( NIncBasis );
-		ElementLuminanceSunDisk = 0.0;
+		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
+		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
 
 		// Integration over sky/ground/sun elements is done over window incoming basis element and flux is calculated for each
 		// outgoing direction. This is used to calculate first reflected flux
@@ -8293,10 +8284,8 @@ namespace DaylightingManager {
 
 		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
 		ElementLuminanceSky = 0.0;
-		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.allocate( NIncBasis );
-		ElementLuminanceSun = 0.0;
-		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.allocate( NIncBasis );
-		ElementLuminanceSunDisk = 0.0;
+		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
+		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
 
 		ComplexFenestrationLuminances( IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum );
 
@@ -9310,14 +9299,10 @@ namespace DaylightingManager {
 		// FLOW:
 		if ( firstTime ) {
 			firstTime = false;
-			FirstTimeMaps.allocate( TotIllumMaps );
-			FirstTimeMaps = true;
-			EnvrnPrint.allocate( TotIllumMaps );
-			EnvrnPrint = true;
+			FirstTimeMaps.dimension( TotIllumMaps, true );
+			EnvrnPrint.dimension( TotIllumMaps, true );
 			RefPts.allocate( MaxRefPoints, NumOfZones );
-			RefPts = "";
 			SavedMnDy.allocate( TotIllumMaps );
-			SavedMnDy = "";
 		}
 
 		if ( FirstTimeMaps( MapNum ) ) {
@@ -9801,8 +9786,7 @@ Label903: ;
 
 		}
 
-		ZoneExtWin.allocate( NumOfZones );
-		ZoneExtWin = 0;
+		ZoneExtWin.dimension( NumOfZones, 0 );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 0 ) {

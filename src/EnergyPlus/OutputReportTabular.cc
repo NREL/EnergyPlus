@@ -393,13 +393,10 @@ namespace OutputReportTabular {
 	FArray1D< BinStatisticsType > BinStatistics;
 	FArray1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
 	FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
-	FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInputCopy;
 	FArray1D< MonthlyInputType > MonthlyInput;
-	FArray1D< MonthlyInputType > MonthlyInputCopy;
 	FArray1D< MonthlyTablesType > MonthlyTables;
 	FArray1D< MonthlyColumnsType > MonthlyColumns;
 	FArray1D< TOCEntriesType > TOCEntries;
-	FArray1D< TOCEntriesType > CopyOfTOCEntries;
 	FArray1D< UnitConvType > UnitConv;
 
 	static gio::Fmt const fmtLD( "*" );
@@ -548,9 +545,7 @@ namespace OutputReportTabular {
 		}
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
+		NumArray.dimension( NumNums, 0.0 );
 		for ( int TabNum = 1, TabNum_end = MonthlyInputCount; TabNum <= TabNum_end; ++TabNum ) { // MonthlyInputCount is modified in the loop
 			GetObjectItem( CurrentModuleObject, TabNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			IsNotOK = false;
@@ -655,16 +650,9 @@ namespace OutputReportTabular {
 			MonthlyInputCount = 1;
 		} else {
 			++MonthlyInputCount;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( MonthlyInputCount > sizeMonthlyInput ) {
-				MonthlyInputCopy.allocate( sizeMonthlyInput );
-				MonthlyInputCopy = MonthlyInput;
-				MonthlyInput.deallocate();
-				MonthlyInput.allocate( sizeMonthlyInput + SizeAdder );
-				MonthlyInput( {1,sizeMonthlyInput} ) = MonthlyInputCopy;
-				MonthlyInputCopy.deallocate();
-				sizeMonthlyInput += SizeAdder;
+				MonthlyInput.redimension( sizeMonthlyInput += SizeAdder );
 			}
 		}
 		// initialize new record
@@ -720,16 +708,9 @@ namespace OutputReportTabular {
 			MonthlyFieldSetInputCount = 1;
 		} else {
 			++MonthlyFieldSetInputCount;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( MonthlyFieldSetInputCount > sizeMonthlyFieldSetInput ) {
-				MonthlyFieldSetInputCopy.allocate( sizeMonthlyFieldSetInput );
-				MonthlyFieldSetInputCopy = MonthlyFieldSetInput;
-				MonthlyFieldSetInput.deallocate();
-				MonthlyFieldSetInput.allocate( sizeMonthlyFieldSetInput + sizeIncrement );
-				MonthlyFieldSetInput( {1,sizeMonthlyFieldSetInput} ) = MonthlyFieldSetInputCopy;
-				MonthlyFieldSetInputCopy.deallocate();
-				sizeMonthlyFieldSetInput += sizeIncrement;
+				MonthlyFieldSetInput.redimension( sizeMonthlyFieldSetInput += sizeIncrement );
 			}
 		}
 		// initialize new record)
@@ -806,7 +787,6 @@ namespace OutputReportTabular {
 		//CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
 		//INTEGER, DIMENSION(:) , ALLOCATABLE                     :: IndexesForKeyVar ! Array index
 		FArray1D_string UniqueKeyNames;
-		FArray1D_string tempUniqueKeyNames;
 		int UniqueKeyCount;
 		int iKey;
 		int jUnique;
@@ -908,14 +888,7 @@ namespace OutputReportTabular {
 					if ( found == 0 ) {
 						++UniqueKeyCount;
 						if ( UniqueKeyCount > maxUniqueKeyCount ) {
-							tempUniqueKeyNames.allocate( maxUniqueKeyCount );
-							tempUniqueKeyNames = UniqueKeyNames;
-							UniqueKeyNames.deallocate();
-							UniqueKeyNames.allocate( maxUniqueKeyCount + 500 );
-							UniqueKeyNames( {1,maxUniqueKeyCount} ) = tempUniqueKeyNames;
-							UniqueKeyNames( {maxUniqueKeyCount + 1,maxUniqueKeyCount + 500} ) = "";
-							tempUniqueKeyNames.deallocate();
-							maxUniqueKeyCount += 500;
+							UniqueKeyNames.redimension( maxUniqueKeyCount += 500 );
 						}
 						UniqueKeyNames( UniqueKeyCount ) = MonthlyFieldSetInput( FirstColumn + colNum - 1 ).NamesOfKeys( iKey );
 					}
@@ -1240,9 +1213,7 @@ namespace OutputReportTabular {
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
+		NumArray.dimension( NumNums, 0.0 );
 
 		timeInYear = 0.0; //intialize the time in year counter
 		// determine size of array that holds the IDF description
@@ -1431,9 +1402,7 @@ namespace OutputReportTabular {
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
+		NumArray.dimension( NumNums, 0.0 );
 
 		NumTabularStyle = GetNumObjectsFound( CurrentModuleObject );
 
@@ -1623,10 +1592,8 @@ namespace OutputReportTabular {
 			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			// allocate the temporary arrays for the call to get the filed
 			AlphArray.allocate( NumAlphas );
-			AlphArray = "";
 			// don't really need the NumArray since not expecting any numbers but the call requires it
-			NumArray.allocate( NumNums );
-			NumArray = 0.0;
+			NumArray.dimension( NumNums, 0.0 );
 			// get the object
 			GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			// default all report flags to false (do not get produced)
@@ -2009,10 +1976,8 @@ namespace OutputReportTabular {
 			GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 			// allocate the temporary arrays for the call to get the filed
 			AlphArray.allocate( NumAlphas );
-			AlphArray = "";
 			// don't really need the NumArray since not expecting any numbers but the call requires it
-			NumArray.allocate( NumNums );
-			NumArray = 0.0;
+			NumArray.dimension( NumNums, 0.0 );
 			// get the object
 			GetObjectItem( CurrentModuleObject, 1, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
 			// loop through the fields looking for matching report titles
@@ -3606,16 +3571,11 @@ namespace OutputReportTabular {
 		//create temporary arrays to speed processing of these arrays
 		if ( RunOnce ) {
 			//MonthlyColumns
-			MonthlyColumnsTypeOfVar.allocate( MonthlyColumnsCount );
 			MonthlyColumnsTypeOfVar = MonthlyColumns.typeOfVar();
-			MonthlyColumnsStepType.allocate( MonthlyColumnsCount );
 			MonthlyColumnsStepType = MonthlyColumns.stepType();
-			MonthlyColumnsAggType.allocate( MonthlyColumnsCount );
 			MonthlyColumnsAggType = MonthlyColumns.aggType();
-			MonthlyColumnsVarNum.allocate( MonthlyColumnsCount );
 			MonthlyColumnsVarNum = MonthlyColumns.varNum();
 			//MonthlyTables
-			MonthlyTablesNumColumns.allocate( MonthlyTablesCount );
 			MonthlyTablesNumColumns = MonthlyTables.numColumns();
 
 			//set flag so this block is only executed once
@@ -6003,8 +5963,7 @@ namespace OutputReportTabular {
 					}}
 				} //jColumn
 				columnHead.allocate( columnUsedCount );
-				columnWidth.allocate( columnUsedCount );
-				columnWidth = 14; //array assignment - same for all columns
+				columnWidth.dimension( columnUsedCount, 14 ); //array assignment - same for all columns
 				tableBody.allocate( 16, columnUsedCount );
 				tableBody = ""; //set entire table to blank as default
 				columnRecount = 0;
@@ -8910,8 +8869,7 @@ namespace OutputReportTabular {
 		NumCols = 6; // Line no., Line name, Qty, Units, ValperQty, Subtotal
 		rowHead.allocate( NumRows );
 		columnHead.allocate( NumCols );
-		columnWidth.allocate( NumCols );
-		columnWidth = 14; //array assignment - same for all columns
+		columnWidth.dimension( NumCols, 14 ); //array assignment - same for all columns
 		tableBody.allocate( NumRows, NumCols );
 		tableBody = "--"; // array init
 		rowHead = "--"; // array init
@@ -9946,8 +9904,7 @@ namespace OutputReportTabular {
 						// now create the arrays that are filled with values
 						rowHead.allocate( curNumRows );
 						columnHead.allocate( curNumColumns );
-						columnWidth.allocate( curNumColumns );
-						columnWidth = 14; //array assignment - same for all columns
+						columnWidth.dimension( curNumColumns, 14 ); //array assignment - same for all columns
 						tableBody.allocate( curNumRows, curNumColumns );
 						rowHead = "";
 						columnHead = "";
@@ -10192,8 +10149,7 @@ namespace OutputReportTabular {
 				//sizes can be set for the table arrays
 				rowHead.allocate( numUniqueObj );
 				columnHead.allocate( numUniqueDesc );
-				columnWidth.allocate( numUniqueDesc );
-				columnWidth = 14; //array assignment - same for all columns
+				columnWidth.dimension( numUniqueDesc, 14 ); //array assignment - same for all columns
 				colUnitConv.allocate( numUniqueDesc );
 				tableBody.allocate( numUniqueObj, numUniqueDesc );
 				// initialize table body to blanks (in case entries are incomplete)
@@ -11265,8 +11221,7 @@ namespace OutputReportTabular {
 
 				rowHead.allocate( rGrdTot );
 				columnHead.allocate( cPerc );
-				columnWidth.allocate( cPerc );
-				columnWidth = 14; //array assignment - same for all columns
+				columnWidth.dimension( cPerc, 14 ); //array assignment - same for all columns
 				tableBody.allocate( rGrdTot, cPerc );
 
 				if ( unitsStyle != unitsStyleInchPound ) {
@@ -11744,8 +11699,7 @@ namespace OutputReportTabular {
 				//---- Heating Peak Load Components Sub-Table
 				rowHead.allocate( rGrdTot );
 				columnHead.allocate( cPerc );
-				columnWidth.allocate( cPerc );
-				columnWidth = 14; //array assignment - same for all columns
+				columnWidth.dimension( cPerc, 14 ); //array assignment - same for all columns
 				tableBody.allocate( rGrdTot, cPerc );
 
 				if ( unitsStyle != unitsStyleInchPound ) {
@@ -13472,17 +13426,9 @@ Label900: ;
 			TOCEntriesCount = 1;
 		} else {
 			++TOCEntriesCount;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( TOCEntriesCount > TOCEntriesSize ) {
-				CopyOfTOCEntries.allocate( TOCEntriesSize );
-				CopyOfTOCEntries = TOCEntries;
-				TOCEntries.deallocate();
-				// double the size of the array
-				TOCEntries.allocate( TOCEntriesSize + 20 );
-				TOCEntries( {1,TOCEntriesSize} ) = CopyOfTOCEntries;
-				CopyOfTOCEntries.deallocate();
-				TOCEntriesSize += 20;
+				TOCEntries.redimension( TOCEntriesSize += 20 );
 			}
 		}
 		TOCEntries( TOCEntriesCount ).reportName = nameReport;

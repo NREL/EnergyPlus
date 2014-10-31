@@ -217,10 +217,8 @@ namespace SolarReflectionManager {
 		ReflFacBmToDiffSolGnd = 0.0;
 		ReflFacBmToBmSolObs.allocate( TotSurfaces, 24 );
 		ReflFacBmToBmSolObs = 0.0;
-		ReflFacSkySolObs.allocate( TotSurfaces );
-		ReflFacSkySolObs = 0.0;
-		ReflFacSkySolGnd.allocate( TotSurfaces );
-		ReflFacSkySolGnd = 0.0;
+		ReflFacSkySolObs.dimension( TotSurfaces, 0.0 );
+		ReflFacSkySolGnd.dimension( TotSurfaces, 0.0 );
 		CosIncAveBmToBmSolObs.allocate( TotSurfaces, 24 );
 		CosIncAveBmToBmSolObs = 0.0;
 

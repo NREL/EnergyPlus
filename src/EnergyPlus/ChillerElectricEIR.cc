@@ -334,8 +334,7 @@ namespace ChillerElectricEIR {
 		// ALLOCATE ARRAYS
 		ElectricEIRChiller.allocate( NumElectricEIRChillers );
 		ElectricEIRChillerReport.allocate( NumElectricEIRChillers );
-		CheckEquipName.allocate( NumElectricEIRChillers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumElectricEIRChillers, true );
 		AllocatedFlag = true;
 
 		// Load arrays with electric EIR chiller data
@@ -1103,8 +1102,7 @@ namespace ChillerElectricEIR {
 		Real64 CondVolFlowRateUser; // Hardsized condenser flow for reporting
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumElectricEIRChillers );
-			MyFlag = true;
+			MyFlag.dimension( NumElectricEIRChillers, true );
 			MyOneTimeFlag = false;
 		}
 

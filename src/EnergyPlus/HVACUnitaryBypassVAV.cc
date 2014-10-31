@@ -527,8 +527,7 @@ namespace HVACUnitaryBypassVAV {
 
 		// allocate the data structures
 		CBVAV.allocate( NumCBVAV );
-		CheckEquipName.allocate( NumCBVAV );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumCBVAV, true );
 
 		// loop over CBVAV units; get and load the input data
 		for ( CBVAVIndex = 1; CBVAVIndex <= NumCBVAV; ++CBVAVIndex ) {

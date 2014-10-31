@@ -380,8 +380,7 @@ namespace SingleDuct {
 		Sys.allocate( NumSys );
 		SysInlet.allocate( NumSys );
 		SysOutlet.allocate( NumSys );
-		CheckEquipName.allocate( NumSys );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSys, true );
 
 		MassFlow1.allocate( NumSys );
 		MassFlow2.allocate( NumSys );
@@ -413,17 +412,11 @@ namespace SingleDuct {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		//Start Loading the System Input
 		for ( SysIndex = 1; SysIndex <= NumVAVSys; ++SysIndex ) {

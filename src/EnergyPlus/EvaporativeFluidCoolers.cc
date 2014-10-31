@@ -383,8 +383,7 @@ namespace EvaporativeFluidCoolers {
 		SimpleEvapFluidCooler.allocate( NumSimpleEvapFluidCoolers );
 		SimpleEvapFluidCoolerReport.allocate( NumSimpleEvapFluidCoolers );
 		SimpleEvapFluidCoolerInlet.allocate( NumSimpleEvapFluidCoolers );
-		CheckEquipName.allocate( NumSimpleEvapFluidCoolers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSimpleEvapFluidCoolers, true );
 
 		// Load data structures with evaporative fluid cooler input data
 		cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;

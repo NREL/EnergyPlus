@@ -173,7 +173,7 @@ namespace WaterManager {
 
 		// Using/Aliasing
 		// na
-		
+
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
@@ -188,7 +188,7 @@ namespace WaterManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		
+
 		if ( ! ( AnyWaterSystemsInModel ) ) return;
 
 		UpdateWaterManager();
@@ -303,17 +303,11 @@ namespace WaterManager {
 			MaxNumAlphas = max( MaxNumAlphas, NumAlphas );
 
 			cAlphaFieldNames.allocate( MaxNumAlphas );
-			cAlphaFieldNames = "";
 			cAlphaArgs.allocate( MaxNumAlphas );
-			cAlphaArgs = "";
-			lAlphaFieldBlanks.allocate( MaxNumAlphas );
-			lAlphaFieldBlanks = false;
+			lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 			cNumericFieldNames.allocate( MaxNumNumbers );
-			cNumericFieldNames = "";
-			rNumericArgs.allocate( MaxNumNumbers );
-			rNumericArgs = 0.0;
-			lNumericFieldBlanks.allocate( MaxNumNumbers );
-			lNumericFieldBlanks = false;
+			rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+			lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 			MyOneTimeFlag = false;
 			cCurrentModuleObject = "WaterUse:Storage";

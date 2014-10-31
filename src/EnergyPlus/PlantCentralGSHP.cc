@@ -642,8 +642,7 @@ namespace PlantCentralGSHP {
 		// ALLOCATE ARRAYS
 		Wrapper.allocate( NumWrappers );
 		WrapperReport.allocate( NumWrappers );
-		CheckEquipName.allocate( NumWrappers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumWrappers, true );
 		AllocatedFlag = true;
 
 		// Load arrays with electric EIR chiller data

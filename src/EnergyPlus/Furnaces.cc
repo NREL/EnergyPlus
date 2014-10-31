@@ -822,25 +822,18 @@ namespace Furnaces {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 
 		NumFurnaces = NumHeatOnly + NumHeatCool + NumUnitaryHeatOnly + NumUnitaryHeatCool + NumHeatPump + NumWaterToAirHeatPump;
 
 		if ( NumFurnaces > 0 ) {
 			Furnace.allocate( NumFurnaces );
 		}
-		CheckEquipName.allocate( NumFurnaces );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumFurnaces, true );
 
 		// Get the data for the HeatOnly Furnace
 		for ( HeatOnlyNum = 1; HeatOnlyNum <= NumHeatOnly + NumUnitaryHeatOnly; ++HeatOnlyNum ) {

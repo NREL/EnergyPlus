@@ -319,8 +319,7 @@ namespace DualDuct {
 		NumDualDuctVarVolOA = GetNumObjectsFound( cCMO_DDVarVolOA );
 		NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
 		Damper.allocate( NumDampers );
-		CheckEquipName.allocate( NumDampers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDampers, true );
 
 		DamperInlet.allocate( NumDampers );
 		DamperHotAirInlet.allocate( NumDampers );
@@ -701,8 +700,7 @@ namespace DualDuct {
 
 			MyEnvrnFlag.allocate( NumDampers );
 			MySizeFlag.allocate( NumDampers );
-			MyAirLoopFlag.allocate( NumDampers );
-			MyAirLoopFlag = true;
+			MyAirLoopFlag.dimension( NumDampers, true );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MassFlowSetToler = HVACFlowRateToler * 0.00001;

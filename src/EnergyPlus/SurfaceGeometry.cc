@@ -108,7 +108,6 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
-	FArray1D< SurfaceData > SurfaceTmpSave; // Allocated/Deallocated during input processing
 
 	// Functions
 
@@ -209,10 +208,8 @@ namespace SurfaceGeometry {
 		CosZoneRelNorth.allocate( NumOfZones );
 		SinZoneRelNorth.allocate( NumOfZones );
 
-		ZoneCeilingHeightEntered.allocate( NumOfZones );
-		ZoneCeilingHeightEntered = false;
-		ZoneCeilingArea.allocate( NumOfZones );
-		ZoneCeilingArea = 0.0;
+		ZoneCeilingHeightEntered.dimension( NumOfZones, false );
+		ZoneCeilingArea.dimension( NumOfZones, 0.0 );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -239,8 +236,7 @@ namespace SurfaceGeometry {
 
 		AllocateModuleArrays(); // This needs to be moved to the main manager routine of SSG at a later date
 
-		AirSkyRadSplit.allocate( TotSurfaces );
-		AirSkyRadSplit = 0.0;
+		AirSkyRadSplit.dimension( TotSurfaces, 0.0 );
 
 		CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
 		// is requested for one or more exterior windows.
@@ -457,8 +453,7 @@ namespace SurfaceGeometry {
 		ZoneCeilingHeightEntered.deallocate();
 		ZoneCeilingArea.deallocate();
 
-		AdjacentZoneToSurface.allocate( TotSurfaces );
-		AdjacentZoneToSurface = 0;
+		AdjacentZoneToSurface.dimension( TotSurfaces, 0 );
 		// note -- adiabatic surfaces will show same zone as surface
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue;
@@ -618,35 +613,21 @@ namespace SurfaceGeometry {
 		ShadeV.allocate( TotSurfaces );
 		ShadeV.NVert() = 0;
 		// Individual components (XV,YV,ZV) allocated in routine ProcessSurfaceVertices
-		X0.allocate( TotSurfaces );
-		X0 = 0.0;
-		Y0.allocate( TotSurfaces );
-		Y0 = 0.0;
-		Z0.allocate( TotSurfaces );
-		Z0 = 0.0;
+		X0.dimension( TotSurfaces, 0.0 );
+		Y0.dimension( TotSurfaces, 0.0 );
+		Z0.dimension( TotSurfaces, 0.0 );
 
-		CBZone.allocate( NumOfZones );
-		CBZone = 0.0;
-		DSZone.allocate( NumOfZones );
-		DSZone = 0.0;
-		DGZone.allocate( NumOfZones );
-		DGZone = 0.0;
-		DBZone.allocate( NumOfZones );
-		DBZone = 0.0;
-		DBZoneSSG.allocate( NumOfZones );
-		DBZoneSSG = 0.0;
-		QSDifSol.allocate( NumOfZones );
-		QSDifSol = 0.0;
-		AISurf.allocate( TotSurfaces );
-		AISurf = 0.0;
-		AOSurf.allocate( TotSurfaces );
-		AOSurf = 0.0;
-		BmToBmReflFacObs.allocate( TotSurfaces );
-		BmToBmReflFacObs = 0.0;
-		BmToDiffReflFacObs.allocate( TotSurfaces );
-		BmToDiffReflFacObs = 0.0;
-		BmToDiffReflFacGnd.allocate( TotSurfaces );
-		BmToDiffReflFacGnd = 0.0;
+		CBZone.dimension( NumOfZones, 0.0 );
+		DSZone.dimension( NumOfZones, 0.0 );
+		DGZone.dimension( NumOfZones, 0.0 );
+		DBZone.dimension( NumOfZones, 0.0 );
+		DBZoneSSG.dimension( NumOfZones, 0.0 );
+		QSDifSol.dimension( NumOfZones, 0.0 );
+		AISurf.dimension( TotSurfaces, 0.0 );
+		AOSurf.dimension( TotSurfaces, 0.0 );
+		BmToBmReflFacObs.dimension( TotSurfaces, 0.0 );
+		BmToDiffReflFacObs.dimension( TotSurfaces, 0.0 );
+		BmToDiffReflFacGnd.dimension( TotSurfaces, 0.0 );
 		AWinSurf.allocate( TotSurfaces, CFSMAXNL + 1 );
 		AWinSurf = 0.0;
 		AWinCFOverlap.allocate( TotSurfaces, MaxSolidWinLayers );
@@ -979,12 +960,7 @@ namespace SurfaceGeometry {
 		// Have to make room for added surfaces, if needed
 		FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
 		if ( NeedToAddSurfaces + NeedToAddSubSurfaces > 0 ) {
-			SurfaceTmpSave.allocate( TotSurfaces );
-			SurfaceTmpSave( {1,FirstTotalSurfaces} ) = SurfaceTmp;
-			SurfaceTmp.deallocate();
-			SurfaceTmp.allocate( TotSurfaces );
-			SurfaceTmp = SurfaceTmpSave;
-			SurfaceTmpSave.deallocate();
+			SurfaceTmp.redimension( TotSurfaces );
 		}
 
 		SurfaceWindow.allocate( TotSurfaces );
@@ -5944,7 +5920,6 @@ namespace SurfaceGeometry {
 		bool SurfacesOfType;
 		int SurfNum;
 		//  INTEGER :: Index
-		FArray1D_int tmpHeatTransferAlgosUsed;
 		int NumEMPDMat;
 		int NumPCMat;
 		int NumVTCMat;
@@ -6000,14 +5975,8 @@ namespace SurfaceGeometry {
 				Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
 
 				if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-					tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-					++NumberOfHeatTransferAlgosUsed;
-					HeatTransferAlgosUsed.deallocate();
-					HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-					tmpHeatTransferAlgosUsed.deallocate();
 				}
 
 			} else {
@@ -6142,14 +6111,8 @@ namespace SurfaceGeometry {
 				ShowWarningError( "In " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", for Multiple Surface Assignment=\"" + cAlphaArgs( 2 ) + "\", there were no surfaces of that type found for assignment." );
 			} else {
 				if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-					tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-					++NumberOfHeatTransferAlgosUsed;
-					HeatTransferAlgosUsed.deallocate();
-					HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-					tmpHeatTransferAlgosUsed.deallocate();
 				}
 			}
 			if ( ErrorsFoundMultiSurf ) ErrorsFound = true;
@@ -6190,14 +6153,8 @@ namespace SurfaceGeometry {
 				if ( ! ErrorsFoundSurfList ) {
 					Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
 					if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-						tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-						tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-						++NumberOfHeatTransferAlgosUsed;
-						HeatTransferAlgosUsed.deallocate();
-						HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-						HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+						HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 						HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-						tmpHeatTransferAlgosUsed.deallocate();
 					}
 				} else {
 					ErrorsFound = true;
@@ -6239,14 +6196,8 @@ namespace SurfaceGeometry {
 					if ( Surface( Item1 ).Construction == Found ) {
 						Surface( Item1 ).HeatTransferAlgorithm = tmpAlgoInput;
 						if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-							tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-							tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-							++NumberOfHeatTransferAlgosUsed;
-							HeatTransferAlgosUsed.deallocate();
-							HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-							HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+							HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 							HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-							tmpHeatTransferAlgosUsed.deallocate();
 						}
 					}
 				}
@@ -8183,8 +8134,7 @@ namespace SurfaceGeometry {
 			ZoneStruct.NumSurfaceFaces = NFaces;
 			ZoneStruct.SurfaceFace.allocate( NFaces );
 			NActFaces = 0;
-			surfacenotused.allocate( NFaces );
-			surfacenotused = 0;
+			surfacenotused.dimension( NFaces, 0 );
 
 			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
 
@@ -8996,27 +8946,12 @@ namespace SurfaceGeometry {
 
 			ConstrNewSh = TotConstructs + 1;
 			SurfaceTmp( SurfNum ).ShadedConstruction = ConstrNewSh;
-			ConstructSave.allocate( TotConstructs );
-			NominalRSave.allocate( TotConstructs );
-			NominalUSave.allocate( TotConstructs );
-			ConstructSave( {1,TotConstructs} ) = Construct( {1,TotConstructs} );
-			NominalRSave( {1,TotConstructs} ) = NominalRforNominalUCalculation( {1,TotConstructs} );
-			NominalUSave( {1,TotConstructs} ) = NominalU( {1,TotConstructs} );
-			Construct.deallocate();
-			NominalRforNominalUCalculation.deallocate();
-			NominalU.deallocate();
 			TotConstructs = ConstrNewSh;
-			Construct.allocate( TotConstructs );
-			NominalRforNominalUCalculation.allocate( TotConstructs );
-			NominalU.allocate( TotConstructs );
-			NominalRforNominalUCalculation = 0.0;
-			NominalU = 0.0;
-			Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );
-			NominalRforNominalUCalculation( {1,TotConstructs - 1} ) = NominalRSave( {1,TotConstructs - 1} );
-			NominalU( {1,TotConstructs - 1} ) = NominalUSave( {1,TotConstructs - 1} );
-			ConstructSave.deallocate();
-			NominalRSave.deallocate();
-			NominalUSave.deallocate();
+			Construct.redimension( TotConstructs );
+			NominalRforNominalUCalculation.redimension( TotConstructs );
+			NominalRforNominalUCalculation( TotConstructs ) = 0.0;
+			NominalU.redimension( TotConstructs );
+			NominalU( TotConstructs ) = 0.0;
 
 			TotLayersOld = Construct( ConstrNum ).TotLayers;
 			TotLayersNew = TotLayersOld + 1;
@@ -9220,19 +9155,9 @@ namespace SurfaceGeometry {
 					if ( MatNewStAir == 0 ) {
 						// Create new material
 						MatNewStAir = TotMaterials + 1;
-						MaterialSave.allocate( TotMaterials );
-						NominalRSave.allocate( TotMaterials );
-						MaterialSave( {1,TotMaterials} ) = Material( {1,TotMaterials} );
-						NominalRSave( {1,TotMaterials} ) = NominalR( {1,TotMaterials} );
-						Material.deallocate();
-						NominalR.deallocate();
 						TotMaterials = MatNewStAir;
-						Material.allocate( TotMaterials );
-						NominalR.allocate( TotMaterials );
-						Material( {1,TotMaterials - 1} ) = MaterialSave( {1,TotMaterials - 1} );
-						NominalR( {1,TotMaterials - 1} ) = NominalRSave( {1,TotMaterials - 1} );
-						MaterialSave.deallocate();
-						NominalRSave.deallocate();
+						Material.redimension( TotMaterials );
+						NominalR.redimension( TotMaterials );
 						Material( TotMaterials ).Name = MatNameStAir;
 						Material( TotMaterials ).Group = WindowGas;
 						Material( TotMaterials ).Roughness = 3;
@@ -9310,25 +9235,10 @@ namespace SurfaceGeometry {
 					} else {
 						Surface( SurfNum ).StormWinShadedConstruction = ConstrNew;
 					}
-					ConstructSave.allocate( TotConstructs );
-					NominalRSave.allocate( TotConstructs );
-					NominalUSave.allocate( TotConstructs );
-					ConstructSave( {1,TotConstructs} ) = Construct( {1,TotConstructs} );
-					NominalRSave( {1,TotConstructs} ) = NominalRforNominalUCalculation( {1,TotConstructs} );
-					NominalUSave( {1,TotConstructs} ) = NominalU( {1,TotConstructs} );
-					Construct.deallocate();
-					NominalRforNominalUCalculation.deallocate();
-					NominalU.deallocate();
 					TotConstructs = ConstrNew;
-					Construct.allocate( TotConstructs );
-					NominalRforNominalUCalculation.allocate( TotConstructs );
-					NominalU.allocate( TotConstructs );
-					Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );
-					NominalRforNominalUCalculation( {1,TotConstructs - 1} ) = NominalRSave( {1,TotConstructs - 1} );
-					NominalU( {1,TotConstructs - 1} ) = NominalUSave( {1,TotConstructs - 1} );
-					ConstructSave.deallocate();
-					NominalRSave.deallocate();
-					NominalUSave.deallocate();
+					Construct.redimension( TotConstructs );
+					NominalRforNominalUCalculation.redimension( TotConstructs );
+					NominalU.redimension( TotConstructs );
 
 					ConstrOld = ConstrNum;
 					if ( loop == 2 ) ConstrOld = ConstrNumSh;
@@ -9632,7 +9542,6 @@ namespace SurfaceGeometry {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TotSurfacesPrev; // Total number of surfaces before splitting window
 		int loop; // DO loop index
 		Real64 H; // Height and width of original window (m)
 		Real64 W;
@@ -9696,18 +9605,7 @@ namespace SurfaceGeometry {
 		IConst2 = FindItemInList( Const2Name, Construct.Name(), TotConstructs );
 
 		++AddedSubSurfaces;
-		TotSurfacesPrev = TotSurfaces;
-		SurfaceTmpSave.allocate( TotSurfacesPrev );
-		for ( loop = 1; loop <= TotSurfacesPrev; ++loop ) {
-			SurfaceTmpSave( loop ) = SurfaceTmp( loop );
-		}
-		SurfaceTmp.deallocate();
-		++TotSurfaces;
-		SurfaceTmp.allocate( TotSurfaces );
-		for ( loop = 1; loop <= TotSurfacesPrev; ++loop ) {
-			SurfaceTmp( loop ) = SurfaceTmpSave( loop );
-		}
-		SurfaceTmpSave.deallocate();
+		SurfaceTmp.redimension( ++TotSurfaces );
 
 		SurfaceTmp( TotSurfaces ).Vertex.allocate( 4 );
 
@@ -10504,10 +10402,6 @@ namespace SurfaceGeometry {
 			} // end of IF (Found > 0) Then
 
 		}
-
-		TmpCandidateSurfaceNames.deallocate();
-		TmpCandidateICSBCTypeNames.deallocate();
-		TmpCandidateICSSurfaceNames.deallocate();
 
 	}
 

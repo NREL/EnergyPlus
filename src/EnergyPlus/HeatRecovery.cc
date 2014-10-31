@@ -339,8 +339,7 @@ namespace HeatRecovery {
 
 		// allocate the data array
 		ExchCond.allocate( NumHeatExchangers );
-		CheckEquipName.allocate( NumHeatExchangers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumHeatExchangers, true );
 
 		if ( NumDesBalExchsPerfDataType1 > 0 ) {
 			BalDesDehumPerfData.allocate( NumDesBalExchsPerfDataType1 );

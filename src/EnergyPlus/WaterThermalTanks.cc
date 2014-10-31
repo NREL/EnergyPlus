@@ -951,21 +951,17 @@ namespace WaterThermalTanks {
 			if ( NumWaterThermalTank > 0 ) {
 				WaterThermalTank.allocate( NumWaterThermalTank );
 				WHSaveNodeNames.allocate( NumWaterThermalTank );
-				CheckWTTEquipName.allocate( NumWaterThermalTank );
-				CheckWTTEquipName = true;
+				CheckWTTEquipName.dimension( NumWaterThermalTank, true );
 			}
 			if ( NumHeatPumpWaterHeater > 0 ) {
 				HPWaterHeater.allocate( NumHeatPumpWaterHeater );
-				MyHPSizeFlag.allocate( NumHeatPumpWaterHeater );
-				MyHPSizeFlag = true;
-				CheckHPWHEquipName.allocate( NumHeatPumpWaterHeater );
-				CheckHPWHEquipName = true;
+				MyHPSizeFlag.dimension( NumHeatPumpWaterHeater, true );
+				CheckHPWHEquipName.dimension( NumHeatPumpWaterHeater, true );
 				HPWHSaveNodeNames.allocate( NumHeatPumpWaterHeater );
 			}
 			if ( NumWaterHeaterDesuperheater > 0 ) {
 				WaterHeaterDesuperheater.allocate( NumWaterHeaterDesuperheater );
-				ValidSourceType.allocate( NumWaterHeaterDesuperheater );
-				ValidSourceType = false;
+				ValidSourceType.dimension( NumWaterHeaterDesuperheater, false );
 				CoilSaveNodeNames.allocate( NumWaterHeaterDesuperheater );
 			}
 
@@ -4273,8 +4269,7 @@ namespace WaterThermalTanks {
 			MyWarmupFlag.allocate( NumWaterThermalTank );
 			SetLoopIndexFlag.allocate( NumWaterThermalTank );
 			MySizingDoneFlag.allocate( NumWaterThermalTank );
-			AlreadyRated.allocate( NumWaterThermalTank );
-			AlreadyRated = false;
+			AlreadyRated.dimension( NumWaterThermalTank, false );
 			MyEnvrnFlag = true;
 			MyWarmupFlag = false;
 			InitWaterThermalTanksOnce = false;
@@ -9324,8 +9319,7 @@ namespace WaterThermalTanks {
 		static gio::Fmt const Format_728( "('Chilled Water Tank Information',5(',',A))" );
 
 		if ( MyOneTimeSetupFlag ) {
-			AlreadyReported.allocate( NumWaterThermalTank );
-			AlreadyReported = false;
+			AlreadyReported.dimension( NumWaterThermalTank, false );
 			MyOneTimeSetupFlag = false;
 		}
 

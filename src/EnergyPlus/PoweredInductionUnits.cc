@@ -309,8 +309,7 @@ namespace PoweredInductionUnits {
 		NumPIUs = NumSeriesPIUs + NumParallelPIUs;
 		// allocate the data structures
 		PIU.allocate( NumPIUs );
-		CheckEquipName.allocate( NumPIUs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumPIUs, true );
 
 		// loop over Series PIUs; get and load the input data
 		for ( PIUIndex = 1; PIUIndex <= NumSeriesPIUs; ++PIUIndex ) {

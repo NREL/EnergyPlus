@@ -55,7 +55,6 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	extern FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
-	extern FArray1D< SurfaceData > SurfaceTmpSave; // Allocated/Deallocated during input processing
 
 	// Functions
 

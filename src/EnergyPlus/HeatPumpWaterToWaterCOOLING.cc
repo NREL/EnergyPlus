@@ -270,8 +270,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// Allocate Arrays
 		GSHP.allocate( NumGSHPs );
 		GSHPReport.allocate( NumGSHPs );
-		CheckEquipName.allocate( NumGSHPs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );

@@ -726,8 +726,7 @@ namespace GroundHeatExchangers {
 		VerticalGlhe.allocate( NumVerticalGlhes );
 
 		VerticalGlheReport.allocate( NumVerticalGlhes );
-		CheckEquipName.allocate( NumVerticalGlhes );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumVerticalGlhes, true );
 
 		for ( GlheNum = 1; GlheNum <= NumVerticalGlhes; ++GlheNum ) {
 			GetObjectItem( cCurrentModuleObject, GlheNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );

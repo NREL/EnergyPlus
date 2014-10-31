@@ -332,17 +332,11 @@ namespace HeatBalanceHAMTManager {
 		ErrorsFound = false;
 
 		AlphaArray.allocate( MaxAlphas );
-		AlphaArray = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = "";
 		cNumericFieldNames.allocate( MaxNums );
-		cNumericFieldNames = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = false;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = false;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, false );
+		lNumericBlanks.dimension( MaxNums, false );
 
 		HAMTitems = GetNumObjectsFound( cHAMTObject1 ); // MaterialProperty:HeatAndMoistureTransfer:Settings
 		for ( item = 1; item <= HAMTitems; ++item ) {

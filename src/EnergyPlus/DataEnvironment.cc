@@ -539,7 +539,6 @@ namespace DataEnvironment {
 		// na
 
 		// Using/Aliasing
-		using General::RoundSigDigits;
 
 		// Argument array dimensioning
 
@@ -556,12 +555,12 @@ namespace DataEnvironment {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 Z; // Centroid value
 
 		if ( SiteWindExp == 0.0 ) {
 			LocalWindSpeed = WindSpeed;
 		} else {
 			Real64 const fac( WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
+			Real64 Z; // Centroid value
 			for ( int i = 1; i <= NumItems; ++i ) {
 				Z = Heights( i );
 				if ( Z <= 0.0 ) {

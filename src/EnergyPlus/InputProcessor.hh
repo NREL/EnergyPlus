@@ -6,6 +6,7 @@
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Vector2.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -115,9 +116,9 @@ namespace InputProcessor {
 		bool MinMaxChk; // true when Min/Max has been added
 		int FieldNumber; // which field number this is
 		std::string FieldName; // Name of the field
-		FArray1D_string MinMaxString; // appropriate Min/Max Strings
-		FArray1D< Real64 > MinMaxValue; // appropriate Min/Max Values
-		FArray1D_int WhichMinMax; // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+		Vector2_string MinMaxString; // appropriate Min/Max Strings
+		Vector2< Real64 > MinMaxValue; // appropriate Min/Max Values
+		Vector2_int WhichMinMax; // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		bool DefaultChk; // true when default has been entered
 		Real64 Default; // Default value
 		bool DefAutoSize; // Default value is "autosize"
@@ -131,9 +132,8 @@ namespace InputProcessor {
 		RangeCheckDef() :
 			MinMaxChk( false ),
 			FieldNumber( 0 ),
-			MinMaxString( 2, Blank ),
-			MinMaxValue( 2, 0.0 ),
-			WhichMinMax( 2, 0 ),
+			MinMaxValue( 0.0 ),
+			WhichMinMax( 0 ),
 			DefaultChk( false ),
 			Default( 0.0 ),
 			DefAutoSize( false ),
@@ -149,9 +149,9 @@ namespace InputProcessor {
 			bool const MinMaxChk, // true when Min/Max has been added
 			int const FieldNumber, // which field number this is
 			std::string const & FieldName, // Name of the field
-			FArray1_string const & MinMaxString, // appropriate Min/Max Strings
-			FArray1< Real64 > const & MinMaxValue, // appropriate Min/Max Values
-			FArray1_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+			Vector2_string const & MinMaxString, // appropriate Min/Max Strings
+			Vector2< Real64 > const & MinMaxValue, // appropriate Min/Max Values
+			Vector2_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 			bool const DefaultChk, // true when default has been entered
 			Real64 const Default, // Default value
 			bool const DefAutoSize, // Default value is "autosize"
@@ -164,9 +164,9 @@ namespace InputProcessor {
 			MinMaxChk( MinMaxChk ),
 			FieldNumber( FieldNumber ),
 			FieldName( FieldName ),
-			MinMaxString( 2, MinMaxString ),
-			MinMaxValue( 2, MinMaxValue ),
-			WhichMinMax( 2, WhichMinMax ),
+			MinMaxString( MinMaxString ),
+			MinMaxValue( MinMaxValue ),
+			WhichMinMax( WhichMinMax ),
 			DefaultChk( DefaultChk ),
 			Default( Default ),
 			DefAutoSize( DefAutoSize ),

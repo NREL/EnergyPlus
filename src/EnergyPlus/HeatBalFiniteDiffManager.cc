@@ -379,8 +379,7 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempEnth ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp - 1 ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempEnth.allocate( MaterialFD( MaterNum ).numTempEnth, 2 );
-				MaterialFD( MaterNum ).TempEnth = 0.0;
+				MaterialFD( MaterNum ).TempEnth.dimension( MaterialFD( MaterNum ).numTempEnth, 2, 0.0 );
 				propNum = 2;
 				// Temperature first
 				for ( pcount = 1; pcount <= MaterialFD( MaterNum ).numTempEnth; ++pcount ) {
@@ -453,8 +452,7 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempCond ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempCond.allocate( MaterialFD( MaterNum ).numTempCond, 2 );
-				MaterialFD( MaterNum ).TempCond = 0.0;
+				MaterialFD( MaterNum ).TempCond.dimension( MaterialFD( MaterNum ).numTempCond, 2, 0.0 );
 				propNum = 1;
 				// Temperature first
 				for ( pcount = 1; pcount <= MaterialFD( MaterNum ).numTempCond; ++pcount ) {
@@ -486,13 +484,11 @@ namespace HeatBalFiniteDiffManager {
 		for ( MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum ) {
 			if ( MaterialFD( MaterNum ).numTempEnth == 0 ) {
 				MaterialFD( MaterNum ).numTempEnth = 3;
-				MaterialFD( MaterNum ).TempEnth.allocate( MaterialFD( MaterNum ).numTempEnth, 2 );
-				MaterialFD( MaterNum ).TempEnth = -100.0;
+				MaterialFD( MaterNum ).TempEnth.dimension( 3, 2, -100.0 );
 			}
 			if ( MaterialFD( MaterNum ).numTempCond == 0 ) {
 				MaterialFD( MaterNum ).numTempCond = 3;
-				MaterialFD( MaterNum ).TempCond.allocate( MaterialFD( MaterNum ).numTempCond, 2 );
-				MaterialFD( MaterNum ).TempCond = -100.0;
+				MaterialFD( MaterNum ).TempCond.dimension( 3, 2, -100.0 );
 			}
 		}
 

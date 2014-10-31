@@ -359,10 +359,8 @@ namespace HeatingCoils {
 		if ( NumHeatingCoils > 0 ) {
 			HeatingCoil.allocate( NumHeatingCoils );
 			HeatingCoilNumericFields.allocate( NumHeatingCoils );
-			ValidSourceType.allocate( NumHeatingCoils );
-			ValidSourceType = false;
-			CheckEquipName.allocate( NumHeatingCoils );
-			CheckEquipName = true;
+			ValidSourceType.dimension( NumHeatingCoils, false );
+			CheckEquipName.dimension( NumHeatingCoils, true );
 		}
 
 		GetObjectDefMaxArgs( "Coil:Heating:Electric", TotalArgs, NumAlphas, NumNums );
@@ -382,17 +380,11 @@ namespace HeatingCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// Get the data for electric heating coils
 		for ( ElecCoilNum = 1; ElecCoilNum <= NumElecCoil; ++ElecCoilNum ) {

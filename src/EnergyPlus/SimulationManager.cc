@@ -234,7 +234,7 @@ namespace SimulationManager {
 		using namespace FaultsManager;
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
-		
+
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -306,7 +306,7 @@ namespace SimulationManager {
 		DoingSizing = false;
 
 		if ( ( DoZoneSizing || DoSystemSizing || DoPlantSizing ) && ! ( DoDesDaySim || ( DoWeathSim && RunPeriodsInInput ) ) ) {
-			ShowWarningError( "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested " "(in SimulationControl object). Succeeding warnings/errors may be confusing." );
+			ShowWarningError( "ManageSimulation: Input file has requested Sizing Calculations but no Simulations are requested (in SimulationControl object). Succeeding warnings/errors may be confusing." );
 		}
 		Available = true;
 
@@ -457,7 +457,7 @@ namespace SimulationManager {
 						if ( AnySlabsInModel ){
 							InitAndSimGroundDomains();
 						}
-						
+
 						BeginTimeStepFlag = true;
 						ExternalInterfaceExchangeVariables();
 
@@ -742,7 +742,7 @@ namespace SimulationManager {
 					MinInt = NumOfTimeStepInHour - Div60( Num );
 					Which = Num;
 				}
-				ShowWarningError( CurrentModuleObject + ": Requested number (" + RoundSigDigits( NumOfTimeStepInHour ) + ") not evenly divisible into 60, " "defaulted to nearest (" + RoundSigDigits( Div60( Which ) ) + ")." );
+				ShowWarningError( CurrentModuleObject + ": Requested number (" + RoundSigDigits( NumOfTimeStepInHour ) + ") not evenly divisible into 60, defaulted to nearest (" + RoundSigDigits( Div60( Which ) ) + ")." );
 				NumOfTimeStepInHour = Div60( Which );
 			}
 			if ( CondFDAlgo && NumOfTimeStepInHour < 20 ) {
@@ -935,7 +935,7 @@ namespace SimulationManager {
 		gio::write( OutputFileInits, fmtA ) << "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}";
 		gio::write( OutputFileInits, Format_731 ) << NumOfTimeStepInHour << int( MinutesPerTimeStep );
 
-		gio::write( OutputFileInits, fmtA ) << "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, " " Minimum Plant Iterations, Maximum Plant Iterations";
+		gio::write( OutputFileInits, fmtA ) << "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant Iterations, Maximum Plant Iterations";
 		MinInt = MinTimeStepSys * 60.0;
 		gio::write( OutputFileInits, Format_733 ) << RoundSigDigits( MinInt ) << RoundSigDigits( MaxIter ) << RoundSigDigits( MinPlantSubIterations ) << RoundSigDigits( MaxPlantSubIterations );
 
@@ -1100,7 +1100,7 @@ namespace SimulationManager {
 			}
 		}
 		if ( ! DoDesDaySim && ! DoWeathSim ) {
-			ShowWarningError( "\"Do the design day simulations\" and \"Do the weather file simulation\"" " are both set to \"No\".  No simulations will be performed, and most input will not be read." );
+			ShowWarningError( "\"Do the design day simulations\" and \"Do the weather file simulation\" are both set to \"No\".  No simulations will be performed, and most input will not be read." );
 		}
 		if ( ! DoZoneSizing && ! DoSystemSizing && ! DoPlantSizing && ! DoDesDaySim && ! DoWeathSim ) {
 			ShowSevereError( "All elements of SimulationControl are set to \"No\". No simulations can be done.  Program terminates." );
@@ -1163,7 +1163,7 @@ namespace SimulationManager {
 			// Not testing for : Output:SQLite or Output:EnvironmentalImpactFactors
 			if ( ! ReportingRequested ) {
 				ShowWarningError( "No reporting elements have been requested. No simulation results produced." );
-				ShowContinueError( "...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", " "\"Output:Variable\", \"Output:Meter\" and others." );
+				ShowContinueError( "...Review requirements such as \"Output:Table:SummaryReports\", \"Output:Table:Monthly\", \"Output:Variable\", \"Output:Meter\" and others." );
 			}
 		}
 
@@ -1623,8 +1623,7 @@ namespace SimulationManager {
 		static gio::Fmt const Format_705( "('! <#NonConnected Nodes>,<Number of NonConnected Nodes>',/,' #NonConnected Nodes,',A)" );
 		static gio::Fmt const Format_706( "('! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>')" );
 
-		NonConnectedNodes.allocate( NumOfNodes );
-		NonConnectedNodes = true;
+		NonConnectedNodes.dimension( NumOfNodes, true );
 
 		NumParents = 0;
 		NumNonParents = 0;
@@ -1866,12 +1865,12 @@ namespace SimulationManager {
 		strip( ChrOut );
 		gio::write( OutputFileBNDetails, Format_713 ) << "! <# Plant Loops>,<Number of Plant Loops>";
 		gio::write( OutputFileBNDetails, Format_707 ) << "#Plant Loops," + ChrOut;
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>," "<Outlet Node Name>,<Branch List>,<Connector List>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Connector>,<Connector Type>,<Connector Name>," "<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Branch>,<Outlet Branch>," "<Loop Name>,<Loop Type>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Node>,<Outlet Node>," "<Loop Name>,<Loop Type>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>," "<Demand Side Inlet Node Name>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>," "<Supply Side Inlet Node Name>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop>,<Plant Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Supply Connection>,<Plant Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Plant Loop Return Connection>,<Plant Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>";
 		for ( Count = 1; Count <= NumPlantLoops; ++Count ) {
 			for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 				//  Plant Supply Side Loop
@@ -1955,12 +1954,12 @@ namespace SimulationManager {
 		strip( ChrOut );
 		gio::write( OutputFileBNDetails, Format_713 ) << "! <# Condenser Loops>,<Number of Condenser Loops>";
 		gio::write( OutputFileBNDetails, Format_707 ) << "#Condenser Loops," + ChrOut;
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>," "<Outlet Node Name>,<Branch List>,<Connector List>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>," "<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Branch>,<Outlet Branch>," "<Loop Name>,<Loop Type>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Node>,<Outlet Node>," "<Loop Name>,<Loop Type>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>," "<Demand Side Inlet Node Name>";
-		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>," "<Supply Side Inlet Node Name>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop>,<Condenser Loop Name>,<Loop Type>,<Inlet Node Name>,<Outlet Node Name>,<Branch List>,<Connector List>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Supply Connection>,<Condenser Loop Name>,<Supply Side Outlet Node Name>,<Demand Side Inlet Node Name>";
+		gio::write( OutputFileBNDetails, Format_713 ) << "! <Condenser Loop Return Connection>,<Condenser Loop Name>,<Demand Side Outlet Node Name>,<Supply Side Inlet Node Name>";
 
 		for ( Count = NumPlantLoops + 1; Count <= TotNumLoops; ++Count ) {
 			for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
@@ -2050,9 +2049,9 @@ namespace SimulationManager {
 		if ( NumOfControlledZones > 0 ) {
 			gio::write( OutputFileBNDetails, Format_713 ) << "! <# Controlled Zones>,<Number of Controlled Zones>";
 			gio::write( OutputFileBNDetails, Format_707 ) << "#Controlled Zones," + ChrOut;
-			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>," "<Zone Node Name>,<Return Air Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>";
-			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>," "<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>," "<DD Sys:Heating Inlet Node Name>";
-			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>," "<Exhaust Air Node Name>";
+			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone>,<Controlled Zone Name>,<Equip List Name>,<Control List Name>,<Zone Node Name>,<Return Air Node Name>,<# Inlet Nodes>,<# Exhaust Nodes>";
+			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone Inlet>,<Inlet Node Count>,<Controlled Zone Name>,<Supply Air Inlet Node Name>,<SD Sys:Cooling/Heating [DD:Cooling] Inlet Node Name>,<DD Sys:Heating Inlet Node Name>";
+			gio::write( OutputFileBNDetails, Format_713 ) << "! <Controlled Zone Exhaust>,<Exhaust Node Count>,<Controlled Zone Name>,<Exhaust Air Node Name>";
 			for ( Count = 1; Count <= NumOfZones; ++Count ) {
 				if ( ! ZoneEquipConfig( Count ).IsControlled ) continue;
 				gio::write( ChrOut, fmtLD ) << ZoneEquipConfig( Count ).NumInletNodes;
@@ -2265,24 +2264,15 @@ namespace SimulationManager {
 			NumVariables = GetNumMeteredVariables( CompSets( Loop ).CType, CompSets( Loop ).CName );
 			gio::write( OutputFileDebug, "(1X,'CompSet,',A,',',A,',',I5)" ) << CompSets( Loop ).CType << CompSets( Loop ).CName << NumVariables;
 			if ( NumVariables <= 0 ) continue;
-			VarIndexes.allocate( NumVariables );
-			VarIndexes = 0;
-			VarIDs.allocate( NumVariables );
-			VarIDs = 0;
-			IndexTypes.allocate( NumVariables );
-			IndexTypes = 0;
-			VarTypes.allocate( NumVariables );
-			VarTypes = 0;
+			VarIndexes.dimension( NumVariables, 0 );
+			VarIDs.dimension( NumVariables, 0 );
+			IndexTypes.dimension( NumVariables, 0 );
+			VarTypes.dimension( NumVariables, 0 );
 			VarNames.allocate( NumVariables );
-			VarNames = "";
 			UnitsStrings.allocate( NumVariables );
-			UnitsStrings = "";
-			ResourceTypes.allocate( NumVariables );
-			ResourceTypes = 0;
+			ResourceTypes.dimension( NumVariables, 0 );
 			EndUses.allocate( NumVariables );
-			EndUses = "";
 			Groups.allocate( NumVariables );
-			Groups = "";
 			GetMeteredVariables( CompSets( Loop ).CType, CompSets( Loop ).CName, VarIndexes, VarTypes, IndexTypes, UnitsStrings, ResourceTypes, EndUses, Groups, VarNames, _, VarIDs );
 			for ( Loop1 = 1; Loop1 <= NumVariables; ++Loop1 ) {
 				gio::write( OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)" ) << VarIndexes( Loop1 ) << VarIDs( Loop1 ) << VarNames( Loop1 ) << UnitsStrings( Loop1 ) << GetResourceTypeChar( ResourceTypes( Loop1 ) ) << EndUses( Loop1 ) << Groups( Loop1 ) << IndexTypes( Loop1 );
@@ -2747,7 +2737,6 @@ Resimulate(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	Real64 ZoneTempChange( 0.0 ); // Dummy variable needed for calling ManageZoneAirUpdates
-	bool AdjustZoneMixingFlowFlag(true);  // holds zone mixing flow calc status
 
 	// FLOW:
 	if ( ResimExt ) {
@@ -2774,13 +2763,7 @@ Resimulate(
 		// HVAC simulation
 		ManageZoneAirUpdates( iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0 );
 		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0 );
-		//CalcAirFlowSimple();
-		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-			CalcAirFlowSimple(AdjustZoneMixingFlowFlag = true);
-		}
-		else {
-			CalcAirFlowSimple();
-		}
+		CalcAirFlowSimple( 0, ZoneAirMassFlow.EnforceZoneMassBalance );
 		ManageZoneAirUpdates( iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0 );
 		if ( Contaminant.SimulateContaminants ) ManageZoneContaminanUpdates( iPredictStep, false, UseZoneTimeStepHistory, 0.0 );
 		SimHVAC();

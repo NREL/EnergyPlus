@@ -1454,20 +1454,6 @@ namespace ThermalISO15099Calc {
 			}
 		} // IF dir = 0
 
-		if ( allocated( FRes ) ) FRes.deallocate();
-		if ( allocated( FResOld ) ) FResOld.deallocate();
-		if ( allocated( FResDiff ) ) FResDiff.deallocate();
-		if ( allocated( Radiation ) ) Radiation.deallocate();
-		if ( allocated( RadiationSave ) ) RadiationSave.deallocate();
-		if ( allocated( thetaSave ) ) thetaSave.deallocate();
-		if ( allocated( x ) ) x.deallocate();
-		if ( allocated( dX ) ) dX.deallocate();
-		if ( allocated( Jacobian ) ) Jacobian.deallocate();
-		if ( allocated( DRes ) ) DRes.deallocate();
-
-		if ( allocated( LeftHandSide ) ) LeftHandSide.deallocate();
-		if ( allocated( RightHandSide ) ) RightHandSide.deallocate();
-
 		//do i=1, nlayer-1
 		//  if (((LayerType(i).eq.VENETBLIND)  &
 		//      &  .and.(ThermalMod.ne.THERM_MOD_CSM))  &

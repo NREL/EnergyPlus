@@ -4120,9 +4120,6 @@ namespace PlantChillers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > CapacityRat( 3 ); // intermediate result:  capacity ratio
-		FArray1D< Real64 > PowerRat( 3 ); // intermediate result:  power ratio
-		FArray1D< Real64 > FullLoadFactor( 3 ); // intermediate result:  full load factor
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
 		Real64 TempCondInDesign; // C - (Electric ADJTC(1)The design secondary loop fluid
@@ -4243,9 +4240,9 @@ namespace PlantChillers {
 		}
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-		CapacityRat = ElectricChiller( ChillNum ).CapRatCoef;
-		PowerRat = ElectricChiller( ChillNum ).PowerRatCoef;
-		FullLoadFactor = ElectricChiller( ChillNum ).FullLoadCoef;
+		auto const & CapacityRat( ElectricChiller( ChillNum ).CapRatCoef );
+		auto const & PowerRat( ElectricChiller( ChillNum ).PowerRatCoef );
+		auto const & FullLoadFactor( ElectricChiller( ChillNum ).FullLoadCoef );
 		MinPartLoadRat = ElectricChiller( ChillNum ).MinPartLoadRat;
 		PartLoadRat = MinPartLoadRat;
 		MaxPartLoadRat = ElectricChiller( ChillNum ).MaxPartLoadRat;
@@ -4673,9 +4670,6 @@ namespace PlantChillers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > CapacityRat( 3 ); // intermediate result:  capacity ratio
-		FArray1D< Real64 > PowerRat( 3 ); // intermediate result:  power ratio
-		FArray1D< Real64 > FullLoadFactor( 3 ); // intermediate result:  full load factor
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
 		Real64 TempCondIn; // C - (EngineDriven ADJTC(1)The design secondary loop fluid
@@ -4855,9 +4849,9 @@ namespace PlantChillers {
 		}
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-		CapacityRat = EngineDrivenChiller( ChillerNum ).CapRatCoef;
-		PowerRat = EngineDrivenChiller( ChillerNum ).PowerRatCoef;
-		FullLoadFactor = EngineDrivenChiller( ChillerNum ).FullLoadCoef;
+		auto const & CapacityRat( EngineDrivenChiller( ChillerNum ).CapRatCoef );
+		auto const & PowerRat( EngineDrivenChiller( ChillerNum ).PowerRatCoef );
+		auto const & FullLoadFactor( EngineDrivenChiller( ChillerNum ).FullLoadCoef );
 		MinPartLoadRat = EngineDrivenChiller( ChillerNum ).MinPartLoadRat;
 		MaxPartLoadRat = EngineDrivenChiller( ChillerNum ).MaxPartLoadRat;
 		TempCondInDesign = EngineDrivenChiller( ChillerNum ).TempDesCondIn;
@@ -5277,9 +5271,6 @@ namespace PlantChillers {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > CapacityRat( 3 ); // intermediate result:  capacity ratio
-		FArray1D< Real64 > PowerRat( 3 ); // intermediate result:  power ratio
-		FArray1D< Real64 > FullLoadFactor( 3 ); // intermediate result:  full load factor
 		Real64 MinPartLoadRat; // min allowed operating frac full load
 		Real64 MaxPartLoadRat; // max allowed operating frac full load
 		Real64 TempCondIn; // C - (GT ADJTC(1)The design secondary loop fluid
@@ -5453,9 +5444,9 @@ namespace PlantChillers {
 		}
 
 		//  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-		CapacityRat = GTChiller( ChillerNum ).CapRatCoef;
-		PowerRat = GTChiller( ChillerNum ).PowerRatCoef;
-		FullLoadFactor = GTChiller( ChillerNum ).FullLoadCoef;
+		auto const & CapacityRat( GTChiller( ChillerNum ).CapRatCoef );
+		auto const & PowerRat( GTChiller( ChillerNum ).PowerRatCoef );
+		auto const & FullLoadFactor( GTChiller( ChillerNum ).FullLoadCoef );
 		MinPartLoadRat = GTChiller( ChillerNum ).MinPartLoadRat;
 		MaxPartLoadRat = GTChiller( ChillerNum ).MaxPartLoadRat;
 		TempCondInDesign = GTChiller( ChillerNum ).TempDesCondIn;

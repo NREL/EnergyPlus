@@ -78,7 +78,6 @@ namespace OutputProcessor {
 	extern int InstMeterCacheSize; // the maximum size of the instant meter cache used in GetInstantMeterValue
 	extern int InstMeterCacheSizeInc; // the increment for the instant meter cache used in GetInstantMeterValue
 	extern FArray1D_int InstMeterCache; // contains a list of RVariableTypes that make up a specific meter
-	extern FArray1D_int InstMeterCacheCopy; // for dynamic array resizing
 	extern int InstMeterCacheLastUsed; // the last item in the instant meter cache used
 
 	// INTERFACE BLOCK SPECIFICATIONS:
@@ -956,18 +955,30 @@ namespace OutputProcessor {
 		int const ReportFreq // Reporting Frequency
 	);
 
+	inline
 	void
 	ReallocateIntegerArray(
 		FArray1D_int & Array,
 		int & ArrayMax, // Current and resultant dimension for Array
 		int const ArrayInc // increment for redimension
-	);
+	)
+	{
+		Array.redimension( ArrayMax += ArrayInc, 0 );
+	}
 
+	inline
 	void
-	ReallocateRVar();
+	ReallocateRVar()
+	{
+		RVariableTypes.redimension( MaxRVariable += RVarAllocInc );
+	}
 
+	inline
 	void
-	ReallocateIVar();
+	ReallocateIVar()
+	{
+		IVariableTypes.redimension( MaxIVariable += IVarAllocInc );
+	}
 
 	int
 	ValidateIndexType(

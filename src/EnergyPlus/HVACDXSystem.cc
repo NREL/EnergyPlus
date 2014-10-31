@@ -360,23 +360,16 @@ namespace HVACDXSystem {
 		NumDXSystem = GetNumObjectsFound( CurrentModuleObject );
 
 		DXCoolingSystem.allocate( NumDXSystem );
-		CheckEquipName.allocate( NumDXSystem );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDXSystem, true );
 
 		GetObjectDefMaxArgs( "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		Numbers.allocate( NumNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		// Get the data for the DX Cooling System
 		for ( DXCoolSysNum = 1; DXCoolSysNum <= NumDXSystem; ++DXCoolSysNum ) {

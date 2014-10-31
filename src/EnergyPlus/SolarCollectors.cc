@@ -291,17 +291,11 @@ namespace SolarCollectors {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 
 		NumOfCollectors = NumFlatPlateUnits + NumOfICSUnits;
 		NumOfParameters = NumOfFlatPlateParam + NumOfICSParam;
@@ -715,8 +709,7 @@ namespace SolarCollectors {
 			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleObject + " input." );
 
 			if ( NumOfCollectors > 0 ) {
-				CheckEquipName.allocate( NumOfCollectors );
-				CheckEquipName = true;
+				CheckEquipName.dimension( NumOfCollectors, true );
 			}
 
 		}

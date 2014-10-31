@@ -75,7 +75,6 @@ namespace NodeInputManager {
 	bool GetNodeInputFlag( true ); // Flag to Get Node Input(s)
 	FArray1D_string TmpNodeID; // Used to "reallocate" name arrays
 	FArray1D_int NodeRef; // Number of times a Node is "referenced"
-	FArray1D_int TmpNodeRef; // used to reallocate
 	std::string CurCheckContextName; // Used in Uniqueness checks
 	FArray1D_string UniqueNodeNames; // used in uniqueness checks
 	int NumCheckNodes( 0 ); // Num of Unique nodes in check
@@ -85,8 +84,6 @@ namespace NodeInputManager {
 
 	// Object Data
 	FArray1D< NodeListDef > NodeLists; // Node Lists
-	FArray1D< NodeData > TmpNode; // Used to "reallocate" Node Structure
-	FArray1D< MarkedNodeData > TmpMarkedNode; // Marked nodes must exist somewhere else
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -665,39 +662,16 @@ namespace NodeInputManager {
 			} else {
 				++NumOfUniqueNodeNames;
 				NumOfNodes = NumOfUniqueNodeNames;
-				TmpNode.allocate( NumOfNodes );
-				TmpNodeID.allocate( {0,NumOfNodes} );
-				TmpNodeRef.allocate( NumOfNodes );
-				TmpMarkedNode.allocate( NumOfNodes );
 
-				TmpNode( {1,NumOfNodes - 1} ) = Node( {1,NumOfNodes - 1} );
-				TmpNodeID( {0,NumOfNodes - 1} ) = NodeID( {0,NumOfNodes - 1} );
-				TmpNodeRef( {1,NumOfNodes - 1} ) = NodeRef( {1,NumOfNodes - 1} );
-				TmpMarkedNode( {1,NumOfNodes - 1} ) = MarkedNode( {1,NumOfNodes - 1} );
-
-				Node.deallocate();
-				NodeID.deallocate();
-				NodeRef.deallocate();
-				MarkedNode.deallocate();
-				Node.allocate( NumOfNodes );
-				NodeID.allocate( {0,NumOfNodes} );
-				NodeRef.allocate( NumOfNodes );
-				MarkedNode.allocate( NumOfNodes );
-				Node( {1,NumOfNodes - 1} ) = TmpNode( {1,NumOfNodes - 1} );
-				NodeID( {0,NumOfNodes - 1} ) = TmpNodeID( {0,NumOfNodes - 1} );
-				NodeRef( {1,NumOfNodes - 1} ) = TmpNodeRef( {1,NumOfNodes - 1} );
-				MarkedNode( {1,NumOfNodes - 1} ) = TmpMarkedNode( {1,NumOfNodes - 1} );
-				TmpNode.deallocate();
-				TmpNodeID.deallocate();
-				TmpNodeRef.deallocate();
-				TmpMarkedNode.deallocate();
-				// Set new item in derived type Node to zero.
+				Node.redimension( NumOfNodes );
+				NodeID.redimension( {0,NumOfNodes} );
+				NodeRef.redimension( NumOfNodes );
+				MarkedNode.redimension( NumOfNodes );
+				// Set new item in Node
 				Node( NumOfNodes ).FluidType = NodeFluidType;
-				// Allocate takes care of defining
-				NodeID( NumOfNodes ) = "";
 				NodeRef( NumOfNodes ) = 0;
-
 				NodeID( NumOfUniqueNodeNames ) = Name;
+
 				AssignNodeNumber = NumOfUniqueNodeNames;
 			}
 		} else {
@@ -780,8 +754,7 @@ namespace NodeInputManager {
 
 		if ( firstTime ) {
 			GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-			NodeNums.allocate( NumParams );
-			NodeNums = 0;
+			NodeNums.dimension( NumParams, 0 );
 			firstTime = false;
 		}
 
@@ -872,7 +845,6 @@ namespace NodeInputManager {
 		NumCheckNodes = 0;
 		MaxCheckNodes = 100;
 		UniqueNodeNames.allocate( MaxCheckNodes );
-		UniqueNodeNames = BlankString;
 		CurCheckContextName = ContextName;
 
 	}
@@ -947,14 +919,7 @@ namespace NodeInputManager {
 				} else {
 					++NumCheckNodes;
 					if ( NumCheckNodes > MaxCheckNodes ) {
-						TmpNodeID.allocate( MaxCheckNodes + 100 );
-						TmpNodeID = BlankString;
-						TmpNodeID( {1,NumCheckNodes - 1} ) = UniqueNodeNames;
-						UniqueNodeNames.deallocate();
-						MaxCheckNodes += 100;
-						UniqueNodeNames.allocate( MaxCheckNodes );
-						UniqueNodeNames = TmpNodeID;
-						TmpNodeID.deallocate();
+						UniqueNodeNames.redimension( MaxCheckNodes += 100 );
 					}
 					UniqueNodeNames( NumCheckNodes ) = CheckName;
 				}
@@ -976,14 +941,7 @@ namespace NodeInputManager {
 				} else {
 					++NumCheckNodes;
 					if ( NumCheckNodes > MaxCheckNodes ) {
-						TmpNodeID.allocate( MaxCheckNodes + 100 );
-						TmpNodeID = BlankString;
-						TmpNodeID( {1,NumCheckNodes - 1} ) = UniqueNodeNames;
-						UniqueNodeNames.deallocate();
-						MaxCheckNodes += 100;
-						UniqueNodeNames.allocate( MaxCheckNodes );
-						UniqueNodeNames = TmpNodeID;
-						TmpNodeID.deallocate();
+						UniqueNodeNames.redimension( MaxCheckNodes += 100 );
 					}
 					UniqueNodeNames( NumCheckNodes ) = NodeID( CheckNumber );
 				}

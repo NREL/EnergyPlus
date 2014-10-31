@@ -290,22 +290,15 @@ namespace PlantHeatExchangerFluidToFluid {
 		MaxNumAlphas = NumAlphas;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( MaxNumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( MaxNumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 		if ( NumberOfPlantFluidHXs > 0 ) {
 			FluidHX.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs = true;
+			CheckFluidHXs.dimension( NumberOfPlantFluidHXs, true );
 			for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;

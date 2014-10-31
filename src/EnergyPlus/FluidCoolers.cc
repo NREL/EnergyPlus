@@ -347,8 +347,7 @@ namespace FluidCoolers {
 		SimpleFluidCooler.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerReport.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerInlet.allocate( NumSimpleFluidCoolers );
-		CheckEquipName.allocate( NumSimpleFluidCoolers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSimpleFluidCoolers, true );
 
 		// Load data structures with fluid cooler input data
 		cCurrentModuleObject = cFluidCooler_SingleSpeed;

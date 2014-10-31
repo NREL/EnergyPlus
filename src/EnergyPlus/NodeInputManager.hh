@@ -34,9 +34,7 @@ namespace NodeInputManager {
 	// The following is a module level flag because there are several possible "entries" into
 	// this module that may need to get the Node Inputs.
 	extern bool GetNodeInputFlag; // Flag to Get Node Input(s)
-	extern FArray1D_string TmpNodeID; // Used to "reallocate" name arrays
 	extern FArray1D_int NodeRef; // Number of times a Node is "referenced"
-	extern FArray1D_int TmpNodeRef; // used to reallocate
 	extern std::string CurCheckContextName; // Used in Uniqueness checks
 	extern FArray1D_string UniqueNodeNames; // used in uniqueness checks
 	extern int NumCheckNodes; // Num of Unique nodes in check
@@ -76,8 +74,6 @@ namespace NodeInputManager {
 
 	// Object Data
 	extern FArray1D< NodeListDef > NodeLists; // Node Lists
-	extern FArray1D< NodeData > TmpNode; // Used to "reallocate" Node Structure
-	extern FArray1D< MarkedNodeData > TmpMarkedNode; // Marked nodes must exist somewhere else
 
 	// Functions
 

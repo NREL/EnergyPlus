@@ -316,8 +316,7 @@ namespace ChillerGasAbsorption {
 		GasAbsorber.allocate( NumGasAbsorbers );
 
 		GasAbsorberReport.allocate( NumGasAbsorbers );
-		CheckEquipName.allocate( NumGasAbsorbers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumGasAbsorbers, true );
 
 		//LOAD ARRAYS
 
@@ -596,8 +595,7 @@ namespace ChillerGasAbsorption {
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
 			MyPlantScanFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumGasAbsorbers, true );
 			MyOneTimeFlag = false;
 			MyPlantScanFlag = true;
 		}

@@ -228,22 +228,15 @@ namespace MixerComponent {
 		NumMixers = GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumMixers > 0 ) MixerCond.allocate( NumMixers );
-		CheckEquipName.allocate( NumMixers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumMixers, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
+		lNumericBlanks.dimension( NumNums, true );
+		NumArray.dimension( NumNums, 0.0 );
 
 		for ( MixerNum = 1; MixerNum <= NumMixers; ++MixerNum ) {
 			GetObjectItem( CurrentModuleObject, MixerNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );

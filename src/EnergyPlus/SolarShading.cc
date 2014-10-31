@@ -200,7 +200,6 @@ namespace SolarShading {
 	FArray1D< SurfaceErrorTracking > TrackTooManyFigures;
 	FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
 	FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
-	FArray1D< SurfaceErrorTracking > TempSurfErrorTracking;
 
 	static gio::Fmt const fmtLD( "*" );
 
@@ -613,14 +612,10 @@ namespace SolarShading {
 
 		// FLOW:
 
-		CTHETA.allocate( TotSurfaces );
-		CTHETA = 0.0;
-		SAREA.allocate( TotSurfaces );
-		SAREA = 0.0;
-		SurfSunlitArea.allocate( TotSurfaces );
-		SurfSunlitArea = 0.0;
-		SurfSunlitFrac.allocate( TotSurfaces );
-		SurfSunlitFrac = 0.0;
+		CTHETA.dimension( TotSurfaces, 0.0 );
+		SAREA.dimension( TotSurfaces, 0.0 );
+		SurfSunlitArea.dimension( TotSurfaces, 0.0 );
+		SurfSunlitFrac.dimension( TotSurfaces, 0.0 );
 		SunlitFracHR.allocate( TotSurfaces, 24 );
 		SunlitFracHR = 0.0;
 		SunlitFrac.allocate( TotSurfaces, 24, NumOfTimeStepInHour );
@@ -635,8 +630,7 @@ namespace SolarShading {
 		CosIncAngHR = 0.0;
 		CosIncAng.allocate( TotSurfaces, 24, NumOfTimeStepInHour );
 		CosIncAng = 0.0;
-		AnisoSkyMult.allocate( TotSurfaces );
-		AnisoSkyMult = 1.0; // For isotropic sky; recalculated in AnisoSkyViewFactors if anisotropic radiance
+		AnisoSkyMult.dimension( TotSurfaces, 1.0 ); // For isotropic sky: recalculated in AnisoSkyViewFactors if anisotropic radiance
 		//  ALLOCATE(WithShdgIsoSky(TotSurfaces))
 		//  WithShdgIsoSky=0.0
 		//  ALLOCATE(WoShdgIsoSky(TotSurfaces))
@@ -649,138 +643,77 @@ namespace SolarShading {
 		//  DifShdgRatioIsoSky=0.0
 		//  ALLOCATE(DifShdgRatioHoriz(TotSurfaces))
 		//  DifShdgRatioHoriz=0.0
-		MultIsoSky.allocate( TotSurfaces );
-		MultIsoSky = 0.0;
-		MultCircumSolar.allocate( TotSurfaces );
-		MultCircumSolar = 0.0;
-		MultHorizonZenith.allocate( TotSurfaces );
-		MultHorizonZenith = 0.0;
-		WinTransSolar.allocate( TotSurfaces );
-		WinTransSolar = 0.0;
-		WinBmSolar.allocate( TotSurfaces );
-		WinBmSolar = 0.0;
-		WinBmBmSolar.allocate( TotSurfaces );
-		WinBmBmSolar = 0.0;
-		WinBmDifSolar.allocate( TotSurfaces );
-		WinBmDifSolar = 0.0;
+		MultIsoSky.dimension( TotSurfaces, 0.0 );
+		MultCircumSolar.dimension( TotSurfaces, 0.0 );
+		MultHorizonZenith.dimension( TotSurfaces, 0.0 );
+		WinTransSolar.dimension( TotSurfaces, 0.0 );
+		WinBmSolar.dimension( TotSurfaces, 0.0 );
+		WinBmBmSolar.dimension( TotSurfaces, 0.0 );
+		WinBmDifSolar.dimension( TotSurfaces, 0.0 );
 
-		WinDifSolar.allocate( TotSurfaces );
-		WinDifSolar = 0.0;
-		WinDirSolTransAtIncAngle.allocate( TotSurfaces );
-		WinDirSolTransAtIncAngle = 0.0;
-		WinHeatGain.allocate( TotSurfaces );
-		WinHeatGain = 0.0;
-		WinHeatGainRep.allocate( TotSurfaces );
-		WinHeatGainRep = 0.0;
-		WinHeatLossRep.allocate( TotSurfaces );
-		WinHeatLossRep = 0.0;
-		WinGainConvGlazToZoneRep.allocate( TotSurfaces );
-		WinGainConvGlazToZoneRep = 0.0;
-		WinGainIRGlazToZoneRep.allocate( TotSurfaces );
-		WinGainIRGlazToZoneRep = 0.0;
-		WinLossSWZoneToOutWinRep.allocate( TotSurfaces );
-		WinLossSWZoneToOutWinRep = 0.0;
-		WinGainFrameDividerToZoneRep.allocate( TotSurfaces );
-		WinGainFrameDividerToZoneRep = 0.0;
-		WinGainConvGlazShadGapToZoneRep.allocate( TotSurfaces );
-		WinGainConvGlazShadGapToZoneRep = 0.0;
-		WinGainConvShadeToZoneRep.allocate( TotSurfaces );
-		WinGainConvShadeToZoneRep = 0.0;
-		OtherConvGainInsideFaceToZoneRep.allocate( TotSurfaces );
-		OtherConvGainInsideFaceToZoneRep = 0.0;
-		WinGainIRShadeToZoneRep.allocate( TotSurfaces );
-		WinGainIRShadeToZoneRep = 0.0;
-		WinGapConvHtFlowRep.allocate( TotSurfaces );
-		WinGapConvHtFlowRep = 0.0;
-		WinShadingAbsorbedSolar.allocate( TotSurfaces );
-		WinShadingAbsorbedSolar = 0.0;
-		WinSysSolTransmittance.allocate( TotSurfaces );
-		WinSysSolTransmittance = 0.0;
-		WinSysSolReflectance.allocate( TotSurfaces );
-		WinSysSolReflectance = 0.0;
-		WinSysSolAbsorptance.allocate( TotSurfaces );
-		WinSysSolAbsorptance = 0.0;
-		InsideGlassCondensationFlag.allocate( TotSurfaces );
-		InsideGlassCondensationFlag = 0;
-		InsideFrameCondensationFlag.allocate( TotSurfaces );
-		InsideFrameCondensationFlag = 0;
-		InsideDividerCondensationFlag.allocate( TotSurfaces );
-		InsideDividerCondensationFlag = 0;
-		ZoneTransSolar.allocate( NumOfZones );
-		ZoneTransSolar = 0.0;
-		ZoneBmSolFrExtWinsRep.allocate( NumOfZones );
-		ZoneBmSolFrExtWinsRep = 0.0;
-		ZoneBmSolFrIntWinsRep.allocate( NumOfZones );
-		ZoneBmSolFrIntWinsRep = 0.0;
-		InitialZoneDifSolReflW.allocate( NumOfZones );
-		InitialZoneDifSolReflW = 0.0;
-		ZoneDifSolFrExtWinsRep.allocate( NumOfZones );
-		ZoneDifSolFrExtWinsRep = 0.0;
-		ZoneDifSolFrIntWinsRep.allocate( NumOfZones );
-		ZoneDifSolFrIntWinsRep = 0.0;
-		ZoneWinHeatGain.allocate( NumOfZones );
-		ZoneWinHeatGain = 0.0;
-		ZoneWinHeatGainRep.allocate( NumOfZones );
-		ZoneWinHeatGainRep = 0.0;
-		ZoneWinHeatLossRep.allocate( NumOfZones );
-		ZoneWinHeatLossRep = 0.0;
-		ZoneOpaqSurfInsFaceCond.allocate( NumOfZones );
-		ZoneOpaqSurfInsFaceCond = 0.0;
-		ZoneOpaqSurfInsFaceCondGainRep.allocate( NumOfZones );
-		ZoneOpaqSurfInsFaceCondGainRep = 0.0;
-		ZoneOpaqSurfInsFaceCondLossRep.allocate( NumOfZones );
-		ZoneOpaqSurfInsFaceCondLossRep = 0.0;
-		ZoneOpaqSurfExtFaceCond.allocate( NumOfZones );
-		ZoneOpaqSurfExtFaceCond = 0.0;
-		ZoneOpaqSurfExtFaceCondGainRep.allocate( NumOfZones );
-		ZoneOpaqSurfExtFaceCondGainRep = 0.0;
-		ZoneOpaqSurfExtFaceCondLossRep.allocate( NumOfZones );
-		ZoneOpaqSurfExtFaceCondLossRep = 0.0;
+		WinDifSolar.dimension( TotSurfaces, 0.0 );
+		WinDirSolTransAtIncAngle.dimension( TotSurfaces, 0.0 );
+		WinHeatGain.dimension( TotSurfaces, 0.0 );
+		WinHeatGainRep.dimension( TotSurfaces, 0.0 );
+		WinHeatLossRep.dimension( TotSurfaces, 0.0 );
+		WinGainConvGlazToZoneRep.dimension( TotSurfaces, 0.0 );
+		WinGainIRGlazToZoneRep.dimension( TotSurfaces, 0.0 );
+		WinLossSWZoneToOutWinRep.dimension( TotSurfaces, 0.0 );
+		WinGainFrameDividerToZoneRep.dimension( TotSurfaces, 0.0 );
+		WinGainConvGlazShadGapToZoneRep.dimension( TotSurfaces, 0.0 );
+		WinGainConvShadeToZoneRep.dimension( TotSurfaces, 0.0 );
+		OtherConvGainInsideFaceToZoneRep.dimension( TotSurfaces, 0.0 );
+		WinGainIRShadeToZoneRep.dimension( TotSurfaces, 0.0 );
+		WinGapConvHtFlowRep.dimension( TotSurfaces, 0.0 );
+		WinShadingAbsorbedSolar.dimension( TotSurfaces, 0.0 );
+		WinSysSolTransmittance.dimension( TotSurfaces, 0.0 );
+		WinSysSolReflectance.dimension( TotSurfaces, 0.0 );
+		WinSysSolAbsorptance.dimension( TotSurfaces, 0.0 );
+		InsideGlassCondensationFlag.dimension( TotSurfaces, 0 );
+		InsideFrameCondensationFlag.dimension( TotSurfaces, 0 );
+		InsideDividerCondensationFlag.dimension( TotSurfaces, 0 );
+		ZoneTransSolar.dimension( NumOfZones, 0.0 );
+		ZoneBmSolFrExtWinsRep.dimension( NumOfZones, 0.0 );
+		ZoneBmSolFrIntWinsRep.dimension( NumOfZones, 0.0 );
+		InitialZoneDifSolReflW.dimension( NumOfZones, 0.0 );
+		ZoneDifSolFrExtWinsRep.dimension( NumOfZones, 0.0 );
+		ZoneDifSolFrIntWinsRep.dimension( NumOfZones, 0.0 );
+		ZoneWinHeatGain.dimension( NumOfZones, 0.0 );
+		ZoneWinHeatGainRep.dimension( NumOfZones, 0.0 );
+		ZoneWinHeatLossRep.dimension( NumOfZones, 0.0 );
+		ZoneOpaqSurfInsFaceCond.dimension( NumOfZones, 0.0 );
+		ZoneOpaqSurfInsFaceCondGainRep.dimension( NumOfZones, 0.0 );
+		ZoneOpaqSurfInsFaceCondLossRep.dimension( NumOfZones, 0.0 );
+		ZoneOpaqSurfExtFaceCond.dimension( NumOfZones, 0.0 );
+		ZoneOpaqSurfExtFaceCondGainRep.dimension( NumOfZones, 0.0 );
+		ZoneOpaqSurfExtFaceCondLossRep.dimension( NumOfZones, 0.0 );
 
-		QRadSWOutIncident.allocate( TotSurfaces );
-		QRadSWOutIncident = 0.0;
-		QRadSWOutIncidentBeam.allocate( TotSurfaces );
-		QRadSWOutIncidentBeam = 0.0;
-		BmIncInsSurfIntensRep.allocate( TotSurfaces );
-		BmIncInsSurfIntensRep = 0.0;
-		BmIncInsSurfAmountRep.allocate( TotSurfaces );
-		BmIncInsSurfAmountRep = 0.0;
+		QRadSWOutIncident.dimension( TotSurfaces, 0.0 );
+		QRadSWOutIncidentBeam.dimension( TotSurfaces, 0.0 );
+		BmIncInsSurfIntensRep.dimension( TotSurfaces, 0.0 );
+		BmIncInsSurfAmountRep.dimension( TotSurfaces, 0.0 );
 		//  ALLOCATE(DifIncInsSurfIntensRep(TotSurfaces))
 		//  DifIncInsSurfIntensRep=0.0
 		//  ALLOCATE(DifIncInsSurfAmountRep(TotSurfaces))
 		//  DifIncInsSurfAmountRep=0.0
-		IntBmIncInsSurfIntensRep.allocate( TotSurfaces );
-		IntBmIncInsSurfIntensRep = 0.0;
-		IntBmIncInsSurfAmountRep.allocate( TotSurfaces );
-		IntBmIncInsSurfAmountRep = 0.0;
+		IntBmIncInsSurfIntensRep.dimension( TotSurfaces, 0.0 );
+		IntBmIncInsSurfAmountRep.dimension( TotSurfaces, 0.0 );
 		//  ALLOCATE(IntDifIncInsSurfIntensRep(TotSurfaces))
 		//  IntDifIncInsSurfIntensRep=0.0
 		//  ALLOCATE(IntDifIncInsSurfAmountRep(TotSurfaces))
 		//  IntDifIncInsSurfAmountRep=0.0
-		QRadSWOutIncidentSkyDiffuse.allocate( TotSurfaces );
-		QRadSWOutIncidentSkyDiffuse = 0.0;
-		QRadSWOutIncidentGndDiffuse.allocate( TotSurfaces );
-		QRadSWOutIncidentGndDiffuse = 0.0;
-		QRadSWOutIncBmToDiffReflGnd.allocate( TotSurfaces );
-		QRadSWOutIncBmToDiffReflGnd = 0.0;
-		QRadSWOutIncSkyDiffReflGnd.allocate( TotSurfaces );
-		QRadSWOutIncSkyDiffReflGnd = 0.0;
-		QRadSWOutIncBmToBmReflObs.allocate( TotSurfaces );
-		QRadSWOutIncBmToBmReflObs = 0.0;
-		QRadSWOutIncBmToDiffReflObs.allocate( TotSurfaces );
-		QRadSWOutIncBmToDiffReflObs = 0.0;
-		QRadSWOutIncSkyDiffReflObs.allocate( TotSurfaces );
-		QRadSWOutIncSkyDiffReflObs = 0.0;
-		CosIncidenceAngle.allocate( TotSurfaces );
-		CosIncidenceAngle = 0.0;
-		BSDFBeamDirectionRep.allocate( TotSurfaces );
-		BSDFBeamDirectionRep = 0;
-		BSDFBeamThetaRep.allocate( TotSurfaces );
-		BSDFBeamThetaRep = 0.0;
-		BSDFBeamPhiRep.allocate( TotSurfaces );
-		BSDFBeamPhiRep = 0.0;
-		QRadSWwinAbsTot.allocate( TotSurfaces );
-		QRadSWwinAbsTot = 0.0;
+		QRadSWOutIncidentSkyDiffuse.dimension( TotSurfaces, 0.0 );
+		QRadSWOutIncidentGndDiffuse.dimension( TotSurfaces, 0.0 );
+		QRadSWOutIncBmToDiffReflGnd.dimension( TotSurfaces, 0.0 );
+		QRadSWOutIncSkyDiffReflGnd.dimension( TotSurfaces, 0.0 );
+		QRadSWOutIncBmToBmReflObs.dimension( TotSurfaces, 0.0 );
+		QRadSWOutIncBmToDiffReflObs.dimension( TotSurfaces, 0.0 );
+		QRadSWOutIncSkyDiffReflObs.dimension( TotSurfaces, 0.0 );
+		CosIncidenceAngle.dimension( TotSurfaces, 0.0 );
+		BSDFBeamDirectionRep.dimension( TotSurfaces, 0 );
+		BSDFBeamThetaRep.dimension( TotSurfaces, 0.0 );
+		BSDFBeamPhiRep.dimension( TotSurfaces, 0.0 );
+		QRadSWwinAbsTot.dimension( TotSurfaces, 0.0 );
 
 		QRadSWwinAbsLayer.allocate( TotSurfaces, MaxSolidWinLayers );
 		QRadSWwinAbsLayer = 0.0;
@@ -790,14 +723,10 @@ namespace SolarShading {
 		FenLaySurfTempBack.allocate( TotSurfaces, MaxSolidWinLayers );
 		FenLaySurfTempBack = 0.0;
 
-		SWwinAbsTotalReport.allocate( TotSurfaces );
-		SWwinAbsTotalReport = 0.0;
-		InitialDifSolInAbsReport.allocate( TotSurfaces );
-		InitialDifSolInAbsReport = 0.0;
-		InitialDifSolInTransReport.allocate( TotSurfaces );
-		InitialDifSolInTransReport = 0.0;
-		SWInAbsTotalReport.allocate( TotSurfaces );
-		SWInAbsTotalReport = 0.0;
+		SWwinAbsTotalReport.dimension( TotSurfaces, 0.0 );
+		InitialDifSolInAbsReport.dimension( TotSurfaces, 0.0 );
+		InitialDifSolInTransReport.dimension( TotSurfaces, 0.0 );
+		SWInAbsTotalReport.dimension( TotSurfaces, 0.0 );
 		WindowRevealStatus.allocate( TotSurfaces, 24, NumOfTimeStepInHour );
 		WindowRevealStatus = 0;
 
@@ -832,58 +761,35 @@ namespace SolarShading {
 		YTEMP1 = 0.0;
 
 		//energy
-		WinTransSolarEnergy.allocate( TotSurfaces );
-		WinTransSolarEnergy = 0.0;
-		WinBmSolarEnergy.allocate( TotSurfaces );
-		WinBmSolarEnergy = 0.0;
+		WinTransSolarEnergy.dimension( TotSurfaces, 0.0 );
+		WinBmSolarEnergy.dimension( TotSurfaces, 0.0 );
 
-		WinBmBmSolarEnergy.allocate( TotSurfaces );
-		WinBmBmSolarEnergy = 0.0;
-		WinBmDifSolarEnergy.allocate( TotSurfaces );
-		WinBmDifSolarEnergy = 0.0;
+		WinBmBmSolarEnergy.dimension( TotSurfaces, 0.0 );
+		WinBmDifSolarEnergy.dimension( TotSurfaces, 0.0 );
 
-		WinDifSolarEnergy.allocate( TotSurfaces );
-		WinDifSolarEnergy = 0.0;
-		WinHeatGainRepEnergy.allocate( TotSurfaces );
-		WinHeatGainRepEnergy = 0.0;
-		WinHeatLossRepEnergy.allocate( TotSurfaces );
-		WinHeatLossRepEnergy = 0.0;
-		WinGapConvHtFlowRepEnergy.allocate( TotSurfaces );
-		WinGapConvHtFlowRepEnergy = 0.0;
-		ZoneTransSolarEnergy.allocate( NumOfZones );
-		ZoneTransSolarEnergy = 0.0;
-		ZoneBmSolFrExtWinsRepEnergy.allocate( NumOfZones );
-		ZoneBmSolFrExtWinsRepEnergy = 0.0;
-		ZoneBmSolFrIntWinsRepEnergy.allocate( NumOfZones );
-		ZoneBmSolFrIntWinsRepEnergy = 0.0;
-		ZoneDifSolFrExtWinsRepEnergy.allocate( NumOfZones );
-		ZoneDifSolFrExtWinsRepEnergy = 0.0;
-		ZoneDifSolFrIntWinsRepEnergy.allocate( NumOfZones );
-		ZoneDifSolFrIntWinsRepEnergy = 0.0;
-		ZoneWinHeatGainRepEnergy.allocate( NumOfZones );
-		ZoneWinHeatGainRepEnergy = 0.0;
-		ZoneWinHeatLossRepEnergy.allocate( NumOfZones );
-		ZoneWinHeatLossRepEnergy = 0.0;
-		BmIncInsSurfAmountRepEnergy.allocate( TotSurfaces );
-		BmIncInsSurfAmountRepEnergy = 0.0;
-		ZnOpqSurfInsFaceCondGnRepEnrg.allocate( NumOfZones );
-		ZnOpqSurfInsFaceCondGnRepEnrg = 0.0;
-		ZnOpqSurfInsFaceCondLsRepEnrg.allocate( NumOfZones );
-		ZnOpqSurfInsFaceCondLsRepEnrg = 0.0;
-		ZnOpqSurfExtFaceCondGnRepEnrg.allocate( NumOfZones );
-		ZnOpqSurfExtFaceCondGnRepEnrg = 0.0;
-		ZnOpqSurfExtFaceCondLsRepEnrg.allocate( NumOfZones );
-		ZnOpqSurfExtFaceCondLsRepEnrg = 0.0;
+		WinDifSolarEnergy.dimension( TotSurfaces, 0.0 );
+		WinHeatGainRepEnergy.dimension( TotSurfaces, 0.0 );
+		WinHeatLossRepEnergy.dimension( TotSurfaces, 0.0 );
+		WinGapConvHtFlowRepEnergy.dimension( TotSurfaces, 0.0 );
+		ZoneTransSolarEnergy.dimension( NumOfZones, 0.0 );
+		ZoneBmSolFrExtWinsRepEnergy.dimension( NumOfZones, 0.0 );
+		ZoneBmSolFrIntWinsRepEnergy.dimension( NumOfZones, 0.0 );
+		ZoneDifSolFrExtWinsRepEnergy.dimension( NumOfZones, 0.0 );
+		ZoneDifSolFrIntWinsRepEnergy.dimension( NumOfZones, 0.0 );
+		ZoneWinHeatGainRepEnergy.dimension( NumOfZones, 0.0 );
+		ZoneWinHeatLossRepEnergy.dimension( NumOfZones, 0.0 );
+		BmIncInsSurfAmountRepEnergy.dimension( TotSurfaces, 0.0 );
+		ZnOpqSurfInsFaceCondGnRepEnrg.dimension( NumOfZones, 0.0 );
+		ZnOpqSurfInsFaceCondLsRepEnrg.dimension( NumOfZones, 0.0 );
+		ZnOpqSurfExtFaceCondGnRepEnrg.dimension( NumOfZones, 0.0 );
+		ZnOpqSurfExtFaceCondLsRepEnrg.dimension( NumOfZones, 0.0 );
 		//  ALLOCATE(DifIncInsSurfAmountRepEnergy(TotSurfaces))
 		//  DifIncInsSurfAmountRepEnergy=0.0
-		IntBmIncInsSurfAmountRepEnergy.allocate( TotSurfaces );
-		IntBmIncInsSurfAmountRepEnergy = 0.0;
+		IntBmIncInsSurfAmountRepEnergy.dimension( TotSurfaces, 0.0 );
 		//  ALLOCATE(IntDifIncInsSurfAmountRepEnergy(TotSurfaces))
 		//  IntDifIncInsSurfAmountRepEnergy=0.0
-		QRadSWwinAbsTotEnergy.allocate( TotSurfaces );
-		QRadSWwinAbsTotEnergy = 0.0;
-		WinShadingAbsorbedSolarEnergy.allocate( TotSurfaces );
-		WinShadingAbsorbedSolarEnergy = 0.0;
+		QRadSWwinAbsTotEnergy.dimension( TotSurfaces, 0.0 );
+		WinShadingAbsorbedSolarEnergy.dimension( TotSurfaces, 0.0 );
 		SurfaceWindow.BmSolAbsdOutsReveal() = 0.0;
 		SurfaceWindow.BmSolRefldOutsRevealReport() = 0.0;
 		SurfaceWindow.BmSolAbsdInsReveal() = 0.0;
@@ -1303,7 +1209,7 @@ namespace SolarShading {
 		Real64 KappaZ3; // Intermediate variable
 		Real64 ViewFactorSkyGeom; // Geometrical sky view factor
 		Real64 const cosine_tolerance( 0.0001 );
-			
+
 		// FLOW:
 #ifdef EP_Count_Calls
 		++NumAnisoSky_Calls;
@@ -1337,7 +1243,7 @@ namespace SolarShading {
 			if ( ! Surface( SurfNum ).ExtSolar ) continue;
 
 			CosIncAngBeamOnSurface = SOLCOS( 1 ) * Surface( SurfNum ).OutNormVec( 1 ) + SOLCOS( 2 ) * Surface( SurfNum ).OutNormVec( 2 ) + SOLCOS( 3 ) * Surface( SurfNum ).OutNormVec( 3 );
-			
+
 			// So I believe this should only be a diagnostic error...the calcs should always be within -1,+1; it's just round-off that we need to trap for
 			if ( CosIncAngBeamOnSurface > 1.0 ) {
 				if ( CosIncAngBeamOnSurface > ( 1.0 + cosine_tolerance ) ) {
@@ -1358,7 +1264,7 @@ namespace SolarShading {
 				}
 				CosIncAngBeamOnSurface = -1.0;
 			}
-			
+
 			IncAng = std::acos( CosIncAngBeamOnSurface );
 
 			ViewFactorSkyGeom = Surface( SurfNum ).ViewFactorSky;
@@ -1825,17 +1731,7 @@ namespace SolarShading {
 			//      FirstSurroundError=.FALSE.
 			//    ENDIF
 			if ( Out ) {
-				++NumBaseSubSurround;
-				if ( NumBaseSubSurround > 1 ) {
-					TempSurfErrorTracking.allocate( NumBaseSubSurround );
-					TempSurfErrorTracking( {1,NumBaseSubSurround - 1} ) = TrackBaseSubSurround;
-					TrackBaseSubSurround.deallocate();
-					TrackBaseSubSurround.allocate( NumBaseSubSurround );
-					TrackBaseSubSurround = TempSurfErrorTracking;
-					TempSurfErrorTracking.deallocate();
-				} else {
-					TrackBaseSubSurround.allocate( NumBaseSubSurround );
-				}
+				TrackBaseSubSurround.redimension( ++NumBaseSubSurround );
 				TrackBaseSubSurround( NumBaseSubSurround ).SurfIndex1 = GRSNR;
 				TrackBaseSubSurround( NumBaseSubSurround ).SurfIndex2 = SBSNR;
 				TrackBaseSubSurround( NumBaseSubSurround ).MiscIndex = OverlapStatus;
@@ -2053,7 +1949,7 @@ namespace SolarShading {
 				Zone( ZoneNum ).FloorArea = HorizAreaSum;
 				ShowWarningError( "ComputeIntSolarAbsorpFactors: Solar distribution model is set to place solar gains " "on the zone floor," );
 				ShowContinueError( "...Zone=\"" + Zone( ZoneNum ).Name + "\" has no floor, but has approximate horizontal surfaces." );
-				ShowContinueError( "...these Tilt > 120�, (area=[" + RoundSigDigits( HorizAreaSum, 2 ) + "] m2) will be used." );
+				ShowContinueError( "...these Tilt > 120°, (area=[" + RoundSigDigits( HorizAreaSum, 2 ) + "] m2) will be used." );
 			}
 
 			// Compute ISABSF
@@ -2812,7 +2708,6 @@ namespace SolarShading {
 		int KK; // Duplicate test index
 		int NVOUT; // Current output length for loops
 		int NVTEMP;
-		int SaveArrayBounds;
 
 		Real64 W; // Normalization factor
 		Real64 HFunct;
@@ -2891,21 +2786,15 @@ namespace SolarShading {
 					KK = NVTEMP;
 					++NVTEMP;
 					if ( NVTEMP > MAXHCArrayBounds ) {
-						SaveArrayBounds = MAXHCArrayBounds;
-						ReallocateRealArray( XTEMP, SaveArrayBounds, MAXHCArrayIncrement );
-						SaveArrayBounds = MAXHCArrayBounds;
-						ReallocateRealArray( YTEMP, SaveArrayBounds, MAXHCArrayIncrement );
-						SaveArrayBounds = MAXHCArrayBounds;
-						ReallocateRealArray( XTEMP1, SaveArrayBounds, MAXHCArrayIncrement );
-						SaveArrayBounds = MAXHCArrayBounds;
-						ReallocateRealArray( YTEMP1, SaveArrayBounds, MAXHCArrayIncrement );
-						SaveArrayBounds = MAXHCArrayBounds;
-						ReallocateRealArray( ATEMP, SaveArrayBounds, MAXHCArrayIncrement );
-						SaveArrayBounds = MAXHCArrayBounds;
-						ReallocateRealArray( BTEMP, SaveArrayBounds, MAXHCArrayIncrement );
-						SaveArrayBounds = MAXHCArrayBounds;
-						ReallocateRealArray( CTEMP, SaveArrayBounds, MAXHCArrayIncrement );
-						MAXHCArrayBounds = SaveArrayBounds;
+						int const NewArrayBounds( MAXHCArrayBounds + MAXHCArrayIncrement );
+						XTEMP.redimension( NewArrayBounds, 0.0 );
+						YTEMP.redimension( NewArrayBounds, 0.0 );
+						XTEMP1.redimension( NewArrayBounds, 0.0 );
+						YTEMP1.redimension( NewArrayBounds, 0.0 );
+						ATEMP.redimension( NewArrayBounds, 0.0 );
+						BTEMP.redimension( NewArrayBounds, 0.0 );
+						CTEMP.redimension( NewArrayBounds, 0.0 );
+						MAXHCArrayBounds = NewArrayBounds;
 					}
 
 					XTEMP( NVTEMP ) = XTEMP1( P );
@@ -3273,16 +3162,7 @@ namespace SolarShading {
 
 			if ( DisplayExtraWarnings ) {
 				++NumTooManyFigures;
-				if ( NumTooManyFigures > 1 ) {
-					TempSurfErrorTracking.allocate( NumTooManyFigures );
-					TempSurfErrorTracking( {1,NumTooManyFigures - 1} ) = TrackTooManyFigures;
-					TrackTooManyFigures.deallocate();
-					TrackTooManyFigures.allocate( NumTooManyFigures );
-					TrackTooManyFigures = TempSurfErrorTracking;
-					TempSurfErrorTracking.deallocate();
-				} else {
-					TrackTooManyFigures.allocate( NumTooManyFigures );
-				}
+				TrackTooManyFigures.redimension( ++NumTooManyFigures );
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex1 = CurrentShadowingSurface;
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex2 = CurrentSurfaceBeingShadowed;
 			}
@@ -3369,17 +3249,7 @@ namespace SolarShading {
 			}
 
 			if ( DisplayExtraWarnings ) {
-				++NumTooManyVertices;
-				if ( NumTooManyVertices > 1 ) {
-					TempSurfErrorTracking.allocate( NumTooManyVertices );
-					TempSurfErrorTracking( {1,NumTooManyVertices - 1} ) = TrackTooManyVertices;
-					TrackTooManyVertices.deallocate();
-					TrackTooManyVertices.allocate( NumTooManyVertices );
-					TrackTooManyVertices = TempSurfErrorTracking;
-					TempSurfErrorTracking.deallocate();
-				} else {
-					TrackTooManyVertices.allocate( NumTooManyVertices );
-				}
+				TrackTooManyVertices.redimension( ++NumTooManyVertices );
 				TrackTooManyVertices( NumTooManyVertices ).SurfIndex1 = CurrentShadowingSurface;
 				TrackTooManyVertices( NumTooManyVertices ).SurfIndex2 = CurrentSurfaceBeingShadowed;
 			}
@@ -3394,17 +3264,7 @@ namespace SolarShading {
 			}
 
 			if ( DisplayExtraWarnings ) {
-				++NumTooManyFigures;
-				if ( NumTooManyFigures > 1 ) {
-					TempSurfErrorTracking.allocate( NumTooManyFigures );
-					TempSurfErrorTracking( {1,NumTooManyFigures - 1} ) = TrackTooManyFigures;
-					TrackTooManyFigures.deallocate();
-					TrackTooManyFigures.allocate( NumTooManyFigures );
-					TrackTooManyFigures = TempSurfErrorTracking;
-					TempSurfErrorTracking.deallocate();
-				} else {
-					TrackTooManyFigures.allocate( NumTooManyFigures );
-				}
+				TrackTooManyFigures.redimension( ++NumTooManyFigures );
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex1 = CurrentShadowingSurface;
 				TrackTooManyFigures( NumTooManyFigures ).SurfIndex2 = CurrentSurfaceBeingShadowed;
 			}
@@ -3810,11 +3670,9 @@ namespace SolarShading {
 		++NumDetShadowCombs_Calls;
 #endif
 
-		ShadowComb.allocate( TotSurfaces );
-		ShadowComb = ShadowingCombinations{}; // Set all elements to default constructed state
+		ShadowComb.dimension( TotSurfaces, ShadowingCombinations{} ); // Set all elements to default constructed state
 
-		CastingSurface.allocate( TotSurfaces );
-		CastingSurface = false;
+		CastingSurface.dimension( TotSurfaces, false );
 
 		HCA.allocate( MaxHCV + 1, MaxHCS * 2 );
 		HCA = 0;
@@ -8436,22 +8294,17 @@ namespace SolarShading {
 
 		// Initialize Surfaces Arrays
 		SAREA = 0.0;
-		WithShdgIsoSky.allocate( TotSurfaces );
-		WithShdgIsoSky = 0.0;
-		WoShdgIsoSky.allocate( TotSurfaces );
-		WoShdgIsoSky = 0.0;
-		WithShdgHoriz.allocate( TotSurfaces );
-		WithShdgHoriz = 0.0;
-		WoShdgHoriz.allocate( TotSurfaces );
-		WoShdgHoriz = 0.0;
+		WithShdgIsoSky.dimension( TotSurfaces, 0.0 );
+		WoShdgIsoSky.dimension( TotSurfaces, 0.0 );
+		WithShdgHoriz.dimension( TotSurfaces, 0.0 );
+		WoShdgHoriz.dimension( TotSurfaces, 0.0 );
 		DifShdgRatioIsoSky.allocate( TotSurfaces );
 		DifShdgRatioHoriz.allocate( TotSurfaces );
 		// initialized as no shading
 		DifShdgRatioIsoSky = 1.0;
 		DifShdgRatioHoriz = 1.0;
 		if ( DetailedSkyDiffuseAlgorithm && ShadingTransmittanceVaries && SolarDistribution != MinimalShadowing ) {
-			curDifShdgRatioIsoSky.allocate( TotSurfaces );
-			curDifShdgRatioIsoSky = 1.0;
+			curDifShdgRatioIsoSky.dimension( TotSurfaces, 1.0 );
 		}
 
 		// only for detailed.
@@ -9500,8 +9353,7 @@ namespace SolarShading {
 				ShowMessage( "" );
 			}
 
-			SurfErrorReported.allocate( TotSurfaces );
-			SurfErrorReported = false;
+			SurfErrorReported.dimension( TotSurfaces, false );
 			TotCount = 0;
 			for ( Loop1 = 1; Loop1 <= NumBaseSubSurround; ++Loop1 ) {
 				Count = 0;
@@ -11004,7 +10856,7 @@ namespace SolarShading {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

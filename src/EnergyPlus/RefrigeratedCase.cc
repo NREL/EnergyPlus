@@ -847,8 +847,7 @@ namespace RefrigeratedCase {
 		if ( NumRefrigeratedRacks > 0 ) {
 			RefrigRack.allocate( NumRefrigeratedRacks );
 			HeatReclaimRefrigeratedRack.allocate( NumRefrigeratedRacks );
-			ShowCOPWarning.allocate( NumRefrigeratedRacks );
-			ShowCOPWarning = true;
+			ShowCOPWarning.dimension( NumRefrigeratedRacks, true );
 		}
 		if ( NumRefrigSystems > 0 ) {
 			System.allocate( NumRefrigSystems );
@@ -859,8 +858,7 @@ namespace RefrigeratedCase {
 		}
 		if ( NumTransRefrigSystems > 0 ) {
 			TransSystem.allocate( NumTransRefrigSystems );
-			ShowUnmetEnergyWarningTrans.allocate( NumTransRefrigSystems );
-			ShowUnmetEnergyWarningTrans = true;
+			ShowUnmetEnergyWarningTrans.dimension( NumTransRefrigSystems, true );
 		}
 		if ( NumRefrigChillerSets > 0 ) AirChillerSet.allocate( NumRefrigChillerSets );
 		if ( NumRefrigCondensers > 0 ) {
@@ -873,19 +871,14 @@ namespace RefrigeratedCase {
 		if ( NumSimulationCases > 0 ) {
 			CaseRAFraction.allocate( NumOfZones );
 			RefrigCase.allocate( NumSimulationCases );
-			ShowStockingWarning.allocate( NumSimulationCases );
-			ShowStockingWarning = true;
-			ShowFrostWarning.allocate( NumSimulationCases );
-			ShowFrostWarning = true;
-			ShowStoreEnergyWarning.allocate( NumSimulationCases );
-			ShowStoreEnergyWarning = true;
+			ShowStockingWarning.dimension( NumSimulationCases, true );
+			ShowFrostWarning.dimension( NumSimulationCases, true );
+			ShowStoreEnergyWarning.dimension( NumSimulationCases, true );
 		}
 		if ( NumSimulationWalkIns > 0 ) {
 			WalkIn.allocate( NumSimulationWalkIns );
-			ShowUnmetWIEnergyWarning.allocate( NumSimulationWalkIns );
-			ShowUnmetWIEnergyWarning = true;
-			ShowWIFrostWarning.allocate( NumSimulationWalkIns );
-			ShowWIFrostWarning = true;
+			ShowUnmetWIEnergyWarning.dimension( NumSimulationWalkIns, true );
+			ShowWIFrostWarning.dimension( NumSimulationWalkIns, true );
 		}
 		if ( ( NumSimulationWalkIns > 0 ) || ( NumSimulationCases > 0 ) ) {
 			CaseWIZoneReport.allocate( NumOfZones );
@@ -895,8 +888,7 @@ namespace RefrigeratedCase {
 		}
 		if ( NumSimulationSecondarySystems > 0 ) {
 			Secondary.allocate( NumSimulationSecondarySystems );
-			ShowUnmetSecondEnergyWarning.allocate( NumSimulationSecondarySystems );
-			ShowUnmetSecondEnergyWarning = true;
+			ShowUnmetSecondEnergyWarning.dimension( NumSimulationSecondarySystems, true );
 		}
 		if ( NumSimulationRefrigAirChillers > 0 ) {
 			WarehouseCoil.allocate( NumSimulationRefrigAirChillers );
@@ -911,8 +903,7 @@ namespace RefrigeratedCase {
 		if ( NumSimulationTransferLoadLists > 0 ) TransferLoadList.allocate( NumSimulationTransferLoadLists );
 
 		DayValues.allocate( 24, NumOfTimeStepInHour );
-		RefrigPresentInZone.allocate( NumOfZones );
-		RefrigPresentInZone = false;
+		RefrigPresentInZone.dimension( NumOfZones, false );
 
 		GetObjectDefMaxArgs( "Refrigeration:Case", MaxNumArgs, MaxNumAlphasCase, MaxNumNumbersCase );
 		GetObjectDefMaxArgs( "Refrigeration:CaseAndWalkInList", MaxNumArgs, MaxNumAlphasCaseAndWalkInList, MaxNumNumbersCaseAndWalkInList );
@@ -934,17 +925,11 @@ namespace RefrigeratedCase {
 		MaxNumNumbersAll = max( MaxNumNumbersCase, MaxNumNumbersCaseAndWalkInList, MaxNumNumbersRack, MaxNumNumbersSys, MaxNumNumbersTransSys, MaxNumNumbersConda, MaxNumNumbersConde, MaxNumNumbersCondw, MaxNumNumbersGasCoolera, MaxNumNumbersComp, MaxNumNumbersCompressorList, MaxNumNumbersSecond, MaxNumNumbersWalkIn, MaxNumNumbersChillerSet, MaxNumNumbersAirChiller );
 
 		Alphas.allocate( MaxNumAlphasAll );
-		Alphas = "";
-		Numbers.allocate( MaxNumNumbersAll );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumNumbersAll, 0.0 );
 		cAlphaFieldNames.allocate( MaxNumAlphasAll );
-		cAlphaFieldNames = "";
 		cNumericFieldNames.allocate( MaxNumNumbersAll );
-		cNumericFieldNames = "";
-		lAlphaBlanks.allocate( MaxNumAlphasAll );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumNumbersAll );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxNumAlphasAll, true );
+		lNumericBlanks.dimension( MaxNumNumbersAll, true );
 		//bbb stovall note for future - for all curve entries, see if need fail on type or if can allow table input
 		if ( NumSimulationCases > 0 ) {
 			CurrentModuleObject = "Refrigeration:Case";
@@ -2417,8 +2402,7 @@ namespace RefrigeratedCase {
 
 		if ( NumRefrigChillerSets > 0 ) {
 
-			CheckChillerSetName.allocate( NumRefrigChillerSets );
-			CheckChillerSetName = true;
+			CheckChillerSetName.dimension( NumRefrigChillerSets, true );
 
 			CurrentModuleObject = "ZoneHVAC:RefrigerationChillerSet";
 			for ( SetID = 1; SetID <= NumRefrigChillerSets; ++SetID ) {
@@ -2938,8 +2922,7 @@ namespace RefrigeratedCase {
 
 			} //RackNum=1,NumRefrigeratedRacks
 
-			CheckEquipNameRackWaterCondenser.allocate( NumRefrigeratedRacks );
-			CheckEquipNameRackWaterCondenser = true;
+			CheckEquipNameRackWaterCondenser.dimension( NumRefrigeratedRacks, true );
 		} //(NumRefrigeratedRacks > 0)
 
 		if ( NumRefrigSystems > 0 || NumTransRefrigSystems > 0 ) {
@@ -3396,8 +3379,7 @@ namespace RefrigeratedCase {
 
 				} // Read input for CONDENSER:REFRIGERATION:WaterCooled
 
-				CheckEquipNameWaterCondenser.allocate( NumRefrigCondensers );
-				CheckEquipNameWaterCondenser = true;
+				CheckEquipNameWaterCondenser.dimension( NumRefrigCondensers, true );
 			} // NumSimulationCondWater > 0
 
 			//cascade condensers assumed to provide zero subcooling

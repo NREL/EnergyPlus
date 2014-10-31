@@ -309,8 +309,7 @@ namespace SurfaceGroundHeatExchanger {
 		SurfaceGHE.allocate( NumOfSurfaceGHEs );
 		SurfaceGHEQTF.allocate( NumOfSurfaceGHEs );
 		SurfaceGHEReport.allocate( NumOfSurfaceGHEs );
-		CheckEquipName.allocate( NumOfSurfaceGHEs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumOfSurfaceGHEs, true );
 
 		// initialize data structures
 		// surface data
