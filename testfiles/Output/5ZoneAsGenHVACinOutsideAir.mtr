@@ -1,0 +1,75 @@
+Program Version,EnergyPlus, Version 8.2.2-38f6382d74, YMD=2014.10.30 21:04
+1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]
+2,6,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType
+3,3,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Meters Requested
+4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Meters Requested
+5,1,Cumulative Days of Simulation[] ! When Run Period Meters Requested
+11,9,Electricity:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+21,9,Electricity:Building [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+41,9,InteriorLights:Electricity [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+717,9,Electricity:HVAC [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+812,9,Electricity:Plant [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+771,9,Gas:Facility [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+781,9,Gas:Plant [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+12,11,Electricity:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+22,11,Electricity:Building [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+42,11,InteriorLights:Electricity [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+718,11,Electricity:HVAC [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+813,11,Electricity:Plant [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+772,11,Gas:Facility [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+782,11,Gas:Plant [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+1017,9,MYGENERALLIGHTS [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+1018,11,MYGENERALLIGHTS [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+1027,9,MYBUILDINGELECTRIC [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+1028,11,MYBUILDINGELECTRIC [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+1037,9,MYBUILDINGOTHER [J] !Monthly  [Value,Min,Day,Hour,Minute,Max,Day,Hour,Minute]
+1038,11,MYBUILDINGOTHER [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]
+End of Data Dictionary
+1,Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300,  41.98, -87.92,  -6.00, 201.00
+4,31, 1
+11,12259467599.3652,711591.812967377, 1, 1,15,11757657.3958646,17,11,60
+21,11223810000.,427500., 1, 1,15,10800000., 1,11,15
+41,7121250000.,337500., 1, 1,15,6750000., 1,11,15
+717,849546011.0995,284091.812967377, 7, 7,15,388244.038339712,10,15,15
+771,11013226113.3915,0.0, 1, 1,15,33620900.6650132, 1, 7,15
+781,11013226113.3915,0.0, 1, 1,15,33620900.6650132, 1, 7,15
+812,186111588.265833,0.0, 1, 1,15,923945.06592071,21,16,30
+1017,7121250000.,337500., 1, 1,15,6750000., 1,11,15
+1027,11223810000.,427500., 1, 1,15,10800000., 1,11,15
+1037,4102560000.,90000., 1, 1,15,4050000., 1,10,15
+5,31
+12,12259467599.3652,711591.812967377, 1, 1, 1,15,11757657.3958646, 1,17,11,60
+22,11223810000.,427500., 1, 1, 1,15,10800000., 1, 1,11,15
+42,7121250000.,337500., 1, 1, 1,15,6750000., 1, 1,11,15
+718,849546011.0995,284091.812967377, 1, 7, 7,15,388244.038339712, 1,10,15,15
+772,11013226113.3915,0.0, 1, 1, 1,15,33620900.6650132, 1, 1, 7,15
+782,11013226113.3915,0.0, 1, 1, 1,15,33620900.6650132, 1, 1, 7,15
+813,186111588.265833,0.0, 1, 1, 1,15,923945.06592071, 1,21,16,30
+1018,7121250000.,337500., 1, 1, 1,15,6750000., 1, 1,11,15
+1028,11223810000.,427500., 1, 1, 1,15,10800000., 1, 1,11,15
+1038,4102560000.,90000., 1, 1, 1,15,4050000., 1, 1,10,15
+1,Chicago Ohare Intl Ap IL USA TMY3 WMO#=725300,  41.98, -87.92,  -6.00, 201.00
+4,31, 7
+11,16195853444.4573,427500., 1, 1,15,17485274.2476551,16,15,60
+21,11223810000.,427500., 1, 1,15,10800000., 1,11,15
+41,7121250000.,337500., 1, 1,15,6750000., 1,11,15
+717,463495510.801792,0.0, 1, 1,15,553207.908115948,17,15,60
+771,766481148.936666,0.0, 1, 1,15,22561246.0225683,10, 7,15
+781,766481148.936666,0.0, 1, 1,15,22561246.0225683,10, 7,15
+812,4508547933.65548,0.0, 1, 1,15,6637546.16884745,17,16,15
+1017,7121250000.,337500., 1, 1,15,6750000., 1,11,15
+1027,11223810000.,427500., 1, 1,15,10800000., 1,11,15
+1037,4102560000.,90000., 1, 1,15,4050000., 1,10,15
+5,31
+12,16195853444.4573,427500., 7, 1, 1,15,17485274.2476551, 7,16,15,60
+22,11223810000.,427500., 7, 1, 1,15,10800000., 7, 1,11,15
+42,7121250000.,337500., 7, 1, 1,15,6750000., 7, 1,11,15
+718,463495510.801792,0.0, 7, 1, 1,15,553207.908115948, 7,17,15,60
+772,766481148.936666,0.0, 7, 1, 1,15,22561246.0225683, 7,10, 7,15
+782,766481148.936666,0.0, 7, 1, 1,15,22561246.0225683, 7,10, 7,15
+813,4508547933.65548,0.0, 7, 1, 1,15,6637546.16884745, 7,17,16,15
+1018,7121250000.,337500., 7, 1, 1,15,6750000., 7, 1,11,15
+1028,11223810000.,427500., 7, 1, 1,15,10800000., 7, 1,11,15
+1038,4102560000.,90000., 7, 1, 1,15,4050000., 7, 1,10,15
+End of Data
+ Number of Records Written=          40

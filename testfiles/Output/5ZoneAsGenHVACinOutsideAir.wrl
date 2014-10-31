@@ -1,0 +1,1063 @@
+#VRML V2.0 utf8
+WorldInfo {
+   title "Building - Building"
+   info ["EnergyPlus Program Version EnergyPlus, Version 8.2.2-38f6382d74, YMD=2014.10.30 21:04"]
+   info ["Surface Color Scheme Default"]
+}
+# Zone Names
+# Zone=1:PLENUM-1
+# Zone=2:SPACE1-1
+# Zone=3:SPACE2-1
+# Zone=4:SPACE3-1
+# Zone=5:SPACE4-1
+# Zone=6:SPACE5-1
+Shape {
+appearance DEF FLOOR Appearance {
+material Material { diffuseColor 0.502 0.502 0.502 }
+}
+}
+Shape {
+appearance DEF ROOF Appearance {
+material Material { diffuseColor 1 1 0 }
+}
+}
+Shape {
+appearance DEF WALL Appearance {
+material Material { diffuseColor 0 1 0 }
+}
+}
+Shape {
+appearance DEF WINDOW Appearance {
+material Material { diffuseColor 0 1 1 }
+}
+}
+Shape {
+appearance DEF DOOR Appearance {
+material Material { diffuseColor 0 1 1 }
+}
+}
+Shape {
+appearance DEF GLASSDOOR Appearance {
+material Material { diffuseColor 0 1 1 }
+}
+}
+Shape {
+appearance DEF FIXEDSHADE Appearance {
+material Material { diffuseColor 1 0 1 }
+}
+}
+Shape {
+appearance DEF BLDGSHADE Appearance {
+material Material { diffuseColor 0 0 1 }
+}
+}
+Shape {
+appearance DEF SUBSHADE Appearance {
+material Material { diffuseColor 1 0 1 }
+}
+}
+Shape {
+appearance DEF BACKCOLOR Appearance {
+material Material { diffuseColor 0.502 0.502 0.784 }
+}
+}
+# PLENUM-1:WALL-1PF
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf5 Coordinate {
+point [
+        0.00000         0.00000         3.00000,
+        0.00000         0.00000         2.40000,
+       26.41377       -15.25000         2.40000,
+       26.41377       -15.25000         3.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:WALL-1PR
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf6 Coordinate {
+point [
+       26.41377       -15.25000         3.00000,
+       26.41377       -15.25000         2.40000,
+       34.01377        -2.08641         2.40000,
+       34.01377        -2.08641         3.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:WALL-1PB
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf7 Coordinate {
+point [
+       34.01377        -2.08641         3.00000,
+       34.01377        -2.08641         2.40000,
+        7.60000        13.16359         2.40000,
+        7.60000        13.16359         3.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:WALL-1PL
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf8 Coordinate {
+point [
+        7.60000        13.16359         3.00000,
+        7.60000        13.16359         2.40000,
+        0.00000         0.00000         2.40000,
+        0.00000         0.00000         3.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:C1-1P
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf9 Coordinate {
+point [
+       25.05948       -10.19571         2.40000,
+       26.41377       -15.25000         2.40000,
+        0.00000         0.00000         2.40000,
+        5.05429         1.35429         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:C2-1P
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf10 Coordinate {
+point [
+       29.00948        -3.35411         2.40000,
+       34.01377        -2.08641         2.40000,
+       26.41377       -15.25000         2.40000,
+       25.05948       -10.19571         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:C3-1P
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf11 Coordinate {
+point [
+       29.00948        -3.35411         2.40000,
+        9.00429         8.19589         2.40000,
+        7.60000        13.16359         2.40000,
+       34.01377        -2.08641         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:C4-1P
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf12 Coordinate {
+point [
+        5.05429         1.35429         2.40000,
+        0.00000         0.00000         2.40000,
+        7.60000        13.16359         2.40000,
+        9.00429         8.19589         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:C5-1P
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf13 Coordinate {
+point [
+       29.00948        -3.35411         2.40000,
+       25.05948       -10.19571         2.40000,
+        5.05429         1.35429         2.40000,
+        9.00429         8.19589         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# PLENUM-1:TOP-1
+Shape {
+appearance USE ROOF
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf14 Coordinate {
+point [
+        7.60000        13.16359         3.00000,
+        0.00000         0.00000         3.00000,
+       26.41377       -15.25000         3.00000,
+       34.01377        -2.08641         3.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:FRONT-1
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf15 Coordinate {
+point [
+        0.00000         0.00000         2.40000,
+        0.00000         0.00000         0.00000,
+       26.41377       -15.25000         0.00000,
+       26.41377       -15.25000         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:WF-1
+Shape {
+appearance USE WINDOW
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf16 Coordinate {
+point [
+        2.59808        -1.50000         2.10000,
+        2.59808        -1.50000         0.90000,
+       14.54923        -8.40000         0.90000,
+       14.54923        -8.40000         2.10000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:DF-1
+Shape {
+appearance USE WINDOW
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf17 Coordinate {
+point [
+       18.44634       -10.65000         2.10000,
+       18.44634       -10.65000         0.00000,
+       20.61140       -11.90000         0.00000,
+       20.61140       -11.90000         2.10000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:SB12
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf18 Coordinate {
+point [
+       26.41377       -15.25000         2.40000,
+       26.41377       -15.25000         0.00000,
+       25.05948       -10.19571         0.00000,
+       25.05948       -10.19571         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:SB14
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf19 Coordinate {
+point [
+        5.05429         1.35429         2.40000,
+        5.05429         1.35429         0.00000,
+        0.00000         0.00000         0.00000,
+        0.00000         0.00000         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:SB15
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf20 Coordinate {
+point [
+       25.05948       -10.19571         2.40000,
+       25.05948       -10.19571         0.00000,
+        5.05429         1.35429         0.00000,
+        5.05429         1.35429         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:F1-1
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf21 Coordinate {
+point [
+       25.05948       -10.19571         0.00000,
+       26.41377       -15.25000         0.00000,
+        0.00000         0.00000         0.00000,
+        5.05429         1.35429         0.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:C1-1
+Shape {
+appearance USE ROOF
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf22 Coordinate {
+point [
+        5.05429         1.35429         2.40000,
+        0.00000         0.00000         2.40000,
+       26.41377       -15.25000         2.40000,
+       25.05948       -10.19571         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:MAIN SOUTH OVERHANG
+Shape {
+appearance USE SUBSHADE
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf22 Coordinate {
+point [
+       -0.65000        -1.12583         2.20000,
+        0.00000         0.00000         2.20000,
+       17.14730        -9.90000         2.20000,
+       16.49730       -11.02583         2.20000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:Mir-MAIN SOUTH OVERHANG
+Shape {
+appearance USE SUBSHADE
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf22 Coordinate {
+point [
+       16.49730       -11.02583         2.20000,
+       17.14730        -9.90000         2.20000,
+        0.00000         0.00000         2.20000,
+       -0.65000        -1.12583         2.20000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:SOUTH DOOR OVERHANG
+Shape {
+appearance USE SUBSHADE
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf22 Coordinate {
+point [
+       17.18653       -12.23205         2.60000,
+       18.18653       -10.50000         2.60000,
+       20.87121       -12.05000         2.60000,
+       19.87121       -13.78205         2.60000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE1-1:Mir-SOUTH DOOR OVERHANG
+Shape {
+appearance USE SUBSHADE
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf22 Coordinate {
+point [
+       19.87121       -13.78205         2.60000,
+       20.87121       -12.05000         2.60000,
+       18.18653       -10.50000         2.60000,
+       17.18653       -12.23205         2.60000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE2-1:RIGHT-1
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf23 Coordinate {
+point [
+       26.41377       -15.25000         2.40000,
+       26.41377       -15.25000         0.00000,
+       34.01377        -2.08641         0.00000,
+       34.01377        -2.08641         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE2-1:WR-1
+Shape {
+appearance USE WINDOW
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf24 Coordinate {
+point [
+       28.31377       -11.95910         2.10000,
+       28.31377       -11.95910         0.90000,
+       32.11377        -5.37731         0.90000,
+       32.11377        -5.37731         2.10000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE2-1:SB21
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf25 Coordinate {
+point [
+       25.05948       -10.19571         2.40000,
+       25.05948       -10.19571         0.00000,
+       26.41377       -15.25000         0.00000,
+       26.41377       -15.25000         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE2-1:SB23
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf26 Coordinate {
+point [
+       34.01377        -2.08641         2.40000,
+       34.01377        -2.08641         0.00000,
+       29.00948        -3.35411         0.00000,
+       29.00948        -3.35411         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE2-1:SB25
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf27 Coordinate {
+point [
+       29.00948        -3.35411         2.40000,
+       29.00948        -3.35411         0.00000,
+       25.05948       -10.19571         0.00000,
+       25.05948       -10.19571         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE2-1:F2-1
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf28 Coordinate {
+point [
+       29.00948        -3.35411         0.00000,
+       34.01377        -2.08641         0.00000,
+       26.41377       -15.25000         0.00000,
+       25.05948       -10.19571         0.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE2-1:C2-1
+Shape {
+appearance USE ROOF
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf29 Coordinate {
+point [
+       25.05948       -10.19571         2.40000,
+       26.41377       -15.25000         2.40000,
+       34.01377        -2.08641         2.40000,
+       29.00948        -3.35411         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:BACK-1
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf30 Coordinate {
+point [
+       34.01377        -2.08641         2.40000,
+       34.01377        -2.08641         0.00000,
+        7.60000        13.16359         0.00000,
+        7.60000        13.16359         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:WB-1
+Shape {
+appearance USE WINDOW
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf31 Coordinate {
+point [
+       31.32910        -0.53641         2.10000,
+       31.32910        -0.53641         0.90000,
+       19.46455         6.31359         0.90000,
+       19.46455         6.31359         2.10000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:DB-1
+Shape {
+appearance USE WINDOW
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf32 Coordinate {
+point [
+       15.48083         8.61359         2.10000,
+       15.48083         8.61359         0.00000,
+       13.66218         9.66359         0.00000,
+       13.66218         9.66359         2.10000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:SB32
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf33 Coordinate {
+point [
+       29.00948        -3.35411         2.40000,
+       29.00948        -3.35411         0.00000,
+       34.01377        -2.08641         0.00000,
+       34.01377        -2.08641         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:SB34
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf34 Coordinate {
+point [
+        7.60000        13.16359         2.40000,
+        7.60000        13.16359         0.00000,
+        9.00429         8.19589         0.00000,
+        9.00429         8.19589         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:SB35
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf35 Coordinate {
+point [
+        9.00429         8.19589         2.40000,
+        9.00429         8.19589         0.00000,
+       29.00948        -3.35411         0.00000,
+       29.00948        -3.35411         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:F3-1
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf36 Coordinate {
+point [
+       29.00948        -3.35411         0.00000,
+        9.00429         8.19589         0.00000,
+        7.60000        13.16359         0.00000,
+       34.01377        -2.08641         0.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE3-1:C3-1
+Shape {
+appearance USE ROOF
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf37 Coordinate {
+point [
+       34.01377        -2.08641         2.40000,
+        7.60000        13.16359         2.40000,
+        9.00429         8.19589         2.40000,
+       29.00948        -3.35411         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE4-1:LEFT-1
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf38 Coordinate {
+point [
+        7.60000        13.16359         2.40000,
+        7.60000        13.16359         0.00000,
+        0.00000         0.00000         0.00000,
+        0.00000         0.00000         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE4-1:WL-1
+Shape {
+appearance USE WINDOW
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf39 Coordinate {
+point [
+        5.70000         9.87269         2.10000,
+        5.70000         9.87269         0.90000,
+        1.90000         3.29090         0.90000,
+        1.90000         3.29090         2.10000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE4-1:SB41
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf40 Coordinate {
+point [
+        0.00000         0.00000         2.40000,
+        0.00000         0.00000         0.00000,
+        5.05429         1.35429         0.00000,
+        5.05429         1.35429         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE4-1:SB43
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf41 Coordinate {
+point [
+        9.00429         8.19589         2.40000,
+        9.00429         8.19589         0.00000,
+        7.60000        13.16359         0.00000,
+        7.60000        13.16359         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE4-1:SB45
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf42 Coordinate {
+point [
+        5.05429         1.35429         2.40000,
+        5.05429         1.35429         0.00000,
+        9.00429         8.19589         0.00000,
+        9.00429         8.19589         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE4-1:F4-1
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf43 Coordinate {
+point [
+        5.05429         1.35429         0.00000,
+        0.00000         0.00000         0.00000,
+        7.60000        13.16359         0.00000,
+        9.00429         8.19589         0.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE4-1:C4-1
+Shape {
+appearance USE ROOF
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf44 Coordinate {
+point [
+        9.00429         8.19589         2.40000,
+        7.60000        13.16359         2.40000,
+        0.00000         0.00000         2.40000,
+        5.05429         1.35429         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE5-1:SB51
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf45 Coordinate {
+point [
+        5.05429         1.35429         2.40000,
+        5.05429         1.35429         0.00000,
+       25.05948       -10.19571         0.00000,
+       25.05948       -10.19571         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE5-1:SB52
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf46 Coordinate {
+point [
+       25.05948       -10.19571         2.40000,
+       25.05948       -10.19571         0.00000,
+       29.00948        -3.35411         0.00000,
+       29.00948        -3.35411         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE5-1:SB53
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf47 Coordinate {
+point [
+       29.00948        -3.35411         2.40000,
+       29.00948        -3.35411         0.00000,
+        9.00429         8.19589         0.00000,
+        9.00429         8.19589         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE5-1:SB54
+Shape {
+appearance USE WALL
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf48 Coordinate {
+point [
+        9.00429         8.19589         2.40000,
+        9.00429         8.19589         0.00000,
+        5.05429         1.35429         0.00000,
+        5.05429         1.35429         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE5-1:F5-1
+Shape {
+appearance USE FLOOR
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf49 Coordinate {
+point [
+       29.00948        -3.35411         0.00000,
+       25.05948       -10.19571         0.00000,
+        5.05429         1.35429         0.00000,
+        9.00429         8.19589         0.00000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}
+# SPACE5-1:C5-1
+Shape {
+appearance USE ROOF
+geometry IndexedFaceSet {
+solid TRUE
+coord DEF Surf50 Coordinate {
+point [
+        9.00429         8.19589         2.40000,
+        5.05429         1.35429         2.40000,
+       25.05948       -10.19571         2.40000,
+       29.00948        -3.35411         2.40000,
+]
+}
+coordIndex [
+ 0 1 2 3 -1
+]
+ccw TRUE
+solid TRUE
+}
+}

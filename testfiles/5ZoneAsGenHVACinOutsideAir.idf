@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneAsGenHVACAfterZoneConfig.idf
+! 5ZoneAsGenHVACinOutsideAir.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
@@ -2518,10 +2518,12 @@ Coil:Heating:Water,      !- Component 4 Object Type
     OA Sys 1 Equipment,      !- Name
     Coil:Heating:Water,      !- Component 1 Object Type
     OA Heating Coil 1,       !- Component 1 Name
-    Coil:Cooling:Water,      !- Component 2 Object Type
-    OA Cooling Coil 1,       !- Component 2 Name
-    OutdoorAir:Mixer,        !- Component 3 Object Type
-    OA Mixing Box 1;         !- Component 3 Name
+    ZoneHVAC:AirLoopConnection, !- Component 2 Object Type
+    SPACE2-1,                !- Component Name
+    Coil:Cooling:Water,      !- Component 3 Object Type
+    OA Cooling Coil 1,       !- Component 3 Name
+    OutdoorAir:Mixer,        !- Component 4 Object Type
+    OA Mixing Box 1;         !- Component 4 Name
 
   Coil:Heating:Water,
     OA Heating Coil 1,       !- Name

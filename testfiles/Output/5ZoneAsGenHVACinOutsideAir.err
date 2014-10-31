@@ -1,0 +1,50 @@
+Program Version,EnergyPlus, Version 8.2.2-38f6382d74, YMD=2014.10.30 21:04,IDD_Version 8.2.2
+   ************* Beginning Zone Sizing Calculations
+   ** Warning ** CheckUsedConstructions: There are 5 nominally unused constructions in input.
+   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;
+   ** Warning ** SetUpZoneSizingArrays: Sizing for Zone="SPACE2-1" will use Sizing:Zone specifications listed for Zone="SPACE1-1".
+   ** Warning ** Calculated design cooling load for zone=SPACE2-1 is zero.
+   **   ~~~   ** Check Sizing:Zone and ZoneControl:Thermostat inputs.
+   ** Warning ** Calculated design heating load for zone=SPACE2-1 is zero.
+   **   ~~~   ** Check Sizing:Zone and ZoneControl:Thermostat inputs.
+   ************* Beginning System Sizing Calculations
+   ************* Beginning Plant Sizing Calculations
+   ************* Testing Individual Branch Integrity
+   ************* All Branches passed integrity testing
+   ************* Testing Individual Supply Air Path Integrity
+   ************* All Supply Air Paths passed integrity testing
+   ************* Testing Individual Return Air Path Integrity
+   ************* All Return Air Paths passed integrity testing
+   ** Severe  ** Node Connection Error, Node="SPACE2-1 IN NODE", ZoneInlet node did not find an outlet node.
+   **   ~~~   ** Reference Object=ZONEHVAC:EQUIPMENTCONNECTIONS, Name=SPACE2-1
+   ** Severe  ** Node Connection Error, Node="SPACE2-1 IN NODE", Inlet node did not find an appropriate matching "outlet" node.
+   **   ~~~   ** If this is an outdoor air inlet node, it must be listed in an OutdoorAir:Node or OutdoorAir:NodeList object.
+   **   ~~~   ** Reference Object=ZONEHVAC:AIRLOOPCONNECTION, Name=SPACE2-1
+   ** Warning ** Node Connection Error for object ZONEHVAC:AIRLOOPCONNECTION, name=SPACE2-1
+   **   ~~~   **   UNDEFINED not on any Branch or Parent Object
+   **   ~~~   **   Inlet Node : UNDEFINED
+   **   ~~~   **   Outlet Node: UNDEFINED
+   ** Warning ** Potential Node Connection Error for object ZONEHVAC:AIRLOOPCONNECTION, name=SPACE2-1
+   **   ~~~   **   Node Types are still UNDEFINED -- See Branch/Node Details file for further information
+   **   ~~~   **   Inlet Node : UNDEFINED
+   **   ~~~   **   Outlet Node: UNDEFINED
+   ************* There were 4 node connection errors noted.
+   ** Warning ** GetChildrenData: Parent Node has no children, node=ZONEHVAC:AIRLOOPCONNECTION:SPACE2-1
+   ** Warning ** GetChildrenData: Parent Node has no children, node=ZONEHVAC:AIRLOOPCONNECTION:SPACE2-1
+   ************* Beginning Simulation
+   ************* Simulation Error Summary *************
+   *************
+   ************* ===== Final Error Summary =====
+   ************* The following error categories occurred.  Consider correcting or noting.
+   ************* Node Connection Errors
+   ************* ..Node connection errors are often caused by spelling mistakes in a node name field.
+   ************* ..To track down the problem, search the idf file for each node name listed to see if it
+   ************* ..occurs in the expected input fields.
+   ************* Nominally Unused Constructions
+   ************* ..The nominally unused constructions warning is provided to alert you to potential conditions that can cause
+   ************* ..extra time during simulation. Each construction is calculated by the algorithm indicated in the HeatBalanceAlgorithm
+   ************* ..object. You may remove the constructions indicated (when you use the DisplayExtraWarnings option).
+   *************
+   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.
+   ************* EnergyPlus Sizing Error Summary. During Sizing: 4 Warning; 0 Severe Errors.
+   ************* EnergyPlus Completed Successfully-- 8 Warning; 2 Severe Errors; Elapsed Time=00hr 00min 46.00sec
