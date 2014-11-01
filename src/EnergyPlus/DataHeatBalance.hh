@@ -2756,6 +2756,7 @@ namespace DataHeatBalance {
 			Class ( 0 ),
 			AirFlowFLTCurve( 0 ),
 			CPUPowerFLTCurve( 0 ),
+			FanPowerFFCurve( 0 ),
 			AirConnectionType( 0 ),
 			InletRoomAirNodeNum( 0 ),
 			OutletRoomAirNodeNum( 0 ),

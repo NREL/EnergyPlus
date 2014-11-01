@@ -3300,8 +3300,6 @@ namespace InternalHeatGains {
 		ZnRpt.SteamPower() = 0.0;
 		ZnRpt.BaseHeatPower() = 0.0;
 
-		ZnRpt.OtherTotGainRate( ) = 0.0;
-
 		//  QSA = 0.0
 
 		// Process Internal Heat Gains, People done below
@@ -3559,6 +3557,7 @@ namespace InternalHeatGains {
 			ZnRpt( NZ ).CO2Rate += ZoneCO2Gen( Loop ).CO2GainRate;
 		}
 
+
 		CalcZoneITEq();
 
 		CalcWaterThermalTankZoneGains();
@@ -3612,7 +3611,7 @@ namespace InternalHeatGains {
 	}
 
 	void
-		CalcZoneITEq( )
+	CalcZoneITEq()
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -3635,11 +3634,33 @@ namespace InternalHeatGains {
 		// Using/Aliasing
 		using namespace ScheduleManager;
 		using DataHeatBalFanSys::MAT;
+		using DataHeatBalFanSys::SumConvHTRadSys;
+		using DataHeatBalFanSys::ZoneLatentGain;
+		using namespace DataDaylighting;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using ZonePlenum::ZoneRetPlenCond;
 		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using DataRoomAirModel::IsZoneDV;
 		using DataRoomAirModel::TCMF;
 		using DataRoomAirModel::IsZoneUI;
+		using WaterThermalTanks::CalcWaterThermalTankZoneGains;
+		using PipeHeatTransfer::CalcZonePipesHeatGain;
+		using WaterUse::CalcWaterUseZoneGains;
+		using FuelCellElectricGenerator::FigureFuelCellZoneGains;
+		using MicroCHPElectricGenerator::FigureMicroCHPZoneGains;
+		using ManageElectricPower::FigureInverterZoneGains;
+		using ManageElectricPower::FigureElectricalStorageZoneGains;
+		using ManageElectricPower::FigureTransformerZoneGains;
+		using DaylightingDevices::FigureTDDZoneGains;
+		using RefrigeratedCase::FigureRefrigerationZoneGains;
+		using OutputReportTabular::radiantPulseUsed;
+		using OutputReportTabular::radiantPulseTimestep;
+		using OutputReportTabular::radiantPulseReceived;
+		using DataGlobals::CompLoadReportIsReq;
+		using DataGlobalConstants::endUseHeating;
+		using DataGlobalConstants::endUseCooling;
+		using OutputReportTabular::AllocateLoadComponentArrays;
+		using DataSizing::CurOverallSimDay;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3733,6 +3754,15 @@ namespace InternalHeatGains {
 		ZnRpt.ITEqTimeBelowDryBulbT() = 0.0;
 		ZnRpt.ITEqTimeAboveDewpointT() = 0.0;
 		ZnRpt.ITEqTimeBelowDewpointT() = 0.0;
+
+		// These work in the subroutine above - repeated here - so why don't the lines before this work
+		ZnRpt.LtsPower( ) = 0.0;
+		ZnRpt.ElecPower( ) = 0.0;
+		ZnRpt.GasPower( ) = 0.0;
+		ZnRpt.HWPower( ) = 0.0;
+		ZnRpt.SteamPower( ) = 0.0;
+		ZnRpt.BaseHeatPower( ) = 0.0;
+
 
 		// Process Internal Heat Gains, People done below
 		// Occupant Stuff
