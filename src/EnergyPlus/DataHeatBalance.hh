@@ -2669,6 +2669,136 @@ namespace DataHeatBalance {
 
 	};
 
+	struct ITEquipData // IT Equipment
+	{
+		// Members
+		std::string Name; // EQUIPMENT object name
+		int ZonePtr; // Which zone internal gain is in
+		Real64 DesignTotalPower; // Design level for internal gain [W]
+		Real64 DesignFanPowerFrac; // Fraction (0.0-1.0) of design power level that is fans
+		int OperSchedPtr; // Schedule pointer for design power input or operating schedule
+		int CPULoadSchedPtr; // Schedule pointer for CPU loading schedule
+		Real64 DesignTAirIn; // Design entering air temperature [C]
+		Real64 DesignFanPower; // Design fan power input [W]
+		Real64 DesignCPUPower; // Design CPU power input [W]
+		int Class; // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6)
+		int AirFlowFLTCurve; // Index for airflow function of TAirIn and CPULoadFrac curve
+		int CPUPowerFLTCurve; // Index for CPU power function of TAirIn and CPULoadFrac curve
+		int AirConnectionType; // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
+		int InletRoomAirNodeNum; // Room air model node number for air inlet
+		int OutletRoomAirNodeNum; // Room air model node number for air outlet
+		int SupplyAirNodeNum; // Node number for supply air inlet
+		Real64 DesignRecircFrac; // Design recirculation fraction (0.0-0.5)
+		int RecircFLTCurve; // Index for recirculation function of TAirIn and CPULoadFrac curve
+		Real64 DesignUPSEfficiency; // Design power supply efficiency (>0.0 - 1.0)
+		int UPSEfficFLTCurve; // Index for recirculation function of TAirIn and CPULoadFrac curve
+		Real64 UPSLossToZoneFrac; // Fraction of UPS power loss to zone (0.0 - 1.0); remainder is lost
+		std::string EndUseSubcategoryCPU; // User defined name for the end use category for the CPU
+		std::string EndUseSubcategoryFan; // User defined name for the end use category for the Fans
+		std::string EndUseSubcategoryUPS; // User defined name for the end use category for the power supply
+		bool EMSCPUPowerOverrideOn; // EMS actuating CPU power if .TRUE.
+		Real64 EMSCPUPower; // Value EMS is directing to use for override of CPU power [W]
+		bool EMSFanPowerOverrideOn; // EMS actuating Fan power if .TRUE.
+		Real64 EMSFanPower; // Value EMS is directing to use for override of Fan power [W]
+		bool EMSUPSPowerOverrideOn; // EMS actuating UPS power if .TRUE.
+		Real64 EMSUPSPower; // Value EMS is directing to use for override of UPS power [W]
+
+		// Default Constructor
+		ITEquipData( ) :
+			ZonePtr( 0 ),
+			DesignTotalPower( 0.0 ),
+			DesignFanPowerFrac( 0.0 ),
+			OperSchedPtr( 0 ),
+			CPULoadSchedPtr( 0 ),
+			DesignTAirIn( 0.0 ),
+			DesignFanPower( 0.0 ),
+			DesignCPUPower( 0.0 ),
+			AirFlowFLTCurve( 0 ),
+			CPUPowerFLTCurve( 0 ),
+			AirConnectionType( 0 ),
+			InletRoomAirNodeNum( 0 ),
+			OutletRoomAirNodeNum( 0 ),
+			SupplyAirNodeNum( 0 ),
+			DesignRecircFrac( 0.0 ),
+			RecircFLTCurve( 0 ),
+			DesignUPSEfficiency( 0.0 ),
+			UPSEfficFLTCurve( 0 ),
+			UPSLossToZoneFrac( 0.0 ),
+			EMSCPUPowerOverrideOn( false ),
+			EMSCPUPower( 0.0 ),
+			EMSFanPowerOverrideOn( false ),
+			EMSFanPower( 0.0 ),
+			EMSUPSPowerOverrideOn( false ),
+			EMSUPSPower( 0.0 )
+		{}
+
+		// Member Constructor
+		ITEquipData(
+			std::string const & Name, // EQUIPMENT object name
+			int const ZonePtr, // Which zone internal gain is in
+			Real64 const DesignTotalPower, // Design level for internal gain [W]
+			Real64 const DesignFanPowerFrac, // Fraction (0.0-1.0) of design power level that is fans
+			int const OperSchedPtr, // Schedule pointer for design power input or operating schedule
+			int const CPULoadSchedPtr, // Schedule pointer for CPU loading schedule
+			Real64 const DesignTAirIn, // Design entering air temperature [C]
+			Real64 const DesignFanPower, // Design fan power input [W]
+			Real64 const DesignCPUPower, // Design CPU power input [W]
+			int const Class, // Environmental class index (A1=1, A2=2, A3=3, A4=4, B=5, C=6)
+			int const AirFlowFLTCurve, // Index for airflow function of TAirIn and CPULoadFrac curve
+			int const CPUPowerFLTCurve, // Index for CPU power function of TAirIn and CPULoadFrac curve
+			int const AirConnectionType, // Air connection type (AdjustedSupply, ZoneAirNode, RoomAirModel)
+			int InletRoomAirNodeNum, // Room air model node number for air inlet
+			int OutletRoomAirNodeNum, // Room air model node number for air outlet
+			int SupplyAirNodeNum, // Node number for supply air inlet
+			Real64 const DesignRecircFrac, // Design recirculation fraction (0.0-0.5)
+			int const RecircFLTCurve, // Index for recirculation function of TAirIn and CPULoadFrac curve
+			Real64 const DesignUPSEfficiency, // Design power supply efficiency (>0.0 - 1.0)
+			int const UPSEfficFLTCurve, // Index for recirculation function of TAirIn and CPULoadFrac curve
+			Real64 const UPSLossToZoneFrac, // Fraction of UPS power loss to zone (0.0 - 1.0), remainder is lost
+			std::string const & EndUseSubcategoryCPU, // user defined name for the end use category for the CPU
+			std::string const & EndUseSubcategoryFan, // user defined name for the end use category for the Fans
+			std::string const & EndUseSubcategoryUPS, // user defined name for the end use category for the power supply
+			bool const EMSCPUPowerOverrideOn, // EMS actuating CPU power if .TRUE.
+			Real64 const EMSCPUPower, // Value EMS is directing to use for override of CPU power [W]
+			bool const EMSFanPowerOverrideOn, // EMS actuating Fan power if .TRUE.
+			Real64 const EMSFanPower, // Value EMS is directing to use for override of Fan power [W]
+			bool const EMSUPSPowerOverrideOn, // EMS actuating UPS power if .TRUE.
+			Real64 const EMSUPSPower // Value EMS is directing to use for override of UPS power [W]
+			) :
+			Name( Name ),
+			ZonePtr( ZonePtr ),
+			DesignTotalPower( DesignTotalPower ),
+			DesignFanPowerFrac( DesignFanPowerFrac ),
+			OperSchedPtr( OperSchedPtr ),
+			CPULoadSchedPtr( CPULoadSchedPtr ),
+			DesignTAirIn( DesignTAirIn ),
+			DesignFanPower( DesignFanPower ),
+			DesignCPUPower( DesignCPUPower ),
+			Class( Class ),
+			AirFlowFLTCurve( AirFlowFLTCurve ),
+			CPUPowerFLTCurve( CPUPowerFLTCurve ),
+			AirConnectionType( AirConnectionType ),
+			InletRoomAirNodeNum( InletRoomAirNodeNum ),
+			OutletRoomAirNodeNum( OutletRoomAirNodeNum ),
+			SupplyAirNodeNum( SupplyAirNodeNum ),
+			DesignRecircFrac( DesignRecircFrac ),
+			RecircFLTCurve( RecircFLTCurve ),
+			DesignUPSEfficiency( DesignUPSEfficiency ),
+			UPSEfficFLTCurve( UPSEfficFLTCurve ),
+			UPSLossToZoneFrac( UPSLossToZoneFrac ),
+			EndUseSubcategoryCPU( EndUseSubcategoryCPU ),
+			EndUseSubcategoryFan( EndUseSubcategoryFan ),
+			EndUseSubcategoryUPS( EndUseSubcategoryUPS ),
+			EMSCPUPowerOverrideOn( EMSCPUPowerOverrideOn ),
+			EMSCPUPower( EMSCPUPower ),
+			EMSFanPowerOverrideOn( EMSFanPowerOverrideOn ),
+			EMSFanPower( EMSFanPower ),
+			EMSUPSPowerOverrideOn( EMSUPSPowerOverrideOn ),
+			EMSUPSPower( EMSUPSPower )
+			{}
+
+	};
+
 	struct BBHeatData
 	{
 		// Members
