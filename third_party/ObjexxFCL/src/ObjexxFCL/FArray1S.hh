@@ -1085,6 +1085,24 @@ public: // Subscript
 		return k_ + ( m_ * i );
 	}
 
+	// array[ i ] const: 0-Based Subscript
+	inline
+	T const &
+	operator []( size_type const i ) const
+	{
+		assert( contains( i + 1 ) );
+		return data_[ k_ + ( m_ * ( i + 1 ) ) ];
+	}
+
+	// array[ i ]: 0-Based Subscript
+	inline
+	T &
+	operator []( size_type const i )
+	{
+		assert( contains( i + 1 ) );
+		return data_[ k_ + ( m_ * ( i + 1 ) ) ];
+	}
+
 public: // Slice Proxy Generators
 
 	// array( s ) const

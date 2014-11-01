@@ -63,8 +63,11 @@ public: // Creation
 
 	// Default Constructor
 	inline
-	Vector3()
-	{} // Coordinate are not explicitly initialized
+	Vector3() :
+	 x( T() ),
+	 y( T() ),
+	 z( T() )
+	{}
 
 	// Copy Constructor
 	inline
@@ -124,6 +127,15 @@ public: // Creation
 	 z( a[ 2 ] )
 	{
 		assert( a.size() == 3 );
+	}
+
+	// Default Vector Named Constructor
+	inline
+	static
+	Vector3
+	default_vector()
+	{
+		return Vector3( T() );
 	}
 
 	// Zero Vector Named Constructor
@@ -918,7 +930,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Set Minimum Coordinates wrt an Vector3
+	// Set Minimum Coordinates wrt a Vector3
 	inline
 	Vector3 &
 	min( Vector3 const & v )
@@ -929,7 +941,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Set Maximum Coordinates wrt an Vector3
+	// Set Maximum Coordinates wrt a Vector3
 	inline
 	Vector3 &
 	max( Vector3 const & v )
@@ -940,7 +952,85 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Project Normally Onto an Vector3
+	// Sum of Vector3s
+	inline
+	Vector3 &
+	sum( Vector3 const & a, Vector3 const & b )
+	{
+		x = a.x + b.x;
+		y = a.y + b.y;
+		z = a.z + b.z;
+		return *this;
+	}
+
+	// Difference of Vector3s
+	inline
+	Vector3 &
+	diff( Vector3 const & a, Vector3 const & b )
+	{
+		x = a.x - b.x;
+		y = a.y - b.y;
+		z = a.z - b.z;
+		return *this;
+	}
+
+	// Cross Product of Vector3s
+	inline
+	Vector3 &
+	cross( Vector3 const & a, Vector3 const & b )
+	{
+		x = ( a.y * b.z ) - ( a.z * b.y );
+		y = ( a.z * b.x ) - ( a.x * b.z );
+		z = ( a.x * b.y ) - ( a.y * b.x );
+		return *this;
+	}
+
+	// Midpoint of Two Vector3s
+	inline
+	Vector3 &
+	mid( Vector3 const & a, Vector3 const & b )
+	{
+		x = T( 0.5 * ( a.x + b.x ) );
+		y = T( 0.5 * ( a.y + b.y ) );
+		z = T( 0.5 * ( a.z + b.z ) );
+		return *this;
+	}
+
+	// Center of Two Vector3s
+	inline
+	Vector3 &
+	cen( Vector3 const & a, Vector3 const & b )
+	{
+		x = T( 0.5 * ( a.x + b.x ) );
+		y = T( 0.5 * ( a.y + b.y ) );
+		z = T( 0.5 * ( a.z + b.z ) );
+		return *this;
+	}
+
+	// Center of Three Vector3s
+	inline
+	Vector3 &
+	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c )
+	{
+		static long double const third( 1.0 / 3.0 );
+		x = T( third * ( a.x + b.x + c.x ) );
+		y = T( third * ( a.y + b.y + c.y ) );
+		z = T( third * ( a.z + b.z + c.z ) );
+		return *this;
+	}
+
+	// Center of Four Vector3s
+	inline
+	Vector3 &
+	cen( Vector3 const & a, Vector3 const & b, Vector3 const & c, Vector3 const & d )
+	{
+		x = T( 0.25 * ( a.x + b.x + c.x + d.x ) );
+		y = T( 0.25 * ( a.y + b.y + c.y + d.y ) );
+		z = T( 0.25 * ( a.z + b.z + c.z + d.z ) );
+		return *this;
+	}
+
+	// Project Normally onto a Vector3
 	inline
 	Vector3 &
 	project_normal( Vector3 const & v )
@@ -953,7 +1043,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Project in Direction of an Vector3
+	// Project in Direction of a Vector3
 	inline
 	Vector3 &
 	project_parallel( Vector3 const & v )
@@ -1243,7 +1333,7 @@ public: // Generators
 		);
 	}
 
-	// Projected Normally Onto an Vector3
+	// Projected Normally onto a Vector3
 	inline
 	Vector3
 	projected_normal( Vector3 const & v ) const
@@ -1253,7 +1343,7 @@ public: // Generators
 		return Vector3( x - ( c * v.x ), y - ( c * v.y ), z - ( c * v.z ) );
 	}
 
-	// Projected in Direction of an Vector3
+	// Projected in Direction of a Vector3
 	inline
 	Vector3
 	projected_parallel( Vector3 const & v ) const

@@ -416,7 +416,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 
 		// Locals
@@ -790,7 +789,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
@@ -885,7 +883,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -1143,7 +1140,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
