@@ -2771,7 +2771,6 @@ namespace DataHeatBalance {
 			EMSFanPower( 0.0 ),
 			EMSUPSPowerOverrideOn( false ),
 			EMSUPSPower( 0.0 ),
-			// Report variables
 			CPUPower( 0.0 ),
 			FanPower( 0.0 ),
 			UPSPower( 0.0 ),
@@ -2908,7 +2907,6 @@ namespace DataHeatBalance {
 			EMSFanPower( EMSFanPower ),
 			EMSUPSPowerOverrideOn( EMSUPSPowerOverrideOn ),
 			EMSUPSPower( EMSUPSPower ),
-			// Report variables
 			CPUPower( CPUPower ),
 			FanPower( FanPower ),
 			UPSPower( UPSPower ),

@@ -38,6 +38,9 @@ namespace InternalHeatGains {
 	InitInternalHeatGains();
 
 	void
+	CalcZoneITEq( );
+
+	void
 	ReportInternalHeatGains();
 
 	Real64

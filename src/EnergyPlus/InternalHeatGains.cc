@@ -2692,6 +2692,10 @@ namespace InternalHeatGains {
 			for ( Loop1 = 1; Loop1 <= TotElecEquip; ++Loop1 ) {
 				if ( ZoneElectric( Loop1 ).ZonePtr != Loop ) continue;
 				ElecTot += ZoneElectric( Loop1 ).DesignLevel;
+			} 
+			for ( Loop1 = 1; Loop1 <= NumZoneITEqStatements; ++Loop1 ) {
+				if ( ZoneITEq( Loop1 ).ZonePtr != Loop ) continue;
+				ElecTot += ZoneITEq( Loop1 ).DesignTotalPower;
 			}
 			for ( Loop1 = 1; Loop1 <= TotGasEquip; ++Loop1 ) {
 				if ( ZoneGas( Loop1 ).ZonePtr != Loop ) continue;
@@ -3099,6 +3103,41 @@ namespace InternalHeatGains {
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
+		for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "ElectricEquipment:ITE:AirCooled" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Convected,CPU End-Use SubCategory,Fan End-Use SubCategory,UPS End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+
+			ZoneNum = ZoneITEq( Loop ).ZonePtr;
+
+			if ( ZoneNum == 0 ) {
+				gio::write( OutputFileInits, Format_724 ) << "ElectricEquipment:ITE:AirCooled-Illegal Zone specified" << ZoneITEq( Loop ).Name;
+				continue;
+			}
+
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, Format_722, flags ) << "ElectricEquipment:ITE:AirCooled" << ZoneITEq( Loop ).Name << GetScheduleName( ZoneITEq( Loop ).OperSchedPtr ) << Zone( ZoneNum ).Name << RoundSigDigits( Zone( ZoneNum ).FloorArea, 2 ) << RoundSigDigits( Zone( ZoneNum ).TotOccupants, 1 ); }
+
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << RoundSigDigits( ZoneITEq( Loop ).DesignTotalPower, 3 ) + ','; }
+			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
+				StringOut = RoundSigDigits( ZoneITEq( Loop ).DesignTotalPower / Zone( ZoneNum ).FloorArea, 3 );
+			} else {
+				StringOut = "N/A";
+			}
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			if ( Zone( ZoneNum ).TotOccupants > 0.0 ) {
+				StringOut = RoundSigDigits( ZoneITEq( Loop ).DesignTotalPower / Zone( ZoneNum ).TotOccupants, 3 );
+			} else {
+				StringOut = "N/A";
+			}
+			StringOut = "1.0"; // ElectricEquipment:ITE:AirCooled is 100% convective
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << ZoneITEq( Loop ).EndUseSubcategoryCPU + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << ZoneITEq( Loop ).EndUseSubcategoryFan + ','; }
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << ZoneITEq( Loop ).EndUseSubcategoryUPS + ','; }
+			StringOut = RoundSigDigits( ZoneITEq( Loop ).NomMinDesignLevel, 3 );
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			StringOut = RoundSigDigits( ZoneITEq( Loop ).NomMaxDesignLevel, 3 );
+			gio::write( OutputFileInits, fmtA ) << StringOut;
+		}
+
 		for ( Loop = 1; Loop <= TotBBHeat; ++Loop ) {
 			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "Outdoor Controlled Baseboard Heat" << "Capacity at Low Temperature {W}," "Low Temperature {C},Capacity at High Temperature {W},High Temperature {C}," "Fraction Radiant,Fraction Convected,End-Use Subcategory";
 
@@ -3260,6 +3299,8 @@ namespace InternalHeatGains {
 		ZnRpt.HWPower() = 0.0;
 		ZnRpt.SteamPower() = 0.0;
 		ZnRpt.BaseHeatPower() = 0.0;
+
+		ZnRpt.OtherTotGainRate( ) = 0.0;
 
 		//  QSA = 0.0
 
@@ -3518,6 +3559,8 @@ namespace InternalHeatGains {
 			ZnRpt( NZ ).CO2Rate += ZoneCO2Gen( Loop ).CO2GainRate;
 		}
 
+		CalcZoneITEq();
+
 		CalcWaterThermalTankZoneGains();
 		CalcZonePipesHeatGain();
 		CalcWaterUseZoneGains();
@@ -3565,6 +3608,253 @@ namespace InternalHeatGains {
 				radiantPulseReceived( SurfNum, CurOverallSimDay ) = ( adjQL - curQL ) * TMULT( NZ ) * ITABSF( SurfNum ) * Surface( SurfNum ).Area;
 			}
 		}
+
+	}
+
+	void
+		CalcZoneITEq( )
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         M.J. Witte
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine calculates the gains and other results for ElectricEquipment:ITE:AirCooled.
+		// This broken into a separate subroutine, because the calculations are more detailed than the other
+		// types of internal gains.
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// Using/Aliasing
+		using namespace ScheduleManager;
+		using DataHeatBalFanSys::MAT;
+		using DataZoneEquipment::ZoneEquipConfig;
+		using Psychrometrics::PsyRhoAirFnPbTdbW;
+		using DataRoomAirModel::IsZoneDV;
+		using DataRoomAirModel::TCMF;
+		using DataRoomAirModel::IsZoneUI;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+		// na
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		// na
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		Real64 ActivityLevel_WperPerson; // Units on Activity Level (Schedule)
+		Real64 NumberOccupants; // Number of occupants
+		int SurfNum; // DO loop counter for surfaces
+		int Loop;
+		int NZ;
+		Real64 Q; // , QR
+		Real64 TotalPeopleGain; // Total heat gain from people (intermediate calculational variable)
+		Real64 SensiblePeopleGain; // Sensible heat gain from people (intermediate calculational variable)
+		Real64 FractionConvected; // For general lighting, fraction of heat from lights convected to zone air
+		Real64 FractionReturnAir; // For general lighting, fraction of heat from lights convected to zone's return air
+		Real64 FractionRadiant; // For general lighting, fraction of heat from lights to zone that is long wave
+		int ReturnZonePlenumCondNum; // Number of ZoneRetPlenCond for a zone's return air plenum, if it exists
+		Real64 ReturnPlenumTemp; // Air temperature of a zone's return air plenum (C)
+		Real64 pulseMultipler; // use to create a pulse for the load component report computations
+		static Real64 curQL( 0.0 ); // radiant value prior to adjustment for pulse for load component report
+		static Real64 adjQL( 0.0 ); // radiant value including adjustment for pulse for load component report
+
+		//  Zero out time step variables
+		// Object report variables
+		ZoneITEq.CPUPower() = 0.0;
+		ZoneITEq.FanPower() = 0.0;
+		ZoneITEq.UPSPower() = 0.0;
+		ZoneITEq.CPUPowerAtDesign() = 0.0;
+		ZoneITEq.FanPowerAtDesign() = 0.0;
+		ZoneITEq.UPSGainRateToZone() = 0.0;
+		ZoneITEq.ConGainRateToZone() = 0.0;
+
+		ZoneITEq.CPUConsumption() = 0.0;
+		ZoneITEq.FanConsumption() = 0.0;
+		ZoneITEq.UPSConsumption() = 0.0;
+		ZoneITEq.CPUEnergyAtDesign() = 0.0;
+		ZoneITEq.FanEnergyAtDesign() = 0.0;
+		ZoneITEq.UPSGainEnergyToZone() = 0.0;
+		ZoneITEq.ConGainEnergyToZone() = 0.0;
+
+		ZoneITEq.AirVolFlowStdDensity() = 0.0;
+		ZoneITEq.AirVolFlowCurDensity() = 0.0;
+		ZoneITEq.AirMassFlow() = 0.0;
+		ZoneITEq.AirInletDryBulbT() = 0.0;
+		ZoneITEq.AirInletDewpointT() = 0.0;
+		ZoneITEq.AirInletRelHum() = 0.0;
+		ZoneITEq.AirOutletDryBulbT() = 0.0;
+		ZoneITEq.SHI() = 0.0;
+		ZoneITEq.TimeOutOfOperRange() = 0.0;
+		ZoneITEq.TimeAboveDryBulbT() = 0.0;
+		ZoneITEq.TimeBelowDryBulbT() = 0.0;
+		ZoneITEq.TimeAboveDewpointT() = 0.0;
+		ZoneITEq.TimeBelowDewpointT() = 0.0;
+		ZoneITEq.DryBulbTAboveDeltaT() = 0.0;
+		ZoneITEq.DryBulbTBelowDeltaT() = 0.0;
+		ZoneITEq.DewpointTAboveDeltaT() = 0.0;
+		ZoneITEq.DewpointTBelowDeltaT() = 0.0;
+
+		// Zone total report variables
+		ZnRpt.ITEqCPUPower() = 0.0;
+		ZnRpt.ITEqFanPower() = 0.0;
+		ZnRpt.ITEqUPSPower() = 0.0;
+		ZnRpt.ITEqCPUPowerAtDesign() = 0.0;
+		ZnRpt.ITEqFanPowerAtDesign() = 0.0;
+		ZnRpt.ITEqUPSGainRateToZone() = 0.0;
+		ZnRpt.ITEqConGainRateToZone() = 0.0;
+
+		ZnRpt.ITEqCPUConsumption() = 0.0;
+		ZnRpt.ITEqFanConsumption() = 0.0;
+		ZnRpt.ITEqUPSConsumption() = 0.0;
+		ZnRpt.ITEqCPUEnergyAtDesign() = 0.0;
+		ZnRpt.ITEqFanEnergyAtDesign() = 0.0;
+		ZnRpt.ITEqUPSGainEnergyToZone() = 0.0;
+		ZnRpt.ITEqConGainEnergyToZone() = 0.0;
+
+		ZnRpt.ITEqAirVolFlowStdDensity() = 0.0;
+		ZnRpt.ITEqAirMassFlow() = 0.0;
+		ZnRpt.ITEqSHI() = 0.0;
+		ZnRpt.ITEqTimeOutOfOperRange() = 0.0;
+		ZnRpt.ITEqTimeAboveDryBulbT() = 0.0;
+		ZnRpt.ITEqTimeBelowDryBulbT() = 0.0;
+		ZnRpt.ITEqTimeAboveDewpointT() = 0.0;
+		ZnRpt.ITEqTimeBelowDewpointT() = 0.0;
+
+		// Process Internal Heat Gains, People done below
+		// Occupant Stuff
+		//   METHOD:
+		//       The function is based on a curve fit to data presented in
+		//       Table 48 'Heat Gain From People' of Chapter 1 of the 'Carrier
+		//       Handbook of Air Conditioning System Design', 1965.  Values of
+		//       Sensible gain were obtained from the table at average adjusted
+		//       metabolic rates 350, 400, 450, 500, 750, 850, 1000, and
+		//       1450 Btu/hr each at temperatures 82, 80, 78, 75, and 70F.
+		//       Sensible gains of 0.0 at 96F and equal to the metabolic rate
+		//       at 30F were assumed in order to give reasonable values beyond
+		//       The reported temperature range.
+		for ( Loop = 1; Loop <= TotPeople; ++Loop ) {
+			NZ = People( Loop ).ZonePtr;
+			NumberOccupants = People( Loop ).NumberOfPeople * GetCurrentScheduleValue( People( Loop ).NumberOfPeoplePtr );
+			if ( People( Loop ).EMSPeopleOn ) NumberOccupants = People( Loop ).EMSNumberOfPeople;
+
+			TotalPeopleGain = 0.0;
+			SensiblePeopleGain = 0.0;
+
+			if ( NumberOccupants > 0.0 ) {
+				ActivityLevel_WperPerson = GetCurrentScheduleValue( People( Loop ).ActivityLevelPtr );
+				TotalPeopleGain = NumberOccupants * ActivityLevel_WperPerson;
+				// if the user did not specify a sensible fraction, calculate the sensible heat gain
+				if ( People( Loop ).UserSpecSensFrac == AutoCalculate ) {
+					if ( !( IsZoneDV( NZ ) || IsZoneUI( NZ ) ) ) {
+						//SensiblePeopleGain = NumberOccupants * ( C( 1 ) + ActivityLevel_WperPerson * ( C( 2 ) + ActivityLevel_WperPerson * C( 3 ) ) + MAT( NZ ) * ( ( C( 4 ) + ActivityLevel_WperPerson * ( C( 5 ) + ActivityLevel_WperPerson * C( 6 ) ) ) + MAT( NZ ) * ( C( 7 ) + ActivityLevel_WperPerson * ( C( 8 ) + ActivityLevel_WperPerson * C( 9 ) ) ) ) );
+					} else { // UCSD - DV or UI
+						//SensiblePeopleGain = NumberOccupants * ( C( 1 ) + ActivityLevel_WperPerson * ( C( 2 ) + ActivityLevel_WperPerson * C( 3 ) ) + TCMF( NZ ) * ( ( C( 4 ) + ActivityLevel_WperPerson * ( C( 5 ) + ActivityLevel_WperPerson * C( 6 ) ) ) + TCMF( NZ ) * ( C( 7 ) + ActivityLevel_WperPerson * ( C( 8 ) + ActivityLevel_WperPerson * C( 9 ) ) ) ) );
+					}
+				} else { // if the user did specify a sensible fraction, use it
+					SensiblePeopleGain = TotalPeopleGain * People( Loop ).UserSpecSensFrac;
+				}
+
+				if ( SensiblePeopleGain > TotalPeopleGain ) SensiblePeopleGain = TotalPeopleGain;
+				if ( SensiblePeopleGain < 0.0 ) SensiblePeopleGain = 0.0;
+
+				//For predefined tabular reports related to outside air ventilation
+				ZonePreDefRep( NZ ).isOccupied = true; //set flag to occupied to be used in tabular reporting for ventilation
+				ZonePreDefRep( NZ ).NumOccAccum += NumberOccupants * TimeStepZone;
+				ZonePreDefRep( NZ ).NumOccAccumTime += TimeStepZone;
+			} else {
+				ZonePreDefRep( NZ ).isOccupied = false; //set flag to occupied to be used in tabular reporting for ventilation
+			}
+
+			People( Loop ).NumOcc = NumberOccupants;
+			People( Loop ).RadGainRate = SensiblePeopleGain * People( Loop ).FractionRadiant;
+			People( Loop ).ConGainRate = SensiblePeopleGain * People( Loop ).FractionConvected;
+			People( Loop ).SenGainRate = SensiblePeopleGain;
+			People( Loop ).LatGainRate = TotalPeopleGain - SensiblePeopleGain;
+			People( Loop ).TotGainRate = TotalPeopleGain;
+			People( Loop ).CO2GainRate = TotalPeopleGain * People( Loop ).CO2RateFactor;
+
+			ZoneIntGain( NZ ).NOFOCC += People( Loop ).NumOcc;
+			ZoneIntGain( NZ ).QOCRAD += People( Loop ).RadGainRate;
+			ZoneIntGain( NZ ).QOCCON += People( Loop ).ConGainRate;
+			ZoneIntGain( NZ ).QOCSEN += People( Loop ).SenGainRate;
+			ZoneIntGain( NZ ).QOCLAT += People( Loop ).LatGainRate;
+			ZoneIntGain( NZ ).QOCTOT += People( Loop ).TotGainRate;
+		}
+
+		// Object report variables
+//		ZoneITEq( Loop ).CPUPower( ) = 0.0;
+//		ZoneITEq( Loop ).FanPower( ) = 0.0;
+//		ZoneITEq( Loop ).UPSPower( ) = 0.0;
+//		ZoneITEq( Loop ).CPUPowerAtDesign( ) = 0.0;
+//		ZoneITEq( Loop ).FanPowerAtDesign( ) = 0.0;
+//		ZoneITEq( Loop ).UPSGainRateToZone( ) = 0.0;
+//		ZoneITEq( Loop ).ConGainRateToZone( ) = 0.0;
+
+//		ZoneITEq( Loop ).CPUConsumption( ) = 0.0;
+//		ZoneITEq( Loop ).FanConsumption( ) = 0.0;
+//		ZoneITEq( Loop ).UPSConsumption( ) = 0.0;
+//		ZoneITEq( Loop ).CPUEnergyAtDesign( ) = 0.0;
+//		ZoneITEq( Loop ).FanEnergyAtDesign( ) = 0.0;
+//		ZoneITEq( Loop ).UPSGainEnergyToZone( ) = 0.0;
+//		ZoneITEq( Loop ).ConGainEnergyToZone( ) = 0.0;
+
+//		ZoneITEq( Loop ).AirVolFlowStdDensity( ) = 0.0;
+//		ZoneITEq( Loop ).AirVolFlowCurDensity( ) = 0.0;
+//		ZoneITEq( Loop ).AirMassFlow( ) = 0.0;
+//		ZoneITEq( Loop ).AirInletDryBulbT( ) = 0.0;
+//		ZoneITEq( Loop ).AirInletDewpointT( ) = 0.0;
+//		ZoneITEq( Loop ).AirInletRelHum( ) = 0.0;
+//		ZoneITEq( Loop ).AirOutletDryBulbT( ) = 0.0;
+//		ZoneITEq( Loop ).SHI( ) = 0.0;
+//		ZoneITEq( Loop ).TimeOutOfOperRange( ) = 0.0;
+//		ZoneITEq( Loop ).TimeAboveDryBulbT( ) = 0.0;
+//		ZoneITEq( Loop ).TimeBelowDryBulbT( ) = 0.0;
+//		ZoneITEq( Loop ).TimeAboveDewpointT( ) = 0.0;
+//		ZoneITEq( Loop ).TimeBelowDewpointT( ) = 0.0;
+//		ZoneITEq( Loop ).DryBulbTAboveDeltaT( ) = 0.0;
+//		ZoneITEq( Loop ).DryBulbTBelowDeltaT( ) = 0.0;
+//		ZoneITEq( Loop ).DewpointTAboveDeltaT( ) = 0.0;
+//		ZoneITEq( Loop ).DewpointTBelowDeltaT( ) = 0.0;
+
+		// Zone total report variables
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqCPUPower( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanPower( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqUPSPower( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqCPUPowerAtDesign( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanPowerAtDesign( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqUPSGainRateToZone( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqConGainRateToZone( ) = 0.0;
+
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqCPUConsumption( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanConsumption( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqUPSConsumption( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqCPUEnergyAtDesign( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqFanEnergyAtDesign( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqUPSGainEnergyToZone( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqConGainEnergyToZone( ) = 0.0;
+
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqAirVolFlowStdDensity( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqAirMassFlow( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqSHI( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeOutOfOperRange( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeAboveDryBulbT( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeBelowDryBulbT( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeAboveDewpointT( ) = 0.0;
+//		ZnRpt( ZoneITEq( Loop ).ZonePtr ).ITEqTimeBelowDewpointT( ) = 0.0;
 
 	}
 
