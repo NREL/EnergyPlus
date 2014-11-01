@@ -223,7 +223,7 @@ main()
 	// Locals
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
-	// in "DataGlobals.f90"
+	// in "DataGlobals.cc"
 	gio::Fmt const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
 	std::string const BlankString;
 

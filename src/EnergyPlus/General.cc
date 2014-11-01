@@ -2693,7 +2693,7 @@ namespace General {
 
 		// PURPOSE OF THIS FUNCTION:
 		// This function creates the time stamp string from the time value specified in seconds.
-		// Inspired by similar function CreateSysTimeIntervalString() in General.f90
+		// Inspired by similar function CreateSysTimeIntervalString() in General.cc
 		// However, this function provides better accuracy for sub-minute time steps
 		// by also showing information down to the 10th of a second.
 		// Note that Time is expected to be specified in REAL(r64).
@@ -2771,7 +2771,7 @@ namespace General {
 		// PURPOSE OF THIS FUNCTION:
 		// This function creates the time stamp with the current time interval from start and end
 		// time values specified in seconds.
-		// Inspired by similar function CreateSysTimeIntervalString() in General.f90
+		// Inspired by similar function CreateSysTimeIntervalString() in General.cc
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -3383,7 +3383,7 @@ namespace General {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
