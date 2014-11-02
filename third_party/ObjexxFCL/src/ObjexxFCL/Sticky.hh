@@ -18,6 +18,7 @@
 
 // C++ Headers
 #include <cassert>
+#include <type_traits>
 
 namespace ObjexxFCL {
 
@@ -40,16 +41,16 @@ public: // Creation
 	// Value Constructor
 	inline
 	explicit
-	Sticky( Value const & val ) :
-		val_( val )
+	Sticky( T const & val ) :
+	 val_( val )
 	{}
 
 	// Value Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	Sticky( U const & val ) :
-		val_( val )
+	 val_( val )
 	{}
 
 public: // Assignment
@@ -57,14 +58,14 @@ public: // Assignment
 	// Value Assignment
 	inline
 	Sticky &
-	operator =( Value const & val )
+	operator =( T const & val )
 	{
 		val_ = val;
 		return *this;
 	}
 
 	// Value Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Sticky &
 	operator =( U const & val )
@@ -77,14 +78,14 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value const &() const
+	operator T const &() const
 	{
 		return val_;
 	}
 
 	// Value Conversion
 	inline
-	operator Value &()
+	operator T &()
 	{
 		return val_;
 	}
@@ -93,7 +94,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value const &
+	T const &
 	operator ()() const
 	{
 		return val_;
@@ -101,7 +102,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value &
+	T &
 	operator ()()
 	{
 		return val_;
@@ -109,7 +110,7 @@ public: // Operators
 
 private: // Data
 
-	Value val_; // Object
+	T val_; // Object
 
 }; // Sticky
 

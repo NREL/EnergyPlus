@@ -405,7 +405,7 @@ namespace EcoRoofManager {
 			// Table 1 for sigmaf_max and min (0.20 to 0.9)
 
 			EpsilonOne = epsilonf + epsilong - epsilong * epsilonf; // Checked (eqn. 6 in FASST Veg Models)
-			RH = OutRelHum; // Get humidity in % from the DataEnvironment.f90
+			RH = OutRelHum; // Get humidity in % from the DataEnvironment.cc
 			eair = ( RH / 100.0 ) * 611.2 * std::exp( 17.67 * Ta / ( Tak - 29.65 ) );
 			qa = ( 0.622 * eair ) / ( Pa - 1.000 * eair ); // Mixing Ratio of air
 			Rhoa = Pa / ( Rair * Tak ); // Density of air. kg/m^3
@@ -1045,7 +1045,7 @@ namespace EcoRoofManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
