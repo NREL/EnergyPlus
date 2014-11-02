@@ -488,6 +488,21 @@ print()
 	return Print();
 }
 
+// Flush /////
+
+// Flush
+void
+flush( Unit const unit )
+{
+	Stream * const Stream_p( streams()[ unit ] );
+	if ( ( Stream_p ) && ( Stream_p->write() ) ) { // Writeable global stream
+		if ( Stream_p->is_open() ) {
+			auto ostream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
+			if ( ostream_p ) ostream_p->flush();
+		}
+	}
+}
+
 // Inquire /////
 
 // Inquire by Unit

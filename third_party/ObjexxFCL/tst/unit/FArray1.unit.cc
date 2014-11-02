@@ -20,6 +20,9 @@
 #include <ObjexxFCL/Fstring.hh>
 #include <ObjexxFCL/DimensionExpressions.hh>
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Vector2.hh>
+#include <ObjexxFCL/Vector3.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <array>
@@ -138,7 +141,7 @@ TEST( FArray1Test, ConstructionInitializerListOnlyFstring )
 	EXPECT_EQ( "Eggs", r( 3 ) );
 }
 
-TEST( FArray1Test, ConstructionArray )
+TEST( FArray1Test, ConstructionStdArray )
 {
 	FArray1D_int v( std::array< int, 3 >{ { 11, 22, 33 } } );
 	EXPECT_EQ( 3u, v.size() );
@@ -152,7 +155,7 @@ TEST( FArray1Test, ConstructionArray )
 	EXPECT_EQ( 33, v( 3 ) );
 }
 
-TEST( FArray1Test, ConstructionVector )
+TEST( FArray1Test, ConstructionStdVector )
 {
 	FArray1D_int v( std::vector< int >{ 11, 22, 33 } );
 	EXPECT_EQ( 3u, v.size() );
@@ -168,6 +171,33 @@ TEST( FArray1Test, ConstructionVector )
 	EXPECT_EQ( 33, v( 3 ) );
 }
 
+TEST( FArray1Test, ConstructionVector2 )
+{
+	FArray1D_int v( Vector2_int{ { 11, 22 } } );
+	EXPECT_EQ( 2u, v.size() );
+	EXPECT_EQ( 2u, v.size1() );
+	EXPECT_EQ( 1, v.l() );
+	EXPECT_EQ( 1, v.l1() );
+	EXPECT_EQ( 2, v.u() );
+	EXPECT_EQ( 2, v.u1() );
+	EXPECT_EQ( 11, v( 1 ) );
+	EXPECT_EQ( 22, v( 2 ) );
+}
+
+TEST( FArray1Test, ConstructionVector3 )
+{
+	FArray1D_int v( Vector3_int{ { 11, 22, 33 } } );
+	EXPECT_EQ( 3u, v.size() );
+	EXPECT_EQ( 3u, v.size1() );
+	EXPECT_EQ( 1, v.l() );
+	EXPECT_EQ( 1, v.l1() );
+	EXPECT_EQ( 3, v.u() );
+	EXPECT_EQ( 3, v.u1() );
+	EXPECT_EQ( 11, v( 1 ) );
+	EXPECT_EQ( 22, v( 2 ) );
+	EXPECT_EQ( 33, v( 3 ) );
+}
+
 static void initializer_function( FArray1D_string & array )
 {
 	array( 1 ) = "This";
@@ -176,7 +206,7 @@ static void initializer_function( FArray1D_string & array )
 	array( 4 ) = "string";
 }
 
-template < typename T >
+template< typename T >
 static void initializer_function_template( FArray1D< T > & array )
 {
 	array( 1 ) = T( 1 );
@@ -803,6 +833,82 @@ TEST( FArray1Test, Redimension )
 	EXPECT_EQ( 17, B( 2 ) );
 	EXPECT_EQ( 33, B( 3 ) );
 	EXPECT_EQ( 44, B( 4 ) );
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 1, 5 }, 2 );
+		EXPECT_EQ( 1, A.l() );
+		EXPECT_EQ( 5, A.u() );
+		EXPECT_TRUE( eq( A, 1 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 2, 4 }, 2 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_TRUE( eq( A, 1 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { -2, 0 }, 2 );
+		EXPECT_EQ( -2, A.l() );
+		EXPECT_EQ( 0, A.u() );
+		EXPECT_TRUE( eq( A, 2 ) );
+	}
+
+	{
+		FArray1D_int A( 5, 1 );
+		A.redimension( { 7, 9 }, 2 );
+		EXPECT_EQ( 7, A.l() );
+		EXPECT_EQ( 9, A.u() );
+		EXPECT_TRUE( eq( A, 2 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 4 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 1, A( 2 ) );
+		EXPECT_EQ( 2, A( 3 ) );
+		EXPECT_EQ( 2, A( 4 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 2 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 2, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+		EXPECT_EQ( 1, A( 2 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { -1, 1 }, 2 );
+		EXPECT_EQ( -1, A.l() );
+		EXPECT_EQ( 1, A.u() );
+		EXPECT_EQ( 2, A( -1 ) );
+		EXPECT_EQ( 2, A( 0 ) );
+		EXPECT_EQ( 1, A( 1 ) );
+	}
+
+	{
+		FArray1D_int A( 2, 1 );
+		A.redimension( { 2, 4 }, 2 );
+		EXPECT_EQ( 2, A.l() );
+		EXPECT_EQ( 4, A.u() );
+		EXPECT_EQ( 1, A( 2 ) );
+		EXPECT_EQ( 2, A( 3 ) );
+		EXPECT_EQ( 2, A( 4 ) );
+	}
 }
 
 TEST( FArray1Test, Swap )

@@ -42,30 +42,41 @@ itime( FArray1< std::int32_t > & timearray )
 void
 gettim( std::int16_t & h, std::int16_t & m, std::int16_t & s, std::int16_t & c )
 {
-	std::time_t const current_time( std::time( NULL ) );
+	using std::chrono::system_clock;
+	using std::chrono::duration_cast;
+	using std::chrono::milliseconds;
+	system_clock::time_point const now( system_clock::now() );
+	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
+	std::time_t const current_time( system_clock::to_time_t( now ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
 	h = timeinfo->tm_hour;
 	m = timeinfo->tm_min;
 	s = timeinfo->tm_sec;
-	c = 0; // Use a higher resolution time to get centi-sec
+	c = ms / 10;
 }
 
 // Current Time: HH, MM, SS, CC
 void
-gettim( std::int32_t & h, int & m, std::int32_t & s, std::int32_t & c )
+gettim( std::int32_t & h, std::int32_t & m, std::int32_t & s, std::int32_t & c )
 {
-	std::time_t const current_time( std::time( NULL ) );
+	using std::chrono::system_clock;
+	using std::chrono::duration_cast;
+	using std::chrono::milliseconds;
+	system_clock::time_point const now( system_clock::now() );
+	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
+	std::time_t const current_time( system_clock::to_time_t( now ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
 	h = timeinfo->tm_hour;
 	m = timeinfo->tm_min;
 	s = timeinfo->tm_sec;
-	c = 0; // Use a higher resolution time to get centi-sec
+	c = ms / 10;
 }
 
 // Current Time: HH:MM:SS
 void
 TIME( Fstring & time )
 {
+	using std::setw;
 	assert( time.length() >= 8 );
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
@@ -73,10 +84,7 @@ TIME( Fstring & time )
 	int const mm( timeinfo->tm_min );
 	int const ss( timeinfo->tm_sec );
 	std::stringstream time_stream;
-	time_stream << std::setfill( '0' );
-	time_stream << std::setw( 2 ) << hh;
-	time_stream << std::setw( 2 ) << mm;
-	time_stream << std::setw( 2 ) << ss;
+	time_stream << std::setfill( '0' ) << setw( 2 ) << hh << setw( 2 ) << mm << setw( 2 ) << ss;
 	time = time_stream.str();
 }
 
@@ -94,16 +102,14 @@ TIME()
 Fstring
 CLOCK()
 {
+	using std::setw;
 	std::time_t const current_time( std::time( NULL ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
 	int const hh( timeinfo->tm_hour );
 	int const mm( timeinfo->tm_min );
 	int const ss( timeinfo->tm_sec );
 	std::stringstream time_stream;
-	time_stream << std::setfill( '0' );
-	time_stream << std::setw( 2 ) << hh << ":";
-	time_stream << std::setw( 2 ) << mm << ":";
-	time_stream << std::setw( 2 ) << ss;
+	time_stream << std::setfill( '0' ) << setw( 2 ) << hh << ":" << setw( 2 ) << mm << ":" << setw( 2 ) << ss;
 	return Fstring( 8, time_stream.str() );
 }
 
@@ -113,8 +119,7 @@ SYSTEM_CLOCK( Optional< std::int64_t > count, Optional< std::int64_t > count_rat
 {
 	using std::chrono::system_clock;
 	system_clock::time_point const now( system_clock::now() );
-	system_clock::duration const dur( now.time_since_epoch() );
-	if ( count.present() ) count = dur.count();
+	if ( count.present() ) count = now.time_since_epoch().count();
 	if ( count_rate.present() ) count_rate = system_clock::period::den / system_clock::period::num;
 	if ( count_max.present() ) count_max = system_clock::duration::max().count();
 }
@@ -125,10 +130,9 @@ SYSTEM_CLOCK32( Optional< std::int32_t > count, Optional< std::int32_t > count_r
 {
 	using std::chrono::system_clock;
 	system_clock::time_point const now( system_clock::now() );
-	system_clock::duration const dur( now.time_since_epoch() );
-	std::int64_t count_64 = dur.count();
-	std::int64_t count_rate_64 = system_clock::period::den / system_clock::period::num;
-	std::int64_t count_max_64 = system_clock::duration::max().count();
+	std::int64_t count_64( now.time_since_epoch().count() );
+	std::int64_t count_rate_64( system_clock::period::den / system_clock::period::num );
+	std::int64_t count_max_64( system_clock::duration::max().count() );
 	std::int64_t mult( count_rate_64 / std::numeric_limits< int >::max() );
 	if ( mult > 0 ) { // Scale rate down
 		mult = std::pow( 10.0, std::ceil( std::log10( double( mult ) ) ) );
@@ -400,7 +404,13 @@ time_zone_offset_seconds()
 void
 date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fstring > zone, Optional< FArray1D< int > > values )
 {
-	std::time_t const current_time( std::time( NULL ) );
+	using std::chrono::system_clock;
+	using std::chrono::duration_cast;
+	using std::chrono::milliseconds;
+	using std::setw;
+	system_clock::time_point const now( system_clock::now() );
+	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
+	std::time_t const current_time( system_clock::to_time_t( now ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
 
 	int const DD( timeinfo->tm_mday ); // Day of month: 1,2,...
@@ -409,10 +419,7 @@ date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fst
 	if ( date.present() ) {
 		assert( date().length() >= 8 );
 		std::stringstream date_stream;
-		date_stream << std::setfill( '0' );
-		date_stream << std::setw( 4 ) << YY;
-		date_stream << std::setw( 2 ) << MM;
-		date_stream << std::setw( 2 ) << DD;
+		date_stream << std::setfill( '0' ) << setw( 4 ) << YY << setw( 2 ) << MM << setw( 2 ) << DD;
 		date = date_stream.str();
 	}
 
@@ -422,10 +429,7 @@ date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fst
 	if ( time.present() ) {
 		assert( time().length() >= 10 );
 		std::stringstream time_stream;
-		time_stream << std::setfill( '0' );
-		time_stream << std::setw( 2 ) << hh;
-		time_stream << std::setw( 2 ) << mm;
-		time_stream << std::setw( 2 ) << ss << ".000"; // Use a higher resolution time to get msec
+		time_stream << std::setfill( '0' ) << setw( 2 ) << hh << setw( 2 ) << mm << setw( 2 ) << ss << '.' << setw( 3 ) << ms;
 		time = time_stream.str();
 	}
 
@@ -435,10 +439,7 @@ date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fst
 		int const zh( std::abs( zs ) / 3600 );
 		int const zm( ( std::abs( zs ) - ( zh * 3600 ) ) / 60 );
 		std::stringstream zone_stream;
-		zone_stream << std::setfill( '0' );
-		zone_stream << ( zs >= 0 ? '+' : '-' );
-		zone_stream << std::setw( 2 ) << zh;
-		zone_stream << std::setw( 2 ) << zm;
+		zone_stream << std::setfill( '0' ) << ( zs >= 0 ? '+' : '-' ) << setw( 2 ) << zh << setw( 2 ) << zm;
 		zone = zone_stream.str();
 	}
 
@@ -451,7 +452,7 @@ date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fst
 		values()( 5 ) = hh;
 		values()( 6 ) = mm;
 		values()( 7 ) = ss;
-		values()( 8 ) = 0;
+		values()( 8 ) = ms;
 	}
 }
 
@@ -459,7 +460,13 @@ date_and_time( Optional< Fstring > date, Optional< Fstring > time, Optional< Fst
 void
 date_and_time_string( Optional< std::string > date, Optional< std::string > time, Optional< std::string > zone, Optional< FArray1D< int > > values )
 {
-	std::time_t const current_time( std::time( NULL ) );
+	using std::chrono::system_clock;
+	using std::chrono::duration_cast;
+	using std::chrono::milliseconds;
+	using std::setw;
+	system_clock::time_point const now( system_clock::now() );
+	int const ms( static_cast< int >( duration_cast< milliseconds >( now.time_since_epoch() ).count() % 1000 ) ); // msec
+	std::time_t const current_time( system_clock::to_time_t( now ) );
 	std::tm const * const timeinfo( std::localtime( &current_time ) );
 
 	int const DD( timeinfo->tm_mday ); // Day of month: 1,2,...
@@ -467,10 +474,7 @@ date_and_time_string( Optional< std::string > date, Optional< std::string > time
 	int const YY( timeinfo->tm_year + 1900 ); // Year
 	if ( date.present() ) {
 		std::stringstream date_stream;
-		date_stream << std::setfill( '0' );
-		date_stream << std::setw( 4 ) << YY;
-		date_stream << std::setw( 2 ) << MM;
-		date_stream << std::setw( 2 ) << DD;
+		date_stream << std::setfill( '0' ) << setw( 4 ) << YY << setw( 2 ) << MM << setw( 2 ) << DD;
 		date = date_stream.str();
 	}
 
@@ -479,10 +483,7 @@ date_and_time_string( Optional< std::string > date, Optional< std::string > time
 	int const ss( timeinfo->tm_sec );
 	if ( time.present() ) {
 		std::stringstream time_stream;
-		time_stream << std::setfill( '0' );
-		time_stream << std::setw( 2 ) << hh;
-		time_stream << std::setw( 2 ) << mm;
-		time_stream << std::setw( 2 ) << ss << ".000"; // Use a higher resolution time to get msec
+		time_stream << std::setfill( '0' ) << setw( 2 ) << hh << setw( 2 ) << mm << setw( 2 ) << ss << '.' << setw( 3 ) << ms;
 		time = time_stream.str();
 	}
 
@@ -491,10 +492,7 @@ date_and_time_string( Optional< std::string > date, Optional< std::string > time
 		int const zh( std::abs( zs ) / 3600 );
 		int const zm( ( std::abs( zs ) - ( zh * 3600 ) ) / 60 );
 		std::stringstream zone_stream;
-		zone_stream << std::setfill( '0' );
-		zone_stream << ( zs >= 0 ? '+' : '-' );
-		zone_stream << std::setw( 2 ) << zh;
-		zone_stream << std::setw( 2 ) << zm;
+		zone_stream << std::setfill( '0' ) << ( zs >= 0 ? '+' : '-' ) << setw( 2 ) << zh << setw( 2 ) << zm;
 		zone = zone_stream.str();
 	}
 
@@ -507,7 +505,7 @@ date_and_time_string( Optional< std::string > date, Optional< std::string > time
 		values()( 5 ) = hh;
 		values()( 6 ) = mm;
 		values()( 7 ) = ss;
-		values()( 8 ) = 0;
+		values()( 8 ) = ms;
 	}
 }
 

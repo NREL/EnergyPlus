@@ -27,7 +27,7 @@ input{ font-family: Arial,sans-serif; }
 .footer_link{ font: bold 9px Verdana,Arial,Helvetica,sans-serif; color: #757D59; text-decoration: none; }
 
 .table_text { font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 10px; }
-.source { font-family: "Courier New", Courier, mono; font-size: 13px; font-weight: bold; }
+.source { font-family: monospace, Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, Courier, sans serif, serif; font-size: 12px; }
 
 .News{ font: bold 9px Verdana,Arial,Helvetica,sans-serif; color: #033; line-height: 12px; }
 

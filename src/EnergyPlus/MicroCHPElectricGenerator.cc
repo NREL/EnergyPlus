@@ -56,7 +56,7 @@ namespace MicroCHPElectricGenerator {
 	// Once the ElectricPowerManager determines that the Combustion Generator
 	// is available to meet an electric load demand, it calls SimCombustionGenerator
 	// which in turn calls the Combustion model.
-	// See DataFuelCells.f90 for structures and variables
+	// See DataFuelCells.cc for structures and variables
 
 	// REFERENCES:
 	// IEA/ECBCS Annex 42 model specification titled: " A Generic Model Specification for

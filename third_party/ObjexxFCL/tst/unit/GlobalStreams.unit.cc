@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/GlobalStreams.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <cstdio>
