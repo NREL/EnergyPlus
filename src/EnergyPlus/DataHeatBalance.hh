@@ -2681,7 +2681,7 @@ namespace DataHeatBalance {
 		Real64 DesignFanPowerFrac; // Fraction (0.0-1.0) of design power level that is fans
 		int OperSchedPtr; // Schedule pointer for design power input or operating schedule
 		int CPULoadSchedPtr; // Schedule pointer for CPU loading schedule
-		Real64 DesignTAirIn; // Design entering air temperature [C]
+		Real64 DesignTAirIn; // Design entering air dry-bulb temperature [C]
 		Real64 DesignFanPower; // Design fan power input [W]
 		Real64 DesignCPUPower; // Design CPU power input [W]
 		Real64 DesignAirVolFlowRate; // Design air volume flow rate [m3/s]
@@ -2694,7 +2694,7 @@ namespace DataHeatBalance {
 		int OutletRoomAirNodeNum; // Room air model node number for air outlet
 		int SupplyAirNodeNum; // Node number for supply air inlet
 		Real64 DesignRecircFrac; // Design recirculation fraction (0.0-0.5)
-		int RecircFLTCurve; // Index for recirculation function of CPULoadFrac (x) and TAirIn (y) curve
+		int RecircFLTCurve; // Index for recirculation function of CPULoadFrac (x) and TSupply (y) curve
 		Real64 DesignUPSEfficiency; // Design power supply efficiency (>0.0 - 1.0)
 		int UPSEfficFPLRCurve; // Index for recirculation function of part load ratio
 		Real64 UPSLossToZoneFrac; // Fraction of UPS power loss to zone (0.0 - 1.0); remainder is lost
@@ -2735,10 +2735,14 @@ namespace DataHeatBalance {
 		Real64 TimeBelowDryBulbT; // ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
 		Real64 TimeAboveDewpointT; // ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
 		Real64 TimeBelowDewpointT; // ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+		Real64 TimeAboveRH; // ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+		Real64 TimeBelowRH; // ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
 		Real64 DryBulbTAboveDeltaT; // ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range [deltaC]
 		Real64 DryBulbTBelowDeltaT; // ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range [deltaC]
 		Real64 DewpointTAboveDeltaT; // ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
 		Real64 DewpointTBelowDeltaT; // ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
+		Real64 RHAboveDeltaRH; // ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
+		Real64 RHBelowDeltaRH; // ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
 
 		// Default Constructor
 		ITEquipData( ) :
@@ -2798,11 +2802,15 @@ namespace DataHeatBalance {
 			TimeAboveDryBulbT( 0.0 ),
 			TimeBelowDryBulbT( 0.0 ),
 			TimeAboveDewpointT( 0.0 ),
+			TimeAboveRH( 0.0 ),
+			TimeBelowRH( 0.0 ),
 			TimeBelowDewpointT( 0.0 ),
 			DryBulbTAboveDeltaT( 0.0 ),
 			DryBulbTBelowDeltaT( 0.0 ),
 			DewpointTAboveDeltaT( 0.0 ),
-			DewpointTBelowDeltaT( 0.0 )
+			DewpointTBelowDeltaT( 0.0 ),
+			RHAboveDeltaRH( 0.0 ),
+			RHBelowDeltaRH( 0.0 )
 		{}
 
 		// Member Constructor
@@ -2869,10 +2877,14 @@ namespace DataHeatBalance {
 			Real64 const TimeBelowDryBulbT, // ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
 			Real64 const TimeAboveDewpointT, // ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
 			Real64 const TimeBelowDewpointT, // ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+			Real64 const TimeAboveRH, // ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+			Real64 const TimeBelowRH, // ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
 			Real64 const DryBulbTAboveDeltaT, // ITE Air Inlet Dry-Bulb Temperature Difference Above Operating Range [deltaC]
 			Real64 const DryBulbTBelowDeltaT, // ITE Air Inlet Dry-Bulb Temperature Difference Below Operating Range [deltaC]
 			Real64 const DewpointTAboveDeltaT, // ITE Air Inlet Dewpoint Temperature Difference Above Operating Range [deltaC]
-			Real64 const DewpointTBelowDeltaT // ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
+			Real64 const DewpointTBelowDeltaT, // ITE Air Inlet Dewpoint Temperature Difference Below Operating Range [deltaC]
+			Real64 RHAboveDeltaRH, // ITE Air Inlet Relative Humidity Difference Above Operating Range [%]
+			Real64 RHBelowDeltaRH // ITE Air Inlet Relative Humidity Difference Below Operating Range [%]
 			) :
 			Name( Name ),
 			ZonePtr( ZonePtr ),
@@ -2935,10 +2947,14 @@ namespace DataHeatBalance {
 			TimeBelowDryBulbT( TimeBelowDryBulbT ),
 			TimeAboveDewpointT( TimeAboveDewpointT ),
 			TimeBelowDewpointT( TimeBelowDewpointT ),
+			TimeAboveRH( TimeAboveRH ),
+			TimeBelowRH( TimeBelowRH ),
 			DryBulbTAboveDeltaT( DryBulbTAboveDeltaT ),
 			DryBulbTBelowDeltaT( DryBulbTBelowDeltaT ),
 			DewpointTAboveDeltaT( DewpointTAboveDeltaT ),
-			DewpointTBelowDeltaT( DewpointTBelowDeltaT )
+			DewpointTBelowDeltaT( DewpointTBelowDeltaT ),
+			RHAboveDeltaRH( RHAboveDeltaRH ),
+			RHBelowDeltaRH( RHBelowDeltaRH )
 			{}
 
 	};
@@ -5225,6 +5241,8 @@ namespace DataHeatBalance {
 		Real64 ITEqTimeBelowDryBulbT; // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
 		Real64 ITEqTimeAboveDewpointT; // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
 		Real64 ITEqTimeBelowDewpointT; // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+		Real64 ITEqTimeAboveRH; // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+		Real64 ITEqTimeBelowRH; // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
 		// Overall Zone Variables
 		Real64 TotRadiantGain;
 		Real64 TotVisHeatGain;
@@ -5353,6 +5371,8 @@ namespace DataHeatBalance {
 			ITEqTimeBelowDryBulbT( 0.0 ),
 			ITEqTimeAboveDewpointT( 0.0 ),
 			ITEqTimeBelowDewpointT( 0.0 ),
+			ITEqTimeAboveRH( 0.0 ),
+			ITEqTimeBelowRH( 0.0 ),
 			TotRadiantGain( 0.0 ),
 			TotVisHeatGain( 0.0 ),
 			TotConvectiveGain( 0.0 ),
@@ -5480,6 +5500,8 @@ namespace DataHeatBalance {
 			Real64 const ITEqTimeBelowDryBulbT, // Zone ITE Air Inlet Dry-Bulb Temperature Below Operating Range Time [hr]
 			Real64 const ITEqTimeAboveDewpointT, // Zone ITE Air Inlet Dewpoint Temperature Above Operating Range Time [hr]
 			Real64 const ITEqTimeBelowDewpointT, // Zone ITE Air Inlet Dewpoint Temperature Below Operating Range Time [hr]
+			Real64 const ITEqTimeAboveRH, // Zone ITE Air Inlet Relative Humidity Above Operating Range Time [hr]
+			Real64 const ITEqTimeBelowRH, // Zone ITE Air Inlet Relative Humidity Below Operating Range Time [hr]
 			Real64 const TotRadiantGain,
 			Real64 const TotVisHeatGain,
 			Real64 const TotConvectiveGain,
@@ -5604,6 +5626,8 @@ namespace DataHeatBalance {
 			ITEqTimeBelowDryBulbT( ITEqTimeBelowDryBulbT ),
 			ITEqTimeAboveDewpointT( ITEqTimeAboveDewpointT ),
 			ITEqTimeBelowDewpointT( ITEqTimeBelowDewpointT ),
+			ITEqTimeAboveRH( ITEqTimeAboveRH ),
+			ITEqTimeBelowRH( ITEqTimeBelowRH ),
 			TotRadiantGain( TotRadiantGain ),
 			TotVisHeatGain( TotVisHeatGain ),
 			TotConvectiveGain( TotConvectiveGain ),
