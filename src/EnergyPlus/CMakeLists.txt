@@ -521,39 +521,39 @@ SET( SRC
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
-add_library( EnergyPlusCore STATIC ${SRC} )
-target_link_libraries( EnergyPlusCore objexx sqlite bcvtb epexpat epfmiimport DElight )
+add_library( EnergyPlusLib STATIC ${SRC} )
+target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight )
 if(UNIX AND NOT APPLE)
-  target_link_libraries( EnergyPlusCore dl )
+  target_link_libraries( EnergyPlusLib dl )
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-add_library( EnergyPlusLib SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+add_library( EnergyPlusAPI SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
 if (UNIX)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
-target_link_libraries( EnergyPlusLib EnergyPlusCore )
+target_link_libraries( EnergyPlusAPI EnergyPlusLib )
 set_target_properties(
-  EnergyPlusLib
+  EnergyPlusAPI
   PROPERTIES
   INSTALL_NAME_DIR "@executable_path"
 )
-install( TARGETS EnergyPlusLib 
+install( TARGETS EnergyPlusAPI 
   RUNTIME DESTINATION ./ 
   LIBRARY DESTINATION ./ 
 )
 
 add_executable( EnergyPlus main.cc )
-target_link_libraries( EnergyPlus EnergyPlusLib )
+target_link_libraries( EnergyPlus EnergyPlusAPI )
 
 set_target_properties(EnergyPlus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
-set_target_properties(EnergyPlusLib PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(EnergyPlusAPI PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 
-install( TARGETS EnergyPlus EnergyPlusLib DESTINATION ./ )
+install( TARGETS EnergyPlus EnergyPlusAPI DESTINATION ./ )
 
 if( BUILD_TESTING )
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
-  target_link_libraries( TestEnergyPlusCallbacks EnergyPlusLib )
+  target_link_libraries( TestEnergyPlusCallbacks EnergyPlusAPI )
   # Currently the TestEnergyPlusCallbacks runner does not exit. Give it an idf and supporting files so that it will run.
   # add_test( NAME integration.TestEnergyPlusCallbacks COMMAND TestEnergyPlusCallbacks WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" )
 endif()
