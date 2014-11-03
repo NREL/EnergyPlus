@@ -2207,7 +2207,7 @@ namespace InternalHeatGains {
 
 		if ( NumZoneITEqStatements > 0 ) {
 			Loop = 0;
-			for ( Item = 1; Item <= NumZoneITEqStatements; ++Item ) {
+			for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
 				AlphaName = BlankString;
 				IHGNumbers = 0.0;
 
@@ -2318,35 +2318,35 @@ namespace InternalHeatGains {
 				// Performance curves
 				ZoneITEq( Loop ).CPUPowerFLTCurve = GetCurveIndex( AlphaName( 6 ) );
 				if ( ZoneITEq( Loop ).CPUPowerFLTCurve == 0 ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 6 ) + '=' + AlphaName( 6 ) );
 					ErrorsFound = true;
 				}
 
 				ZoneITEq( Loop ).AirFlowFLTCurve = GetCurveIndex( AlphaName( 7 ) );
 				if ( ZoneITEq( Loop ).AirFlowFLTCurve == 0 ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 7 ) + '=' + AlphaName( 7 ) );
 					ErrorsFound = true;
 				}
 
 				ZoneITEq( Loop ).FanPowerFFCurve = GetCurveIndex( AlphaName( 8 ) );
 				if ( ZoneITEq( Loop ).FanPowerFFCurve == 0 ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 8 ) + '=' + AlphaName( 8 ) );
 					ErrorsFound = true;
 				}
 
 				ZoneITEq( Loop ).RecircFLTCurve = GetCurveIndex( AlphaName( 14 ) );
 				if ( ZoneITEq( Loop ).RecircFLTCurve == 0 ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 14 ) + '=' + AlphaName( 14 ) );
 					ErrorsFound = true;
 				}
 
 				ZoneITEq( Loop ).UPSEfficFPLRCurve = GetCurveIndex( AlphaName( 15 ) );
 				if ( ZoneITEq( Loop ).UPSEfficFPLRCurve == 0 ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
+					ShowSevereError( RoutineName + CurrentModuleObject + " \"" + AlphaName( 1 ) + "\"" );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 15 ) + '=' + AlphaName( 15 ) );
 					ErrorsFound = true;
 				}
@@ -2354,20 +2354,20 @@ namespace InternalHeatGains {
 				// Environmental class
 				if ( SameString( AlphaName( 9 ), "None" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassNone;
-				} else if ( SameString( cAlphaArgs( 9 ), "A1" ) ) {
+				} else if ( SameString( AlphaName( 9 ), "A1" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA1;
-				} else if ( SameString( cAlphaArgs( 9 ), "A2" ) ) {
+				} else if ( SameString( AlphaName( 9 ), "A2" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA2;
-				} else if ( SameString( cAlphaArgs( 9 ), "A3" ) ) {
+				} else if ( SameString( AlphaName( 9 ), "A3" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA3;
-				} else if ( SameString( cAlphaArgs( 9 ), "A4" ) ) {
+				} else if ( SameString( AlphaName( 9 ), "A4" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassA4;
-				} else if ( SameString( cAlphaArgs( 9 ), "B" ) ) {
+				} else if ( SameString( AlphaName( 9 ), "B" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassB;
-				} else if ( SameString( cAlphaArgs( 9 ), "C" ) ) {
+				} else if ( SameString( AlphaName( 9 ), "C" ) ) {
 					ZoneITEq( Loop ).Class = ITEClassC;
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + ": " + AlphaName( 1 ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 9 ) + '=' + AlphaName( 9 ) );
 					ShowContinueError( "Valid entries are None, A1, A2, A3, A4, B or C." );
 					ErrorsFound = true;
@@ -2376,28 +2376,28 @@ namespace InternalHeatGains {
 				// Air and supply inlet connections
 				if ( SameString( AlphaName( 10 ), "AdjustedSupply" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletAdjustedSupply;
-				} else if ( SameString( cAlphaArgs( 10 ), "ZoneAirNode" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "ZoneAirNode" ) ) {
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
-				} else if ( SameString( cAlphaArgs( 10 ), "RoomAirModel" ) ) {
+				} else if ( SameString( AlphaName( 10 ), "RoomAirModel" ) ) {
 					// ZoneITEq( Loop ).AirConnectionType = ITEInletRoomAirModel;
 					ShowWarningError( RoutineName + CurrentModuleObject + "=\"" + AlphaName( 1 ) + "Air Inlet Connection Type = RoomAirModel is not implemented yet, using ZoneAirNode" );
 					ZoneITEq( Loop ).AirConnectionType = ITEInletZoneAirNode;
 				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + ": " + AlphaName( 1 ) );
+					ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
 					ShowContinueError( "Invalid " + cAlphaFieldNames( 10 ) + '=' + AlphaName( 10 ) );
 					ShowContinueError( "Valid entries are AdjustedSupply, ZoneAirNode, or RoomAirModel." );
 					ErrorsFound = true;
 				}
 				if ( lAlphaFieldBlanks( 13 ) ) {
 					if ( ZoneITEq( Loop ).AirConnectionType == ITEInletAdjustedSupply ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + ": " + AlphaName( 1 ) );
+						ShowSevereError( RoutineName + CurrentModuleObject + ": " + AlphaName( 1 ) );
 						ShowContinueError( "For " + cAlphaFieldNames( 10 ) + "= AdjustedSupply, " + cAlphaFieldNames( 13 ) + " is required, but this field is blank." );
 						ErrorsFound = true;
 					} else {
 						ZoneITEq( Loop ).SupplyAirNodeNum = 0;
 					}
 				} else {
-					ZoneITEq( Loop ).SupplyAirNodeNum = GetOnlySingleNode( cAlphaArgs( 13 ), ErrorsFound, cCurrentModuleObject, AlphaName( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
+					ZoneITEq( Loop ).SupplyAirNodeNum = GetOnlySingleNode( AlphaName( 13 ), ErrorsFound, CurrentModuleObject, AlphaName( 1 ), NodeType_Air, NodeConnectionType_Sensor, 1, ObjectIsNotParent );
 				}
 
 				// End-Use subcategories
@@ -3831,7 +3831,7 @@ namespace InternalHeatGains {
 
 			//Calcaulate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
 			UPSPartLoadRatio = ( CPUPower + FanPower ) / ZoneITEq( Loop ).DesignTotalPower;
-			UPSPower = ( CPUPower + FanPower ) * ( 1.0 - CurveValue( ZoneITEq( Loop ).UPSEfficFPLRCurve, UPSPartLoadRatio ) );
+			UPSPower = ( CPUPower + FanPower ) * ( 1.0 - ZoneITEq( Loop ).DesignUPSEfficiency * CurveValue( ZoneITEq( Loop ).UPSEfficFPLRCurve, UPSPartLoadRatio ) );
 			UPSHeatGain = UPSPower * ZoneITEq( Loop ).UPSLossToZoneFrac;
 
 			// Calculate air outlet conditions and convective heat gain to zone
@@ -3873,9 +3873,9 @@ namespace InternalHeatGains {
 			ZoneITEq( Loop ).FanConsumption = FanPower * TimeStepZone * SecInHour;
 			ZoneITEq( Loop ).UPSConsumption = UPSPower * TimeStepZone * SecInHour;
 			ZoneITEq( Loop ).CPUEnergyAtDesign = ZoneITEq( Loop ).CPUPowerAtDesign * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).FanEnergyAtDesign = ZoneITEq( Loop ).FanEnergyAtDesign * TimeStepZone * SecInHour;
+			ZoneITEq( Loop ).FanEnergyAtDesign = ZoneITEq( Loop ).FanPowerAtDesign * TimeStepZone * SecInHour;
 			ZoneITEq( Loop ).UPSGainEnergyToZone = UPSHeatGain * TimeStepZone * SecInHour;
-			ZoneITEq( Loop ).ConGainEnergyToZone = ZoneITEq( Loop ).ConGainEnergyToZone * TimeStepZone * SecInHour;
+			ZoneITEq( Loop ).ConGainEnergyToZone = ZoneITEq( Loop ).ConGainRateToZone * TimeStepZone * SecInHour;
 
 			ZnRpt( NZ ).ITEqCPUConsumption += ZoneITEq( Loop ).CPUConsumption;
 			ZnRpt( NZ ).ITEqFanConsumption += ZoneITEq( Loop ).FanConsumption;
