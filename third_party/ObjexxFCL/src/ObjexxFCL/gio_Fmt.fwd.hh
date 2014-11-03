@@ -16,7 +16,7 @@
 namespace ObjexxFCL {
 namespace gio {
 
-// Forward Declarations
+// Forward
 class Fmt;
 
 } // gio

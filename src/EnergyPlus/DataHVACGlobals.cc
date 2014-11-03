@@ -269,7 +269,7 @@ namespace DataHVACGlobals {
 	Real64 DXElecHeatingPower( 0.0 ); // Electric power consumed by DX heating coil last DX simulation
 	Real64 ElecHeatingCoilPower( 0.0 ); // Electric power consumed by electric heating coil
 	Real64 AirToAirHXElecPower( 0.0 ); // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
-	// from last simulation in HeatRecovery.f90
+	// from last simulation in HeatRecovery.cc
 	Real64 UnbalExhMassFlow( 0.0 ); // unbalanced zone exhaust from a zone equip component [kg/s]
 	Real64 BalancedExhMassFlow( 0.0 ); // balanced zone exhaust (declared as so by user)  [kg/s]
 	Real64 PlenumInducedMassFlow( 0.0 ); // secondary air mass flow rate induced from a return plenum [kg/s]
@@ -325,7 +325,7 @@ namespace DataHVACGlobals {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

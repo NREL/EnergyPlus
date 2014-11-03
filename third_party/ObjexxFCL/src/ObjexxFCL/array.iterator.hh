@@ -19,7 +19,7 @@
 namespace ObjexxFCL {
 
 // Begin Iterator for C Array
-template < typename T, std::size_t N >
+template< typename T, std::size_t N >
 inline
 T *
 begin( T (&array)[N] )
@@ -28,7 +28,7 @@ begin( T (&array)[N] )
 }
 
 // End Iterator for C Array
-template < typename T, std::size_t N >
+template< typename T, std::size_t N >
 inline
 T *
 end( T (&array)[N] )
