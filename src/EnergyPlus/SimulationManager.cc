@@ -429,7 +429,7 @@ namespace SimulationManager {
 				strip( DayOfSimChr );
 				if ( ! WarmupFlag ) {
 					++CurrentOverallSimDay;
-//					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); // Doesn't do anything!
+					DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); 
 				} else {
 					DayOfSimChr = "0";
 				}

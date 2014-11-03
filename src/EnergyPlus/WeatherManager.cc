@@ -576,7 +576,7 @@ namespace WeatherManager {
 					MaxNumberSimYears = max( MaxNumberSimYears, Environment( Loop ).NumSimYears );
 				}
 			}
-//			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); // Doesn't do anything!
+			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); 
 		}
 
 		CloseWeatherFile(); // will only close if opened.
