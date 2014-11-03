@@ -552,9 +552,9 @@ set_target_properties(EnergyPlusAPI PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 install( TARGETS EnergyPlus EnergyPlusAPI DESTINATION ./ )
 
 if( BUILD_TESTING )
+  # Build the test executable
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
   target_link_libraries( TestEnergyPlusCallbacks EnergyPlusAPI )
-  # Currently the TestEnergyPlusCallbacks runner does not exit. Give it an idf and supporting files so that it will run.
-  # add_test( NAME integration.TestEnergyPlusCallbacks COMMAND TestEnergyPlusCallbacks WORKING_DIRECTORY "${CMAKE_BINARY_DIR}" )
+  ADD_API_CALLBACK_TEST()
 endif()
 
