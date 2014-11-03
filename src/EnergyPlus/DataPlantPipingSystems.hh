@@ -1325,11 +1325,7 @@ namespace DataPlantPipingSystems {
 		int SlabMaterialNum;
 		Real64 SlabWidth;
 		Real64 SlabLength;
-		Real64 SlabThickness;
-		int BasementFloorMaterialNum; 
-		int BasementWallMaterialNum;
-		Real64 BasementFloorThickness;
-		Real64 BasementWallThickness;
+		Real64 SlabThickness; 
 		Real64 XIndex;
 		Real64 YIndex;
 		Real64 ZIndex;
@@ -1386,10 +1382,6 @@ namespace DataPlantPipingSystems {
 			SlabWidth( 0.0 ),
 			SlabLength( 0.0 ),
 			SlabThickness( 0.0 ),
-			BasementWallMaterialNum( 0 ),
-			BasementFloorMaterialNum( 0 ),
-			BasementWallThickness( 0.0 ),
-			BasementFloorThickness( 0.0 ),
 			XIndex( 0 ),
 			YIndex( 0 ),
 			ZIndex( 0 ),
@@ -1464,10 +1456,6 @@ namespace DataPlantPipingSystems {
 			Real64 const SlabWidth,
 			Real64 const SlabLength,
 			Real64 const SlabThickness,
-			int const BasementWallMaterialNum,
-			int const BasementFloorMaterialNum,
-			Real64 const BasementWallThickness,
-			Real64 const BasementFloorThickness,
 			Real64 const XIndex,
 			Real64 const YIndex,
 			Real64 const ZIndex,
@@ -1540,10 +1528,6 @@ namespace DataPlantPipingSystems {
 			SlabWidth( SlabWidth ),
 			SlabLength( SlabLength ),
 			SlabThickness( SlabThickness ),
-			BasementFloorMaterialNum( BasementFloorMaterialNum ),
-			BasementWallMaterialNum( BasementWallMaterialNum ),
-			BasementFloorThickness( BasementFloorThickness ),
-			BasementWallThickness( BasementWallThickness ),
 			XIndex( XIndex ),
 			YIndex( YIndex ),
 			ZIndex( ZIndex ),

@@ -1649,7 +1649,7 @@ namespace PlantPipingSystemsManager {
 				}
 			}
 			
-			CurIndex = 7;
+			CurIndex = 6;
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName = cAlphaArgs( CurIndex );
 			PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex = FindItemInList( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMName, OSCM.Name(), TotOSCM );
 			if ( PipingSystemDomains( DomainNum ).BasementZone.WallBoundaryOSCMIndex <= 0 ) {
@@ -1683,10 +1683,10 @@ namespace PlantPipingSystemsManager {
 
 			// set flag for horizontal insulation
 			//Check cAlphaArgs value
-			if ( SameString( cAlphaArgs( 4 ), "NO" ) ) {
+			if ( SameString( cAlphaArgs( 3 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = false;
 			}
-			else if ( SameString( cAlphaArgs( 4 ), "YES" ) ) {
+			else if ( SameString( cAlphaArgs( 3 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).HorizInsPresentFlag = true;
 			}
 			else {
@@ -1696,10 +1696,10 @@ namespace PlantPipingSystemsManager {
 
 			// Get horizontal insulation material properties
 			if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 5 );
-				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 5 ), Material.Name(), TotMaterials );
+				Domain( BasementCtr ).HorizInsMaterial = cAlphaArgs( 4 );
+				PipingSystemDomains( DomainNum ).HorizInsMaterialNum = FindItemInList( cAlphaArgs( 4 ), Material.Name(), TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).HorizInsMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 5 ) + "=" + cAlphaArgs( 5 ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 4 ) + "=" + cAlphaArgs( 4 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).HorizInsMaterial );
 					ErrorsFound = true;
 				}
@@ -1711,10 +1711,10 @@ namespace PlantPipingSystemsManager {
 				}
 
 				//Set flag for horizontal insulation extents
-				if ( SameString( cAlphaArgs( 6 ), "PERIMETER" ) ) {
+				if ( SameString( cAlphaArgs( 5 ), "PERIMETER" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = false;
 				}
-				else if ( SameString( cAlphaArgs( 6 ), "FULL" ) ) {
+				else if ( SameString( cAlphaArgs( 5 ), "FULL" ) ) {
 					PipingSystemDomains( DomainNum ).FullHorizInsPresent = true;
 				}
 				else {
@@ -1727,10 +1727,10 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// set flag for vertical insulation
-			if ( SameString( cAlphaArgs( 9 ), "NO" ) ) {
+			if ( SameString( cAlphaArgs( 7 ), "NO" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = false;
 			}
-			else if ( SameString( cAlphaArgs( 9 ), "YES" ) ) {
+			else if ( SameString( cAlphaArgs( 7 ), "YES" ) ) {
 				PipingSystemDomains( DomainNum ).VertInsPresentFlag = true;
 			}
 			else {
@@ -1740,10 +1740,10 @@ namespace PlantPipingSystemsManager {
 
 			// Get vertical insulation material properties
 			if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 10 );
-				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 10 ), Material.Name(), TotMaterials );
+				Domain( BasementCtr ).VertInsMaterial = cAlphaArgs( 8 );
+				PipingSystemDomains( DomainNum ).VertInsMaterialNum = FindItemInList( cAlphaArgs( 8 ), Material.Name(), TotMaterials );
 				if ( PipingSystemDomains( DomainNum ).VertInsMaterialNum == 0 ) {
-					ShowSevereError( "Invalid " + cAlphaFieldNames( 10 ) + "=" + cAlphaArgs( 10 ) );
+					ShowSevereError( "Invalid " + cAlphaFieldNames( 8 ) + "=" + cAlphaArgs( 8 ) );
 					ShowContinueError( "Found in " + Domain( BasementCtr ).VertInsMaterial );
 					ErrorsFound = true;
 				}
@@ -1759,10 +1759,10 @@ namespace PlantPipingSystemsManager {
 			}
 
 			// Set simulation interval flag
-			if ( SameString( cAlphaArgs( 11 ), "TIMESTEP" ) ) {
+			if ( SameString( cAlphaArgs( 9 ), "TIMESTEP" ) ) {
 				PipingSystemDomains( DomainNum ).SimTimestepFlag = true;
 			}
-			else if ( SameString( cAlphaArgs( 11 ), "HOURLY" ) ) {
+			else if ( SameString( cAlphaArgs( 9 ), "HOURLY" ) ) {
 				PipingSystemDomains( DomainNum ).SimHourlyFlag = true;
 			}
 			else {

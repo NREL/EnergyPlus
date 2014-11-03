@@ -1943,19 +1943,15 @@ Site:GroundDomain:Basement,
         \required-field
         \type object-list
         \object-list OSCMNames
-   A3,  \field Basement Floor Material Name
-        \required-field
-        \type object-list
-        \object-list MaterialName
-   A4,  \field Horizontal Insulation
+   A3,  \field Horizontal Insulation
         \type choice
         \key Yes
         \key No
         \note This field specifies the presence of insulation beneath the basement floor.
-   A5,  \field Horizontal Insulation Material Name
+   A4,  \field Horizontal Insulation Material Name
         \type object-list
         \object-list MaterialName
-   A6,  \field Horizontal Insulation Extents
+   A5,  \field Horizontal Insulation Extents
         \type choice
         \key Perimeter
         \key Full
@@ -1973,20 +1969,16 @@ Site:GroundDomain:Basement,
         \units m
         \minimum> 0.0
         \note Depth measured from ground surface.
-   A7,  \field Basement Wall Boundary Condition Model Name
+   A6,  \field Basement Wall Boundary Condition Model Name
         \required-field
         \type object-list
         \object-list OSCMNames
-   A8,  \field Basement Wall Material Name
-        \required-field
-        \type object-list
-        \object-list MaterialName
-   A9,  \field Vertical Insulation
+   A7,  \field Vertical Insulation
         \type choice
         \key Yes
         \key No
         \default No
-   A10, \field Basement Wall Vertical Insulation Material Name
+   A8, \field Basement Wall Vertical Insulation Material Name
         \type object-list
         \object-list MaterialName
    N15, \field Vertical Insulation Depth
@@ -1994,7 +1986,7 @@ Site:GroundDomain:Basement,
         \units m
         \minimum> 0.0
         \note Depth measured from the ground surface.
-   A11, \field Simulation Timestep
+   A9, \field Simulation Timestep
         \type choice
         \key Timestep
         \key Hourly
