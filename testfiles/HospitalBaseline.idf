@@ -64977,6 +64977,7 @@
     AUTOSIZE,                !- Reference Condenser Water Flow Rate {m3/s}
     CoolSys1 Chiller ClgCapFuncTempCurve,  !- Cooling Capacity Function of Temperature Curve Name
     CoolSys1 Chiller EirFuncTempCurve,  !- Electric Input to Cooling Output Ratio Function of Temperature Curve Name
+    ,                        !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Type
     CoolSys1 Chiller EirFuncPlrCurve,  !- Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
     0.15,                    !- Minimum Part Load Ratio
     1.0,                     !- Maximum Part Load Ratio
