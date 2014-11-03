@@ -1304,8 +1304,7 @@ namespace DataPlantPipingSystems {
 		MeshProperties Mesh;
 		BaseThermalPropertySet GroundProperties;
 		BaseThermalPropertySet SlabProperties;
-		BaseThermalPropertySet BasementFloorProperties;
-		BaseThermalPropertySet BasementWallProperties;
+		BaseThermalPropertySet BasementInterfaceProperties;
 		BaseThermalPropertySet HorizInsProperties;
 		BaseThermalPropertySet VertInsProperties;
 		SimulationControl SimControls;
@@ -1444,8 +1443,7 @@ namespace DataPlantPipingSystems {
 			MeshProperties const & Mesh,
 			BaseThermalPropertySet const & GroundProperties,
 			BaseThermalPropertySet const & SlabProperties,
-			BaseThermalPropertySet const & BasementFloorProperties,
-			BaseThermalPropertySet const & BasementWallProperties,
+			BaseThermalPropertySet const & BasementInterfaceProperties,
 			BaseThermalPropertySet const & HorizInsProperties,
 			BaseThermalPropertySet const & VertInsProperties,
 			SimulationControl const & SimControls,
@@ -1520,8 +1518,7 @@ namespace DataPlantPipingSystems {
 			Mesh( Mesh ),
 			GroundProperties( GroundProperties ),
 			SlabProperties( SlabProperties ),
-			BasementFloorProperties( BasementFloorProperties ),
-			BasementWallProperties( BasementWallProperties ),
+			BasementInterfaceProperties( BasementInterfaceProperties ),
 			HorizInsProperties( HorizInsProperties ),
 			VertInsProperties( VertInsProperties ),
 			SimControls( SimControls ),
