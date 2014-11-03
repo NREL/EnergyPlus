@@ -161,15 +161,6 @@ function( ADD_SIMULATION_TEST )
 
 endfunction()
 
-function( ADD_API_CALLBACK_TEST )
-  
-  add_test(NAME "integration.TestEnergyPlusCallbacks" COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR} -DBINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
-
-  SET_TESTS_PROPERTIES("integration.TestEnergyPlusCallbacks" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-  SET_TESTS_PROPERTIES("integration.TestEnergyPlusCallbacks" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
-
-endfunction()
-
 macro( ADD_CXX_DEFINITIONS NEWFLAGS )
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${NEWFLAGS}")
 endmacro()

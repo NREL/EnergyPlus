@@ -555,6 +555,14 @@ if( BUILD_TESTING )
   # Build the test executable
   add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
   target_link_libraries( TestEnergyPlusCallbacks EnergyPlusAPI )
-  ADD_API_CALLBACK_TEST()
+  add_test(NAME "integration.TestEnergyPlusCallbacks" 
+           COMMAND ${CMAKE_COMMAND} 
+           -DSOURCE_DIR=${CMAKE_SOURCE_DIR} 
+           -DBINARY_DIR=${CMAKE_BINARY_DIR} 
+           -DIDF_FILE=1ZoneUncontrolled.idf
+           -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
+           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
 endif()
 
