@@ -1456,7 +1456,7 @@ namespace PlantPipingSystemsManager {
 		bool IsNotOK;
 		bool BasementInputError;
 		Real64 ThisArea;
-
+		
 		struct GroundDomainData
 		{
 			// Members
@@ -1679,7 +1679,11 @@ namespace PlantPipingSystemsManager {
 			PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
 			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = rNumericArgs( 16 );
 			PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
-
+			
+			//Initialize properties for basement interface cells
+			PipingSystemDomains( DomainNum ).BasementInterfaceProperties.Conductivity = 500.0;
+			PipingSystemDomains( DomainNum ).BasementInterfaceProperties.SpecificHeat = 1.0;
+			PipingSystemDomains( DomainNum ).BasementInterfaceProperties.Density = 1.0;
 
 			// set flag for horizontal insulation
 			//Check cAlphaArgs value
@@ -6570,7 +6574,7 @@ namespace PlantPipingSystemsManager {
 		} else {
 			//Error
 		}}
-
+		
 		if ( ThisMesh.RegionMeshCount > 0 ) {
 			RetVal.allocate( {0,ThisMesh.RegionMeshCount - 1} );
 			RetMaxIndex = ThisMesh.RegionMeshCount - 1;
@@ -6611,10 +6615,10 @@ namespace PlantPipingSystemsManager {
 				CellWidth *= ThisMesh.GeometricSeriesCoefficient;
 				RetVal( I ) = CellWidth;
 			}
-			SubIndex = NumCellsOnEachSide;
+			SubIndex = NumCellsOnEachSide;  
 			for ( I = NumCellsOnEachSide - 1; I >= 0; --I ) {
-				++SubIndex;
 				RetVal( SubIndex ) = RetVal( I );
+				++SubIndex;  //SubIndex should be incremented here - After RetVal (SubIndex) is assigned a value. -SA
 			}
 
 		}
@@ -9117,11 +9121,10 @@ namespace PlantPipingSystemsManager {
 		Real64 Resistance;
 		int DirectionCtr;
 		int CurDirection;
-		static Real64 Dummy( 0.0 );
 		int TotalSegments;
 		int SegCtr2;
 		Real64 ThisCellTemp;
-
+				
 		//'initialize cell properties
 		for ( Z = lbound( PipingSystemDomains( DomainNum ).Cells, 3 ); Z <= ubound( PipingSystemDomains( DomainNum ).Cells, 3 ); ++Z ) {
 			for ( Y = lbound( PipingSystemDomains( DomainNum ).Cells, 2 ); Y <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ); ++Y ) {
@@ -9146,10 +9149,7 @@ namespace PlantPipingSystemsManager {
 					} else if ( ( SELECT_CASE_var == CellType_BasementWall ) || ( SELECT_CASE_var == CellType_BasementFloor ) || ( SELECT_CASE_var == CellType_BasementCorner ) ) {
 						if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ){
 							//Basement interface layer
-							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.Conductivity = 500.0;
-							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.SpecificHeat = 1.0;
-							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties.Density = 1.0;
-							
+							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).BasementInterfaceProperties;
 						} else{
 							//basement cells are partially ground, give them some props
 							PipingSystemDomains( DomainNum ).Cells( X, Y, Z ).MyBase.Properties = PipingSystemDomains( DomainNum ).GroundProperties;
