@@ -11288,9 +11288,9 @@ Label50: ;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int const DXSystem( 14 ); // must match SimAirServingZones.f90 (not public)
-		int const Fan_Simple_VAV( 3 ); // must match SimAirServingZones.f90 (not public)
-		int const UnitarySystem( 19 ); // must match SimAirServingZones.f90 (not public)
+		int const DXSystem( 14 ); // must match SimAirServingZones.cc (not public)
+		int const Fan_Simple_VAV( 3 ); // must match SimAirServingZones.cc (not public)
+		int const UnitarySystem( 19 ); // must match SimAirServingZones.cc (not public)
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12931,7 +12931,7 @@ Label50: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

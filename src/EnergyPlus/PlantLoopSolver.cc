@@ -34,7 +34,7 @@ namespace PlantLoopSolver {
 	// MODULE INFORMATION:
 	//       AUTHOR         B. Griffith,  Dan Fisher, Sankaranarayanan K P, Rich Liesen, Edwin Lee
 	//       DATE WRITTEN   Feb 2010
-	//         This file developed from PlantSupplySideSolvers.f90 by Sankaranarayanan K P, Rich Liesen, Dan Fisher
+	//         This file developed from PlantSupplySideSolvers.cc by Sankaranarayanan K P, Rich Liesen, Dan Fisher
 	//       MODIFIED       na
 	//       RE-ENGINEERED  Aug 2010 Edwin Lee
 
@@ -2961,7 +2961,7 @@ namespace PlantLoopSolver {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
