@@ -107,6 +107,11 @@ derivative works thereof, in binary and source code form.
 ///
 ///////////////////////////////////////////////////////
 #include <fcntl.h>
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 #include "utilSocket.h"
 #include "utilXml.h"
 // Global variable to check for FMUExport case
@@ -425,7 +430,7 @@ int getsocketportnumber(const char *const docname) {
 #endif
     return -1;
   }
-  if (0 == getxmlvalue((char*)docname, xPat, res, &i, BUFFER_LENGTH))
+  if (0 == getxmlvalue(docname, xPat, res, &i, BUFFER_LENGTH))
     retVal = atoi((char*)res);
   else
     retVal = -1;
@@ -456,7 +461,7 @@ int getmainversionnumber(){
 int getsockethost(const char *const docname, char *const hostname) {
   char *xPat = "//ipc/socket[@hostname]";
   int i;
-  int r = getxmlvalue((char*)docname, xPat, hostname, &i, BUFFER_LENGTH);
+  int r = getxmlvalue(docname, xPat, hostname, &i, BUFFER_LENGTH);
   return r;
 }
 
@@ -1171,11 +1176,5 @@ int closeipc(int* sockfd){
 #endif
 }
 
-
-int main( int argc, const char* argv[] )
-{
-  fprintf(stderr, "Calling establ...'\n");
-  //  establishclientsocket("socket.cfg");
-}
 
 

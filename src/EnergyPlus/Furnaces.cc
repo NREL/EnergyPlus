@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -280,7 +281,7 @@ namespace Furnaces {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int FurnaceNum; // Furnace number
 		static bool GetInputFlag( true ); // Logical to allow "GetInput" only once per simulation
-		Real64 HeatCoilLoad; // Zone heating coil load
+		Real64 HeatCoilLoad( 0.0 ); // Zone heating coil load
 		Real64 ReheatCoilLoad; // Load to be met by the reheat coil (if high humidity control)
 		Real64 ZoneLoad; // Control zone sensible load
 		Real64 MoistureLoad; // Control zone latent load
@@ -545,11 +546,14 @@ namespace Furnaces {
 				SimVariableSpeedHP( FurnaceNum, FirstHVACIteration, ZoneLoad, MoistureLoad, OnOffAirFlowRatio );
 
 			} else if ( Furnace( FurnaceNum ).WatertoAirHPType == WatertoAir_VarSpeedLooUpTable ) {
-
+				HeatCoilLoad = 0.0; // Added: Used below
+			} else {
+				assert( false ); //? If all possible states covered by if conditions change to HeatCoilLoad = 0.0;
 			}
 
 		} else {
 			// will never get here, all system types are simulated above
+			assert( false );
 
 		}}
 
@@ -9504,7 +9508,7 @@ namespace Furnaces {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

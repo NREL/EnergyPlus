@@ -61,7 +61,7 @@ namespace UnitHeater {
 	// REFERENCES:
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.3-31.8
 	// Rick Strand's unit heater module which was based upon Fred Buhl's fan coil
-	// module (FanCoilUnits.f90)
+	// module (FanCoilUnits.cc)
 
 	// OTHER NOTES: none
 
@@ -230,7 +230,7 @@ namespace UnitHeater {
 		// Standard EnergyPlus methodology.
 
 		// REFERENCES:
-		// Fred Buhl's fan coil module (FanCoilUnits.f90)
+		// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
@@ -1676,7 +1676,7 @@ namespace UnitHeater {
 		// na
 
 		// Return value
-		Real64 Residuum; // Result (force to 0)
+		Real64 Residuum( 0.0 ); // Result (force to 0)
 
 		// Argument array dimensioning
 
@@ -1732,7 +1732,7 @@ namespace UnitHeater {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

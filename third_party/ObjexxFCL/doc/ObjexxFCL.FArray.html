@@ -70,7 +70,7 @@
 				<li>Dynamic (run-time) sizing</li>
 				<li>Automatic dynamic sizing using <a href="ObjexxFCL.Dimension.html">Dimensions</a></li>
 			</ul>
-			<p class="body">The FArrays are not intended to be a complete numerical matrix class  library. A number of general purpose matrix libraries are available for C++ and Objexx Engineering can provide interfacing to those libraries. Objexx Engineering can also provide linear algebra functions and solvers for the FArray classes to meet project requirements.</p>
+			<p class="body">The FArrays are not intended to be a complete numerical matrix class library. A number of general purpose matrix libraries are available for C++ and Objexx Engineering can provide interfacing to those libraries. Objexx Engineering can also provide linear algebra functions and solvers for the FArray classes to meet project requirements.</p>
 			<p class="body">There are five types of FArrays:</p>
 			<ul class="body">
 				<li><a href="#Base_FArrays">Base FArrays</a> are the abstract base class for the three concrete FArray types.</li>
@@ -123,7 +123,7 @@ FArray2D_double B( 3, 3 );
 B = A;
 ...
 A += B;</pre></td>
-			  </tr>
+			</tr>
 			</table>
 			<p class="body">and the whole-array  assignment of any value that is assignment-compatible with the FArray's value type with the operators {=, +=, -=, *=, /=}:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
@@ -133,7 +133,7 @@ A += B;</pre></td>
 ...
 A = 123; // All elements set to 123
 A += 4.2; // Now elements are 127</pre></td>
-			  </tr>
+			</tr>
 			</table>
 			<p class="body">The FArray whole-array assignment operators are supported for value types that support those operators.</p>
 			<p>FArrays also support assignment of different dimensioned arrays of the same rank with the operator = functions:</p>
@@ -166,7 +166,7 @@ A[ 28 ] = 4.56;</pre></td>
 			<h3 class="h4">Construction</h3>
 			<p class="body">Real FArrays can be constructed in a number of ways. Default construction is not possible with Fortran 77 arrays but is for FArrays: </p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>FArray2D_int A; // Default constructed: Nothing allocated</pre></td>
 			  </tr>
 			</table>
@@ -269,14 +269,14 @@ C.redimension( B ); // C is now 5 x 5 with 3 x 3 portion preserved</pre></td>
 			<h3 class="h4">Construction</h3>
 			<p class="body">Proxy FArrays can be constructed in a number of ways. Default construction creates an undimensioned proxy FArray that is not attached to another FArray:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>FArray2P_int P; // Default constructed: Detached</pre></td>
 			  </tr>
 			</table>
 			<p class="body">Default-constructed proxy FArrays can be later attached and dimensioned  with <span class="source">attach</span> and <span class="source">dimension</span> calls as described below.</p>
 			<p class="body">Whole array construction attaches the proxy FArray to the whole source FArray: </p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>FArray2D_int A( 7, 7 );
 FArray1P_int P( A ); // 1-D view of A</pre></td>
 			  </tr>
@@ -327,7 +327,7 @@ P.attach( A( 3, 3, 2 ) ).dimension( 3, 3 ); // Slice of A</pre></td>
 			<h3 class="h4">Explicit Dimensioning</h3>
 			<p class="body">Proxy FArrays can be dynamically (re)sized via the <span class="source">dimension</span> member function using a syntax similar to their constructors:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>FArray3D_int A( 3, 3, 5 );
 FArray2P_int P( A( 1, 1, 2 ) );
 P.dimension( 3, 3 );
@@ -337,7 +337,7 @@ P.dimension( 3, 3 );
 			<p class="body">Dimensioning proxy FArrays only changes the perceived size of the proxys' view and doesn't cause reallocation of a data array, so no initializing variants of <span class="source">dimension</span> are provided. From the proxys' perspective the elements are reflowed in column-major order to fill the new dimensions, unlike a data-preserving <span class="source">redimension</span> call on a real FArray, which keeps elements in their original index positions as the dimensions change. Attempting to dimension a proxy FArray to a size that exceeds the actual size of the associated data array, if known, will trigger an assertion failure in debug builds.</p>
 			<p class="body">Proxy FArrays can also be dimensioned to match the dimensions of another array:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>FArray2D_float B( 3, 3 );
 
 FArray3D_int A( 3, 3, 5 );
@@ -348,7 +348,7 @@ P.dimension( B );
 			</table>
 			<p class="body">An assumed-size (upper-unbounded) dimension can be specified for the last dimension by using the <span class="source">ObjexxFCL::star</span> object: </p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>void f( FArray2P_int I )
 {
    I.dim( 100, star ); // Assumed-size
@@ -358,7 +358,7 @@ P.dimension( B );
 			<p><span class="body">The use of <span class="source">ObjexxFCL::star</span> for the last dimension is analogous to Fortran's assumed-size array dimensioning. If the actual array size is known then the last dimension will be set appropriately so that bounds errors can be caught by assertion failures in debug builds, but if an array element is passed by the fast method the last dimension will have an unbounded upper extent and the array size will be unbounded.</span></p>
 			<p><span class="body">The <span class="source">dim</span> function can be used to dimension a const proxy FArray, such as one created <i>via</i> a pass-by-value argument:</span></p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>void f( FArray2P_double const R )
 {
    R.dim( 3, 3 );
@@ -387,7 +387,7 @@ FArray2P_int const C( A ); // Can alter A's data but not proxy's state</pre>
 			<p class="body">Construction, assignment, attach/detach, explicit dimensioning and other functions are analogous to those of proxy FArrays. Index ranges are specified the same as for real and proxy FArrays except that StaticIndexRange is the index range type used by argument FArrays.</p>
 			<p class="body">Here is an example of a real FArray of three dimensions being passed to an argument FArray of two dimensions:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>void f( FArray2A_int A ) // Pass by value
 {
    A.dim( 10, 77 );
@@ -426,7 +426,7 @@ void g()
 			<h2 class="h3"><a name="Slice_FArrays" id="Slice_FArrays"></a>Slice FArrays</h2>
 			<p class="body">Slice FArrays are array proxies that present a slice of another array as an array of the same or lesser rank. A slice FArray is normally created by an indexing operation on an array where some or all of the indexes are index slices rather than scalar indexes. An index slice has a start index, an end index, and a stride, or step, value. Index slices are denoted with a <span class="source">{start,end,stride}</span> syntax:</p>
 			<table border="1" cellspacing="0" cellpadding="12">
-			<tr>
+			  <tr>
 				<td bgcolor="#F7F4F7"><pre>FArray2D_int A( 3, 3 ); // 2D array
 ...
 A( {1,3,2}, {1,3,2} ); // 2D 2x2 slice of A selecting indexes 1 and 3 in each dimension

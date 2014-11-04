@@ -517,6 +517,47 @@ namespace HeatBalanceManager {
 	}
 
 	void
+	SetPreConstructionInputParameters()
+	{
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Edwin Lee
+		//       DATE WRITTEN   October 2014
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine sets parameters that need to be established before any heat balance inputs are read
+
+		int NumAlpha;
+		int NumNumber;
+		int IOStat;
+
+		// Get all the construction objects to determine the max layers and use this as the value for DataHeatBalance::MaxSolidWinLayers
+		// The variable MaxSolidWinLayers is initialized to zero to immediately catch any issues with timing of this routine
+
+		// start by setting this to 5; it will satisfy the regular window constructions (Construction) and the Window5 files (Construction:WindowDataFile)
+		MaxSolidWinLayers = 7;
+
+		// Construction:ComplexFenestrationState have a limit of 10 layers, so set it up to 10 if they are present
+		if ( GetNumObjectsFound( "Construction:ComplexFenestrationState" ) > 0 ) {
+			MaxSolidWinLayers = max( MaxSolidWinLayers, 10 );
+		}
+
+		// then process the rest of the relevant constructions
+		std::string constructName( "Construction:WindowEquivalentLayer" );
+		int numConstructions( GetNumObjectsFound( constructName ) );
+		for ( int constructionNum = 1; constructionNum <= numConstructions; ++ constructionNum ) {
+			GetObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			int numLayersInThisConstruct( NumAlpha - 1 );
+			MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
+		}
+		
+		// construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor, Construction:InternalSource
+		
+
+	}
+
+	void
 	GetProjectControlData( bool & ErrorsFound ) // Set to true if errors detected during getting data
 	{
 
@@ -885,7 +926,7 @@ namespace HeatBalanceManager {
 		HeatTransferAlgosUsed( 1 ) = OverallHeatTransferSolutionAlgo;
 
 		// algorithm input checks now deferred until surface properties are read in,
-		//  moved to SurfaceGeometry.f90 routine GetSurfaceHeatTransferAlgorithmOverrides
+		//  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
 		gio::write( OutputFileInits, Format_724 );
 
@@ -1060,10 +1101,10 @@ namespace HeatBalanceManager {
 
 		gio::write(OutputFileInits, Format_732);
 		if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-			gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1);
+			gio::write(OutputFileInits, Format_733) << "Yes";
 		}
 		else {
-			gio::write(OutputFileInits, Format_733) << "No" << "N/A";
+			gio::write(OutputFileInits, Format_733) << "No";
 		}
 
 	}
@@ -8064,7 +8105,7 @@ Label1000: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

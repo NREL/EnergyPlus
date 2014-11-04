@@ -1049,9 +1049,9 @@ isize( MArray< A, T > const & a )
 	return static_cast< int >( size( a ) );
 }
 
-template< template< class, typename > class ArrayType, class A, typename T >
+template< template< class, typename > class ArrayType, class A, typename T, class = typename std::enable_if< std::is_base_of< MArray< A, T >, ArrayType< A, T > >::value >::type >
 inline
-typename std::enable_if< std::is_base_of< MArray< A, T >, ArrayType< A, T > >::value, int >::type // Restrict to MArray
+int
 isize( ArrayType< A, T > const & a, int const dim )
 {
 	return static_cast< int >( size( a, dim ) );

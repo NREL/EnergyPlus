@@ -1,0 +1,171 @@
+#!/bin/bash
+#====================================================================
+# Runs EPMacro (macro preprocessor for EnergyPlus input files)
+#
+# This script needs the environment variable ENERGYPLUS_DIR to be
+# set to the root directory of EnergyPlus.
+#
+# April 28, 2003, Linda@Lawrie.com
+# modified March 29, 2009, kyle.benne@nrel.gov
+# Added support to find ENERGYPLUS_DIR if unset by user
+#====================================================================
+
+HEADER="=============== EPMacro ================="
+# Name of executable
+PRG_N=EPMacro
+# Input path
+INP_P=`pwd`
+# Output path
+OUT_P=$INP_P
+# output/input file names
+LINK_NAMES="in.imf out.idf audit.out"
+
+# function to set ENERGYPLUS_DIR relative to this script
+function SetEnergyPlusDir() {
+  unamestr=`uname`
+  if [ "$unamestr" == 'Darwin' ]; then
+    ENERGYPLUS_DIR="/usr"
+  else
+    U_DIR=`pwd`
+    if [ -n "`readlink "$0"`" ]; then
+      S_DIR=$(cd "$(dirname "$(readlink "$0")")"; pwd)
+      cd "$U_DIR"
+    else
+      S_DIR=$(cd "$(dirname "$0")"; pwd)
+      cd "$U_DIR"
+    fi
+    ENERGYPLUS_DIR=`dirname "$S_DIR"`
+  fi
+}
+
+# Check for user set ENERGYPLUS_DIR
+auto_eplus_dir=true
+if [ -n "$ENERGYPLUS_DIR" ]; then
+  auto_eplus_dir=false
+fi
+
+# Set the ENERGYPLUS_DIR 
+if $auto_eplus_dir; then
+  SetEnergyPlusDir
+fi
+
+# ==========================================================
+function Usage() {
+  echo "Usage:  runepmacro InputFileName"
+  echo "   or:  runepmacro --clean (or -c)"
+  echo "   or:  runepmacro --help (or -h)"
+  echo ""
+  echo "Runs EPMacro program."
+  echo ""
+  echo "InputFileName does not have a file extension."
+  echo ""
+  echo " --clean, or -c    deletes all output files in the current directory"
+  echo " --help, or -h     displays this help"
+}
+# ==========================================================
+function CleanOutputFiles() {
+  # delete files
+  # delete links
+  for files in $LINK_NAMES;
+  do
+    if [ -L $files ]; then
+      rm $files
+    fi
+  done
+  echo "Deleted output files";
+}
+# ==========================================================
+function ExitWithError() {
+  echo "===== EnergyPlus terminated with error ====="
+  exit 1
+}
+# ==========================================================
+if [ "$1" = ""  ]; then
+  Usage ; exit 0;
+fi
+
+if [ "$1" = "--help" ]; then
+  Usage ; exit 0;
+fi
+
+if [ "$1" = "-h" ]; then
+  Usage ; exit 0;
+fi
+
+# ==========================================================
+if [ "$ENERGYPLUS_DIR" = "" ]; then
+  echo "$HEADER";
+  echo "To use EnergyPlus, you need to set the";
+  echo "environment variable ENERGYPLUS_DIR to";
+  echo "the root directory of EnergyPlus.";
+  ExitWithError;
+fi
+
+# ==========================================================
+# Clean output files only
+if [ $1 = --clean ]; then
+  CleanOutputFiles ; exit 0;
+fi
+
+if [ $1 = -c ]; then
+  CleanOutputFiles ; exit 0;
+fi
+
+# ==========================================================
+# Prepare to run EPMacro
+# Check for imf file
+if [ ! -f $INP_P/$1.imf ]; then
+  echo "$HEADER"
+  echo "First argument must the input file name,"
+  echo "did not find $INP_P/$1.imf"
+  echo ""
+  Usage
+  ExitWithError
+fi
+
+# ==========================================================
+echo "$HEADER"
+echo "   Input file  : $1.imf"
+
+# ==========================================================
+# Delete all output files
+for filename in $LINK_NAMES;
+do
+  rm -f $filename
+done
+
+# ==========================================================
+# Make links
+ln -s $INP_P/$1.imf in.imf
+
+# ==========================================================
+# Start energyplus
+if $auto_eplus_dir; then
+  $ENERGYPLUS_DIR/bin/$PRG_N
+else
+  $ENERGYPLUS_DIR/$PRG_N
+fi
+
+# ==========================================================
+# Move output files (except inp, since it is only a symlink)
+
+if [ -f audit.out ]; then
+  mv audit.out $1.epmdet
+fi
+
+if [ -f out.idf ]; then
+  mv out.idf $1.epmidf
+fi
+
+# Delete additional files
+for filename in $LINK_NAMES;
+do
+  if [ -f $filename ]; then
+    rm $filename
+  fi
+done
+
+#====================================================================
+# Check for error
+#
+# Not implemented for EPMacro

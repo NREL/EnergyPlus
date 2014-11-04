@@ -40,28 +40,27 @@ public: // Creation
 	inline
 	explicit
 	Print( std::string const & fmt = "*" ) :
-		pos_( 0 ),
-		format_( FormatFactory::create( fmt ) ),
-		reverts_( 0 )
+	 pos_( 0 ),
+	 format_( FormatFactory::create( fmt ) ),
+	 reverts_( 0 )
 	{}
 
 	// Format Wrapper Constructor
 	inline
 	explicit
 	Print( gio::Fmt const & fmt ) :
-		pos_( 0 ),
-		format_( fmt.format_clone() ),
-		reverts_( 0 )
+	 pos_( 0 ),
+	 format_( fmt.format_clone() ),
+	 reverts_( 0 )
 	{}
 
 	// Move Constructor
 	inline
 	Print( Print && p ) :
-		//stream_( std::move( p.stream_ ) ),
-		stream_( p.stream_.str() ), // Initialize with contents until compilers have stream move constructors
-		pos_( p.pos_ ),
-		format_( p.format_ ),
-		reverts_( p.reverts_ )
+	 stream_( p.stream_.str() ), // Initialize with contents until compilers have stream move constructors: stream_( std::move( p.stream_ ) ),
+	 pos_( p.pos_ ),
+	 format_( p.format_ ),
+	 reverts_( p.reverts_ )
 	{}
 
 	// Destructor

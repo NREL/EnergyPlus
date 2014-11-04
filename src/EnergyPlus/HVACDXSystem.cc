@@ -1014,7 +1014,7 @@ namespace HVACDXSystem {
 						//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//           do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//           run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
@@ -1266,7 +1266,7 @@ namespace HVACDXSystem {
 						//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//           do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc * 2.0 ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//           run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc * 2.0 ) {
@@ -1640,7 +1640,7 @@ namespace HVACDXSystem {
 						//            IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//            do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//            If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//            run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
@@ -1835,7 +1835,7 @@ namespace HVACDXSystem {
 						//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 						//           do not run the compressor
 						if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-							PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+							//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 							//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 							//           run the compressor at PartLoadFrac = 1.
 						} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
@@ -2017,7 +2017,7 @@ namespace HVACDXSystem {
 							//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 							//           do not run the compressor
 							if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-								PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+								//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 								//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 								//           run the compressor at PartLoadFrac = 1.
 							} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc ) {
@@ -3300,7 +3300,7 @@ namespace HVACDXSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

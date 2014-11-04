@@ -693,7 +693,7 @@ namespace ExternalInterface {
 						// generate vectors here first
 						std::vector<unsigned int> valueReferenceVec;
 						std::vector<Real64> realVarValueVec;
-						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); ++x ) {
 							valueReferenceVec.push_back( FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).ValueReference );
 							realVarValueVec.push_back( FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).RealVarValue );
 						}
@@ -701,7 +701,7 @@ namespace ExternalInterface {
 						// pass in the vectors as pointers to the first member of the vector
 						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec[0], &realVarValueVec[0], &FMU( i ).Instance( j ).NumOutputVariablesSchedule, &FMU( i ).Instance( j ).Index );
 						
-						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableSchedule ); ++x ) {
 							FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).ValueReference = valueReferenceVec[x-1];
 							FMU( i ).Instance( j ).fmuOutputVariableSchedule( x ).RealVarValue = realVarValueVec[x-1];
 						}
@@ -721,7 +721,7 @@ namespace ExternalInterface {
 						
 						std::vector<unsigned int> valueReferenceVec2;
 						std::vector<Real64> realVarValueVec2;
-						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); ++x ) {
 							valueReferenceVec2.push_back( FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).ValueReference );
 							realVarValueVec2.push_back( FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).RealVarValue );
 						}
@@ -729,7 +729,7 @@ namespace ExternalInterface {
 						// pass in the vectors as pointers to the first member of the vector
 						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec2[0], &realVarValueVec2[0], &FMU( i ).Instance( j ).NumOutputVariablesVariable, &FMU( i ).Instance( j ).Index );
 
-						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableVariable ); ++x ) {
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).ValueReference = valueReferenceVec2[x-1];
 							FMU( i ).Instance( j ).fmuOutputVariableVariable( x ).RealVarValue = realVarValueVec2[x-1];
 						}
@@ -749,7 +749,7 @@ namespace ExternalInterface {
 						// generate vectors here first
 						std::vector<unsigned int> valueReferenceVec3;
 						std::vector<Real64> realVarValueVec3;
-						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); ++x ) {
 							valueReferenceVec3.push_back( FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).ValueReference );
 							realVarValueVec3.push_back( FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).RealVarValue );
 						}
@@ -757,7 +757,7 @@ namespace ExternalInterface {
 						// pass in the vectors as pointers to the first member of the vector
 						FMU( i ).Instance( j ).fmistatus = fmiEPlusGetReal ( &FMU( i ).Instance( j ).fmicomponent, &valueReferenceVec3[0], &realVarValueVec3[0], &FMU( i ).Instance( j ).NumOutputVariablesActuator, &FMU( i ).Instance( j ).Index );
 
-						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuOutputVariableActuator ); ++x ) {
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).ValueReference = valueReferenceVec3[x-1];
 							FMU( i ).Instance( j ).fmuOutputVariableActuator( x ).RealVarValue = realVarValueVec3[x-1];
 						}
@@ -805,12 +805,12 @@ namespace ExternalInterface {
 					
 					// generate vectors here first
 					std::vector<unsigned int> valueReferenceVec4;
-					for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
+					for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); ++x ) {
 						valueReferenceVec4.push_back( FMU( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
 					}
 					
 					std::vector<Real64> rtsValueVec4;
-					for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+					for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); ++x ) {
 						rtsValueVec4.push_back( FMU( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
 					}
 					
@@ -1832,12 +1832,12 @@ namespace ExternalInterface {
 						for ( j = 1; j <= FMU( i ).NumInstances; ++j ) {
 							
 							std::vector< unsigned int > valRefVec;
-							for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); x++ ) {
+							for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).fmuInputVariable ); ++x ) {
 								valRefVec.push_back( FMU( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
 							}
 							
 							std::vector< Real64 > rtsValVec;
-							for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+							for ( unsigned long x = 1; x <= size( FMU( i ).Instance( j ).eplusOutputVariable ); ++x ) {
 								rtsValVec.push_back( FMU( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
 							}
 							
@@ -1884,11 +1884,11 @@ namespace ExternalInterface {
 						
 						// make vectors first
 						std::vector< unsigned int > valRefVec;
-						for ( unsigned long x = 1; x <= size( FMUTemp( i ).Instance( j ).fmuInputVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMUTemp( i ).Instance( j ).fmuInputVariable ); ++x ) {
 							valRefVec.push_back( FMUTemp( i ).Instance( j ).fmuInputVariable( x ).ValueReference );
 						}
 						std::vector< Real64 > rtsValVec;
-						for ( unsigned long x = 1; x <= size( FMUTemp( i ).Instance( j ).eplusOutputVariable ); x++ ) {
+						for ( unsigned long x = 1; x <= size( FMUTemp( i ).Instance( j ).eplusOutputVariable ); ++x ) {
 							rtsValVec.push_back( FMUTemp( i ).Instance( j ).eplusOutputVariable( x ).RTSValue );
 						}
 						
@@ -2288,7 +2288,7 @@ namespace ExternalInterface {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

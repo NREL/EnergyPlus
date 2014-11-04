@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -4026,7 +4027,7 @@ namespace EconomicTariff {
 		FArray1D< Real64 > offsetVals( MaxNumMonths );
 		FArray1D< Real64 > seasonFromMask( MaxNumMonths );
 		FArray1D< Real64 > seasonToMask( MaxNumMonths );
-		bool isMonthly;
+		bool isMonthly( false );
 		FArray1D< Real64 > adjSeasonal( MaxNumMonths );
 		FArray1D< Real64 > adjPeak( MaxNumMonths );
 		FArray1D< Real64 > maxAdjBase( MaxNumMonths );
@@ -4083,6 +4084,8 @@ namespace EconomicTariff {
 		} else if ( SELECT_CASE_var == seasonMonthly ) {
 			seasonFromMask = 1.0; //all months are 1
 			isMonthly = true;
+		} else {
+			assert( false );
 		}}
 		// find proper season to mask
 		{ auto const SELECT_CASE_var( ratchet( indexInChg ).seasonTo );
@@ -5757,7 +5760,7 @@ namespace EconomicTariff {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

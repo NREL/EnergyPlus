@@ -2241,7 +2241,7 @@ namespace WindowManager {
 			// Reset hcin if necessary since too small a value sometimes causes non-convergence
 			// of window layer heat balance solution.
 			if ( surface.IntConvCoeff == 0 ) {
-				if ( hcin <= LowHConvLimit ) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.f90
+				if ( hcin <= LowHConvLimit ) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
 					//  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
 					hcin = LowHConvLimit;
 					HConvIn( SurfNum ) = hcin; // store for accurate reporting.
@@ -4437,9 +4437,9 @@ namespace WindowManager {
 		static FArray1D< Real64 > kdpdown( 10 );
 		Real64 kmix; // For accumulating conductance of gas mixture
 		Real64 mumix; // For accumulating viscosity of gas mixture
-		Real64 visc; // Dynamic viscosity of mixture at tmean (g/m-s)
-		Real64 cp; // Specific heat of mixture at tmean (J/m3-K)
-		Real64 dens; // Density of mixture at tmean (kg/m3)
+		Real64 visc( 0.0 ); // Dynamic viscosity of mixture at tmean (g/m-s)
+		Real64 cp( 0.0 ); // Specific heat of mixture at tmean (J/m3-K)
+		Real64 dens( 0.0 ); // Density of mixture at tmean (kg/m3)
 		Real64 cpmixm; // Gives cp when divided by molmix
 		Real64 phimup; // Numerator factor
 		Real64 downer; // Denominator factor
@@ -4535,6 +4535,8 @@ namespace WindowManager {
 			dens = rhomix;
 			cp = cpmixm / molmix;
 
+		} else {
+			assert( false );
 		} // End of check if single or multiple gases in gap
 
 		pr = cp * visc / con;
@@ -5022,8 +5024,8 @@ namespace WindowManager {
 		Real64 ReflectCurveFH; // average of curves F and H
 		Real64 TransCurveBDCD; // average of curves B, D, C, and D (again)
 		Real64 ReflectCurveBDCD; // average of curves B, D, C, and D (again)
-		Real64 TransTmp; // temporary value for normalized transmission (carry out of if blocks)
-		Real64 ReflectTmp; // temporary value for normalized reflectance (carry out of if blocks)
+		Real64 TransTmp( 0.0 ); // temporary value for normalized transmission (carry out of if blocks)
+		Real64 ReflectTmp( 0.0 ); // temporary value for normalized reflectance (carry out of if blocks)
 		Real64 testval; // temporary value for calculations
 		Real64 tmp1; // temporary value for calculations
 		Real64 tmp2; // temporary value for calculations
@@ -5248,7 +5250,11 @@ namespace WindowManager {
 					TransTmp = TransCurveD;
 					ReflectTmp = ReflectCurveD;
 
+				} else {
+					assert( false );
 				}
+			} else {
+				assert( false );
 			}
 
 			if ( cs == 1.0 ) { // at 0 deg incident, TransTmp should be 1.0
@@ -8872,7 +8878,7 @@ Label99999: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

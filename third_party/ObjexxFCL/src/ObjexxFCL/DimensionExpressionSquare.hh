@@ -32,8 +32,8 @@ public: // Creation
 	// Copy Constructor
 	inline
 	DimensionExpressionSquare( DimensionExpressionSquare const & exp ) :
-		Super(),
-		exp_p_( exp.exp_p_ ? exp.exp_p_->clone() : static_cast< DimensionExpression * >( 0 ) )
+	 Super(),
+	 exp_p_( exp.exp_p_ ? exp.exp_p_->clone() : static_cast< DimensionExpression * >( 0 ) )
 	{
 		assert( exp_p_ );
 	}
@@ -41,7 +41,7 @@ public: // Creation
 	// Expression Constructor
 	inline
 	DimensionExpressionSquare( DimensionExpression const & exp ) :
-		exp_p_( exp.clone() )
+	 exp_p_( exp.clone() )
 	{
 		assert( exp_p_ );
 	}
@@ -49,7 +49,7 @@ public: // Creation
 	// Expression Pointer Constructor (Ownership Transfer)
 	inline
 	DimensionExpressionSquare( DimensionExpression * exp_p ) :
-		exp_p_( exp_p )
+	 exp_p_( exp_p )
 	{
 		assert( exp_p_ );
 	}

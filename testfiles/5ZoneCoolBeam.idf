@@ -2400,7 +2400,7 @@
     SPACE1-1 HW Coil Water Out Node,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
@@ -2412,7 +2412,7 @@
     SPACE2-1 HW Coil Water Out Node,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
@@ -2424,7 +2424,7 @@
     SPACE3-1 HW Coil Water Out Node,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
@@ -2436,7 +2436,7 @@
     SPACE4-1 HW Coil Water Out Node,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
@@ -2448,7 +2448,7 @@
     SPACE5-1 HW Coil Water Out Node,  !- Outlet Node Name
     HeatingDesignCapacity,   !- Heating Design Capacity Method
     Autosize,                !- Heating Design Capacity {W}
-    ,                        !- Heating Design Capacity Per Floor Area
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
     ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize;                !- Maximum Water Flow Rate {m3/s}
