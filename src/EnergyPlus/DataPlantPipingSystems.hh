@@ -1357,6 +1357,9 @@ namespace DataPlantPipingSystems {
 		Real64 ZoneCoupledSurfaceTemp;
 		Real64 BasementWallTemp;
 		Real64 BasementFloorTemp;
+		int NumDomainCells;
+		int NumGroundSurfCells;
+		int NumInsulationCells;
 
 		// Main 3D cells array
 		FArray3D< CartesianCell > Cells;
@@ -1412,7 +1415,10 @@ namespace DataPlantPipingSystems {
 			SimHourlyFlag( false ),
 			ZoneCoupledSurfaceTemp( 0.0 ),
 			BasementWallTemp( 0.0 ),
-			BasementFloorTemp( 0.0 )
+			BasementFloorTemp( 0.0 ),
+			NumDomainCells ( 0 ),
+			NumGroundSurfCells( 0 ),
+			NumInsulationCells( 0 )
 
 		{}
 
@@ -1486,6 +1492,9 @@ namespace DataPlantPipingSystems {
 			Real64 ZoneCoupledSurfaceTemp,
 			Real64 BasementWallTemp,
 			Real64 BasementFloorTemp,
+			int const NumDomainCells,
+			int const NumGroundSurfCells,
+			int const NumInsulationCells,
 
 			FArray3< CartesianCell > const & Cells			
 		) :
@@ -1557,6 +1566,9 @@ namespace DataPlantPipingSystems {
 			ZoneCoupledSurfaceTemp( ZoneCoupledSurfaceTemp ),
 			BasementWallTemp( BasementWallTemp ),
 			BasementFloorTemp( BasementFloorTemp ),
+			NumDomainCells( NumDomainCells ),
+			NumGroundSurfCells( NumGroundSurfCells ),
+			NumInsulationCells( NumInsulationCells ),
 			Cells( Cells )
 		{}
 
