@@ -22,7 +22,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class byte;
 class ubyte;
 

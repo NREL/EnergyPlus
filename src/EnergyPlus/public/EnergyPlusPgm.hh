@@ -1,12 +1,10 @@
-#ifndef main_hh_INCLUDED
-#define main_hh_INCLUDED
+#ifndef EnergyPlusPgm_hh_INCLUDED
+#define EnergyPlusPgm_hh_INCLUDED
+
+#include <EnergyPlusAPI.hh>
 
 // C++ Headers
 #include <string>
-
-// EnergyPlus Headers
-#include <EnergyPlus.hh>
-
 
 	// Functions
 
@@ -21,5 +19,13 @@
 		std::string & DataOut // Output from the retrieval
 	);
 
+	void ENERGYPLUSLIB_API
+	EnergyPlusPgm( std::string filepath = std::string() );
+
+	void ENERGYPLUSLIB_API
+	StoreProgressCallback( void ( *f )( int ) );
+
+	void ENERGYPLUSLIB_API
+	StoreMessageCallback( void ( *f )( std::string ) );
 
 #endif

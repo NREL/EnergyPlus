@@ -12,5 +12,9 @@ SET(SRC
   sqlite3.c
 ) 
 
+if (UNIX)
+  ADD_DEFINITIONS( " -fPIC " )
+endif()
+
 ADD_LIBRARY( sqlite ${SRC} )
 

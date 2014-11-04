@@ -28,7 +28,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Fstring;
 class IOFlags;
 
@@ -351,6 +351,12 @@ print( Fmt const & fmt );
 // Print to stdout with List-Directed Format
 Print
 print();
+
+// Flush /////
+
+// Flush
+void
+flush( Unit const unit );
 
 // Inquire /////
 
