@@ -98,6 +98,12 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES("${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM)
 
+if( BUILD_TESTING )
+  option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
+  enable_testing()
+  include(CTest)
+endif()
+
 # E+ required libraries
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
@@ -114,9 +120,6 @@ ENDIF()
 ADD_SUBDIRECTORY(src/EnergyPlus)
 
 if( BUILD_TESTING )
-  option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
-  enable_testing()
-  include(CTest)
   ADD_SUBDIRECTORY(third_party/gtest)
   ADD_SUBDIRECTORY(testfiles)
   ADD_SUBDIRECTORY(tst/EnergyPlus/unit)
