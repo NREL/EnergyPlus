@@ -1,5 +1,8 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
+# public API headers go in the src/EnergyPlus/public folder
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
+
 if(MSVC)
 #  add_definitions(/Za)
 endif()
@@ -520,15 +523,51 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
-ADD_LIBRARY(energypluslib STATIC ${SRC})
-ADD_EXECUTABLE(energyplus main.cc main.hh)
+# first we will create a static library of EnergyPlus
+# this will be linked statically to create the DLL and also the unit tests
+add_library( energypluslib STATIC ${SRC} )
+target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( energypluslib dl )
+endif()
 
-TARGET_LINK_LIBRARIES( energyplus energypluslib objexx sqlite bcvtb epexpat epfmiimport DElight)
+# second we will create the shared library that is actually packaged with EnergyPlus
+add_library( energyplusapi SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+if (UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
+target_link_libraries( energyplusapi energypluslib )
+set_target_properties(
+  energyplusapi
+  PROPERTIES
+  INSTALL_NAME_DIR "@executable_path"
+)
+install( TARGETS energyplusapi 
+  RUNTIME DESTINATION ./ 
+  LIBRARY DESTINATION ./ 
+)
 
-if(CMAKE_HOST_UNIX)
-  if(NOT APPLE)
-    TARGET_LINK_LIBRARIES( energyplus dl )
-  endif()
+add_executable( energyplus main.cc )
+target_link_libraries( energyplus energyplusapi )
+
+set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+
+install( TARGETS energyplus energyplusapi DESTINATION ./ )
+
+if( BUILD_TESTING )
+  # Build the test executable
+  add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
+  target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
+  add_test(NAME "integration.TestEnergyPlusCallbacks" 
+           COMMAND ${CMAKE_COMMAND} 
+           -DSOURCE_DIR=${CMAKE_SOURCE_DIR} 
+           -DBINARY_DIR=${CMAKE_BINARY_DIR} 
+           -DIDF_FILE=1ZoneUncontrolled.idf
+           -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
+           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -536,5 +575,3 @@ if(UNIX AND NOT APPLE)
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
   COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus") 
 endif()
-
-INSTALL( TARGETS energyplus DESTINATION ./ )

@@ -49,7 +49,7 @@ protected: // Creation
 	inline
 	explicit
 	Stream( Name name = Name() ) :
-		name_( stripped_whitespace( name ) )
+	 name_( stripped_whitespace( name ) )
 	{
 		flags_.name( name_ );
 	}
@@ -57,8 +57,8 @@ protected: // Creation
 	// Name + Flags Constructor
 	inline
 	Stream( Name name, IOFlags flags ) :
-		name_( stripped_whitespace( name ) ),
-		flags_( flags )
+	 name_( stripped_whitespace( name ) ),
+	 flags_( flags )
 	{
 		flags_.name( name_ );
 	}
@@ -304,8 +304,8 @@ public: // Creation
 	inline
 	explicit
 	IStream( std::istream & stream, Name const & name = Name() ) :
-		Stream( name ),
-		stream_( stream )
+	 Stream( name ),
+	 stream_( stream )
 	{}
 
 	// Destructor
@@ -447,8 +447,8 @@ public: // Creation
 	inline
 	explicit
 	OStream( std::ostream & stream, Name const & name = Name() ) :
-		Stream( name ),
-		stream_( stream )
+	 Stream( name ),
+	 stream_( stream )
 	{
 		flags().ter_lf();
 	}
@@ -592,8 +592,8 @@ public: // Creation
 	inline
 	explicit
 	IOStream( std::iostream & stream, Name const & name = Name() ) :
-		Stream( name ),
-		stream_( stream )
+	 Stream( name ),
+	 stream_( stream )
 	{
 		flags().ter_lf();
 	}
@@ -738,7 +738,7 @@ public: // Creation
 	inline
 	explicit
 	IStringStream( std::string const & s = std::string() ) :
-		stream_( s )
+	 stream_( s )
 	{}
 
 	// Destructor
@@ -873,7 +873,7 @@ public: // Creation
 	inline
 	explicit
 	OStringStream( std::string const & s = std::string() ) :
-		stream_( s )
+	 stream_( s )
 	{
 		flags().ter_lf();
 	}
@@ -1010,7 +1010,7 @@ public: // Creation
 	inline
 	explicit
 	StringStream( Name const & name = Name() ) :
-		Stream( name )
+	 Stream( name )
 	{
 		flags().ter_lf();
 	}
@@ -1148,7 +1148,7 @@ public: // Creation
 	inline
 	explicit
 	IFileStream( Name const & name ) :
-		Stream( name )
+	 Stream( name )
 	{
 		assert( ! name.empty() );
 		if ( ! name.empty() ) stream_.open( name, mode() );
@@ -1157,7 +1157,7 @@ public: // Creation
 	// Name + Flags Constructor
 	inline
 	IFileStream( Name const & name, IOFlags const & flags ) :
-		Stream( name, flags )
+	 Stream( name, flags )
 	{
 		assert( ! name.empty() );
 		assert( ! flags.scratch() );
@@ -1343,7 +1343,7 @@ public: // Creation
 	inline
 	explicit
 	OFileStream( Name const & name ) :
-		Stream( name )
+	 Stream( name )
 	{
 		assert( ! name.empty() );
 		open_file();
@@ -1352,7 +1352,7 @@ public: // Creation
 	// Name + Flags Constructor
 	inline
 	OFileStream( Name const & name, IOFlags const & flags ) :
-		Stream( name, flags )
+	 Stream( name, flags )
 	{
 		assert( ! name.empty() );
 		open_file();
@@ -1552,7 +1552,7 @@ public: // Creation
 	inline
 	explicit
 	FileStream( Name const & name ) :
-		Stream( name )
+	 Stream( name )
 	{
 		assert( ! name.empty() );
 		open_file();
@@ -1561,7 +1561,7 @@ public: // Creation
 	// Name + Flags Constructor
 	inline
 	FileStream( Name const & name, IOFlags const & flags ) :
-		Stream( name, flags )
+	 Stream( name, flags )
 	{
 		assert( ! name.empty() );
 		open_file();

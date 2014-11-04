@@ -18,9 +18,6 @@ namespace DXFEarClipping {
 	using DataVectorTypes::dTriangle;
 
 	// Data
-	// Module parameter definitions:
-	extern Real64 const twopi; // 6.283185307179586476925287D0
-	extern Real64 const radtodeg; // 57.2957795
 
 	// Derived type definitions:
 	// na

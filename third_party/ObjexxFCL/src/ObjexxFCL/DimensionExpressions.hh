@@ -28,7 +28,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Dimension;
 
 // Dimension Math

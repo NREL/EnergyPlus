@@ -1,0 +1,1 @@
+I was hoping there would be no binaries in the main repo.  But alas, here is EPMacro.  The code is too awful to translate up to gfortran.  But I want to start including the macro files in the test suite.  

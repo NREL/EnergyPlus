@@ -9,7 +9,7 @@ namespace DataPhotovoltaics {
 	// MODULE INFORMATION:
 	//       AUTHOR         D. Bradley
 	//       DATE WRITTEN   May 2003
-	//       MODIFIED       B. Griffith, Dec. 2003, heavy changes, moved derived types here from Photovoltaics.f90
+	//       MODIFIED       B. Griffith, Dec. 2003, heavy changes, moved derived types here from Photovoltaics.cc
 	//                      B. Griffith, Feb 2008, added BIPV and inverter to one-diode model
 	//       RE-ENGINEERED  na
 
@@ -92,7 +92,7 @@ namespace DataPhotovoltaics {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

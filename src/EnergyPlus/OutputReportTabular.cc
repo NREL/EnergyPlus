@@ -1774,7 +1774,7 @@ namespace OutputReportTabular {
 					//the sizing period reports
 					displayZoneComponentLoadSummary = true;
 				}
-				//check the reports that are predefined and are created by outputreportpredefined.f90
+				//check the reports that are predefined and are created by outputreportpredefined.cc
 				for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 					lenAlpha = len( AlphArray( iReport ) );
 					lenReport = len( reportName( jReport ).name );
@@ -14404,7 +14404,7 @@ Label900: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
