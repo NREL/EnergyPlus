@@ -5,6 +5,8 @@
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
 
+#include <string>
+
 namespace EnergyPlus {
 
 namespace DataGlobals {
@@ -175,6 +177,10 @@ namespace DataGlobals {
 	bool ShowDecayCurvesInEIO( false ); // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	bool AnySlabsInModel( false ); // true if there are any zone-coupled ground domains in the input file
 
+	int Progress( 0 ); // current progress (0-100)
+	void ( *fProgressPtr )( int );
+	void ( *fMessagePtr )( std::string );
+
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
@@ -182,7 +188,7 @@ namespace DataGlobals {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.
