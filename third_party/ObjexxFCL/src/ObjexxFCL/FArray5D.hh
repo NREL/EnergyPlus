@@ -1479,13 +1479,14 @@ public: // Modifier
 	FArray5D &
 	swap( FArray5D & v )
 	{
+		using std::swap;
 		swap5DB( v );
 		I1_.swap_no_notify( v.I1_ );
 		I2_.swap_no_notify( v.I2_ );
 		I3_.swap_no_notify( v.I3_ );
 		I4_.swap_no_notify( v.I4_ );
 		I5_.swap_no_notify( v.I5_ );
-		std::swap( initializer_, v.initializer_ );
+		swap( initializer_, v.initializer_ );
 		notify(); // So proxy FArrays can reattach
 		v.notify(); // So proxy FArrays can reattach
 		return *this;
@@ -3701,29 +3702,5 @@ operator ||( MArray5< A, T > const & a, MArray5< A, T > const & b )
 }
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add template functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.  The legal alternative would be
-// to add specializations of swap for each anticipated instantiation.
-
-namespace std {
-
-// std::swap( FArray5D, FArray5D )
-template< typename T >
-inline
-void
-swap( ObjexxFCL::FArray5D< T > & a, ObjexxFCL::FArray5D< T > & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_FArray5D_hh_INCLUDED

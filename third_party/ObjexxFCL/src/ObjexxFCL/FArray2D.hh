@@ -1154,9 +1154,14 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
 				int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
-				for ( int i2 = b2; i2 <= e2; ++i2 ) {
-					for ( int i1 = b1; i1 <= e1; ++i1 ) {
-						o( i1, i2 ) = operator ()( i1, i2 );
+				size_type const s1( o.size1() );
+				size_type l_beg( index( b1, b2 ) );
+				size_type m_beg( o.index( b1, b2 ) );
+				size_type l, m;
+				for ( int i2 = b2; i2 <= e2; ++i2, l_beg += z1_, m_beg += s1 ) {
+					l = l_beg; m = m_beg;
+					for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+						o[ m ] = operator []( l );
 					}
 				}
 			}
@@ -1174,9 +1179,14 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b1( std::max( I1.l(), l1() ) ), e1( std::min( I1.u(), u1() ) );
 				int const b2( std::max( I2.l(), l2() ) ), e2( std::min( I2.u(), u2() ) );
-				for ( int i2 = b2; i2 <= e2; ++i2 ) {
-					for ( int i1 = b1; i1 <= e1; ++i1 ) {
-						o( i1, i2 ) = operator ()( i1, i2 );
+				size_type const s1( o.size1() );
+				size_type l_beg( index( b1, b2 ) );
+				size_type m_beg( o.index( b1, b2 ) );
+				size_type l, m;
+				for ( int i2 = b2; i2 <= e2; ++i2, l_beg += z1_, m_beg += s1 ) {
+					l = l_beg; m = m_beg;
+					for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+						o[ m ] = operator []( l );
 					}
 				}
 			}
@@ -1195,9 +1205,14 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b1( std::max( a.l1(), l1() ) ), e1( std::min( a.u1(), u1() ) );
 				int const b2( std::max( a.l2(), l2() ) ), e2( std::min( a.u2(), u2() ) );
-				for ( int i2 = b2; i2 <= e2; ++i2 ) {
-					for ( int i1 = b1; i1 <= e1; ++i1 ) {
-						o( i1, i2 ) = operator ()( i1, i2 );
+				size_type const s1( o.size1() );
+				size_type l_beg( index( b1, b2 ) );
+				size_type m_beg( o.index( b1, b2 ) );
+				size_type l, m;
+				for ( int i2 = b2; i2 <= e2; ++i2, l_beg += z1_, m_beg += s1 ) {
+					l = l_beg; m = m_beg;
+					for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+						o[ m ] = operator []( l );
 					}
 				}
 			}
@@ -1216,9 +1231,14 @@ public: // Modifier
 			if ( o.dimensions_initialized() ) { // Copy array data where overlap
 				int const b1( std::max( a.l1(), l1() ) ), e1( std::min( a.u1(), u1() ) );
 				int const b2( std::max( a.l2(), l2() ) ), e2( std::min( a.u2(), u2() ) );
-				for ( int i2 = b2; i2 <= e2; ++i2 ) {
-					for ( int i1 = b1; i1 <= e1; ++i1 ) {
-						o( i1, i2 ) = operator ()( i1, i2 );
+				size_type const s1( o.size1() );
+				size_type l_beg( index( b1, b2 ) );
+				size_type m_beg( o.index( b1, b2 ) );
+				size_type l, m;
+				for ( int i2 = b2; i2 <= e2; ++i2, l_beg += z1_, m_beg += s1 ) {
+					l = l_beg; m = m_beg;
+					for ( int i1 = b1; i1 <= e1; ++i1, ++l, ++m ) {
+						o[ m ] = operator []( l );
 					}
 				}
 			}
@@ -1273,10 +1293,11 @@ public: // Modifier
 	FArray2D &
 	swap( FArray2D & v )
 	{
+		using std::swap;
 		swap2DB( v );
 		I1_.swap_no_notify( v.I1_ );
 		I2_.swap_no_notify( v.I2_ );
-		std::swap( initializer_, v.initializer_ );
+		swap( initializer_, v.initializer_ );
 		notify(); // So proxy FArrays can reattach
 		v.notify(); // So proxy FArrays can reattach
 		return *this;
@@ -2707,7 +2728,7 @@ operator ||( FArray2< T > const & a, FArray2< T > const & b )
 	return r;
 }
 
-// Transpose: Fortran Compatible 1-Based Indexing
+// Transpose: Fortran-Compatible 1-Based Indexing
 template< typename T >
 inline
 FArray2D< T >
@@ -2716,7 +2737,7 @@ transpose( FArray2< T > const & a )
 	typedef  typename FArray2D< T >::size_type  size_type;
 	size_type const as1( a.size1() );
 	size_type const as2( a.size2() );
-	FArray2D< T > aT( a.I2(), a.I1() );
+	FArray2D< T > aT( as2, as1 );
 	for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
 		for ( size_type i1 = 0, lT = i2; i1 < as1; ++i1, ++l, lT += as2 ) {
 			aT[ lT ] = a[ l ];
@@ -3000,7 +3021,7 @@ operator ||( FArray2S< T > const & a, FArray2S< T > const & b )
 	return r;
 }
 
-// Transpose: Fortran Compatible 1-Based Indexing
+// Transpose: Fortran-Compatible 1-Based Indexing
 template< typename T >
 inline
 FArray2D< T >
@@ -3010,9 +3031,9 @@ transpose( FArray2S< T > const & a )
 	size_type const as1( a.size1() );
 	size_type const as2( a.size2() );
 	FArray2D< T > aT( as2, as1 );
-	for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			aT( i2, i1 ) = a( i1, i2 );
+	for ( int i2 = 1, e2 = a.u1(); i2 <= e2; ++i2 ) {
+		for ( int i1 = 1, e1 = a.u2(); i1 <= e1; ++i1 ) {
+			aT( i1, i2 ) = a( i2, i1 );
 		}
 	}
 	return aT;
@@ -3284,7 +3305,7 @@ operator ||( MArray2< A, T > const & a, MArray2< A, T > const & b )
 	return r;
 }
 
-// Transpose: Fortran Compatible 1-Based Indexing
+// Transpose: Fortran-Compatible 1-Based Indexing
 template< class A, typename T >
 inline
 FArray2D< T >
@@ -3294,9 +3315,9 @@ transpose( MArray2< A, T > const & a )
 	size_type const as1( a.size1() );
 	size_type const as2( a.size2() );
 	FArray2D< T > aT( as2, as1 );
-	for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
-		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
-			aT( i2, i1 ) = a( i1, i2 );
+	for ( int i2 = 1, e2 = a.u1(); i2 <= e2; ++i2 ) {
+		for ( int i1 = 1, e1 = a.u2(); i1 <= e1; ++i1 ) {
+			aT( i1, i2 ) = a( i2, i1 );
 		}
 	}
 	return aT;
@@ -3312,29 +3333,5 @@ transposed( MArray2< A, T > const & a )
 }
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add template functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.  The legal alternative would be
-// to add specializations of swap for each anticipated instantiation.
-
-namespace std {
-
-// std::swap( FArray2D, FArray2D )
-template< typename T >
-inline
-void
-swap( ObjexxFCL::FArray2D< T > & a, ObjexxFCL::FArray2D< T > & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_FArray2D_hh_INCLUDED

@@ -1901,7 +1901,7 @@ public: // Slice Proxy Generators
 
 public: // Predicate
 
-	// contains( i1, i2, i3, i4, i5 )
+	// Contains Indexed Element?
 	inline
 	bool
 	contains( int const i1, int const i2, int const i3, int const i4, int const i5 ) const

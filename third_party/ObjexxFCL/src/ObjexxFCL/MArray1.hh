@@ -872,7 +872,7 @@ public: // Subscript
 
 public: // Predicate
 
-	// contains( i )
+	// Contains Indexed Element?
 	inline
 	bool
 	contains( int const i ) const
