@@ -3110,7 +3110,7 @@ namespace InternalHeatGains {
 		}
 
 		for ( Loop = 1; Loop <= NumZoneITEqStatements; ++Loop ) {
-			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "ElectricEquipment:ITE:AirCooled" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Convected,CPU End-Use SubCategory,Fan End-Use SubCategory,UPS End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}";
+			if ( Loop == 1 ) gio::write( OutputFileInits, Format_723 ) << "ElectricEquipment:ITE:AirCooled" << "Equipment Level {W}," "Equipment/Floor Area {W/m2},Equipment per person {W/person}," "Fraction Convected,CPU End-Use SubCategory,Fan End-Use SubCategory,UPS End-Use SubCategory," "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}, Design Air Volume Flow Rate {m3/s}";
 
 			ZoneNum = ZoneITEq( Loop ).ZonePtr;
 
@@ -3141,6 +3141,8 @@ namespace InternalHeatGains {
 			StringOut = RoundSigDigits( ZoneITEq( Loop ).NomMinDesignLevel, 3 );
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = RoundSigDigits( ZoneITEq( Loop ).NomMaxDesignLevel, 3 );
+			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
+			StringOut = RoundSigDigits( ZoneITEq( Loop ).DesignAirVolFlowRate , 10 );
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
