@@ -438,13 +438,13 @@ Zone,
     0.7,                     !- Solar Absorptance
     0.7;                     !- Visible Absorptance
 
-!***********************************************************
+!**************************************************************
 !********* BASEMENT SURFACE MATERIALS/CONSTRUCTIONS ***********
-!***********************************************************
+!**************************************************************
   Material,
-    Basement Floor Material-GroundSide,  !- Name
+    Basement Floor Material,  !- Name
     MediumRough,             !- Roughness
-    0.1397,                  !- Thickness {m}
+    0.150,                  !- Thickness {m}
     1.805,                   !- Conductivity {W/m-K}
     2243,                    !- Density {kg/m3}
     837,                     !- Specific Heat {J/kg-K}
@@ -453,31 +453,9 @@ Zone,
     0.65;                    !- Visible Absorptance
 
 Material,
-    Basement Wall Material-GroundSide,  !- Name
+    Basement Wall Material,  !- Name
     MediumRough,             !- Roughness
-    0.2032,                 	 !- Thickness {m}
-    1.802,                   !- Conductivity {W/m-K}
-    2243,                    !- Density {kg/m3}
-    837,                     !- Specific Heat {J/kg-K}
-    0.9,                     !- Thermal Absorptance
-    0.65,                    !- Solar Absorptance
-    0.65;                    !- Visible Absorptance
-	
-  Material,
-    Basement Floor Material-EPlusSide,  !- Name
-    MediumRough,             !- Roughness
-    0.0127,                  !- Thickness {m}
-    1.805,                   !- Conductivity {W/m-K}
-    2243,                    !- Density {kg/m3}
-    837,                     !- Specific Heat {J/kg-K}
-    0.9,                     !- Thermal Absorptance
-    0.65,                    !- Solar Absorptance
-    0.65;                    !- Visible Absorptance
-
-Material,
-    Basement Wall Material-EPlusSide,  !- Name
-    MediumRough,             !- Roughness
-    0.0127,                  !- Thickness {m}
+    0.250,                  !- Thickness {m}
     1.802,                   !- Conductivity {W/m-K}
     2243,                    !- Density {kg/m3}
     837,                     !- Specific Heat {J/kg-K}
@@ -487,11 +465,11 @@ Material,
 
   Construction,
     Basement Floor Construction,  !- Name
-    Basement Floor Material-EPlusSide;  !- Outside Layer
+    Basement Floor Material;  !- Outside Layer
 
   Construction,
     Basement Wall Construction,  !- Name
-    Basement Wall Material-EPlusSide;  !- Outside Layer
+    Basement Wall Material;  !- Outside Layer
 
  Material,
     Basement Insulation, !- Name
@@ -561,18 +539,17 @@ GlobalGeometryRules,
     17.3,                    !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
     1,                       !- Evapotranspiration Ground Cover Parameter
     BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
-    Basement Floor Material-GroundSide,   !- Basement Floor Material Name
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
     Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
     Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
-    1,                       !- Perimeter width (m)
+    1,                       !- Perimeter Insulation Width (m)
     2.5,                     !- Depth of Basement Wall In Ground Domain {m}
-    BasementWallOSCM,        !- Name of Basement Floor Boundary Condition Model
-    Basement Wall Material-GroundSide,    !- Basement Wall Material Name;
+    BasementWallOSCM,        !- Name of Basement Wall Boundary Condition Model
     Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.3,                     !- Vertical insulation depth from surface (m)
-    Hourly;                  !- Domain Update interval. (Timestep, Hourly);
+    Hourly,                  !- Domain Update interval (Timestep, Hourly)
+    3;                       !- Mesh Density Parameter
 
 !***********************************************************
 !****** OUTPUT CONTROLS ************************************
