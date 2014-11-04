@@ -6859,10 +6859,8 @@ namespace WaterThermalTanks {
 			WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
 
 			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-            HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
+			HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
 			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
-			// It turns out that the water tank delta T increases each iteration and water mass flow decreases each iteration causing the HPWH to incorrectly report results.
-			// commenting out for now. A similar loop exists several lines down.
 			for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
 				CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
 				//       Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
@@ -6937,12 +6935,11 @@ namespace WaterThermalTanks {
 						}
 					}
 				}
-				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
-				if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-					NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-					NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( HPNum ).ControlSensorLocation );
-				}}
+
+				// Re-calculate the HPWH Coil to get the correct heat transfer rate
+				Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
+				CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
+
 			} else {
 				HPPartLoadRatio = 1.0;
 			}
@@ -7011,7 +7008,7 @@ namespace WaterThermalTanks {
 				Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
 
 				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-                HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
+				HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
 				for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
 					CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
 					//         Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
@@ -7081,6 +7078,9 @@ namespace WaterThermalTanks {
 							}
 						}
 					}
+					// Re-calculate the HPWH Coil to get the correct heat transfer rate
+					Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
+					CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
 				}
 			}
 
