@@ -1,9 +1,10 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 if(MSVC)
-  add_definitions(/Za)
+#  add_definitions(/Za)
 endif()
 
+configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 
 SET( SRC
   Timer.h
@@ -137,7 +138,7 @@ SET( SRC
   DataShadowingCombinations.hh
   DataSizing.cc
   DataSizing.hh
-  DataStringGlobals.cc
+  "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc"
   DataStringGlobals.hh
   DataSurfaceColors.cc
   DataSurfaceColors.hh
@@ -518,11 +519,8 @@ SET( SRC
 ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
 ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
 
-#TARGET_LINK_LIBRARIES( EnergyPlus bcvtb )
-#TARGET_LINK_LIBRARIES( EnergyPlus epexpat )
-#TARGET_LINK_LIBRARIES( EnergyPlus epfmiimport)
 #TARGET_LINK_LIBRARIES( EnergyPlus DElight )
-TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite)
+TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport )
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)

@@ -1903,8 +1903,15 @@ SurfaceProperty:OtherSideConditionsModel,
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
+    , ! Supply air flow rate per floor area during cooling operation
+    , ! fraction of autosized design cooling supply air flow rate
+    , ! design supply air flow rate per unit cooling capacity
     DesignDay,               !- Heating Design Air Flow Method
     0,                       !- Heating Design Air Flow Rate {m3/s}
+    , ! Supply air flow rate per floor area during heating operation
+    , ! Fraction of autosized design heating supply air flow rate
+    , ! fraction of autosized design cooling supply air flow rate
+    , ! design supply air flow rate per unit heating capacity
     ;                        !- System Outdoor Air Method
 
   Sizing:Plant,
