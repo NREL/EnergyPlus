@@ -476,7 +476,7 @@ namespace BranchInputManager {
 		// USE STATEMENTS:
 
 		// Return value
-		int GetAirBranchIndex;
+		int GetAirBranchIndex( 0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -504,7 +504,6 @@ namespace BranchInputManager {
 
 		if ( NumBranches == 0 ) {
 			ShowSevereError( "GetAirBranchIndex:  Branch not found with component = " + CompType + " \"" + CompName + "\"" );
-			GetAirBranchIndex = 0;
 		} else {
 			BranchLoop: for ( BranchNum = 1; BranchNum <= NumBranches; ++BranchNum ) {
 				for ( CompNum = 1; CompNum <= Branch( BranchNum ).NumOfComponents; ++CompNum ) {
@@ -545,7 +544,7 @@ namespace BranchInputManager {
 		using General::TrimSigDigits;
 
 		// Return value
-		Real64 GetBranchFlow;
+		Real64 GetBranchFlow( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -571,7 +570,6 @@ namespace BranchInputManager {
 
 		if ( NumBranches == 0 ) {
 			ShowSevereError( "GetBranchFlow:  Branch index not found = " + TrimSigDigits( BranchNum ) );
-			GetBranchFlow = 0.0;
 		} else {
 			if ( BranchNum > 0 && BranchNum <= NumBranches ) {
 				GetBranchFlow = Branch( BranchNum ).MaxFlowRate;
@@ -702,7 +700,7 @@ namespace BranchInputManager {
 		int CompNum; // loop counter
 		int NumBranches; // number of branches
 		int BranchNum; // loop index
-		int AirBranchIndex; // index to branch containing CompType, CompName
+		int AirBranchIndex( 0 ); // index to branch containing CompType, CompName
 
 		if ( GetBranchInputFlag ) {
 			GetBranchInputFlag = false;
@@ -3432,7 +3430,7 @@ namespace BranchInputManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

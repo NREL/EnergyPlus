@@ -2937,7 +2937,7 @@ namespace SystemReports {
 			for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 
 				// Report selection
-				ReportLoopData * select_ThisReportData;
+				ReportLoopData * select_ThisReportData( nullptr );
 
 				if ( PlantLoopNum <= NumPlantLoops ) {
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -2945,6 +2945,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepPlantDemandSide( PlantLoopNum );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepPlantSupplySide( PlantLoopNum );
+					} else {
+						assert( false );
 					}}
 				} else { // CondLoop
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -2952,6 +2954,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepCondDemandSide( PlantLoopNum - NumPlantLoops );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepCondSupplySide( PlantLoopNum - NumPlantLoops );
+					} else {
+						assert( false );
 					}}
 				}
 
@@ -3049,7 +3053,7 @@ namespace SystemReports {
 			for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 
 				// Report selection
-				ReportLoopData * select_ThisReportData;
+				ReportLoopData * select_ThisReportData( nullptr );
 
 				if ( PlantLoopNum <= NumPlantLoops ) {
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -3057,6 +3061,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepPlantDemandSide( PlantLoopNum );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepPlantSupplySide( PlantLoopNum );
+					} else {
+						assert( false );
 					}}
 				} else { // CondLoop
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -3064,6 +3070,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepCondDemandSide( PlantLoopNum - NumPlantLoops );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepCondSupplySide( PlantLoopNum - NumPlantLoops );
+					} else {
+						assert( false );
 					}}
 				}
 
@@ -4951,7 +4959,7 @@ namespace SystemReports {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

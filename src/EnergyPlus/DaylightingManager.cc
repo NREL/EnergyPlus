@@ -8400,7 +8400,7 @@ namespace DaylightingManager {
 		int SolBmIndex;
 		int NTrnBasis;
 		int iTrnElem;
-		Real64 WindowSolidAngleDaylightPoint;
+		Real64 WindowSolidAngleDaylightPoint( 0.0 );
 		Real64 XR;
 		Real64 YR;
 		Real64 PosFac;
@@ -8423,6 +8423,8 @@ namespace DaylightingManager {
 			WindowSolidAngleDaylightPoint = SurfaceWindow( iWin ).SolidAngAtRefPtWtd( iRefPoint );
 		} else if ( SELECT_CASE_var == CalledForMapPoint ) {
 			WindowSolidAngleDaylightPoint = MapWindowSolidAngAtRefPtWtd()( LoopWin, iRefPoint );
+		} else {
+			assert( false ); // Bad CalledFrom argument
 		}}
 
 		if ( WindowSolidAngleDaylightPoint < 1e-6 ) return;
@@ -10305,7 +10307,7 @@ Label903: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

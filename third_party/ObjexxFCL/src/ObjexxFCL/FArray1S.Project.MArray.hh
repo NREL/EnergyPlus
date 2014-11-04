@@ -16,7 +16,7 @@
 // Notes:
 //  These are convenience methods to provide near-Fortran syntax for MArray usage
 
-// Forward Declarations
+// Forward
 template< typename > class FArray1D;
 
 	// Types

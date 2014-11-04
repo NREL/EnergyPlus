@@ -44,25 +44,25 @@ public: // Creation
 	// Default Constructor
 	inline
 	IndexSlice() :
-		l_init_( false ),
-		u_init_( false ),
-		scalar_( false ),
-		l_( 1 ),
-		u_( 0 ),
-		s_( 1 ),
-		size_( 0 )
+	 l_init_( false ),
+	 u_init_( false ),
+	 scalar_( false ),
+	 l_( 1 ),
+	 u_( 0 ),
+	 s_( 1 ),
+	 size_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	IndexSlice( IndexSlice const & I ) :
-		l_init_( I.l_init_ ),
-		u_init_( I.u_init_ ),
-		scalar_( I.scalar_ ),
-		l_( I.l_ ),
-		u_( I.u_ ),
-		s_( I.s_ ),
-		size_( I.size_ )
+	 l_init_( I.l_init_ ),
+	 u_init_( I.u_init_ ),
+	 scalar_( I.scalar_ ),
+	 l_( I.l_ ),
+	 u_( I.u_ ),
+	 s_( I.s_ ),
+	 size_( I.size_ )
 	{
 		assert( size_ == computed_size() );
 	}
@@ -70,40 +70,40 @@ public: // Creation
 	// Scalar Constructor
 	inline
 	IndexSlice( int const i ) :
-		l_init_( true ),
-		u_init_( true ),
-		scalar_( true ),
-		l_( i ),
-		u_( i ),
-		s_( 1 ),
-		size_( 1u )
+	 l_init_( true ),
+	 u_init_( true ),
+	 scalar_( true ),
+	 l_( i ),
+	 u_( i ),
+	 s_( 1 ),
+	 size_( 1u )
 	{}
 
 	// Index Slice Constructor
 	inline
 	IndexSlice( int const l, int const u, int const s = 1 ) :
-		l_init_( true ),
-		u_init_( true ),
-		scalar_( false ),
-		l_( l ),
-		u_( u ),
-		s_( s ),
-		size_( computed_size() )
+	 l_init_( true ),
+	 u_init_( true ),
+	 scalar_( false ),
+	 l_( l ),
+	 u_( u ),
+	 s_( s ),
+	 size_( computed_size() )
 	{
 		assert( s_ != 0 );
 	}
 
 	// Initializer List of Integer Constructor
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
 	inline
-	IndexSlice( std::initializer_list< U > const lus, typename std::enable_if< std::is_constructible< int, U >::value >::type * = 0 ) :
-		l_init_( lus.size() > 0u ),
-		u_init_( lus.size() > 1u ),
-		scalar_( false ),
-		l_( 1 ),
-		u_( 0 ),
-		s_( 1 ),
-		size_( 0 )
+	IndexSlice( std::initializer_list< U > const lus ) :
+	 l_init_( lus.size() > 0u ),
+	 u_init_( lus.size() > 1u ),
+	 scalar_( false ),
+	 l_( 1 ),
+	 u_( 0 ),
+	 s_( 1 ),
+	 size_( 0 )
 	{
 		size_type const n( lus.size() );
 		assert( n <= 3 );
@@ -137,13 +137,13 @@ public: // Creation
 	// Initializer List of Index Constructor
 	inline
 	IndexSlice( std::initializer_list< Index > const lus ) :
-		l_init_( ( lus.size() > 0u ) && ( lus.begin()->initialized() ) ),
-		u_init_( ( lus.size() > 1u ) && ( ( lus.begin() + 1 )->initialized() ) ),
-		scalar_( false ),
-		l_( 1 ),
-		u_( 0 ),
-		s_( 1 ),
-		size_( 0 )
+	 l_init_( ( lus.size() > 0u ) && ( lus.begin()->initialized() ) ),
+	 u_init_( ( lus.size() > 1u ) && ( ( lus.begin() + 1 )->initialized() ) ),
+	 scalar_( false ),
+	 l_( 1 ),
+	 u_( 0 ),
+	 s_( 1 ),
+	 size_( 0 )
 	{
 		size_type const n( lus.size() );
 		assert( n <= 3 );
@@ -177,13 +177,13 @@ public: // Creation
 	// Omit Constructor
 	inline
 	IndexSlice( Omit ) :
-		l_init_( false ),
-		u_init_( false ),
-		scalar_( false ),
-		l_( 1 ),
-		u_( 0 ),
-		s_( 1 ),
-		size_( 0 )
+	 l_init_( false ),
+	 u_init_( false ),
+	 scalar_( false ),
+	 l_( 1 ),
+	 u_( 0 ),
+	 s_( 1 ),
+	 size_( 0 )
 	{
 		assert( s_ != 0 );
 	}
@@ -191,13 +191,13 @@ public: // Creation
 	// Lower Index + Omit Constructor
 	inline
 	IndexSlice( int const l, Omit, int const s = 1 ) :
-		l_init_( true ),
-		u_init_( false ),
-		scalar_( false ),
-		l_( l ),
-		u_( 0 ),
-		s_( s ),
-		size_( 0 )
+	 l_init_( true ),
+	 u_init_( false ),
+	 scalar_( false ),
+	 l_( l ),
+	 u_( 0 ),
+	 s_( s ),
+	 size_( 0 )
 	{
 		assert( s_ != 0 );
 	}
@@ -205,13 +205,13 @@ public: // Creation
 	// Omit + Upper Index Constructor
 	inline
 	IndexSlice( Omit, int const u, int const s = 1 ) :
-		l_init_( false ),
-		u_init_( true ),
-		scalar_( false ),
-		l_( 1 ),
-		u_( u ),
-		s_( s ),
-		size_( 0 )
+	 l_init_( false ),
+	 u_init_( true ),
+	 scalar_( false ),
+	 l_( 1 ),
+	 u_( u ),
+	 s_( s ),
+	 size_( 0 )
 	{
 		assert( s_ != 0 );
 	}
@@ -219,13 +219,13 @@ public: // Creation
 	// Omit + Omit Constructor
 	inline
 	IndexSlice( Omit, Omit, int const s = 1 ) :
-		l_init_( false ),
-		u_init_( false ),
-		scalar_( false ),
-		l_( 1 ),
-		u_( 0 ),
-		s_( s ),
-		size_( 0 )
+	 l_init_( false ),
+	 u_init_( false ),
+	 scalar_( false ),
+	 l_( 1 ),
+	 u_( 0 ),
+	 s_( s ),
+	 size_( 0 )
 	{
 		assert( s_ != 0 );
 	}

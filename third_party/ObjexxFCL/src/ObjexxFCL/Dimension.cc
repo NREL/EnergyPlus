@@ -30,26 +30,26 @@ namespace ObjexxFCL {
 
 	// Copy Constructor
 	Dimension::Dimension( Dimension const & dim ) :
-		ObserverMulti(),
-		exp_p_( new DimensionExpressionRef( dim ) ),
-		initialized_( exp_p_->initialized() ),
-		value_( dim.value_ )
+	 ObserverMulti(),
+	 exp_p_( new DimensionExpressionRef( dim ) ),
+	 initialized_( exp_p_->initialized() ),
+	 value_( dim.value_ )
 	{
 		insert_as_observer_of( dim );
 	}
 
 	// int Constructor
 	Dimension::Dimension( int const i ) :
-		exp_p_( new DimensionExpressionCon( i ) ),
-		initialized_( true ),
-		value_( i )
+	 exp_p_( new DimensionExpressionCon( i ) ),
+	 initialized_( true ),
+	 value_( i )
 	{}
 
 	// double Constructor
 	Dimension::Dimension( double const d ) :
-		exp_p_( new DimensionExpressionCon( d ) ),
-		initialized_( true ),
-		value_( static_cast< int >( d ) )
+	 exp_p_( new DimensionExpressionCon( d ) ),
+	 initialized_( true ),
+	 value_( static_cast< int >( d ) )
 	{}
 
 	// Copy Assignment

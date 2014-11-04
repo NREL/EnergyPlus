@@ -1,3 +1,6 @@
+// C++ Headers
+#include <cassert>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
@@ -87,7 +90,7 @@ namespace WaterManager {
 		// to a different timestep (with less iteration), then numerical solution
 		// may need to be added.  Iteration is being used to solve interdependecies
 		// of storage, supply, and demand modeling of water system.
-		// Most data are declared in data-only module DataWater.f90
+		// Most data are declared in data-only module DataWater.cc
 		// Calling order,
 		//   storage tanks
 		//   supply
@@ -996,7 +999,7 @@ namespace WaterManager {
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		// see DataWater.f90
+		// see DataWater.cc
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 OrigVdotDemandRequest( 0.0 );
@@ -1509,10 +1512,10 @@ namespace WaterManager {
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		// see DataWater.f90
+		// see DataWater.cc
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 LossFactor;
+		Real64 LossFactor( 0.0 );
 		Real64 VdotAvail;
 
 		//If (.NOT.(IsRain)) Then ! is it raining now? No don't use this flag since precip schedule might differ from weather file
@@ -1532,6 +1535,8 @@ namespace WaterManager {
 				LossFactor = RainCollector( RainColNum ).LossFactor;
 			} else if ( SELECT_CASE_var == ScheduledRainLossFactor ) {
 				LossFactor = GetCurrentScheduleValue( RainCollector( RainColNum ).LossFactorSchedID );
+			} else {
+				assert( false );
 			}}
 
 			VdotAvail = RainFall.CurrentRate * RainCollector( RainColNum ).HorizArea * ( 1.0 - LossFactor );
@@ -1590,7 +1595,7 @@ namespace WaterManager {
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		// see DataWater.f90
+		// see DataWater.cc
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 VdotDelivered;
@@ -1808,7 +1813,7 @@ namespace WaterManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

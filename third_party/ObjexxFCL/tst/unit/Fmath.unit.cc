@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <cstddef> // size_t
@@ -23,6 +24,22 @@
 using namespace ObjexxFCL;
 
 typedef unsigned short ushort;
+
+struct S
+{
+	S( int const x_ = 11 ) :
+		x( x_ )
+	{}
+
+	friend
+	S
+	operator *( S const & s1, S const & s2 )
+	{
+		return S( s1.x * s2.x );
+	}
+
+	int x;
+};
 
 TEST( FmathTest, Min )
 {
@@ -149,13 +166,16 @@ TEST( FmathTest, Square )
 {
 	EXPECT_EQ( short( 11 ) * short( 11 ), square( short( -11 ) ) );
 	EXPECT_EQ( ushort( 11 ) * ushort( 11 ), square( ushort( 11 ) ) );
-	EXPECT_EQ( 11*11, square( -11 ) );
+	EXPECT_EQ( 11 * 11, square( -11 ) );
 	EXPECT_EQ( 11u * 11u, square( 11u ) );
 	EXPECT_EQ( 11l * 11l, square( -11l ) );
 	EXPECT_EQ( 11ul * 11ul, square( 11ul ) );
 	EXPECT_EQ( 11.0f * 11.0f, square( -11.0f ) );
 	EXPECT_EQ( 11.0 * 11.0, square( -11.0 ) );
 	EXPECT_EQ( 11.0l * 11.0l, square( -11.0l ) );
+
+	S s; // Test non-arithmetic overload
+	EXPECT_EQ( 11 * 11, square( s ).x );
 }
 
 TEST( FmathTest, Cube )

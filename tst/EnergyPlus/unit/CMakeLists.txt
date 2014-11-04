@@ -19,7 +19,8 @@ set( test_dependencies
   bcvtb 
   epexpat 
   epfmiimport 
-)
+  DElight
+ )
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)

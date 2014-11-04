@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -451,7 +452,7 @@ namespace RefrigeratedCase {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is called from HVACManager.f90, subroutine ManageHVAC to
+		// This subroutine is called from HVACManager.cc, subroutine ManageHVAC to
 		// manage refrigerated cases and associated compressor racks on zone time step
 		// OR from SimAirChillerSet in this module on sys time step (Stovall 2011)
 
@@ -7883,11 +7884,11 @@ namespace RefrigeratedCase {
 		static std::string TypeName;
 		static std::string ErrIntro;
 		int PlantInletNode( 0 ); //Autodesk:Init
-		int PlantOutletNode;
+		int PlantOutletNode( 0 );
 		int PlantLoopIndex( 0 ); //Autodesk:Init
-		int PlantLoopSideIndex;
-		int PlantBranchIndex;
-		int PlantCompIndex;
+		int PlantLoopSideIndex( 0 );
+		int PlantBranchIndex( 0 );
+		int PlantCompIndex( 0 );
 		int Num( 0 ); // local index //Autodesk:Init
 		Real64 rho; // local fluid density
 		Real64 Cp; // local fluid specific heat
@@ -8006,6 +8007,8 @@ namespace RefrigeratedCase {
 			HighFlowWarnIndex = Condenser( Num ).HighFlowWarnIndex;
 			HighTempWarnIndex = Condenser( Num ).HighTempWarnIndex;
 			HighInletWarnIndex = Condenser( Num ).HighInletWarnIndex;
+		} else {
+			assert( false );
 		}}
 
 		// Current condenser is water cooled
@@ -10392,7 +10395,7 @@ namespace RefrigeratedCase {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Find the subcooler energy exchange and refrigerant states for a particular detailed
-		// refrigeration system. Use the refrigerant property subroutines in FluidProperties.f90
+		// refrigeration system. Use the refrigerant property subroutines in FluidProperties.cc
 
 		// METHODOLOGY EMPLOYED:
 		// Use refrigerant properties and heat exchanger correlations.  NOTE:  Assumes any Mech subcooler
@@ -11780,6 +11783,7 @@ namespace RefrigeratedCase {
 			//  TotalLoad = RefrigerationLoad + DistPipeHeatGain  + ReceiverHeatGain &
 			//           + TotalPumpPower*Secondary(SecondaryNum)%PumpPowertoHeat
 			FinalRateCoils( DeRate, SecondarySystem, SecondaryNum, TotalLoad, MaxLoad ); //assign case credits for coils on this loop
+			//Bug TotalCoolingLoad not set but used below
 		} // no air coils on secondary loop
 		Secondary( SecondaryNum ).PumpPowerTotal = TotalPumpPower;
 		Secondary( SecondaryNum ).PumpElecEnergyTotal = TotalPumpPower * LocalTimeStep * SecInHour;
@@ -12924,7 +12928,7 @@ namespace RefrigeratedCase {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -456,7 +456,7 @@ namespace PlantPressureSystem {
 		Real64 NodeTemperature; // Nodal temperature {C}
 		Real64 NodeDensity; // Nodal density {kg/m3}
 		Real64 NodeViscosity; // Nodal viscosity, assuming mu here (dynamic viscosity)
-		Real64 BranchDeltaPress; // Pressure drop for component, {Pa}
+		Real64 BranchDeltaPress( 0.0 ); // Pressure drop for component, {Pa}
 		static int ErrorCounter( 0 ); // For proper error handling
 
 		//Exit early if need be
@@ -1455,7 +1455,7 @@ namespace PlantPressureSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

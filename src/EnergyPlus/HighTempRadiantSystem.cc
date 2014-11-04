@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -969,7 +970,7 @@ namespace HighTempRadiantSystem {
 		int IterNum; // iteration number
 		Real64 SetPtTemp; // Setpoint temperature [C]
 		int ZoneNum; // number of zone being served
-		Real64 ZoneTemp; // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
+		Real64 ZoneTemp( 0.0 ); // zone temperature (MAT, MRT, or Operative Temperature, depending on control type) [C]
 
 		// FLOW:
 		// initialize local variables
@@ -1001,6 +1002,8 @@ namespace HighTempRadiantSystem {
 				ZoneTemp = MRT( ZoneNum );
 			} else if ( SELECT_CASE_var == OperativeSPControl ) {
 				ZoneTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+			} else {
+				assert( false );
 			}}
 
 			if ( ZoneTemp < ( SetPtTemp - TempConvToler ) ) {
@@ -1489,7 +1492,7 @@ namespace HighTempRadiantSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

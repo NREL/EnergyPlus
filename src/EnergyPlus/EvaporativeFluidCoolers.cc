@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -1022,7 +1023,7 @@ namespace EvaporativeFluidCoolers {
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool OneTimeFlagForEachEvapFluidCooler;
-		int TypeOf_Num;
+		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;
 		int BranchIndex;
@@ -1048,6 +1049,8 @@ namespace EvaporativeFluidCoolers {
 				TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
 			} else if ( SimpleEvapFluidCooler( EvapFluidCoolerNum ).EvapFluidCoolerType_Num == EvapFluidCooler_TwoSpeed ) {
 				TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
+			} else {
+				assert( false );
 			}
 			ErrorsFound = false;
 			// Locate the tower on the plant loops for later usage
@@ -2559,7 +2562,7 @@ namespace EvaporativeFluidCoolers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
