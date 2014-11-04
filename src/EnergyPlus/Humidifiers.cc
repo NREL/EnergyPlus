@@ -661,49 +661,47 @@ namespace Humidifiers {
 						}
 					}
 				}
+			}
+			
+			Humidifier( HumNum ).NomCap = RhoH2O( InitConvTemp ) * Humidifier( HumNum ).NomCapVol;
+			RefrigerantIndex = FindRefrigerant( fluidNameSteam );
+			WaterIndex = FindGlycol( fluidNameWater );
+			SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom );
+			WaterSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 0.0, RefrigerantIndex, CalledFrom );
+			WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( fluidNameWater, TSteam, WaterIndex, CalledFrom ) + GetSpecificHeatGlycol( fluidNameWater, Tref, WaterIndex, CalledFrom ) );
 
-				Humidifier( HumNum ).NomCap = RhoH2O( InitConvTemp ) * Humidifier( HumNum ).NomCapVol;
+			NominalPower = Humidifier( HumNum ).NomCap * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) );
 
-				RefrigerantIndex = FindRefrigerant( fluidNameSteam );
-				WaterIndex = FindGlycol( fluidNameWater );
-				SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom );
-				WaterSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 0.0, RefrigerantIndex, CalledFrom );
-				WaterSpecHeatAvg = 0.5 * ( GetSpecificHeatGlycol( fluidNameWater, TSteam, WaterIndex, CalledFrom ) + GetSpecificHeatGlycol( fluidNameWater, Tref, WaterIndex, CalledFrom ) );
-
-				NominalPower = Humidifier( HumNum ).NomCap * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) );
-
-				IsAutoSize = false;
-				if ( Humidifier( HumNum ).NomPower == AutoSize ) {
-					IsAutoSize = true;
-				}
-
-				NomPowerDes = NominalPower;
-				if ( IsAutoSize ) {
-					Humidifier( HumNum ).NomPower = NomPowerDes;
-					ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes );
-				} else {
-					if ( Humidifier( HumNum ).NomPower >= 0.0 && Humidifier( HumNum ).NomCap > 0.0 ) {
-						NomPowerUser = Humidifier( HumNum ).NomPower;
-						ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes,
-							"User-Specified Rated Power [W]", NomPowerUser);
-						if ( DisplayExtraWarnings ) {
-							if ( (std::abs( NomPowerDes - NomPowerUser )/NomPowerUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for Humidifier:Steam:Electric=\"" + Humidifier( HumNum ).Name + "\"." );
-								ShowContinueError( "User-Specified Rated Power of " + RoundSigDigits( NomPowerUser, 2 ) + " [W]" );
-								ShowContinueError( "differs from Design Size Rated Power of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
+			if ( Humidifier( HumNum ).NomPower == AutoSize ) {
+				IsAutoSize = true;
+			}
+			
+			NomPowerDes = NominalPower;
+			if ( IsAutoSize ) {
+				Humidifier( HumNum ).NomPower = NomPowerDes;
+				ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes );
+			} else {
+				if ( Humidifier( HumNum ).NomPower >= 0.0 && Humidifier( HumNum ).NomCap > 0.0 ) {
+					NomPowerUser = Humidifier( HumNum ).NomPower;
+					ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes,
+						"User-Specified Rated Power [W]", NomPowerUser);
+					if ( DisplayExtraWarnings ) {
+						if ( (std::abs( NomPowerDes - NomPowerUser )/NomPowerUser ) > AutoVsHardSizingThreshold ) {
+							ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for Humidifier:Steam:Electric=\"" + Humidifier( HumNum ).Name + "\"." );
+							ShowContinueError( "User-Specified Rated Power of " + RoundSigDigits( NomPowerUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Rated Power of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 						}
-						if ( Humidifier( HumNum ).NomPower < NominalPower ) {
-							ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated " " Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
-							ShowContinueError( " specified Rated Power = " + RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) );
-							ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
-						}
-					} else {
-						ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero " " for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
-						ShowContinueError( " For zero nominal capacity humidifier the rated power is zero." );
 					}
+					if ( Humidifier( HumNum ).NomPower < NominalPower ) {
+						ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated " " Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+						ShowContinueError( " specified Rated Power = " + RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) );
+						ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
+					}
+				} else {
+					ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero " " for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+					ShowContinueError( " For zero nominal capacity humidifier the rated power is zero." );
 				}
 			}
 		}
