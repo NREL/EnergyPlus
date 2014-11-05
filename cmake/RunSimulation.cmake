@@ -65,12 +65,12 @@ if(BUILD_FORTRAN)
     execute_process(COMMAND "${PARAMETRIC_EXE}" "${IDF_FILE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
     
     # this handles the LBuildingAppGRotPar parametric file
-    if (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/${IDF_NAME}-G000.idf")
-      set (IDF_PATH "${BINARY_DIR}/testfiles/${IDF_NAME}/${IDF_NAME}-G000.idf")
+    if (EXISTS "${OUTPUT_DIR_PATH}/${IDF_NAME}-G000.idf")
+      set (IDF_PATH "${OUTPUT_DIR_PATH}/${IDF_NAME}-G000.idf")
     
     # this handles the LBuildingAppGRotPar and ParametricInsulation-5ZoneAirCooled parametric files
-    elseif (EXISTS "${BINARY_DIR}/testfiles/${IDF_NAME}/${IDF_NAME}-000001.idf")
-      set (IDF_PATH "${BINARY_DIR}/testfiles/${IDF_NAME}/${IDF_NAME}-000001.idf")
+    elseif (EXISTS "${OUTPUT_DIR_PATH}/${IDF_NAME}-000001.idf")
+      set (IDF_PATH "${OUTPUT_DIR_PATH}/${IDF_NAME}-000001.idf")
     
     # this shouldn't happen unless a new parametric file is added with a different processed filename
     else ()
@@ -80,6 +80,48 @@ if(BUILD_FORTRAN)
 
   endif () # parametric preprocessor definitions detected
   
+  # Run ExpandObjects independently if there are ground heat transfer objects
+  string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Slab" SLAB_RESULT)
+  string(FIND "${IDF_CONTENT}" "GroundHeatTransfer:Basement" BASEMENT_RESULT)
+
+  if ( "${SLAB_RESULT}" GREATER -1 OR "${BASEMENT_RESULT}" GREATER -1)
+    find_program(EXPANDOBJECTS_EXE ExpandObjects PATHS "${BINARY_DIR}/Products/" 
+      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+    message("Executing ExpandObjects from ${EXPANDOBJECTS_EXE}")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${IDF_PATH}" "${OUTPUT_DIR_PATH}/in.idf")    
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${EPW_PATH}" "${OUTPUT_DIR_PATH}/in.epw")    
+    execute_process(COMMAND "${EXPANDOBJECTS_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
+    
+    if ( "${SLAB_RESULT}" GREATER -1)
+      # Copy files needed for Slab
+      file ( COPY "${SOURCE_DIR}/idd/SlabGHT.idd" DESTINATION "${OUTPUT_DIR_PATH}" )
+      # Find and run slab
+      find_program(SLAB_EXE Slab PATHS "${PRODUCT_PATH}" 
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+      message("Executing Slab from ${SLAB_EXE}")
+      execute_process(COMMAND "${SLAB_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
+      # Then copy slab results into the expanded file
+      file(READ "${OUTPUT_DIR_PATH}/SLABSurfaceTemps.TXT" SLAB_CONTENTS)
+      file(APPEND "${OUTPUT_DIR_PATH}/expanded.idf" "${SLAB_CONTENTS}")
+    endif()
+  
+    if ( "${BASEMENT_RESULT}" GREATER -1)
+      # Copy files needed for Basement
+      file ( COPY "${SOURCE_DIR}/idd/BasementGHT.idd" DESTINATION "${OUTPUT_DIR_PATH}" )
+      # Find and run basement
+      find_program(BASEMENT_EXE Basement PATHS "${PRODUCT_PATH}" 
+        NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+      message("Executing Basement from ${BASEMENT_EXE}")
+      execute_process(COMMAND "${BASEMENT_EXE}" WORKING_DIRECTORY "${OUTPUT_DIR_PATH}")
+      # Then copy basement results into the expanded file
+      file(READ "${OUTPUT_DIR_PATH}/EPObjects.TXT" BASEMENT_CONTENTS)
+      file(APPEND "${OUTPUT_DIR_PATH}/expanded.idf" "${BASEMENT_CONTENTS}")
+    endif()
+
+    set (IDF_PATH "${OUTPUT_DIR_PATH}/expanded.idf")      
+
+  endif() # expand objects found something and created expanded.idf
+    
   list(FIND ENERGYPLUS_FLAGS_LIST -x EXPAND_RESULT)
 
   if("${EXPAND_RESULT}" GREATER -1)
@@ -87,16 +129,6 @@ if(BUILD_FORTRAN)
       NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
     # Move to executable directory
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${EXPANDOBJECTS_EXE}" "${EXE_PATH}")
-    
-    find_program(BASEMENT_EXE Basement PATHS "${PRODUCT_PATH}" 
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-    # Move Basement to executable directory
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${BASEMENT_EXE}" "${EXE_PATH}")
-    
-    find_program(SLAB_EXE Slab PATHS "${PRODUCT_PATH}" 
-      NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-    # Move Slab to executable directory
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SLAB_EXE}" "${EXE_PATH}")
   endif()
   
   list(FIND ENERGYPLUS_FLAGS_LIST -r READVARS_RESULT)

@@ -506,6 +506,6 @@ IF (BUILD_FORTRAN)
     ADD_SIMULATION_TEST(IDF_FILE 1ZoneParameterAspect.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
     ADD_SIMULATION_TEST(IDF_FILE ParametricInsulation-5ZoneAirCooled.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
     # Basement/slab dependent files
-    ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooledWithSlab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -x)
-    ADD_SIMULATION_TEST(IDF_FILE LgOffVAVusingBasement.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw ENERGYPLUS_FLAGS -x)
+    ADD_SIMULATION_TEST(IDF_FILE 5ZoneAirCooledWithSlab.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+    ADD_SIMULATION_TEST(IDF_FILE LgOffVAVusingBasement.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ENDIF ()
