@@ -258,7 +258,7 @@ public: // Creation
 	 I1_( I1 ),
 	 I2_( I2 )
 	{
-		assert( size_ == l.size() );
+		assert( size_of( I1, I2 ) == l.size() );
 		setup_real();
 		insert_as_observer();
 	}
@@ -2737,7 +2737,7 @@ transpose( FArray2< T > const & a )
 	typedef  typename FArray2D< T >::size_type  size_type;
 	size_type const as1( a.size1() );
 	size_type const as2( a.size2() );
-	FArray2D< T > aT( as2, as1 );
+	FArray2D< T > aT( static_cast< int >( as2 ), static_cast< int >( as1 ) );
 	for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
 		for ( size_type i1 = 0, lT = i2; i1 < as1; ++i1, ++l, lT += as2 ) {
 			aT[ lT ] = a[ l ];

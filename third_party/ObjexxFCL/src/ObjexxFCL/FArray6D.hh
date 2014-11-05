@@ -330,7 +330,7 @@ public: // Creation
 	 I5_( I5 ),
 	 I6_( I6 )
 	{
-		assert( size_ == l.size() );
+		assert( size_of( I1, I2, I3, I4, I5, I6 ) == l.size() );
 		setup_real();
 		insert_as_observer();
 	}

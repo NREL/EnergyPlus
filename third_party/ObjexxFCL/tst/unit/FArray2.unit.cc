@@ -1352,7 +1352,7 @@ TEST( FArray2Test, SubscriptOperator )
 	EXPECT_EQ( 23, A1[ 5 ] );
 
 	for ( std::size_t i = 0; i < A1.size(); ++i ) A1[ i ] = static_cast< int >( i * 10 );
-	EXPECT_EQ( 0, A1[ 0 ] );
+	EXPECT_EQ(  0, A1[ 0 ] );
 	EXPECT_EQ( 10, A1[ 1 ] );
 	EXPECT_EQ( 20, A1[ 2 ] );
 	EXPECT_EQ( 30, A1[ 3 ] );
@@ -1452,7 +1452,6 @@ TEST( FArray2Test, PredicateComparisonsValues )
 	EXPECT_TRUE( ge( A2, 31459 ) && ge( 31459, A2 ) );
 	EXPECT_TRUE( ge( A2, 31458 ) && ge( 31460, A2 ) );
 
-	// Elements compared in order
 	FArray2D_int A3( 2, 3, { 11, 21, 12, 22, 13, 23 } );
 	EXPECT_FALSE( eq( A3, 11 ) || eq( 23, A3 ) );
 	EXPECT_TRUE( ne( A3, 11 ) && ne( 23, A3 ) );
@@ -1948,14 +1947,14 @@ TEST( FArray2Test, ModifierInvert )
 	// Illegal to call on an uninitialized array
 
 	// Inverts values of an initialized array
-	FArray2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01 } );
+	FArray2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01, 0.001 } );
 	A2.invert();
-	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0 } ), A2 ) );
+	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0, 1000.0 } ), A2 ) );
 
 	// Inverts values of an initialized array
-	FArray2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01 } );
+	FArray2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01, -0.001 } );
 	A3.invert();
-	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0 } ), A3 ) );
+	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0, -1000.0 } ), A3 ) );
 }
 
 TEST( FArray2Test, ModifierAllocateDeallocate )

@@ -119,7 +119,7 @@ namespace CurveManager {
 	int const DESCENDING( 2 );
 
 	// parameters describing curve object/table types
-	int const NumAllCurveTypes( 21 );
+	int const NumAllCurveTypes( 22 );
 
 	// curve object/table types (used for warning messages)
 	int const CurveType_Linear( 1 );
@@ -437,7 +437,7 @@ namespace CurveManager {
 
 		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
 					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
-					NumExpDecay + NumDoubleExpDecay + NumQLinear; 
+					NumExpDecay + NumDoubleExpDecay + NumQLinear;
 
 		// intermediate count for one and two variable performance tables
 		NumTables = NumOneVarTab + NumTwoVarTab;
@@ -826,7 +826,7 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).CurveMax = Numbers( 12 );
 				PerfCurve( CurveNum ).CurveMaxPresent = true;
 			}
-            
+
 			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );

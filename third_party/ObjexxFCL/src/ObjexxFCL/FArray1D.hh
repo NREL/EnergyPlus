@@ -409,7 +409,7 @@ public: // Creation
 	 Super( l ),
 	 I_( I )
 	{
-		assert( size_ == l.size() );
+		assert( size_of( I ) == l.size() );
 		setup_real();
 		insert_as_observer();
 	}
