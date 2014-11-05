@@ -113,7 +113,7 @@ endmacro()
 function( ADD_SIMULATION_TEST )
   set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
   set(oneValueArgs IDF_FILE EPW_FILE)
-  set(multiValueArgs "")
+  set(multiValueArgs ENERGYPLUS_FLAGS)
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
   if( DESIGN_DAY_ONLY )
@@ -124,6 +124,12 @@ function( ADD_SIMULATION_TEST )
     set(ANNUAL_SIMULATION false)
   endif()
 
+  if(ANNUAL_SIMULATION)
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -a" )
+  else()
+   set( ENERGYPLUS_FLAGS "${ADD_SIM_TEST_ENERGYPLUS_FLAGS} -D" )
+  endif()
+  
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
   
   add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
@@ -132,7 +138,7 @@ function( ADD_SIMULATION_TEST )
     -DENERGYPLUS_EXE=$<TARGET_FILE:energyplus>
     -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
     -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
-    -DANNUAL_SIMULATION=${ANNUAL_SIMULATION}
+    -DENERGYPLUS_FLAGS=${ENERGYPLUS_FLAGS}
     -DBUILD_FORTRAN=${BUILD_FORTRAN}
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
   )  

@@ -499,7 +499,7 @@ ProcessArgs(int argc, const char * argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (opt.isSet("-w")) {
+	if (opt.isSet("-w") && !DDOnlySimulation) {
 		{ IOFlags flags; gio::inquire( inputWeatherFileName, flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
 			DisplayString("ERROR: Could not find weather file: " + getAbsolutePath(inputWeatherFileName) + "." );

@@ -216,6 +216,17 @@ namespace DataSystemVariables {
 			gio::write( EchoInputFile, fmtA ) << "not found (user input)=" + InputFileName;
 		}
 
+		// Look relative to input file path
+		{ IOFlags flags; gio::inquire( idfDirPathName + InputFileName, flags ); FileExist = flags.exists(); }
+		if ( FileExist ) {
+			FileFound = true;
+			CheckedFileName = idfDirPathName + InputFileName;
+			gio::write( EchoInputFile, fmtA ) << "found (idf)=" + CheckedFileName;
+			return;
+		} else {
+			gio::write( EchoInputFile, fmtA ) << "not found (idf)=" + idfDirPathName + InputFileName;
+		}
+
 		// Look relative to input path
 		{ IOFlags flags; gio::inquire( envinputpath1 + InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
