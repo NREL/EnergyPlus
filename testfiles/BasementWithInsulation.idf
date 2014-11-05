@@ -542,7 +542,7 @@ GlobalGeometryRules,
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
     Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name
     Full,                    !- Full Horizontal or Perimeter Only (Full/Perimeter)
-    1,                       !- Perimeter Insulation Width (m)
+    ,                        !- Perimeter Insulation Width (m)
     2.5,                     !- Depth of Basement Wall In Ground Domain {m}
     BasementWallOSCM,        !- Name of Basement Wall Boundary Condition Model
     Yes,                     !- Basement Wall Vertical Insulation Present(Yes/No)
