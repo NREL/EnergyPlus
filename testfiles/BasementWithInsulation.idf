@@ -526,7 +526,7 @@ GlobalGeometryRules,
 !***************************************************************
   Site:GroundDomain:Basement,
     CoupledBasement,         !- Name
-    8,                       !- Ground Domain Depth {m}
+    10,                      !- Ground Domain Depth {m}
     1,                       !- Aspect ratio {m}
     5,                       !- Perimeter offset {m}
     1.8,                     !- Soil Thermal Conductivity {W/m-K}
@@ -549,7 +549,7 @@ GlobalGeometryRules,
     Basement Insulation,     !- Basement Wall Vertical Insulation Material Name
     2.3,                     !- Vertical insulation depth from surface (m)
     Hourly,                  !- Domain Update interval (Timestep, Hourly)
-    3;                       !- Mesh Density Parameter
+    4;                       !- Mesh Density Parameter
 
 !***********************************************************
 !****** OUTPUT CONTROLS ************************************

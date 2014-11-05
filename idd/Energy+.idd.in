@@ -1994,7 +1994,7 @@ Site:GroundDomain:Basement,
         \note This field specifies the basement domain simulation interval.
    N16; \field Mesh Density Parameter
         \type integer
-        \default 3
+        \default 4
         \minimum 2
 
 Site:GroundReflectance,
