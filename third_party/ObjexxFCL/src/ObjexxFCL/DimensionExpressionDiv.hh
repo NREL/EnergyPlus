@@ -32,9 +32,9 @@ public: // Creation
 	// Copy Constructor
 	inline
 	DimensionExpressionDiv( DimensionExpressionDiv const & exp ) :
-		Super(),
-		exp1_p_( exp.exp1_p_ ? exp.exp1_p_->clone() : static_cast< DimensionExpression * >( 0 ) ),
-		exp2_p_( exp.exp2_p_ ? exp.exp2_p_->clone() : static_cast< DimensionExpression * >( 0 ) )
+	 Super(),
+	 exp1_p_( exp.exp1_p_ ? exp.exp1_p_->clone() : static_cast< DimensionExpression * >( 0 ) ),
+	 exp2_p_( exp.exp2_p_ ? exp.exp2_p_->clone() : static_cast< DimensionExpression * >( 0 ) )
 	{
 		assert( exp1_p_ );
 		assert( exp2_p_ );
@@ -43,8 +43,8 @@ public: // Creation
 	// Expression Constructor
 	inline
 	DimensionExpressionDiv( DimensionExpression const & exp1, DimensionExpression const & exp2 ) :
-		exp1_p_( exp1.clone() ),
-		exp2_p_( exp2.clone() )
+	 exp1_p_( exp1.clone() ),
+	 exp2_p_( exp2.clone() )
 	{
 		assert( exp1_p_ );
 		assert( exp2_p_ );
@@ -53,8 +53,8 @@ public: // Creation
 	// Expression Pointer Constructor (Ownership Transfer)
 	inline
 	DimensionExpressionDiv( DimensionExpression * exp1_p, DimensionExpression * exp2_p ) :
-		exp1_p_( exp1_p ),
-		exp2_p_( exp2_p )
+	 exp1_p_( exp1_p ),
+	 exp2_p_( exp2_p )
 	{
 		assert( exp1_p_ );
 		assert( exp2_p_ );

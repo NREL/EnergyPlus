@@ -16,6 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Fstring.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 

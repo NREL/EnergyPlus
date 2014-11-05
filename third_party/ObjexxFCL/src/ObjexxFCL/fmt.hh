@@ -36,7 +36,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class byte;
 class ubyte;
 class Fstring;
@@ -63,7 +63,7 @@ public: // Creation
 	inline
 	explicit
 	Skip( Size const w = 1ul ) :
-		w_( w )
+	 w_( w )
 	{}
 
 	// Destructor

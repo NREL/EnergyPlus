@@ -4517,6 +4517,7 @@ namespace InputProcessor {
 		int Found;
 		int ObjFound;
 		int NumOrphObjNames;
+		bool potentialOrphanedSpecialObjects( false );
 
 		OrphanObjectNames.allocate( NumIDFRecords );
 		OrphanNames.allocate( NumIDFRecords );
@@ -4539,6 +4540,11 @@ namespace InputProcessor {
 					if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
 					++NumOrphObjNames;
 					OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
+					// To avoid looking up potential things later when they *definitely* aren't there, we'll trap for specific flags here first
+					//  and set the potential flag.  If the potential flag is false, nothing else is looked up later to save time
+					if ( OrphanObjectNames( NumOrphObjNames ).substr( 0, 1 ) == "Z" ) {
+						potentialOrphanedSpecialObjects = true;
+					}
 					if ( ObjectDef( ObjFound ).NameAlpha1 ) {
 						OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
 					}
@@ -4561,6 +4567,20 @@ namespace InputProcessor {
 					}
 				} else {
 					ShowWarningError( "ReportOrphanRecordObjects: object not found=" + IDFRecords( Count ).Name );
+				}
+			}
+		}
+
+		// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
+		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if 
+		// for now, the list includes:
+		//  - objects that start with "ZONEHVAC:"
+		if ( potentialOrphanedSpecialObjects ) {
+			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
+				if ( OrphanObjectNames( Count ).substr( 0, 9 ) == "ZONEHVAC:" ) {
+					ShowSevereError( "Orphaned ZoneHVAC object found.  This object was never referenced in the idf, and was not used." );
+					ShowContinueError( " -- Object type: " + OrphanObjectNames( Count ) );
+					ShowContinueError( " -- Object name: " + OrphanNames( Count ) );
 				}
 			}
 		}
@@ -6160,7 +6180,7 @@ namespace InputProcessor {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

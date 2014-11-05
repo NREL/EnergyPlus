@@ -81,7 +81,7 @@ namespace Photovoltaics {
 	// na
 
 	// DERIVED TYPE DEFINITIONS:
-	//   see DataPhotovoltaics.f90
+	//   see DataPhotovoltaics.cc
 
 	FArray1D_bool CheckEquipName;
 
@@ -273,10 +273,10 @@ namespace Photovoltaics {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// This subroutine gets the input for the Photovoltaic units saving it in
-		// the data structures defined in DataPhotovoltaics.f90.
+		// the data structures defined in DataPhotovoltaics.cc.
 
 		// METHODOLOGY EMPLOYED:
-		// subroutine structure taken from Beta2 BaseboardRadiator.f90
+		// subroutine structure taken from Beta2 BaseboardRadiator.cc
 
 		// REFERENCES:
 		// na
@@ -2765,7 +2765,7 @@ namespace Photovoltaics {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -33,29 +33,29 @@ public: // Creation
 	// Default Constructor
 	inline
 	Index() :
-		i_init_( false ),
-		i_( 0 )
+	 i_init_( false ),
+	 i_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	Index( Index const & I ) :
-		i_init_( I.i_init_ ),
-		i_( I.i_ )
+	 i_init_( I.i_init_ ),
+	 i_( I.i_ )
 	{}
 
 	// Index Constructor
 	inline
 	Index( int const i ) :
-		i_init_( true ),
-		i_( i )
+	 i_init_( true ),
+	 i_( i )
 	{}
 
 	// Omit Constructor
 	inline
 	Index( Omit ) :
-		i_init_( false ),
-		i_( 0 )
+	 i_init_( false ),
+	 i_( 0 )
 	{}
 
 	// Destructor
