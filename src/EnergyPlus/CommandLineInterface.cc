@@ -516,12 +516,18 @@ ProcessArgs(int argc, const char * argv[])
 
 	// Preprocessors (These will likely move to a new file)
 	if(runEPMacro){
+		std::string epMacroPath = exeDirectory + "EPMacro";
+		{ IOFlags flags; gio::inquire( epMacroPath, flags ); FileExists = flags.exists(); }
+		if (!FileExists){
+			DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + "." );
+			exit(EXIT_FAILURE);
+		}
+		std::string epMacroCommand = "\"" + epMacroPath + "\"";
 		bool inputFileNamedIn =
 				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.imf"));
 
 		if (!inputFileNamedIn)
 			linkFile(inputIdfFileName.c_str(), "in.imf");
-		std::string epMacroCommand = "\"" + exeDirectory + "EPMacro\"";
 		DisplayString("Running EPMacro...");
 		systemCall(epMacroCommand);
 		if (!inputFileNamedIn)
@@ -532,13 +538,19 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	if(runExpandObjects) {
+		std::string expandObjectsPath = exeDirectory + "ExpandObjects";
+		{ IOFlags flags; gio::inquire( expandObjectsPath, flags ); FileExists = flags.exists(); }
+		if (!FileExists){
+			DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + "." );
+			exit(EXIT_FAILURE);
+		}
+		std::string expandObjectsCommand = "\"" + expandObjectsPath + "\"";
 		bool inputFileNamedIn =
 				(getAbsolutePath(inputIdfFileName) == getAbsolutePath("in.idf"));
 
 		bool iddFileNamedEnergy =
 				(getAbsolutePath(inputIddFileName) == getAbsolutePath("Energy+.idd"));
 
-		std::string expandObjectsCommand = "\"" + exeDirectory + "ExpandObjects\"";
 		if (!inputFileNamedIn)
 			linkFile(inputIdfFileName.c_str(), "in.idf");
 		if (!iddFileNamedEnergy)

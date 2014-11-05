@@ -359,7 +359,15 @@ EnergyPlusPgm(int argc, const char * argv[])
 	ReportOrphanSchedules();
 
     if(runReadVars) {
-    	std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
+		std::string readVarsPath = exeDirectory + "ReadVarsESO";
+		bool FileExists;
+		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
+		if (!FileExists){
+			DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + "." );
+			exit(EXIT_FAILURE);
+		}
+
+		std::string RVIfile = idfDirPathName + idfFileNameOnly + ".rvi";
     	std::string MVIfile = idfDirPathName + idfFileNameOnly + ".mvi";
 
     	int fileUnitNumber;
@@ -393,8 +401,8 @@ EnergyPlusPgm(int argc, const char * argv[])
 			gio::close( fileUnitNumber );
     	}
 
-    	std::string readVarsRviCommand = "\"" + exeDirectory + "ReadVarsESO\"" + " " + RVIfile + " unlimited";
-    	std::string readVarsMviCommand = "\"" + exeDirectory + "ReadVarsESO\"" + " " + MVIfile + " unlimited";
+    	std::string readVarsRviCommand = "\"" + readVarsPath + "\"" + " " + RVIfile + " unlimited";
+    	std::string readVarsMviCommand = "\"" + readVarsPath + "\"" + " " + MVIfile + " unlimited";
 
     	systemCall(readVarsRviCommand);
     	systemCall(readVarsMviCommand);
