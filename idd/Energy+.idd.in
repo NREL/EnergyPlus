@@ -76687,11 +76687,12 @@ Table:MultiVariableLookup,
        \memo polynomial order is assumed to be the number of interpolation points (n) minus 1.
        \memo When any independent variable value is outside the table limits, linear extrapolation
        \memo is used to predict the table result and is based on the two nearest data points in the
-       \memo table for that particularindependent variable.
+       \memo table for that particular independent variable.
        \extensible:20 repeat last twenty fields remembering to move the semi-colon to the last value
        \min-fields 27
   A1 , \field Name
        \required-field
+       \reference AllCurves
        \type alpha
   A2 , \field Interpolation Method
        \type choice
