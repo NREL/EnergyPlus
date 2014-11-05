@@ -202,7 +202,7 @@ namespace OutsideEnergySources {
 	void
 	SizeDistrictEnergy( 
 		int const EnergySourceNum 
-		);
+	);
 
 	void
 	SimDistrictEnergy(

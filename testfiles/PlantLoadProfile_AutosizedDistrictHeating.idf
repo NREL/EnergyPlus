@@ -137,6 +137,12 @@
     Demand Connectors,       !- Demand Side Connector List Name
     OPTIMAL;                 !- Load Distribution Scheme
 
+  Sizing:Plant,
+    Main Loop,               !- Plant or Condenser Loop Name
+    Heating,                 !- Loop Type
+    60,                      !- Design Loop Exit Temperature
+    15;                      !- Loop Design Temperature Difference
+      
   SetpointManager:Scheduled,
     Main Loop Setpoint Manager,  !- Name
     Temperature,             !- Control Variable

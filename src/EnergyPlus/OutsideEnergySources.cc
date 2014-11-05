@@ -1,5 +1,6 @@
 // C++ Headers
 #include <cmath>
+#include <string>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -403,6 +404,8 @@ namespace OutsideEnergySources {
 		using PlantUtilities::InitComponentNodes;
 		using PlantUtilities::RegisterPlantCompDesignFlow;
 		using DataGlobals::BeginEnvrnFlag;
+		using DataPlant::PlantSizesOkayToFinalize;
+		using DataPlant::PlantSizeNotComplete;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -450,6 +453,7 @@ namespace OutsideEnergySources {
 			// component model has not design flow rates, using data for overall plant loop
 			InitComponentNodes( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MinMassFlowRate, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).MaxMassFlowRate, EnergySource( EnergySourceNum ).InletNodeNum, EnergySource( EnergySourceNum ).OutletNodeNum, EnergySource( EnergySourceNum ).LoopNum, EnergySource( EnergySourceNum ).LoopSideNum, EnergySource( EnergySourceNum ).BranchNum, EnergySource( EnergySourceNum ).CompNum );
 			EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = false;
+			if ( PlantSizesOkayToFinalize && PlantSizeNotComplete ) SizeDistrictEnergy( EnergySourceNum );
 		}
 		if ( ! BeginEnvrnFlag ) EnergySource( EnergySourceNum ).BeginEnvrnInitFlag = true;
 
@@ -484,7 +488,7 @@ namespace OutsideEnergySources {
 	void
 	SizeDistrictEnergy( 
 		int const EnergySourceNum 
-		)
+	)
 	{
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Daeho Kang
@@ -495,14 +499,7 @@ namespace OutsideEnergySources {
 		// PURPOSE OF THIS SUBROUTINE:
 		//  This subroutine is for sizing capacities of district cooling and heating objects. 
 
-		// METHODOLOGY EMPLOYED:
-		//  na
-
-		// REFERENCES:
-		//  na
-
-        // USE STATEMENTS:
-
+		// USE STATEMENTS:
 		using DataSizing::AutoSize;
 		using DataSizing::PlantSizData;
 		using DataSizing::AutoVsHardSizingThreshold;
@@ -510,128 +507,66 @@ namespace OutsideEnergySources {
 		using FluidProperties::GetDensityGlycol;
 		using FluidProperties::GetSpecificHeatGlycol;
 
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		//  na
-
-		// DERIVED TYPE DEFINITIONS:
-		//  na
-
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PltSizHeatNum;	// Plant sizing index for hot water loop
-		int PltSizCoolNum;  // Plant sizing index for chilled water loop
-		bool ErrorsFound;	// If errors detected in input
-		bool LoopErrorsFound;
-		std::string equipName;
+		int PltSizNum( 0 );	// Plant sizing index for hot water loop
+		bool ErrorsFound( false );	// If errors detected in input
+		bool IsAutoSize( false );	// Indicator to autosize for reporting
+		Real64 NomCapDes( 0.0 );	// Autosized nominal capacity for reporting
+		Real64 NomCapUser( 0.0 );	// Hardsized nominal capacity for reporting
+		Real64 rho( 0.0 );	// Density (kg/m3)
+		Real64 Cp( 0.0 );	// Specific Heat (J/kg-K)
 
-		Real64 rho;
-		Real64 Cp;
-		bool IsAutoSize;	// Indicator to autosize for reporting
-		Real64 NomCapDes;	// Autosized nominal capacity for reporting
-		Real64 NomCapUser;	// Hardsized nominal capacity for reporting
+		// Type name string variable to collapse the sizing for cooling and heating into one block
+		std::string typeName;
+		if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {
+			typeName = "Cooling";
+		} else { // Heating
+			typeName = "Heating";
+		}
 
-		PltSizCoolNum = 0;
-		PltSizHeatNum = 0;
-		ErrorsFound = false;
-		IsAutoSize = false;
-		NomCapDes = 0.0;
-		NomCapUser = 0.0;
-
-		if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictCooling ) {  // District cooling
-			PltSizCoolNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
-			if ( PltSizCoolNum > 0 ) {
-				if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
-					IsAutoSize = true;
-				}
-				rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, 
-					PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrictCooling" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, 
-					PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrictCooling" );
-				NomCapDes = Cp * rho * PlantSizData( PltSizCoolNum ).DeltaT * PlantSizData( PltSizCoolNum ).DesVolFlowRate;
-
-				if ( PlantSizesOkayToFinalize ) {
-					if ( IsAutoSize ) {
-						EnergySource( EnergySourceNum ).NomCap = NomCapDes;
-						ReportSizingOutput( "DistrictCooling", EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes );
-					} else {  // Hard-size with sizing data
-						if ( EnergySource( EnergySourceNum ).NomCap > 0.0 && NomCapDes > 0.0 ) {
-							NomCapUser = EnergySource( EnergySourceNum ).NomCap;
-							ReportSizingOutput( "DistrictCooling", EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes, 
-								"User-Specified Nominal Capacity [W]", NomCapUser );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDistrictCooling: Potential issue with equipment sizing for " + EnergySource( EnergySourceNum ).Name );
-									ShowContinueError ( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NomCapDes, 2 ) + " [W]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
+		// Do the sizing here
+		if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
+			IsAutoSize = true;
+		}
+		PltSizNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
+		if ( PltSizNum > 0 ) {
+			rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop(EnergySource( EnergySourceNum).LoopNum ).FluidIndex, "SizeDistrict" + typeName );
+			NomCapDes = Cp * rho * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
+			if ( PlantSizesOkayToFinalize ) {
+				if ( IsAutoSize ) {
+					EnergySource( EnergySourceNum ).NomCap = NomCapDes;
+					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes );
+				} else {  // Hard-size with sizing data
+					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 && NomCapDes > 0.0 ) {
+						NomCapUser = EnergySource( EnergySourceNum ).NomCap;
+						ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes, "User-Specified Nominal Capacity [W]", NomCapUser );
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
+								ShowMessage( "SizeDistrict" + typeName + ": Potential issue with equipment sizing for " + EnergySource( EnergySourceNum ).Name );
+								ShowContinueError ( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) + " [W]" );
+								ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NomCapDes, 2 ) + " [W]" );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
 							}
 						}
 					}
 				}
+			}
+		} else {
+			if ( IsAutoSize ) {
+				ShowSevereError( "Autosizing of District " + typeName + " nominal capacity requires a loop Sizing:Plant object" );
+				ShowContinueError( "Occurs in District" + typeName + " object=" + EnergySource( EnergySourceNum ).Name );
+				ErrorsFound = true;
 			} else {
-				if ( IsAutoSize ) {
-					ShowSevereError( "Autosizing of District Cooling nominal capacity requires a loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in DistrictCooling object=" + EnergySource( EnergySourceNum ).Name );
-					ErrorsFound = true;
-				} else {
-					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "DistrictCooling", EnergySource( EnergySourceNum ).Name, 
-							"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
-					}
+				if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
+					ReportSizingOutput( "District" + typeName, EnergySource( EnergySourceNum ).Name, 
+						"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
 				}
 			}
-		} else if ( EnergySource( EnergySourceNum ).EnergyType == EnergyType_DistrictHeating ) {   // District heating 
-			PltSizHeatNum = PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).PlantSizNum;
-
-			if ( PltSizHeatNum > 0 ) {
-				if ( EnergySource( EnergySourceNum ).NomCap == AutoSize ) {
-					IsAutoSize = true;
-				}
-
-				rho = GetDensityGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp,
-					PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrictHeating" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidName, InitConvTemp,
-					PlantLoop( EnergySource( EnergySourceNum ).LoopNum ).FluidIndex, "SizeDistrictHeating" );
-
-				NomCapDes = Cp * rho * PlantSizData( PltSizHeatNum ).DeltaT * PlantSizData( PltSizHeatNum ).DesVolFlowRate;
-
-				if ( PlantSizesOkayToFinalize ) {
-					if ( IsAutoSize ) {
-						EnergySource( EnergySourceNum ).NomCap = NomCapDes;
-						ReportSizingOutput( "DistrictHeating", EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes );
-					} else { // Hard-size with sizing data
-						if ( EnergySource( EnergySourceNum ).NomCap > 0.0 && NomCapDes > 0.0 ) {
-							NomCapUser = EnergySource( EnergySourceNum ).NomCap;
-							ReportSizingOutput ( "DistrictHeating", EnergySource( EnergySourceNum ).Name, "Design Size Nominal Capacity [W]", NomCapDes,
-								"User-Specified Nominal Capacity [W]", NomCapUser );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( NomCapDes - NomCapUser ) / NomCapUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeDistrictHeating: Potential issue with equipment sizing for " + EnergySource( EnergySourceNum ).Name );
-									ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NomCapUser, 2 ) +  " [W]" );
-									ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NomCapDes, 2 ) + " [W]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
-				}
-			} else {
-				if ( IsAutoSize ) {
-					ShowSevereError( "Autosizing of District Heating nominal capacity requires a loop Sizing:Plant object" );
-					ShowContinueError( "Occurs in DistrictHeating object=" + EnergySource( EnergySourceNum ).Name );
-					ErrorsFound = true;
-				} else {
-					if ( EnergySource( EnergySourceNum ).NomCap > 0.0 ) {
-						ReportSizingOutput( "DistrictHeating", EnergySource( EnergySourceNum ).Name, 
-							"User-Specified Nominal Capacity [W]", EnergySource( EnergySourceNum ).NomCap );
-					}
-				}
-			}
+		}
+		if ( ErrorsFound ) {
+			ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 	}
 
