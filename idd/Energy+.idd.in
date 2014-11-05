@@ -58661,7 +58661,7 @@ DistrictCooling,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
+       \autosizable
        \units W
        \minimum 0.0
   A4 ; \field Capacity Fraction Schedule Name
@@ -58680,7 +58680,7 @@ DistrictHeating,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
+       \autosizable
        \units W
        \minimum 0.0
   A4 ; \field Capacity Fraction Schedule Name
