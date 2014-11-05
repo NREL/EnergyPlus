@@ -549,8 +549,11 @@ ProcessArgs(int argc, const char * argv[])
 		if (!iddFileNamedEnergy)
 			removeFile("Energy+.idd");
 		moveFile("expandedidf.err", outputExperrFileName);
-		moveFile("expanded.idf", outputExpidfFileName);
-	    inputIdfFileName = outputExpidfFileName;
+		{ IOFlags flags; gio::inquire( "expanded.idf", flags ); FileExists = flags.exists(); }
+		if (FileExists){
+			moveFile("expanded.idf", outputExpidfFileName);
+		    inputIdfFileName = outputExpidfFileName;
+		}
 	}
 
 
