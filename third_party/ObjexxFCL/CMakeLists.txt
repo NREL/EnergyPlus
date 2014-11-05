@@ -4,6 +4,9 @@ if(MSVC)
   ADD_DEFINITIONS("-Za") # Disables MS language extensions
 endif()
 
+if (UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
 
 set(src
   src/ObjexxFCL/array.iterator.hh
@@ -273,10 +276,10 @@ set(src
   src/ObjexxFCL/Sticky.fwd.hh
   src/ObjexxFCL/Sticky.hh
   src/ObjexxFCL/Stream.cc
-  src/ObjexxFCL/Stream.fwd.hh
-  src/ObjexxFCL/Stream.hh
   src/ObjexxFCL/stream.functions.cc
   src/ObjexxFCL/stream.functions.hh
+  src/ObjexxFCL/Stream.fwd.hh
+  src/ObjexxFCL/Stream.hh
   src/ObjexxFCL/string.constants.cc
   src/ObjexxFCL/string.constants.hh
   src/ObjexxFCL/string.functions.cc
@@ -293,6 +296,10 @@ set(src
   src/ObjexxFCL/TypeTraits.hh
   src/ObjexxFCL/ubyte.fwd.hh
   src/ObjexxFCL/ubyte.hh
+  src/ObjexxFCL/Vector2.fwd.hh
+  src/ObjexxFCL/Vector2.hh
+  src/ObjexxFCL/Vector3.fwd.hh
+  src/ObjexxFCL/Vector3.hh
   src/ObjexxFCL/Write.cc
   src/ObjexxFCL/Write.fwd.hh
   src/ObjexxFCL/Write.hh
@@ -314,6 +321,10 @@ set( test_src
   tst/unit/FArray.unit.cc
   tst/unit/FArray1.unit.cc
   tst/unit/FArray2.unit.cc
+  tst/unit/FArray3.unit.cc
+  tst/unit/FArray4.unit.cc
+  tst/unit/FArray5.unit.cc
+  tst/unit/FArray6.unit.cc
   tst/unit/FArrayS.unit.cc
   tst/unit/floops.unit.cc
   tst/unit/Fmath.unit.cc
@@ -326,6 +337,7 @@ set( test_src
   tst/unit/main.cc
   tst/unit/MArray.unit.cc
   tst/unit/numeric.unit.cc
+  tst/unit/ObjexxFCL.unit.hh
   tst/unit/Optional.unit.cc
   tst/unit/Print.unit.cc
   tst/unit/Read.unit.cc
@@ -337,6 +349,8 @@ set( test_src
   tst/unit/string.functions.unit.cc
   tst/unit/TypeTraits.unit.cc
   tst/unit/ubyte.unit.cc
+  tst/unit/Vector2.unit.cc
+  tst/unit/Vector3.unit.cc
   tst/unit/Write.unit.cc
 )
 

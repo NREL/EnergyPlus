@@ -19,7 +19,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Dimension;
 class Observer;
 

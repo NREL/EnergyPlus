@@ -979,9 +979,9 @@ isize( FArrayS< T > const & a )
 	return static_cast< int >( size( a ) );
 }
 
-template< template< typename > class A, typename T >
+template< template< typename > class A, typename T, class = typename std::enable_if< std::is_base_of< FArrayS< T >, A< T > >::value >::type >
 inline
-typename std::enable_if< std::is_base_of< FArrayS< T >, A< T > >::value, int >::type // Restrict to FArrayS
+int
 isize( A< T > const & a, int const dim )
 {
 	return static_cast< int >( size( a, dim ) );
