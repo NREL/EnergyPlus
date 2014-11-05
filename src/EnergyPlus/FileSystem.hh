@@ -28,7 +28,7 @@ makeDirectory(std::string directoryName);
 void
 moveFile(std::string filePath, std::string destination);
 
-void
+int
 systemCall(std::string command);
 
 void

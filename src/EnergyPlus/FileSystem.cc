@@ -50,7 +50,7 @@ getAbsolutePath( std::string const& filePath )
 #ifdef _WIN32
 	GetFullPathName(filePath.c_str(), sizeof(absolutePath), absolutePath, NULL);
 #else
-	realpath(filePath.c_str(), absolutePath);
+	char *result = realpath(filePath.c_str(), absolutePath);
 #endif
 	return std::string(absolutePath);
 }
@@ -64,7 +64,7 @@ getProgramPath()
 	uint32_t pathSize = sizeof(executableRelativePath);
 	_NSGetExecutablePath(executableRelativePath, &pathSize);
 #elif __linux__
-	readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
+	ssize_t len = readlink("/proc/self/exe", executableRelativePath, sizeof(executableRelativePath)-1);
 #elif _WIN32
 	GetModuleFileName(NULL, executableRelativePath, sizeof(executableRelativePath));
 #endif
@@ -110,10 +110,10 @@ moveFile(std::string filePath, std::string destination){
 	rename(filePath.c_str(), destination.c_str());
 }
 
-void
+int
 systemCall(std::string command)
 {
-	system(command.c_str());
+	return system(command.c_str());
 }
 
 void
@@ -128,7 +128,7 @@ linkFile(std::string fileName, std::string link)
 #ifdef _WIN32
 	CopyFile(fileName.c_str(), link.c_str(), false);
 #else
-	symlink(fileName.c_str(), link.c_str());
+	int status = symlink(fileName.c_str(), link.c_str());
 #endif
 }
 
