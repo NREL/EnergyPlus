@@ -99,14 +99,14 @@ SET( delight_src
   WxTMY2.h
 )
 
-IF( NOT UNIX )
+#IF( NOT UNIX )
   ADD_LIBRARY( DElight STATIC ${delight_src} )
-ELSE()
-  ADD_LIBRARY( DElight SHARED ${delight_src} )
-  set_target_properties(
-    DElight
-    PROPERTIES
-    INSTALL_NAME_DIR "@executable_path"
-  )
-  INSTALL( TARGETS DElight DESTINATION ./ )
-ENDIF()
+  #ELSE()
+  #  ADD_LIBRARY( DElight SHARED ${delight_src} )
+  #  set_target_properties(
+  #    DElight
+  #   PROPERTIES
+  #   INSTALL_NAME_DIR "@executable_path"
+  # )
+  # INSTALL( TARGETS DElight DESTINATION ./ )
+  #ENDIF()

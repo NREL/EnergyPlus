@@ -543,7 +543,7 @@ install( TARGETS EnergyPlusAPI
   LIBRARY DESTINATION ./ 
 )
 
-add_executable( EnergyPlus main.cc )
+add_executable( EnergyPlus main.cc "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
 target_link_libraries( EnergyPlus EnergyPlusAPI )
 
 set_target_properties(EnergyPlus PROPERTIES VERSION ${ENERGYPLUS_VERSION})

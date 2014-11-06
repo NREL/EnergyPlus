@@ -63,10 +63,21 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       endif()
     endif()
 
+    option(ENABLE_LTO "Enable link-time-optimization in gcc/clang" FALSE)
+
+    if(ENABLE_LTO)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -flto=7")
+      #            set(LINKER_FLAGS "${LINKER_FLAGS} -fno-use-linker-plugin")
+            set(LINKER_FLAGS "${LINKER_FLAGS} -fwhole-program")
+      add_definitions(-flto=7)
+      #add_definitions(-fno-use-linker-plugin)
+            add_definitions(-fwhole-program)
+    endif()
+
+
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
-
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++
