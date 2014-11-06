@@ -220,6 +220,12 @@ ProcessArgs(int argc, const char * argv[])
 	if(opt.lastArgs.size() == 0)
 		inputIdfFileName = "in.idf";
 
+	// Convert all paths to native paths
+	makeNativePath(inputIdfFileName);
+	makeNativePath(inputWeatherFileName);
+	makeNativePath(inputIddFileName);
+	makeNativePath(dirPathName);
+
 	std::vector<std::string> badOptions;
 	if(opt.lastArgs.size() > 1){
 		bool invalidOptionFound = false;
@@ -278,6 +284,7 @@ ProcessArgs(int argc, const char * argv[])
 	if(opt.isSet("-p")) {
 		std::string prefixOutName;
 		opt.get("-p")->getString(prefixOutName);
+		makeNativePath(prefixOutName);
 		outputFilePrefix = dirPathName + prefixOutName;
 	}
 	else if (!legacyMode)

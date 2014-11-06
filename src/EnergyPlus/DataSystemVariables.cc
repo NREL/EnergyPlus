@@ -8,6 +8,7 @@
 #include <DataSystemVariables.hh>
 #include <DataPrecisionGlobals.hh>
 #include <DataStringGlobals.hh>
+#include <FileSystem.hh>
 #include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
@@ -40,6 +41,7 @@ namespace DataSystemVariables {
 	using DataStringGlobals::altpathChar;
 	using DataStringGlobals::CurrentWorkingFolder;
 	using DataStringGlobals::ProgramPath;
+	using namespace FileSystem;
 
 	// Data
 	// -only module should be available to other modules and routines.
@@ -200,20 +202,16 @@ namespace DataSystemVariables {
 
 		CheckedFileName = blank;
 		InputFileName = originalInputFileName;
-		pos = index( InputFileName, altpathChar );
-		while ( pos != std::string::npos ) {
-			InputFileName[ pos ] = pathChar;
-			pos = index( InputFileName, altpathChar );
-		}
+		makeNativePath(InputFileName);
 
 		{ IOFlags flags; gio::inquire( InputFileName, flags ); FileExist = flags.exists(); }
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (user input)=" + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "found (user input)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (user input)=" + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (user input)=" + getAbsolutePath(InputFileName);
 		}
 
 		// Look relative to input file path
@@ -221,10 +219,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = idfDirPathName + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (idf)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (idf)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (idf)=" + idfDirPathName + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (idf)=" + getAbsolutePath(idfDirPathName + InputFileName);
 		}
 
 		// Look relative to input path
@@ -232,10 +230,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = envinputpath1 + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (epin)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (epin)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (epin)=" + envinputpath1 + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (epin)=" + getAbsolutePath(envinputpath1 + InputFileName);
 		}
 
 		// Look relative to input path
@@ -243,10 +241,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = envinputpath2 + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (input_path)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (input_path)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (input_path)=" + envinputpath2 + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (input_path)=" + getAbsolutePath(envinputpath2 + InputFileName);
 		}
 
 		// Look relative to program path
@@ -254,10 +252,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = envprogrampath + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (program_path)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (program_path)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (program_path)=" + envprogrampath + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (program_path)=" + getAbsolutePath(envprogrampath + InputFileName);
 		}
 
 		if ( ! TestAllPaths ) return;
@@ -267,10 +265,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = CurrentWorkingFolder + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (CWF)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (CWF)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (CWF)=" + CurrentWorkingFolder + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (CWF)=" + getAbsolutePath(CurrentWorkingFolder + InputFileName);
 		}
 
 		// Look relative to program path
@@ -278,10 +276,10 @@ namespace DataSystemVariables {
 		if ( FileExist ) {
 			FileFound = true;
 			CheckedFileName = ProgramPath + InputFileName;
-			gio::write( EchoInputFile, fmtA ) << "found (program path - ini)=" + CheckedFileName;
+			gio::write(EchoInputFile, fmtA) << "found (program path - ini)=" + getAbsolutePath(CheckedFileName);
 			return;
 		} else {
-			gio::write( EchoInputFile, fmtA ) << "not found (program path - ini)=" + ProgramPath + InputFileName;
+			gio::write(EchoInputFile, fmtA) << "not found (program path - ini)=" + getAbsolutePath(ProgramPath + InputFileName);
 		}
 
 	}

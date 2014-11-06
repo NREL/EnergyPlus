@@ -27,7 +27,7 @@ namespace EnergyPlus{
 
 namespace FileSystem {
 
-using DataStringGlobals::pathChar;
+using namespace DataStringGlobals;
 
 #ifdef _WIN32
 std::string const exeExtension(".exe");
@@ -35,6 +35,11 @@ std::string const exeExtension(".exe");
 std::string const exeExtension("");
 #endif
 
+void
+makeNativePath(std::string &path)
+{
+	std::replace(path.begin(), path.end(), altpathChar, pathChar);
+}
 
 std::string
 getFileName( std::string const& filePath )
@@ -43,7 +48,8 @@ getFileName( std::string const& filePath )
 	return filePath.substr(pathCharPosition + 1, filePath.size() - 1);
 }
 
-std::string getDirectoryPath( std::string const& filePath )
+std::string 
+getDirectoryPath( std::string const& filePath )
 {
 	int pathCharPosition = filePath.find_last_of(pathChar);
 	return filePath.substr(0, pathCharPosition + 1);

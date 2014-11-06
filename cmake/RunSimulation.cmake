@@ -12,16 +12,19 @@ get_filename_component(IDF_NAME "${IDF_FILE}" NAME_WE)
 get_filename_component(IDF_EXT "${IDF_FILE}" EXT)
 get_filename_component(EXE_PATH "${ENERGYPLUS_EXE}" PATH)
 
-# Clean up old test directory
-execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${BINARY_DIR}/testfiles/${IDF_NAME}" )
-execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${BINARY_DIR}/testfiles/${IDF_NAME}" )
-
 # Create path variables
 set (OUTPUT_DIR_PATH "${BINARY_DIR}/testfiles/${IDF_NAME}/")
 set (IDF_PATH "${SOURCE_DIR}/testfiles/${IDF_FILE}")
 set (PRODUCT_PATH "${BINARY_DIR}/Products/")
 set (EXE_PATH "${EXE_PATH}/")
 set (EPW_PATH "${SOURCE_DIR}/weather/${EPW_FILE}")
+
+# Copy IDD to Executable directory if it is not already there
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PRODUCT_PATH}/Energy+.idd" "${EXE_PATH}")
+
+# Clean up old test directory
+execute_process(COMMAND "${CMAKE_COMMAND}" -E remove_directory "${OUTPUT_DIR_PATH}" )
+execute_process(COMMAND "${CMAKE_COMMAND}" -E make_directory "${OUTPUT_DIR_PATH}" )
 
 # Read the file contents to check for special cases
 file(READ "${IDF_PATH}" IDF_CONTENT)

@@ -1,11 +1,16 @@
 #ifndef FileSystem_hh_INCLUDED
 #define FileSystem_hh_INCLUDED
 
+#include <algorithm>
+
 namespace EnergyPlus{
 
 namespace FileSystem {
 
 extern std::string const exeExtension;
+
+void
+makeNativePath(std::string &path);
 
 std::string
 getFileName( std::string const& filePath );
