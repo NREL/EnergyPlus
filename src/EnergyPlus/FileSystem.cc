@@ -29,6 +29,12 @@ namespace FileSystem {
 
 using DataStringGlobals::pathChar;
 
+#ifdef _WIN32
+std::string const exeExtension(".exe");
+#else
+std::string const exeExtension("");
+#endif
+
 
 std::string
 getFileName( std::string const& filePath )

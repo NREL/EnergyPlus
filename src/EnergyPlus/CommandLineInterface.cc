@@ -516,7 +516,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	// Preprocessors (These will likely move to a new file)
 	if(runEPMacro){
-		std::string epMacroPath = exeDirectory + "EPMacro";
+		std::string epMacroPath = exeDirectory + "EPMacro" + exeExtension;
 		{ IOFlags flags; gio::inquire( epMacroPath, flags ); FileExists = flags.exists(); }
 		if (!FileExists){
 			DisplayString("ERROR: Could not find EPMacro executable: " + getAbsolutePath(epMacroPath) + "." );
@@ -538,7 +538,7 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	if(runExpandObjects) {
-		std::string expandObjectsPath = exeDirectory + "ExpandObjects";
+		std::string expandObjectsPath = exeDirectory + "ExpandObjects" + exeExtension;
 		{ IOFlags flags; gio::inquire( expandObjectsPath, flags ); FileExists = flags.exists(); }
 		if (!FileExists){
 			DisplayString("ERROR: Could not find ExpandObjects executable: " + getAbsolutePath(expandObjectsPath) + "." );

@@ -5,6 +5,8 @@ namespace EnergyPlus{
 
 namespace FileSystem {
 
+extern std::string const exeExtension;
+
 std::string
 getFileName( std::string const& filePath );
 

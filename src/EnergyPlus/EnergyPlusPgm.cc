@@ -359,7 +359,7 @@ EnergyPlusPgm(int argc, const char * argv[])
 	ReportOrphanSchedules();
 
     if(runReadVars) {
-		std::string readVarsPath = exeDirectory + "ReadVarsESO";
+		std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
 		bool FileExists;
 		{ IOFlags flags; gio::inquire( readVarsPath, flags ); FileExists = flags.exists(); }
 		if (!FileExists){
