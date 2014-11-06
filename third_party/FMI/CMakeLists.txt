@@ -26,15 +26,10 @@ ADD_LIBRARY( epfmiimport STATIC ${SRC} )
 IF( MSVC )
   ADD_DEFINITIONS( "/w" )
 ELSE()
-  ADD_DEFINITIONS( "-w" )
+  ADD_DEFINITIONS( "-w -fPIC" )
 ENDIF()
 
 TARGET_LINK_LIBRARIES( epfmiimport epexpat miniziplib )
-
-#INSTALL( TARGETS epfmiimport 
-#  RUNTIME DESTINATION ./ 
-#  LIBRARY DESTINATION ./ 
-#)
 
 if( UNIX )
 set_target_properties(

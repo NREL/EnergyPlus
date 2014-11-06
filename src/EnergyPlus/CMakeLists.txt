@@ -519,6 +519,10 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
+if (UNIX)
+  ADD_DEFINITIONS("-fPIC")
+endif()
+
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( EnergyPlusLib STATIC ${SRC} )
@@ -529,9 +533,6 @@ endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
 add_library( EnergyPlusAPI SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-if (UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-endif()
 target_link_libraries( EnergyPlusAPI EnergyPlusLib )
 set_target_properties(
   EnergyPlusAPI
@@ -543,7 +544,13 @@ install( TARGETS EnergyPlusAPI
   LIBRARY DESTINATION ./ 
 )
 
-add_executable( EnergyPlus main.cc "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+if(ENABLE_LTO)
+  message("For some reason we cannot get the EnergyPlusPgm symbols from the .so visible when building with -flto")
+  add_executable( EnergyPlus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+else()
+  add_executable( EnergyPlus main.cc  )
+endif()
+
 target_link_libraries( EnergyPlus EnergyPlusAPI )
 
 set_target_properties(EnergyPlus PROPERTIES VERSION ${ENERGYPLUS_VERSION})

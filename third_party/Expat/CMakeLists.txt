@@ -21,7 +21,7 @@ endif(WIN32)
 IF( MSVC )
   ADD_DEFINITIONS( "/w" )
 ELSE()
-  ADD_DEFINITIONS( "-w" )
+  ADD_DEFINITIONS( "-w -fPIC" )
 ENDIF()
 
 add_library(epexpat STATIC ${epexpat_SRCS})
@@ -32,12 +32,4 @@ set_target_properties(
   INSTALL_NAME_DIR "@executable_path"
 )
 
-#INSTALL( TARGETS epexpat 
-#  RUNTIME DESTINATION ./ 
-#  LIBRARY DESTINATION ./ 
-#)
 
-#INSTALL( TARGETS epexpat 
-#  RUNTIME DESTINATION PreProcess/FMUParser
-#  LIBRARY DESTINATION PreProcess/FMUParser
-#)

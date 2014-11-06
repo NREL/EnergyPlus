@@ -23,7 +23,7 @@ ENDIF()
 IF( MSVC )
   ADD_DEFINITIONS( "/w" )
 ELSE()
-  ADD_DEFINITIONS( "-w" )
+  ADD_DEFINITIONS( "-w -fPIC" )
 ENDIF()
 
 set_target_properties(
@@ -32,8 +32,4 @@ set_target_properties(
   INSTALL_NAME_DIR "@executable_path"
 )
 
-#INSTALL( TARGETS bcvtb 
-#  RUNTIME DESTINATION ./ 
-#  LIBRARY DESTINATION ./ 
-#)
 
