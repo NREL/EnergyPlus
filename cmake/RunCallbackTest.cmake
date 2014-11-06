@@ -14,7 +14,11 @@
     set(ECHO_CMD "echo")
   endif()
   find_program(TEST_EXE TestEnergyPlusCallbacks PATHS "${BINARY_DIR}/Products/" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
-  execute_process(COMMAND ${ECHO_CMD} COMMAND "${TEST_EXE}" "${BINARY_DIR}/${TEST_DIR}")
+  if ( UNIX AND NOT APPLE )
+    execute_process(COMMAND ${ECHO_CMD} COMMAND "${TEST_EXE}" "${BINARY_DIR}/${TEST_DIR}")
+  else()
+    execute_process(COMMAND ${ECHO_CMD} COMMAND "${TEST_EXE} ${BINARY_DIR}/${TEST_DIR}")
+  endif()
   
   # Clean up
   execute_process(COMMAND "${CMAKE_COMMAND}" -E remove "${BINARY_DIR}/${TEST_DIR}/Energy+.idd" "${BINARY_DIR}/${TEST_DIR}/in.epw" )
