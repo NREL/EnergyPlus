@@ -2512,3 +2512,33 @@ TEST( FArray2Test, Transpose )
 		EXPECT_EQ( A( 2,  1 ), B(  1, 2 ) );
 	}
 }
+
+TEST( FArray2FunctionsTest, Count )
+{
+	FArray2D_bool A( 2, 3, { true, false, false, false, true, true } );
+	FArray1D_size C1( 3, { 1, 0, 2 } );
+	FArray1D_size C2( 2, { 2, 1 } );
+	EXPECT_EQ( 3u, count( A ) );
+	EXPECT_TRUE( eq( C1, count( A, 1 ) ) );
+	EXPECT_TRUE( eq( C2, count( A, 2 ) ) );
+}
+
+TEST( FArray2FunctionsTest, Sum )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1D_int S1( 2, { 32, 34 } );
+	FArray1D_int S2( 2, { 23, 43 } );
+	EXPECT_EQ( 66, sum( A ) );
+	EXPECT_TRUE( eq( S1, sum( A, 1 ) ) );
+	EXPECT_TRUE( eq( S2, sum( A, 2 ) ) );
+}
+
+TEST( FArray2FunctionsTest, Product )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1D_int P1( 2, { 231, 264 } );
+	FArray1D_int P2( 2, { 132, 462 } );
+	EXPECT_EQ( 60984, product( A ) );
+	EXPECT_TRUE( eq( P1, product( A, 1 ) ) );
+	EXPECT_TRUE( eq( P2, product( A, 2 ) ) );
+}
