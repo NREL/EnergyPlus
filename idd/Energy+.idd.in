@@ -18275,6 +18275,9 @@ RoomAirModelType,
       \key UnderFloorAirDistributionExterior
       \note (2-Node UFAD model for exterior zones)
       \note needs RoomAirSettings:UnderFloorAirDistributionExterior object referencing this Zone
+      \key AirflowNetwork
+      \note (RoomAir modeling using AirflowNetwork)
+      \note needs RoomAirSettings:AirflowNetwork object referencing this Zone
       \default Mixing
   A4; \field Air Temperature Coupling Strategy
       \type choice
@@ -19086,6 +19089,410 @@ RoomAirSettings:UnderFloorAirDistributionExterior,
        \autocalculatable
        \default Autocalculate
 
+RoomAir:Node:AirflowNetwork,
+      \memo define an air node for some types of nodal air models
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirflowNetworkNodes
+  A2, \field Zone Name
+      \required-field
+      \type object-list
+      \object-list ZoneNames
+  N1, \field Fraction of Zone Air Volume
+      \type real
+      \minimum 0.0
+      \maximum 1.0
+  A3, \field RoomAir:Node:AirflowNetwork:AdjacentSurfaceList Name
+      \type object-list
+      \object-list RoomAirNodeSurfaceLists
+  A4, \field RoomAir:Node:AirflowNetwork:InternalGains Name
+      \type object-list
+      \object-list RoomAirNodeGains
+  A5; \field RoomAir:Node:AirflowNetwork:HVACEquipment Name
+      \type object-list
+      \object-list RoomAirNodeHVACEquipment
+      
+      
+ RoomAir:Node:AirflowNetwork:AdjacentSurfaceList, 
+       \extensible:1
+       \min-fields 2
+  A1,  \field Name
+       \type Alpha
+       \reference RoomAirNodeSurfaceLists       
+  A2 , \field Surface 1 Name
+       \begin-extensible
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A3 , \field Surface 2 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A4 , \field Surface 3 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A5 , \field Surface 4 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A6 , \field Surface 5 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A7 , \field Surface 6 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A8, \field Surface 7 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A9, \field Surface 8 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A10, \field Surface 9 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A11, \field Surface 10 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A12, \field Surface 11 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A13, \field Surface 12 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A14, \field Surface 13 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A15, \field Surface 14 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A16, \field Surface 15 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A17, \field Surface 16 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A18, \field Surface 17 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A19, \field Surface 18 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A20, \field Surface 19 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A21, \field Surface 20 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+  A22; \field Surface 21 Name
+       \type object-list
+       \object-list AllHeatTranSurfNames
+
+RoomAir:Node:AirflowNetwork:InternalGains,
+      \extensible:4
+      \min-fields 5
+      \memo define the internal gains that are associated with one particular RoomAir:Node
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirNodeGains
+  A2, \field Internal Gain Object 1 Type
+      \begin-extensible
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined   
+  A3, \field Internal Gain Object 1 Name
+      \type alpha
+  N1, \field Fraction of Gains to Node 1 
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+      \note fraction applies to sensible, latent, carbon dioxide, and generic contaminant gains or losses  
+  A4, \field Internal Gain Object 2 Type
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined  
+  A5, \field Internal Gain Object 2 Name
+      \type alpha
+  N2, \field Fraction of Gains to Node 2
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+  A6, \field Internal Gain Object 3 Type
+      \type choice
+      \key People
+      \key Lights
+      \key ElectricEquipment
+      \key GasEquipment
+      \key HotWaterEquipment
+      \key SteamEquipment
+      \key OtherEquipment
+      \key ZoneBaseboard:OutdoorTemperatureControlled
+      \key ZoneContaminantSourceAndSink:CarbonDioxide
+      \key WaterUse:Equipment     
+      \key DaylightingDevice:Tubular
+      \key WaterHeater:Mixed
+      \key WaterHeater:Stratified
+      \key ThermalStorage:ChilledWater:Mixed
+      \key ThermalStorage:ChilledWater:Stratified
+      \key Generator:FuelCell
+      \key Generator:MicroCHP
+      \key ElectricLoadCenter:Transformer
+      \key ElectricLoadCenter:Inverter:Simple
+      \key ElectricLoadCenter:Inverter:FunctionOfPower
+      \key ElectricLoadCenter:Inverter:LookUpTable
+      \key ElectricLoadCenter:Storage:Battery
+      \key ElectricLoadCenter:Storage:Simple
+      \key Pipe:Indoor
+      \key Refrigeration:Case
+      \key Refrigeration:CompressorRack
+      \key Refrigeration:System:Condenser:AirCooled
+      \key Refrigeration:TranscriticalSystem:GasCooler:AirCooled
+      \key Refrigeration:System:SuctionPipe
+      \key Refrigeration:TranscriticalSystem:SuctionPipeMT
+      \key Refrigeration:TranscriticalSystem:SuctionPipeLT
+      \key Refrigeration:SecondarySystem:Receiver
+      \key Refrigeration:SecondarySystem:Pipe
+      \key Refrigeration:WalkIn
+      \key Pump:VariableSpeed
+      \key Pump:ConstantSpeed
+      \key Pump:VariableSpeed:Condensate
+      \key HeaderedPumps:VariableSpeed
+      \key HeaderedPumps:ConstantSpeed
+      \key ZoneContaminantSourceAndSink:GenericContaminant
+      \key PlantComponent:UserDefined
+      \key Coil:UserDefined
+      \key ZoneHVAC:ForcedAir:UserDefined
+      \key AirTerminal:SingleDuct:UserDefined  
+  A7, \field Internal Gain Object 3 Name
+      \type alpha
+  N3; \field Fraction of Gains to Node 3
+      \type real
+      \mininum 0.0
+      \maximum 1.0
+
+RoomAir:Node:AirflowNetwork:HVACEquipment,
+      \extensible:4
+      \memo define the zone equipment associated with one particular RoomAir:Node
+  A1, \field Name
+      \type Alpha
+      \reference RoomAirNodeHVACEquipment
+  A2, \field ZoneHVAC or Air Terminal Equipment Object Type 1
+      \begin-extensible
+      \type choice
+      \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+      \key ZoneHVAC:EnergyRecoveryVentilator
+      \key ZoneHVAC:FourPipeFanCoil
+      \key ZoneHVAC:OutdoorAirUnit
+      \key ZoneHVAC:PackagedTerminalAirConditioner
+      \key ZoneHVAC:PackagedTerminalHeatPump
+      \key ZoneHVAC:UnitHeater
+      \key ZoneHVAC:UnitVentilator
+      \key ZoneHVAC:VentilatedSlab
+      \key ZoneHVAC:WaterToAirHeatPump
+      \key ZoneHVAC:WindowAirConditioner
+      \key ZoneHVAC:Baseboard:RadiantConvective:Electric
+      \key ZoneHVAC:Baseboard:RadiantConvective:Water
+      \key ZoneHVAC:Baseboard:RadiantConvective:Steam
+      \key ZoneHVAC:Baseboard:Convective:Electric
+      \key ZoneHVAC:Baseboard:Convective:Water
+      \key ZoneHVAC:HighTemperatureRadiant
+      \key ZoneHVAC:Dehumidifier:DX
+      \key ZoneHVAC:IdealLoadsAirSystem
+      \key ZoneHVAC:RefrigerationChillerSet
+      \key Fan:ZoneExhaust
+      \key WaterHeater:HeatPump
+      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:DualDuct:ConstantVolume
+      \key AirTerminal:DualDuct:VAV
+      \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+      \key AirTerminal:SingleDuct:VAV:Reheat
+      \key AirTerminal:SingleDuct:VAV:NoReheat
+      \key AirTerminal:SingleDuct:SeriesPIU:Reheat
+      \key AirTerminal:SingleDuct:ParallelPIU:Reheat
+      \key AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+      \key AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+      \key AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+      \key AirTerminal:DualDuct:VAV:OutdoorAir
+      \key AirLoopHVACReturnAir
+  A3, \field ZoneHVAC or Air Terminal Equipment Object Name 1
+      \type alpha
+      \note for object type AirLoopHVACReturnAir, then enter zone return air node name 
+  N1, \field Fraction of Output or Supply Air from HVAC Equipment 1 
+      \type real
+      \minimum 0.0
+      \maximum 1.0
+      \note 
+  N2, \field Fraction of Input or Return Air to HVAC Equipment 1
+      \type real
+      \minimum 0.0
+      \maximum 1.0        
+  A4, \field ZoneHVAC or Air Terminal Equipment Object Type 2
+      \type choice
+      \key ZoneHVAC:TerminalUnit:VariableRefrigerantFlow
+      \key ZoneHVAC:EnergyRecoveryVentilator
+      \key ZoneHVAC:FourPipeFanCoil
+      \key ZoneHVAC:OutdoorAirUnit
+      \key ZoneHVAC:PackagedTerminalAirConditioner
+      \key ZoneHVAC:PackagedTerminalHeatPump
+      \key ZoneHVAC:UnitHeater
+      \key ZoneHVAC:UnitVentilator
+      \key ZoneHVAC:VentilatedSlab
+      \key ZoneHVAC:WaterToAirHeatPump
+      \key ZoneHVAC:WindowAirConditioner
+      \key ZoneHVAC:Baseboard:RadiantConvective:Electric
+      \key ZoneHVAC:Baseboard:RadiantConvective:Water
+      \key ZoneHVAC:Baseboard:RadiantConvective:Steam
+      \key ZoneHVAC:Baseboard:Convective:Electric
+      \key ZoneHVAC:Baseboard:Convective:Water
+      \key ZoneHVAC:HighTemperatureRadiant
+      \key ZoneHVAC:Dehumidifier:DX
+      \key ZoneHVAC:IdealLoadsAirSystem
+      \key ZoneHVAC:RefrigerationChillerSet
+      \key Fan:ZoneExhaust
+      \key WaterHeater:HeatPump
+      \key AirTerminal:SingleDuct:Uncontrolled       
+      \key AirTerminal:DualDuct:ConstantVolume
+      \key AirTerminal:DualDuct:VAV
+      \key AirTerminal:SingleDuct:ConstantVolume:Reheat
+      \key AirTerminal:SingleDuct:VAV:Reheat
+      \key AirTerminal:SingleDuct:VAV:NoReheat
+      \key AirTerminal:SingleDuct:SeriesPIU:Reheat
+      \key AirTerminal:SingleDuct:ParallelPIU:Reheat
+      \key AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction
+      \key AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat
+      \key AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat
+      \key AirTerminal:SingleDuct:ConstantVolume:CooledBeam
+      \key AirTerminal:DualDuct:VAV:OutdoorAir
+  A5, \field ZoneHVAC or Air Terminal Equipment Object Name 2
+      \type alpha
+  N3, \field Fraction of Output or Supply Air from HVAC Equipment 2 
+      \type real
+      \minimum 0.0
+      \maximum 1.0  
+  N4; \field Fraction of Input or Return Air to HVAC Equipment 2
+      \type real
+      \minimum 0.0
+      \maximum 1.0  
+
+RoomAirSettings:AirflowNetwork, 
+       \extensible:1
+       \memo RoomAir modeling using Airflow pressure network solver 
+       \min-fields 7
+  A1 , \field Name
+       \required-field
+       \type alpha
+  A2 , \field Zone Name
+       \note Name of Zone being described. Any existing zone name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  A3 , \field Control Point RoomAirflowNetwork:Node Name
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A4 , \field RoomAirflowNetwork:Node Name 1
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+       \begin-extensible
+  A5 , \field RoomAirflowNetwork:Node Name 2
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A6 , \field RoomAirflowNetwork:Node Name 3
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A7 , \field RoomAirflowNetwork:Node Name 4
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A8 , \field RoomAirflowNetwork:Node Name 5
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+  A9 ; \field RoomAirflowNetwork:Node Name 6
+       \type object-list
+       \object-list RoomAirflowNetworkNodes
+
+ 
 \group Internal Gains
 
 People,
@@ -23223,6 +23630,72 @@ AirflowNetwork:Distribution:Linkage,
       \note Only used if component = AirflowNetwork:Distribution:Component:Duct
       \note The zone name is where AirflowNetwork:Distribution:Component:Duct is exposed. Leave this field blank if the duct
       \note conduction loss is ignored.
+
+AirflowNetwork:IntraZone:Node,
+      \min-fields 2
+      \memo This object represents a node in a zone in the combination of RoomAir and 
+      \memo AirflowNetwork model.
+ A1 , \field Name
+      \required-field
+      \type alpha
+      \reference AirflowNetworkNodeNames
+      \note Enter a unique name for this object.
+ A2 , \field RoomAirflowNetwork:Node Name
+      \required-field
+      \type alpha
+      \object-list RoomAirflowNetworkNodes
+      \note Enter the name of a RoomAir:Node object defined in a RoomAirSettings:AirflowNetwork 
+      \note object.
+ A3 , \field Zone Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetwork:MultiZone:Zone
+      \note Enter the name of a zone object defined in a AirflowNetwork:MultiZone:Zone
+      \note object.
+ N1 ; \field Node Height
+      \type real
+      \units m
+      \default 0.0
+      \note Enter the reference height used to calculate the relative pressure
+      \note Coordinate system is ?? absolute, zone relative? 
+
+AirflowNetwork:IntraZone:Linkage,
+      \min-fields 4
+      \memo This object defines the connection between two nodes and a component used 
+      \memo in the combination of RoomAir and AirflowNetwork model.
+ A1 , \field Name
+      \required-field
+      \type alpha
+      \note Enter a unique name for this object.
+      \reference AirflowNetwork LinkageNames
+ A2 , \field Node 1 Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetworkNodeNames
+      \object-list ZoneNames
+      \note Enter the name of zone or AirflowNetwork Node.
+ A3 , \field Node 2 Name
+      \required-field
+      \type alpha
+      \object-list AirflowNetworkNodeNames
+      \object-list ZoneNames
+      \note Enter the name of zone or AirflowNetwork Node.
+ A4 , \field Component Name
+      \type object-list
+      \object-list AirflowNetworkComponentNames
+      \note Enter the name of an AirflowNetwork component. A component is one of the
+      \note following AirflowNetwork:Multizone:Component objects:      
+      \note AirflowNetwork:MultiZone:Component:DetailedOpening,
+      \note AirflowNetwork:MultiZone:Component:SimpleOpening,
+      \note AirflowNetwork:MultiZone:Surface:Crack,
+      \note AirflowNetwork:MultiZone:Surface:EffectiveLeakageArea,
+      \note AirflowNetwork:MultiZone:Component:HorizontalOpening
+      \note If the next field is specified, this field can be either blank or ignored.
+ A5 ; \field AirflowNetwork:MultiZone:Surface Name
+      \type object-list
+      \object-list SurfAndSubSurfNames
+      \note Only used when one of two nodes defined above are not located in the same zone, and
+      \note the input of the Component Name field in this object is ignored
 
 \group Exterior Equipment
        ! This equipment is used merely for reporting.
@@ -32564,11 +33037,11 @@ ZoneHVAC:UnitHeater,
         \key Yes
         \key No
         \note This choice field allows the user to define how the unit heater will operate 
-        \note under “no heating load” or cooling conditions. If the “No” is selected, then 
+        \note under "no heating load" or cooling conditions. If the "No" is selected, then 
         \note the fan will not run unless there is a heating load. If the fan does not run, 
         \note this effectively shuts the unit heater system off when there is no heating load. 
-        \note If the “Yes” is selected, the unit heater is available and has a ConstantVolume 
-        \note fan, or has an OnOff fan with “Supply Air Fan Operating Mode Schedule” value 
+        \note If the "Yes" is selected, the unit heater is available and has a ConstantVolume 
+        \note fan, or has an OnOff fan with "Supply Air Fan Operating Mode Schedule" value 
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -74115,7 +74588,7 @@ FaultModel:Fouling:Coil,
        \type real       
        \minimum> 0.0
        \default 0.07
-       
+
 \group General Data Entry
 
 

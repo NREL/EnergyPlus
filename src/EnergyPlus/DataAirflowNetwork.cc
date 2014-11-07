@@ -102,6 +102,8 @@ namespace DataAirflowNetwork {
 	int NumOfNodesDistribution( 0 ); // Number of nodes for distribution system calculation
 	int NumOfLinksMultiZone( 0 ); // Number of links for multizone calculation
 	int NumOfLinksDistribution( 0 ); // Number of links for distribution system calculation
+	int NumOfNodesIntraZone( 0 ); // Number of nodes for intrazone calculation
+	int NumOfLinksIntraZone( 0 ); // Number of links for intrazone calculation
 
 	int AirflowNetworkNumOfNodes( 0 ); // Number of nodes for AirflowNetwork calculation
 	// = NumOfNodesMultiZone+NumOfNodesDistribution
@@ -151,6 +153,7 @@ namespace DataAirflowNetwork {
 	FArray1D< AirflowNetworkLinkSimuData > AirflowNetworkLinkSimu;
 	FArray1D< AirflowNetworkExchangeProp > AirflowNetworkExchangeData;
 	FArray1D< AirflowNetworkExchangeProp > AirflowNetworkMultiExchangeData;
+	FArray1D< AirflowNetworkExchangeProp > AirflowNetworkRAFNExchangeData;
 	FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport;
 	FArray1D< AirflowNetworkNodeReportData > AirflowNetworkNodeReport;
 	FArray1D< AirflowNetworkLinkReportData > AirflowNetworkLinkReport1;
@@ -174,6 +177,8 @@ namespace DataAirflowNetwork {
 	FArray1D< MultizoneCPValueProp > MultizoneCPValueDataTempUnMod; // temporary CPValues, without modifcation factor
 	FArray1D< DeltaCpProp > DeltaCp;
 	FArray1D< DeltaCpProp > EPDeltaCP;
+	FArray1D< IntraZoneNodeProp > IntraZoneNodeData;
+	FArray1D< IntraZoneLinkageProp > IntraZoneLinkageData;
 	FArray1D< MultizoneCompExhaustFanProp > MultizoneCompExhaustFanData;
 	FArray1D< DisSysNodeProp > DisSysNodeData;
 	FArray1D< DisSysCompLeakProp > DisSysCompLeakData;

@@ -34,6 +34,7 @@ namespace DataRoomAirModel {
 	extern int const RoomAirModel_UCSDCV; // UCSD-CV
 	extern int const RoomAirModel_UCSDUFI; // UCSD UFAD interior zone model
 	extern int const RoomAirModel_UCSDUFE; // UCSD UFAD interior zone model
+	extern int const RoomAirModel_AirflowNetwork; // RoomAirModel_AirflowNetwork interior zone model
 	extern FArray1D_string const ChAirModel;
 
 	// Parameters to indicate air temperature coupling scheme
@@ -47,6 +48,7 @@ namespace DataRoomAirModel {
 	extern int const CeilingAirNode; // air node at ceiling (for Mundt Model)
 	extern int const MundtRoomAirNode; // air node for vertical walls (for Mundt Model)
 	extern int const ReturnAirNode; // air node for return (for Mundt and Rees&Haves Models)
+	extern int const AirflowNetworkRoomAirNode; // air node for airflow network based room air model
 	extern int const PlumeAirNode1; // air node for plume load (for Rees&Haves Model)
 	extern int const PlumeAirNode2; // air node for plume load (for Rees&Haves Model)
 	extern int const PlumeAirNode3; // air node for plume load (for Rees&Haves Model)
@@ -103,6 +105,7 @@ namespace DataRoomAirModel {
 
 	// MODULE VARIABLE DECLARATIONS:
 	extern int TotNumOfAirNodes;
+	extern int TotNumOfRoomAFNNodes;
 	extern FArray1D_int TotNumOfZoneAirNodes;
 	extern FArray1D< Real64 > ConvectiveFloorSplit;
 	extern FArray1D< Real64 > InfiltratFloorSplit;
@@ -225,6 +228,7 @@ namespace DataRoomAirModel {
 	extern int NumSurfaceMapping; // count of generic surface map patterns in input
 
 	extern bool UserDefinedUsed; // true if user-defined model used anywhere
+	extern bool RoomAirflowNetworkModelUsed; // true if RoomAirflownetwork modei is used
 	// End User-defined patterns
 
 	// Types
@@ -237,7 +241,7 @@ namespace DataRoomAirModel {
 		int ZonePtr; // Pointer to the zone number for this statement
 		int AirModelType; // 1 = Mixing, 2 = Mundt, 3 = Rees and Haves,
 		// 4 = UCSDDV, 5 = UCSDCV, -1 = user defined
-		// 6 = UCSDUFI
+		// 6 = UCSDUFI, 7 = UCSDUFE, 8 = AirflowNetwork
 		int TempCoupleScheme; // 1 = absolute (direct),
 		// 2 = relative air model temperature passing scheme (indirect)
 		bool SimAirModel; // FALSE if Mixing air model is currently used and
@@ -278,13 +282,17 @@ namespace DataRoomAirModel {
 		int ZonePtr; // Pointer to the zone number for this statement
 		int ClassType; // depending on type of model
 		Real64 Height; // height
+		Real64 ZoneVolumeFraction; // portion of zone air volume associated with this node
 		FArray1D_bool SurfMask; // limit of 60 surfaces at current sizing
+		bool IsZone; // TRUE if this node is zone node
 
 		// Default Constructor
 		AirNodeData() :
 			ZonePtr( 0 ),
 			ClassType( 0 ),
-			Height( 0.0 )
+			Height( 0.0 ),
+			ZoneVolumeFraction( 0 ),
+			IsZone( false )
 		{}
 
 		// Member Constructor
@@ -294,14 +302,18 @@ namespace DataRoomAirModel {
 			int const ZonePtr, // Pointer to the zone number for this statement
 			int const ClassType, // depending on type of model
 			Real64 const Height, // height
-			FArray1_bool const & SurfMask // limit of 60 surfaces at current sizing
-		) :
+			Real64 const ZoneVolumeFraction, // portion of zone air volume associated with this node
+			FArray1_bool const & SurfMask, // limit of 60 surfaces at current sizing
+			bool const IsZone // TRUE if this node is zone node
+			) :
 			Name( Name ),
 			ZoneName( ZoneName ),
 			ZonePtr( ZonePtr ),
 			ClassType( ClassType ),
 			Height( Height ),
-			SurfMask( SurfMask )
+			ZoneVolumeFraction( ZoneVolumeFraction ),
+			SurfMask( SurfMask ),
+			IsZone( IsZone )
 		{}
 
 	};
@@ -984,6 +996,465 @@ namespace DataRoomAirModel {
 
 	};
 
+	struct AirflowLinkagesInfoNestedStruct // becomes link
+	{
+		// Members
+		// user variables
+		int AirflowNetworkLinkSimuID; // point to this linkage in AirflowNetworkLinkSimu structure
+		int AirflowNetworkLinkageDataID; // point to this linkage in AirflowNetworkLinkageData structure
+		int AirflowNetworkLinkReportID; // point to this linkage in AirflowNetworkLinkReport structure
+		Real64 MdotIn; // mass flow rate of air into control volume(neg means leaving control volume) (kg / s)
+		Real64 TempIn; // dryblub temperature of air into control volume
+		Real64 HumRatIn; // humidity ratio of air into control volume
+
+		// Default Constructor
+		AirflowLinkagesInfoNestedStruct() :
+			AirflowNetworkLinkSimuID( 0 ),
+			AirflowNetworkLinkageDataID( 0 ),
+			AirflowNetworkLinkReportID( 0 ),
+			MdotIn( 0.0 ),
+			TempIn( 0.0 ),
+			HumRatIn( 0.0 )
+		{}
+
+		// Member Constructor
+		AirflowLinkagesInfoNestedStruct(
+			int const AirflowNetworkLinkSimuID, // point to this linkage in AirflowNetworkLinkSimu structure
+			int const AirflowNetworkLinkageDataID, // point to this linkage in AirflowNetworkLinkageData structure
+			int const AirflowNetworkLinkReportID, // point to this linkage in AirflowNetworkLinkReport structure
+			Real64 const MdotIn, // mass flow rate of air into control volume(neg means leaving control volume) (kg / s)
+			Real64 const TempIn, // dryblub temperature of air into control volume
+			Real64 const HumRatIn // humidity ratio of air into control volume
+			) :
+				AirflowNetworkLinkSimuID( AirflowNetworkLinkSimuID ),
+				AirflowNetworkLinkageDataID( AirflowNetworkLinkageDataID ),
+				AirflowNetworkLinkReportID( AirflowNetworkLinkReportID ),
+				MdotIn( MdotIn ),
+				TempIn( TempIn ),
+				HumRatIn( HumRatIn )
+		{}
+
+	};
+
+	struct RoomAirflowNetworkNodeInternalGainsStruct // becomes IntGain
+	{
+		// Members
+		// user variables
+		int TypeOfNum; // Internal type
+		std::string Name; // Intenral gain name
+		bool UseRoomAirModelTempForGains; // TRUE if user inputs temp for gains
+		bool FractionCheck; // TRUE if a fraction of internal gain for each object is checked
+
+		// Default Constructor
+		RoomAirflowNetworkNodeInternalGainsStruct() :
+			TypeOfNum( 0 ),
+			UseRoomAirModelTempForGains( false ),
+			FractionCheck ( false )
+		{}
+
+		// Member Constructor
+		RoomAirflowNetworkNodeInternalGainsStruct(
+			int const TypeOfNum, // Internal type
+			std::string const & Name, // Intenral gain name
+			bool const UseRoomAirModelTempForGains, // TRUE if user inputs temp for gains
+			bool const FractionCheck // TRUE if a fraction of internal gain for each object is checked
+		) :
+				TypeOfNum( TypeOfNum ),
+				Name( Name ),
+				UseRoomAirModelTempForGains( UseRoomAirModelTempForGains ),
+				FractionCheck ( FractionCheck )
+		{}
+
+	};
+
+	struct RoomAirflowNetworkHVACStruct // becomes HVAC
+	{
+		// Members
+		// user variables
+		std::string Name; // HVAC system name
+		std::string ObjectTypeName; // HVAC object type name
+		std::string SupplyNodeName; // HVAC system supply node name
+		std::string ReturnNodeName; // HVAC system return node name
+		int TypeOfNum; // HVAC type num
+		Real64 SupplyFraction; // Supply flow fraction
+		Real64 ReturnFraction; // Return flow fraction
+		int EquipConfigIndex; // HVAC equipment configuration index
+		int SupNodeNum; // HVAC supply node number
+		int RetNodeNum; // HVAC return node number
+
+		// Default Constructor
+		RoomAirflowNetworkHVACStruct() :
+			TypeOfNum( 0 ), // HVAC type num
+			SupplyFraction( 0 ), // Supply flow fraction
+			ReturnFraction( 0 ), // Return flow fraction
+			EquipConfigIndex( 0 ), // HVAC equipment configuration index
+			SupNodeNum( 0 ), // HVAC supply node number
+			RetNodeNum( 0 ) // HVAC return node number
+		{}
+
+		// Member Constructor
+		RoomAirflowNetworkHVACStruct(
+			std::string const & Name, // HVAC system name
+			std::string const & ObjectTypeName, // HVAC object type name
+			std::string const & SupplyNodeName, // HVAC system supply node name
+			std::string const & ReturnNodeName, // HVAC system return node name
+			int const TypeOfNum, // HVAC type num
+			Real64 const SupplyFraction, // Supply flow fraction
+			Real64 const ReturnFraction, // Return flow fraction
+			int const EquipConfigIndex, // HVAC equipment configuration index
+			int const SupNodeNum, // HVAC supply node number
+			int const RetNodeNum // HVAC return node number
+			) :
+				Name(Name),
+				ObjectTypeName( ObjectTypeName ),
+				SupplyNodeName( SupplyNodeName ),
+				ReturnNodeName( ReturnNodeName ),
+				TypeOfNum( TypeOfNum ),
+				SupplyFraction( SupplyFraction ),
+				ReturnFraction( ReturnFraction ),
+				EquipConfigIndex( EquipConfigIndex ),
+				SupNodeNum( SupNodeNum ),
+				RetNodeNum( RetNodeNum )
+		{}
+
+	};
+
+	struct RoomAirflowNetworkAirNodeNestedStruct // becomes Node
+	{
+		// Members
+		// user variables
+		std::string Name; // name of the node itself
+		Real64 ZoneVolumeFraction; // Zone volume fraction applied to this specific node
+		std::string NodeSurfListName; // name of nodes' adjacent surface list
+		bool HasSurfacesAssigned; // True if this node has surfaces assigned
+		FArray1D< bool > SurfMask; // Sized to num of surfs in Zone, true if surface is associated with this node
+		std::string NodeIntGainsListName; // name of node's internal gains list
+		bool HasIntGainsAssigned; // True if this node has internal gain assigned
+		int NumIntGains; // Number of internal gain objects
+		FArray1D< int > IntGainsDeviceIndices; // sized to NumIntGains, index pointers to internal gains struct
+		FArray1D< Real64 > IntGainsFractions; // sized to NumIntGains, gain fractions to this node
+		FArray1D< RoomAirflowNetworkNodeInternalGainsStruct > IntGain; // Internal gain struct
+		std::string NodeHVACListName; // name of node's HVAC list
+		bool HasHVACAssigned; // True if HVAC systems are assigned to this node
+		int NumHVACs; // Number of HVAC systems
+		FArray1D< RoomAirflowNetworkHVACStruct > HVAC; // HVAC struct
+		int AirflowNetworkNodeID; // pointer to AirflowNetworkNodeData structure
+		int NumOfAirflowLinks; // Number of intra zone links
+		FArray1D< AirflowLinkagesInfoNestedStruct > Link; // Linkage struct
+		Real64 AirVolume; // air volume in control volume associated with this node(m3 / s)
+		Real64 RhoAir; // current density of air for nodal control volume
+		Real64 CpAir; // current heat capacity of air for nodal control volume
+
+		Real64 AirTemp; // node air temperature
+		Real64 AirTempX1; // node air temperature at t minus 1 zone timestep
+		Real64 AirTempX2; // node air temperature at t minus 2 zone timestep
+		Real64 AirTempX3; // node air temperature at t minus 3 zone timestep
+		Real64 AirTempX4; // node air temperature at t minus 4 zone timestep
+		Real64 AirTempDSX1; // node air temperature at t minus 1 system timestep
+		Real64 AirTempDSX2; // node air temperature at t minus 2 system timestep
+		Real64 AirTempDSX3; // node air temperature at t minus 3 system timestep
+		Real64 AirTempDSX4; // node air temperature at t minus 4 system timestep
+
+		Real64 HumRat; // node air humidity ratio
+		Real64 HumRatX1; // node air humidity ratio at t minus 1 zone timestep
+		Real64 HumRatX2; // node air humidity ratio at t minus 2 zone timestep
+		Real64 HumRatX3; // node air humidity ratio at t minus 3 zone timestep
+		Real64 HumRatX4; // node air humidity ratio at t minus 4 zone timestep
+		Real64 HumRatDSX1; // node air humidity ratio at t minus 1 system timestep
+		Real64 HumRatDSX2; // node air humidity ratio at t minus 2 system timestep
+		Real64 HumRatDSX3; // node air humidity ratio at t minus 3 system timestep
+		Real64 HumRatDSX4; // node air humidity ratio at t minus 4 system timestep
+		// sensible heat balance terms for node
+		Real64 SumIntSensibleGain; // rate of heat gain from internal sensible gains(after fraction)
+		Real64 SumHA; // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
+		Real64 SumHATsurf; // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
+		Real64 SumHATref; // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
+		Real64 SumLinkMCp; // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
+		Real64 SumLinkMCpT; // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
+		Real64 SumSysMCp; // sum of mdor*Cp for incoming supply airflows for this node 
+		Real64 SumSysMCpT; // sum of mdor*Cp*T for incoming supply airflows and temperature for this node 
+		Real64 SumSysM; // sum of mdot for incoming supply airflows for this node 
+		Real64 SumSysMW; // sum of mdot*W for incoming supply airflows and temperature for this node 
+		Real64 NonAirSystemResponse; // sum of convective system load 
+		Real64 SysDepZoneLoadsLagged; // sum of system lagged load
+		// latent moisture balance terms for node
+		Real64 SumIntLatentGain; // rate of heat gain form internal latent gains(after fraction)
+		Real64 SumHmAW; // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+		Real64 SumHmARa; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+		Real64 SumHmARaW; // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
+		Real64 SumLinkM; // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
+		Real64 SumLinkMW; // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
+
+		// Default Constructor
+		RoomAirflowNetworkAirNodeNestedStruct() :
+			ZoneVolumeFraction( 0.0 ),
+			HasSurfacesAssigned( false ),
+			HasIntGainsAssigned( false ),
+			NumIntGains( 0 ),
+			HasHVACAssigned( false ),
+			NumHVACs( 0 ),
+			AirflowNetworkNodeID( 0 ),  // pointer to AirflowNetworkNodeData structure
+			NumOfAirflowLinks( 0 ),
+			AirVolume( 0.0 ),  // air volume in control volume associated with this node(m3 / s)
+			RhoAir( 0.0 ),  // current density of air for nodal control volume
+			CpAir( 0.0 ),  // current heat capacity of air for nodal control volume
+			AirTemp( 0.0 ), // node air temperature
+			AirTempX1( 0.0 ),  // node air temperature at t minus 1 zone timestep
+			AirTempX2( 0.0 ),  // node air temperature at t minus 2 zone timestep
+			AirTempX3( 0.0 ), // node air temperature at t minus 3 zone timestep
+			AirTempX4( 0.0 ), // node air temperature at t minus 4 zone timestep
+			AirTempDSX1( 0.0 ), // node air temperature at t minus 1 system timestep
+			AirTempDSX2( 0.0 ), // node air temperature at t minus 2 system timestep
+			AirTempDSX3( 0.0 ), // node air temperature at t minus 3 system timestep
+			AirTempDSX4( 0.0 ), // node air temperature at t minus 4 system timestep
+			HumRat( 0.0 ), // node air humidity ratio
+			HumRatX1( 0.0 ), // node air humidity ratio at t minus 1 zone timestep
+			HumRatX2( 0.0 ), // node air humidity ratio at t minus 2 zone timestep
+			HumRatX3( 0.0 ), // node air humidity ratio at t minus 3 zone timestep
+			HumRatX4( 0.0 ), // node air humidity ratio at t minus 4 zone timestep
+			HumRatDSX1( 0.0 ), // node air humidity ratio at t minus 1 system timestep
+			HumRatDSX2( 0.0 ), // node air humidity ratio at t minus 2 system timestep
+			HumRatDSX3( 0.0 ), // node air humidity ratio at t minus 3 system timestep
+			HumRatDSX4( 0.0 ), // node air humidity ratio at t minus 4 system timestep
+			//sensible heat balance terms for node
+			SumIntSensibleGain( 0.0 ), // rate of heat gain from internal sensible gains(after fraction)
+			SumHA( 0.0 ), // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
+			SumHATsurf( 0.0 ),
+			SumHATref( 0.0 ), // sum of Hc * Area * Temp for surfaces associated with this node
+			SumLinkMCp( 0.0 ),
+			SumLinkMCpT( 0.0 ),
+			SumSysMCp( 0.0 ),
+			SumSysMCpT( 0.0 ),
+			SumSysM( 0.0 ),
+			SumSysMW( 0.0 ),
+			NonAirSystemResponse( 0.0 ),
+			SysDepZoneLoadsLagged( 0.0 ),
+			//latent moisture balance terms for node
+			SumIntLatentGain( 0.0 ), // rate of heat gain form internal latent gains(after fraction)
+			SumHmAW( 0.0 ), // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+			SumHmARa( 0.0 ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+			SumHmARaW( 0.0 ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
+			SumLinkM( 0.0 ),
+			SumLinkMW( 0.0 )
+		{}
+
+		// Member Constructor
+		RoomAirflowNetworkAirNodeNestedStruct(
+			std::string const & Name, // name of the node itself
+			Real64 const ZoneVolumeFraction, // Zone volume fraction applied to this specific node
+			std::string const & NodeSurfListName, // name of nodes' adjacent surface list
+			bool const HasSurfacesAssigned, // True if this node has surfaces assigned
+			FArray1< bool > const & SurfMask, // Sized to num of surfs in Zone, true if surface is associated with this node
+			std::string const & NodeIntGainsListName, // name of node's internal gains list
+			bool const HasIntGainsAssigned, // True if this node has internal gain assigned
+			int const NumIntGains, // Number of internal gain objects
+			FArray1< int > const & IntGainsDeviceIndices, // sized to NumIntGains, index pointers to internal gains struct
+			FArray1< Real64 > const & IntGainsFractions, // sized to NumIntGains, gain fractions to this node
+			FArray1< RoomAirflowNetworkNodeInternalGainsStruct > const & IntGain, // Internal gain struct
+			std::string const & NodeHVACListName, // name of node's HVAC list
+			bool const HasHVACAssigned, // True if HVAC systems are assigned to this node
+			int const NumHVACs, // Number of HVAC systems
+			FArray1D< RoomAirflowNetworkHVACStruct > const & HVAC, // HVAC struct
+			int const AirflowNetworkNodeID, // pointer to AirflowNetworkNodeData structure
+			int const NumOfAirflowLinks, // Number of intra zone links
+			FArray1< AirflowLinkagesInfoNestedStruct > const & Link, // Linkage struct
+			Real64 const AirVolume, // air volume in control volume associated with this node(m3 / s)
+			Real64 const RhoAir, // current density of air for nodal control volume
+			Real64 const CpAir, // current heat capacity of air for nodal control volume
+
+			Real64 const AirTemp, // node air temperature
+			Real64 const AirTempX1, // node air temperature at t minus 1 zone timestep
+			Real64 const AirTempX2, // node air temperature at t minus 2 zone timestep
+			Real64 const AirTempX3, // node air temperature at t minus 3 zone timestep
+			Real64 const AirTempX4, // node air temperature at t minus 4 zone timestep
+			Real64 const AirTempDSX1, // node air temperature at t minus 1 system timestep
+			Real64 const AirTempDSX2, // node air temperature at t minus 2 system timestep
+			Real64 const AirTempDSX3, // node air temperature at t minus 3 system timestep
+			Real64 const AirTempDSX4, // node air temperature at t minus 4 system timestep
+
+			Real64 const HumRat, // node air humidity ratio
+			Real64 const HumRatX1, // node air humidity ratio at t minus 1 zone timestep
+			Real64 const HumRatX2, // node air humidity ratio at t minus 2 zone timestep
+			Real64 const HumRatX3, // node air humidity ratio at t minus 3 zone timestep
+			Real64 const HumRatX4, // node air humidity ratio at t minus 4 zone timestep
+			Real64 const HumRatDSX1, // node air humidity ratio at t minus 1 system timestep
+			Real64 const HumRatDSX2, // node air humidity ratio at t minus 2 system timestep
+			Real64 const HumRatDSX3, // node air humidity ratio at t minus 3 system timestep
+			Real64 const HumRatDSX4, // node air humidity ratio at t minus 4 system timestep
+			// sensible heat balance terms for node
+			Real64 const SumIntSensibleGain, // rate of heat gain from internal sensible gains(after fraction)
+			Real64 const SumHA, // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
+			Real64 const SumHATsurf, // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
+			Real64 const SumHATref, // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
+			Real64 const SumLinkMCp, // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
+			Real64 const SumLinkMCpT, // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
+			Real64 const SumSysMCp, // sum of mdor*Cp for incoming supply airflows for this node 
+			Real64 const SumSysMCpT, // sum of mdor*Cp for incoming supply airflows and temperature for this node 
+			Real64 const SumSysM, // sum of mdot for incoming supply airflows for this node 
+			Real64 const SumSysMW, // sum of mdot*W for incoming supply airflows and temperature for this node 
+			Real64 const NonAirSystemResponse, // sum of convective system load 
+			Real64 const SysDepZoneLoadsLagged, // sum of system lagged load
+			// latent moisture balance terms for node
+			Real64 const SumIntLatentGain, // rate of heat gain form internal latent gains(after fraction)
+			Real64 const SumHmAW, // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+			Real64 const SumHmARa, // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+			Real64 const SumHmARaW, // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
+			Real64 const SumLinkM, // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
+			Real64 const SumLinkMW // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
+			) :
+				Name( Name ), // name of the node itself
+				ZoneVolumeFraction( ZoneVolumeFraction ), // Zone volume fraction applied to this specific node
+				NodeSurfListName( NodeSurfListName ), // name of nodes' adjacent surface list
+				HasSurfacesAssigned( HasSurfacesAssigned ), // True if this node has surfaces assigned
+				SurfMask( SurfMask ), // Sized to num of surfs in Zone, true if surface is associated with this node
+				NodeIntGainsListName( NodeIntGainsListName ), // name of node's internal gains list
+				HasIntGainsAssigned( HasIntGainsAssigned ), // True if this node has internal gain assigned
+				NumIntGains( NumIntGains ), // Number of internal gain objects
+				IntGainsDeviceIndices( IntGainsDeviceIndices ), // sized to NumIntGains, index pointers to internal gains struct
+				IntGainsFractions( IntGainsFractions ), // sized to NumIntGains, gain fractions to this node
+				IntGain( IntGain ), // Internal gain struct
+				NodeHVACListName( NodeHVACListName ), // name of node's HVAC list
+				HasHVACAssigned( HasHVACAssigned ), // True if HVAC systems are assigned to this node
+				NumHVACs( NumHVACs ), // Number of HVAC systems
+				HVAC( ), // HVAC struct
+				AirflowNetworkNodeID( ), // pointer to AirflowNetworkNodeData structure
+				NumOfAirflowLinks( ), // Number of intra zone links
+				Link( Link ), // Linkage struct
+				AirVolume( AirVolume ), // air volume in control volume associated with this node( m3 / s )
+				RhoAir( RhoAir ), // current density of air for nodal control volume
+				CpAir( CpAir ), // current heat capacity of air for nodal control volume
+
+				AirTemp( AirTemp ), // node air temperature
+				AirTempX1( AirTempX1 ), // node air temperature at t minus 1 zone timestep
+				AirTempX2( AirTempX2 ), // node air temperature at t minus 2 zone timestep
+				AirTempX3( AirTempX3 ), // node air temperature at t minus 3 zone timestep
+				AirTempX4( AirTempX4 ), // node air temperature at t minus 4 zone timestep
+				AirTempDSX1( AirTempDSX1 ), // node air temperature at t minus 1 system timestep
+				AirTempDSX2( AirTempDSX2 ), // node air temperature at t minus 2 system timestep
+				AirTempDSX3( AirTempDSX3 ), // node air temperature at t minus 3 system timestep
+				AirTempDSX4( AirTempDSX4 ), // node air temperature at t minus 4 system timestep
+
+				HumRat( HumRat ), // node air humidity ratio
+				HumRatX1( HumRatX1 ), // node air humidity ratio at t minus 1 zone timestep
+				HumRatX2( HumRatX2 ), // node air humidity ratio at t minus 2 zone timestep
+				HumRatX3( HumRatX3 ), // node air humidity ratio at t minus 3 zone timestep
+				HumRatX4( HumRatX4 ), // node air humidity ratio at t minus 4 zone timestep
+				HumRatDSX1( HumRatDSX1 ), // node air humidity ratio at t minus 1 system timestep
+				HumRatDSX2( HumRatDSX2 ), // node air humidity ratio at t minus 2 system timestep
+				HumRatDSX3( HumRatDSX3 ), // node air humidity ratio at t minus 3 system timestep
+				HumRatDSX4( HumRatDSX4 ), // node air humidity ratio at t minus 4 system timestep
+				// sensible heat balance terms for node
+				SumIntSensibleGain( SumIntSensibleGain ), // rate of heat gain from internal sensible gains( after fraction )
+				SumHA( SumHA ), // sum of Hc * Area for surfaces associated with this node( surface convection sensible gain term )
+				SumHATsurf( SumHATsurf ), // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
+				SumHATref( SumHATref ), // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
+				SumLinkMCp( SumLinkMCp ), // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
+				SumLinkMCpT( SumLinkMCpT ), // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
+				SumSysMCp( SumSysMCp ), // sum of mdor*Cp for incoming supply airflows for this node 
+				SumSysMCpT( SumSysMCpT ), // sum of mdor*Cp for incoming supply airflows and temperature for this node 
+				SumSysM( SumSysM ), // sum of mdot for incoming supply airflows for this node 
+				SumSysMW( SumSysMW ), // sum of mdot*W for incoming supply airflows and temperature for this node 
+				NonAirSystemResponse( NonAirSystemResponse ), // sum of convective system load 
+				SysDepZoneLoadsLagged( SysDepZoneLoadsLagged ), // sum of system lagged load
+				// latent moisture balance terms for node
+				SumIntLatentGain( SumIntLatentGain ), // rate of heat gain form internal latent gains( after fraction )
+				SumHmAW( SumHmAW ), // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+				SumHmARa( SumHmARa ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+				SumHmARaW( SumHmARaW ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
+				SumLinkM( SumLinkM ), // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
+				SumLinkMW( SumLinkMW ) // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
+
+		{}
+
+	};
+
+	struct RoomAirflowNetworkInfoByZoneStruct // becomes RoomAirflowNetworkZoneInfo
+	{
+		// Members
+		// user variables
+		bool IsUsed; // true. if RoomAirflowNetwork model used in zone
+		std::string Name; // Name
+		std::string ZoneName; // Zone name in building
+		int ZoneID; // Index of Zone in Heat Balance
+		int ActualZoneID; // Index of controlled zones in ZoneCOnfigure
+		std::string AvailSched; // Name of availability schedule
+		int AvailSchedID; // index of availability schedule
+		int ControlAirNodeID; // index of roomair node that is HVAC control sensor location
+		int NumOfAirNodes; // Number of air nodes
+		FArray1D< RoomAirflowNetworkAirNodeNestedStruct > Node; // Node struct
+		int ReturnAirNodeID; // index in system Node array
+		int ZoneNodeID; // index in system Node array for this zone
+		Real64 TairMean; // comes from MAT
+		Real64 Tstat; // temperature for thermostat
+		Real64 Tleaving; // temperature for return air node
+		Real64 Texhaust; // temperature for exhaust air node
+		FArray1D< SurfaceAssocNestedStruct > Surf; // Surface struct
+		int totNumSurfs; // total surfs for this zone
+		int firstSurfID; // Index of first surface
+
+		// Default Constructor
+		RoomAirflowNetworkInfoByZoneStruct() :
+			IsUsed( false ), // true. if RoomAirflowNetwork model used in zone
+			ZoneID( 0 ), // Index of Zone in Heat Balance
+			ActualZoneID( 0 ), // Index of controlled zones in ZoneCOnfigure
+			AvailSchedID( 0 ), // index of availability schedule
+			ControlAirNodeID( 0 ), // index of roomair node that is HVAC control sensor location
+			NumOfAirNodes( 0 ), // Number of air nodes
+			ReturnAirNodeID( 0 ), // index in system Node array
+			ZoneNodeID( 0 ), // index in system Node array for this zone
+			TairMean( 23.0 ), // comes from MAT
+			Tstat( 23.0 ), // temperature for thermostat
+			Tleaving( 23.0 ), // temperature for return air node
+			Texhaust( 23.0 ), // temperature for exhaust air node
+			totNumSurfs( 0 ), // total surfs for this zone
+			firstSurfID( 0 ) // Index of first surface
+		{}
+
+		// Member Constructor
+		RoomAirflowNetworkInfoByZoneStruct(
+			bool const IsUsed, // true. if RoomAirflowNetwork model used in zone
+			std::string const Name, // Name
+			std::string const ZoneName, // Zone name in building
+			int const ZoneID, // Index of Zone in Heat Balance
+			int const ActualZoneID, // Index of controlled zones in ZoneCOnfigure
+			std::string const AvailSched, // Name of availability schedule
+			int const AvailSchedID, // index of availability schedule
+			int const ControlAirNodeID, // index of roomair node that is HVAC control sensor location
+			int const NumOfAirNodes, // Number of air nodes
+			FArray1< RoomAirflowNetworkAirNodeNestedStruct > const & Node, // Node struct
+			int const ReturnAirNodeID, // index in system Node array
+			int const ZoneNodeID, // index in system Node array for this zone
+			Real64 const TairMean, // comes from MAT
+			Real64 const Tstat, // temperature for thermostat
+			Real64 const Tleaving, // temperature for return air node
+			Real64 const Texhaust, // temperature for exhaust air node
+			FArray1< SurfaceAssocNestedStruct > const & Surf, // Surface struct
+			int const totNumSurfs, // total surfs for this zone
+			int const firstSurfID // Index of first surface
+			) :
+				IsUsed( IsUsed ),
+				Name( Name ),
+				ZoneName( ZoneName ),
+				ZoneID( ZoneID ),
+				ActualZoneID( ActualZoneID ), // Index of controlled zones in ZoneCOnfigure
+				AvailSched( AvailSched ), // Name of availability schedule
+				AvailSchedID( AvailSchedID ), // index of availability schedule
+				ControlAirNodeID( ControlAirNodeID ), // index of roomair node that is HVAC control sensor location
+				NumOfAirNodes( NumOfAirNodes ), // Number of air nodes
+				Node( Node ), // Node struct
+				ReturnAirNodeID( ReturnAirNodeID ), // index in system Node array
+				ZoneNodeID( ZoneNodeID ), // index in system Node array for this zone
+				TairMean( TairMean ), // comes from MAT
+				Tstat( Tstat ), // temperature for thermostat
+				Tleaving( Tleaving ), // temperature for return air node
+				Texhaust( Texhaust ), // temperature for exhaust air node
+				Surf( Surf ), // Surface struct
+				totNumSurfs( totNumSurfs ), // total surfs for this zone
+				firstSurfID( firstSurfID ) // Index of first surface
+		{}
+
+	};
+
 	// Object Data
 	extern FArray1D< AirModelData > AirModel;
 	extern FArray1D< AirNodeData > AirNode;
@@ -995,6 +1466,10 @@ namespace DataRoomAirModel {
 	extern FArray1D< CVDVParameters > SurfParametersCVDV; // Surface parameters
 	extern FArray1D< TemperaturePatternStruct > RoomAirPattern; // user defined patterns ,various types
 	extern FArray1D< AirPatternInfobyZoneStruct > AirPatternZoneInfo; // added zone information for user defined patterns
+//	extern FArray1D< AirflowLinkagesInfoNestedStruct > link; // added AirflowNetwork linkage info
+//	extern FArray1D< RoomAirflowNetworkNodeInternalGainsStruct > IntGain; // added intenral gain component
+//	extern FArray1D< RoomAirflowNetworkHVACStruct > HVAC; // added HVAC system 
+	extern FArray1D< RoomAirflowNetworkInfoByZoneStruct > RoomAirflowNetworkZoneInfo; // added zone info 
 
 } // DataRoomAirModel
 

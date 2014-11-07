@@ -3,6 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1S.hh>
+#include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -63,6 +64,39 @@ namespace InternalHeatGains {
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
 		FArray1S_int const GainTypeARR, // variable length 1-d array of integer valued gain types
 		Real64 & SumConvGainRate
+	);
+
+	void
+	GetInternalGainDeviceIndex(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		int const IntGainTypeOfNum, // zone internal gain type number
+		std::string const & IntGainName, // Internal gain name
+		int & DeviceIndex, // Device index
+		bool & ErrorFound
+	);
+
+	void
+	SumInternalConvectionGainsByIndices(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		FArray1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+		FArray1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
+		Real64 & SumConvGainRate
+	);
+
+	void
+	SumInternalLatentGainsByIndices(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		FArray1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+		FArray1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
+		Real64 & SumLatentGainRate
+	);
+
+	void
+	SumReturnAirConvectionGainsByIndices(
+		int const ZoneNum, // zone index pointer for which zone to sum gains for
+		FArray1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
+		FArray1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
+		Real64 & SumReturnAirGainRate
 	);
 
 	void

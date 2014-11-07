@@ -215,10 +215,16 @@ namespace ZoneTempPredictorCorrector {
 	CalcZoneAirTempSetPoints();
 
 	void
-	CalcPredictedSystemLoad( int const ZoneNum );
+	CalcPredictedSystemLoad(
+		int const ZoneNum,
+		Real64 RAFNFrac
+	);
 
 	void
-	CalcPredictedHumidityRatio( int const ZoneNum );
+	CalcPredictedHumidityRatio(
+		int const ZoneNum,
+		Real64 RAFNFrac
+	);
 
 	void
 	CorrectZoneAirTemp(
