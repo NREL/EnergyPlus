@@ -103,7 +103,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -1884,8 +1884,15 @@
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:Plant,
@@ -2579,7 +2586,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -2675,7 +2682,7 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Hot Water Loop Setpoint Manager,  !- Name
@@ -2988,7 +2995,7 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    SEQUENTIAL;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Chilled Water Loop Setpoint Manager,  !- Name
@@ -5070,7 +5077,43 @@
 
   LifeCycleCost:UsePriceEscalation,
     MidWest  Commercial-Electricity,  !- Name
-    Electricity,             !- Resource
+    ElectricityPurchased,
+    2012,                    !- Escalation Start Year
+    January,                 !- Escalation Start Month
+    1.0072,                  !- Year 1 Escalation
+    1.0148,                  !- Year 2 Escalation
+    1.0315,                  !- Year 3 Escalation
+    1.0493,                  !- Year 4 Escalation
+    1.0505,                  !- Year 5 Escalation
+    1.0451,                  !- Year 6 Escalation
+    1.0429,                  !- Year 7 Escalation
+    1.0410,                  !- Year 8 Escalation
+    1.0406,                  !- Year 9 Escalation
+    1.0444,                  !- Year 10 Escalation
+    1.0505,                  !- Year 11 Escalation
+    1.0535,                  !- Year 12 Escalation
+    1.0524,                  !- Year 13 Escalation
+    1.0478,                  !- Year 14 Escalation
+    1.0429,                  !- Year 15 Escalation
+    1.0391,                  !- Year 16 Escalation
+    1.0372,                  !- Year 17 Escalation
+    1.0360,                  !- Year 18 Escalation
+    1.0341,                  !- Year 19 Escalation
+    1.0319,                  !- Year 20 Escalation
+    1.0288,                  !- Year 21 Escalation
+    1.0341,                  !- Year 22 Escalation
+    1.0425,                  !- Year 23 Escalation
+    1.0508,                  !- Year 24 Escalation
+    1.0569,                  !- Year 25 Escalation
+    1.0626,                  !- Year 26 Escalation
+    1.0694,                  !- Year 27 Escalation
+    1.0721,                  !- Year 28 Escalation
+    1.0744,                  !- Year 29 Escalation
+    1.0774;                  !- Year 30 Escalation
+
+  LifeCycleCost:UsePriceEscalation,
+    MidWest  Commercial-Electricity,  !- Name
+    ElectricitySurplusSold,
     2012,                    !- Escalation Start Year
     January,                 !- Escalation Start Month
     1.0072,                  !- Year 1 Escalation

@@ -59,6 +59,8 @@ namespace WaterUse {
 	int const HeatRecoveryConfigEquipment( 2 );
 	int const HeatRecoveryConfigPlantAndEquip( 3 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -264,13 +266,9 @@ namespace WaterUse {
 		if ( BeginEnvrnFlag && MyEnvrnFlag ) {
 			MaxIterationsErrorCount = 0;
 			if ( NumWaterEquipment > 0 ) {
-				WaterEquipment.SensibleRate() = 0.0;
-				WaterEquipment.SensibleEnergy() = 0.0;
-				WaterEquipment.LatentRate() = 0.0;
-				WaterEquipment.LatentEnergy() = 0.0;
-				WaterEquipment.MixedTemp() = 0.0;
-				WaterEquipment.TotalMassFlowRate() = 0.0;
-				WaterEquipment.DrainTemp() = 0.0;
+				for ( int i = WaterEquipment.l(), e = WaterEquipment.u(); i <= e; ++i ) {
+					WaterEquipment( i ).reset();
+				}
 			}
 
 			if ( NumWaterConnections > 0 ) {
@@ -348,7 +346,7 @@ namespace WaterUse {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool ErrorsFound( false ); // Set to true if errors in input, fatal at end of routine
@@ -878,6 +876,8 @@ namespace WaterUse {
 		Real64 FlowMassMax;
 		Real64 MoistureMassMax;
 
+		static std::string const RoutineName( "CalcEquipmentDrainTemp" );
+
 		// FLOW:
 
 		WaterEquipment( WaterEquipNum ).SensibleRate = 0.0;
@@ -906,7 +906,7 @@ namespace WaterUse {
 				WaterEquipment( WaterEquipNum ).LatentEnergy = 0.0;
 			} else {
 				ZoneHumRat = ZoneAirHumRat( ZoneNum );
-				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, "CalcEquipmentDrainTemp" ); // Humidratio at 100% relative humidity
+				ZoneHumRatSat = PsyWFnTdbRhPb( ZoneMAT, 1.0, OutBaroPress, RoutineName ); // Humidratio at 100% relative humidity
 				RhoAirDry = PsyRhoAirFnPbTdbW( OutBaroPress, ZoneMAT, 0.0 );
 
 				ZoneMassMax = ( ZoneHumRatSat - ZoneHumRat ) * RhoAirDry * Zone( ZoneNum ).Volume; // Max water that can be evaporated to zone
@@ -1545,7 +1545,7 @@ namespace WaterUse {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

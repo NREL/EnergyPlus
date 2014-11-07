@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     NONE,                    !- Name
@@ -1179,8 +1179,15 @@
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Curve:Biquadratic,
@@ -1475,7 +1482,7 @@
     ,                        !- Latent Load Control
     Coil:Heating:Gas,        !- Supplemental Heating Coil Object Type
     Heat Pump DX Supp Heating Coil 1,  !- Supplemental Heating Coil Name
-    SupplyAirFlowRate,       !- Supply air Flow Rate Method During Cooling Operation
+    SupplyAirFlowRate,       !- Supply Air Flow Rate Method During Cooling Operation
     autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
@@ -1485,7 +1492,7 @@
     ,                        !- Supply Air Flow Rate Per Floor Area during Heating Operation {m3/s-m2}
     ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
     ,                        !- Design Supply Air Flow Rate Per Unit of Capacity During Heating Operation {m3/s-W}
-    SupplyAirFlowRate,       !- Supply air Flow Rate Method When No Cooling or Heating is Required
+    SupplyAirFlowRate,       !- Supply Air Flow Rate Method When No Cooling or Heating is Required
     autosize,                !- Supply Air Flow Rate When No Cooling or Heating is Required {m3/s}
     ,                        !- Supply Air Flow Rate Per Floor Area When No Cooling or Heating is Required {m3/s-m2}
     ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
@@ -1626,7 +1633,7 @@
   Fan:OnOff,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

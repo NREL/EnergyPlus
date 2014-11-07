@@ -74,7 +74,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                Yes
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -1430,7 +1430,7 @@
   Fan:OnOff,
     ZN_1_FLR_1_SEC_1 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.1908,                  !- Fan Efficiency
+    0.1908,                  !- Fan Total Efficiency
     297.23,                  !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -1972,7 +1972,7 @@
   Fan:OnOff,
     ZN_1_FLR_1_SEC_2 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.1908,                  !- Fan Efficiency
+    0.1908,                  !- Fan Total Efficiency
     297.23,                  !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -2514,7 +2514,7 @@
   Fan:OnOff,
     ZN_1_FLR_1_SEC_3 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.1908,                  !- Fan Efficiency
+    0.1908,                  !- Fan Total Efficiency
     297.23,                  !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -3056,7 +3056,7 @@
   Fan:OnOff,
     ZN_1_FLR_1_SEC_4 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.1908,                  !- Fan Efficiency
+    0.1908,                  !- Fan Total Efficiency
     297.23,                  !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -3584,7 +3584,7 @@
   Fan:OnOff,
     ZN_1_FLR_1_SEC_5 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.1908,                  !- Fan Efficiency
+    0.1908,                  !- Fan Total Efficiency
     297.23,                  !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency

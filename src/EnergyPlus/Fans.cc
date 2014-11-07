@@ -94,6 +94,7 @@ namespace Fans {
 
 	int const ExhaustFanCoupledToAvailManagers( 150 );
 	int const ExhaustFanDecoupledFromAvailManagers( 151 );
+	static std::string const BlankString;
 
 	//na
 
@@ -107,6 +108,7 @@ namespace Fans {
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
+	static FArray1D_bool MySizeFlag;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -126,6 +128,7 @@ namespace Fans {
 	// Object Data
 	FArray1D< FanEquipConditions > Fan;
 	FArray1D< NightVentPerfData > NightVentPerf;
+	FArray1D< FanNumericFieldData > FanNumericFields;
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -167,7 +170,7 @@ namespace Fans {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 
@@ -197,7 +200,7 @@ namespace Fans {
 				ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Number of Fans=" + TrimSigDigits( NumFans ) + ", Fan name=" + CompName );
 			}
 			if ( CheckEquipName( FanNum ) ) {
-				if ( CompName != Blank && CompName != Fan( FanNum ).FanName ) {
+				if ( ! CompName.empty() && CompName != Fan( FanNum ).FanName ) {
 					ShowFatalError( "SimulateFanComponents: Invalid CompIndex passed=" + TrimSigDigits( FanNum ) + ", Fan name=" + CompName + ", stored Fan Name for that index=" + Fan( FanNum ).FanName );
 				}
 				CheckEquipName( FanNum ) = false;
@@ -383,6 +386,7 @@ namespace Fans {
 		NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
 		if ( NumFans > 0 ) {
 			Fan.allocate( NumFans );
+			FanNumericFields.allocate( NumFans );
 		}
 		CheckEquipName.allocate( NumFans );
 		CheckEquipName = true;
@@ -391,6 +395,11 @@ namespace Fans {
 			FanNum = SimpFanNum;
 			cCurrentModuleObject = "Fan:ConstantVolume";
 			GetObjectItem( cCurrentModuleObject, SimpFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
+			FanNumericFields( FanNum ).FieldNames = "";
+			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -440,6 +449,11 @@ namespace Fans {
 			FanNum = NumSimpFan + VarVolFanNum;
 			cCurrentModuleObject = "Fan:VariableVolume";
 			GetObjectItem( cCurrentModuleObject, VarVolFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
+			FanNumericFields( FanNum ).FieldNames = "";
+			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -508,6 +522,11 @@ namespace Fans {
 			FanNum = NumSimpFan + NumVarVolFan + ExhFanNum;
 			cCurrentModuleObject = "Fan:ZoneExhaust";
 			GetObjectItem( cCurrentModuleObject, ExhFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
+			FanNumericFields( FanNum ).FieldNames = "";
+			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -623,6 +642,11 @@ namespace Fans {
 			FanNum = NumSimpFan + NumVarVolFan + NumZoneExhFan + OnOffFanNum;
 			cCurrentModuleObject = "Fan:OnOff";
 			GetObjectItem( cCurrentModuleObject, OnOffFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
+			FanNumericFields( FanNum ).FieldNames = "";
+			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -732,6 +756,11 @@ namespace Fans {
 
 			cCurrentModuleObject = "Fan:ComponentModel";
 			GetObjectItem( cCurrentModuleObject, CompModelFanNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			FanNumericFields( FanNum ).FieldNames.allocate( MaxNumbers );
+			FanNumericFields( FanNum ).FieldNames = "";
+			FanNumericFields( FanNum ).FieldNames = cNumericFieldNames;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), Fan.FanName(), FanNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -865,6 +894,8 @@ namespace Fans {
 		}
 
 		ManageEMS( emsCallFromComponentGetInput );
+		MySizeFlag.allocate( NumFans );
+		MySizeFlag = true;
 
 	}
 
@@ -923,7 +954,6 @@ namespace Fans {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
 		int Loop;
 
 		// FLOW:
@@ -931,9 +961,7 @@ namespace Fans {
 		if ( MyOneTimeFlag ) {
 
 			MyEnvrnFlag.allocate( NumFans );
-			MySizeFlag.allocate( NumFans );
 			MyEnvrnFlag = true;
-			MySizeFlag = true;
 
 			MyOneTimeFlag = false;
 
@@ -1070,12 +1098,13 @@ namespace Fans {
 		using CurveManager::GetCurveIndex;
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeFan: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1084,7 +1113,6 @@ namespace Fans {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 FanMinAirFlowRate; // minimum air flow rate [m3/s]
 		int NVPerfNum; // Index to night ventialation performance object
 		std::string equipName; // Equipment name
 		Real64 RatedPower; // Rated fan power [W]
@@ -1106,132 +1134,31 @@ namespace Fans {
 		Real64 MotorPLEff; // Motor normalized (part-load) efficiency [-]
 		static Real64 VFDSpdRatio( 0.0 ); // Ratio of motor speed to motor max speed [-]
 		static Real64 VFDOutPwrRatio( 0.0 ); // Ratio of VFD output power to max VFD output power [-]
-		bool OASysFlag; // Logical flag determines if parent object set OA Sys coil property
-		bool AirLoopSysFlag; // Logical flag determines if parent object set air loop coil property
-		Real64 MaxAirFlowRateDes; // Design maximum air flow rate for reporting
-		Real64 MaxAirFlowRateUser; // User hard-sized maximum air flow rate for reproting
-		Real64 MinAirFlowRateDes; // Design minimum air flow rate for reporting
-		Real64 MinAirFlowRateUser; // User hard-sized minimum air flow rate for reproting
-		bool IsAutoSize; // Indicator to autosize
-		bool HardSizeNoDesRun; // Indicator to hardsize with no disign run
-		bool SizingDesRunThisAirSys; // true if a particular air system had a Sizing:System object and system sizing done
-		bool SizingDesRunThisZone; // true if a particular zone had a Sizing:Zone object and zone sizing was done
+		std::string CompName; // component name
+		std::string	CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		bool bPRINT = true; // TRUE if sizing is reported to output (eio)
+		Real64 TempFlow; // autosized flow rate of fan [m3/s]
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int NumFansSized = 0; // counter used to deallocate temporary string array after all fans have been sized
 
-		FanMinAirFlowRate = 0.0;
-		NVPerfNum = Fan( FanNum ).NVPerfNum;
-		MaxAirFlowRateDes = 0.0;
-		MaxAirFlowRateUser = 0.0;
-		IsAutoSize = false;
-		if ( SysSizingRunDone || ZoneSizingRunDone ) {
-			HardSizeNoDesRun = false;
+		if ( Fan( FanNum ).FanType_Num == FanType_ComponentModel ) {
+			FieldNum = 1;
 		} else {
-			HardSizeNoDesRun = true;
+			FieldNum = 3;
 		}
-
-		if ( CurSysNum > 0 ) {
-			CheckThisAirSystemForSizing( CurSysNum, SizingDesRunThisAirSys );
-		} else {
-			SizingDesRunThisAirSys = false;
-		}
-		if ( CurZoneEqNum > 0 ) {
-			CheckThisZoneForSizing( CurZoneEqNum, SizingDesRunThisZone );
-		} else {
-			SizingDesRunThisZone = false;
-		}
-
-		if ( Fan( FanNum ).MaxAirFlowRate == AutoSize ) {
-			IsAutoSize = true;
-		}
-
-		if ( CurSysNum > 0 ) {
-			if ( ! IsAutoSize && ! SizingDesRunThisAirSys ) { // Simulation continue
-				HardSizeNoDesRun = true;
-				if ( Fan( FanNum ).MaxAirFlowRate > 0.0 ) {
-					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "User-Specified Maximum Flow Rate [m3/s]", Fan( FanNum ).MaxAirFlowRate );
-				}
-			} else { // AutoSize or hardsize with sizing run
-
-				OASysFlag = false;
-				AirLoopSysFlag = false;
-				// logicals used when parent sizes fan
-				if ( CurOASysNum > 0 ) OASysFlag = OASysEqSizing( CurOASysNum ).AirFlow;
-				if ( CurSysNum > 0 ) AirLoopSysFlag = UnitarySysEqSizing( CurSysNum ).AirFlow;
-
-				CheckSysSizing( Fan( FanNum ).FanType, Fan( FanNum ).FanName );
-
-				if ( OASysFlag ) {
-					MaxAirFlowRateDes = OASysEqSizing( CurOASysNum ).AirVolFlow;
-				} else if ( AirLoopSysFlag ) {
-					MaxAirFlowRateDes = UnitarySysEqSizing( CurSysNum ).AirVolFlow;
-				} else {
-					{ auto const SELECT_CASE_var( CurDuctType );
-					if ( SELECT_CASE_var == Main ) {
-						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					} else if ( SELECT_CASE_var == Cooling ) {
-						// MaxAirFlowRateDes = FinalSysSizing(CurSysNum)%DesCoolVolFlow
-						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					} else if ( SELECT_CASE_var == Heating ) {
-						// MaxAirFlowRateDes = FinalSysSizing(CurSysNum)%DesHeatVolFlow
-						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					} else if ( SELECT_CASE_var == Other ) {
-						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					} else {
-						MaxAirFlowRateDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
-					}}
-				}
-
-				FanMinAirFlowRate = Fan( FanNum ).MinAirFlowRate;
-			}
-		} else if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! SizingDesRunThisZone ) { // Simulation continue
-				HardSizeNoDesRun = true;
-				if ( Fan( FanNum ).MaxAirFlowRate > 0.0 ) {
-					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "User-Specified Maximum Flow Rate [m3/s]", Fan( FanNum ).MaxAirFlowRate );
-				}
-			} else { // AutoSize or hardsize with sizing run
-				CheckZoneSizing( Fan( FanNum ).FanType, Fan( FanNum ).FanName );
-				if ( ZoneEqSizing( CurZoneEqNum ).AirFlow ) {
-					MaxAirFlowRateDes = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-				} else {
-					if ( ZoneCoolingOnlyFan ) {
-						MaxAirFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-					} else if ( ZoneHeatingOnlyFan ) {
-						MaxAirFlowRateDes = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-					} else {
-						MaxAirFlowRateDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow );
-					}
-				}
-			}
-		}
-
-		if ( MaxAirFlowRateDes < SmallAirVolFlow ) {
-			MaxAirFlowRateDes = 0.0;
-		}
-
-		if ( Fan( FanNum ).MaxAirFlowRateEMSOverrideOn ) {
-			MaxAirFlowRateDes = Fan( FanNum ).MaxAirFlowRateEMSOverrideValue;
-		}
-
-		if ( ! HardSizeNoDesRun ) {
-			if ( IsAutoSize ) {
-				Fan( FanNum ).MaxAirFlowRate = MaxAirFlowRateDes;
-				ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Size Maximum Flow Rate [m3/s]", MaxAirFlowRateDes );
-			} else {
-				if ( Fan( FanNum ).MaxAirFlowRate > 0.0 && Fan( FanNum ).MaxAirFlowRateIsAutosizable && MaxAirFlowRateDes > 0.0 ) {
-					MaxAirFlowRateUser = Fan( FanNum ).MaxAirFlowRate;
-					ReportSizingOutput( Fan( FanNum ).FanType, Fan( FanNum ).FanName, "Design Size Maximum Flow Rate [m3/s]", MaxAirFlowRateDes, "User-Specified Maximum Flow Rate [m3/s]", MaxAirFlowRateUser );
-					if ( DisplayExtraWarnings ) {
-						if ( ( std::abs( MaxAirFlowRateDes - MaxAirFlowRateUser ) / MaxAirFlowRateUser ) > AutoVsHardSizingThreshold ) {
-							ShowMessage( "SizeHVACFans: Potential issue with equipment sizing for " + Fan( FanNum ).FanType + " = \"" + Fan( FanNum ).FanName + "\"." );
-							ShowContinueError( "User-Specified Maximum Flow Rate of " + RoundSigDigits( MaxAirFlowRateUser, 5 ) + " [m3/s]" );
-							ShowContinueError( "differs from Design Size Maximum Flow Rate of " + RoundSigDigits( MaxAirFlowRateDes, 5 ) + " [m3/s]" );
-							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-						}
-					}
-				}
-			}
-		}
+		TempFlow = Fan( FanNum ).MaxAirFlowRate;
+		DataAutosizable = Fan( FanNum ).MaxAirFlowRateIsAutosizable;
+		SizingString = FanNumericFields( FanNum ).FieldNames( FieldNum ) + " [m3/s]";
+		CompType = Fan( FanNum ).FanType;
+		CompName = Fan( FanNum ).FanName;
+		DataEMSOverrideON = Fan( FanNum ).MaxAirFlowRateEMSOverrideOn;
+		DataEMSOverride = Fan( FanNum ).MaxAirFlowRateEMSOverrideValue;
+		RequestSizing( CompType, CompName, SystemAirflowSizing, SizingString, TempFlow, bPRINT, RoutineName );
+		Fan( FanNum ).MaxAirFlowRate = TempFlow;
+		DataAutosizable = true;
+		DataEMSOverrideON = false;
+		DataEMSOverride = 0.0;
 
 		//cpw31Aug2010 Add fan, belt, motor and VFD component autosizing and maximum efficiency calculations
 		FanVolFlow = Fan( FanNum ).MaxAirFlowRate; //Maximum volumetric airflow through fan [m3/s at standard conditions]
@@ -1252,7 +1179,7 @@ namespace Fans {
 			//   and Sherman-Wray system curve model (assumes static pressure surrounding air distribution system is zero)
 			DuctStaticPress = CurveValue( Fan( FanNum ).PressResetCurveIndex, FanVolFlow ); //Duct static pressure setpoint [Pa]
 			DeltaPressTot = CurveValue( Fan( FanNum ).PressRiseCurveIndex, FanVolFlow, DuctStaticPress ); //Max fan total pressure rise [Pa]
-			FanOutletVelPress = 0.5 * RhoAir * std::pow( ( FanVolFlow / Fan( FanNum ).FanOutletArea ), 2 ); //Max fan outlet velocity pressure [Pa]
+			FanOutletVelPress = 0.5 * RhoAir * pow_2( FanVolFlow / Fan( FanNum ).FanOutletArea ); //Max fan outlet velocity pressure [Pa]
 			//Outlet velocity pressure cannot exceed total pressure rise
 			FanOutletVelPress = min( FanOutletVelPress, DeltaPressTot );
 			Fan( FanNum ).DeltaPress = DeltaPressTot - FanOutletVelPress; //Max fan static pressure rise [Pa]
@@ -1262,7 +1189,7 @@ namespace Fans {
 
 			// Calculate fan wheel efficiency at max fan volumetric flow and corresponding fan static pressure rise,
 			//   using fan characteristics and Wray dimensionless fan static efficiency model
-			EulerNum = ( Fan( FanNum ).DeltaPress * std::pow( Fan( FanNum ).FanWheelDia, 4 ) ) / ( RhoAir * std::pow( FanVolFlow, 2 ) ); //[-]
+			EulerNum = ( Fan( FanNum ).DeltaPress * pow_4( Fan( FanNum ).FanWheelDia ) ) / ( RhoAir * pow_2( FanVolFlow ) ); //[-]
 			NormalizedEulerNum = std::log10( EulerNum / Fan( FanNum ).EuMaxEff );
 			if ( NormalizedEulerNum <= 0.0 ) {
 				Fan( FanNum ).FanWheelEff = CurveValue( Fan( FanNum ).PLFanEffNormCurveIndex, NormalizedEulerNum );
@@ -1283,7 +1210,7 @@ namespace Fans {
 			} else {
 				FanDimFlow = CurveValue( Fan( FanNum ).DimFlowStallCurveIndex, NormalizedEulerNum ); //[-]
 			}
-			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * std::pow( Fan( FanNum ).FanWheelDia, 3 ) ); //[rad/s]
+			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * pow_3( Fan( FanNum ).FanWheelDia ) ); //[rad/s]
 			Fan( FanNum ).FanSpd = FanSpdRadS * 9.549296586; //[rpm, conversion factor is 30/PI]
 
 			if ( Fan( FanNum ).PulleyDiaRatio == AutoSize ) {
@@ -1317,7 +1244,7 @@ namespace Fans {
 
 			// Calculate belt max efficiency using correlations and coefficients based on AMCA data
 			// Direct-drive is represented using curve coefficients such that "belt" max eff and PL eff = 1.0
-			XbeltMax = std::log( Fan( FanNum ).FanShaftPwrMax / 746. ); //Natural log of belt output power in hp
+			XbeltMax = std::log( Fan( FanNum ).FanShaftPwrMax / 746.0 ); //Natural log of belt output power in hp
 			if ( Fan( FanNum ).BeltMaxEffCurveIndex != 0 ) {
 				Fan( FanNum ).BeltMaxEff = std::exp( CurveValue( Fan( FanNum ).BeltMaxEffCurveIndex, XbeltMax ) ); //[-]
 			} else {
@@ -1357,7 +1284,7 @@ namespace Fans {
 			}
 
 			// Calculate motor max efficiency using correlations and coefficients based on MotorMaster+ data
-			XmotorMax = std::log( Fan( FanNum ).MotorMaxOutPwr / 746. ); //Natural log of motor output power in hp
+			XmotorMax = std::log( Fan( FanNum ).MotorMaxOutPwr / 746.0 ); //Natural log of motor output power in hp
 			if ( Fan( FanNum ).MotorMaxEffCurveIndex != 0 ) {
 				Fan( FanNum ).MotorMaxEff = CurveValue( Fan( FanNum ).MotorMaxEffCurveIndex, XmotorMax ); //[-]
 			} else {
@@ -1473,11 +1400,14 @@ namespace Fans {
 		PreDefTableEntry( pdchFanMotorIn, equipName, Fan( FanNum ).MotInAirFrac );
 		PreDefTableEntry( pdchFanEndUse, equipName, Fan( FanNum ).EndUseSubcategoryName );
 
+		NVPerfNum = Fan( FanNum ).NVPerfNum;
 		if ( NVPerfNum > 0 ) {
 			if ( NightVentPerf( NVPerfNum ).MaxAirFlowRate == AutoSize ) {
 				NightVentPerf( NVPerfNum ).MaxAirFlowRate = Fan( FanNum ).MaxAirFlowRate;
 			}
 		}
+
+		if ( ++NumFansSized == NumFans ) FanNumericFields.deallocate(); // remove temporary array for field names at end of sizing
 
 	}
 
@@ -1711,7 +1641,7 @@ namespace Fans {
 			if ( NightVentOn && NVPerfNum > 0 ) {
 				PartLoadFrac = 1.0;
 			} else {
-				PartLoadFrac = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * FlowFracForPower + Fan( FanNum ).FanCoeff( 3 ) * std::pow( FlowFracForPower, 2 ) + Fan( FanNum ).FanCoeff( 4 ) * std::pow( FlowFracForPower, 3 ) + Fan( FanNum ).FanCoeff( 5 ) * std::pow( FlowFracForPower, 4 );
+				PartLoadFrac = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * FlowFracForPower + Fan( FanNum ).FanCoeff( 3 ) * pow_2( FlowFracForPower ) + Fan( FanNum ).FanCoeff( 4 ) * pow_3( FlowFracForPower ) + Fan( FanNum ).FanCoeff( 5 ) * pow_4( FlowFracForPower );
 			}
 
 			Fan( FanNum ).FanPower = PartLoadFrac * MaxAirMassFlowRate * DeltaPress / ( FanEff * RhoAir ); // total fan power (PH 7/13/03)
@@ -1735,11 +1665,11 @@ namespace Fans {
 			if ( DeltaTAcrossFan > 20.0 ) {
 				MinFlowFracLimitFanHeat = 0.10;
 				if ( FlowFracForPower < MinFlowFracLimitFanHeat ) {
-					PartLoadFracatLowMin = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) * std::pow( MinFlowFracLimitFanHeat, 2 ) + Fan( FanNum ).FanCoeff( 4 ) * std::pow( MinFlowFracLimitFanHeat, 3 ) + Fan( FanNum ).FanCoeff( 5 ) * std::pow( MinFlowFracLimitFanHeat, 4 );
+					PartLoadFracatLowMin = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) * pow_2( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 4 ) * pow_3( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 5 ) * pow_4( MinFlowFracLimitFanHeat );
 					FanPoweratLowMinimum = PartLoadFracatLowMin * MaxAirMassFlowRate * DeltaPress / ( FanEff * RhoAir );
 					Fan( FanNum ).FanPower = FlowFracForPower * FanPoweratLowMinimum / MinFlowFracLimitFanHeat;
 				} else if ( FlowFracActual < MinFlowFracLimitFanHeat ) {
-					PartLoadFracatLowMin = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) * std::pow( MinFlowFracLimitFanHeat, 2 ) + Fan( FanNum ).FanCoeff( 4 ) * std::pow( MinFlowFracLimitFanHeat, 3 ) + Fan( FanNum ).FanCoeff( 5 ) * std::pow( MinFlowFracLimitFanHeat, 4 );
+					PartLoadFracatLowMin = Fan( FanNum ).FanCoeff( 1 ) + Fan( FanNum ).FanCoeff( 2 ) * MinFlowFracLimitFanHeat + Fan( FanNum ).FanCoeff( 3 ) * pow_2( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 4 ) * pow_3( MinFlowFracLimitFanHeat ) + Fan( FanNum ).FanCoeff( 5 ) * pow_4( MinFlowFracLimitFanHeat );
 					FanPoweratLowMinimum = PartLoadFracatLowMin * MaxAirMassFlowRate * DeltaPress / ( FanEff * RhoAir );
 					Fan( FanNum ).FanPower = FlowFracActual * FanPoweratLowMinimum / MinFlowFracLimitFanHeat;
 				}
@@ -1982,7 +1912,7 @@ namespace Fans {
 		Real64 MassFlow; // [kg/sec]
 		Real64 Tin; // [C]
 		Real64 PowerLossToAir; // fan and motor loss to air stream (watts)
-		bool FanIsRunning;
+		bool FanIsRunning = false; // There seems to be a missing else case below unless false is assumed
 
 		DeltaPress = Fan( FanNum ).DeltaPress;
 		if ( Fan( FanNum ).EMSFanPressureOverrideOn ) DeltaPress = Fan( FanNum ).EMSFanPressureValue;
@@ -2197,7 +2127,7 @@ namespace Fans {
 			FanVolFlow = MassFlow / RhoAir; //[m3/s at standard conditions]
 			DuctStaticPress = CurveValue( Fan( FanNum ).PressResetCurveIndex, FanVolFlow ); //Duct static pressure setpoint [Pa]
 			DeltaPressTot = CurveValue( Fan( FanNum ).PressRiseCurveIndex, FanVolFlow, DuctStaticPress ); //Fan total pressure rise [Pa]
-			FanOutletVelPress = 0.5 * RhoAir * std::pow( ( FanVolFlow / Fan( FanNum ).FanOutletArea ), 2 ); //Fan outlet velocity pressure [Pa]
+			FanOutletVelPress = 0.5 * RhoAir * pow_2( FanVolFlow / Fan( FanNum ).FanOutletArea ); //Fan outlet velocity pressure [Pa]
 			//Outlet velocity pressure cannot exceed total pressure rise
 			FanOutletVelPress = min( FanOutletVelPress, DeltaPressTot );
 			Fan( FanNum ).DeltaPress = DeltaPressTot - FanOutletVelPress; //Fan static pressure rise [Pa]
@@ -2209,7 +2139,7 @@ namespace Fans {
 
 			// Calculate fan wheel efficiency using fan volumetric flow, fan static pressure rise,
 			//   fan characteristics, and Wray dimensionless fan static efficiency model
-			EulerNum = ( Fan( FanNum ).DeltaPress * std::pow( Fan( FanNum ).FanWheelDia, 4 ) ) / ( RhoAir * std::pow( FanVolFlow, 2 ) ); //[-]
+			EulerNum = ( Fan( FanNum ).DeltaPress * pow_4( Fan( FanNum ).FanWheelDia ) ) / ( RhoAir * pow_2( FanVolFlow ) ); //[-]
 			NormalizedEulerNum = std::log10( EulerNum / Fan( FanNum ).EuMaxEff );
 			if ( NormalizedEulerNum <= 0.0 ) {
 				Fan( FanNum ).FanWheelEff = CurveValue( Fan( FanNum ).PLFanEffNormCurveIndex, NormalizedEulerNum );
@@ -2228,7 +2158,7 @@ namespace Fans {
 			} else {
 				FanDimFlow = CurveValue( Fan( FanNum ).DimFlowStallCurveIndex, NormalizedEulerNum ); //[-]
 			}
-			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * std::pow( Fan( FanNum ).FanWheelDia, 3 ) ); //[rad/s]
+			FanSpdRadS = FanVolFlow / ( FanDimFlow * Fan( FanNum ).FanMaxDimFlow * pow_3( Fan( FanNum ).FanWheelDia ) ); //[rad/s]
 			Fan( FanNum ).FanTrq = Fan( FanNum ).FanShaftPower / FanSpdRadS; //[N-m]
 			Fan( FanNum ).FanSpd = FanSpdRadS * 9.549296586; //[rpm, conversion factor is 30/PI]
 			MotorSpeed = Fan( FanNum ).FanSpd * Fan( FanNum ).PulleyDiaRatio; //[rpm]
@@ -3140,6 +3070,124 @@ namespace Fans {
 		}
 
 	}
+	
+	Real64
+	FanDesDT(
+		int const FanNum, // index of fan in Fan array
+		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   August 2014
+		//       MODIFIED       
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function calculates and returns the design fan delta T from the fan input data
+
+		// METHODOLOGY EMPLOYED:
+		// Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
+		//              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
+		//              Qdot,air = cp,air*rho,air*Vdot*deltaT
+
+		// REFERENCES: EnergyPlus Engineering Reference
+		
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 RhoAir; // density of air [kg/m3]
+		Real64 CpAir;  // specific heat of air [J/kg-K]
+		Real64 DeltaP; // fan design pressure rise [N/m2]
+		Real64 TotEff; // fan design total efficiency
+		Real64 MotEff; // fan design motor efficiency
+		Real64 MotInAirFrac; // fraction of motor in the air stream
+		Real64 PowerLossToAir; // fan and motor loss to air stream (W)
+		//
+		if ( FanNum == 0 ) {
+			DesignDeltaT = 0.0;
+		}
+		else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+			DeltaP = Fan( FanNum ).DeltaPress;
+			TotEff = Fan( FanNum ).FanEff;
+			MotEff = Fan( FanNum ).MotEff;
+			MotInAirFrac = Fan( FanNum ).MotInAirFrac;
+			RhoAir = StdRhoAir;
+			CpAir = PsyCpAirFnWTdb( constant_zero, constant_twenty );
+			DesignDeltaT = ( DeltaP / ( RhoAir * CpAir * TotEff ) ) * ( MotEff + MotInAirFrac * ( 1.0 - MotEff ) );
+		}
+		else {
+			DesignDeltaT = 0.0;
+		}
+	
+		return DesignDeltaT;
+	
+	} // FanDesDT
+
+	Real64
+	FanDesHeatGain(
+		int const FanNum, // index of fan in Fan array
+		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   August 2014
+		//       MODIFIED       
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function calculates and returns the design fan heat gain from the fan input data
+
+		// METHODOLOGY EMPLOYED:
+		// Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
+		//              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
+
+		// REFERENCES: EnergyPlus Engineering Reference
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+		using DataSizing::CurSysNum;
+		using DataAirLoop::AirLoopControlInfo;
+
+		// Return value
+		Real64 DesignHeatGain; // returned heat gain of matched fan [W]
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 RhoAir; // density of air [kg/m3]
+		Real64 CpAir;  // specific heat of air [J/kg-K]
+		Real64 DeltaP; // fan design pressure rise [N/m2]
+		Real64 TotEff; // fan design total efficiency
+		Real64 MotEff; // fan design motor efficiency
+		Real64 MotInAirFrac; // fraction of motor in the air stream
+		Real64 FanPowerTot; // total fan power consumption [W]
+		//
+		if ( FanNum == 0 ) {
+			DesignHeatGain = 0.0;
+		}
+		else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+			DeltaP = Fan( FanNum ).DeltaPress;
+			TotEff = Fan( FanNum ).FanEff;
+			MotEff = Fan( FanNum ).MotEff;
+			MotInAirFrac = Fan( FanNum ).MotInAirFrac;
+			FanPowerTot = ( FanVolFlow * DeltaP ) / TotEff;
+			DesignHeatGain = MotEff*FanPowerTot + ( FanPowerTot - MotEff * FanPowerTot ) * MotInAirFrac;
+		}
+		else {
+			if ( !SysSizingCalc && MySizeFlag( FanNum ) ) {
+				SizeFan( FanNum );
+				MySizeFlag( FanNum ) = false;
+			}
+			DesignHeatGain = Fan( FanNum ).FanShaftPower + ( Fan( FanNum ).MotorInputPower - Fan( FanNum ).FanShaftPower ) * Fan( FanNum ).MotInAirFrac;
+		}
+
+		return DesignHeatGain;
+
+	} // FanDesHeatGain
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
@@ -3153,7 +3201,7 @@ namespace Fans {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

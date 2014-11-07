@@ -30,7 +30,7 @@
 !        ZN15_Shop_1 is a floating zone
 !
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,4;
 
@@ -3222,8 +3222,15 @@
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     ,                        !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     ,                        !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 !
@@ -3404,7 +3411,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN1,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -3498,8 +3505,15 @@
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     ,                        !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     ,                        !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 !
@@ -3680,7 +3694,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN2,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -3774,8 +3788,15 @@
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     ,                        !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     ,                        !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 !
@@ -3956,7 +3977,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN3,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4050,8 +4071,15 @@
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     ,                        !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     ,                        !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 !
@@ -4232,7 +4260,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN4,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4326,8 +4354,15 @@
     0.004,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     ,                        !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     ,                        !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 !
@@ -4508,7 +4543,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN5,          !- Name
     HVACoperationSchd,       !- Availability Schedule Name
-    0.53,                    !- Fan Efficiency
+    0.53,                    !- Fan Total Efficiency
     600.00000,               !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.85,                    !- Motor Efficiency
@@ -4701,7 +4736,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN11,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency
@@ -4904,7 +4939,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN12,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency
@@ -5094,7 +5129,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN13,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency
@@ -5296,7 +5331,7 @@
   Fan:ConstantVolume,
     Supply Fan ZN14,         !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600,                     !- Pressure Rise {Pa}
     3.0,                     !- Maximum Flow Rate {m3/s}
     0.55,                    !- Motor Efficiency

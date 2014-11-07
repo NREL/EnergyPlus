@@ -196,6 +196,19 @@ namespace WaterUse {
 			Energy( Energy )
 		{}
 
+		// Reset Some Values to Zeros
+		void
+		reset()
+		{
+			SensibleRate = 0.0;
+			SensibleEnergy = 0.0;
+			LatentRate = 0.0;
+			LatentEnergy = 0.0;
+			MixedTemp = 0.0;
+			TotalMassFlowRate = 0.0;
+			DrainTemp = 0.0;
+		}
+
 	};
 
 	struct WaterConnectionsType
@@ -506,7 +519,7 @@ namespace WaterUse {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

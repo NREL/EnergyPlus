@@ -19,10 +19,11 @@
 
 // C++ Headers
 #include <complex>
+#include <cstddef>
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class byte;
 class ubyte;
 
@@ -31,7 +32,7 @@ template< typename T >
 struct TraitsF
 {
 	typedef  T  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -58,7 +59,7 @@ template<>
 struct TraitsF< char >
 {
 	typedef  char  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -76,7 +77,7 @@ template<>
 struct TraitsF< bool >
 {
 	typedef  bool  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -94,7 +95,7 @@ template<>
 struct TraitsF< byte >
 {
 	typedef  byte  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -112,7 +113,7 @@ template<>
 struct TraitsF< ubyte >
 {
 	typedef  ubyte  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -130,7 +131,7 @@ template<>
 struct TraitsF< short int >
 {
 	typedef  short int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -148,7 +149,7 @@ template<>
 struct TraitsF< unsigned short int >
 {
 	typedef  unsigned short int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -166,7 +167,7 @@ template<>
 struct TraitsF< int >
 {
 	typedef  int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -184,7 +185,7 @@ template<>
 struct TraitsF< unsigned int >
 {
 	typedef  unsigned int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -202,7 +203,7 @@ template<>
 struct TraitsF< long int >
 {
 	typedef  long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -220,7 +221,7 @@ template<>
 struct TraitsF< unsigned long int >
 {
 	typedef  unsigned long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -238,7 +239,7 @@ template<>
 struct TraitsF< long long int >
 {
 	typedef  long long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -256,7 +257,7 @@ template<>
 struct TraitsF< unsigned long long int >
 {
 	typedef  unsigned long long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -274,7 +275,7 @@ template<>
 struct TraitsF< float >
 {
 	typedef  float  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -301,7 +302,7 @@ template<>
 struct TraitsF< double >
 {
 	typedef  double  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -328,7 +329,7 @@ template<>
 struct TraitsF< long double >
 {
 	typedef  long double  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline

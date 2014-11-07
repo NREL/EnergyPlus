@@ -36,7 +36,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class byte;
 class ubyte;
 class Fstring;
@@ -63,7 +63,7 @@ public: // Creation
 	inline
 	explicit
 	Skip( Size const w = 1ul ) :
-		w_( w )
+	 w_( w )
 	{}
 
 	// Destructor
@@ -177,11 +177,12 @@ inline
 std::string
 B( T const & t, Size w = TraitsB< T >::w(), Size const m = 0ul )
 {
+	static std::locale const loc( std::locale(), new fmt::Binary_num_put );
 	if ( w == NOSIZE ) w = TraitsB< T >::w();
 	std::ostringstream stream;
 	if ( w > 0ul ) stream << std::setw( m > 0ul ? std::min( m, w ) : w );
 	if ( m > 0ul ) stream << std::setfill( '0' );
-	stream.imbue( std::locale( std::locale(), new Binary_num_put ) );
+	stream.imbue( loc );
 	stream << t;
 	return ( w > 0ul ? lpadded( stream.str(), w ) : stream.str() );
 }
@@ -263,10 +264,13 @@ inline
 std::string
 E( T const & t, Size w = TraitsE< T >::w(), Size const d = TraitsE< T >::d(), Size e = TraitsE< T >::e(), int const k = 0 )
 {
+	static auto np( new fmt::Exponent_num_put );
+	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w();
-	if ( w == 0 ) return std::string();
+	if ( w == 0ul ) return std::string();
+	np->set( d, e, k );
 	std::ostringstream stream;
-	stream.imbue( std::locale( std::locale(), new fmt::Exponent_num_put( d, e, k ) ) );
+	stream.imbue( loc );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -286,10 +290,13 @@ inline
 std::string
 D( T const & t, Size w = TraitsE< T >::w(), Size const d = TraitsE< T >::d(), Size e = TraitsE< T >::e(), int const k = 0 )
 {
+	static auto np( new fmt::Exponent_num_put );
+	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w();
-	if ( w == 0 ) return std::string();
+	if ( w == 0ul ) return std::string();
+	np->set( d, e, k, 'D' );
 	std::ostringstream stream;
-	stream.imbue( std::locale( std::locale(), new fmt::Exponent_num_put( d, e, k, 'D' ) ) );
+	stream.imbue( loc );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -309,10 +316,13 @@ inline
 std::string
 EN( T const & t, Size w = TraitsE< T >::w(), Size const d = TraitsE< T >::d(), Size e = TraitsE< T >::e() )
 {
+	static auto np( new fmt::Engineering_num_put );
+	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w();
-	if ( w == 0 ) return std::string();
+	if ( w == 0ul ) return std::string();
+	np->set( d, e );
 	std::ostringstream stream;
-	stream.imbue( std::locale( std::locale(), new fmt::Engineering_num_put( d, e ) ) );
+	stream.imbue( loc );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -332,10 +342,13 @@ inline
 std::string
 ES( T const & t, Size w = TraitsE< T >::w(), Size const d = TraitsE< T >::d(), Size e = TraitsE< T >::e() )
 {
+	static auto np( new fmt::Scientific_num_put );
+	static std::locale const loc( std::locale(), np );
 	if ( w == NOSIZE ) w = TraitsE< T >::w();
-	if ( w == 0 ) return std::string();
+	if ( w == 0ul ) return std::string();
+	np->set( d, e );
 	std::ostringstream stream;
-	stream.imbue( std::locale( std::locale(), new fmt::Scientific_num_put( d, e ) ) );
+	stream.imbue( loc );
 	stream << std::showpoint << std::uppercase << std::setw( w ) << t;
 	return stream.str();
 }
@@ -370,7 +383,7 @@ G( T const & t, Size w = TraitsG< T >::w(), Size const d = TraitsG< T >::d(), Si
 				Size const n( std::min( e + 2, w ) );
 				return F( t, w - n, d - std::min( Size( p ), d ) ) + std::string( n, ' ' );
 			} else { // Use E editing
-				if ( w == 0 ) { // Choose width
+				if ( w == 0ul ) { // Choose width
 					Size const e_( TraitsG< T >::e() ); // G0.dEe form not allowed in Fortran: Set exponent width based on type
 					return E( t, d + e_ + 4, d, e_, k );
 				} else { // Use specified width

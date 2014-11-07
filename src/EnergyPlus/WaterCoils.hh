@@ -553,9 +553,26 @@ namespace WaterCoils {
 		{}
 
 	};
+	struct WaterCoilNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		WaterCoilNumericFieldData()
+		{}
+
+		// Member Constructor
+		WaterCoilNumericFieldData(
+			FArray1_string const & FieldNames // Name of the WaterCoil numeric field descriptions
+		) :
+			FieldNames( FieldNames )
+		{}
+	};
 
 	// Object Data
 	extern FArray1D< WaterCoilEquipConditions > WaterCoil;
+	extern FArray1D< WaterCoilNumericFieldData > WaterCoilNumericFields;
 
 	// Functions
 
@@ -742,8 +759,8 @@ namespace WaterCoils {
 
 	void
 	CalcDryFinEffCoef(
-		Real64 & OutTubeEffFinDiamRatio,
-		FArray1S< Real64 > PolynomCoef
+		Real64 const OutTubeEffFinDiamRatio,
+		FArray1< Real64 > & PolynomCoef
 	);
 
 	void
@@ -764,8 +781,8 @@ namespace WaterCoils {
 
 	void
 	CalcPolynomCoef(
-		FArray2A< Real64 > OrderedPair,
-		FArray1S< Real64 > PolynomCoef
+		FArray2< Real64 > const & OrderedPair,
+		FArray1< Real64 > & PolynomCoef
 	);
 
 	Real64
@@ -921,7 +938,7 @@ namespace WaterCoils {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

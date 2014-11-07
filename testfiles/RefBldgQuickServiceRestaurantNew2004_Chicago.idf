@@ -73,7 +73,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 3
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -1336,7 +1336,7 @@
   Fan:ConstantVolume,
     PSZ-AC_1:1_Fan,          !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.546,                   !- Fan Efficiency
+    0.546,                   !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.84,                    !- Motor Efficiency
@@ -1348,7 +1348,7 @@
   Fan:ConstantVolume,
     PSZ-AC_2:2_Fan,          !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.546,                   !- Fan Efficiency
+    0.546,                   !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.84,                    !- Motor Efficiency
@@ -1360,7 +1360,7 @@
   Fan:ZoneExhaust,
     Dining Exhaust Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    1.0,                     !- Fan Efficiency
+    1.0,                     !- Fan Total Efficiency
     1.0e-006,                !- Pressure Rise {Pa}
     0.834532374100719,       !- Maximum Flow Rate {m3/s}
     Dining Exhaust Fan Node, !- Air Inlet Node Name
@@ -1376,7 +1376,7 @@
   Fan:ZoneExhaust,
     Kitchen Exhaust Fan,     !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     185,                     !- Pressure Rise {Pa}
     1.557,                   !- Maximum Flow Rate {m3/s}
     Kitchen Exhaust Fan Node,!- Air Inlet Node Name
@@ -1593,8 +1593,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -1615,8 +1622,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Controller:OutdoorAir,

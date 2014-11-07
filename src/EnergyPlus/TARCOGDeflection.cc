@@ -2,6 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <TARCOGDeflection.hh>
@@ -91,7 +92,7 @@ namespace TARCOGDeflection {
 		i = 0;
 		// first calculate D coefficients since that will be necessary for any of selected standards
 		for ( i = 1; i <= nlayer; ++i ) {
-			DCoeff( i ) = YoungsMod( i ) * std::pow( PaneThickness( i ), 3.0 ) / ( 12 * ( 1 - std::pow( PoissonsRat( i ), 2.0 ) ) );
+			DCoeff( i ) = YoungsMod( i ) * pow_3( PaneThickness( i ) ) / ( 12 * ( 1 - pow_2( PoissonsRat( i ) ) ) );
 		}
 
 		{ auto const SELECT_CASE_var( DeflectionStandard );
@@ -142,6 +143,9 @@ namespace TARCOGDeflection {
 		// Locals
 		//OUTPUT
 
+		// Static constants
+		static Real64 const Pi_6( pow_6( Pi ) );
+
 		//localy used
 		FArray1D< Real64 > DPressure( maxlay ); // delta pressure at each glazing layer
 		FArray1D< Real64 > Vini( MaxGap );
@@ -170,8 +174,9 @@ namespace TARCOGDeflection {
 		Ratio = MeanLDSum / MaxLDSum;
 
 		//calculate Vgap for each gap
+		Real64 const W_H_Ratio( W * H * Ratio );
 		for ( i = 1; i <= nlayer - 1; ++i ) {
-			Vgap( i ) = Vini( i ) + W * H * Ratio * ( LayerDeflection( i ) - LayerDeflection( i + 1 ) );
+			Vgap( i ) = Vini( i ) + W_H_Ratio * ( LayerDeflection( i ) - LayerDeflection( i + 1 ) );
 		} //do i = 1, nlayer
 
 		//calculate Tgap for each gap
@@ -193,8 +198,9 @@ namespace TARCOGDeflection {
 			DPressure( i ) = Pgap( i ) - Pgap( i - 1 );
 		} //do i = 1, nlayer
 
+		Real64 const deflection_fac( DeflectionRelaxation * MaxLDSum * 16 );
 		for ( i = 1; i <= nlayer; ++i ) {
-			LayerDeflection( i ) += DeflectionRelaxation * MaxLDSum * 16 * DPressure( i ) / ( std::pow( Pi, 6 ) * DCoeff( i ) );
+			LayerDeflection( i ) += deflection_fac * DPressure( i ) / ( Pi_6 * DCoeff( i ) );
 		}
 
 		for ( i = 1; i <= nlayer - 1; ++i ) {
@@ -292,7 +298,7 @@ namespace TARCOGDeflection {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

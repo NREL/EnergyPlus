@@ -282,7 +282,7 @@ namespace PlantCentralGSHP {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
+		static std::string const RoutineName( "SizeCGSHPChillerHeater" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na
@@ -417,9 +417,9 @@ namespace PlantCentralGSHP {
 				}
 				if ( PltSizNum > 0 ) {
 					if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpEvapVolFlowRate > 0.0 ) {
-						Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "SizeCGSHPChillerHeater" );
+						Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "SizeCGSHPChillerHeater" );
+						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 						tmpNomCap = Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate;
 						if ( ! IsAutoSize ) tmpNomCap = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCapCooling;
 						//IF (PlantSizesOkayToFinalize) Wrapper(WrapperNum)%ChillerHeater(NumChillerHeater)%RefCapCooling = tmpNomCap
@@ -470,8 +470,8 @@ namespace PlantCentralGSHP {
 				}
 				if ( PltSizCondNum > 0 ) {
 					if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
-						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, "SizeCGSHPChillerHeater" );
-						Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).TempRefCondIn, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, "SizeCGSHPChillerHeater" );
+						rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, RoutineName );
+						Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).TempRefCondIn, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, RoutineName );
 						tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).RefCOPCooling ) * Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).OpenMotorEff ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 						Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).tmpCondVolFlowRate = tmpCondVolFlowRate;
 						if ( ! IsAutoSize ) tmpCondVolFlowRate = Wrapper( WrapperNum ).ChillerHeater( NumChillerHeater ).CondVolFlowRate;
@@ -1270,7 +1270,7 @@ namespace PlantCentralGSHP {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitCGSHPHeatPump" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na
@@ -1419,7 +1419,7 @@ namespace PlantCentralGSHP {
 					Wrapper( WrapperNum ).GLHEVolFlowRate += Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).CondVolFlowRate;
 				}
 
-				rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "InitCGSHPHeatPump" );
+				rho = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				Wrapper( WrapperNum ).CHWMassFlowRateMax = Wrapper( WrapperNum ).CHWVolFlowRate * rho;
 				Wrapper( WrapperNum ).HWMassFlowRateMax = Wrapper( WrapperNum ).HWVolFlowRate * rho;
@@ -1569,6 +1569,8 @@ namespace PlantCentralGSHP {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcChillerHeaterModel" );
+		static std::string const RoutineNameElecEIRChiller( "CalcElectricEIRChillerModel" );
 
 		//CHARACTER(len=*), PARAMETER :: OutputFormat  = '(F6.2)'
 
@@ -1712,9 +1714,9 @@ namespace PlantCentralGSHP {
 
 				// Calculate density ratios to adjust mass flow rates from initialized ones
 				// Hot water temperature is known, but evaporator mass flow rates will be adjusted in the following "Do" loop
-				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
-				EvapDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
-				CondDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
+				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+				EvapDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+				CondDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				// Calculate density ratios to adjust mass flow rates from initialized ones
 				CHWDensityRatio = EvapDensity / InitDensity;
@@ -1804,7 +1806,7 @@ namespace PlantCentralGSHP {
 				}
 
 				// Calculate the specific heat of chilled water
-				Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				// Calculate cooling load this chiller should meet and the other chillers are demanded
 				EvapOutletTempSetPoint = Node( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).TempSetPointNodeNum ).TempSetPoint;
@@ -1928,7 +1930,7 @@ namespace PlantCentralGSHP {
 				ActualCOP = ( QEvaporator + ChillerFalseLoadRate ) / CHPower;
 
 				if ( CondMassFlowRate > MassFlowTolerance ) {
-					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, "CalcElectricEIRChillerModel" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).GLHELoopNum ).FluidIndex, RoutineNameElecEIRChiller );
 					CondOutletTemp = QCondenser / CondMassFlowRate / Cp + CondInletTemp;
 				} else {
 					ShowSevereError( "CalcChillerheaterModel: Condenser flow = 0, for Chillerheater=" + Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).Name );
@@ -2055,6 +2057,8 @@ namespace PlantCentralGSHP {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "CalcChillerHeaterModel" );
+		static std::string const RoutineNameElecEIRChiller( "CalcElectricEIRChillerModel" );
 
 		//CHARACTER(len=*), PARAMETER :: OutputFormat  = '(F6.2)'
 
@@ -2191,9 +2195,9 @@ namespace PlantCentralGSHP {
 
 				// Calculate density ratios to adjust mass flow rates from initialized ones
 				// Hot water temperature is known, but condenser mass flow rates will be adjusted in the following "Do" loop
-				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
-				EvapDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
-				CondDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
+				InitDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+				EvapDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, EvapInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
+				CondDensity = GetDensityGlycol( PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				// Calculate density ratios to adjust mass flow rates from initialized ones
 				HWDensityRatio = CondDensity / InitDensity;
@@ -2269,7 +2273,7 @@ namespace PlantCentralGSHP {
 				// Mode 4 uses all data from the chilled water loop due to no heating demand
 				if ( SimulClgDominant || CurrentMode == 3 ) {
 					CurrentMode = 3;
-					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 					QCondenser = Wrapper( WrapperNum ).ChillerHeaterReport( ChillerHeaterNum ).QCondSimul;
 
@@ -2358,7 +2362,7 @@ namespace PlantCentralGSHP {
 						PartLoadRat = 0.0;
 					}
 
-					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidName, Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).EvapInletNode.Temp, PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidIndex, "CalcChillerHeaterModel" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidName, Wrapper( WrapperNum ).ChillerHeater( ChillerHeaterNum ).EvapInletNode.Temp, PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 					// Calculate evaporator heat transfer
 					if ( EvapMassFlowRate > MassFlowTolerance ) {
@@ -2432,7 +2436,7 @@ namespace PlantCentralGSHP {
 					// Set load this chiller heater should meet and temperatures given
 					QCondenser = min( HeatingLoadToMeet, QCondenser );
 
-					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidIndex, "CalcElectricEIRChillerModel" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidName, CondInletTemp, PlantLoop( Wrapper( WrapperNum ).HWLoopNum ).FluidIndex, RoutineNameElecEIRChiller );
 
 					// Calculate temperatures for constant flow and mass flow rate for variable flow
 					// Limit mass for this chiller heater to the available mass at given temperature conditions
@@ -2746,7 +2750,7 @@ namespace PlantCentralGSHP {
 					if ( CHWBypassMassFlowRate > 0.0 ) {
 						CHWOutletTemp += CHWInletTemp * CHWBypassMassFlowRate / CHWInletMassFlowRate;
 					} else {
-						CHWOutletTemp = CHWOutletTemp;
+						//CHWOutletTemp = CHWOutletTemp; // Self-assignment commented out
 					}
 
 					if ( GLHEInletMassFlowRate > 0.0 ) {
@@ -2754,7 +2758,7 @@ namespace PlantCentralGSHP {
 						if ( GLHEBypassMassFlowRate > 0.0 ) {
 							GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 						} else {
-							GLHEOutletTemp = GLHEOutletTemp;
+							//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 						}
 					} else {
 						GLHEOutletTemp = GLHEInletTemp;
@@ -2915,8 +2919,8 @@ namespace PlantCentralGSHP {
 										GLHEInletMassFlowRate = 0.0;
 										GLHEOutletTemp = GLHEInletTemp;
 									} else { // At leaset, one of chiller heater units is cooling-only mode
-										GLHEOutletMassFlowRate = GLHEOutletMassFlowRate;
-										GLHEOutletTemp = GLHEOutletTemp;
+										//GLHEOutletMassFlowRate = GLHEOutletMassFlowRate; // Self-assignment commented out
+										//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 									}
 								}
 								// Calculate mass weighed chilled water temperatures
@@ -2944,7 +2948,7 @@ namespace PlantCentralGSHP {
 								if ( CHWBypassMassFlowRate > 0.0 ) {
 									CHWOutletTemp += CHWInletTemp * CHWBypassMassFlowRate / CHWInletMassFlowRate;
 								} else { // No bypass withnin a wrapper
-									CHWOutletTemp = CHWOutletTemp;
+									//CHWOutletTemp = CHWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								CHWOutletTemp = CHWInletTemp;
@@ -2955,7 +2959,7 @@ namespace PlantCentralGSHP {
 								if ( HWBypassMassFlowRate > 0.0 ) {
 									HWOutletTemp += HWInletTemp * HWBypassMassFlowRate / HWInletMassFlowRate;
 								} else {
-									HWOutletTemp = HWOutletTemp;
+									//HWOutletTemp = HWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								HWOutletTemp = HWInletTemp;
@@ -2966,7 +2970,7 @@ namespace PlantCentralGSHP {
 								if ( GLHEBypassMassFlowRate > 0.0 ) {
 									GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 								} else {
-									GLHEOutletTemp = GLHEOutletTemp;
+									//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								GLHEOutletTemp = GLHEInletTemp;
@@ -3022,8 +3026,8 @@ namespace PlantCentralGSHP {
 										GLHEInletMassFlowRate = 0.0;
 										GLHEOutletTemp = GLHEInletTemp;
 									} else { // At leaset, one of chiller heater units is heating only mode
-										GLHEOutletMassFlowRate = GLHEOutletMassFlowRate;
-										GLHEOutletTemp = GLHEOutletTemp;
+										//GLHEOutletMassFlowRate = GLHEOutletMassFlowRate; // Self-assignment commented out
+										//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 									}
 								}
 
@@ -3051,7 +3055,7 @@ namespace PlantCentralGSHP {
 								if ( CHWBypassMassFlowRate > 0.0 ) {
 									CHWOutletTemp += CHWInletTemp * CHWBypassMassFlowRate / CHWInletMassFlowRate;
 								} else { // No bypass withnin a wrapper
-									CHWOutletTemp = CHWOutletTemp;
+									//CHWOutletTemp = CHWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								CHWOutletTemp = CHWInletTemp;
@@ -3062,7 +3066,7 @@ namespace PlantCentralGSHP {
 								if ( HWBypassMassFlowRate > 0.0 ) {
 									HWOutletTemp += HWInletTemp * HWBypassMassFlowRate / HWInletMassFlowRate;
 								} else {
-									HWOutletTemp = HWOutletTemp;
+									//HWOutletTemp = HWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								HWOutletTemp = HWInletTemp;
@@ -3073,7 +3077,7 @@ namespace PlantCentralGSHP {
 								if ( GLHEBypassMassFlowRate > 0.0 ) {
 									GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 								} else {
-									GLHEOutletTemp = GLHEOutletTemp;
+									//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								GLHEOutletTemp = GLHEInletTemp;
@@ -3120,7 +3124,7 @@ namespace PlantCentralGSHP {
 							if ( HWBypassMassFlowRate > 0.0 ) {
 								HWOutletTemp += HWInletTemp * HWBypassMassFlowRate / HWInletMassFlowRate;
 							} else {
-								HWOutletTemp = HWOutletTemp;
+								//HWOutletTemp = HWOutletTemp; // Self-assignment commented out
 								if ( HWOutletTemp > HWInletTemp ) HWOutletTemp = HWInletTemp;
 							}
 						} else {
@@ -3133,7 +3137,7 @@ namespace PlantCentralGSHP {
 							if ( GLHEBypassMassFlowRate > 0.0 ) {
 								GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 							} else {
-								GLHEOutletTemp = GLHEOutletTemp;
+								//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 							}
 						} else {
 							GLHEOutletTemp = GLHEInletTemp;
@@ -3373,7 +3377,7 @@ namespace PlantCentralGSHP {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

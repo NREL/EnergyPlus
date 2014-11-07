@@ -22,6 +22,7 @@
 #include <cmath>
 #include <cstddef>
 #include <initializer_list>
+#include <type_traits>
 #include <utility>
 
 namespace ObjexxFCL {
@@ -67,15 +68,15 @@ public: // Creation
 	// Default Constructor
 	inline
 	CArray() :
-		size_( 0 ),
-		data_( nullptr )
+	 size_( 0 ),
+	 data_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	CArray( CArray const & a ) :
-		size_( a.size_ ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( a.size_ ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = a.data_[ i ];
@@ -83,11 +84,11 @@ public: // Creation
 	}
 
 	// Copy Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	CArray( CArray< U > const & a ) :
-		size_( a.size_ ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( a.size_ ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = T( a.data_[ i ] );
@@ -97,11 +98,11 @@ public: // Creation
 	// Pointer + Size Constructor
 	inline
 	CArray(
-		T const * const p,
-		size_type const size
+	 T const * const p,
+	 size_type const size
 	) :
-		size_( size ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( size ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = p[ i ];
@@ -109,14 +110,14 @@ public: // Creation
 	}
 
 	// Pointer + Size Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	CArray(
-		U const * const p,
-		size_type const size
+	 U const * const p,
+	 size_type const size
 	) :
-		size_( size ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( size ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = T( p[ i ] );
@@ -127,11 +128,11 @@ public: // Creation
 	template< typename InputIterator >
 	inline
 	CArray(
-		InputIterator const beg,
-		InputIterator const end
+	 InputIterator const beg,
+	 InputIterator const end
 	) :
-		size_( end - beg ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( end - beg ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		if ( size_ > 0u ) {
 			InputIterator k( beg );
@@ -142,22 +143,22 @@ public: // Creation
 	}
 
 	// Size Constructor
-	// Built-in value types are not initialized
+	//  Built-in value types are not initialized
 	inline
 	explicit
 	CArray( size_type const size ) :
-		size_( size ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( size ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{}
 
 	// Size + Uniform Value Constructor
 	inline
 	CArray(
-		size_type const size,
-		T const & t
+	 size_type const size,
+	 T const & t
 	) :
-		size_( size ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( size ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		for ( size_type i = 0; i < size_; ++i ) {
 			data_[ i ] = t;
@@ -165,11 +166,11 @@ public: // Creation
 	}
 
 	// Initializer List Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	CArray( std::initializer_list< U > const l ) :
-		size_( l.size() ),
-		data_( size_ > 0u ? new T[ size_ ] : nullptr )
+	 size_( l.size() ),
+	 data_( size_ > 0u ? new T[ size_ ] : nullptr )
 	{
 		std::copy( l.begin(), l.end(), data_ );
 	}
@@ -210,7 +211,7 @@ public: // Assignment
 	}
 
 	// Copy Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	CArray &
 	operator =( CArray< U > const & a )
@@ -237,7 +238,7 @@ public: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	CArray &
 	operator =( std::initializer_list< U > const l )
@@ -251,8 +252,8 @@ public: // Assignment
 	inline
 	CArray &
 	assign(
-		T const * const p,
-		size_type const size
+	 T const * const p,
+	 size_type const size
 	)
 	{
 		if ( size_ != size ) {
@@ -266,12 +267,12 @@ public: // Assignment
 	}
 
 	// Pointer + Size Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	CArray &
 	assign(
-		U const * const p,
-		size_type const size
+	 U const * const p,
+	 size_type const size
 	)
 	{
 		if ( size_ != size ) {
@@ -289,8 +290,8 @@ public: // Assignment
 	inline
 	CArray &
 	assign(
-		InputIterator const beg,
-		InputIterator const end
+	 InputIterator const beg,
+	 InputIterator const end
 	)
 	{
 		size_type const size( end - beg );
@@ -311,8 +312,8 @@ public: // Assignment
 	inline
 	CArray &
 	assign(
-		size_type const size,
-		T const & value
+	 size_type const size,
+	 T const & value
 	)
 	{
 		if ( size_ != size ) { // Set to new array with uniform values
@@ -324,7 +325,7 @@ public: // Assignment
 	}
 
 	// += CArray
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	CArray &
 	operator +=( CArray< U > const & a )
@@ -337,7 +338,7 @@ public: // Assignment
 	}
 
 	// -= CArray
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	CArray &
 	operator -=( CArray< U > const & a )
@@ -383,13 +384,28 @@ public: // Assignment
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	CArray &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( size_type i = 0; i < size_; ++i ) {
-			data_[ i ] /= t;
+			data_[ i ] *= inv_u;
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	CArray &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( size_type i = 0; i < size_; ++i ) {
+			data_[ i ] /= u;
 		}
 		return *this;
 	}
@@ -447,7 +463,8 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			length_sq += square( data_[ i ] );
+			T const data_i( data_[ i ] );
+			length_sq += data_i * data_i;
 		}
 		return std::sqrt( length_sq );
 	}
@@ -459,7 +476,8 @@ public: // Inspector
 	{
 		T length_sq( T( 0 ) );
 		for ( size_type i = 0; i < size_; ++i ) {
-			length_sq += square( data_[ i ] );
+			T const data_i( data_[ i ] );
+			length_sq += data_i * data_i;
 		}
 		return length_sq;
 	}
@@ -500,8 +518,8 @@ public: // Modifier
 	inline
 	CArray &
 	resize(
-		size_type const size,
-		T const & fill = T()
+	 size_type const size,
+	 T const & fill = T()
 	)
 	{
 		if ( size_ < size ) {
@@ -640,17 +658,6 @@ public: // Array Accessor
 		return data_;
 	}
 
-private: // Static Functions
-
-	// square( x ) == x^2
-	inline
-	static
-	T
-	square( T const & x )
-	{
-		return x * x;
-	}
-
 private: // Data
 
 	size_type size_; // Number of array elements
@@ -660,6 +667,64 @@ private: // Data
 }; // CArray
 
 // Functions
+
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( CArray< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( CArray< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return mag_sq;
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( CArray< T > const & a, CArray< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( CArray< T > const & a, CArray< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
 
 // Dot Product
 template< typename T >
@@ -687,34 +752,6 @@ dot_product( CArray< T > const & a, CArray< T > const & b )
 		sum += a[ i ] * b[ i ];
 	}
 	return sum;
-}
-
-// Distance
-template< typename T >
-inline
-T
-distance( CArray< T > const & a, CArray< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return std::sqrt( distance_sq );
-}
-
-// Distance Squared
-template< typename T >
-inline
-T
-distance_squared( CArray< T > const & a, CArray< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename CArray< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return distance_sq;
 }
 
 // Swap

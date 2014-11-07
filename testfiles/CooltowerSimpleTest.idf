@@ -73,7 +73,7 @@
 !   Environmental Emissions:        None
 !   Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     BUILDING #1,             !- Name
@@ -2181,9 +2181,7 @@
 
   Output:Variable,*,Zone Cooltower Air Volume,hourly;
 
-  Output:Variable,*,Zone Cooltower Current Density Volumetric Flow Rate,hourly;
-
-  Output:Variable,*,Zone Cooltower Standard Density Volumetric Flow Rate,hourly;
+  Output:Variable,*,Zone Cooltower Current Density Air Volume Flow Rate,hourly;
 
   Output:Variable,*,Zone Cooltower Air Mass,hourly;
 

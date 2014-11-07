@@ -89,6 +89,8 @@ namespace SteamBaseboardRadiator {
 		int BBLoadReSimIndex;
 		int BBMassFlowReSimIndex;
 		int BBInletTempFlowReSimIndex;
+		int HeatingCapMethod; // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		SteamBaseboardParams() :
@@ -131,7 +133,9 @@ namespace SteamBaseboardRadiator {
 			CompNum( 0 ),
 			BBLoadReSimIndex( 0 ),
 			BBMassFlowReSimIndex( 0 ),
-			BBInletTempFlowReSimIndex( 0 )
+			BBInletTempFlowReSimIndex( 0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -180,7 +184,10 @@ namespace SteamBaseboardRadiator {
 			int const CompNum, // plant loop component index
 			int const BBLoadReSimIndex,
 			int const BBMassFlowReSimIndex,
-			int const BBInletTempFlowReSimIndex
+			int const BBInletTempFlowReSimIndex,
+			int const HeatingCapMethod,   // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+  			Real64 const ScaledHeatingCapacity   // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+
 		) :
 			EquipID( EquipID ),
 			EquipType( EquipType ),
@@ -226,13 +233,33 @@ namespace SteamBaseboardRadiator {
 			CompNum( CompNum ),
 			BBLoadReSimIndex( BBLoadReSimIndex ),
 			BBMassFlowReSimIndex( BBMassFlowReSimIndex ),
-			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex )
+			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
 
 	};
 
+	struct SteamBaseboardNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		SteamBaseboardNumericFieldData()
+		{}
+
+		// Member Constructor
+		SteamBaseboardNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< SteamBaseboardParams > SteamBaseboard;
+	extern FArray1D< SteamBaseboardNumericFieldData > SteamBaseboardNumericFields;
 
 	// Functions
 
@@ -301,7 +328,7 @@ namespace SteamBaseboardRadiator {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -1397,7 +1397,7 @@ namespace ZoneContaminantPredictorCorrector {
 					Pi = AirflowNetworkNodeSimu( MultizoneSurfaceData( SurfNum ).NodeNums( 1 ) ).PZ;
 					Pj = AirflowNetworkNodeSimu( MultizoneSurfaceData( SurfNum ).NodeNums( 2 ) ).PZ;
 					if ( Pj >= Pi ) {
-						GCGain = ZoneContamGenericPDriven( Loop ).GCGenRateCoef * GetCurrentScheduleValue( ZoneContamGenericPDriven( Loop ).GCGenRateCoefSchedPtr ) * std::pow( ( Pj - Pi ), ZoneContamGenericPDriven( Loop ).GCExpo );
+						GCGain = ZoneContamGenericPDriven( Loop ).GCGenRateCoef * GetCurrentScheduleValue( ZoneContamGenericPDriven( Loop ).GCGenRateCoefSchedPtr ) * std::pow( Pj - Pi, ZoneContamGenericPDriven( Loop ).GCExpo );
 					} else {
 						GCGain = 0.0;
 					}
@@ -1495,7 +1495,7 @@ namespace ZoneContaminantPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PredictZoneContaminants" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1635,7 +1635,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 				if ( ControlledCO2ZoneFlag ) {
 					// The density of air
-					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "PredictZoneContaminants" );
+					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 
 					// Calculate Co2 from infiltration + humidity added from latent load
 					// to determine system added/subtracted moisture.
@@ -1668,7 +1668,7 @@ namespace ZoneContaminantPredictorCorrector {
 						if ( A == 0.0 ) { // B=0
 							LoadToCO2SetPoint = C * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) ) - B;
 						} else {
-							LoadToCO2SetPoint = A * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) * std::exp( min( 700., - A / C ) ) ) / ( 1.0 - std::exp( min( 700., - A / C ) ) ) - B;
+							LoadToCO2SetPoint = A * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) * std::exp( min( 700.0, - A / C ) ) ) / ( 1.0 - std::exp( min( 700.0, - A / C ) ) ) - B;
 						}
 					} else if ( SELECT_CASE_var == UseEulerMethod ) {
 						LoadToCO2SetPoint = C * ( ZoneAirCO2SetPoint - ZoneCO21( ZoneNum ) ) + A * ZoneAirCO2SetPoint - B;
@@ -1717,7 +1717,7 @@ namespace ZoneContaminantPredictorCorrector {
 
 				if ( ControlledGCZoneFlag ) {
 					// The density of air
-					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "PredictZoneContaminants" );
+					RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 
 					// Calculate generic contaminant from infiltration + humidity added from latent load
 					// to determine system added/subtracted moisture.
@@ -1750,7 +1750,7 @@ namespace ZoneContaminantPredictorCorrector {
 						if ( A == 0.0 ) { // B=0
 							LoadToGCSetPoint = C * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) ) - B;
 						} else {
-							LoadToGCSetPoint = A * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) * std::exp( min( 700., - A / C ) ) ) / ( 1.0 - std::exp( min( 700., - A / C ) ) ) - B;
+							LoadToGCSetPoint = A * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) * std::exp( min( 700.0, - A / C ) ) ) / ( 1.0 - std::exp( min( 700.0, - A / C ) ) ) - B;
 						}
 					} else if ( SELECT_CASE_var == UseEulerMethod ) {
 						LoadToGCSetPoint = C * ( ZoneAirGCSetPoint - ZoneGC1( ZoneNum ) ) + A * ZoneAirGCSetPoint - B;
@@ -2006,7 +2006,7 @@ namespace ZoneContaminantPredictorCorrector {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CorrectZoneContaminants" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2212,7 +2212,7 @@ namespace ZoneContaminantPredictorCorrector {
 			// CO2 balance.  There are 2 cases that should be considered, system
 			// operating and system shutdown.
 
-			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), "CorrectZoneContaminants" );
+			RhoAir = PsyRhoAirFnPbTdbW( OutBaroPress, ZT( ZoneNum ), ZoneAirHumRat( ZoneNum ), RoutineName );
 			//    RhoAir = ZoneAirDensityCO(ZoneNum)
 
 			if ( Contaminant.CO2Simulation ) ZoneAirDensityCO( ZoneNum ) = RhoAir;
@@ -2264,7 +2264,7 @@ namespace ZoneContaminantPredictorCorrector {
 					if ( A == 0.0 ) { // B=0
 						ZoneAirCO2Temp( ZoneNum ) = ZoneCO21( ZoneNum ) + B / C;
 					} else {
-						ZoneAirCO2Temp( ZoneNum ) = ( ZoneCO21( ZoneNum ) - B / A ) * std::exp( min( 700., - A / C ) ) + B / A;
+						ZoneAirCO2Temp( ZoneNum ) = ( ZoneCO21( ZoneNum ) - B / A ) * std::exp( min( 700.0, - A / C ) ) + B / A;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZoneAirCO2Temp( ZoneNum ) = ( C * ZoneCO21( ZoneNum ) + B ) / ( C + A );
@@ -2325,7 +2325,7 @@ namespace ZoneContaminantPredictorCorrector {
 					if ( A == 0.0 ) { // B=0
 						ZoneAirGCTemp( ZoneNum ) = ZoneGC1( ZoneNum ) + B / C;
 					} else {
-						ZoneAirGCTemp( ZoneNum ) = ( ZoneGC1( ZoneNum ) - B / A ) * std::exp( min( 700., - A / C ) ) + B / A;
+						ZoneAirGCTemp( ZoneNum ) = ( ZoneGC1( ZoneNum ) - B / A ) * std::exp( min( 700.0, - A / C ) ) + B / A;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZoneAirGCTemp( ZoneNum ) = ( C * ZoneGC1( ZoneNum ) + B ) / ( C + A );
@@ -2356,7 +2356,7 @@ namespace ZoneContaminantPredictorCorrector {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

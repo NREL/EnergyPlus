@@ -69,6 +69,8 @@ namespace DemandManager {
 	int const SetLimit( 2 );
 	int const ClearLimit( 3 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -352,7 +354,7 @@ namespace DemandManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int ListNum;
@@ -376,7 +378,7 @@ namespace DemandManager {
 
 		if ( NumDemandManagerList > 0 ) {
 			AlphArray.allocate( NumAlphas );
-			AlphArray = Blank;
+			AlphArray = BlankString;
 			NumArray.allocate( NumNums );
 			NumArray = 0.0;
 
@@ -574,7 +576,7 @@ namespace DemandManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int NumDemandMgrExtLights;
@@ -637,7 +639,7 @@ namespace DemandManager {
 
 		if ( NumDemandMgr > 0 ) {
 			AlphArray.allocate( MaxAlphas );
-			AlphArray = Blank;
+			AlphArray = BlankString;
 			NumArray.allocate( MaxNums );
 			NumArray = 0.0;
 
@@ -1625,7 +1627,7 @@ namespace DemandManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

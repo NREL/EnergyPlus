@@ -2,6 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <ThermalEN673Calc.hh>
@@ -323,7 +324,7 @@ namespace ThermalEN673Calc {
 						frctg( j ) = frct( i + 1, j );
 					}
 					GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
-					Gr( i ) = ( GravityConstant * std::pow( gap( i ), 3.0 ) * dT( i ) * std::pow( dens, 2 ) ) / ( Tm * std::pow( visc, 2 ) );
+					Gr( i ) = ( GravityConstant * pow_3( gap( i ) ) * dT( i ) * pow_2( dens ) ) / ( Tm * pow_2( visc ) );
 					Ra( i ) = Gr( i ) * pr;
 					Nu( i ) = A * std::pow( Ra( i ), n );
 					if ( Nu( i ) < 1.0 ) {
@@ -338,7 +339,7 @@ namespace ThermalEN673Calc {
 				}
 			}
 			for ( i = 1; i <= nlayer - 1; ++i ) {
-				hr( i ) = 4.0 * StefanBoltzmann * std::pow( ( 1.0 / emis( 2 * i ) + 1.0 / emis( 2 * i + 1 ) - 1.0 ), ( -1.0 ) ) * std::pow( Tm, 3 );
+				hr( i ) = 4.0 * StefanBoltzmann * std::pow( 1.0 / emis( 2 * i ) + 1.0 / emis( 2 * i + 1 ) - 1.0, -1.0 ) * pow_3( Tm );
 				hs( i ) = hg( i ) + hr( i );
 				rs( 2 * i + 1 ) = 1.0 / hs( i ); // Thermal resistance of each gap
 				sumRs += rs( 2 * i + 1 );
@@ -375,7 +376,7 @@ namespace ThermalEN673Calc {
 								frctg( j ) = frct( i + 1, j );
 							} // j, gas mix
 							GASSES90( Tm, ipropg, frctg, presure( i + 1 ), nmix( i + 1 ), xwght, xgcon, xgvis, xgcp, con, visc, dens, cp, pr, standard, nperr, ErrorMessage );
-							Gr( i ) = ( GravityConstant * std::pow( gap( i ), 3.0 ) * dT( i ) * std::pow( dens, 2.0 ) ) / ( Tm * std::pow( visc, 2.0 ) );
+							Gr( i ) = ( GravityConstant * pow_3( gap( i ) ) * dT( i ) * pow_2( dens ) ) / ( Tm * pow_2( visc ) );
 							Ra( i ) = Gr( i ) * pr;
 							Nu( i ) = A * std::pow( Ra( i ), n );
 							if ( Nu( i ) < 1.0 ) {
@@ -503,7 +504,7 @@ namespace ThermalEN673Calc {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

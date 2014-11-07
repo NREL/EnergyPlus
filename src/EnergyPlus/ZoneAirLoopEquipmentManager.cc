@@ -197,6 +197,7 @@ namespace ZoneAirLoopEquipmentManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetZoneAirLoopEquipment: " ); // include trailing blank space
+		static std::string const CurrentModuleObject( "ZoneHVAC:AirDistributionUnit" ); // Object type for getting and error messages
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -212,16 +213,15 @@ namespace ZoneAirLoopEquipmentManager {
 		int NumAlphas;
 		int NumNums;
 		int IOStat;
-		FArray1D_string AlphArray( 4 );
-		FArray1D< Real64 > NumArray( 2 );
+		static FArray1D_string AlphArray( 4 ); //Tuned Made static
+		static FArray1D< Real64 > NumArray( 2 ); //Tuned Made static
 		static bool ErrorsFound( false ); // If errors detected in input
 		bool IsNotOK; // Flag to verify name
 		bool IsBlank; // Flag for blank name
-		std::string CurrentModuleObject; // Object type for getting and error messages
-		FArray1D_string cAlphaFields( 4 ); // Alpha field names
-		FArray1D_string cNumericFields( 2 ); // Numeric field names
-		FArray1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE.
-		FArray1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE.
+		static FArray1D_string cAlphaFields( 4 ); // Alpha field names //Tuned Made static
+		static FArray1D_string cNumericFields( 2 ); // Numeric field names //Tuned Made static
+		static FArray1D_bool lAlphaBlanks( 4 ); // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
+		static FArray1D_bool lNumericBlanks( 2 ); // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
 		bool DualDuctRecircIsUsed; // local temporary for deciding if recirc side used by dual duct terminal
 		static int ATMixerPriNode( 0 ); // primary air inlet node for air terminal mixers
 
@@ -231,8 +231,6 @@ namespace ZoneAirLoopEquipmentManager {
 		} else {
 			GetAirDistUnitsFlag = false;
 		}
-
-		CurrentModuleObject = "ZoneHVAC:AirDistributionUnit";
 
 		NumAirDistUnits = GetNumObjectsFound( CurrentModuleObject );
 
@@ -386,7 +384,7 @@ namespace ZoneAirLoopEquipmentManager {
 					SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) + ":COOL", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
 					//  For dual duct units with decoupled OA and RA, set up two component sets, one for OA (Outdoor Air)
 					//  and one for RA (Recirculated Air)
-				} else if ( ( AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) == DualDuctVAVOutdoorAir ) ) {
+				} else if ( AirDistUnit( AirDistUnitNum ).EquipType_Num( AirDistCompUnitNum ) == DualDuctVAVOutdoorAir ) {
 					SetUpCompSets( CurrentModuleObject, AirDistUnit( AirDistUnitNum ).Name, AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ) + ":OutdoorAir", AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), "UNDEFINED", AlphArray( 2 ) );
 					GetDualDuctOutdoorAirRecircUse( AirDistUnit( AirDistUnitNum ).EquipType( AirDistCompUnitNum ), AirDistUnit( AirDistUnitNum ).EquipName( AirDistCompUnitNum ), DualDuctRecircIsUsed );
 					if ( DualDuctRecircIsUsed ) {
@@ -744,7 +742,7 @@ namespace ZoneAirLoopEquipmentManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

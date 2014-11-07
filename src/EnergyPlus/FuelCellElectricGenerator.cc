@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -54,7 +55,7 @@ namespace FuelCellElectricGenerator {
 	// Once the ElectricPowerManager determines that the FuelCell Generator
 	// is available to meet an electric load demand, it calls SimFuelCellGenerator
 	// which in turn calls the FuelCell model.
-	// See DataGenerators.f90 for structures and variables
+	// See DataGenerators.cc for structures and variables
 
 	// REFERENCES:
 	// IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells
@@ -565,7 +566,7 @@ namespace FuelCellElectricGenerator {
 					}
 
 					// check for molar fractions summing to 1.0.
-					if ( std::abs( sum( FuelCell( thisFuelCell ).AirSup.ConstitMolalFract ) - 1.0 ) > .0001 ) {
+					if ( std::abs( sum( FuelCell( thisFuelCell ).AirSup.ConstitMolalFract ) - 1.0 ) > 0.0001 ) {
 
 						ShowSevereError( cCurrentModuleObject + " molar fractions do not sum to 1.0" );
 						ShowContinueError( "..Sum was=" + RoundSigDigits( sum( FuelCell( thisFuelCell ).AirSup.ConstitMolalFract ), 1 ) );
@@ -1132,7 +1133,7 @@ namespace FuelCellElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const KJtoJ( 1000. ); // convert Kjoules to joules
+		Real64 const KJtoJ( 1000.0 ); // convert Kjoules to joules
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -1993,7 +1994,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * std::pow( Tsho, 2 ) + D * std::pow( Tsho, 3 ) + E / ( std::pow( Tsho, 2 ) ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2004,7 +2005,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * std::pow( Tkel, 2 ) + A4 * std::pow( Tkel, 3 ) + A5 * std::pow( Tkel, 4 ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -2093,7 +2094,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HairI = ( A * Tsho + B * ( std::pow( Tsho, 2 ) ) / 2.0 + C * ( std::pow( Tsho, 3 ) ) / 3.0 + D * ( std::pow( Tsho, 4 ) ) / 4.0 - E / Tsho + F - H );
+					HairI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
 
 					tempHair += HairI * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 
@@ -2106,7 +2107,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * std::pow( Tkel, 2 ) / 3.0 + A4 * std::pow( Tkel, 3 ) / 4.0 + A5 * std::pow( Tkel, 4 ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
+					tempHair += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).AirSup.ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2188,7 +2189,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * std::pow( Tsho, 2 ) + D * std::pow( Tsho, 3 ) + E / ( std::pow( Tsho, 2 ) ) ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2198,7 +2199,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * std::pow( Tkel, 2 ) + A4 * std::pow( Tkel, 3 ) + A5 * std::pow( Tkel, 4 ) ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
 				}
 			}
@@ -2286,7 +2287,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					HfuelI = ( A * Tsho + B * ( std::pow( Tsho, 2 ) ) / 2.0 + C * ( std::pow( Tsho, 3 ) ) / 3.0 + D * ( std::pow( Tsho, 4 ) ) / 4.0 - E / Tsho + F - H );
+					HfuelI = ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H );
 
 					tempHfuel += HfuelI * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 
@@ -2300,7 +2301,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * std::pow( Tkel, 2 ) / 3.0 + A4 * std::pow( Tkel, 3 ) / 4.0 + A5 * std::pow( Tkel, 4 ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
+					tempHfuel += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelSupply( FuelCell( GeneratorNum ).FuelSupNum ).ConstitMolalFract( thisConstit );
 				}
 			}
 		}
@@ -2386,7 +2387,7 @@ namespace FuelCellElectricGenerator {
 					F = GasPhaseThermoChemistryData( gasID ).ShomateF;
 					H = GasPhaseThermoChemistryData( gasID ).ShomateH;
 
-					tempHprodGases += ( ( A * Tsho + B * ( std::pow( Tsho, 2 ) ) / 2.0 + C * ( std::pow( Tsho, 3 ) ) / 3.0 + D * ( std::pow( Tsho, 4 ) ) / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempHprodGases += ( ( A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F - H ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
 					A1 = GasPhaseThermoChemistryData( gasID ).NASA_A1;
@@ -2396,7 +2397,7 @@ namespace FuelCellElectricGenerator {
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 					A6 = GasPhaseThermoChemistryData( gasID ).NASA_A6;
 
-					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * std::pow( Tkel, 2 ) / 3.0 + A4 * std::pow( Tkel, 3 ) / 4.0 + A5 * std::pow( Tkel, 4 ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempHprodGases += ( ( ( A1 + A2 * Tkel / 2.0 + A3 * pow_2( Tkel ) / 3.0 + A4 * pow_3( Tkel ) / 4.0 + A5 * pow_4( Tkel ) / 5.0 + A6 / Tkel ) * RinKJperMolpK * Tkel ) - GasPhaseThermoChemistryData( gasID ).StdRefMolarEnthOfForm ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 				}
 			} // gasid > 0
 		}
@@ -2490,7 +2491,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * std::pow( Tsho, 2 ) + D * std::pow( Tsho, 3 ) + E / ( std::pow( Tsho, 2 ) ) ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2500,7 +2501,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * std::pow( Tkel, 2 ) + A4 * std::pow( Tkel, 3 ) + A5 * std::pow( Tkel, 4 ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).FCPM.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2597,7 +2598,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * std::pow( Tsho, 2 ) + D * std::pow( Tsho, 3 ) + E / ( std::pow( Tsho, 2 ) ) ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2607,7 +2608,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * std::pow( Tkel, 2 ) + A4 * std::pow( Tkel, 3 ) + A5 * std::pow( Tkel, 4 ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).AuxilHeat.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2704,7 +2705,7 @@ namespace FuelCellElectricGenerator {
 					D = GasPhaseThermoChemistryData( gasID ).ShomateD;
 					E = GasPhaseThermoChemistryData( gasID ).ShomateE;
 
-					tempCp += ( ( A + B * Tsho + C * std::pow( Tsho, 2 ) + D * std::pow( Tsho, 3 ) + E / ( std::pow( Tsho, 2 ) ) ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
+					tempCp += ( ( A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho ) ) * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit ) );
 				}
 
 				if ( GasPhaseThermoChemistryData( gasID ).ThermoMode == NASAPolynomial ) {
@@ -2714,7 +2715,7 @@ namespace FuelCellElectricGenerator {
 					A4 = GasPhaseThermoChemistryData( gasID ).NASA_A4;
 					A5 = GasPhaseThermoChemistryData( gasID ).NASA_A5;
 
-					tempCp += ( A1 + A2 * Tkel + A3 * std::pow( Tkel, 2 ) + A4 * std::pow( Tkel, 3 ) + A5 * std::pow( Tkel, 4 ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
+					tempCp += ( A1 + A2 * Tkel + A3 * pow_2( Tkel ) + A4 * pow_3( Tkel ) + A5 * pow_4( Tkel ) ) * RinKJperMolpK * FuelCell( GeneratorNum ).ExhaustHX.ConstitMolalFract( thisConstit );
 
 				}
 
@@ -2782,7 +2783,7 @@ namespace FuelCellElectricGenerator {
 		E = 0.11725;
 		F = -250.569;
 
-		HGasWater = A * Tsho + B * ( std::pow( Tsho, 2 ) ) / 2.0 + C * ( std::pow( Tsho, 3 ) ) / 3.0 + D * ( std::pow( Tsho, 4 ) ) / 4.0 - E / Tsho + F; //- H
+		HGasWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
 	}
 
@@ -2843,7 +2844,7 @@ namespace FuelCellElectricGenerator {
 		F = -256.5478;
 		H = -285.8304;
 
-		HLiqWater = A * Tsho + B * ( std::pow( Tsho, 2 ) ) / 2.0 + C * ( std::pow( Tsho, 3 ) ) / 3.0 + D * ( std::pow( Tsho, 4 ) ) / 4.0 - E / Tsho + F; //- H
+		HLiqWater = A * Tsho + B * pow_2( Tsho ) / 2.0 + C * pow_3( Tsho ) / 3.0 + D * pow_4( Tsho ) / 4.0 - E / Tsho + F; //- H
 
 	}
 
@@ -2913,7 +2914,7 @@ namespace FuelCellElectricGenerator {
 		D = 2474.455;
 		E = 3.85533;
 
-		Cp = A + B * Tsho + C * std::pow( Tsho, 2 ) + D * std::pow( Tsho, 3 ) + E / ( std::pow( Tsho, 2 ) );
+		Cp = A + B * Tsho + C * pow_2( Tsho ) + D * pow_3( Tsho ) + E / pow_2( Tsho );
 
 	}
 
@@ -3308,15 +3309,15 @@ namespace FuelCellElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcFuelCellGenHeatRecovery" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 eHX; // fixed effectiveness
-		Real64 MdotWater;
-		int inNodeNum;
+		Real64 MdotWater( 0.0 );
+		int inNodeNum( 0 );
 		Real64 MWwater;
 		Real64 NdotWater;
 		Real64 TwaterIn;
@@ -3325,13 +3326,13 @@ namespace FuelCellElectricGenerator {
 		Real64 TprodGasIn;
 		Real64 CpProdGasMol;
 		Real64 NdotCp;
-		Real64 qHX;
+		Real64 qHX( 0.0 );
 		Real64 UAeff;
 		Real64 TauxMix;
 		Real64 NdotCpWater;
 		Real64 NdotCpAuxMix;
-		Real64 THXexh;
-		Real64 TwaterOut;
+		Real64 THXexh( 0.0 );
+		Real64 TwaterOut( 0.0 );
 		Real64 hgas;
 		Real64 hwater;
 		static Real64 waterFract( 0.0 );
@@ -3373,7 +3374,7 @@ namespace FuelCellElectricGenerator {
 
 			THXexh = TprodGasIn - qHX / ( NdotGas * CpProdGasMol * 1000.0 );
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( FuelCell( Num ).CWLoopNum ).FluidName, TwaterIn, PlantLoop( FuelCell( Num ).CWLoopNum ).FluidIndex, "CalcFuelCellGenHeatRecovery" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( FuelCell( Num ).CWLoopNum ).FluidName, TwaterIn, PlantLoop( FuelCell( Num ).CWLoopNum ).FluidIndex, RoutineName );
 
 			if ( MdotWater * Cp <= 0.0 ) {
 				TwaterOut = TwaterIn;
@@ -3388,7 +3389,7 @@ namespace FuelCellElectricGenerator {
 			NdotWater = MdotWater / MWwater;
 			NdotGas = FuelCell( Num ).AuxilHeat.NdotAuxMix;
 
-			UAeff = FuelCell( Num ).ExhaustHX.hxs0 + FuelCell( Num ).ExhaustHX.hxs1 * NdotWater + FuelCell( Num ).ExhaustHX.hxs2 * ( std::pow( NdotWater, 2 ) ) + FuelCell( Num ).ExhaustHX.hxs3 * NdotGas + FuelCell( Num ).ExhaustHX.hxs4 * ( std::pow( NdotGas, 2 ) );
+			UAeff = FuelCell( Num ).ExhaustHX.hxs0 + FuelCell( Num ).ExhaustHX.hxs1 * NdotWater + FuelCell( Num ).ExhaustHX.hxs2 * pow_2( NdotWater ) + FuelCell( Num ).ExhaustHX.hxs3 * NdotGas + FuelCell( Num ).ExhaustHX.hxs4 * pow_2( NdotGas );
 
 			TauxMix = FuelCell( Num ).AuxilHeat.TauxMix;
 			TwaterIn = FuelCell( Num ).ExhaustHX.WaterInletTemp;
@@ -3433,9 +3434,9 @@ namespace FuelCellElectricGenerator {
 			MWwater = GasPhaseThermoChemistryData( 4 ).MolecularWeight;
 			NdotWater = MdotWater / MWwater;
 
-			hgas = FuelCell( Num ).ExhaustHX.h0gas * std::pow( ( NdotGas / FuelCell( Num ).ExhaustHX.NdotGasRef ), FuelCell( Num ).ExhaustHX.nCoeff ); //Eq. 48
+			hgas = FuelCell( Num ).ExhaustHX.h0gas * std::pow( NdotGas / FuelCell( Num ).ExhaustHX.NdotGasRef, FuelCell( Num ).ExhaustHX.nCoeff ); //Eq. 48
 
-			hwater = FuelCell( Num ).ExhaustHX.h0Water * std::pow( ( NdotWater / FuelCell( Num ).ExhaustHX.NdotWaterRef ), FuelCell( Num ).ExhaustHX.mCoeff ); //Eq. 48
+			hwater = FuelCell( Num ).ExhaustHX.h0Water * std::pow( NdotWater / FuelCell( Num ).ExhaustHX.NdotWaterRef, FuelCell( Num ).ExhaustHX.mCoeff ); //Eq. 48
 
 			// now equation 47
 			UAeff = 1.0 / ( 1.0 / ( hgas * FuelCell( Num ).ExhaustHX.AreaGas ) + 1.0 / ( hwater * FuelCell( Num ).ExhaustHX.AreaWater ) + FuelCell( Num ).ExhaustHX.Fadjust );
@@ -3473,7 +3474,7 @@ namespace FuelCellElectricGenerator {
 				NdotWater = MdotWater / MWwater;
 				NdotGas = FuelCell( Num ).AuxilHeat.NdotAuxMix;
 
-				UAeff = FuelCell( Num ).ExhaustHX.hxs0 + FuelCell( Num ).ExhaustHX.hxs1 * NdotWater + FuelCell( Num ).ExhaustHX.hxs2 * std::pow( NdotWater, 2 ) + FuelCell( Num ).ExhaustHX.hxs3 * NdotGas + FuelCell( Num ).ExhaustHX.hxs4 * std::pow( NdotGas, 2 );
+				UAeff = FuelCell( Num ).ExhaustHX.hxs0 + FuelCell( Num ).ExhaustHX.hxs1 * NdotWater + FuelCell( Num ).ExhaustHX.hxs2 * pow_2( NdotWater ) + FuelCell( Num ).ExhaustHX.hxs3 * NdotGas + FuelCell( Num ).ExhaustHX.hxs4 * pow_2( NdotGas );
 
 				TauxMix = FuelCell( Num ).AuxilHeat.TauxMix;
 				TwaterIn = FuelCell( Num ).ExhaustHX.WaterInletTemp;
@@ -3492,7 +3493,7 @@ namespace FuelCellElectricGenerator {
 				hxl1 = FuelCell( Num ).ExhaustHX.l1Coeff;
 				hxl2 = FuelCell( Num ).ExhaustHX.l2Coeff;
 
-				NdotWaterCond = ( TcondThresh - TwaterIn ) * ( hxl1 * ( NdotWaterVapor / NdotGas ) + hxl2 * std::pow( ( NdotWaterVapor / NdotGas ), 2 ) );
+				NdotWaterCond = ( TcondThresh - TwaterIn ) * ( hxl1 * ( NdotWaterVapor / NdotGas ) + hxl2 * pow_2( NdotWaterVapor / NdotGas ) );
 
 				if ( NdotWaterCond < 0.0 ) NdotWaterCond = 0.0;
 
@@ -3586,6 +3587,8 @@ namespace FuelCellElectricGenerator {
 			//    TwaterOut  =  TwaterIn + qHX / (MdotWater * CPCW( (TwaterIn + TwaterOut)/2 ))
 			//  ENDIF
 
+		} else {
+			assert( false ); // Variables not set are used below
 		}}
 
 		// update results in data structure.
@@ -3741,7 +3744,7 @@ namespace FuelCellElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitFuelCellGenerators" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3840,7 +3843,7 @@ namespace FuelCellElectricGenerator {
 			FuelCell( FCnum ).Inverter.PCUlosses = 0.0;
 			FuelCell( FCnum ).Inverter.QairIntake = 0.0;
 
-			rho = GetDensityGlycol( PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidName, InitHRTemp, PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidIndex, "InitFuelCellGenerators" );
+			rho = GetDensityGlycol( PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidName, InitHRTemp, PlantLoop( FuelCell( FCnum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			FuelCell( FCnum ).ExhaustHX.WaterMassFlowRateDesign = FuelCell( FCnum ).ExhaustHX.WaterVolumeFlowMax * rho;
 			FuelCell( FCnum ).ExhaustHX.WaterMassFlowRate = FuelCell( FCnum ).ExhaustHX.WaterMassFlowRateDesign;

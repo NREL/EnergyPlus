@@ -231,7 +231,7 @@ namespace DataEnvironment {
 		std::string const & Settings
 	);
 
-	template< class H, class W >
+	template< class H, class W > // Overload for member arrays
 	void
 	SetWindSpeedAt(
 		int const NumItems,
@@ -243,12 +243,13 @@ namespace DataEnvironment {
 		if ( SiteWindExp == 0.0 ) {
 			LocalWindSpeed = WindSpeed;
 		} else {
+			Real64 const fac( WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
 			for ( int i = 1; i <= NumItems; ++i ) {
 				Real64 const Z( Heights( i ) );
 				if ( Z <= 0.0 ) {
 					LocalWindSpeed( i ) = 0.0;
 				} else {
-					LocalWindSpeed( i ) = WindSpeed * WeatherFileWindModCoeff * std::pow( ( Z / SiteWindBLHeight ), SiteWindExp );
+					LocalWindSpeed( i ) = fac * std::pow( Z, SiteWindExp );
 				}
 			}
 		}
@@ -263,7 +264,7 @@ namespace DataEnvironment {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

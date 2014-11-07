@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <cstddef> // size_t
@@ -23,6 +24,22 @@
 using namespace ObjexxFCL;
 
 typedef unsigned short ushort;
+
+struct S
+{
+	S( int const x_ = 11 ) :
+		x( x_ )
+	{}
+
+	friend
+	S
+	operator *( S const & s1, S const & s2 )
+	{
+		return S( s1.x * s2.x );
+	}
+
+	int x;
+};
 
 TEST( FmathTest, Min )
 {
@@ -149,24 +166,51 @@ TEST( FmathTest, Square )
 {
 	EXPECT_EQ( short( 11 ) * short( 11 ), square( short( -11 ) ) );
 	EXPECT_EQ( ushort( 11 ) * ushort( 11 ), square( ushort( 11 ) ) );
-	EXPECT_EQ( 11*11, square( -11 ) );
+	EXPECT_EQ( 11 * 11, square( -11 ) );
 	EXPECT_EQ( 11u * 11u, square( 11u ) );
 	EXPECT_EQ( 11l * 11l, square( -11l ) );
 	EXPECT_EQ( 11ul * 11ul, square( 11ul ) );
 	EXPECT_EQ( 11.0f * 11.0f, square( -11.0f ) );
 	EXPECT_EQ( 11.0 * 11.0, square( -11.0 ) );
 	EXPECT_EQ( 11.0l * 11.0l, square( -11.0l ) );
+
+	S s; // Test non-arithmetic overload
+	EXPECT_EQ( 11 * 11, square( s ).x );
 }
 
 TEST( FmathTest, Cube )
 {
 	EXPECT_EQ( -11*11*11, cube( -11 ) );
-	EXPECT_EQ( 11*11*11, cube( 11u ) );
-	EXPECT_EQ( -11L*11L*11L, cube( -11L ) );
+	EXPECT_EQ( 11u*11u*11u, cube( 11u ) );
+	EXPECT_EQ( -11l*11l*11l, cube( -11l ) );
 	EXPECT_EQ( 11ul*11ul*11ul, cube( 11ul ) );
 	EXPECT_EQ( -11.0f * 11.0f * 11.0f, cube( -11.0f ) );
 	EXPECT_EQ( -11.0f * 11.0 * 11.0, cube( -11.0 ) );
 	EXPECT_EQ( -11.0l * 11.0l * 11.0l, cube( -11.0l ) );
+}
+
+TEST( FmathTest, Pow )
+{
+	EXPECT_EQ( 11*11, pow_2( -11 ) );
+	EXPECT_EQ( -11*11*11, pow_3( -11 ) );
+	EXPECT_EQ( 11u*11u*11u, pow_3( 11u ) );
+	EXPECT_EQ( -11l*11l*11l, pow_3( -11l ) );
+	EXPECT_EQ( 11ul*11ul*11ul, pow_3( 11ul ) );
+	EXPECT_EQ( -11.0f * 11.0f * 11.0f, pow_3( -11.0f ) );
+	EXPECT_EQ( -11.0f * 11.0 * 11.0, pow_3( -11.0 ) );
+	EXPECT_EQ( -11.0l * 11.0l * 11.0l, pow_3( -11.0l ) );
+	EXPECT_EQ( 16, pow_4( 2.0 ) );
+	EXPECT_EQ( 32, pow_5( 2.0 ) );
+	EXPECT_EQ( 64, pow_6( 2.0 ) );
+	EXPECT_EQ( 128, pow_7( 2.0 ) );
+	EXPECT_EQ( 256, pow_8( 2.0 ) );
+	EXPECT_EQ( 512, pow_9( 2.0 ) );
+}
+
+TEST( FmathTest, Root )
+{
+	EXPECT_EQ( 3, root_4( 81 ) );
+	EXPECT_EQ( 3, root_8( 6561 ) );
 }
 
 TEST( FmathTest, Sign )
@@ -213,12 +257,12 @@ TEST( FmathTest, Nearest )
 	EXPECT_EQ( -3, nearest< int >( -3.4999 ) );
 	EXPECT_EQ( -3.4999, nearest< double >( -3.4999 ) );
 
-	EXPECT_EQ( 3, nearest_size( 3.123 ) );
-	EXPECT_EQ( 3, nearest_size( 3.4999 ) );
-	EXPECT_EQ( 4, nearest_size( 3.5 ) );
-	EXPECT_EQ( 0, nearest_size( -3.123 ) );
-	EXPECT_EQ( 0, nearest_size( -3.4999 ) );
-	EXPECT_EQ( 0, nearest_size( -3.5 ) );
+	EXPECT_EQ( 3u, nearest_size( 3.123 ) );
+	EXPECT_EQ( 3u, nearest_size( 3.4999 ) );
+	EXPECT_EQ( 4u, nearest_size( 3.5 ) );
+	EXPECT_EQ( 0u, nearest_size( -3.123 ) );
+	EXPECT_EQ( 0u, nearest_size( -3.4999 ) );
+	EXPECT_EQ( 0u, nearest_size( -3.5 ) );
 
 	EXPECT_EQ( 3, nearest_ssize( 3.123 ) );
 	EXPECT_EQ( 3, nearest_ssize( 3.4999 ) );

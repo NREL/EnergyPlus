@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -532,7 +533,7 @@ namespace Boilers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitBoiler" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -577,7 +578,7 @@ namespace Boilers {
 
 		if ( MyEnvrnFlag( BoilerNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
 			if ( PlantSizeNotComplete ) SizeBoiler( BoilerNum );
-			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, "InitBoiler" );
+			rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 			Boiler( BoilerNum ).DesMassFlowRate = Boiler( BoilerNum ).VolFlowRate * rho;
 
 			InitComponentNodes( 0.0, Boiler( BoilerNum ).DesMassFlowRate, Boiler( BoilerNum ).BoilerInletNodeNum, Boiler( BoilerNum ).BoilerOutletNodeNum, Boiler( BoilerNum ).LoopNum, Boiler( BoilerNum ).LoopSideNum, Boiler( BoilerNum ).BranchNum, Boiler( BoilerNum ).CompNum );
@@ -667,7 +668,7 @@ namespace Boilers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeBoiler" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -703,8 +704,8 @@ namespace Boilers {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 
-				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, "SizeBoiler" );
-				Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Boiler( BoilerNum ).TempDesBoilerOut, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, "SizeBoiler" );
+				rho = GetDensityGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
+				Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Boiler( BoilerNum ).TempDesBoilerOut, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 				tmpNomCap = Cp * rho * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate;
 				if ( ! IsAutoSize ) tmpNomCap = Boiler( BoilerNum ).NomCap;
 				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap = tmpNomCap
@@ -862,7 +863,7 @@ namespace Boilers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcBoilerModel" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -874,7 +875,7 @@ namespace Boilers {
 		Real64 BoilerMinPLR; // boiler minimum part load ratio
 		Real64 TheorFuelUse; // Theoretical (stoichiometric) fuel use
 		Real64 OperPLR; // operating part load ratio
-		Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference
+		Real64 BoilerDeltaTemp( 0.0 ); // C - boiler inlet to outlet temperature difference
 		Real64 TempUpLimitBout; // C - boiler high temperature limit
 		int BoilerInletNode; // Boiler inlet node number
 		int BoilerOutletNode; // Boiler outlet node number
@@ -902,7 +903,7 @@ namespace Boilers {
 		LoopNum = Boiler( BoilerNum ).LoopNum;
 		LoopSideNum = Boiler( BoilerNum ).LoopSideNum;
 
-		Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Node( BoilerInletNode ).Temp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, "CalcBoilerModel" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidName, Node( BoilerInletNode ).Temp, PlantLoop( Boiler( BoilerNum ).LoopNum ).FluidIndex, RoutineName );
 
 		//If the specified load is 0.0 or the boiler should not run then we leave this subroutine. Before leaving
 		//if the component control is SERIESACTIVE we set the component flow to inlet flow so that flow resolver
@@ -939,6 +940,8 @@ namespace Boilers {
 					BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPointLo - Node( BoilerInletNode ).Temp;
+				} else {
+					assert( false );
 				}}
 
 				BoilerOutletTemp = BoilerDeltaTemp + Node( BoilerInletNode ).Temp;
@@ -1154,7 +1157,7 @@ namespace Boilers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

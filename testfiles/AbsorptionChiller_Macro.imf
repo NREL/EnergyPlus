@@ -1,4 +1,4 @@
-##fileprefix c:\energyplus-dev\test_files-utilities\internaltests\inputfiles\
+!##fileprefix <needs path from install>
 !AbsorptionChiller_Macro.imf
 ! Basic file description:  1 story building divided into 3 interior conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Outdoor air is modulated based on occupancy and floor area.

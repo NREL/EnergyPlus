@@ -19,10 +19,6 @@
 #include <ObjexxFCL/FArray3S.hh>
 #include <ObjexxFCL/MArray4.hh>
 
-// C++ Headers
-#include <cstdint>
-#include <initializer_list>
-
 namespace ObjexxFCL {
 
 // FArray4S: 4D Slice Array Proxy
@@ -66,6 +62,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::overlap;
 	using Super::size;
 	using Super::slice_k;
@@ -79,30 +76,30 @@ public: // Creation
 	// Default Constructor
 	inline
 	FArray4S() :
-		m1_( 1 ),
-		m2_( 1 ),
-		m3_( 1 ),
-		m4_( 1 ),
-		k_( 0 ),
-		u1_( 0 ),
-		u2_( 0 ),
-		u3_( 0 ),
-		u4_( 0 )
+	 m1_( 1 ),
+	 m2_( 1 ),
+	 m3_( 1 ),
+	 m4_( 1 ),
+	 k_( 0 ),
+	 u1_( 0 ),
+	 u2_( 0 ),
+	 u3_( 0 ),
+	 u4_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	FArray4S( FArray4S const & a ) :
-		Super( a ),
-		m1_( a.m1_ ),
-		m2_( a.m2_ ),
-		m3_( a.m3_ ),
-		m4_( a.m4_ ),
-		k_( a.k_ ),
-		u1_( a.u1_ ),
-		u2_( a.u2_ ),
-		u3_( a.u3_ ),
-		u4_( a.u4_ )
+	 Super( a ),
+	 m1_( a.m1_ ),
+	 m2_( a.m2_ ),
+	 m3_( a.m3_ ),
+	 m4_( a.m4_ ),
+	 k_( a.k_ ),
+	 u1_( a.u1_ ),
+	 u2_( a.u2_ ),
+	 u3_( a.u3_ ),
+	 u4_( a.u4_ )
 	{
 		data_set();
 	}
@@ -110,16 +107,16 @@ public: // Creation
 	// Data Constructor
 	inline
 	FArray4S( T const * data, std::int64_t const k, DS const & d1, DS const & d2, DS const & d3, DS const & d4 ) :
-		Super( data, d1.z() * d2.z() * d3.z() * d4.z() ),
-		m1_( d1.m() ),
-		m2_( d2.m() ),
-		m3_( d3.m() ),
-		m4_( d4.m() ),
-		k_( k + d1.k() + d2.k() + d3.k() + d4.k() ),
-		u1_( d1.u() ),
-		u2_( d2.u() ),
-		u3_( d3.u() ),
-		u4_( d4.u() )
+	 Super( data, d1.z() * d2.z() * d3.z() * d4.z() ),
+	 m1_( d1.m() ),
+	 m2_( d2.m() ),
+	 m3_( d3.m() ),
+	 m4_( d4.m() ),
+	 k_( k + d1.k() + d2.k() + d3.k() + d4.k() ),
+	 u1_( d1.u() ),
+	 u2_( d2.u() ),
+	 u3_( d3.u() ),
+	 u4_( d4.u() )
 	{
 		data_set();
 	}
@@ -127,16 +124,16 @@ public: // Creation
 	// Non-Const Data Constructor
 	inline
 	FArray4S( T * data, std::int64_t const k, DS const & d1, DS const & d2, DS const & d3, DS const & d4 ) :
-		Super( data, d1.z() * d2.z() * d3.z() * d4.z() ),
-		m1_( d1.m() ),
-		m2_( d2.m() ),
-		m3_( d3.m() ),
-		m4_( d4.m() ),
-		k_( k + d1.k() + d2.k() + d3.k() + d4.k() ),
-		u1_( d1.u() ),
-		u2_( d2.u() ),
-		u3_( d3.u() ),
-		u4_( d4.u() )
+	 Super( data, d1.z() * d2.z() * d3.z() * d4.z() ),
+	 m1_( d1.m() ),
+	 m2_( d2.m() ),
+	 m3_( d3.m() ),
+	 m4_( d4.m() ),
+	 k_( k + d1.k() + d2.k() + d3.k() + d4.k() ),
+	 u1_( d1.u() ),
+	 u2_( d2.u() ),
+	 u3_( d3.u() ),
+	 u4_( d4.u() )
 	{
 		data_set();
 	}
@@ -145,16 +142,16 @@ public: // Creation
 	template< template< typename > class Array >
 	inline
 	FArray4S( Array< T > const & a ) :
-		Super( a.data(), a.size() ),
-		m1_( 1 ),
-		m2_( a.size1() ),
-		m3_( a.size2() * m2_ ),
-		m4_( a.size3() * m3_ ),
-		k_( -( m1_ + m2_ + m3_ + m4_ ) ),
-		u1_( a.size1() ),
-		u2_( a.size2() ),
-		u3_( a.size3() ),
-		u4_( a.size4() )
+	 Super( a.data(), a.size() ),
+	 m1_( 1 ),
+	 m2_( a.size1() ),
+	 m3_( a.size2() * m2_ ),
+	 m4_( a.size3() * m3_ ),
+	 k_( -( m1_ + m2_ + m3_ + m4_ ) ),
+	 u1_( a.isize1() ),
+	 u2_( a.isize2() ),
+	 u3_( a.isize3() ),
+	 u4_( a.isize4() )
 	{
 		data_set();
 	}
@@ -165,7 +162,7 @@ public: // Creation
 	~FArray4S()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -177,9 +174,9 @@ public: // Assignment
 			if ( overlap( a ) ) { // Overlap-safe
 				CArray< T > c( size_ );
 				size_type l( 0 );
-				for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-					for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-						for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+				for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+					for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+						for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
 								c[ l ] = a( i1, i2, i3, i4 );
 							}
@@ -187,21 +184,21 @@ public: // Assignment
 					}
 				}
 				l = 0;
-				for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-					for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-						for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+				for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+					for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+						for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-								operator()( i1, i2, i3, i4 ) = c[ l ];
+								operator ()( i1, i2, i3, i4 ) = c[ l ];
 							}
 						}
 					}
 				}
 			} else { // Not overlap-safe
-				for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-					for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-						for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+				for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+					for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+						for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-								operator()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
+								operator ()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
 							}
 						}
 					}
@@ -212,17 +209,17 @@ public: // Assignment
 	}
 
 	// Copy Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
 	operator =( FArray4S< U > const & a )
 	{
 		assert( conformable( a ) );
-		for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
+						operator ()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
 					}
 				}
 			}
@@ -238,11 +235,11 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-							operator()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
+							operator ()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
 						}
 					}
 				}
@@ -271,21 +268,21 @@ public: // Assignment
 				}
 			}
 			l = 0;
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-							operator()( i1, i2, i3, i4 ) = c[ l ];
+							operator ()( i1, i2, i3, i4 ) = c[ l ];
 						}
 					}
 				}
 			}
 		} else { // Not overlap-safe
-			for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-				for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-					for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-							operator()( i1, i2, i3, i4 ) = a( j1, j2, j3, j4 );
+							operator ()( i1, i2, i3, i4 ) = a( j1, j2, j3, j4 );
 						}
 					}
 				}
@@ -295,17 +292,17 @@ public: // Assignment
 	}
 
 	// Array Assignment Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
 	operator =( ArrayType< U > const & a )
 	{
 		assert( conformable( a ) );
-		for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-			for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-				for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-						operator()( i1, i2, i3, i4 ) = a( j1, j2, j3, j4 );
+						operator ()( i1, i2, i3, i4 ) = a( j1, j2, j3, j4 );
 					}
 				}
 			}
@@ -314,18 +311,18 @@ public: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
 	operator =( std::initializer_list< U > const l )
 	{
 		assert( size_ == l.size() );
-		auto il( l.begin() );
-		for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++il ) {
-						operator()( i1, i2, i3, i4 ) = *il;
+		auto r( l.begin() );
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++r ) {
+						operator ()( i1, i2, i3, i4 ) = *r;
 					}
 				}
 			}
@@ -341,11 +338,11 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-							operator()( i1, i2, i3, i4 ) += a( i1, i2, i3, i4 );
+							operator ()( i1, i2, i3, i4 ) += a( i1, i2, i3, i4 );
 						}
 					}
 				}
@@ -362,11 +359,11 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-							operator()( i1, i2, i3, i4 ) -= a( i1, i2, i3, i4 );
+							operator ()( i1, i2, i3, i4 ) -= a( i1, i2, i3, i4 );
 						}
 					}
 				}
@@ -383,11 +380,11 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-							operator()( i1, i2, i3, i4 ) *= a( i1, i2, i3, i4 );
+							operator ()( i1, i2, i3, i4 ) *= a( i1, i2, i3, i4 );
 						}
 					}
 				}
@@ -404,12 +401,12 @@ public: // Assignment
 	{
 		assert( conformable( a ) );
 		if ( a.dimensions_initialized() ) {
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
 							assert( T( a( i1, i2, i3, i4 ) ) != T( 0 ) );
-							operator()( i1, i2, i3, i4 ) /= a( i1, i2, i3, i4 );
+							operator ()( i1, i2, i3, i4 ) /= a( i1, i2, i3, i4 );
 						}
 					}
 				}
@@ -438,21 +435,21 @@ public: // Assignment
 				}
 			}
 			l = 0;
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-							operator()( i1, i2, i3, i4 ) += c[ l ];
+							operator ()( i1, i2, i3, i4 ) += c[ l ];
 						}
 					}
 				}
 			}
 		} else { // Not overlap-safe
-			for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-				for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-					for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-							operator()( i1, i2, i3, i4 ) += a( j1, j2, j3, j4 );
+							operator ()( i1, i2, i3, i4 ) += a( j1, j2, j3, j4 );
 						}
 					}
 				}
@@ -481,21 +478,21 @@ public: // Assignment
 				}
 			}
 			l = 0;
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-							operator()( i1, i2, i3, i4 ) -= c[ l ];
+							operator ()( i1, i2, i3, i4 ) -= c[ l ];
 						}
 					}
 				}
 			}
 		} else { // Not overlap-safe
-			for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-				for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-					for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-							operator()( i1, i2, i3, i4 ) -= a( j1, j2, j3, j4 );
+							operator ()( i1, i2, i3, i4 ) -= a( j1, j2, j3, j4 );
 						}
 					}
 				}
@@ -524,21 +521,21 @@ public: // Assignment
 				}
 			}
 			l = 0;
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-							operator()( i1, i2, i3, i4 ) *= c[ l ];
+							operator ()( i1, i2, i3, i4 ) *= c[ l ];
 						}
 					}
 				}
 			}
 		} else { // Not overlap-safe
-			for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-				for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-					for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-							operator()( i1, i2, i3, i4 ) *= a( j1, j2, j3, j4 );
+							operator ()( i1, i2, i3, i4 ) *= a( j1, j2, j3, j4 );
 						}
 					}
 				}
@@ -568,22 +565,22 @@ public: // Assignment
 				}
 			}
 			l = 0;
-			for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-				for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-					for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
-							operator()( i1, i2, i3, i4 ) /= c[ l ];
+							operator ()( i1, i2, i3, i4 ) /= c[ l ];
 						}
 					}
 				}
 			}
 		} else { // Not overlap-safe
-			for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-				for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-					for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
 							assert( T( a( j1, j2, j3, j4 ) ) != T( 0 ) );
-							operator()( i1, i2, i3, i4 ) /= a( j1, j2, j3, j4 );
+							operator ()( i1, i2, i3, i4 ) /= a( j1, j2, j3, j4 );
 						}
 					}
 				}
@@ -593,17 +590,17 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
 	operator +=( ArrayType< U > const & a )
 	{
 		assert( conformable( a ) );
-		for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-			for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-				for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-						operator()( i1, i2, i3, i4 ) += a( j1, j2, j3, j4 );
+						operator ()( i1, i2, i3, i4 ) += a( j1, j2, j3, j4 );
 					}
 				}
 			}
@@ -612,17 +609,17 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
 	operator -=( ArrayType< U > const & a )
 	{
 		assert( conformable( a ) );
-		for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-			for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-				for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-						operator()( i1, i2, i3, i4 ) -= a( j1, j2, j3, j4 );
+						operator ()( i1, i2, i3, i4 ) -= a( j1, j2, j3, j4 );
 					}
 				}
 			}
@@ -631,17 +628,17 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
 	operator *=( ArrayType< U > const & a )
 	{
 		assert( conformable( a ) );
-		for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-			for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-				for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
-						operator()( i1, i2, i3, i4 ) *= a( j1, j2, j3, j4 );
+						operator ()( i1, i2, i3, i4 ) *= a( j1, j2, j3, j4 );
 					}
 				}
 			}
@@ -650,18 +647,18 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
 	operator /=( ArrayType< U > const & a )
 	{
 		assert( conformable( a ) );
-		for ( int i4 = 1, j4 = a.l4(), e4 = u4_; i4 <= e4; ++i4, ++j4 ) {
-			for ( int i3 = 1, j3 = a.l3(), e3 = u3_; i3 <= e3; ++i3, ++j3 ) {
-				for ( int i2 = 1, j2 = a.l2(), e2 = u2_; i2 <= e2; ++i2, ++j2 ) {
+		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
+			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
+				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
 					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
 						assert( T( a( j1, j2, j3, j4 ) ) != T( 0 ) );
-						operator()( i1, i2, i3, i4 ) /= a( j1, j2, j3, j4 );
+						operator ()( i1, i2, i3, i4 ) /= a( j1, j2, j3, j4 );
 					}
 				}
 			}
@@ -669,16 +666,148 @@ public: // Assignment
 		return *this;
 	}
 
+public: // Assignment: Logical
+
+	// &&= Array
+	inline
+	FArray4S &
+	and_equals( FArray4S const & a )
+	{
+		assert( conformable( a ) );
+		if ( overlap( a ) ) { // Overlap-safe
+			CArray< T > c( size_ );
+			size_type l( 0 );
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+							c[ l ] = a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+			l = 0;
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+							auto & v( operator ()( i1, i2, i3, i4 ) );
+							v = v && c[ l ];
+						}
+					}
+				}
+			}
+		} else { // Not overlap-safe
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+							auto & v( operator ()( i1, i2, i3, i4 ) );
+							v = v && a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// ||= Array
+	inline
+	FArray4S &
+	or_equals( FArray4S const & a )
+	{
+		assert( conformable( a ) );
+		if ( overlap( a ) ) { // Overlap-safe
+			CArray< T > c( size_ );
+			size_type l( 0 );
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+							c[ l ] = a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+			l = 0;
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+							auto & v( operator ()( i1, i2, i3, i4 ) );
+							v = v || c[ l ];
+						}
+					}
+				}
+			}
+		} else { // Not overlap-safe
+			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+							auto & v( operator ()( i1, i2, i3, i4 ) );
+							v = v || a( i1, i2, i3, i4 );
+						}
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// &&= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray4S &
+	and_equals( FArray4S const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						auto & v( operator ()( i1, i2, i3, i4 ) );
+						v = v && a( i1, i2, i3, i4 );
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// ||= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray4S &
+	or_equals( FArray4S const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						auto & v( operator ()( i1, i2, i3, i4 ) );
+						v = v || a( i1, i2, i3, i4 );
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+public: // Assignment: Value
+
 	// = Value
 	inline
 	FArray4S &
 	operator =( T const & t )
 	{
-		for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator()( i1, i2, i3, i4 ) = t;
+						operator ()( i1, i2, i3, i4 ) = t;
 					}
 				}
 			}
@@ -691,11 +820,11 @@ public: // Assignment
 	FArray4S &
 	operator +=( T const & t )
 	{
-		for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator()( i1, i2, i3, i4 ) += t;
+						operator ()( i1, i2, i3, i4 ) += t;
 					}
 				}
 			}
@@ -708,11 +837,11 @@ public: // Assignment
 	FArray4S &
 	operator -=( T const & t )
 	{
-		for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator()( i1, i2, i3, i4 ) -= t;
+						operator ()( i1, i2, i3, i4 ) -= t;
 					}
 				}
 			}
@@ -725,11 +854,11 @@ public: // Assignment
 	FArray4S &
 	operator *=( T const & t )
 	{
-		for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator()( i1, i2, i3, i4 ) *= t;
+						operator ()( i1, i2, i3, i4 ) *= t;
 					}
 				}
 			}
@@ -738,16 +867,37 @@ public: // Assignment
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray4S &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
-		for ( int i4 = 1, e4 = u4_; i4 <= e4; ++i4 ) {
-			for ( int i3 = 1, e3 = u3_; i3 <= e3; ++i3 ) {
-				for ( int i2 = 1, e2 = u2_; i2 <= e2; ++i2 ) {
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
 					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
-						operator()( i1, i2, i3, i4 ) /= t;
+						operator ()( i1, i2, i3, i4 ) *= inv_u;
+					}
+				}
+			}
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	FArray4S &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
+			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
+				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
+					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						operator ()( i1, i2, i3, i4 ) /= u;
 					}
 				}
 			}
@@ -1263,27 +1413,7 @@ public: // Inspector
 		}
 	}
 
-	// Lower Index of a Dimension
-	inline
-	int
-	l( int const d ) const
-	{
-		switch ( d ) {
-		case 1:
-			return 1;
-		case 2:
-			return 1;
-		case 3:
-			return 1;
-		case 4:
-			return 1;
-		default:
-			assert( false );
-			return 1;
-		}
-	}
-
-	// Upper Index of Dimension
+	// Upper Index of a Dimension
 	inline
 	int
 	u( int const d ) const
@@ -1323,6 +1453,26 @@ public: // Inspector
 		}
 	}
 
+	// Size of a Dimension
+	inline
+	int
+	isize( int const d ) const
+	{
+		switch ( d ) {
+		case 1:
+			return isize1();
+		case 2:
+			return isize2();
+		case 3:
+			return isize3();
+		case 4:
+			return isize4();
+		default:
+			assert( false );
+			return isize1();
+		}
+	}
+
 	// IndexRange of Dimension 1
 	inline
 	IR
@@ -1351,6 +1501,14 @@ public: // Inspector
 	inline
 	size_type
 	size1() const
+	{
+		return u1_;
+	}
+
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
 	{
 		return u1_;
 	}
@@ -1387,6 +1545,14 @@ public: // Inspector
 		return u2_;
 	}
 
+	// Size of Dimension 2
+	inline
+	int
+	isize2() const
+	{
+		return u2_;
+	}
+
 	// IndexRange of Dimension 3
 	inline
 	IR
@@ -1419,6 +1585,14 @@ public: // Inspector
 		return u3_;
 	}
 
+	// Size of Dimension 3
+	inline
+	int
+	isize3() const
+	{
+		return u3_;
+	}
+
 	// IndexRange of Dimension 4
 	inline
 	IR
@@ -1447,6 +1621,14 @@ public: // Inspector
 	inline
 	size_type
 	size4() const
+	{
+		return u4_;
+	}
+
+	// Size of Dimension 4
+	inline
+	int
+	isize4() const
 	{
 		return u4_;
 	}
@@ -2168,7 +2350,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2190,7 +2372,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2234,7 +2416,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -2630,7 +2812,6 @@ public: // Comparison: Predicate: Any: MArray
 	bool
 	any_eq( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return false;
 		for ( int i4 = 1, e4 = b.u4(); i4 <= e4; ++i4 ) {
@@ -2662,10 +2843,8 @@ public: // Comparison: Predicate: Any: MArray
 	bool
 	any_lt( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return false;
-		if ( &a == &b ) return false;
 		for ( int i4 = 1, e4 = b.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = b.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = b.u2(); i2 <= e2; ++i2 ) {
@@ -2685,7 +2864,6 @@ public: // Comparison: Predicate: Any: MArray
 	bool
 	any_le( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return false;
 		for ( int i4 = 1, e4 = b.u4(); i4 <= e4; ++i4 ) {
@@ -2707,10 +2885,8 @@ public: // Comparison: Predicate: Any: MArray
 	bool
 	any_gt( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return false;
-		if ( &a == &b ) return false;
 		for ( int i4 = 1, e4 = b.u4(); i4 <= e4; ++i4 ) {
 			for ( int i3 = 1, e3 = b.u3(); i3 <= e3; ++i3 ) {
 				for ( int i2 = 1, e2 = b.u2(); i2 <= e2; ++i2 ) {
@@ -2730,7 +2906,6 @@ public: // Comparison: Predicate: Any: MArray
 	bool
 	any_ge( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return false;
 		for ( int i4 = 1, e4 = b.u4(); i4 <= e4; ++i4 ) {
@@ -2936,7 +3111,6 @@ public: // Comparison: Count: MArray
 	size_type
 	count_eq( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		size_type n( 0 );
@@ -2959,7 +3133,6 @@ public: // Comparison: Count: MArray
 	size_type
 	count_ne( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		size_type n( 0 );
@@ -2982,7 +3155,6 @@ public: // Comparison: Count: MArray
 	size_type
 	count_lt( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		size_type n( 0 );
@@ -3005,7 +3177,6 @@ public: // Comparison: Count: MArray
 	size_type
 	count_le( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		size_type n( 0 );
@@ -3028,7 +3199,6 @@ public: // Comparison: Count: MArray
 	size_type
 	count_gt( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		size_type n( 0 );
@@ -3051,7 +3221,6 @@ public: // Comparison: Count: MArray
 	size_type
 	count_ge( FArray4S const & a, MArray4< A, T > const & b )
 	{
-		assert( a.size_bounded() );
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
 		size_type n( 0 );

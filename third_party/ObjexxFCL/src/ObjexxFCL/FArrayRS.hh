@@ -61,6 +61,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::overlap;
 	using Super::size;
 	using Super::slice_k;
@@ -79,19 +80,19 @@ protected: // Creation
 	// Copy Constructor
 	inline
 	FArrayRS( FArrayRS const & a ) :
-		Super( a )
+	 Super( a )
 	{}
 
 	// Data Constructor
 	inline
 	FArrayRS( T const * data, size_type const size ) :
-		Super( data, size )
+	 Super( data, size )
 	{}
 
 	// Non-Const Data Constructor
 	inline
 	FArrayRS( T * data, size_type const size ) :
-		Super( data, size )
+	 Super( data, size )
 	{}
 
 public: // Creation

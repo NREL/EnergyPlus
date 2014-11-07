@@ -2,6 +2,7 @@
 #include <cmath>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <TARCOGCommon.hh>
@@ -70,7 +71,7 @@ namespace TARCOGCommon {
 		// Height - glazing system height
 
 		// Using/Aliasing
-		using DataGlobals::Pi;
+		using DataGlobals::PiOvr2;
 		using namespace TARCOGParams;
 		//use TARCOGGassesParams
 
@@ -83,8 +84,10 @@ namespace TARCOGCommon {
 
 		LDSumMax = 0.0;
 		for ( i = 1; i <= mmax; i += 2 ) {
+			Real64 const sin_i( std::sin( i * PiOvr2 ) );
+			Real64 const pow_i_W( pow_2( i / Width ) );
 			for ( j = 1; j <= nmax; j += 2 ) {
-				LDSumMax += ( std::sin( i * Pi / 2 ) * std::sin( j * Pi / 2 ) ) / ( i * j * std::pow( ( std::pow( ( i / Width ), 2 ) + std::pow( ( j / Height ), 2 ) ), 2 ) );
+				LDSumMax += ( sin_i * std::sin( j * PiOvr2 ) ) / ( i * j * pow_2( pow_i_W + pow_2( j / Height ) ) );
 			} //do j = 1, nmax, 2
 		} //do i = 1, mmax, 2
 
@@ -110,13 +113,16 @@ namespace TARCOGCommon {
 		Real64 LDSumMean;
 
 		// Locals
+		static Real64 const Pi_squared( Pi * Pi );
 		int i;
 		int j;
 
 		LDSumMean = 0.0;
 		for ( i = 1; i <= mmax; i += 2 ) {
+			Real64 const pow_i_Pi_2( i * i * Pi_squared );
+			Real64 const pow_i_W( pow_2( i / Width ) );
 			for ( j = 1; j <= nmax; j += 2 ) {
-				LDSumMean += 4 / ( std::pow( i, 2 ) * std::pow( j, 2 ) * std::pow( Pi, 2 ) * std::pow( ( std::pow( ( i / Width ), 2 ) + std::pow( ( j / Height ), 2 ) ), 2 ) );
+				LDSumMean += 4.0 / ( pow_i_Pi_2 * pow_2( j ) * pow_2( pow_i_W + pow_2( j / Height ) ) );
 			} //do j = 1, nmax, 2
 		} //do i = 1, mmax, 2
 
@@ -213,9 +219,9 @@ namespace TARCOGCommon {
 			a( k + 1, k ) = scon( i ) / thick( i ) + hcgas( i );
 			a( k + 1, k + 1 ) = -scon( i ) / thick( i );
 			a( k + 1, k + 2 ) = 1.0;
-			a( k + 2, k ) = emis( front ) * StefanBoltzmann * std::pow( theta( front ), 3.0 );
+			a( k + 2, k ) = emis( front ) * StefanBoltzmann * pow_3( theta( front ) );
 			a( k + 2, k + 2 ) = -1.0;
-			a( k + 3, k + 1 ) = emis( back ) * StefanBoltzmann * std::pow( theta( back ), 3.0 );
+			a( k + 3, k + 1 ) = emis( back ) * StefanBoltzmann * pow_3( theta( back ) );
 			a( k + 3, k + 3 ) = -1.0;
 		}
 
@@ -436,7 +442,7 @@ namespace TARCOGCommon {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

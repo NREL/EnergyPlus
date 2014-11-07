@@ -99,7 +99,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     VRF TU with DOAS RH Control,  !- Name
@@ -2213,8 +2213,15 @@
     0.003,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ZoneSum;                 !- System Outdoor Air Method
 
   AirLoopHVAC,
@@ -2630,7 +2637,7 @@
   Fan:VariableVolume,
     DOAS Supply Fan,         !- Name
     OCCUPY-1,                !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -2752,12 +2759,12 @@
     15,                      !- Crankcase Heater Power per Compressor {W}
     3,                       !- Number of Compressors {dimensionless}
     0.33,                    !- Ratio of Compressor Size to Total Compressor Capacity {W/W}
-    7,                       !- Maximum Outdoor Dry-bulb Temperature for Crankcase Heater {C}
+    7,                       !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater {C}
     Resistive,               !- Defrost Strategy
     Timed,                   !- Defrost Control
     ,                        !- Defrost Energy Input Ratio Modifier Function of Temperature Curve Name
     ,                        !- Defrost Time Period Fraction {dimensionless}
-    28000,               !- Resistive Defrost Heater Capacity {W}
+    28000,                   !- Resistive Defrost Heater Capacity {W}
     7,                       !- Maximum Outdoor Dry-bulb Temperature for Defrost Operation {C}
     AirCooled,               !- Condenser Type
     VRF OutdoorAirNode,      !- Condenser Inlet Node Name
@@ -2783,7 +2790,7 @@
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     SPACE1-1 TU,             !- Zone Terminal Unit Name
-    ALWAYS_ON,               !- Terminal Unit Availability schedule
+    ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE1-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE1-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
     autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2794,7 +2801,7 @@
     0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
     0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
-    drawthrough,             !- Supply Air Fan placement
+    drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE1-1_Fan,            !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
@@ -2810,7 +2817,7 @@
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     SPACE2-1 TU,             !- Zone Terminal Unit Name
-    ALWAYS_ON,               !- Terminal Unit Availability schedule
+    ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE2-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE2-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
     autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2821,7 +2828,7 @@
     0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
     0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
-    drawthrough,             !- Supply Air Fan placement
+    drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE2-1_Fan,            !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
@@ -2837,7 +2844,7 @@
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     SPACE3-1 TU,             !- Zone Terminal Unit Name
-    ALWAYS_ON,               !- Terminal Unit Availability schedule
+    ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE3-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE3-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
     autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2848,7 +2855,7 @@
     0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
     0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
-    drawthrough,             !- Supply Air Fan placement
+    drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE3-1_Fan,            !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
@@ -2864,7 +2871,7 @@
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     SPACE4-1 TU,             !- Zone Terminal Unit Name
-    ALWAYS_ON,               !- Terminal Unit Availability schedule
+    ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE4-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE4-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
     autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2875,7 +2882,7 @@
     0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
     0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
-    drawthrough,             !- Supply Air Fan placement
+    drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE4-1_Fan,            !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
@@ -2891,7 +2898,7 @@
 
   ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
     SPACE5-1 TU,             !- Zone Terminal Unit Name
-    ALWAYS_ON,               !- Terminal Unit Availability schedule
+    ALWAYS_ON,               !- Terminal Unit Availability Schedule
     SPACE5-1 TU Inlet Node,  !- Terminal Unit Air Inlet Node Name
     SPACE5-1 TU Outlet Node, !- Terminal Unit Air Outlet Node Name
     autosize,                !- Supply Air Flow Rate During Cooling Operation {m3/s}
@@ -2902,7 +2909,7 @@
     0.0,                     !- Outdoor Air Flow Rate During Heating Operation {m3/s}
     0.0,                     !- Outdoor Air Flow Rate When No Cooling or Heating is Needed {m3/s}
     VRFFanOprMode,           !- Supply Air Fan Operating Mode Schedule Name
-    drawthrough,             !- Supply Air Fan placement
+    drawthrough,             !- Supply Air Fan Placement
     Fan:OnOff,               !- Supply Air Fan Object Type
     SPACE5-1_Fan,            !- Supply Air Fan Object Name
     OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
@@ -2954,7 +2961,7 @@
   Fan:OnOff,
     SPACE1-1_Fan,            !- Name
     VRFFanOperatingSch,      !- Availability Schedule Name
-    0.6175,                  !- Fan Efficiency
+    0.6175,                  !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.95,                    !- Motor Efficiency
@@ -2966,7 +2973,7 @@
   Fan:OnOff,
     SPACE2-1_Fan,            !- Name
     VRFFanOperatingSch,      !- Availability Schedule Name
-    0.6175,                  !- Fan Efficiency
+    0.6175,                  !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.95,                    !- Motor Efficiency
@@ -2978,7 +2985,7 @@
   Fan:OnOff,
     SPACE3-1_Fan,            !- Name
     VRFFanOperatingSch,      !- Availability Schedule Name
-    0.6175,                  !- Fan Efficiency
+    0.6175,                  !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.95,                    !- Motor Efficiency
@@ -2990,7 +2997,7 @@
   Fan:OnOff,
     SPACE4-1_Fan,            !- Name
     VRFFanOperatingSch,      !- Availability Schedule Name
-    0.6175,                  !- Fan Efficiency
+    0.6175,                  !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.95,                    !- Motor Efficiency
@@ -3002,7 +3009,7 @@
   Fan:OnOff,
     SPACE5-1_Fan,            !- Name
     VRFFanOperatingSch,      !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     250.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency

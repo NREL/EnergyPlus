@@ -60,7 +60,7 @@ namespace PlantPressureSystem {
 
 	// Data
 	// MODULE PARAMETER/ENUMERATIONS DEFINITIONS:
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 	//TYPE, PUBLIC:: PlantPressureCurveData
@@ -456,7 +456,7 @@ namespace PlantPressureSystem {
 		Real64 NodeTemperature; // Nodal temperature {C}
 		Real64 NodeDensity; // Nodal density {kg/m3}
 		Real64 NodeViscosity; // Nodal viscosity, assuming mu here (dynamic viscosity)
-		Real64 BranchDeltaPress; // Pressure drop for component, {Pa}
+		Real64 BranchDeltaPress( 0.0 ); // Pressure drop for component, {Pa}
 		static int ErrorCounter( 0 ); // For proper error handling
 
 		//Exit early if need be
@@ -508,7 +508,7 @@ namespace PlantPressureSystem {
 
 		//Update the effective K-value for this branch
 		if ( NodeMassFlow > 0.0 ) {
-			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).PressureEffectiveK = BranchDeltaPress / ( std::pow( NodeMassFlow, 2.0 ) );
+			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).PressureEffectiveK = BranchDeltaPress / pow_2( NodeMassFlow );
 		} else {
 			PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch( BranchNum ).PressureEffectiveK = 0.0;
 		}
@@ -868,7 +868,7 @@ namespace PlantPressureSystem {
 			}
 
 			//Add parallel branches if they are greater than zero, by taking the sum and performing (1/(SUM^2))
-			if ( TempVal_SumOfOneByRootK > 0.0 ) EffectiveLoopSideKValue += ( 1.0 / ( std::pow( TempVal_SumOfOneByRootK, 2 ) ) );
+			if ( TempVal_SumOfOneByRootK > 0.0 ) EffectiveLoopSideKValue += ( 1.0 / pow_2( TempVal_SumOfOneByRootK ) );
 
 			//Always take the last branch K, it will be in series
 			BranchNum = size( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Branch );
@@ -1347,7 +1347,7 @@ namespace PlantPressureSystem {
 		//Get loop level data
 		FluidIndex = PlantLoop( LoopNum ).FluidIndex;
 		LoopEffectiveK = PlantLoop( LoopNum ).PressureEffectiveK;
-		SystemPressureDrop = LoopEffectiveK * std::pow( SystemMassFlow, 2.0 );
+		SystemPressureDrop = LoopEffectiveK * pow_2( SystemMassFlow );
 
 		//Read data off the node data structure
 		NodeTemperature = Node( PlantLoop( LoopNum ).LoopSide( SupplySide ).NodeNumIn ).Temp;
@@ -1398,7 +1398,7 @@ namespace PlantPressureSystem {
 			PsiPump = CurveValue( PumpCurveNum, PhiPump );
 
 			//Calcuate Pump Pressure rise
-			PumpPressureRise = PsiPump * NodeDensity * ( std::pow( PumpSpeed, 2 ) ) * ( std::pow( PumpImpellerDia, 2 ) );
+			PumpPressureRise = PsiPump * NodeDensity * pow_2( PumpSpeed ) * pow_2( PumpImpellerDia );
 
 			//Convergence Criteria Based on Pressure
 			if ( std::abs( SystemPressureDrop - PumpPressureRise ) < ( PressureConvergeCriteria ) ) {
@@ -1455,7 +1455,7 @@ namespace PlantPressureSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

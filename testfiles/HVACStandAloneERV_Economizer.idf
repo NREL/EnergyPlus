@@ -107,7 +107,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -1314,6 +1314,10 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone1BBHWInletNode,      !- Inlet Node Name
     Zone1BBHWOutletNode,     !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     500.,                    !- U-Factor Times Area Value {W/K}
     0.0013,                  !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -1323,6 +1327,10 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone2BBHWInletNode,      !- Inlet Node Name
     Zone2BBHWOutletNode,     !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     500.,                    !- U-Factor Times Area Value {W/K}
     0.0012,                  !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -1332,6 +1340,10 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone3BBHWInletNode,      !- Inlet Node Name
     Zone3BBHWOutletNode,     !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     500.,                    !- U-Factor Times Area Value {W/K}
     0.0013,                  !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -1414,7 +1426,7 @@
   Fan:ConstantVolume,
     Zone2WindACFan,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.6,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1425,7 +1437,7 @@
   Fan:ConstantVolume,
     Zone3WindACFan,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.6,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1438,7 +1450,7 @@
   Fan:OnOff,
     Zone1WindACFan,          !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.6,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1449,7 +1461,7 @@
   Fan:OnOff,
     Stand Alone ERV Supply Fan,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.06,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1460,7 +1472,7 @@
   Fan:OnOff,
     Stand Alone ERV Exhaust Fan,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.06,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1471,7 +1483,7 @@
   Fan:OnOff,
     Stand Alone ERV Supply Fan 2,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.05,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1482,7 +1494,7 @@
   Fan:OnOff,
     Stand Alone ERV Exhaust Fan 2,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     0.05,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1493,7 +1505,7 @@
   Fan:OnOff,
     Stand Alone ERV Supply Fan 3,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     35.0,                    !- Pressure Rise {Pa}
     0.015,                   !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1504,7 +1516,7 @@
   Fan:OnOff,
     Stand Alone ERV Exhaust Fan 3,  !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     35.0,                    !- Pressure Rise {Pa}
     0.015,                   !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

@@ -23,89 +23,89 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Fstring;
 
 inline
 int
-kind( bool )
+kind( bool const & )
 {
 	return 4; // Assumes bool is standing for LOGICAL
 }
 
 inline
 int
-kind( std::int8_t )
+kind( std::int8_t const & )
 {
 	return 1;
 }
 
 inline
 int
-kind( std::int16_t )
+kind( std::int16_t const & )
 {
 	return 2;
 }
 
 inline
 int
-kind( std::int32_t )
+kind( std::int32_t const & )
 {
 	return 4;
 }
 
 inline
 int
-kind( std::int64_t )
+kind( std::int64_t const & )
 {
 	return 8;
 }
 
 inline
 int
-kind( std::uint8_t )
+kind( std::uint8_t const & )
 {
 	return 1;
 }
 
 inline
 int
-kind( std::uint16_t )
+kind( std::uint16_t const & )
 {
 	return 2;
 }
 
 inline
 int
-kind( std::uint32_t )
+kind( std::uint32_t const & )
 {
 	return 4;
 }
 
 inline
 int
-kind( std::uint64_t )
+kind( std::uint64_t const & )
 {
 	return 8;
 }
 
 inline
 int
-kind( float )
+kind( float const & )
 {
 	return 4;
 }
 
 inline
 int
-kind( double )
+kind( double const & )
 {
 	return 8;
 }
 
 inline
 int
-kind( long double )
+kind( long double const & )
 {
 	return 16; // Assumes long double standing in for REAL(16)
 }
@@ -133,7 +133,7 @@ kind( std::complex< long double > const & )
 
 inline
 int
-kind( char )
+kind( char const & )
 {
 	return 1;
 }
@@ -155,7 +155,7 @@ kind( Fstring const & )
 template< typename T >
 inline
 int
-KIND( T const x )
+KIND( T const & x )
 {
 	return kind( x );
 }
@@ -183,7 +183,7 @@ SELECTED_REAL_KIND( int const p = 0, int const r = 0 ) // Fortran 2008 variant w
 
 inline
 int
-selected_char_kind( char )
+selected_char_kind( char const & )
 {
 	return -1;
 }
@@ -197,7 +197,7 @@ selected_char_kind( Fstring const & s );
 template< typename S >
 inline
 int
-SELECTED_CHAR_KIND( S const s )
+SELECTED_CHAR_KIND( S const & s )
 {
 	return selected_char_kind( s );
 }
@@ -205,7 +205,7 @@ SELECTED_CHAR_KIND( S const s )
 template< typename T >
 inline
 int
-radix( T )
+radix( T const & )
 {
 	return std::numeric_limits< T >::radix;
 }
@@ -213,7 +213,7 @@ radix( T )
 template< typename T >
 inline
 int
-RADIX( T )
+RADIX( T const & )
 {
 	return std::numeric_limits< T >::radix;
 }
@@ -221,7 +221,7 @@ RADIX( T )
 template< typename T >
 inline
 int
-digits( T )
+digits( T const & )
 {
 	return std::numeric_limits< T >::digits;
 }
@@ -229,105 +229,105 @@ digits( T )
 template< typename T >
 inline
 int
-DIGITS( T )
+DIGITS( T const & )
 {
 	return std::numeric_limits< T >::digits;
 }
 
 inline
 int
-range( std::int8_t )
+range( std::int8_t const & )
 {
 	return 2;
 }
 
 inline
 int
-range( std::int16_t )
+range( std::int16_t const & )
 {
 	return 4;
 }
 
 inline
 int
-range( std::int32_t )
+range( std::int32_t const & )
 {
 	return 9;
 }
 
 inline
 int
-range( std::int64_t )
+range( std::int64_t const & )
 {
 	return 18;
 }
 
 inline
 int
-range( std::uint8_t )
+range( std::uint8_t const & )
 {
 	return 2;
 }
 
 inline
 int
-range( std::uint16_t )
+range( std::uint16_t const & )
 {
 	return 4;
 }
 
 inline
 int
-range( std::uint32_t )
+range( std::uint32_t const & )
 {
 	return 9;
 }
 
 inline
 int
-range( std::uint64_t )
+range( std::uint64_t const & )
 {
 	return 18;
 }
 
 inline
 int
-range( float )
+range( float const & )
 {
 	return 37;
 }
 
 inline
 int
-range( double )
+range( double const & )
 {
 	return 307;
 }
 
 inline
 int
-range( long double )
+range( long double const & )
 {
 	return 4931; // Assumes long double standing in for REAL(16)
 }
 
 inline
 int
-range( std::complex< float > )
+range( std::complex< float > const & )
 {
 	return 37;
 }
 
 inline
 int
-range( std::complex< double > )
+range( std::complex< double > const & )
 {
 	return 307;
 }
 
 inline
 int
-range( std::complex< long double > )
+range( std::complex< long double > const & )
 {
 	return 4931;
 }
@@ -335,7 +335,7 @@ range( std::complex< long double > )
 template< typename T >
 inline
 int
-RANGE( T const x )
+RANGE( T const & x )
 {
 	return range( x );
 }
@@ -344,7 +344,7 @@ RANGE( T const x )
 template< typename T >
 inline
 T
-huge( T )
+huge( T const & )
 {
 	return std::numeric_limits< T >::max();
 }
@@ -353,7 +353,7 @@ huge( T )
 template< typename T >
 inline
 T
-tiny( T )
+tiny( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::min();
@@ -363,7 +363,7 @@ tiny( T )
 template< typename T >
 inline
 T
-TINY( T )
+TINY( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::min();
@@ -373,7 +373,7 @@ TINY( T )
 template< typename T >
 inline
 T
-epsilon( T )
+epsilon( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::epsilon();
@@ -383,7 +383,7 @@ epsilon( T )
 template< typename T >
 inline
 T
-EPSILON( T )
+EPSILON( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::epsilon();
@@ -392,7 +392,7 @@ EPSILON( T )
 template< typename T >
 inline
 int
-precision( T const x  )
+precision( T const & x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return int( ( digits( x ) - 1 ) * std::log10( double( radix( x ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
@@ -401,7 +401,7 @@ precision( T const x  )
 template< typename T >
 inline
 int
-precision( std::complex< T > const x  )
+precision( std::complex< T > const & x )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return int( ( digits( x.real() ) - 1 ) * std::log10( double( radix( x.real() ) ) ) ); // + 1 if radix(x) == 10^N but we don't support non-traditional architectures
@@ -410,7 +410,7 @@ precision( std::complex< T > const x  )
 template< typename T >
 inline
 int
-PRECISION( T const x )
+PRECISION( T const & x )
 {
 	return precision( x );
 }
@@ -418,7 +418,7 @@ PRECISION( T const x )
 template< typename T >
 inline
 T
-minexponent( T )
+minexponent( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::min_exponent;
@@ -427,7 +427,7 @@ minexponent( T )
 template< typename T >
 inline
 T
-MINEXPONENT( T )
+MINEXPONENT( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::min_exponent;
@@ -436,7 +436,7 @@ MINEXPONENT( T )
 template< typename T >
 inline
 T
-maxexponent( T )
+maxexponent( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::max_exponent;
@@ -445,7 +445,7 @@ maxexponent( T )
 template< typename T >
 inline
 T
-MAXEXPONENT( T )
+MAXEXPONENT( T const & )
 {
 	static_assert( std::is_floating_point< T >::value, "Floating point argument required" );
 	return std::numeric_limits< T >::max_exponent;

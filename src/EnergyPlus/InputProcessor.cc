@@ -2,7 +2,6 @@
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <InputProcessor.hh>
@@ -14,7 +13,6 @@
 #include <DataSystemVariables.hh>
 #include <DisplayRoutines.hh>
 #include <SortAndStringUtilities.hh>
-#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -81,10 +79,12 @@ namespace InputProcessor {
 	std::string::size_type const MaxInputLineLength( 500 ); // Maximum number of characters in an input line (in.idf, energy+.idd)
 	std::string::size_type const MaxFieldNameLength( 140 ); // Maximum number of characters in a field name string // Not used with std::string
 	std::string const Blank;
-	std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
-	gio::Fmt const fmta( "(A)" );
+	static std::string const BlankString;
+	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
 	Real64 const DefAutoSizeValue( AutoSize );
 	Real64 const DefAutoCalculateValue( AutoCalculate );
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -150,7 +150,6 @@ namespace InputProcessor {
 	bool RequiredObject( false ); // Set to true when ReadInputLine has a required object
 	bool UniqueObject( false ); // Set to true when ReadInputLine has a unique object
 	bool ExtensibleObject( false ); // Set to true when ReadInputLine has an extensible object
-	bool StripCR( false ); // If true, strip last character (<cr> off each schedule:file line)
 	int ExtensibleNumFields( 0 ); // set to number when ReadInputLine has an extensible object
 	FArray1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
 
@@ -263,18 +262,14 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + FullName );
 		}
 		IDDFile = GetNewUnitNumber();
-		StripCR = false;
 		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, FullName, flags ); read_stat = flags.ios(); }
 		if ( read_stat != 0 ) {
 			DisplayString( "Could not open (read) Energy+.idd." );
 			ShowFatalError( "ProcessInput: Could not open file \"Energy+.idd\" for input (read)." );
 		}
-		gio::read( IDDFile, fmta ) >> InputLine;
+		gio::read( IDDFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
-			if ( int( InputLine[ endcol - 1 ] ) == iASCII_CR ) {
-				StripCR = true;
-			}
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
 				ShowSevereError( "ProcessInput: \"Energy+.idd\" appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
@@ -285,7 +280,7 @@ namespace InputProcessor {
 		NumLines = 0;
 
 		DoingInputProcessing = true;
-		gio::write( EchoInputFile, "*" ) << " Processing Data Dictionary (Energy+.idd) File -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
 
@@ -315,17 +310,17 @@ namespace InputProcessor {
 		}
 
 		ProcessingIDD = false;
-		gio::write( EchoInputFile, "*" ) << " Processing Data Dictionary (Energy+.idd) File -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Complete";
 
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Number of Object Definitions=" << NumObjectDefs;
-		gio::write( EchoInputFile, "*" ) << " Number of Section Definitions=" << NumSectionDefs;
-		gio::write( EchoInputFile, "*" ) << " Total Number of Alpha Fields=" << NumAlphaArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha Args=" << MaxAlphaArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric Args=" << MaxNumericArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Object Definitions=" << NumObjectDefs;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Section Definitions=" << NumSectionDefs;
+		gio::write( EchoInputFile, fmtLD ) << " Total Number of Alpha Fields=" << NumAlphaArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Total Number of Numeric Fields=" << NumNumericArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
-		gio::write( EchoInputFile, "*" ) << " Processing Input Data File (in.idf) -- Start";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
 
 		{ IOFlags flags; gio::inquire( "in.idf", flags ); FileExists = flags.exists(); }
 		if ( ! FileExists ) {
@@ -333,19 +328,15 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: in.idf missing. Program terminates." );
 		}
 
-		StripCR = false;
 		IDFFile = GetNewUnitNumber();
 		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, "in.idf", flags ); read_stat = flags.ios(); }
 		if ( read_stat != 0 ) {
 			DisplayString( "Could not open (read) in.idf." );
 			ShowFatalError( "ProcessInput: Could not open file \"in.idf\" for input (read)." );
 		}
-		gio::read( IDFFile, fmta ) >> InputLine;
+		gio::read( IDFFile, fmtA ) >> InputLine;
 		endcol = len( InputLine );
 		if ( endcol > 0 ) {
-			if ( int( InputLine[ endcol - 1 ] ) == iASCII_CR ) {
-				StripCR = true;
-			}
 			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
 				ShowSevereError( "ProcessInput: \"in.idf\" appears to be a Unicode or binary file." );
 				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
@@ -365,13 +356,13 @@ namespace InputProcessor {
 		gio::close( IDFFile );
 
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaFieldNames = Blank;
+		cAlphaFieldNames = BlankString;
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaArgs = Blank;
+		cAlphaArgs = BlankString;
 		lAlphaFieldBlanks.allocate( MaxAlphaIDFDefArgsFound );
 		lAlphaFieldBlanks = false;
 		cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		cNumericFieldNames = Blank;
+		cNumericFieldNames = BlankString;
 		rNumericArgs.allocate( MaxNumericIDFDefArgsFound );
 		rNumericArgs = 0.0;
 		lNumericFieldBlanks.allocate( MaxNumericIDFDefArgsFound );
@@ -380,18 +371,18 @@ namespace InputProcessor {
 		IDFRecordsGotten.allocate( NumIDFRecords );
 		IDFRecordsGotten = false;
 
-		gio::write( EchoInputFile, "*" ) << " Processing Input Data File (in.idf) -- Complete";
+		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Complete";
 		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
-		gio::write( EchoInputFile, "*" ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Alpha IDF Args=" << MaxAlphaIDFArgsFound;
+		gio::write( EchoInputFile, fmtLD ) << " Maximum number of Numeric IDF Args=" << MaxNumericIDFArgsFound;
 		GetIDFRecordsStats( iNumberOfRecords, iNumberOfDefaultedFields, iTotalFieldsWithDefaults, iNumberOfAutoSizedFields, iTotalAutoSizableFields, iNumberOfAutoCalcedFields, iTotalAutoCalculatableFields );
-		gio::write( EchoInputFile, "*" ) << " Number of IDF \"Lines\"=" << iNumberOfRecords;
-		gio::write( EchoInputFile, "*" ) << " Number of Defaulted Fields=" << iNumberOfDefaultedFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Fields with Defaults=" << iTotalFieldsWithDefaults;
-		gio::write( EchoInputFile, "*" ) << " Number of Autosized Fields=" << iNumberOfAutoSizedFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Autosizable Fields =" << iTotalAutoSizableFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Autocalculated Fields=" << iNumberOfAutoCalcedFields;
-		gio::write( EchoInputFile, "*" ) << " Number of Autocalculatable Fields =" << iTotalAutoCalculatableFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of IDF \"Lines\"=" << iNumberOfRecords;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Defaulted Fields=" << iNumberOfDefaultedFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Fields with Defaults=" << iTotalFieldsWithDefaults;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autosized Fields=" << iNumberOfAutoSizedFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autosizable Fields =" << iTotalAutoSizableFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autocalculated Fields=" << iNumberOfAutoCalcedFields;
+		gio::write( EchoInputFile, fmtLD ) << " Number of Autocalculatable Fields =" << iTotalAutoCalculatableFields;
 
 		CountErr = 0;
 		for ( Loop = 1; Loop <= NumIDFSections; ++Loop ) {
@@ -399,7 +390,7 @@ namespace InputProcessor {
 			if ( equali( SectionsOnFile( Loop ).Name, "REPORT VARIABLE DICTIONARY" ) ) continue;
 			if ( CountErr == 0 ) {
 				ShowSevereError( "IP: Potential errors in IDF processing -- see .audit file for details." );
-				gio::write( EchoInputFile, fmta ) << " Potential errors in IDF processing:";
+				gio::write( EchoInputFile, fmtA ) << " Potential errors in IDF processing:";
 			}
 			++CountErr;
 			Which = SectionsOnFile( Loop ).FirstRecord;
@@ -411,12 +402,12 @@ namespace InputProcessor {
 					Num1 = FindItemInList( IDFRecords( Which ).Name, ListOfObjects, NumObjectDefs );
 				}
 				if ( ObjectDef( Num1 ).NameAlpha1 && IDFRecords( Which ).NumAlphas > 0 ) {
-					gio::write( EchoInputFile, fmta ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Object Name=" + IDFRecords( Which ).Alphas( 1 );
+					gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Object Name=" + IDFRecords( Which ).Alphas( 1 );
 				} else {
-					gio::write( EchoInputFile, fmta ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Name field not recorded for Object.";
+					gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], Object Type Preceding=" + IDFRecords( Which ).Name + ", Name field not recorded for Object.";
 				}
 			} else {
-				gio::write( EchoInputFile, fmta ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], No prior Objects.";
+				gio::write( EchoInputFile, fmtA ) << " Potential \"semi-colon\" misplacement=" + SectionsOnFile( Loop ).Name + ", at about line number=[" + IPTrimSigDigits( SectionsOnFile( Loop ).FirstLineNo ) + "], No prior Objects.";
 			}
 		}
 
@@ -625,7 +616,7 @@ namespace InputProcessor {
 		}
 		errFlag = false;
 
-		if ( SqueezedSection != Blank ) {
+		if ( ! SqueezedSection.empty() ) {
 			if ( FindItemInList( SqueezedSection, SectionDef.Name(), NumSectionDefs ) > 0 ) {
 				ShowSevereError( "IP: Already a Section called " + SqueezedSection + ". This definition ignored.", EchoInputFile );
 				// Error Condition
@@ -736,7 +727,7 @@ namespace InputProcessor {
 		}
 
 		SqueezedObject = MakeUPPERCase( stripped( ProposedObject ) );
-		if ( len( stripped( ProposedObject ) ) > static_cast< std::string::size_type >( MaxObjectNameLength ) ) {
+		if ( len( SqueezedObject ) > static_cast< std::string::size_type >( MaxObjectNameLength ) ) {
 			ShowWarningError( "IP: Object length exceeds maximum, will be truncated=" + ProposedObject, EchoInputFile );
 			ShowContinueError( "Will be processed as Object=" + SqueezedObject, EchoInputFile );
 			ErrorsFound = true;
@@ -757,7 +748,7 @@ namespace InputProcessor {
 		AutoCalculate = false;
 		WhichMinMax = 0;
 
-		if ( SqueezedObject != Blank ) {
+		if ( ! SqueezedObject.empty() ) {
 			if ( FindItemInList( SqueezedObject, ObjectDef.Name(), NumObjectDefs ) > 0 ) {
 				ShowSevereError( "IP: Already an Object called " + SqueezedObject + ". This definition ignored.", EchoInputFile );
 				// Error Condition
@@ -797,8 +788,8 @@ namespace InputProcessor {
 			PrevSizeNumAlpha = MaxANArgs;
 		}
 
-		AlphFieldChecks( {1,PrevSizeNumAlpha} ) = Blank;
-		AlphFieldDefaults( {1,PrevSizeNumAlpha} ) = Blank;
+		AlphFieldChecks( {1,PrevSizeNumAlpha} ) = BlankString;
+		AlphFieldDefaults( {1,PrevSizeNumAlpha} ) = BlankString;
 
 		if ( PrevSizeNumNumeric == -1 ) {
 			PrevSizeNumNumeric = MaxANArgs;
@@ -807,24 +798,24 @@ namespace InputProcessor {
 		//clear only portion of NumRangeChecks array used in the previous
 		//call to reduce computation time to clear this large array.
 		for ( int i = 1; i <= PrevSizeNumNumeric; ++i ) {
-			auto & RangeCheck( NumRangeChecks( i ) );
-			RangeCheck.MinMaxChk = false;
-			RangeCheck.WhichMinMax( 1 ) = 0;
-			RangeCheck.WhichMinMax( 2 ) = 0;
-			RangeCheck.MinMaxString( 1 ) = Blank;
-			RangeCheck.MinMaxString( 2 ) = Blank;
-			RangeCheck.MinMaxValue( 1 ) = 0.0;
-			RangeCheck.MinMaxValue( 2 ) = 0.0;
-			RangeCheck.Default = 0.0;
-			RangeCheck.DefaultChk = false;
-			RangeCheck.DefAutoSize = false;
-			RangeCheck.DefAutoCalculate = false;
-			RangeCheck.FieldNumber = 0;
-			RangeCheck.FieldName = Blank;
-			RangeCheck.AutoSizable = false;
-			RangeCheck.AutoSizeValue = DefAutoSizeValue;
-			RangeCheck.AutoCalculatable = false;
-			RangeCheck.AutoCalculateValue = DefAutoCalculateValue;
+			auto & numRangeCheck( NumRangeChecks( i ) );
+			numRangeCheck.MinMaxChk = false;
+			numRangeCheck.WhichMinMax( 1 ) = 0;
+			numRangeCheck.WhichMinMax( 2 ) = 0;
+			numRangeCheck.MinMaxString( 1 ).clear();
+			numRangeCheck.MinMaxString( 2 ).clear();
+			numRangeCheck.MinMaxValue( 1 ) = 0.0;
+			numRangeCheck.MinMaxValue( 2 ) = 0.0;
+			numRangeCheck.Default = 0.0;
+			numRangeCheck.DefaultChk = false;
+			numRangeCheck.DefAutoSize = false;
+			numRangeCheck.DefAutoCalculate = false;
+			numRangeCheck.FieldNumber = 0;
+			numRangeCheck.FieldName = BlankString;
+			numRangeCheck.AutoSizable = false;
+			numRangeCheck.AutoSizeValue = DefAutoSizeValue;
+			numRangeCheck.AutoCalculatable = false;
+			numRangeCheck.AutoCalculateValue = DefAutoCalculateValue;
 		}
 
 		Count = 0;
@@ -858,11 +849,11 @@ namespace InputProcessor {
 						TempChecks( {1,MaxANArgs} ) = NumRangeChecks( {1,MaxANArgs} );
 						NumRangeChecks.deallocate();
 						TempAFC.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFC = Blank;
+						TempAFC = BlankString;
 						TempAFC( {1,MaxANArgs} ) = AlphFieldChecks;
 						AlphFieldChecks.deallocate();
 						TempAFD.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFD = Blank;
+						TempAFD = BlankString;
 						TempAFD( {1,MaxANArgs} ) = AlphFieldDefaults;
 						AlphFieldDefaults.deallocate();
 						AlphaOrNumeric.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
@@ -1572,7 +1563,7 @@ namespace InputProcessor {
 
 				errFlag = false;
 				LineItem.Name = SqueezedObject;
-				LineItem.Alphas = Blank;
+				LineItem.Alphas = BlankString;
 				LineItem.AlphBlank = false;
 				LineItem.NumAlphas = 0;
 				LineItem.Numbers = 0.0;
@@ -1604,11 +1595,11 @@ namespace InputProcessor {
 		++CurPos;
 
 		//  Keep context buffer in case of errors
-		LineBuf = Blank;
+		LineBuf = BlankString;
 		NumConxLines = 0;
 		StartLine = NumLines;
 		cStartLine = InputLine.substr( 0, 300 );
-		cStartName = Blank;
+		cStartName = BlankString;
 		NumConxLines = 0;
 		CurLines = NumLines;
 		CurQPtr = 0;
@@ -1668,7 +1659,7 @@ namespace InputProcessor {
 							ShowContinueError( "Will be processed as Alpha=" + SqueezedArg, EchoInputFile );
 						}
 					} else {
-						SqueezedArg = Blank;
+						SqueezedArg = BlankString;
 					}
 					if ( NumArg == NumArgExpected && ! ObjectDef( Found ).ExtensibleObject ) {
 						DumpCurrentLineBuffer( StartLine, cStartLine, cStartName, NumLines, NumConxLines, LineBuf, CurQPtr );
@@ -1693,10 +1684,10 @@ namespace InputProcessor {
 									SqueezedArg = InputLine.substr( CurPos, Pos );
 									strip( SqueezedArg );
 								}
-								if ( SqueezedArg != Blank ) {
+								if ( ! SqueezedArg.empty() ) {
 									LineItem.Alphas( NumAlpha ) = SqueezedArg;
 								} else if ( ObjectDef( Found ).ReqField( NumArg ) ) { // Blank Argument
-									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != Blank ) {
+									if ( ! ObjectDef( Found ).AlphFieldDefs( NumAlpha ).empty() ) {
 										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
 									} else {
 										if ( ObjectDef( Found ).NameAlpha1 && NumAlpha != 1 ) {
@@ -1711,7 +1702,7 @@ namespace InputProcessor {
 									}
 								} else {
 									LineItem.AlphBlank( NumAlpha ) = true;
-									if ( ObjectDef( Found ).AlphFieldDefs( NumAlpha ) != Blank ) {
+									if ( ! ObjectDef( Found ).AlphFieldDefs( NumAlpha ).empty() ) {
 										LineItem.Alphas( NumAlpha ) = ObjectDef( Found ).AlphFieldDefs( NumAlpha );
 									}
 								}
@@ -1725,7 +1716,7 @@ namespace InputProcessor {
 							} else {
 								++NumNumeric;
 								LineItem.NumNumbers = NumNumeric;
-								if ( SqueezedArg != Blank ) {
+								if ( ! SqueezedArg.empty() ) {
 									if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoSizable && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).AutoCalculatable ) {
 										LineItem.Numbers( NumNumeric ) = ProcessNumber( SqueezedArg, errFlag );
 									} else if ( SqueezedArg == "AUTOSIZE" ) {
@@ -1770,7 +1761,7 @@ namespace InputProcessor {
 									if ( SqueezedArg[ 0 ] != '=' ) { // argument does not start with "=" (parametric)
 										FieldString = IPTrimSigDigits( NumNumeric );
 										FieldNameString = ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName;
-										if ( FieldNameString != Blank ) {
+										if ( ! FieldNameString.empty() ) {
 											Message = "Invalid Number in Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + SqueezedArg;
 										} else { // Field Name not recorded
 											Message = "Invalid Number in Numeric Field#" + FieldString + ", value=" + SqueezedArg;
@@ -1831,7 +1822,7 @@ namespace InputProcessor {
 							++NumAlpha;
 							if ( NumAlpha <= LineItem.NumAlphas ) continue;
 							++LineItem.NumAlphas;
-							if ( ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) != Blank ) {
+							if ( ! ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ).empty() ) {
 								LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas );
 								ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Found ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
 							} else if ( ObjectDef( Found ).ReqField( Count ) ) {
@@ -1842,7 +1833,7 @@ namespace InputProcessor {
 								}
 								errFlag = true;
 							} else {
-								LineItem.Alphas( LineItem.NumAlphas ) = Blank;
+								LineItem.Alphas( LineItem.NumAlphas ).clear();
 								LineItem.AlphBlank( LineItem.NumAlphas ) = true;
 								ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Found ).AlphFieldChks( NumAlpha ) );
 							}
@@ -1854,7 +1845,7 @@ namespace InputProcessor {
 							if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefaultChk ) {
 								if ( ! ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize && ! ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
 									LineItem.Numbers( NumNumeric ) = ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
-									gio::write( String, "*" ) << ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
+									gio::write( String, fmtLD ) << ObjectDef( Found ).NumRangeChks( NumNumeric ).Default;
 									strip( String );
 									ShowAuditErrorMessage( " **   Add   ** ", String + "   ! field=>" + ObjectDef( Found ).NumRangeChks( NumNumeric ).FieldName );
 								} else if ( ObjectDef( Found ).NumRangeChks( NumNumeric ).DefAutoSize ) {
@@ -1963,7 +1954,7 @@ namespace InputProcessor {
 
 		for ( int Count = 1; Count <= NumIDFSections; ++Count ) {
 			if ( SectionsOnFile( Count ).FirstRecord > SectionsOnFile( Count ).LastRecord ) {
-				gio::write( EchoInputFile, "*" ) << " Section " << Count << " " << SectionsOnFile( Count ).Name << " had no object records";
+				gio::write( EchoInputFile, fmtLD ) << " Section " << Count << " " << SectionsOnFile( Count ).Name << " had no object records";
 				SectionsOnFile( Count ).FirstRecord = -1;
 				SectionsOnFile( Count ).LastRecord = -1;
 			}
@@ -2336,7 +2327,7 @@ namespace InputProcessor {
 				cfld2 = IPTrimSigDigits( MaxAlphas );
 				ShowFatalError( "IP: GetObjectItem: " + Object + ", Number of ObjectDef Alpha Args [" + cfld1 + "] > Size of AlphaArg array [" + cfld2 + "]." );
 			}
-			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = Blank;
+			Alphas( {1,ObjectDef( Found ).NumAlpha} ) = BlankString;
 		}
 		if ( ObjectDef( Found ).NumNumeric > 0 ) {
 			if ( ObjectDef( Found ).NumNumeric > MaxNumbers ) {
@@ -2355,7 +2346,7 @@ namespace InputProcessor {
 		}
 
 		if ( ObjectGotCount( Found ) == 0 ) {
-			gio::write( EchoInputFile, "*" ) << "Getting object=" << UCObject;
+			gio::write( EchoInputFile, fmtLD ) << "Getting object=" << UCObject;
 		}
 		++ObjectGotCount( Found );
 
@@ -2683,7 +2674,7 @@ namespace InputProcessor {
 				}
 			}
 		} else {
-			gio::write( EchoInputFile, "*" ) << " Requested Record" << Which << " not in range, 1 -- " << NumIDFRecords;
+			gio::write( EchoInputFile, fmtLD ) << " Requested Record" << Which << " not in range, 1 -- " << NumIDFRecords;
 		}
 
 	}
@@ -2696,17 +2687,7 @@ namespace InputProcessor {
 		std::string::size_type & CurPos,
 		bool & BlankLine,
 		int & InputLineLength,
-		bool & EndofFile,
-		Optional_bool MinMax,
-		Optional_int WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max< //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_string MinMaxString, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional< Real64 > Value, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool Default,
-		Optional_string DefString, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool AutoSizable,
-		Optional_bool AutoCalculatable,
-		Optional_bool RetainCase, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool ErrorsFound //Autodesk:OPTIONAL Used without PRESENT check
+		bool & EndofFile
 	)
 	{
 
@@ -2733,6 +2714,10 @@ namespace InputProcessor {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char const TabChar( '\t' );
+		static gio::Fmt const fmt_1( "(I7,1X,A)" );
+		static gio::Fmt const fmt_2( "(1X,A,1X,A)" );
+		static gio::Fmt const fmt_3( "('      ***** Tabs eliminated from above line')" );
+		static gio::Fmt const fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2745,26 +2730,17 @@ namespace InputProcessor {
 		std::string::size_type Pos;
 		std::string::size_type Slash;
 		std::string::size_type P1;
-		std::string UCInputLine; // Each line can be up to MaxInputLineLength characters long
 		bool TabsInLine;
 		std::string::size_type NSpace;
 		bool errFlag;
-		int ErrLevel;
-		int endcol;
 		std::string cNumLines;
 		bool LineTooLong;
 
 		errFlag = false;
 		LineTooLong = false;
-		{ IOFlags flags; gio::read( UnitNumber, fmta, flags ) >> InputLine; ReadStat = flags.ios(); }
+		{ IOFlags flags; gio::read_line( UnitNumber, flags, InputLine ); ReadStat = flags.ios(); }
 
-		if ( ReadStat != 0 ) InputLine = Blank;
-
-		// Following section of code allows same software to read Win or Unix files without translating
-		if ( StripCR ) {
-			endcol = len( InputLine );
-			if ( ( endcol > 0 ) && ( int( InputLine[ endcol - 1 ] ) == iASCII_CR ) ) InputLine.erase( endcol - 1 ); //Autodesk Added ( endcol > 0 ) to prevent illegal substring range use
-		}
+		if ( ReadStat != 0 ) InputLine.clear();
 
 		if ( len_trim( InputLine ) > MaxInputLineLength ) {
 			LineTooLong = true;
@@ -2785,17 +2761,17 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( NumLines < 100000 ) {
-					gio::write( EchoInputFile, "(2X,I5,1X,A)" ) << NumLines << InputLine;
+				if ( NumLines < 10000000 ) {
+					gio::write( EchoInputFile, fmt_1 ) << NumLines << InputLine;
 				} else {
 					cNumLines = IPTrimSigDigits( NumLines );
-					gio::write( EchoInputFile, "(1X,A,1X,A)" ) << cNumLines << InputLine;
+					gio::write( EchoInputFile, fmt_2 ) << cNumLines << InputLine;
 				}
-				if ( TabsInLine ) gio::write( EchoInputFile, "(6X,'***** Tabs eliminated from above line')" );
+				if ( TabsInLine ) gio::write( EchoInputFile, fmt_3 );
 				if ( LineTooLong ) {
 					ShowSevereError( "Input line longer than maximum length allowed=" + IPTrimSigDigits( MaxInputLineLength ) + " characters. Other errors may follow." );
 					ShowContinueError( ".. at line=" + IPTrimSigDigits( NumLines ) + ", first 50 characters=" + InputLine.substr( 0, 50 ) );
-					gio::write( EchoInputFile, "(6X,'***** Previous line is longer than allowed length for input line')" );
+					gio::write( EchoInputFile, fmt_4 );
 				}
 			}
 			EchoInputLine = true;
@@ -2820,136 +2796,317 @@ namespace InputProcessor {
 					BlankLine = true;
 				}
 				if ( Slash != std::string::npos && Pos == Slash ) {
-					UCInputLine = MakeUPPERCase( InputLine );
-					if ( UCInputLine.substr( Slash, 6 ) == "\\FIELD" ) {
+					std::string UCInputLine( InputLine, Pos );
+					uppercase( UCInputLine ); // With this many comparisons probably faster to uppercase once vs many c-i comparisons
+					FieldSet = false;
+					if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
 						// Capture Field Name
 						CurrentFieldName = InputLine.substr( Slash + 6 );
 						strip( CurrentFieldName );
 						P1 = scan( CurrentFieldName, '!' );
 						if ( P1 != std::string::npos ) CurrentFieldName.erase( P1 );
 						FieldSet = true;
-					} else {
-						FieldSet = false;
-					}
-					if ( UCInputLine.substr( Slash, 15 ) == "\\REQUIRED-FIELD" ) {
+					} else if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
 						RequiredField = true;
-					} // Required-field arg
-					if ( UCInputLine.substr( Slash, 16 ) == "\\REQUIRED-OBJECT" ) {
+					} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
 						RequiredObject = true;
-					} // Required-object arg
-					if ( UCInputLine.substr( Slash, 14 ) == "\\UNIQUE-OBJECT" ) {
+					} else if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
 						UniqueObject = true;
-					} // Unique-object arg
-					if ( UCInputLine.substr( Slash, 11 ) == "\\EXTENSIBLE" ) {
+					} else if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
 						ExtensibleObject = true;
-						if ( UCInputLine[ Slash + 11 ] != ':' ) {
+						if ( UCInputLine[ 11 ] != ':' ) {
 							ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
-						} else {
-							// process number
-							NSpace = scan( UCInputLine.substr( Slash + 12 ), " !" );
+						} else { // process number
+							std::string const number_str( UCInputLine.substr( 12 ) );
+							NSpace = scan( number_str, " !" );
 							if ( NSpace != std::string::npos ) {
-								ExtensibleNumFields = int( ProcessNumber( UCInputLine.substr( Slash + 12, NSpace ), errFlag ) );
+								ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+								if ( errFlag ) {
+									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
+								}
 							} else {
 								ExtensibleNumFields = 0.0;
 								errFlag = false;
 							}
-							if ( errFlag ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
-							}
 						}
-					} // Extensible arg
-					if ( UCInputLine.substr( Slash, 11 ) == "\\RETAINCASE" ) {
-						RetainCase = true;
-					} // Unique-object arg
-					if ( UCInputLine.substr( Slash, 11 ) == "\\MIN-FIELDS" ) {
-						//              RequiredField=.TRUE.
-						NSpace = FindNonSpace( UCInputLine.substr( Slash + 11 ) );
+					} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
+						//RetainCase = true; // Arg not present
+					} else if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
+						//RequiredField = true;
+						NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
 						if ( NSpace == std::string::npos ) {
 							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
 							errFlag = true;
 							MinimumNumberOfFields = 0;
 						} else {
-							Slash += 11 + NSpace;
-							NSpace = scan( UCInputLine.substr( Slash ), " !" );
-							MinimumNumberOfFields = int( ProcessNumber( UCInputLine.substr( Slash, NSpace ), errFlag ) );
+							std::string const number_str( UCInputLine.substr( 11 + NSpace ) );
+							NSpace = scan( number_str, " !" );
+							if ( NSpace == std::string::npos ) {
+								MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
+							} else {
+								MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+							}
 							if ( errFlag ) {
 								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
 							}
 						}
-					} // Min-Fields Arg
-					if ( UCInputLine.substr( Slash, 9 ) == "\\OBSOLETE" ) {
-						NSpace = index( UCInputLine.substr( Slash + 9 ), "=>" );
+					} else if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
+						NSpace = index( UCInputLine.substr( 9 ), "=>" );
 						if ( NSpace == std::string::npos ) {
 							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
 							errFlag = true;
 						} else {
-							Slash += 9 + NSpace + 2;
-							NSpace = scan( UCInputLine.substr( Slash ), '!' );
+							std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
+							NSpace = scan( name_str, '!' );
 							if ( NSpace == std::string::npos ) {
-								ReplacementName = InputLine.substr( Slash );
+								ReplacementName = trimmed( name_str );
 							} else {
-								ReplacementName = InputLine.substr( Slash, NSpace - 1 );
+								ReplacementName = trimmed( name_str.substr( 0, NSpace ) );
 							}
 							ObsoleteObject = true;
 						}
-					} // Obsolete Arg
-					if ( present( MinMax ) ) {
-						if ( UCInputLine.substr( Pos, 8 ) == "\\MINIMUM" || UCInputLine.substr( Pos, 8 ) == "\\MAXIMUM" ) {
-							MinMax = true;
-							ProcessMinMaxDefLine( UCInputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ErrLevel > 0 ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Minimum/Maximum designation -- invalid number=" + UCInputLine.substr( Pos ), EchoInputFile );
-								errFlag = true;
+					}
+				}
+			}
+		}
+
+	}
+
+	void
+	ReadInputLine(
+		int const UnitNumber,
+		std::string::size_type & CurPos,
+		bool & BlankLine,
+		int & InputLineLength,
+		bool & EndofFile,
+		bool & MinMax,
+		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+		std::string & MinMaxString,
+		Real64 & Value,
+		bool & Default,
+		std::string & DefString,
+		bool & AutoSizable,
+		bool & AutoCalculatable,
+		bool & RetainCase,
+		bool & ErrorsFound
+	)
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   September 1997
+		//       MODIFIED       na
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine reads a line in the specified file and checks for end of file
+
+		// METHODOLOGY EMPLOYED:
+		// na
+
+		// REFERENCES:
+		// na
+
+		// USE STATEMENTS:
+		// na
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static char const TabChar( '\t' );
+		static gio::Fmt const fmt_1( "(I7,1X,A)" );
+		static gio::Fmt const fmt_2( "(1X,A,1X,A)" );
+		static gio::Fmt const fmt_3( "('      ***** Tabs eliminated from above line')" );
+		static gio::Fmt const fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
+
+		// INTERFACE BLOCK SPECIFICATIONS
+		// na
+
+		// DERIVED TYPE DEFINITIONS
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		int ReadStat;
+		std::string::size_type Pos;
+		std::string::size_type Slash;
+		std::string::size_type P1;
+		bool TabsInLine;
+		std::string::size_type NSpace;
+		bool errFlag;
+		std::string cNumLines;
+		bool LineTooLong;
+		int ErrLevel;
+
+		errFlag = false;
+		LineTooLong = false;
+		{ IOFlags flags; gio::read_line( UnitNumber, flags, InputLine ); ReadStat = flags.ios(); }
+
+		if ( ReadStat != 0 ) InputLine.clear();
+
+		if ( len_trim( InputLine ) > MaxInputLineLength ) {
+			LineTooLong = true;
+			InputLine.erase( MaxInputLineLength );
+		}
+
+		P1 = scan( InputLine, TabChar );
+		TabsInLine = false;
+		while ( P1 != std::string::npos ) {
+			TabsInLine = true;
+			InputLine[ P1 ] = ' ';
+			P1 = scan( InputLine, TabChar );
+		}
+		BlankLine = false;
+		CurPos = 0;
+		if ( ReadStat < 0 ) {
+			EndofFile = true;
+		} else {
+			if ( EchoInputLine ) {
+				++NumLines;
+				if ( NumLines < 10000000 ) {
+					gio::write( EchoInputFile, fmt_1 ) << NumLines << InputLine;
+				} else {
+					cNumLines = IPTrimSigDigits( NumLines );
+					gio::write( EchoInputFile, fmt_2 ) << cNumLines << InputLine;
+				}
+				if ( TabsInLine ) gio::write( EchoInputFile, fmt_3 );
+				if ( LineTooLong ) {
+					ShowSevereError( "Input line longer than maximum length allowed=" + IPTrimSigDigits( MaxInputLineLength ) + " characters. Other errors may follow." );
+					ShowContinueError( ".. at line=" + IPTrimSigDigits( NumLines ) + ", first 50 characters=" + InputLine.substr( 0, 50 ) );
+					gio::write( EchoInputFile, fmt_4 );
+				}
+			}
+			EchoInputLine = true;
+			InputLineLength = len_trim( InputLine );
+			if ( InputLineLength == 0 ) {
+				BlankLine = true;
+			}
+			if ( ProcessingIDD ) {
+				Pos = scan( InputLine, "!\\" ); // 4/30/09 remove ~
+				Slash = index( InputLine, '\\' );
+			} else {
+				Pos = scan( InputLine, '!' ); // 4/30/09 remove ~
+				Slash = std::string::npos;
+			}
+			if ( Pos != std::string::npos ) {
+				InputLineLength = Pos + 1;
+				if ( Pos > 0 ) {
+					if ( is_blank( InputLine.substr( 0, Pos ) ) ) {
+						BlankLine = true;
+					}
+				} else {
+					BlankLine = true;
+				}
+				if ( Slash != std::string::npos && Pos == Slash ) {
+					std::string UCInputLine( InputLine, Pos );
+					uppercase( UCInputLine ); // With this many comparisons probably faster to uppercase once vs many c-i comparisons
+					FieldSet = false;
+					MinMax = false;
+					Default = false;
+					AutoSizable = false;
+					AutoCalculatable = false;
+					if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
+						// Capture Field Name
+						CurrentFieldName = InputLine.substr( Slash + 6 );
+						strip( CurrentFieldName );
+						P1 = scan( CurrentFieldName, '!' );
+						if ( P1 != std::string::npos ) CurrentFieldName.erase( P1 );
+						FieldSet = true;
+					} else if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
+						RequiredField = true;
+					} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
+						RequiredObject = true;
+					} else if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
+						UniqueObject = true;
+					} else if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
+						ExtensibleObject = true;
+						if ( UCInputLine[ 11 ] != ':' ) {
+							ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
+						} else { // process number
+							std::string const number_str( UCInputLine.substr( 12 ) );
+							NSpace = scan( number_str, " !" );
+							if ( NSpace != std::string::npos ) {
+								ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+								if ( errFlag ) {
+									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
+								}
+							} else {
+								ExtensibleNumFields = 0.0;
+								errFlag = false;
 							}
-						} else {
-							MinMax = false;
 						}
-					} // Min/Max Args
-					if ( present( Default ) ) {
-						if ( UCInputLine.substr( Pos, 8 ) == "\\DEFAULT" ) {
-							// WhichMinMax, MinMaxString not filled here
-							Default = true;
-							ProcessMinMaxDefLine( InputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ! RetainCase && DefString != Blank ) uppercase( DefString );
-							if ( ErrLevel > 1 ) {
-								ShowContinueError( "Blank Default Field Encountered", EchoInputFile );
-								errFlag = true;
+					} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
+						RetainCase = true;
+					} else if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
+						//RequiredField = true;
+						NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
+						if ( NSpace == std::string::npos ) {
+							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
+							errFlag = true;
+							MinimumNumberOfFields = 0;
+						} else {
+							std::string const number_str( UCInputLine.substr( 11 + NSpace ) );
+							NSpace = scan( number_str, " !" );
+							if ( NSpace == std::string::npos ) {
+								MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
+							} else {
+								MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
 							}
-						} else {
-							Default = false;
-						}
-					} // Default Arg
-					if ( present( AutoSizable ) ) {
-						if ( UCInputLine.substr( Pos, 6 ) == "\\AUTOS" ) {
-							AutoSizable = true;
-							ProcessMinMaxDefLine( UCInputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ErrLevel > 0 ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autosize designation -- invalid number=" + UCInputLine.substr( Pos ), EchoInputFile );
-								errFlag = true;
+							if ( errFlag ) {
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
 							}
-						} else {
-							AutoSizable = false;
 						}
-					} // AutoSizable Arg
-					if ( present( AutoCalculatable ) ) {
-						if ( UCInputLine.substr( Pos, 6 ) == "\\AUTOC" ) {
-							AutoCalculatable = true;
-							ProcessMinMaxDefLine( UCInputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-							if ( ErrLevel > 0 ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autocalculate designation -- invalid number=" + UCInputLine.substr( Pos ), EchoInputFile );
-								errFlag = true;
+					} else if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
+						NSpace = index( UCInputLine.substr( 9 ), "=>" );
+						if ( NSpace == std::string::npos ) {
+							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
+							errFlag = true;
+						} else {
+							std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
+							NSpace = scan( name_str, '!' );
+							if ( NSpace == std::string::npos ) {
+								ReplacementName = trimmed( name_str );
+							} else {
+								ReplacementName = trimmed( name_str.substr( 0, NSpace ) );
 							}
-						} else {
-							AutoCalculatable = false;
+							ObsoleteObject = true;
 						}
-					} // AutoCalculatable Arg
+					} else if ( has_prefix( UCInputLine, "\\MINIMUM" ) || has_prefix( UCInputLine, "\\MAXIMUM" ) ) { // Min/Max args
+						MinMax = true;
+						ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+						if ( ErrLevel > 0 ) {
+							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Minimum/Maximum designation -- invalid number=" + UCInputLine, EchoInputFile );
+							errFlag = true;
+						}
+					} else if ( has_prefix( UCInputLine, "\\DEFAULT" ) ) { // Default arg
+						// WhichMinMax, MinMaxString not filled here
+						Default = true;
+						ProcessMinMaxDefLine( InputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+						if ( ( ! RetainCase ) && ( ! DefString.empty() ) ) uppercase( DefString );
+						if ( ErrLevel > 1 ) {
+							ShowContinueError( "Blank Default Field Encountered", EchoInputFile );
+							errFlag = true;
+						}
+					} else if ( has_prefix( UCInputLine, "\\AUTOS" ) ) { // AutoSizable arg
+						AutoSizable = true;
+						ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+						if ( ErrLevel > 0 ) {
+							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autosize designation -- invalid number=" + UCInputLine, EchoInputFile );
+							errFlag = true;
+						}
+					} else if ( has_prefix( UCInputLine, "\\AUTOC" ) ) { // AutoCalculatable arg
+						AutoCalculatable = true;
+						ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+						if ( ErrLevel > 0 ) {
+							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autocalculate designation -- invalid number=" + UCInputLine, EchoInputFile );
+							errFlag = true;
+						}
+					}
 				}
 			}
 		}
 		if ( errFlag ) {
-			if ( present( ErrorsFound ) ) {
-				ErrorsFound = true;
-			}
+			ErrorsFound = true;
 		}
 
 	}
@@ -3033,7 +3190,7 @@ namespace InputProcessor {
 		// Object Data
 		FArray1D< RangeCheckDef > TempChecks;
 
-		gio::write( EchoInputFile, "(A)" ) << "Attempting to auto-extend object=" + ObjectDef( ObjectNum ).Name;
+		gio::write( EchoInputFile, fmtA ) << "Attempting to auto-extend object=" + ObjectDef( ObjectNum ).Name;
 		if ( CurObject != ObjectDef( ObjectNum ).Name ) {
 			DisplayString( "Auto-extending object=\"" + ObjectDef( ObjectNum ).Name + "\", input processing may be slow." );
 			CurObject = ObjectDef( ObjectNum ).Name;
@@ -3095,7 +3252,7 @@ namespace InputProcessor {
 		if ( NumAlphaField > 0 ) {
 			TempFieldCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			TempFieldCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldChks;
-			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 			ObjectDef( ObjectNum ).AlphFieldChks.deallocate();
 			ObjectDef( ObjectNum ).AlphFieldChks.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			ObjectDef( ObjectNum ).AlphFieldChks = TempFieldCharacter;
@@ -3108,7 +3265,7 @@ namespace InputProcessor {
 
 			TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldDefs;
-			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 			ObjectDef( ObjectNum ).AlphFieldDefs.deallocate();
 			ObjectDef( ObjectNum ).AlphFieldDefs.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 			ObjectDef( ObjectNum ).AlphFieldDefs = TempCharacter;
@@ -3118,7 +3275,7 @@ namespace InputProcessor {
 				// must redimension LineItem args
 				TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 				TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = LineItem.Alphas;
-				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = Blank;
+				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
 				LineItem.Alphas.deallocate();
 				LineItem.Alphas.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 				LineItem.Alphas = TempCharacter;
@@ -3241,7 +3398,7 @@ namespace InputProcessor {
 		int IoStatus( 0 );
 		if ( PString.find_first_not_of( ValidNumerics ) == std::string::npos ) {
 			Real64 Temp;
-			{ IOFlags flags; gio::read( PString, "*", flags ) >> rProcessNumber; IoStatus = flags.ios(); }
+			{ IOFlags flags; gio::read( PString, fmtLD, flags ) >> rProcessNumber; IoStatus = flags.ios(); }
 			ErrorFlag = false;
 		} else {
 			rProcessNumber = 0.0;
@@ -3258,7 +3415,7 @@ namespace InputProcessor {
 
 	void
 	ProcessMinMaxDefLine(
-		std::string const & UCInputLine, // part of input line starting \min or \max
+		std::string const & partLine, // part of input line starting \min or \max  Not uppercase if \default
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		std::string & MinMaxString,
 		Real64 & Value,
@@ -3309,14 +3466,14 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		ErrLevel = 0;
-		std::string::size_type Pos = scan( UCInputLine, ' ' );
+		std::string::size_type Pos = scan( partLine, ' ' );
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( UCInputLine.substr( 0, 4 ) ) );
+		{ auto const maxMinDefLine( uppercased( partLine.substr( 0, 4 ) ) );
 
-		if ( SELECT_CASE_var == "\\MIN" ) {
+		if ( maxMinDefLine == "\\MIN" ) {
 			WhichMinMax = 1;
-			if ( has( UCInputLine, '>' ) ) {
-				Pos = scan( UCInputLine, '>' ) + 1;
+			if ( has( partLine, '>' ) ) {
+				Pos = scan( partLine, '>' ) + 1;
 				WhichMinMax = 2;
 			}
 			if ( WhichMinMax == 1 ) {
@@ -3325,10 +3482,10 @@ namespace InputProcessor {
 				MinMaxString = ">";
 			}
 
-		} else if ( SELECT_CASE_var == "\\MAX" ) {
+		} else if ( maxMinDefLine == "\\MAX" ) {
 			WhichMinMax = 3;
-			if ( has( UCInputLine, '<' ) ) {
-				Pos = scan( UCInputLine, '<' ) + 1;
+			if ( has( partLine, '<' ) ) {
+				Pos = scan( partLine, '<' ) + 1;
 				WhichMinMax = 4;
 			}
 			if ( WhichMinMax == 3 ) {
@@ -3337,50 +3494,50 @@ namespace InputProcessor {
 				MinMaxString = "<";
 			}
 
-		} else if ( SELECT_CASE_var == "\\DEF" ) {
+		} else if ( maxMinDefLine == "\\DEF" ) {
 			WhichMinMax = 5;
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 
-		} else if ( SELECT_CASE_var == "\\AUT" ) {
+		} else if ( maxMinDefLine == "\\AUT" ) {
 			WhichMinMax = 6;
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 
 		} else {
 			WhichMinMax = 0; // invalid field
-			MinMaxString = Blank;
+			MinMaxString = BlankString;
 			Value = -999999.0;
 
 		}}
 
 		if ( WhichMinMax != 0 ) {
-			if ( Pos == std::string::npos ) Pos = UCInputLine.length(); // So that NSpace=npos
-			std::string::size_type NSpace = FindNonSpace( UCInputLine.substr( Pos ) );
+			if ( Pos == std::string::npos ) Pos = partLine.length(); // So that NSpace=npos
+			std::string::size_type NSpace = FindNonSpace( partLine.substr( Pos ) );
 			if ( NSpace == std::string::npos ) {
 				if ( WhichMinMax != 6 ) { // Only autosize/autocalculate can't have argument
 					ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + "Min/Max/Default field cannot be blank -- must have value", EchoInputFile );
 					ErrLevel = 2;
-				} else if ( has_prefix( UCInputLine, "\\AUTOS" ) ) {
+				} else if ( has_prefix( partLine, "\\AUTOS" ) ) {
 					Value = DefAutoSizeValue;
-				} else if ( has_prefix( UCInputLine, "\\AUTOC" ) ) {
+				} else if ( has_prefix( partLine, "\\AUTOC" ) ) {
 					Value = DefAutoCalculateValue;
 				}
 			} else {
 				Pos += NSpace;
-				NSpace = scan( UCInputLine.substr( Pos ), " !" );
-				MinMaxString += UCInputLine.substr( Pos, NSpace );
+				NSpace = scan( partLine.substr( Pos ), " !" );
+				MinMaxString += partLine.substr( Pos, NSpace );
 				bool errFlag;
-				Value = ProcessNumber( UCInputLine.substr( Pos, NSpace ), errFlag );
+				Value = ProcessNumber( partLine.substr( Pos, NSpace ), errFlag );
 				if ( errFlag ) ErrLevel = 1;
-				NSpace = scan( UCInputLine.substr( Pos ), '!' );
+				NSpace = scan( partLine.substr( Pos ), '!' );
 				if ( NSpace != std::string::npos ) {
-					DefaultString = UCInputLine.substr( Pos, NSpace - 1 );
+					DefaultString = partLine.substr( Pos, NSpace - 1 );
 				} else {
-					DefaultString = UCInputLine.substr( Pos );
+					DefaultString = partLine.substr( Pos );
 				}
 				strip( DefaultString );
-				if ( DefaultString == Blank ) {
+				if ( DefaultString == BlankString ) {
 					if ( WhichMinMax == 6 ) {
-						if ( has_prefix( UCInputLine, "\\AUTOS" ) ) {
+						if ( has_prefix( partLine, "\\AUTOS" ) ) {
 							Value = DefAutoSizeValue;
 						} else {
 							Value = DefAutoCalculateValue;
@@ -3443,17 +3600,10 @@ namespace InputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		int FindItemInList = 0;
-
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( String == ListOfItems( Count ) ) {
-				FindItemInList = Count;
-				break;
-			}
+			if ( String == ListOfItems( Count ) ) return Count;
 		}
-
-		return FindItemInList;
-
+		return 0; // Not found
 	}
 
 	int
@@ -3487,7 +3637,6 @@ namespace InputProcessor {
 		// na
 
 		// Return value
-		int FindItemInSortedList;
 
 		// Argument array dimensioning
 
@@ -3504,33 +3653,25 @@ namespace InputProcessor {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int LBnd;
-		int UBnd;
+
 		int Probe( 0 );
-		bool Found;
-
-		LBnd = 0;
-		UBnd = NumItems + 1;
-		Found = false;
-
-		while ( ! Found || Probe != 0 ) {
+		int LBnd( 0 );
+		int UBnd( NumItems + 1 );
+		bool Found( false );
+		while ( ( ! Found ) || ( Probe != 0 ) ) {
 			Probe = ( UBnd - LBnd ) / 2;
 			if ( Probe == 0 ) break;
 			Probe += LBnd;
 			if ( equali( String, ListOfItems( Probe ) ) ) {
 				Found = true;
 				break;
-			} else if ( MakeUPPERCase( String ) < MakeUPPERCase( ListOfItems( Probe ) ) ) {
+			} else if ( lessthani( String, ListOfItems( Probe ) ) ) {
 				UBnd = Probe;
 			} else {
 				LBnd = Probe;
 			}
 		}
-
-		FindItemInSortedList = Probe;
-
-		return FindItemInSortedList;
-
+		return Probe;
 	}
 
 	int
@@ -3583,14 +3724,9 @@ namespace InputProcessor {
 		if ( FindItem != 0 ) return FindItem;
 
 		for ( int Count = 1; Count <= NumItems; ++Count ) {
-			if ( equali( String, ListOfItems( Count ) ) ) {
-				FindItem = Count;
-				break;
-			}
+			if ( equali( String, ListOfItems( Count ) ) ) return Count;
 		}
-
-		return FindItem;
-
+		return 0; // Not found
 	}
 
 	std::string
@@ -3645,62 +3781,6 @@ namespace InputProcessor {
 
 		return ResultString;
 
-	}
-
-	bool
-	SameString(
-		std::string const & TestString1, // First String to Test
-		std::string const & TestString2 // Second String to Test
-	)
-	{
-
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda K. Lawrie
-		//       DATE WRITTEN   November 1997
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS SUBROUTINE:
-		// This function returns true if the two strings are equal (case insensitively)
-
-		// METHODOLOGY EMPLOYED:
-		// Make both strings uppercase.  Do internal compare.
-
-		// REFERENCES:
-		// na
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-//		bool SameString;
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
-
-		// INTERFACE BLOCK SPECIFICATIONS
-		// na
-
-		// DERIVED TYPE DEFINITIONS
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-//		if ( len( TestString1 ) != len( TestString2 ) ) {
-//			SameString = false;
-//		} else if ( TestString1 == TestString2 ) {
-//			SameString = true;
-//		} else {
-//			SameString = MakeUPPERCase( TestString1 ) == MakeUPPERCase( TestString2 );
-//		}
-//
-//		return SameString;
-
-		return equali( TestString1, TestString2 ); //Autodesk:Tune Avoid string creation
 	}
 
 	void
@@ -3846,18 +3926,18 @@ namespace InputProcessor {
 			}
 			Message2 += "}";
 
-			{ auto const SELECT_CASE_var( ErrorString[ 0 ] );
+			{ auto const errorCheck( ErrorString[ 0 ] );
 
-			if ( ( SELECT_CASE_var == 'W' ) || ( SELECT_CASE_var == 'w' ) ) {
+			if ( ( errorCheck == 'W' ) || ( errorCheck == 'w' ) ) {
 				ShowWarningError( Message1 );
 				ShowContinueError( Message2 );
 
-			} else if ( ( SELECT_CASE_var == 'S' ) || ( SELECT_CASE_var == 's' ) ) {
+			} else if ( ( errorCheck == 'S' ) || ( errorCheck == 's' ) ) {
 				ShowSevereError( Message1 );
 				ShowContinueError( Message2 );
 				ErrorsFound = true;
 
-			} else if ( ( SELECT_CASE_var == 'F' ) || ( SELECT_CASE_var == 'f' ) ) {
+			} else if ( ( errorCheck == 'F' ) || ( errorCheck == 'f' ) ) {
 				ShowSevereError( Message1 );
 				ShowContinueError( Message2 );
 				ShowFatalError( "Program terminates due to preceding condition(s)." );
@@ -3941,7 +4021,7 @@ namespace InputProcessor {
 					FieldNameString = ObjectDef( WhichObject ).NumRangeChks( FieldNumber ).FieldName;
 					gio::write( ValueString, "(F20.5)" ) << Value;
 					strip( ValueString );
-					if ( FieldNameString != Blank ) {
+					if ( ! FieldNameString.empty() ) {
 						Message = "Out of range value Numeric Field#" + FieldString + " (" + FieldNameString + "), value=" + ValueString + ", range={";
 					} else { // Field Name not recorded
 						Message = "Out of range value Numeric Field#" + FieldString + ", value=" + ValueString + ", range={";
@@ -4377,8 +4457,8 @@ namespace InputProcessor {
 			if ( IDFRecords( iRecord ).ObjectDefPtr <= 0 || IDFRecords( iRecord ).ObjectDefPtr > NumObjectDefs ) continue;
 			iObjectDef = IDFRecords( iRecord ).ObjectDefPtr;
 			for ( iField = 1; iField <= IDFRecords( iRecord ).NumAlphas; ++iField ) {
-				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != Blank ) ++iTotalFieldsWithDefaults;
-				if ( ObjectDef( iObjectDef ).AlphFieldDefs( iField ) != Blank && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
+				if ( ! ObjectDef( iObjectDef ).AlphFieldDefs( iField ).empty() ) ++iTotalFieldsWithDefaults;
+				if ( ! ObjectDef( iObjectDef ).AlphFieldDefs( iField ).empty() && IDFRecords( iRecord ).AlphBlank( iField ) ) ++iNumberOfDefaultedFields;
 			}
 			for ( iField = 1; iField <= IDFRecords( iRecord ).NumNumbers; ++iField ) {
 				if ( ObjectDef( iObjectDef ).NumRangeChks( iField ).DefaultChk ) ++iTotalFieldsWithDefaults;
@@ -4437,11 +4517,12 @@ namespace InputProcessor {
 		int Found;
 		int ObjFound;
 		int NumOrphObjNames;
+		bool potentialOrphanedSpecialObjects( false );
 
 		OrphanObjectNames.allocate( NumIDFRecords );
 		OrphanNames.allocate( NumIDFRecords );
-		OrphanObjectNames = Blank;
-		OrphanNames = Blank;
+		OrphanObjectNames = BlankString;
+		OrphanNames = BlankString;
 		NumOrphObjNames = 0;
 
 		for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
@@ -4459,6 +4540,11 @@ namespace InputProcessor {
 					if ( ObjectDef( ObjFound ).ObsPtr > 0 ) continue; // Obsolete object, don't report "orphan"
 					++NumOrphObjNames;
 					OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
+					// To avoid looking up potential things later when they *definitely* aren't there, we'll trap for specific flags here first
+					//  and set the potential flag.  If the potential flag is false, nothing else is looked up later to save time
+					if ( OrphanObjectNames( NumOrphObjNames ).substr( 0, 1 ) == "Z" ) {
+						potentialOrphanedSpecialObjects = true;
+					}
 					if ( ObjectDef( ObjFound ).NameAlpha1 ) {
 						OrphanNames( NumOrphObjNames ) = IDFRecords( Count ).Alphas( 1 );
 					}
@@ -4485,13 +4571,27 @@ namespace InputProcessor {
 			}
 		}
 
-		if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
-			gio::write( EchoInputFile, "*" ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
+		// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
+		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if 
+		// for now, the list includes:
+		//  - objects that start with "ZONEHVAC:"
+		if ( potentialOrphanedSpecialObjects ) {
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanNames( Count ) != Blank ) {
-					gio::write( EchoInputFile, fmta ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
+				if ( OrphanObjectNames( Count ).substr( 0, 9 ) == "ZONEHVAC:" ) {
+					ShowSevereError( "Orphaned ZoneHVAC object found.  This object was never referenced in the idf, and was not used." );
+					ShowContinueError( " -- Object type: " + OrphanObjectNames( Count ) );
+					ShowContinueError( " -- Object name: " + OrphanNames( Count ) );
+				}
+			}
+		}
+
+		if ( NumOrphObjNames > 0 && DisplayUnusedObjects ) {
+			gio::write( EchoInputFile, fmtLD ) << "Unused Objects -- Objects in IDF that were never \"gotten\"";
+			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
+				if ( ! OrphanNames( Count ).empty() ) {
+					gio::write( EchoInputFile, fmtA ) << " " + OrphanObjectNames( Count ) + '=' + OrphanNames( Count );
 				} else {
-					gio::write( EchoInputFile, "*" ) << OrphanObjectNames( Count );
+					gio::write( EchoInputFile, fmtLD ) << OrphanObjectNames( Count );
 				}
 			}
 			ShowWarningError( "The following lines are \"Unused Objects\".  These objects are in the idf" );
@@ -4502,13 +4602,13 @@ namespace InputProcessor {
 				ShowContinueError( " Each unused object is shown." );
 			}
 			ShowContinueError( " See InputOutputReference document for more details." );
-			if ( OrphanNames( 1 ) != Blank ) {
+			if ( ! OrphanNames( 1 ).empty() ) {
 				ShowMessage( "Object=" + OrphanObjectNames( 1 ) + '=' + OrphanNames( 1 ) );
 			} else {
 				ShowMessage( "Object=" + OrphanObjectNames( 1 ) );
 			}
 			for ( Count = 2; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanNames( Count ) != Blank ) {
+				if ( ! OrphanNames( Count ).empty() ) {
 					ShowContinueError( "Object=" + OrphanObjectNames( Count ) + '=' + OrphanNames( Count ) );
 				} else {
 					ShowContinueError( "Object=" + OrphanObjectNames( Count ) );
@@ -4625,9 +4725,9 @@ namespace InputProcessor {
 		if ( ! equali( LineItem.Name, "OUTPUT:REPORTS" ) ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
 		if ( LineItem.NumAlphas < 1 ) ShowFatalError( "Invalid object for deferred transition=" + LineItem.Name );
 
-		{ auto const SELECT_CASE_var( MakeUPPERCase( LineItem.Alphas( 1 ) ) );
+		{ auto const makeTransition( uppercased( LineItem.Alphas( 1 ) ) );
 
-		if ( SELECT_CASE_var == "VARIABLEDICTIONARY" ) {
+		if ( makeTransition == "VARIABLEDICTIONARY" ) {
 			LineItem.Name = "OUTPUT:VARIABLEDICTIONARY";
 			if ( SameString( LineItem.Alphas( 2 ), "IDF" ) ) {
 				LineItem.Alphas( 1 ) = "IDF";
@@ -4643,28 +4743,28 @@ namespace InputProcessor {
 				LineItem.NumAlphas = 2;
 			}
 
-		} else if ( SELECT_CASE_var == "SURFACES" ) {
+		} else if ( makeTransition == "SURFACES" ) {
 			// Depends on first Alpha
-			{ auto const SELECT_CASE_var1( MakeUPPERCase( LineItem.Alphas( 2 ) ) );
+			{ auto const surfacesTransition( LineItem.Alphas( 2 ) );
 
-			if ( ( SELECT_CASE_var1 == "DXF" ) || ( SELECT_CASE_var1 == "DXF:WIREFRAME" ) || ( SELECT_CASE_var1 == "VRML" ) ) {
+			if ( surfacesTransition == "DXF" || surfacesTransition == "DXF:WIREFRAME" || surfacesTransition == "VRML" ) {
 				LineItem.Name = "OUTPUT:SURFACES:DRAWING";
 				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 				LineItem.NumAlphas = 1;
-				if ( LineItem.Alphas( 3 ) != Blank ) {
+				if ( ! LineItem.Alphas( 3 ).empty() ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
 				}
-				if ( LineItem.Alphas( 4 ) != Blank ) {
+				if ( ! LineItem.Alphas( 4 ).empty() ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 3 ) = LineItem.Alphas( 4 );
 				}
 
-			} else if ( ( SELECT_CASE_var1 == "LINES" ) || ( SELECT_CASE_var1 == "DETAILS" ) || ( SELECT_CASE_var1 == "VERTICES" ) || ( SELECT_CASE_var1 == "DETAILSWITHVERTICES" ) || ( SELECT_CASE_var1 == "VIEWFACTORINFO" ) || ( SELECT_CASE_var1 == "COSTINFO" ) ) {
+			} else if ( surfacesTransition == "LINES" || surfacesTransition == "DETAILS" || surfacesTransition == "VERTICES" || surfacesTransition == "DETAILSWITHVERTICES" || surfacesTransition == "VIEWFACTORINFO" || surfacesTransition == "COSTINFO" ) {
 				LineItem.Name = "OUTPUT:SURFACES:LIST";
 				LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 				LineItem.NumAlphas = 1;
-				if ( LineItem.Alphas( 3 ) != Blank ) {
+				if ( ! LineItem.Alphas( 3 ).empty() ) {
 					++LineItem.NumAlphas;
 					LineItem.Alphas( 2 ) = LineItem.Alphas( 3 );
 				}
@@ -4674,17 +4774,17 @@ namespace InputProcessor {
 
 			}}
 
-		} else if ( ( SELECT_CASE_var == "CONSTRUCTIONS" ) || ( SELECT_CASE_var == "CONSTRUCTION" ) ) {
+		} else if ( makeTransition == "CONSTRUCTIONS" || makeTransition == "CONSTRUCTION" ) {
 			LineItem.Name = "OUTPUT:CONSTRUCTIONS";
 			LineItem.Alphas( 1 ) = "CONSTRUCTIONS";
 			LineItem.NumAlphas = 1;
 
-		} else if ( ( SELECT_CASE_var == "MATERIALS" ) || ( SELECT_CASE_var == "MATERIAL" ) ) {
+		} else if ( makeTransition == "MATERIALS" || makeTransition == "MATERIAL" ) {
 			LineItem.Name = "OUTPUT:CONSTRUCTIONS";
 			LineItem.Alphas( 1 ) = "MATERIALS";
 			LineItem.NumAlphas = 1;
 
-		} else if ( SELECT_CASE_var == "SCHEDULES" ) {
+		} else if ( makeTransition == "SCHEDULES" ) {
 			LineItem.Name = "OUTPUT:SCHEDULES";
 			LineItem.Alphas( 1 ) = LineItem.Alphas( 2 );
 			LineItem.NumAlphas = 1;
@@ -4747,7 +4847,7 @@ namespace InputProcessor {
 
 		NumArg = 0;
 		LineItem.Name = ObjectDef( Which ).Name;
-		LineItem.Alphas = Blank;
+		LineItem.Alphas = BlankString;
 		LineItem.AlphBlank = false;
 		LineItem.NumAlphas = 0;
 		LineItem.Numbers = 0.0;
@@ -4777,7 +4877,7 @@ namespace InputProcessor {
 						++NumAlpha;
 						if ( NumAlpha <= LineItem.NumAlphas ) continue;
 						++LineItem.NumAlphas;
-						if ( ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) != Blank ) {
+						if ( ! ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ).empty() ) {
 							LineItem.Alphas( LineItem.NumAlphas ) = ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas );
 							ShowAuditErrorMessage( " **   Add   ** ", ObjectDef( Which ).AlphFieldDefs( LineItem.NumAlphas ) + "   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
 						} else if ( ObjectDef( Which ).ReqField( Count ) ) {
@@ -4788,7 +4888,7 @@ namespace InputProcessor {
 							}
 							//            errFlag=.TRUE.
 						} else {
-							LineItem.Alphas( LineItem.NumAlphas ) = Blank;
+							LineItem.Alphas( LineItem.NumAlphas ).clear();
 							LineItem.AlphBlank( LineItem.NumAlphas ) = true;
 							ShowAuditErrorMessage( " **   Add   ** ", "<blank field>   ! field=>" + ObjectDef( Which ).AlphFieldChks( NumAlpha ) );
 						}
@@ -4800,7 +4900,7 @@ namespace InputProcessor {
 						if ( ObjectDef( Which ).NumRangeChks( NumNumeric ).DefaultChk ) {
 							if ( ! ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoSize && ! ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoCalculate ) {
 								LineItem.Numbers( NumNumeric ) = ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
-								gio::write( String, "*" ) << ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
+								gio::write( String, fmtLD ) << ObjectDef( Which ).NumRangeChks( NumNumeric ).Default;
 								strip( String );
 								ShowAuditErrorMessage( " **   Add   ** ", String + "   ! field=>" + ObjectDef( Which ).NumRangeChks( NumNumeric ).FieldName );
 							} else if ( ObjectDef( Which ).NumRangeChks( NumNumeric ).DefAutoSize ) {
@@ -4926,24 +5026,24 @@ namespace InputProcessor {
 		NumPrePM = GetNumObjectsFound( cCurrentModuleObject );
 		if ( NumPrePM > 0 ) {
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumParams, NumAlphas, NumNumbers );
-			cAlphaArgs( {1,NumAlphas} ) = Blank;
+			cAlphaArgs( {1,NumAlphas} ) = BlankString;
 			for ( CountP = 1; CountP <= NumPrePM; ++CountP ) {
 				GetObjectItem( cCurrentModuleObject, CountP, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-				if ( cAlphaArgs( 1 ) == Blank ) cAlphaArgs( 1 ) = "Unknown";
+				if ( cAlphaArgs( 1 ).empty() ) cAlphaArgs( 1 ) = "Unknown";
 				if ( NumAlphas > 3 ) {
 					Multiples = "s";
 				} else {
-					Multiples = Blank;
+					Multiples = BlankString;
 				}
-				if ( cAlphaArgs( 2 ) == Blank ) cAlphaArgs( 2 ) = "Unknown";
-				{ auto const SELECT_CASE_var( MakeUPPERCase( cAlphaArgs( 2 ) ) );
-				if ( SELECT_CASE_var == "INFORMATION" ) {
+				if ( cAlphaArgs( 2 ).empty() ) cAlphaArgs( 2 ) = "Unknown";
+				{ auto const errorType( uppercased( cAlphaArgs( 2 ) ) );
+				if ( errorType == "INFORMATION" ) {
 					ShowMessage( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Information message" + Multiples + ':' );
-				} else if ( SELECT_CASE_var == "WARNING" ) {
+				} else if ( errorType == "WARNING" ) {
 					ShowWarningError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Warning condition" + Multiples + ':' );
-				} else if ( SELECT_CASE_var == "SEVERE" ) {
+				} else if ( errorType == "SEVERE" ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Severe condition" + Multiples + ':' );
-				} else if ( SELECT_CASE_var == "FATAL" ) {
+				} else if ( errorType == "FATAL" ) {
 					ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" has the following Fatal condition" + Multiples + ':' );
 					PreP_Fatal = true;
 				} else {
@@ -5188,7 +5288,7 @@ namespace InputProcessor {
 		CurrentRecord = FindFirstRecord( EMSSensor );
 		while ( CurrentRecord != 0 ) {
 			if ( IDFRecords( CurrentRecord ).NumAlphas < 2 ) CurrentRecord = FindNextRecord( EMSSensor, CurrentRecord );
-			if ( IDFRecords( CurrentRecord ).Alphas( 2 ) != Blank ) {
+			if ( ! IDFRecords( CurrentRecord ).Alphas( 2 ).empty() ) {
 				AddRecordToOutputVariableStructure( IDFRecords( CurrentRecord ).Alphas( 2 ), IDFRecords( CurrentRecord ).Alphas( 3 ) );
 			} else {
 				AddRecordToOutputVariableStructure( "*", IDFRecords( CurrentRecord ).Alphas( 3 ) );
@@ -5289,25 +5389,23 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		{ auto const SELECT_CASE_var( reportName );
-
-		if ( SELECT_CASE_var == "ZONECOOLINGSUMMARYMONTHLY" ) {
+		if ( reportName == "ZONECOOLINGSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE TOTAL INTERNAL LATENT GAIN RATE" );
 
-		} else if ( SELECT_CASE_var == "ZONEHEATINGSUMMARYMONTHLY" ) {
+		} else if ( reportName == "ZONEHEATINGSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE HEATING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE HEATING RATE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 
-		} else if ( SELECT_CASE_var == "ZONEELECTRICSUMMARYMONTHLY" ) {
+		} else if ( reportName == "ZONEELECTRICSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE ELECTRIC EQUIPMENT ELECTRIC ENERGY" );
 
-		} else if ( SELECT_CASE_var == "SPACEGAINSMONTHLY" ) {
+		} else if ( reportName == "SPACEGAINSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" );
@@ -5318,7 +5416,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "PEAKSPACEGAINSMONTHLY" ) {
+		} else if ( reportName == "PEAKSPACEGAINSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE ELECTRIC EQUIPMENT TOTAL HEATING ENERGY" );
@@ -5329,7 +5427,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY" ) {
+		} else if ( reportName == "SPACEGAINCOMPONENTSATCOOLINGPEAKMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE AIR SYSTEM SENSIBLE COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE TOTAL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE LIGHTS TOTAL HEATING ENERGY" );
@@ -5341,39 +5439,39 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INFILTRATION SENSIBLE HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY" ) {
+		} else if ( reportName == "SETPOINTSNOTMETWITHTEMPERATURESMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE HEATING SETPOINT NOT MET TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MEAN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE HEATING SETPOINT NOT MET WHILE OCCUPIED TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE COOLING SETPOINT NOT MET TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE COOLING SETPOINT NOT MET WHILE OCCUPIED TIME" );
 
-		} else if ( SELECT_CASE_var == "COMFORTREPORTSIMPLE55MONTHLY" ) {
+		} else if ( reportName == "COMFORTREPORTSIMPLE55MONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MEAN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL WINTER CLOTHES NOT COMFORTABLE TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT ASHRAE 55 SIMPLE MODEL SUMMER OR WINTER CLOTHES NOT COMFORTABLE TIME" );
 
-		} else if ( SELECT_CASE_var == "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY" ) {
+		} else if ( reportName == "UNGLAZEDTRANSPIREDSOLARCOLLECTORSUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR SYSTEM EFFICIENCY" );
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR OUTSIDE FACE SUCTION VELOCITY" );
 			AddRecordToOutputVariableStructure( "*", "SOLAR COLLECTOR SENSIBLE HEATING RATE" );
 
-		} else if ( SELECT_CASE_var == "OCCUPANTCOMFORTDATASUMMARYMONTHLY" ) {
+		} else if ( reportName == "OCCUPANTCOMFORTDATASUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "PEOPLE OCCUPANT COUNT" );
 			AddRecordToOutputVariableStructure( "*", "PEOPLE AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "PEOPLE AIR RELATIVE HUMIDITY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT FANGER MODEL PMV" );
 			AddRecordToOutputVariableStructure( "*", "ZONE THERMAL COMFORT FANGER MODEL PPD" );
 
-		} else if ( SELECT_CASE_var == "CHILLERREPORTMONTHLY" ) {
+		} else if ( reportName == "CHILLERREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "CHILLER ELECTRIC ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "CHILLER ELECTRIC POWER" );
 			AddRecordToOutputVariableStructure( "*", "CHILLER EVAPORATOR COOLING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "CHILLER CONDENSER HEAT TRANSFER ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "CHILLER COP" );
 
-		} else if ( SELECT_CASE_var == "TOWERREPORTMONTHLY" ) {
+		} else if ( reportName == "TOWERREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER FAN ELECTRIC ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER FAN ELECTRIC POWER" );
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER HEAT TRANSFER RATE" );
@@ -5381,7 +5479,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER OUTLET TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "COOLING TOWER MASS FLOW RATE" );
 
-		} else if ( SELECT_CASE_var == "BOILERREPORTMONTHLY" ) {
+		} else if ( reportName == "BOILERREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "BOILER HEATING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "BOILER GAS CONSUMPTION" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "BOILER HEATING ENERGY" ); // on meter
@@ -5392,7 +5490,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "BOILER MASS FLOW RATE" );
 			AddRecordToOutputVariableStructure( "*", "BOILER ANCILLARY ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "DXREPORTMONTHLY" ) {
+		} else if ( reportName == "DXREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL TOTAL COOLING ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL ELECTRIC ENERGY" ); // on meter
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL SENSIBLE COOLING ENERGY" );
@@ -5405,7 +5503,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL ELECTRIC POWER" );
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL CRANKCASE HEATER ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "WINDOWREPORTMONTHLY" ) {
+		} else if ( reportName == "WINDOWREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
@@ -5415,14 +5513,14 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SURFACE SHADING DEVICE IS ON TIME FRACTION" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE STORM WINDOW ON OFF STATUS" );
 
-		} else if ( SELECT_CASE_var == "WINDOWENERGYREPORTMONTHLY" ) {
+		} else if ( reportName == "WINDOWENERGYREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "SURFACE WINDOW HEAT LOSS ENERGY" );
 
-		} else if ( SELECT_CASE_var == "WINDOWZONESUMMARYMONTHLY" ) {
+		} else if ( reportName == "WINDOWZONESUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION RATE" );
@@ -5431,7 +5529,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION RATE" );
 
-		} else if ( SELECT_CASE_var == "WINDOWENERGYZONESUMMARYMONTHLY" ) {
+		} else if ( reportName == "WINDOWENERGYZONESUMMARYMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL HEAT LOSS ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOWS TOTAL TRANSMITTED SOLAR RADIATION ENERGY" );
@@ -5440,7 +5538,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED DIFFUSE SOLAR RADIATION ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE INTERIOR WINDOWS TOTAL TRANSMITTED BEAM SOLAR RADIATION ENERGY" );
 
-		} else if ( SELECT_CASE_var == "AVERAGEOUTDOORCONDITIONSMONTHLY" ) {
+		} else if ( reportName == "AVERAGEOUTDOORCONDITIONSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5450,7 +5548,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE RAIN STATUS" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY" ) {
+		} else if ( reportName == "OUTDOORCONDITIONSMAXIMUMDRYBULBMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5459,7 +5557,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY" ) {
+		} else if ( reportName == "OUTDOORCONDITIONSMINIMUMDRYBULBMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5468,7 +5566,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY" ) {
+		} else if ( reportName == "OUTDOORCONDITIONSMAXIMUMWETBULBMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
@@ -5477,7 +5575,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY" ) {
+		} else if ( reportName == "OUTDOORCONDITIONSMAXIMUMDEWPOINTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DEWPOINT TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR DRYBULB TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE OUTDOOR AIR WETBULB TEMPERATURE" );
@@ -5486,7 +5584,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE DIFFUSE SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE DIRECT SOLAR RADIATION RATE PER AREA" );
 
-		} else if ( SELECT_CASE_var == "OUTDOORGROUNDCONDITIONSMONTHLY" ) {
+		} else if ( reportName == "OUTDOORGROUNDCONDITIONSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE GROUND TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE SURFACE GROUND TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "SITE DEEP GROUND TEMPERATURE" );
@@ -5494,7 +5592,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "SITE GROUND REFLECTED SOLAR RADIATION RATE PER AREA" );
 			AddRecordToOutputVariableStructure( "*", "SITE SNOW ON GROUND STATUS" );
 
-		} else if ( SELECT_CASE_var == "WINDOWACREPORTMONTHLY" ) {
+		} else if ( reportName == "WINDOWACREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER TOTAL COOLING ENERGY" );
@@ -5505,7 +5603,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER LATENT COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "ZONE WINDOW AIR CONDITIONER ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "WATERHEATERREPORTMONTHLY" ) {
+		} else if ( reportName == "WATERHEATERREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER TOTAL DEMAND HEAT TRANSFER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER USE SIDE HEAT TRANSFER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER BURNER HEATING ENERGY" );
@@ -5517,7 +5615,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER HEAT RECOVERY SUPPLY ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "WATER HEATER SOURCE ENERGY" );
 
-		} else if ( SELECT_CASE_var == "GENERATORREPORTMONTHLY" ) {
+		} else if ( reportName == "GENERATORREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "GENERATOR PRODUCED ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "GENERATOR DIESEL CONSUMPTION" );
 			AddRecordToOutputVariableStructure( "*", "GENERATOR GAS CONSUMPTION" );
@@ -5528,7 +5626,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "GENERATOR EXHAUST HEAT RECOVERY ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "GENERATOR EXHAUST AIR TEMPERATURE" );
 
-		} else if ( SELECT_CASE_var == "DAYLIGHTINGREPORTMONTHLY" ) {
+		} else if ( reportName == "DAYLIGHTINGREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "SITE EXTERIOR BEAM NORMAL ILLUMINANCE" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING LIGHTING POWER MULTIPLIER" );
@@ -5541,7 +5639,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 GLARE INDEX SETPOINT EXCEEDED TIME" );
 			AddRecordToOutputVariableStructure( "*", "DAYLIGHTING REFERENCE POINT 2 DAYLIGHT ILLUMINANCE SETPOINT EXCEEDED TIME" );
 
-		} else if ( SELECT_CASE_var == "COILREPORTMONTHLY" ) {
+		} else if ( reportName == "COILREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "HEATING COIL HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "HEATING COIL HEATING RATE" );
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL SENSIBLE COOLING ENERGY" );
@@ -5550,16 +5648,16 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL SENSIBLE COOLING RATE" );
 			AddRecordToOutputVariableStructure( "*", "COOLING COIL WETTED AREA FRACTION" );
 
-		} else if ( SELECT_CASE_var == "PLANTLOOPDEMANDREPORTMONTHLY" ) {
+		} else if ( reportName == "PLANTLOOPDEMANDREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" );
 
-		} else if ( SELECT_CASE_var == "FANREPORTMONTHLY" ) {
+		} else if ( reportName == "FANREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "FAN ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "FAN RISE IN AIR TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "FAN ELECTRIC POWER" );
 
-		} else if ( SELECT_CASE_var == "PUMPREPORTMONTHLY" ) {
+		} else if ( reportName == "PUMPREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "PUMP ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "PUMP FLUID HEAT GAIN ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "PUMP ELECTRIC POWER" );
@@ -5568,17 +5666,17 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "PUMP OUTLET TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "PUMP MASS FLOW RATE" );
 
-		} else if ( SELECT_CASE_var == "CONDLOOPDEMANDREPORTMONTHLY" ) {
+		} else if ( reportName == "CONDLOOPDEMANDREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE COOLING DEMAND RATE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE HEATING DEMAND RATE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE INLET TEMPERATURE" );
 			AddRecordToOutputVariableStructure( "*", "PLANT SUPPLY SIDE OUTLET TEMPERATURE" );
 
-		} else if ( SELECT_CASE_var == "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY" ) {
+		} else if ( reportName == "ZONETEMPERATUREOSCILLATIONREPORTMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE OSCILLATING TEMPERATURES TIME" );
 			AddRecordToOutputVariableStructure( "*", "ZONE PEOPLE OCCUPANT COUNT" );
 
-		} else if ( SELECT_CASE_var == "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY" ) {
+		} else if ( reportName == "AIRLOOPSYSTEMENERGYANDWATERUSEMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM HOT WATER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM STEAM ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM CHILLED WATER ENERGY" );
@@ -5586,7 +5684,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM GAS ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM WATER VOLUME" );
 
-		} else if ( SELECT_CASE_var == "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY" ) {
+		} else if ( reportName == "AIRLOOPSYSTEMCOMPONENTLOADSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM FAN AIR HEATING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM COOLING COIL TOTAL COOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM HEATING COIL TOTAL HEATING ENERGY" );
@@ -5596,7 +5694,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM EVAPORATIVE COOLER TOTAL COOLING ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER TOTAL COOLING ENERGY" );
 
-		} else if ( SELECT_CASE_var == "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY" ) {
+		} else if ( reportName == "AIRLOOPSYSTEMCOMPONENTENERGYUSEMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM FAN ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM HEATING COIL HOT WATER ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM COOLING COIL CHILLED WATER ENERGY" );
@@ -5609,7 +5707,7 @@ namespace InputProcessor {
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM EVAPORATIVE COOLER ELECTRIC ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "AIR SYSTEM DESICCANT DEHUMIDIFIER ELECTRIC ENERGY" );
 
-		} else if ( SELECT_CASE_var == "MECHANICALVENTILATIONLOADSMONTHLY" ) {
+		} else if ( reportName == "MECHANICALVENTILATIONLOADSMONTHLY" ) {
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION NO LOAD HEAT REMOVAL ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE ENERGY" );
 			AddRecordToOutputVariableStructure( "*", "ZONE MECHANICAL VENTILATION COOLING LOAD INCREASE DUE TO OVERHEATING ENERGY" );
@@ -5622,7 +5720,7 @@ namespace InputProcessor {
 
 		} else {
 
-		}}
+		}
 
 	}
 
@@ -5944,12 +6042,12 @@ namespace InputProcessor {
 		if ( StartLine <= 99999 ) {
 			gio::write( TextLine, "(1X,I5,1X,A)" ) << StartLine << cStartLine;
 		} else {
-			gio::write( cLineNo, "*" ) << StartLine;
+			gio::write( cLineNo, fmtLD ) << StartLine;
 			strip( cLineNo );
 			gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << cStartLine;
 		}
 		ShowMessage( TextLine );
-		if ( cStartName != Blank ) {
+		if ( ! cStartName.empty() ) {
 			ShowMessage( "indicated Name=" + cStartName );
 		}
 		ShowMessage( "Only last " + IPTrimSigDigits( NumConxLines ) + " lines before error line shown....." );
@@ -5964,7 +6062,7 @@ namespace InputProcessor {
 			if ( SLine <= 99999 ) {
 				gio::write( TextLine, "(1X,I5,1X,A)" ) << SLine << LineBuf( CurPos );
 			} else {
-				gio::write( cLineNo, "*" ) << SLine;
+				gio::write( cLineNo, fmtLD ) << SLine;
 				strip( cLineNo );
 				gio::write( TextLine, "(1X,A,1X,A)" ) << cLineNo << LineBuf( CurPos );
 			}
@@ -6018,7 +6116,7 @@ namespace InputProcessor {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		if ( Severity != Blank ) {
+		if ( ! Severity.empty() ) {
 			++TotalAuditErrors;
 			gio::write( EchoInputFile, ErrorFormat ) << Severity + ErrorMessage;
 		} else {
@@ -6068,7 +6166,7 @@ namespace InputProcessor {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		std::string String; // Working string
 
-		gio::write( String, "*" ) << IntegerValue;
+		gio::write( String, fmtLD ) << IntegerValue;
 		return stripped( String );
 
 	}
@@ -6082,7 +6180,7 @@ namespace InputProcessor {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

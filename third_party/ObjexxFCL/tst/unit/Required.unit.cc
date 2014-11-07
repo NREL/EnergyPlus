@@ -16,20 +16,21 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Required.hh>
 #include <ObjexxFCL/Fstring.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 
 TEST( RequiredTest, ConstructionDefault )
 {
-	EXPECT_DEATH( Required_int_const(), ".*Assertion.*" );
+	EXPECT_DEBUG_DEATH( Required_int_const(), ".*Assertion.*" );
 }
 
 TEST( RequiredTest, ConstructionOmit )
 {
 #ifdef __INTEL_COMPILER
-	EXPECT_DEATH( Required_int_const( Omit{} ), ".*Assertion.*" ); // Intel C++ gives wrong remark about hiding ObjexxFCL::_ if we use _ arg
+	EXPECT_DEBUG_DEATH( Required_int_const( Omit{} ), ".*Assertion.*" ); // Intel C++ gives wrong remark about hiding ObjexxFCL::_ if we use _ arg
 #else
-	EXPECT_DEATH( Required_int_const( _ ), ".*Assertion.*" );
+	EXPECT_DEBUG_DEATH( Required_int_const( _ ), ".*Assertion.*" );
 #endif
 }
 
@@ -79,7 +80,7 @@ TEST( RequiredTest, AssignmentValue )
 //{
 //	int i( -3 );
 //	Required_int r( i );
-//	EXPECT_DEATH( r = _, ".*Assertion.*" ); // Required = Omit operator removed
+//	EXPECT_DEBUG_DEATH( r = _, ".*Assertion.*" ); // Required = Omit operator removed
 //}
 
 TEST( RequiredTest, FstringFromLiteral )
@@ -93,7 +94,7 @@ TEST( RequiredTest, FstringFromLiteral )
 
 TEST( RequiredTest, FstringAssignment )
 {
-	static Fstring s( "A literal string" );
+	Fstring s( "A literal string" );
 	Required_Fstring o( s );
 	EXPECT_EQ( Fstring( "A literal string" ), o );
 	EXPECT_EQ( "A literal string", o() ); // Need the () on o() when types don't match exactly

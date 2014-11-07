@@ -117,6 +117,11 @@ namespace DataHeatBalFanSys {
 	FArray1D< Real64 > MixingMassFlowZone; // Mixing MASS FLOW
 	FArray1D< Real64 > MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
 
+	FArray1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
+	FArray1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
+	FArray1D_bool ZoneMassBalanceRepVarFlag; // zone mass flow balance reporting flag
+	FArray1D_int ZoneReOrder;           // zone number reordered for zone mass balance
+
 	//REAL Variables for the Heat Balance Simulation
 
 	FArray1D< Real64 > QRadSysSource; // Current source/sink for a particular surface (radiant sys)
@@ -188,7 +193,7 @@ namespace DataHeatBalFanSys {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

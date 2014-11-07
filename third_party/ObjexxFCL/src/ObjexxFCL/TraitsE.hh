@@ -19,10 +19,11 @@
 
 // C++ Headers
 #include <complex>
+#include <cstddef>
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class byte;
 class ubyte;
 
@@ -31,7 +32,7 @@ template< typename T >
 struct TraitsE
 {
 	typedef  T  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -67,7 +68,7 @@ template<>
 struct TraitsE< char >
 {
 	typedef  char  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -103,7 +104,7 @@ template<>
 struct TraitsE< bool >
 {
 	typedef  bool  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -139,7 +140,7 @@ template<>
 struct TraitsE< byte >
 {
 	typedef  byte  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -175,7 +176,7 @@ template<>
 struct TraitsE< ubyte >
 {
 	typedef  ubyte  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -211,7 +212,7 @@ template<>
 struct TraitsE< short int >
 {
 	typedef  short int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -247,7 +248,7 @@ template<>
 struct TraitsE< unsigned short int >
 {
 	typedef  unsigned short int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -283,7 +284,7 @@ template<>
 struct TraitsE< int >
 {
 	typedef  int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -319,7 +320,7 @@ template<>
 struct TraitsE< unsigned int >
 {
 	typedef  unsigned int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -355,7 +356,7 @@ template<>
 struct TraitsE< long int >
 {
 	typedef  long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -391,7 +392,7 @@ template<>
 struct TraitsE< unsigned long int >
 {
 	typedef  unsigned long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -427,7 +428,7 @@ template<>
 struct TraitsE< long long int >
 {
 	typedef  long long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -463,7 +464,7 @@ template<>
 struct TraitsE< unsigned long long int >
 {
 	typedef  unsigned long long int  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -499,7 +500,7 @@ template<>
 struct TraitsE< float >
 {
 	typedef  float  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -535,7 +536,7 @@ template<>
 struct TraitsE< double >
 {
 	typedef  double  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline
@@ -571,7 +572,7 @@ template<>
 struct TraitsE< long double >
 {
 	typedef  long double  traits_type;
-	typedef  unsigned int  Size;
+	typedef  std::size_t  Size;
 
 	// Field Width
 	inline

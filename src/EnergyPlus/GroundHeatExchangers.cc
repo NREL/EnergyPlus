@@ -76,7 +76,7 @@ namespace GroundHeatExchangers {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE PARAMETER DEFINITIONS
-	Real64 const HrsPerDay( 24. ); // Number of hours in a day
+	Real64 const HrsPerDay( 24.0 ); // Number of hours in a day
 	Real64 const HrsPerMonth( 730.0 ); // Number of hours in month
 	int const MaxTSinHr( 60 ); // Max number of time step in a hour
 
@@ -244,6 +244,7 @@ namespace GroundHeatExchangers {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS
+		static std::string const RoutineName( "CalcVerticalGroundHeatExchanger" );
 
 		//LOCAL BHORE HOLE PARAMETERS
 		int NumBholes;
@@ -301,10 +302,10 @@ namespace GroundHeatExchangers {
 		BholeLength = VerticalGlhe( GlheNum ).BoreholeLength;
 		GlheInletNode = VerticalGlhe( GlheNum ).GlheInletNodeNum;
 		GlheInletTemp = Node( GlheInletNode ).Temp;
-		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
 		Tground = VerticalGlhe( GlheNum ).TempGround;
-		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 		K_Ground = VerticalGlhe( GlheNum ).KGround;
 		K_Ground_Factor = 2.0 * Pi * K_Ground;
 		AGG = VerticalGlhe( GlheNum ).AGG;
@@ -312,8 +313,8 @@ namespace GroundHeatExchangers {
 		GroundDiffusivity = VerticalGlhe( GlheNum ).KGround / VerticalGlhe( GlheNum ).CpRhoGround;
 
 		// calculate annual time constant for ground conduction
-		TimeSS = ( std::pow( VerticalGlhe( GlheNum ).BoreholeLength, 2 ) / ( 9. * GroundDiffusivity ) ) / SecInHour / 8760.0;
-		TimeSS_Factor = TimeSS * 8760.;
+		TimeSS = ( pow_2( VerticalGlhe( GlheNum ).BoreholeLength ) / ( 9.0 * GroundDiffusivity ) ) / SecInHour / 8760.0;
+		TimeSS_Factor = TimeSS * 8760.0;
 
 		GlheOutletNode = VerticalGlhe( GlheNum ).GlheOutletNodeNum;
 		LoopNum = VerticalGlhe( GlheNum ).LoopNum;
@@ -383,7 +384,7 @@ namespace GroundHeatExchangers {
 				XI = std::log( CurrentSimTime / ( TimeSS_Factor ) );
 				INTERP( GlheNum, XI, GfuncVal );
 
-				C_1 = ( BholeLength * NumBholes ) / ( 2. * MDotActual * Cp_Fluid );
+				C_1 = ( BholeLength * NumBholes ) / ( 2.0 * MDotActual * Cp_Fluid );
 				tmpQnSubHourly = ( Tground - GlheInletTemp ) / ( GfuncVal / ( K_Ground_Factor ) + ResistanceBhole + C_1 );
 				FluidAveTemp = Tground - tmpQnSubHourly * ResistanceBhole;
 				ToutNew = Tground - tmpQnSubHourly * ( GfuncVal / ( K_Ground_Factor ) + ResistanceBhole - C_1 );
@@ -461,7 +462,7 @@ namespace GroundHeatExchangers {
 					//Dr.Spitler's Explicit set of equations to calculate the New Outlet Temperature of the U-Tube
 					C0 = RQSubHr;
 					C1 = Tground - ( SumTotal - VerticalGlhe( GlheNum ).QnSubHr( 1 ) * RQSubHr );
-					C2 = BholeLength * NumBholes / ( 2. * MDotActual * Cp_Fluid );
+					C2 = BholeLength * NumBholes / ( 2.0 * MDotActual * Cp_Fluid );
 					C3 = MDotActual * Cp_Fluid / ( BholeLength * NumBholes );
 					tmpQnSubHourly = ( C1 - GlheInletTemp ) / ( ResistanceBhole + C0 - C2 + ( 1 / C3 ) );
 					FluidAveTemp = C1 - ( C0 + ResistanceBhole ) * tmpQnSubHourly;
@@ -631,7 +632,7 @@ namespace GroundHeatExchangers {
 		if ( PrevHour( GlheNum ) != LocHourOfDay ) {
 			SumQnHr = 0.0;
 			for ( J = 1; J <= ( N - VerticalGlhe( GlheNum ).LastHourN( 1 ) ); ++J ) { // Check during debugging if we need a +1
-				SumQnHr += VerticalGlhe( GlheNum ).QnSubHr( J ) * std::abs( ( PrevTimeSteps( J ) - PrevTimeSteps( J + 1 ) ) );
+				SumQnHr += VerticalGlhe( GlheNum ).QnSubHr( J ) * std::abs( PrevTimeSteps( J ) - PrevTimeSteps( J + 1 ) );
 			}
 			SumQnHr /= std::abs( PrevTimeSteps( 1 ) - PrevTimeSteps( J ) );
 			VerticalGlhe( GlheNum ).QnHr = eoshift( VerticalGlhe( GlheNum ).QnHr, -1, SumQnHr );
@@ -872,7 +873,7 @@ namespace GroundHeatExchangers {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcVerticalGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -919,15 +920,15 @@ namespace GroundHeatExchangers {
 		K_Ground = VerticalGlhe( GlheNum ).KGround;
 		Cp_Ground = VerticalGlhe( GlheNum ).CpRhoGround;
 
-		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		Cp_Fluid = GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
 		Tground = VerticalGlhe( GlheNum ).TempGround;
 		K_Grout = VerticalGlhe( GlheNum ).KGrout;
 		K_Pipe = VerticalGlhe( GlheNum ).KPipe;
-		K_Fluid = GetConductivityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
-		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		K_Fluid = GetConductivityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
+		FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
-		FluidViscosity = GetViscosityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "CalcVerticalGroundHeatExchanger" );
+		FluidViscosity = GetViscosityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 
 		PipeOuterDia = VerticalGlhe( GlheNum ).PipeOutDia;
 		DistUtube = VerticalGlhe( GlheNum ).UtubeDist;
@@ -940,10 +941,10 @@ namespace GroundHeatExchangers {
 		PipeInnerRad = PipeOuterRad - ThickPipe;
 		PipeInnerDia = 2.0 * PipeInnerRad;
 		//Re=Rho*V*D/Mu
-		ReynoldsNum = FluidDensity * PipeInnerDia * ( BholeMdot / FluidDensity / ( Pi * std::pow( PipeInnerRad, 2 ) ) ) / FluidViscosity;
+		ReynoldsNum = FluidDensity * PipeInnerDia * ( BholeMdot / FluidDensity / ( Pi * pow_2( PipeInnerRad ) ) ) / FluidViscosity;
 		PrandlNum = ( Cp_Fluid * FluidViscosity ) / ( K_Fluid );
 		//   Convection Resistance
-		NusseltNum = 0.023 * ( std::pow( ReynoldsNum, 0.8 ) ) * ( std::pow( PrandlNum, 0.35 ) );
+		NusseltNum = 0.023 * std::pow( ReynoldsNum, 0.8 ) * std::pow( PrandlNum, 0.35 );
 		hci = NusseltNum * K_Fluid / PipeInnerDia;
 		if ( BholeMdot == 0.0 ) {
 			Rconv = 0.0;
@@ -952,10 +953,10 @@ namespace GroundHeatExchangers {
 		}
 
 		//   Conduction Resistance
-		Rcond = std::log( PipeOuterRad / PipeInnerRad ) / ( 2.0 * Pi * K_Pipe ) / 2.; // pipe in parallel so /2
+		Rcond = std::log( PipeOuterRad / PipeInnerRad ) / ( 2.0 * Pi * K_Pipe ) / 2.0; // pipe in parallel so /2
 
 		//   Resistance Due to the grout.
-		MaxDistance = 2. * BholeRadius - ( 2. * PipeOuterDia );
+		MaxDistance = 2.0 * BholeRadius - ( 2.0 * PipeOuterDia );
 		DistanceRatio = DistUtube / MaxDistance;
 
 		if ( DistanceRatio >= 0.0 && DistanceRatio <= 0.25 ) {
@@ -972,7 +973,7 @@ namespace GroundHeatExchangers {
 			B1 = -0.3796;
 		}
 
-		Rgrout = 1.0 / ( K_Grout * ( B0 * std::pow( ( BholeRadius / PipeOuterRad ), B1 ) ) );
+		Rgrout = 1.0 / ( K_Grout * ( B0 * std::pow( BholeRadius / PipeOuterRad, B1 ) ) );
 		ResistanceBhole = Rcond + Rconv + Rgrout;
 	}
 
@@ -1154,6 +1155,7 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "InitBoreholeHXSimVars" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1192,7 +1194,7 @@ namespace GroundHeatExchangers {
 			MyEnvrnFlag( GlheNum ) = false;
 
 			if ( ! allocated( LastQnSubHr ) ) LastQnSubHr.allocate( NumVerticalGlhes );
-			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, 20., PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, "InitBoreholeHXSimVars" );
+			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidName, 20.0, PlantLoop( VerticalGlhe( GlheNum ).LoopNum ).FluidIndex, RoutineName );
 			VerticalGlhe( GlheNum ).DesignMassFlow = VerticalGlhe( GlheNum ).DesignFlow * FluidDensity;
 			InitComponentNodes( 0.0, VerticalGlhe( GlheNum ).DesignMassFlow, VerticalGlhe( GlheNum ).GlheInletNodeNum, VerticalGlhe( GlheNum ).GlheOutletNodeNum, VerticalGlhe( GlheNum ).LoopNum, VerticalGlhe( GlheNum ).LoopSideNum, VerticalGlhe( GlheNum ).BranchNum, VerticalGlhe( GlheNum ).CompNum );
 
@@ -1253,7 +1255,8 @@ namespace GroundHeatExchangers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const DeltaTempLimit( 100. ); // temp limit for warnings
+		Real64 const DeltaTempLimit( 100.0 ); // temp limit for warnings
+		static std::string const RoutineName( "UpdateVerticalGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1277,7 +1280,7 @@ namespace GroundHeatExchangers {
 		SafeCopyPlantNode( GlheInletNode, GlheOutletNode );
 
 		Node( GlheOutletNode ).Temp = GlheOutletTemp;
-		Node( GlheOutletNode ).Enthalpy = GlheOutletTemp * GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheOutletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, "UpdateVerticalGroundHeatExchanger" );
+		Node( GlheOutletNode ).Enthalpy = GlheOutletTemp * GetSpecificHeatGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheOutletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, RoutineName );
 		GlhedeltaTemp = std::abs( GlheOutletTemp - GlheInletTemp );
 		VerticalGlheReport( Num ).GlheBoreholeTemp = GlheBoreholeTemp;
 		VerticalGlheReport( Num ).GlheOutletTemp = GlheOutletTemp;
@@ -1288,7 +1291,7 @@ namespace GroundHeatExchangers {
 		VerticalGlheReport( Num ).GlheAveFluidTemp = GlheAveFluidTemp;
 
 		if ( GlhedeltaTemp > DeltaTempLimit && NumErrorCalls < NumVerticalGlhes && ! WarmupFlag ) {
-			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, "UpdateVerticalGroundHeatExchanger" );
+			FluidDensity = GetDensityGlycol( PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidName, GlheInletTemp, PlantLoop( VerticalGlhe( Num ).LoopNum ).FluidIndex, RoutineName );
 			DesignMassFlow = VerticalGlhe( Num ).DesignFlow * FluidDensity;
 			ShowWarningError( "Check GLHE design inputs & g-functions for consistency" );
 			ShowContinueError( "For GroundHeatExchanger:Vertical " + VerticalGlhe( Num ).Name + "GLHE delta Temp > 100C." );
@@ -1309,7 +1312,7 @@ namespace GroundHeatExchangers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

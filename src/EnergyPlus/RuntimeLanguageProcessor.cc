@@ -74,6 +74,8 @@ namespace RuntimeLanguageProcessor {
 	int const ParenthesisLeft( 10 ); // indicates left side parenthesis found in parsing
 	int const ParenthesisRight( 11 ); // indicates right side parenthesis found in parsing
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -112,6 +114,9 @@ namespace RuntimeLanguageProcessor {
 	int CurrentEnvironmentPeriodNum( 0 );
 	int ActualDateAndTimeNum( 0 );
 	int ActualTimeNum( 0 );
+
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
 
 	// SUBROUTINE SPECIFICATIONS:
 
@@ -399,7 +404,6 @@ namespace RuntimeLanguageProcessor {
 		int const IfDepthAllowed( 5 ); // depth of IF block nesting
 		int const ELSEIFLengthAllowed( 200 ); // number of ELSEIFs allowed
 		int const WhileDepthAllowed( 1 ); // depth of While block nesting
-		static gio::Fmt const fmta( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LineNum;
@@ -462,7 +466,7 @@ namespace RuntimeLanguageProcessor {
 			{ auto const SELECT_CASE_var( Keyword );
 
 			if ( SELECT_CASE_var == "RETURN" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "RETURN \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "RETURN \"" + Line + "\"";
 				if ( Remainder.empty() ) {
 					InstructionNum = AddInstruction( StackNum, LineNum, KeywordReturn );
 				} else {
@@ -471,7 +475,7 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "SET" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "SET \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "SET \"" + Line + "\"";
 				Pos = scan( Remainder, '=' );
 				if ( Pos == std::string::npos ) {
 					AddError( StackNum, LineNum, "Equal sign missing for the SET instruction." );
@@ -496,7 +500,7 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "RUN" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "RUN \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "RUN \"" + Line + "\"";
 				if ( Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Program or Subroutine name missing for the RUN instruction." );
 				} else {
@@ -512,8 +516,8 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "IF" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "IF \"" + Line + "\"";
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "IF \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtLD ) << "NestedIf=" << NestedIfDepth;
 				if ( Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Expression missing for the IF instruction." );
 					ExpressionNum = 0;
@@ -534,8 +538,8 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "ELSEIF" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ELSEIF \"" + Line + "\"";
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ELSEIF \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtLD ) << "NestedIf=" << NestedIfDepth;
 				if ( NestedIfDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting IF instruction missing for the ELSEIF instruction." );
 					break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
@@ -564,8 +568,8 @@ namespace RuntimeLanguageProcessor {
 				SavedIfInstructionNum( NestedIfDepth ) = InstructionNum;
 
 			} else if ( SELECT_CASE_var == "ELSE" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ELSE \"" + Line + "\"";
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ELSE \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtLD ) << "NestedIf=" << NestedIfDepth;
 				if ( NestedIfDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting IF instruction missing for the ELSE instruction." );
 					break; // Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
@@ -594,8 +598,8 @@ namespace RuntimeLanguageProcessor {
 				SavedIfInstructionNum( NestedIfDepth ) = InstructionNum;
 
 			} else if ( SELECT_CASE_var == "ENDIF" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ENDIF \"" + Line + "\"";
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, "*" ) << "NestedIf=" << NestedIfDepth;
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ENDIF \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtLD ) << "NestedIf=" << NestedIfDepth;
 				if ( NestedIfDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting IF instruction missing for the ENDIF instruction." );
 					break; // PE Getting strange error on DEALLOCATE for the next instruction that I try to add, so doing EXIT here
@@ -626,7 +630,7 @@ namespace RuntimeLanguageProcessor {
 				--NestedIfDepth;
 
 			} else if ( SELECT_CASE_var == "WHILE" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "WHILE \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "WHILE \"" + Line + "\"";
 				if ( Remainder.empty() ) {
 					AddError( StackNum, LineNum, "Expression missing for the WHILE instruction." );
 					ExpressionNum = 0;
@@ -646,7 +650,7 @@ namespace RuntimeLanguageProcessor {
 				}
 
 			} else if ( SELECT_CASE_var == "ENDWHILE" ) {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ENDWHILE \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ENDWHILE \"" + Line + "\"";
 				if ( NestedWhileDepth == 0 ) {
 					AddError( StackNum, LineNum, "Starting WHILE instruction missing for the ENDWHILE instruction." );
 					break;
@@ -665,7 +669,7 @@ namespace RuntimeLanguageProcessor {
 				SavedWhileExpressionNum = 0;
 
 			} else {
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + Line + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + Line + "\"";
 				AddError( StackNum, LineNum, "Unknown keyword [" + Keyword + "]." );
 
 			}}
@@ -991,8 +995,8 @@ namespace RuntimeLanguageProcessor {
 		}
 
 		if ( ! MyOneTimeFlag ) {
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "<Erl program name, line #, line text, result, occurance timing information ... >";
+			gio::write( OutputEMSFileUnitNum, fmtA ) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
+			gio::write( OutputEMSFileUnitNum, fmtA ) << "<Erl program name, line #, line text, result, occurance timing information ... >";
 			MyOneTimeFlag = true;
 		}
 		// if have not return'd yet then write out full trace
@@ -1019,7 +1023,7 @@ namespace RuntimeLanguageProcessor {
 		}
 		TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
-		gio::write( OutputEMSFileUnitNum, "(A)" ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
+		gio::write( OutputEMSFileUnitNum, fmtA ) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
 
 	}
 
@@ -1057,7 +1061,6 @@ namespace RuntimeLanguageProcessor {
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxDoLoopCounts( 500 );
-		static gio::Fmt const fmta( "(A)" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1222,9 +1225,9 @@ namespace RuntimeLanguageProcessor {
 				if ( ! ErrorFlag ) {
 					Token( NumTokens ).Type = TokenNumber;
 					Token( NumTokens ).String = StringToken;
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "Number=\"" + StringToken + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "Number=\"" + StringToken + "\"";
 					Token( NumTokens ).Number = ProcessNumber( StringToken, ErrorFlag );
-					if ( DeveloperFlag && ErrorFlag ) gio::write( OutputFileDebug, fmta ) << "Numeric error flagged";
+					if ( DeveloperFlag && ErrorFlag ) gio::write( OutputFileDebug, fmtA ) << "Numeric error flagged";
 					if ( MinusFound ) Token( NumTokens ).Number = -Token( NumTokens ).Number;
 					if ( ErrorFlag ) {
 						// Error: something wrong with this number!
@@ -1258,7 +1261,7 @@ namespace RuntimeLanguageProcessor {
 				// Save the variable token
 				Token( NumTokens ).Type = TokenVariable;
 				Token( NumTokens ).String = StringToken;
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "Variable=\"" + StringToken + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "Variable=\"" + StringToken + "\"";
 				Token( NumTokens ).Variable = NewEMSVariable( StringToken, StackNum );
 
 			} else if ( is_any_of( NextChar, "+-*/^=<>@|&" ) ) {
@@ -1270,32 +1273,32 @@ namespace RuntimeLanguageProcessor {
 				// First check for two character operators:  == <> <= >=
 				std::string const cc( String.substr( Pos, 2 ) );
 				if ( cc == "==" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
 				} else if ( cc == "<>" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorNotEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
 				} else if ( cc == "<=" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLessOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
 				} else if ( cc == ">=" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorGreaterOrEqual;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
 				} else if ( cc == "||" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatiorLogicalOR;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
 				} else if ( cc == "&&" ) {
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 2 ) + "\"";
 					Token( NumTokens ).Operator = OperatorLogicalAND;
 					Token( NumTokens ).String = String.substr( Pos, 2 );
 					++Pos;
@@ -1303,278 +1306,278 @@ namespace RuntimeLanguageProcessor {
 				} else if ( String[ Pos ] == '@' ) {
 
 					if ( SameString( String.substr( Pos, 6 ), "@Round" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 6 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 6 ) + "\"";
 						Token( NumTokens ).Operator = FuncRound;
 						Token( NumTokens ).String = String.substr( Pos, 6 );
 						Pos += 5;
 					} else if ( SameString( String.substr( Pos, 4 ), "@Mod" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMod;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
 					} else if ( SameString( String.substr( Pos, 4 ), "@Sin" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncSin;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
 					} else if ( SameString( String.substr( Pos, 4 ), "@Cos" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncCos;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
 					} else if ( SameString( String.substr( Pos, 7 ), "@ArcCos" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncArcCos;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
 					} else if ( SameString( String.substr( Pos, 7 ), "@ArcSin" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncArcSin;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
 					} else if ( SameString( String.substr( Pos, 9 ), "@DegToRad" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncDegToRad;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 9 ), "@RadToDeg" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncRadToDeg;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 4 ), "@Exp" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncExp;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
 					} else if ( SameString( String.substr( Pos, 3 ), "@Ln" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 3 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 3 ) + "\"";
 						Token( NumTokens ).Operator = FuncLn;
 						Token( NumTokens ).String = String.substr( Pos, 3 );
 						Pos += 2;
 					} else if ( SameString( String.substr( Pos, 4 ), "@Max" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMax;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
 					} else if ( SameString( String.substr( Pos, 4 ), "@Min" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncMin;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
 					} else if ( SameString( String.substr( Pos, 4 ), "@Abs" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 4 ) + "\"";
 						Token( NumTokens ).Operator = FuncABS;
 						Token( NumTokens ).String = String.substr( Pos, 4 );
 						Pos += 3;
 					} else if ( SameString( String.substr( Pos, 14 ), "@RANDOMUNIFORM" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 14 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 14 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandU;
 						Token( NumTokens ).String = String.substr( Pos, 14 );
 						Pos += 13;
 					} else if ( SameString( String.substr( Pos, 13 ), "@RANDOMNORMAL" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 13 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandG;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
 					} else if ( SameString( String.substr( Pos, 11 ), "@SEEDRANDOM" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + String.substr( Pos, 11 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRandSeed;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else if ( SameString( String.substr( Pos, 15 ), "@RhoAirFnPbTdbW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhoAirFnPbTdbW;
 						Token( NumTokens ).String = String.substr( Pos, 15 );
 						Pos += 14;
 					} else if ( SameString( String.substr( Pos, 12 ), "@CpAirFnWTdb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpAirFnWTdb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 13 ), "@HfgAirFnWTdb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncHfgAirFnWTdb;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
 					} else if ( SameString( String.substr( Pos, 12 ), "@HgAirFnWTdb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncHgAirFnWTdb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 14 ), "@TdpFnTdbTwbPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 14 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 14 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdpFnTdbTwbPb;
 						Token( NumTokens ).String = String.substr( Pos, 14 );
 						Pos += 13;
 					} else if ( SameString( String.substr( Pos, 9 ), "@TdpFnWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdpFnWPb;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 8 ), "@HFnTdbW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncHFnTdbW;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
 					} else if ( SameString( String.substr( Pos, 11 ), "@HFnTdbRhPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncHFnTdbRhPb;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else if ( SameString( String.substr( Pos, 8 ), "@TdbFnHW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncTdbFnHW;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
 					} else if ( SameString( String.substr( Pos, 12 ), "@RhovFnTdbRh" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRh;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 18 ), "@RhovFnTdbRhLBnd0C" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbRhLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
 					} else if ( SameString( String.substr( Pos, 13 ), "@RhovFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhovFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
 					} else if ( SameString( String.substr( Pos, 12 ), "@RhFnTdbRhov" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhov;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 18 ), "@RhFnTdbRhovLBnd0C" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 18 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbRhovLBnd0C;
 						Token( NumTokens ).String = String.substr( Pos, 18 );
 						Pos += 17;
 					} else if ( SameString( String.substr( Pos, 11 ), "@RhFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else if ( SameString( String.substr( Pos, 12 ), "@TwbFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncTwbFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 10 ), "@VFnTdbWPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
 						Token( NumTokens ).Operator = FuncVFnTdbWPb;
 						Token( NumTokens ).String = String.substr( Pos, 10 );
 						Pos += 9;
 					} else if ( SameString( String.substr( Pos, 9 ), "@WFnTdpPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdpPb;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 8 ), "@WFnTdbH" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 8 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbH;
 						Token( NumTokens ).String = String.substr( Pos, 8 );
 						Pos += 7;
 					} else if ( SameString( String.substr( Pos, 12 ), "@WFnTdbTwbPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbTwbPb;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 11 ), "@WFnTdbRhPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncWFnTdbRhPb;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else if ( SameString( String.substr( Pos, 11 ), "@PsatFnTemp" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncPsatFnTemp;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else if ( SameString( String.substr( Pos, 10 ), "@TsatFnHPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 10 ) + "\"";
 						Token( NumTokens ).Operator = FuncTsatFnHPb;
 						Token( NumTokens ).String = String.substr( Pos, 10 );
 						Pos += 9;
 					} else if ( SameString( String.substr( Pos, 9 ), "@TsatFnPb" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTsatFnPb;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 5 ), "@CpCW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpCW;
 						Token( NumTokens ).String = String.substr( Pos, 5 );
 						Pos += 4;
 					} else if ( SameString( String.substr( Pos, 5 ), "@CpHW" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 5 ) + "\"";
 						Token( NumTokens ).Operator = FuncCpHW;
 						Token( NumTokens ).String = String.substr( Pos, 5 );
 						Pos += 4;
 					} else if ( SameString( String.substr( Pos, 7 ), "@RhoH2O" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncRhoH2O;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
 					} else if ( SameString( String.substr( Pos, 12 ), "@FATALHALTEP" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 12 ) + "\"";
 						Token( NumTokens ).Operator = FuncFatalHaltEp;
 						Token( NumTokens ).String = String.substr( Pos, 12 );
 						Pos += 11;
 					} else if ( SameString( String.substr( Pos, 13 ), "@SEVEREWARNEP" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncSevereWarnEp;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
 					} else if ( SameString( String.substr( Pos, 7 ), "@WARNEP" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 7 ) + "\"";
 						Token( NumTokens ).Operator = FuncWarnEp;
 						Token( NumTokens ).String = String.substr( Pos, 7 );
 						Pos += 6;
 					} else if ( SameString( String.substr( Pos, 11 ), "@TRENDVALUE" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendValue;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else if ( SameString( String.substr( Pos, 13 ), "@TRENDAVERAGE" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 13 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendAverage;
 						Token( NumTokens ).String = String.substr( Pos, 13 );
 						Pos += 12;
 					} else if ( SameString( String.substr( Pos, 9 ), "@TRENDMAX" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendMax;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 9 ), "@TRENDMIN" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendMin;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 15 ), "@TRENDDIRECTION" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 15 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendDirection;
 						Token( NumTokens ).String = String.substr( Pos, 15 );
 						Pos += 14;
 					} else if ( SameString( String.substr( Pos, 9 ), "@TRENDSUM" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 9 ) + "\"";
 						Token( NumTokens ).Operator = FuncTrendSum;
 						Token( NumTokens ).String = String.substr( Pos, 9 );
 						Pos += 8;
 					} else if ( SameString( String.substr( Pos, 11 ), "@CURVEVALUE" ) ) {
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "FUNCTION \"" + String.substr( Pos, 11 ) + "\"";
 						Token( NumTokens ).Operator = FuncCurveValue;
 						Token( NumTokens ).String = String.substr( Pos, 11 );
 						Pos += 10;
 					} else { // throw error
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + String + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + String + "\"";
 						ShowFatalError( "EMS Runtime Language: did not find valid input for built-in function =" + String );
 					}
 				} else {
 					// Check for remaining single character operators
 					Token( NumTokens ).String = StringToken;
-					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "OPERATOR \"" + StringToken + "\"";
+					if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "OPERATOR \"" + StringToken + "\"";
 
 					if ( StringToken == "+" ) {
 						if ( ! OperatorProcessing ) {
@@ -1609,7 +1612,7 @@ namespace RuntimeLanguageProcessor {
 						OperatorProcessing = true;
 					} else {
 						// Uh OH, this should never happen! throw error
-						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR \"" + StringToken + "\"";
+						if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR \"" + StringToken + "\"";
 						ShowFatalError( "EMS, caught unexpected token = \"" + StringToken + "\" ; while parsing string=" + String );
 
 					}
@@ -1621,7 +1624,7 @@ namespace RuntimeLanguageProcessor {
 				// Parse a parenthesis token
 				++Pos;
 				StringToken = NextChar;
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "PAREN \"" + StringToken + "\"";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "PAREN \"" + StringToken + "\"";
 				Token( NumTokens ).Type = TokenParenthesis;
 				Token( NumTokens ).String = StringToken;
 				if ( NextChar == '(' ) Token( NumTokens ).Parenthesis = ParenthesisLeft;
@@ -1629,7 +1632,7 @@ namespace RuntimeLanguageProcessor {
 
 			} else if ( is_any_of( NextChar, "\"" ) ) {
 				// Parse a string literal token
-				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "LITERAL STRING";
+				if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "LITERAL STRING";
 				++Pos;
 
 			} else {
@@ -1639,7 +1642,7 @@ namespace RuntimeLanguageProcessor {
 		}
 
 		if ( NumErrors > 0 ) {
-			if ( DeveloperFlag ) gio::write( OutputFileDebug, fmta ) << "ERROR OUT";
+			if ( DeveloperFlag ) gio::write( OutputFileDebug, fmtA ) << "ERROR OUT";
 			ShowFatalError( "EMS, previous errors cause termination." );
 		}
 
@@ -2042,6 +2045,8 @@ namespace RuntimeLanguageProcessor {
 		// Object Data
 		FArray1D< ErlValueType > Operand;
 
+		static std::string const EMSBuiltInFunction( "EMS Built-In Function" );
+
 		// FLOW:
 		ReturnValue.Type = ValueNumber;
 		ReturnValue.Number = 0.0;
@@ -2222,8 +2227,8 @@ namespace RuntimeLanguageProcessor {
 				while ( true ) { // Box-Muller algorithm
 					RANDOM_NUMBER( tmpRANDU1 );
 					RANDOM_NUMBER( tmpRANDU2 );
-					tmpRANDU1 = 2. * tmpRANDU1 - 1.0;
-					tmpRANDU2 = 2. * tmpRANDU2 - 1.0;
+					tmpRANDU1 = 2.0 * tmpRANDU1 - 1.0;
+					tmpRANDU2 = 2.0 * tmpRANDU2 - 1.0;
 					UnitCircleTest = square( tmpRANDU1 ) + square( tmpRANDU2 );
 					if ( UnitCircleTest > 0.0 && UnitCircleTest < 1.0 ) break;
 				}
@@ -2249,63 +2254,63 @@ namespace RuntimeLanguageProcessor {
 				ReturnValue = SetErlValueNumber( double( SeedIntARR( 1 ) ) ); //just return first number pass as seed
 				SeedIntARR.deallocate();
 			} else if ( SELECT_CASE_var == FuncRhoAirFnPbTdbW ) {
-				ReturnValue = SetErlValueNumber( PsyRhoAirFnPbTdbW( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result =>   density of moist air (kg/m3) | pressure (Pa) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | called from
+				ReturnValue = SetErlValueNumber( PsyRhoAirFnPbTdbW( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result =>   density of moist air (kg/m3) | pressure (Pa) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | called from
 			} else if ( SELECT_CASE_var == FuncCpAirFnWTdb ) {
-				ReturnValue = SetErlValueNumber( PsyCpAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>   heat capacity of air {J/kg-C} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyCpAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat capacity of air {J/kg-C} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHfgAirFnWTdb ) {
 				//BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
-				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>   heat of vaporization for moist air {J/kg} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyHfgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   heat of vaporization for moist air {J/kg} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncHgAirFnWTdb ) {
 				// confusing ?  seems like this is really classical Hfg, heat of vaporization
-				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>   enthalpy of the gas {units?} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyHgAirFnWTdb( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>   enthalpy of the gas {units?} | Humidity ratio (kg water vapor/kg dry air) | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncTdpFnTdbTwbPb ) {
-				ReturnValue = SetErlValueNumber( PsyTdpFnTdbTwbPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyTdpFnTdbTwbPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result =>   dew-point temperature {C} | drybulb (C) | wetbulb (C) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTdpFnWPb ) {
-				ReturnValue = SetErlValueNumber( PsyTdpFnWPb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyTdpFnWPb( Operand( 1 ).Number, Operand( 2 ).Number, EMSBuiltInFunction ) ); // result =>  dew-point temperature {C} | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncHFnTdbW ) {
-				ReturnValue = SetErlValueNumber( PsyHFnTdbW( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air)
+				ReturnValue = SetErlValueNumber( PsyHFnTdbW( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  enthalpy (J/kg) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air)
 			} else if ( SELECT_CASE_var == FuncHFnTdbRhPb ) {
-				ReturnValue = SetErlValueNumber( PsyHFnTdbRhPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result =>  enthalpy (J/kg) | drybulb (C) | relative humidity value (0.0 - 1.0) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyHFnTdbRhPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result =>  enthalpy (J/kg) | drybulb (C) | relative humidity value (0.0 - 1.0) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTdbFnHW ) {
-				ReturnValue = SetErlValueNumber( PsyTdbFnHW( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
+				ReturnValue = SetErlValueNumber( PsyTdbFnHW( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  dry-bulb temperature {C} | enthalpy (J/kg) | Humidity ratio (kg water vapor/kg dry air)
 			} else if ( SELECT_CASE_var == FuncRhovFnTdbRh ) {
-				ReturnValue = SetErlValueNumber( PsyRhovFnTdbRh( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
+				ReturnValue = SetErlValueNumber( PsyRhovFnTdbRh( Operand( 1 ).Number, Operand( 2 ).Number, EMSBuiltInFunction ) ); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
 			} else if ( SELECT_CASE_var == FuncRhovFnTdbRhLBnd0C ) {
-				ReturnValue = SetErlValueNumber( PsyRhovFnTdbRhLBnd0C( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
+				ReturnValue = SetErlValueNumber( PsyRhovFnTdbRhLBnd0C( Operand( 1 ).Number, Operand( 2 ).Number ) ); // result =>  Vapor density in air (kg/m3) | drybulb (C) | relative humidity value (0.0 - 1.0)
 			} else if ( SELECT_CASE_var == FuncRhovFnTdbWPb ) {
-				ReturnValue = SetErlValueNumber( PsyRhovFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result =>  Vapor density in air (kg/m3) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyRhovFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number ) ); // result =>  Vapor density in air (kg/m3) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncRhFnTdbRhov ) {
-				ReturnValue = SetErlValueNumber( PsyRhFnTdbRhov( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result => relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
+				ReturnValue = SetErlValueNumber( PsyRhFnTdbRhov( Operand( 1 ).Number, Operand( 2 ).Number, EMSBuiltInFunction ) ); // result => relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
 			} else if ( SELECT_CASE_var == FuncRhFnTdbRhovLBnd0C ) {
-				ReturnValue = SetErlValueNumber( PsyRhFnTdbRhovLBnd0C( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
+				ReturnValue = SetErlValueNumber( PsyRhFnTdbRhovLBnd0C( Operand( 1 ).Number, Operand( 2 ).Number, EMSBuiltInFunction ) ); // relative humidity value (0.0-1.0) | drybulb (C) | vapor density in air (kg/m3)
 			} else if ( SELECT_CASE_var == FuncRhFnTdbWPb ) {
-				ReturnValue = SetErlValueNumber( PsyRhFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result =>  relative humidity value (0.0-1.0) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyRhFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result =>  relative humidity value (0.0-1.0) | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncTwbFnTdbWPb ) {
-				ReturnValue = SetErlValueNumber( PsyTwbFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result=> Temperature Wet-Bulb {C} | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyTwbFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result=> Temperature Wet-Bulb {C} | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncVFnTdbWPb ) {
-				ReturnValue = SetErlValueNumber( PsyVFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result=> specific volume {m3/kg} | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyVFnTdbWPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result=> specific volume {m3/kg} | drybulb (C) | Humidity ratio (kg water vapor/kg dry air) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncWFnTdpPb ) {
-				ReturnValue = SetErlValueNumber( PsyWFnTdpPb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | dew point temperature (C) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyWFnTdpPb( Operand( 1 ).Number, Operand( 2 ).Number, EMSBuiltInFunction ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | dew point temperature (C) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncWFnTdbH ) {
-				ReturnValue = SetErlValueNumber( PsyWFnTdbH( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | enthalpy (J/kg)
+				ReturnValue = SetErlValueNumber( PsyWFnTdbH( Operand( 1 ).Number, Operand( 2 ).Number, EMSBuiltInFunction ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | enthalpy (J/kg)
 			} else if ( SELECT_CASE_var == FuncWFnTdbTwbPb ) {
-				ReturnValue = SetErlValueNumber( PsyWFnTdbTwbPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | wet-bulb temperature {C} | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyWFnTdbTwbPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | wet-bulb temperature {C} | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncWFnTdbRhPb ) {
-				ReturnValue = SetErlValueNumber( PsyWFnTdbRhPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, "EMS Built-In Function" ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | relative humidity value (0.0-1.0) | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyWFnTdbRhPb( Operand( 1 ).Number, Operand( 2 ).Number, Operand( 3 ).Number, EMSBuiltInFunction ) ); // result=> humidity ratio  (kg water vapor/kg dry air) | drybulb (C) | relative humidity value (0.0-1.0) | pressure (Pa)
 			} else if ( SELECT_CASE_var == FuncPsatFnTemp ) {
-				ReturnValue = SetErlValueNumber( PsyPsatFnTemp( Operand( 1 ).Number, "EMS Built-In Function" ) ); // result=> saturation pressure {Pascals} | drybulb (C)
+				ReturnValue = SetErlValueNumber( PsyPsatFnTemp( Operand( 1 ).Number, EMSBuiltInFunction ) ); // result=> saturation pressure {Pascals} | drybulb (C)
 			} else if ( SELECT_CASE_var == FuncTsatFnHPb ) {
-				ReturnValue = SetErlValueNumber( PsyTsatFnHPb( Operand( 1 ).Number, Operand( 2 ).Number, "EMS Built-In Function" ) ); // result=> saturation temperature {C} | enthalpy {J/kg} | pressure (Pa)
+				ReturnValue = SetErlValueNumber( PsyTsatFnHPb( Operand( 1 ).Number, Operand( 2 ).Number, EMSBuiltInFunction ) ); // result=> saturation temperature {C} | enthalpy {J/kg} | pressure (Pa)
 				//      CASE (FuncTsatFnPb)
 				//        ReturnValue = NumberValue( &   ! result=> saturation temperature {C}
 				//                        PsyTsatFnPb(Operand(1)%Number, & ! pressure (Pa)
 				//                                    'EMS Built-In Function') )
 			} else if ( SELECT_CASE_var == FuncCpCW ) {
-				ReturnValue = SetErlValueNumber( CPCW( Operand( 1 ).Number, "EMS Built-In Function" ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
+				ReturnValue = SetErlValueNumber( CPCW( Operand( 1 ).Number ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
 			} else if ( SELECT_CASE_var == FuncCpHW ) {
-				ReturnValue = SetErlValueNumber( CPHW( Operand( 1 ).Number, "EMS Built-In Function" ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
+				ReturnValue = SetErlValueNumber( CPHW( Operand( 1 ).Number ) ); // result => specific heat of water (J/kg-K) = 4180.d0 | temperature (C) unused
 			} else if ( SELECT_CASE_var == FuncRhoH2O ) {
-				ReturnValue = SetErlValueNumber( RhoH2O( Operand( 1 ).Number, "EMS Built-In Function" ) ); // result => density of water (kg/m3) | temperature (C)
+				ReturnValue = SetErlValueNumber( RhoH2O( Operand( 1 ).Number ) ); // result => density of water (kg/m3) | temperature (C)
 			} else if ( SELECT_CASE_var == FuncFatalHaltEp ) {
 
 				ShowSevereError( "EMS user program found serious problem and is halting simulation" );
@@ -2439,7 +2444,7 @@ namespace RuntimeLanguageProcessor {
 
 						if ( thisIndex <= TrendVariable( thisTrend ).LogDepth ) {
 							// closed form solution for slope of linear least squares fit
-							thisSlope = ( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ) * sum( TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) - thisIndex * sum( ( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) * TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) ) ) / ( std::pow( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ), 2 ) - thisIndex * sum( pow( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ), 2 ) ) );
+							thisSlope = ( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ) * sum( TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) - thisIndex * sum( ( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) * TrendVariable( thisTrend ).TrendValARR( {1,thisIndex} ) ) ) ) / ( pow_2( sum( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ) ) ) - thisIndex * sum( pow( TrendVariable( thisTrend ).TimeARR( {1,thisIndex} ), 2 ) ) );
 							ReturnValue = SetErlValueNumber( thisSlope, Operand( 1 ) ); // rate of change per hour
 						} else {
 							ReturnValue.Type = ValueError;
@@ -2525,7 +2530,6 @@ namespace RuntimeLanguageProcessor {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetRuntimeLanguageUserInput: " );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -3394,7 +3398,7 @@ namespace RuntimeLanguageProcessor {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		gio::write( String, "*" ) << Number; // Could add formatting here
+		gio::write( String, fmtLD ) << Number; // Could add formatting here
 		strip( String );
 
 		return String;
@@ -4106,7 +4110,7 @@ namespace RuntimeLanguageProcessor {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

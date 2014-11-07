@@ -3647,7 +3647,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SingZoneRhSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = SingZoneRhSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( SingZoneRhSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 				}
 			}
@@ -3660,7 +3660,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SingZoneHtSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = SingZoneHtSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( SingZoneHtSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 				}
 			}
@@ -3673,7 +3673,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= SingZoneClSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = SingZoneClSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( SingZoneClSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 				}
 			}
@@ -3683,9 +3683,9 @@ namespace SetPointManager {
 				Node( MixedAirSetPtMgr( SetPtMgrNum ).RefNode ).MassFlowRate = 0.0;
 				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanInNode ).MassFlowRate = 0.0;
 				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanOutNode ).MassFlowRate = 0.0;
-				Node( MixedAirSetPtMgr( SetPtMgrNum ).RefNode ).Temp = 20.;
-				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanInNode ).Temp = 20.;
-				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanOutNode ).Temp = 20.;
+				Node( MixedAirSetPtMgr( SetPtMgrNum ).RefNode ).Temp = 20.0;
+				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanInNode ).Temp = 20.0;
+				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanOutNode ).Temp = 20.0;
 				Node( MixedAirSetPtMgr( SetPtMgrNum ).RefNode ).HumRat = OutHumRat;
 				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanInNode ).HumRat = OutHumRat;
 				Node( MixedAirSetPtMgr( SetPtMgrNum ).FanOutNode ).HumRat = OutHumRat;
@@ -3701,7 +3701,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= MixedAirSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = MixedAirSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( MixedAirSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 				}
 			}
@@ -3712,10 +3712,10 @@ namespace SetPointManager {
 				Node( OAPretreatSetPtMgr( SetPtMgrNum ).MixedOutNode ).MassFlowRate = 0.0;
 				Node( OAPretreatSetPtMgr( SetPtMgrNum ).OAInNode ).MassFlowRate = 0.0;
 				Node( OAPretreatSetPtMgr( SetPtMgrNum ).ReturnInNode ).MassFlowRate = 0.0;
-				Node( OAPretreatSetPtMgr( SetPtMgrNum ).RefNode ).Temp = 20.;
-				Node( OAPretreatSetPtMgr( SetPtMgrNum ).MixedOutNode ).Temp = 20.;
-				Node( OAPretreatSetPtMgr( SetPtMgrNum ).OAInNode ).Temp = 20.;
-				Node( OAPretreatSetPtMgr( SetPtMgrNum ).ReturnInNode ).Temp = 20.;
+				Node( OAPretreatSetPtMgr( SetPtMgrNum ).RefNode ).Temp = 20.0;
+				Node( OAPretreatSetPtMgr( SetPtMgrNum ).MixedOutNode ).Temp = 20.0;
+				Node( OAPretreatSetPtMgr( SetPtMgrNum ).OAInNode ).Temp = 20.0;
+				Node( OAPretreatSetPtMgr( SetPtMgrNum ).ReturnInNode ).Temp = 20.0;
 				Node( OAPretreatSetPtMgr( SetPtMgrNum ).RefNode ).HumRat = OutHumRat;
 				Node( OAPretreatSetPtMgr( SetPtMgrNum ).MixedOutNode ).HumRat = OutHumRat;
 				Node( OAPretreatSetPtMgr( SetPtMgrNum ).OAInNode ).HumRat = OutHumRat;
@@ -3735,7 +3735,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= OAPretreatSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = OAPretreatSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( OAPretreatSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 					if ( OAPretreatSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_MaxHumRat ) {
 						Node( NodeNum ).HumRatMax = OutHumRat; // Set the setpoint
@@ -3753,7 +3753,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= WarmestSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = WarmestSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( WarmestSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 				}
 			}
@@ -3762,7 +3762,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= ColdestSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = ColdestSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( ColdestSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 				}
 			}
@@ -3771,7 +3771,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= WarmestSetPtMgrTempFlow( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = WarmestSetPtMgrTempFlow( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( WarmestSetPtMgrTempFlow( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the temperature setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the temperature setpoint
 						if ( WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopNum != 0 ) {
 							AirLoopFlow( WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopNum ).ReqSupplyFrac = 1.0; // PH 10/09/04 Set the flow
 							AirLoopControlInfo( WarmestSetPtMgrTempFlow( SetPtMgrNum ).AirLoopNum ).LoopFlowRateSet = true; // PH 10/09/04 Set the flag
@@ -3793,7 +3793,7 @@ namespace SetPointManager {
 				for ( CtrlNodeIndex = 1; CtrlNodeIndex <= MZAverageCoolingSetPtMgr( SetPtMgrNum ).NumCtrlNodes; ++CtrlNodeIndex ) {
 					NodeNum = MZAverageCoolingSetPtMgr( SetPtMgrNum ).CtrlNodes( CtrlNodeIndex ); // Get the node number
 					if ( MZAverageCoolingSetPtMgr( SetPtMgrNum ).CtrlTypeMode == iCtrlVarType_Temp ) {
-						Node( NodeNum ).TempSetPoint = 20.; // Set the setpoint
+						Node( NodeNum ).TempSetPoint = 20.0; // Set the setpoint
 					}
 				}
 			}
@@ -4321,7 +4321,7 @@ namespace SetPointManager {
 			SchedVal = 0.0;
 		}
 
-		if ( SchedVal == 2. ) {
+		if ( SchedVal == 2.0 ) {
 			OutLowTemp = OutAirSetPtMgr( SetPtMgrNum ).OutLow2;
 			OutHighTemp = OutAirSetPtMgr( SetPtMgrNum ).OutHigh2;
 			SetTempAtOutLow = OutAirSetPtMgr( SetPtMgrNum ).OutLowSetPt2;
@@ -6340,7 +6340,7 @@ namespace SetPointManager {
 			// In this section we find the worst case of (Cond ent - Evap lvg) for the
 			// chillers that are running.
 			Cur_MinLiftTD = 9999.0;
-			temp_MinLiftTD = 20. / 1.8;
+			temp_MinLiftTD = 20.0 / 1.8;
 			temp_MinLiftTD = CondInletTemp - EvapOutletTemp;
 			Cur_MinLiftTD = min( Cur_MinLiftTD, temp_MinLiftTD );
 		}
@@ -6529,7 +6529,7 @@ namespace SetPointManager {
 							RunSubOptCondEntTemp = false;
 							RunFinalOptCondEntTemp = true;
 						} else {
-							CondWaterSetPoint = CondWaterSetPoint;
+							//CondWaterSetPoint = CondWaterSetPoint; // Self-assignment commented out
 							TotEnergyPre = 0.0;
 							RunOptCondEntTemp = false;
 							RunSubOptCondEntTemp = false;
@@ -7580,7 +7580,7 @@ namespace SetPointManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

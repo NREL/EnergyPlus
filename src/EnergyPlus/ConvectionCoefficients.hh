@@ -4,7 +4,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -23,12 +22,9 @@ namespace ConvectionCoefficients {
 	// MODULE PARAMETER DEFINITIONS:
 	extern Real64 const AdaptiveHcInsideLowLimit; // W/m2-K
 	extern Real64 const AdaptiveHcOutsideLowLimit; // W/m2-K
-	extern gio::Fmt const fmtx;
-	extern gio::Fmt const fmty;
 
 	extern Real64 const MinFlow; // Minimum mass flow rate
 	extern Real64 const MaxACH; // Maximum ceiling diffuser correlation limit
-	extern std::string const Blank;
 
 	extern Real64 const OneThird; // 1/3 in highest precision
 	extern Real64 const OneFourth; // 1/4 in highest precision
@@ -1225,7 +1221,7 @@ namespace ConvectionCoefficients {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

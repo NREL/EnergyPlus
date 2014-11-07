@@ -641,6 +641,54 @@ namespace RefrigeratedCase {
 			DeltaDefrostEnergy( DeltaDefrostEnergy )
 		{}
 
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			TotalCoolingLoad = 0.0;
+			TotalCoolingEnergy = 0.0;
+			SensCoolingEnergyRate = 0.0;
+			SensCoolingEnergy = 0.0;
+			LatCoolingEnergyRate = 0.0;
+			LatCoolingEnergy = 0.0;
+			SensZoneCreditRate = 0.0;
+			SensZoneCreditCoolRate = 0.0;
+			SensZoneCreditCool = 0.0;
+			SensZoneCreditHeatRate = 0.0;
+			SensZoneCreditHeat = 0.0;
+			LatZoneCreditRate = 0.0;
+			LatZoneCredit = 0.0;
+			SensHVACCreditRate = 0.0;
+			SensHVACCreditCoolRate = 0.0;
+			SensHVACCreditCool = 0.0;
+			SensHVACCreditHeatRate = 0.0;
+			SensHVACCreditHeat = 0.0;
+			LatHVACCreditRate = 0.0;
+			LatHVACCredit = 0.0;
+			ElecFanPower = 0.0;
+			ElecFanConsumption = 0.0;
+			ElecAntiSweatPower = 0.0;
+			ElecAntiSweatConsumption = 0.0;
+			ElecLightingPower = 0.0;
+			ElecLightingConsumption = 0.0;
+			ElecDefrostPower = 0.0;
+			ElecDefrostConsumption = 0.0;
+			DefEnergyCurveValue = 0.0;
+			LatEnergyCurveValue = 0.0;
+			HotDefrostCondCredit = 0.0;
+		}
+
+		// Reset Accumulation and Carry-Over Values to Zeros
+		void
+		reset_init_accum()
+		{
+			DefrostEnergy = 0.0;
+			StockingEnergy = 0.0;
+			WarmEnvEnergy = 0.0;
+			KgFrost = 0.0;
+			StoredEnergy = 0.0;
+		}
+
 	};
 
 	struct RefrigRackData
@@ -952,6 +1000,25 @@ namespace RefrigeratedCase {
 			OutletTempMax( OutletTempMax ),
 			TotalCoolingLoad( TotalCoolingLoad )
 		{}
+
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			SensHVACCreditHeatRate = 0.0;
+			SensHVACCreditHeat = 0.0;
+			SensZoneCreditHeatRate = 0.0;
+			SensZoneCreditHeat = 0.0;
+			CondLoad = 0.0;
+			CondEnergy = 0.0;
+			MassFlowRate = 0.0;
+			RackElecConsumption = 0.0;
+			CondenserFanConsumption = 0.0;
+			EvapPumpConsumption = 0.0;
+			RackCompressorPower = 0.0;
+			ActualCondenserFanPower = 0.0;
+			ActualEvapPumpPower = 0.0;
+		}
 
 	};
 
@@ -1351,6 +1418,28 @@ namespace RefrigeratedCase {
 			UnmetEnergySaved( UnmetEnergySaved )
 		{}
 
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			TotalCoolingLoad = 0.0;
+			TotalCondDefrostCredit = 0.0;
+			SumSecondaryLoopLoad = 0.0;
+			SumMechSCBenefit = 0.0;
+			NetHeatRejectLoad = 0.0;
+			NetHeatRejectEnergy = 0.0;
+			AverageCompressorCOP = 0.0;
+			TotCompCapacity = 0.0;
+			TotHiStageCompCapacity = 0.0;
+			TotCompElecConsump = 0.0;
+			TotHiStageCompElecConsump = 0.0;
+			TotCompElecConsumpTwoStage = 0.0;
+			TotCompPower = 0.0;
+			TotHiStageCompPower = 0.0;
+			TotCompCoolingEnergy = 0.0;
+			TotHiStageCompCoolingEnergy = 0.0;
+		}
+
 	};
 
 	struct TransRefrigSystemData
@@ -1749,6 +1838,24 @@ namespace RefrigeratedCase {
 			UnmetEnergySavedMT( UnmetEnergySavedMT ),
 			UnmetEnergySavedLT( UnmetEnergySavedLT )
 		{}
+
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			TotalCoolingLoadMT = 0.0;
+			TotalCoolingLoadLT = 0.0;
+			TotalCondDefrostCredit = 0.0;
+			NetHeatRejectLoad = 0.0;
+			NetHeatRejectEnergy = 0.0;
+			AverageCompressorCOP = 0.0;
+			TotCompCapacityHP = 0.0;
+			TotCompCapacityLP = 0.0;
+			TotCompElecConsump = 0.0;
+			TotCompPowerHP = 0.0;
+			TotCompPowerLP = 0.0;
+			TotCompCoolingEnergy = 0.0;
+		}
 
 	};
 
@@ -2207,6 +2314,28 @@ namespace RefrigeratedCase {
 			LaggedUsedHVACCoil( LaggedUsedHVACCoil )
 		{}
 
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			CondLoad = 0.0;
+			CondEnergy = 0.0;
+			MassFlowRate = 0.0;
+			ActualFanPower = 0.0;
+			FanElecEnergy = 0.0;
+			EvapWaterConsumpRate = 0.0;
+			EvapWaterConsumption = 0.0;
+			ActualEvapPumpPower = 0.0;
+			EvapPumpConsumption = 0.0;
+			ExternalHeatRecoveredLoad = 0.0;
+			ExternalEnergyRecovered = 0.0;
+			InternalHeatRecoveredLoad = 0.0;
+			InternalEnergyRecovered = 0.0;
+			TotalHeatRecoveredLoad = 0.0;
+			TotalHeatRecoveredEnergy = 0.0;
+			// LowTempWarn = 0
+		}
+
 	};
 
 	struct RefrigGasCoolerData
@@ -2376,6 +2505,20 @@ namespace RefrigeratedCase {
 			TransitionTemperature( TransitionTemperature )
 		{}
 
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			GasCoolerLoad = 0.0;
+			GasCoolerEnergy = 0.0;
+			ActualFanPower = 0.0;
+			FanElecEnergy = 0.0;
+			InternalHeatRecoveredLoad = 0.0;
+			InternalEnergyRecovered = 0.0;
+			TotalHeatRecoveredLoad = 0.0;
+			TotalHeatRecoveredEnergy = 0.0;
+		}
+
 	};
 
 	struct RefrigCompressorData
@@ -2477,6 +2620,14 @@ namespace RefrigeratedCase {
 			EndUseSubcategory( EndUseSubcategory ),
 			TransFlag( TransFlag )
 		{}
+
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			ElecConsumption = 0.0;
+			Power = 0.0;
+		}
 
 	};
 
@@ -2814,6 +2965,17 @@ namespace RefrigeratedCase {
 			UnmetEnergySaved( UnmetEnergySaved )
 		{}
 
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			TotalCoolingLoad = 0.0;
+			PumpPowerTotal = 0.0;
+			PumpElecEnergyTotal = 0.0;
+			ReceiverZoneHeatGain = 0.0;
+			DistPipeZoneHeatGain = 0.0;
+		}
+
 	};
 
 	struct TransferLoadListDef // Derived Type for Transfer Load (Secondary and Cascade) Lists
@@ -3130,6 +3292,29 @@ namespace RefrigeratedCase {
 			SensZoneCreditHeat( SensZoneCreditHeat )
 		{}
 
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			HotDefrostCondCredit = 0.0;
+			TotalCoolingLoad = 0.0;
+			TotalCoolingEnergy = 0.0;
+			TotSensCoolingEnergyRate = 0.0;
+			TotSensCoolingEnergy = 0.0;
+			TotLatCoolingEnergyRate = 0.0;
+			TotLatCoolingEnergy = 0.0;
+			ElecFanPower = 0.0;
+			ElecFanConsumption = 0.0;
+			ElecHeaterPower = 0.0;
+			ElecHeaterConsumption = 0.0;
+			ElecLightingPower = 0.0;
+			ElecLightingConsumption = 0.0;
+			TotalElecPower = 0.0;
+			TotalElecConsumption = 0.0;
+			ElecDefrostPower = 0.0;
+			ElecDefrostConsumption = 0.0;
+		}
+
 	};
 
 	struct CaseWIZoneReportData
@@ -3188,6 +3373,23 @@ namespace RefrigeratedCase {
 			TotHtXferToZoneEnergy( TotHtXferToZoneEnergy ),
 			SenCaseCreditToZoneEnergy( SenCaseCreditToZoneEnergy )
 		{}
+
+		// Reset to Zeros
+		void
+		reset()
+		{
+			LatCoolingToZoneRate = 0.0;
+			LatCoolingToZoneEnergy = 0.0;
+			SenCoolingToZoneRate = 0.0;
+			SenCoolingToZoneEnergy = 0.0;
+			HeatingToZoneRate = 0.0;
+			HeatingToZoneEnergy = 0.0;
+			TotCoolingToZoneRate = 0.0;
+			TotCoolingToZoneEnergy = 0.0;
+			TotHtXferToZoneRate = 0.0;
+			TotHtXferToZoneEnergy = 0.0;
+			SenCaseCreditToZoneEnergy = 0.0;
+		}
 
 	};
 
@@ -3509,6 +3711,36 @@ namespace RefrigeratedCase {
 			TotalElecConsumption( TotalElecConsumption )
 		{}
 
+		// Reset Initialization Values to Zeros
+		void
+		reset_init()
+		{
+			HotDefrostCondCredit = 0.0;
+			TotalCoolingLoad = 0.0;
+			TotalCoolingEnergy = 0.0;
+			SensCoolingEnergyRate = 0.0;
+			SensCoolingEnergy = 0.0;
+			SensCreditRate = 0.0;
+			LatKgPerS_ToZone = 0.0;
+			SensHeatRatio = 0.0;
+			LatCreditEnergy = 0.0;
+			LatCreditRate = 0.0;
+			ElecFanPower = 0.0;
+			ElecFanConsumption = 0.0;
+			ElecHeaterPower = 0.0;
+			ElecHeaterConsumption = 0.0;
+			TotalElecPower = 0.0;
+			TotalElecConsumption = 0.0;
+			ElecDefrostPower = 0.0;
+			ElecDefrostConsumption = 0.0;
+			ReportTotalCoolCreditRate = 0.0;
+			ReportTotalCoolCreditEnergy = 0.0;
+			ReportSensCoolCreditRate = 0.0;
+			ReportHeatingCreditRate = 0.0;
+			ReportSensCoolCreditEnergy = 0.0;
+			ReportHeatingCreditEnergy = 0.0;
+		}
+
 	};
 
 	struct AirChillerSetData
@@ -3637,6 +3869,26 @@ namespace RefrigeratedCase {
 			ReportTotCoolingToZoneRate( ReportTotCoolingToZoneRate ),
 			ReportTotCoolingToZoneEnergy( ReportTotCoolingToZoneEnergy )
 		{}
+
+		// Reset to Zeros
+		void
+		reset()
+		{
+			LatCreditToZoneRate = 0.0;
+			LatCreditToZoneEnergy = 0.0;
+			LatKgPerS_ToZoneRate = 0.0;
+			SenCreditToZoneRate = 0.0;
+			SenCreditToZoneEnergy = 0.0;
+			ReportH20RemovedKgPerS_FromZoneRate = 0.0;
+			ReportLatCreditToZoneRate = 0.0;
+			ReportLatCreditToZoneEnergy = 0.0;
+			ReportHeatingToZoneRate = 0.0;
+			ReportHeatingToZoneEnergy = 0.0;
+			ReportSenCoolingToZoneRate = 0.0;
+			ReportSenCoolingToZoneEnergy = 0.0;
+			ReportTotCoolingToZoneRate = 0.0;
+			ReportTotCoolingToZoneEnergy = 0.0;
+		}
 
 	};
 
@@ -3869,7 +4121,7 @@ namespace RefrigeratedCase {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

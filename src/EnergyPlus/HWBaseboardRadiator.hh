@@ -94,6 +94,8 @@ namespace HWBaseboardRadiator {
 		int BBLoadReSimIndex;
 		int BBMassFlowReSimIndex;
 		int BBInletTempFlowReSimIndex;
+		int HeatingCapMethod; // - Method for heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		HWBaseboardParams() :
@@ -143,7 +145,9 @@ namespace HWBaseboardRadiator {
 			CompNum( 0 ),
 			BBLoadReSimIndex( 0 ),
 			BBMassFlowReSimIndex( 0 ),
-			BBInletTempFlowReSimIndex( 0 )
+			BBInletTempFlowReSimIndex( 0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -199,7 +203,9 @@ namespace HWBaseboardRadiator {
 			int const CompNum, // plant loop component index
 			int const BBLoadReSimIndex,
 			int const BBMassFlowReSimIndex,
-			int const BBInletTempFlowReSimIndex
+			int const BBInletTempFlowReSimIndex,
+			int const HeatingCapMethod, // - Method for HW baseboard heating capacity scalable sizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity // - HW baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
 		) :
 			EquipID( EquipID ),
 			EquipType( EquipType ),
@@ -252,13 +258,32 @@ namespace HWBaseboardRadiator {
 			CompNum( CompNum ),
 			BBLoadReSimIndex( BBLoadReSimIndex ),
 			BBMassFlowReSimIndex( BBMassFlowReSimIndex ),
-			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex )
+			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
+		{}
+	};
+
+	struct HWBaseboardNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		HWBaseboardNumericFieldData()
 		{}
 
+		// Member Constructor
+		HWBaseboardNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
 	};
 
 	// Object Data
 	extern FArray1D< HWBaseboardParams > HWBaseboard;
+	extern FArray1D< HWBaseboardNumericFieldData > HWBaseboardNumericFields;
 
 	// Functions
 
@@ -328,7 +353,7 @@ namespace HWBaseboardRadiator {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

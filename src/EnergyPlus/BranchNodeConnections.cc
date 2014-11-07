@@ -45,7 +45,7 @@ namespace BranchNodeConnections {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -797,9 +797,9 @@ namespace BranchNodeConnections {
 		bool ErrInObject;
 		int Which;
 
-		InletNodeName = Blank;
+		InletNodeName = BlankString;
 		InletNodeNum = 0;
-		OutletNodeName = Blank;
+		OutletNodeName = BlankString;
 		OutletNodeNum = 0;
 		ErrInObject = false;
 
@@ -1160,10 +1160,10 @@ namespace BranchNodeConnections {
 		OutletNodeNums.allocate( NumOutlets );
 		OutletFluidStreams.allocate( NumOutlets );
 
-		InletNodeNames = Blank;
+		InletNodeNames = BlankString;
 		InletNodeNums = 0;
 		InletFluidStreams = 0;
-		OutletNodeNames = Blank;
+		OutletNodeNames = BlankString;
 		OutletNodeNums = 0;
 		OutletFluidStreams = 0;
 		NumInlets = 0;
@@ -1262,11 +1262,11 @@ namespace BranchNodeConnections {
 		//unused1109  LOGICAL Matched
 		int CountMatchLoop;
 
-		ChildrenCType = Blank;
-		ChildrenCName = Blank;
-		InletNodeName = Blank;
+		ChildrenCType = BlankString;
+		ChildrenCName = BlankString;
+		InletNodeName = BlankString;
 		InletNodeNum = 0;
-		OutletNodeName = Blank;
+		OutletNodeName = BlankString;
 		OutletNodeNum = 0;
 		ErrInObject = false;
 
@@ -1282,10 +1282,10 @@ namespace BranchNodeConnections {
 				ChildOutNodeName.allocate( NumChildren );
 				ChildInNodeNum.allocate( NumChildren );
 				ChildOutNodeNum.allocate( NumChildren );
-				ChildCType = Blank;
-				ChildCName = Blank;
-				ChildInNodeName = Blank;
-				ChildOutNodeName = Blank;
+				ChildCType = BlankString;
+				ChildCName = BlankString;
+				ChildInNodeName = BlankString;
+				ChildOutNodeName = BlankString;
 				ChildInNodeNum = 0;
 				ChildOutNodeNum = 0;
 				CountNum = 0;
@@ -1335,7 +1335,7 @@ namespace BranchNodeConnections {
 								InletNodeNum( CountNum ) = ChildInNodeNum( Loop );
 								OutletNodeName( CountNum ) = ChildOutNodeName( Loop );
 								OutletNodeNum( CountNum ) = ChildOutNodeNum( Loop );
-								ChildInNodeName( Loop ) = Blank; // So it won't match anymore
+								ChildInNodeName( Loop ).clear(); // So it won't match anymore
 								//              Matched=.TRUE.
 								MatchNodeName = ChildOutNodeName( Loop );
 								break;
@@ -1357,7 +1357,7 @@ namespace BranchNodeConnections {
 					}
 					if ( MatchNodeName != ParentOutletNodeName ) {
 						for ( Loop = 1; Loop <= NumChildren; ++Loop ) {
-							if ( ChildInNodeName( Loop ) == Blank ) continue;
+							if ( ChildInNodeName( Loop ).empty() ) continue;
 							if ( ChildOutNodeName( Loop ) == ParentOutletNodeName ) break;
 							//            CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
 							//                                 'Required Child Node, not matched.  Expected (Last) Outlet Node='//  &
@@ -1369,7 +1369,7 @@ namespace BranchNodeConnections {
 						}
 					}
 					for ( Loop = 1; Loop <= NumChildren; ++Loop ) {
-						if ( ChildInNodeName( Loop ) == Blank ) continue;
+						if ( ChildInNodeName( Loop ).empty() ) continue;
 						++CountNum;
 						ChildrenCType( CountNum ) = ChildCType( Loop );
 						ChildrenCName( CountNum ) = ChildCName( Loop );
@@ -1565,12 +1565,12 @@ namespace BranchNodeConnections {
 				TempCompSets( {1,NumCompSets - 1} ) = CompSets;
 				CompSets.deallocate();
 			}
-			TempCompSets( NumCompSets ).CName = Blank;
-			TempCompSets( NumCompSets ).CType = Blank;
-			TempCompSets( NumCompSets ).InletNodeName = Blank;
-			TempCompSets( NumCompSets ).OutletNodeName = Blank;
-			TempCompSets( NumCompSets ).ParentCType = Blank;
-			TempCompSets( NumCompSets ).ParentCName = Blank;
+			TempCompSets( NumCompSets ).CName = BlankString;
+			TempCompSets( NumCompSets ).CType = BlankString;
+			TempCompSets( NumCompSets ).InletNodeName = BlankString;
+			TempCompSets( NumCompSets ).OutletNodeName = BlankString;
+			TempCompSets( NumCompSets ).ParentCType = BlankString;
+			TempCompSets( NumCompSets ).ParentCName = BlankString;
 			TempCompSets( NumCompSets ).Description = "UNDEFINED";
 			CompSets.allocate( NumCompSets );
 			CompSets = TempCompSets;
@@ -2026,7 +2026,7 @@ namespace BranchNodeConnections {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

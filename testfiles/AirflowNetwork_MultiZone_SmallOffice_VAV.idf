@@ -128,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -2946,7 +2946,7 @@
   Fan:ZoneExhaust,
     Zone3 Exhaust Fan,       !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     500,                     !- Pressure Rise {Pa}
     0.001,                   !- Maximum Flow Rate {m3/s}
     Zone3 Exhaust Node,      !- Air Inlet Node Name
@@ -3138,8 +3138,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
 ! Outdoor air specification should be consistent with Sizing:Zone object inputs.
@@ -3251,7 +3258,7 @@
     ACDXCoil 1,              !- Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
     autosize,                !- High Speed Gross Rated Total Cooling Capacity {W}
-    0.8,                    !- High Speed Rated Sensible Heat Ratio
+    0.8,                     !- High Speed Rated Sensible Heat Ratio
     3.0,                     !- High Speed Gross Rated Cooling COP {W/W}
     autosize,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
@@ -3263,7 +3270,7 @@
     PackagedRatedCoolEIRFFlow,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     VarSpeedCyclingPLFFPLR,  !- Part Load Fraction Correlation Curve Name
     autosize,                !- Low Speed Gross Rated Total Cooling Capacity {W}
-    0.8,                    !- Low Speed Gross Rated Sensible Heat Ratio
+    0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio
     4.2,                     !- Low Speed Gross Rated Cooling COP {W/W}
     autosize,                !- Low Speed Rated Air Flow Rate {m3/s}
     VarSpeedCoolCapLSFT,     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
@@ -3273,7 +3280,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method

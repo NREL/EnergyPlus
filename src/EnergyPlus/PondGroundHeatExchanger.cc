@@ -80,6 +80,8 @@ namespace PondGroundHeatExchanger {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
+	static std::string const BlankString;
+	static std::string const fluidNameWater( "WATER" );
 	Real64 const SmallNum( 1.0e-30 ); // Very small number to avoid div0 errors
 	Real64 const StefBoltzmann( 5.6697e-08 ); // Stefan-Boltzmann constant
 	//  REAL(r64), PARAMETER :: KelvinConv    = KelvinConv           ! Conversion from Celsius to Kelvin
@@ -265,7 +267,7 @@ namespace PondGroundHeatExchanger {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -295,7 +297,7 @@ namespace PondGroundHeatExchanger {
 		CheckEquipName = true;
 
 		// record fluid prop index for water
-		WaterIndex = FindGlycol( "WATER" );
+		WaterIndex = FindGlycol( fluidNameWater );
 
 		// Obtain all of the user data related to the ponds...
 		for ( Item = 1; Item <= NumOfPondGHEs; ++Item ) {
@@ -481,6 +483,7 @@ namespace PondGroundHeatExchanger {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const DesignVelocity( 0.5 ); // Hypothetical design max pipe velocity [m/s]
 		Real64 const PondHeight( 0.0 ); // for now
+		static std::string const RoutineName( "InitPondGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -526,10 +529,10 @@ namespace PondGroundHeatExchanger {
 			if ( errFlag ) {
 				ShowFatalError( "InitPondGroundHeatExchanger: Program terminated due to previous condition(s)." );
 			}
-			rho = GetDensityGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, "InitPondGroundHeatExchanger" );
-			Cp = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, "InitPondGroundHeatExchanger" );
-			PondGHE( PondGHENum ).DesignMassFlowRate = Pi / 4.0 * std::pow( PondGHE( PondGHENum ).TubeInDiameter, 2 ) * DesignVelocity * rho * PondGHE( PondGHENum ).NumCircuits;
-			PondGHE( PondGHENum ).DesignCapacity = PondGHE( PondGHENum ).DesignMassFlowRate * Cp * 10.; //assume 10C delta T?
+			rho = GetDensityGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
+			Cp = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, constant_zero, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
+			PondGHE( PondGHENum ).DesignMassFlowRate = Pi / 4.0 * pow_2( PondGHE( PondGHENum ).TubeInDiameter ) * DesignVelocity * rho * PondGHE( PondGHENum ).NumCircuits;
+			PondGHE( PondGHENum ).DesignCapacity = PondGHE( PondGHENum ).DesignMassFlowRate * Cp * 10.0; //assume 10C delta T?
 			InitComponentNodes( 0.0, PondGHE( PondGHENum ).DesignMassFlowRate, PondGHE( PondGHENum ).InletNodeNum, PondGHE( PondGHENum ).OutletNodeNum, PondGHE( PondGHENum ).LoopNum, PondGHE( PondGHENum ).LoopSideNum, PondGHE( PondGHENum ).BranchNum, PondGHE( PondGHENum ).CompNum );
 			RegisterPlantCompDesignFlow( PondGHE( PondGHENum ).InletNodeNum, PondGHE( PondGHENum ).DesignMassFlowRate / rho );
 
@@ -614,7 +617,7 @@ namespace PondGroundHeatExchanger {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcPondGroundHeatExchanger" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -634,9 +637,9 @@ namespace PondGroundHeatExchanger {
 		Real64 SpecificHeat;
 		Real64 PondMass;
 
-		PondMass = PondDepth * PondArea * GetDensityGlycol( "WATER", max( PondTemp, constant_zero ), WaterIndex, "CalcPondGroundHeatExchanger" );
+		PondMass = PondDepth * PondArea * GetDensityGlycol( fluidNameWater, max( PondTemp, constant_zero ), WaterIndex, RoutineName );
 
-		SpecificHeat = GetSpecificHeatGlycol( "WATER", max( PondTemp, constant_zero ), WaterIndex, "CalcPondGroundHeatExchanger" ); //DSU bug fix here, was using working fluid index
+		SpecificHeat = GetSpecificHeatGlycol( fluidNameWater, max( PondTemp, constant_zero ), WaterIndex, RoutineName ); //DSU bug fix here, was using working fluid index
 
 		Flux = CalcTotalFLux( PondTemp, PondGHENum );
 		PondTempStar = PastPondTemp + 0.5 * SecInHour * TimeStepSys * Flux / ( SpecificHeat * PondMass );
@@ -723,6 +726,7 @@ namespace PondGroundHeatExchanger {
 		Real64 const PrantlAir( 0.71 ); // Prantl number for air - assumed constant
 		Real64 const SchmidtAir( 0.6 ); // Schmidt number for air - assumed constant
 		Real64 const PondHeight( 0.0 ); // for now
+		static std::string const RoutineName( "PondGroundHeatExchanger:CalcTotalFlux" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -778,13 +782,13 @@ namespace PondGroundHeatExchanger {
 		FluxConvect = ConvCoef * ( PondBulkTemp - ExternalTemp );
 
 		// long-wave radiation between pond and sky.
-		FluxLongwave = StefBoltzmann * ThermalAbs * ( ( std::pow( SurfTempAbs, 4 ) ) - ( std::pow( SkyTempAbs, 4 ) ) );
+		FluxLongwave = StefBoltzmann * ThermalAbs * ( pow_4( SurfTempAbs ) - pow_4( SkyTempAbs ) );
 
 		// total absorbed solar using function - no ground solar
 		FluxSolAbsorbed = CalcSolarFlux();
 
 		// specific heat from fluid prop routines
-		SpecHeat = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, max( InletTemp, 0.0 ), PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, "PondGroundHeatExchanger:CalcTotalFlux" );
+		SpecHeat = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, max( InletTemp, 0.0 ), PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
 		// heat transfer with fluid - heat exchanger analogy.
 		Qfluid = FlowRate * SpecHeat * CalcEffectiveness( InletTemp, PondBulkTemp, FlowRate, PondGHENum ) * ( InletTemp - PondBulkTemp );
 
@@ -795,9 +799,9 @@ namespace PondGroundHeatExchanger {
 		HumRatioAir = PsyWFnTdbTwbPb( OutDryBulb, OutWetBulb, OutBaroPress );
 		HumRatioFilm = PsyWFnTdbTwbPb( PondBulkTemp, PondBulkTemp, OutBaroPress );
 		SpecHeatAir = PsyCpAirFnWTdb( HumRatioAir, OutDryBulb );
-		LatentHeatAir = PsyHfgAirFnWTdb( HumRatioAir, OutDryBulb, "PondGroundHeatExchanger:CalcTotalFlux" );
+		LatentHeatAir = PsyHfgAirFnWTdb( HumRatioAir, OutDryBulb );
 
-		FluxEvap = std::pow( ( PrantlAir / SchmidtAir ), 2.0 ) / 3.0 * ConvCoef / SpecHeatAir * ( HumRatioFilm - HumRatioAir ) * LatentHeatAir;
+		FluxEvap = pow_2( PrantlAir / SchmidtAir ) / 3.0 * ConvCoef / SpecHeatAir * ( HumRatioFilm - HumRatioAir ) * LatentHeatAir;
 
 		// ground heat transfer flux
 		Perimeter = 4.0 * std::sqrt( PondArea ); // square assumption
@@ -893,8 +897,8 @@ namespace PondGroundHeatExchanger {
 		Absorbtance = std::exp( -PondExtCoef * PondDepth / std::cos( RefractAngle ) );
 
 		// parallel and perpendicular components
-		ParallelRad = std::pow( std::tan( RefractAngle - IncidAngle ), 2 ) / std::pow( std::tan( RefractAngle + IncidAngle ), 2 );
-		PerpendRad = std::pow( std::sin( RefractAngle - IncidAngle ), 2 ) / std::pow( std::sin( RefractAngle + IncidAngle ), 2 );
+		ParallelRad = pow_2( std::tan( RefractAngle - IncidAngle ) ) / pow_2( std::tan( RefractAngle + IncidAngle ) );
+		PerpendRad = pow_2( std::sin( RefractAngle - IncidAngle ) ) / pow_2( std::sin( RefractAngle + IncidAngle ) );
 
 		// transmittance: Tau
 		Transmitance = 0.5 * Absorbtance * ( ( 1.0 - ParallelRad ) / ( 1.0 + ParallelRad ) + ( 1.0 - PerpendRad ) / ( 1.0 + PerpendRad ) );
@@ -963,7 +967,7 @@ namespace PondGroundHeatExchanger {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		Real64 const MaxLaminarRe( 2300. ); // Maximum Reynolds number for laminar flow
+		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		Real64 const GravConst( 9.81 ); // gravitational constant - should be fixed!
 		static std::string const CalledFrom( "PondGroundHeatExchanger:CalcEffectiveness" );
 
@@ -1008,7 +1012,7 @@ namespace PondGroundHeatExchanger {
 
 		// Calculate the Nusselt number based on what flow regime one is in. h = (k)(Nu)/D
 		if ( ReynoldsNum >= MaxLaminarRe ) { // Turbulent flow --> use Dittus-Boelter equation
-			NuseltNum = 0.023 * ( std::pow( ReynoldsNum, ( 0.8 ) ) ) * ( std::pow( PrantlNum, ( 0.3 ) ) );
+			NuseltNum = 0.023 * std::pow( ReynoldsNum, 0.8 ) * std::pow( PrantlNum, 0.3 );
 		} else { // Laminar flow --> use constant surface temperature relation
 			NuseltNum = 3.66;
 		}
@@ -1017,25 +1021,25 @@ namespace PondGroundHeatExchanger {
 		ConvCoefIn = Conductivity * NuseltNum / TubeInDiameter;
 
 		// now find properties of pond water - always assume pond fluid is water
-		WaterSpecHeat = GetSpecificHeatGlycol( "WATER", max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
-		Conductivity = GetConductivityGlycol( "WATER", max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
-		Viscosity = GetViscosityGlycol( "WATER", max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
-		Density = GetDensityGlycol( "WATER", max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
+		WaterSpecHeat = GetSpecificHeatGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
+		Conductivity = GetConductivityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
+		Viscosity = GetViscosityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
+		Density = GetDensityGlycol( fluidNameWater, max( PondTemperature, 0.0 ), WaterIndex, CalledFrom );
 
 		// derived properties for natural convection coefficient
 		// expansion coef (Beta) = -1/Rho. dRho/dT
 		// The following code includes some slight modifications from Simon's original code.
 		// It guarantees that the delta T is 10C and also avoids the problems associated with
 		// water hitting a maximum density at around 4C. (RKS)
-		ExpansionCoef = -( GetDensityGlycol( "WATER", max( PondTemperature, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( "WATER", max( PondTemperature, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * Density );
+		ExpansionCoef = -( GetDensityGlycol( fluidNameWater, max( PondTemperature, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( fluidNameWater, max( PondTemperature, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * Density );
 
 		ThermDiff = Conductivity / ( Density * WaterSpecHeat );
 		PrantlNum = Viscosity * WaterSpecHeat / Conductivity;
 
-		RayleighNum = Density * GravConst * ExpansionCoef * std::abs( InsideTemperature - PondTemperature ) * std::pow( TubeOutDiameter, 3 ) / ( Viscosity * ThermDiff );
+		RayleighNum = Density * GravConst * ExpansionCoef * std::abs( InsideTemperature - PondTemperature ) * pow_3( TubeOutDiameter ) / ( Viscosity * ThermDiff );
 
 		// Calculate the Nusselt number for natural convection at outside of pipe
-		NuseltNum = std::pow( ( 0.6 + ( 0.387 * std::pow( RayleighNum, ( 1.0 / 6.0 ) ) / ( std::pow( ( 1.0 + 0.559 / std::pow( PrantlNum, ( 9.0 / 16.0 ) ) ), ( 8.0 / 27.0 ) ) ) ) ), 2 );
+		NuseltNum = pow_2( 0.6 + ( 0.387 * std::pow( RayleighNum, 1.0 / 6.0 ) / ( std::pow( 1.0 + 0.559 / std::pow( PrantlNum, 9.0 / 16.0 ), 8.0 / 27.0 ) ) ) );
 
 		// outside convection resistance, from Nu
 		ConvCoefOut = Conductivity * NuseltNum / TubeOutDiameter;
@@ -1109,7 +1113,7 @@ namespace PondGroundHeatExchanger {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PondGroundHeatExchanger:Update" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1122,7 +1126,7 @@ namespace PondGroundHeatExchanger {
 
 		// Calculate the water side outlet conditions and set the
 		// appropriate conditions on the correct HVAC node.
-		CpFluid = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, InletTemp, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, "PondGroundHeatExchanger:Update" );
+		CpFluid = GetSpecificHeatGlycol( PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidName, InletTemp, PlantLoop( PondGHE( PondGHENum ).LoopNum ).FluidIndex, RoutineName );
 		// check for flow
 
 		SafeCopyPlantNode( InletNodeNum, OutletNodeNum );
@@ -1201,7 +1205,7 @@ namespace PondGroundHeatExchanger {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

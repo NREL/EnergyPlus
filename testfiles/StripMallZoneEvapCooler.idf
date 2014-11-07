@@ -49,7 +49,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 10
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -4149,7 +4149,7 @@
     0.2,                     !- Direct Pad Depth {m}
     55.,                     !- Recirculating Water Pump Power Consumption {W}
     1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     200.0,                   !- Secondary Fan Delta Pressure {Pa}
     0.67,                    !- Indirect Heat Exchanger Effectiveness
     LGstore1 Fan outlet,     !- Primary Air Inlet Node Name
@@ -4198,7 +4198,7 @@
   Fan:OnOff,
     LGstore2 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     1.0,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4241,7 +4241,7 @@
   Fan:ConstantVolume,
     SMstore1 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     0.65,                    !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4284,7 +4284,7 @@
   Fan:ConstantVolume,
     SMstore2 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4327,7 +4327,7 @@
   Fan:VariableVolume,
     SMstore3 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -4378,7 +4378,7 @@
   Fan:VariableVolume,
     SMstore4 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -4431,7 +4431,7 @@
   Fan:VariableVolume,
     SMstore5 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -4454,7 +4454,7 @@
     ,                        !- Cooler Flow Ratio
     55.0000,                 !- Recirculating Water Pump Power Consumption {W}
     1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.6000,                  !- Secondary Fan Efficiency
+    0.6000,                  !- Secondary Fan Total Efficiency
     124.6000,                !- Secondary Fan Delta Pressure {Pa}
     SMstore5 Fan outlet,     !- Primary Air Inlet Node Name
     SMstore5 Inlet Node,     !- Primary Air Outlet Node Name
@@ -4495,7 +4495,7 @@
   Fan:ConstantVolume,
     SMstore6 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     0.5,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4510,7 +4510,7 @@
     0.16,                    !- Coil Flow Ratio
     55.,                     !- Recirculating Water Pump Power Consumption {W}
     0.6,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     200.0,                   !- Secondary Fan Delta Pressure {Pa}
     SMstore6 Cooler Unit OA Inlet,  !- Primary Air Inlet Node Name
     SMstore6 Fan Inlet Node, !- Primary Air Outlet Node Name
@@ -4546,7 +4546,7 @@
   Fan:ConstantVolume,
     SMstore7 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     0.5,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -4561,7 +4561,7 @@
     0.16,                    !- Coil Flow Ratio
     55.,                     !- Recirculating Water Pump Power Consumption {W}
     0.6,                     !- Secondary Fan Flow Rate {m3/s}
-    0.7,                     !- Secondary Fan Efficiency
+    0.7,                     !- Secondary Fan Total Efficiency
     200.0,                   !- Secondary Fan Delta Pressure {Pa}
     SMstore7 Cooler Unit OA Inlet,  !- Primary Air Inlet Node Name
     SMstore7 Indirect Outlet Node,  !- Primary Air Outlet Node Name
@@ -4607,7 +4607,7 @@
   Fan:VariableVolume,
     SMstore8 Supply Fan,     !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     300.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -4630,7 +4630,7 @@
     ,                        !- Cooler Flow Ratio
     55.0000,                 !- Recirculating Water Pump Power Consumption {W}
     1.0,                     !- Secondary Fan Flow Rate {m3/s}
-    0.6000,                  !- Secondary Fan Efficiency
+    0.6000,                  !- Secondary Fan Total Efficiency
     124.6000,                !- Secondary Fan Delta Pressure {Pa}
     SMstore8 Fan outlet,     !- Primary Air Inlet Node Name
     SMstore8 Indirect Outlet Node,  !- Primary Air Outlet Node Name
@@ -4791,61 +4791,91 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     LGstore1 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     LGstore2 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore1 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore2 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore3 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore4 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore5 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore6 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore7 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
   ZoneHVAC:Baseboard:Convective:Electric,
     SMstore8 Zone Baseboard, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Autosize,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.97;                    !- Efficiency
 
 ! ***SCHEDULES***

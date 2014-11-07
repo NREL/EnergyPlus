@@ -46,9 +46,9 @@ namespace DataEnvironment {
 	// Thus, all variables in this module must be PUBLIC.
 
 	// MODULE PARAMETER DEFINITIONS:
-	Real64 const EarthRadius( 6356000. ); // Radius of the Earth (m)
+	Real64 const EarthRadius( 6356000.0 ); // Radius of the Earth (m)
 	Real64 const AtmosphericTempGradient( 0.0065 ); // Standard atmospheric air temperature gradient (K/m)
-	Real64 const SunIsUpValue( .00001 ); // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
+	Real64 const SunIsUpValue( 0.00001 ); // if Cos Zenith Angle of the sun is >= this value, the sun is "up"
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -128,7 +128,7 @@ namespace DataEnvironment {
 	Real64 PDIFLW; // Luminous efficacy (lum/W) of sky diffuse solar radiation
 	Real64 SkyClearness; // Sky clearness (see subr. DayltgLuminousEfficacy)
 	Real64 SkyBrightness; // Sky brightness (see subr. DayltgLuminousEfficacy)
-	Real64 StdBaroPress( 101325. ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
+	Real64 StdBaroPress( 101325.0 ); // Standard "atmospheric pressure" based on elevation (ASHRAE HOF p6.1)
 	Real64 StdRhoAir; // Standard "rho air" set in WeatherManager - based on StdBaroPress
 	Real64 TimeZoneNumber; // Time Zone Number of building location
 	Real64 TimeZoneMeridian; // Standard Meridian of TimeZone
@@ -155,7 +155,7 @@ namespace DataEnvironment {
 	Real64 WeatherFileTempModCoeff( 0.0 ); // =AtmosphericTempGradient*EarthRadius*SensorHeight/(EarthRadius+SensorHeight)
 
 	Real64 SiteWindExp( 0.22 ); // Exponent for the wind velocity profile at the site
-	Real64 SiteWindBLHeight( 370. ); // Boundary layer height for the wind velocity profile at the site (m)
+	Real64 SiteWindBLHeight( 370.0 ); // Boundary layer height for the wind velocity profile at the site (m)
 	Real64 SiteTempGradient( 0.0065 ); // Air temperature gradient coefficient (K/m)
 
 	bool GroundTempObjInput( false ); // Ground temperature object input
@@ -369,7 +369,7 @@ namespace DataEnvironment {
 			//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
 			//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
 			//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-			LocalWindSpeed = WindSpeed * WeatherFileWindModCoeff * std::pow( ( Z / SiteWindBLHeight ), SiteWindExp );
+			LocalWindSpeed = WindSpeed * WeatherFileWindModCoeff * std::pow( Z / SiteWindBLHeight, SiteWindExp );
 		}
 
 		return LocalWindSpeed;
@@ -418,7 +418,7 @@ namespace DataEnvironment {
 		} else if ( SiteTempGradient == 0.0 ) {
 			LocalAirPressure = OutBaroPress;
 		} else {
-			LocalAirPressure = StdBaroPress * std::pow( ( BaseTemp / ( BaseTemp + TempGradient * ( Z - GeopotentialH ) ) ), ( ( StdGravity * AirMolarMass ) / ( GasConstant * TempGradient ) ) );
+			LocalAirPressure = StdBaroPress * std::pow( BaseTemp / ( BaseTemp + TempGradient * ( Z - GeopotentialH ) ), ( StdGravity * AirMolarMass ) / ( GasConstant * TempGradient ) );
 		}
 
 		return LocalAirPressure;
@@ -556,13 +556,13 @@ namespace DataEnvironment {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i; // Loop Control
 		Real64 Z; // Centroid value
 
 		if ( SiteWindExp == 0.0 ) {
 			LocalWindSpeed = WindSpeed;
 		} else {
-			for ( i = 1; i <= NumItems; ++i ) {
+			Real64 const fac( WindSpeed * WeatherFileWindModCoeff * std::pow( SiteWindBLHeight, -SiteWindExp ) );
+			for ( int i = 1; i <= NumItems; ++i ) {
 				Z = Heights( i );
 				if ( Z <= 0.0 ) {
 					LocalWindSpeed( i ) = 0.0;
@@ -570,7 +570,7 @@ namespace DataEnvironment {
 					//  [Met] - at meterological Station, Height of measurement is usually 10m above ground
 					//  LocalWindSpeed = Windspeed [Met] * (Wind Boundary LayerThickness [Met]/Height [Met])**Wind Exponent[Met] &
 					//                     * (Height above ground / Site Wind Boundary Layer Thickness) ** Site Wind Exponent
-					LocalWindSpeed( i ) = WindSpeed * WeatherFileWindModCoeff * std::pow( ( Z / SiteWindBLHeight ), SiteWindExp );
+					LocalWindSpeed( i ) = fac * std::pow( Z, SiteWindExp );
 				}
 			}
 		}
@@ -586,7 +586,7 @@ namespace DataEnvironment {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

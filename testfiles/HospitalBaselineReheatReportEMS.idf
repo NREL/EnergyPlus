@@ -100,7 +100,7 @@
 ! End SimMetaData
 ! Number of Zones: 130
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -5622,7 +5622,7 @@
   Fan:ZoneExhaust,
     Floor 1 Gas Storage Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.3927,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Gas Storage Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -6505,7 +6505,7 @@
   Fan:ZoneExhaust,
     Floor 1 Kitchen Exhaust Fan 1,  !- Name
     KITCHEN_EXH_SCH,         !- Availability Schedule Name
-    0.5500,                  !- Fan Efficiency
+    0.5500,                  !- Fan Total Efficiency
     573.0000,                !- Pressure Rise {Pa}
     4.7700,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Kitchen Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -6515,7 +6515,7 @@
   Fan:ZoneExhaust,
     Floor 1 Kitchen Exhaust Fan 2,  !- Name
     KITCHEN_EXH_SCH,         !- Availability Schedule Name
-    0.5600,                  !- Fan Efficiency
+    0.5600,                  !- Fan Total Efficiency
     473.0000,                !- Pressure Rise {Pa}
     5.9000,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Kitchen Exhaust Fan 2 Inlet Node,  !- Air Inlet Node Name
@@ -6525,7 +6525,7 @@
   Fan:ZoneExhaust,
     Floor 1 Kitchen Exhaust Fan 3,  !- Name
     KITCHEN_EXH_SCH,         !- Availability Schedule Name
-    0.4700,                  !- Fan Efficiency
+    0.4700,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.4700,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Kitchen Exhaust Fan 3 Inlet Node,  !- Air Inlet Node Name
@@ -7873,7 +7873,7 @@
   Fan:ZoneExhaust,
     Floor 1 Laundry Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     1.7588,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Laundry Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -14612,7 +14612,7 @@
   Fan:ZoneExhaust,
     Floor 1 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.3776,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -22059,7 +22059,7 @@
   Fan:ZoneExhaust,
     Floor 2 Lockers Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.5899,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Lockers Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -28944,7 +28944,7 @@
   Fan:ZoneExhaust,
     Floor 2 Restroom 1 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.5034,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Restroom 1 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -29392,7 +29392,7 @@
   Fan:ZoneExhaust,
     Floor 2 Restroom 2 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7079,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Restroom 2 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -29767,7 +29767,7 @@
   Fan:ZoneExhaust,
     Floor 2 Soil 1 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.3799,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Soil 1 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -30142,7 +30142,7 @@
   Fan:ZoneExhaust,
     Floor 2 Soil 2 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.2517,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Soil 2 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -30565,7 +30565,7 @@
   Fan:ZoneExhaust,
     Floor 2 Sterilizing Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     1.0697,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Sterilizing Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -32128,7 +32128,7 @@
   Fan:ZoneExhaust,
     Floor 2 Triage Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.8259,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Triage Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -39987,7 +39987,7 @@
   Fan:ZoneExhaust,
     Floor 3 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7866,                  !- Maximum Flow Rate {m3/s}
     Floor 3 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -40834,7 +40834,7 @@
   Fan:ZoneExhaust,
     Floor 3 Triage Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     1.4158,                  !- Maximum Flow Rate {m3/s}
     Floor 3 Triage Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -45976,7 +45976,7 @@
   Fan:ZoneExhaust,
     Floor 4-6 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7866,                  !- Maximum Flow Rate {m3/s}
     Floor 4-6 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -51081,7 +51081,7 @@
   Fan:ZoneExhaust,
     Floor 7 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7866,                  !- Maximum Flow Rate {m3/s}
     Floor 7 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -57631,8 +57631,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -57890,7 +57897,7 @@
   Fan:ConstantVolume,
     AHU2_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.748,                   !- Fan Efficiency
+    0.748,                   !- Fan Total Efficiency
     2421,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -58188,8 +58195,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -58447,7 +58461,7 @@
   Fan:ConstantVolume,
     AHU1_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.748,                   !- Fan Efficiency
+    0.748,                   !- Fan Total Efficiency
     2421,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -58747,8 +58761,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -59006,7 +59027,7 @@
   Fan:ConstantVolume,
     AHU3_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.702,                   !- Fan Efficiency
+    0.702,                   !- Fan Total Efficiency
     3007,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -59238,8 +59259,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -59497,7 +59525,7 @@
   Fan:ConstantVolume,
     AHU5_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.682,                   !- Fan Efficiency
+    0.682,                   !- Fan Total Efficiency
     2364,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9620,                  !- Motor Efficiency
@@ -59761,8 +59789,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -60020,7 +60055,7 @@
   Fan:ConstantVolume,
     AHU4_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.682,                   !- Fan Efficiency
+    0.682,                   !- Fan Total Efficiency
     2364,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9620,                  !- Motor Efficiency
@@ -60277,8 +60312,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -60531,7 +60573,7 @@
   Fan:ConstantVolume,
     AHU6_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.64,                    !- Fan Efficiency
+    0.64,                    !- Fan Total Efficiency
     2008,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -65276,7 +65318,7 @@
     CoolSys1 Chiller TowerSys Demand Outlet Node,  !- Demand Side Outlet Node Name
     CoolSys1 Chiller TowerSys Demand Branches,  !- Condenser Demand Side Branch List Name
     CoolSys1 Chiller TowerSys Demand Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name
@@ -72333,169 +72375,169 @@
     SET Flr_7_Supply_RE = 0, !- <none>
     SET MOB_Flr1_Core_RE = 0,!- <none>
     SET MOB_Flr1_Prm1_RE = 0,!- <none>
-    SET MOB_Flr1_Prm2_RE = 0,!- Extended Field
-    SET MOB_Flr1_Prm3_RE = 0,!- Extended Field
-    SET MOB_24_Core_RE = 0,  !- Extended Field
-    SET MOB_24_Prm1_RE = 0,  !- Extended Field
-    SET MOB_24_Prm2_RE = 0,  !- Extended Field
-    SET MOB_24_Prm3_RE = 0,  !- Extended Field
-    SET MOB_24_Prm_4_RE = 0, !- Extended Field
-    SET MOB_Flr5_Core_RE = 0,!- Extended Field
-    SET MOB_Flr5_Prm1_RE = 0,!- Extended Field
-    SET MOB_Flr5_Prm2_RE = 0,!- Extended Field
-    SET MOB_Flr5_Prm3_RE = 0,!- Extended Field
-    SET MOB_Flr5_Prm4_RE = 0,!- Extended Field
-    SET Reheat = 0,          !- Extended Field
-    SET Flr_1_Cafe_Heat = 0, !- Extended Field
-    SET Flr_1_Clean_Heat = 0,!- Extended Field
-    SET Flr_1_Conf_Heat = 0, !- Extended Field
-    SET Flr_1_Dining_Heat = 0,  !- Extended Field
-    SET Flr_1_Elev_Heat = 0, !- Extended Field
-    SET Flr_1_Exam_Heat = 0, !- Extended Field
-    SET Flr_1_FStor_Heat = 0,!- Extended Field
-    SET Flr_1_GStor_Heat = 0,!- Extended Field
-    SET Flr_1_Image_Heat = 0,!- Extended Field
-    SET Flr_1_Kitchen_Heat = 0,  !- Extended Field
-    SET Flr_1_Lab_1_Heat = 0,!- Extended Field
-    SET Flr_1_Lab_2_Heat = 0,!- Extended Field
-    SET Flr_1_Laundry_Heat = 0,  !- Extended Field
-    SET Flr_1_Lobby_Heat = 0,!- Extended Field
-    SET Flr_1_Lounge_Heat = 0,  !- Extended Field
-    SET Flr_1_Mech_1_Heat = 0,  !- Extended Field
-    SET Flr_1_Mech_2_Heat = 0,  !- Extended Field
-    SET Flr_1_Off_1_Heat = 0,!- Extended Field
-    SET Flr_1_Off_2_Heat = 0,!- Extended Field
-    SET Flr_1_Off_3_Heat = 0,!- Extended Field
-    SET Flr_1_Off3_P1_Heat = 0,  !- Extended Field
-    SET Flr_1_Off3_P2_Heat = 0,  !- Extended Field
-    SET Flr_1_Off3_P3_Heat = 0,  !- Extended Field
-    SET Flr_1_Pat_Heat = 0,  !- Extended Field
-    SET Flr_1_Pharm_Heat = 0,!- Extended Field
-    SET Flr_1_PT_Heat = 0,   !- Extended Field
-    SET Flr_1_Receive_Heat = 0,  !- Extended Field
-    SET Flr_1_Recep_Heat = 0,!- Extended Field
-    SET Flr_1_Soil_Heat = 0, !- Extended Field
-    SET Flr_1_Stor_Heat = 0, !- Extended Field
-    SET Flr_1_Waiting_Heat = 0,  !- Extended Field
-    SET Flr_2_Chapel_Heat = 0,  !- Extended Field
-    SET Flr_2_Clean_1_Heat = 0,  !- Extended Field
-    SET Flr_2_Clean_2_Heat = 0,  !- Extended Field
-    SET Flr_2_Cor_Heat = 0,  !- Extended Field
-    SET Flr_2_Elev_Heat = 0, !- Extended Field
-    SET Flr_2_Exam_1_Heat = 0,  !- Extended Field
-    SET Flr_2_Exam_2_Heat = 0,  !- Extended Field
-    SET Flr_2_Exam_3_Heat = 0,  !- Extended Field
-    SET Flr_2_Exam_4_Heat = 0,  !- Extended Field
-    SET Flr_2_Gift_Heat = 0, !- Extended Field
-    SET Flr_2_Image_1_Heat = 0,  !- Extended Field
-    SET Flr_2_Image_2_Heat = 0,  !- Extended Field
-    SET Flr_2_Image_3_Heat = 0,  !- Extended Field
-    SET Flr_2_Lab_1_Heat = 0,!- Extended Field
-    SET Flr_2_Lab_2_Heat = 0,!- Extended Field
-    SET Flr_2_Lounge1_Heat = 0,  !- Extended Field
-    SET Flr_2_Lounge2_Heat = 0,  !- Extended Field
-    SET Flr_2_Lockers_Heat = 0,  !- Extended Field
-    SET Flr_2_NS_1_Heat = 0, !- Extended Field
-    SET Flr_2_NS_2_Heat = 0, !- Extended Field
-    SET Flr_2_Off_1_Heat = 0,!- Extended Field
-    SET Flr_2_Off_2_Heat = 0,!- Extended Field
-    SET Flr_2_Off_3_Heat = 0,!- Extended Field
-    SET Flr_2_Off_4_Heat = 0,!- Extended Field
-    SET Flr_2_Sterile_Heat = 0,  !- Extended Field
-    SET Flr_2_OR_Heat = 0,   !- Extended Field
-    SET Flr_2_PACU_Heat = 0, !- Extended Field
-    SET Flr_2_Pat_1_Heat = 0,!- Extended Field
-    SET Flr_2_Pat_2_Heat = 0,!- Extended Field
-    SET Flr_2_Proc_1_Heat = 0,  !- Extended Field
-    SET Flr_2_Proc_2_Heat = 0,  !- Extended Field
-    SET Flr_2_Recep_Heat = 0,!- Extended Field
-    SET Flr_2_Rest_1_Heat = 0,  !- Extended Field
-    SET Flr_2_Rest_2_Heat = 0,  !- Extended Field
-    SET Flr_2_Soil_1_Heat = 0,  !- Extended Field
-    SET Flr_2_Soil_2_Heat = 0,  !- Extended Field
-    SET Flr_2_Stor_1_Heat = 0,  !- Extended Field
-    SET Flr_2_Stor_2_Heat = 0,  !- Extended Field
-    SET Flr_2_Trauma_Heat = 0,  !- Extended Field
-    SET Flr_2_Triage_Heat = 0,  !- Extended Field
-    SET Flr_2_Waiting_Heat = 0,  !- Extended Field
-    SET Flr_3_Clean_Heat = 0,!- Extended Field
-    SET Flr_3_Elev_Heat = 0, !- Extended Field
-    SET Flr_3_Exam_Heat = 0, !- Extended Field
-    SET Flr_3_ICU_Heat = 0,  !- Extended Field
-    SET Flr_3_NS_1_Heat = 0, !- Extended Field
-    SET Flr_3_NS_2_Heat = 0, !- Extended Field
-    SET Flr_3_Nursery_Heat = 0,  !- Extended Field
-    SET Flr_3_Off_Heat = 0,  !- Extended Field
-    SET Flr_3_OR_Heat = 0,   !- Extended Field
-    SET Flr_3_Pat_1_Heat = 0,!- Extended Field
-    SET Flr_3_Pat_2_Heat = 0,!- Extended Field
-    SET Flr_3_Pat_3_Heat = 0,!- Extended Field
-    SET Flr_3_Pat_4_Heat = 0,!- Extended Field
-    SET Flr_3_PatCor1_Heat = 0,  !- Extended Field
-    SET Flr_3_PatCor2_Heat = 0,  !- Extended Field
-    SET Flr_3_Proc_Heat = 0, !- Extended Field
-    SET Flr_3_Soil_Heat = 0, !- Extended Field
-    SET Flr_3_Supply_Heat = 0,  !- Extended Field
-    SET Flr_3_Triage_Heat = 0,  !- Extended Field
-    SET Flr_3_Waiting_Heat = 0,  !- Extended Field
-    SET Flr46_Clean_Heat = 0,!- Extended Field
-    SET Flr46_Elev_Heat = 0, !- Extended Field
-    SET Flr46_NS_Heat = 0,   !- Extended Field
-    SET Flr46_Off_Heat = 0,  !- Extended Field
-    SET Flr46_Pat_1_Heat = 0,!- Extended Field
-    SET Flr46_Pat_2_Heat = 0,!- Extended Field
-    SET Flr46_Pat_3_Heat = 0,!- Extended Field
-    SET Flr46_Pat_4_Heat = 0,!- Extended Field
-    SET Flr46_PatCor1_Heat = 0,  !- Extended Field
-    SET Flr46_PatCor2_Heat = 0,  !- Extended Field
-    SET Flr46_Soil_Heat = 0, !- Extended Field
-    SET Flr46_Supply_Heat = 0,  !- Extended Field
-    SET Flr_7_Clean_Heat = 0,!- Extended Field
-    SET Flr_7_Elev_Heat = 0, !- Extended Field
-    SET Flr_7_NS_Heat = 0,   !- Extended Field
-    SET Flr_7_Off_Heat = 0,  !- Extended Field
-    SET Flr_7_Pat_1_Heat = 0,!- Extended Field
-    SET Flr_7_Pat_2_Heat = 0,!- Extended Field
-    SET Flr_7_Pat_3_Heat = 0,!- Extended Field
-    SET Flr_7_Pat_4_Heat = 0,!- Extended Field
-    SET Flr_7_PatCor1_Heat = 0,  !- Extended Field
-    SET Flr_7_PatCor2_Heat = 0,  !- Extended Field
-    SET Flr_7_Soil_Heat = 0, !- Extended Field
-    SET Flr_7_Supply_Heat = 0,  !- Extended Field
-    SET MOB_Flr1_Core_Heat = 0,  !- Extended Field
-    SET MOB_Flr1_Prm1_Heat = 0,  !- Extended Field
-    SET MOB_Flr1_Prm2_Heat = 0,  !- Extended Field
-    SET MOB_Flr1_Prm3_Heat = 0,  !- Extended Field
-    SET MOB_24_Core_Heat = 0,!- Extended Field
-    SET MOB_24_Prm1_Heat = 0,!- Extended Field
-    SET MOB_24_Prm2_Heat = 0,!- Extended Field
-    SET MOB_24_Prm3_Heat = 0,!- Extended Field
-    SET MOB_24_Prm_4_Heat = 0,  !- Extended Field
-    SET MOB_Flr5_Core_Heat = 0,  !- Extended Field
-    SET MOB_Flr5_Prm1_Heat = 0,  !- Extended Field
-    SET MOB_Flr5_Prm2_Heat = 0,  !- Extended Field
-    SET MOB_Flr5_Prm3_Heat = 0,  !- Extended Field
-    SET MOB_Flr5_Prm4_Heat = 0,  !- Extended Field
-    SET AHU_1_Heat = 0,      !- Extended Field
-    SET AHU_2_Heat = 0,      !- Extended Field
-    SET AHU_3_Heat = 0,      !- Extended Field
-    SET AHU_4_Heat = 0,      !- Extended Field
-    SET AHU_5_Heat = 0,      !- Extended Field
-    SET AHU_6_Heat = 0,      !- Extended Field
-    SET Heat = 0,            !- Extended Field
-    SET AHU_1_Problem = 0,   !- Extended Field
-    SET AHU_2_Problem = 0,   !- Extended Field
-    SET AHU_3_Problem = 0,   !- Extended Field
-    SET AHU_4_Problem = 0,   !- Extended Field
-    SET AHU_5_Problem = 0,   !- Extended Field
-    SET AHU_6_Problem = 0,   !- Extended Field
-    SET AHU_1_Economize = 0, !- Extended Field
-    SET AHU_2_Economize = 0, !- Extended Field
-    SET AHU_3_Economize = 0, !- Extended Field
-    SET AHU_4_Economize = 0, !- Extended Field
-    SET AHU_5_Economize = 0, !- Extended Field
-    SET AHU_6_Economize = 0, !- Extended Field
-    ENDIF;                   !- Extended Field
+    SET MOB_Flr1_Prm2_RE = 0,!- <none>
+    SET MOB_Flr1_Prm3_RE = 0,!- <none>
+    SET MOB_24_Core_RE = 0,  !- <none>
+    SET MOB_24_Prm1_RE = 0,  !- <none>
+    SET MOB_24_Prm2_RE = 0,  !- <none>
+    SET MOB_24_Prm3_RE = 0,  !- <none>
+    SET MOB_24_Prm_4_RE = 0, !- <none>
+    SET MOB_Flr5_Core_RE = 0,!- <none>
+    SET MOB_Flr5_Prm1_RE = 0,!- <none>
+    SET MOB_Flr5_Prm2_RE = 0,!- <none>
+    SET MOB_Flr5_Prm3_RE = 0,!- <none>
+    SET MOB_Flr5_Prm4_RE = 0,!- <none>
+    SET Reheat = 0,          !- <none>
+    SET Flr_1_Cafe_Heat = 0, !- <none>
+    SET Flr_1_Clean_Heat = 0,!- <none>
+    SET Flr_1_Conf_Heat = 0, !- <none>
+    SET Flr_1_Dining_Heat = 0,  !- <none>
+    SET Flr_1_Elev_Heat = 0, !- <none>
+    SET Flr_1_Exam_Heat = 0, !- <none>
+    SET Flr_1_FStor_Heat = 0,!- <none>
+    SET Flr_1_GStor_Heat = 0,!- <none>
+    SET Flr_1_Image_Heat = 0,!- <none>
+    SET Flr_1_Kitchen_Heat = 0,  !- <none>
+    SET Flr_1_Lab_1_Heat = 0,!- <none>
+    SET Flr_1_Lab_2_Heat = 0,!- <none>
+    SET Flr_1_Laundry_Heat = 0,  !- <none>
+    SET Flr_1_Lobby_Heat = 0,!- <none>
+    SET Flr_1_Lounge_Heat = 0,  !- <none>
+    SET Flr_1_Mech_1_Heat = 0,  !- <none>
+    SET Flr_1_Mech_2_Heat = 0,  !- <none>
+    SET Flr_1_Off_1_Heat = 0,!- <none>
+    SET Flr_1_Off_2_Heat = 0,!- <none>
+    SET Flr_1_Off_3_Heat = 0,!- <none>
+    SET Flr_1_Off3_P1_Heat = 0,  !- <none>
+    SET Flr_1_Off3_P2_Heat = 0,  !- <none>
+    SET Flr_1_Off3_P3_Heat = 0,  !- <none>
+    SET Flr_1_Pat_Heat = 0,  !- <none>
+    SET Flr_1_Pharm_Heat = 0,!- <none>
+    SET Flr_1_PT_Heat = 0,   !- <none>
+    SET Flr_1_Receive_Heat = 0,  !- <none>
+    SET Flr_1_Recep_Heat = 0,!- <none>
+    SET Flr_1_Soil_Heat = 0, !- <none>
+    SET Flr_1_Stor_Heat = 0, !- <none>
+    SET Flr_1_Waiting_Heat = 0,  !- <none>
+    SET Flr_2_Chapel_Heat = 0,  !- <none>
+    SET Flr_2_Clean_1_Heat = 0,  !- <none>
+    SET Flr_2_Clean_2_Heat = 0,  !- <none>
+    SET Flr_2_Cor_Heat = 0,  !- <none>
+    SET Flr_2_Elev_Heat = 0, !- <none>
+    SET Flr_2_Exam_1_Heat = 0,  !- <none>
+    SET Flr_2_Exam_2_Heat = 0,  !- <none>
+    SET Flr_2_Exam_3_Heat = 0,  !- <none>
+    SET Flr_2_Exam_4_Heat = 0,  !- <none>
+    SET Flr_2_Gift_Heat = 0, !- <none>
+    SET Flr_2_Image_1_Heat = 0,  !- <none>
+    SET Flr_2_Image_2_Heat = 0,  !- <none>
+    SET Flr_2_Image_3_Heat = 0,  !- <none>
+    SET Flr_2_Lab_1_Heat = 0,!- <none>
+    SET Flr_2_Lab_2_Heat = 0,!- <none>
+    SET Flr_2_Lounge1_Heat = 0,  !- <none>
+    SET Flr_2_Lounge2_Heat = 0,  !- <none>
+    SET Flr_2_Lockers_Heat = 0,  !- <none>
+    SET Flr_2_NS_1_Heat = 0, !- <none>
+    SET Flr_2_NS_2_Heat = 0, !- <none>
+    SET Flr_2_Off_1_Heat = 0,!- <none>
+    SET Flr_2_Off_2_Heat = 0,!- <none>
+    SET Flr_2_Off_3_Heat = 0,!- <none>
+    SET Flr_2_Off_4_Heat = 0,!- <none>
+    SET Flr_2_Sterile_Heat = 0,  !- <none>
+    SET Flr_2_OR_Heat = 0,   !- <none>
+    SET Flr_2_PACU_Heat = 0, !- <none>
+    SET Flr_2_Pat_1_Heat = 0,!- <none>
+    SET Flr_2_Pat_2_Heat = 0,!- <none>
+    SET Flr_2_Proc_1_Heat = 0,  !- <none>
+    SET Flr_2_Proc_2_Heat = 0,  !- <none>
+    SET Flr_2_Recep_Heat = 0,!- <none>
+    SET Flr_2_Rest_1_Heat = 0,  !- <none>
+    SET Flr_2_Rest_2_Heat = 0,  !- <none>
+    SET Flr_2_Soil_1_Heat = 0,  !- <none>
+    SET Flr_2_Soil_2_Heat = 0,  !- <none>
+    SET Flr_2_Stor_1_Heat = 0,  !- <none>
+    SET Flr_2_Stor_2_Heat = 0,  !- <none>
+    SET Flr_2_Trauma_Heat = 0,  !- <none>
+    SET Flr_2_Triage_Heat = 0,  !- <none>
+    SET Flr_2_Waiting_Heat = 0,  !- <none>
+    SET Flr_3_Clean_Heat = 0,!- <none>
+    SET Flr_3_Elev_Heat = 0, !- <none>
+    SET Flr_3_Exam_Heat = 0, !- <none>
+    SET Flr_3_ICU_Heat = 0,  !- <none>
+    SET Flr_3_NS_1_Heat = 0, !- <none>
+    SET Flr_3_NS_2_Heat = 0, !- <none>
+    SET Flr_3_Nursery_Heat = 0,  !- <none>
+    SET Flr_3_Off_Heat = 0,  !- <none>
+    SET Flr_3_OR_Heat = 0,   !- <none>
+    SET Flr_3_Pat_1_Heat = 0,!- <none>
+    SET Flr_3_Pat_2_Heat = 0,!- <none>
+    SET Flr_3_Pat_3_Heat = 0,!- <none>
+    SET Flr_3_Pat_4_Heat = 0,!- <none>
+    SET Flr_3_PatCor1_Heat = 0,  !- <none>
+    SET Flr_3_PatCor2_Heat = 0,  !- <none>
+    SET Flr_3_Proc_Heat = 0, !- <none>
+    SET Flr_3_Soil_Heat = 0, !- <none>
+    SET Flr_3_Supply_Heat = 0,  !- <none>
+    SET Flr_3_Triage_Heat = 0,  !- <none>
+    SET Flr_3_Waiting_Heat = 0,  !- <none>
+    SET Flr46_Clean_Heat = 0,!- <none>
+    SET Flr46_Elev_Heat = 0, !- <none>
+    SET Flr46_NS_Heat = 0,   !- <none>
+    SET Flr46_Off_Heat = 0,  !- <none>
+    SET Flr46_Pat_1_Heat = 0,!- <none>
+    SET Flr46_Pat_2_Heat = 0,!- <none>
+    SET Flr46_Pat_3_Heat = 0,!- <none>
+    SET Flr46_Pat_4_Heat = 0,!- <none>
+    SET Flr46_PatCor1_Heat = 0,  !- <none>
+    SET Flr46_PatCor2_Heat = 0,  !- <none>
+    SET Flr46_Soil_Heat = 0, !- <none>
+    SET Flr46_Supply_Heat = 0,  !- <none>
+    SET Flr_7_Clean_Heat = 0,!- <none>
+    SET Flr_7_Elev_Heat = 0, !- <none>
+    SET Flr_7_NS_Heat = 0,   !- <none>
+    SET Flr_7_Off_Heat = 0,  !- <none>
+    SET Flr_7_Pat_1_Heat = 0,!- <none>
+    SET Flr_7_Pat_2_Heat = 0,!- <none>
+    SET Flr_7_Pat_3_Heat = 0,!- <none>
+    SET Flr_7_Pat_4_Heat = 0,!- <none>
+    SET Flr_7_PatCor1_Heat = 0,  !- <none>
+    SET Flr_7_PatCor2_Heat = 0,  !- <none>
+    SET Flr_7_Soil_Heat = 0, !- <none>
+    SET Flr_7_Supply_Heat = 0,  !- <none>
+    SET MOB_Flr1_Core_Heat = 0,  !- <none>
+    SET MOB_Flr1_Prm1_Heat = 0,  !- <none>
+    SET MOB_Flr1_Prm2_Heat = 0,  !- <none>
+    SET MOB_Flr1_Prm3_Heat = 0,  !- <none>
+    SET MOB_24_Core_Heat = 0,!- <none>
+    SET MOB_24_Prm1_Heat = 0,!- <none>
+    SET MOB_24_Prm2_Heat = 0,!- <none>
+    SET MOB_24_Prm3_Heat = 0,!- <none>
+    SET MOB_24_Prm_4_Heat = 0,  !- <none>
+    SET MOB_Flr5_Core_Heat = 0,  !- <none>
+    SET MOB_Flr5_Prm1_Heat = 0,  !- <none>
+    SET MOB_Flr5_Prm2_Heat = 0,  !- <none>
+    SET MOB_Flr5_Prm3_Heat = 0,  !- <none>
+    SET MOB_Flr5_Prm4_Heat = 0,  !- <none>
+    SET AHU_1_Heat = 0,      !- <none>
+    SET AHU_2_Heat = 0,      !- <none>
+    SET AHU_3_Heat = 0,      !- <none>
+    SET AHU_4_Heat = 0,      !- <none>
+    SET AHU_5_Heat = 0,      !- <none>
+    SET AHU_6_Heat = 0,      !- <none>
+    SET Heat = 0,            !- <none>
+    SET AHU_1_Problem = 0,   !- <none>
+    SET AHU_2_Problem = 0,   !- <none>
+    SET AHU_3_Problem = 0,   !- <none>
+    SET AHU_4_Problem = 0,   !- <none>
+    SET AHU_5_Problem = 0,   !- <none>
+    SET AHU_6_Problem = 0,   !- <none>
+    SET AHU_1_Economize = 0, !- <none>
+    SET AHU_2_Economize = 0, !- <none>
+    SET AHU_3_Economize = 0, !- <none>
+    SET AHU_4_Economize = 0, !- <none>
+    SET AHU_5_Economize = 0, !- <none>
+    SET AHU_6_Economize = 0, !- <none>
+    ENDIF;                   !- <none>
 
   EnergyManagementSystem:Program,
     Flr_1_Cafe_Coil_Reheat_Energy_Program,  !- Name
@@ -75075,298 +75117,298 @@
     Flr_1_Mech_2_RE,         !- <none>
     Flr_1_Off_1_RE,          !- <none>
     Flr_1_Off_2_RE,          !- <none>
-    Flr_1_Off_3_RE,          !- Extended Field
-    Flr_1_Off3_P1_RE,        !- Extended Field
-    Flr_1_Off3_P2_RE,        !- Extended Field
-    Flr_1_Off3_P3_RE,        !- Extended Field
-    Flr_1_Pat_RE,            !- Extended Field
-    Flr_1_Pharm_RE,          !- Extended Field
-    Flr_1_PT_RE,             !- Extended Field
-    Flr_1_Receive_RE,        !- Extended Field
-    Flr_1_Recep_RE,          !- Extended Field
-    Flr_1_Soil_RE,           !- Extended Field
-    Flr_1_Stor_RE,           !- Extended Field
-    Flr_1_Waiting_RE,        !- Extended Field
-    Flr_2_Chapel_RE,         !- Extended Field
-    Flr_2_Clean_1_RE,        !- Extended Field
-    Flr_2_Clean_2_RE,        !- Extended Field
-    Flr_2_Cor_RE,            !- Extended Field
-    Flr_2_Elev_RE,           !- Extended Field
-    Flr_2_Exam_1_RE,         !- Extended Field
-    Flr_2_Exam_2_RE,         !- Extended Field
-    Flr_2_Exam_3_RE,         !- Extended Field
-    Flr_2_Exam_4_RE,         !- Extended Field
-    Flr_2_Gift_RE,           !- Extended Field
-    Flr_2_Image_1_RE,        !- Extended Field
-    Flr_2_Image_2_RE,        !- Extended Field
-    Flr_2_Image_3_RE,        !- Extended Field
-    Flr_2_Lab_1_RE,          !- Extended Field
-    Flr_2_Lab_2_RE,          !- Extended Field
-    Flr_2_Lounge1_RE,        !- Extended Field
-    Flr_2_Lounge2_RE,        !- Extended Field
-    Flr_2_Lockers_RE,        !- Extended Field
-    Flr_2_NS_1_RE,           !- Extended Field
-    Flr_2_NS_2_RE,           !- Extended Field
-    Flr_2_Off_1_RE,          !- Extended Field
-    Flr_2_Off_2_RE,          !- Extended Field
-    Flr_2_Off_3_RE,          !- Extended Field
-    Flr_2_Off_4_RE,          !- Extended Field
-    Flr_2_Sterile_RE,        !- Extended Field
-    Flr_2_OR_RE,             !- Extended Field
-    Flr_2_PACU_RE,           !- Extended Field
-    Flr_2_Pat_1_RE,          !- Extended Field
-    Flr_2_Pat_2_RE,          !- Extended Field
-    Flr_2_Proc_1_RE,         !- Extended Field
-    Flr_2_Proc_2_RE,         !- Extended Field
-    Flr_2_Recep_RE,          !- Extended Field
-    Flr_2_Rest_1_RE,         !- Extended Field
-    Flr_2_Rest_2_RE,         !- Extended Field
-    Flr_2_Soil_1_RE,         !- Extended Field
-    Flr_2_Soil_2_RE,         !- Extended Field
-    Flr_2_Stor_1_RE,         !- Extended Field
-    Flr_2_Stor_2_RE,         !- Extended Field
-    Flr_2_Trauma_RE,         !- Extended Field
-    Flr_2_Triage_RE,         !- Extended Field
-    Flr_2_Waiting_RE,        !- Extended Field
-    Flr_3_Clean_RE,          !- Extended Field
-    Flr_3_Elev_RE,           !- Extended Field
-    Flr_3_Exam_RE,           !- Extended Field
-    Flr_3_ICU_RE,            !- Extended Field
-    Flr_3_NS_1_RE,           !- Extended Field
-    Flr_3_NS_2_RE,           !- Extended Field
-    Flr_3_Nursery_RE,        !- Extended Field
-    Flr_3_Off_RE,            !- Extended Field
-    Flr_3_OR_RE,             !- Extended Field
-    Flr_3_Pat_1_RE,          !- Extended Field
-    Flr_3_Pat_2_RE,          !- Extended Field
-    Flr_3_Pat_3_RE,          !- Extended Field
-    Flr_3_Pat_4_RE,          !- Extended Field
-    Flr_3_PatCor1_RE,        !- Extended Field
-    Flr_3_PatCor2_RE,        !- Extended Field
-    Flr_3_Proc_RE,           !- Extended Field
-    Flr_3_Soil_RE,           !- Extended Field
-    Flr_3_Supply_RE,         !- Extended Field
-    Flr_3_Triage_RE,         !- Extended Field
-    Flr_3_Waiting_RE,        !- Extended Field
-    Flr46_Clean_RE,          !- Extended Field
-    Flr46_Elev_RE,           !- Extended Field
-    Flr46_NS_RE,             !- Extended Field
-    Flr46_Off_RE,            !- Extended Field
-    Flr46_Pat_1_RE,          !- Extended Field
-    Flr46_Pat_2_RE,          !- Extended Field
-    Flr46_Pat_3_RE,          !- Extended Field
-    Flr46_Pat_4_RE,          !- Extended Field
-    Flr46_PatCor1_RE,        !- Extended Field
-    Flr46_PatCor2_RE,        !- Extended Field
-    Flr46_Soil_RE,           !- Extended Field
-    Flr46_Supply_RE,         !- Extended Field
-    Flr_7_Clean_RE,          !- Extended Field
-    Flr_7_Elev_RE,           !- Extended Field
-    Flr_7_NS_RE,             !- Extended Field
-    Flr_7_Off_RE,            !- Extended Field
-    Flr_7_Pat_1_RE,          !- Extended Field
-    Flr_7_Pat_2_RE,          !- Extended Field
-    Flr_7_Pat_3_RE,          !- Extended Field
-    Flr_7_Pat_4_RE,          !- Extended Field
-    Flr_7_PatCor1_RE,        !- Extended Field
-    Flr_7_PatCor2_RE,        !- Extended Field
-    Flr_7_Soil_RE,           !- Extended Field
-    Flr_7_Supply_RE,         !- Extended Field
-    MOB_Flr1_Core_RE,        !- Extended Field
-    MOB_Flr1_Prm1_RE,        !- Extended Field
-    MOB_Flr1_Prm2_RE,        !- Extended Field
-    MOB_Flr1_Prm3_RE,        !- Extended Field
-    MOB_24_Core_RE,          !- Extended Field
-    MOB_24_Prm1_RE,          !- Extended Field
-    MOB_24_Prm2_RE,          !- Extended Field
-    MOB_24_Prm3_RE,          !- Extended Field
-    MOB_24_Prm_4_RE,         !- Extended Field
-    MOB_Flr5_Core_RE,        !- Extended Field
-    MOB_Flr5_Prm1_RE,        !- Extended Field
-    MOB_Flr5_Prm2_RE,        !- Extended Field
-    MOB_Flr5_Prm3_RE,        !- Extended Field
-    MOB_Flr5_Prm4_RE,        !- Extended Field
-    Reheat,                  !- Extended Field
-    Flr_1_Cafe_Heat,         !- Extended Field
-    Flr_1_Clean_Heat,        !- Extended Field
-    Flr_1_Conf_Heat,         !- Extended Field
-    Flr_1_Dining_Heat,       !- Extended Field
-    Flr_1_Elev_Heat,         !- Extended Field
-    Flr_1_Exam_Heat,         !- Extended Field
-    Flr_1_FStor_Heat,        !- Extended Field
-    Flr_1_GStor_Heat,        !- Extended Field
-    Flr_1_Image_Heat,        !- Extended Field
-    Flr_1_Kitchen_Heat,      !- Extended Field
-    Flr_1_Lab_1_Heat,        !- Extended Field
-    Flr_1_Lab_2_Heat,        !- Extended Field
-    Flr_1_Laundry_Heat,      !- Extended Field
-    Flr_1_Lobby_Heat,        !- Extended Field
-    Flr_1_Lounge_Heat,       !- Extended Field
-    Flr_1_Mech_1_Heat,       !- Extended Field
-    Flr_1_Mech_2_Heat,       !- Extended Field
-    Flr_1_Off_1_Heat,        !- Extended Field
-    Flr_1_Off_2_Heat,        !- Extended Field
-    Flr_1_Off_3_Heat,        !- Extended Field
-    Flr_1_Off3_P1_Heat,      !- Extended Field
-    Flr_1_Off3_P2_Heat,      !- Extended Field
-    Flr_1_Off3_P3_Heat,      !- Extended Field
-    Flr_1_Pat_Heat,          !- Extended Field
-    Flr_1_Pharm_Heat,        !- Extended Field
-    Flr_1_PT_Heat,           !- Extended Field
-    Flr_1_Receive_Heat,      !- Extended Field
-    Flr_1_Recep_Heat,        !- Extended Field
-    Flr_1_Soil_Heat,         !- Extended Field
-    Flr_1_Stor_Heat,         !- Extended Field
-    Flr_1_Waiting_Heat,      !- Extended Field
-    Flr_2_Chapel_Heat,       !- Extended Field
-    Flr_2_Clean_1_Heat,      !- Extended Field
-    Flr_2_Clean_2_Heat,      !- Extended Field
-    Flr_2_Cor_Heat,          !- Extended Field
-    Flr_2_Elev_Heat,         !- Extended Field
-    Flr_2_Exam_1_Heat,       !- Extended Field
-    Flr_2_Exam_2_Heat,       !- Extended Field
-    Flr_2_Exam_3_Heat,       !- Extended Field
-    Flr_2_Exam_4_Heat,       !- Extended Field
-    Flr_2_Gift_Heat,         !- Extended Field
-    Flr_2_Image_1_Heat,      !- Extended Field
-    Flr_2_Image_2_Heat,      !- Extended Field
-    Flr_2_Image_3_Heat,      !- Extended Field
-    Flr_2_Lab_1_Heat,        !- Extended Field
-    Flr_2_Lab_2_Heat,        !- Extended Field
-    Flr_2_Lounge1_Heat,      !- Extended Field
-    Flr_2_Lounge2_Heat,      !- Extended Field
-    Flr_2_Lockers_Heat,      !- Extended Field
-    Flr_2_NS_1_Heat,         !- Extended Field
-    Flr_2_NS_2_Heat,         !- Extended Field
-    Flr_2_Off_1_Heat,        !- Extended Field
-    Flr_2_Off_2_Heat,        !- Extended Field
-    Flr_2_Off_3_Heat,        !- Extended Field
-    Flr_2_Off_4_Heat,        !- Extended Field
-    Flr_2_Sterile_Heat,      !- Extended Field
-    Flr_2_OR_Heat,           !- Extended Field
-    Flr_2_PACU_Heat,         !- Extended Field
-    Flr_2_Pat_1_Heat,        !- Extended Field
-    Flr_2_Pat_2_Heat,        !- Extended Field
-    Flr_2_Proc_1_Heat,       !- Extended Field
-    Flr_2_Proc_2_Heat,       !- Extended Field
-    Flr_2_Recep_Heat,        !- Extended Field
-    Flr_2_Rest_1_Heat,       !- Extended Field
-    Flr_2_Rest_2_Heat,       !- Extended Field
-    Flr_2_Soil_1_Heat,       !- Extended Field
-    Flr_2_Soil_2_Heat,       !- Extended Field
-    Flr_2_Stor_1_Heat,       !- Extended Field
-    Flr_2_Stor_2_Heat,       !- Extended Field
-    Flr_2_Trauma_Heat,       !- Extended Field
-    Flr_2_Triage_Heat,       !- Extended Field
-    Flr_2_Waiting_Heat,      !- Extended Field
-    Flr_3_Clean_Heat,        !- Extended Field
-    Flr_3_Elev_Heat,         !- Extended Field
-    Flr_3_Exam_Heat,         !- Extended Field
-    Flr_3_ICU_Heat,          !- Extended Field
-    Flr_3_NS_1_Heat,         !- Extended Field
-    Flr_3_NS_2_Heat,         !- Extended Field
-    Flr_3_Nursery_Heat,      !- Extended Field
-    Flr_3_Off_Heat,          !- Extended Field
-    Flr_3_OR_Heat,           !- Extended Field
-    Flr_3_Pat_1_Heat,        !- Extended Field
-    Flr_3_Pat_2_Heat,        !- Extended Field
-    Flr_3_Pat_3_Heat,        !- Extended Field
-    Flr_3_Pat_4_Heat,        !- Extended Field
-    Flr_3_PatCor1_Heat,      !- Extended Field
-    Flr_3_PatCor2_Heat,      !- Extended Field
-    Flr_3_Proc_Heat,         !- Extended Field
-    Flr_3_Soil_Heat,         !- Extended Field
-    Flr_3_Supply_Heat,       !- Extended Field
-    Flr_3_Triage_Heat,       !- Extended Field
-    Flr_3_Waiting_Heat,      !- Extended Field
-    Flr46_Clean_Heat,        !- Extended Field
-    Flr46_Elev_Heat,         !- Extended Field
-    Flr46_NS_Heat,           !- Extended Field
-    Flr46_Off_Heat,          !- Extended Field
-    Flr46_Pat_1_Heat,        !- Extended Field
-    Flr46_Pat_2_Heat,        !- Extended Field
-    Flr46_Pat_3_Heat,        !- Extended Field
-    Flr46_Pat_4_Heat,        !- Extended Field
-    Flr46_PatCor1_Heat,      !- Extended Field
-    Flr46_PatCor2_Heat,      !- Extended Field
-    Flr46_Soil_Heat,         !- Extended Field
-    Flr46_Supply_Heat,       !- Extended Field
-    Flr_7_Clean_Heat,        !- Extended Field
-    Flr_7_Elev_Heat,         !- Extended Field
-    Flr_7_NS_Heat,           !- Extended Field
-    Flr_7_Off_Heat,          !- Extended Field
-    Flr_7_Pat_1_Heat,        !- Extended Field
-    Flr_7_Pat_2_Heat,        !- Extended Field
-    Flr_7_Pat_3_Heat,        !- Extended Field
-    Flr_7_Pat_4_Heat,        !- Extended Field
-    Flr_7_PatCor1_Heat,      !- Extended Field
-    Flr_7_PatCor2_Heat,      !- Extended Field
-    Flr_7_Soil_Heat,         !- Extended Field
-    Flr_7_Supply_Heat,       !- Extended Field
-    MOB_Flr1_Core_Heat,      !- Extended Field
-    MOB_Flr1_Prm1_Heat,      !- Extended Field
-    MOB_Flr1_Prm2_Heat,      !- Extended Field
-    MOB_Flr1_Prm3_Heat,      !- Extended Field
-    MOB_24_Core_Heat,        !- Extended Field
-    MOB_24_Prm1_Heat,        !- Extended Field
-    MOB_24_Prm2_Heat,        !- Extended Field
-    MOB_24_Prm3_Heat,        !- Extended Field
-    MOB_24_Prm_4_Heat,       !- Extended Field
-    MOB_Flr5_Core_Heat,      !- Extended Field
-    MOB_Flr5_Prm1_Heat,      !- Extended Field
-    MOB_Flr5_Prm2_Heat,      !- Extended Field
-    MOB_Flr5_Prm3_Heat,      !- Extended Field
-    MOB_Flr5_Prm4_Heat,      !- Extended Field
-    AHU_1_Heat,              !- Extended Field
-    AHU_2_Heat,              !- Extended Field
-    AHU_3_Heat,              !- Extended Field
-    AHU_4_Heat,              !- Extended Field
-    AHU_5_Heat,              !- Extended Field
-    AHU_6_Heat,              !- Extended Field
-    Heat,                    !- Extended Field
-    AHU_1_Problem,           !- Extended Field
-    AHU_2_Problem,           !- Extended Field
-    AHU_3_Problem,           !- Extended Field
-    AHU_4_Problem,           !- Extended Field
-    AHU_5_Problem,           !- Extended Field
-    AHU_6_Problem,           !- Extended Field
-    AHU_1_Economize,         !- Extended Field
-    AHU_2_Economize,         !- Extended Field
-    AHU_3_Economize,         !- Extended Field
-    AHU_4_Economize,         !- Extended Field
-    AHU_5_Economize,         !- Extended Field
-    AHU_6_Economize,         !- Extended Field
-    Flr_1_Cafe_DT2,          !- Extended Field
-    Flr_1_Clean_DT2,         !- Extended Field
-    Flr_1_Conf_DT2,          !- Extended Field
-    Flr_1_Dining_DT2,        !- Extended Field
-    Flr_1_Elev_DT2,          !- Extended Field
-    Flr_1_Exam_DT2,          !- Extended Field
-    Flr_1_FStor_DT2,         !- Extended Field
-    Flr_1_GStor_DT2,         !- Extended Field
-    Flr_1_Image_DT2,         !- Extended Field
-    Flr_1_Kitchen_DT2,       !- Extended Field
-    Flr_1_Lab_1_DT2,         !- Extended Field
-    Flr_1_Lab_2_DT2,         !- Extended Field
-    Flr_1_Laundry_DT2,       !- Extended Field
-    Flr_1_Lobby_DT2,         !- Extended Field
-    Flr_1_Lounge_DT2,        !- Extended Field
-    Flr_1_Mech_1_DT2,        !- Extended Field
-    Flr_1_Mech_2_DT2,        !- Extended Field
-    Flr_1_Off_1_DT2,         !- Extended Field
-    Flr_1_Off_2_DT2,         !- Extended Field
-    Flr_1_Off_3_DT2,         !- Extended Field
-    Flr_1_Off3_P1_DT2,       !- Extended Field
-    Flr_1_Off3_P2_DT2,       !- Extended Field
-    Flr_1_Off3_P3_DT2,       !- Extended Field
-    Flr_1_Pat_DT2,           !- Extended Field
-    Flr_1_Pharm_DT2,         !- Extended Field
-    Flr_1_PT_DT2,            !- Extended Field
-    Flr_1_Receive_DT2,       !- Extended Field
-    Flr_1_Recep_DT2,         !- Extended Field
-    Flr_1_Soil_DT2,          !- Extended Field
-    Flr_1_Stor_DT2,          !- Extended Field
-    Flr_1_Waiting_DT2;       !- Extended Field
+    Flr_1_Off_3_RE,          !- <none>
+    Flr_1_Off3_P1_RE,        !- <none>
+    Flr_1_Off3_P2_RE,        !- <none>
+    Flr_1_Off3_P3_RE,        !- <none>
+    Flr_1_Pat_RE,            !- <none>
+    Flr_1_Pharm_RE,          !- <none>
+    Flr_1_PT_RE,             !- <none>
+    Flr_1_Receive_RE,        !- <none>
+    Flr_1_Recep_RE,          !- <none>
+    Flr_1_Soil_RE,           !- <none>
+    Flr_1_Stor_RE,           !- <none>
+    Flr_1_Waiting_RE,        !- <none>
+    Flr_2_Chapel_RE,         !- <none>
+    Flr_2_Clean_1_RE,        !- <none>
+    Flr_2_Clean_2_RE,        !- <none>
+    Flr_2_Cor_RE,            !- <none>
+    Flr_2_Elev_RE,           !- <none>
+    Flr_2_Exam_1_RE,         !- <none>
+    Flr_2_Exam_2_RE,         !- <none>
+    Flr_2_Exam_3_RE,         !- <none>
+    Flr_2_Exam_4_RE,         !- <none>
+    Flr_2_Gift_RE,           !- <none>
+    Flr_2_Image_1_RE,        !- <none>
+    Flr_2_Image_2_RE,        !- <none>
+    Flr_2_Image_3_RE,        !- <none>
+    Flr_2_Lab_1_RE,          !- <none>
+    Flr_2_Lab_2_RE,          !- <none>
+    Flr_2_Lounge1_RE,        !- <none>
+    Flr_2_Lounge2_RE,        !- <none>
+    Flr_2_Lockers_RE,        !- <none>
+    Flr_2_NS_1_RE,           !- <none>
+    Flr_2_NS_2_RE,           !- <none>
+    Flr_2_Off_1_RE,          !- <none>
+    Flr_2_Off_2_RE,          !- <none>
+    Flr_2_Off_3_RE,          !- <none>
+    Flr_2_Off_4_RE,          !- <none>
+    Flr_2_Sterile_RE,        !- <none>
+    Flr_2_OR_RE,             !- <none>
+    Flr_2_PACU_RE,           !- <none>
+    Flr_2_Pat_1_RE,          !- <none>
+    Flr_2_Pat_2_RE,          !- <none>
+    Flr_2_Proc_1_RE,         !- <none>
+    Flr_2_Proc_2_RE,         !- <none>
+    Flr_2_Recep_RE,          !- <none>
+    Flr_2_Rest_1_RE,         !- <none>
+    Flr_2_Rest_2_RE,         !- <none>
+    Flr_2_Soil_1_RE,         !- <none>
+    Flr_2_Soil_2_RE,         !- <none>
+    Flr_2_Stor_1_RE,         !- <none>
+    Flr_2_Stor_2_RE,         !- <none>
+    Flr_2_Trauma_RE,         !- <none>
+    Flr_2_Triage_RE,         !- <none>
+    Flr_2_Waiting_RE,        !- <none>
+    Flr_3_Clean_RE,          !- <none>
+    Flr_3_Elev_RE,           !- <none>
+    Flr_3_Exam_RE,           !- <none>
+    Flr_3_ICU_RE,            !- <none>
+    Flr_3_NS_1_RE,           !- <none>
+    Flr_3_NS_2_RE,           !- <none>
+    Flr_3_Nursery_RE,        !- <none>
+    Flr_3_Off_RE,            !- <none>
+    Flr_3_OR_RE,             !- <none>
+    Flr_3_Pat_1_RE,          !- <none>
+    Flr_3_Pat_2_RE,          !- <none>
+    Flr_3_Pat_3_RE,          !- <none>
+    Flr_3_Pat_4_RE,          !- <none>
+    Flr_3_PatCor1_RE,        !- <none>
+    Flr_3_PatCor2_RE,        !- <none>
+    Flr_3_Proc_RE,           !- <none>
+    Flr_3_Soil_RE,           !- <none>
+    Flr_3_Supply_RE,         !- <none>
+    Flr_3_Triage_RE,         !- <none>
+    Flr_3_Waiting_RE,        !- <none>
+    Flr46_Clean_RE,          !- <none>
+    Flr46_Elev_RE,           !- <none>
+    Flr46_NS_RE,             !- <none>
+    Flr46_Off_RE,            !- <none>
+    Flr46_Pat_1_RE,          !- <none>
+    Flr46_Pat_2_RE,          !- <none>
+    Flr46_Pat_3_RE,          !- <none>
+    Flr46_Pat_4_RE,          !- <none>
+    Flr46_PatCor1_RE,        !- <none>
+    Flr46_PatCor2_RE,        !- <none>
+    Flr46_Soil_RE,           !- <none>
+    Flr46_Supply_RE,         !- <none>
+    Flr_7_Clean_RE,          !- <none>
+    Flr_7_Elev_RE,           !- <none>
+    Flr_7_NS_RE,             !- <none>
+    Flr_7_Off_RE,            !- <none>
+    Flr_7_Pat_1_RE,          !- <none>
+    Flr_7_Pat_2_RE,          !- <none>
+    Flr_7_Pat_3_RE,          !- <none>
+    Flr_7_Pat_4_RE,          !- <none>
+    Flr_7_PatCor1_RE,        !- <none>
+    Flr_7_PatCor2_RE,        !- <none>
+    Flr_7_Soil_RE,           !- <none>
+    Flr_7_Supply_RE,         !- <none>
+    MOB_Flr1_Core_RE,        !- <none>
+    MOB_Flr1_Prm1_RE,        !- <none>
+    MOB_Flr1_Prm2_RE,        !- <none>
+    MOB_Flr1_Prm3_RE,        !- <none>
+    MOB_24_Core_RE,          !- <none>
+    MOB_24_Prm1_RE,          !- <none>
+    MOB_24_Prm2_RE,          !- <none>
+    MOB_24_Prm3_RE,          !- <none>
+    MOB_24_Prm_4_RE,         !- <none>
+    MOB_Flr5_Core_RE,        !- <none>
+    MOB_Flr5_Prm1_RE,        !- <none>
+    MOB_Flr5_Prm2_RE,        !- <none>
+    MOB_Flr5_Prm3_RE,        !- <none>
+    MOB_Flr5_Prm4_RE,        !- <none>
+    Reheat,                  !- <none>
+    Flr_1_Cafe_Heat,         !- <none>
+    Flr_1_Clean_Heat,        !- <none>
+    Flr_1_Conf_Heat,         !- <none>
+    Flr_1_Dining_Heat,       !- <none>
+    Flr_1_Elev_Heat,         !- <none>
+    Flr_1_Exam_Heat,         !- <none>
+    Flr_1_FStor_Heat,        !- <none>
+    Flr_1_GStor_Heat,        !- <none>
+    Flr_1_Image_Heat,        !- <none>
+    Flr_1_Kitchen_Heat,      !- <none>
+    Flr_1_Lab_1_Heat,        !- <none>
+    Flr_1_Lab_2_Heat,        !- <none>
+    Flr_1_Laundry_Heat,      !- <none>
+    Flr_1_Lobby_Heat,        !- <none>
+    Flr_1_Lounge_Heat,       !- <none>
+    Flr_1_Mech_1_Heat,       !- <none>
+    Flr_1_Mech_2_Heat,       !- <none>
+    Flr_1_Off_1_Heat,        !- <none>
+    Flr_1_Off_2_Heat,        !- <none>
+    Flr_1_Off_3_Heat,        !- <none>
+    Flr_1_Off3_P1_Heat,      !- <none>
+    Flr_1_Off3_P2_Heat,      !- <none>
+    Flr_1_Off3_P3_Heat,      !- <none>
+    Flr_1_Pat_Heat,          !- <none>
+    Flr_1_Pharm_Heat,        !- <none>
+    Flr_1_PT_Heat,           !- <none>
+    Flr_1_Receive_Heat,      !- <none>
+    Flr_1_Recep_Heat,        !- <none>
+    Flr_1_Soil_Heat,         !- <none>
+    Flr_1_Stor_Heat,         !- <none>
+    Flr_1_Waiting_Heat,      !- <none>
+    Flr_2_Chapel_Heat,       !- <none>
+    Flr_2_Clean_1_Heat,      !- <none>
+    Flr_2_Clean_2_Heat,      !- <none>
+    Flr_2_Cor_Heat,          !- <none>
+    Flr_2_Elev_Heat,         !- <none>
+    Flr_2_Exam_1_Heat,       !- <none>
+    Flr_2_Exam_2_Heat,       !- <none>
+    Flr_2_Exam_3_Heat,       !- <none>
+    Flr_2_Exam_4_Heat,       !- <none>
+    Flr_2_Gift_Heat,         !- <none>
+    Flr_2_Image_1_Heat,      !- <none>
+    Flr_2_Image_2_Heat,      !- <none>
+    Flr_2_Image_3_Heat,      !- <none>
+    Flr_2_Lab_1_Heat,        !- <none>
+    Flr_2_Lab_2_Heat,        !- <none>
+    Flr_2_Lounge1_Heat,      !- <none>
+    Flr_2_Lounge2_Heat,      !- <none>
+    Flr_2_Lockers_Heat,      !- <none>
+    Flr_2_NS_1_Heat,         !- <none>
+    Flr_2_NS_2_Heat,         !- <none>
+    Flr_2_Off_1_Heat,        !- <none>
+    Flr_2_Off_2_Heat,        !- <none>
+    Flr_2_Off_3_Heat,        !- <none>
+    Flr_2_Off_4_Heat,        !- <none>
+    Flr_2_Sterile_Heat,      !- <none>
+    Flr_2_OR_Heat,           !- <none>
+    Flr_2_PACU_Heat,         !- <none>
+    Flr_2_Pat_1_Heat,        !- <none>
+    Flr_2_Pat_2_Heat,        !- <none>
+    Flr_2_Proc_1_Heat,       !- <none>
+    Flr_2_Proc_2_Heat,       !- <none>
+    Flr_2_Recep_Heat,        !- <none>
+    Flr_2_Rest_1_Heat,       !- <none>
+    Flr_2_Rest_2_Heat,       !- <none>
+    Flr_2_Soil_1_Heat,       !- <none>
+    Flr_2_Soil_2_Heat,       !- <none>
+    Flr_2_Stor_1_Heat,       !- <none>
+    Flr_2_Stor_2_Heat,       !- <none>
+    Flr_2_Trauma_Heat,       !- <none>
+    Flr_2_Triage_Heat,       !- <none>
+    Flr_2_Waiting_Heat,      !- <none>
+    Flr_3_Clean_Heat,        !- <none>
+    Flr_3_Elev_Heat,         !- <none>
+    Flr_3_Exam_Heat,         !- <none>
+    Flr_3_ICU_Heat,          !- <none>
+    Flr_3_NS_1_Heat,         !- <none>
+    Flr_3_NS_2_Heat,         !- <none>
+    Flr_3_Nursery_Heat,      !- <none>
+    Flr_3_Off_Heat,          !- <none>
+    Flr_3_OR_Heat,           !- <none>
+    Flr_3_Pat_1_Heat,        !- <none>
+    Flr_3_Pat_2_Heat,        !- <none>
+    Flr_3_Pat_3_Heat,        !- <none>
+    Flr_3_Pat_4_Heat,        !- <none>
+    Flr_3_PatCor1_Heat,      !- <none>
+    Flr_3_PatCor2_Heat,      !- <none>
+    Flr_3_Proc_Heat,         !- <none>
+    Flr_3_Soil_Heat,         !- <none>
+    Flr_3_Supply_Heat,       !- <none>
+    Flr_3_Triage_Heat,       !- <none>
+    Flr_3_Waiting_Heat,      !- <none>
+    Flr46_Clean_Heat,        !- <none>
+    Flr46_Elev_Heat,         !- <none>
+    Flr46_NS_Heat,           !- <none>
+    Flr46_Off_Heat,          !- <none>
+    Flr46_Pat_1_Heat,        !- <none>
+    Flr46_Pat_2_Heat,        !- <none>
+    Flr46_Pat_3_Heat,        !- <none>
+    Flr46_Pat_4_Heat,        !- <none>
+    Flr46_PatCor1_Heat,      !- <none>
+    Flr46_PatCor2_Heat,      !- <none>
+    Flr46_Soil_Heat,         !- <none>
+    Flr46_Supply_Heat,       !- <none>
+    Flr_7_Clean_Heat,        !- <none>
+    Flr_7_Elev_Heat,         !- <none>
+    Flr_7_NS_Heat,           !- <none>
+    Flr_7_Off_Heat,          !- <none>
+    Flr_7_Pat_1_Heat,        !- <none>
+    Flr_7_Pat_2_Heat,        !- <none>
+    Flr_7_Pat_3_Heat,        !- <none>
+    Flr_7_Pat_4_Heat,        !- <none>
+    Flr_7_PatCor1_Heat,      !- <none>
+    Flr_7_PatCor2_Heat,      !- <none>
+    Flr_7_Soil_Heat,         !- <none>
+    Flr_7_Supply_Heat,       !- <none>
+    MOB_Flr1_Core_Heat,      !- <none>
+    MOB_Flr1_Prm1_Heat,      !- <none>
+    MOB_Flr1_Prm2_Heat,      !- <none>
+    MOB_Flr1_Prm3_Heat,      !- <none>
+    MOB_24_Core_Heat,        !- <none>
+    MOB_24_Prm1_Heat,        !- <none>
+    MOB_24_Prm2_Heat,        !- <none>
+    MOB_24_Prm3_Heat,        !- <none>
+    MOB_24_Prm_4_Heat,       !- <none>
+    MOB_Flr5_Core_Heat,      !- <none>
+    MOB_Flr5_Prm1_Heat,      !- <none>
+    MOB_Flr5_Prm2_Heat,      !- <none>
+    MOB_Flr5_Prm3_Heat,      !- <none>
+    MOB_Flr5_Prm4_Heat,      !- <none>
+    AHU_1_Heat,              !- <none>
+    AHU_2_Heat,              !- <none>
+    AHU_3_Heat,              !- <none>
+    AHU_4_Heat,              !- <none>
+    AHU_5_Heat,              !- <none>
+    AHU_6_Heat,              !- <none>
+    Heat,                    !- <none>
+    AHU_1_Problem,           !- <none>
+    AHU_2_Problem,           !- <none>
+    AHU_3_Problem,           !- <none>
+    AHU_4_Problem,           !- <none>
+    AHU_5_Problem,           !- <none>
+    AHU_6_Problem,           !- <none>
+    AHU_1_Economize,         !- <none>
+    AHU_2_Economize,         !- <none>
+    AHU_3_Economize,         !- <none>
+    AHU_4_Economize,         !- <none>
+    AHU_5_Economize,         !- <none>
+    AHU_6_Economize,         !- <none>
+    Flr_1_Cafe_DT2,          !- <none>
+    Flr_1_Clean_DT2,         !- <none>
+    Flr_1_Conf_DT2,          !- <none>
+    Flr_1_Dining_DT2,        !- <none>
+    Flr_1_Elev_DT2,          !- <none>
+    Flr_1_Exam_DT2,          !- <none>
+    Flr_1_FStor_DT2,         !- <none>
+    Flr_1_GStor_DT2,         !- <none>
+    Flr_1_Image_DT2,         !- <none>
+    Flr_1_Kitchen_DT2,       !- <none>
+    Flr_1_Lab_1_DT2,         !- <none>
+    Flr_1_Lab_2_DT2,         !- <none>
+    Flr_1_Laundry_DT2,       !- <none>
+    Flr_1_Lobby_DT2,         !- <none>
+    Flr_1_Lounge_DT2,        !- <none>
+    Flr_1_Mech_1_DT2,        !- <none>
+    Flr_1_Mech_2_DT2,        !- <none>
+    Flr_1_Off_1_DT2,         !- <none>
+    Flr_1_Off_2_DT2,         !- <none>
+    Flr_1_Off_3_DT2,         !- <none>
+    Flr_1_Off3_P1_DT2,       !- <none>
+    Flr_1_Off3_P2_DT2,       !- <none>
+    Flr_1_Off3_P3_DT2,       !- <none>
+    Flr_1_Pat_DT2,           !- <none>
+    Flr_1_Pharm_DT2,         !- <none>
+    Flr_1_PT_DT2,            !- <none>
+    Flr_1_Receive_DT2,       !- <none>
+    Flr_1_Recep_DT2,         !- <none>
+    Flr_1_Soil_DT2,          !- <none>
+    Flr_1_Stor_DT2,          !- <none>
+    Flr_1_Waiting_DT2;       !- <none>
 
 !-   ===========  ALL OBJECTS IN CLASS: ENERGYMANAGEMENTSYSTEM:OUTPUTVARIABLE ===========
 

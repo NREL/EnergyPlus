@@ -96,6 +96,10 @@ namespace DataZoneEquipment {
 	int NumOfZoneEquipLists( 0 ); // The Number of Zone Equipment List objects
 	FArray1D_int ZoneEquipAvail;
 
+	FArray1D_bool CrossMixingReportFlag;
+	FArray1D_bool MixingReportFlag;
+	FArray1D< Real64 > VentMCP;
+
 	// Utility routines for module
 
 	// Object Data
@@ -1308,13 +1312,13 @@ namespace DataZoneEquipment {
 			OAVolumeFlowRate = OARequirements( DSOAPtr ).OAFlowPerArea * Zone( ActualZoneNum ).FloorArea;
 		} else if ( SELECT_CASE_var == OAFlowACH ) {
 			// Multiplied by zone volume
-			OAVolumeFlowRate = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.;
+			OAVolumeFlowRate = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
 
 		} else if ( ( SELECT_CASE_var == OAFlowSum ) || ( SELECT_CASE_var == OAFlowMax ) ) {
 			// Use sum or max of per person and the following
 			DSOAFlowPerZone = OARequirements( DSOAPtr ).OAFlowPerZone;
 			DSOAFlowPerArea = OARequirements( DSOAPtr ).OAFlowPerArea * Zone( ActualZoneNum ).FloorArea;
-			DSOAFlowACH = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.;
+			DSOAFlowACH = OARequirements( DSOAPtr ).OAFlowACH * Zone( ActualZoneNum ).Volume / 3600.0;
 			if ( OARequirements( DSOAPtr ).OAFlowMethod == OAFlowMax ) {
 				OAVolumeFlowRate = max( DSOAFlowPeople, DSOAFlowPerZone, DSOAFlowPerArea, DSOAFlowACH );
 			} else {
@@ -1350,7 +1354,7 @@ namespace DataZoneEquipment {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

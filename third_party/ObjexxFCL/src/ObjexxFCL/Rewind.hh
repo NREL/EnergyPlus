@@ -18,7 +18,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class IOFlags;
 
 // Rewind Input Stream

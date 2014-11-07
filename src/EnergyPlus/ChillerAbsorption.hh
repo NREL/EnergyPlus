@@ -134,7 +134,7 @@ namespace ChillerAbsorption {
 			GeneratorVolFlowRate( 0.0 ),
 			GeneratorSubcool( 0.0 ),
 			SteamFluidIndex( 0 ),
-			GeneratorDeltaTemp( -99999. ),
+			GeneratorDeltaTemp( -99999.0 ),
 			CWLoopNum( 0 ),
 			CWLoopSideNum( 0 ),
 			CWBranchNum( 0 ),

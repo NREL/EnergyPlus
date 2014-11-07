@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -114,6 +115,8 @@ namespace ManageElectricPower {
 
 	int const Battery_LifeCalculation_Yes( 1 );
 	int const Battery_LifeCalculation_No( 2 );
+
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -891,7 +894,6 @@ namespace ManageElectricPower {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		static std::string const RoutineName( "GetPowerManagerInput: " );
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1646,7 +1648,7 @@ namespace ManageElectricPower {
 				ElecLoadCenter( Count ).InverterPresent = true;
 				ElecLoadCenter( Count ).StoragePresent = true;
 				cAlphaArgs( 6 ) = "DirectCurrentWithInverterACStorage";
-			} else if ( SameString( cAlphaArgs( 6 ), Blank ) ) {
+			} else if ( cAlphaArgs( 6 ).empty() ) {
 				ElecLoadCenter( Count ).BussType = ACBuss;
 				cAlphaArgs( 6 ) = "AlternatingCurrent (field was blank)";
 			} else {
@@ -2145,7 +2147,6 @@ namespace ManageElectricPower {
 			}
 		}
 
-		ThermalLoad = ThermalLoad;
 
 	}
 
@@ -2238,8 +2239,8 @@ namespace ManageElectricPower {
 		Real64 NormalizedPower;
 		int InvertNum;
 		int StorNum;
-		Real64 tmpEffic;
-		Real64 tempACpower;
+		Real64 tmpEffic( 0.0 );
+		Real64 tempACpower( 0.0 );
 
 		//model inverters
 		InvertNum = ElecLoadCenter( LoadCenterNum ).InverterModelNum;
@@ -2301,6 +2302,8 @@ namespace ManageElectricPower {
 					tmpEffic = Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 5 ) + ( ( NormalizedPower - 0.75 ) / ( 1.0 - 0.75 ) ) * ( Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 6 ) - Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 5 ) );
 				} else if ( NormalizedPower >= 1.0 ) {
 					tmpEffic = Inverter( InvertNum ).LUTable.NomVoltEfficiencyARR( 6 );
+				} else {
+					assert( false );
 				}
 
 				Inverter( InvertNum ).Efficiency = max( tmpEffic, 0.0 );
@@ -2333,6 +2336,8 @@ namespace ManageElectricPower {
 
 				tempACpower = Inverter( InvertNum ).Efficiency * Inverter( InvertNum ).DCPowerIn;
 
+			} else {
+				assert( false );
 			}}
 
 			Inverter( InvertNum ).ACPowerOut = tempACpower;
@@ -3174,8 +3179,8 @@ namespace ManageElectricPower {
 			ElecStorage( ElecStorNum ).FractionSOC = TotalSOC / qmax;
 			ElecStorage( ElecStorNum ).BatteryCurrent = I0 * Numpar;
 			ElecStorage( ElecStorNum ).BatteryVoltage = Volt * Numser;
-			ElecStorage( ElecStorNum ).ThermLossRate = InternalR * std::pow( I0, 2 ) * Numbattery;
-			ElecStorage( ElecStorNum ).ThermLossEnergy = InternalR * std::pow( I0, 2 ) * TimeStepSys * SecInHour * Numbattery;
+			ElecStorage( ElecStorNum ).ThermLossRate = InternalR * pow_2( I0 ) * Numbattery;
+			ElecStorage( ElecStorNum ).ThermLossEnergy = InternalR * pow_2( I0 ) * TimeStepSys * SecInHour * Numbattery;
 
 			if ( ElecStorage( ElecStorNum ).ZoneNum > 0 ) { // set values for zone heat gains
 				ElecStorage( ElecStorNum ).QdotConvZone = ( ( 1.0 - ElecStorage( ElecStorNum ).ZoneRadFract ) * ElecStorage( ElecStorNum ).ThermLossRate ) * Numbattery;
@@ -3328,10 +3333,10 @@ namespace ManageElectricPower {
 
 					Capacity = Transformer( TransfNum ).RatedCapacity;
 					Numerator = Capacity * Transformer( TransfNum ).RatedPUL * ( 1.0 - Transformer( TransfNum ).RatedEfficiency );
-					Denominator = Transformer( TransfNum ).RatedEfficiency * ( 1.0 + std::pow( ( Transformer( TransfNum ).RatedPUL / Transformer( TransfNum ).MaxPUL ), 2 ) );
+					Denominator = Transformer( TransfNum ).RatedEfficiency * ( 1.0 + pow_2( Transformer( TransfNum ).RatedPUL / Transformer( TransfNum ).MaxPUL ) );
 
 					Transformer( TransfNum ).RatedNL = Numerator / Denominator;
-					Transformer( TransfNum ).RatedLL = Transformer( TransfNum ).RatedNL / ( FactorTempCorr * std::pow( ( Transformer( TransfNum ).MaxPUL ), 2 ) );
+					Transformer( TransfNum ).RatedLL = Transformer( TransfNum ).RatedNL / ( FactorTempCorr * pow_2( Transformer( TransfNum ).MaxPUL ) );
 
 				}
 			}
@@ -3404,7 +3409,7 @@ namespace ManageElectricPower {
 					ShowRecurringSevereErrorAtEnd( "Transformer Overloaded: " "Entered in ElectricLoadCenter:Transformer =" + Transformer( TransfNum ).Name, Transformer( TransfNum ).OverloadErrorIndex );
 				}
 
-				TempChange = ( std::pow( PUL, 1.6 ) ) * Transformer( TransfNum ).TempRise;
+				TempChange = std::pow( PUL, 1.6 ) * Transformer( TransfNum ).TempRise;
 
 				if ( Transformer( TransfNum ).HeatLossesDestination == ZoneGains ) {
 					ZoneNum = Transformer( TransfNum ).ZoneNum;
@@ -3418,7 +3423,7 @@ namespace ManageElectricPower {
 				ResRatio = ResSpecified / ResRef;
 				FactorTempCorr = ( 1.0 - Transformer( TransfNum ).EddyFrac ) * ResRatio + Transformer( TransfNum ).EddyFrac * ( 1.0 / ResRatio );
 
-				Transformer( TransfNum ).LoadLossRate = Transformer( TransfNum ).RatedLL * ( std::pow( PUL, 2 ) ) * FactorTempCorr;
+				Transformer( TransfNum ).LoadLossRate = Transformer( TransfNum ).RatedLL * pow_2( PUL ) * FactorTempCorr;
 				Transformer( TransfNum ).NoLoadLossRate = Transformer( TransfNum ).RatedNL;
 			} else { //Transformer is not available.
 				Transformer( TransfNum ).LoadLossRate = 0.0;
@@ -3683,8 +3688,8 @@ namespace ManageElectricPower {
 		// na
 
 		// Argument array dimensioning
-		A.dim( {0,dim} );
-		B.dim( {0,dim} );
+		A.dim( {1,dim} );
+		B.dim( {1,dim} );
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3722,7 +3727,7 @@ namespace ManageElectricPower {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

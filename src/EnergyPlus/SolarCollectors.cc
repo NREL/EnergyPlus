@@ -72,6 +72,8 @@ namespace SolarCollectors {
 	int const ICSRectangularTank( 1 );
 	//INTEGER, PARAMETER :: ICSProgressiveTube = 2
 
+	static std::string const fluidNameWater( "WATER" );
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -759,6 +761,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "InitSolarCollector" );
 		int InletNode;
 		int OutletNode;
 
@@ -815,7 +818,7 @@ namespace SolarCollectors {
 		if ( BeginEnvrnFlag && Collector( CollectorNum ).Init ) {
 			// Clear node initial conditions
 			if ( Collector( CollectorNum ).VolFlowRateMax > 0 ) { //CR7425
-				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, "InitSolarCollector" );
+				rho = GetDensityGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InitConvTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 
 				Collector( CollectorNum ).MassFlowRateMax = Collector( CollectorNum ).VolFlowRateMax * rho;
 			} else { //CR7425
@@ -869,7 +872,7 @@ namespace SolarCollectors {
 
 			// transmittance-absorptance product for sky diffuse radiation.  Uses equivalent incident angle
 			// of sky radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-			Theta = ( 59.68 - 0.1388 * Tilt + 0.001497 * std::pow( Tilt, 2 ) ) * DegToRadians;
+			Theta = ( 59.68 - 0.1388 * Tilt + 0.001497 * pow_2( Tilt ) ) * DegToRadians;
 			CalcTransRefAbsOfCover( CollectorNum, Theta, TransSys, RefSys, AbsCover1, AbsCover2 );
 			Collector( CollectorNum ).TauAlphaSkyDiffuse = TransSys * Parameters( ParamNum ).AbsorOfAbsPlate / ( 1.0 - ( 1.0 - Parameters( ParamNum ).AbsorOfAbsPlate ) * Collector( CollectorNum ).RefDiffInnerCover );
 			Collector( CollectorNum ).CoversAbsSkyDiffuse( 1 ) = AbsCover1;
@@ -877,7 +880,7 @@ namespace SolarCollectors {
 
 			// transmittance-absorptance product for ground diffuse radiation.  Uses equivalent incident angle
 			// of ground radiation (radians), and is calculated according to Brandemuehl and Beckman (1980):
-			Theta = ( 90.0 - 0.5788 * Tilt + 0.002693 * std::pow( Tilt, 2 ) ) * DegToRadians;
+			Theta = ( 90.0 - 0.5788 * Tilt + 0.002693 * pow_2( Tilt ) ) * DegToRadians;
 			CalcTransRefAbsOfCover( CollectorNum, Theta, TransSys, RefSys, AbsCover1, AbsCover2 );
 			Collector( CollectorNum ).TauAlphaGndDiffuse = TransSys * Parameters( ParamNum ).AbsorOfAbsPlate / ( 1.0 - ( 1.0 - Parameters( ParamNum ).AbsorOfAbsPlate ) * Collector( CollectorNum ).RefDiffInnerCover );
 			Collector( CollectorNum ).CoversAbsGndDiffuse( 1 ) = AbsCover1;
@@ -968,6 +971,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "CalcSolarCollector" );
 		int SurfNum; // Surface object number for collector
 		int ParamNum; // Collector parameters object number
 		Real64 Tilt; // Surface tilt angle (degrees)
@@ -1008,8 +1012,8 @@ namespace SolarCollectors {
 
 			// Calculate equivalent incident angles for sky and ground radiation according to Brandemuehl and Beckman (1980)
 			Tilt = Surface( SurfNum ).Tilt;
-			ThetaSky = ( 59.68 - 0.1388 * Tilt + 0.001497 * std::pow( Tilt, 2 ) ) * DegToRadians;
-			ThetaGnd = ( 90.0 - 0.5788 * Tilt + 0.002693 * std::pow( Tilt, 2 ) ) * DegToRadians;
+			ThetaSky = ( 59.68 - 0.1388 * Tilt + 0.001497 * pow_2( Tilt ) ) * DegToRadians;
+			ThetaGnd = ( 90.0 - 0.5788 * Tilt + 0.002693 * pow_2( Tilt ) ) * DegToRadians;
 
 			IncidentAngleModifier = ( QRadSWOutIncidentBeam( SurfNum ) * IAM( ParamNum, ThetaBeam ) + QRadSWOutIncidentSkyDiffuse( SurfNum ) * IAM( ParamNum, ThetaSky ) + QRadSWOutIncidentGndDiffuse( SurfNum ) * IAM( ParamNum, ThetaGnd ) ) / QRadSWOutIncident( SurfNum );
 		} else {
@@ -1020,7 +1024,7 @@ namespace SolarCollectors {
 
 		MassFlowRate = Collector( CollectorNum ).MassFlowRate;
 
-		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, "CalcSolarCollector" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 
 		Area = Surface( SurfNum ).Area;
 		mCpA = MassFlowRate * Cp / Area;
@@ -1069,12 +1073,12 @@ namespace SolarCollectors {
 				if ( ( -FpULTest / mCpA ) < 700.0 ) {
 					FlowMod = mCpA * ( 1.0 - std::exp( -FpULTest / mCpA ) );
 				} else { // avoid EXP(too large #)
-					FlowMod = FlowMod;
+					//FlowMod = FlowMod; // Self-assignment commented out
 				}
 				if ( ( -FpULTest / mCpATest ) < 700.0 ) {
 					FlowMod /= ( mCpATest * ( 1.0 - std::exp( -FpULTest / mCpATest ) ) );
 				} else {
-					FlowMod = FlowMod;
+					//FlowMod = FlowMod; // Self-assignment commented out
 				}
 
 				// Calculate fluid heat gain (or loss)
@@ -1107,8 +1111,8 @@ namespace SolarCollectors {
 				// Calculate temperature of stagnant fluid in collector
 				A = -FRULT;
 				B = -FRUL + 2.0 * FRULT * Surface( SurfNum ).OutDryBulbTemp;
-				C = -FRULT * std::pow( Surface( SurfNum ).OutDryBulbTemp, 2 ) + FRUL * Surface( SurfNum ).OutDryBulbTemp - FRTAN * IncidentAngleModifier * QRadSWOutIncident( SurfNum );
-				qEquation = ( std::pow( B, 2 ) - 4.0 * A * C );
+				C = -FRULT * pow_2( Surface( SurfNum ).OutDryBulbTemp ) + FRUL * Surface( SurfNum ).OutDryBulbTemp - FRTAN * IncidentAngleModifier * QRadSWOutIncident( SurfNum );
+				qEquation = ( pow_2( B ) - 4.0 * A * C );
 				if ( qEquation < 0.0 ) {
 					if ( Collector( CollectorNum ).ErrIndex == 0 ) {
 						ShowSevereMessage( "CalcSolarCollector: " + ccSimPlantEquipTypes( Collector( CollectorNum ).TypeNum ) + "=\"" + Collector( CollectorNum ).Name + "\", possible bad input coefficients." );
@@ -1120,7 +1124,7 @@ namespace SolarCollectors {
 				if ( FRULT == 0.0 || qEquation < 0.0 ) { // Linear, 1st order solution
 					OutletTemp = Surface( SurfNum ).OutDryBulbTemp - FRTAN * IncidentAngleModifier * QRadSWOutIncident( SurfNum ) / FRUL;
 				} else { // Quadratic, 2nd order solution
-					OutletTemp = ( -B + std::pow( qEquation, 0.5 ) ) / ( 2.0 * A );
+					OutletTemp = ( -B + std::sqrt( qEquation ) ) / ( 2.0 * A );
 				}
 			}
 
@@ -1182,6 +1186,8 @@ namespace SolarCollectors {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
+		static gio::Fmt const fmtLD( "*" );
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 s; // Intermediate variable
 		std::string String; // Dummy string for converting numbers to strings
@@ -1197,16 +1203,16 @@ namespace SolarCollectors {
 
 			s = ( 1.0 / std::cos( IncidentAngle ) ) - 1.0;
 
-			IAM = 1.0 + Parameters( ParamNum ).iam1 * s + Parameters( ParamNum ).iam2 * ( std::pow( s, 2 ) );
+			IAM = 1.0 + Parameters( ParamNum ).iam1 * s + Parameters( ParamNum ).iam2 * pow_2( s );
 			IAM = max( IAM, 0.0 ); // Never allow to be less than zero, but greater than one is a possibility
 
 			if ( IAM > 10.0 ) { // Greater than 10 is probably not a possibility
 				ShowSevereError( "IAM Function: SolarCollectorPerformance:FlatPlate = " + Parameters( ParamNum ).Name + ":  Incident Angle Modifier is out of bounds due to bad coefficients." );
-				gio::write( String, "*" ) << Parameters( ParamNum ).iam1;
+				gio::write( String, fmtLD ) << Parameters( ParamNum ).iam1;
 				ShowContinueError( "Coefficient 2 of Incident Angle Modifier =" + String );
-				gio::write( String, "*" ) << Parameters( ParamNum ).iam2;
+				gio::write( String, fmtLD ) << Parameters( ParamNum ).iam2;
 				ShowContinueError( "Coefficient 3 of Incident Angle Modifier =" + String );
-				gio::write( String, "*" ) << IAM;
+				gio::write( String, fmtLD ) << IAM;
 				ShowContinueError( "Calculated Incident Angle Modifier =" + String );
 				ShowContinueError( "Expected Incident Angle Modifier should be approximately 1.5 or less." );
 				ShowFatalError( "Errors in SolarCollectorPerformance:FlatPlate input." );
@@ -1262,7 +1268,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcICSSolarCollector" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		//  REAL(r64) :: TimeElapsed             ! Fraction of the current hour that has elapsed (h)
@@ -1329,9 +1335,9 @@ namespace SolarCollectors {
 
 		MassFlowRate = Collector( ColleNum ).MassFlowRate;
 
-		Cpw = GetSpecificHeatGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, "CalcICSSolarCollector" );
+		Cpw = GetSpecificHeatGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, RoutineName );
 
-		Rhow = GetDensityGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, "CalcICSSolarCollector" );
+		Rhow = GetDensityGlycol( PlantLoop( Collector( ColleNum ).WLoopNum ).FluidName, InletTemp, PlantLoop( Collector( ColleNum ).WLoopNum ).FluidIndex, RoutineName );
 
 		// calculate heat transfer coefficients and covers temperature:
 		CalcHeatTransCoeffAndCoverTemp( ColleNum );
@@ -1452,10 +1458,10 @@ namespace SolarCollectors {
 			a = 1.0;
 			b = -( a1 + b2 );
 			c = a1 * b2 - a2 * b1;
-			BSquareM4TimesATimesC = std::pow( b, 2 ) - 4.0 * a * c;
+			BSquareM4TimesATimesC = pow_2( b ) - 4.0 * a * c;
 			if ( BSquareM4TimesATimesC > 0.0 ) {
-				lamda1 = ( -b + std::sqrt( BSquareM4TimesATimesC ) ) / ( 2. * a );
-				lamda2 = ( -b - std::sqrt( BSquareM4TimesATimesC ) ) / ( 2. * a );
+				lamda1 = ( -b + std::sqrt( BSquareM4TimesATimesC ) ) / ( 2.0 * a );
+				lamda2 = ( -b - std::sqrt( BSquareM4TimesATimesC ) ) / ( 2.0 * a );
 				DetOfMatrix = c;
 				ConstOfTpSln = ( -a3 * b2 + b3 * a2 ) / DetOfMatrix;
 				ConstOfTwSln = ( -a1 * b3 + b1 * a3 ) / DetOfMatrix;
@@ -1670,19 +1676,19 @@ namespace SolarCollectors {
 
 			// parallel and perpendicular reflection components:
 			if ( IncAngle == 0.0 ) {
-				ParaRad = std::pow( ( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) ), 2 );
-				PerpRad = std::pow( ( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) ), 2 );
+				ParaRad = pow_2( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) );
+				PerpRad = pow_2( ( CoverRefrIndex - AirRefIndex ) / ( CoverRefrIndex + AirRefIndex ) );
 			} else {
-				ParaRad = std::pow( std::tan( RefrAngle - IncAngle ), 2 ) / std::pow( std::tan( RefrAngle + IncAngle ), 2 );
-				PerpRad = std::pow( std::sin( RefrAngle - IncAngle ), 2 ) / std::pow( std::sin( RefrAngle + IncAngle ), 2 );
+				ParaRad = pow_2( std::tan( RefrAngle - IncAngle ) ) / pow_2( std::tan( RefrAngle + IncAngle ) );
+				PerpRad = pow_2( std::sin( RefrAngle - IncAngle ) ) / pow_2( std::sin( RefrAngle + IncAngle ) );
 			}
 
 			// parallel and perpendicular transmitted components:
-			TransPerp( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - PerpRad ) / ( 1.0 + PerpRad ) ) * ( ( 1.0 - std::pow( PerpRad, 2 ) ) / ( 1.0 - std::pow( ( PerpRad * TransAbsOnly( nCover ) ), 2 ) ) );
-			TransPara( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - ParaRad ) / ( 1.0 + ParaRad ) ) * ( ( 1.0 - std::pow( ParaRad, 2 ) ) / ( 1.0 - std::pow( ( ParaRad * TransAbsOnly( nCover ) ), 2 ) ) );
+			TransPerp( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - PerpRad ) / ( 1.0 + PerpRad ) ) * ( ( 1.0 - pow_2( PerpRad ) ) / ( 1.0 - pow_2( PerpRad * TransAbsOnly( nCover ) ) ) );
+			TransPara( nCover ) = TransAbsOnly( nCover ) * ( ( 1.0 - ParaRad ) / ( 1.0 + ParaRad ) ) * ( ( 1.0 - pow_2( ParaRad ) ) / ( 1.0 - pow_2( ParaRad * TransAbsOnly( nCover ) ) ) );
 
-			ReflPerp( nCover ) = ( PerpRad + ( ( std::pow( ( 1.0 - PerpRad ), 2 ) ) * ( std::pow( TransAbsOnly( nCover ), 2 ) ) * PerpRad ) / ( 1.0 - std::pow( ( PerpRad * TransAbsOnly( nCover ) ), 2 ) ) );
-			ReflPara( nCover ) = ( ParaRad + ( ( std::pow( ( 1.0 - ParaRad ), 2 ) ) * ( std::pow( TransAbsOnly( nCover ), 2 ) ) * ParaRad ) / ( 1.0 - std::pow( ( ParaRad * TransAbsOnly( nCover ) ), 2 ) ) );
+			ReflPerp( nCover ) = ( PerpRad + ( pow_2( 1.0 - PerpRad ) * pow_2( TransAbsOnly( nCover ) ) * PerpRad ) / ( 1.0 - pow_2( PerpRad * TransAbsOnly( nCover ) ) ) );
+			ReflPara( nCover ) = ( ParaRad + ( pow_2( 1.0 - ParaRad ) * pow_2( TransAbsOnly( nCover ) ) * ParaRad ) / ( 1.0 - pow_2( ParaRad * TransAbsOnly( nCover ) ) ) );
 
 			AbsorPerp( nCover ) = 1.0 - TransPerp( nCover ) - ReflPerp( nCover );
 			AbsorPara( nCover ) = 1.0 - TransPara( nCover ) - ReflPara( nCover );
@@ -1784,7 +1790,7 @@ namespace SolarCollectors {
 		{ auto const SELECT_CASE_var( NumCovers );
 		if ( SELECT_CASE_var == 1 ) {
 			// calc linearized radiation coefficient
-			tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( std::pow( ( TempAbsPlate + KelvinConv ), 2 ) + std::pow( ( TempOuterCover + KelvinConv ), 2 ) );
+			tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( pow_2( TempAbsPlate + KelvinConv ) + pow_2( TempOuterCover + KelvinConv ) );
 			tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfOuterCover - 1.0;
 			hRadCoefA2C = tempnom / tempdenom;
 			hRadCoefC2C = 0.0;
@@ -1795,14 +1801,14 @@ namespace SolarCollectors {
 			for ( CoverNum = 1; CoverNum <= NumCovers; ++CoverNum ) {
 				if ( CoverNum == 1 ) {
 					// calc linearized radiation coefficient
-					tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempInnerCover + KelvinConv ) ) * ( std::pow( ( TempAbsPlate + KelvinConv ), 2 ) + std::pow( ( TempInnerCover + KelvinConv ), 2 ) );
+					tempnom = StefanBoltzmann * ( ( TempAbsPlate + KelvinConv ) + ( TempInnerCover + KelvinConv ) ) * ( pow_2( TempAbsPlate + KelvinConv ) + pow_2( TempInnerCover + KelvinConv ) );
 					tempdenom = 1.0 / EmissOfAbsPlate + 1.0 / EmissOfInnerCover - 1.0;
 					hRadCoefA2C = tempnom / tempdenom;
 					// Calc convection heat transfer coefficient:
 					hConvCoefA2C = CalcConvCoeffBetweenPlates( TempAbsPlate, TempOuterCover, AirGapDepth, Collector( ColleNum ).CosTilt, Collector( ColleNum ).SinTilt );
 				} else {
 					// calculate the linearized radiation coeff.
-					tempnom = StefanBoltzmann * ( ( TempInnerCover + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( std::pow( ( TempInnerCover + KelvinConv ), 2 ) + std::pow( ( TempOuterCover + KelvinConv ), 2 ) );
+					tempnom = StefanBoltzmann * ( ( TempInnerCover + KelvinConv ) + ( TempOuterCover + KelvinConv ) ) * ( pow_2( TempInnerCover + KelvinConv ) + pow_2( TempOuterCover + KelvinConv ) );
 					tempdenom = 1.0 / EmissOfInnerCover + 1.0 / EmissOfOuterCover - 1.0;
 					hRadCoefC2C = tempnom / tempdenom;
 					// Calc convection heat transfer coefficient:
@@ -1815,7 +1821,7 @@ namespace SolarCollectors {
 		hConvCoefC2O = 2.8 + 3.0 * Surface( SurfNum ).WindSpeed;
 
 		// Calc linearized radiation coefficient between outer cover and the surrounding:
-		tempnom = Surface( SurfNum ).ViewFactorSky * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + SkyTempKelvin ) * ( std::pow( ( TempOuterCover + KelvinConv ), 2 ) + std::pow( SkyTempKelvin, 2 ) );
+		tempnom = Surface( SurfNum ).ViewFactorSky * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + SkyTempKelvin ) * ( pow_2( TempOuterCover + KelvinConv ) + pow_2( SkyTempKelvin ) );
 		tempdenom = ( TempOuterCover - TempOutdoorAir ) / ( TempOuterCover - SkyTemp );
 		if ( tempdenom < 0.0 ) {
 			// use approximate linearized radiation coefficient
@@ -1827,7 +1833,7 @@ namespace SolarCollectors {
 			hRadCoefC2Sky = tempnom / tempdenom;
 		}
 
-		tempnom = Surface( SurfNum ).ViewFactorGround * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + GroundTempKelvin ) * ( std::pow( ( TempOuterCover + KelvinConv ), 2 ) + std::pow( GroundTempKelvin, 2 ) );
+		tempnom = Surface( SurfNum ).ViewFactorGround * EmissOfOuterCover * StefanBoltzmann * ( ( TempOuterCover + KelvinConv ) + GroundTempKelvin ) * ( pow_2( TempOuterCover + KelvinConv ) + pow_2( GroundTempKelvin ) );
 		tempdenom = ( TempOuterCover - TempOutdoorAir ) / ( TempOuterCover - GroundTemp );
 		if ( tempdenom < 0.0 ) {
 			// use approximate linearized radiation coefficient
@@ -1929,9 +1935,9 @@ namespace SolarCollectors {
 
 		int const NumOfPropDivisions( 11 );
 		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { -23.15, 6.85, 16.85, 24.85, 26.85, 36.85, 46.85, 56.85, 66.85, 76.85, 126.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { .0000161, .0000175, .000018, .0000184, .0000185, .000019, .0000194, .0000199, .0000203, .0000208, .0000229 } ); // Viscosity, in kg/(m.s)
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { .0223, .0246, .0253, .0259, .0261, .0268, .0275, .0283, .0290, .0297, .0331 } ); // Conductivity, in W/mK
-		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { .724, .717, .714, .712, .712, .711, .71, .708, .707, .706, .703 } ); // Prandtl number (dimensionless)
+		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.0000161, 0.0000175, 0.000018, 0.0000184, 0.0000185, 0.000019, 0.0000194, 0.0000199, 0.0000203, 0.0000208, 0.0000229 } ); // Viscosity, in kg/(m.s)
+		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.0223, 0.0246, 0.0253, 0.0259, 0.0261, 0.0268, 0.0275, 0.0283, 0.0290, 0.0297, 0.0331 } ); // Conductivity, in W/mK
+		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 0.724, 0.717, 0.714, 0.712, 0.712, 0.711, 0.71, 0.708, 0.707, 0.706, 0.703 } ); // Prandtl number (dimensionless)
 		static FArray1D< Real64 > const Density( NumOfPropDivisions, { 1.413, 1.271, 1.224, 1.186, 1.177, 1.143, 1.110, 1.076, 1.043, 1.009, 0.883 } ); // Density, in kg/m3
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1986,19 +1992,19 @@ namespace SolarCollectors {
 
 		VolExpAir = 1.0 / ( Tref + KelvinConv );
 
-		RaNum = gravity * ( std::pow( DensOfAir, 2 ) ) * VolExpAir * PrOfAir * DeltaT * ( std::pow( AirGap, 3 ) ) / ( std::pow( VisDOfAir, 2 ) );
+		RaNum = gravity * pow_2( DensOfAir ) * VolExpAir * PrOfAir * DeltaT * pow_3( AirGap ) / pow_2( VisDOfAir );
 		RaNumCosTilt = RaNum * CosTilt;
 		if ( RaNum == 0.0 ) {
 			NuL = 0.0;
 		} else {
-			if ( RaNumCosTilt > 1708. ) {
-				NuL = 1.44 * ( 1.0 - 1708. * ( std::pow( SinTilt, 1.6 ) ) / ( RaNum * CosTilt ) ) * ( 1.0 - 1708.0 / RaNumCosTilt );
+			if ( RaNumCosTilt > 1708.0 ) {
+				NuL = 1.44 * ( 1.0 - 1708.0 * std::pow( SinTilt, 1.6 ) / ( RaNum * CosTilt ) ) * ( 1.0 - 1708.0 / RaNumCosTilt );
 			} else {
 				NuL = 0.0;
 			}
 		}
-		if ( RaNumCosTilt > 5830. ) {
-			NuL += std::pow( ( RaNumCosTilt / 5830. - 1.0 ), ( 1.0 / 3.0 ) );
+		if ( RaNumCosTilt > 5830.0 ) {
+			NuL += std::pow( RaNumCosTilt / 5830.0 - 1.0, 1.0 / 3.0 );
 		}
 		++NuL;
 		hConvCoef = NuL * CondOfAir / AirGap;
@@ -2076,18 +2082,18 @@ namespace SolarCollectors {
 		DeltaT = std::abs( TAbsorber - TWater );
 		TReference = TAbsorber - 0.25 * ( TAbsorber - TWater );
 		// record fluid prop index for water
-		WaterIndex = FindGlycol( "WATER" );
+		WaterIndex = FindGlycol( fluidNameWater );
 		// find properties of water - always assume water
-		WaterSpecHeat = GetSpecificHeatGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
-		CondOfWater = GetConductivityGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
-		VisOfWater = GetViscosityGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
-		DensOfWater = GetDensityGlycol( "WATER", max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		WaterSpecHeat = GetSpecificHeatGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		CondOfWater = GetConductivityGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		VisOfWater = GetViscosityGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
+		DensOfWater = GetDensityGlycol( fluidNameWater, max( TReference, 0.0 ), WaterIndex, CalledFrom );
 		PrOfWater = VisOfWater * WaterSpecHeat / CondOfWater;
 		// Requires a different reference temperature for volumetric expansion coefficient
 		TReference = TWater - 0.25 * ( TWater - TAbsorber );
-		VolExpWater = -( GetDensityGlycol( "WATER", max( TReference, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( "WATER", max( TReference, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * DensOfWater );
+		VolExpWater = -( GetDensityGlycol( fluidNameWater, max( TReference, 10.0 ) + 5.0, WaterIndex, CalledFrom ) - GetDensityGlycol( fluidNameWater, max( TReference, 10.0 ) - 5.0, WaterIndex, CalledFrom ) ) / ( 10.0 * DensOfWater );
 
-		GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * ( std::pow( Lc, 3 ) ) / ( std::pow( VisOfWater, 2 ) );
+		GrNum = gravity * VolExpWater * DensOfWater * DensOfWater * PrOfWater * DeltaT * pow_3( Lc ) / pow_2( VisOfWater );
 		CosTilt = std::cos( TiltR2V * DegToRadians );
 		if ( TAbsorber > TWater ) {
 			// hot absorber plate facing down
@@ -2097,24 +2103,24 @@ namespace SolarCollectors {
 				if ( RaNum <= 1708.0 ) {
 					NuL = 1.0;
 				} else {
-					NuL = 0.58 * std::pow( ( RaNum ), 0.20 );
+					NuL = 0.58 * std::pow( RaNum, 0.20 );
 				}
 			} else {
 				RaNum = GrNum * PrOfWater * CosTilt;
 				if ( RaNum <= 1708.0 ) {
 					NuL = 1.0;
 				} else {
-					NuL = 0.56 * std::pow( ( RaNum ), 0.25 );
+					NuL = 0.56 * root_4( RaNum );
 				}
 			}
 		} else {
 			// cold plate facing down or hot plate facing up
 			RaNum = GrNum * PrOfWater;
 			if ( RaNum > 5.0e8 ) {
-				NuL = 0.13 * std::pow( ( RaNum ), ( 1.0 / 3.0 ) );
+				NuL = 0.13 * std::pow( RaNum, 1.0 / 3.0 );
 			} else {
-				NuL = 0.16 * std::pow( ( RaNum ), ( 1.0 / 3.0 ) );
-				if ( RaNum <= 1708. ) NuL = 1.0;
+				NuL = 0.16 * std::pow( RaNum, 1.0 / 3.0 );
+				if ( RaNum <= 1708.0 ) NuL = 1.0;
 			}
 		}
 		hConvA2W = NuL * CondOfWater / Lc;
@@ -2148,6 +2154,7 @@ namespace SolarCollectors {
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "UpdateSolarCollector" );
 		int InletNode;
 		int OutletNode;
 		Real64 Cp;
@@ -2159,7 +2166,7 @@ namespace SolarCollectors {
 		SafeCopyPlantNode( InletNode, OutletNode );
 		// Set outlet node variables that are possibly changed
 		Node( OutletNode ).Temp = Collector( CollectorNum ).OutletTemp;
-		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, Collector( CollectorNum ).OutletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, "UpdateSolarCollector" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidName, Collector( CollectorNum ).OutletTemp, PlantLoop( Collector( CollectorNum ).WLoopNum ).FluidIndex, RoutineName );
 		Node( OutletNode ).Enthalpy = Cp * Node( OutletNode ).Temp;
 
 	}
@@ -2327,7 +2334,7 @@ namespace SolarCollectors {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

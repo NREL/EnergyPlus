@@ -388,9 +388,9 @@ namespace Vectors {
 
 		az /= DegToRadians;
 		az = mod( 450.0 - az, 360.0 );
-		az += 90.;
+		az += 90.0;
 		if ( az < 0.0 ) az += 360.0;
-		az = mod( az, 360. );
+		az = mod( az, 360.0 );
 
 		// Clean up angle precision
 		if ( std::abs( az - 360.0 ) < 1.0e-3 ) { // Bring small angles to zero
@@ -820,7 +820,7 @@ namespace Vectors {
 		for ( int NFace = 1; NFace <= Poly.NumSurfaceFaces; ++NFace ) {
 			p3FaceOrigin = Poly.SurfaceFace( NFace ).FacePoints( 2 );
 			PyramidVolume = dot( Poly.SurfaceFace( NFace ).NewellAreaVector, ( p3FaceOrigin - p0 ) );
-			Volume += PyramidVolume / 3.;
+			Volume += PyramidVolume / 3.0;
 		}
 
 	}

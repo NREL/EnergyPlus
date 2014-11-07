@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -640,6 +641,7 @@ namespace ChillerReformulatedEIR {
 		//  na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "InitElecReformEIRChiller" );
 		static bool MyOneTimeFlag( true ); // One time logic flag for allocating MyEnvrnFlag array
 		static FArray1D_bool MyFlag;
 		static FArray1D_bool MyEnvrnFlag; // Logical array to initialize when appropriate
@@ -751,7 +753,7 @@ namespace ChillerReformulatedEIR {
 
 		if ( MyEnvrnFlag( EIRChillNum ) && BeginEnvrnFlag && ( PlantSizesOkayToFinalize ) ) {
 			if ( PlantSizeNotComplete ) SizeElecReformEIRChiller( EIRChillNum );
-			rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, "InitElecReformEIRChiller" );
+			rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			ElecReformEIRChiller( EIRChillNum ).EvapMassFlowRateMax = ElecReformEIRChiller( EIRChillNum ).EvapVolFlowRate * rho;
 
@@ -759,13 +761,13 @@ namespace ChillerReformulatedEIR {
 
 			if ( ElecReformEIRChiller( EIRChillNum ).CondenserType == WaterCooled ) {
 
-				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, "InitElecReformEIRChiller" );
+				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				ElecReformEIRChiller( EIRChillNum ).CondMassFlowRateMax = rho * ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
 				InitComponentNodes( 0.0, ElecReformEIRChiller( EIRChillNum ).CondMassFlowRateMax, CondInletNode, CondOutletNode, ElecReformEIRChiller( EIRChillNum ).CDLoopNum, ElecReformEIRChiller( EIRChillNum ).CDLoopSideNum, ElecReformEIRChiller( EIRChillNum ).CDBranchNum, ElecReformEIRChiller( EIRChillNum ).CDCompNum );
 				Node( CondInletNode ).Temp = ElecReformEIRChiller( EIRChillNum ).TempRefCondIn;
 			} else { // air or evap air condenser
 				// Initialize maximum available condenser flow rate
-				Node( CondInletNode ).MassFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, 0.0, "InitElecReformEIRChiller" );
+				Node( CondInletNode ).MassFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, 0.0, RoutineName );
 				Node( CondOutletNode ).MassFlowRate = Node( CondInletNode ).MassFlowRate;
 				Node( CondInletNode ).MassFlowRateMaxAvail = Node( CondInletNode ).MassFlowRate;
 				Node( CondInletNode ).MassFlowRateMax = Node( CondInletNode ).MassFlowRate;
@@ -779,7 +781,7 @@ namespace ChillerReformulatedEIR {
 			}
 
 			if ( ElecReformEIRChiller( EIRChillNum ).HeatRecActive ) {
-				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, "InitElecReformEIRChiller" );
+				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, RoutineName );
 				ElecReformEIRChiller( EIRChillNum ).DesignHeatRecMassFlowRate = rho * ElecReformEIRChiller( EIRChillNum ).DesignHeatRecVolFlowRate;
 				InitComponentNodes( 0.0, ElecReformEIRChiller( EIRChillNum ).DesignHeatRecMassFlowRate, ElecReformEIRChiller( EIRChillNum ).HeatRecInletNodeNum, ElecReformEIRChiller( EIRChillNum ).HeatRecOutletNodeNum, ElecReformEIRChiller( EIRChillNum ).HRLoopNum, ElecReformEIRChiller( EIRChillNum ).HRLoopSideNum, ElecReformEIRChiller( EIRChillNum ).HRBranchNum, ElecReformEIRChiller( EIRChillNum ).HRCompNum );
 				// overall capacity limit
@@ -882,7 +884,7 @@ namespace ChillerReformulatedEIR {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
+		static std::string const RoutineName( "SizeElecReformEIRChiller" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		//  na
@@ -1022,9 +1024,9 @@ namespace ChillerReformulatedEIR {
 					SizingEvapOutletTemp = ElecReformEIRChiller( EIRChillNum ).TempRefEvapOut;
 					SizingCondOutletTemp = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut;
 				}
-				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, "SizeElecReformEIRChiller" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, "SizeElecReformEIRChiller" );
+				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 				RefCapFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, SizingEvapOutletTemp, SizingCondOutletTemp );
 				tmpNomCap = ( Cp * rho * PlantSizData( PltSizNum ).DeltaT * tmpEvapVolFlowRate ) / RefCapFT;
@@ -1079,9 +1081,9 @@ namespace ChillerReformulatedEIR {
 		}
 		if ( PltSizCondNum > 0 && PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow && tmpNomCap > 0.0 ) {
-				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, "SizeElecReformEIRChiller" );
+				rho = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, InitConvTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
-				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, "SizeElecReformEIRChiller" );
+				Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondIn, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 				tmpCondVolFlowRate = tmpNomCap * ( 1.0 + ( 1.0 / ElecReformEIRChiller( EIRChillNum ).RefCOP ) * ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac ) / ( PlantSizData( PltSizCondNum ).DeltaT * Cp * rho );
 				if ( ! IsAutoSize ) tmpCondVolFlowRate = ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate;
 				//IF (PlantSizesOkayToFinalize) ElecReformEIRChiller(EIRChillNum)%CondVolFlowRate = tmpCondVolFlowRate
@@ -1227,9 +1229,9 @@ namespace ChillerReformulatedEIR {
 			}
 
 			//  Initialize condenser reference inlet temperature (not a user input)
-			Density = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, "SizeElecReformEIRChiller" );
+			Density = GetDensityGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
-			SpecificHeat = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, "SizeElecReformEIRChiller" );
+			SpecificHeat = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, ElecReformEIRChiller( EIRChillNum ).TempRefCondOut, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 			CondenserCapacity = ElecReformEIRChiller( EIRChillNum ).RefCap * ( 1.0 + ( 1.0 / ElecReformEIRChiller( EIRChillNum ).RefCOP ) * ElecReformEIRChiller( EIRChillNum ).CompPowerToCondenserFrac );
 			DeltaTCond = ( CondenserCapacity ) / ( ElecReformEIRChiller( EIRChillNum ).CondVolFlowRate * Density * SpecificHeat );
 			ElecReformEIRChiller( EIRChillNum ).TempRefCondIn = ElecReformEIRChiller( EIRChillNum ).TempRefCondOut - DeltaTCond;
@@ -1464,7 +1466,7 @@ namespace ChillerReformulatedEIR {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		//  na
+		static std::string const RoutineName( "EIRChillerHeatRecovery" );
 
 		// DERIVED TYPE DEFINITIONS:
 		//  na
@@ -1484,7 +1486,7 @@ namespace ChillerReformulatedEIR {
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
 		Real64 CpCond; // Condenser water inlet specific heat [J/kg-K]
 		Real64 QHeatRecToSetPoint;
-		Real64 THeatRecSetPoint;
+		Real64 THeatRecSetPoint( 0.0 );
 		Real64 HeatRecHighInletLimit;
 
 		// Begin routine
@@ -1497,8 +1499,8 @@ namespace ChillerReformulatedEIR {
 		HeatRecInletTemp = Node( HeatRecInNode ).Temp;
 		HeatRecMassFlowRate = Node( HeatRecInNode ).MassFlowRate;
 
-		CpHeatRec = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, "EIRChillerHeatRecovery" );
-		CpCond = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, CondInletTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, "EIRChillerHeatRecovery" );
+		CpHeatRec = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidName, HeatRecInletTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).HRLoopNum ).FluidIndex, RoutineName );
+		CpCond = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, CondInletTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 
 		// Before we modify the QCondenser, the total or original value is transferred to QTot
 		QTotal = QCond;
@@ -1519,6 +1521,8 @@ namespace ChillerReformulatedEIR {
 				THeatRecSetPoint = Node( ElecReformEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum ).TempSetPoint;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				THeatRecSetPoint = Node( ElecReformEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum ).TempSetPointHi;
+			} else {
+				assert( false );
 			}}
 
 			QHeatRecToSetPoint = HeatRecMassFlowRate * CpHeatRec * ( THeatRecSetPoint - HeatRecInletTemp );
@@ -1815,6 +1819,7 @@ namespace ChillerReformulatedEIR {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static std::string const RoutineName( "CalcElecReformEIRChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		//  na
@@ -1829,10 +1834,10 @@ namespace ChillerReformulatedEIR {
 		Real64 MaxPartLoadRat; // Maximum allowed operating fraction of full load
 		Real64 EvapInletTemp; // Evaporator inlet temperature [C]
 		Real64 CondInletTemp; // Condenser inlet temperature [C]
-		Real64 EvapOutletTempSetPoint; // Evaporator outlet temperature setpoint [C]
+		Real64 EvapOutletTempSetPoint( 0.0 ); // Evaporator outlet temperature setpoint [C]
 		Real64 AvailChillerCap; // Chiller available capacity [W]
 		Real64 ChillerRefCap; // Chiller reference capacity [W]
-		Real64 EvapDeltaTemp; // Evaporator temperature difference [C]
+		Real64 EvapDeltaTemp( 0.0 ); // Evaporator temperature difference [C]
 		Real64 ReferenceCOP; // Reference coefficient of performance, from user input
 		Real64 PartLoadRat; // Operating part load ratio
 		Real64 TempLowLimitEout; // Evaporator low temp. limit cut off [C]
@@ -1966,6 +1971,8 @@ namespace ChillerReformulatedEIR {
 			} else { // use plant loop overall setpoint
 				EvapOutletTempSetPoint = Node( PlantLoop( PlantLoopNum ).TempSetPointNodeNum ).TempSetPointHi;
 			}
+		} else {
+			assert( false );
 		}}
 
 		// correct temperature if using heat recovery
@@ -2008,7 +2015,7 @@ namespace ChillerReformulatedEIR {
 		// This chiller is currenlty has only a water-cooled condenser
 
 		// Calculate water side load
-		Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, Node( EvapInletNode ).Temp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, "CalcElecReformEIRChillerModel" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidName, Node( EvapInletNode ).Temp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CWLoopNum ).FluidIndex, RoutineName );
 		// problem here if no setpoint on outlet
 		// CR 9132 changed from actual node flow rate to maximum available to avoid issue of limiting capacity
 
@@ -2059,6 +2066,8 @@ namespace ChillerReformulatedEIR {
 					EvapDeltaTemp = Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPoint;
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					EvapDeltaTemp = Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPointHi;
+				} else {
+					assert( false );
 				}}
 
 				if ( EvapDeltaTemp != 0 ) {
@@ -2208,7 +2217,7 @@ namespace ChillerReformulatedEIR {
 		if ( CondMassFlowRate > MassFlowTolerance ) {
 			// If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
 			if ( ElecReformEIRChiller( EIRChillNum ).HeatRecActive ) ReformEIRChillerHeatRecovery( EIRChillNum, QCondenser, CondMassFlowRate, CondInletTemp, QHeatRecovered );
-			Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, CondInletTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, "CalcElecReformEIRChillerModel" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidName, CondInletTemp, PlantLoop( ElecReformEIRChiller( EIRChillNum ).CDLoopNum ).FluidIndex, RoutineName );
 			CondOutletTemp = QCondenser / CondMassFlowRate / Cp + CondInletTemp;
 		} else {
 			ShowSevereError( "ControlReformEIRChillerModel: Condenser flow = 0, for ElecReformEIRChiller=" + ElecReformEIRChiller( EIRChillNum ).Name );
@@ -2258,7 +2267,7 @@ namespace ChillerReformulatedEIR {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int EvapOutletNode; // Chiller evaporator outlet node number
-		Real64 EvapOutletTempSetPoint; // Evaporator outlet temperature setpoint [C]
+		Real64 EvapOutletTempSetPoint( 0.0 ); // Evaporator outlet temperature setpoint [C]
 		Real64 CAPFTXTmin; // Minimum evaporator leaving temperature allowed by CAPFT curve [C]
 		Real64 CAPFTXTmax; // Maximum evaporator leaving temperature allowed by CAPFT curve [C]
 		Real64 CAPFTYTmin; // Minimum condenser  leaving temperature allowed by CAPFT curve [C]
@@ -2390,6 +2399,8 @@ namespace ChillerReformulatedEIR {
 			} else { // use plant loop overall setpoint
 				EvapOutletTempSetPoint = Node( PlantLoop( PlantLoopNum ).TempSetPointNodeNum ).TempSetPointHi;
 			}
+		} else {
+			assert( false );
 		}}
 		ChillerCapFT = CurveValue( ElecReformEIRChiller( EIRChillNum ).ChillerCapFT, EvapOutletTempSetPoint, CondOutletTemp );
 

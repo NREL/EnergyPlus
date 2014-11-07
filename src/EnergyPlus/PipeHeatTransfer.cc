@@ -71,7 +71,7 @@ namespace PipeHeatTransfer {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
 
 	int const None( 0 );
 	int const ZoneEnv( 1 );
@@ -727,10 +727,10 @@ namespace PipeHeatTransfer {
 			PipeHT( Item ).OutsideArea = Pi * ( PipeHT( Item ).PipeOD + 2 * PipeHT( Item ).InsulationThickness ) * PipeHT( Item ).Length / NumSections;
 
 			// cross sectional area
-			PipeHT( Item ).SectionArea = Pi * 0.25 * std::pow( PipeHT( Item ).PipeID, 2 );
+			PipeHT( Item ).SectionArea = Pi * 0.25 * pow_2( PipeHT( Item ).PipeID );
 
 			// pipe & insulation mass
-			PipeHT( Item ).PipeHeatCapacity = PipeHT( Item ).PipeCp * PipeHT( Item ).PipeDensity * ( Pi * 0.25 * std::pow( PipeHT( Item ).PipeOD, 2 ) - PipeHT( Item ).SectionArea ); // the metal component
+			PipeHT( Item ).PipeHeatCapacity = PipeHT( Item ).PipeCp * PipeHT( Item ).PipeDensity * ( Pi * 0.25 * pow_2( PipeHT( Item ).PipeOD ) - PipeHT( Item ).SectionArea ); // the metal component
 		}
 
 		// final error check
@@ -928,6 +928,7 @@ namespace PipeHeatTransfer {
 		Real64 const LargeNumber( 9999.9 ); // Large number (compared to temperature values)
 		Real64 const SecondsInHour( 3600.0 ); // Number of seconds in hour
 		Real64 const HoursInDay( 24.0 ); // Number of hours in day
+		static std::string const RoutineName( "InitPipesHeatTransfer" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1185,8 +1186,8 @@ namespace PipeHeatTransfer {
 		//Even though the loop eventually has no flow rate, it appears it initializes to a value, then converges to OFF
 		//Thus, this is called at the beginning of every time step once.
 
-		PipeHT( PipeHTNum ).FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, "InitPipesHeatTransfer" );
-		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, "InitPipesHeatTransfer" );
+		PipeHT( PipeHTNum ).FluidSpecHeat = GetSpecificHeatGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
+		PipeHT( PipeHTNum ).FluidDensity = GetDensityGlycol( PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidName, InletTemp, PlantLoop( PipeHT( PipeHTNum ).LoopNum ).FluidIndex, RoutineName );
 
 		// At this point, for all Pipe:Interior objects we should zero out the energy and rate arrays
 		PipeHTReport( PipeHTNum ).FluidHeatLossRate = 0.0;
@@ -1526,7 +1527,7 @@ namespace PipeHeatTransfer {
 		static Real64 Cp( 0.0 ); // Placeholder for soil specific heat
 
 		// There are a number of coefficients which change through the simulation, and they are updated here
-		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * DeltaTime / ( std::pow( PipeHT( PipeHTNum ).dSregular, 2 ) ); //Eq. D4
+		PipeHT( PipeHTNum ).FourierDS = PipeHT( PipeHTNum ).SoilDiffusivity * DeltaTime / pow_2( PipeHT( PipeHTNum ).dSregular ); //Eq. D4
 		PipeHT( PipeHTNum ).CoefA1 = PipeHT( PipeHTNum ).FourierDS / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D2
 		PipeHT( PipeHTNum ).CoefA2 = 1 / ( 1 + 4 * PipeHT( PipeHTNum ).FourierDS ); //Eq. D3
 
@@ -1569,7 +1570,7 @@ namespace PipeHeatTransfer {
 
 							// thermal radiation coefficient using surf temp from past time step
 							if ( std::abs( PastNodeTempAbs - SkyTempAbs ) > rTinyValue ) {
-								RadCoef = StefBoltzmann * TopThermAbs * ( ( std::pow( PastNodeTempAbs, 4 ) ) - ( std::pow( SkyTempAbs, 4 ) ) ) / ( PastNodeTempAbs - SkyTempAbs );
+								RadCoef = StefBoltzmann * TopThermAbs * ( pow_4( PastNodeTempAbs ) - pow_4( SkyTempAbs ) ) / ( PastNodeTempAbs - SkyTempAbs );
 							} else {
 								RadCoef = 0.0;
 							}
@@ -1884,11 +1885,11 @@ namespace PipeHeatTransfer {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "PipeHeatTransfer::CalcPipeHeatTransCoef: " );
-		Real64 const MaxLaminarRe( 2300. ); // Maximum Reynolds number for laminar flow
+		Real64 const MaxLaminarRe( 2300.0 ); // Maximum Reynolds number for laminar flow
 		int const NumOfPropDivisions( 13 ); // intervals in property correlation
 		static FArray1D< Real64 > const Temps( NumOfPropDivisions, { 1.85, 6.85, 11.85, 16.85, 21.85, 26.85, 31.85, 36.85, 41.85, 46.85, 51.85, 56.85, 61.85 } ); // Temperature, in C
-		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { .001652, .001422, .001225, .00108, .000959, .000855, .000769, .000695, .000631, .000577, .000528, .000489, .000453 } ); // Viscosity, in Ns/m2
-		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { .574, .582, .590, .598, .606, .613, .620, .628, .634, .640, .645, .650, .656 } ); // Conductivity, in W/mK
+		static FArray1D< Real64 > const Mu( NumOfPropDivisions, { 0.001652, 0.001422, 0.001225, 0.00108, 0.000959, 0.000855, 0.000769, 0.000695, 0.000631, 0.000577, 0.000528, 0.000489, 0.000453 } ); // Viscosity, in Ns/m2
+		static FArray1D< Real64 > const Conductivity( NumOfPropDivisions, { 0.574, 0.582, 0.590, 0.598, 0.606, 0.613, 0.620, 0.628, 0.634, 0.640, 0.645, 0.650, 0.656 } ); // Conductivity, in W/mK
 		static FArray1D< Real64 > const Pr( NumOfPropDivisions, { 12.22, 10.26, 8.81, 7.56, 6.62, 5.83, 5.20, 4.62, 4.16, 3.77, 3.42, 3.15, 2.88 } ); // Prandtl number (dimensionless)
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1945,7 +1946,7 @@ namespace PipeHeatTransfer {
 		} else { // Calculate the Nusselt number based on what flow regime one is in
 
 			if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
-				NuD = 0.023 * ( std::pow( ReD, ( 0.8 ) ) ) * ( std::pow( PRactual, ( 1.0 / 3.0 ) ) );
+				NuD = 0.023 * std::pow( ReD, 0.8 ) * std::pow( PRactual, 1.0 / 3.0 );
 			} else { // Laminar flow --> use constant surface temperature relation
 				NuD = 3.66;
 			}
@@ -2097,7 +2098,7 @@ namespace PipeHeatTransfer {
 		}
 
 		// Calculate the Nusselt number
-		NuD = Coef * ( std::pow( ReD, ( rExp ) ) ) * ( std::pow( Pr, ( 1.0 / 3.0 ) ) );
+		NuD = Coef * std::pow( ReD, rExp ) * std::pow( Pr, 1.0 / 3.0 );
 
 		// If the wind speed is too small, we need to use natural convection behavior:
 		NuD = max( NuD, NaturalConvNusselt );
@@ -2139,7 +2140,7 @@ namespace PipeHeatTransfer {
 		Real64 TBND;
 
 		//Kusuda and Achenbach
-		TBND = PipeHT( PipeHTNum ).AvgGroundTemp - PipeHT( PipeHTNum ).AvgGndTempAmp * std::exp( -z * ( std::pow( ( Pi / ( 365.0 * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ), ( 0.5 ) ) ) ) * std::cos( ( 2.0 * Pi / 365.0 ) * ( DayOfSim - PipeHT( PipeHTNum ).PhaseShiftDays - ( z / 2.0 ) * ( std::pow( ( 365.0 / ( Pi * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ), ( 0.5 ) ) ) ) );
+		TBND = PipeHT( PipeHTNum ).AvgGroundTemp - PipeHT( PipeHTNum ).AvgGndTempAmp * std::exp( -z * std::sqrt( Pi / ( 365.0 * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ) ) * std::cos( ( 2.0 * Pi / 365.0 ) * ( DayOfSim - PipeHT( PipeHTNum ).PhaseShiftDays - ( z / 2.0 ) * std::sqrt( 365.0 / ( Pi * PipeHT( PipeHTNum ).SoilDiffusivityPerDay ) ) ) );
 
 		return TBND;
 
@@ -2158,7 +2159,7 @@ namespace PipeHeatTransfer {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

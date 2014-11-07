@@ -81,7 +81,7 @@ namespace HVACStandAloneERV {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 
-	std::string const Blank;
+	static std::string const BlankString;
 
 	int const ControllerSimple( 1 );
 	int const ControllerOutsideAir( 2 );
@@ -546,7 +546,6 @@ namespace HVACStandAloneERV {
 
 			if ( ! lAlphaBlanks( 7 ) ) {
 				StandAloneERV( StandAloneERVNum ).AvailManagerListName = Alphas( 7 );
-				ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).AvailManagerListName = Alphas( 7 );
 			}
 
 			// Read supply and exhaust air flow rates
@@ -696,7 +695,7 @@ namespace HVACStandAloneERV {
 			} else {
 				ShowSevereError( "GetERVController: Could not find ZoneHVAC:EnergyRecoveryVentilator with " + cAlphaFields( 1 ) + " = \"" + Alphas( 1 ) + "\"" );
 				ErrorsFound = true;
-				AirFlowRate = -1000.;
+				AirFlowRate = -1000.0;
 			}
 			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
 			SetOAControllerData( OutAirNum, ErrorsFound, _, _, _, _, _, _, _, _, _, _, AirFlowRate );
@@ -1034,6 +1033,7 @@ namespace HVACStandAloneERV {
 		Real64 RhoAir; // air density at SupInNode, standard conditions (dry air @ 20C,actual elevation pressure)
 		static bool MyOneTimeFlag( true );
 		static FArray1D_bool MyEnvrnFlag;
+		static FArray1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		int Loop; // loop counter
 
@@ -1042,14 +1042,20 @@ namespace HVACStandAloneERV {
 
 			MyEnvrnFlag.allocate( NumStandAloneERVs );
 			MySizeFlag.allocate( NumStandAloneERVs );
+			MyZoneEqFlag.allocate ( NumStandAloneERVs );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
+			MyZoneEqFlag = true;
 			MyOneTimeFlag = false;
 
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).ZoneNum = ZoneNum;
+			if ( MyZoneEqFlag( StandAloneERVNum ) ) { // initialize the name of each availability manager list and zone number
+				ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).AvailManagerListName = StandAloneERV( StandAloneERVNum ).AvailManagerListName;
+				ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).ZoneNum = ZoneNum;
+				MyZoneEqFlag ( StandAloneERVNum ) = false;
+			}
 			StandAloneERV( StandAloneERVNum ).AvailStatus = ZoneComp( ERVStandAlone_Num ).ZoneCompAvailMgrs( StandAloneERVNum ).AvailStatus;
 		}
 
@@ -1525,6 +1531,7 @@ namespace HVACStandAloneERV {
 		using DataZoneEquipment::ZoneEquipConfig;
 		using General::RoundSigDigits;
 		using DataAirLoop::OAControllerInfo;
+		using DataHeatBalance::ZoneAirMassFlow;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1654,7 +1661,7 @@ namespace HVACStandAloneERV {
 			//      END DO
 			TotalExhaustMassFlow = Node( ExhaustInletNode ).MassFlowRate;
 			TotalSupplyMassFlow = Node( SupInletNode ).MassFlowRate;
-			if ( TotalExhaustMassFlow > TotalSupplyMassFlow ) {
+			if ( TotalExhaustMassFlow > TotalSupplyMassFlow && !ZoneAirMassFlow.EnforceZoneMassBalance ) {
 				ShowWarningError( "For " + StandAloneERV( StandAloneERVNum ).UnitType + " \"" + StandAloneERV( StandAloneERVNum ).Name + "\" there is unbalanced exhaust air flow." );
 				ShowContinueError( "... The exhaust air mass flow rate = " + RoundSigDigits( Node( ExhaustInletNode ).MassFlowRate, 6 ) );
 				ShowContinueError( "... The  supply air mass flow rate = " + RoundSigDigits( Node( SupInletNode ).MassFlowRate, 6 ) );
@@ -2098,7 +2105,7 @@ namespace HVACStandAloneERV {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

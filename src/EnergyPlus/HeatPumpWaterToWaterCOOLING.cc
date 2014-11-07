@@ -468,7 +468,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitGshp" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -517,12 +517,12 @@ namespace HeatPumpWaterToWaterCOOLING {
 			GSHP( GSHPNum ).MustRun = true;
 
 			MyEnvrnFlag( GSHPNum ) = false;
-			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "InitGshp" );
+			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 			GSHP( GSHPNum ).LoadSideDesignMassFlow = GSHP( GSHPNum ).LoadSideVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, GSHP( GSHPNum ).LoadSideDesignMassFlow, GSHP( GSHPNum ).LoadSideInletNodeNum, GSHP( GSHPNum ).LoadSideOutletNodeNum, GSHP( GSHPNum ).LoadLoopNum, GSHP( GSHPNum ).LoadLoopSideNum, GSHP( GSHPNum ).LoadBranchNum, GSHP( GSHPNum ).LoadCompNum );
 
-			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "InitGshp" );
+			rho = GetDensityGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, InitConvTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 			GSHP( GSHPNum ).SourceSideDesignMassFlow = GSHP( GSHPNum ).SourceSideVolFlowRate * rho;
 
 			InitComponentNodes( 0.0, GSHP( GSHPNum ).SourceSideDesignMassFlow, GSHP( GSHPNum ).SourceSideInletNodeNum, GSHP( GSHPNum ).SourceSideOutletNodeNum, GSHP( GSHPNum ).SourceLoopNum, GSHP( GSHPNum ).SourceLoopSideNum, GSHP( GSHPNum ).SourceBranchNum, GSHP( GSHPNum ).SourceCompNum );
@@ -588,6 +588,13 @@ namespace HeatPumpWaterToWaterCOOLING {
 		Real64 const RelaxParam( 0.6 );
 		Real64 const SmallNum( 1.0e-20 );
 		int const IterationLimit( 500 );
+		static std::string const RoutineName( "CalcGshpModel" );
+		static std::string const RoutineNameLoadSideRefridgTemp( "CalcGSHPModel:LoadSideRefridgTemp" );
+		static std::string const RoutineNameSourceSideRefridgTemp( "CalcGSHPModel:SourceSideRefridgTemp" );
+		static std::string const RoutineNameCompressInletTemp( "CalcGSHPModel:CompressInletTemp" );
+		static std::string const RoutineNameSuctionPr( "CalcGSHPModel:SuctionPr" );
+		static std::string const RoutineNameCompSuctionTemp( "CalcGSHPModel:CompSuctionTemp" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -738,9 +745,9 @@ namespace HeatPumpWaterToWaterCOOLING {
 		initialQLoad = 0.0;
 		IterationCount = 0;
 
-		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, "CalcGshpModel" );
+		CpSourceSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidName, SourceSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).SourceLoopNum ).FluidIndex, RoutineName );
 
-		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, "CalcGshpModel" );
+		CpLoadSide = GetSpecificHeatGlycol( PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidName, LoadSideWaterInletTemp, PlantLoop( GSHP( GSHPNum ).LoadLoopNum ).FluidIndex, RoutineName );
 
 		//Determine effectiveness of Load Side
 		LoadSideEffect = 1.0 - std::exp( -LoadSideUA / ( CpLoadSide * LoadSideWaterMassFlowRate ) );
@@ -758,8 +765,8 @@ namespace HeatPumpWaterToWaterCOOLING {
 			SourceSideRefridgTemp = SourceSideWaterInletTemp + initialQSource / ( SourceSideEffect * CpSourceSide * SourceSideWaterMassFlowRate );
 
 			// Determine the evaporating and condensing pressures
-			SourceSidePressure = GetSatPressureRefrig( GSHPRefrigerant, SourceSideRefridgTemp, GSHPRefrigIndex, "CalcGSHPModel" );
-			LoadSidePressure = GetSatPressureRefrig( GSHPRefrigerant, LoadSideRefridgTemp, GSHPRefrigIndex, "CalcGSHPModel" );
+			SourceSidePressure = GetSatPressureRefrig( GSHPRefrigerant, SourceSideRefridgTemp, GSHPRefrigIndex, RoutineName );
+			LoadSidePressure = GetSatPressureRefrig( GSHPRefrigerant, LoadSideRefridgTemp, GSHPRefrigIndex, RoutineName );
 
 			if ( SourceSidePressure < LowPressCutoff ) {
 				ShowSevereError( ModuleCompName + "=\"" + GSHPName + "\" Cooling Source Side Pressure Less than the Design Minimum" );
@@ -796,17 +803,17 @@ namespace HeatPumpWaterToWaterCOOLING {
 			// Determine the Source Side Outlet Enthalpy
 
 			qual = 1.0;
-			LoadSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, LoadSideRefridgTemp, qual, GSHPRefrigIndex, "CalcGSHPModel:LoadSideRefridgTemp" );
+			LoadSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, LoadSideRefridgTemp, qual, GSHPRefrigIndex, RoutineNameLoadSideRefridgTemp );
 
 			qual = 0.0;
-			SourceSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, SourceSideRefridgTemp, qual, GSHPRefrigIndex, "CalcGSHPModel:SourceSideRefridgTemp" );
+			SourceSideOutletEnth = GetSatEnthalpyRefrig( GSHPRefrigerant, SourceSideRefridgTemp, qual, GSHPRefrigIndex, RoutineNameSourceSideRefridgTemp );
 
 			// Determine Load Side Outlet Enthalpy
 			// Determine superheated temperature of the LoadSide outlet/compressor inlet
 			CompressInletTemp = LoadSideRefridgTemp + ShTemp;
 
 			// Determine the enathalpy of the super heated fluid at Source Side outlet
-			SuperHeatEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompressInletTemp, LoadSidePressure, GSHPRefrigIndex, "CalcGSHPModel:CompressInletTemp" );
+			SuperHeatEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompressInletTemp, LoadSidePressure, GSHPRefrigIndex, RoutineNameCompressInletTemp );
 
 			// Determining the suction state of the fluid from inlet state involves interation
 			// Method employed...
@@ -814,18 +821,18 @@ namespace HeatPumpWaterToWaterCOOLING {
 			// check that with the inlet enthalpy ( as suction loss is isenthalpic). Iterate till desired accuracy is reached
 
 			//this routine was reenginerred from HVACsim + takes pressure in Pascals, tolrance, refrgerant # R22 =6
-			CompSuctionSatTemp = GetSatTemperatureRefrig( GSHPRefrigerant, SuctionPr, GSHPRefrigIndex, "CalcGSHPModel:SuctionPr" );
+			CompSuctionSatTemp = GetSatTemperatureRefrig( GSHPRefrigerant, SuctionPr, GSHPRefrigIndex, RoutineNameSuctionPr );
 
 			T110 = CompSuctionSatTemp;
 			//            Shoot into the super heated region
-			T111 = CompSuctionSatTemp + 100.;
+			T111 = CompSuctionSatTemp + 100.0;
 			// Iterate to find the Suction State
 			LOOP: while ( true ) {
 				CompSuctionTemp = 0.5 * ( T110 + T111 );
 
-				CompSuctionEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, "CalcGSHPModel:CompSuctionTemp" );
+				CompSuctionEnth = GetSupHeatEnthalpyRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
 
-				if ( std::abs( CompSuctionEnth - SuperHeatEnth ) / SuperHeatEnth < .0001 ) {
+				if ( std::abs( CompSuctionEnth - SuperHeatEnth ) / SuperHeatEnth < 0.0001 ) {
 					goto LOOP_exit;
 				}
 
@@ -839,15 +846,15 @@ namespace HeatPumpWaterToWaterCOOLING {
 			LOOP_exit: ;
 
 			// Determine the Mass flow rate of refrigerant
-			CompSuctionDensity = GetSupHeatDensityRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, "CalcGSHPModel:CompSuctionTemp" );
-			MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * ( std::pow( ( DischargePr / SuctionPr ), ( 1 / gamma ) ) ) );
+			CompSuctionDensity = GetSupHeatDensityRefrig( GSHPRefrigerant, CompSuctionTemp, SuctionPr, GSHPRefrigIndex, RoutineNameCompSuctionTemp );
+			MassRef = PistonDisp * CompSuctionDensity * ( 1 + ClearanceFactor - ClearanceFactor * std::pow( DischargePr / SuctionPr, 1 / gamma ) );
 
 			// Find the Source Side Heat Transfer
 
 			QLoad = MassRef * ( LoadSideOutletEnth - SourceSideOutletEnth );
 
 			// Determine the theoretical power
-			Power = PowerLosses + ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity / LosFac * ( std::pow( ( DischargePr / SuctionPr ), ( ( gamma - 1 ) / gamma ) ) - 1 ) );
+			Power = PowerLosses + ( MassRef * gamma / ( gamma - 1 ) * SuctionPr / CompSuctionDensity / LosFac * ( std::pow( DischargePr / SuctionPr, ( gamma - 1 ) / gamma ) - 1 ) );
 
 			// Determine the Loadside HeatRate (QLoad)
 			QSource = Power + QLoad;
@@ -857,19 +864,19 @@ namespace HeatPumpWaterToWaterCOOLING {
 					ShowWarningError( "HeatPump:WaterToWater:ParameterEstimation, Cooling did not converge" );
 					ShowContinueErrorTimeStamp( "" );
 					ShowContinueError( "Heatpump Name = " + GSHP( GSHPNum ).Name );
-					gio::write( ErrString, "*" ) << std::abs( 100.0 * ( QSource - initialQSource ) / ( initialQSource + SmallNum ) );
+					gio::write( ErrString, fmtLD ) << std::abs( 100.0 * ( QSource - initialQSource ) / ( initialQSource + SmallNum ) );
 					ShowContinueError( "Heat Inbalance (%)             = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << QLoad;
+					gio::write( ErrString, fmtLD ) << QLoad;
 					ShowContinueError( "Load-side heat transfer rate   = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << QSource;
+					gio::write( ErrString, fmtLD ) << QSource;
 					ShowContinueError( "Source-side heat transfer rate = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << SourceSideWaterMassFlowRate;
+					gio::write( ErrString, fmtLD ) << SourceSideWaterMassFlowRate;
 					ShowContinueError( "Source-side mass flow rate     = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << LoadSideWaterMassFlowRate;
+					gio::write( ErrString, fmtLD ) << LoadSideWaterMassFlowRate;
 					ShowContinueError( "Load-side mass flow rate       = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << SourceSideWaterInletTemp;
+					gio::write( ErrString, fmtLD ) << SourceSideWaterInletTemp;
 					ShowContinueError( "Source-side inlet temperature  = " + stripped( ErrString ) );
-					gio::write( ErrString, "*" ) << LoadSideWaterInletTemp;
+					gio::write( ErrString, fmtLD ) << LoadSideWaterInletTemp;
 					ShowContinueError( "Load-side inlet temperature    = " + stripped( ErrString ) );
 
 				}

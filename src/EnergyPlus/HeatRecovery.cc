@@ -101,6 +101,8 @@ namespace HeatRecovery {
 	int const EconoLockOut_No( 0 );
 	int const EconoLockOut_Yes( 1 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -2137,7 +2139,14 @@ namespace HeatRecovery {
 		Real64 MinHumRatNeeded; // minimum humidity ratio setpoint for balanced desiccant HX [kg/kg]
 		Real64 HXPartLoadRatio; // local heat exchanger part-load ratio
 		Real64 TestSaturationEnthalpy; // enthalpy used to test for regeneration outlet condition over saturation curve (J/kg)
-		static std::string ThisSub( "CalcDesiccantBalancedHeatExch:  " ); // Used to pass to Psyc routines
+		static std::string const ThisSub( "CalcDesiccantBalancedHeatExch:  " ); // Used to pass to Psyc routines
+		static std::string const ThisSubTSat( "CalcDesiccantBalancedHeatExch:   TSat" );
+		static std::string const ThisSubTSatFullLoadOutTemp( "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutTemp" );
+		static std::string const ThisSubTSatFullLoadOutHumRat( "CalcDesiccantBalancedHeatExch:   TSat-FullLoadOutHumRat" );
+		static std::string const ThisSubSecOutHumRat( "CalcDesiccantBalancedHeatExch:   SecOutHumRat" );
+		static std::string const ThisSubTestSatSec( "CalcDesiccantBalancedHeatExch:   TestSatSec" );
+		static std::string const ThisSubTSatSecOutHumRat( "CalcDesiccantBalancedHeatExch:   TSat-SecOutHumRat" );
+
 		Real64 AverageMassFlowRate; // average of supply (regen) and secondary (process) mass flow rates [kg/s]
 		bool EconomizerActiveFlag; // local representing the economizer status when PRESENT
 		bool HighHumCtrlActiveFlag; // local representing high humidity control when PRESENT
@@ -2277,10 +2286,10 @@ namespace HeatRecovery {
 
 				//     Check for saturation in the model's calculated supply outlet and reset temp, then humidity ratio at constant enthalpy
 				//     Reset delta T and delta W such that the model does not allow an outlet condition over saturation
-				TestSaturationEnthalpy = PsyHFnTdbW( FullLoadSupOutTemp, FullLoadSupOutHumRat, ThisSub + " TestSatSup" );
-				if ( PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSub + " TSat" ) > FullLoadSupOutTemp ) {
-					FullLoadSupOutTemp = PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSub + " TSat-FullLoadOutTemp" );
-					FullLoadSupOutHumRat = PsyWFnTdbH( FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSub + " TSat-FullLoadOutHumRat" );
+				TestSaturationEnthalpy = PsyHFnTdbW( FullLoadSupOutTemp, FullLoadSupOutHumRat );
+				if ( PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSubTSat ) > FullLoadSupOutTemp ) {
+					FullLoadSupOutTemp = PsyTsatFnHPb( TestSaturationEnthalpy, OutBaroPress, ThisSubTSatFullLoadOutTemp );
+					FullLoadSupOutHumRat = PsyWFnTdbH( FullLoadSupOutTemp, TestSaturationEnthalpy, ThisSubTSatFullLoadOutHumRat );
 					FullLoadDeltaT = FullLoadSupOutTemp - ExchCond( ExNum ).SupInTemp;
 					FullLoadDeltaW = FullLoadSupOutHumRat - ExchCond( ExNum ).SupInHumRat;
 				}
@@ -2334,10 +2343,10 @@ namespace HeatRecovery {
 				//     the mass flow rate on the process and secondary side of HX may be imbalanced when the HX is used in the OA branch
 				//     use the average mass flow rate to avoid psych warnings, mass flow rates will converge at the end of the iteration
 				//     if the air mass flow rates do not converge, this model should not be used
-				CSup = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp, ThisSub + " CSup" );
-				CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp, ThisSub + " CSec" );
+				CSup = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SupInHumRat, ExchCond( ExNum ).SupInTemp );
+				CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp );
 
-				ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat, ThisSub + " SupOutEnth" );
+				ExchCond( ExNum ).SupOutEnth = PsyHFnTdbW( ExchCond( ExNum ).SupOutTemp, ExchCond( ExNum ).SupOutHumRat );
 
 				SensHeatRecRate = CSup * ( ExchCond( ExNum ).SupOutTemp - ExchCond( ExNum ).SupInTemp );
 
@@ -2349,15 +2358,15 @@ namespace HeatRecovery {
 
 				ExchCond( ExNum ).SecOutTemp = ExchCond( ExNum ).SecInTemp - SensHeatRecRate / CSec;
 
-				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSub + " SecOutHumRat" );
+				ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSubSecOutHumRat );
 
 				// check for saturation in process (secondary) outlet
 				// The process outlet conditions should never be over the saturation curve for the balanced desiccant model
 				// although this may occur during warmup. This check is included here for consistency.
-				TempSecOutSat = PsyTsatFnHPb( ExchCond( ExNum ).SecOutEnth, OutBaroPress, ThisSub + " TestSatSec" );
+				TempSecOutSat = PsyTsatFnHPb( ExchCond( ExNum ).SecOutEnth, OutBaroPress, ThisSubTestSatSec );
 				if ( TempSecOutSat > ExchCond( ExNum ).SecOutTemp ) {
 					ExchCond( ExNum ).SecOutTemp = TempSecOutSat;
-					ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSub + " TSat-SecOutHumRat" );
+					ExchCond( ExNum ).SecOutHumRat = PsyWFnTdbH( ExchCond( ExNum ).SecOutTemp, ExchCond( ExNum ).SecOutEnth, ThisSubTSatSecOutHumRat );
 				}
 
 				ExchCond( ExNum ).ElecUseRate = BalDesDehumPerfData( ExchCond( ExNum ).PerfDataIndex ).NomElecPower * HXPartLoadRatio;
@@ -2369,7 +2378,7 @@ namespace HeatRecovery {
 		} //ENDIF for "IF (UnitOn) THEN"
 
 		// Report the process side heat transfer
-		CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp, ThisSub );
+		CSec = AverageMassFlowRate * PsyCpAirFnWTdb( ExchCond( ExNum ).SecInHumRat, ExchCond( ExNum ).SecInTemp );
 		ProcessSensHeatRecRate = CSec * ( ExchCond( ExNum ).SecOutTemp - ExchCond( ExNum ).SecInTemp );
 
 		ProcessTotHeatRecRate = ExchCond( ExNum ).SecOutMassFlow * ( ExchCond( ExNum ).SecOutEnth - ExchCond( ExNum ).SecInEnth );
@@ -2913,7 +2922,7 @@ namespace HeatRecovery {
 				Temp = ( 1.0 + Z );
 				Eps = ( 1.0 - std::exp( -NTU * Temp ) ) / Temp;
 			} else if ( SELECT_CASE_var == Cross_Flow_Both_Unmixed ) { // CROSS FLOW BOTH UNMIXED
-				Temp = Z * std::pow( NTU, ( -0.22 ) );
+				Temp = Z * std::pow( NTU, -0.22 );
 				Eps = 1.0 - std::exp( ( std::exp( -NTU * Temp ) - 1.0 ) / Temp );
 			} else if ( SELECT_CASE_var == Cross_Flow_Other ) { // CROSS FLOW, Cmax MIXED, Cmin UNMIXED
 				Eps = ( 1.0 - std::exp( -Z * ( 1.0 - std::exp( -NTU ) ) ) ) / Z;
@@ -3084,7 +3093,7 @@ namespace HeatRecovery {
 
 		int SolFla; // Flag of solver
 		static Real64 NTU0( 0.0 ); // lower bound for NTU
-		static Real64 NTU1( 50. ); // upper bound for NTU
+		static Real64 NTU1( 50.0 ); // upper bound for NTU
 		FArray1D< Real64 > Par( 2 );
 
 		Par( 1 ) = Eps;
@@ -4887,7 +4896,7 @@ namespace HeatRecovery {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

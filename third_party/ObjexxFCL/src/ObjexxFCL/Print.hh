@@ -40,28 +40,27 @@ public: // Creation
 	inline
 	explicit
 	Print( std::string const & fmt = "*" ) :
-		pos_( 0 ),
-		format_( FormatFactory::create( fmt ) ),
-		reverts_( 0 )
+	 pos_( 0 ),
+	 format_( FormatFactory::create( fmt ) ),
+	 reverts_( 0 )
 	{}
 
 	// Format Wrapper Constructor
 	inline
 	explicit
 	Print( gio::Fmt const & fmt ) :
-		pos_( 0 ),
-		format_( fmt.format_clone() ),
-		reverts_( 0 )
+	 pos_( 0 ),
+	 format_( fmt.format_clone() ),
+	 reverts_( 0 )
 	{}
 
 	// Move Constructor
 	inline
 	Print( Print && p ) :
-		//stream_( std::move( p.stream_ ) ),
-		stream_( p.stream_.str() ), // Initialize with contents until compilers have stream move constructors
-		pos_( p.pos_ ),
-		format_( p.format_ ),
-		reverts_( p.reverts_ )
+	 stream_( p.stream_.str() ), // Initialize with contents until compilers have stream move constructors: stream_( std::move( p.stream_ ) ),
+	 pos_( p.pos_ ),
+	 format_( p.format_ ),
+	 reverts_( p.reverts_ )
 	{}
 
 	// Destructor
@@ -71,7 +70,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ ) {
 				Format * active( format_->current() );
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 					active = active->next();
 				}
 				if ( format_->non_advancing() ) { // Non-advancing
@@ -108,13 +107,13 @@ public: // Operators
 		if ( stream_ && format_ ) {
 			reverts_ = format_->reverts();
 			Format * active( format_->current() );
-			while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output( stream_, pos_ ) ) { // Outputs up to arg-based format
+			while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to arg-based format
 				active = active->next();
 			}
-			if ( stream_ && active && active->uses_arg() && active->output( stream_, pos_, t ) ) { // Output arg using active format
+			if ( stream_ && active && active->uses_arg() && active->output_val( stream_, pos_, t ) ) { // Output arg using active format
 				reverts_ = format_->reverts();
 				active = active->next();
-				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && format_->not_colon_terminated() && active->output( stream_, pos_ ) ) { // Outputs up to next arg-based format if not : terminated
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts_ ) && format_->not_colon_terminated() && active->output_no_arg( stream_, pos_ ) ) { // Outputs up to next arg-based format if not : terminated
 					active = active->next();
 				}
 			}

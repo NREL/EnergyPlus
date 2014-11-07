@@ -72,7 +72,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 67
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -15556,7 +15556,7 @@
   Fan:OnOff,
     GuestRoom101 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15570,7 +15570,7 @@
   Fan:OnOff,
     GuestRoom102 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15584,7 +15584,7 @@
   Fan:OnOff,
     GuestRoom103 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15598,7 +15598,7 @@
   Fan:OnOff,
     GuestRoom104 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15612,7 +15612,7 @@
   Fan:OnOff,
     GuestRoom105 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15626,7 +15626,7 @@
   Fan:OnOff,
     GuestRoom201 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15640,7 +15640,7 @@
   Fan:OnOff,
     GuestRoom202_205 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15654,7 +15654,7 @@
   Fan:OnOff,
     GuestRoom206_208 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15668,7 +15668,7 @@
   Fan:OnOff,
     GuestRoom209_212 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15682,7 +15682,7 @@
   Fan:OnOff,
     GuestRoom213 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15696,7 +15696,7 @@
   Fan:OnOff,
     GuestRoom214 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15710,7 +15710,7 @@
   Fan:OnOff,
     GuestRoom215_218 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15724,7 +15724,7 @@
   Fan:OnOff,
     GuestRoom219 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15738,7 +15738,7 @@
   Fan:OnOff,
     GuestRoom220_223 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15752,7 +15752,7 @@
   Fan:OnOff,
     GuestRoom224 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15766,7 +15766,7 @@
   Fan:OnOff,
     GuestRoom301 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15780,7 +15780,7 @@
   Fan:OnOff,
     GuestRoom302_305 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15794,7 +15794,7 @@
   Fan:OnOff,
     GuestRoom306_308 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15808,7 +15808,7 @@
   Fan:OnOff,
     GuestRoom309_312 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15822,7 +15822,7 @@
   Fan:OnOff,
     GuestRoom313 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15836,7 +15836,7 @@
   Fan:OnOff,
     GuestRoom314 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15850,7 +15850,7 @@
   Fan:OnOff,
     GuestRoom315_318 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15864,7 +15864,7 @@
   Fan:OnOff,
     GuestRoom319 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15878,7 +15878,7 @@
   Fan:OnOff,
     GuestRoom320_323 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15892,7 +15892,7 @@
   Fan:OnOff,
     GuestRoom324 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15906,7 +15906,7 @@
   Fan:OnOff,
     GuestRoom401 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15920,7 +15920,7 @@
   Fan:OnOff,
     GuestRoom402_405 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15934,7 +15934,7 @@
   Fan:OnOff,
     GuestRoom406_408 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15948,7 +15948,7 @@
   Fan:OnOff,
     GuestRoom409_412 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15962,7 +15962,7 @@
   Fan:OnOff,
     GuestRoom413 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15976,7 +15976,7 @@
   Fan:OnOff,
     GuestRoom414 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -15990,7 +15990,7 @@
   Fan:OnOff,
     GuestRoom415_418 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -16004,7 +16004,7 @@
   Fan:OnOff,
     GuestRoom419 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -16018,7 +16018,7 @@
   Fan:OnOff,
     GuestRoom420_423 PTACFan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -16032,7 +16032,7 @@
   Fan:OnOff,
     GuestRoom424 PTACFan,    !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -16046,7 +16046,7 @@
   Fan:ConstantVolume,
     FrontStairsFlr1 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16058,7 +16058,7 @@
   Fan:ConstantVolume,
     FrontStairsFlr2 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16070,7 +16070,7 @@
   Fan:ConstantVolume,
     FrontStairsFlr3 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16082,7 +16082,7 @@
   Fan:ConstantVolume,
     FrontStairsFlr4 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16094,7 +16094,7 @@
   Fan:ConstantVolume,
     FrontStorageFlr1 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16106,7 +16106,7 @@
   Fan:ConstantVolume,
     FrontStorageFlr2 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16118,7 +16118,7 @@
   Fan:ConstantVolume,
     FrontStorageFlr3 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16130,7 +16130,7 @@
   Fan:ConstantVolume,
     FrontStorageFlr4 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16142,7 +16142,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:10_Fan,     !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16154,7 +16154,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:11_Fan,     !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16166,7 +16166,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:12_Fan,     !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16178,7 +16178,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:1_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16190,7 +16190,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:2_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.546,                   !- Fan Efficiency
+    0.546,                   !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.84,                    !- Motor Efficiency
@@ -16202,7 +16202,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:3_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16214,7 +16214,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:4_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16226,7 +16226,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:5_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16238,7 +16238,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:6_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16250,7 +16250,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:7_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.56875,                 !- Fan Efficiency
+    0.56875,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.875,                   !- Motor Efficiency
@@ -16262,7 +16262,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:8_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16274,7 +16274,7 @@
   Fan:ConstantVolume,
     PSZ-HEATCOOL:9_Fan,      !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16286,7 +16286,7 @@
   Fan:ConstantVolume,
     RearStairsFlr1 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16298,7 +16298,7 @@
   Fan:ConstantVolume,
     RearStairsFlr2 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16310,7 +16310,7 @@
   Fan:ConstantVolume,
     RearStairsFlr3 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16322,7 +16322,7 @@
   Fan:ConstantVolume,
     RearStairsFlr4 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16334,7 +16334,7 @@
   Fan:ConstantVolume,
     RearStorageFlr1 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16346,7 +16346,7 @@
   Fan:ConstantVolume,
     RearStorageFlr2 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16358,7 +16358,7 @@
   Fan:ConstantVolume,
     RearStorageFlr3 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -16370,7 +16370,7 @@
   Fan:ConstantVolume,
     RearStorageFlr4 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     49.8,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -21963,8 +21963,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -21985,8 +21992,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22007,8 +22021,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22029,8 +22050,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22051,8 +22079,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22073,8 +22108,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22095,8 +22137,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22117,8 +22166,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22139,8 +22195,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22161,8 +22224,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22183,8 +22253,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -22205,8 +22282,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Controller:OutdoorAir,

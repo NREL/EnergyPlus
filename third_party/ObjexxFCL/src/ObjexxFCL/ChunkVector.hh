@@ -24,6 +24,7 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+#include <type_traits>
 #include <vector>
 
 namespace ObjexxFCL {
@@ -84,34 +85,34 @@ public: // Creation
 	// Default Constructor
 	inline
 	ChunkVector() :
-		size_( 0 ),
-		chunk_exponent_( 0 ),
-		chunk_size_( 1 ),
-		chunk_mask_( 0 )
+	 size_( 0 ),
+	 chunk_exponent_( 0 ),
+	 chunk_size_( 1 ),
+	 chunk_mask_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	ChunkVector( ChunkVector const & v ) :
-		size_( v.size_ ),
-		chunk_exponent_( v.chunk_exponent_ ),
-		chunk_size_( v.chunk_size_ ),
-		chunk_mask_( v.chunk_mask_ ),
-		chunks_( v.chunks_ )
+	 size_( v.size_ ),
+	 chunk_exponent_( v.chunk_exponent_ ),
+	 chunk_size_( v.chunk_size_ ),
+	 chunk_mask_( v.chunk_mask_ ),
+	 chunks_( v.chunks_ )
 	{
 		assert( v.n_chunk() == computed_n_chunk() );
 	}
 
 	// Copy Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	ChunkVector( ChunkVector< U > const & v ) :
-		size_( v.size_ ),
-		chunk_exponent_( v.chunk_exponent_ ),
-		chunk_size_( v.chunk_size_ ),
-		chunk_mask_( v.chunk_mask_ ),
-		chunks_( v.n_chunk() ) // std::vector doesn't have a copy constructor template
+	 size_( v.size_ ),
+	 chunk_exponent_( v.chunk_exponent_ ),
+	 chunk_size_( v.chunk_size_ ),
+	 chunk_mask_( v.chunk_mask_ ),
+	 chunks_( v.n_chunk() ) // std::vector doesn't have a copy constructor template
 	{
 		// Size and assign Chunks
 		assert( v.n_chunk() == computed_n_chunk() );
@@ -130,14 +131,14 @@ public: // Creation
 	template< typename U, typename L >
 	inline
 	ChunkVector(
-		std::vector< U, L > const & v,
-		ChunkExponent const & exponent
+	 std::vector< U, L > const & v,
+	 ChunkExponent const & exponent
 	) :
-		size_( v.size() ),
-		chunk_exponent_( exponent ),
-		chunk_size_( size_type( 1u ) << chunk_exponent_ ),
-		chunk_mask_( chunk_size_ - size_type( 1u ) ),
-		chunks_( computed_n_chunk() )
+	 size_( v.size() ),
+	 chunk_exponent_( exponent ),
+	 chunk_size_( size_type( 1u ) << chunk_exponent_ ),
+	 chunk_mask_( chunk_size_ - size_type( 1u ) ),
+	 chunks_( computed_n_chunk() )
 	{
 		// Size and assign Chunks
 		if ( size_ > 0u ) {
@@ -157,15 +158,15 @@ public: // Creation
 	template< typename InputIterator >
 	inline
 	ChunkVector(
-		InputIterator const beg,
-		InputIterator const end,
-		ChunkExponent const & exponent
+	 InputIterator const beg,
+	 InputIterator const end,
+	 ChunkExponent const & exponent
 	) :
-		size_( end - beg ),
-		chunk_exponent_( exponent ),
-		chunk_size_( size_type( 1u ) << chunk_exponent_ ),
-		chunk_mask_( chunk_size_ - size_type( 1u ) ),
-		chunks_( computed_n_chunk() )
+	 size_( end - beg ),
+	 chunk_exponent_( exponent ),
+	 chunk_size_( size_type( 1u ) << chunk_exponent_ ),
+	 chunk_mask_( chunk_size_ - size_type( 1u ) ),
+	 chunks_( computed_n_chunk() )
 	{
 		// Size and assign Chunks
 		if ( size_ > 0u ) {
@@ -184,14 +185,14 @@ public: // Creation
 	// Size + Exponent Constructor: Built-In Values are Not Initialized!
 	inline
 	ChunkVector(
-		size_type const size,
-		ChunkExponent const & exponent
+	 size_type const size,
+	 ChunkExponent const & exponent
 	) :
-		size_( size ),
-		chunk_exponent_( exponent ),
-		chunk_size_( size_type( 1u ) << chunk_exponent_ ),
-		chunk_mask_( chunk_size_ - size_type( 1u ) ),
-		chunks_( computed_n_chunk() )
+	 size_( size ),
+	 chunk_exponent_( exponent ),
+	 chunk_size_( size_type( 1u ) << chunk_exponent_ ),
+	 chunk_mask_( chunk_size_ - size_type( 1u ) ),
+	 chunks_( computed_n_chunk() )
 	{
 		// Size and assign Chunks
 		if ( size_ > 0u ) {
@@ -206,15 +207,15 @@ public: // Creation
 	// Size + Exponent + Uniform Value Constructor
 	inline
 	ChunkVector(
-		size_type const size,
-		ChunkExponent const & exponent,
-		T const & value
+	 size_type const size,
+	 ChunkExponent const & exponent,
+	 T const & value
 	) :
-		size_( size ),
-		chunk_exponent_( exponent ),
-		chunk_size_( size_type( 1u ) << chunk_exponent_ ),
-		chunk_mask_( chunk_size_ - size_type( 1u ) ),
-		chunks_( computed_n_chunk() )
+	 size_( size ),
+	 chunk_exponent_( exponent ),
+	 chunk_size_( size_type( 1u ) << chunk_exponent_ ),
+	 chunk_mask_( chunk_size_ - size_type( 1u ) ),
+	 chunks_( computed_n_chunk() )
 	{
 		// Size and assign Chunks
 		if ( size_ > 0u ) {
@@ -262,7 +263,7 @@ public: // Assignment
 	}
 
 	// Copy Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	ChunkVector &
 	operator =( ChunkVector< U > const & v )
@@ -325,8 +326,8 @@ public: // Assignment
 	inline
 	ChunkVector &
 	assign(
-		std::vector< U, L > const & v,
-		ChunkExponent const & exponent
+	 std::vector< U, L > const & v,
+	 ChunkExponent const & exponent
 	)
 	{
 		if ( chunk_exponent_ == exponent ) { // Call other assign function for efficiency
@@ -356,8 +357,8 @@ public: // Assignment
 	inline
 	ChunkVector &
 	assign(
-		InputIterator const beg,
-		InputIterator const end
+	 InputIterator const beg,
+	 InputIterator const end
 	)
 	{
 		non_preserving_resize( end - beg );
@@ -379,9 +380,9 @@ public: // Assignment
 	inline
 	ChunkVector &
 	assign(
-		InputIterator const beg,
-		InputIterator const end,
-		ChunkExponent const & exponent
+	 InputIterator const beg,
+	 InputIterator const end,
+	 ChunkExponent const & exponent
 	)
 	{
 		if ( chunk_exponent_ == exponent ) { // Call other assign function for efficiency
@@ -410,8 +411,8 @@ public: // Assignment
 	inline
 	ChunkVector &
 	assign(
-		size_type const size,
-		T const & value
+	 size_type const size,
+	 T const & value
 	)
 	{
 		non_preserving_resize( size );
@@ -428,9 +429,9 @@ public: // Assignment
 	inline
 	ChunkVector &
 	assign(
-		size_type const size,
-		ChunkExponent const & exponent,
-		T const & value
+	 size_type const size,
+	 ChunkExponent const & exponent,
+	 T const & value
 	)
 	{
 		if ( chunk_exponent_ == exponent ) { // Call other assign function for efficiency
@@ -483,7 +484,7 @@ public: // Assignment
 	}
 
 	// += ChunkVector Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	ChunkVector &
 	operator +=( ChunkVector< U > const & v )
@@ -500,7 +501,7 @@ public: // Assignment
 	}
 
 	// -= ChunkVector Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	ChunkVector &
 	operator -=( ChunkVector< U > const & v )
@@ -709,7 +710,7 @@ public: // Inspector
 	back() const
 	{
 		assert( size_ > 0u );
-		return operator()( size_ );
+		return operator ()( size_ );
 	}
 
 	// Length
@@ -721,7 +722,8 @@ public: // Inspector
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			Chunk_type & chunk( chunks_[ i ] );
 			for ( size_type j = 0, je = chunk.size(); j < je; ++j ) {
-				length_sq += square( chunk[ j ] );
+				T const chunk_j( chunk[ j ] );
+				length_sq += chunk_j * chunk_j;
 			}
 		}
 		return std::sqrt( length_sq );
@@ -736,7 +738,8 @@ public: // Inspector
 		for ( Chunks_size_type i = 0, ie = chunks_.size(); i < ie; ++i ) {
 			Chunk_type & chunk( chunks_[ i ] );
 			for ( size_type j = 0, je = chunk.size(); j < je; ++j ) {
-				length_sq += square( chunk[ j ] );
+				T const chunk_j( chunk[ j ] );
+				length_sq += chunk_j * chunk_j;
 			}
 		}
 		return length_sq;
@@ -759,7 +762,7 @@ public: // Modifier
 	back()
 	{
 		assert( size_ > 0u );
-		return operator()( size_ );
+		return operator ()( size_ );
 	}
 
 	// Append an Element
@@ -809,7 +812,7 @@ public: // Modifier
 	}
 
 	// Append ChunkVector Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	ChunkVector &
 	append( ChunkVector< U > const & v )
@@ -848,8 +851,8 @@ public: // Modifier
 	inline
 	ChunkVector &
 	resize(
-		size_type const size,
-		T const & value = T()
+	 size_type const size,
+	 T const & value = T()
 	)
 	{
 		Chunks_size_type const n_chunk_o( n_chunk() );
@@ -913,9 +916,9 @@ public: // Modifier
 	inline
 	ChunkVector &
 	reshape(
-		size_type const size,
-		ChunkExponent const & exponent,
-		T const & value = T()
+	 size_type const size,
+	 ChunkExponent const & exponent,
+	 T const & value = T()
 	)
 	{
 		ChunkVector v( size, exponent, value ); // Temporary with desired shape
@@ -930,8 +933,8 @@ public: // Modifier
 	inline
 	ChunkVector &
 	non_preserving_reshape(
-		size_type const size,
-		ChunkExponent const & exponent
+	 size_type const size,
+	 ChunkExponent const & exponent
 	)
 	{
 		ChunkVector( size, exponent ).swap( *this ); // Set to new array
@@ -1045,17 +1048,6 @@ private: // Functions
 		return *this;
 	}
 
-private: // Static Functions
-
-	// square( x ) == x^2
-	inline
-	static
-	T
-	square( T const & x )
-	{
-		return x * x;
-	}
-
 private: // Data
 
 	size_type size_; // Number of elements
@@ -1071,6 +1063,64 @@ private: // Data
 }; // ChunkVector
 
 // Functions
+
+// Magnitude
+template< typename T >
+inline
+T
+magnitude( ChunkVector< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return std::sqrt( mag_sq );
+}
+
+// Magnitude Squared
+template< typename T >
+inline
+T
+magnitude_squared( ChunkVector< T > const & a )
+{
+	T mag_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const a_i( a[ i ] );
+		mag_sq += a_i * a_i;
+	}
+	return mag_sq;
+}
+
+// Distance
+template< typename T >
+inline
+T
+distance( ChunkVector< T > const & a, ChunkVector< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return std::sqrt( distance_sq );
+}
+
+// Distance Squared
+template< typename T >
+inline
+T
+distance_squared( ChunkVector< T > const & a, ChunkVector< T > const & b )
+{
+	assert( a.size() == b.size() );
+	T distance_sq( T( 0 ) );
+	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
+		T const distance_i( a[ i ] - b[ i ] );
+		distance_sq += distance_i * distance_i;
+	}
+	return distance_sq;
+}
 
 // Dot Product
 template< typename T >
@@ -1098,34 +1148,6 @@ dot_product( ChunkVector< T > const & a, ChunkVector< T > const & b )
 		sum += a[ i ] * b[ i ];
 	}
 	return sum;
-}
-
-// Distance
-template< typename T >
-inline
-T
-distance( ChunkVector< T > const & a, ChunkVector< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return std::sqrt( distance_sq );
-}
-
-// Distance Squared
-template< typename T >
-inline
-T
-distance_squared( ChunkVector< T > const & a, ChunkVector< T > const & b )
-{
-	assert( a.size() == b.size() );
-	T distance_sq( T( 0 ) );
-	for ( typename ChunkVector< T >::size_type i = 0, ie = a.size(); i < ie; ++i ) {
-		distance_sq += square( a[ i ] - b[ i ] );
-	}
-	return distance_sq;
 }
 
 // Swap

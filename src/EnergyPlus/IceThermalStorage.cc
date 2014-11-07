@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -71,11 +72,16 @@ namespace IceThermalStorage {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
+	static std::string const BlankString;
+
 	std::string const cIceStorageSimple( "ThermalStorage:Ice:Simple" );
 	std::string const cIceStorageDetailed( "ThermalStorage:Ice:Detailed" );
 
 	int const IceStorageType_Simple( 1 );
 	int const IceStorageType_Detailed( 2 );
+
+	int const CurveQuadraticLinear( 1 );
+	int const CurveCubicLinear( 2 );
 
 	int const DetIceInsideMelt( 1 ); // Inside melt system--charge starting with bare coil
 	int const DetIceOutsideMelt( 2 ); // Outside melt system--charge from existing ice layer on coil
@@ -97,9 +103,9 @@ namespace IceThermalStorage {
 	Real64 const Pa( 0.088065 );
 	Real64 const Pb( 1.137742 );
 	Real64 const Pc( -0.225806 );
-	Real64 const Tref( 85. ); // F
+	Real64 const Tref( 85.0 ); // F
 	Real64 const Tcharge( 1.0 ); // F
-	Real64 const Tdischarge( 5. ); // F
+	Real64 const Tdischarge( 5.0 ); // F
 
 	// Parameter used by the Detailed Ice Storage Model
 	Real64 const DeltaTofMin( 0.5 ); // Minimum allowed outlet side temperature difference [C]
@@ -202,7 +208,7 @@ namespace IceThermalStorage {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		Real64 DemandMdot;
 		Real64 TempIn;
-		Real64 TempSetPt;
+		Real64 TempSetPt( 0.0 );
 		Real64 MyLoad2;
 		Real64 MaxCap;
 		Real64 MinCap;
@@ -210,7 +216,7 @@ namespace IceThermalStorage {
 		Real64 Cp; // local plant fluid specific heat
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SimIceStorage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -308,10 +314,12 @@ namespace IceThermalStorage {
 				TempSetPt = Node( OutletNodeNum ).TempSetPoint;
 			} else if ( SELECT_CASE_var1 == DualSetPointDeadBand ) {
 				TempSetPt = Node( OutletNodeNum ).TempSetPointHi;
+			} else {
+				assert( false );
 			}}
 			DemandMdot = IceStorage( IceNum ).DesignMassFlowRate;
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( IceStorage( IceNum ).LoopNum ).FluidName, TempIn, PlantLoop( IceStorage( IceNum ).LoopNum ).FluidIndex, "SimIceStorage" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( IceStorage( IceNum ).LoopNum ).FluidName, TempIn, PlantLoop( IceStorage( IceNum ).LoopNum ).FluidIndex, RoutineName );
 
 			MyLoad2 = ( DemandMdot * Cp * ( TempIn - TempSetPt ) );
 			MyLoad = MyLoad2;
@@ -423,6 +431,10 @@ namespace IceThermalStorage {
 		Real64 const TankDischargeToler( 0.001 ); // Below this fraction, there is nothing left to discharge
 		Real64 const TankChargeToler( 0.999 ); // Above this fraction, we don't have anything left to charge
 		Real64 const TemperatureToler( 0.1 ); // Temperature difference between iterations that indicates convergence [C]
+		Real64 const SIEquiv100GPMinMassFlowRate( 6.31 ); // Used to non-dimensionalize flow rate for use in CubicLinear charging equation
+														  // Flow rate divided by nominal 100GPM used to non-dimensionalize volume flow rate
+														  // Assumes approximate density of 1000 kg/m3 to get an estimate for mass flow rate
+		static std::string const RoutineName( "SimDetailedIceStorage" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -441,11 +453,12 @@ namespace IceThermalStorage {
 		int NodeNumOut; // Plant loop outlet node number for component
 		Real64 Qstar; // Current load on the ice storage unit [non-dimensional]
 		Real64 TempIn; // Inlet temperature to component (from plant loop) [C]
-		Real64 TempSetPt; // Setpoint temperature defined by loop controls [C]
+		Real64 TempSetPt( 0.0 ); // Setpoint temperature defined by loop controls [C]
 		Real64 ToutNew; // Updated outlet temperature from the tank [C]
 		Real64 ToutOld; // Tank outlet temperature from the last iteration [C]
 		Real64 Cp; // local plant fluid specific heat
 		Real64 mdot; // local mass flow rate for plant connection
+		Real64 MassFlowstar; //non-dimensional mass flow rate for charge curve use [non-dimensional]
 
 		// FLOW:
 		// Set local variables
@@ -457,6 +470,8 @@ namespace IceThermalStorage {
 			TempSetPt = Node( NodeNumOut ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			TempSetPt = Node( NodeNumOut ).TempSetPointHi;
+		} else {
+			assert( false );
 		}}
 
 		IterNum = 0;
@@ -471,7 +486,7 @@ namespace IceThermalStorage {
 		}
 
 		// Calculate the current load on the ice storage unit
-		Cp = GetSpecificHeatGlycol( PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidName, TempIn, PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidIndex, "SimDetailedIceStorage" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidName, TempIn, PlantLoop( DetIceStor( IceNum ).PlantLoopNum ).FluidIndex, RoutineName );
 
 		LocalLoad = DetIceStor( IceNum ).MassFlowRate * Cp * ( TempIn - TempSetPt );
 
@@ -537,7 +552,12 @@ namespace IceThermalStorage {
 					AvgFracCharged = DetIceStor( IceNum ).IceFracRemaining + ( ChargeFrac / 2.0 );
 				}
 
-				Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, AvgFracCharged, LMTDstar ) );
+				if ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveQuadraticLinear ) {
+					Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, AvgFracCharged, LMTDstar ) );
+				} else  { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveCubicLinear )
+					MassFlowstar = DetIceStor( IceNum ).MassFlowRate/SIEquiv100GPMinMassFlowRate;
+					Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, LMTDstar, MassFlowstar ) );
+				}
 
 				ActualLoad = Qstar * DetIceStor( IceNum ).NomCapacity / DetIceStor( IceNum ).CurveFitTimeStep;
 
@@ -561,7 +581,12 @@ namespace IceThermalStorage {
 							// Calculate new values for LMTDstar and Qstar based on updated outlet temperature
 							ToutOld = ToutNew;
 							LMTDstar = CalcDetIceStorLMTDstar( TempIn, ToutOld, DetIceStor( IceNum ).FreezingTemp );
-							Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, AvgFracCharged, LMTDstar ) );
+							if ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveQuadraticLinear ) {
+								Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, AvgFracCharged, LMTDstar ) );
+							} else  { // ( DetIceStor( IceNum ).ChargeCurveTypeNum == CurveCubicLinear )
+								MassFlowstar = DetIceStor( IceNum ).MassFlowRate/SIEquiv100GPMinMassFlowRate;
+								Qstar = std::abs( CurveValue( DetIceStor( IceNum ).ChargeCurveNum, LMTDstar, MassFlowstar ) );
+							}
 
 							// Now make sure that we don't go above 100% charged and calculate the new average fraction
 							ChargeFrac = Qstar * ( TimeStepSys / DetIceStor( IceNum ).CurveFitTimeStep );
@@ -660,7 +685,11 @@ namespace IceThermalStorage {
 				if ( ( DetIceStor( IceNum ).IceFracRemaining - ChargeFrac ) < 0.0 ) ChargeFrac = DetIceStor( IceNum ).IceFracRemaining;
 				AvgFracCharged = DetIceStor( IceNum ).IceFracRemaining - ( ChargeFrac / 2.0 );
 
-				Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, ( 1.0 - AvgFracCharged ), LMTDstar ) );
+				if ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveQuadraticLinear ) {
+					Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, ( 1.0 - AvgFracCharged ), LMTDstar ) );
+				} else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
+					Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, LMTDstar, AvgFracCharged ) );
+				}
 
 				ActualLoad = Qstar * DetIceStor( IceNum ).NomCapacity / DetIceStor( IceNum ).CurveFitTimeStep;
 
@@ -684,7 +713,12 @@ namespace IceThermalStorage {
 							// Calculate new values for LMTDstar and Qstar based on updated outlet temperature
 							ToutOld = ToutNew;
 							LMTDstar = CalcDetIceStorLMTDstar( TempIn, ToutOld, DetIceStor( IceNum ).FreezingTemp );
-							Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, ( 1.0 - AvgFracCharged ), LMTDstar ) );
+
+							if ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveQuadraticLinear ) {
+								Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, ( 1.0 - AvgFracCharged ), LMTDstar ) );
+							} else { // ( DetIceStor( IceNum ).DischargeCurveTypeNum == CurveCubicLinear )
+								Qstar = std::abs( CurveValue( DetIceStor( IceNum ).DischargeCurveNum, LMTDstar, AvgFracCharged ) );
+							}
 
 							// Now make sure that we don't go below 100% discharged and calculate the new average fraction
 							ChargeFrac = Qstar * ( TimeStepSys / DetIceStor( IceNum ).CurveFitTimeStep );
@@ -791,7 +825,7 @@ namespace IceThermalStorage {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -978,11 +1012,16 @@ namespace IceThermalStorage {
 				ErrorsFound = true;
 			} else {
 				DetIceStor( IceNum ).DischargeCurveType = GetCurveType( DetIceStor( IceNum ).DischargeCurveNum );
+				if ( DetIceStor( IceNum ).DischargeCurveType == "QUADRATICLINEAR") {
+					DetIceStor(IceNum).DischargeCurveTypeNum = CurveQuadraticLinear;
+				} else if ( DetIceStor( IceNum ).DischargeCurveType == "CUBICLINEAR") {
+					DetIceStor(IceNum).DischargeCurveTypeNum = CurveCubicLinear;
+				}
 			}
-			if ( ( DetIceStor( IceNum ).DischargeCurveType != cAlphaArgs( 5 ) ) || ( DetIceStor( IceNum ).DischargeCurveType != "QUADRATICLINEAR" ) ) {
+			if ( ( DetIceStor( IceNum ).DischargeCurveType != cAlphaArgs( 5 ) ) || ( ( DetIceStor( IceNum ).DischargeCurveType != "QUADRATICLINEAR" ) && ( DetIceStor( IceNum ).DischargeCurveType != "CUBICLINEAR" ) ) ) {
 				ShowSevereError( cCurrentModuleObject + ": Discharge curve type not valid, type=" + cAlphaArgs( 5 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear" );
+				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear" );
 				ErrorsFound = true;
 			}
 
@@ -994,11 +1033,16 @@ namespace IceThermalStorage {
 				ErrorsFound = true;
 			} else {
 				DetIceStor( IceNum ).ChargeCurveType = GetCurveType( DetIceStor( IceNum ).ChargeCurveNum );
+				if ( DetIceStor( IceNum ).ChargeCurveType == "QUADRATICLINEAR") {
+					DetIceStor(IceNum).ChargeCurveTypeNum = CurveQuadraticLinear;
+				} else if ( DetIceStor( IceNum ).ChargeCurveType == "CUBICLINEAR") {
+					DetIceStor(IceNum).ChargeCurveTypeNum = CurveCubicLinear;
+				}
 			}
-			if ( ( DetIceStor( IceNum ).ChargeCurveType != cAlphaArgs( 7 ) ) || ( DetIceStor( IceNum ).ChargeCurveType != "QUADRATICLINEAR" ) ) {
+			if ( ( DetIceStor( IceNum ).ChargeCurveType != cAlphaArgs( 7 ) ) || ( ( DetIceStor( IceNum ).ChargeCurveType != "QUADRATICLINEAR" ) && ( DetIceStor( IceNum ).ChargeCurveType != "CUBICLINEAR" ) ) ) {
 				ShowSevereError( cCurrentModuleObject + ": Charge curve type not valid, type=" + cAlphaArgs( 7 ) );
 				ShowContinueError( "Entered in " + cCurrentModuleObject + '=' + cAlphaArgs( 1 ) );
-				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear" );
+				ShowContinueError( "Type does not match type for curve name or type does not equal QuadraticLinear or CubicLinear" );
 				ErrorsFound = true;
 			}
 
@@ -1013,7 +1057,7 @@ namespace IceThermalStorage {
 			DetIceStor( IceNum ).ThawProcessIndicator = cAlphaArgs( 9 );
 			if ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "INSIDEMELT" ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceInsideMelt;
-			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, Blank ) ) ) {
+			} else if ( ( SameString( DetIceStor( IceNum ).ThawProcessIndicator, "OUTSIDEMELT" ) ) || ( DetIceStor( IceNum ).ThawProcessIndicator.empty() ) ) {
 				DetIceStor( IceNum ).ThawProcessIndex = DetIceOutsideMelt;
 			} else {
 				ShowSevereError( "Invalid thaw process indicator of " + cAlphaArgs( 9 ) + " was entered" );
@@ -1790,6 +1834,7 @@ namespace IceThermalStorage {
 		// REFERENCES:
 
 		// Using/Aliasing
+		using DataBranchAirLoopPlant::MassFlowTolerance;
 		using DataGlobals::HourOfDay;
 		using DataGlobals::TimeStep;
 		using DataGlobals::NumOfTimeStepInHour;
@@ -1799,12 +1844,13 @@ namespace IceThermalStorage {
 		using DataPlant::DualSetPointDeadBand;
 		using FluidProperties::GetDensityGlycol;
 		using PlantUtilities::SetComponentFlowRate;
-
+		
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const TempTol( 0.0001 ); // C - minimum significant mass flow rate
+		static std::string const RoutineName( "CalcIceStorageDischarge" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1868,7 +1914,7 @@ namespace IceThermalStorage {
 			LoopNum = IceStorage( IceNum ).LoopNum;
 			LoopSideNum = IceStorage( IceNum ).LoopSideNum;
 
-			CpFluid = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, Node( InletNodeNum ).Temp, PlantLoop( LoopNum ).FluidIndex, "CalcIceStorageDischarge" );
+			CpFluid = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, Node( InletNodeNum ).Temp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 			// Calculate Umyload based on MyLoad from E+
 			Umyload = -MyLoad * TimeInterval / ITSNomCap;
@@ -1895,7 +1941,7 @@ namespace IceThermalStorage {
 			Qice = max( Qice, -MaxCap );
 
 			// Calculate leaving water temperature
-			if ( ( Qice >= 0.0 ) || ( XCurIceFrac <= 0.0 ) ) {
+			if ( ( Qice >= 0.0 ) || ( XCurIceFrac <= 0.0 ) || ( ITSMassFlowRate < MassFlowTolerance ) ) {
 				ITSOutletTemp = ITSInletTemp;
 				DeltaTemp = 0.0;
 				Qice = 0.0;
@@ -1944,7 +1990,7 @@ namespace IceThermalStorage {
 
 		// Locals
 		Real64 ITSInletTemp;
-		Real64 ITSOutletTemp;
+		Real64 ITSOutletTemp( 0.0 );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1970,6 +2016,8 @@ namespace IceThermalStorage {
 			ITSOutletTemp = Node( OutletNodeNum ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			ITSOutletTemp = Node( OutletNodeNum ).TempSetPointHi;
+		} else {
+			assert( false );
 		}}
 
 		LogTerm = ( ITSInletTemp - FreezTemp ) / ( ITSOutletTemp - FreezTemp );
@@ -2027,15 +2075,15 @@ namespace IceThermalStorage {
 		{ auto const SELECT_CASE_var( IceStorage( IceNum ).ITSType_Num );
 		if ( SELECT_CASE_var == ITSType_IceOnCoilInternal ) {
 			y = XCurIceFrac;
-			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * std::pow( y, 2 ) - 47.6084 * std::pow( y, 3 ) + 41.8498 * std::pow( y, 4 ) - 14.2948 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * pow_2( y ) - 47.6084 * pow_3( y ) + 41.8498 * pow_4( y ) - 14.2948 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			y = 1.0 - XCurIceFrac;
-			UAIceDisCh = ( 1.3879 - 7.6333 * y + 26.3423 * std::pow( y, 2 ) - 47.6084 * std::pow( y, 3 ) + 41.8498 * std::pow( y, 4 ) - 14.2948 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceDisCh = ( 1.3879 - 7.6333 * y + 26.3423 * pow_2( y ) - 47.6084 * pow_3( y ) + 41.8498 * pow_4( y ) - 14.2948 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			HLoss = 0.0;
 		} else if ( SELECT_CASE_var == ITSType_IceOnCoilExternal ) {
 			y = XCurIceFrac;
-			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * std::pow( y, 2 ) - 47.6084 * std::pow( y, 3 ) + 41.8498 * std::pow( y, 4 ) - 14.2948 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceCh = ( 1.3879 - 7.6333 * y + 26.3423 * pow_2( y ) - 47.6084 * pow_3( y ) + 41.8498 * pow_4( y ) - 14.2948 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			y = 1.0 - XCurIceFrac;
-			UAIceDisCh = ( 1.1756 - 5.3689 * y + 17.3602 * std::pow( y, 2 ) - 30.1077 * std::pow( y, 3 ) + 25.6387 * std::pow( y, 4 ) - 8.5102 * std::pow( y, 5 ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
+			UAIceDisCh = ( 1.1756 - 5.3689 * y + 17.3602 * pow_2( y ) - 30.1077 * pow_3( y ) + 25.6387 * pow_4( y ) - 8.5102 * pow_5( y ) ) * IceStorage( IceNum ).ITSNomCap / TimeInterval / 10.0; // [W/C]
 			HLoss = 0.0;
 
 		}}
@@ -2477,14 +2525,14 @@ namespace IceThermalStorage {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -15,19 +15,30 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/string.functions.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 using std::string;
 
-TEST( stringFunctionsTest, CaseChange )
+TEST( StringFunctionsTest, CaseChange )
 {
 	string s( "Fish" );
+	string t( "FishY" );
+	EXPECT_EQ( "Fish", s );
+	EXPECT_TRUE( equal( s, "fiSh", false ) );
+	EXPECT_TRUE( equal( s, "Fish" ) );
+	EXPECT_TRUE( equal( s, "FiSh", false ) );
+	EXPECT_FALSE( equal( s, "fiSh" ) );
+	EXPECT_FALSE( equal( s, "fiSh", true ) );
 	lowercase( s );
 	EXPECT_EQ( "fish", s );
 	uppercase( s );
 	EXPECT_EQ( "FISH", s );
 	EXPECT_TRUE( equali( s, "fiSh" ) );
 	EXPECT_FALSE( equali( s, "fiShY" ) );
+	EXPECT_FALSE( equali( s, t ) );
+	EXPECT_TRUE( equali( "fiSh", s ) );
+	EXPECT_FALSE( equali( "fiShY", s ) );
 	EXPECT_TRUE( equali( "FISH", "fiSh" ) );
 	EXPECT_FALSE( equali( "FISH", "fiShY" ) );
 	EXPECT_TRUE( equali( "FISH ", "fiSh " ) );
@@ -35,9 +46,13 @@ TEST( stringFunctionsTest, CaseChange )
 	EXPECT_FALSE( equali( "FISH ", "fiSh" ) );
 	EXPECT_EQ( "fish", lowercased( s ) );
 	EXPECT_EQ( "FISH", uppercased( s ) );
+	EXPECT_TRUE( lessthani( s, "fiShY" ) );
+	EXPECT_FALSE( lessthani( s, "fiSh" ) );
+	EXPECT_TRUE( lessthani( s, "GISH" ) );
+	EXPECT_TRUE( lessthani( "aaa", "Z" ) );
 }
 
-TEST( stringFunctionsTest, JustificationTrimming )
+TEST( StringFunctionsTest, JustificationTrimming )
 {
 	string s( "  Fish " );
 	EXPECT_EQ( 6u, len_trim( s ) );
@@ -58,7 +73,7 @@ TEST( stringFunctionsTest, JustificationTrimming )
 	EXPECT_EQ( "Bozo", s );
 }
 
-TEST( stringFunctionsTest, StripSpace )
+TEST( StringFunctionsTest, StripSpace )
 {
 	string s( "  Fish " );
 	EXPECT_EQ( "Fish", stripped( s ) );
@@ -73,7 +88,7 @@ TEST( stringFunctionsTest, StripSpace )
 	EXPECT_EQ( "Cow", s );
 }
 
-TEST( stringFunctionsTest, StripWhitespace )
+TEST( StringFunctionsTest, StripWhitespace )
 {
 	string s( " \0\0\t \t\0\t Fish \t\0 ", 17 );
 	EXPECT_EQ( string( "\0\0\t \t\0\t Fish \t\0", 15 ), stripped( s ) );
@@ -89,7 +104,7 @@ TEST( stringFunctionsTest, StripWhitespace )
 	EXPECT_EQ( "Cow", s );
 }
 
-TEST( stringFunctionsTest, StripSpecifiedCharacters )
+TEST( StringFunctionsTest, StripSpecifiedCharacters )
 {
 	string s( "Fish" );
 	EXPECT_EQ( "Fis", stripped( s, "h" ) );
@@ -105,7 +120,7 @@ TEST( stringFunctionsTest, StripSpecifiedCharacters )
 	EXPECT_EQ( "i", s );
 }
 
-TEST( stringFunctionsTest, PrefixSuffix )
+TEST( StringFunctionsTest, PrefixSuffix )
 {
 	string const s( "Fish Tank" );
 	EXPECT_TRUE( has_prefix( s, "Fi" ) );
@@ -120,7 +135,7 @@ TEST( stringFunctionsTest, PrefixSuffix )
 	EXPECT_TRUE( has_suffix( t, "cat" ) ); // Find last instance
 }
 
-TEST( stringFunctionsTest, Centering )
+TEST( StringFunctionsTest, Centering )
 {
 	string s( "    Fish Tank" );
 	EXPECT_EQ( "  Fish Tank  ", centered( s ) );
@@ -128,7 +143,7 @@ TEST( stringFunctionsTest, Centering )
 	EXPECT_EQ( "  Fish Tank  ", s );
 }
 
-TEST( stringFunctionsTest, Replace )
+TEST( StringFunctionsTest, Replace )
 {
 	string const s( "Fish Tank" );
 	EXPECT_EQ( "Dish Tank", replaced( s, "F", "D" ) );
@@ -144,7 +159,7 @@ TEST( stringFunctionsTest, Replace )
 	EXPECT_EQ( t2, replaced( replaced( t, dslash, slash ), slash_dquote, dquote ) );
 }
 
-TEST( stringFunctionsTest, Pad )
+TEST( StringFunctionsTest, Pad )
 {
 	string s( "Fish Tank" );
 	EXPECT_EQ( "Fish Tank", padded( s, 5 ) );
@@ -153,7 +168,7 @@ TEST( stringFunctionsTest, Pad )
 	EXPECT_EQ( "Fish Tank   ", pad( s, 12 ) );
 }
 
-TEST( stringFunctionsTest, Pare )
+TEST( StringFunctionsTest, Pare )
 {
 	string s( "Fish Tank" );
 	EXPECT_EQ( "Fish Tank", pared( s, 12 ) );

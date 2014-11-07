@@ -73,10 +73,10 @@ public: // Creation
 	// Default Constructor
 	inline
 	Fstring() :
-		len_( 1 ),
-		str_( new char[ 1 ] ), // Single space as in Fortran
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( 1 ),
+	 str_( new char[ 1 ] ), // Single space as in Fortran
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		str_[ 0 ] = ' ';
 	}
@@ -84,10 +84,10 @@ public: // Creation
 	// Copy Constructor
 	inline
 	Fstring( Fstring const & s ) :
-		len_( s.len_ ),
-		str_( len_ > 0u ? new char[ len_ ] : nullptr ),
-		c_str_( nullptr ),
-		sub_( false )
+	 len_( s.len_ ),
+	 str_( len_ > 0u ? new char[ len_ ] : nullptr ),
+	 c_str_( nullptr ),
+	 sub_( false )
 	{
 		std::memcpy( str_, s.str_, len_ );
 	}
@@ -171,73 +171,73 @@ public: // Creation
 protected: // Creation
 
 	// Substring Range Constructor
-	template< typename L, typename U >
+	template< typename L, typename U, class = typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_unsigned< L >::value && std::is_unsigned< U >::value >::type >
 	inline
-	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_unsigned< L >::value && std::is_unsigned< U >::value >::type * = 0 ) :
-		len_( l <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - l + 1u : static_cast< size_type >( 0 ) ),
-		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
+	Fstring( Fstring const & s, L const l, U const u ) :
+	 len_( l <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - l + 1u : static_cast< size_type >( 0 ) ),
+	 str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
+	 c_str_( nullptr ),
+	 sub_( true )
 	{
 		assert( l > 0u );
 	}
 
 	// Substring Range Constructor
-	template< typename L, typename U >
+	template< typename L, typename U, class = typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_signed< L >::value && std::is_signed< U >::value >::type, typename = void >
 	inline
-	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_signed< L >::value && std::is_signed< U >::value >::type * = 0 ) :
-		len_( static_cast< size_type >( l ) <= std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) ? std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
-		str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
+	Fstring( Fstring const & s, L const l, U const u ) :
+	 len_( static_cast< size_type >( l ) <= std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) ? std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
+	 str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
+	 c_str_( nullptr ),
+	 sub_( true )
 	{
 		assert( l > 0 );
 	}
 
 	// Substring Range Constructor
-	template< typename L, typename U >
+	template< typename L, typename U, class = typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_unsigned< L >::value && std::is_signed< U >::value >::type, typename = void, typename = void >
 	inline
-	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_unsigned< L >::value && std::is_signed< U >::value >::type * = 0 ) :
-		len_( l <= std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) ? std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) - l + 1u : static_cast< size_type >( 0 ) ),
-		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
+	Fstring( Fstring const & s, L const l, U const u ) :
+	 len_( l <= std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) ? std::min( static_cast< size_type >( std::max( u, 0 ) ), s.len_ ) - l + 1u : static_cast< size_type >( 0 ) ),
+	 str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
+	 c_str_( nullptr ),
+	 sub_( true )
 	{
 		assert( l > 0u );
 	}
 
 	// Substring Range Constructor
-	template< typename L, typename U >
+	template< typename L, typename U, class = typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_signed< L >::value && std::is_unsigned< U >::value >::type, typename = void, typename = void, typename = void >
 	inline
-	Fstring( Fstring const & s, L const l, U const u, typename std::enable_if< std::is_integral< L >::value && std::is_integral< U >::value && std::is_signed< L >::value && std::is_unsigned< U >::value >::type * = 0 ) :
-		len_( static_cast< size_type >( l ) <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
-		str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
+	Fstring( Fstring const & s, L const l, U const u ) :
+	 len_( static_cast< size_type >( l ) <= std::min( u, s.len_ ) ? std::min( u, s.len_ ) - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
+	 str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
+	 c_str_( nullptr ),
+	 sub_( true )
 	{
 		assert( l > 0 );
 	}
 
 	// Substring Tail Constructor
-	template< typename L >
+	template< typename L, class = typename std::enable_if< std::is_integral< L >::value && std::is_unsigned< L >::value >::type >
 	inline
-	Fstring( Fstring const & s, L const l, typename std::enable_if< std::is_integral< L >::value && std::is_unsigned< L >::value >::type * = 0 ) :
-		len_( l <= s.len_ ? s.len_ - l + 1u : static_cast< size_type >( 0 ) ),
-		str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
+	Fstring( Fstring const & s, L const l ) :
+	 len_( l <= s.len_ ? s.len_ - l + 1u : static_cast< size_type >( 0 ) ),
+	 str_( l <= s.len_ ? s.str_ + l - 1u : s.str_ ),
+	 c_str_( nullptr ),
+	 sub_( true )
 	{
 		assert( l > 0u );
 	}
 
 	// Substring Tail Constructor
-	template< typename L >
+	template< typename L, class = typename std::enable_if< std::is_integral< L >::value && std::is_signed< L >::value >::type, typename = void >
 	inline
-	Fstring( Fstring const & s, L const l, typename std::enable_if< std::is_integral< L >::value && std::is_signed< L >::value >::type * = 0 ) :
-		len_( static_cast< size_type >( l ) <= s.len_ ? s.len_ - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
-		str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
-		c_str_( nullptr ),
-		sub_( true )
+	Fstring( Fstring const & s, L const l ) :
+	 len_( static_cast< size_type >( l ) <= s.len_ ? s.len_ - static_cast< size_type >( l ) + 1u : static_cast< size_type >( 0 ) ),
+	 str_( static_cast< size_type >( l ) <= s.len_ ? s.str_ + static_cast< size_type >( l ) - 1u : s.str_ ),
+	 c_str_( nullptr ),
+	 sub_( true )
 	{
 		assert( l > 0 );
 	}
@@ -2828,8 +2828,8 @@ template< typename T >
 inline
 Fstring
 Fstring_of(
-	T const & t,
-	int const p // Precision
+ T const & t,
+ int const p // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -2842,9 +2842,9 @@ template< typename T >
 inline
 Fstring
 left_Fstring_of(
-	T const & t,
-	int const w, // Minimum width
-	char const f = ' ' // Fill character
+ T const & t,
+ int const w, // Minimum width
+ char const f = ' ' // Fill character
 )
 {
 	std::ostringstream t_stream;
@@ -2858,9 +2858,9 @@ template< typename T >
 inline
 Fstring
 right_Fstring_of(
-	T const & t,
-	int const w, // Minimum width
-	char const f = ' ' // Fill character
+ T const & t,
+ int const w, // Minimum width
+ char const f = ' ' // Fill character
 )
 {
 	std::ostringstream t_stream;
@@ -2875,8 +2875,8 @@ template< typename T >
 inline
 Fstring
 lead_zero_Fstring_of(
-	T const & t,
-	int const w // Minimum width
+ T const & t,
+ int const w // Minimum width
 )
 {
 	std::ostringstream t_stream;
@@ -2890,9 +2890,9 @@ template< typename T >
 inline
 Fstring
 general_Fstring_of(
-	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+ T const & t,
+ int const w = TypeTraits< T >::iwidth(), // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -2906,9 +2906,9 @@ template< typename T >
 inline
 Fstring
 fixed_Fstring_of(
-	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+ T const & t,
+ int const w = TypeTraits< T >::iwidth(), // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;
@@ -2922,9 +2922,9 @@ template< typename T >
 inline
 Fstring
 scientific_Fstring_of(
-	T const & t,
-	int const w = TypeTraits< T >::width(), // Minimum width
-	int const p = TypeTraits< T >::precision() // Precision
+ T const & t,
+ int const w = TypeTraits< T >::iwidth(), // Minimum width
+ std::streamsize const p = TypeTraits< T >::precision() // Precision
 )
 {
 	std::ostringstream t_stream;

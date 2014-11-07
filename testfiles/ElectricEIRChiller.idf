@@ -101,7 +101,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -1616,7 +1616,7 @@
     Condenser Demand Outlet Node,  !- Demand Side Outlet Node Name
     Condenser Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Condenser Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Condenser Loop Setpoint Manager,  !- Name
@@ -2227,7 +2227,7 @@
   Fan:ConstantVolume,
     Supply Fan 1,            !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     1.3,                     !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency

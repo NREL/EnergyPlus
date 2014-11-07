@@ -16,6 +16,7 @@ namespace Fans {
 
 	// Using/Aliasing
 	using DataHVACGlobals::MinFrac;
+	using DataHVACGlobals::SystemAirflowSizing;
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
@@ -508,9 +509,27 @@ namespace Fans {
 
 	};
 
+	struct FanNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		FanNumericFieldData()
+		{}
+
+		// Member Constructor
+		FanNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+		) :
+			FieldNames( FieldNames )
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< FanEquipConditions > Fan;
 	extern FArray1D< NightVentPerfData > NightVentPerf;
+	extern FArray1D< FanNumericFieldData > FanNumericFields;
 
 	// Functions
 
@@ -672,6 +691,18 @@ namespace Fans {
 		Optional< Real64 const > MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
 		Optional< Real64 const > MinAirVolFlow = _ // Fan air volumetric flow rate    [m3/s]
 	);
+	
+	Real64
+	FanDesDT(
+		int const FanNum, // index of fan in Fan array
+		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+	);
+
+	Real64
+	FanDesHeatGain(
+		int const FanNum, // index of fan in Fan array
+		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+	);
 
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
@@ -685,7 +716,7 @@ namespace Fans {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

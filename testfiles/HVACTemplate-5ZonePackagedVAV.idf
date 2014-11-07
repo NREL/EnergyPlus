@@ -74,8 +74,8 @@
 !
 ! HVAC:                           Packaged VAV system with outside air economizer. Sys 1 serves spaces
 !                                 1, 2, 3, and 5 with HVACTemplate:Zone:VAV terminal units and fixed
-!                                 supply air setpoint.  Sys 2 serves space 4 and uses the 
-!                                 WarmestTemperatureFirst reset option for cooling. 
+!                                 supply air setpoint.  Sys 2 serves space 4 and uses the
+!                                 WarmestTemperatureFirst reset option for cooling.
 !                                 All equipment is autosized.
 !
 ! Zonal Equipment:                None
@@ -96,7 +96,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -1892,7 +1892,7 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: HVACTEMPLATE:ZONE:VAV:HEATANDCOOL ===========
 
-HVACTemplate:Zone:VAV:HeatAndCool,
+  HVACTemplate:Zone:VAV:HeatAndCool,
     SPACE4-1,                !- Zone Name
     DXVAV Sys 2,             !- Template VAV System Name
     All Zones,               !- Template Thermostat Name
@@ -1920,7 +1920,6 @@ HVACTemplate:Zone:VAV:HeatAndCool,
     SupplyAirTemperature,    !- Zone Heating Design Supply Air Temperature Input Method
     50,                      !- Zone Heating Design Supply Air Temperature {C}
     30;                      !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-
 
 !-   ===========  ALL OBJECTS IN CLASS: HVACTemplate:System:PackagedVAV ===========
 
@@ -1985,7 +1984,7 @@ HVACTemplate:Zone:VAV:HeatAndCool,
     ,                        !- Return Fan Motor in Air Stream Fraction
     ;                        !- Return Fan Part-Load Power Coefficients
 
-HVACTemplate:System:PackagedVAV,
+  HVACTemplate:System:PackagedVAV,
     DXVAV Sys 2,             !- Name
     FanAvailSched,           !- System Availability Schedule Name
     autosize,                !- Supply Fan Maximum Flow Rate {m3/s}
@@ -2045,7 +2044,6 @@ HVACTemplate:System:PackagedVAV,
     ,                        !- Return Fan Motor Efficiency
     ,                        !- Return Fan Motor in Air Stream Fraction
     ;                        !- Return Fan Part-Load Power Coefficients
-
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 

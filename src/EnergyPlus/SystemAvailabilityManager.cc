@@ -71,6 +71,8 @@ namespace SystemAvailabilityManager {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
+	static std::string const BlankString;
+
 	int const MaxDayTypes( 12 );
 	int const StayOff( 0 );
 	int const CycleOnAny( 1 );
@@ -1406,7 +1408,7 @@ namespace SystemAvailabilityManager {
 			GetAvailListsInput = false;
 		}
 
-		if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input ) {
+		if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input ) { // when both air loop and zone eq avail managers are present, zone avail mngrs list name has not been read in first time through here (see end of if block)
 			AvailabilityListName = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).AvailManagerListName;
 			Found = 0;
 			if ( NumAvailManagerLists > 0 ) Found = FindItemInList( AvailabilityListName, SysAvailMgrListData.Name(), NumAvailManagerLists );
@@ -1437,7 +1439,8 @@ namespace SystemAvailabilityManager {
 					}
 				} //End of Num Loop
 			}
-			ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input = false;
+			if ( ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Count > 0 || Found > 0)ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).Input = false;
+			ZoneComp ( ZoneEquipType ).ZoneCompAvailMgrs ( CompNum ).Count += 1;
 		}
 
 	}
@@ -2325,7 +2328,7 @@ namespace SystemAvailabilityManager {
 						DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 					}
 					PreStartTime = FanStartTime - DeltaTime;
-					if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+					if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 					PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 					if ( PreStartTimeTmr < 0.0 ) {
 						PreStartTimeTmr += 24.0;
@@ -2400,7 +2403,7 @@ namespace SystemAvailabilityManager {
 								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
-							if ( PreStartTime < 0 ) PreStartTime = -.1;
+							if ( PreStartTime < 0 ) PreStartTime = -0.1;
 							PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 							if ( PreStartTimeTmr < 0 ) {
 								PreStartTimeTmr += 24.0;
@@ -2479,7 +2482,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;
@@ -2579,7 +2582,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;
@@ -2660,7 +2663,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;
@@ -2792,7 +2795,7 @@ namespace SystemAvailabilityManager {
 								DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 							}
 							PreStartTime = FanStartTime - DeltaTime;
-							if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+							if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 							PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 							if ( PreStartTimeTmr < 0.0 ) {
 								PreStartTimeTmr += 24.0;
@@ -2914,7 +2917,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0.0 ) {
 							PreStartTimeTmr += 24.0;
@@ -3096,7 +3099,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0.0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0.0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0.0 ) {
 							PreStartTimeTmr += 24.0;
@@ -3219,7 +3222,7 @@ namespace SystemAvailabilityManager {
 							DeltaTime = OptStartSysAvailMgrData( SysAvailNum ).MaxOptStartTime;
 						}
 						PreStartTime = FanStartTime - DeltaTime;
-						if ( PreStartTime < 0 ) PreStartTime = -.1;
+						if ( PreStartTime < 0 ) PreStartTime = -0.1;
 						PreStartTimeTmr = FanStartTimeTmr - DeltaTime;
 						if ( PreStartTimeTmr < 0 ) {
 							PreStartTimeTmr += 24.0;
@@ -4796,7 +4799,7 @@ namespace SystemAvailabilityManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

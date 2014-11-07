@@ -2,6 +2,9 @@
 #include <cmath>
 #include <string>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/Fmath.hh>
+
 // EnergyPlus Headers
 #include <TarcogShading.hh>
 #include <DataGlobals.hh>
@@ -380,7 +383,7 @@ namespace TarcogShading {
 
 		H0 = ( dens * cp * s * forcedspeed ) / ( 4.0 * hc + 8.0 * forcedspeed );
 
-		Toutlet = Tav - ( Tav - Tinlet ) * ( std::pow( e, ( -H / H0 ) ) );
+		Toutlet = Tav - ( Tav - Tinlet ) * std::pow( e, -H / H0 );
 
 		qv = -dens * cp * forcedspeed * s * ( Toutlet - Tinlet ) / H;
 
@@ -561,6 +564,9 @@ namespace TarcogShading {
 
 		converged = false;
 		iter = 0;
+		Real64 const s1_2( pow_2( s1 ) );
+		Real64 const s2_2( pow_2( s2 ) );
+		Real64 const s1_s2_2( pow_2( s1 / s2 ) );
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap1, iprop1, frct1, press1, nmix1, xwght, xgcon, xgvis, xgcp, con1, visc1, dens1, cp1, pr1, 1, nperr, ErrorMessage );
@@ -582,10 +588,10 @@ namespace TarcogShading {
 			}
 
 			B1 = dens1 / 2;
-			B2 = ( dens2 / 2 ) * ( std::pow( ( s1 / s2 ), 2 ) );
+			B2 = ( dens2 / 2 ) * s1_s2_2;
 
-			C1 = 12 * visc1 * H / ( std::pow( s1, 2 ) );
-			C2 = 12 * visc2 * ( H / ( std::pow( s2, 2 ) ) ) * ( s1 / s2 );
+			C1 = 12 * visc1 * H / s1_2;
+			C2 = 12 * visc2 * ( H / s2_2 ) * ( s1 / s2 );
 
 			if ( Tgap1 >= Tgap2 ) {
 				A1eqin = Abot + 0.5 * Atop * ( Al + Ar + Ah ) / ( Abot + Atop );
@@ -599,18 +605,18 @@ namespace TarcogShading {
 				A2eqout = Atop + 0.5 * Abot * ( Al + Ar + Ah ) / ( Abot + Atop );
 			}
 
-			Zin1 = std::pow( ( ( s1 * L / ( 0.6 * A1eqin ) ) - 1.0 ), 2 );
-			Zin2 = std::pow( ( ( s2 * L / ( 0.6 * A2eqin ) ) - 1.0 ), 2 );
-			Zout1 = std::pow( ( ( s1 * L / ( 0.6 * A1eqout ) ) - 1.0 ), 2 );
-			Zout2 = std::pow( ( ( s2 * L / ( 0.6 * A2eqout ) ) - 1.0 ), 2 );
+			Zin1 = pow_2( ( s1 * L / ( 0.6 * A1eqin ) ) - 1.0 );
+			Zin2 = pow_2( ( s2 * L / ( 0.6 * A2eqin ) ) - 1.0 );
+			Zout1 = pow_2( ( s1 * L / ( 0.6 * A1eqout ) ) - 1.0 );
+			Zout2 = pow_2( ( s2 * L / ( 0.6 * A2eqout ) ) - 1.0 );
 
 			D1 = ( dens1 / 2.0 ) * ( Zin1 + Zout1 );
-			D2 = ( dens2 / 2.0 ) * ( std::pow( ( s1 / s2 ), 2.0 ) ) * ( Zin2 + Zout2 );
+			D2 = ( dens2 / 2.0 ) * s1_s2_2 * ( Zin2 + Zout2 );
 
 			A1 = B1 + D1 + B2 + D2;
 			A2 = C1 + C2;
 
-			speed1 = ( std::sqrt( ( std::pow( A2, 2.0 ) ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
+			speed1 = ( std::sqrt( pow_2( A2 ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
 			speed2 = speed1 * s1 / s2;
 
 			H01 = ( dens1 * cp1 * s1 * speed1 ) / ( 4.0 * hc1 + 8.0 * speed1 );
@@ -835,6 +841,7 @@ namespace TarcogShading {
 
 		converged = false;
 		iter = 0;
+		Real64 const s_2( pow_2( s ) );
 		while ( ! converged ) {
 			++iter;
 			GASSES90( Tgap, iprop2, frct2, press2, nmix2, xwght, xgcon, xgvis, xgcp, con2, visc2, dens2, cp2, pr2, 1, nperr, ErrorMessage );
@@ -848,7 +855,7 @@ namespace TarcogShading {
 			//  A = dens0 * T0 * GravityConstant * H * ABS(cos(tilt)) * (Tgap - Tenv) / (Tgap * Tenv)
 
 			B1 = dens2 / 2;
-			C1 = 12.0 * visc2 * H / ( std::pow( s, 2.0 ) );
+			C1 = 12.0 * visc2 * H / s_2;
 
 			if ( Tgap > Tenv ) {
 				A1eqin = Abot + 0.5 * Atop * ( Al + Ar + Ah ) / ( Abot + Atop );
@@ -858,8 +865,8 @@ namespace TarcogShading {
 				A1eqin = Atop + 0.5 * Abot * ( Al + Ar + Ah ) / ( Abot + Atop );
 			}
 
-			Zin1 = std::pow( ( ( s * L / ( 0.6 * A1eqin ) ) - 1 ), 2.0 );
-			Zout1 = std::pow( ( ( s * L / ( 0.6 * A1eqout ) ) - 1 ), 2.0 );
+			Zin1 = pow_2( ( s * L / ( 0.6 * A1eqin ) ) - 1 );
+			Zout1 = pow_2( ( s * L / ( 0.6 * A1eqout ) ) - 1 );
 
 			D1 = ( dens2 / 2.0 ) * ( Zin1 + Zout1 );
 
@@ -872,7 +879,7 @@ namespace TarcogShading {
 			if ( ( forcedspeed != 0.0 ) && ( CalcForcedVentilation != 0 ) ) {
 				speed = forcedspeed;
 			} else {
-				speed = ( std::sqrt( ( std::pow( A2, 2 ) ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
+				speed = ( std::sqrt( pow_2( A2 ) + std::abs( 4.0 * A * A1 ) ) - A2 ) / ( 2.0 * A1 );
 				//  speed = ABS((SQRT((A2 ** 2) + (4 * A * A1)) - A2) / (2 * A1))
 			}
 
@@ -922,7 +929,7 @@ namespace TarcogShading {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

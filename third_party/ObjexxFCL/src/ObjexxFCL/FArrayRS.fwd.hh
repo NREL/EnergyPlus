@@ -20,7 +20,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename, int > class FArrayRS;
 class byte;
 class ubyte;
@@ -28,7 +28,6 @@ class Fstring;
 
 // Types
 typedef  byte  sbyte;
-#if !defined(_MSC_VER) || (_MSC_VER > 1700) // VC11 and earlier don't support type aliases
 template< int Rank > using FArrayRS_bool       = FArrayRS< bool, Rank >;
 template< int Rank > using FArrayRS_byte       = FArrayRS< byte, Rank >;
 template< int Rank > using FArrayRS_sbyte      = FArrayRS< sbyte, Rank >;
@@ -56,7 +55,6 @@ template< int Rank > using FArrayRS_uchar      = FArrayRS< unsigned char, Rank >
 template< int Rank > using FArrayRS_schar      = FArrayRS< signed char, Rank >;
 template< int Rank > using FArrayRS_string     = FArrayRS< std::string, Rank >;
 template< int Rank > using FArrayRS_Fstring    = FArrayRS< Fstring, Rank >;
-#endif
 
 } // ObjexxFCL
 

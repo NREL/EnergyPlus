@@ -1092,8 +1092,45 @@ namespace DXCoils {
 
 	};
 
+	struct PerfModeData
+	{
+		// Members
+		FArray1D< std::string > FieldNames;
+
+		// Default Constructor
+		PerfModeData ():
+			FieldNames( )  
+		{}
+
+		// Member Constructor
+		PerfModeData(
+			FArray1D< std::string > const & FieldNames // Name of the HeatingCoil numeric field descriptions
+	) :
+	    FieldNames( FieldNames )
+		{}
+	};
+
+	struct DXCoilNumericFieldData
+	{
+		// Members
+		FArray1D < PerfModeData > PerfMode; // Coil Performance object type
+
+		// Default Constructor
+		DXCoilNumericFieldData ():
+			PerfMode( 0 )
+		{}
+
+		// Member Constructor
+		DXCoilNumericFieldData(
+			FArray1_int const & PerfMode // Name of the HeatingCoil numeric field descriptions
+	) :
+		PerfMode( 0 )
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< DXCoilData > DXCoil;
+	extern FArray1D< DXCoilNumericFieldData > DXCoilNumericFields;
 
 	// Functions
 
@@ -1450,7 +1487,7 @@ namespace DXCoils {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

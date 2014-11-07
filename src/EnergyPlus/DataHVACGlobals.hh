@@ -32,13 +32,29 @@ namespace DataHVACGlobals {
 	extern Real64 const RetTempMin; // minimum return air temperature [deg C]
 
 	extern int const CoolingAirflowSizing; // request sizing for cooling air flow rate
+	extern int const CoolingWaterflowSizing; // request sizing for cooling coil water flow rate
+	extern int const HeatingWaterflowSizing; // request sizing for heating coil water flow rate
+	extern int const CoolingWaterDesAirInletTempSizing; // request sizing for cooling water coil inlet air temp
+	extern int const CoolingWaterDesAirInletHumRatSizing; // request sizing for cooling water coil inlet air humidity ratio
+	extern int const CoolingWaterDesWaterInletTempSizing; // request sizing for cooling water coil inlet water temp
+	extern int const CoolingWaterDesAirOutletTempSizing; // request sizing for cooling water coil outlet air temp
+	extern int const CoolingWaterDesAirOutletHumRatSizing; // request sizing for cooling water coil outlet air humidity ratio
+	extern int const CoolingWaterNumofTubesPerRowSizing; // request sizing for cooling water coil number of tubes per row
+	extern int const HeatingWaterDesAirInletTempSizing; // request sizing for heating water coil inlet air temp
+	extern int const HeatingWaterDesAirInletHumRatSizing; // request sizing for heating water coil inlet air humidity ratio
+	extern int const HeatingWaterDesCoilLoadUsedForUASizing; // request sizing for heating water coil capacity used for UA sizing
+	extern int const HeatingWaterDesCoilWaterVolFlowUsedForUASizing; // request sizing for heating water coil volume flow rate used for UA sizing
 	extern int const HeatingAirflowSizing; // request sizing for heating air flow rate
+	extern int const HeatingAirflowUASizing; // request sizing for heating air flow rate
 	extern int const SystemAirflowSizing; // request sizing for system air flow rate
 	extern int const CoolingCapacitySizing; // request sizing for cooling capacity
 	extern int const HeatingCapacitySizing; // request sizing for heating capacity
+	extern int const WaterHeatingCapacitySizing; // request sizing for heating capacity
+	extern int const WaterHeatingCoilUASizing; // request sizing for heating coil UA
 	extern int const SystemCapacitySizing; // request sizing for system capacity
 	extern int const CoolingSHRSizing; // request sizing for cooling SHR
 	extern int const HeatingDefrostSizing; // request sizing for heating defrost capacity
+	extern int const AutoCalculateSizing; // identifies an autocalulate input
 
 	// Condenser Type (using same numbering scheme as for chillers)
 	extern int const AirCooled; // Air-cooled condenser
@@ -244,7 +260,7 @@ namespace DataHVACGlobals {
 	extern Real64 DXElecHeatingPower; // Electric power consumed by DX heating coil last DX simulation
 	extern Real64 ElecHeatingCoilPower; // Electric power consumed by electric heating coil
 	extern Real64 AirToAirHXElecPower; // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
-	// from last simulation in HeatRecovery.f90
+	// from last simulation in HeatRecovery.cc
 	extern Real64 UnbalExhMassFlow; // unbalanced zone exhaust from a zone equip component [kg/s]
 	extern Real64 BalancedExhMassFlow; // balanced zone exhaust (declared as so by user)  [kg/s]
 	extern Real64 PlenumInducedMassFlow; // secondary air mass flow rate induced from a return plenum [kg/s]
@@ -286,6 +302,7 @@ namespace DataHVACGlobals {
 	extern bool SimPlantLoopsFlag; // True when the main plant loops need to be (re)simulated
 	extern bool SimZoneEquipmentFlag; // True when zone equipment components need to be (re)simulated
 	extern bool SimNonZoneEquipmentFlag; // True when non-zone equipment components need to be (re)simulated
+	extern bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
 
 	extern int const NumZoneHVACTerminalTypes;
 	extern FArray1D_string const ccZoneHVACTerminalTypes;
@@ -387,7 +404,8 @@ namespace DataHVACGlobals {
 		FArray1D_int AvailManagerType; // type of availability manager
 		FArray1D_int AvailManagerNum; // index for availability manager
 		int ZoneNum; // cycle off time (in SimTimeSteps)
-		bool Input;
+		bool Input; // starts off as true to initialize zone equipment availability manager data
+		int Count; // initialize twice to ensure zone equipment availability manager list name has been read in
 
 		// Default Constructor
 		DefineZoneCompAvailMgrs() :
@@ -396,7 +414,8 @@ namespace DataHVACGlobals {
 			StartTime( 0 ),
 			StopTime( 0 ),
 			ZoneNum( 0 ),
-			Input( true )
+			Input( true ),
+			Count ( 0  )
 		{}
 
 		// Member Constructor
@@ -410,7 +429,8 @@ namespace DataHVACGlobals {
 			FArray1_int const & AvailManagerType, // type of availability manager
 			FArray1_int const & AvailManagerNum, // index for availability manager
 			int const ZoneNum, // cycle off time (in SimTimeSteps)
-			bool const Input
+			bool const Input,
+			int const Count
 		) :
 			NumAvailManagers( NumAvailManagers ),
 			AvailStatus( AvailStatus ),
@@ -421,7 +441,8 @@ namespace DataHVACGlobals {
 			AvailManagerType( AvailManagerType ),
 			AvailManagerNum( AvailManagerNum ),
 			ZoneNum( ZoneNum ),
-			Input( Input )
+			Input( Input ),
+			Count ( Count )
 		{}
 
 	};

@@ -77,6 +77,8 @@ namespace UFADManager {
 
 	// Data
 	// MODULE VARIABLE DECLARATIONS:
+	static std::string const BlankString;
+
 	Real64 HAT_MX( 0.0 ); // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone
 	Real64 HAT_MXWin( 0.0 ); // HAT_MX Convection Coefficient times Area times Temperature for the upper subzone (windows only)
 	Real64 HA_MX( 0.0 ); // HA_MX Convection Coefficient times Area for the upper subzone
@@ -318,12 +320,12 @@ namespace UFADManager {
 				if ( ZoneUCSDUI( UINum ).DiffuserType == Swirl ) {
 					ZoneUCSDUI( UINum ).DiffArea = 0.0075;
 				} else if ( ZoneUCSDUI( UINum ).DiffuserType == VarArea ) {
-					ZoneUCSDUI( UINum ).DiffArea = .035;
+					ZoneUCSDUI( UINum ).DiffArea = 0.035;
 				} else if ( ZoneUCSDUI( UINum ).DiffuserType == DisplVent ) {
 					ZoneUCSDUI( UINum ).DiffArea = 0.0060;
 				} else if ( ZoneUCSDUI( UINum ).DiffuserType == LinBarGrille ) {
 					// 4 ft x 4 inches; 75 cfm per linear foot; area is .025 m2/m
-					ZoneUCSDUI( UINum ).DiffArea = .03;
+					ZoneUCSDUI( UINum ).DiffArea = 0.03;
 				} else {
 					ZoneUCSDUI( UINum ).DiffArea = 0.0075;
 				}
@@ -331,15 +333,15 @@ namespace UFADManager {
 			}
 			if ( ZoneUCSDUI( UINum ).DiffAngle == AutoSize ) {
 				if ( ZoneUCSDUI( UINum ).DiffuserType == Swirl ) {
-					ZoneUCSDUI( UINum ).DiffAngle = 28.;
+					ZoneUCSDUI( UINum ).DiffAngle = 28.0;
 				} else if ( ZoneUCSDUI( UINum ).DiffuserType == VarArea ) {
-					ZoneUCSDUI( UINum ).DiffAngle = 45.;
+					ZoneUCSDUI( UINum ).DiffAngle = 45.0;
 				} else if ( ZoneUCSDUI( UINum ).DiffuserType == DisplVent ) {
-					ZoneUCSDUI( UINum ).DiffAngle = 73.;
+					ZoneUCSDUI( UINum ).DiffAngle = 73.0;
 				} else if ( ZoneUCSDUI( UINum ).DiffuserType == LinBarGrille ) {
-					ZoneUCSDUI( UINum ).DiffAngle = 15.;
+					ZoneUCSDUI( UINum ).DiffAngle = 15.0;
 				} else {
-					ZoneUCSDUI( UINum ).DiffAngle = 28.;
+					ZoneUCSDUI( UINum ).DiffAngle = 28.0;
 				}
 				ReportSizingOutput( "RoomAirSettings:UnderFloorAirDistributionInterior", ZoneUCSDUI( UINum ).ZoneName, "Angle between diffuser slots and the vertical", ZoneUCSDUI( UINum ).DiffAngle );
 			}
@@ -483,15 +485,15 @@ namespace UFADManager {
 			}
 			if ( ZoneUCSDUE( UINum ).DiffAngle == AutoSize ) {
 				if ( ZoneUCSDUE( UINum ).DiffuserType == Swirl ) {
-					ZoneUCSDUE( UINum ).DiffAngle = 28.;
+					ZoneUCSDUE( UINum ).DiffAngle = 28.0;
 				} else if ( ZoneUCSDUE( UINum ).DiffuserType == VarArea ) {
-					ZoneUCSDUE( UINum ).DiffAngle = 45.;
+					ZoneUCSDUE( UINum ).DiffAngle = 45.0;
 				} else if ( ZoneUCSDUE( UINum ).DiffuserType == DisplVent ) {
-					ZoneUCSDUE( UINum ).DiffAngle = 73.;
+					ZoneUCSDUE( UINum ).DiffAngle = 73.0;
 				} else if ( ZoneUCSDUE( UINum ).DiffuserType == LinBarGrille ) {
-					ZoneUCSDUE( UINum ).DiffAngle = 15.;
+					ZoneUCSDUE( UINum ).DiffAngle = 15.0;
 				} else {
-					ZoneUCSDUE( UINum ).DiffAngle = 28.;
+					ZoneUCSDUE( UINum ).DiffAngle = 28.0;
 				}
 				ReportSizingOutput( "RoomAirSettings:UnderFloorAirDistributionExterior", ZoneUCSDUE( UINum ).ZoneName, "Angle between diffuser slots and the vertical", ZoneUCSDUE( UINum ).DiffAngle );
 			}
@@ -1099,7 +1101,7 @@ namespace UFADManager {
 		// 150 ft3/min / 400 ft/min = .375 ft2 = .035 m2. This is adjusted each time step by
 		//               (TotSysFlow/(NumDiffusers*.0708))*.035
 		if ( ZoneUCSDUI( UINum ).DiffuserType == VarArea ) {
-			DiffArea = .035 * TotSysFlow / ( .0708 * NumDiffusers );
+			DiffArea = 0.035 * TotSysFlow / ( 0.0708 * NumDiffusers );
 		}
 		// initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
 		HcUCSDUF( ZoneNum, 0.5 );
@@ -1115,9 +1117,9 @@ namespace UFADManager {
 			// The system will mix
 			HeightFrac = 0.0;
 		} else {
-			Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+			Gamma = std::pow( TotSysFlow * std::cos( ThrowAngle ), 1.5 ) / ( NumberOfPlumes * std::pow( NumDiffusersPerPlume * DiffArea, 1.25 ) * std::sqrt( 0.0281 * 0.001 * PowerInPlumes ) );
 			if ( ZoneUCSDUI( UINum ).CalcTransHeight ) {
-				HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+				HeightFrac = ( std::sqrt( NumDiffusersPerPlume * DiffArea ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 			} else {
 				HeightFrac = ZoneUCSDUI( UINum ).TransHeight / CeilingHeight;
 			}
@@ -1133,15 +1135,15 @@ namespace UFADManager {
 					NumDiffusersPerPlume = 1.0;
 				}
 				if ( PowerInPlumes <= 0.0 ) break;
-				Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+				Gamma = std::pow( TotSysFlow * std::cos( ThrowAngle ), 1.5 ) / ( NumberOfPlumes * std::pow( NumDiffusersPerPlume * DiffArea, 1.25 ) * std::sqrt( 0.0281 * 0.001 * PowerInPlumes ) );
 				if ( ZoneUCSDUI( UINum ).CalcTransHeight ) {
-					HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+					HeightFrac = ( std::sqrt( NumDiffusersPerPlume * DiffArea ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 				} else {
 					HeightFrac = ZoneUCSDUI( UINum ).TransHeight / CeilingHeight;
 				}
 				HeightFrac = max( 0.0, min( 1.0, HeightFrac ) );
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				GainsFrac = ZoneUCSDUI( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUI( UINum ).B_Kc ) + ZoneUCSDUI( UINum ).C_Kc + ZoneUCSDUI( UINum ).D_Kc * Gamma + ZoneUCSDUI( UINum ).E_Kc * std::pow( Gamma, 2 );
+				GainsFrac = ZoneUCSDUI( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUI( UINum ).B_Kc ) + ZoneUCSDUI( UINum ).C_Kc + ZoneUCSDUI( UINum ).D_Kc * Gamma + ZoneUCSDUI( UINum ).E_Kc * pow_2( Gamma );
 				GainsFrac = max( 0.6, min( GainsFrac, 1.0 ) );
 				AIRRATOC( ZoneNum ) = Zone( ZoneNum ).Volume * ( HeightTransition( ZoneNum ) - min( HeightTransition( ZoneNum ), 0.2 ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATOC( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATOC( ZoneNum ) ) / ( TimeStepSys * SecInHour );
 				AIRRATMX( ZoneNum ) = Zone( ZoneNum ).Volume * ( CeilingHeight - HeightTransition( ZoneNum ) ) / CeilingHeight * ZoneVolCapMultpSens * PsyRhoAirFnPbTdbW( OutBaroPress, MATMX( ZoneNum ), ZoneAirHumRat( ZoneNum ) ) * PsyCpAirFnWTdb( ZoneAirHumRat( ZoneNum ), MATMX( ZoneNum ) ) / ( TimeStepSys * SecInHour );
@@ -1176,7 +1178,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTOC( ZoneNum ) = Zone1OC( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTOC( ZoneNum ) = ( Zone1OC( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTOC( ZoneNum ) = ( Zone1OC( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTOC( ZoneNum ) = ( AirCap * Zone1OC( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1192,7 +1194,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTMX( ZoneNum ) = Zone1MX( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTMX( ZoneNum ) = ( Zone1MX( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTMX( ZoneNum ) = ( Zone1MX( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTMX( ZoneNum ) = ( AirCap * Zone1MX( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1231,7 +1233,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTAveraged = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTAveraged = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1249,7 +1251,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTAveraged = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTAveraged = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1265,8 +1267,8 @@ namespace UFADManager {
 		// Comfort temperature and temperature at the thermostat/temperature control sensor
 
 		HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-		HeightUpSubzoneAve = ( CeilingHeight + HeightTransition( ZoneNum ) ) / 2.;
-		HeightOccupiedSubzoneAve = HeightTransition( ZoneNum ) / 2.;
+		HeightUpSubzoneAve = ( CeilingHeight + HeightTransition( ZoneNum ) ) / 2.0;
+		HeightOccupiedSubzoneAve = HeightTransition( ZoneNum ) / 2.0;
 		// Comfort temperature
 
 		if ( MIXFLAG ) {
@@ -1521,7 +1523,7 @@ namespace UFADManager {
 		// 150 ft3/min / 400 ft/min = .375 ft2 = .035 m2. This is adjusted each time step by
 		//               (TotSysFlow/(NumDiffusers*.0708))*.035
 		if ( ZoneUCSDUE( UINum ).DiffuserType == VarArea ) {
-			DiffArea = .035 * TotSysFlow / ( .0708 * NumDiffusers );
+			DiffArea = 0.035 * TotSysFlow / ( 0.0708 * NumDiffusers );
 		}
 		// initial estimate of convective transfer from surfaces; assume HeightFrac is 0.5.
 		HcUCSDUF( ZoneNum, 0.5 );
@@ -1542,24 +1544,24 @@ namespace UFADManager {
 			if ( PowerInPlumes > 0.0 ) {
 				if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // exterior zone formula
 					PowerInPlumesPerMeter = PowerInPlumes / ZoneUCSDUE( UINum ).WinWidth;
-					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * std::pow( ( 0.0281 * 0.001 * PowerInPlumesPerMeter ), 0.333333 ) );
+					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * std::pow( 0.0281 * 0.001 * PowerInPlumesPerMeter, 0.333333 ) );
 				} else { // interior zone formula
-					Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+					Gamma = std::pow( TotSysFlow * std::cos( ThrowAngle ), 1.5 ) / ( NumberOfPlumes * std::pow( NumDiffusersPerPlume * DiffArea, 1.25 ) * std::sqrt( 0.0281 * 0.001 * PowerInPlumes ) );
 				}
 			} else {
-				Gamma = 1000.;
+				Gamma = 1000.0;
 			}
 			if ( ZoneUCSDUE( UINum ).CalcTransHeight ) {
 				if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // use exterior zone formula
-					HeightFrac = ( std::pow( DiffArea, 0.5 ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
+					HeightFrac = ( std::sqrt( DiffArea ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
 				} else { // use interior zone formula
-					HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+					HeightFrac = ( std::sqrt( NumDiffusersPerPlume * DiffArea ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 				}
 			} else {
 				HeightFrac = ZoneUCSDUE( UINum ).TransHeight / CeilingHeight;
 			}
 			HeightFrac = max( 0.0, min( 1.0, HeightFrac ) );
-			GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * std::pow( Gamma, 2 );
+			GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * pow_2( Gamma );
 			GainsFrac = max( 0.7, min( GainsFrac, 1.0 ) );
 			if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 				GainsFrac -= 0.2;
@@ -1575,22 +1577,22 @@ namespace UFADManager {
 				if ( PowerInPlumes <= 0.0 ) break;
 				if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // use exterior zone formula
 					PowerInPlumesPerMeter = PowerInPlumes / ZoneUCSDUE( UINum ).WinWidth;
-					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * std::pow( ( 0.0281 * 0.001 * PowerInPlumesPerMeter ), 0.333333 ) );
+					Gamma = ( TotSysFlow * std::cos( ThrowAngle ) ) / ( NumDiffusers * DiffArea * std::pow( 0.0281 * 0.001 * PowerInPlumesPerMeter, 0.333333 ) );
 				} else { // use interior zone formula
-					Gamma = std::pow( ( TotSysFlow * std::cos( ThrowAngle ) ), 1.5 ) / ( NumberOfPlumes * std::pow( ( NumDiffusersPerPlume * DiffArea ), 1.25 ) * std::pow( ( 0.0281 * 0.001 * PowerInPlumes ), 0.5 ) );
+					Gamma = std::pow( TotSysFlow * std::cos( ThrowAngle ), 1.5 ) / ( NumberOfPlumes * std::pow( NumDiffusersPerPlume * DiffArea, 1.25 ) * std::sqrt( 0.0281 * 0.001 * PowerInPlumes ) );
 				}
 				if ( ZoneUCSDUE( UINum ).CalcTransHeight ) {
 					if ( ZoneUCSDUE( UINum ).WinWidth > 0.0 ) { // exterior zone formula
-						HeightFrac = ( std::pow( DiffArea, 0.5 ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
+						HeightFrac = ( std::sqrt( DiffArea ) * ( 11.03 * std::log( Gamma ) - 10.73 ) + 0.5 * SourceHeight ) / CeilingHeight;
 					} else { // interior zone formula
-						HeightFrac = ( std::pow( ( NumDiffusersPerPlume * DiffArea ), 0.5 ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
+						HeightFrac = ( std::sqrt( NumDiffusersPerPlume * DiffArea ) * ( 7.43 * std::log( Gamma ) - 1.35 ) + 0.5 * SourceHeight ) / CeilingHeight;
 					}
 				} else {
 					HeightFrac = ZoneUCSDUE( UINum ).TransHeight / CeilingHeight;
 				}
 				HeightFrac = min( 1.0, HeightFrac );
 				HeightTransition( ZoneNum ) = HeightFrac * CeilingHeight;
-				GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * std::pow( Gamma, 2 );
+				GainsFrac = ZoneUCSDUE( UINum ).A_Kc * std::pow( Gamma, ZoneUCSDUE( UINum ).B_Kc ) + ZoneUCSDUE( UINum ).C_Kc + ZoneUCSDUE( UINum ).D_Kc * Gamma + ZoneUCSDUE( UINum ).E_Kc * pow_2( Gamma );
 				GainsFrac = max( 0.7, min( GainsFrac, 1.0 ) );
 				if ( ZoneUCSDUE( UINum ).ShadeDown ) {
 					GainsFrac -= 0.2;
@@ -1628,7 +1630,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTOC( ZoneNum ) = Zone1OC( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTOC( ZoneNum ) = ( Zone1OC( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTOC( ZoneNum ) = ( Zone1OC( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTOC( ZoneNum ) = ( AirCap * Zone1OC( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1644,7 +1646,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTMX( ZoneNum ) = Zone1MX( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTMX( ZoneNum ) = ( Zone1MX( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTMX( ZoneNum ) = ( Zone1MX( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTMX( ZoneNum ) = ( AirCap * Zone1MX( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1686,7 +1688,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTAveraged = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTAveraged = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1704,7 +1706,7 @@ namespace UFADManager {
 					if ( TempDepCoef == 0.0 ) { // B=0
 						ZTAveraged = ZoneT1( ZoneNum ) + TempIndCoef / AirCap;
 					} else {
-						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700., - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
+						ZTAveraged = ( ZoneT1( ZoneNum ) - TempIndCoef / TempDepCoef ) * std::exp( min( 700.0, - TempDepCoef / AirCap ) ) + TempIndCoef / TempDepCoef;
 					}
 				} else if ( SELECT_CASE_var == UseEulerMethod ) {
 					ZTAveraged = ( AirCap * ZoneT1( ZoneNum ) + TempIndCoef ) / ( AirCap + TempDepCoef );
@@ -1719,8 +1721,8 @@ namespace UFADManager {
 
 		// Comfort temperature and temperature at the thermostat/temperature control sensor
 
-		HeightUpSubzoneAve = ( CeilingHeight + HeightTransition( ZoneNum ) ) / 2.;
-		HeightOccupiedSubzoneAve = HeightTransition( ZoneNum ) / 2.;
+		HeightUpSubzoneAve = ( CeilingHeight + HeightTransition( ZoneNum ) ) / 2.0;
+		HeightOccupiedSubzoneAve = HeightTransition( ZoneNum ) / 2.0;
 		// Comfort temperature
 
 		if ( MIXFLAG ) {
@@ -1799,7 +1801,7 @@ namespace UFADManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -92,7 +92,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -1593,6 +1593,10 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone1BBHWInletNode,      !- Inlet Node Name
     Zone1BBHWOutletNode,     !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -1629,6 +1633,10 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone2BBHWInletNode,      !- Inlet Node Name
     Zone2BBHWOutletNode,     !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -1665,6 +1673,10 @@
     FanAndCoilAvailSched,    !- Availability Schedule Name
     Zone3BBHWInletNode,      !- Inlet Node Name
     Zone3BBHWOutletNode,     !- Outlet Node Name
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    Autosize,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     0.001;                   !- Convergence Tolerance
@@ -2411,7 +2423,7 @@
     RatedCap,                !- <none>
     RatedEIR,                !- <none>
     OA_MdotIn,               !- <none>
-    ZoneCoolTstat;           !- Extended Field
+    ZoneCoolTstat;           !- <none>
 
   Output:EnergyManagementSystem,
     Verbose,                 !- Actuator Availability Dictionary Reporting

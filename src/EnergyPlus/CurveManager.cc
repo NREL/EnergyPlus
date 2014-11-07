@@ -37,6 +37,7 @@ namespace CurveManager {
 	//                       RR added exponential curve
 	//                      May 2009 Brent griffith add EMS actuator registry and override (for custom equations)
 	//                      August 2010, Richard Raustad, FSEC, added Table:* objects
+	//                      August 2014, Rick Strand, added a curve type (cubic-linear)
 	//                      Future Improvements:
 	//                       1) Merge TableData and TableLookup arrays. Care is needed here since the
 	//                          Table:OneIndependentVariable (and Two) use different data patterns.
@@ -80,7 +81,7 @@ namespace CurveManager {
 
 	// Data
 	//MODULE PARAMETER DEFINITIONS
-	std::string const Blank;
+	static std::string const BlankString;
 
 	// Curve Type parameters, these can differ from object types (e.g. a CurveType_TableOneIV can be linear, quadratic, etc)
 	int const Linear( 1 );
@@ -103,6 +104,7 @@ namespace CurveManager {
 	int const ExponentialDecay( 18 );
 	int const DoubleExponentialDecay( 19 );
 	int const QuadLinear( 20 );
+	int const CubicLinear( 21 );
 
 	// Interpolation Types
 	int const LinearInterpolationOfTable( 1 );
@@ -141,8 +143,10 @@ namespace CurveManager {
 	int const CurveType_ExponentialDecay( 19 );
 	int const CurveType_DoubleExponentialDecay( 20 );
 	int const CurveType_QuadLinear( 21 );
+	int const CurveType_CubicLinear( 22 );
 
-	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear" } );
+	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear",
+		"Curve:CubicLinear" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -353,6 +357,7 @@ namespace CurveManager {
 		int NumQuartic; // Number of quartic (4th order polynomial) objects in the input data file
 		int NumQuad; // Number of quadratic curve objects in the input data file
 		int NumQuadLinear; // Number of quadratic linear curve objects in the input data file
+		int NumCubicLinear; // Number of cubic linear curve objects in the input file
 		int NumQLinear; // Number of quad linear curve objects in the input data file
 		int NumLinear; // Number of linear curve objects in the input data file
 		int NumBicubic; // Number of bicubic curve objects in the input data file
@@ -415,6 +420,7 @@ namespace CurveManager {
 		NumQuad = GetNumObjectsFound( "Curve:Quadratic" );
 		NumQLinear = GetNumObjectsFound( "Curve:QuadLinear" );
 		NumQuadLinear = GetNumObjectsFound( "Curve:QuadraticLinear" );
+		NumCubicLinear = GetNumObjectsFound( "Curve:CubicLinear" );
 		NumLinear = GetNumObjectsFound( "Curve:Linear" );
 		NumBicubic = GetNumObjectsFound( "Curve:Bicubic" );
 		NumTriQuad = GetNumObjectsFound( "Curve:Triquadratic" );
@@ -430,7 +436,9 @@ namespace CurveManager {
 		NumOneVarTab = GetNumObjectsFound( "Table:OneIndependentVariable" );
 		NumTwoVarTab = GetNumObjectsFound( "Table:TwoIndependentVariables" );
 
-		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic + NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 + NumExpDecay + NumDoubleExpDecay + NumQLinear; //cpw22Aug2010
+		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
+					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
+					NumExpDecay + NumDoubleExpDecay + NumQLinear; 
 
 		// intermediate count for one and two variable performance tables
 		NumTables = NumOneVarTab + NumTwoVarTab;
@@ -749,6 +757,77 @@ namespace CurveManager {
 				PerfCurve( CurveNum ).CurveMaxPresent = true;
 			}
 
+			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
+				ErrorsFound = true;
+			}
+			if ( Numbers( 9 ) > Numbers( 10 ) ) { // error
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 9 ) + " [" + RoundSigDigits( Numbers( 9 ), 2 ) + "] > " + cNumericFieldNames( 10 ) + " [" + RoundSigDigits( Numbers( 10 ), 2 ) + ']' );
+				ErrorsFound = true;
+			}
+			if ( NumAlphas >= 2 ) {
+				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
+				}
+			}
+			if ( NumAlphas >= 3 ) {
+				if ( ! IsCurveInputTypeValid( Alphas( 3 ) ) ) {
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Y is invalid." );
+				}
+			}
+			if ( NumAlphas >= 4 ) {
+				if ( ! IsCurveOutputTypeValid( Alphas( 4 ) ) ) {
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
+				}
+			}
+		}
+
+		// Loop over cubic-linear curves and load data
+		CurrentModuleObject = "Curve:CubicLinear";
+		for ( CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex ) {
+			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			++CurveNum;
+			IsNotOK = false;
+			IsBlank = false;
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			if ( IsNotOK ) {
+				ErrorsFound = true;
+				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+			}
+			// Need to verify that this name isn't used in Pressure Curves as well.
+			if ( NumPressureCurves > 0 ) {
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				if ( CurveFound != 0 ) {
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
+					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
+					ErrorsFound = true;
+				}
+			}
+			PerfCurve( CurveNum ).Name = Alphas( 1 );
+			PerfCurve( CurveNum ).CurveType = CubicLinear;
+			PerfCurve( CurveNum ).ObjectType = CurveType_CubicLinear;
+			PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
+			PerfCurve( CurveNum ).Coeff1 = Numbers( 1 );
+			PerfCurve( CurveNum ).Coeff2 = Numbers( 2 );
+			PerfCurve( CurveNum ).Coeff3 = Numbers( 3 );
+			PerfCurve( CurveNum ).Coeff4 = Numbers( 4 );
+			PerfCurve( CurveNum ).Coeff5 = Numbers( 5 );
+			PerfCurve( CurveNum ).Coeff6 = Numbers( 6 );
+			PerfCurve( CurveNum ).Var1Min = Numbers( 7 );
+			PerfCurve( CurveNum ).Var1Max = Numbers( 8 );
+			PerfCurve( CurveNum ).Var2Min = Numbers( 9 );
+			PerfCurve( CurveNum ).Var2Max = Numbers( 10 );
+			if ( NumNumbers > 10 && ! lNumericFieldBlanks( 11 ) ) {
+				PerfCurve( CurveNum ).CurveMin = Numbers( 11 );
+				PerfCurve( CurveNum ).CurveMinPresent = true;
+			}
+			if ( NumNumbers > 11 && ! lNumericFieldBlanks( 12 ) ) {
+				PerfCurve( CurveNum ).CurveMax = Numbers( 12 );
+				PerfCurve( CurveNum ).CurveMaxPresent = true;
+			}
+            
 			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
 				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
@@ -1634,12 +1713,12 @@ namespace CurveManager {
 			}}
 
 			if ( lNumericFieldBlanks( 1 ) ) {
-				PerfCurve( CurveNum ).Var1Min = 99999999999.;
+				PerfCurve( CurveNum ).Var1Min = 99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Min = Numbers( 1 );
 			}
 			if ( lNumericFieldBlanks( 2 ) ) {
-				PerfCurve( CurveNum ).Var1Max = -99999999999.;
+				PerfCurve( CurveNum ).Var1Max = -99999999999.0;
 			} else {
 				PerfCurve( CurveNum ).Var1Max = Numbers( 2 );
 			}
@@ -1731,7 +1810,7 @@ namespace CurveManager {
 			// create curve objects when regression analysis is required
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
-				if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) ) {
+				if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) || ( SELECT_CASE_var == Exponent ) ) {
 					TempArray1.allocate( size( PerfCurveTableData( TableNum ).X1 ) );
 					TempArray1 = PerfCurveTableData( TableNum ).X1;
 					TempArray2.allocate( size( PerfCurveTableData( TableNum ).Y ) );
@@ -2368,8 +2447,8 @@ namespace CurveManager {
 				if ( ( SELECT_CASE_var1 == Linear ) || ( SELECT_CASE_var1 == Quadratic ) || ( SELECT_CASE_var1 == Cubic ) || ( SELECT_CASE_var1 == Quartic ) || ( SELECT_CASE_var1 == Exponent ) || ( SELECT_CASE_var1 == FuncPressDrop ) ) {
 					// CurrentModuleObject='Curve:Linear/Quadratic/Cubic/Quartic/Exponent/Functional:PressureDrop'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-				} else if ( ( SELECT_CASE_var1 == BiQuadratic ) || ( SELECT_CASE_var1 == QuadraticLinear ) || ( SELECT_CASE_var1 == BiCubic ) ) {
-					// CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic'
+				} else if ( ( SELECT_CASE_var1 == BiQuadratic ) || ( SELECT_CASE_var1 == QuadraticLinear ) || ( SELECT_CASE_var1 == BiCubic ) || ( SELECT_CASE_var1 == CubicLinear ) ) {
+					// CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic/CubicLinear'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( SELECT_CASE_var1 == TriQuadratic ) {
@@ -2456,6 +2535,7 @@ namespace CurveManager {
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt const fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2505,7 +2585,6 @@ namespace CurveManager {
 		TableNum = PerfCurve( CurveNum ).TableIndex;
 
 		if ( ReadFromFile ) {
-			FileExists = false;
 			CheckForActualFileName( FileName, FileExists, TempFullFileName );
 			if ( ! FileExists ) goto Label999;
 			FileNum = GetNewUnitNumber();
@@ -2536,7 +2615,7 @@ namespace CurveManager {
 
 			gio::rewind( FileNum );
 
-			{ IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars; ReadStat = flags.ios(); }
+			{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars; ReadStat = flags.ios(); }
 			if ( NumIVars > 5 || NumIVars < 1 ) {
 				ShowSevereError( "ReadTableData: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
 				ShowContinueError( "...Invalid number of independent variables found in external file = " + FileName );
@@ -2545,11 +2624,11 @@ namespace CurveManager {
 
 			gio::rewind( FileNum );
 
-			if ( NumIVars == 1 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 2 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 3 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 4 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars; ReadStat = flags.ios(); };
-			if ( NumIVars == 5 ) { IOFlags flags; gio::read( FileNum, "*", flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars >> TableLookup( TableNum ).NumX5Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 1 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 2 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 3 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 4 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars; ReadStat = flags.ios(); };
+			if ( NumIVars == 5 ) { IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> NumIVars >> TableLookup( TableNum ).NumX1Vars >> TableLookup( TableNum ).NumX2Vars >> TableLookup( TableNum ).NumX3Vars >> TableLookup( TableNum ).NumX4Vars >> TableLookup( TableNum ).NumX5Vars; ReadStat = flags.ios(); };
 
 			if ( ReadStat < GoodIOStatValue ) goto Label1000; //Autodesk:Uninit TotalDataSets was uninitialized after goto jump
 
@@ -2616,14 +2695,14 @@ namespace CurveManager {
 				{
 					IOFlags flags;
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X1Var( I );
+						gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X1Var( I );
 					}
 					ReadStat = flags.ios();
 				}
 
 				if ( EchoTableDataToEio ) {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X1Var( I );
+						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X1Var( I );
 					} gio::write( OutputFileInits );
 				}
 
@@ -2638,7 +2717,7 @@ namespace CurveManager {
 
 					if ( EchoTableDataToEio ) {
 						for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-							gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X1Var( I );
+							gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X1Var( I );
 						} gio::write( OutputFileInits );
 					}
 
@@ -2665,14 +2744,14 @@ namespace CurveManager {
 					{
 						IOFlags flags;
 						for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
-							gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X2Var( I );
+							gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X2Var( I );
 						}
 						ReadStat = flags.ios();
 					}
 
 					if ( EchoTableDataToEio ) {
 						for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
-							gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X2Var( I );
+							gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X2Var( I );
 						} gio::write( OutputFileInits );
 					}
 
@@ -2686,7 +2765,7 @@ namespace CurveManager {
 
 						if ( EchoTableDataToEio ) {
 							for ( I = 1; I <= TableLookup( TableNum ).NumX2Vars; ++I ) {
-								gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X2Var( I );
+								gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X2Var( I );
 							} gio::write( OutputFileInits );
 						}
 
@@ -2713,14 +2792,14 @@ namespace CurveManager {
 						{
 							IOFlags flags;
 							for ( I = 1; I <= TableLookup( TableNum ).NumX3Vars; ++I ) {
-								gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X3Var( I );
+								gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X3Var( I );
 							}
 							ReadStat = flags.ios();
 						}
 
 						if ( EchoTableDataToEio ) {
 							for ( I = 1; I <= TableLookup( TableNum ).NumX3Vars; ++I ) {
-								gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X3Var( I );
+								gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X3Var( I );
 							} gio::write( OutputFileInits );
 						}
 
@@ -2735,7 +2814,7 @@ namespace CurveManager {
 
 							if ( EchoTableDataToEio ) {
 								for ( I = 1; I <= TableLookup( TableNum ).NumX3Vars; ++I ) {
-									gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X3Var( I );
+									gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X3Var( I );
 								} gio::write( OutputFileInits );
 							}
 
@@ -2764,7 +2843,7 @@ namespace CurveManager {
 								IOFlags flags;
 
 								for ( I = 1; I <= TableLookup( TableNum ).NumX4Vars; ++I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X4Var( I );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X4Var( I );
 								}
 								ReadStat = flags.ios();
 							}
@@ -2772,7 +2851,7 @@ namespace CurveManager {
 							if ( EchoTableDataToEio ) {
 								TableLookup( TableNum ).X4Var( I );
 								for ( I = 1; I <= TableLookup( TableNum ).NumX4Vars; ++I ) {
-									gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X4Var( I );
+									gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X4Var( I );
 								} gio::write( OutputFileInits );
 							}
 
@@ -2787,7 +2866,7 @@ namespace CurveManager {
 
 								if ( EchoTableDataToEio ) {
 									for ( I = 1; I <= TableLookup( TableNum ).NumX4Vars; ++I ) {
-										gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X4Var( I );
+										gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X4Var( I );
 									} gio::write( OutputFileInits );
 								}
 
@@ -2815,14 +2894,14 @@ namespace CurveManager {
 									IOFlags flags;
 									for ( I = 1; I <= TableLookup( TableNum ).NumX5Vars; ++I )
 									{
-										gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).X5Var( I );
+										gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).X5Var( I );
 									}
 									ReadStat = flags.ios();
 								}
 
 								if ( EchoTableDataToEio ) {
 									for ( I = 1; I <= TableLookup( TableNum ).NumX5Vars; ++I ) {
-										gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X5Var( I );
+										gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X5Var( I );
 									} gio::write( OutputFileInits );
 								}
 
@@ -2837,7 +2916,7 @@ namespace CurveManager {
 
 									if ( EchoTableDataToEio ) {
 										for ( I = 1; I <= TableLookup( TableNum ).NumX5Vars; ++I ) {
-											gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).X5Var( I );
+											gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).X5Var( I );
 										} gio::write( OutputFileInits );
 									}
 
@@ -2889,10 +2968,10 @@ namespace CurveManager {
 			if ( NumIVars == 3 ) {
 				if ( ReadFromFile ) {
 
-					{ IOFlags flags; gio::read( FileNum, "*", flags ) >> Var3; ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> Var3; ReadStat = flags.ios(); }
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3;
+						gio::write( CharTableData, fmtLD ) << Var3;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2903,7 +2982,7 @@ namespace CurveManager {
 					++NumbersOffset;
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3;
+						gio::write( CharTableData, fmtLD ) << Var3;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2911,10 +2990,10 @@ namespace CurveManager {
 			} else if ( NumIVars == 4 ) {
 				if ( ReadFromFile ) {
 
-					{ IOFlags flags; gio::read( FileNum, "*", flags ) >> Var3 >> Var4; ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> Var3 >> Var4; ReadStat = flags.ios(); }
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2926,7 +3005,7 @@ namespace CurveManager {
 					NumbersOffset += 2;
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2934,10 +3013,10 @@ namespace CurveManager {
 			} else if ( NumIVars == 5 ) {
 				if ( ReadFromFile ) {
 
-					{ IOFlags flags; gio::read( FileNum, "*", flags ) >> Var3 >> Var4 >> Var5; ReadStat = flags.ios(); }
+					{ IOFlags flags; gio::read( FileNum, fmtLD, flags ) >> Var3 >> Var4 >> Var5; ReadStat = flags.ios(); }
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4 << "  " << Var5;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4 << "  " << Var5;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -2950,7 +3029,7 @@ namespace CurveManager {
 					NumbersOffset += 3;
 
 					if ( EchoTableDataToEio ) {
-						gio::write( CharTableData, "*" ) << Var3 << "  " << Var4 << "  " << Var5;
+						gio::write( CharTableData, fmtLD ) << Var3 << "  " << Var4 << "  " << Var5;
 						gio::write( OutputFileInits, fmtA ) << trim( CharTableData );
 					}
 
@@ -3056,7 +3135,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3081,7 +3160,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3108,7 +3187,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3132,7 +3211,7 @@ namespace CurveManager {
 							{
 								IOFlags flags;
 								for ( I = TableLookup( TableNum ).NumX1Vars; I >= 1; --I ) {
-									gio::read( FileNum, "*", flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+									gio::read( FileNum, fmtLD, flags ) >> TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 								}
 								ReadStat = flags.ios();
 							}
@@ -3156,7 +3235,7 @@ namespace CurveManager {
 				// write data to eio file in ascending order
 				if ( EchoTableDataToEio ) {
 					for ( I = 1; I <= TableLookup( TableNum ).NumX1Vars; ++I ) {
-						gio::write( OutputFileInits, "*", non_adv ) << TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
+						gio::write( OutputFileInits, fmtLD, non_adv ) << TableLookup( TableNum ).TableLookupZData( I, J, Var3Index, Var4Index, Var5Index );
 					} gio::write( OutputFileInits );
 				}
 
@@ -3268,8 +3347,6 @@ Label999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:!
-		bool QUITX;
-		bool QUITY;
 		int I;
 		int ISXPT( 0 );
 		int IEXPT( 0 );
@@ -3277,23 +3354,15 @@ Label999: ;
 		int ISYPT( 0 );
 		int IEYPT( 0 );
 		int K;
-		int L;
 		int M1;
 		Real64 MIDX;
 		Real64 MIDY;
-		FArray1D< Real64 > XLAG;
-		FArray1D< Real64 > YLAG;
 
 		//       INITIALIZE
-		L = size( Z( _, 1 ) );
-		L = max( L, isize( Z( 1, _ ) ) ) + 1;
-		XLAG.allocate( L );
-		YLAG.allocate( L );
-		QUITX = false;
-		QUITY = false;
+		bool QUITX = false;
+		bool QUITY = false;
 		IEXTX = 0;
 		IEXTY = 0;
-		L = 0;
 		//       The following code has been upgraded to current Fortran standards
 		//       See Starteam Revision 33, August 17, 2010 for legacy code if comparison is needed
 		//       FIND THE RANGE OF INTERPOLATION ALONG X
@@ -3363,21 +3432,20 @@ Label999: ;
 		if ( QUITX && QUITY ) {
 			DLAG = Z( I, J ); // found exact X and Y point in Z array
 		} else if ( QUITX && ! QUITY ) { // only interpolate in Y direction
-			for ( L = ISYPT; L <= IEYPT; ++L ) {
-				XLAG( L ) = Z( I, L ); // store X's at each Y (I = midpoint of array from above)
+			FArray1D< Real64 > XLAG( IEYPT );
+			for ( int l = ISYPT; l <= IEYPT; ++l ) {
+				XLAG( l ) = Z( I, l ); // store X's at each Y (I = midpoint of array from above)
 			}
 			Interpolate_Lagrange( YY, XLAG, Y, ISYPT, IEYPT, DLAG ); // now interpolate these X's
 		} else if ( ! QUITX && QUITY ) { // only interpolate in X direction
 			Interpolate_Lagrange( XX, Z( _, J ), X, ISXPT, IEXPT, DLAG ); // (:,J) interpolate X array at fixed Y (J here)
 		} else { // else interpolate in X and Y directions
+			FArray1D< Real64 > XLAG( IEYPT );
 			for ( K = ISYPT; K <= IEYPT; ++K ) {
 				Interpolate_Lagrange( XX, Z( _, K ), X, ISXPT, IEXPT, XLAG( K ) ); // (:,K) interpolate X array at all Y's (K here)
 			}
 			Interpolate_Lagrange( YY, XLAG, Y, ISYPT, IEYPT, DLAG ); // final interpolation of X array
 		}
-
-		XLAG.deallocate();
-		YLAG.deallocate();
 
 		return DLAG;
 	}
@@ -3432,6 +3500,8 @@ Label999: ;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 
+		static Real64 const sqrt_2_inv( 1.0 / std::sqrt( 2.0 ) );
+
 		Real64 CoeffZ1; // cpw22Aug2010 Coefficient Z1 in exponential skew normal curve
 		Real64 CoeffZ2; // cpw22Aug2010 Coefficient Z2 in exponential skew normal curve
 		Real64 CoeffZ3; // cpw22Aug2010 Coefficient Z3 in exponential skew normal curve
@@ -3460,6 +3530,8 @@ Label999: ;
 			CurveValue = Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * Curve.Coeff3 ) + V2 * ( Curve.Coeff4 + V2 * Curve.Coeff5 ) + V1 * V2 * Curve.Coeff6;
 		} else if ( SELECT_CASE_var == QuadraticLinear ) {
 			CurveValue = ( Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * Curve.Coeff3 ) ) + ( Curve.Coeff4 + V1 * ( Curve.Coeff5 + V1 * Curve.Coeff6 ) ) * V2;
+		} else if ( SELECT_CASE_var == CubicLinear ) {
+			CurveValue = ( Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * ( Curve.Coeff3 + V1 * Curve.Coeff4 ) ) ) + ( Curve.Coeff5 + V1 * Curve.Coeff6 ) * V2;
 		} else if ( SELECT_CASE_var == BiCubic ) {
 			CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 + V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 + V1 * V2 * V2 * Curve.Coeff10;
 		} else if ( SELECT_CASE_var == TriQuadratic ) {
@@ -3478,12 +3550,12 @@ Label999: ;
 			CoeffZ3 = -Curve.Coeff1 / Curve.Coeff2;
 			//    CurveValueNumer = EXP(-0.5d0 * CoeffZ1**2) * (1.0d0 + SIGN(1.0d0,CoeffZ2) * ErfFunction(ABS(CoeffZ2)/SQRT(2.0d0)))
 			//    CurveValueDenom = EXP(-0.5d0 * CoeffZ3**2) * (1.0d0 + SIGN(1.0d0,CoeffZ3) * ErfFunction(ABS(CoeffZ3)/SQRT(2.0d0)))
-			CurveValueNumer = std::exp( -0.5 * ( CoeffZ1 * CoeffZ1 ) ) * ( 1.0 + sign( 1.0, CoeffZ2 ) * std::erf( std::abs( CoeffZ2 ) / std::sqrt( 2.0 ) ) );
-			CurveValueDenom = std::exp( -0.5 * ( CoeffZ3 * CoeffZ3 ) ) * ( 1.0 + sign( 1.0, CoeffZ3 ) * std::erf( std::abs( CoeffZ3 ) / std::sqrt( 2.0 ) ) );
+			CurveValueNumer = std::exp( -0.5 * ( CoeffZ1 * CoeffZ1 ) ) * ( 1.0 + sign( 1.0, CoeffZ2 ) * std::erf( std::abs( CoeffZ2 ) * sqrt_2_inv ) );
+			CurveValueDenom = std::exp( -0.5 * ( CoeffZ3 * CoeffZ3 ) ) * ( 1.0 + sign( 1.0, CoeffZ3 ) * std::erf( std::abs( CoeffZ3 ) * sqrt_2_inv ) );
 			CurveValue = CurveValueNumer / CurveValueDenom;
 		} else if ( SELECT_CASE_var == Sigmoid ) { //cpw22Aug2010 Added Sigmoid curve
 			CurveValueExp = std::exp( ( Curve.Coeff3 - V1 ) / Curve.Coeff4 );
-			CurveValue = Curve.Coeff1 + Curve.Coeff2 / ( std::pow( ( 1.0 + CurveValueExp ), Curve.Coeff5 ) );
+			CurveValue = Curve.Coeff1 + Curve.Coeff2 / std::pow( 1.0 + CurveValueExp, Curve.Coeff5 );
 		} else if ( SELECT_CASE_var == RectangularHyperbola1 ) { //cpw22Aug2010 Added Rectangular Hyperbola Type 1 curve
 			CurveValueNumer = Curve.Coeff1 * V1;
 			CurveValueDenom = Curve.Coeff2 + V1;
@@ -4622,15 +4694,14 @@ Label999: ;
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 Lagrange; // intermediate variable
-		int J; // loop coungters
-		int K;
 
 		ALAG = 0.0;
-		for ( J = ISPT; J <= IEPT; ++J ) {
+		for ( int J = ISPT; J <= IEPT; ++J ) {
 			Lagrange = 1.0;
-			for ( K = ISPT; K <= IEPT; ++K ) {
+			Real64 const Ordinate_J( Ordinate( J ) );
+			for ( int K = ISPT; K <= IEPT; ++K ) {
 				if ( K != J ) {
-					Lagrange *= ( ( DataPoint - Ordinate( K ) ) / ( Ordinate( J ) - Ordinate( K ) ) );
+					Lagrange *= ( ( DataPoint - Ordinate( K ) ) / ( Ordinate_J - Ordinate( K ) ) );
 				}
 			}
 			ALAG += Lagrange * FunctionArray( J );
@@ -4813,6 +4884,8 @@ Label999: ;
 				GetCurveType = "BIQUADRATIC";
 			} else if ( SELECT_CASE_var == QuadraticLinear ) {
 				GetCurveType = "QUADRATICLINEAR";
+			} else if ( SELECT_CASE_var == CubicLinear ) {
+				GetCurveType = "CUBICLINEAR";
 			} else if ( SELECT_CASE_var == BiCubic ) {
 				GetCurveType = "BICUBIC";
 			} else if ( SELECT_CASE_var == TriQuadratic ) {
@@ -5395,7 +5468,7 @@ Label999: ;
 		ConstantF = PressureCurve( PressureCurveIndex ).ConstantF;
 
 		//Intermediate calculations
-		CrossSectArea = ( Pi / 4.0 ) * std::pow( Diameter, 2 );
+		CrossSectArea = ( Pi / 4.0 ) * pow_2( Diameter );
 		Velocity = MassFlow / ( Density * CrossSectArea );
 		ReynoldsNumber = Density * Diameter * Velocity / Viscosity; //assuming mu here
 		RoughnessRatio = Roughness / Diameter;
@@ -5418,7 +5491,7 @@ Label999: ;
 		}
 
 		//Pressure drop calculation
-		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * std::pow( Velocity, 2 ) ) / 2.0;
+		PressureCurveValue = ( FrictionFactor * ( Length / Diameter ) + MinorLossCoeff ) * ( Density * pow_2( Velocity ) ) / 2.0;
 
 		if ( PressureCurve( PressureCurveIndex ).EMSOverrideOn ) PressureCurveValue = PressureCurve( PressureCurveIndex ).EMSOverrideCurveValue;
 
@@ -5492,11 +5565,11 @@ Label999: ;
 		}
 
 		//Calculate the friction factor
-		Term1 = std::pow( ( RoughnessRatio / 3.7 ), ( 1.11 ) );
+		Term1 = std::pow( RoughnessRatio / 3.7, 1.11 );
 		Term2 = 6.9 / ReynoldsNumber;
 		Term3 = -1.8 * std::log10( Term1 + Term2 );
 		if ( Term3 != 0.0 ) {
-			CalculateMoodyFrictionFactor = std::pow( Term3, ( -2.0 ) );
+			CalculateMoodyFrictionFactor = std::pow( Term3, -2.0 );
 		} else {
 			if ( ! FrictionFactorErrorHasOccurred ) {
 				RR = RoundSigDigits( RoughnessRatio, 7 );
@@ -5567,14 +5640,14 @@ Label999: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -1,3 +1,7 @@
+// ObjexxFCL Headers
+#include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
+
 // EnergyPlus Headers
 #include <DataConvergParams.hh>
 #include <DataPrecisionGlobals.hh>
@@ -22,7 +26,7 @@ namespace DataConvergParams {
 	// Note: Unless otherwise noted, the tolerance parameters listed below were chosen
 	// to represent educated guesses at what the tolerances for individual physical
 	// parameters should be.
-	Real64 const HVACEnthalpyToler( 260. ); // Tolerance for enthalpy comparisons (in kJ/kgK)
+	Real64 const HVACEnthalpyToler( 260.0 ); // Tolerance for enthalpy comparisons (in kJ/kgK)
 	Real64 const HVACFlowRateToler( 0.01 ); // Tolerance for mass flow rate convergence (in kg/s) [~20 CFM]
 	Real64 const HVACFlowRateSlopeToler( 0.001 ); // Slope tolerance for mass flow, kg/s/iteration
 	Real64 const HVACFlowRateOscillationToler( 0.0000001 ); // tolerance for detecting duplicate flow rate in stack
@@ -56,9 +60,14 @@ namespace DataConvergParams {
 	// Energy Tolerance Calculation, used to scale the answer
 	// for a more intuitive answer for comparison
 	Real64 const PlantFlowFlowRateToler( 0.01 ); // Tolerance for mass flow rate convergence (in kg/s)
+	Real64 const PlantLowFlowRateToler(0.000001); // Tolerance for low flow rate used for determining when
+	//plant pumps can be shut down
 
 	int const ConvergLogStackDepth( 10 );
 	FArray1D< Real64 > const ConvergLogStackARR( ConvergLogStackDepth, { 0.0, -1.0, -2.0, -3.0, -4.0, -5.0, -6.0, -7.0, -8.0, -9.0 } );
+	Real64 const sum_ConvergLogStackARR( sum( ConvergLogStackARR ) );
+	Real64 const square_sum_ConvergLogStackARR( pow_2( sum_ConvergLogStackARR ) );
+	Real64 const sum_square_ConvergLogStackARR( sum( pow( ConvergLogStackARR, 2 ) ) );
 
 	int const CalledFromAirSystemDemandSide( 100 );
 	int const CalledFromAirSystemSupplySideDeck1( 101 );
@@ -74,7 +83,7 @@ namespace DataConvergParams {
 	Real64 MinTimeStepTol( 1.0e-4 ); // = min allowable for ABS(1.-TimeStepSys/(MinTimeStepSys))
 	Real64 MaxZoneTempDiff( 0.3 ); // 0.3 C = (1% OF 300 C) = max allowable difference between
 	//   zone air temp at Time=T and Time=T-1
-	Real64 MinSysTimeRemaining( ( 1.0 / 3600. ) ); // = 1 second
+	Real64 MinSysTimeRemaining( ( 1.0 / 3600.0 ) ); // = 1 second
 	int MaxIter( 20 ); // maximum number of iterations allowed
 
 	int MaxPlantSubIterations( 8 ); // Iteration Max for Plant Simulation sub iterations
@@ -92,7 +101,7 @@ namespace DataConvergParams {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

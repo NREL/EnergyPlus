@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/GrndTempCalc/Basement" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/GrndTempCalc/BasementGHT.idd" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PostProcess/convertESOMTRpgm/convertESOMTR" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/dos2unix" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/EnergyPlus" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/Energy+.idd" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/EPMacro" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/ExpandObjects" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PostProcess/HVAC-Diagram" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/ParametricPreProcessor/parametricpreprocessor" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PostProcess/ReadVarsESO" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/runenergyplus" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/runepmacro" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/runreadvars" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/GrndTempCalc/Slab" /usr/bin/
+ln -sf "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/GrndTempCalc/SlabGHT.idd" /usr/bin/
+
+chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@/ExampleFiles"
+chmod -R a+w "$2@CPACK_PACKAGING_INSTALL_PREFIX@/PreProcess/IDFVersionUpdater/IDFVersionUpdater.app/Contents/MacOS/"
+
+exit 0

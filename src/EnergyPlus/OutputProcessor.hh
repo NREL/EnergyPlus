@@ -7,7 +7,6 @@
 #include <ObjexxFCL/FArray2D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -56,13 +55,7 @@ namespace OutputProcessor {
 	extern int const MeterType_CustomDec; // Type value for custom meters that decrement another meter
 	extern int const MeterType_CustomDiff; // Type value for custom meters that difference another meter
 
-	extern gio::Fmt const TimeStampFormat;
-	extern gio::Fmt const DailyStampFormat;
-	extern gio::Fmt const MonthlyStampFormat;
-	extern gio::Fmt const RunPeriodStampFormat;
-	extern gio::Fmt const fmta;
 	extern FArray1D_string const DayTypes;
-	extern std::string const BlankString;
 	extern int const UnitsStringLength;
 
 	extern int const RVarAllocInc;
@@ -213,9 +206,9 @@ namespace OutputProcessor {
 			thisTSStored( false ),
 			thisTSCount( 0 ),
 			ReportFreq( 0 ),
-			MaxValue( -9999. ),
+			MaxValue( -9999.0 ),
 			maxValueDate( 0 ),
-			MinValue( 9999. ),
+			MinValue( 9999.0 ),
 			minValueDate( 0 ),
 			ReportID( 0 ),
 			SchedPtr( 0 ),
@@ -660,39 +653,39 @@ namespace OutputProcessor {
 			HRValue( 0.0 ),
 			RptHR( false ),
 			RptHRFO( false ),
-			HRMaxVal( -99999. ),
+			HRMaxVal( -99999.0 ),
 			HRMaxValDate( 0 ),
-			HRMinVal( 99999. ),
+			HRMinVal( 99999.0 ),
 			HRMinValDate( 0 ),
 			HRRptNum( 0 ),
 			DYValue( 0.0 ),
 			RptDY( false ),
 			RptDYFO( false ),
-			DYMaxVal( -99999. ),
+			DYMaxVal( -99999.0 ),
 			DYMaxValDate( 0 ),
-			DYMinVal( 99999. ),
+			DYMinVal( 99999.0 ),
 			DYMinValDate( 0 ),
 			DYRptNum( 0 ),
 			MNValue( 0.0 ),
 			RptMN( false ),
 			RptMNFO( false ),
-			MNMaxVal( -99999. ),
+			MNMaxVal( -99999.0 ),
 			MNMaxValDate( 0 ),
-			MNMinVal( 99999. ),
+			MNMinVal( 99999.0 ),
 			MNMinValDate( 0 ),
 			MNRptNum( 0 ),
 			SMValue( 0.0 ),
 			RptSM( false ),
 			RptSMFO( false ),
-			SMMaxVal( -99999. ),
+			SMMaxVal( -99999.0 ),
 			SMMaxValDate( 0 ),
-			SMMinVal( 99999. ),
+			SMMinVal( 99999.0 ),
 			SMMinValDate( 0 ),
 			SMRptNum( 0 ),
 			LastSMValue( 0.0 ),
-			LastSMMaxVal( -99999. ),
+			LastSMMaxVal( -99999.0 ),
 			LastSMMaxValDate( 0 ),
-			LastSMMinVal( 99999. ),
+			LastSMMinVal( 99999.0 ),
 			LastSMMinValDate( 0 ),
 			RptAccTS( false ),
 			RptAccTSFO( false ),
@@ -1123,7 +1116,7 @@ namespace OutputProcessor {
 		std::string const & EndUseSubName
 	);
 
-	int
+	void
 	WriteTimeStampFormatData(
 		int const unitNumber, // the Fortran output unit number
 		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
@@ -1171,15 +1164,13 @@ namespace OutputProcessor {
 
 	void
 	WriteRealVariableOutput(
-		int const reportType, // The report type or interval (e.g., hourly)
-		int const timeIndex // An index that points to the timestamp
+		int const reportType // The report type or interval (e.g., hourly)
 	);
 
 	void
 	WriteReportRealData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const storeType, // Averaged or Sum
 		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
@@ -1194,7 +1185,6 @@ namespace OutputProcessor {
 	WriteCumulativeReportMeterData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		bool const meterOnlyFlag // A flag that indicates if the data should be written to standard output
 	);
@@ -1203,7 +1193,6 @@ namespace OutputProcessor {
 	WriteReportMeterData(
 		int const reportID, // The variable's report ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp
 		Real64 const repValue, // The variable's value
 		int const reportingInterval, // The variable's reporting interval (e.g., hourly)
 		Real64 const minValue, // The variable's minimum value during the reporting interval
@@ -1217,21 +1206,18 @@ namespace OutputProcessor {
 	WriteRealData(
 		int const reportID, // The variable's reporting ID
 		std::string const & creportID, // variable ID in characters
-		int const timeIndex, // An index that points to the timestamp for the variable
 		Real64 const repValue // The variable's value
 	);
 
 	void
 	WriteIntegerVariableOutput(
-		int const reportType, // The report type (i.e., the reporting interval)
-		int const timeIndex // An index that points to the timestamp for this data
+		int const reportType // The report type (i.e., the reporting interval)
 	);
 
 	void
 	WriteReportIntegerData(
 		int const reportID, // The variable's reporting ID
 		std::string const & reportIDString, // The variable's reporting ID (character)
-		int const timeIndex, // An index that points to this timestamp for this data
 		Real64 const repValue, // The variable's value
 		int const storeType, // Type of item (averaged or summed)
 		Optional< Real64 const > numOfItemsStored = _, // The number of items (hours or timesteps) of data stored //Autodesk:OPTIONAL Used without PRESENT check
@@ -1246,7 +1232,6 @@ namespace OutputProcessor {
 	WriteIntegerData(
 		int const reportID, // the reporting ID of the data
 		std::string const & reportIDString, // the reporting ID of the data (character)
-		int const timeIndex, // an index that points to the data's timestamp
 		Optional_int_const IntegerValue = _, // the value of the data
 		Optional< Real64 const > RealValue = _ // the value of the data
 	);
@@ -1437,7 +1422,7 @@ AddToOutputVariableList(
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

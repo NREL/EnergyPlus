@@ -93,8 +93,8 @@ namespace DaylightingDevices {
 	// upper window onto the ceiling of the zone as diffuse light.  The outside shelf, if specified, changes
 	// the total amount of light incident on the window.  All light reflected from the outside shelf also goes
 	// onto the zone ceiling.
-	// Most of the work for daylighting shelves is actually done in DaylightingManager.f90, SolarShading.f90,
-	// and HeatBalanceSurfaceManager.f90.  The main task of the module is to get the input and initialize the
+	// Most of the work for daylighting shelves is actually done in DaylightingManager.cc, SolarShading.cc,
+	// and HeatBalanceSurfaceManager.cc.  The main task of the module is to get the input and initialize the
 	// shelf.  The biggest part of initialization is calculating the window view factor to the outside shelf.
 	// It is up to the user to reduce the window view factor to ground accordingly.
 	// The inside shelf is modeled in both daylighting and heat balance simulations by converting all light
@@ -185,6 +185,8 @@ namespace DaylightingDevices {
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
 		// DERIVED TYPE DEFINITIONS:
+
+		static gio::Fmt const fmtA( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PipeNum; // TDD pipe object number
@@ -364,10 +366,10 @@ namespace DaylightingDevices {
 
 				// Report calculated view factor so that user knows what to make the view factor to ground
 				if ( ! ShelfReported ) {
-					gio::write( OutputFileInits, "(A)" ) << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
+					gio::write( OutputFileInits, fmtA ) << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
 					ShelfReported = true;
 				}
-				gio::write( OutputFileInits, "(A)" ) << Shelf( ShelfNum ).Name + ',' + RoundSigDigits( Shelf( ShelfNum ).ViewFactor, 2 ) + ',' + Surface( WinSurf ).Name + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorSky, 2 ) + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorGround, 2 );
+				gio::write( OutputFileInits, fmtA ) << Shelf( ShelfNum ).Name + ',' + RoundSigDigits( Shelf( ShelfNum ).ViewFactor, 2 ) + ',' + Surface( WinSurf ).Name + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorSky, 2 ) + ',' + RoundSigDigits( Surface( WinSurf ).ViewFactorGround, 2 );
 				//      CALL SetupOutputVariable('View Factor To Outside Shelf []', &
 				//        Shelf(ShelfNum)%ViewFactor,'Zone','Average',Shelf(ShelfNum)%Name)
 			}
@@ -487,7 +489,7 @@ namespace DaylightingDevices {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " Equivalent Layer Window is not supported." );
 						ErrorsFound = true;
 					}
-					// Window multiplier is already handled in SurfaceGeometry.f90
+					// Window multiplier is already handled in SurfaceGeometry.cc
 
 					if ( ! Surface( SurfNum ).ExtSolar ) {
 						ShowWarningError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " is not exposed to exterior radiation." );
@@ -525,7 +527,7 @@ namespace DaylightingDevices {
 					}
 
 					if ( TDDPipe( PipeNum ).Dome > 0 && std::abs( Surface( SurfNum ).Area - Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) {
-						if ( SafeDivide( std::abs( Surface( SurfNum ).Area - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > .1 ) { // greater than 10%
+						if ( SafeDivide( std::abs( Surface( SurfNum ).Area - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) { // greater than 10%
 							ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome and diffuser areas are significantly different (>10%)." );
 							ShowContinueError( "...Diffuser Area=[" + RoundSigDigits( Surface( SurfNum ).Area, 4 ) + "]; Dome Area=[" + RoundSigDigits( Surface( TDDPipe( PipeNum ).Dome ).Area, 4 ) + "]." );
 							ErrorsFound = true;
@@ -550,7 +552,7 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					// Window multiplier is already handled in SurfaceGeometry.f90
+					// Window multiplier is already handled in SurfaceGeometry.cc
 
 					TDDPipe( PipeNum ).Diffuser = SurfNum;
 				}
@@ -572,9 +574,9 @@ namespace DaylightingDevices {
 					ErrorsFound = true;
 				}
 
-				PipeArea = 0.25 * Pi * std::pow( TDDPipe( PipeNum ).Diameter, 2 );
+				PipeArea = 0.25 * Pi * pow_2( TDDPipe( PipeNum ).Diameter );
 				if ( TDDPipe( PipeNum ).Dome > 0 && std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) {
-					if ( SafeDivide( std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > .1 ) { // greater than 10%
+					if ( SafeDivide( std::abs( PipeArea - Surface( TDDPipe( PipeNum ).Dome ).Area ), Surface( TDDPipe( PipeNum ).Dome ).Area ) > 0.1 ) { // greater than 10%
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Pipe and dome/diffuser areas are significantly different (>10%)." );
 						ShowContinueError( "...Pipe Area=[" + RoundSigDigits( PipeArea, 4 ) + "]; Dome/Diffuser Area=[" + RoundSigDigits( Surface( TDDPipe( PipeNum ).Dome ).Area, 4 ) + "]." );
 						ErrorsFound = true;
@@ -896,7 +898,7 @@ namespace DaylightingDevices {
 		T = 0.0;
 		i = 1.0 / N;
 
-		xLimit = ( std::log( std::pow( N, 2.0 ) * myLocalTiny ) / std::log( R ) ) / xTol;
+		xLimit = ( std::log( pow_2( N ) * myLocalTiny ) / std::log( R ) ) / xTol;
 
 		c1 = A * std::tan( Theta );
 		c2 = 4.0 / Pi;
@@ -906,7 +908,7 @@ namespace DaylightingDevices {
 			x = c1 / s;
 
 			if ( x < xLimit ) {
-				dT = c2 * ( std::pow( R, int( x ) ) ) * ( 1.0 - ( 1.0 - R ) * ( x - int( x ) ) ) * ( std::pow( s, 2 ) ) / std::sqrt( 1.0 - std::pow( s, 2 ) );
+				dT = c2 * std::pow( R, int( x ) ) * ( 1.0 - ( 1.0 - R ) * ( x - int( x ) ) ) * pow_2( s ) / std::sqrt( 1.0 - pow_2( s ) );
 				T += dT;
 			}
 
@@ -943,7 +945,7 @@ namespace DaylightingDevices {
 		// Not sure if shading and tilt is adequately accounted for by DifShdgRatioIsoSky later on or not...
 
 		// REFERENCES:
-		// See AnisoSkyViewFactors in SolarShading.f90.
+		// See AnisoSkyViewFactors in SolarShading.cc.
 
 		// USE STATEMENTS: na
 
@@ -1016,7 +1018,7 @@ namespace DaylightingDevices {
 		// Not sure if shading is adequately accounted for by DifShdgRatioHoriz later on or not...
 
 		// REFERENCES:
-		// See AnisoSkyViewFactors in SolarShading.f90.
+		// See AnisoSkyViewFactors in SolarShading.cc.
 
 		// Using/Aliasing
 		using namespace DataSurfaces;
@@ -1101,14 +1103,14 @@ namespace DaylightingDevices {
 		//   FluxInc = IsoSkyRad + CircumSolarRad + HorizonRad
 		//   FluxTrans = T1*IsoSkyRad + T2*CircumSolarRad + T3*HorizonRad
 		// It turns out that FluxTrans/FluxInc is equivalent to AnisoSkyTDDMult/AnisoSkyMult.
-		// AnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.f90.
+		// AnisoSkyMult has been conveniently calculated already in AnisoSkyViewFactors in SolarShading.cc.
 		// AnisoSkyMult = MultIsoSky*DifShdgRatioIsoSky + MultCircumSolar*SunlitFrac + MultHorizonZenith*DifShdgRatioHoriz
 		// In this routine a similar AnisoSkyTDDMult is calculated that applies the appropriate transmittance to each
 		// of the components above.  The result is Trans = AnisoSkyTDDMult/AnisoSkyMult.
 		// Shading and orientation are already taken care of by DifShdgRatioIsoSky and DifShdgRatioHoriz.
 
 		// REFERENCES:
-		// See AnisoSkyViewFactors in SolarShading.f90.
+		// See AnisoSkyViewFactors in SolarShading.cc.
 
 		// USE STATEMENTS: na
 		// Using/Aliasing
@@ -1371,7 +1373,7 @@ namespace DaylightingDevices {
 		//     a. Reflection off of diffuser surface (inside of TDD)
 		//     b. Zone diffuse interior shortwave incident on the diffuser from windows, lights, etc.
 		//   3. Inward absorbed solar in dome and diffuser glass
-		// This subroutine is called by InitIntSolarDistribution in HeatBalanceSurfaceManager.f90.
+		// This subroutine is called by InitIntSolarDistribution in HeatBalanceSurfaceManager.cc.
 
 		// REFERENCES: na
 
@@ -1491,10 +1493,10 @@ namespace DaylightingDevices {
 		M = H / W;
 		N = L / W;
 
-		E1 = M * std::atan( ( 1.0 / M ) ) + N * std::atan( ( 1.0 / N ) ) - ( std::sqrt( std::pow( N, 2 ) + std::pow( M, 2 ) ) ) * std::atan( std::pow( ( ( std::pow( N, 2 ) + std::pow( M, 2 ) ) ), ( -0.5 ) ) );
-		E2 = ( ( 1.0 + std::pow( M, 2 ) ) * ( 1.0 + std::pow( N, 2 ) ) ) / ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) );
-		E3 = std::pow( ( ( std::pow( M, 2 ) ) * ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) ) / ( ( 1.0 + std::pow( M, 2 ) ) * ( std::pow( M, 2 ) + std::pow( N, 2 ) ) ) ), ( std::pow( M, 2 ) ) );
-		E4 = std::pow( ( ( std::pow( N, 2 ) ) * ( 1.0 + std::pow( M, 2 ) + std::pow( N, 2 ) ) / ( ( 1.0 + std::pow( N, 2 ) ) * ( std::pow( M, 2 ) + std::pow( N, 2 ) ) ) ), ( std::pow( N, 2 ) ) );
+		E1 = M * std::atan( 1.0 / M ) + N * std::atan( 1.0 / N ) - std::sqrt( pow_2( N ) + pow_2( M ) ) * std::atan( std::pow( pow_2( N ) + pow_2( M ), -0.5 ) );
+		E2 = ( ( 1.0 + pow_2( M ) ) * ( 1.0 + pow_2( N ) ) ) / ( 1.0 + pow_2( M ) + pow_2( N ) );
+		E3 = std::pow( pow_2( M ) * ( 1.0 + pow_2( M ) + pow_2( N ) ) / ( ( 1.0 + pow_2( M ) ) * ( pow_2( M ) + pow_2( N ) ) ), pow_2( M ) );
+		E4 = std::pow( pow_2( N ) * ( 1.0 + pow_2( M ) + pow_2( N ) ) / ( ( 1.0 + pow_2( N ) ) * ( pow_2( M ) + pow_2( N ) ) ), pow_2( N ) );
 
 		Shelf( ShelfNum ).ViewFactor = ( 1.0 / ( Pi * M ) ) * ( E1 + 0.25 * std::log( E2 * E3 * E4 ) );
 
@@ -1560,7 +1562,7 @@ namespace DaylightingDevices {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

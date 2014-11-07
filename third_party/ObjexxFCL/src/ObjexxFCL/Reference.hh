@@ -20,6 +20,7 @@
 // C++ Headers
 #include <cassert>
 #include <cstddef>
+#include <type_traits>
 
 namespace ObjexxFCL {
 
@@ -38,29 +39,29 @@ public: // Creation
 	// Default Constructor
 	inline
 	Reference() :
-		ptr_( nullptr ),
-		own_( false )
+	 ptr_( nullptr ),
+	 own_( false )
 	{}
 
 	// Copy Constructor
 	inline
 	Reference( Reference const & ref ) :
-		ptr_( ref.ptr_ ),
-		own_( false )
+	 ptr_( ref.ptr_ ),
+	 own_( false )
 	{}
 
 	// Null Pointer Constructor
 	inline
 	Reference( std::nullptr_t ) :
-		ptr_( nullptr ),
-		own_( false )
+	 ptr_( nullptr ),
+	 own_( false )
 	{}
 
 	// Value Constructor
 	inline
-	Reference( Value const & val ) :
-		ptr_( const_cast< Value * >( &val ) ), // Fortran compilers allow modifying INTENT(IN) args via POINTERs
-		own_( false )
+	Reference( T const & val ) :
+	 ptr_( const_cast< T * >( &val ) ), // Fortran compilers allow modifying INTENT(IN) args via POINTERs
+	 own_( false )
 	{}
 
 	// Destructor
@@ -83,7 +84,7 @@ public: // Assignment
 	// Value Assignment
 	inline
 	Reference &
-	operator =( Value const & val )
+	operator =( T const & val )
 	{
 		assert( ptr_ != nullptr );
 		*ptr_ = val;
@@ -91,7 +92,7 @@ public: // Assignment
 	}
 
 	// Value Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	Reference &
 	operator =( U const & val )
@@ -105,7 +106,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value const &() const
+	operator T const &() const
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -113,7 +114,7 @@ public: // Conversion
 
 	// Value Conversion
 	inline
-	operator Value &()
+	operator T &()
 	{
 		assert( ptr_ != nullptr );
 		return *ptr_;
@@ -123,7 +124,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value const &
+	T const &
 	operator ()() const
 	{
 		assert( ptr_ != nullptr );
@@ -132,7 +133,7 @@ public: // Operators
 
 	// Value
 	inline
-	Value &
+	T &
 	operator ()()
 	{
 		assert( ptr_ != nullptr );
@@ -142,9 +143,9 @@ public: // Operators
 	// Attach to Value
 	inline
 	void
-	operator >>=( Value const & val )
+	operator >>=( T const & val )
 	{
-		ptr_ = const_cast< Value * >( &val ); // Fortran compilers allow modifying INTENT(IN) args via POINTERs
+		ptr_ = const_cast< T * >( &val ); // Fortran compilers allow modifying INTENT(IN) args via POINTERs
 		own_ = false;
 	}
 
@@ -173,13 +174,13 @@ public: // Properties
 	bool
 	associated() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 	// Associated with a Given Value?
 	inline
 	bool
-	associated( Value const & val ) const
+	associated( T const & val ) const
 	{
 		return ( ptr_ == &val );
 	}
@@ -197,13 +198,13 @@ public: // Properties
 	bool
 	attached() const
 	{
-		return ptr_;
+		return ( ptr_ != nullptr );
 	}
 
 	// Attached to a Given Value?
 	inline
 	bool
-	attached( Value const & val ) const
+	attached( T const & val ) const
 	{
 		return ( ptr_ == &val );
 	}
@@ -213,9 +214,9 @@ public: // Modifiers
 	// Attach to Value
 	inline
 	void
-	attach( Value const & val )
+	attach( T const & val )
 	{
-		ptr_ = const_cast< Value * >( &val ); // Fortran compilers allow modifying INTENT(IN) args via POINTERs
+		ptr_ = const_cast< T * >( &val ); // Fortran compilers allow modifying INTENT(IN) args via POINTERs
 		own_ = false;
 	}
 
@@ -337,7 +338,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Reference const & a, Value const & b )
+	operator ==( Reference const & a, T const & b )
 	{
 		assert( a.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( a.ptr_ != nullptr ) && ( *a.ptr_ == b ) );
@@ -347,7 +348,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Reference const & a, Value const & b )
+	operator !=( Reference const & a, T const & b )
 	{
 		assert( a.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( a.ptr_ == nullptr ) || ( *a.ptr_ != b ) );
@@ -357,7 +358,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator ==( Value const & a, Reference const & b )
+	operator ==( T const & a, Reference const & b )
 	{
 		assert( b.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( b.ptr_ != nullptr ) && ( a == *b.ptr_ ) );
@@ -367,7 +368,7 @@ public: // Comparison
 	inline
 	friend
 	bool
-	operator !=( Value const & a, Reference const & b )
+	operator !=( T const & a, Reference const & b )
 	{
 		assert( b.ptr_ != nullptr ); // Fortran disallows use if not associated
 		return ( ( b.ptr_ == nullptr ) || ( a != *b.ptr_ ) );
@@ -375,7 +376,7 @@ public: // Comparison
 
 private: // Data
 
-	Value * ptr_; // Pointer to object
+	T * ptr_; // Pointer to object
 	bool own_; // Allocated the object?
 
 }; // Reference

@@ -1,0 +1,20 @@
+
+IF ( MSVC ) # visual c++ (VS 2013)
+    ADD_DEFINITIONS("-W0")
+ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
+    ADD_DEFINITIONS("-w")
+ELSEIF ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" )
+    ADD_DEFINITIONS("${CMAKE_CXX_FLAGS} /W0")
+ENDIF () # COMPILER TYPE
+
+SET(SRC 
+  sqlite3.h
+  sqlite3.c
+) 
+
+if (UNIX)
+  ADD_DEFINITIONS( " -fPIC " )
+endif()
+
+ADD_LIBRARY( sqlite ${SRC} )
+

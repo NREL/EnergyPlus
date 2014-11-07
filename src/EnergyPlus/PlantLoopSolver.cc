@@ -11,6 +11,7 @@
 // EnergyPlus Headers
 #include <PlantLoopSolver.hh>
 #include <DataBranchAirLoopPlant.hh>
+#include <DataConvergParams.hh>
 #include <DataGlobals.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -33,7 +34,7 @@ namespace PlantLoopSolver {
 	// MODULE INFORMATION:
 	//       AUTHOR         B. Griffith,  Dan Fisher, Sankaranarayanan K P, Rich Liesen, Edwin Lee
 	//       DATE WRITTEN   Feb 2010
-	//         This file developed from PlantSupplySideSolvers.f90 by Sankaranarayanan K P, Rich Liesen, Dan Fisher
+	//         This file developed from PlantSupplySideSolvers.cc by Sankaranarayanan K P, Rich Liesen, Dan Fisher
 	//       MODIFIED       na
 	//       RE-ENGINEERED  Aug 2010 Edwin Lee
 
@@ -57,6 +58,8 @@ namespace PlantLoopSolver {
 	Real64 LoadToLoopSetPointThatWasntMet; // Unmet Demand
 	Real64 InitialDemandToLoopSetPointSAVED;
 	int RefrigIndex( 0 ); // Index denoting refrigerant used (possibly steam)
+
+	static std::string const fluidNameSteam( "STEAM" );
 
 	// SUBROUTINE SPECIFICATIONS:
 	//PRIVATE EvaluatePumpFlowConditions
@@ -549,6 +552,7 @@ namespace PlantLoopSolver {
 		using DataPlant::GenEquipTypes_Pump;
 		using DataPlant::TypeOf_PumpConstantSpeed;
 		using DataPlant::TypeOf_PumpBankConstantSpeed;
+		using DataPlant::TypeOf_PumpCondensate;
 		using DataPlant::SupplySide;
 		using DataPlant::CommonPipe_TwoWay;
 		using DataPlant::DemandSide;
@@ -560,6 +564,7 @@ namespace PlantLoopSolver {
 		using Pumps::PumpEquip;
 		using PlantUtilities::IntegerIsWithinTwoValues;
 		using DataHVACGlobals::SmallLoad;
+		using DataConvergParams::PlantLowFlowRateToler;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -591,10 +596,12 @@ namespace PlantLoopSolver {
 		bool ThisSideHasPumps;
 		bool OtherSideHasPumps;
 		bool ThisLoopHasCommonPipe;
-		FArray1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
-		FArray1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
-		FArray1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
-		FArray1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
+
+		//Tuned Made static: Set before use
+		static FArray1D_bool ThisLoopHasConstantSpeedBranchPumps( 2 );
+		static FArray1D< Real64 > EachSideFlowRequestNeedAndTurnOn( 2 ); // 2 for SupplySide/DemandSide
+		static FArray1D< Real64 > EachSideFlowRequestNeedIfOn( 2 ); // 2 for SupplySide/DemandSide
+		static FArray1D< Real64 > EachSideFlowRequestFinal( 2 ); // 2 for SupplySide/DemandSide
 
 		static bool AllocatedParallelArray( false );
 		int MaxParallelBranchCount;
@@ -642,33 +649,33 @@ namespace PlantLoopSolver {
 			OutletBranchRequestNeedIfOn = 0.0;
 			EachSideFlowRequestNeedAndTurnOn( LoopSideCounter ) = 0.0;
 			EachSideFlowRequestNeedIfOn( LoopSideCounter ) = 0.0;
-            
+
             // reference
             auto & loop_side( loop.LoopSide( LoopSideCounter ) );
-            
+
 			// Now loop through all the branches on this LoopSide and get flow requests
 			NumBranchesOnThisLoopSide = loop_side.TotalBranches;
 			ParallelBranchIndex = 0;
 			for ( BranchCounter = 1; BranchCounter <= NumBranchesOnThisLoopSide; ++BranchCounter ) {
 				ThisBranchFlowRequestNeedAndTurnOn = 0.0;
 				ThisBranchFlowRequestNeedIfOn = 0.0;
-                
+
                 // reference
                 auto & branch( loop_side.Branch( BranchCounter ) );
-                
+
 				if ( BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide ) ++ParallelBranchIndex;
 				NumCompsOnThisBranch = branch.TotalComponents;
 				for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
-                    
+
                     // reference
                     auto & component( branch.Comp( CompCounter ) );
-                    
+
 					NodeToCheckRequest = component.NodeNumIn;
 					FlowPriorityStatus = component.FlowPriority;
-                    
+
                     // reference
                     auto & node_with_request( Node( NodeToCheckRequest ) );
-                    
+
 					if ( component.GeneralEquipType != GenEquipTypes_Pump ) {
 
 						{ auto const SELECT_CASE_var( FlowPriorityStatus );
@@ -753,8 +760,20 @@ namespace PlantLoopSolver {
 										ThisBranchFlowRequestNeedIfOn = max( ThisBranchFlowRequestNeedIfOn, this_pump.MassFlowRateMax / this_pump.NumPumpsInBank );
 									}
 								}
+							}
+						
+							//overwrite here for branch pumps
+							if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
+								CompIndex = component.CompNum;
+								if ( CompIndex > 0 ) {
+									auto & this_pump(PumpEquip( CompIndex ) );
+									this_pump.LoopSolverOverwriteFlag = false;
+								}
+								
+
 							}}
 						}
+						
 					}
 
 				}
@@ -870,6 +889,33 @@ namespace PlantLoopSolver {
 			LoopFlow = EachSideFlowRequestFinal( ThisSide );
 			ThisLoopHasCommonPipe = true;
 		}
+
+		
+		
+		//overrides the loop solver flow request to allow loop pump to turn off when not in use
+		if ( PlantLoop( LoopNum ).LoopSide( ThisSide ).TotalPumps == 1) {
+			if ( LoopFlow < PlantLowFlowRateToler ) {  //Update from dataconvergetols...
+				auto & loop_side( PlantLoop( LoopNum ).LoopSide( ThisSide ) );
+				NumBranchesOnThisLoopSide = loop_side.TotalBranches;
+				for ( BranchCounter = 1; BranchCounter <= NumBranchesOnThisLoopSide; ++BranchCounter ) {
+					// reference
+					auto & branch( loop_side.Branch( BranchCounter ) );
+					NumCompsOnThisBranch = branch.TotalComponents;
+					for ( CompCounter = 1; CompCounter <= NumCompsOnThisBranch; ++CompCounter ) {
+						auto & component( branch.Comp( CompCounter ) );
+						auto const SELECT_CASE_var( component.TypeOf_Num );
+						if ( ( SELECT_CASE_var == TypeOf_PumpVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpBankVariableSpeed ) || ( SELECT_CASE_var == TypeOf_PumpCondensate ) ) {
+							CompIndex = component.CompNum;
+							if ( CompIndex > 0 ){
+								auto & this_pump( PumpEquip( CompIndex ) );
+								this_pump.LoopSolverOverwriteFlag = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
 
 		// do some diagnostic that are easy and fast at this point, the rest of this routine could be moved
 		//?  should be caught previously in input~ Check erroneous conditions first before we do the logic below
@@ -1533,6 +1579,9 @@ namespace PlantLoopSolver {
 		int BranchIndex; // ~ This is a 1 - n value within the current branch group
 		int StartingComponent; // ~ The component which "would" be simulated next
 
+		static std::string const RoutineName( "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+		static std::string const RoutineNameAlt( "PlantSupplySide:EvaluateLoopSetPointLoad" );
+
 		//~ General variables
 		Real64 EnteringTemperature;
 		Real64 MassFlowRate;
@@ -1584,7 +1633,7 @@ namespace PlantLoopSolver {
 
 		if ( PlantLoop( LoopNum ).FluidType == NodeType_Water ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 
@@ -1646,7 +1695,7 @@ namespace PlantLoopSolver {
 
 		} else if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
 
-			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, WeightedInletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 
@@ -1658,8 +1707,8 @@ namespace PlantLoopSolver {
 				// Calculate the delta temperature
 				DeltaTemp = LoopSetPointTemperature - WeightedInletTemp;
 
-				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 1.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
-				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 0.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
+				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 1.0, RefrigIndex, RoutineNameAlt );
+				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 0.0, RefrigIndex, RoutineNameAlt );
 
 				LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 
@@ -1735,7 +1784,7 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PlantLoopSolver::UpdateAnyLoopDemandAlterations" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1796,7 +1845,7 @@ namespace PlantLoopSolver {
 		InletTemp = Node( InletNode ).Temp;
 		OutletTemp = Node( OutletNode ).Temp;
 		AverageTemp = ( InletTemp + OutletTemp ) / 2;
-		ComponentCp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, AverageTemp, PlantLoop( LoopNum ).FluidIndex, "PlantLoopSolver::UpdateAnyLoopDemandAlterations" );
+		ComponentCp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, AverageTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		// Calculate the load altered by this component
 		LoadAlteration = ComponentMassFlowRate * ComponentCp * ( OutletTemp - InletTemp );
@@ -1947,7 +1996,7 @@ namespace PlantLoopSolver {
 			ParallelBranchMaxAvail = 0.0;
 			ParallelBranchMinAvail = 0.0;
 			for ( iBranch = 1; iBranch <= NumSplitOutlets; ++iBranch ) {
-			    
+
 				BranchNum = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
 				auto & this_branch( this_loopside.Branch( BranchNum ) );
 				SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( iBranch );
@@ -2006,7 +2055,7 @@ namespace PlantLoopSolver {
 
 			auto & first_branch_inlet_node( Node( FirstNodeOnBranchIn ) );
 			auto & last_branch_inlet_node( Node( FirstNodeOnBranchOut ) );
-			
+
 			//Reset branch inlet node flow rates for the first and last branch on loop
 			first_branch_inlet_node.MassFlowRate = ThisLoopSideFlow;
 			last_branch_inlet_node.MassFlowRate = ThisLoopSideFlow;
@@ -2180,17 +2229,39 @@ namespace PlantLoopSolver {
 				//DSU? didn't take the time to figure out what this should be... SplitterFlowIn = SplitterInletFlow(SplitNum)
 				// 1) apportion flow based on requested fraction of total
 				for ( OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum ) {
+					
 					SplitterBranchOut = this_loopside.Splitter( SplitNum ).BranchNumOut( OutletNum );
 					ThisBranchRequest = DetermineBranchFlowRequest( LoopNum, LoopSideNum, SplitterBranchOut );
 					FirstNodeOnBranch = this_loopside.Branch( SplitterBranchOut ).NodeNumIn;
-					if ( ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_Active ) || ( this_loopside.Branch( SplitterBranchOut ).ControlType == ControlType_SeriesActive ) ) {
+					auto & this_splitter_outlet_branch( this_loopside.Branch( SplitterBranchOut ) );
+				
+					if ( ( this_splitter_outlet_branch.ControlType == ControlType_Active ) || ( this_splitter_outlet_branch.ControlType == ControlType_SeriesActive ) ) {
+						
+						// since we are calculating this fraction based on the total parallel request calculated above, we must mimic the logic to make sure the math works every time
+						// that means we must make the variable speed pump correction here as well.
+						for ( CompCounter = 1; CompCounter <= this_splitter_outlet_branch.TotalComponents; ++CompCounter ) {
+
+							auto & this_comp( this_splitter_outlet_branch.Comp( CompCounter ) );
+
+							//if this isn't a variable speed pump then just keep cycling
+							if ( ( this_comp.TypeOf_Num != TypeOf_PumpVariableSpeed ) && ( this_comp.TypeOf_Num != TypeOf_PumpBankVariableSpeed ) ) {
+								continue;
+							}
+
+							CompInletNode = this_comp.NodeNumIn;
+							ThisBranchRequest = max( ThisBranchRequest, Node( CompInletNode ).MassFlowRateRequest );
+
+						}
+						
 						ThisBranchRequestFrac = ThisBranchRequest / TotParallelBranchFlowReq;
 						//    FracFlow = Node(FirstNodeOnBranch)%MassFlowRate/TotParallelBranchFlowReq
 						//    Node(FirstNodeOnBranch)%MassFlowRate = MIN((FracFlow * Node(FirstNodeOnBranch)%MassFlowRate),FlowRemaining)
 						Node( FirstNodeOnBranch ).MassFlowRate = ThisBranchRequestFrac * ThisLoopSideFlow;
 						PushBranchFlowCharacteristics( LoopNum, LoopSideNum, SplitterBranchOut, Node( FirstNodeOnBranch ).MassFlowRate, FirstHVACIteration );
 						FlowRemaining -= Node( FirstNodeOnBranch ).MassFlowRate;
+						
 					}
+					
 				}
 
 				// 1b) check if flow all apportioned
@@ -2553,7 +2624,7 @@ namespace PlantLoopSolver {
 		// store node data in plant
 		auto & this_supplyside( PlantLoop( LoopNum ).LoopSide( SupplySide ) );
 		auto & this_loop_report( PlantReport( LoopNum ) );
-		
+
 		if ( LoopSide == SupplySide ) {
 			this_loop_report.InletNodeFlowrate = Node( this_supplyside.NodeNumIn ).MassFlowRate;
 			this_loop_report.InletNodeTemperature = Node( this_supplyside.NodeNumIn ).Temp;
@@ -2619,7 +2690,8 @@ namespace PlantLoopSolver {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+		static std::string const RoutineNameAlt( "PlantSupplySide:EvaluateLoopSetPointLoad" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2652,7 +2724,7 @@ namespace PlantLoopSolver {
 
 		if ( this_loop.FluidType == NodeType_Water ) {
 
-			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( this_loop.LoopDemandCalcScheme );
 
@@ -2696,7 +2768,7 @@ namespace PlantLoopSolver {
 
 		} else if ( this_loop.FluidType == NodeType_Steam ) {
 
-			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, "PlantLoopSolver::EvaluateLoopSetPointLoad" );
+			Cp = GetSpecificHeatGlycol( this_loop.FluidName, TargetTemp, this_loop.FluidIndex, RoutineName );
 
 			{ auto const SELECT_CASE_var( this_loop.LoopDemandCalcScheme );
 
@@ -2708,8 +2780,8 @@ namespace PlantLoopSolver {
 				// Calculate the delta temperature
 				DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
-				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 1.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
-				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( "STEAM", LoopSetPointTemperature, 0.0, RefrigIndex, "PlantSupplySide:EvaluateLoopSetPointLoad" );
+				EnthalpySteamSatVapor = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 1.0, RefrigIndex, RoutineNameAlt );
+				EnthalpySteamSatLiquid = GetSatEnthalpyRefrig( fluidNameSteam, LoopSetPointTemperature, 0.0, RefrigIndex, RoutineNameAlt );
 
 				LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 
@@ -2857,7 +2929,7 @@ namespace PlantLoopSolver {
 		auto & this_loopside( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
 		auto & this_branch( this_loopside.Branch( BranchNum ) );
 		auto & this_comp( this_branch.Comp( CompNum ) );
-		
+
 		if ( ( this_loopside.EMSCtrl ) && ( this_loopside.EMSValue <= 0.0 ) ) {
 			FlowToRequest = 0.0;
 			return;
@@ -2889,7 +2961,7 @@ namespace PlantLoopSolver {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

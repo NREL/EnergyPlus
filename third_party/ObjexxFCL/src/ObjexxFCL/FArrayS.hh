@@ -24,9 +24,10 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
-#include <cstddef>
 #include <cstdlib>
+#include <initializer_list>
 #include <limits>
+#include <type_traits>
 
 namespace ObjexxFCL {
 
@@ -70,38 +71,38 @@ protected: // Creation
 	// Default Constructor
 	inline
 	FArrayS() :
-		data_( nullptr ),
-		data_beg_( nullptr ),
-		data_end_( nullptr ),
-		size_( 0 )
+	 data_( nullptr ),
+	 data_beg_( nullptr ),
+	 data_end_( nullptr ),
+	 size_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	FArrayS( FArrayS const & a ) :
-		BArray( a ),
-		data_( a.data_ ),
-		data_beg_( a.data_beg_ ),
-		data_end_( a.data_end_ ),
-		size_( a.size_ )
+	 BArray( a ),
+	 data_( a.data_ ),
+	 data_beg_( a.data_beg_ ),
+	 data_end_( a.data_end_ ),
+	 size_( a.size_ )
 	{}
 
 	// Data Constructor
 	inline
 	FArrayS( T const * data, size_type const size ) :
-		data_( const_cast< T * >( data ) ),
-		data_beg_( nullptr ),
-		data_end_( nullptr ),
-		size_( size )
+	 data_( const_cast< T * >( data ) ),
+	 data_beg_( nullptr ),
+	 data_end_( nullptr ),
+	 size_( size )
 	{}
 
 	// Non-Const Data Constructor
 	inline
 	FArrayS( T * data, size_type const size ) :
-		data_( data ),
-		data_beg_( nullptr ),
-		data_end_( nullptr ),
-		size_( size )
+	 data_( data ),
+	 data_beg_( nullptr ),
+	 data_end_( nullptr ),
+	 size_( size )
 	{}
 
 public: // Creation
@@ -192,12 +193,27 @@ public: // Inspector
 		return size_;
 	}
 
-	// Lower Index of a Dimension
-	virtual
+	// Active Array Size
+	inline
 	int
-	l( int const d ) const = 0;
+	isize() const
+	{
+		return static_cast< int >( size_ );
+	}
 
-	// Upper Index of Dimension
+	// Lower Index of a Dimension
+	inline
+	int
+	l( int const d ) const
+	{
+		assert( ( 1 <= d ) && ( d <= rank() ) );
+#ifdef NDEBUG
+		static_cast< void >( d ); // Suppress unused warning
+#endif
+		return 1;
+	}
+
+	// Upper Index of a Dimension
 	virtual
 	int
 	u( int const d ) const = 0;
@@ -206,6 +222,11 @@ public: // Inspector
 	virtual
 	size_type
 	size( int const d ) const = 0;
+
+	// Size of a Dimension
+	virtual
+	int
+	isize( int const d ) const = 0;
 
 	// Array Data Pointer
 	inline

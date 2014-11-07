@@ -28,7 +28,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Dimension;
 
 // IndexRange: Index Range Abstract Base Class
@@ -58,66 +58,66 @@ protected: // Creation
 	// Default Constructor
 	inline
 	IndexRange() :
-		l_( 1 ),
-		u_( 0 ),
-		size_( 0 )
+	 l_( 1 ),
+	 u_( 0 ),
+	 size_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	IndexRange( IndexRange const & I ) :
-		l_( I.l_ ),
-		u_( I.u_ ),
-		size_( I.size_ )
+	 l_( I.l_ ),
+	 u_( I.u_ ),
+	 size_( I.size_ )
 	{}
 
 	// Upper Index Constructor
 	inline
 	IndexRange( int const u ) :
-		l_( 1 ),
-		u_( clean_u( u ) ),
-		size_( u_ )
+	 l_( 1 ),
+	 u_( clean_u( u ) ),
+	 size_( u_ )
 	{}
 
 	// Star Constructor
 	inline
 	IndexRange( Star const ) :
-		l_( 1 ),
-		u_( -1 ),
-		size_( npos )
+	 l_( 1 ),
+	 u_( -1 ),
+	 size_( npos )
 	{}
 
 	// Index Range Constructor
 	inline
 	IndexRange( int const l, int const u ) :
-		l_( l ),
-		u_( clean_u( u ) ),
-		size_( computed_size() )
+	 l_( l ),
+	 u_( clean_u( u ) ),
+	 size_( computed_size() )
 	{}
 
 	// Lower Index + Star Constructor
 	inline
 	IndexRange( int const l, Star const ) :
-		l_( l ),
-		u_( l_ - 2 ),
-		size_( npos )
+	 l_( l ),
+	 u_( l_ - 2 ),
+	 size_( npos )
 	{}
 
 	// Star + Upper Index Constructor
 	inline
 	IndexRange( Star const, int const u ) :
-		l_( u + 2 ),
-		u_( u ),
-		size_( npos )
+	 l_( u + 2 ),
+	 u_( u ),
+	 size_( npos )
 	{}
 
 	// Initializer List of Integer Constructor
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
 	inline
-	IndexRange( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * = 0 ) :
-		l_( 1 ),
-		u_( 0 ),
-		size_( 0 )
+	IndexRange( std::initializer_list< U > const lu ) :
+	 l_( 1 ),
+	 u_( 0 ),
+	 size_( 0 )
 	{
 		size_type const n( lu.size() );
 		assert( n <= 2 );
@@ -142,9 +142,9 @@ protected: // Creation
 	// Initializer List of Index Constructor
 	inline
 	IndexRange( std::initializer_list< Index > const lu ) :
-		l_( 1 ),
-		u_( 0 ),
-		size_( 0 )
+	 l_( 1 ),
+	 u_( 0 ),
+	 size_( 0 )
 	{
 		size_type const n( lu.size() );
 		assert( n <= 2 );
@@ -169,33 +169,33 @@ protected: // Creation
 	// Omit Constructor
 	inline
 	IndexRange( Omit const ) :
-		l_( 1 ),
-		u_( -1 ),
-		size_( npos )
+	 l_( 1 ),
+	 u_( -1 ),
+	 size_( npos )
 	{}
 
 	// Lower Index + Omit Constructor
 	inline
 	IndexRange( int const l, Omit const ) :
-		l_( l ),
-		u_( l_ - 2 ),
-		size_( npos )
+	 l_( l ),
+	 u_( l_ - 2 ),
+	 size_( npos )
 	{}
 
 	// Omit + Upper Index Constructor
 	inline
 	IndexRange( Omit const, int const u ) :
-		l_( u + 2 ),
-		u_( u ),
-		size_( npos )
+	 l_( u + 2 ),
+	 u_( u ),
+	 size_( npos )
 	{}
 
 	// Omit + Omit Constructor
 	inline
 	IndexRange( Omit const, Omit const ) :
-		l_( 1 ),
-		u_( -1 ),
-		size_( npos )
+	 l_( 1 ),
+	 u_( -1 ),
+	 size_( npos )
 	{}
 
 public: // Creation
@@ -245,13 +245,13 @@ public: // Assignment
 	}
 
 	// Initializer List of int Assignment
-	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
+	template< typename U, class = typename std::enable_if< std::is_assignable< int&, U >::value >::type >
 	inline
 	IndexRange &
 	operator =( std::initializer_list< U > const lu )
 	{
 		size_type const n( lu.size() );
-		assert(  n <= 2 );
+		assert( n <= 2 );
 		auto i( lu.begin() );
 		switch ( n ) {
 		case 0: // {}
@@ -277,7 +277,7 @@ public: // Assignment
 	operator =( std::initializer_list< Index > const lu )
 	{
 		size_type const n( lu.size() );
-		assert(  n <= 2 );
+		assert( n <= 2 );
 		auto i( lu.begin() );
 		switch ( n ) {
 		case 0: // {}
@@ -509,6 +509,15 @@ public: // Inspector
 	size() const
 	{
 		return size_; // Unbounded => npos
+	}
+
+	// Size
+	inline
+	int
+	isize() const
+	{
+		assert( size_ != npos );
+		return static_cast< int >( size_ );
 	}
 
 	// Offset of an Index

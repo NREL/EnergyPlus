@@ -18,21 +18,22 @@
 #include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray2D.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 
 struct C
 {
 	C( int const m_ = 0, float const x_ = 0.0f ) :
-		m( m_ ),
-		x( x_ )
+	 m( m_ ),
+	 x( x_ )
 	{}
 
 	int m;
 	float x;
 };
 
-TEST( MArray1Test, Basic )
+TEST( MArrayTest, Basic1D )
 {
 	FArray1D< C > a( 5 );
 	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
@@ -57,7 +58,7 @@ TEST( MArray1Test, Basic )
 	EXPECT_EQ( 6, ma( 5 ) );
 }
 
-TEST( MArray1Test, Range )
+TEST( MArrayTest, Range1D )
 {
 	FArray1D< C > a( FArray1D< C >::IR( -3, 3 ) );
 	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
@@ -84,7 +85,7 @@ TEST( MArray1Test, Range )
 	EXPECT_EQ( 3, ma( 7 ) );
 }
 
-TEST( MArray1Test, MakerFree )
+TEST( MArrayTest, MakerFree1D )
 {
 	FArray1D< C > a( 5 );
 	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
@@ -96,7 +97,7 @@ TEST( MArray1Test, MakerFree )
 	EXPECT_EQ( a( 5 ).m, ma( 5 ) );
 }
 
-TEST( MArrayTest, MakerMethod )
+TEST( MArrayTest, MakerMethod1D )
 {
 	FArray1D< C > a( 5 );
 	for ( int i = 1; i <= a.u(); ++i ) a( i ).m = i;
@@ -109,7 +110,7 @@ TEST( MArrayTest, MakerMethod )
 	EXPECT_EQ( a( 5 ).m, ma( 5 ) );
 }
 
-TEST( MArray2Test, Basic )
+TEST( MArrayTest, Basic2D )
 {
 	C const c( 42, 123.5 );
 	FArray2D< C > a( 2, 2, c );
@@ -125,7 +126,20 @@ TEST( MArray2Test, Basic )
 	EXPECT_EQ( 43, ma( 2, 2 ) );
 }
 
-TEST( MArray1Test, dot )
+TEST( MArrayTest, Functions1D )
+{
+	C const ca( 42, 5.0f );
+	FArray1D< C > a( 3, ca );
+	auto A( make_MArray1( a, &C::x ) );
+	C const cb( 42, 4.0f );
+	FArray1D< C > b( 3, cb );
+	auto B( make_MArray1( b, &C::x ) );
+	EXPECT_EQ( 75.0f, magnitude_squared( A ) );
+	EXPECT_EQ( 3.0f, distance_squared( A, B ) );
+	EXPECT_EQ( 60.0f, dot( A, B ) );
+}
+
+TEST( MArrayTest, dot1D )
 {
 	C const c( 42, 5.0f );
 	FArray1D< C > a( 5, c );
@@ -137,7 +151,7 @@ TEST( MArray1Test, dot )
 	EXPECT_EQ( 125.0f, dot_product( B, A ) );
 }
 
-//TEST( MArray1Test, Eoshift1DPos )
+//TEST( MArrayTest, EoshiftPos1D )
 //{
 //	FArray1D< C > a( 5 );
 //	for ( int i = a.l(); i <= a.u(); ++i ) a( i ).m = i;
@@ -146,7 +160,7 @@ TEST( MArray1Test, dot )
 //	EXPECT_TRUE( eq( FArray1D_int( { 3, 4, 5, 9, 9 } ), eoshift( A, 2, 9 ) ) );
 //}
 
-TEST( MArray2Test, AnyOp2D )
+TEST( MArrayTest, AnyOp2D )
 {
 	FArray2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 3 ), C( 4 ), C( 5 ), C( 6 ), C( 7 ), C( 8 ), C( 9 ) } );
 	auto M( make_MArray2( A, &C::m ) );
@@ -159,7 +173,7 @@ TEST( MArray2Test, AnyOp2D )
 	EXPECT_FALSE( any_gt( M, 9 ) );
 }
 
-TEST( MArray2Test, AllOp2D )
+TEST( MArrayTest, AllOp2D )
 {
 	FArray2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 3 ), C( 4 ), C( 5 ), C( 6 ), C( 7 ), C( 8 ), C( 9 ) } );
 	auto M( make_MArray2( A, &C::m ) );
@@ -173,7 +187,7 @@ TEST( MArray2Test, AllOp2D )
 	EXPECT_TRUE( all_gt( M, 0 ) );
 }
 
-TEST( MArray2Test, CountOp2D )
+TEST( MArrayTest, CountOp2D )
 {
 	FArray2D< C > const A( 3, 3, { C( 1 ), C( 2 ), C( 2 ), C( 3 ), C( 3 ), C( 3 ), C( 7 ), C( 8 ), C( 9 ) } );
 	auto M( make_MArray2( A, &C::m ) );

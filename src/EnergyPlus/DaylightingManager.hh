@@ -273,8 +273,8 @@ namespace DaylightingManager {
 		int const iHour,
 		int & ISunPos,
 		Real64 const SkyObstructionMult,
-		FArray1A< Real64 > const RWIN2, // Center of a window element for TDD:DOME (if exists) in abs coord sys
-		FArray1A< Real64 > const Ray, // Unit vector along ray from reference point to window element
+		FArray1< Real64 > const & RWIN2, // Center of a window element for TDD:DOME (if exists) in abs coord sys
+		FArray1< Real64 > const & Ray, // Unit vector along ray from reference point to window element
 		Real64 const PHRAY, // Altitude of ray from reference point to window element (radians)
 		int const LSHCAL, // Interior shade calculation flag:  0=not yet calculated, 1=already calculated
 		int const InShelfSurf, // Inside daylighting shelf surface number
@@ -286,11 +286,11 @@ namespace DaylightingManager {
 		int const ShType, // Window shading type
 		int const BlNum, // Window blind number
 		Real64 const THRAY, // Azimuth of ray from reference point to window element (radians)
-		FArray1A< Real64 > const WNORM2, // Unit vector normal to window
+		FArray1< Real64 > const & WNORM2, // Unit vector normal to window
 		int const ExtWinType, // Exterior window type (InZoneExtWin, AdjZoneExtWin, NotInOrAdjZoneExtWin)
 		int const IConst, // Construction counter
 		Real64 const AZVIEW, // Azimuth of view vector in absolute coord system for
-		FArray1A< Real64 > const RREF2, // Location of virtual reference point in absolute coordinate system
+		FArray1< Real64 > const & RREF2, // Location of virtual reference point in absolute coordinate system
 		int const loopwin,
 		int const IHitIntObs, // = 1 if interior obstruction hit, = 0 otherwise
 		int const IHitExtObs, // 1 if ray from ref pt to ext win hits an exterior obstruction
@@ -364,46 +364,19 @@ namespace DaylightingManager {
 
 	void
 	DayltgCrossProduct(
-		FArray1A< Real64 > A, // Vector components: C = A X B
-		FArray1A< Real64 > B,
-		FArray1A< Real64 > C
+		FArray1< Real64 > const & A, // Vector components: C = A X B
+		FArray1< Real64 > const & B,
+		FArray1< Real64 > & C
 	);
 
 	void
 	DayltgPierceSurface(
 		int const ISurf, // Surface index
-		FArray1A< Real64 > const R1, // Point from which ray originates
-		FArray1A< Real64 > const RN, // Unit vector along in direction of ray whose
+		FArray1< Real64 > const & R1, // Point from which ray originates
+		FArray1< Real64 > const & RN, // Unit vector along in direction of ray whose
 		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		FArray1A< Real64 > CP, // Point that ray along RN intersects plane of surface
-		bool const = false // Disambiguation sentinel
+		FArray1< Real64 > & CP // Point that ray along RN intersects plane of surface
 	);
-
-	inline
-	void
-	DayltgPierceSurface(
-		int const ISurf, // Surface index
-		FArray1A< Real64 > const R1, // Point from which ray originates
-		FArray1S< Real64 > const & RN, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		FArray1A< Real64 > CP // Point that ray along RN intersects plane of surface
-	)
-	{
-		DayltgPierceSurface( ISurf, R1, FArray1D< Real64 >( RN ), IPIERC, CP, false );
-	}
-
-	inline
-	void
-	DayltgPierceSurface(
-		int const ISurf, // Surface index
-		FArray1A< Real64 > const R1, // Point from which ray originates
-		FArray1D< Real64 > const & RN, // Unit vector along in direction of ray whose
-		int & IPIERC, // =1 if line through point R1 in direction of unit vector
-		FArray1A< Real64 > CP // Point that ray along RN intersects plane of surface
-	)
-	{
-		DayltgPierceSurface( ISurf, R1, RN, IPIERC, CP, false );
-	}
 
 	void
 	DayltgHitObstruction(
@@ -610,7 +583,7 @@ namespace DaylightingManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

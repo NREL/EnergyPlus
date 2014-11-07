@@ -38,7 +38,7 @@ template< class A, typename T >
 std::ostream &
 operator <<( std::ostream & stream, MArray1< A, T > const & a )
 {
-	if ( ( stream ) && ( a.size() > 0u ) ) { // Write array to stream in row-major order
+	if ( ( stream ) && ( a.size() > 0u ) ) { // Write array to stream
 
 		// Types
 		using std::setw;
@@ -46,11 +46,11 @@ operator <<( std::ostream & stream, MArray1< A, T > const & a )
 
 		// Save current stream state and set persistent state
 		std::ios_base::fmtflags const old_flags( stream.flags() );
-		int const old_precision( stream.precision( Traits::precision() ) );
+		std::streamsize const old_precision( stream.precision( Traits::precision() ) );
 		stream << std::right << std::showpoint << std::uppercase;
 
 		// Output array to stream
-		int const w( Traits::width() );
+		int const w( Traits::iwidth() );
 		for ( int i = 1, e = a.u(); i < e; ++i ) {
 			stream << setw( w ) << a( i ) << ' ';
 			if ( ! stream ) break;

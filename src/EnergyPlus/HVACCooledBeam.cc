@@ -450,7 +450,7 @@ namespace HVACCooledBeam {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitCoolBeam" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -515,7 +515,7 @@ namespace HVACCooledBeam {
 
 			InWaterNode = CoolBeam( CBNum ).CWInNode;
 			OutWaterNode = CoolBeam( CBNum ).CWOutNode;
-			rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "InitCoolBeam" );
+			rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 			CoolBeam( CBNum ).MaxCoolWaterMassFlow = rho * CoolBeam( CBNum ).MaxCoolWaterVolFlow;
 			InitComponentNodes( 0.0, CoolBeam( CBNum ).MaxCoolWaterMassFlow, InWaterNode, OutWaterNode, CoolBeam( CBNum ).CWLoopNum, CoolBeam( CBNum ).CWLoopSideNum, CoolBeam( CBNum ).CWBranchNum, CoolBeam( CBNum ).CWCompNum );
 			MySizeFlag( CBNum ) = false;
@@ -625,6 +625,7 @@ namespace HVACCooledBeam {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		static std::string const RoutineName( "SizeCoolBeam" );
 		static int PltSizCoolNum( 0 ); // index of plant sizing object for the cooling loop
 		static int NumBeams( 0 ); // number of beams in the zone
 		static int Iter( 0 ); // beam length iteration index
@@ -699,9 +700,9 @@ namespace HVACCooledBeam {
 							DesCoilLoad = CpAir * RhoAir * DesAirVolFlow * ( FinalZoneSizing( CurZoneEqNum ).DesCoolCoilInTempTU - ZoneSizThermSetPtHi( CurZoneEqNum ) );
 						}
 
-						rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "SizeCoolBeam" );
+						rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-						Cp = GetSpecificHeatGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "SizeCoolBeam" );
+						Cp = GetSpecificHeatGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 						CoolBeam( CBNum ).MaxCoolWaterVolFlow = DesCoilLoad / ( ( CoolBeam( CBNum ).DesOutletWaterTemp - CoolBeam( CBNum ).DesInletWaterTemp ) * Cp * rho );
 						CoolBeam( CBNum ).MaxCoolWaterVolFlow = max( CoolBeam( CBNum ).MaxCoolWaterVolFlow, 0.0 );
@@ -724,7 +725,7 @@ namespace HVACCooledBeam {
 		}
 
 		if ( CoolBeam( CBNum ).NumBeams == AutoSize ) {
-			rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "SizeCoolBeam" );
+			rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 			NumBeams = int( CoolBeam( CBNum ).MaxCoolWaterVolFlow * rho / NomMassFlowPerBeam ) + 1;
 			CoolBeam( CBNum ).NumBeams = double( NumBeams );
@@ -738,15 +739,15 @@ namespace HVACCooledBeam {
 				CheckZoneSizing( CoolBeam( CBNum ).UnitType, CoolBeam( CBNum ).Name );
 
 				if ( PltSizCoolNum > 0 ) {
-					rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "SizeCoolBeam" );
+					rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-					Cp = GetSpecificHeatGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "SizeCoolBeam" );
+					Cp = GetSpecificHeatGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 					DesCoilLoad = CoolBeam( CBNum ).MaxCoolWaterVolFlow * ( CoolBeam( CBNum ).DesOutletWaterTemp - CoolBeam( CBNum ).DesInletWaterTemp ) * Cp * rho;
 					if ( DesCoilLoad > 0.0 ) {
 						DesLoadPerBeam = DesCoilLoad / NumBeams;
 						DesAirFlowPerBeam = CoolBeam( CBNum ).MaxAirVolFlow / NumBeams;
 						WaterVolFlowPerBeam = CoolBeam( CBNum ).MaxCoolWaterVolFlow / NumBeams;
-						WaterVel = WaterVolFlowPerBeam / ( Pi * std::pow( ( CoolBeam( CBNum ).InDiam ), 2 ) / 4.0 );
+						WaterVel = WaterVolFlowPerBeam / ( Pi * pow_2( CoolBeam( CBNum ).InDiam ) / 4.0 );
 						if ( FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak > 0.0 ) {
 							DT = FinalZoneSizing( CurZoneEqNum ).ZoneTempAtCoolPeak - 0.5 * ( CoolBeam( CBNum ).DesInletWaterTemp + CoolBeam( CBNum ).DesOutletWaterTemp );
 							if ( DT <= 0.0 ) {
@@ -980,7 +981,7 @@ namespace HVACCooledBeam {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcCoolBeam" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1015,9 +1016,9 @@ namespace HVACCooledBeam {
 		CWFlowPerBeam = mdot / CoolBeam( CBNum ).NumBeams;
 		TWIn = CoolBeam( CBNum ).TWIn;
 
-		Cp = GetSpecificHeatGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, TWIn, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "CalcCoolBeam" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, TWIn, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 
-		rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, TWIn, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, "CalcCoolBeam" );
+		rho = GetDensityGlycol( PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidName, TWIn, PlantLoop( CoolBeam( CBNum ).CWLoopNum ).FluidIndex, RoutineName );
 
 		TWOut = TWIn + 2.0;
 		ZTemp = Node( ZoneNode ).Temp;
@@ -1039,7 +1040,7 @@ namespace HVACCooledBeam {
 			DT = max( ZTemp - 0.5 * ( TWIn + TWOut ), 0.0 );
 			IndFlow = CoolBeam( CBNum ).K1 * std::pow( DT, CoolBeam( CBNum ).n ) + CoolBeam( CBNum ).Kin * CoolBeam( CBNum ).BeamFlow / CoolBeam( CBNum ).BeamLength;
 			CoilFlow = ( IndFlow / CoolBeam( CBNum ).a0 ) * StdRhoAir;
-			WaterVel = CWFlowPerBeam / ( rho * Pi * std::pow( ( CoolBeam( CBNum ).InDiam ), 2 ) / 4.0 );
+			WaterVel = CWFlowPerBeam / ( rho * Pi * pow_2( CoolBeam( CBNum ).InDiam ) / 4.0 );
 			if ( WaterVel > MinWaterVel ) {
 				K = CoolBeam( CBNum ).a * std::pow( DT, CoolBeam( CBNum ).n1 ) * std::pow( CoilFlow, CoolBeam( CBNum ).n2 ) * std::pow( WaterVel, CoolBeam( CBNum ).n3 );
 			} else {
@@ -1272,7 +1273,7 @@ namespace HVACCooledBeam {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

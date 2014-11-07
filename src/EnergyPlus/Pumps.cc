@@ -97,6 +97,9 @@ namespace Pumps {
 	int const PumpBank_ConSpeed( 105 );
 	FArray1D_string const cPumpTypes( {101,105}, { cPump_VarSpeed, cPump_ConSpeed, cPump_Cond, cPumpBank_VarSpeed, cPumpBank_ConSpeed } );
 
+	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const fluidNameWater( "WATER" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -280,6 +283,7 @@ namespace Pumps {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StartTemp( 100.0 ); // Standard Temperature across code to calculated Steam density
 		static std::string const RoutineName( "GetPumpInput: " );
+		static std::string const RoutineNameNoColon( "GetPumpInput" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PumpNum;
@@ -624,8 +628,8 @@ namespace Pumps {
 				PumpEquip( PumpNum ).NomVolFlowRate = AutoSize;
 			} else {
 				// Calc Condensate Pump Water Volume Flow Rate
-				SteamDensity = GetSatDensityRefrig( "STEAM", StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, "GetPumpInput" );
-				TempWaterDensity = GetDensityGlycol( "WATER", InitConvTemp, DummyWaterIndex, RoutineName );
+				SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameNoColon );
+				TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
 				PumpEquip( PumpNum ).NomVolFlowRate = ( PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity ) / TempWaterDensity;
 			}
 		}
@@ -994,8 +998,8 @@ namespace Pumps {
 		if ( PumpEquip( PumpNum ).PumpInitFlag && BeginEnvrnFlag ) {
 			if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
 
-				TempWaterDensity = GetDensityGlycol( "WATER", InitConvTemp, DummyWaterIndex, RoutineName );
-				SteamDensity = GetSatDensityRefrig( "STEAM", StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineName );
+				TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+				SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineName );
 				PumpEquip( PumpNum ).NomVolFlowRate = ( PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity ) / TempWaterDensity;
 
 				//set the maximum flow rate on the outlet node
@@ -1133,7 +1137,15 @@ namespace Pumps {
 
 		//User specified min/max mass flow rates for pump
 		PumpOverridableMaxLimit = PumpEquip( PumpNum ).MassFlowRateMax;
-		PumpMassFlowRateMinLimit = PumpEquip( PumpNum ).MassFlowRateMin;
+		
+		// override the user specified min to allow pump to turn off when no flow is required.
+		if ( PumpEquip( PumpNum ).LoopSolverOverwriteFlag == true ) {
+			PumpMassFlowRateMinLimit = 0.0;
+		}
+		else {
+			PumpMassFlowRateMinLimit = PumpEquip( PumpNum ).MassFlowRateMin;
+		}
+		
 
 		//The pump outlet node Min/MaxAvail
 		PumpMassFlowRateMin = max( InletNodeMin, PumpMassFlowRateMinLimit );
@@ -1403,7 +1415,7 @@ namespace Pumps {
 
 			VolFlowRate = PumpMassFlowRate / LoopDensity;
 			PartLoadRatio = min( 1.0, ( VolFlowRate / PumpEquip( PumpNum ).NomVolFlowRate ) );
-			FracFullLoadPower = PumpEquip( PumpNum ).PartLoadCoef( 1 ) + PumpEquip( PumpNum ).PartLoadCoef( 2 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) * std::pow( PartLoadRatio, 2 ) + PumpEquip( PumpNum ).PartLoadCoef( 4 ) * std::pow( PartLoadRatio, 3 );
+			FracFullLoadPower = PumpEquip( PumpNum ).PartLoadCoef( 1 ) + PumpEquip( PumpNum ).PartLoadCoef( 2 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) * pow_2( PartLoadRatio ) + PumpEquip( PumpNum ).PartLoadCoef( 4 ) * pow_3( PartLoadRatio );
 			Power = FracFullLoadPower * PumpEquip( PumpNum ).NomPowerUse;
 
 		} else if ( PumpType == PumpBank_ConSpeed || PumpType == PumpBank_VarSpeed ) {
@@ -1417,7 +1429,7 @@ namespace Pumps {
 			FullLoadPower = PumpEquip( PumpNum ).NomPowerUse / PumpEquip( PumpNum ).NumPumpsInBank;
 			FullLoadPowerRatio = PumpEquip( PumpNum ).PartLoadCoef( 1 ) + PumpEquip( PumpNum ).PartLoadCoef( 2 ) + PumpEquip( PumpNum ).PartLoadCoef( 3 ) + PumpEquip( PumpNum ).PartLoadCoef( 4 );
 			PartLoadRatio = min( 1.0, ( PartLoadVolFlowRate / FullLoadVolFlowRate ) );
-			FracFullLoadPower = PumpEquip( PumpNum ).PartLoadCoef( 1 ) + PumpEquip( PumpNum ).PartLoadCoef( 2 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) * std::pow( PartLoadRatio, 2 ) + PumpEquip( PumpNum ).PartLoadCoef( 4 ) * std::pow( PartLoadRatio, 3 );
+			FracFullLoadPower = PumpEquip( PumpNum ).PartLoadCoef( 1 ) + PumpEquip( PumpNum ).PartLoadCoef( 2 ) * PartLoadRatio + PumpEquip( PumpNum ).PartLoadCoef( 3 ) * pow_2( PartLoadRatio ) + PumpEquip( PumpNum ).PartLoadCoef( 4 ) * pow_3( PartLoadRatio );
 			Power = ( FullLoadPowerRatio * NumPumpsFullLoad + FracFullLoadPower ) * FullLoadPower;
 
 		}
@@ -1529,6 +1541,7 @@ namespace Pumps {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StartTemp( 100.0 ); // Standard Temperature across code to calculated Steam density
 		static std::string const RoutineName( "PlantPumps::InitSimVars " );
+		static std::string const RoutineNameSizePumps( "SizePumps" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1553,7 +1566,7 @@ namespace Pumps {
 		if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
 			TempWaterDensity = GetDensityGlycol( PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidName, InitConvTemp, PlantLoop( PumpEquip( PumpNum ).LoopNum ).FluidIndex, RoutineName );
 		} else {
-			TempWaterDensity = GetDensityGlycol( "WATER", InitConvTemp, DummyWaterIndex, RoutineName );
+			TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
 		}
 
 		// note: we assume pump impeller efficiency is 78% for autosizing
@@ -1594,8 +1607,8 @@ namespace Pumps {
 					if ( ! PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).BranchPumpsExist ) {
 						// size pump to full flow of plant loop
 						if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
-							TempWaterDensity = GetDensityGlycol( "WATER", InitConvTemp, DummyWaterIndex, RoutineName );
-							SteamDensity = GetSatDensityRefrig( "STEAM", StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, "SizePumps" );
+							TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameSizePumps );
 							PumpEquip( PumpNum ).NomSteamVolFlowRate = PlantSizData( PlantSizNum ).DesVolFlowRate * PumpSizFac;
 							PumpEquip( PumpNum ).NomVolFlowRate = PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
 						} else {
@@ -1605,8 +1618,8 @@ namespace Pumps {
 						// Distribute sizes evenly across all branch pumps
 						DesVolFlowRatePerBranch = PlantSizData( PlantSizNum ).DesVolFlowRate / PlantLoop( PumpEquip( PumpNum ).LoopNum ).LoopSide( Side ).TotalPumps;
 						if ( PumpEquip( PumpNum ).PumpType == Pump_Cond ) {
-							TempWaterDensity = GetDensityGlycol( "WATER", InitConvTemp, DummyWaterIndex, RoutineName );
-							SteamDensity = GetSatDensityRefrig( "STEAM", StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, "SizePumps" );
+							TempWaterDensity = GetDensityGlycol( fluidNameWater, InitConvTemp, DummyWaterIndex, RoutineName );
+							SteamDensity = GetSatDensityRefrig( fluidNameSteam, StartTemp, 1.0, PumpEquip( PumpNum ).FluidIndex, RoutineNameSizePumps );
 							PumpEquip( PumpNum ).NomSteamVolFlowRate = DesVolFlowRatePerBranch * PumpSizFac;
 							PumpEquip( PumpNum ).NomVolFlowRate = PumpEquip( PumpNum ).NomSteamVolFlowRate * SteamDensity / TempWaterDensity;
 						} else {
@@ -1864,8 +1877,8 @@ namespace Pumps {
 		//Calculate maximum and minimum mass flow rate associated with operating pressure range
 		if ( PumpEquip( PumpNum ).LoopNum > 0 ) {
 			if ( PlantLoop( LoopNum ).PressureEffectiveK > 0.0 ) {
-				PumpMassFlowRateMaxPress = std::pow( ( ( MaxPress ) / ( PlantLoop( LoopNum ).PressureEffectiveK ) ), 0.5 );
-				PumpMassFlowRateMinPress = std::pow( ( ( MinPress ) / ( PlantLoop( LoopNum ).PressureEffectiveK ) ), 0.5 );
+				PumpMassFlowRateMaxPress = std::sqrt( MaxPress / PlantLoop( LoopNum ).PressureEffectiveK );
+				PumpMassFlowRateMinPress = std::sqrt( MinPress / PlantLoop( LoopNum ).PressureEffectiveK );
 			}
 		}
 
@@ -1917,7 +1930,7 @@ namespace Pumps {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -70,6 +70,11 @@ public: // Types
 	typedef  typename Initializer::Function  InitializerFunction;
 
 	using Super::conformable;
+	using Super::isize1;
+	using Super::isize2;
+	using Super::isize3;
+	using Super::isize4;
+	using Super::isize5;
 	using Super::l;
 	using Super::operator ();
 	using Super::reassign;
@@ -105,58 +110,58 @@ public: // Creation
 	// Copy Constructor
 	inline
 	FArray5D( FArray5D const & a ) :
-		Super( a ),
-		ObserverMulti(),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ )
+	 Super( a ),
+	 ObserverMulti(),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ )
 	{
 		insert_as_observer();
 	}
 
 	// Copy Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray5D( FArray5D< U > const & a ) :
-		Super( a ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		I4_( a.I4_ ),
-		I5_( a.I5_ )
+	 Super( a ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 I4_( a.I4_ ),
+	 I5_( a.I5_ )
 	{
 		insert_as_observer();
 	}
 
 	// Super Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray5D( FArray5< U > const & a ) :
-		Super( a ),
-		I1_( a.I1() ),
-		I2_( a.I2() ),
-		I3_( a.I3() ),
-		I4_( a.I4() ),
-		I5_( a.I5() )
+	 Super( a ),
+	 I1_( a.I1() ),
+	 I2_( a.I2() ),
+	 I3_( a.I3() ),
+	 I4_( a.I4() ),
+	 I5_( a.I5() )
 	{
 		insert_as_observer();
 	}
 
 	// Slice Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	explicit
 	FArray5D( FArray5S< U > const & a ) :
-		Super( a ),
-		I1_( 1, a.u1() ),
-		I2_( 1, a.u2() ),
-		I3_( 1, a.u3() ),
-		I4_( 1, a.u4() ),
-		I5_( 1, a.u5() )
+	 Super( a ),
+	 I1_( 1, a.u1() ),
+	 I2_( 1, a.u2() ),
+	 I3_( 1, a.u3() ),
+	 I4_( 1, a.u4() ),
+	 I5_( 1, a.u5() )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -181,12 +186,12 @@ public: // Creation
 	inline
 	explicit
 	FArray5D( MArray5< A, M > const & a ) :
-		Super( a ),
-		I1_( 1, a.u1() ),
-		I2_( 1, a.u2() ),
-		I3_( 1, a.u3() ),
-		I4_( 1, a.u4() ),
-		I5_( 1, a.u5() )
+	 Super( a ),
+	 I1_( 1, a.u1() ),
+	 I2_( 1, a.u2() ),
+	 I3_( 1, a.u3() ),
+	 I4_( 1, a.u4() ),
+	 I5_( 1, a.u5() )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -212,7 +217,7 @@ public: // Creation
 	inline
 	explicit
 	FArray5D( Sticky< T > const & t ) :
-		initializer_( t )
+	 initializer_( t )
 	{
 		insert_as_observer();
 	}
@@ -220,12 +225,12 @@ public: // Creation
 	// IndexRange Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		insert_as_observer();
@@ -234,13 +239,13 @@ public: // Creation
 	// IndexRange + Initializer Value Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, T const & t ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -250,13 +255,13 @@ public: // Creation
 	// IndexRange + Sticky Initializer Value Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -266,13 +271,13 @@ public: // Creation
 	// IndexRange + Sticky Initializer Value + Initializer Value Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, T const & u ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -283,13 +288,13 @@ public: // Creation
 	// IndexRange + Initializer Function Constructor
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, InitializerFunction const & fxn ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( fxn )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( fxn )
 	{
 		setup_real();
 		initialize();
@@ -297,15 +302,15 @@ public: // Creation
 	}
 
 	// IndexRange + Initializer List Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, std::initializer_list< U > const l ) :
-		Super( l ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( l ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		assert( size_ == l.size() );
 		setup_real();
@@ -313,16 +318,16 @@ public: // Creation
 	}
 
 	// IndexRange + Sticky Initializer + Initializer List Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, std::initializer_list< U > const l ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		assert( size_ == l.size() );
 		setup_real();
@@ -332,15 +337,15 @@ public: // Creation
 	}
 
 	// IndexRange + Super Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, FArray5< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -355,16 +360,16 @@ public: // Creation
 	}
 
 	// IndexRange + Sticky Initializer + Super Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, Sticky< T > const & t, FArray5< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 ),
-		initializer_( t )
+	 Super( size_of( I1, I2, I3, I4, I5 ), InitializerSentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 ),
+	 initializer_( t )
 	{
 		setup_real();
 		initialize();
@@ -380,15 +385,15 @@ public: // Creation
 	}
 
 	// IndexRange + Slice Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, FArray5S< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -413,12 +418,12 @@ public: // Creation
 	template< class A, typename M >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, MArray5< A, M > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -442,15 +447,15 @@ public: // Creation
 	}
 
 	// Super + IndexRange Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( FArray5< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -465,15 +470,15 @@ public: // Creation
 	}
 
 	// IndexRange + Base Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5, FArray< U > const & a ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -488,15 +493,15 @@ public: // Creation
 	}
 
 	// Base + IndexRange Constructor Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< T, U >::value >::type >
 	inline
 	FArray5D( FArray< U > const & a, IR const & I1, IR const & I2, IR const & I3, IR const & I4, IR const & I5 ) :
-		Super( size_of( I1, I2, I3, I4, I5 ) ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		I4_( I4 ),
-		I5_( I5 )
+	 Super( size_of( I1, I2, I3, I4, I5 ) ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 I4_( I4 ),
+	 I5_( I5 )
 	{
 		setup_real();
 		if ( dimensions_initialized() ) {
@@ -537,7 +542,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5< U > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// Array Shape + Initializer Value Named Constructor Template
@@ -547,7 +552,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5< U > const & a, T const & t )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), t );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), t );
 	}
 
 	// Slice Shape Named Constructor Template
@@ -557,7 +562,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5S< U > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// Slice Shape + Initializer Value Named Constructor Template
@@ -567,7 +572,7 @@ public: // Creation
 	FArray5D
 	shape( FArray5S< U > const & a, T const & t )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), t );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), t );
 	}
 
 	// MArray Shape Named Constructor Template
@@ -577,7 +582,7 @@ public: // Creation
 	FArray5D
 	shape( MArray5< A, M > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// MArray Shape + Initializer Value Named Constructor Template
@@ -587,7 +592,7 @@ public: // Creation
 	FArray5D
 	shape( MArray5< A, M > const & a, T const & t )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), t );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), t );
 	}
 
 	// One-Based Copy Named Constructor Template
@@ -597,7 +602,7 @@ public: // Creation
 	FArray5D
 	one_based( FArray5< U > const & a )
 	{
-		return FArray5D( a, a.size1(), a.size2(), a.size3(), a.size4(), a.size5() );
+		return FArray5D( a, a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() );
 	}
 
 	// One-Based Slice Named Constructor Template
@@ -607,7 +612,7 @@ public: // Creation
 	FArray5D
 	one_based( FArray5S< U > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a );
 	}
 
 	// One-Based MArray Named Constructor Template
@@ -617,7 +622,7 @@ public: // Creation
 	FArray5D
 	one_based( MArray5< A, M > const & a )
 	{
-		return FArray5D( a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a );
+		return FArray5D( a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a );
 	}
 
 	// Destructor
@@ -626,7 +631,7 @@ public: // Creation
 	~FArray5D()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -653,7 +658,7 @@ public: // Assignment
 	}
 
 	// Super Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator =( FArray5< U > const & a )
@@ -664,7 +669,7 @@ public: // Assignment
 	}
 
 	// Slice Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator =( FArray5S< U > const & a )
@@ -684,7 +689,7 @@ public: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator =( std::initializer_list< U > const l )
@@ -694,7 +699,7 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator +=( FArray5< U > const & a )
@@ -704,7 +709,7 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator -=( FArray5< U > const & a )
@@ -714,7 +719,7 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator *=( FArray5< U > const & a )
@@ -724,7 +729,7 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator /=( FArray5< U > const & a )
@@ -734,7 +739,7 @@ public: // Assignment
 	}
 
 	// += Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator +=( FArray5S< U > const & a )
@@ -744,7 +749,7 @@ public: // Assignment
 	}
 
 	// -= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator -=( FArray5S< U > const & a )
@@ -754,7 +759,7 @@ public: // Assignment
 	}
 
 	// *= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator *=( FArray5S< U > const & a )
@@ -764,7 +769,7 @@ public: // Assignment
 	}
 
 	// /= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray5D &
 	operator /=( FArray5S< U > const & a )
@@ -787,7 +792,7 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray5D &
-	operator -=(  MArray5< A, M > const & a )
+	operator -=( MArray5< A, M > const & a )
 	{
 		Super::operator -=( a );
 		return *this;
@@ -797,7 +802,7 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray5D &
-	operator *=(  MArray5< A, M > const & a )
+	operator *=( MArray5< A, M > const & a )
 	{
 		Super::operator *=( a );
 		return *this;
@@ -807,18 +812,82 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray5D &
-	operator /=(  MArray5< A, M > const & a )
+	operator /=( MArray5< A, M > const & a )
 	{
 		Super::operator /=( a );
 		return *this;
 	}
+
+public: // Assignment: Array: Logical
+
+	// &&= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	and_equals( FArray5< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	or_equals( FArray5< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	and_equals( FArray5S< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray5D &
+	or_equals( FArray5S< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= MArray Template
+	template< class A, typename M >
+	inline
+	FArray5D &
+	and_equals( MArray5< A, M > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= MArray Template
+	template< class A, typename M >
+	inline
+	FArray5D &
+	or_equals( MArray5< A, M > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+public: // Assignment: Value
 
 	// = Value
 	inline
 	FArray5D &
 	operator =( T const & t )
 	{
-		Super::operator =( t );
+		Base::operator =( t );
 		return *this;
 	}
 
@@ -827,7 +896,7 @@ public: // Assignment
 	FArray5D &
 	operator +=( T const & t )
 	{
-		Super::operator +=( t );
+		Base::operator +=( t );
 		return *this;
 	}
 
@@ -836,7 +905,7 @@ public: // Assignment
 	FArray5D &
 	operator -=( T const & t )
 	{
-		Super::operator -=( t );
+		Base::operator -=( t );
 		return *this;
 	}
 
@@ -845,7 +914,7 @@ public: // Assignment
 	FArray5D &
 	operator *=( T const & t )
 	{
-		Super::operator *=( t );
+		Base::operator *=( t );
 		return *this;
 	}
 
@@ -854,7 +923,7 @@ public: // Assignment
 	FArray5D &
 	operator /=( T const & t )
 	{
-		Super::operator /=( t );
+		Base::operator /=( t );
 		return *this;
 	}
 
@@ -1061,6 +1130,14 @@ public: // Inspector
 	size5() const
 	{
 		return I5_.size();
+	}
+
+	// Size of Dimension 5
+	inline
+	int
+	isize5() const
+	{
+		return I5_.isize();
 	}
 
 public: // Modifier

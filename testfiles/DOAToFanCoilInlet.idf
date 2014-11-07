@@ -98,7 +98,7 @@
 ! Utility Tariffs:                None
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,8.1;
+  Version,8.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -2032,8 +2032,15 @@
     0.003,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ZoneSum;                 !- System Outdoor Air Method
 
 !-   ===========  ALL OBJECTS IN CLASS: SIZING:PLANT ===========
@@ -2412,7 +2419,7 @@
   Fan:ConstantVolume,
     SPACE1-1 Supply Fan,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2423,7 +2430,7 @@
   Fan:ConstantVolume,
     SPACE2-1 Supply Fan,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2434,7 +2441,7 @@
   Fan:ConstantVolume,
     SPACE3-1 Supply Fan,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2445,7 +2452,7 @@
   Fan:ConstantVolume,
     SPACE4-1 Supply Fan,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2456,7 +2463,7 @@
   Fan:ConstantVolume,
     SPACE5-1 Supply Fan,     !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     75,                      !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2469,7 +2476,7 @@
   Fan:VariableVolume,
     DOAS Supply Fan,         !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     1000,                    !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -3683,7 +3690,7 @@
     Hot Water Loop HW Demand Outlet,  !- Demand Side Outlet Node Name
     Hot Water Loop HW Demand Side Branches,  !- Demand Side Branch List Name
     Hot Water Loop HW Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     ,                        !- Availability Manager List Name
     SingleSetpoint;          !- Plant Loop Demand Calculation Scheme
 
@@ -3706,7 +3713,7 @@
     Chilled Water Loop ChW Demand Outlet,  !- Demand Side Outlet Node Name
     Chilled Water Loop ChW Demand Side Branches,  !- Demand Side Branch List Name
     Chilled Water Loop ChW Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     ,                        !- Availability Manager List Name
     SingleSetpoint,          !- Plant Loop Demand Calculation Scheme
     None;                    !- Common Pipe Simulation
@@ -3732,7 +3739,7 @@
     Chilled Water Loop CndW Demand Outlet,  !- Demand Side Outlet Node Name
     Chilled Water Loop CndW Demand Side Branches,  !- Condenser Demand Side Branch List Name
     Chilled Water Loop CndW Demand Side Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
 !-   ===========  ALL OBJECTS IN CLASS: PLANTEQUIPMENTLIST ===========
 

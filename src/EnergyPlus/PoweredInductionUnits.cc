@@ -105,6 +105,9 @@ namespace PoweredInductionUnits {
 	int const HCoilType_SimpleHeating( 3 );
 	int const HCoilType_SteamAirHeating( 4 );
 
+	static std::string const fluidNameSteam( "STEAM" );
+	static std::string const fluidNameWater( "WATER" );
+
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -632,7 +635,7 @@ namespace PoweredInductionUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitPIU" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -701,7 +704,7 @@ namespace PoweredInductionUnits {
 			HotConNode = PIU( PIUNum ).HotControlNode;
 			if ( HotConNode > 0 ) {
 				//plant upgrade note? why no separate handling of steam coil? add it ?
-				rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60., PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, "InitPIU" );
+				rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 				PIU( PIUNum ).MaxHotWaterFlow = rho * PIU( PIUNum ).MaxVolHotWaterFlow;
 				PIU( PIUNum ).MinHotWaterFlow = rho * PIU( PIUNum ).MinVolHotWaterFlow;
@@ -833,7 +836,7 @@ namespace PoweredInductionUnits {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizePIU" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1111,8 +1114,8 @@ namespace PoweredInductionUnits {
 								DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
 								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 
-								rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60., PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, "SizePIU" );
-								Cp = GetSpecificHeatGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60., PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, "SizePIU" );
+								rho = GetDensityGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidName, 60.0, PlantLoop( PIU( PIUNum ).HWLoopNum ).FluidIndex, RoutineName );
 
 								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
 							} else {
@@ -1173,11 +1176,11 @@ namespace PoweredInductionUnits {
 								DesMassFlow = StdRhoAir * TermUnitSizing( CurZoneEqNum ).AirVolFlow;
 								DesCoilLoad = PsyCpAirFnWTdb( CoilOutHumRat, 0.5 * ( CoilInTemp + CoilOutTemp ) ) * DesMassFlow * ( CoilOutTemp - CoilInTemp );
 								TempSteamIn = 100.00;
-								EnthSteamInDry = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 1.0, PIU( PIUNum ).HCoil_FluidIndex, "SizePIU" );
-								EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", TempSteamIn, 0.0, PIU( PIUNum ).HCoil_FluidIndex, "SizePIU" );
+								EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, PIU( PIUNum ).HCoil_FluidIndex, RoutineName );
+								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, PIU( PIUNum ).HCoil_FluidIndex, RoutineName );
 								LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-								SteamDensity = GetSatDensityRefrig( "STEAM", TempSteamIn, 1.0, PIU( PIUNum ).HCoil_FluidIndex, "SizePIU" );
-								Cp = GetSpecificHeatGlycol( "WATER", PlantSizData( PltSizHeatNum ).ExitTemp, DummyWaterIndex, "SizePIU" );
+								SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, PIU( PIUNum ).HCoil_FluidIndex, RoutineName );
+								Cp = GetSpecificHeatGlycol( fluidNameWater, PlantSizData( PltSizHeatNum ).ExitTemp, DummyWaterIndex, RoutineName );
 								MaxVolHotSteamFlowDes = DesCoilLoad / ( SteamDensity * ( LatentHeatSteam + PlantSizData( PltSizHeatNum ).DeltaT * Cp ) );
 							} else {
 								MaxVolHotSteamFlowDes = 0.0;
@@ -1871,7 +1874,7 @@ namespace PoweredInductionUnits {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

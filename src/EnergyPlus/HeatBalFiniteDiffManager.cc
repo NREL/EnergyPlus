@@ -157,9 +157,9 @@ namespace HeatBalFiniteDiffManager {
 	//                                                                 ! before CR 8280 -- Qdryout         !HeatFlux on Surface for reporting for Sensible only
 
 	int CondFDSchemeType( FullyImplicitFirstOrder ); // solution scheme for CondFD - default
-	Real64 SpaceDescritConstant( 3. ); // spatial descritization constant,
-	Real64 MinTempLimit( -100. ); // lower limit check, degree C
-	Real64 MaxTempLimit( 100. ); // upper limit check, degree C
+	Real64 SpaceDescritConstant( 3.0 ); // spatial descritization constant,
+	Real64 MinTempLimit( -100.0 ); // lower limit check, degree C
+	Real64 MaxTempLimit( 100.0 ); // upper limit check, degree C
 	//feb2012 INTEGER   :: MaxGSiter = 200  ! maximum number of Gauss Seidel iterations
 	int MaxGSiter( 30 ); // maximum number of Gauss Seidel iterations
 	Real64 fracTimeStepZone_Hour( 0.0 );
@@ -845,7 +845,7 @@ namespace HeatBalFiniteDiffManager {
 					//check for Material layers that are too thin and highly conductivity (not appropriate for surface models)
 					if ( Alpha > HighDiffusivityThreshold && ! Material( CurrentLayer ).WarnedForHighDiffusivity ) {
 						DeltaTimestep = TimeStepZone * SecInHour;
-						ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3. );
+						ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 						if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
 							ShowSevereError( "InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too highly conductive," " material name = " + Material( CurrentLayer ).Name );
 							ShowContinueError( "High conductivity Material layers are not well supported by Conduction Finite Difference, " " material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
@@ -876,8 +876,8 @@ namespace HeatBalFiniteDiffManager {
 
 				dxn = Material( CurrentLayer ).Thickness / double( Ipts1 ); // full node thickness
 
-				StabilityTemp = Alpha * Delt / std::pow( dxn, 2 );
-				StabilityMoist = mAlpha * Delt / std::pow( dxn, 2 );
+				StabilityTemp = Alpha * Delt / pow_2( dxn );
+				StabilityMoist = mAlpha * Delt / pow_2( dxn );
 				ConstructFD( ConstrNum ).TempStability( Layer ) = StabilityTemp;
 				ConstructFD( ConstrNum ).MoistStability( Layer ) = StabilityMoist;
 				ConstructFD( ConstrNum ).DelX( Layer ) = dxn;
@@ -1251,7 +1251,8 @@ namespace HeatBalFiniteDiffManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1273,17 +1274,17 @@ namespace HeatBalFiniteDiffManager {
 		static gio::Fmt const Format_701( "(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)" );
 		static gio::Fmt const Format_702( "(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)" );
 
-		gio::write( OutputFileInits, "(A)" ) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant," "Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
-		gio::write( OutputFileInits, "(A)" ) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType( CondFDSchemeType ) + ',' + RoundSigDigits( SpaceDescritConstant, 2 ) + ',' + RoundSigDigits( CondFDRelaxFactorInput, 2 ) + ',' + RoundSigDigits( MaxAllowedDelTempCondFD, 4 );
+		gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant," "Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
+		gio::write( OutputFileInits, fmtA ) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType( CondFDSchemeType ) + ',' + RoundSigDigits( SpaceDescritConstant, 2 ) + ',' + RoundSigDigits( CondFDRelaxFactorInput, 2 ) + ',' + RoundSigDigits( MaxAllowedDelTempCondFD, 4 );
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
 		if ( DoReport ) {
 
 			//                                      Write Descriptions
-			gio::write( OutputFileInits, "(A)" ) << "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}";
-			gio::write( OutputFileInits, "(A)" ) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X," "Layer Alpha*Delt/Delx**2,Layer Moisture Stability";
+			gio::write( OutputFileInits, fmtA ) << "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}";
+			gio::write( OutputFileInits, fmtA ) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X," "Layer Alpha*Delt/Delx**2,Layer Moisture Stability";
 			//HT Algo issue
-			if ( any_eq( HeatTransferAlgosUsed, UseCondFD ) ) gio::write( OutputFileInits, "(A)" ) << "! <ConductionFiniteDifference Node>,Node Identifier, " " Node Distance From Outside Face {m}, Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
+			if ( any_eq( HeatTransferAlgosUsed, UseCondFD ) ) gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference Node>,Node Identifier, " " Node Distance From Outside Face {m}, Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
 				if ( Construct( ThisNum ).TypeIsWindow ) continue;
@@ -1302,7 +1303,7 @@ namespace HeatBalFiniteDiffManager {
 					OutwardMatLayerNum = Layer - 1;
 					for ( LayerNode = 1; LayerNode <= ConstructFD( ThisNum ).NodeNumPoint( Layer ); ++LayerNode ) {
 						++Inodes;
-						gio::write( InodesChar, "*" ) << Inodes;
+						gio::write( InodesChar, fmtLD ) << Inodes;
 						if ( Inodes == 1 ) {
 							gio::write( OutputFileInits, Format_702 ) << "Node #" + stripped( InodesChar ) << RoundSigDigits( ConstructFD( ThisNum ).NodeXlocation( Inodes ), 8 ) << Construct( ThisNum ).Name << "Surface Outside Face" << ConstructFD( ThisNum ).Name( Layer );
 
@@ -1322,7 +1323,7 @@ namespace HeatBalFiniteDiffManager {
 
 				Layer = Construct( ThisNum ).TotLayers;
 				++Inodes;
-				gio::write( InodesChar, "*" ) << Inodes;
+				gio::write( InodesChar, fmtLD ) << Inodes;
 				gio::write( OutputFileInits, Format_702 ) << "Node #" + stripped( InodesChar ) << RoundSigDigits( ConstructFD( ThisNum ).NodeXlocation( Inodes ), 8 ) << Construct( ThisNum ).Name << ConstructFD( ThisNum ).Name( Layer ) << "Surface Inside Face";
 
 			}
@@ -1597,14 +1598,14 @@ namespace HeatBalFiniteDiffManager {
 
 				kto = Material( MatLay ).Conductivity; //  20C base conductivity
 				kt1 = MaterialFD( MatLay ).tk1; //  linear coefficient (normally zero)
-				kt = kto + kt1 * ( ( TDT( i ) + TDT( i + 1 ) ) / 2. - 20. );
+				kt = kto + kt1 * ( ( TDT( i ) + TDT( i + 1 ) ) / 2.0 - 20.0 );
 
 				if ( sum( MaterialFD( MatLay ).TempCond( {1,3}, 2 ) ) >= 0.0 ) { // Multiple Linear Segment Function
 
 					DepVarCol = 2; // thermal conductivity
 					IndVarCol = 1; //temperature
 					//  Use average temp of surface and first node for k
-					kt = terpld( MaterialFD( MatLay ).numTempCond, MaterialFD( MatLay ).TempCond, ( TDT( i ) + TDT( i + 1 ) ) / 2., IndVarCol, DepVarCol );
+					kt = terpld( MaterialFD( MatLay ).numTempCond, MaterialFD( MatLay ).TempCond, ( TDT( i ) + TDT( i + 1 ) ) / 2.0, IndVarCol, DepVarCol );
 
 				}
 
@@ -1665,7 +1666,7 @@ namespace HeatBalFiniteDiffManager {
 
 						} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 							//   First Order
-							TDT( i ) = ( 2.0 * Delt * DelX * QRadSWOutFD + Cp * std::pow( DelX, 2 ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hgnd * Tgnd + 2.0 * Delt * DelX * hconvo * Toa + 2.0 * Delt * DelX * hrad * Toa + 2.0 * Delt * DelX * hsky * Tsky ) / ( 2.0 * Delt * DelX * hconvo + 2.0 * Delt * DelX * hgnd + 2.0 * Delt * DelX * hrad + 2.0 * Delt * DelX * hsky + 2.0 * Delt * kt + Cp * std::pow( DelX, 2 ) * RhoS );
+							TDT( i ) = ( 2.0 * Delt * DelX * QRadSWOutFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hgnd * Tgnd + 2.0 * Delt * DelX * hconvo * Toa + 2.0 * Delt * DelX * hrad * Toa + 2.0 * Delt * DelX * hsky * Tsky ) / ( 2.0 * Delt * DelX * hconvo + 2.0 * Delt * DelX * hgnd + 2.0 * Delt * DelX * hrad + 2.0 * Delt * DelX * hsky + 2.0 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
 
 						}}
 
@@ -1684,11 +1685,11 @@ namespace HeatBalFiniteDiffManager {
 						// Wall first node temperature behind Movable insulation
 						{ auto const SELECT_CASE_var( CondFDSchemeType );
 						if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
-							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * std::pow( DelX, 2 ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * std::pow( DelX, 2 ) * RhoS );
+							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
 
 						} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 							// Currently same as Crank Nicholson, need fully implicit formulation
-							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * std::pow( DelX, 2 ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * std::pow( DelX, 2 ) * RhoS );
+							TDT( i ) = ( 2 * Delt * DelX * QRadSWOutFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2 * Delt * kt * TDT( i + 1 ) + 2 * Delt * DelX * HMovInsul * TInsulOut ) / ( 2 * Delt * DelX * HMovInsul + 2 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
 
 						}}
 
@@ -1944,13 +1945,13 @@ namespace HeatBalFiniteDiffManager {
 
 		kt1o = Material( MatLay ).Conductivity;
 		kt11 = MaterialFD( MatLay ).tk1;
-		kt1 = kt1o + kt11 * ( ( TDT( i ) + TDT( i - 1 ) ) / 2. - 20. );
+		kt1 = kt1o + kt11 * ( ( TDT( i ) + TDT( i - 1 ) ) / 2.0 - 20.0 );
 
 		if ( sum( MaterialFD( MatLay ).TempCond( {1,3}, 2 ) ) >= 0.0 ) { // Multiple Linear Segment Function
 
 			IndVarCol = 1; // temperature
 			DepVarCol = 2; // thermal conductivity
-			kt1 = terpld( MaterialFD( MatLay ).numTempCond, MaterialFD( MatLay ).TempCond, ( TDT( i ) + TDT( i - 1 ) ) / 2., IndVarCol, DepVarCol );
+			kt1 = terpld( MaterialFD( MatLay ).numTempCond, MaterialFD( MatLay ).TempCond, ( TDT( i ) + TDT( i - 1 ) ) / 2.0, IndVarCol, DepVarCol );
 
 		}
 
@@ -1961,13 +1962,13 @@ namespace HeatBalFiniteDiffManager {
 
 		kt2o = Material( MatLay2 ).Conductivity;
 		kt21 = MaterialFD( MatLay2 ).tk1;
-		kt2 = kt2o + kt21 * ( ( TDT( i ) + TDT( i + 1 ) ) / 2. - 20. );
+		kt2 = kt2o + kt21 * ( ( TDT( i ) + TDT( i + 1 ) ) / 2.0 - 20.0 );
 
 		if ( sum( MaterialFD( MatLay2 ).TempCond( {1,3}, 2 ) ) >= 0.0 ) { // Multiple Linear Segment Function
 
 			IndVarCol = 1; // temperature
 			DepVarCol = 2; // thermal conductivity
-			kt2 = terpld( MaterialFD( MatLay2 ).numTempCond, MaterialFD( MatLay2 ).TempCond, ( TDT( i ) + TDT( i + 1 ) ) / 2., IndVarCol, DepVarCol );
+			kt2 = terpld( MaterialFD( MatLay2 ).numTempCond, MaterialFD( MatLay2 ).TempCond, ( TDT( i ) + TDT( i + 1 ) ) / 2.0, IndVarCol, DepVarCol );
 
 		}
 
@@ -2024,11 +2025,11 @@ namespace HeatBalFiniteDiffManager {
 				{ auto const SELECT_CASE_var( CondFDSchemeType );
 				if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
 
-					TDT( i ) = ( 2. * Delt * Delx2 * QSSFlux * Rlayer - Delt * Delx2 * TD( i ) - Delt * kt2 * Rlayer * TD( i ) + Cp2 * std::pow( Delx2, 2 ) * RhoS2 * Rlayer * TD( i ) + Delt * Delx2 * TD( i - 1 ) + Delt * kt2 * Rlayer * TD( i + 1 ) + Delt * Delx2 * TDT( i - 1 ) + Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( Delt * Delx2 + Delt * kt2 * Rlayer + Cp2 * std::pow( Delx2, 2. ) * RhoS2 * Rlayer );
+					TDT( i ) = ( 2.0 * Delt * Delx2 * QSSFlux * Rlayer - Delt * Delx2 * TD( i ) - Delt * kt2 * Rlayer * TD( i ) + Cp2 * pow_2( Delx2 ) * RhoS2 * Rlayer * TD( i ) + Delt * Delx2 * TD( i - 1 ) + Delt * kt2 * Rlayer * TD( i + 1 ) + Delt * Delx2 * TDT( i - 1 ) + Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( Delt * Delx2 + Delt * kt2 * Rlayer + Cp2 * pow_2( Delx2 ) * RhoS2 * Rlayer );
 
 				} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 
-					TDT( i ) = ( 2. * Delt * Delx2 * QSSFlux * Rlayer + Cp2 * std::pow( Delx2, 2 ) * RhoS2 * Rlayer * TD( i ) + 2. * Delt * Delx2 * TDT( i - 1 ) + 2. * Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( 2. * Delt * Delx2 + 2. * Delt * kt2 * Rlayer + Cp2 * std::pow( Delx2, 2. ) * RhoS2 * Rlayer );
+					TDT( i ) = ( 2.0 * Delt * Delx2 * QSSFlux * Rlayer + Cp2 * pow_2( Delx2 ) * RhoS2 * Rlayer * TD( i ) + 2.0 * Delt * Delx2 * TDT( i - 1 ) + 2.0 * Delt * kt2 * Rlayer * TDT( i + 1 ) ) / ( 2.0 * Delt * Delx2 + 2.0 * Delt * kt2 * Rlayer + Cp2 * pow_2( Delx2 ) * RhoS2 * Rlayer );
 
 				}}
 
@@ -2060,9 +2061,9 @@ namespace HeatBalFiniteDiffManager {
 				{ auto const SELECT_CASE_var( CondFDSchemeType );
 
 				if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
-					TDT( i ) = ( 2. * Delt * Delx1 * QSSFlux * Rlayer2 - Delt * Delx1 * TD( i ) - Delt * kt1 * Rlayer2 * TD( i ) + Cp1 * std::pow( Delx1, 2 ) * RhoS1 * Rlayer2 * TD( i ) + Delt * kt1 * Rlayer2 * TD( i - 1 ) + Delt * Delx1 * TD( i + 1 ) + Delt * kt1 * Rlayer2 * TDT( i - 1 ) + Delt * Delx1 * TDT( i + 1 ) ) / ( Delt * Delx1 + Delt * kt1 * Rlayer2 + Cp1 * std::pow( Delx1, 2 ) * RhoS1 * Rlayer2 );
+					TDT( i ) = ( 2.0 * Delt * Delx1 * QSSFlux * Rlayer2 - Delt * Delx1 * TD( i ) - Delt * kt1 * Rlayer2 * TD( i ) + Cp1 * pow_2( Delx1 ) * RhoS1 * Rlayer2 * TD( i ) + Delt * kt1 * Rlayer2 * TD( i - 1 ) + Delt * Delx1 * TD( i + 1 ) + Delt * kt1 * Rlayer2 * TDT( i - 1 ) + Delt * Delx1 * TDT( i + 1 ) ) / ( Delt * Delx1 + Delt * kt1 * Rlayer2 + Cp1 * pow_2( Delx1 ) * RhoS1 * Rlayer2 );
 				} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
-					TDT( i ) = ( 2. * Delt * Delx1 * QSSFlux * Rlayer2 + Cp1 * std::pow( Delx1, 2 ) * RhoS1 * Rlayer2 * TD( i ) + 2. * Delt * kt1 * Rlayer2 * TDT( i - 1 ) + 2. * Delt * Delx1 * TDT( i + 1 ) ) / ( 2. * Delt * Delx1 + 2. * Delt * kt1 * Rlayer2 + Cp1 * std::pow( Delx1, 2 ) * RhoS1 * Rlayer2 );
+					TDT( i ) = ( 2.0 * Delt * Delx1 * QSSFlux * Rlayer2 + Cp1 * pow_2( Delx1 ) * RhoS1 * Rlayer2 * TD( i ) + 2.0 * Delt * kt1 * Rlayer2 * TDT( i - 1 ) + 2.0 * Delt * Delx1 * TDT( i + 1 ) ) / ( 2.0 * Delt * Delx1 + 2.0 * Delt * kt1 * Rlayer2 + Cp1 * pow_2( Delx1 ) * RhoS1 * Rlayer2 );
 
 				}}
 
@@ -2133,11 +2134,11 @@ namespace HeatBalFiniteDiffManager {
 
 				if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
 					//     Regular Internal Interface Node with Source/sink using Adams Moulton second order
-					TDT( i ) = ( 2. * Delt * Delx1 * Delx2 * QSSFlux - Delt * Delx2 * kt1 * TD( i ) - Delt * Delx1 * kt2 * TD( i ) + Cp1 * std::pow( Delx1, 2. ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * std::pow( Delx2, 2. ) * RhoS2 * TD( i ) + Delt * Delx2 * kt1 * TD( i - 1 ) + Delt * Delx1 * kt2 * TD( i + 1 ) + Delt * Delx2 * kt1 * TDT( i - 1 ) + Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( Delt * Delx2 * kt1 + Delt * Delx1 * kt2 + Cp1 * std::pow( Delx1, 2. ) * Delx2 * RhoS1 + Cp2 * Delx1 * std::pow( Delx2, 2. ) * RhoS2 );
+					TDT( i ) = ( 2.0 * Delt * Delx1 * Delx2 * QSSFlux - Delt * Delx2 * kt1 * TD( i ) - Delt * Delx1 * kt2 * TD( i ) + Cp1 * pow_2( Delx1 ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * pow_2( Delx2 ) * RhoS2 * TD( i ) + Delt * Delx2 * kt1 * TD( i - 1 ) + Delt * Delx1 * kt2 * TD( i + 1 ) + Delt * Delx2 * kt1 * TDT( i - 1 ) + Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( Delt * Delx2 * kt1 + Delt * Delx1 * kt2 + Cp1 * pow_2( Delx1 ) * Delx2 * RhoS1 + Cp2 * Delx1 * pow_2( Delx2 ) * RhoS2 );
 
 				} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 					// first order adams moulton
-					TDT( i ) = ( 2. * Delt * Delx1 * Delx2 * QSSFlux + Cp1 * std::pow( Delx1, 2. ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * std::pow( Delx2, 2. ) * RhoS2 * TD( i ) + 2. * Delt * Delx2 * kt1 * TDT( i - 1 ) + 2. * Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( 2. * Delt * Delx2 * kt1 + 2. * Delt * Delx1 * kt2 + Cp1 * std::pow( Delx1, 2. ) * Delx2 * RhoS1 + Cp2 * Delx1 * std::pow( Delx2, 2. ) * RhoS2 );
+					TDT( i ) = ( 2.0 * Delt * Delx1 * Delx2 * QSSFlux + Cp1 * pow_2( Delx1 ) * Delx2 * RhoS1 * TD( i ) + Cp2 * Delx1 * pow_2( Delx2 ) * RhoS2 * TD( i ) + 2.0 * Delt * Delx2 * kt1 * TDT( i - 1 ) + 2.0 * Delt * Delx1 * kt2 * TDT( i + 1 ) ) / ( 2.0 * Delt * Delx2 * kt1 + 2.0 * Delt * Delx1 * kt2 + Cp1 * pow_2( Delx1 ) * Delx2 * RhoS1 + Cp2 * Delx1 * pow_2( Delx2 ) * RhoS2 );
 
 				}}
 
@@ -2276,7 +2277,7 @@ namespace HeatBalFiniteDiffManager {
 			//  Set Thermal Conductivity.  Can be constant, simple linear temp dep or multiple linear segment temp function dep.
 			kto = Material( MatLay ).Conductivity; //  20C base conductivity
 			kt1 = MaterialFD( MatLay ).tk1; //  linear coefficient (normally zero)
-			kt = kto + kt1 * ( ( TDT( i ) + TDT( i - 1 ) ) / 2. - 20. );
+			kt = kto + kt1 * ( ( TDT( i ) + TDT( i - 1 ) ) / 2.0 - 20.0 );
 
 			if ( sum( MaterialFD( MatLay ).TempCond( {1,3}, 2 ) ) >= 0.0 ) { // Multiple Linear Segment Function
 
@@ -2337,20 +2338,20 @@ namespace HeatBalFiniteDiffManager {
 
 					if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
 						// Adams-Moulton second order
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * std::pow( DelX, 2 ) * RhoS * TD( i ) + Delt * kt * TD( i + 1 ) + Delt * kt * TDT( i + 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * std::pow( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * pow_2( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i + 1 ) + Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * pow_2( DelX ) * RhoS );
 
 					} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
 						// Adams-Moulton First order
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD + Cp * std::pow( DelX, 2 ) * RhoS * TD( i ) + 2. * Delt * kt * TDT( i + 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( 2. * Delt * DelX * hconvi + 2. * Delt * kt + Cp * std::pow( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i + 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( 2.0 * Delt * DelX * hconvi + 2.0 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
 					}}
 
 				} else { // for regular or interzone walls
 					{ auto const SELECT_CASE_var( CondFDSchemeType );
 
 					if ( SELECT_CASE_var == CrankNicholsonSecondOrder ) {
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * std::pow( DelX, 2 ) * RhoS * TD( i ) + Delt * kt * TD( i - 1 ) + Delt * kt * TDT( i - 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * std::pow( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD - Delt * DelX * hconvi * TD( i ) - Delt * kt * TD( i ) + Cp * pow_2( DelX ) * RhoS * TD( i ) + Delt * kt * TD( i - 1 ) + Delt * kt * TDT( i - 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( Delt * DelX * hconvi + Delt * kt + Cp * pow_2( DelX ) * RhoS );
 					} else if ( SELECT_CASE_var == FullyImplicitFirstOrder ) {
-						TDT( i ) = ( 2. * Delt * DelX * NetLWRadToSurfFD + 2. * Delt * DelX * QHtRadSysSurfFD + 2. * Delt * DelX * QHWBaseboardSurfFD + 2. * Delt * DelX * QSteamBaseboardSurfFD + 2. * Delt * DelX * QElecBaseboardSurfFD + 2. * Delt * DelX * QRadSWInFD + 2. * Delt * DelX * QRadThermInFD + Cp * std::pow( DelX, 2 ) * RhoS * TD( i ) + 2. * Delt * kt * TDT( i - 1 ) + 2. * Delt * DelX * hconvi * Tia ) / ( 2. * Delt * DelX * hconvi + 2. * Delt * kt + Cp * std::pow( DelX, 2 ) * RhoS );
+						TDT( i ) = ( 2.0 * Delt * DelX * NetLWRadToSurfFD + 2.0 * Delt * DelX * QHtRadSysSurfFD + 2.0 * Delt * DelX * QHWBaseboardSurfFD + 2.0 * Delt * DelX * QSteamBaseboardSurfFD + 2.0 * Delt * DelX * QElecBaseboardSurfFD + 2.0 * Delt * DelX * QRadSWInFD + 2.0 * Delt * DelX * QRadThermInFD + Cp * pow_2( DelX ) * RhoS * TD( i ) + 2.0 * Delt * kt * TDT( i - 1 ) + 2.0 * Delt * DelX * hconvi * Tia ) / ( 2.0 * Delt * DelX * hconvi + 2.0 * Delt * kt + Cp * pow_2( DelX ) * RhoS );
 					}}
 				}
 
@@ -2499,7 +2500,7 @@ namespace HeatBalFiniteDiffManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -80,6 +80,8 @@ namespace TARCOGOutput {
 	std::string const VersionNumber( " 7.0.15.00 " );
 	std::string const VersionCompileDateCC( " August 02, 2012" );
 
+	static gio::Fmt const fmtLD( "*" );
+
 	// Functions
 
 	void
@@ -292,10 +294,10 @@ namespace TARCOGOutput {
 
 		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
 
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 		//  write(InArgumentsFile, 10001) VersionNumber, VersionCompileDateCC
 		gio::write( InArgumentsFile, Format_1001 ) << DATE_TIME( 1 ) << DATE_TIME( 2 ) << DATE_TIME( 3 ) << DATE_TIME( 5 ) << DATE_TIME( 6 ) << DATE_TIME( 7 );
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 
 		if ( winID == -1 ) {
 			gio::write( InArgumentsFile, Format_1002 ) << winID;
@@ -309,11 +311,11 @@ namespace TARCOGOutput {
 			gio::write( InArgumentsFile, Format_1007 ) << iguID;
 		}
 
-		gio::write( InArgumentsFile, "*" ) << "    Debug dir:     " + DBGD;
+		gio::write( InArgumentsFile, fmtLD ) << "    Debug dir:     " + DBGD;
 
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 		gio::write( InArgumentsFile, Format_1000 );
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 		gio::write( InArgumentsFile, Format_1005 );
 		gio::write( InArgumentsFile, Format_1010 ) << tout << tout - KelvinConv;
 		gio::write( InArgumentsFile, Format_1015 ) << tind << tind - KelvinConv;
@@ -357,7 +359,7 @@ namespace TARCOGOutput {
 		//    if (ThermalMod.eq.THERM_MOD_CSM)
 		//        write(InArgumentsFile, 10740) SDScalar
 
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 
 		gio::write( InArgumentsFile, Format_1075 );
 		gio::write( InArgumentsFile, Format_1076 ) << height;
@@ -366,7 +368,7 @@ namespace TARCOGOutput {
 		gio::write( InArgumentsFile, Format_1079 ) << tilt;
 		gio::write( InArgumentsFile, Format_1080 ) << totsol;
 		gio::write( InArgumentsFile, Format_1081 ) << nlayer;
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 
 		gio::write( InArgumentsFile, Format_1089 );
 		for ( i = 1; i <= nlayer; ++i ) {
@@ -436,7 +438,7 @@ namespace TARCOGOutput {
 			}
 		} // i - layers
 
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 
 		gio::write( InArgumentsFile, Format_1110 );
 
@@ -479,7 +481,7 @@ namespace TARCOGOutput {
 			//end if  ! MGAS = 1 - "table" gasses
 		} // i - gas loop
 
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 		gio::write( InArgumentsFile, Format_1198 );
 
 		//close(InArgumentsFile)
@@ -583,9 +585,9 @@ namespace TARCOGOutput {
 		//        position=FilePosition, form='formatted', iostat=nperr)
 		//if (nperr.ne.0)  open(unit=InArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
 		//        position=FilePosition, form='formatted', iostat=nperr)
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 		gio::write( InArgumentsFile, Format_1014 );
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 		gio::write( InArgumentsFile, Format_1055 ) << esky;
 		gio::write( InArgumentsFile, Format_1016 ) << trmout << trmout - KelvinConv;
 		gio::write( InArgumentsFile, Format_1020 ) << trmin << trmin - KelvinConv;
@@ -593,7 +595,7 @@ namespace TARCOGOutput {
 		gio::write( InArgumentsFile, Format_10191 ) << ebroom;
 		gio::write( InArgumentsFile, Format_1017 ) << Gout;
 		gio::write( InArgumentsFile, Format_1018 ) << Gin;
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 
 		for ( i = 1; i <= nlayer; ++i ) {
 			if ( LayerType( i ) == VENETBLIND ) { // SD layer
@@ -602,7 +604,7 @@ namespace TARCOGOutput {
 				gio::write( InArgumentsFile, Format_1091 ) << scon( i );
 			}
 		}
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 
 		gio::write( InArgumentsFile, Format_1013 );
 		for ( i = 1; i <= nlayer + 1; ++i ) { // loop through gaps:
@@ -619,7 +621,7 @@ namespace TARCOGOutput {
 				gio::write( InArgumentsFile, Format_1134 ) << xwght( j );
 			} // j - gas mix
 		} // i - gaps
-		gio::write( InArgumentsFile, "*" );
+		gio::write( InArgumentsFile, fmtLD );
 		gio::write( InArgumentsFile, Format_1198 );
 		//close(InArgumentsFile)
 
@@ -773,11 +775,11 @@ namespace TARCOGOutput {
 		//if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode, &
 		//      position=FilePosition, form='formatted', iostat=nperr)
 		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2000 ) << DATE_TIME( 1 ) << DATE_TIME( 2 ) << DATE_TIME( 3 ) << DATE_TIME( 5 ) << DATE_TIME( 6 ) << DATE_TIME( 7 );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2350 );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2105 ) << tamb << tamb - KelvinConv;
 		gio::write( OutArgumentsFile, Format_2180 ) << q( 1 );
 
@@ -830,13 +832,13 @@ namespace TARCOGOutput {
 
 		gio::write( OutArgumentsFile, Format_2115 ) << troom << troom - KelvinConv;
 
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 
 		//Simon: Write energy balances on layer surfaces
 		gio::write( OutArgumentsFile, Format_4350 );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_4205 ) << ebsky << Gout;
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 
 		for ( i = 1; i <= nlayer; ++i ) {
 			{ auto const SELECT_CASE_var( LayerType( i ) );
@@ -871,43 +873,43 @@ namespace TARCOGOutput {
 				gio::write( OutArgumentsFile, Format_4121 );
 				gio::write( OutArgumentsFile, Format_4120 ) << i << Ebb( i ) << i << Rb( i );
 			}}
-			gio::write( OutArgumentsFile, "*" );
+			gio::write( OutArgumentsFile, fmtLD );
 		}
 
 		gio::write( OutArgumentsFile, Format_4215 ) << ebroom << Gin;
 
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2351 );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2120 ) << ufactor;
 		gio::write( OutArgumentsFile, Format_2130 ) << shgc;
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2132 ) << sc;
 		gio::write( OutArgumentsFile, Format_2170 ) << hflux;
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2131 ) << shgct;
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2140 ) << hcin << hrin << hcin + hrin;
 		gio::write( OutArgumentsFile, Format_2150 ) << hcout << hrout << hcout + hrout;
 
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		for ( i = 1; i <= nlayer - 1; ++i ) {
 			gio::write( OutArgumentsFile, Format_2155 ) << i << Ra( i ) << i << Nu( i );
 		}
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2330 ) << ShadeEmisRatioIn << ShadeEmisRatioOut;
 		gio::write( OutArgumentsFile, Format_2331 ) << ShadeHcRatioIn << ShadeHcRatioOut;
 		gio::write( OutArgumentsFile, Format_2332 ) << HcUnshadedIn << HcUnshadedOut;
 
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		for ( i = 2; i <= nlayer; ++i ) {
 			gio::write( OutArgumentsFile, Format_2160 ) << i << hcgas( i ) << i << hrgas( i );
 		}
 
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, "('  Error Tolerance = ', e12.6)" ) << AchievedErrorTolerance;
 
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, "('  Number of Iterations = ', i6)" ) << NumOfIter;
 
 		//  write(OutArgumentsFile, *)
@@ -983,21 +985,21 @@ namespace TARCOGOutput {
 		//if (nperr.ne.0)  open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', access=FileMode,  &
 		//      position=FilePosition, form='formatted', iostat=nperr)
 		date_and_time_string( real_CLOCK( 1 ), real_CLOCK( 2 ), real_CLOCK( 3 ), DATE_TIME );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2000 ) << DATE_TIME( 1 ) << DATE_TIME( 2 ) << DATE_TIME( 3 ) << DATE_TIME( 5 ) << DATE_TIME( 6 ) << DATE_TIME( 7 );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2351 );
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2120 ) << ufactor;
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		gio::write( OutArgumentsFile, Format_2220 ) << hout << hin;
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		for ( i = 1; i <= nlayer - 1; ++i ) {
 			gio::write( OutArgumentsFile, Format_2155 ) << i << Ra( i ) << i << Nu( i );
 		}
-		gio::write( OutArgumentsFile, "*" );
+		gio::write( OutArgumentsFile, fmtLD );
 		for ( i = 1; i <= nlayer - 1; ++i ) {
 			gio::write( OutArgumentsFile, Format_2230 ) << i << hg( i ) << i << hr( i ) << i << hs( i );
 		}
@@ -1373,7 +1375,7 @@ namespace TARCOGOutput {
 		gio::write( WINCogFile, Format_900 );
 		gio::write( WINCogFile, Format_113 );
 		//  write(WINCogFile, 1198)
-		gio::write( WINCogFile, "*" );
+		gio::write( WINCogFile, fmtLD );
 
 		//close(WINCogFile)
 
@@ -1412,7 +1414,7 @@ namespace TARCOGOutput {
 			//if (ferr.ne.0) open(unit=OutArgumentsFile,  file=DebugOutputFileName,  status='unknown', position='APPEND',  &
 			//      &  form='formatted', iostat=ferr)
 
-			gio::write( OutArgumentsFile, "*" );
+			gio::write( OutArgumentsFile, fmtLD );
 			if ( ( nperr > 0 ) && ( nperr < 1000 ) ) {
 				gio::write( OutArgumentsFile, Format_2362 ) << nperr;
 			} else if ( ( nperr >= 1000 ) ) {
@@ -1421,7 +1423,7 @@ namespace TARCOGOutput {
 				gio::write( OutArgumentsFile, Format_2360 ) << nperr;
 			}
 
-			gio::write( OutArgumentsFile, "*" );
+			gio::write( OutArgumentsFile, fmtLD );
 			gio::write( OutArgumentsFile, Format_1199 );
 			gio::write( OutArgumentsFile, Format_1199 );
 
@@ -1554,7 +1556,7 @@ namespace TARCOGOutput {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

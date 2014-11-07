@@ -92,6 +92,8 @@ namespace DualDuct {
 	int const PerPersonDCVByCurrentLevel( 21 );
 	int const PerPersonByDesignLevel( 22 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS
 
 	//MODULE VARIABLE DECLARATIONS:
@@ -1745,6 +1747,7 @@ namespace DualDuct {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		bool const UseMinOASchFlag( true ); // Always use min OA schedule in calculations.
+		static std::string const RoutineName( "HVACDualDuctSystem:CalcOAOnlyMassFlow" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1780,7 +1783,7 @@ namespace DualDuct {
 
 		OAVolumeFlowRate = CalcDesignSpecificationOutdoorAir( Damper( DamperNum ).OARequirementsPtr, Damper( DamperNum ).ActualZoneNum, UseOccSchFlag, UseMinOASchFlag, PerPersonNotSet );
 
-		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, "HVACDualDuctSystem:CalcOAOnlyMassFlow" );
+		RhoAir = PsyRhoAirFnPbTdbW( Node( Damper( DamperNum ).OutletNodeNum ).Press, Node( Damper( DamperNum ).OutletNodeNum ).Temp, Node( Damper( DamperNum ).OutletNodeNum ).HumRat, RoutineName );
 
 		OAMassFlow = OAVolumeFlowRate * RhoAir;
 
@@ -1858,6 +1861,21 @@ namespace DualDuct {
 			Node( OutletNode ).Quality = Node( HotInletNode ).Quality;
 			Node( OutletNode ).Press = Node( HotInletNode ).Press;
 
+			if ( Contaminant.CO2Simulation ) {
+				if ( Node( OutletNode ).MassFlowRate > 0.0 ) {
+					Node( OutletNode ).CO2 = ( Node( HotInletNode ).CO2 * Node( HotInletNode ).MassFlowRate + Node( ColdInletNode ).CO2 * Node( ColdInletNode ).MassFlowRate) / Node( OutletNode ).MassFlowRate;
+				} else {
+					Node( OutletNode ).CO2 = max( Node( HotInletNode ).CO2, Node( ColdInletNode ).CO2);
+				}
+			}
+			if ( Contaminant.GenericContamSimulation ) {
+				if ( Node( OutletNode ).MassFlowRate > 0.0) {
+					Node( OutletNode ).GenContam = ( Node( HotInletNode ).GenContam * Node( HotInletNode ).MassFlowRate + Node( ColdInletNode ).GenContam * Node( ColdInletNode ).MassFlowRate ) / Node( OutletNode ).MassFlowRate;
+				}
+				else {
+					Node( OutletNode ).GenContam = max( Node( HotInletNode ).GenContam, Node( ColdInletNode ).GenContam );
+				}
+			}
 		} else if ( Damper( DamperNum ).DamperType == DualDuct_OutdoorAir ) {
 
 			OutletNode = Damper( DamperNum ).OutletNodeNum;
@@ -1878,13 +1896,34 @@ namespace DualDuct {
 			// FIX THIS LATER!!!!
 			Node( OutletNode ).Quality = Node( OAInletNode ).Quality;
 			Node( OutletNode ).Press = Node( OAInletNode ).Press;
-		}
 
-		if ( Contaminant.CO2Simulation ) {
-			Node( OutletNode ).CO2 = max( Node( HotInletNode ).CO2, Node( ColdInletNode ).CO2 );
-		}
-		if ( Contaminant.GenericContamSimulation ) {
-			Node( OutletNode ).GenContam = max( Node( HotInletNode ).GenContam, Node( ColdInletNode ).GenContam );
+			if ( Damper( DamperNum ).RecircIsUsed ) {
+				if ( Node( OutletNode ).MassFlowRate > 0.0 ){
+					if ( Contaminant.CO2Simulation ) {
+						Node( OutletNode ).CO2 = ( Node( OAInletNode ).CO2 * Node( OAInletNode ).MassFlowRate + Node( RAInletNode ).CO2 * Node( RAInletNode ).MassFlowRate ) / Node( OutletNode ).MassFlowRate;
+					}
+					if ( Contaminant.GenericContamSimulation ) {
+						Node( OutletNode ).GenContam = ( Node( OAInletNode ).GenContam * Node( OAInletNode ).MassFlowRate + Node( RAInletNode ).GenContam * Node( RAInletNode ).MassFlowRate ) / Node( OutletNode ).MassFlowRate;
+					}
+				}
+				else {
+					if ( Contaminant.CO2Simulation ) {
+						Node( OutletNode ).CO2 = max( Node( OAInletNode ).CO2, Node( RAInletNode ).CO2 );
+					}
+					if ( Contaminant.GenericContamSimulation ) {
+						Node( OutletNode ).GenContam = max( Node( OAInletNode ).GenContam, Node( RAInletNode ).GenContam );
+					}
+				}
+
+			} else {
+				if ( Contaminant.CO2Simulation ) {
+					Node( OutletNode ).CO2 = Node( OAInletNode ).CO2;
+				}
+				if ( Contaminant.GenericContamSimulation ) {
+					Node( OutletNode ).GenContam = Node( OAInletNode ).GenContam;
+				}
+			}
+
 		}
 
 	}
@@ -1988,13 +2027,14 @@ namespace DualDuct {
 		static gio::Fmt const Format_100( "('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')" );
 		static gio::Fmt const Format_101( "(A)" );
 		static gio::Fmt const Format_102( "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet Node Type>,<AirLoopHVAC Name>')" );
+		static gio::Fmt const fmtLD( "*" );
 
 		if ( ! allocated( Damper ) ) return; //Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDampers either set >0 or uninitialized
 
 		//Report Dual Duct Dampers to BND File
 		gio::write( OutputFileBNDetails, Format_101 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_100 );
-		gio::write( ChrOut, "*" ) << NumDampers * 2;
+		gio::write( ChrOut, fmtLD ) << NumDampers * 2;
 		gio::write( OutputFileBNDetails, Format_101 ) << " #Dual Duct Damper Connections," + stripped( ChrOut );
 		gio::write( OutputFileBNDetails, Format_102 );
 
@@ -2034,7 +2074,7 @@ namespace DualDuct {
 			}
 			if ( Found == 0 ) ChrName = "**Unknown**";
 
-			gio::write( ChrOut, "*" ) << Count1;
+			gio::write( ChrOut, fmtLD ) << Count1;
 			if ( Damper( Count1 ).DamperType == DualDuct_ConstantVolume ) {
 				DamperType = cCMO_DDConstantVolume;
 			} else if ( Damper( Count1 ).DamperType == DualDuct_VariableVolume ) {
@@ -2162,7 +2202,7 @@ namespace DualDuct {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

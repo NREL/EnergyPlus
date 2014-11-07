@@ -566,7 +566,8 @@ namespace ICEngineElectricGenerator {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat (J/kg-K)
-		Real64 const KJtoJ( 1000. ); // convert Kjoules to joules
+		Real64 const KJtoJ( 1000.0 ); // convert Kjoules to joules
+		static std::string const RoutineName( "CalcICEngineGeneratorModel" );
 
 		// DERIVED TYPE DEFINITIONS
 
@@ -615,7 +616,7 @@ namespace ICEngineElectricGenerator {
 		if ( ICEngineGenerator( GeneratorNum ).HeatRecActive ) {
 			HeatRecInNode = ICEngineGenerator( GeneratorNum ).HeatRecInletNodeNum;
 			HeatRecInTemp = Node( HeatRecInNode ).Temp;
-			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, "CalcICEngineGeneratorModel" );
+			HeatRecCp = GetSpecificHeatGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 			HeatRecMdot = Node( HeatRecInNode ).MassFlowRate;
 
 		} else {
@@ -712,6 +713,7 @@ namespace ICEngineElectricGenerator {
 			}
 		} else {
 			QExhaustRec = 0.0;
+			//Bug ExhaustStackTemp not set but used below
 		}
 
 		QTotalHeatRecovered = QExhaustRec + QLubeOilRec + QJacketRec;
@@ -787,7 +789,7 @@ namespace ICEngineElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcICEngineGeneratorModel" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -808,7 +810,7 @@ namespace ICEngineElectricGenerator {
 		HRecRatio = 1.0;
 
 		HeatRecInTemp = Node( HeatRecInNode ).Temp;
-		HeatRecCp = GetSpecificHeatGlycol( PlantLoop( ICEngineGenerator( Num ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( ICEngineGenerator( Num ).HRLoopNum ).FluidIndex, "CalcICEngineGeneratorModel" );
+		HeatRecCp = GetSpecificHeatGlycol( PlantLoop( ICEngineGenerator( Num ).HRLoopNum ).FluidName, HeatRecInTemp, PlantLoop( ICEngineGenerator( Num ).HRLoopNum ).FluidIndex, RoutineName );
 
 		//Don't divide by zero - Note This also results in no heat recovery when
 		//  design Mdot for Heat Recovery - Specified on Chiller Input - is zero
@@ -889,7 +891,7 @@ namespace ICEngineElectricGenerator {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitICEngineGenerators" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -936,7 +938,7 @@ namespace ICEngineElectricGenerator {
 			HeatRecOutletNode = ICEngineGenerator( GeneratorNum ).HeatRecOutletNodeNum;
 
 			//size mass flow rate
-			rho = GetDensityGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, "InitICEngineGenerators" );
+			rho = GetDensityGlycol( PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidName, InitConvTemp, PlantLoop( ICEngineGenerator( GeneratorNum ).HRLoopNum ).FluidIndex, RoutineName );
 
 			ICEngineGenerator( GeneratorNum ).DesignHeatRecMassFlowRate = rho * ICEngineGenerator( GeneratorNum ).DesignHeatRecVolFlowRate;
 			ICEngineGenerator( GeneratorNum ).HeatRecMdotDesign = ICEngineGenerator( GeneratorNum ).DesignHeatRecMassFlowRate;

@@ -4,12 +4,13 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
-#include <ObjexxFCL/gio_Fmt.hh>
 #include <ObjexxFCL/Optional.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
 #include <DataGlobals.hh>
+#include <UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -34,8 +35,6 @@ namespace InputProcessor {
 	extern std::string::size_type const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
 	extern std::string::size_type const MaxFieldNameLength; // Maximum number of characters in a field name string
 	extern std::string const Blank;
-	extern std::string const AlphaNum; // Valid indicators for Alpha or Numeric fields (A or N)
-	extern gio::Fmt const fmta;
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
 
@@ -103,7 +102,6 @@ namespace InputProcessor {
 	extern bool RequiredObject; // Set to true when ReadInputLine has a required object
 	extern bool UniqueObject; // Set to true when ReadInputLine has a unique object
 	extern bool ExtensibleObject; // Set to true when ReadInputLine has an extensible object
-	extern bool StripCR; // If true, strip last character (<cr> off each schedule:file line)
 	extern int ExtensibleNumFields; // set to number when ReadInputLine has an extensible object
 	extern FArray1D_bool IDFRecordsGotten; // Denotes that this record has been "gotten" from the IDF
 
@@ -523,17 +521,26 @@ namespace InputProcessor {
 		std::string::size_type & CurPos,
 		bool & BlankLine,
 		int & InputLineLength,
+		bool & EndofFile
+	);
+
+	void
+	ReadInputLine(
+		int const UnitNumber,
+		std::string::size_type & CurPos,
+		bool & BlankLine,
+		int & InputLineLength,
 		bool & EndofFile,
-		Optional_bool MinMax = _,
-		Optional_int WhichMinMax = _, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max< //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_string MinMaxString = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional< Real64 > Value = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool Default = _,
-		Optional_string DefString = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool AutoSizable = _,
-		Optional_bool AutoCalculatable = _,
-		Optional_bool RetainCase = _, //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_bool ErrorsFound = _ //Autodesk:OPTIONAL Used without PRESENT check
+		bool & MinMax,
+		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+		std::string & MinMaxString,
+		Real64 & Value,
+		bool & Default,
+		std::string & DefString,
+		bool & AutoSizable,
+		bool & AutoCalculatable,
+		bool & RetainCase,
+		bool & ErrorsFound
 	);
 
 	void
@@ -550,7 +557,7 @@ namespace InputProcessor {
 
 	void
 	ProcessMinMaxDefLine(
-		std::string const & UCInputLine, // part of input line starting \min or \max
+		std::string const & partLine, // part of input line starting \min or \max
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		std::string & MinMaxString,
 		Real64 & Value,
@@ -574,7 +581,10 @@ namespace InputProcessor {
 		int const NumItems
 	)
 	{
-		return FindItemInList( String, FArray1D_string( ListOfItems ), NumItems );
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( String == ListOfItems( Count ) ) return Count;
+		}
+		return 0; // Not found
 	}
 
 	int
@@ -593,7 +603,24 @@ namespace InputProcessor {
 		int const NumItems
 	)
 	{
-		return FindItemInSortedList( String, FArray1D_string( ListOfItems ), NumItems );
+		int Probe( 0 );
+		int LBnd( 0 );
+		int UBnd( NumItems + 1 );
+		bool Found( false );
+		while ( ( ! Found ) || ( Probe != 0 ) ) {
+			Probe = ( UBnd - LBnd ) / 2;
+			if ( Probe == 0 ) break;
+			Probe += LBnd;
+			if ( equali( String, ListOfItems( Probe ) ) ) {
+				Found = true;
+				break;
+			} else if ( lessthani( String, ListOfItems( Probe ) ) ) {
+				UBnd = Probe;
+			} else {
+				LBnd = Probe;
+			}
+		}
+		return Probe;
 	}
 
 	int
@@ -612,17 +639,50 @@ namespace InputProcessor {
 		int const NumItems
 	)
 	{
-		return FindItem( String, FArray1D_string( ListOfItems ), NumItems );
+		int const item_number( FindItemInList( String, ListOfItems, NumItems ) );
+		if ( item_number != 0 ) return item_number;
+		for ( int Count = 1; Count <= NumItems; ++Count ) {
+			if ( equali( String, ListOfItems( Count ) ) ) return Count;
+		}
+		return 0; // Not found
 	}
 
 	std::string
 	MakeUPPERCase( std::string const & InputString ); // Input String
 
+	typedef char const * c_cstring;
+
+	inline
 	bool
-	SameString(
-		std::string const & TestString1, // First String to Test
-		std::string const & TestString2 // Second String to Test
-	);
+	SameString( std::string const & s, std::string const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( std::string const & s, c_cstring const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( c_cstring const & s, std::string const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
+
+	inline
+	bool
+	SameString( c_cstring const & s, c_cstring const & t )
+	{
+		// case insensitive comparison
+		return equali( s, t );
+	}
 
 	void
 	VerifyName(
@@ -645,8 +705,25 @@ namespace InputProcessor {
 		bool & IsBlank,
 		std::string const & StringToDisplay
 	)
-	{
-		VerifyName( NameToVerify, FArray1D_string( NamesList ), NumOfNames, ErrorFound, IsBlank, StringToDisplay );
+	{ // Overload for member arrays: Implemented here to avoid copy to FArray_string to forward to other VerifyName
+		int Found;
+
+		ErrorFound = false;
+		if ( NumOfNames > 0 ) {
+			Found = FindItem( NameToVerify, NamesList, NumOfNames ); // Calls FindItem overload that accepts member arrays
+			if ( Found != 0 ) {
+				ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify );
+				ErrorFound = true;
+			}
+		}
+
+		if ( NameToVerify.empty() ) {
+			ShowSevereError( StringToDisplay + ", cannot be blank" );
+			ErrorFound = true;
+			IsBlank = true;
+		} else {
+			IsBlank = false;
+		}
 	}
 
 	void
@@ -797,7 +874,7 @@ namespace InputProcessor {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

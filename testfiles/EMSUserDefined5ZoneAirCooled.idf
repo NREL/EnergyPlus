@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Building,                !- Name
@@ -1895,8 +1895,15 @@
     0.008,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0,                       !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0,                       !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:Plant,
@@ -3092,7 +3099,7 @@
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
-    0.7,                     !- Fan Efficiency
+    0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
     Fraction,                !- Fan Power Minimum Flow Rate Input Method
@@ -3208,7 +3215,7 @@
     HW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Heating Demand Side Branches,  !- Demand Side Branch List Name
     Heating Demand Side Connectors,  !- Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:Scheduled,
     Hot Water Loop Setpoint Manager,  !- Name
@@ -3534,7 +3541,7 @@
     CW Demand Outlet Node,   !- Demand Side Outlet Node Name
     Cooling Demand Side Branches,  !- Demand Side Branch List Name
     Cooling Demand Side Connectors,  !- Demand Side Connector List Name
-    SEQUENTIAL,              !- Load Distribution Scheme
+    SequentialLoad,          !- Load Distribution Scheme
     CW Avail List;           !- Availability Manager List Name
 
   AvailabilityManagerAssignmentList,
@@ -4180,16 +4187,16 @@
     HW_Tin,                  !- <none>
     HW_Cp,                   !- <none>
     HW_Tout,                 !- <none>
-    HW_MdotRequest,          !- Extended Field
-    Zone_T,                  !- Extended Field
-    Zone_W,                  !- Extended Field
-    Space1ATU_DesignAirMdot, !- Extended Field
-    Space2ATU_DesignAirMdot, !- Extended Field
-    Space3ATU_DesignAirMdot, !- Extended Field
-    Space4ATU_DesignAirMdot, !- Extended Field
-    Space5ATU_DesignAirMdot, !- Extended Field
-    Zone_Tsp_Cool,           !- Extended Field
-    Zone_Tsp_Heat;           !- Extended Field
+    HW_MdotRequest,          !- <none>
+    Zone_T,                  !- <none>
+    Zone_W,                  !- <none>
+    Space1ATU_DesignAirMdot, !- <none>
+    Space2ATU_DesignAirMdot, !- <none>
+    Space3ATU_DesignAirMdot, !- <none>
+    Space4ATU_DesignAirMdot, !- <none>
+    Space5ATU_DesignAirMdot, !- <none>
+    Zone_Tsp_Cool,           !- <none>
+    Zone_Tsp_Heat;           !- <none>
 
   EnergyManagementSystem:InternalVariable,
     Space1ATU_HeatAirMdot,   !- Name

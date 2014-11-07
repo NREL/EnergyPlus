@@ -44,10 +44,10 @@ namespace DataPrecisionGlobals {
 	Real64 const constant_one( 1.0 );
 	Real64 const constant_minusone( -1.0 );
 	Real64 const constant_twenty( 20.0 );
-	Real64 const constant_pointfive( .5 );
-	Real64 const EXP_LowerLimit( -20. ); // In IVF=2.061153622438558d-009 - used 20
+	Real64 const constant_pointfive( 0.5 );
+	Real64 const EXP_LowerLimit( -20.0 ); // In IVF=2.061153622438558d-009 - used 20
 	// because it's already used in other parts of the code
-	Real64 const EXP_UpperLimit( 40. ); // In IVF=2.353852668370200d+017
+	Real64 const EXP_UpperLimit( 40.0 ); // In IVF=2.353852668370200d+017
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -65,7 +65,7 @@ namespace DataPrecisionGlobals {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

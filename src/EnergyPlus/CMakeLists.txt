@@ -1,9 +1,13 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
+# public API headers go in the src/EnergyPlus/public folder
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
+
 if(MSVC)
-  add_definitions(/Za)
+#  add_definitions(/Za)
 endif()
 
+configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
 
 SET( SRC
   Timer.h
@@ -137,7 +141,7 @@ SET( SRC
   DataShadowingCombinations.hh
   DataSizing.cc
   DataSizing.hh
-  DataStringGlobals.cc
+  "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc"
   DataStringGlobals.hh
   DataSurfaceColors.cc
   DataSurfaceColors.hh
@@ -289,8 +293,6 @@ SET( SRC
   Humidifiers.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
-  ISO_C_FUNCTION_BINDING.cc
-  ISO_C_FUNCTION_BINDING.hh
   IceThermalStorage.cc
   IceThermalStorage.hh
   InputProcessor.cc
@@ -399,8 +401,6 @@ SET( SRC
   RootFinder.hh
   RuntimeLanguageProcessor.cc
   RuntimeLanguageProcessor.hh
-  SQLiteFortranRoutines.cc
-  SQLiteFortranRoutines.hh
   SQLiteProcedures.cc
   SQLiteProcedures.hh
   ScheduleManager.cc
@@ -519,17 +519,52 @@ SET( SRC
   ZonePlenum.hh
   ZoneTempPredictorCorrector.cc
   ZoneTempPredictorCorrector.hh
-  main.cc
-  main.hh
 )
 
-ADD_EXECUTABLE(EnergyPlus ${SRC})
+# first we will create a static library of EnergyPlus
+# this will be linked statically to create the DLL and also the unit tests
+add_library( EnergyPlusLib STATIC ${SRC} )
+target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( EnergyPlusLib dl )
+endif()
 
-#TARGET_LINK_LIBRARIES( EnergyPlus sqlite )
-#TARGET_LINK_LIBRARIES( EnergyPlus bcvtb )
-#TARGET_LINK_LIBRARIES( EnergyPlus epexpat )
-#TARGET_LINK_LIBRARIES( EnergyPlus epfmiimport)
-#TARGET_LINK_LIBRARIES( EnergyPlus DElight )
-TARGET_LINK_LIBRARIES( EnergyPlus objexx )
+# second we will create the shared library that is actually packaged with EnergyPlus
+add_library( EnergyPlusAPI SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+if (UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
+target_link_libraries( EnergyPlusAPI EnergyPlusLib )
+set_target_properties(
+  EnergyPlusAPI
+  PROPERTIES
+  INSTALL_NAME_DIR "@executable_path"
+)
+install( TARGETS EnergyPlusAPI 
+  RUNTIME DESTINATION ./ 
+  LIBRARY DESTINATION ./ 
+)
 
-INSTALL( TARGETS EnergyPlus DESTINATION ./ )
+add_executable( EnergyPlus main.cc )
+target_link_libraries( EnergyPlus EnergyPlusAPI )
+
+set_target_properties(EnergyPlus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(EnergyPlusAPI PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+
+install( TARGETS EnergyPlus EnergyPlusAPI DESTINATION ./ )
+
+if( BUILD_TESTING )
+  # Build the test executable
+  add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
+  target_link_libraries( TestEnergyPlusCallbacks EnergyPlusAPI )
+  add_test(NAME "integration.TestEnergyPlusCallbacks" 
+           COMMAND ${CMAKE_COMMAND} 
+           -DSOURCE_DIR=${CMAKE_SOURCE_DIR} 
+           -DBINARY_DIR=${CMAKE_BINARY_DIR} 
+           -DIDF_FILE=1ZoneUncontrolled.idf
+           -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
+           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+endif()
+

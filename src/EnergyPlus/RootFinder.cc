@@ -2724,6 +2724,8 @@ namespace RootFinder {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2737,25 +2739,25 @@ namespace RootFinder {
 		// FLOW:
 
 		// UNIT=0 should correspond to the standard output file (screen).
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, "(A)", flags ) << "Current = "; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, fmtA, flags ) << "Current = "; }
 		WritePoint( FileUnit, RootFinderData.CurrentPoint, true );
-		gio::write( FileUnit, "*" );
+		gio::write( FileUnit, fmtLD );
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, "(A)", flags ) << "Min     = "; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, fmtA, flags ) << "Min     = "; }
 		WritePoint( FileUnit, RootFinderData.MinPoint, true );
-		gio::write( FileUnit, "*" );
+		gio::write( FileUnit, fmtLD );
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, "(A)", flags ) << "Lower   = "; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, fmtA, flags ) << "Lower   = "; }
 		WritePoint( FileUnit, RootFinderData.LowerPoint, false );
-		gio::write( FileUnit, "*" );
+		gio::write( FileUnit, fmtLD );
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, "(A)", flags ) << "Upper   = "; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, fmtA, flags ) << "Upper   = "; }
 		WritePoint( FileUnit, RootFinderData.UpperPoint, false );
-		gio::write( FileUnit, "*" );
+		gio::write( FileUnit, fmtLD );
 
-		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, "(A)", flags ) << "Max     = "; }
+		{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( FileUnit, fmtA, flags ) << "Max     = "; }
 		WritePoint( FileUnit, RootFinderData.MaxPoint, true );
-		gio::write( FileUnit, "*" );
+		gio::write( FileUnit, fmtLD );
 
 	}
 
@@ -2786,7 +2788,7 @@ namespace RootFinder {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2801,30 +2803,30 @@ namespace RootFinder {
 
 		{ auto const SELECT_CASE_var( RootFinderData.StatusFlag );
 		if ( SELECT_CASE_var == iStatusOK ) {
-			gio::write( FileUnit, "(A)" ) << "Found unconstrained root";
+			gio::write( FileUnit, fmtA ) << "Found unconstrained root";
 		} else if ( SELECT_CASE_var == iStatusOKMin ) {
-			gio::write( FileUnit, "(A)" ) << "Found min constrained root";
+			gio::write( FileUnit, fmtA ) << "Found min constrained root";
 		} else if ( SELECT_CASE_var == iStatusOKMax ) {
-			gio::write( FileUnit, "(A)" ) << "Found max constrained root";
+			gio::write( FileUnit, fmtA ) << "Found max constrained root";
 		} else if ( SELECT_CASE_var == iStatusOKRoundOff ) {
-			gio::write( FileUnit, "(A)" ) << "Detected round-off convergence in bracket";
+			gio::write( FileUnit, fmtA ) << "Detected round-off convergence in bracket";
 
 		} else if ( SELECT_CASE_var == iStatusWarningSingular ) {
-			gio::write( FileUnit, "(A)" ) << "Detected singularity warning";
+			gio::write( FileUnit, fmtA ) << "Detected singularity warning";
 		} else if ( SELECT_CASE_var == iStatusWarningNonMonotonic ) {
-			gio::write( FileUnit, "(A)" ) << "Detected non-monotonicity warning";
+			gio::write( FileUnit, fmtA ) << "Detected non-monotonicity warning";
 
 		} else if ( SELECT_CASE_var == iStatusErrorRange ) {
-			gio::write( FileUnit, "(A)" ) << "Detected out-of-range error";
+			gio::write( FileUnit, fmtA ) << "Detected out-of-range error";
 		} else if ( SELECT_CASE_var == iStatusErrorBracket ) {
-			gio::write( FileUnit, "(A)" ) << "Detected bracket error";
+			gio::write( FileUnit, fmtA ) << "Detected bracket error";
 		} else if ( SELECT_CASE_var == iStatusErrorSlope ) {
-			gio::write( FileUnit, "(A)" ) << "Detected slope error";
+			gio::write( FileUnit, fmtA ) << "Detected slope error";
 		} else if ( SELECT_CASE_var == iStatusErrorSingular ) {
-			gio::write( FileUnit, "(A)" ) << "Detected singularity error";
+			gio::write( FileUnit, fmtA ) << "Detected singularity error";
 
 		} else {
-			gio::write( FileUnit, "(A)" ) << "Detected bad root finder status";
+			gio::write( FileUnit, fmtA ) << "Detected bad root finder status";
 		}}
 
 	}
@@ -2838,7 +2840,7 @@ namespace RootFinder {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

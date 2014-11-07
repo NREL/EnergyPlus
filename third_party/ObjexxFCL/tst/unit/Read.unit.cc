@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Read.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <sstream>
@@ -58,6 +59,16 @@ TEST( ReadTest, ReadStringFromStream )
 TEST( ReadTest, ReadStringFromMultilineStream )
 {
 	std::istringstream stream( "ABC\nXYZ" );
+	std::string s;
+	Read( stream, "*" ) >> s;
+	EXPECT_EQ( "ABC", s );
+	Read( stream, "*" ) >> s;
+	EXPECT_EQ( "XYZ", s );
+}
+
+TEST( ReadTest, ReadStringFromMultilineCRLFStream )
+{
+	std::istringstream stream( "ABC\r\nXYZ" );
 	std::string s;
 	Read( stream, "*" ) >> s;
 	EXPECT_EQ( "ABC", s );

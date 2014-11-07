@@ -28,7 +28,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Fstring;
 class IOFlags;
 
@@ -228,6 +228,14 @@ read( std::string const & str, gio::Fmt const & fmt )
 	return Read( str, fmt );
 }
 
+// Read Line from Unit
+void
+read_line( Unit const unit, IOFlags & flags, std::string & line );
+
+// Read Line from Unit
+void
+read_line( Unit const unit, std::string & line );
+
 // Write /////
 
 // Write to Unit
@@ -343,6 +351,12 @@ print( Fmt const & fmt );
 // Print to stdout with List-Directed Format
 Print
 print();
+
+// Flush /////
+
+// Flush
+void
+flush( Unit const unit );
 
 // Inquire /////
 

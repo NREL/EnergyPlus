@@ -17,6 +17,7 @@
 #include <ObjexxFCL/ChunkVector.hh>
 #include <ObjexxFCL/ChunkVector.io.hh>
 #include <ObjexxFCL/TypeTraits.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <limits>
@@ -38,12 +39,12 @@ operator <<( std::ostream & stream, std::vector< T > const & v )
 
 	// Save current stream state and set persistent state
 	std::ios_base::fmtflags const old_flags( stream.flags() );
-	int const old_precision( stream.precision( Traits::precision() ) );
+	std::streamsize const old_precision( stream.precision( Traits::precision() ) );
 	stream << std::right << std::showpoint << std::uppercase;
 
 	// Output array to stream
 	size_type const e( v.size() - 1 );
-	int const w( Traits::width() );
+	int const w( Traits::iwidth() );
 	for ( size_type i = 0; i < e; ++i ) {
 		stream << setw( w ) << v[ i ] << ' ';
 	} stream << setw( w ) << v[ e ];
@@ -187,6 +188,15 @@ TEST( ChunkVectorTest, Subscripting )
 	v( 5 ) = 44;
 	EXPECT_EQ( 44, v( 5 ) );
 	EXPECT_EQ( 44, v[ 4 ] );
+}
+
+TEST( ChunkVectorTest, Functions )
+{
+	ChunkVector_int u( std::vector< int >{ 1, 2, 3 }, 2u );
+	ChunkVector_int v( std::vector< int >{ 2, 3, 4 }, 2u );
+	EXPECT_EQ( 14, magnitude_squared( u ) );
+	EXPECT_EQ( 3, distance_squared( u, v ) );
+	EXPECT_EQ( 20, dot( u, v ) );
 }
 
 TEST( ChunkVectorTest, Swap )

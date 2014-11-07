@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/byte.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 

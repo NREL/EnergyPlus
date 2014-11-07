@@ -82,7 +82,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 118
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -23018,7 +23018,7 @@
   Fan:VariableVolume,
     AHU-1_Fan,               !- Name
     AHU-1_Fan_Sch,           !- Availability Schedule Name
-    0.6045,                  !- Fan Efficiency
+    0.6045,                  !- Fan Total Efficiency
     1515.192,                !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
@@ -23038,7 +23038,7 @@
   Fan:VariableVolume,
     AHU-2_Fan,               !- Name
     AHU-2_Fan_Sch,           !- Availability Schedule Name
-    0.6045,                  !- Fan Efficiency
+    0.6045,                  !- Fan Total Efficiency
     1515.192,                !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
@@ -23058,7 +23058,7 @@
   Fan:ZoneExhaust,
     Floor 1 Anesthesia Exhaust Fan,  !- Name
     AHU-1_Fan_Sch,           !- Availability Schedule Name
-    0.338,                   !- Fan Efficiency
+    0.338,                   !- Fan Total Efficiency
     125,                     !- Pressure Rise {Pa}
     0.0680,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Anesthesia Exhaust Fan Node,  !- Air Inlet Node Name
@@ -23068,7 +23068,7 @@
   Fan:ZoneExhaust,
     Floor 1 MRI Control Room Exhaust Fan,  !- Name
     AHU-1_Fan_Sch,           !- Availability Schedule Name
-    0.338,                   !- Fan Efficiency
+    0.338,                   !- Fan Total Efficiency
     125,                     !- Pressure Rise {Pa}
     0.0793,                  !- Maximum Flow Rate {m3/s}
     Floor 1 MRI Control Room Exhaust Fan Node,  !- Air Inlet Node Name
@@ -23078,7 +23078,7 @@
   Fan:ZoneExhaust,
     Floor 1 MRI Room Exhaust Fan,  !- Name
     AHU-1_Fan_Sch,           !- Availability Schedule Name
-    0.338,                   !- Fan Efficiency
+    0.338,                   !- Fan Total Efficiency
     125,                     !- Pressure Rise {Pa}
     0.2077,                  !- Maximum Flow Rate {m3/s}
     Floor 1 MRI Room Exhaust Fan Node,  !- Air Inlet Node Name
@@ -23088,7 +23088,7 @@
   Fan:ZoneExhaust,
     Floor 1 Soil Exhaust Fan,!- Name
     AHU-1_Fan_Sch,           !- Availability Schedule Name
-    0.338,                   !- Fan Efficiency
+    0.338,                   !- Fan Total Efficiency
     125,                     !- Pressure Rise {Pa}
     0.0991,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Soil Exhaust Fan Node,  !- Air Inlet Node Name
@@ -23098,7 +23098,7 @@
   Fan:ZoneExhaust,
     Floor 1 Soil Hold Exhaust Fan,  !- Name
     AHU-1_Fan_Sch,           !- Availability Schedule Name
-    0.338,                   !- Fan Efficiency
+    0.338,                   !- Fan Total Efficiency
     125,                     !- Pressure Rise {Pa}
     0.0440,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Soil Hold Exhaust Fan Node,  !- Air Inlet Node Name
@@ -23108,7 +23108,7 @@
   Fan:ZoneExhaust,
     Floor 1 Soil Work Exhaust Fan,  !- Name
     AHU-1_Fan_Sch,           !- Availability Schedule Name
-    0.338,                   !- Fan Efficiency
+    0.338,                   !- Fan Total Efficiency
     125,                     !- Pressure Rise {Pa}
     0.1416,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Soil Work Exhaust Fan Node,  !- Air Inlet Node Name
@@ -30015,8 +30015,15 @@
     0.007,                   !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -30037,8 +30044,15 @@
     0.0078,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Controller:OutdoorAir,

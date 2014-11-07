@@ -527,9 +527,9 @@ max( T const & a, T const & b, T const & c, T const & d, Ts const &... o )
 // Math Functions
 
 // abs( x ) == | x |
-template< typename T >
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
 inline
-typename std::enable_if< std::is_arithmetic< T >::value, T >::type // Restrict to built-in arithmetic types
+T
 abs( T const & x )
 {
 	return ( x < T( 0 ) ? -x : x );
@@ -554,7 +554,132 @@ CEILING( T const & x )
 }
 
 // square( x ) == x^2
-template< typename T >
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+square( T const x )
+{
+	return x * x;
+}
+
+// cube( x ) == x^3
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+cube( T const x )
+{
+	return x * x * x;
+}
+
+// quad( x ) == x^4
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+quad( T const x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_2( x ) == x^2
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_2( T const x )
+{
+	return x * x;
+}
+
+// pow_3( x ) == x^3
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_3( T const x )
+{
+	return x * x * x;
+}
+
+// pow_4( x ) == x^4
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_4( T const x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_5( x ) == x^5
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_5( T const x )
+{
+	T const t( x * x );
+	return t * t * x;
+}
+
+// pow_6( x ) == x^6
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_6( T const x )
+{
+	T const t( x * x * x );
+	return t * t;
+}
+
+// pow_7( x ) == x^7
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_7( T const x )
+{
+	T const t( x * x * x );
+	return t * t * x;
+}
+
+// pow_8( x ) == x^8
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_8( T const x )
+{
+	T t( x * x );
+	t *= t;
+	return t * t;
+}
+
+// pow_9( x ) == x^9
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_9( T const x )
+{
+	T const t( x * x * x );
+	return t * t * t;
+}
+
+// root_4( x ) == x^(1/4)
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+root_4( T const x )
+{
+	return std::sqrt( std::sqrt( x ) );
+}
+
+// root_8( x ) == x^(1/8)
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+T
+root_8( T const x )
+{
+	return std::sqrt( std::sqrt( std::sqrt( x ) ) );
+}
+
+// square( x ) == x^2
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 square( T const & x )
@@ -563,7 +688,7 @@ square( T const & x )
 }
 
 // cube( x ) == x^3
-template< typename T >
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
 T
 cube( T const & x )
@@ -571,19 +696,108 @@ cube( T const & x )
 	return x * x * x;
 }
 
-// sign( x )
-template< typename T >
+// quad( x ) == x^4
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
 inline
-typename std::enable_if< std::is_arithmetic< T >::value, int >::type // Restrict to built-in arithmetic types
+T
+quad( T const & x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_2( x ) == x^2
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_2( T const & x )
+{
+	return x * x;
+}
+
+// pow_3( x ) == x^3
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_3( T const & x )
+{
+	return x * x * x;
+}
+
+// pow_4( x ) == x^4
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_4( T const & x )
+{
+	T const t( x * x );
+	return t * t;
+}
+
+// pow_5( x ) == x^5
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_5( T const & x )
+{
+	T const t( x * x );
+	return t * t * x;
+}
+
+// pow_6( x ) == x^6
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_6( T const & x )
+{
+	T const t( x * x * x );
+	return t * t;
+}
+
+// pow_7( x ) == x^7
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_7( T const & x )
+{
+	T const t( x * x * x );
+	return t * t * x;
+}
+
+// pow_8( x ) == x^8
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_8( T const & x )
+{
+	T t( x * x );
+	t *= t;
+	return t * t;
+}
+
+// pow_9( x ) == x^9
+template< typename T, class = typename std::enable_if< ! std::is_arithmetic< T >::value >::type >
+inline
+T
+pow_9( T const & x )
+{
+	T const t( x * x * x );
+	return t * t * t;
+}
+
+// sign( x )
+template< typename T, class = typename std::enable_if< std::is_arithmetic< T >::value >::type >
+inline
+int
 sign( T const & x )
 {
 	return ( x >= T( 0 ) ? +1 : -1 );
 }
 
 // Sign Transfer from Second Argument to First Argument
-template< typename X, typename Y >
+template< typename X, typename Y, class = typename std::enable_if< std::is_arithmetic< X >::value && std::is_arithmetic< Y >::value, X >::type >
 inline
-typename std::enable_if< std::is_arithmetic< X >::value && std::is_arithmetic< Y >::value, X >::type // Restrict to built-in arithmetic types
+X
 sign( X const & x, Y const & y )
 {
 	return ( y >= Y( 0 ) ? abs( x ) : -abs( x ) );

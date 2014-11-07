@@ -81,7 +81,7 @@
 ! Utility Tariffs:                None
 !
 
-  Version,8.1;
+  Version,8.2;
 
   Building,
     Multistory Example,      !- Name
@@ -876,7 +876,7 @@
   Fan:OnOff,
     Gnd West OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -903,7 +903,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Gnd West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1133,7 +1136,7 @@
   Fan:OnOff,
     Gnd Center OA Fan,       !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1160,7 +1163,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Gnd Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1406,7 +1412,7 @@
   Fan:OnOff,
     Gnd East OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1433,7 +1439,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Gnd East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -1690,7 +1699,7 @@
   Fan:OnOff,
     Mid West OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1717,7 +1726,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Mid West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -1947,7 +1959,7 @@
   Fan:OnOff,
     Mid Center OA Fan,       !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -1974,7 +1986,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Mid Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -2220,7 +2235,7 @@
   Fan:OnOff,
     Mid East OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2247,7 +2262,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Mid East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ZoneGroup,
@@ -2504,7 +2522,7 @@
   Fan:OnOff,
     Top West OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2531,7 +2549,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Top West Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -2761,7 +2782,7 @@
   Fan:OnOff,
     Top Center OA Fan,       !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -2788,7 +2809,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Top Center Baseboard,    !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   Zone,
@@ -3034,7 +3058,7 @@
   Fan:OnOff,
     Top East OA Fan,         !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    0.5,                     !- Fan Efficiency
+    0.5,                     !- Fan Total Efficiency
     75.0,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9,                     !- Motor Efficiency
@@ -3061,7 +3085,10 @@
   ZoneHVAC:Baseboard:Convective:Electric,
     Top East Baseboard,      !- Name
     AlwaysOnSchedule,        !- Availability Schedule Name
-    AUTOSIZE,                !- Nominal Capacity {W}
+    HeatingDesignCapacity,   !- Heating Design Capacity Method
+    AUTOSIZE,                !- Heating Design Capacity {W}
+    ,                        !- Heating Design Capacity Per Floor Area {W/m2}
+    ,                        !- Fraction of Autosized Heating Design Capacity
     0.95;                    !- Efficiency
 
   ScheduleTypeLimits,

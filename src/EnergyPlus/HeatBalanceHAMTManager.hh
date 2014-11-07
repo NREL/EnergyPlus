@@ -118,7 +118,7 @@ namespace HeatBalanceHAMTManager {
 			rh( 0.1 ),
 			rhp1( 0.1 ),
 			rhp2( 0.1 ),
-			rhp( 10. ),
+			rhp( 10.0 ),
 			dwdphi( -1.0 ),
 			dw( -1.0 ),
 			origin( 3, 0.0 ),
@@ -277,7 +277,7 @@ namespace HeatBalanceHAMTManager {
 	//     copyrighted by other individuals, companies and institutions.  These
 	//     portions have been incorporated into the EnergyPlus software package
 	//     under license.  For a complete list of contributors, see "Notice"
-	//     located in EnergyPlus.f90.
+	//     located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting
 	//     on its behalf a paid-up, nonexclusive, irrevocable, worldwide license

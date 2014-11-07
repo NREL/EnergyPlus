@@ -16,6 +16,7 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Fstring.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 
@@ -101,7 +102,7 @@ TEST( OptionalTest, FstringFromLiteral )
 
 TEST( OptionalTest, FstringAssignment )
 {
-	static Fstring s( "A literal string" );
+	Fstring s( "A literal string" );
 	Optional_Fstring o( s );
 	EXPECT_EQ( Fstring( "A literal string" ), o );
 	EXPECT_EQ( "A literal string", o() ); // Need the () on o() when types don't match exactly

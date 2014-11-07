@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -74,6 +75,7 @@ namespace BoilerSteam {
 	int NumBoilers( 0 ); // Number of boilers
 	Real64 BoilerMassFlowMaxAvail( 0.0 ); // kg/s - Boiler mass flow rate
 	Real64 BoilerMassFlowMinAvail( 0.0 ); // kg/s - Boiler mass flow rate
+	static std::string const FluidNameSteam( "STEAM" );
 
 	FArray1D_bool CheckEquipName;
 
@@ -431,7 +433,7 @@ namespace BoilerSteam {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "InitBoiler" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -484,11 +486,11 @@ namespace BoilerSteam {
 			//TempUpLimitBoilerOut =Boiler(BoilerNum)%TempUpLimitBoilerOut
 			//      TempUpLimitBoilerOut = Node(BoilerOutletNode)%TempSetPoint
 			TempUpLimitBoilerOut = Boiler( BoilerNum ).TempUpLimitBoilerOut; // Design Outlet Steam Temperature
-			EnthSteamOutDry = GetSatEnthalpyRefrig( "STEAM", TempUpLimitBoilerOut, 1.0, Boiler( BoilerNum ).FluidIndex, "InitBoiler" );
-			EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", TempUpLimitBoilerOut, 0.0, Boiler( BoilerNum ).FluidIndex, "InitBoiler" );
+			EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, TempUpLimitBoilerOut, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+			EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, TempUpLimitBoilerOut, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 			LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
-			CpWater = GetSatSpecificHeatRefrig( "STEAM", TempUpLimitBoilerOut, 0.0, Boiler( BoilerNum ).FluidIndex, "InitBoiler" );
+			CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, TempUpLimitBoilerOut, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 			Boiler( BoilerNum ).DesMassFlowRate = Boiler( BoilerNum ).NomCap / ( LatentEnthSteam + CpWater * ( TempUpLimitBoilerOut - Node( BoilerInletNode ).Temp ) );
 
@@ -587,7 +589,7 @@ namespace BoilerSteam {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "SizeBoiler" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -624,11 +626,11 @@ namespace BoilerSteam {
 		if ( PltSizNum > 0 ) {
 			if ( PlantSizData( PltSizNum ).DesVolFlowRate >= SmallWaterVolFlow ) {
 				SizingTemp = Boiler( BoilerNum ).TempUpLimitBoilerOut;
-				SteamDensity = GetSatDensityRefrig( "STEAM", SizingTemp, 1.0, Boiler( BoilerNum ).FluidIndex, "SizeBoiler" );
-				EnthSteamOutDry = GetSatEnthalpyRefrig( "STEAM", SizingTemp, 1.0, Boiler( BoilerNum ).FluidIndex, "SizeBoiler" );
-				EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", SizingTemp, 0.0, Boiler( BoilerNum ).FluidIndex, "SizeBoiler" );
+				SteamDensity = GetSatDensityRefrig( FluidNameSteam, SizingTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, SizingTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, SizingTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
-				CpWater = GetSatSpecificHeatRefrig( "STEAM", SizingTemp, 0.0, Boiler( BoilerNum ).FluidIndex, "SizeBoiler" );
+				CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, SizingTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 				tmpNomCap = ( CpWater * SteamDensity * Boiler( BoilerNum ).SizFac * PlantSizData( PltSizNum ).DeltaT * PlantSizData( PltSizNum ).DesVolFlowRate + PlantSizData( PltSizNum ).DesVolFlowRate * SteamDensity * LatentEnthSteam );
 				if ( ! IsAutoSize ) tmpNomCap = Boiler( BoilerNum ).NomCap;
 				//IF (PlantSizesOkayToFinalize) Boiler(BoilerNum)%NomCap =tmpNomCap
@@ -733,7 +735,7 @@ namespace BoilerSteam {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "CalcBoilerModel" );
 
 		// DERIVED TYPE DEFINITIONS
 		// na
@@ -745,7 +747,7 @@ namespace BoilerSteam {
 		Real64 BoilerMinPLR; // boiler minimum part load ratio
 		Real64 TheorFuelUse; // Theoretical (stoichiometric) fuel use
 		Real64 OperPLR; // operating part load ratio
-		Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference
+		Real64 BoilerDeltaTemp( 0.0 ); // C - boiler inlet to outlet temperature difference
 		Real64 TempUpLimitBout; // C - boiler high temperature limit
 		Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 		Real64 EnthSteamOutDry;
@@ -795,7 +797,7 @@ namespace BoilerSteam {
 		//Set the current load equal to the boiler load
 		BoilerLoad = MyLoad;
 
-		Boiler( BoilerNum ).BoilerPressCheck = GetSatPressureRefrig( "STEAM", BoilerOutletTemp, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+		Boiler( BoilerNum ).BoilerPressCheck = GetSatPressureRefrig( FluidNameSteam, BoilerOutletTemp, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 		if ( ( Boiler( BoilerNum ).BoilerPressCheck ) > BoilerMaxPress ) {
 			if ( Boiler( BoilerNum ).PressErrIndex == 0 ) {
@@ -807,7 +809,7 @@ namespace BoilerSteam {
 			ShowRecurringSevereErrorAtEnd( "Boiler:Steam=\"" + Boiler( BoilerNum ).Name + "\", Saturation Pressure is greater than Maximum Operating Pressure..continues", Boiler( BoilerNum ).PressErrIndex, Boiler( BoilerNum ).BoilerPressCheck, Boiler( BoilerNum ).BoilerPressCheck, _, "[Pa]", "[Pa]" );
 		}
 
-		CpWater = GetSatSpecificHeatRefrig( "STEAM", Node( BoilerInletNode ).Temp, 0.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+		CpWater = GetSatSpecificHeatRefrig( FluidNameSteam, Node( BoilerInletNode ).Temp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 		if ( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).FlowLock == 0 ) {
 			// Calculate the flow for the boiler
@@ -817,12 +819,14 @@ namespace BoilerSteam {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPointLo - Node( BoilerInletNode ).Temp;
+			} else {
+				assert( false );
 			}}
 			BoilerOutletTemp = BoilerDeltaTemp + Node( BoilerInletNode ).Temp;
 
-			EnthSteamOutDry = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+			EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
-			EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+			EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 			LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -852,8 +856,8 @@ namespace BoilerSteam {
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPointLo;
 				}}
-				EnthSteamOutDry = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
-				EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -868,8 +872,8 @@ namespace BoilerSteam {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPointLo;
 				}}
 
-				EnthSteamOutDry = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
-				EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -890,9 +894,9 @@ namespace BoilerSteam {
 					BoilerOutletTemp = Node( BoilerOutletNode ).TempSetPointLo;
 				}}
 
-				EnthSteamOutDry = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+				EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
-				EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+				EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 				LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -908,8 +912,8 @@ namespace BoilerSteam {
 				if ( BoilerMassFlowRate > MassFlowTolerance ) {
 					BoilerLoad = BoilerNomCap;
 
-					EnthSteamOutDry = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
-					EnthSteamOutWet = GetSatEnthalpyRefrig( "STEAM", BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, "CalcBoilerModel" );
+					EnthSteamOutDry = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 1.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
+					EnthSteamOutWet = GetSatEnthalpyRefrig( FluidNameSteam, BoilerOutletTemp, 0.0, Boiler( BoilerNum ).FluidIndex, RoutineName );
 
 					LatentEnthSteam = EnthSteamOutDry - EnthSteamOutWet;
 
@@ -940,7 +944,7 @@ namespace BoilerSteam {
 		TheorFuelUse = BoilerLoad / BoilerEff;
 
 		// Calculate fuel used
-		FuelUsed = TheorFuelUse / ( LoadCoef( 1 ) + LoadCoef( 2 ) * OperPLR + LoadCoef( 3 ) * std::pow( OperPLR, 2 ) );
+		FuelUsed = TheorFuelUse / ( LoadCoef( 1 ) + LoadCoef( 2 ) * OperPLR + LoadCoef( 3 ) * pow_2( OperPLR ) );
 
 	}
 
@@ -1044,7 +1048,7 @@ namespace BoilerSteam {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <functional>
 
@@ -2567,7 +2568,7 @@ namespace FluidProperties {
 					GlycolData( GlycolNum ).CpLowTempValue = GlycolData( GlycolNum ).CpTemps( IndexNum );
 					break;
 				}
-				// check for highest non-zero value  by referencing temp data
+				// check for highest non-zero value by referencing temp data
 				for ( IndexNum = GlycolData( GlycolNum ).NumCpTempPts; IndexNum >= 1; --IndexNum ) {
 					if ( GlycolData( GlycolNum ).CpValues( IndexNum ) <= 0.0 ) continue;
 					GlycolData( GlycolNum ).CpHighTempIndex = IndexNum;
@@ -2847,8 +2848,9 @@ namespace FluidProperties {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		Real64 const incr( 10.0 );
+		static std::string const RoutineName( "ReportAndTestGlycols" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2869,190 +2871,190 @@ namespace FluidProperties {
 			GlycolIndex = 0; // used in routine calls -- value is returned when first 0
 			// Lay out the basic values:
 			if ( GlycolData( GlycolNum ).GlycolName != "" ) {
-				gio::write( OutputFileDebug, fmta ) << "Glycol=" + GlycolData( GlycolNum ).Name + ", Mixture fluid=" + GlycolData( GlycolNum ).GlycolName;
+				gio::write( OutputFileDebug, fmtA ) << "Glycol=" + GlycolData( GlycolNum ).Name + ", Mixture fluid=" + GlycolData( GlycolNum ).GlycolName;
 			} else {
-				gio::write( OutputFileDebug, fmta ) << "Glycol=" + GlycolData( GlycolNum ).Name;
+				gio::write( OutputFileDebug, fmtA ) << "Glycol=" + GlycolData( GlycolNum ).Name;
 			}
-			gio::write( OutputFileDebug, fmta ) << "Concentration:," + RoundSigDigits( GlycolData( GlycolNum ).Concentration, 2 );
+			gio::write( OutputFileDebug, fmtA ) << "Concentration:," + RoundSigDigits( GlycolData( GlycolNum ).Concentration, 2 );
 			if ( GlycolData( GlycolNum ).CpDataPresent ) {
-				gio::write( OutputFileDebug, fmta ) << "Specific Heat Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CpLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CpLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CpHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CpHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Specific Heat Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CpLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CpLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CpHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CpHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCpTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Specific Heat:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Specific Heat:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCpTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpValues( GlycolData( GlycolNum ).NumCpTempPts ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpValues( GlycolData( GlycolNum ).NumCpTempPts ), 2 );
 			}
 			if ( GlycolData( GlycolNum ).RhoDataPresent ) {
-				gio::write( OutputFileDebug, fmta ) << "Density Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).RhoLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).RhoLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).RhoHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).RhoHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Density Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).RhoLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).RhoLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).RhoHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).RhoHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumRhoTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumRhoTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoValues( GlycolData( GlycolNum ).NumRhoTempPts ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoValues( GlycolData( GlycolNum ).NumRhoTempPts ), 2 );
 			}
 			if ( GlycolData( GlycolNum ).CondDataPresent ) {
-				gio::write( OutputFileDebug, fmta ) << "Conductivity Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CondLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CondLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CondHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CondHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Conductivity Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CondLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CondLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).CondHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).CondHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCondTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Conductivity:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Conductivity:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCondTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondValues( GlycolData( GlycolNum ).NumCondTempPts ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondValues( GlycolData( GlycolNum ).NumCondTempPts ), 2 );
 			}
 			if ( GlycolData( GlycolNum ).ViscDataPresent ) {
-				gio::write( OutputFileDebug, fmta ) << "Viscosity Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).ViscLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).ViscLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).ViscHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).ViscHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Viscosity Data points:,Low Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).ViscLowTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).ViscLowTempIndex ) + ",High Temperature=," + RoundSigDigits( GlycolData( GlycolNum ).ViscHighTempValue, 2 ) + ",Index=," + RoundSigDigits( GlycolData( GlycolNum ).ViscHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumViscTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Viscosity:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Viscosity:"; }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumViscTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscValues( GlycolData( GlycolNum ).NumViscTempPts ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscValues( GlycolData( GlycolNum ).NumViscTempPts ), 2 );
 			}
 			// ============================================
 			// Glycol Results, using out of bounds to out of bounds values in calling
 			// ============================================
 
 			// ========= Specific Heat from Temperatures
-			gio::write( OutputFileDebug, fmta ) << "Glycol=" + GlycolData( GlycolNum ).Name + " **** Results ****";
+			gio::write( OutputFileDebug, fmtA ) << "Glycol=" + GlycolData( GlycolNum ).Name + " **** Results ****";
 			if ( GlycolData( GlycolNum ).CpDataPresent ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Specific Heat Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Specific Heat Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCpTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( Loop ), 2 ); }
 					Temperature = GlycolData( GlycolNum ).CpTemps( Loop ) + ( GlycolData( GlycolNum ).CpTemps( Loop + 1 ) - GlycolData( GlycolNum ).CpTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Specific Heat:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Specific Heat:"; }
 				Temperature = GlycolData( GlycolNum ).CpTemps( 1 ) - incr;
-				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCpTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).CpTemps( Loop );
-					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = GlycolData( GlycolNum ).CpTemps( Loop ) + ( GlycolData( GlycolNum ).CpTemps( Loop + 1 ) - GlycolData( GlycolNum ).CpTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts );
-				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = GlycolData( GlycolNum ).CpTemps( GlycolData( GlycolNum ).NumCpTempPts ) + incr;
-				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
+				ReturnValue = GetSpecificHeatGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
 			// ========= Density from Temperatures
 			if ( GlycolData( GlycolNum ).RhoDataPresent ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumRhoTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( Loop ), 2 ); }
 					Temperature = GlycolData( GlycolNum ).RhoTemps( Loop ) + ( GlycolData( GlycolNum ).RhoTemps( Loop + 1 ) - GlycolData( GlycolNum ).RhoTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density:"; }
 				Temperature = GlycolData( GlycolNum ).RhoTemps( 1 ) - incr;
-				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumRhoTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).RhoTemps( Loop );
-					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 					Temperature = GlycolData( GlycolNum ).RhoTemps( Loop ) + ( GlycolData( GlycolNum ).RhoTemps( Loop + 1 ) - GlycolData( GlycolNum ).RhoTemps( Loop ) ) / 2.0;
-					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+					ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts );
-				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				Temperature = GlycolData( GlycolNum ).RhoTemps( GlycolData( GlycolNum ).NumRhoTempPts ) + incr;
-				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 3 );
+				ReturnValue = GetDensityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 3 );
 			}
 
 			// ========= Conductivity from Temperatures
 			if ( GlycolData( GlycolNum ).CondDataPresent ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Conductivity Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Conductivity Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCondTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( Loop ), 2 ); }
 					Temperature = GlycolData( GlycolNum ).CondTemps( Loop ) + ( GlycolData( GlycolNum ).CondTemps( Loop + 1 ) - GlycolData( GlycolNum ).CondTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Conductivity:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Conductivity:"; }
 				Temperature = GlycolData( GlycolNum ).CondTemps( 1 ) - incr;
-				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumCondTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).CondTemps( Loop );
-					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 					Temperature = GlycolData( GlycolNum ).CondTemps( Loop ) + ( GlycolData( GlycolNum ).CondTemps( Loop + 1 ) - GlycolData( GlycolNum ).CondTemps( Loop ) ) / 2.0;
-					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+					ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts );
-				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
+				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 3 ); }
 				Temperature = GlycolData( GlycolNum ).CondTemps( GlycolData( GlycolNum ).NumCondTempPts ) + incr;
-				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 3 );
+				ReturnValue = GetConductivityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 3 );
 			}
 
 			// ========= Viscosity from Temperatures
 			if ( GlycolData( GlycolNum ).ViscDataPresent ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Viscosity Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Viscosity Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumViscTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( Loop ), 2 ); }
 					Temperature = GlycolData( GlycolNum ).ViscTemps( Loop ) + ( GlycolData( GlycolNum ).ViscTemps( Loop + 1 ) - GlycolData( GlycolNum ).ViscTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Viscosity:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Viscosity:"; }
 				Temperature = GlycolData( GlycolNum ).ViscTemps( 1 ) - incr;
-				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
+				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 				for ( Loop = 1; Loop <= GlycolData( GlycolNum ).NumViscTempPts - 1; ++Loop ) {
 					Temperature = GlycolData( GlycolNum ).ViscTemps( Loop );
-					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
+					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 					Temperature = GlycolData( GlycolNum ).ViscTemps( Loop ) + ( GlycolData( GlycolNum ).ViscTemps( Loop + 1 ) - GlycolData( GlycolNum ).ViscTemps( Loop ) ) / 2.0;
-					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
+					ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 				}
 				Temperature = GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts );
-				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
+				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 4 ); }
 				Temperature = GlycolData( GlycolNum ).ViscTemps( GlycolData( GlycolNum ).NumViscTempPts ) + incr;
-				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, "ReportAndTestGlycols" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 4 );
+				ReturnValue = GetViscosityGlycol( GlycolData( GlycolNum ).Name, Temperature, GlycolIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 4 );
 			}
 		}
 
@@ -3089,9 +3091,10 @@ namespace FluidProperties {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
+		static gio::Fmt const fmtA( "(A)" );
 		Real64 const incr( 10.0 );
 		Real64 const Quality( 1.0 );
+		static std::string const RoutineName( "ReportAndTestRefrigerants" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3114,137 +3117,137 @@ namespace FluidProperties {
 			RefrigIndex = 0; // used in routine calls -- value is returned when first 0
 			// Lay out the basic values:
 			if ( RefrigData( RefrigNum ).Name != "" ) {
-				gio::write( OutputFileDebug, fmta ) << "Refrigerant=" + RefrigData( RefrigNum ).Name;
+				gio::write( OutputFileDebug, fmtA ) << "Refrigerant=" + RefrigData( RefrigNum ).Name;
 			}
 			if ( RefrigData( RefrigNum ).NumPsPoints > 0 ) {
-				gio::write( OutputFileDebug, fmta ) << "Saturation Pressures Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).PsLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).PsLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).PsHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).PsHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Saturation Pressures Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).PsLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).PsLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).PsHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).PsHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumPsPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturation Pressure:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Saturation Pressure:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumPsPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsValues( RefrigData( RefrigNum ).NumPsPoints ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsValues( RefrigData( RefrigNum ).NumPsPoints ), 2 );
 			}
 			if ( RefrigData( RefrigNum ).NumHPoints > 0 ) {
-				gio::write( OutputFileDebug, fmta ) << "Enthalpy Saturated Fluid Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Enthalpy Saturated Fluid Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumHPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Enthalpy Saturated Fluid:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Enthalpy Saturated Fluid:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumHPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfValues( RefrigData( RefrigNum ).NumHPoints ), 2 );
-				gio::write( OutputFileDebug, fmta ) << "Enthalpy Saturated Fluid/Gas Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfgLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfgLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfgHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfgHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfValues( RefrigData( RefrigNum ).NumHPoints ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "Enthalpy Saturated Fluid/Gas Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfgLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfgLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).HfgHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).HfgHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumHPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Enthalpy Saturated Fluid/Gas:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Enthalpy Saturated Fluid/Gas:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumHPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfgValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfgValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfgValues( RefrigData( RefrigNum ).NumHPoints ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HfgValues( RefrigData( RefrigNum ).NumHPoints ), 2 );
 			}
 			if ( RefrigData( RefrigNum ).NumCpPoints > 0 ) {
-				gio::write( OutputFileDebug, fmta ) << "Specific Heat Saturated Fluid Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Specific Heat Saturated Fluid Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumCpPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Specific Heat Saturated Fluid:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Specific Heat Saturated Fluid:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumCpPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfValues( RefrigData( RefrigNum ).NumCpPoints ), 2 );
-				gio::write( OutputFileDebug, fmta ) << "Specific Heat Saturated Fluid/Gas Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfValues( RefrigData( RefrigNum ).NumCpPoints ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "Specific Heat Saturated Fluid/Gas Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).CpfgHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumCpPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Specific Heat Saturated Fluid/Gas:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Specific Heat Saturated Fluid/Gas:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumCpPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfgValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfgValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfgValues( RefrigData( RefrigNum ).NumCpPoints ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpfgValues( RefrigData( RefrigNum ).NumCpPoints ), 2 );
 			}
 			if ( RefrigData( RefrigNum ).NumRhoPoints > 0 ) {
-				gio::write( OutputFileDebug, fmta ) << "Density Saturated Fluid Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Density Saturated Fluid Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumRhoPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density Saturated Fluid:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density Saturated Fluid:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumRhoPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofValues( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
-				gio::write( OutputFileDebug, fmta ) << "Density Saturated Fluid/Gas Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgHighTempIndex );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofValues( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "Density Saturated Fluid/Gas Data points:,Low Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgLowTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgLowTempIndex ) + ",High Temperature=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgHighTempValue, 2 ) + ",Index=," + RoundSigDigits( RefrigData( RefrigNum ).RhofgHighTempIndex );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumRhoPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density Saturated Fluid/Gas:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density Saturated Fluid/Gas:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumRhoPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofgValues( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofgValues( Loop ), 2 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofgValues( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhofgValues( RefrigData( RefrigNum ).NumRhoPoints ), 2 );
 			}
 
 			if ( RefrigData( RefrigNum ).NumSuperTempPts > 0 && RefrigData( RefrigNum ).NumSuperPressPts > 0 ) {
-				gio::write( OutputFileDebug, fmta ) << "Superheated Gas Fluid Data points:,NumTemperaturePoints=," + RoundSigDigits( RefrigData( RefrigNum ).NumSuperTempPts ) + ",NumPressurePoints=," + RoundSigDigits( RefrigData( RefrigNum ).NumSuperPressPts );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Superheated Temperatures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "Superheated Gas Fluid Data points:,NumTemperaturePoints=," + RoundSigDigits( RefrigData( RefrigNum ).NumSuperTempPts ) + ",NumPressurePoints=," + RoundSigDigits( RefrigData( RefrigNum ).NumSuperPressPts );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Superheated Temperatures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperTempPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( Loop ), 3 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( Loop ), 3 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( RefrigData( RefrigNum ).NumSuperTempPts ), 3 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Superheated Pressures:"; }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( RefrigData( RefrigNum ).NumSuperTempPts ), 3 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Superheated Pressures:"; }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperPressPts - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHPress( Loop ), 3 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHPress( Loop ), 3 ); }
 				}
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHPress( RefrigData( RefrigNum ).NumSuperPressPts ), 3 );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).SHPress( RefrigData( RefrigNum ).NumSuperPressPts ), 3 );
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperPressPts; ++Loop ) {
-					gio::write( OutputFileDebug, fmta ) << "Superheated Pressure:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHPress( Loop ), 2 );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Enthalpy Superheated Gas:"; }
+					gio::write( OutputFileDebug, fmtA ) << "Superheated Pressure:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHPress( Loop ), 2 );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Enthalpy Superheated Gas:"; }
 					for ( Loop1 = 1; Loop1 <= RefrigData( RefrigNum ).NumSuperTempPts - 1; ++Loop1 ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( Loop1, Loop ), 3 ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( Loop1, Loop ), 3 ); }
 					}
-					gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( RefrigData( RefrigNum ).NumSuperTempPts, Loop ), 3 );
+					gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( RefrigData( RefrigNum ).NumSuperTempPts, Loop ), 3 );
 				}
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperPressPts; ++Loop ) {
-					gio::write( OutputFileDebug, fmta ) << "Superheated Pressure:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHPress( Loop ), 2 );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density Superheated Gas:"; }
+					gio::write( OutputFileDebug, fmtA ) << "Superheated Pressure:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHPress( Loop ), 2 );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density Superheated Gas:"; }
 					for ( Loop1 = 1; Loop1 <= RefrigData( RefrigNum ).NumSuperTempPts - 1; ++Loop1 ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( Loop1, Loop ), 3 ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( Loop1, Loop ), 3 ); }
 					}
-					gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( RefrigData( RefrigNum ).NumSuperTempPts, Loop ), 3 );
+					gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( RefrigData( RefrigNum ).NumSuperTempPts, Loop ), 3 );
 				}
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperTempPts; ++Loop ) {
-					gio::write( OutputFileDebug, fmta ) << "Superheated Temperature:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( Loop ), 2 );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Enthalpy Superheated Gas:"; }
+					gio::write( OutputFileDebug, fmtA ) << "Superheated Temperature:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( Loop ), 2 );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Enthalpy Superheated Gas:"; }
 					for ( Loop1 = 1; Loop1 <= RefrigData( RefrigNum ).NumSuperPressPts - 1; ++Loop1 ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( Loop, Loop1 ), 3 ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( Loop, Loop1 ), 3 ); }
 					}
-					gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( Loop, RefrigData( RefrigNum ).NumSuperPressPts ), 3 );
+					gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HshValues( Loop, RefrigData( RefrigNum ).NumSuperPressPts ), 3 );
 				}
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperTempPts; ++Loop ) {
-					gio::write( OutputFileDebug, fmta ) << "Superheated Temperature:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( Loop ), 2 );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density Superheated Gas:"; }
+					gio::write( OutputFileDebug, fmtA ) << "Superheated Temperature:#" + RoundSigDigits( Loop ) + '=' + RoundSigDigits( RefrigData( RefrigNum ).SHTemps( Loop ), 2 );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density Superheated Gas:"; }
 					for ( Loop1 = 1; Loop1 <= RefrigData( RefrigNum ).NumSuperPressPts - 1; ++Loop1 ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( Loop, Loop1 ), 3 ); }
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( Loop, Loop1 ), 3 ); }
 					}
-					gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( Loop, RefrigData( RefrigNum ).NumSuperPressPts ), 3 );
+					gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoshValues( Loop, RefrigData( RefrigNum ).NumSuperPressPts ), 3 );
 				}
 			}
 
@@ -3253,128 +3256,128 @@ namespace FluidProperties {
 			// ============================================
 
 			// ========= Pressure from Temperatures
-			gio::write( OutputFileDebug, fmta ) << "Refrigerant=" + RefrigData( RefrigNum ).Name + " **** Results ****";
+			gio::write( OutputFileDebug, fmtA ) << "Refrigerant=" + RefrigData( RefrigNum ).Name + " **** Results ****";
 			if ( RefrigData( RefrigNum ).NumPsPoints > 0 ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Pressure Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Pressure Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumPsPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( Loop ), 2 ); }
 					Temperature = RefrigData( RefrigNum ).PsTemps( Loop ) + ( RefrigData( RefrigNum ).PsTemps( Loop + 1 ) - RefrigData( RefrigNum ).PsTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Pressures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Saturated Pressures:"; }
 				Temperature = RefrigData( RefrigNum ).PsTemps( 1 ) - incr;
-				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumPsPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).PsTemps( Loop );
-					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).PsTemps( Loop ) + ( RefrigData( RefrigNum ).PsTemps( Loop + 1 ) - RefrigData( RefrigNum ).PsTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints );
-				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).NumPsPoints ) + incr;
-				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, "ReportAndTestRefrigerants" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
+				ReturnValue = GetSatPressureRefrig( RefrigData( RefrigNum ).Name, Temperature, RefrigIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
 			// ========= Enthalpy from Temperatures
 			if ( RefrigData( RefrigNum ).NumHPoints > 0 ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Enthalpy Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Enthalpy Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumHPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( Loop ), 2 ); }
 					Temperature = RefrigData( RefrigNum ).HTemps( Loop ) + ( RefrigData( RefrigNum ).HTemps( Loop + 1 ) - RefrigData( RefrigNum ).HTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Enthalpy:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Saturated Enthalpy:"; }
 				Temperature = RefrigData( RefrigNum ).HTemps( 1 ) - incr;
-				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumHPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).HTemps( Loop );
-					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).HTemps( Loop ) + ( RefrigData( RefrigNum ).HTemps( Loop + 1 ) - RefrigData( RefrigNum ).HTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints );
-				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).HTemps( RefrigData( RefrigNum ).NumHPoints ) + incr;
-				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
+				ReturnValue = GetSatEnthalpyRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
 			// ========= Specific Heat from Temperatures
 			if ( RefrigData( RefrigNum ).NumCpPoints > 0 ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Specific Heat Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Specific Heat Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumCpPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( Loop ), 2 ); }
 					Temperature = RefrigData( RefrigNum ).CpTemps( Loop ) + ( RefrigData( RefrigNum ).CpTemps( Loop + 1 ) - RefrigData( RefrigNum ).CpTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Specific Heat:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Saturated Specific Heat:"; }
 				Temperature = RefrigData( RefrigNum ).CpTemps( 1 ) - incr;
-				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumCpPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).CpTemps( Loop );
-					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).CpTemps( Loop ) + ( RefrigData( RefrigNum ).CpTemps( Loop + 1 ) - RefrigData( RefrigNum ).CpTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints );
-				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).CpTemps( RefrigData( RefrigNum ).NumCpPoints ) + incr;
-				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
+				ReturnValue = GetSatSpecificHeatRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 
 			// ========= Density from Temperatures
 			if ( RefrigData( RefrigNum ).NumRhoPoints > 0 ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Density Results at Temperatures:"; }
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( 1 ) - incr, 2 ); }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Density Results at Temperatures:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( 1 ) - incr, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumRhoPoints - 1; ++Loop ) {
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( Loop ), 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( Loop ), 2 ); }
 					Temperature = RefrigData( RefrigNum ).RhoTemps( Loop ) + ( RefrigData( RefrigNum ).RhoTemps( Loop + 1 ) - RefrigData( RefrigNum ).RhoTemps( Loop ) ) / 2.0;
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( Temperature, 2 ); }
 				}
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ), 2 ); }
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ) + incr, 2 );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "Saturated Density:"; }
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ), 2 ); }
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ) + incr, 2 );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "Saturated Density:"; }
 				Temperature = RefrigData( RefrigNum ).RhoTemps( 1 ) - incr;
-				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumRhoPoints - 1; ++Loop ) {
 					Temperature = RefrigData( RefrigNum ).RhoTemps( Loop );
-					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 					Temperature = RefrigData( RefrigNum ).RhoTemps( Loop ) + ( RefrigData( RefrigNum ).RhoTemps( Loop + 1 ) - RefrigData( RefrigNum ).RhoTemps( Loop ) ) / 2.0;
-					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+					ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				}
 				Temperature = RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints );
-				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmta, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
+				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileDebug, fmtA, flags ) << "," + RoundSigDigits( ReturnValue, 2 ); }
 				Temperature = RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).NumRhoPoints ) + incr;
-				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, "ReportAndTestRefrigerants" );
-				gio::write( OutputFileDebug, fmta ) << "," + RoundSigDigits( ReturnValue, 2 );
+				ReturnValue = GetSatDensityRefrig( RefrigData( RefrigNum ).Name, Temperature, Quality, RefrigIndex, RoutineName );
+				gio::write( OutputFileDebug, fmtA ) << "," + RoundSigDigits( ReturnValue, 2 );
 			}
 		}
 
@@ -3458,24 +3461,25 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
 		// determine array indices for
-		LoTempIndex = FindArrayIndex( Temperature, RefrigData( RefrigNum ).PsTemps, RefrigData( RefrigNum ).PsLowTempIndex, RefrigData( RefrigNum ).PsHighTempIndex );
+		LoTempIndex = FindArrayIndex( Temperature, refrig.PsTemps, refrig.PsLowTempIndex, refrig.PsHighTempIndex );
 		HiTempIndex = LoTempIndex + 1;
 
 		// check for out of data bounds problems
 		if ( LoTempIndex == 0 ) {
-			ReturnValue = RefrigData( RefrigNum ).PsValues( RefrigData( RefrigNum ).PsLowTempIndex );
+			ReturnValue = refrig.PsValues( refrig.PsLowTempIndex );
 			ErrorFlag = true;
-		} else if ( HiTempIndex > RefrigData( RefrigNum ).PsHighTempIndex ) {
-			ReturnValue = RefrigData( RefrigNum ).PsValues( RefrigData( RefrigNum ).PsHighTempIndex );
+		} else if ( HiTempIndex > refrig.PsHighTempIndex ) {
+			ReturnValue = refrig.PsValues( refrig.PsHighTempIndex );
 			ErrorFlag = true;
 		} else {
 			// find interpolation ratio w.r.t temperature
-			TempInterpRatio = ( Temperature - RefrigData( RefrigNum ).PsTemps( LoTempIndex ) ) / ( RefrigData( RefrigNum ).PsTemps( HiTempIndex ) - RefrigData( RefrigNum ).PsTemps( LoTempIndex ) );
+			TempInterpRatio = ( Temperature - refrig.PsTemps( LoTempIndex ) ) / ( refrig.PsTemps( HiTempIndex ) - refrig.PsTemps( LoTempIndex ) );
 
 			// apply final linear interpolation
-			ReturnValue = RefrigData( RefrigNum ).PsValues( LoTempIndex ) + TempInterpRatio * ( RefrigData( RefrigNum ).PsValues( HiTempIndex ) - RefrigData( RefrigNum ).PsValues( LoTempIndex ) );
+			ReturnValue = refrig.PsValues( LoTempIndex ) + TempInterpRatio * ( refrig.PsValues( HiTempIndex ) - refrig.PsValues( LoTempIndex ) );
 		}
 
 		if ( ! WarmupFlag && ErrorFlag ) {
@@ -3483,7 +3487,7 @@ namespace FluidProperties {
 			// send warning
 			if ( RefrigErrorTracking( RefrigNum ).SatTempErrCount <= RefrigerantErrorLimitTest ) {
 				ShowSevereMessage( RoutineName + "Saturation temperature is out of range for refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] supplied data: **" );
-				ShowContinueError( "...Called From:" + CalledFrom + ", supplied data range=[" + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).PsLowTempIndex ), 2 ) + ',' + RoundSigDigits( RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).PsHighTempIndex ), 2 ) + ']' );
+				ShowContinueError( "...Called From:" + CalledFrom + ", supplied data range=[" + RoundSigDigits( refrig.PsTemps( refrig.PsLowTempIndex ), 2 ) + ',' + RoundSigDigits( refrig.PsTemps( refrig.PsHighTempIndex ), 2 ) + ']' );
 				ShowContinueError( "...Supplied Refrigerant Temperature=" + RoundSigDigits( Temperature, 2 ) + " Returned saturated pressure value = " + RoundSigDigits( ReturnValue, 0 ) );
 				ShowContinueErrorTimeStamp( "" );
 			}
@@ -3572,24 +3576,25 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
 		// get the array indices
-		LoPresIndex = FindArrayIndex( Pressure, RefrigData( RefrigNum ).PsValues, RefrigData( RefrigNum ).PsLowPresIndex, RefrigData( RefrigNum ).PsHighPresIndex );
+		LoPresIndex = FindArrayIndex( Pressure, refrig.PsValues, refrig.PsLowPresIndex, refrig.PsHighPresIndex );
 		HiPresIndex = LoPresIndex + 1;
 
 		// check for out of data bounds problems
 		if ( LoPresIndex == 0 ) {
-			ReturnValue = RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).PsLowPresIndex );
+			ReturnValue = refrig.PsTemps( refrig.PsLowPresIndex );
 			ErrorFlag = true;
-		} else if ( HiPresIndex > RefrigData( RefrigNum ).PsHighPresIndex ) {
-			ReturnValue = RefrigData( RefrigNum ).PsTemps( RefrigData( RefrigNum ).PsHighPresIndex );
+		} else if ( HiPresIndex > refrig.PsHighPresIndex ) {
+			ReturnValue = refrig.PsTemps( refrig.PsHighPresIndex );
 			ErrorFlag = true;
 		} else {
 			// find interpolation ratio w.r.t temperature
-			PresInterpRatio = ( Pressure - RefrigData( RefrigNum ).PsValues( LoPresIndex ) ) / ( RefrigData( RefrigNum ).PsValues( HiPresIndex ) - RefrigData( RefrigNum ).PsValues( LoPresIndex ) );
+			PresInterpRatio = ( Pressure - refrig.PsValues( LoPresIndex ) ) / ( refrig.PsValues( HiPresIndex ) - refrig.PsValues( LoPresIndex ) );
 
 			// apply final linear interpolation
-			ReturnValue = RefrigData( RefrigNum ).PsTemps( LoPresIndex ) + PresInterpRatio * ( RefrigData( RefrigNum ).PsTemps( HiPresIndex ) - RefrigData( RefrigNum ).PsTemps( LoPresIndex ) );
+			ReturnValue = refrig.PsTemps( LoPresIndex ) + PresInterpRatio * ( refrig.PsTemps( HiPresIndex ) - refrig.PsTemps( LoPresIndex ) );
 		}
 
 		if ( ! WarmupFlag && ErrorFlag ) {
@@ -3597,7 +3602,7 @@ namespace FluidProperties {
 			// send warning
 			if ( RefrigErrorTracking( RefrigNum ).SatPressErrCount <= RefrigerantErrorLimitTest ) {
 				ShowSevereMessage( RoutineName + "Saturation pressure is out of range for refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] supplied data: **" );
-				ShowContinueError( "...Called From:" + CalledFrom + ", supplied data range=[" + RoundSigDigits( RefrigData( RefrigNum ).PsValues( RefrigData( RefrigNum ).PsLowPresIndex ), 0 ) + ',' + RoundSigDigits( RefrigData( RefrigNum ).PsValues( RefrigData( RefrigNum ).PsHighPresIndex ), 0 ) + ']' );
+				ShowContinueError( "...Called From:" + CalledFrom + ", supplied data range=[" + RoundSigDigits( refrig.PsValues( refrig.PsLowPresIndex ), 0 ) + ',' + RoundSigDigits( refrig.PsValues( refrig.PsHighPresIndex ), 0 ) + ']' );
 				ShowContinueError( "...Supplied Refrigerant Pressure=" + RoundSigDigits( Pressure, 0 ) + " Returned saturated temperature value =" + RoundSigDigits( ReturnValue, 2 ) );
 				ShowContinueErrorTimeStamp( "" );
 			}
@@ -3641,7 +3646,6 @@ namespace FluidProperties {
 		// na
 
 		// Return value
-		Real64 ReturnValue;
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -3685,11 +3689,10 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
 		// Apply linear interpolation function
-		ReturnValue = GetInterpolatedSatProp( Temperature, RefrigData( RefrigNum ).HTemps, RefrigData( RefrigNum ).HfValues, RefrigData( RefrigNum ).HfgValues, Quality, CalledFrom, RefrigData( RefrigNum ).HfLowTempIndex, RefrigData( RefrigNum ).HfHighTempIndex );
-
-		return ReturnValue;
+		return GetInterpolatedSatProp( Temperature, refrig.HTemps, refrig.HfValues, refrig.HfgValues, Quality, CalledFrom, refrig.HfLowTempIndex, refrig.HfHighTempIndex );
 
 	}
 
@@ -3784,37 +3787,38 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
 		ErrorFlag = false;
 
-		LoTempIndex = FindArrayIndex( Temperature, RefrigData( RefrigNum ).RhoTemps, RefrigData( RefrigNum ).RhofLowTempIndex, RefrigData( RefrigNum ).RhofHighTempIndex );
+		LoTempIndex = FindArrayIndex( Temperature, refrig.RhoTemps, refrig.RhofLowTempIndex, refrig.RhofHighTempIndex );
 		HiTempIndex = LoTempIndex + 1;
 
 		//Error check to make sure the temperature is not out of bounds
 		if ( LoTempIndex == 0 ) {
 			//Give the lowest density value if the temperature is below than the minimum
 			//temperature in the refrigerant table
-			ReturnValue = 1.0 / RefrigData( RefrigNum ).RhofValues( RefrigData( RefrigNum ).RhofLowTempIndex ) + Quality * ( 1.0 / RefrigData( RefrigNum ).RhofgValues( RefrigData( RefrigNum ).RhofLowTempIndex ) - 1.0 / RefrigData( RefrigNum ).RhofValues( RefrigData( RefrigNum ).RhofLowTempIndex ) );
+			ReturnValue = 1.0 / refrig.RhofValues( refrig.RhofLowTempIndex ) + Quality * ( 1.0 / refrig.RhofgValues( refrig.RhofLowTempIndex ) - 1.0 / refrig.RhofValues( refrig.RhofLowTempIndex ) );
 			ReturnValue = 1.0 / ReturnValue;
 			ErrorFlag = true;
-		} else if ( HiTempIndex > RefrigData( RefrigNum ).RhofHighTempIndex ) {
+		} else if ( HiTempIndex > refrig.RhofHighTempIndex ) {
 			//Give the highest density value if the temperature is higher than the maximum
 			//temperature in the refrigerant table
-			ReturnValue = 1.0 / RefrigData( RefrigNum ).RhofValues( RefrigData( RefrigNum ).RhofHighTempIndex ) + Quality * ( 1.0 / RefrigData( RefrigNum ).RhofgValues( RefrigData( RefrigNum ).RhofHighTempIndex ) - 1.0 / RefrigData( RefrigNum ).RhofValues( RefrigData( RefrigNum ).RhofHighTempIndex ) );
+			ReturnValue = 1.0 / refrig.RhofValues( refrig.RhofHighTempIndex ) + Quality * ( 1.0 / refrig.RhofgValues( refrig.RhofHighTempIndex ) - 1.0 / refrig.RhofValues( refrig.RhofHighTempIndex ) );
 			ReturnValue = 1.0 / ReturnValue;
 			ErrorFlag = true;
 		} else { // Okay
 
 			//Calculate the specific volume for the lower temperature index based on linear
 			//interpolation of the quality
-			LoSatProp = 1.0 / RefrigData( RefrigNum ).RhofValues( LoTempIndex ) + Quality * ( 1.0 / RefrigData( RefrigNum ).RhofgValues( LoTempIndex ) - 1.0 / RefrigData( RefrigNum ).RhofValues( LoTempIndex ) );
+			LoSatProp = 1.0 / refrig.RhofValues( LoTempIndex ) + Quality * ( 1.0 / refrig.RhofgValues( LoTempIndex ) - 1.0 / refrig.RhofValues( LoTempIndex ) );
 
 			//Calculate the specific volume for the higher temperature index based on linear
 			//interpolation of the quality
-			HiSatProp = 1.0 / RefrigData( RefrigNum ).RhofValues( HiTempIndex ) + Quality * ( 1.0 / RefrigData( RefrigNum ).RhofgValues( HiTempIndex ) - 1.0 / RefrigData( RefrigNum ).RhofValues( HiTempIndex ) );
+			HiSatProp = 1.0 / refrig.RhofValues( HiTempIndex ) + Quality * ( 1.0 / refrig.RhofgValues( HiTempIndex ) - 1.0 / refrig.RhofValues( HiTempIndex ) );
 
 			//Find interpolation ratio in temperature direction
-			TempInterpRatio = ( Temperature - RefrigData( RefrigNum ).RhoTemps( LoTempIndex ) ) / ( RefrigData( RefrigNum ).RhoTemps( HiTempIndex ) - RefrigData( RefrigNum ).RhoTemps( LoTempIndex ) );
+			TempInterpRatio = ( Temperature - refrig.RhoTemps( LoTempIndex ) ) / ( refrig.RhoTemps( HiTempIndex ) - refrig.RhoTemps( LoTempIndex ) );
 
 			//Apply final linear interpolation to find the specific volume
 			ReturnValue = LoSatProp + TempInterpRatio * ( HiSatProp - LoSatProp );
@@ -3827,7 +3831,7 @@ namespace FluidProperties {
 			// send warning
 			if ( RefrigErrorTracking( RefrigNum ).SatTempDensityErrCount <= RefrigerantErrorLimitTest ) {
 				ShowSevereMessage( RoutineName + "Saturation temperature is out of range for refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] supplied data: **" );
-				ShowContinueError( "...Called From:" + CalledFrom + ", supplied data range=[" + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).RhofLowTempIndex ), 2 ) + ',' + RoundSigDigits( RefrigData( RefrigNum ).RhoTemps( RefrigData( RefrigNum ).RhofHighTempIndex ), 2 ) + ']' );
+				ShowContinueError( "...Called From:" + CalledFrom + ", supplied data range=[" + RoundSigDigits( refrig.RhoTemps( refrig.RhofLowTempIndex ), 2 ) + ',' + RoundSigDigits( refrig.RhoTemps( refrig.RhofHighTempIndex ), 2 ) + ']' );
 				ShowContinueError( "...Supplied Refrigerant Temperature=" + RoundSigDigits( Temperature, 2 ) + " Returned saturated density value =" + RoundSigDigits( ReturnValue, 2 ) );
 				ShowContinueErrorTimeStamp( "" );
 			}
@@ -3917,9 +3921,10 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
 		// Apply linear interpolation function
-		ReturnValue = GetInterpolatedSatProp( Temperature, RefrigData( RefrigNum ).CpTemps, RefrigData( RefrigNum ).CpfValues, RefrigData( RefrigNum ).CpfgValues, Quality, CalledFrom, RefrigData( RefrigNum ).CpfLowTempIndex, RefrigData( RefrigNum ).CpfHighTempIndex );
+		ReturnValue = GetInterpolatedSatProp( Temperature, refrig.CpTemps, refrig.CpfValues, refrig.CpfgValues, Quality, CalledFrom, refrig.CpfLowTempIndex, refrig.CpfHighTempIndex );
 
 		return ReturnValue;
 
@@ -3974,6 +3979,8 @@ namespace FluidProperties {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetSupHeatEnthalpyRefrig: " );
+		static std::string const RoutineNameNoSpace( "GetSupHeatEnthalpyRefrig:" );
+		static std::string const RoutineNameNoColon( "GetSupHeatEnthalpyRefrig" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4016,7 +4023,7 @@ namespace FluidProperties {
 
 		RefrigNum = 0;
 		if ( NumOfRefrigerants == 0 ) {
-			ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatEnthalpyRefrig", "properties", CalledFrom );
+			ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom );
 		}
 
 		ErrCount = 0;
@@ -4032,18 +4039,19 @@ namespace FluidProperties {
 			// Find which refrigerant (index) is being requested
 			RefrigNum = FindRefrigerant( Refrigerant );
 			if ( RefrigNum == 0 ) {
-				ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, "GetSupHeatEnthalpyRefrig", "properties", CalledFrom );
+				ReportFatalRefrigerantErrors( NumOfRefrigerants, RefrigNum, true, Refrigerant, RoutineNameNoColon, "properties", CalledFrom );
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
-		TempIndex = FindArrayIndex( Temperature, RefrigData( RefrigNum ).SHTemps, 1, RefrigData( RefrigNum ).NumSuperTempPts );
-		LoPressIndex = FindArrayIndex( Pressure, RefrigData( RefrigNum ).SHPress, 1, RefrigData( RefrigNum ).NumSuperPressPts );
+		TempIndex = FindArrayIndex( Temperature, refrig.SHTemps, 1, refrig.NumSuperTempPts );
+		LoPressIndex = FindArrayIndex( Pressure, refrig.SHPress, 1, refrig.NumSuperPressPts );
 
 		// check temperature data range and attempt to cap if necessary
-		if ( ( TempIndex > 0 ) && ( TempIndex < RefrigData( RefrigNum ).NumSuperTempPts ) ) { // in range
+		if ( ( TempIndex > 0 ) && ( TempIndex < refrig.NumSuperTempPts ) ) { // in range
 			HiTempIndex = TempIndex + 1;
-			TempInterpRatio = ( Temperature - RefrigData( RefrigNum ).SHTemps( TempIndex ) ) / ( RefrigData( RefrigNum ).SHTemps( HiTempIndex ) - RefrigData( RefrigNum ).SHTemps( TempIndex ) );
+			TempInterpRatio = ( Temperature - refrig.SHTemps( TempIndex ) ) / ( refrig.SHTemps( HiTempIndex ) - refrig.SHTemps( TempIndex ) );
 		} else if ( TempIndex < 1 ) {
 			++CurTempRangeErrCount;
 			++ErrCount;
@@ -4059,9 +4067,9 @@ namespace FluidProperties {
 		}
 
 		// check pressure data range and attempt to cap if necessary
-		if ( ( LoPressIndex > 0 ) && ( LoPressIndex < RefrigData( RefrigNum ).NumSuperPressPts ) ) { // in range
+		if ( ( LoPressIndex > 0 ) && ( LoPressIndex < refrig.NumSuperPressPts ) ) { // in range
 			HiPressIndex = LoPressIndex + 1;
-			PressInterpRatio = ( Pressure - RefrigData( RefrigNum ).SHPress( LoPressIndex ) ) / ( RefrigData( RefrigNum ).SHPress( HiPressIndex ) - RefrigData( RefrigNum ).SHPress( LoPressIndex ) );
+			PressInterpRatio = ( Pressure - refrig.SHPress( LoPressIndex ) ) / ( refrig.SHPress( HiPressIndex ) - refrig.SHPress( LoPressIndex ) );
 		} else if ( LoPressIndex < 1 ) {
 			++CurPresRangeErrCount;
 			++ErrCount;
@@ -4077,24 +4085,24 @@ namespace FluidProperties {
 		}
 
 		// get interpolation point values
-		LoTempLoEnthalpy = RefrigData( RefrigNum ).HshValues( TempIndex, LoPressIndex );
-		LoTempHiEnthalpy = RefrigData( RefrigNum ).HshValues( TempIndex, HiPressIndex );
-		HiTempLoEnthalpy = RefrigData( RefrigNum ).HshValues( HiTempIndex, LoPressIndex );
-		HiTempHiEnthalpy = RefrigData( RefrigNum ).HshValues( HiTempIndex, HiPressIndex );
+		LoTempLoEnthalpy = refrig.HshValues( TempIndex, LoPressIndex );
+		LoTempHiEnthalpy = refrig.HshValues( TempIndex, HiPressIndex );
+		HiTempLoEnthalpy = refrig.HshValues( HiTempIndex, LoPressIndex );
+		HiTempHiEnthalpy = refrig.HshValues( HiTempIndex, HiPressIndex );
 
 		// to give reasonable interpolation near saturation reset any point with zero value
 		// in table to saturation value
 		if ( LoTempLoEnthalpy <= 0.0 ) {
-			LoTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			LoTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 		if ( LoTempHiEnthalpy <= 0.0 ) {
-			LoTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			LoTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 		if ( HiTempLoEnthalpy <= 0.0 ) {
-			HiTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			HiTempLoEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 		if ( HiTempHiEnthalpy <= 0.0 ) {
-			HiTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig" );
+			HiTempHiEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoColon );
 		}
 
 		// interpolate w.r.t. pressure
@@ -4107,10 +4115,10 @@ namespace FluidProperties {
 
 		// Check to see if all data is at zero. In this case we are completely
 		// inside the saturation dome. Best thing we can do is return saturation value
-		if ( ( RefrigData( RefrigNum ).HshValues( TempIndex, LoPressIndex ) <= 0.0 ) && ( RefrigData( RefrigNum ).HshValues( TempIndex, HiPressIndex ) <= 0.0 ) && ( RefrigData( RefrigNum ).HshValues( HiTempIndex, LoPressIndex ) <= 0.0 ) && ( RefrigData( RefrigNum ).HshValues( HiTempIndex, HiPressIndex ) <= 0.0 ) ) {
+		if ( ( refrig.HshValues( TempIndex, LoPressIndex ) <= 0.0 ) && ( refrig.HshValues( TempIndex, HiPressIndex ) <= 0.0 ) && ( refrig.HshValues( HiTempIndex, LoPressIndex ) <= 0.0 ) && ( refrig.HshValues( HiTempIndex, HiPressIndex ) <= 0.0 ) ) {
 			++SatErrCount;
 			// set return value
-			ReturnValue = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatEnthalpyRefrig:" + CalledFrom );
+			ReturnValue = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom );
 			// send warning
 			if ( ! WarmupFlag ) {
 				RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrCount += SatErrCount;
@@ -4209,6 +4217,7 @@ namespace FluidProperties {
 		Real64 const EnthalpyDiff( 0.01 ); // Allows a 1% difference in the enthalpy input and
 		// the enthalpy calculated from the pressure found
 		static std::string const RoutineName( "GetSupHeatPressureRefrig: " );
+		static std::string const RoutineNameNoSpace( "GetSupHeatPressureRefrig:" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -4284,12 +4293,13 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
-		LoTempIndex = FindArrayIndex( Temperature, RefrigData( RefrigNum ).SHTemps, 1, RefrigData( RefrigNum ).NumSuperTempPts );
+		LoTempIndex = FindArrayIndex( Temperature, refrig.SHTemps, 1, refrig.NumSuperTempPts );
 		HiTempIndex = LoTempIndex + 1;
 
 		// check temperature data range and attempt to cap if necessary
-		if ( ( LoTempIndex > 0 ) && ( LoTempIndex < RefrigData( RefrigNum ).NumSuperTempPts ) ) { // in range
+		if ( ( LoTempIndex > 0 ) && ( LoTempIndex < refrig.NumSuperTempPts ) ) { // in range
 			HiTempIndex = LoTempIndex + 1;
 		} else if ( LoTempIndex < 1 ) { // below lower bound
 			++CurTempRangeErrCount;
@@ -4301,25 +4311,25 @@ namespace FluidProperties {
 		}
 
 		// check for lowest non-zero value in lower temp data
-		LoTempStart = RefrigData( RefrigNum ).NumSuperPressPts;
-		for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperPressPts; ++Loop ) {
-			if ( RefrigData( RefrigNum ).HshValues( LoTempIndex, Loop ) > 0.0 ) {
+		LoTempStart = refrig.NumSuperPressPts;
+		for ( Loop = 1; Loop <= refrig.NumSuperPressPts; ++Loop ) {
+			if ( refrig.HshValues( LoTempIndex, Loop ) > 0.0 ) {
 				LoTempStart = Loop;
 				break;
 			}
 		}
 		// check for highest non-zero value in lower temp data
 		LoTempFinish = 1;
-		for ( Loop = RefrigData( RefrigNum ).NumSuperPressPts; Loop >= 1; --Loop ) {
-			if ( RefrigData( RefrigNum ).HshValues( LoTempIndex, Loop ) <= 0.0 ) {
+		for ( Loop = refrig.NumSuperPressPts; Loop >= 1; --Loop ) {
+			if ( refrig.HshValues( LoTempIndex, Loop ) <= 0.0 ) {
 				LoTempFinish = Loop;
 				//EXIT
 			}
 		}
 		// check for lowest non-zero value in high temp data
-		HiTempStart = RefrigData( RefrigNum ).NumSuperPressPts;
-		for ( Loop = 1; Loop <= RefrigData( RefrigNum ).NumSuperPressPts; ++Loop ) {
-			if ( RefrigData( RefrigNum ).HshValues( HiTempIndex, Loop ) > 0.0 ) {
+		HiTempStart = refrig.NumSuperPressPts;
+		for ( Loop = 1; Loop <= refrig.NumSuperPressPts; ++Loop ) {
+			if ( refrig.HshValues( HiTempIndex, Loop ) > 0.0 ) {
 				HiTempStart = Loop;
 				break;
 			}
@@ -4327,8 +4337,8 @@ namespace FluidProperties {
 
 		// check for highest non-zero value in high temp data
 		HiTempFinish = 1;
-		for ( Loop = RefrigData( RefrigNum ).NumSuperPressPts; Loop >= 1; --Loop ) {
-			if ( RefrigData( RefrigNum ).HshValues( HiTempIndex, Loop ) <= 0.0 ) {
+		for ( Loop = refrig.NumSuperPressPts; Loop >= 1; --Loop ) {
+			if ( refrig.HshValues( HiTempIndex, Loop ) <= 0.0 ) {
 				HiTempFinish = Loop;
 			}
 		}
@@ -4338,17 +4348,17 @@ namespace FluidProperties {
 		TempFinish = min( LoTempFinish, HiTempFinish );
 		// calculate interpolation ratio w.r.t temperature
 		// This ratio is used to find enthalpies at the given temperature
-		TempInterpRatio = ( Temperature - RefrigData( RefrigNum ).SHTemps( LoTempIndex ) ) / ( RefrigData( RefrigNum ).SHTemps( HiTempIndex ) - RefrigData( RefrigNum ).SHTemps( LoTempIndex ) );
+		TempInterpRatio = ( Temperature - refrig.SHTemps( LoTempIndex ) ) / ( refrig.SHTemps( HiTempIndex ) - refrig.SHTemps( LoTempIndex ) );
 
 		// search for array index by bisection
 		start = TempStart; // set the bounds
 		finish = TempFinish;
 
 		// find the bounds of the enthalpy data available
-		EnthalpyMax = max( RefrigData( RefrigNum ).HshValues( LoTempIndex, TempStart ), RefrigData( RefrigNum ).HshValues( HiTempIndex, TempStart ) );
-		EnthalpyMin = min( RefrigData( RefrigNum ).HshValues( LoTempIndex, TempFinish ), RefrigData( RefrigNum ).HshValues( HiTempIndex, TempFinish ) );
+		EnthalpyMax = max( refrig.HshValues( LoTempIndex, TempStart ), refrig.HshValues( HiTempIndex, TempStart ) );
+		EnthalpyMin = min( refrig.HshValues( LoTempIndex, TempFinish ), refrig.HshValues( HiTempIndex, TempFinish ) );
 		// get saturated enthalpy for checking
-		SatEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, "GetSupHeatPressureRefrig:" + CalledFrom );
+		SatEnthalpy = GetSatEnthalpyRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineNameNoSpace + CalledFrom );
 
 		// make some checks on the data before interpolating
 		if ( Enthalpy < SatEnthalpy ) {
@@ -4356,7 +4366,7 @@ namespace FluidProperties {
 			++CurSatErrCount;
 			++ErrCount;
 			// return sat pressure at this temperature
-			ReturnValue = GetSatPressureRefrig( Refrigerant, Temperature, RefrigNum, "GetSupHeatPressureRefrig:" + CalledFrom );
+			ReturnValue = GetSatPressureRefrig( Refrigerant, Temperature, RefrigNum, RoutineNameNoSpace + CalledFrom );
 
 		} else if ( EnthalpyMax < Enthalpy || EnthalpyMin > Enthalpy ) {
 			// out of range error
@@ -4364,10 +4374,10 @@ namespace FluidProperties {
 			++ErrCount;
 			if ( Enthalpy > EnthalpyMax ) {
 				// return min pressure
-				ReturnValue = RefrigData( RefrigNum ).SHPress( HiTempStart );
+				ReturnValue = refrig.SHPress( HiTempStart );
 			} else {
 				// return max pressure
-				ReturnValue = RefrigData( RefrigNum ).SHPress( LoTempFinish );
+				ReturnValue = refrig.SHPress( LoTempFinish );
 			}
 		} else {
 			// go ahead and search
@@ -4375,7 +4385,7 @@ namespace FluidProperties {
 				middle = ( finish + start ) / 2;
 
 				// calc enthalpy at middle index for given temperature
-				EnthalpyCheck = RefrigData( RefrigNum ).HshValues( LoTempIndex, middle ) + TempInterpRatio * ( RefrigData( RefrigNum ).HshValues( HiTempIndex, middle ) - RefrigData( RefrigNum ).HshValues( LoTempIndex, middle ) );
+				EnthalpyCheck = refrig.HshValues( LoTempIndex, middle ) + TempInterpRatio * ( refrig.HshValues( HiTempIndex, middle ) - refrig.HshValues( LoTempIndex, middle ) );
 
 				if ( Enthalpy < EnthalpyCheck ) {
 					start = middle;
@@ -4387,13 +4397,13 @@ namespace FluidProperties {
 			HiEnthalpyIndex = start + 1;
 
 			// calculate enthalpies adjacent specified enthalpy at given temperature
-			EnthalpyLow = RefrigData( RefrigNum ).HshValues( LoTempIndex, LoEnthalpyIndex ) + TempInterpRatio * ( RefrigData( RefrigNum ).HshValues( HiTempIndex, LoEnthalpyIndex ) - RefrigData( RefrigNum ).HshValues( LoTempIndex, LoEnthalpyIndex ) );
+			EnthalpyLow = refrig.HshValues( LoTempIndex, LoEnthalpyIndex ) + TempInterpRatio * ( refrig.HshValues( HiTempIndex, LoEnthalpyIndex ) - refrig.HshValues( LoTempIndex, LoEnthalpyIndex ) );
 
-			EnthalpyHigh = RefrigData( RefrigNum ).HshValues( LoTempIndex, HiEnthalpyIndex ) + TempInterpRatio * ( RefrigData( RefrigNum ).HshValues( HiTempIndex, HiEnthalpyIndex ) - RefrigData( RefrigNum ).HshValues( LoTempIndex, HiEnthalpyIndex ) );
+			EnthalpyHigh = refrig.HshValues( LoTempIndex, HiEnthalpyIndex ) + TempInterpRatio * ( refrig.HshValues( HiTempIndex, HiEnthalpyIndex ) - refrig.HshValues( LoTempIndex, HiEnthalpyIndex ) );
 			// calculate an interpolation ratio
 			EnthInterpRatio = ( Enthalpy - EnthalpyLow ) / ( EnthalpyHigh - EnthalpyLow );
 			// apply this interpolation ratio to find the final pressure
-			ReturnValue = RefrigData( RefrigNum ).SHPress( LoEnthalpyIndex ) + EnthInterpRatio * ( RefrigData( RefrigNum ).SHPress( HiEnthalpyIndex ) - RefrigData( RefrigNum ).SHPress( LoEnthalpyIndex ) );
+			ReturnValue = refrig.SHPress( LoEnthalpyIndex ) + EnthInterpRatio * ( refrig.SHPress( HiEnthalpyIndex ) - refrig.SHPress( LoEnthalpyIndex ) );
 		}
 
 		if ( ! WarmupFlag ) {
@@ -4604,53 +4614,51 @@ namespace FluidProperties {
 		// to give reasonable interpolation near saturation reset any point with zero value
 		// in table to saturation value
 		int n_zero( 0 );
-		if ( LoTempLoDensity <= 0.0 ) {
-			LoTempLoDensity = GetSatDensityRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineName );
-			++n_zero;
-		}
-		if ( LoTempHiDensity <= 0.0 ) {
-			LoTempHiDensity = GetSatDensityRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineName );
-			++n_zero;
-		}
-		if ( HiTempLoDensity <= 0.0 ) {
-			HiTempLoDensity = GetSatDensityRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineName );
-			++n_zero;
-		}
-		if ( HiTempHiDensity <= 0.0 ) {
-			HiTempHiDensity = GetSatDensityRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineName );
-			++n_zero;
+		Real64 saturated_density( 0.0 );
+		if ( min( LoTempLoDensity, LoTempHiDensity, HiTempLoDensity, HiTempHiDensity ) <= 0.0 ) {
+			saturated_density = GetSatDensityRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineName );
+			if ( LoTempLoDensity <= 0.0 ) {
+				LoTempLoDensity = saturated_density;
+				++n_zero;
+			}
+			if ( LoTempHiDensity <= 0.0 ) {
+				LoTempHiDensity = saturated_density;
+				++n_zero;
+			}
+			if ( HiTempLoDensity <= 0.0 ) {
+				HiTempLoDensity = saturated_density;
+				++n_zero;
+			}
+			if ( HiTempHiDensity <= 0.0 ) {
+				HiTempHiDensity = saturated_density;
+				++n_zero;
+			}
 		}
 
-		// interpolate w.r.t. pressure
-		DensityLow = PressInterpRatio * LoTempHiDensity + ( 1.0 - PressInterpRatio ) * LoTempLoDensity;
+		if ( n_zero < 4 ) {
+			// interpolate w.r.t. pressure
+			DensityLow = PressInterpRatio * LoTempHiDensity + ( 1.0 - PressInterpRatio ) * LoTempLoDensity;
+			DensityHigh = PressInterpRatio * HiTempHiDensity + ( 1.0 - PressInterpRatio ) * HiTempLoDensity;
 
-		DensityHigh = PressInterpRatio * HiTempHiDensity + ( 1.0 - PressInterpRatio ) * HiTempLoDensity;
-
-		// interpolate w.r.t. temperature
-		ReturnValue = TempInterpRatio * DensityHigh + ( 1.0 - TempInterpRatio ) * DensityLow;
-
-		// some checks...
-		// Check to see if all data is at zero. In this case we are completely
-		// inside the saturation dome. Best thing we can do is return saturation value
-		if ( n_zero == 4 ) {
+			// interpolate w.r.t. temperature
+			ReturnValue = TempInterpRatio * DensityHigh + ( 1.0 - TempInterpRatio ) * DensityLow;
+		} else { // All data is at zero: we are completely inside the saturation dome. Best thing we can do is return saturation value
 			++SatErrCount;
-			// set return value
-			ReturnValue = GetSatDensityRefrig( Refrigerant, Temperature, 1.0, RefrigNum, RoutineName );
 			// send warning
 			RefrigErrorTracking( RefrigNum ).SatSupDensityErrCount += SatErrCount;
 			// send warning
 			if ( RefrigErrorTracking( RefrigNum ).SatSupDensityErrCount <= RefrigerantErrorLimitTest ) {
-				ShowSevereMessage( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, " "saturated density at given temperature returned. **" );
+				ShowSevereMessage( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] is saturated at the given conditions, saturated density at given temperature returned. **" );
 				ShowContinueError( "...Called From:" + CalledFrom );
 				ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 				ShowContinueError( "Refrigerant pressure = " + RoundSigDigits( Pressure, 0 ) );
-				ShowContinueError( "Returned Density value = " + RoundSigDigits( ReturnValue, 3 ) );
+				ShowContinueError( "Returned Density value = " + RoundSigDigits( saturated_density, 3 ) );
 				ShowContinueErrorTimeStamp( "" );
 			}
 			if ( SatErrCount > 0 ) {
 				ShowRecurringSevereErrorAtEnd( RoutineName + ": Refrigerant [" + RefrigErrorTracking( RefrigNum ).Name + "] saturated at the given conditions **", RefrigErrorTracking( RefrigNum ).SatSupEnthalpyErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
-			return ReturnValue;
+			return saturated_density;
 		}
 
 		if ( ! WarmupFlag ) {
@@ -4740,12 +4748,10 @@ namespace FluidProperties {
 		static int HighTempLimitIndex( 0 );
 		static int LowTempLimitIndex( 0 );
 		int GlycolNum;
-		bool LowErrorThisTime;
-		bool HighErrorThisTime;
 
 		// FLOW:
-		LowErrorThisTime = false;
-		HighErrorThisTime = false;
+		bool LowErrorThisTime( false );
+		bool HighErrorThisTime( false );
 
 		// Get the input if we haven't already
 		if ( GetInput ) {
@@ -4767,60 +4773,64 @@ namespace FluidProperties {
 			}
 			GlycolIndex = GlycolNum;
 		}
+		auto const & glycol_data( GlycolData( GlycolIndex ) );
 
 		// If user didn't input data (shouldn't get this far, but just in case...), we can't find a value
-		if ( ! GlycolData( GlycolIndex ).CpDataPresent ) {
-			ReportFatalGlycolErrors( NumOfGlycols, GlycolNum, GlycolData( GlycolIndex ).CpDataPresent, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom );
+		if ( ! glycol_data.CpDataPresent ) {
+			ReportFatalGlycolErrors( NumOfGlycols, GlycolNum, glycol_data.CpDataPresent, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom );
 		}
 
 		// Now determine the value of specific heat using interpolation
-		if ( Temperature < GlycolData( GlycolIndex ).CpLowTempValue ) { // Temperature too low
+		if ( Temperature < glycol_data.CpLowTempValue ) { // Temperature too low
 			LowErrorThisTime = true;
-			ReturnValue = GlycolData( GlycolIndex ).CpValues( GlycolData( GlycolIndex ).CpLowTempIndex );
-		} else if ( Temperature > GlycolData( GlycolIndex ).CpHighTempValue ) { // Temperature too high
+			if ( ! WarmupFlag ) LowTempLimitErr = ++GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrCount;
+			ReturnValue = glycol_data.CpValues( glycol_data.CpLowTempIndex );
+		} else if ( Temperature > glycol_data.CpHighTempValue ) { // Temperature too high
 			HighErrorThisTime = true;
-			ReturnValue = GlycolData( GlycolIndex ).CpValues( GlycolData( GlycolIndex ).CpHighTempIndex );
+			if ( ! WarmupFlag ) HighTempLimitErr = ++GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrCount;
+			ReturnValue = glycol_data.CpValues( glycol_data.CpHighTempIndex );
 		} else { // Temperature somewhere between the lowest and highest value
 			// make sure there is a return value
-			ReturnValue = GlycolData( GlycolIndex ).CpValues( GlycolData( GlycolIndex ).CpLowTempIndex );
+			ReturnValue = glycol_data.CpValues( glycol_data.CpLowTempIndex );
 			// bracket is temp > low, <= high (for interpolation
-			for ( Loop = GlycolData( GlycolIndex ).CpLowTempIndex + 1; Loop <= GlycolData( GlycolIndex ).CpHighTempIndex; ++Loop ) {
-				if ( Temperature > GlycolData( GlycolIndex ).CpTemps( Loop ) ) continue;
-				ReturnValue = GetInterpValue( Temperature, GlycolData( GlycolIndex ).CpTemps( Loop - 1 ), GlycolData( GlycolIndex ).CpTemps( Loop ), GlycolData( GlycolIndex ).CpValues( Loop - 1 ), GlycolData( GlycolIndex ).CpValues( Loop ) );
-				break; // DO loop
-			}
+			auto const & glycol_CpTemps( glycol_data.CpTemps );
+			auto const & glycol_CpValues( glycol_data.CpValues );
+			//for ( Loop = glycol_data.CpLowTempIndex + 1; Loop <= glycol_data.CpHighTempIndex; ++Loop ) { //Tuned Replaced by binary search below
+			//	if ( Temperature > glycol_data.CpTemps( Loop ) ) continue;
+			//	ReturnValue = GetInterpValue( Temperature, glycol_CpTemps( Loop - 1 ), glycol_CpTemps( Loop ), glycol_CpValues( Loop - 1 ), glycol_CpValues( Loop ) );
+			//	break; // DO loop
+			//}
+			//assert( std::is_sorted( glycol_CpTemps.begin(), glycol_CpTemps.end() ) ); // Sorted temperature array is assumed: Enable if/when arrays have begin()/end()
+			typedef  FArray1D< Real64 >::size_type  size_type;
+			size_type const a_size( glycol_CpTemps.size() );
+			assert( a_size > 0 );
+			size_type beg( 0 ), mid, end( a_size - 1 ); // Zero-based indexing
+			while ( beg + 1 < end ) {
+				mid = ( ( beg + end ) >> 1 ); // bit shifting is faster than /2
+				( Temperature > glycol_CpTemps[ mid ] ? beg : end ) = mid;
+			} // Invariant: glycol_CpTemps[beg] <= Temperature <= glycol_CpTemps[end]
+			ReturnValue = GetInterpValue( Temperature, glycol_CpTemps[ beg ], glycol_CpTemps[ end ], glycol_CpValues[ beg ], glycol_CpValues[ end ] );
 		}
 
 		// Error handling
 		if ( ! WarmupFlag ) {
 
-			//    IF (LowErrorThisTime)  LowTempLimitErr = LowTempLimitErr + 1
-			//    IF (HighErrorThisTime) HighTempLimitErr = HighTempLimitErr + 1
 			if ( LowErrorThisTime ) {
-				++GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrCount;
-				LowTempLimitErr = GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrCount;
-			}
-			if ( HighErrorThisTime ) {
-				++GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrCount;
-				HighTempLimitErr = GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrCount;
+				if ( LowTempLimitErr <= GlycolErrorLimitTest ) {
+					ShowWarningMessage( RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name + "] specific heat supplied values **" );
+					ShowContinueError( "..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits( Temperature, 2 ) + "], supplied data range=[" + RoundSigDigits( glycol_data.CpLowTempValue, 2 ) + ',' + RoundSigDigits( glycol_data.CpHighTempValue, 2 ) + ']' );
+					ShowContinueErrorTimeStamp( "" );
+				}
+				ShowRecurringWarningErrorAtEnd( RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name + "] specific heat **", GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 
-			if ( ( LowErrorThisTime ) && ( LowTempLimitErr <= GlycolErrorLimitTest ) ) {
-				ShowWarningMessage( RoutineName + "Temperature is out of range (too low) for fluid [" + GlycolData( GlycolIndex ).Name + "] specific heat supplied values **" );
-				ShowContinueError( "..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits( Temperature, 2 ) + "], supplied data range=[" + RoundSigDigits( GlycolData( GlycolIndex ).CpLowTempValue, 2 ) + ',' + RoundSigDigits( GlycolData( GlycolIndex ).CpHighTempValue, 2 ) + ']' );
-				ShowContinueErrorTimeStamp( "" );
-			}
-			if ( LowErrorThisTime ) {
-				ShowRecurringWarningErrorAtEnd( RoutineName + "Temperature out of range (too low) for fluid [" + GlycolData( GlycolIndex ).Name + "] specific heat **", GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
-			}
-
-			if ( ( HighErrorThisTime ) && ( HighTempLimitErr <= GlycolErrorLimitTest ) ) {
-				ShowWarningMessage( RoutineName + "Temperature is out of range (too high) for fluid [" + GlycolData( GlycolIndex ).Name + "] specific heat **" );
-				ShowContinueError( "..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits( Temperature, 2 ) + "], supplied data range=[" + RoundSigDigits( GlycolData( GlycolIndex ).CpLowTempValue, 2 ) + ',' + RoundSigDigits( GlycolData( GlycolIndex ).CpHighTempValue, 2 ) + ']' );
-				ShowContinueErrorTimeStamp( "" );
-			}
 			if ( HighErrorThisTime ) {
-				ShowRecurringWarningErrorAtEnd( RoutineName + "Temperature out of range (too high) for fluid [" + GlycolData( GlycolIndex ).Name + "] specific heat **", GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
+				if ( HighTempLimitErr <= GlycolErrorLimitTest ) {
+					ShowWarningMessage( RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **" );
+					ShowContinueError( "..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits( Temperature, 2 ) + "], supplied data range=[" + RoundSigDigits( glycol_data.CpLowTempValue, 2 ) + ',' + RoundSigDigits( glycol_data.CpHighTempValue, 2 ) + ']' );
+					ShowContinueErrorTimeStamp( "" );
+				}
+				ShowRecurringWarningErrorAtEnd( RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **", GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
 		}
 
@@ -5268,7 +5278,6 @@ namespace FluidProperties {
 		Real64 const Xhi // value of property at Thi
 	)
 	{
-
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Rick Strand
 		//       DATE WRITTEN   June 2004
@@ -5288,13 +5297,13 @@ namespace FluidProperties {
 		// na
 
 		// Return value
-		Real64 ReturnValue;
+		// na
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		Real64 const TempToler( 0.001 ); // Some reasonable value for comparisons
+		static Real64 const TempToler( 0.001 ); // Some reasonable value for comparisons
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5307,14 +5316,11 @@ namespace FluidProperties {
 
 		// FLOW:
 		if ( std::abs( Thi - Tlo ) > TempToler ) {
-			ReturnValue = Xhi - ( ( ( Thi - Tact ) / ( Thi - Tlo ) ) * ( Xhi - Xlo ) );
+			return Xhi - ( ( ( Thi - Tact ) / ( Thi - Tlo ) ) * ( Xhi - Xlo ) );
 		} else {
 			ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );
-			ReturnValue = 0.0;
+			return 0.0;
 		}
-
-		return ReturnValue;
-
 	}
 
 	//*****************************************************************************
@@ -5395,27 +5401,28 @@ namespace FluidProperties {
 			}
 			RefrigIndex = RefrigNum;
 		}
+		auto const & refrig( RefrigData( RefrigNum ) );
 
-		LoTempIndex = FindArrayIndex( Temperature, RefrigData( RefrigNum ).HTemps, RefrigData( RefrigNum ).HfLowTempIndex, RefrigData( RefrigNum ).HfHighTempIndex );
+		LoTempIndex = FindArrayIndex( Temperature, refrig.HTemps, refrig.HfLowTempIndex, refrig.HfHighTempIndex );
 		HiTempIndex = LoTempIndex + 1;
 
 		// check on the data bounds and adjust indices to give clamped return value
 		if ( LoTempIndex == 0 ) {
-			SatLiqEnthalpy = RefrigData( RefrigNum ).HfValues( RefrigData( RefrigNum ).HfLowTempIndex );
-			SatVapEnthalpy = RefrigData( RefrigNum ).HfgValues( RefrigData( RefrigNum ).HfLowTempIndex );
+			SatLiqEnthalpy = refrig.HfValues( refrig.HfLowTempIndex );
+			SatVapEnthalpy = refrig.HfgValues( refrig.HfLowTempIndex );
 			// Temperature supplied is out of bounds--produce an error message...
 			if ( ! WarmupFlag ) ShowRecurringWarningErrorAtEnd( "GetQualityRefrig: ** Temperature for requested quality is below the range of data supplied **", TempLoRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 
-		} else if ( HiTempIndex > RefrigData( RefrigNum ).NumHPoints ) {
-			SatLiqEnthalpy = RefrigData( RefrigNum ).HfValues( RefrigData( RefrigNum ).HfHighTempIndex );
-			SatVapEnthalpy = RefrigData( RefrigNum ).HfgValues( RefrigData( RefrigNum ).HfHighTempIndex );
+		} else if ( HiTempIndex > refrig.NumHPoints ) {
+			SatLiqEnthalpy = refrig.HfValues( refrig.HfHighTempIndex );
+			SatVapEnthalpy = refrig.HfgValues( refrig.HfHighTempIndex );
 			// Temperature supplied is out of bounds--produce an error message...
 			if ( ! WarmupFlag ) ShowRecurringWarningErrorAtEnd( "GetQualityRefrig: ** Temperature requested quality is above the range of data supplied **", TempHiRangeErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 
 		} else { // in normal range work out interpolated liq and gas enthalpies
-			TempInterpRatio = ( Temperature - RefrigData( RefrigNum ).HTemps( LoTempIndex ) ) / ( RefrigData( RefrigNum ).HTemps( HiTempIndex ) - RefrigData( RefrigNum ).HTemps( LoTempIndex ) );
-			SatLiqEnthalpy = TempInterpRatio * RefrigData( RefrigNum ).HfValues( HiTempIndex ) + ( 1.0 - TempInterpRatio ) * RefrigData( RefrigNum ).HfValues( LoTempIndex );
-			SatVapEnthalpy = TempInterpRatio * RefrigData( RefrigNum ).HfgValues( HiTempIndex ) + ( 1.0 - TempInterpRatio ) * RefrigData( RefrigNum ).HfgValues( LoTempIndex );
+			TempInterpRatio = ( Temperature - refrig.HTemps( LoTempIndex ) ) / ( refrig.HTemps( HiTempIndex ) - refrig.HTemps( LoTempIndex ) );
+			SatLiqEnthalpy = TempInterpRatio * refrig.HfValues( HiTempIndex ) + ( 1.0 - TempInterpRatio ) * refrig.HfValues( LoTempIndex );
+			SatVapEnthalpy = TempInterpRatio * refrig.HfgValues( HiTempIndex ) + ( 1.0 - TempInterpRatio ) * refrig.HfgValues( LoTempIndex );
 		}
 
 		// calculate final quality value from enthalpy ratio
@@ -5577,7 +5584,6 @@ namespace FluidProperties {
 	std::string
 	GetGlycolNameByIndex( int const Idx ) // carries in substance index
 	{
-
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Edwin Lee
 		//       DATE WRITTEN   May 2009
@@ -5603,7 +5609,7 @@ namespace FluidProperties {
 		// na
 
 		// Return value
-		std::string GetGlycolNameByIndex;
+		// na
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5626,13 +5632,10 @@ namespace FluidProperties {
 		//  ArrayLength = SIZE(GlycolData)
 
 		if ( Idx > 0 && Idx <= NumOfGlycols ) {
-			GetGlycolNameByIndex = GlycolData( Idx ).Name;
+			return GlycolData( Idx ).Name;
 		} else { // return blank - error checking in calling proceedure
-			GetGlycolNameByIndex = "";
+			return "";
 		}
-
-		return GetGlycolNameByIndex;
-
 	}
 
 	//*****************************************************************************
@@ -5640,7 +5643,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1< Real64 > const & Array, // Array of values in ascending order
+		FArray1D< Real64 > const & Array, // Array of values in ascending order
 		int const LowBound, // Valid values lower bound (set by calling program)
 		int const UpperBound // Valid values upper bound (set by calling program)
 	)
@@ -5669,16 +5672,17 @@ namespace FluidProperties {
 		// Linear indexing used to assure we are bit shifting positive values where behavior is assured
 		// std::lower_bound was 4x slower for the small (~100) array sizes seen in EnergyPlus use
 		typedef  FArray1< Real64 >::size_type  size_type;
-		assert( LowBound >= Array.l() );
+		int const l( Array.l() );
+		assert( LowBound >= l );
 		assert( LowBound <= UpperBound );
 		assert( UpperBound <= Array.u() );
 		assert( Array.size() > 0u ); // Empty arrays are not currently supported
-		assert( Array.l() > 0 ); // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
-		size_type beg( LowBound - Array.l() );
+		assert( l > 0 ); // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
+		size_type beg( LowBound - l );
 		if ( Value < Array[ beg ] ) {
 			return 0;
 		} else {
-			size_type end( UpperBound - Array.l() );
+			size_type end( UpperBound - l );
 			if ( Value > Array[ end ] ) {
 				return UpperBound;
 			} else { // Binary search
@@ -5687,7 +5691,7 @@ namespace FluidProperties {
 					mid = ( ( beg + end ) >> 1 );
 					( Value > Array[ mid ] ? beg : end ) = mid;
 				}
-				return Array.l() + beg;
+				return l + beg;
 			}
 		}
 	}
@@ -5695,7 +5699,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1< Real64 > const & Array // Array of values in ascending order
+		FArray1D< Real64 > const & Array // Array of values in ascending order
 	)
 	{
 		// FUNCTION INFORMATION:
@@ -5746,9 +5750,9 @@ namespace FluidProperties {
 	Real64
 	GetInterpolatedSatProp(
 		Real64 const Temperature, // Saturation Temp.
-		FArray1< Real64 > const & PropTemps, // Array of temperature at which props are available
-		FArray1< Real64 > const & LiqProp, // Array of saturated liquid properties
-		FArray1< Real64 > const & VapProp, // Array of saturatedvapour properties
+		FArray1D< Real64 > const & PropTemps, // Array of temperature at which props are available
+		FArray1D< Real64 > const & LiqProp, // Array of saturated liquid properties
+		FArray1D< Real64 > const & VapProp, // Array of saturatedvapour properties
 		Real64 const Quality, // Quality
 		std::string const & CalledFrom, // routine this function was called from (error messages)
 		int const LowBound, // Valid values lower bound (set by calling program)
@@ -5834,7 +5838,7 @@ namespace FluidProperties {
 			++TempRangeErrCount;
 			// send warning
 			if ( TempRangeErrCount <= RefrigerantErrorLimitTest ) {
-				ShowSevereError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range " "of data supplied: **" );
+				ShowSevereError( "GetInterpolatedSatProp: Saturation temperature for interpolation is out of range of data supplied: **" );
 				ShowContinueErrorTimeStamp( " Called from:" + CalledFrom );
 				ShowContinueError( "Refrigerant temperature = " + RoundSigDigits( Temperature, 2 ) );
 				ShowContinueError( "Returned saturated property value = " + RoundSigDigits( ReturnValue, 3 ) );
@@ -6237,7 +6241,7 @@ namespace FluidProperties {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

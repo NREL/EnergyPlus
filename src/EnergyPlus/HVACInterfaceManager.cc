@@ -122,7 +122,7 @@ namespace HVACInterfaceManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth );
+		static FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth ); //Tuned Made static
 		Real64 DeltaEnergy;
 		// FLOW:
 
@@ -360,7 +360,7 @@ namespace HVACInterfaceManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName( "UpdatePlantLoopInterface" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -393,7 +393,7 @@ namespace HVACInterfaceManager {
 		OldTankOutletTemp = Node( OtherLoopSideInletNode ).Temp;
 
 		//calculate the specific heat
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, OldTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdatePlantLoopInterface" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, OldTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		//update the enthalpy
 		Node( OtherLoopSideInletNode ).Enthalpy = Cp * Node( OtherLoopSideInletNode ).Temp;
@@ -545,6 +545,7 @@ namespace HVACInterfaceManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const FracTotLoopMass( 0.5 ); // Fraction of total loop mass assigned to the half loop
+		static std::string const RoutineName( "UpdateHalfLoopInletTemp" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -587,7 +588,7 @@ namespace HVACInterfaceManager {
 		LastTankOutletTemp = PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LastTempInterfaceTankOutlet;
 
 		//calculate the specific heat for the capacitance calculation
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdateHalfLoopInletTemp" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 		//set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
 		//calculate new loop inlet temperature.  The calculation is a simple 'tank' (thermal capacitance) calculation that includes:
@@ -686,6 +687,7 @@ namespace HVACInterfaceManager {
 		// SUBROUTINE ARGUMENTS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "UpdateCommonPipe" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -738,7 +740,7 @@ namespace HVACInterfaceManager {
 		LastTankOutletTemp = PlantLoop( LoopNum ).LoopSide( TankOutletLoopSide ).LastTempInterfaceTankOutlet;
 
 		//calculate the specific heat for the capacitance calculation
-		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, "UpdateCommonPipe" );
+		Cp = GetSpecificHeatGlycol( PlantLoop( LoopNum ).FluidName, LastTankOutletTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 
 		//set the fraction of loop mass assigned to each half loop outlet capacitance ('tank') calculation
 
@@ -910,7 +912,7 @@ namespace HVACInterfaceManager {
 			MdotPriRCLeg = 0.0;
 			MdotSecRCLeg = 0.0;
 			CPFlowDir = NoRecircFlow;
-			CommonPipeTemp = ( TempPriOutTankOut + TempSecOutTankOut ) / 2.;
+			CommonPipeTemp = ( TempPriOutTankOut + TempSecOutTankOut ) / 2.0;
 		}
 
 		// now calculate inlet temps
@@ -1260,11 +1262,11 @@ namespace HVACInterfaceManager {
 		PlantCommonPipe.allocate( TotNumLoops );
 
 		for ( CurLoopNum = 1; CurLoopNum <= TotNumLoops; ++CurLoopNum ) {
-		    
+
 			// reference to easily lookup the first item once
 			auto & first_demand_component_typenum( PlantLoop( CurLoopNum ).LoopSide( DemandSide ).Branch( 1 ).Comp( 1 ).TypeOf_Num );
 			auto & first_supply_component_typenum( PlantLoop( CurLoopNum ).LoopSide( SupplySide ).Branch( 1 ).Comp( 1 ).TypeOf_Num );
-		    
+
 			{ auto const SELECT_CASE_var( PlantLoop( CurLoopNum ).CommonPipeType );
 			if ( SELECT_CASE_var == CommonPipe_No ) {
 				PlantCommonPipe( CurLoopNum ).CommonPipeType = CommonPipe_No;
@@ -1326,7 +1328,7 @@ namespace HVACInterfaceManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

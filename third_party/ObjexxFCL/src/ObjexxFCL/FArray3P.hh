@@ -62,6 +62,7 @@ public: // Types
 	typedef  typename Base::Size  Size;
 	typedef  typename Base::Difference  Difference;
 
+	using Super::conformable;
 	using Super::npos;
 	using Super::operator ();
 	using Super::shift_set;
@@ -84,35 +85,19 @@ public: // Creation
 	// Default Constructor
 	inline
 	FArray3P() :
-		Super( ProxySentinel() ),
-		source_( 0 )
+	 Super( ProxySentinel() ),
+	 source_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	FArray3P( FArray3P const & a ) :
-		Super( a, ProxySentinel() ),
-		ObserverMulti(),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		source_( &a )
-	{
-		shift_set( a.shift_ );
-		z1_ = a.z1_;
-		z2_ = a.z2_;
-		insert_as_observer();
-	}
-
-	// Non-Const Copy Constructor
-	inline
-	FArray3P( FArray3P & a ) :
-		Super( a, ProxySentinel() ),
-		ObserverMulti(),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		source_( &a )
+	 Super( a, ProxySentinel() ),
+	 ObserverMulti(),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 source_( &a )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -123,26 +108,11 @@ public: // Creation
 	// Real Constructor
 	inline
 	FArray3P( real_FArray const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		source_( &a )
-	{
-		shift_set( a.shift_ );
-		z1_ = a.z1_;
-		z2_ = a.z2_;
-		insert_as_observer();
-	}
-
-	// Non-Const Real Constructor
-	inline
-	FArray3P( real_FArray & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1_ ),
-		I2_( a.I2_ ),
-		I3_( a.I3_ ),
-		source_( &a )
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 source_( &a )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -153,26 +123,11 @@ public: // Creation
 	// Super Constructor
 	inline
 	FArray3P( Super const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1() ),
-		I2_( a.I2() ),
-		I3_( a.I3() ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
-	{
-		shift_set( a.shift_ );
-		z1_ = a.z1_;
-		z2_ = a.z2_;
-		insert_as_observer();
-	}
-
-	// Non-Const Super Constructor
-	inline
-	FArray3P( Super & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( a.I1() ),
-		I2_( a.I2() ),
-		I3_( a.I3() ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1() ),
+	 I2_( a.I2() ),
+	 I3_( a.I3() ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
 	{
 		shift_set( a.shift_ );
 		z1_ = a.z1_;
@@ -183,25 +138,11 @@ public: // Creation
 	// Base Constructor
 	inline
 	FArray3P( Base const & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( a.size() ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
-	{
-		shift_set( 3 );
-		z1_ = z2_ = 1;
-		insert_as_observer();
-	}
-
-	// Non-Const Base Constructor
-	inline
-	FArray3P( Base & a ) :
-		Super( a, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( a.size() ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	 Super( a, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( a.isize() ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
 	{
 		shift_set( 3 );
 		z1_ = z2_ = 1;
@@ -211,25 +152,11 @@ public: // Creation
 	// Tail Constructor
 	inline
 	FArray3P( Tail const & s ) :
-		Super( s, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( s.size() ),
-		source_( 0 )
-	{
-		shift_set( 3 );
-		z1_ = z2_ = 1;
-		insert_as_observer();
-	}
-
-	// Non-Const Tail Constructor
-	inline
-	FArray3P( Tail & s ) :
-		Super( s, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( s.size() ),
-		source_( 0 )
+	 Super( s, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( s.isize() ),
+	 source_( 0 )
 	{
 		shift_set( 3 );
 		z1_ = z2_ = 1;
@@ -239,25 +166,11 @@ public: // Creation
 	// Value Constructor
 	inline
 	FArray3P( T const & t ) :
-		Super( t, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( star ), // Unbounded
-		source_( 0 )
-	{
-		shift_set( 3 );
-		z1_ = z2_ = 1;
-		insert_as_observer();
-	}
-
-	// Non-Const Value Constructor
-	inline
-	FArray3P( T & t ) :
-		Super( t, ProxySentinel() ),
-		I1_( 1 ),
-		I2_( 1 ),
-		I3_( star ), // Unbounded
-		source_( 0 )
+	 Super( t, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( star ), // Unbounded
+	 source_( 0 )
 	{
 		shift_set( 3 );
 		z1_ = z2_ = 1;
@@ -267,24 +180,11 @@ public: // Creation
 	// Copy + IndexRange Constructor
 	inline
 	FArray3P( FArray3P const & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( &a )
-	{
-		dimension_proxy();
-		insert_as_observer();
-	}
-
-	// Non-Const Copy + IndexRange Constructor
-	inline
-	FArray3P( FArray3P & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( &a )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( &a )
 	{
 		dimension_proxy();
 		insert_as_observer();
@@ -293,24 +193,11 @@ public: // Creation
 	// Real + IndexRange Constructor
 	inline
 	FArray3P( real_FArray const & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( &a )
-	{
-		dimension_proxy();
-		insert_as_observer();
-	}
-
-	// Non-Const Real + IndexRange Constructor
-	inline
-	FArray3P( real_FArray & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( &a )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( &a )
 	{
 		dimension_proxy();
 		insert_as_observer();
@@ -319,24 +206,11 @@ public: // Creation
 	// Super + IndexRange Constructor
 	inline
 	FArray3P( Super const & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
-	{
-		dimension_proxy();
-		insert_as_observer();
-	}
-
-	// Non-Const Super + IndexRange Constructor
-	inline
-	FArray3P( Super & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
 	{
 		dimension_proxy();
 		insert_as_observer();
@@ -345,24 +219,11 @@ public: // Creation
 	// Base + IndexRange Constructor
 	inline
 	FArray3P( Base const & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
-	{
-		dimension_proxy();
-		insert_as_observer();
-	}
-
-	// Non-Const Base + IndexRange Constructor
-	inline
-	FArray3P( Base & a, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( a, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
 	{
 		dimension_proxy();
 		insert_as_observer();
@@ -371,24 +232,11 @@ public: // Creation
 	// Tail + IndexRange Constructor
 	inline
 	FArray3P( Tail const & s, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( s, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( 0 )
-	{
-		dimension_proxy();
-		insert_as_observer();
-	}
-
-	// Non-Const Tail + IndexRange Constructor
-	inline
-	FArray3P( Tail & s, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( s, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( 0 )
+	 Super( s, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( 0 )
 	{
 		dimension_proxy();
 		insert_as_observer();
@@ -397,11 +245,166 @@ public: // Creation
 	// Value + IndexRange Constructor
 	inline
 	FArray3P( T const & t, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( t, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( 0 )
+	 Super( t, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( 0 )
+	{
+		dimension_proxy();
+		insert_as_observer();
+	}
+
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Copy Constructor
+	inline
+	FArray3P( FArray3P & a ) :
+	 Super( a, ProxySentinel() ),
+	 ObserverMulti(),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 source_( &a )
+	{
+		shift_set( a.shift_ );
+		z1_ = a.z1_;
+		z2_ = a.z2_;
+		insert_as_observer();
+	}
+
+	// Non-Const Real Constructor
+	inline
+	FArray3P( real_FArray & a ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1_ ),
+	 I2_( a.I2_ ),
+	 I3_( a.I3_ ),
+	 source_( &a )
+	{
+		shift_set( a.shift_ );
+		z1_ = a.z1_;
+		z2_ = a.z2_;
+		insert_as_observer();
+	}
+
+	// Non-Const Super Constructor
+	inline
+	FArray3P( Super & a ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( a.I1() ),
+	 I2_( a.I2() ),
+	 I3_( a.I3() ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	{
+		shift_set( a.shift_ );
+		z1_ = a.z1_;
+		z2_ = a.z2_;
+		insert_as_observer();
+	}
+
+	// Non-Const Base Constructor
+	inline
+	FArray3P( Base & a ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( a.isize() ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	{
+		shift_set( 3 );
+		z1_ = z2_ = 1;
+		insert_as_observer();
+	}
+
+	// Non-Const Tail Constructor
+	inline
+	FArray3P( Tail & s ) :
+	 Super( s, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( s.isize() ),
+	 source_( 0 )
+	{
+		shift_set( 3 );
+		z1_ = z2_ = 1;
+		insert_as_observer();
+	}
+
+	// Non-Const Value Constructor
+	inline
+	FArray3P( T & t ) :
+	 Super( t, ProxySentinel() ),
+	 I1_( 1 ),
+	 I2_( 1 ),
+	 I3_( star ), // Unbounded
+	 source_( 0 )
+	{
+		shift_set( 3 );
+		z1_ = z2_ = 1;
+		insert_as_observer();
+	}
+
+	// Non-Const Copy + IndexRange Constructor
+	inline
+	FArray3P( FArray3P & a, IR const & I1, IR const & I2, IR const & I3 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( &a )
+	{
+		dimension_proxy();
+		insert_as_observer();
+	}
+
+	// Non-Const Real + IndexRange Constructor
+	inline
+	FArray3P( real_FArray & a, IR const & I1, IR const & I2, IR const & I3 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( &a )
+	{
+		dimension_proxy();
+		insert_as_observer();
+	}
+
+	// Non-Const Super + IndexRange Constructor
+	inline
+	FArray3P( Super & a, IR const & I1, IR const & I2, IR const & I3 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	{
+		dimension_proxy();
+		insert_as_observer();
+	}
+
+	// Non-Const Base + IndexRange Constructor
+	inline
+	FArray3P( Base & a, IR const & I1, IR const & I2, IR const & I3 ) :
+	 Super( a, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( dynamic_cast< SubjectMulti const * >( &a ) )
+	{
+		dimension_proxy();
+		insert_as_observer();
+	}
+
+	// Non-Const Tail + IndexRange Constructor
+	inline
+	FArray3P( Tail & s, IR const & I1, IR const & I2, IR const & I3 ) :
+	 Super( s, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( 0 )
 	{
 		dimension_proxy();
 		insert_as_observer();
@@ -410,15 +413,17 @@ public: // Creation
 	// Non-Const Value + IndexRange Constructor
 	inline
 	FArray3P( T & t, IR const & I1, IR const & I2, IR const & I3 ) :
-		Super( t, ProxySentinel() ),
-		I1_( I1 ),
-		I2_( I2 ),
-		I3_( I3 ),
-		source_( 0 )
+	 Super( t, ProxySentinel() ),
+	 I1_( I1 ),
+	 I2_( I2 ),
+	 I3_( I3 ),
+	 source_( 0 )
 	{
 		dimension_proxy();
 		insert_as_observer();
 	}
+
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Destructor
 	inline
@@ -428,7 +433,7 @@ public: // Creation
 		if ( source_ ) source_->remove_observer( *this );
 	}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -436,7 +441,7 @@ public: // Assignment
 	operator =( FArray3P const & a )
 	{
 		if ( this != &a ) {
-			if ( ! Super::conformable( a ) ) dimension( a );
+			if ( ! conformable( a ) ) dimension( a );
 			Base::operator =( a );
 		}
 		return *this;
@@ -448,25 +453,25 @@ public: // Assignment
 	operator =( Super const & a )
 	{
 		if ( this != &a ) {
-			if ( ! Super::conformable( a ) ) dimension( a );
+			if ( ! conformable( a ) ) dimension( a );
 			Base::operator =( a );
 		}
 		return *this;
 	}
 
 	// Super Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator =( FArray3< U > const & a )
 	{
-		if ( ! Super::conformable( a ) ) dimension( a );
+		if ( ! conformable( a ) ) dimension( a );
 		Base::operator =( a );
 		return *this;
 	}
 
 	// Slice Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator =( FArray3S< U > const & a )
@@ -486,7 +491,7 @@ public: // Assignment
 	}
 
 	// Initializer List Assignment Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator =( std::initializer_list< U > const l )
@@ -496,7 +501,7 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator +=( FArray3< U > const & a )
@@ -506,7 +511,7 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator -=( FArray3< U > const & a )
@@ -516,7 +521,7 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator *=( FArray3< U > const & a )
@@ -526,7 +531,7 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator /=( FArray3< U > const & a )
@@ -536,7 +541,7 @@ public: // Assignment
 	}
 
 	// += Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator +=( FArray3S< U > const & a )
@@ -546,7 +551,7 @@ public: // Assignment
 	}
 
 	// -= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator -=( FArray3S< U > const & a )
@@ -556,7 +561,7 @@ public: // Assignment
 	}
 
 	// *= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator *=( FArray3S< U > const & a )
@@ -566,7 +571,7 @@ public: // Assignment
 	}
 
 	// /= Slice Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	FArray3P &
 	operator /=( FArray3S< U > const & a )
@@ -589,7 +594,7 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray3P &
-	operator -=(  MArray3< A, M > const & a )
+	operator -=( MArray3< A, M > const & a )
 	{
 		Super::operator -=( a );
 		return *this;
@@ -599,7 +604,7 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray3P &
-	operator *=(  MArray3< A, M > const & a )
+	operator *=( MArray3< A, M > const & a )
 	{
 		Super::operator *=( a );
 		return *this;
@@ -609,18 +614,82 @@ public: // Assignment
 	template< class A, typename M >
 	inline
 	FArray3P &
-	operator /=(  MArray3< A, M > const & a )
+	operator /=( MArray3< A, M > const & a )
 	{
 		Super::operator /=( a );
 		return *this;
 	}
+
+public: // Assignment: Array: Logical
+
+	// &&= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray3P &
+	and_equals( FArray3< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Array Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray3P &
+	or_equals( FArray3< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray3P &
+	and_equals( FArray3S< U > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= Slice Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	FArray3P &
+	or_equals( FArray3S< U > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+	// &&= MArray Template
+	template< class A, typename M >
+	inline
+	FArray3P &
+	and_equals( MArray3< A, M > const & a )
+	{
+		Super::and_equals( a );
+		return *this;
+	}
+
+	// ||= MArray Template
+	template< class A, typename M >
+	inline
+	FArray3P &
+	or_equals( MArray3< A, M > const & a )
+	{
+		Super::or_equals( a );
+		return *this;
+	}
+
+public: // Assignment: Value
 
 	// = Value
 	inline
 	FArray3P &
 	operator =( T const & t )
 	{
-		Super::operator =( t );
+		Base::operator =( t );
 		return *this;
 	}
 
@@ -629,7 +698,7 @@ public: // Assignment
 	FArray3P &
 	operator +=( T const & t )
 	{
-		Super::operator +=( t );
+		Base::operator +=( t );
 		return *this;
 	}
 
@@ -638,7 +707,7 @@ public: // Assignment
 	FArray3P &
 	operator -=( T const & t )
 	{
-		Super::operator -=( t );
+		Base::operator -=( t );
 		return *this;
 	}
 
@@ -647,7 +716,7 @@ public: // Assignment
 	FArray3P &
 	operator *=( T const & t )
 	{
-		Super::operator *=( t );
+		Base::operator *=( t );
 		return *this;
 	}
 
@@ -656,7 +725,7 @@ public: // Assignment
 	FArray3P &
 	operator /=( T const & t )
 	{
-		Super::operator /=( t );
+		Base::operator /=( t );
 		return *this;
 	}
 
@@ -798,6 +867,14 @@ public: // Inspector
 	size3() const
 	{
 		return I3_.size();
+	}
+
+	// Size of Dimension 3
+	inline
+	int
+	isize3() const
+	{
+		return I3_.isize();
 	}
 
 public: // Modifier
@@ -970,7 +1047,7 @@ public: // Modifier
 		z1_ = z2_ = 1;
 		I1_ = 1;
 		I2_ = 1;
-		I3_ = a.size();
+		I3_ = a.isize();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = dynamic_cast< SubjectMulti const * >( &a );
 		if ( source_ ) source_->insert_observer( *this );
@@ -986,7 +1063,7 @@ public: // Modifier
 		z1_ = z2_ = 1;
 		I1_ = 1;
 		I2_ = 1;
-		I3_ = a.size();
+		I3_ = a.isize();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = dynamic_cast< SubjectMulti const * >( &a );
 		if ( source_ ) source_->insert_observer( *this );
@@ -1002,7 +1079,7 @@ public: // Modifier
 		z1_ = z2_ = 1;
 		I1_ = 1;
 		I2_ = 1;
-		I3_ = s.size();
+		I3_ = s.isize();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = 0;
 		return *this;
@@ -1017,7 +1094,7 @@ public: // Modifier
 		z1_ = z2_ = 1;
 		I1_ = 1;
 		I2_ = 1;
-		I3_ = s.size();
+		I3_ = s.isize();
 		if ( source_ ) source_->remove_observer( *this );
 		source_ = 0;
 		return *this;
@@ -1134,7 +1211,7 @@ private: // Functions
 			} else if ( data_size_ != npos ) { // Unbounded with bounded data array
 				size_type const slice_size( size_of( z1_, z2_ ) );
 				if ( slice_size > 0u ) { // Infer upper index and size
-					I3_.u_no_notify( I3_.lz() + ( data_size_ / slice_size ) - 1 );
+					I3_.u_no_notify( I3_.lz() + static_cast< int >( data_size_ / slice_size ) - 1 );
 					size_set( size_of( slice_size, I3_.size() ) );
 				} else {
 					size_set( data_size_ );

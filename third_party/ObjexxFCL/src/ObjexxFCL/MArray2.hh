@@ -59,6 +59,7 @@ public: // Types
 
 	// Using
 	using Super::in_range;
+	using Super::isize;
 	using Super::l;
 	using Super::u;
 	using Super::size;
@@ -72,13 +73,13 @@ public: // Creation
 	// Copy Constructor
 	inline
 	MArray2( MArray2 const & a ) :
-		Super( a )
+	 Super( a )
 	{}
 
 	// Constructor
 	inline
 	MArray2( A & a, T Class::* pmem ) :
-		Super( a, pmem )
+	 Super( a, pmem )
 	{}
 
 	// Destructor
@@ -87,7 +88,7 @@ public: // Creation
 	~MArray2()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -98,7 +99,7 @@ public: // Assignment
 			assert( conformable( a ) );
 			for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 				for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-					operator()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
+					operator ()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
 				}
 			}
 		}
@@ -114,14 +115,14 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) = a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
 	}
 
 	// Array Assignment Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray2 &
 	operator =( ArrayType< U > const & a )
@@ -129,7 +130,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) = a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) = a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -144,7 +145,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) += a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) += a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -159,7 +160,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) -= a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) -= a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -174,7 +175,7 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) *= a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) *= a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
@@ -190,14 +191,14 @@ public: // Assignment
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
 				assert( a( i1, i2 ) != T( 0 ) );
-				operator()( i1, i2 ) /= a( i1, i2 ); // Not overlap-safe
+				operator ()( i1, i2 ) /= a( i1, i2 ); // Not overlap-safe
 			}
 		}
 		return *this;
 	}
 
 	// += Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray2 &
 	operator +=( ArrayType< U > const & a )
@@ -205,14 +206,14 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) += a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) += a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
 	}
 
 	// -= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray2 &
 	operator -=( ArrayType< U > const & a )
@@ -220,14 +221,14 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) -= a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) -= a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
 	}
 
 	// *= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray2 &
 	operator *=( ArrayType< U > const & a )
@@ -235,14 +236,14 @@ public: // Assignment
 		assert( conformable( a ) );
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
-				operator()( i1, i2 ) *= a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) *= a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
 	}
 
 	// /= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray2 &
 	operator /=( ArrayType< U > const & a )
@@ -251,11 +252,45 @@ public: // Assignment
 		for ( int i2 = 1, j2 = a.l2(), e2 = u2(); i2 <= e2; ++i2, ++j2 ) {
 			for ( int i1 = 1, j1 = a.l1(), e1 = u1(); i1 <= e1; ++i1, ++j1 ) {
 				assert( a( j1, j2 ) != T( 0 ) );
-				operator()( i1, i2 ) /= a( j1, j2 ); // Not overlap-safe
+				operator ()( i1, i2 ) /= a( j1, j2 ); // Not overlap-safe
 			}
 		}
 		return *this;
 	}
+
+public: // Assignment: Logical
+
+	// &&= MArray2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray2 &
+	and_equals( MArray2 const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
+			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
+				operator ()( i1, i2 ) = operator ()( i1, i2 ) && a( i1, i2 ); // Not overlap-safe
+			}
+		}
+		return *this;
+	}
+
+	// ||= MArray2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray2 &
+	or_equals( MArray2 const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
+			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
+				operator ()( i1, i2 ) = operator ()( i1, i2 ) || a( i1, i2 ); // Not overlap-safe
+			}
+		}
+		return *this;
+	}
+
+public: // Assignment: Value
 
 	// = Value
 	inline
@@ -264,21 +299,21 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = t;
+				operator ()( i1, i2 ) = t;
 			}
 		}
 		return *this;
 	}
 
 	// = Value Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray2 &
 	operator =( U const & t )
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = t;
+				operator ()( i1, i2 ) = t;
 			}
 		}
 		return *this;
@@ -291,7 +326,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) += t;
+				operator ()( i1, i2 ) += t;
 			}
 		}
 		return *this;
@@ -304,7 +339,7 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) -= t;
+				operator ()( i1, i2 ) -= t;
 			}
 		}
 		return *this;
@@ -317,21 +352,38 @@ public: // Assignment
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) *= t;
+				operator ()( i1, i2 ) *= t;
 			}
 		}
 		return *this;
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray2 &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) /= t;
+				operator ()( i1, i2 ) *= inv_u;
+			}
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	MArray2 &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
+			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
+				operator ()( i1, i2 ) /= u;
 			}
 		}
 		return *this;
@@ -428,7 +480,7 @@ public: // Inspector
 	int
 	u1() const
 	{
-		return array_.size1();
+		return array_.isize1();
 	}
 
 	// Size of Dimension 1
@@ -437,6 +489,14 @@ public: // Inspector
 	size1() const
 	{
 		return array_.size1();
+	}
+
+	// Size of Dimension 1
+	inline
+	int
+	isize1() const
+	{
+		return array_.isize1();
 	}
 
 	// IndexRange of Dimension 2
@@ -452,7 +512,7 @@ public: // Inspector
 	int
 	l2() const
 	{
-		return 2;
+		return 1;
 	}
 
 	// Upper Index of Dimension 2
@@ -460,7 +520,7 @@ public: // Inspector
 	int
 	u2() const
 	{
-		return array_.size2();
+		return array_.isize2();
 	}
 
 	// Size of Dimension 2
@@ -469,6 +529,14 @@ public: // Inspector
 	size2() const
 	{
 		return array_.size2();
+	}
+
+	// Size of Dimension 2
+	inline
+	int
+	isize2() const
+	{
+		return array_.isize2();
 	}
 
 public: // Modifier
@@ -480,7 +548,7 @@ public: // Modifier
 	{
 		for ( int i2 = 1, e2 = u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = u1(); i1 <= e1; ++i1 ) {
-				operator()( i1, i2 ) = Traits::initial_value();
+				operator ()( i1, i2 ) = Traits::initial_value();
 			}
 		}
 		return *this;
@@ -1124,7 +1192,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -1142,7 +1210,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -1160,7 +1228,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -1178,7 +1246,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -1196,7 +1264,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -1214,7 +1282,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {

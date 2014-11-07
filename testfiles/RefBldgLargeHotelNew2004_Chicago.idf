@@ -82,7 +82,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 22
 
-  Version,8.1;
+  Version,8.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -6355,7 +6355,7 @@
   Fan:VariableVolume,
     VAV WITH REHEAT_Fan,     !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.61425,                 !- Fan Efficiency
+    0.61425,                 !- Fan Total Efficiency
     1017.592,                !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     FixedFlowRate,           !- Fan Power Minimum Flow Rate Input Method
@@ -6375,7 +6375,7 @@
   Fan:ConstantVolume,
     FLR_3_DOAS_Fan,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.56875,                 !- Fan Efficiency
+    0.56875,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.875,                   !- Motor Efficiency
@@ -6387,7 +6387,7 @@
   Fan:ConstantVolume,
     FLR_6_DOAS_Fan,          !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.53625,                 !- Fan Efficiency
+    0.53625,                 !- Fan Total Efficiency
     622.0,                   !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6399,7 +6399,7 @@
   Fan:ConstantVolume,
     Room_1_Flr_3 fan coilfan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6410,7 +6410,7 @@
   Fan:ConstantVolume,
     Room_1_Flr_6 fan coilfan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6421,7 +6421,7 @@
   Fan:ConstantVolume,
     Room_2_Flr_3 fan coilfan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6432,7 +6432,7 @@
   Fan:ConstantVolume,
     Room_2_Flr_6 fan coilfan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6443,7 +6443,7 @@
   Fan:ConstantVolume,
     Room_3_Mult19_Flr_3 fan coilfan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6454,7 +6454,7 @@
   Fan:ConstantVolume,
     Room_3_Mult9_Flr_6 fan coilfan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6465,7 +6465,7 @@
   Fan:ConstantVolume,
     Room_4_Mult19_Flr_3 fan coilfan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6476,7 +6476,7 @@
   Fan:ConstantVolume,
     Room_5_Flr_3 fan coilfan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6487,7 +6487,7 @@
   Fan:ConstantVolume,
     Room_6_Flr_3 fan coilfan,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.52,                    !- Fan Efficiency
+    0.52,                    !- Fan Total Efficiency
     331,                     !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.8,                     !- Motor Efficiency
@@ -6498,7 +6498,7 @@
   Fan:ConstantVolume,
     Corridor_Flr_6 Unit HeaterFan,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    0.536,                   !- Fan Efficiency
+    0.536,                   !- Fan Total Efficiency
     50,                      !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.825,                   !- Motor Efficiency
@@ -6510,7 +6510,7 @@
   Fan:ZoneExhaust,
     Dining_Flr_6 Exhaust Fan,!- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    1.0,                     !- Fan Efficiency
+    1.0,                     !- Fan Total Efficiency
     1.0e-006,                !- Pressure Rise {Pa}
     1.84352,                 !- Maximum Flow Rate {m3/s}
     Dining_Flr_6 Exhaust Fan Node,  !- Air Inlet Node Name
@@ -6520,7 +6520,7 @@
   Fan:ZoneExhaust,
     Kitchen_Flr_6 Exhaust Fan,  !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    1.0,                     !- Fan Efficiency
+    1.0,                     !- Fan Total Efficiency
     1.0e-006,                !- Pressure Rise {Pa}
     0.0444800000000001,      !- Maximum Flow Rate {m3/s}
     Kitchen_Flr_6 Exhaust Fan Node,  !- Air Inlet Node Name
@@ -6530,7 +6530,7 @@
   Fan:ZoneExhaust,
     Laundry_Flr_1 Exhaust Fan,  !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.34,                    !- Fan Efficiency
+    0.34,                    !- Fan Total Efficiency
     125,                     !- Pressure Rise {Pa}
     0.236,                   !- Maximum Flow Rate {m3/s}
     Laundry_Flr_1 Exhaust Fan Node,  !- Air Inlet Node Name
@@ -7415,7 +7415,7 @@
     Corridor_Flr_6 Unit Heater Inlet Node Name,  !- Air Outlet Node Name
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Corridor_Flr_6 Unit HeaterFan,  !- Supply Air Fan Name
-    AUTOSIZE,                 !- Maximum Supply Air Flow Rate {m3/s}
+    AUTOSIZE,                !- Maximum Supply Air Flow Rate {m3/s}
     Coil:Heating:Electric,   !- Heating Coil Object Type
     Corridor_Flr_6 Unit Heater coil,  !- Heating Coil Name
     ,                        !- Supply Air Fan Operating Mode Schedule Name
@@ -8880,8 +8880,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     Flow/System,             !- Cooling Design Air Flow Method
     2.37888,                 !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     Flow/System,             !- Heating Design Air Flow Method
     2.37888,                 !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -8902,8 +8909,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     Flow/System,             !- Cooling Design Air Flow Method
     0.15576,                 !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     Flow/System,             !- Heating Design Air Flow Method
     0.15576,                 !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Sizing:System,
@@ -8924,8 +8938,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     ,                        !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     ,                        !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   Controller:OutdoorAir,
@@ -10405,7 +10426,7 @@
     CoolSys1 Demand Outlet Node,  !- Demand Side Outlet Node Name
     CoolSys1 Demand Branches,!- Demand Side Branch List Name
     CoolSys1 Demand Connectors,  !- Demand Side Connector List Name
-    Uniform;                 !- Load Distribution Scheme
+    UniformLoad;             !- Load Distribution Scheme
 
   PlantLoop,
     HeatSys1,                !- Name

@@ -950,7 +950,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1< Real64 > const & Array, // Array of values in ascending order
+		FArray1D< Real64 > const & Array, // Array of values in ascending order
 		int const LowBound, // Valid values lower bound (set by calling program)
 		int const UpperBound // Valid values upper bound (set by calling program)
 	);
@@ -958,7 +958,7 @@ namespace FluidProperties {
 	int
 	FindArrayIndex(
 		Real64 const Value, // Value to be placed/found within the array of values
-		FArray1< Real64 > const & Array // Array of values in ascending order
+		FArray1D< Real64 > const & Array // Array of values in ascending order
 	);
 
 	//*****************************************************************************
@@ -966,9 +966,9 @@ namespace FluidProperties {
 	Real64
 	GetInterpolatedSatProp(
 		Real64 const Temperature, // Saturation Temp.
-		FArray1< Real64 > const & PropTemps, // Array of temperature at which props are available
-		FArray1< Real64 > const & LiqProp, // Array of saturated liquid properties
-		FArray1< Real64 > const & VapProp, // Array of saturatedvapour properties
+		FArray1D< Real64 > const & PropTemps, // Array of temperature at which props are available
+		FArray1D< Real64 > const & LiqProp, // Array of saturated liquid properties
+		FArray1D< Real64 > const & VapProp, // Array of saturatedvapour properties
 		Real64 const Quality, // Quality
 		std::string const & CalledFrom, // routine this function was called from (error messages)
 		int const LowBound, // Valid values lower bound (set by calling program)
@@ -1028,7 +1028,7 @@ namespace FluidProperties {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

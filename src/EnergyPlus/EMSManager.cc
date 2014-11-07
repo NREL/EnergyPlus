@@ -61,6 +61,8 @@ namespace EMSManager {
 	int const iMassFlowRateMinSetPoint( 108 ); // integer for node setpoint control type
 	int const iMassFlowRateMaxSetPoint( 109 ); // integer for node setpoint control type
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE TYPE DECLARATIONS:
@@ -556,7 +558,7 @@ namespace EMSManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
@@ -687,7 +689,7 @@ namespace EMSManager {
 					}
 				}
 
-				if ( cAlphaArgs( 2 ) == "*" ) cAlphaArgs( 2 ) = Blank;
+				if ( cAlphaArgs( 2 ) == "*" ) cAlphaArgs( 2 ).clear();
 				Sensor( SensorNum ).UniqueKeyName = cAlphaArgs( 2 );
 				Sensor( SensorNum ).OutputVarName = cAlphaArgs( 3 );
 
@@ -1306,7 +1308,7 @@ namespace EMSManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1324,12 +1326,12 @@ namespace EMSManager {
 
 		if ( OutputEMSActuatorAvailFull ) {
 
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units";
+			gio::write( OutputEMSFileUnitNum, fmtA ) << "! <EnergyManagementSystem:Actuator Available>, Component Unique Name, Component Type,  Control Type, Units";
 			for ( ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
-				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available," + EMSActuatorAvailable( ActuatorLoop ).UniqueIDName + ',' + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
+				gio::write( OutputEMSFileUnitNum, fmtA ) << "EnergyManagementSystem:Actuator Available," + EMSActuatorAvailable( ActuatorLoop ).UniqueIDName + ',' + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
 			}
 		} else if ( OutputEMSActuatorAvailSmall ) {
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units";
+			gio::write( OutputEMSFileUnitNum, fmtA ) << "! <EnergyManagementSystem:Actuator Available>, *, Component Type, Control Type, Units";
 
 			TempTypeName.allocate( numEMSActuatorsAvailable );
 			TempTypeName = EMSActuatorAvailable.ComponentTypeName();
@@ -1351,7 +1353,7 @@ namespace EMSManager {
 			}
 			for ( ActuatorLoop = 1; ActuatorLoop <= numEMSActuatorsAvailable; ++ActuatorLoop ) {
 				if ( ! NonUniqueARRflag( ActuatorLoop ) ) {
-					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:Actuator Available, *," + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
+					gio::write( OutputEMSFileUnitNum, fmtA ) << "EnergyManagementSystem:Actuator Available, *," + EMSActuatorAvailable( ActuatorLoop ).ComponentTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).ControlTypeName + ',' + EMSActuatorAvailable( ActuatorLoop ).Units;
 				}
 			}
 
@@ -1391,7 +1393,7 @@ namespace EMSManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static gio::Fmt const fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1407,13 +1409,13 @@ namespace EMSManager {
 
 		if ( OutputEMSInternalVarsFull ) {
 
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units ";
+			gio::write( OutputEMSFileUnitNum, fmtA ) << "! <EnergyManagementSystem:InternalVariable Available>, Unique Name, Internal Data Type, Units ";
 			for ( InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
-				gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available," + EMSInternalVarsAvailable( InternalDataLoop ).UniqueIDName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
+				gio::write( OutputEMSFileUnitNum, fmtA ) << "EnergyManagementSystem:InternalVariable Available," + EMSInternalVarsAvailable( InternalDataLoop ).UniqueIDName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
 			}
 
 		} else if ( OutputEMSInternalVarsSmall ) {
-			gio::write( OutputEMSFileUnitNum, "(A)" ) << "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type";
+			gio::write( OutputEMSFileUnitNum, fmtA ) << "! <EnergyManagementSystem:InternalVariable Available>, *, Internal Data Type";
 			TempTypeName.allocate( numEMSInternalVarsAvailable );
 			TempTypeName = EMSInternalVarsAvailable.DataTypeName();
 			UniqueARRflag.allocate( numEMSInternalVarsAvailable );
@@ -1428,7 +1430,7 @@ namespace EMSManager {
 			}
 			for ( InternalDataLoop = 1; InternalDataLoop <= numEMSInternalVarsAvailable; ++InternalDataLoop ) {
 				if ( UniqueARRflag( InternalDataLoop ) ) {
-					gio::write( OutputEMSFileUnitNum, "(A)" ) << "EnergyManagementSystem:InternalVariable Available, *," + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
+					gio::write( OutputEMSFileUnitNum, fmtA ) << "EnergyManagementSystem:InternalVariable Available, *," + EMSInternalVarsAvailable( InternalDataLoop ).DataTypeName + ',' + EMSInternalVarsAvailable( InternalDataLoop ).Units;
 				}
 			}
 
@@ -1481,8 +1483,8 @@ namespace EMSManager {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int LoopNode; // local do loop index
-		bool lDummy; // not going to setup a pointer to logical control
-		// (could this ever cause a fault?)
+		static bool lDummy; // not going to setup a pointer to logical control //Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
+		// (could this ever cause a fault?) // It caused illegal memory access/corruption
 		// make it optional in Setup call?
 		int OutsideAirNodeNum; // local do loop index
 		int NodeNum; // local index.
@@ -1700,7 +1702,7 @@ namespace EMSManager {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int numAirLoops( 0 );
 		static int Loop( 0 );
-		bool lDummy;
+		static bool lDummy; //Fix Changed to static: Passed to SetupEMSActuator as source of persistent Reference
 
 		lDummy = false;
 
@@ -2051,7 +2053,7 @@ namespace EMSManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -22,7 +22,7 @@
 ! Plant:    None.
 ! SolDis=FullExterior, Aniso, Simple Interior and Exterior Convection
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,4;
 
@@ -2185,9 +2185,7 @@
 
   Output:Variable,*,Earth Tube Air Flow Volume,hourly;
 
-  Output:Variable,*,Earth Tube Air Current Density Volumetric Flow Rate,hourly;
-
-  Output:Variable,*,Earth Tube Air Standard Density Volumetric Flow Rate,hourly;
+  Output:Variable,*,Earth Tube Current Density Air Volume Flow Rate,hourly;
 
   Output:Variable,*,Earth Tube Air Flow Mass,hourly;
 

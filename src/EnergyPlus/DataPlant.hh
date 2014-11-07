@@ -21,9 +21,17 @@ namespace DataPlant {
 	// Data
 	//MODULE PARAMETER DEFINITIONS:
 	// Parameters for use in Load Distribution Schemes
-	extern int const OptimalLoading; // Optimal Load Distribution Scheme
-	extern int const SequentialLoading; // sequential Distribution Scheme
-	extern int const UniformLoading; // sequential Distribution Scheme
+	//extern int const OptimalLoading; // Optimal Load Distribution Scheme
+	//extern int const SequentialLoading; // Seqential Load Distribution Scheme
+	//extern int const UniformLoading; // Uniform Load Distribution Scheme
+	//extern int const UniformPLRLoading; // Uniform PLR Load Distribution Scheme
+	//extern int const SequentialUniformPLRLoading; // Sequential Uniform PLR Load Distribution Scheme
+
+	int const OptimalLoading( 1 ); // Optimal Load Distribution Scheme
+	int const SequentialLoading( 2 ); // Sequential Load Distribution Scheme
+	int const UniformLoading( 3 ); // Uniform Load Distribution Scheme
+	int const UniformPLRLoading( 4 ); // Uniform PLR Load Distribution Scheme
+	int const SequentialUniformPLRLoading( 5 ); // Sequential Uniform PLR Load Distribution Scheme
 
 	// Parameters for scheme types
 	// Used in TYPE(OperationData)%OpSchemeType
@@ -304,8 +312,11 @@ namespace DataPlant {
 
 	extern int const NumConvergenceHistoryTerms;
 	extern FArray1D< Real64 > const ConvergenceHistoryARR;
+	extern Real64 const sum_ConvergenceHistoryARR;
+	extern Real64 const square_sum_ConvergenceHistoryARR;
+	extern Real64 const sum_square_ConvergenceHistoryARR;
 
-	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.f90.  A common definition would be nicer.
+	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.cc.  A common definition would be nicer.
 
 	// The next three types (all starting with RepReport) are the "shadow"
 	// derived types for the ventilation reports.  It keeps the node and
@@ -352,7 +363,7 @@ namespace DataPlant {
 
 	// these variables are arrays, allocated for the number of those particular loopsides, containing data for the vent reports
 	// they are operated on like normal in almost all cases currently, except in the routine which actually mines data and sets them up
-	// in that routine in SystemReports.f90, a POINTER is used to iterate over the different array variables below
+	// in that routine in SystemReports.cc, a POINTER is used to iterate over the different array variables below
 	// this is why the TARGET attribute is applied to them here
 	// further info can be found in SystemReports
 
@@ -645,7 +656,7 @@ namespace DataPlant {
 			MinOutletTemp( 0.0 ),
 			MaxOutletTemp( 0.0 ),
 			FreeCoolCntrlShutDown( false ),
-			FreeCoolCntrlMinCntrlTemp( 0. ),
+			FreeCoolCntrlMinCntrlTemp( 0.0 ),
 			FreeCoolCntrlMode( 0 ),
 			FreeCoolCntrlNodeNum( 0 ),
 			IndexInLoopSidePumps( 0 ),
@@ -2350,7 +2361,7 @@ namespace DataPlant {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

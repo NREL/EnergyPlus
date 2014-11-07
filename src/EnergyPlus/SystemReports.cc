@@ -1,6 +1,9 @@
 // C++ Headers
+#include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <string>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -81,6 +84,8 @@ namespace SystemReports {
 	int const HeatingOnly( 2 );
 	int const HeatAndCool( 3 );
 	int const MaxSetBackCount( 3 );
+
+	static std::string const BlankString;
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -178,6 +183,9 @@ namespace SystemReports {
 	FArray1D_bool AirLoopCalcDone;
 	FArray1D_bool NoLoadFlag;
 	FArray1D_bool UnmetLoadFlag;
+
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
 
@@ -473,32 +481,32 @@ namespace SystemReports {
 
 					//Eliminate duplicates in the connection arrays
 					if ( allocated( ZoneCompToPlant ) ) {
-						EquipNum = size( ZoneCompToPlant );
+						EquipNum = isize( ZoneCompToPlant );
 					} else {
 						EquipNum = 0;
 					}
 					if ( allocated( ZoneSubCompToPlant ) ) {
-						SubEquipNum = size( ZoneSubCompToPlant );
+						SubEquipNum = isize( ZoneSubCompToPlant );
 					} else {
 						SubEquipNum = 0;
 					}
 					if ( allocated( ZoneSubSubCompToPlant ) ) {
-						SubSubEquipNum = size( ZoneSubSubCompToPlant );
+						SubSubEquipNum = isize( ZoneSubSubCompToPlant );
 					} else {
 						SubSubEquipNum = 0;
 					}
 					if ( allocated( AirSysCompToPlant ) ) {
-						CompNum = size( AirSysCompToPlant );
+						CompNum = isize( AirSysCompToPlant );
 					} else {
 						CompNum = 0;
 					}
 					if ( allocated( AirSysSubCompToPlant ) ) {
-						SubCompNum = size( AirSysSubCompToPlant );
+						SubCompNum = isize( AirSysSubCompToPlant );
 					} else {
 						SubCompNum = 0;
 					}
 					if ( allocated( AirSysSubSubCompToPlant ) ) {
-						SubSubCompNum = size( AirSysSubSubCompToPlant );
+						SubSubCompNum = isize( AirSysSubSubCompToPlant );
 					} else {
 						SubSubCompNum = 0;
 					}
@@ -827,32 +835,32 @@ namespace SystemReports {
 			//4.  Now Load all of the plant supply/demand side connections in a single array with pointers from the
 			//    connection arrays (ZoneCompToPlant, ZoneSubCompToPlant, ZoneSubSubCompToPlant, AirSysCompToPlant, etc.)
 			if ( allocated( ZoneCompToPlant ) ) {
-				NumZoneConnectComps = size( ZoneCompToPlant );
+				NumZoneConnectComps = isize( ZoneCompToPlant );
 			} else {
 				NumZoneConnectComps = 0;
 			}
 			if ( allocated( ZoneSubCompToPlant ) ) {
-				NumZoneConnectSubComps = size( ZoneSubCompToPlant );
+				NumZoneConnectSubComps = isize( ZoneSubCompToPlant );
 			} else {
 				NumZoneConnectSubComps = 0;
 			}
 			if ( allocated( ZoneSubSubCompToPlant ) ) {
-				NumZoneConnectSubSubComps = size( ZoneSubSubCompToPlant );
+				NumZoneConnectSubSubComps = isize( ZoneSubSubCompToPlant );
 			} else {
 				NumZoneConnectSubSubComps = 0;
 			}
 			if ( allocated( AirSysCompToPlant ) ) {
-				NumAirSysConnectComps = size( AirSysCompToPlant );
+				NumAirSysConnectComps = isize( AirSysCompToPlant );
 			} else {
 				NumAirSysConnectComps = 0;
 			}
 			if ( allocated( AirSysSubCompToPlant ) ) {
-				NumAirSysConnectSubComps = size( AirSysSubCompToPlant );
+				NumAirSysConnectSubComps = isize( AirSysSubCompToPlant );
 			} else {
 				NumAirSysConnectSubComps = 0;
 			}
 			if ( allocated( AirSysSubSubCompToPlant ) ) {
-				NumAirSysConnectSubSubComps = size( AirSysSubSubCompToPlant );
+				NumAirSysConnectSubSubComps = isize( AirSysSubSubCompToPlant );
 			} else {
 				NumAirSysConnectSubSubComps = 0;
 			}
@@ -1131,7 +1139,7 @@ namespace SystemReports {
 		int DemandSideLoopType;
 		static bool OneTimeFlag( true ); // Flag set to make sure you initialize reports one time
 		bool found;
-		int countloop;
+//		int countloop;
 
 		struct IdentifyLoop
 		{
@@ -1214,7 +1222,7 @@ namespace SystemReports {
 							DemandSideConnect( ArrayCount ).CompNum = DemandSideCompNum;
 
 							found = false;
-							gio::write( OutputFileDebug, "*" ) << "1271=lstacksize" << size( LoopStack );
+							gio::write( OutputFileDebug, fmtLD ) << "1271=lstacksize" << size( LoopStack );
 							for ( Idx = 1; Idx <= isize( LoopStack ); ++Idx ) {
 								if ( DemandSideLoopNum == LoopStack( Idx ).LoopNum && DemandSideLoopType == LoopStack( Idx ).LoopType ) {
 									found = true;
@@ -1303,7 +1311,7 @@ namespace SystemReports {
 					}
 				}
 			} else {
-				gio::write( OutputFileDebug, "*" ) << "1361=error";
+				gio::write( OutputFileDebug, fmtLD ) << "1361=error";
 				//error
 			}
 
@@ -2929,7 +2937,7 @@ namespace SystemReports {
 			for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 
 				// Report selection
-				ReportLoopData * select_ThisReportData;
+				ReportLoopData * select_ThisReportData( nullptr );
 
 				if ( PlantLoopNum <= NumPlantLoops ) {
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -2937,6 +2945,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepPlantDemandSide( PlantLoopNum );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepPlantSupplySide( PlantLoopNum );
+					} else {
+						assert( false );
 					}}
 				} else { // CondLoop
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -2944,6 +2954,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepCondDemandSide( PlantLoopNum - NumPlantLoops );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepCondSupplySide( PlantLoopNum - NumPlantLoops );
+					} else {
+						assert( false );
 					}}
 				}
 
@@ -3041,7 +3053,7 @@ namespace SystemReports {
 			for ( LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum ) {
 
 				// Report selection
-				ReportLoopData * select_ThisReportData;
+				ReportLoopData * select_ThisReportData( nullptr );
 
 				if ( PlantLoopNum <= NumPlantLoops ) {
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -3049,6 +3061,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepPlantDemandSide( PlantLoopNum );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepPlantSupplySide( PlantLoopNum );
+					} else {
+						assert( false );
 					}}
 				} else { // CondLoop
 					{ auto const SELECT_CASE_var( LoopSideNum );
@@ -3056,6 +3070,8 @@ namespace SystemReports {
 						select_ThisReportData = &VentRepCondDemandSide( PlantLoopNum - NumPlantLoops );
 					} else if ( SELECT_CASE_var == SupplySide ) {
 						select_ThisReportData = &VentRepCondSupplySide( PlantLoopNum - NumPlantLoops );
+					} else {
+						assert( false );
 					}}
 				}
 
@@ -3496,6 +3512,54 @@ namespace SystemReports {
 
 	}
 
+	bool
+	index_in_sorted_string_vector(
+		std::vector< std::string > const & v,
+		std::string const & s,
+		std::vector< std::string >::size_type & i
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Stuart Mentzer
+		//       DATE WRITTEN   June 2014
+		//       MODIFIED
+		//       RE-ENGINEERED
+
+		// PURPOSE OF THIS FUNCTION:
+		// Find a string in a sorted vector of strings
+		// std::lower_bound can do this but is slower
+
+		// METHODOLOGY EMPLOYED:
+		// Binary search
+
+		assert( std::is_sorted( v.begin(), v.end() ) );
+		typedef  std::vector< std::string >::size_type  size_type;
+		size_type const v_size( v.size() );
+		if ( v_size == 0 ) { // Empty
+			i = 1u;
+			return false;
+		} else if ( s < v[ 0 ] ) { // Less than all
+			i = v_size;
+			return false;
+		} else if ( s > v[ v_size - 1 ] ) { // Greater than all
+			i = v_size;
+			return false;
+		} else {
+			size_type beg( 0 ), mid, end( v_size );
+			while ( beg + 1 < end ) {
+				mid = ( ( beg + end ) >> 1 ); // bit shifting is faster than /2
+				( s >= v[ mid ] ? beg : end ) = mid;
+			} // Invariant: v[beg] <= s < v[end] (if end < v.size())
+			if ( s == v[ beg ] ) {
+				i = beg;
+				return true;
+			} else {
+				i = v_size;
+				return false;
+			}
+		}
+	}
+
 	void
 	CalcSystemEnergyUse(
 		bool const CompLoadFlag,
@@ -3525,11 +3589,183 @@ namespace SystemReports {
 		using namespace DataZoneEnergyDemands;
 		using namespace DataGlobalConstants;
 		using InputProcessor::FindItemInList;
+		using InputProcessor::SameString;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+
+		//Tuned String comparisons were a big performance hit
+		// ComponentTypes and component_strings must remain in sync and sorted
+		enum ComponentTypes : std::vector< std::string >::size_type { // Using older enum style to avoid the name scoping cruft
+			AIRLOOPHVAC_OUTDOORAIRSYSTEM,
+			AIRLOOPHVAC_UNITARY_FURNACE_HEATCOOL,
+			AIRLOOPHVAC_UNITARY_FURNACE_HEATONLY,
+			AIRLOOPHVAC_UNITARYHEATCOOL,
+			AIRLOOPHVAC_UNITARYHEATCOOL_VAVCHANGEOVERBYPASS,
+			AIRLOOPHVAC_UNITARYHEATONLY,
+			AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR,
+			AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR_MULTISPEED,
+			AIRLOOPHVAC_UNITARYHEATPUMP_WATERTOAIR,
+			AIRLOOPHVAC_UNITARYSYSTEM,
+			AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_COOL,
+			AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_HEAT,
+			AIRTERMINAL_DUALDUCT_VAV_COOL,
+			AIRTERMINAL_DUALDUCT_VAV_HEAT,
+			AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_OUTDOORAIR,
+			AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_RECIRCULATEDAIR,
+			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_COOLEDBEAM,
+			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION,
+			AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT,
+			AIRTERMINAL_SINGLEDUCT_INLETSIDEMIXER,
+			AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT,
+			AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT,
+			AIRTERMINAL_SINGLEDUCT_SUPPLYSIDEMIXER,
+			AIRTERMINAL_SINGLEDUCT_UNCONTROLLED,
+			AIRTERMINAL_SINGLEDUCT_USERDEFINED,
+			AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT,
+			AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_REHEAT,
+			AIRTERMINAL_SINGLEDUCT_VAV_NOREHEAT,
+			AIRTERMINAL_SINGLEDUCT_VAV_REHEAT,
+			AIRTERMINAL_SINGLEDUCT_VAV_REHEAT_VARIABLESPEEDFAN,
+			COIL_COOLING_DX_MULTISPEED,
+			COIL_COOLING_DX_SINGLESPEED,
+			COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE,
+			COIL_COOLING_DX_TWOSPEED,
+			COIL_COOLING_DX_TWOSTAGEWITHHUMIDITYCONTROLMODE,
+			COIL_COOLING_DX_VARIABLESPEED,
+			COIL_COOLING_WATER,
+			COIL_COOLING_WATER_DETAILEDGEOMETRY,
+			COIL_COOLING_WATERTOAIRHEATPUMP_EQUATIONFIT,
+			COIL_COOLING_WATERTOAIRHEATPUMP_PARAMETERESTIMATION,
+			COIL_COOLING_WATERTOAIRHEATPUMP_VARIABLESPEEDEQUATIONFIT,
+			COIL_HEATING_DESUPERHEATER,
+			COIL_HEATING_DX_MULTISPEED,
+			COIL_HEATING_DX_SINGLESPEED,
+			COIL_HEATING_DX_VARIABLESPEED,
+			COIL_HEATING_ELECTRIC,
+			COIL_HEATING_ELECTRIC_MULTISTAGE,
+			COIL_HEATING_GAS,
+			COIL_HEATING_GAS_MULTISTAGE,
+			COIL_HEATING_STEAM,
+			COIL_HEATING_WATER,
+			COIL_HEATING_WATERTOAIRHEATPUMP_EQUATIONFIT,
+			COIL_HEATING_WATERTOAIRHEATPUMP_PARAMETERESTIMATION,
+			COIL_HEATING_WATERTOAIRHEATPUMP_VARIABLESPEEDEQUATIONFIT,
+			COIL_USERDEFINED,
+			COILSYSTEM_COOLING_DX,
+			COILSYSTEM_COOLING_DX_HEATEXCHANGERASSISTED,
+			COILSYSTEM_COOLING_WATER_HEATEXCHANGERASSISTED,
+			COILSYSTEM_HEATING_DX,
+			DEHUMIDIFIER_DESICCANT_NOFANS,
+			DEHUMIDIFIER_DESICCANT_SYSTEM,
+			DUCT,
+			EVAPORATIVECOOLER_DIRECT_CELDEKPAD,
+			EVAPORATIVECOOLER_DIRECT_RESEARCHSPECIAL,
+			EVAPORATIVECOOLER_INDIRECT_CELDEKPAD,
+			EVAPORATIVECOOLER_INDIRECT_RESEARCHSPECIAL,
+			EVAPORATIVECOOLER_INDIRECT_WETCOIL,
+			FAN_COMPONENTMODEL,
+			FAN_CONSTANTVOLUME,
+			FAN_ONOFF,
+			FAN_VARIABLEVOLUME,
+			HEATEXCHANGER_AIRTOAIR_FLATPLATE,
+			HEATEXCHANGER_AIRTOAIR_SENSIBLEANDLATENT,
+			HEATEXCHANGER_DESICCANT_BALANCEDFLOW,
+			HUMIDIFIER_STEAM_ELECTRIC,
+			OUTDOORAIR_MIXER,
+			SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL,
+			SOLARCOLLECTOR_UNGLAZEDTRANSPIRED,
+			ZONEHVAC_AIRDISTRIBUTIONUNIT,
+			n_ComponentTypes,
+			Unknown_ComponentType
+		};
+
+		static std::vector< std::string > const component_strings = { // Must be sorted!
+			"AIRLOOPHVAC:OUTDOORAIRSYSTEM",
+			"AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL",
+			"AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY",
+			"AIRLOOPHVAC:UNITARYHEATCOOL",
+			"AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS",
+			"AIRLOOPHVAC:UNITARYHEATONLY",
+			"AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR",
+			"AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED",
+			"AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR",
+			"AIRLOOPHVAC:UNITARYSYSTEM",
+			"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL",
+			"AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT",
+			"AIRTERMINAL:DUALDUCT:VAV:COOL",
+			"AIRTERMINAL:DUALDUCT:VAV:HEAT",
+			"AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:OUTDOORAIR",
+			"AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:RECIRCULATEDAIR",
+			"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM",
+			"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION",
+			"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
+			"AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER",
+			"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT",
+			"AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT",
+			"AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER",
+			"AIRTERMINAL:SINGLEDUCT:UNCONTROLLED",
+			"AIRTERMINAL:SINGLEDUCT:USERDEFINED",
+			"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT",
+			"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT",
+			"AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT",
+			"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT",
+			"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN",
+			"COIL:COOLING:DX:MULTISPEED",
+			"COIL:COOLING:DX:SINGLESPEED",
+			"COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE",
+			"COIL:COOLING:DX:TWOSPEED",
+			"COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE",
+			"COIL:COOLING:DX:VARIABLESPEED",
+			"COIL:COOLING:WATER",
+			"COIL:COOLING:WATER:DETAILEDGEOMETRY",
+			"COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+			"COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+			"COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+			"COIL:HEATING:DESUPERHEATER",
+			"COIL:HEATING:DX:MULTISPEED",
+			"COIL:HEATING:DX:SINGLESPEED",
+			"COIL:HEATING:DX:VARIABLESPEED",
+			"COIL:HEATING:ELECTRIC",
+			"COIL:HEATING:ELECTRIC:MULTISTAGE",
+			"COIL:HEATING:GAS",
+			"COIL:HEATING:GAS:MULTISTAGE",
+			"COIL:HEATING:STEAM",
+			"COIL:HEATING:WATER",
+			"COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT",
+			"COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION",
+			"COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT",
+			"COIL:USERDEFINED",
+			"COILSYSTEM:COOLING:DX",
+			"COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED",
+			"COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED",
+			"COILSYSTEM:HEATING:DX",
+			"DEHUMIDIFIER:DESICCANT:NOFANS",
+			"DEHUMIDIFIER:DESICCANT:SYSTEM",
+			"DUCT",
+			"EVAPORATIVECOOLER:DIRECT:CELDEKPAD",
+			"EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL",
+			"EVAPORATIVECOOLER:INDIRECT:CELDEKPAD",
+			"EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL",
+			"EVAPORATIVECOOLER:INDIRECT:WETCOIL",
+			"FAN:COMPONENTMODEL",
+			"FAN:CONSTANTVOLUME",
+			"FAN:ONOFF",
+			"FAN:VARIABLEVOLUME",
+			"HEATEXCHANGER:AIRTOAIR:FLATPLATE",
+			"HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT",
+			"HEATEXCHANGER:DESICCANT:BALANCEDFLOW",
+			"HUMIDIFIER:STEAM:ELECTRIC",
+			"OUTDOORAIR:MIXER",
+			"SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL",
+			"SOLARCOLLECTOR:UNGLAZEDTRANSPIRED",
+			"ZONEHVAC:AIRDISTRIBUTIONUNIT"
+		};
+		assert( std::is_sorted( component_strings.begin(), component_strings.end() ) );
+		assert( component_strings.size() == n_ComponentTypes );
+
 		Real64 const SmallLoad( 0.1 ); // (W)
 		Real64 const KJperJ( 0.001 ); // kilojoules per joules
 
@@ -3540,7 +3776,6 @@ namespace SystemReports {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static int NumCompTypes( 0 );
-		static bool firstTime( true );
 		int found;
 
 		struct CompTypeError
@@ -3566,7 +3801,7 @@ namespace SystemReports {
 		};
 
 		// Object Data
-		static FArray1D< CompTypeError > CompTypeErrors;
+		static FArray1D< CompTypeError > CompTypeErrors( 100 );
 
 		if ( ! AirLoopLoadsReportEnabled ) return;
 
@@ -3575,15 +3810,15 @@ namespace SystemReports {
 
 		//    cEnergyType=cRT_ValidTypes(EnergyType-ResourceTypeInitialOffset)
 
-		if ( firstTime ) {
-			CompTypeErrors.allocate( 100 );
-			firstTime = false;
+		// Find enum for the component type string
+		std::vector< std::string >::size_type iCompType;
+		ComponentTypes comp_type( Unknown_ComponentType );
+		if ( index_in_sorted_string_vector( component_strings, CompType, iCompType ) ) {
+			comp_type = static_cast< ComponentTypes >( iCompType );
 		}
 
-		{ auto const SELECT_CASE_var( CompType );
-
-		// Outside Air System
-		if ( SELECT_CASE_var == "AIRLOOPHVAC:OUTDOORAIRSYSTEM" ) {
+		switch( comp_type ) {
+		case AIRLOOPHVAC_OUTDOORAIRSYSTEM: // Outside Air System
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
 					SysOALoadCLNG( AirLoopNum ) += std::abs( CompLoad );
@@ -3591,58 +3826,87 @@ namespace SystemReports {
 					SysOALoadHTNG( AirLoopNum ) += std::abs( CompLoad );
 				}
 			}
-			// Outdoor Air Mixer
-		} else if ( SELECT_CASE_var == "OUTDOORAIR:MIXER" ) {
+			break;
+		case OUTDOORAIR_MIXER: // Outdoor Air Mixer
+			//No energy transfers to account for
+			break;
+		case AIRTERMINAL_SINGLEDUCT_INLETSIDEMIXER:
 			//No energy transfers to account for
 
-		} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:INLETSIDEMIXER" ) {
-			//No energy transfers to account for
-
-		} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:SUPPLYSIDEMIXER" ) {
+			break;
+		case AIRTERMINAL_SINGLEDUCT_SUPPLYSIDEMIXER:
 			//No energy transfers to account for
 
 			// Fan Types for the air sys simulation
-		} else if ( ( SELECT_CASE_var == "FAN:CONSTANTVOLUME" ) || ( SELECT_CASE_var == "FAN:VARIABLEVOLUME" ) || ( SELECT_CASE_var == "FAN:ONOFF" ) || ( SELECT_CASE_var == "FAN:COMPONENTMODEL" ) ) { //cpw22Aug2010 Add 'FAN:COMPONENTMODEL')
+			break;
+		case FAN_CONSTANTVOLUME:
+		case FAN_VARIABLEVOLUME:
+		case FAN_ONOFF:
+		case FAN_COMPONENTMODEL : //cpw22Aug2010 Add 'FAN_COMPONENTMODEL')
 
 			if ( CompLoadFlag ) SysFANCompHTNG( AirLoopNum ) += std::abs( CompLoad );
 			SysFANCompElec( AirLoopNum ) += CompEnergy;
 
 			// Cooling Coil Types for the air sys simulation
-		} else if ( ( SELECT_CASE_var == "COILSYSTEM:COOLING:DX:HEATEXCHANGERASSISTED" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:TWOSPEED" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:MULTISPEED" ) || ( SELECT_CASE_var == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || ( SELECT_CASE_var == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:VARIABLESPEED" ) || ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) || ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) || ( SELECT_CASE_var == "COIL:COOLING:WATER" ) || ( SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE" ) ) {
+			break;
+		case COILSYSTEM_COOLING_DX_HEATEXCHANGERASSISTED:
+		case COIL_COOLING_DX_SINGLESPEED:
+		case COIL_COOLING_DX_TWOSPEED:
+		case COIL_COOLING_DX_TWOSTAGEWITHHUMIDITYCONTROLMODE:
+		case COIL_COOLING_DX_MULTISPEED:
+		case COIL_COOLING_WATERTOAIRHEATPUMP_EQUATIONFIT:
+		case COIL_COOLING_WATERTOAIRHEATPUMP_PARAMETERESTIMATION:
+		case COIL_COOLING_WATERTOAIRHEATPUMP_VARIABLESPEEDEQUATIONFIT:
+		case COIL_COOLING_DX_VARIABLESPEED:
+		case COILSYSTEM_COOLING_WATER_HEATEXCHANGERASSISTED:
+		case COIL_COOLING_WATER_DETAILEDGEOMETRY:
+		case COIL_COOLING_WATER:
+		case COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE:
 
 			if ( CompLoadFlag ) SysCCCompCLNG( AirLoopNum ) += std::abs( CompLoad );
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( ( SELECT_CASE_var1 == iRT_PlantLoopCoolingDemand ) || ( SELECT_CASE_var1 == iRT_DistrictCooling ) ) {
+			if ( ( EnergyType == iRT_PlantLoopCoolingDemand ) || ( EnergyType == iRT_DistrictCooling ) ) {
 				SysCCCompH2OCOLD( AirLoopNum ) += CompEnergy;
-			} else if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			} else if ( EnergyType == iRT_Electricity ) {
 				SysCCCompElec( AirLoopNum ) += CompEnergy;
-			}}
+			}
 
 			// Heating Coil Types for the air sys simulation
-		} else if ( ( SELECT_CASE_var == "COIL:HEATING:WATER" ) || ( SELECT_CASE_var == "COIL:HEATING:DX:SINGLESPEED" ) || ( SELECT_CASE_var == "COIL:HEATING:DX:MULTISPEED" ) || ( SELECT_CASE_var == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION" ) || ( SELECT_CASE_var == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT" ) || ( SELECT_CASE_var == "COIL:HEATING:DX:VARIABLESPEED" ) || ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) || ( SELECT_CASE_var == "COIL:HEATING:GAS" ) || ( SELECT_CASE_var == "COIL:HEATING:GAS:MULTISTAGE" ) || ( SELECT_CASE_var == "COIL:HEATING:DESUPERHEATER" ) ) {
+			break;
+		case COIL_HEATING_WATER:
+		case COIL_HEATING_DX_SINGLESPEED:
+		case COIL_HEATING_DX_MULTISPEED:
+		case COIL_HEATING_WATERTOAIRHEATPUMP_EQUATIONFIT:
+		case COIL_HEATING_WATERTOAIRHEATPUMP_PARAMETERESTIMATION:
+		case COIL_HEATING_WATERTOAIRHEATPUMP_VARIABLESPEEDEQUATIONFIT:
+		case COIL_HEATING_DX_VARIABLESPEED:
+		case COIL_HEATING_STEAM:
+		case COIL_HEATING_GAS:
+		case COIL_HEATING_GAS_MULTISTAGE:
+		case COIL_HEATING_DESUPERHEATER:
 
 			if ( CompLoadFlag ) SysHCCompHTNG( AirLoopNum ) += std::abs( CompLoad );
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( ( SELECT_CASE_var1 == iRT_PlantLoopHeatingDemand ) || ( SELECT_CASE_var1 == iRT_DistrictHeating ) ) {
+			if ( ( EnergyType == iRT_PlantLoopHeatingDemand ) || ( EnergyType == iRT_DistrictHeating ) ) {
 				SysHCCompH2OHOT( AirLoopNum ) += CompEnergy;
-			} else if ( SELECT_CASE_var1 == iRT_Steam ) {
+			} else if ( EnergyType == iRT_Steam ) {
 				SysHCCompSteam( AirLoopNum ) += CompEnergy;
-			} else if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			} else if ( EnergyType == iRT_Electricity ) {
 				SysHCCompElec( AirLoopNum ) += CompEnergy;
-			} else if ( ( SELECT_CASE_var1 == iRT_Natural_Gas ) || ( SELECT_CASE_var1 == iRT_Propane ) ) {
+			} else if ( ( EnergyType == iRT_Natural_Gas ) || ( EnergyType == iRT_Propane ) ) {
 				SysHCCompGas( AirLoopNum ) += CompEnergy;
-			}}
+			}
 
-		} else if ( ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) || ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC:MULTISTAGE" ) ) {
+			break;
+		case COIL_HEATING_ELECTRIC:
+		case COIL_HEATING_ELECTRIC_MULTISTAGE:
 
 			if ( CompLoadFlag ) SysHCCompHTNG( AirLoopNum ) += std::abs( CompLoad );
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			if ( EnergyType == iRT_Electricity ) {
 				SysHCCompElecRes( AirLoopNum ) += CompEnergy;
 			} else {
-			}}
+			}
 
-		} else if ( SELECT_CASE_var == "COIL:USERDEFINED" ) {
+			break;
+		case COIL_USERDEFINED:
 
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
@@ -3651,77 +3915,95 @@ namespace SystemReports {
 					SysHCCompHTNG( AirLoopNum ) += std::abs( CompLoad );
 				}
 			}
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( ( SELECT_CASE_var1 == iRT_PlantLoopHeatingDemand ) || ( SELECT_CASE_var1 == iRT_DistrictHeating ) ) {
+			if ( ( EnergyType == iRT_PlantLoopHeatingDemand ) || ( EnergyType == iRT_DistrictHeating ) ) {
 				SysHCCompH2OHOT( AirLoopNum ) += CompEnergy;
-			} else if ( ( SELECT_CASE_var1 == iRT_PlantLoopCoolingDemand ) || ( SELECT_CASE_var1 == iRT_DistrictCooling ) ) {
+			} else if ( ( EnergyType == iRT_PlantLoopCoolingDemand ) || ( EnergyType == iRT_DistrictCooling ) ) {
 				SysCCCompH2OCOLD( AirLoopNum ) += CompEnergy;
-			} else if ( SELECT_CASE_var1 == iRT_Steam ) {
+			} else if ( EnergyType == iRT_Steam ) {
 				SysHCCompSteam( AirLoopNum ) += CompEnergy;
-			} else if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			} else if ( EnergyType == iRT_Electricity ) {
 				if ( CompLoad > 0.0 ) {
 					SysCCCompElec( AirLoopNum ) += CompEnergy;
 				} else {
 					SysHCCompElec( AirLoopNum ) += CompEnergy;
 				}
-			} else if ( ( SELECT_CASE_var1 == iRT_Natural_Gas ) || ( SELECT_CASE_var1 == iRT_Propane ) ) {
+			} else if ( ( EnergyType == iRT_Natural_Gas ) || ( EnergyType == iRT_Propane ) ) {
 				SysHCCompGas( AirLoopNum ) += CompEnergy;
-			}}
+			}
 
 			//DX Systems
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM" ) {
+			break;
+		case AIRLOOPHVAC_UNITARYSYSTEM:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR" ) {
+			break;
+		case AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATPUMP:WATERTOAIR" ) {
+			break;
+		case AIRLOOPHVAC_UNITARYHEATPUMP_WATERTOAIR:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:DX" ) {
+			break;
+		case COILSYSTEM_COOLING_DX:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "COILSYSTEM:HEATING:DX" ) {
+			break;
+		case COILSYSTEM_HEATING_DX:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARY:FURNACE:HEATONLY" ) {
+			break;
+		case AIRLOOPHVAC_UNITARY_FURNACE_HEATONLY:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARY:FURNACE:HEATCOOL" ) {
+			break;
+		case AIRLOOPHVAC_UNITARY_FURNACE_HEATCOOL:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATONLY" ) {
+			break;
+		case AIRLOOPHVAC_UNITARYHEATONLY:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATCOOL" ) {
+			break;
+		case AIRLOOPHVAC_UNITARYHEATCOOL:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATCOOL:VAVCHANGEOVERBYPASS" ) {
+			break;
+		case AIRLOOPHVAC_UNITARYHEATCOOL_VAVCHANGEOVERBYPASS:
 			//All energy transfers accounted for in subcomponent models
-		} else if ( SELECT_CASE_var == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED" ) {
+			break;
+		case AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR_MULTISPEED:
 			//All energy transfers accounted for in subcomponent models
 
 			// Humidifier Types for the air system simulation
-		} else if ( SELECT_CASE_var == "HUMIDIFIER:STEAM:ELECTRIC" ) {
+			break;
+		case HUMIDIFIER_STEAM_ELECTRIC:
 			if ( CompLoadFlag ) SysHumidHTNG( AirLoopNum ) += std::abs( CompLoad );
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( SELECT_CASE_var1 == iRT_Water ) {
+			if ( EnergyType == iRT_Water ) {
 				SysDomesticH20( AirLoopNum ) += std::abs( CompEnergy );
-			} else if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			} else if ( EnergyType == iRT_Electricity ) {
 				SysHumidElec( AirLoopNum ) += CompEnergy;
-			}}
+			}
 
 			// Evap Cooler Types for the air system simulation
-		} else if ( ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:CELDEKPAD" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:CELDEKPAD" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:WETCOIL" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL" ) || ( SELECT_CASE_var == "EVAPORATIVECOOLER:INDIRECT:RESEARCHSPECIAL" ) ) {
+			break;
+		case EVAPORATIVECOOLER_DIRECT_CELDEKPAD:
+		case EVAPORATIVECOOLER_INDIRECT_CELDEKPAD:
+		case EVAPORATIVECOOLER_INDIRECT_WETCOIL:
+		case EVAPORATIVECOOLER_DIRECT_RESEARCHSPECIAL:
+		case EVAPORATIVECOOLER_INDIRECT_RESEARCHSPECIAL:
 			if ( CompLoadFlag ) SysEvapCLNG( AirLoopNum ) += std::abs( CompLoad );
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( SELECT_CASE_var1 == iRT_Water ) {
+			if ( EnergyType == iRT_Water ) {
 				SysDomesticH20( AirLoopNum ) += std::abs( CompEnergy );
-			} else if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			} else if ( EnergyType == iRT_Electricity ) {
 				SysEvapElec( AirLoopNum ) += CompEnergy;
-			}}
+			}
 
 			// Desiccant Dehumidifier Types for the air system simulation
-		} else if ( ( SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:NOFANS" ) || ( SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:SYSTEM" ) ) {
+			break;
+		case DEHUMIDIFIER_DESICCANT_NOFANS:
+		case DEHUMIDIFIER_DESICCANT_SYSTEM:
 			if ( CompLoadFlag ) DesDehumidCLNG( AirLoopNum ) += std::abs( CompLoad );
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			if ( EnergyType == iRT_Electricity ) {
 				DesDehumidElec( AirLoopNum ) += CompEnergy;
-			}}
+			}
 
 			// Heat Exchanger Types
-		} else if ( ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:FLATPLATE" ) || ( SELECT_CASE_var == "HEATEXCHANGER:AIRTOAIR:SENSIBLEANDLATENT" ) || ( SELECT_CASE_var == "HEATEXCHANGER:DESICCANT:BALANCEDFLOW" ) ) {
+			break;
+		case HEATEXCHANGER_AIRTOAIR_FLATPLATE:
+		case HEATEXCHANGER_AIRTOAIR_SENSIBLEANDLATENT:
+		case HEATEXCHANGER_DESICCANT_BALANCEDFLOW:
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
 					SysHeatExCLNG( AirLoopNum ) += std::abs( CompLoad );
@@ -3731,11 +4013,30 @@ namespace SystemReports {
 			}
 
 			// Air Terminal Types
-		} else if ( ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:COOL" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME:HEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:COOL" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:HEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:OUTDOORAIR" ) || ( SELECT_CASE_var == "AIRTERMINAL:DUALDUCT:VAV:OUTDOORAIR:RECIRCULATEDAIR" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEINDUCTION" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:NOREHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN" ) || ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM" ) || ( SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT" ) ) {
+			break;
+		case AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_COOL:
+		case AIRTERMINAL_DUALDUCT_CONSTANTVOLUME_HEAT:
+		case AIRTERMINAL_DUALDUCT_VAV_COOL:
+		case AIRTERMINAL_DUALDUCT_VAV_HEAT:
+		case AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_OUTDOORAIR:
+		case AIRTERMINAL_DUALDUCT_VAV_OUTDOORAIR_RECIRCULATEDAIR:
+		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_FOURPIPEINDUCTION:
+		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_REHEAT:
+		case AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT:
+		case AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT:
+		case AIRTERMINAL_SINGLEDUCT_UNCONTROLLED:
+		case AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT:
+		case AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_REHEAT:
+		case AIRTERMINAL_SINGLEDUCT_VAV_NOREHEAT:
+		case AIRTERMINAL_SINGLEDUCT_VAV_REHEAT:
+		case AIRTERMINAL_SINGLEDUCT_VAV_REHEAT_VARIABLESPEEDFAN:
+		case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_COOLEDBEAM:
+		case ZONEHVAC_AIRDISTRIBUTIONUNIT:
 			//All energy transfers accounted for in component models
 
 			// Duct Types
-		} else if ( SELECT_CASE_var == "DUCT" ) {
+			break;
+		case DUCT:
 			// duct losses should be accounted for here ???
 			// requires addition of a new variable to sum duct losses
 			// Example:
@@ -3746,7 +4047,9 @@ namespace SystemReports {
 			//      ENDIF
 
 			// Solar Collector Types
-		} else if ( ( SELECT_CASE_var == "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL" ) || ( SELECT_CASE_var == "SOLARCOLLECTOR:UNGLAZEDTRANSPIRED" ) ) {
+			break;
+		case SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL:
+		case SOLARCOLLECTOR_UNGLAZEDTRANSPIRED:
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
 					SysSolarCollectCooling( AirLoopNum ) += std::abs( CompLoad );
@@ -3755,7 +4058,8 @@ namespace SystemReports {
 				}
 			}
 
-		} else if ( SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:USERDEFINED" ) {
+			break;
+		case AIRTERMINAL_SINGLEDUCT_USERDEFINED:
 			// User component model energy use should be accounted for here
 			if ( CompLoadFlag ) {
 				if ( CompLoad > 0.0 ) {
@@ -3764,37 +4068,36 @@ namespace SystemReports {
 					SysUserDefinedTerminalHeating( AirLoopNum ) += std::abs( CompLoad );
 				}
 			}
-			{ auto const SELECT_CASE_var1( EnergyType );
-			if ( ( SELECT_CASE_var1 == iRT_PlantLoopHeatingDemand ) || ( SELECT_CASE_var1 == iRT_DistrictHeating ) ) {
+			if ( ( EnergyType == iRT_PlantLoopHeatingDemand ) || ( EnergyType == iRT_DistrictHeating ) ) {
 				SysHCCompH2OHOT( AirLoopNum ) += CompEnergy;
-			} else if ( ( SELECT_CASE_var1 == iRT_PlantLoopCoolingDemand ) || ( SELECT_CASE_var1 == iRT_DistrictCooling ) ) {
+			} else if ( ( EnergyType == iRT_PlantLoopCoolingDemand ) || ( EnergyType == iRT_DistrictCooling ) ) {
 				SysCCCompH2OCOLD( AirLoopNum ) += CompEnergy;
-			} else if ( SELECT_CASE_var1 == iRT_Steam ) {
+			} else if ( EnergyType == iRT_Steam ) {
 				SysHCCompSteam( AirLoopNum ) += CompEnergy;
-			} else if ( SELECT_CASE_var1 == iRT_Electricity ) {
+			} else if ( EnergyType == iRT_Electricity ) {
 				if ( CompLoad > 0.0 ) {
 					SysCCCompElec( AirLoopNum ) += CompEnergy;
 				} else {
 					SysHCCompElec( AirLoopNum ) += CompEnergy;
 				}
-			} else if ( ( SELECT_CASE_var1 == iRT_Natural_Gas ) || ( SELECT_CASE_var1 == iRT_Propane ) ) {
+			} else if ( ( EnergyType == iRT_Natural_Gas ) || ( EnergyType == iRT_Propane ) ) {
 				SysHCCompGas( AirLoopNum ) += CompEnergy;
-			}}
+			}
 			// Recurring warning for unaccounted equipment types
 			// (should never happen, when this does happen enter appropriate equipment CASE statement above)
-		} else {
+			break;
+		default:
 			found = 0;
 			if ( NumCompTypes > 0 ) {
 				found = FindItemInList( CompType, CompTypeErrors.CompType(), NumCompTypes );
 			}
 			if ( found == 0 ) {
-				++NumCompTypes;
-				CompTypeErrors( NumCompTypes ).CompType = CompType;
+				CompTypeErrors( ++NumCompTypes ).CompType = CompType;
 				found = NumCompTypes;
 			}
 			ShowRecurringSevereErrorAtEnd( "CalcSystemEnergyUse: Component Type=" + CompType + " not logged as one of allowable Component Types.", CompTypeErrors( found ).CompErrIndex );
-
-		}}
+			break;
+		} // switch
 
 	}
 
@@ -4472,7 +4775,7 @@ namespace SystemReports {
 
 		gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_706 );
-		gio::write( ChrOut, "*" ) << NumPrimaryAirSys;
+		gio::write( ChrOut, fmtLD ) << NumPrimaryAirSys;
 		gio::write( OutputFileBNDetails, Format_707 ) << "#AirLoopHVACs," + stripped( ChrOut );
 		gio::write( OutputFileBNDetails, Format_708 );
 		gio::write( OutputFileBNDetails, Format_709 );
@@ -4484,10 +4787,10 @@ namespace SystemReports {
 		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Branch>,<Outlet Branch>," "<Loop Name>,<Loop Type>";
 		gio::write( OutputFileBNDetails, Format_713 ) << "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>," "<Connector Name>,<Inlet Node>,<Outlet Node>," "<Loop Name>,<Loop Type>";
 		for ( Count = 1; Count <= NumPrimaryAirSys; ++Count ) {
-			gio::write( ChrOut, "*" ) << AirToZoneNodeInfo( Count ).NumReturnNodes;
-			gio::write( ChrOut2, "*" ) << AirToZoneNodeInfo( Count ).NumSupplyNodes;
-			gio::write( ChrOut3, "*" ) << AirToZoneNodeInfo( Count ).NumZonesCooled;
-			gio::write( ChrOut4, "*" ) << AirToZoneNodeInfo( Count ).NumZonesHeated;
+			gio::write( ChrOut, fmtLD ) << AirToZoneNodeInfo( Count ).NumReturnNodes;
+			gio::write( ChrOut2, fmtLD ) << AirToZoneNodeInfo( Count ).NumSupplyNodes;
+			gio::write( ChrOut3, fmtLD ) << AirToZoneNodeInfo( Count ).NumZonesCooled;
+			gio::write( ChrOut4, fmtLD ) << AirToZoneNodeInfo( Count ).NumZonesHeated;
 			strip( ChrOut );
 			strip( ChrOut2 );
 			strip( ChrOut3 );
@@ -4499,14 +4802,14 @@ namespace SystemReports {
 			}
 			gio::write( OutputFileBNDetails, Format_701 ) << " AirLoopHVAC," + AirToZoneNodeInfo( Count ).AirLoopName + ',' + ChrOut + ',' + ChrOut2 + ',' + ChrOut3 + ',' + ChrOut4 + ',' + ChrOut5;
 			for ( Count1 = 1; Count1 <= AirToZoneNodeInfo( Count ).NumReturnNodes; ++Count1 ) {
-				gio::write( ChrOut, "*" ) << Count1;
+				gio::write( ChrOut, fmtLD ) << Count1;
 				if ( AirToZoneNodeInfo( Count ).ZoneEquipReturnNodeNum( Count1 ) > 0 ) {
-					gio::write( ChrOut2, "*" ) << AirToZoneNodeInfo( Count ).ZoneEquipReturnNodeNum( Count1 );
+					gio::write( ChrOut2, fmtLD ) << AirToZoneNodeInfo( Count ).ZoneEquipReturnNodeNum( Count1 );
 				} else {
 					ChrOut2 = errstring;
 				}
 				if ( AirToZoneNodeInfo( Count ).AirLoopReturnNodeNum( Count1 ) > 0 ) {
-					gio::write( ChrOut3, "*" ) << AirToZoneNodeInfo( Count ).AirLoopReturnNodeNum( Count1 );
+					gio::write( ChrOut3, fmtLD ) << AirToZoneNodeInfo( Count ).AirLoopReturnNodeNum( Count1 );
 				} else {
 					ChrOut3 = errstring;
 				}
@@ -4526,14 +4829,14 @@ namespace SystemReports {
 				}
 			}
 			for ( Count1 = 1; Count1 <= AirToZoneNodeInfo( Count ).NumSupplyNodes; ++Count1 ) {
-				gio::write( ChrOut, "*" ) << Count1;
+				gio::write( ChrOut, fmtLD ) << Count1;
 				if ( AirToZoneNodeInfo( Count ).ZoneEquipSupplyNodeNum( Count1 ) > 0 ) {
-					gio::write( ChrOut2, "*" ) << AirToZoneNodeInfo( Count ).ZoneEquipSupplyNodeNum( Count1 );
+					gio::write( ChrOut2, fmtLD ) << AirToZoneNodeInfo( Count ).ZoneEquipSupplyNodeNum( Count1 );
 				} else {
 					ChrOut2 = errstring;
 				}
 				if ( AirToZoneNodeInfo( Count ).AirLoopSupplyNodeNum( Count1 ) > 0 ) {
-					gio::write( ChrOut3, "*" ) << AirToZoneNodeInfo( Count ).AirLoopSupplyNodeNum( Count1 );
+					gio::write( ChrOut3, fmtLD ) << AirToZoneNodeInfo( Count ).AirLoopSupplyNodeNum( Count1 );
 				} else {
 					ChrOut3 = errstring;
 				}
@@ -4554,9 +4857,9 @@ namespace SystemReports {
 			}
 
 			for ( Count1 = 1; Count1 <= AirToZoneNodeInfo( Count ).NumZonesCooled; ++Count1 ) {
-				gio::write( ChrOut, "*" ) << Count1;
+				gio::write( ChrOut, fmtLD ) << Count1;
 				if ( AirToZoneNodeInfo( Count ).CoolZoneInletNodes( Count1 ) > 0 ) {
-					gio::write( ChrOut2, "*" ) << AirToZoneNodeInfo( Count ).CoolZoneInletNodes( Count1 );
+					gio::write( ChrOut2, fmtLD ) << AirToZoneNodeInfo( Count ).CoolZoneInletNodes( Count1 );
 				} else {
 					ChrOut2 = errstring;
 				}
@@ -4572,9 +4875,9 @@ namespace SystemReports {
 				}
 			}
 			for ( Count1 = 1; Count1 <= AirToZoneNodeInfo( Count ).NumZonesHeated; ++Count1 ) {
-				gio::write( ChrOut, "*" ) << Count1;
+				gio::write( ChrOut, fmtLD ) << Count1;
 				if ( AirToZoneNodeInfo( Count ).HeatZoneInletNodes( Count1 ) > 0 ) {
-					gio::write( ChrOut2, "*" ) << AirToZoneNodeInfo( Count ).HeatZoneInletNodes( Count1 );
+					gio::write( ChrOut2, fmtLD ) << AirToZoneNodeInfo( Count ).HeatZoneInletNodes( Count1 );
 				} else {
 					ChrOut2 = errstring;
 				}
@@ -4591,12 +4894,12 @@ namespace SystemReports {
 			}
 			if ( AirToOANodeInfo( Count ).OASysExists ) {
 				if ( AirToOANodeInfo( Count ).OASysInletNodeNum > 0 ) {
-					gio::write( ChrOut, "*" ) << AirToOANodeInfo( Count ).OASysInletNodeNum;
+					gio::write( ChrOut, fmtLD ) << AirToOANodeInfo( Count ).OASysInletNodeNum;
 				} else {
 					ChrOut = errstring;
 				}
 				if ( AirToOANodeInfo( Count ).OASysOutletNodeNum > 0 ) {
-					gio::write( ChrOut2, "*" ) << AirToOANodeInfo( Count ).OASysOutletNodeNum;
+					gio::write( ChrOut2, fmtLD ) << AirToOANodeInfo( Count ).OASysOutletNodeNum;
 				} else {
 					ChrOut2 = errstring;
 				}
@@ -4616,10 +4919,10 @@ namespace SystemReports {
 			}
 			//  Report HVAC Air Loop Splitter to BND file
 			if ( PrimaryAirSystem( Count ).Splitter.Exists ) {
-				gio::write( ChrOut, "*" ) << PrimaryAirSystem( Count ).Splitter.TotalOutletNodes;
+				gio::write( ChrOut, fmtLD ) << PrimaryAirSystem( Count ).Splitter.TotalOutletNodes;
 				gio::write( OutputFileBNDetails, Format_701 ) << "   AirLoopHVAC Connector,Splitter," + PrimaryAirSystem( Count ).Splitter.Name + ',' + PrimaryAirSystem( Count ).Name + ",Air," + stripped( ChrOut );
 				for ( Count1 = 1; Count1 <= PrimaryAirSystem( Count ).Splitter.TotalOutletNodes; ++Count1 ) {
-					gio::write( ChrOut, "*" ) << Count1;
+					gio::write( ChrOut, fmtLD ) << Count1;
 					if ( PrimaryAirSystem( Count ).Splitter.BranchNumIn <= 0 ) {
 						ChrOut2 = errstring;
 					}
@@ -4656,7 +4959,7 @@ namespace SystemReports {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

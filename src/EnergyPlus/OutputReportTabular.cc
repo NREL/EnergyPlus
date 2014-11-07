@@ -1,5 +1,9 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
+#include <map>
+#include <utility>
+#include <vector>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -148,7 +152,8 @@ namespace OutputReportTabular {
 	int const numResourceTypes( 14 );
 	int const numSourceTypes( 12 );
 
-	std::string const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
+	static std::string const validChars( "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_:." );
+	static std::string const BlankString;
 
 	//MODULE VARIABLE DECLARATIONS:
 
@@ -396,6 +401,9 @@ namespace OutputReportTabular {
 	FArray1D< TOCEntriesType > TOCEntries;
 	FArray1D< TOCEntriesType > CopyOfTOCEntries;
 	FArray1D< UnitConvType > UnitConv;
+
+	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt const fmtA( "(A)" );
 
 	// Functions
 
@@ -1398,15 +1406,12 @@ namespace OutputReportTabular {
 		using DataStringGlobals::CharComma;
 		using DataStringGlobals::CharTab;
 		using DataStringGlobals::CharSpace;
-		using SQLiteProcedures::WriteTabularDataToSQLite;
-		using SQLiteProcedures::WriteOutputToSQLite;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 		static std::string const CurrentModuleObject( "OutputControl:Table:Style" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1534,7 +1539,7 @@ namespace OutputReportTabular {
 		}
 
 		if ( WriteTabularFiles ) {
-			gio::write( OutputFileInits, fmta ) << "! <Tabular Report>,Style,Unit Conversion";
+			gio::write( OutputFileInits, fmtA ) << "! <Tabular Report>,Style,Unit Conversion";
 			if ( AlphArray( 1 ) != "HTML" ) {
 				ConvertCaseToLower( AlphArray( 1 ), AlphArray( 2 ) );
 				AlphArray( 1 ).erase( 1 );
@@ -1767,7 +1772,7 @@ namespace OutputReportTabular {
 					//the sizing period reports
 					displayZoneComponentLoadSummary = true;
 				}
-				//check the reports that are predefined and are created by outputreportpredefined.f90
+				//check the reports that are predefined and are created by outputreportpredefined.cc
 				for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 					lenAlpha = len( AlphArray( iReport ) );
 					lenReport = len( reportName( jReport ).name );
@@ -3078,7 +3083,6 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 		static gio::Fmt const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
 		static gio::Fmt const TimeStampFmt2( "(A,I2.2,A,I2.2,A,I2.2,A)" );
 
@@ -3109,60 +3113,60 @@ namespace OutputReportTabular {
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.csv\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "Program Version:" + curDel + VerString;
-					gio::write( curFH, "*" ) << "Tabular Output Report in Format: " + curDel + "Comma";
-					gio::write( curFH, fmta ) << "";
-					gio::write( curFH, fmta ) << "Building:" + curDel + BuildingName;
+					gio::write( curFH, fmtA ) << "Program Version:" + curDel + VerString;
+					gio::write( curFH, fmtLD ) << "Tabular Output Report in Format: " + curDel + "Comma";
+					gio::write( curFH, fmtA ) << "";
+					gio::write( curFH, fmtA ) << "Building:" + curDel + BuildingName;
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName;
+						gio::write( curFH, fmtA ) << "Environment:" + curDel + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName + " ** " + WeatherFileLocationTitle;
+						gio::write( curFH, fmtA ) << "Environment:" + curDel + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
-					gio::write( curFH, fmta ) << "";
+					gio::write( curFH, fmtA ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleTab ) {
 					DisplayString( "Writing tabular output file results using tab format." );
 					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, "eplustbl.tab", flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.tab\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "Program Version" + curDel + VerString;
-					gio::write( curFH, fmta ) << "Tabular Output Report in Format: " + curDel + "Tab";
-					gio::write( curFH, fmta ) << "";
-					gio::write( curFH, fmta ) << "Building:" + curDel + BuildingName;
+					gio::write( curFH, fmtA ) << "Program Version" + curDel + VerString;
+					gio::write( curFH, fmtA ) << "Tabular Output Report in Format: " + curDel + "Tab";
+					gio::write( curFH, fmtA ) << "";
+					gio::write( curFH, fmtA ) << "Building:" + curDel + BuildingName;
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName;
+						gio::write( curFH, fmtA ) << "Environment:" + curDel + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "Environment:" + curDel + EnvironmentName + " ** " + WeatherFileLocationTitle;
+						gio::write( curFH, fmtA ) << "Environment:" + curDel + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
-					gio::write( curFH, fmta ) << "";
+					gio::write( curFH, fmtA ) << "";
 				} else if ( TableStyle( iStyle ) == tableStyleHTML ) {
 					DisplayString( "Writing tabular output file results using HTML format." );
 					{ IOFlags flags; flags.ACTION( "WRITE" ); gio::open( curFH, "eplustbl.htm", flags ); write_stat = flags.ios(); }
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.htm\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" "\"http://www.w3.org/TR/html4/loose.dtd\">";
-					gio::write( curFH, fmta ) << "<html>";
-					gio::write( curFH, fmta ) << "<head>";
+					gio::write( curFH, fmtA ) << "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" "\"http://www.w3.org/TR/html4/loose.dtd\">";
+					gio::write( curFH, fmtA ) << "<html>";
+					gio::write( curFH, fmtA ) << "<head>";
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "<title> " + BuildingName + ' ' + EnvironmentName;
+						gio::write( curFH, fmtA ) << "<title> " + BuildingName + ' ' + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "<title> " + BuildingName + ' ' + EnvironmentName + " ** " + WeatherFileLocationTitle;
+						gio::write( curFH, fmtA ) << "<title> " + BuildingName + ' ' + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
 					gio::write( curFH, TimeStampFmt1 ) << "  " << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
 					gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << " ";
-					gio::write( curFH, fmta ) << " - EnergyPlus</title>";
-					gio::write( curFH, fmta ) << "</head>";
-					gio::write( curFH, fmta ) << "<body>";
-					gio::write( curFH, fmta ) << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>";
-					gio::write( curFH, fmta ) << "<a name=top></a>";
-					gio::write( curFH, fmta ) << "<p>Program Version:<b>" + VerString + "</b></p>";
-					gio::write( curFH, fmta ) << "<p>Tabular Output Report in Format: <b>HTML</b></p>";
-					gio::write( curFH, fmta ) << "<p>Building: <b>" + BuildingName + "</b></p>";
+					gio::write( curFH, fmtA ) << " - EnergyPlus</title>";
+					gio::write( curFH, fmtA ) << "</head>";
+					gio::write( curFH, fmtA ) << "<body>";
+					gio::write( curFH, fmtA ) << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>";
+					gio::write( curFH, fmtA ) << "<a name=top></a>";
+					gio::write( curFH, fmtA ) << "<p>Program Version:<b>" + VerString + "</b></p>";
+					gio::write( curFH, fmtA ) << "<p>Tabular Output Report in Format: <b>HTML</b></p>";
+					gio::write( curFH, fmtA ) << "<p>Building: <b>" + BuildingName + "</b></p>";
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "<p>Environment: <b>" + EnvironmentName + "</b></p>";
+						gio::write( curFH, fmtA ) << "<p>Environment: <b>" + EnvironmentName + "</b></p>";
 					} else {
-						gio::write( curFH, fmta ) << "<p>Environment: <b>" + EnvironmentName + " ** " + WeatherFileLocationTitle + "</b></p>";
+						gio::write( curFH, fmtA ) << "<p>Environment: <b>" + EnvironmentName + " ** " + WeatherFileLocationTitle + "</b></p>";
 					}
 					gio::write( curFH, TimeStampFmt1 ) << "<p>Simulation Timestamp: <b>" << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
 					gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << "</b></p>";
@@ -3172,20 +3176,20 @@ namespace OutputReportTabular {
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.xml\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "<?xml version=\"1.0\"?>";
-					gio::write( curFH, fmta ) << "<EnergyPlusTabularReports>";
-					gio::write( curFH, fmta ) << "  <BuildingName>" + BuildingName + "</BuildingName>";
-					gio::write( curFH, fmta ) << "  <EnvironmentName>" + EnvironmentName + "</EnvironmentName>";
-					gio::write( curFH, fmta ) << "  <WeatherFileLocationTitle>" + WeatherFileLocationTitle + "</WeatherFileLocationTitle>";
-					gio::write( curFH, fmta ) << "  <ProgramVersion>" + VerString + "</ProgramVersion>";
-					gio::write( curFH, fmta ) << "  <SimulationTimestamp>";
-					gio::write( curFH, fmta ) << "    <Date>";
+					gio::write( curFH, fmtA ) << "<?xml version=\"1.0\"?>";
+					gio::write( curFH, fmtA ) << "<EnergyPlusTabularReports>";
+					gio::write( curFH, fmtA ) << "  <BuildingName>" + BuildingName + "</BuildingName>";
+					gio::write( curFH, fmtA ) << "  <EnvironmentName>" + EnvironmentName + "</EnvironmentName>";
+					gio::write( curFH, fmtA ) << "  <WeatherFileLocationTitle>" + WeatherFileLocationTitle + "</WeatherFileLocationTitle>";
+					gio::write( curFH, fmtA ) << "  <ProgramVersion>" + VerString + "</ProgramVersion>";
+					gio::write( curFH, fmtA ) << "  <SimulationTimestamp>";
+					gio::write( curFH, fmtA ) << "    <Date>";
 					gio::write( curFH, TimeStampFmt1 ) << "      " << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
-					gio::write( curFH, fmta ) << "    </Date>";
-					gio::write( curFH, fmta ) << "    <Time>";
+					gio::write( curFH, fmtA ) << "    </Date>";
+					gio::write( curFH, fmtA ) << "    <Time>";
 					gio::write( curFH, TimeStampFmt2 ) << "      " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << " ";
-					gio::write( curFH, fmta ) << "    </Time>";
-					gio::write( curFH, fmta ) << "  </SimulationTimestamp>";
+					gio::write( curFH, fmtA ) << "    </Time>";
+					gio::write( curFH, fmtA ) << "  </SimulationTimestamp>";
 					gio::write( curFH );
 				} else {
 					DisplayString( "Writing tabular output file results using text format." );
@@ -3193,16 +3197,16 @@ namespace OutputReportTabular {
 					if ( write_stat != 0 ) {
 						ShowFatalError( "OpenOutputTabularFile: Could not open file \"eplustbl.txt\" for output (write)." );
 					}
-					gio::write( curFH, fmta ) << "Program Version: " + VerString;
-					gio::write( curFH, fmta ) << "Tabular Output Report in Format: " + curDel + "Fixed";
-					gio::write( curFH, fmta ) << "";
-					gio::write( curFH, fmta ) << "Building:        " + BuildingName;
+					gio::write( curFH, fmtA ) << "Program Version: " + VerString;
+					gio::write( curFH, fmtA ) << "Tabular Output Report in Format: " + curDel + "Fixed";
+					gio::write( curFH, fmtA ) << "";
+					gio::write( curFH, fmtA ) << "Building:        " + BuildingName;
 					if ( EnvironmentName == WeatherFileLocationTitle ) {
-						gio::write( curFH, fmta ) << "Environment:     " + EnvironmentName;
+						gio::write( curFH, fmtA ) << "Environment:     " + EnvironmentName;
 					} else {
-						gio::write( curFH, fmta ) << "Environment:     " + EnvironmentName + " ** " + WeatherFileLocationTitle;
+						gio::write( curFH, fmtA ) << "Environment:     " + EnvironmentName + " ** " + WeatherFileLocationTitle;
 					}
-					gio::write( curFH, fmta ) << "";
+					gio::write( curFH, fmtA ) << "";
 				}
 			}
 		}
@@ -3236,7 +3240,6 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3251,13 +3254,13 @@ namespace OutputReportTabular {
 			for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 				// if HTML file put ending info
 				if ( TableStyle( iStyle ) == tableStyleHTML ) {
-					gio::write( TabularOutputFile( iStyle ), fmta ) << "</body>";
-					gio::write( TabularOutputFile( iStyle ), fmta ) << "</html>";
+					gio::write( TabularOutputFile( iStyle ), fmtA ) << "</body>";
+					gio::write( TabularOutputFile( iStyle ), fmtA ) << "</html>";
 				} else if ( TableStyle( iStyle ) == tableStyleXML ) {
 					if ( len( prevReportName ) != 0 ) {
-						gio::write( TabularOutputFile( iStyle ), fmta ) << "</" + prevReportName + '>'; //close the last element if it was used.
+						gio::write( TabularOutputFile( iStyle ), fmtA ) << "</" + prevReportName + '>'; //close the last element if it was used.
 					}
-					gio::write( TabularOutputFile( iStyle ), fmta ) << "</EnergyPlusTabularReports>";
+					gio::write( TabularOutputFile( iStyle ), fmtA ) << "</EnergyPlusTabularReports>";
 				}
 				gio::close( TabularOutputFile( iStyle ) );
 			}
@@ -3292,7 +3295,6 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3317,52 +3319,52 @@ namespace OutputReportTabular {
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			if ( TableStyle( iStyle ) == tableStyleHTML ) {
 				curFH = TabularOutputFile( iStyle );
-				gio::write( curFH, fmta ) << "<hr>";
-				gio::write( curFH, fmta ) << "<a name=toc></a>";
-				gio::write( curFH, fmta ) << "<p><b>Table of Contents</b></p>";
-				gio::write( curFH, fmta ) << "<a href=\"#top\">Top</a>";
+				gio::write( curFH, fmtA ) << "<hr>";
+				gio::write( curFH, fmtA ) << "<a name=toc></a>";
+				gio::write( curFH, fmtA ) << "<p><b>Table of Contents</b></p>";
+				gio::write( curFH, fmtA ) << "<a href=\"#top\">Top</a>";
 				if ( displayTabularBEPS ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Annual Building Utility Performance Summary", "Entire Facility" ) + "\">Annual Building Utility Performance Summary</a>";
+					gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( "Annual Building Utility Performance Summary", "Entire Facility" ) + "\">Annual Building Utility Performance Summary</a>";
 				}
 				if ( displayTabularVeriSum ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Input Verification and Results Summary", "Entire Facility" ) + "\">Input Verification and Results Summary</a>";
+					gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( "Input Verification and Results Summary", "Entire Facility" ) + "\">Input Verification and Results Summary</a>";
 				}
 				if ( displayDemandEndUse ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Demand End Use Components Summary", "Entire Facility" ) + "\">Demand End Use Components Summary</a>";
+					gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( "Demand End Use Components Summary", "Entire Facility" ) + "\">Demand End Use Components Summary</a>";
 				}
 				if ( displaySourceEnergyEndUseSummary ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Source Energy End Use Components Summary", "Entire Facility" ) + "\">Source Energy End Use Components Summary</a>";
+					gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( "Source Energy End Use Components Summary", "Entire Facility" ) + "\">Source Energy End Use Components Summary</a>";
 				}
 				if ( DoCostEstimate ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Component Cost Economics Summary", "Entire Facility" ) + "\">Component Cost Economics Summary</a>";
+					gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( "Component Cost Economics Summary", "Entire Facility" ) + "\">Component Cost Economics Summary</a>";
 				}
 				if ( displayComponentSizing ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Component Sizing Summary", "Entire Facility" ) + "\">Component Sizing Summary</a>";
+					gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( "Component Sizing Summary", "Entire Facility" ) + "\">Component Sizing Summary</a>";
 				}
 				if ( displaySurfaceShadowing ) {
-					gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( "Surface Shadowing Summary", "Entire Facility" ) + "\">Surface Shadowing Summary</a>";
+					gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( "Surface Shadowing Summary", "Entire Facility" ) + "\">Surface Shadowing Summary</a>";
 				}
 				for ( kReport = 1; kReport <= numReportName; ++kReport ) {
 					if ( reportName( kReport ).show ) {
-						gio::write( curFH, fmta ) << "<br><a href=\"#" + MakeAnchorName( reportName( kReport ).namewithspaces, "Entire Facility" ) + "\">" + reportName( kReport ).namewithspaces + "</a>";
+						gio::write( curFH, fmtA ) << "<br><a href=\"#" + MakeAnchorName( reportName( kReport ).namewithspaces, "Entire Facility" ) + "\">" + reportName( kReport ).namewithspaces + "</a>";
 					}
 				}
 				if ( DoWeathSim ) {
 					for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
 						if ( MonthlyInput( iInput ).numTables > 0 ) {
-							gio::write( curFH, fmta ) << "<p><b>" + MonthlyInput( iInput ).name + "</b></p> |";
+							gio::write( curFH, fmtA ) << "<p><b>" + MonthlyInput( iInput ).name + "</b></p> |";
 							for ( jTable = 1; jTable <= MonthlyInput( iInput ).numTables; ++jTable ) {
 								curTable = jTable + MonthlyInput( iInput ).firstTable - 1;
-								gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue ) + "\">" + MonthlyTables( curTable ).keyValue + "</a>    |   ";
+								gio::write( curFH, fmtA ) << "<a href=\"#" + MakeAnchorName( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue ) + "\">" + MonthlyTables( curTable ).keyValue + "</a>    |   ";
 							}
 						}
 					}
 					for ( iInput = 1; iInput <= OutputTableBinnedCount; ++iInput ) {
 						if ( OutputTableBinned( iInput ).numTables > 0 ) {
 							if ( OutputTableBinned( iInput ).scheduleIndex == 0 ) {
-								gio::write( curFH, fmta ) << "<p><b>" + OutputTableBinned( iInput ).varOrMeter + "</b></p> |";
+								gio::write( curFH, fmtA ) << "<p><b>" + OutputTableBinned( iInput ).varOrMeter + "</b></p> |";
 							} else {
-								gio::write( curFH, fmta ) << "<p><b>" + OutputTableBinned( iInput ).varOrMeter + " [" + OutputTableBinned( iInput ).ScheduleName + "]</b></p> |";
+								gio::write( curFH, fmtA ) << "<p><b>" + OutputTableBinned( iInput ).varOrMeter + " [" + OutputTableBinned( iInput ).ScheduleName + "]</b></p> |";
 							}
 							for ( jTable = 1; jTable <= OutputTableBinned( iInput ).numTables; ++jTable ) {
 								curTable = OutputTableBinned( iInput ).resIndex + ( jTable - 1 );
@@ -3374,9 +3376,9 @@ namespace OutputReportTabular {
 									curName = OutputTableBinned( iInput ).varOrMeter + " [" + OutputTableBinned( iInput ).units + ']';
 								}
 								if ( OutputTableBinned( iInput ).scheduleIndex == 0 ) {
-									gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( curName, BinObjVarID( curTable ).namesOfObj ) + "\">" + BinObjVarID( curTable ).namesOfObj + "</a>   |  ";
+									gio::write( curFH, fmtA ) << "<a href=\"#" + MakeAnchorName( curName, BinObjVarID( curTable ).namesOfObj ) + "\">" + BinObjVarID( curTable ).namesOfObj + "</a>   |  ";
 								} else {
-									gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( curName + OutputTableBinned( iInput ).ScheduleName, BinObjVarID( curTable ).namesOfObj ) + "\">" + BinObjVarID( curTable ).namesOfObj + "</a>   |  ";
+									gio::write( curFH, fmtA ) << "<a href=\"#" + MakeAnchorName( curName + OutputTableBinned( iInput ).ScheduleName, BinObjVarID( curTable ).namesOfObj ) + "\">" + BinObjVarID( curTable ).namesOfObj + "</a>   |  ";
 								}
 							}
 						}
@@ -3386,11 +3388,11 @@ namespace OutputReportTabular {
 				for ( iEntry = 1; iEntry <= TOCEntriesCount; ++iEntry ) {
 					if ( ! TOCEntries( iEntry ).isWritten ) {
 						curSection = TOCEntries( iEntry ).sectionName;
-						gio::write( curFH, fmta ) << "<p><b>" + curSection + "</b></p> |";
+						gio::write( curFH, fmtA ) << "<p><b>" + curSection + "</b></p> |";
 						for ( jEntry = iEntry; jEntry <= TOCEntriesCount; ++jEntry ) {
 							if ( ! TOCEntries( jEntry ).isWritten ) {
 								if ( TOCEntries( jEntry ).sectionName == curSection ) {
-									gio::write( curFH, fmta ) << "<a href=\"#" + MakeAnchorName( TOCEntries( jEntry ).sectionName, TOCEntries( jEntry ).reportName ) + "\">" + TOCEntries( jEntry ).reportName + "</a>   |  ";
+									gio::write( curFH, fmtA ) << "<a href=\"#" + MakeAnchorName( TOCEntries( jEntry ).sectionName, TOCEntries( jEntry ).reportName ) + "\">" + TOCEntries( jEntry ).reportName + "</a>   |  ";
 									TOCEntries( jEntry ).isWritten = true;
 								}
 							}
@@ -4824,22 +4826,22 @@ namespace OutputReportTabular {
 			}
 		}
 		EchoInputFile = FindUnitNumber( "eplusout.audit" );
-		gio::write( EchoInputFile, "*" ) << "MonthlyInputCount=" << MonthlyInputCount;
-		gio::write( EchoInputFile, "*" ) << "sizeMonthlyInput=" << sizeMonthlyInput;
-		gio::write( EchoInputFile, "*" ) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
-		gio::write( EchoInputFile, "*" ) << "sizeMonthlyFieldSetInput=" << sizeMonthlyFieldSetInput;
-		gio::write( EchoInputFile, "*" ) << "MonthlyTablesCount=" << MonthlyTablesCount;
-		gio::write( EchoInputFile, "*" ) << "MonthlyColumnsCount=" << MonthlyColumnsCount;
-		gio::write( EchoInputFile, "*" ) << "sizeReportName=" << sizeReportName;
-		gio::write( EchoInputFile, "*" ) << "numReportName=" << numReportName;
-		gio::write( EchoInputFile, "*" ) << "sizeSubTable=" << sizeSubTable;
-		gio::write( EchoInputFile, "*" ) << "numSubTable=" << numSubTable;
-		gio::write( EchoInputFile, "*" ) << "sizeColumnTag=" << sizeColumnTag;
-		gio::write( EchoInputFile, "*" ) << "numColumnTag=" << numColumnTag;
-		gio::write( EchoInputFile, "*" ) << "sizeTableEntry=" << sizeTableEntry;
-		gio::write( EchoInputFile, "*" ) << "numTableEntry=" << numTableEntry;
-		gio::write( EchoInputFile, "*" ) << "sizeCompSizeTableEntry=" << sizeCompSizeTableEntry;
-		gio::write( EchoInputFile, "*" ) << "numCompSizeTableEntry=" << numCompSizeTableEntry;
+		gio::write( EchoInputFile, fmtLD ) << "MonthlyInputCount=" << MonthlyInputCount;
+		gio::write( EchoInputFile, fmtLD ) << "sizeMonthlyInput=" << sizeMonthlyInput;
+		gio::write( EchoInputFile, fmtLD ) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
+		gio::write( EchoInputFile, fmtLD ) << "sizeMonthlyFieldSetInput=" << sizeMonthlyFieldSetInput;
+		gio::write( EchoInputFile, fmtLD ) << "MonthlyTablesCount=" << MonthlyTablesCount;
+		gio::write( EchoInputFile, fmtLD ) << "MonthlyColumnsCount=" << MonthlyColumnsCount;
+		gio::write( EchoInputFile, fmtLD ) << "sizeReportName=" << sizeReportName;
+		gio::write( EchoInputFile, fmtLD ) << "numReportName=" << numReportName;
+		gio::write( EchoInputFile, fmtLD ) << "sizeSubTable=" << sizeSubTable;
+		gio::write( EchoInputFile, fmtLD ) << "numSubTable=" << numSubTable;
+		gio::write( EchoInputFile, fmtLD ) << "sizeColumnTag=" << sizeColumnTag;
+		gio::write( EchoInputFile, fmtLD ) << "numColumnTag=" << numColumnTag;
+		gio::write( EchoInputFile, fmtLD ) << "sizeTableEntry=" << sizeTableEntry;
+		gio::write( EchoInputFile, fmtLD ) << "numTableEntry=" << numTableEntry;
+		gio::write( EchoInputFile, fmtLD ) << "sizeCompSizeTableEntry=" << sizeCompSizeTableEntry;
+		gio::write( EchoInputFile, fmtLD ) << "numCompSizeTableEntry=" << numCompSizeTableEntry;
 
 	}
 
@@ -4872,7 +4874,6 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const degChar( "°" );
-		static gio::Fmt const fmtA( "(A)" );
 
 		// LineTypes for reading the stat file
 		int const StatisticsLine( 1 );
@@ -5608,8 +5609,8 @@ namespace OutputReportTabular {
 				HrsPerWeek = 24 * 7 * Lights( iLight ).SumConsumption / ( Lights( iLight ).DesignLevel * gatherElapsedTimeBEPS * SecInHour );
 				PreDefTableEntry( pdchInLtFullLoadHrs, Lights( iLight ).Name, HrsPerWeek );
 			}
-			PreDefTableEntry( pdchInLtConsump, Lights( iLight ).Name, Lights( iLight ).SumConsumption / 1000000000. );
-			consumptionTotal += Lights( iLight ).SumConsumption / 1000000000.;
+			PreDefTableEntry( pdchInLtConsump, Lights( iLight ).Name, Lights( iLight ).SumConsumption / 1000000000.0 );
+			consumptionTotal += Lights( iLight ).SumConsumption / 1000000000.0;
 		}
 		PreDefTableEntry( pdchInLtConsump, "Interior Lighting Total", consumptionTotal );
 
@@ -5629,8 +5630,8 @@ namespace OutputReportTabular {
 				HrsPerWeek = 24 * 7 * ExteriorLights( iLight ).SumConsumption / ( ExteriorLights( iLight ).DesignLevel * gatherElapsedTimeBEPS * SecInHour );
 				PreDefTableEntry( pdchExLtFullLoadHrs, ExteriorLights( iLight ).Name, HrsPerWeek );
 			}
-			PreDefTableEntry( pdchExLtConsump, ExteriorLights( iLight ).Name, ExteriorLights( iLight ).SumConsumption / 1000000000. );
-			consumptionTotal += ExteriorLights( iLight ).SumConsumption / 1000000000.;
+			PreDefTableEntry( pdchExLtConsump, ExteriorLights( iLight ).Name, ExteriorLights( iLight ).SumConsumption / 1000000000.0 );
+			consumptionTotal += ExteriorLights( iLight ).SumConsumption / 1000000000.0;
 		}
 		PreDefTableEntry( pdchExLtConsump, "Exterior Lighting Total", consumptionTotal );
 
@@ -5882,7 +5883,6 @@ namespace OutputReportTabular {
 		//   converted prior to calling WriteTable.
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5928,6 +5928,9 @@ namespace OutputReportTabular {
 		Real64 veryLarge;
 		Real64 verySmall;
 
+		static Real64 const storedMaxVal( std::numeric_limits< Real64 >::max() );
+		static Real64 const storedMinVal( std::numeric_limits< Real64 >::lowest() );
+
 		rowHead( 1 ) = "January";
 		rowHead( 2 ) = "February";
 		rowHead( 3 ) = "March";
@@ -5963,20 +5966,22 @@ namespace OutputReportTabular {
 		verySmall = -1.0E280;
 
 		// set the unit conversion
-		{ auto const SELECT_CASE_var( unitsStyle );
-		if ( SELECT_CASE_var == unitsStyleNone ) {
+		if ( unitsStyle == unitsStyleNone ) {
 			energyUnitsString = "J";
 			energyUnitsConversionFactor = 1.0;
-		} else if ( SELECT_CASE_var == unitsStyleJtoKWH ) {
+		} else if ( unitsStyle == unitsStyleJtoKWH ) {
 			energyUnitsString = "kWh";
 			energyUnitsConversionFactor = 1.0 / 3600000.0;
-		} else if ( SELECT_CASE_var == unitsStyleJtoMJ ) {
+		} else if ( unitsStyle == unitsStyleJtoMJ ) {
 			energyUnitsString = "MJ";
 			energyUnitsConversionFactor = 1.0 / 1000000.0;
-		} else if ( SELECT_CASE_var == unitsStyleJtoGJ ) {
+		} else if ( unitsStyle == unitsStyleJtoGJ ) {
 			energyUnitsString = "GJ";
 			energyUnitsConversionFactor = 1.0 / 1000000000.0;
-		}}
+		} else { // Should never happen but assures compilers of initialization
+			energyUnitsString = "J";
+			energyUnitsConversionFactor = 1.0;
+		}
 
 		// loop through each input to get the name of the tables
 		for ( iInput = 1; iInput <= MonthlyInputCount; ++iInput ) {
@@ -6033,8 +6038,8 @@ namespace OutputReportTabular {
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
 						sumVal = 0.0;
 						sumDuration = 0.0;
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							if ( MonthlyColumns( curCol ).avgSum == isAverage ) { // if it is a average variable divide by duration
 								if ( MonthlyColumns( curCol ).duration( lMonth ) != 0 ) {
@@ -6066,10 +6071,10 @@ namespace OutputReportTabular {
 						} else {
 							tableBody( 14, columnRecount ) = RealToStr( sumVal, digitsShown );
 						}
-						if ( minVal != huge( maxVal ) ) {
+						if ( minVal != storedMaxVal ) {
 							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
-						if ( maxVal != -huge( maxVal ) ) {
+						if ( maxVal != storedMinVal ) {
 							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( ( SELECT_CASE_var == aggTypeHoursZero ) || ( SELECT_CASE_var == aggTypeHoursNonZero ) || ( SELECT_CASE_var == aggTypeHoursPositive ) || ( SELECT_CASE_var == aggTypeHoursNonPositive ) || ( SELECT_CASE_var == aggTypeHoursNegative ) || ( SELECT_CASE_var == aggTypeHoursNonNegative ) ) {
@@ -6078,8 +6083,8 @@ namespace OutputReportTabular {
 						// put in the name of the variable for the column
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [HOURS]";
 						sumVal = 0.0;
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							curVal = MonthlyColumns( curCol ).reslt( lMonth );
 							if ( IsMonthGathered( lMonth ) ) {
@@ -6093,10 +6098,10 @@ namespace OutputReportTabular {
 						} //lMonth
 						// add the summary to bottom
 						tableBody( 14, columnRecount ) = RealToStr( sumVal, digitsShown );
-						if ( minVal != huge( maxVal ) ) {
+						if ( minVal != storedMaxVal ) {
 							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
-						if ( maxVal != -huge( maxVal ) ) {
+						if ( maxVal != storedMinVal ) {
 							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( SELECT_CASE_var == aggTypeValueWhenMaxMin ) {
@@ -6133,8 +6138,8 @@ namespace OutputReportTabular {
 							curConversionFactor *= 3600.0;
 						}
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + curAggString + " [" + curUnits + ']';
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							curVal = MonthlyColumns( curCol ).reslt( lMonth ) * curConversionFactor + curConversionOffset;
 							if ( IsMonthGathered( lMonth ) ) {
@@ -6146,10 +6151,10 @@ namespace OutputReportTabular {
 							}
 						} //lMonth
 						// add the summary to bottom
-						if ( minVal != huge( maxVal ) ) {
+						if ( minVal != storedMaxVal ) {
 							tableBody( 15, columnRecount ) = RealToStr( minVal, digitsShown );
 						}
-						if ( maxVal != -huge( maxVal ) ) {
+						if ( maxVal != storedMinVal ) {
 							tableBody( 16, columnRecount ) = RealToStr( maxVal, digitsShown );
 						}
 					} else if ( ( SELECT_CASE_var == aggTypeMaximum ) || ( SELECT_CASE_var == aggTypeMinimum ) || ( SELECT_CASE_var == aggTypeMaximumDuringHoursShown ) || ( SELECT_CASE_var == aggTypeMinimumDuringHoursShown ) ) {
@@ -6188,8 +6193,8 @@ namespace OutputReportTabular {
 						}
 						columnHead( columnRecount - 1 ) = MonthlyColumns( curCol ).varName + curAggString + '[' + curUnits + ']';
 						columnHead( columnRecount ) = MonthlyColumns( curCol ).varName + " {TIMESTAMP} ";
-						maxVal = -huge( maxVal );
-						minVal = huge( maxVal );
+						minVal = storedMaxVal;
+						maxVal = storedMinVal;
 						for ( lMonth = 1; lMonth <= 12; ++lMonth ) {
 							if ( IsMonthGathered( lMonth ) ) {
 								curVal = MonthlyColumns( curCol ).reslt( lMonth );
@@ -6232,7 +6237,7 @@ namespace OutputReportTabular {
 				WriteReportHeaders( MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, isAverage );
 				WriteSubtitle( "Custom Monthly Report" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose monthly XML tables.
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, MonthlyInput( iInput ).name, MonthlyTables( curTable ).keyValue, "Custom Monthly Report" );
 				columnHead.deallocate();
 				columnWidth.deallocate();
 				tableBody.deallocate();
@@ -6258,14 +6263,12 @@ namespace OutputReportTabular {
 		//   routine.  All arrays are strings so numbers need to be
 		//   converted prior to calling WriteTable.
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -6447,7 +6450,7 @@ namespace OutputReportTabular {
 				WriteTextLine( "" );
 				WriteSubtitle( "Time Bin Results" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, true ); //transpose XML tables
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Time Bin Results" );
 				//create statistics table
 				rowHeadStat( 1 ) = "Minimum";
 				rowHeadStat( 2 ) = "Mean minus two standard deviations";
@@ -6460,8 +6463,8 @@ namespace OutputReportTabular {
 				//per Applied Regression Analysis and Other Multivariate Methods, Kleinburger/Kupper, 1978
 				//first check if very large constant number has caused the second part to be larger than the first
 				if ( BinStatistics( repIndex ).n > 1 ) {
-					if ( BinStatistics( repIndex ).sum2 > ( ( std::pow( BinStatistics( repIndex ).sum, 2 ) ) / BinStatistics( repIndex ).n ) ) {
-						repStDev = std::sqrt( ( BinStatistics( repIndex ).sum2 - ( ( std::pow( BinStatistics( repIndex ).sum, 2 ) ) / BinStatistics( repIndex ).n ) ) / ( BinStatistics( repIndex ).n - 1 ) );
+					if ( BinStatistics( repIndex ).sum2 > ( pow_2( BinStatistics( repIndex ).sum ) / BinStatistics( repIndex ).n ) ) {
+						repStDev = std::sqrt( ( BinStatistics( repIndex ).sum2 - ( pow_2( BinStatistics( repIndex ).sum ) / BinStatistics( repIndex ).n ) ) / ( BinStatistics( repIndex ).n - 1 ) );
 					} else {
 						repStDev = 0.0;
 					}
@@ -6487,7 +6490,7 @@ namespace OutputReportTabular {
 				}
 				WriteSubtitle( "Statistics" );
 				WriteTable( tableBodyStat, rowHeadStat, columnHeadStat, columnWidthStat, true ); //transpose XML table
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, repNameWithUnitsandscheduleName, BinObjVarID( repIndex ).namesOfObj, "Statistics" );
 			}
 			columnHead.deallocate();
 			columnWidth.deallocate();
@@ -6526,7 +6529,6 @@ namespace OutputReportTabular {
 		using DataWater::WaterStorage;
 		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 		using DataHVACGlobals::deviationFromSetPtThresholdHtg;
 		using DataHVACGlobals::deviationFromSetPtThresholdClg;
 		using ScheduleManager::GetScheduleName;
@@ -6675,7 +6677,7 @@ namespace OutputReportTabular {
 			// unit conversion - all values are used as divisors
 			{ auto const SELECT_CASE_var( unitsStyle );
 			if ( SELECT_CASE_var == unitsStyleJtoKWH ) {
-				largeConversionFactor = 3600000.;
+				largeConversionFactor = 3600000.0;
 				kConversionFactor = 1.0;
 				waterConversionFactor = 1.0;
 				areaConversionFactor = 1.0;
@@ -6685,7 +6687,7 @@ namespace OutputReportTabular {
 				waterConversionFactor = getSpecificUnitDivider( "m3", "gal" ); //0.003785413 m3 to gal
 				areaConversionFactor = getSpecificUnitDivider( "m2", "ft2" ); //0.092893973 m2 to ft2
 			} else {
-				largeConversionFactor = 1000000000.;
+				largeConversionFactor = 1000000000.0;
 				kConversionFactor = 1000.0;
 				waterConversionFactor = 1.0;
 				areaConversionFactor = 1.0;
@@ -6938,7 +6940,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Site and Source Energy" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site and Source Energy" );
 			}
 
 			columnHead.deallocate();
@@ -7075,7 +7077,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Site to Source Energy Conversion Factors" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Site to Source Energy Conversion Factors" );
 			}
 
 			columnHead.deallocate();
@@ -7113,7 +7115,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Building Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Building Area" );
 			}
 
 			columnHead.deallocate();
@@ -7228,7 +7230,7 @@ namespace OutputReportTabular {
 				}
 			}
 
-			unconvert = largeConversionFactor / 1000000000.; //to avoid double converting, the values for the LEED report should be in GJ
+			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Interior Lighting", unconvert * ( useVal( 3, colElectricity ) - leedIntLightProc( colElectricity ) ), 2 );
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Exterior Lighting", unconvert * useVal( 4, colElectricity ), 2 );
 			PreDefTableEntry( pdchLeedPerfElEneUse, "Space Heating", unconvert * useVal( 1, colElectricity ), 2 );
@@ -7383,7 +7385,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "End Uses" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses" );
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -7511,7 +7513,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "End Uses By Subcategory" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory" );
 			}
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -7584,7 +7586,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Utility Use Per Conditioned Floor Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Conditioned Floor Area" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Conditioned Floor Area" );
 			}
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -7599,7 +7601,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Utility Use Per Total Floor Area" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Utility Use Per Total Floor Area" );
 			}
 
 			columnHead.deallocate();
@@ -7640,7 +7642,7 @@ namespace OutputReportTabular {
 			tableBody = "";
 
 			// show annual values
-			unconvert = largeConversionFactor / 1000000000.; //to avoid double converting, the values for the LEED report should be in GJ
+			unconvert = largeConversionFactor / 1000000000.0; //to avoid double converting, the values for the LEED report should be in GJ
 
 			tableBody( 1, 1 ) = RealToStr( gatherPowerFuelFireGen, 2 );
 			tableBody( 2, 1 ) = RealToStr( gatherPowerHTGeothermal, 2 );
@@ -7675,7 +7677,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Electric Loads Satisfied" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Electric Loads Satisfied" );
 			}
 
 			columnHead.deallocate();
@@ -7746,7 +7748,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "On-Site Thermal Sources" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "On-Site Thermal Sources" );
 			}
 
 			columnHead.deallocate();
@@ -7837,7 +7839,7 @@ namespace OutputReportTabular {
 			if ( displayTabularBEPS ) {
 				WriteSubtitle( "Water Source Summary" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Water Source Summary" );
 			}
 
 			columnHead.deallocate();
@@ -7874,7 +7876,7 @@ namespace OutputReportTabular {
 				}
 
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Setpoint Not Met Criteria" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -7907,7 +7909,7 @@ namespace OutputReportTabular {
 
 			if ( displayTabularBEPS ) {
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "Comfort and Setpoint Not Met Summary" );
 			}
 
 			columnHead.deallocate();
@@ -7948,7 +7950,6 @@ namespace OutputReportTabular {
 		// Using/Aliasing
 		using OutputProcessor::MaxNumSubcategories;
 		using OutputProcessor::EndUseCategory;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8022,13 +8023,13 @@ namespace OutputReportTabular {
 
 			{ auto const SELECT_CASE_var( unitsStyle );
 			if ( SELECT_CASE_var == unitsStyleJtoKWH ) {
-				largeConversionFactor = 3600000.;
+				largeConversionFactor = 3600000.0;
 				areaConversionFactor = 1.0;
 			} else if ( SELECT_CASE_var == unitsStyleInchPound ) {
 				largeConversionFactor = getSpecificUnitDivider( "J", "kBtu" ); //1054351.84 J to kBtu
 				areaConversionFactor = getSpecificUnitDivider( "m2", "ft2" ); //0.092893973 m2 to ft2
 			} else {
-				largeConversionFactor = 1000000.; // to MJ
+				largeConversionFactor = 1000000.0; // to MJ
 				areaConversionFactor = 1.0;
 			}}
 
@@ -8105,7 +8106,7 @@ namespace OutputReportTabular {
 				columnHead( 3 ) = "Source Additional Fuel [GJ]";
 				columnHead( 4 ) = "Source District Cooling [GJ]";
 				columnHead( 5 ) = "Source District Heating [GJ]";
-				largeConversionFactor = 1000.; // for converting MJ to GJ
+				largeConversionFactor = 1000.0; // for converting MJ to GJ
 			}}
 
 			//---- End Uses by Source Energy Sub-Table
@@ -8121,7 +8122,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Summary" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Summary" );
 
 			//---- Normalized by Conditioned Area Sub-Table
 
@@ -8161,7 +8162,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Per Conditioned Floor Area" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Component Per Conditioned Floor Area" );
 
 			//---- Normalized by Total Area Sub-Table
 			tableBody = "";
@@ -8177,7 +8178,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "Source Energy End Use Components Per Total Floor Area" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SourceEnergyEndUseComponentsSummary", "Entire Facility", "Source Energy End Use Components Per Total Floor Area" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8214,7 +8215,6 @@ namespace OutputReportTabular {
 		using DataWater::WaterStorage;
 		using ManageElectricPower::ElecStorage;
 		using ManageElectricPower::NumElecStorageDevices;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8593,7 +8593,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "End Uses" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8715,7 +8715,7 @@ namespace OutputReportTabular {
 			// heading for the entire sub-table
 			WriteSubtitle( "End Uses By Subcategory" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth, false, footnote );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory" );
 			columnHead.deallocate();
 			rowHead.deallocate();
 			columnWidth.deallocate();
@@ -8745,7 +8745,6 @@ namespace OutputReportTabular {
 
 		// Using/Aliasing
 		using namespace DataCostEstimate;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -8900,7 +8899,7 @@ namespace OutputReportTabular {
 
 		WriteSubtitle( "Construction Cost Estimate Summary" );
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
+		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Construction Cost Estimate Summary" );
 
 		columnHead.deallocate();
 		rowHead.deallocate();
@@ -8956,7 +8955,7 @@ namespace OutputReportTabular {
 		tableBody( NumRows, 6 ) = RealToStr( CurntBldg.LineItemTot, 2 );
 		WriteSubtitle( "Cost Line Item Details" ); //: '//TRIM(RealToStr(CostEstimateTotal, 2)))
 		WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
+		sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "Construction Cost Estimate Summary", "Entire Facility", "Cost Line Item Details" );
 		columnHead.deallocate();
 		rowHead.deallocate();
 		columnWidth.deallocate();
@@ -9032,7 +9031,6 @@ namespace OutputReportTabular {
 		using ExteriorEnergyUse::AstroClockOverride;
 		using General::SafeDivide;
 		using General::RoundSigDigits;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9213,7 +9211,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "General" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "General" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9274,8 +9272,8 @@ namespace OutputReportTabular {
 			DetailedWWR = ( GetNumSectionsFound( "DETAILEDWWR_DEBUG" ) > 0 );
 
 			if ( DetailedWWR ) {
-				gio::write( OutputFileDebug, "(A)" ) << "======90.1 Classification [>=60 & <=120] tilt = wall==================";
-				gio::write( OutputFileDebug, "(A)" ) << "SurfName,Class,Area,Tilt";
+				gio::write( OutputFileDebug, fmtA ) << "======90.1 Classification [>=60 & <=120] tilt = wall==================";
+				gio::write( OutputFileDebug, fmtA ) << "SurfName,Class,Area,Tilt";
 			}
 
 			for ( iSurf = 1; iSurf <= TotSurfaces; ++iSurf ) {
@@ -9297,33 +9295,33 @@ namespace OutputReportTabular {
 							isConditioned = true;
 						}
 					}
-					if ( ( Surface( iSurf ).Tilt >= 60. ) && ( Surface( iSurf ).Tilt <= 120. ) ) {
+					if ( ( Surface( iSurf ).Tilt >= 60.0 ) && ( Surface( iSurf ).Tilt <= 120.0 ) ) {
 						//vertical walls and windows
 						{ auto const SELECT_CASE_var( Surface( iSurf ).Class );
 						if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Floor ) || ( SELECT_CASE_var == SurfaceClass_Roof ) ) {
 							mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
-							if ( ( curAzimuth >= 315. ) || ( curAzimuth < 45. ) ) {
+							if ( ( curAzimuth >= 315.0 ) || ( curAzimuth < 45.0 ) ) {
 								wallAreaN += curArea * mult;
 								if ( isConditioned ) wallAreaNcond += curArea * mult;
 								if ( isAboveGround ) {
 									aboveGroundWallAreaN += curArea * mult;
 									if ( isConditioned ) aboveGroundWallAreaNcond += curArea * mult;
 								}
-							} else if ( ( curAzimuth >= 45. ) && ( curAzimuth < 135. ) ) {
+							} else if ( ( curAzimuth >= 45.0 ) && ( curAzimuth < 135.0 ) ) {
 								wallAreaE += curArea * mult;
 								if ( isConditioned ) wallAreaEcond += curArea * mult;
 								if ( isAboveGround ) {
 									aboveGroundWallAreaE += curArea * mult;
 									if ( isConditioned ) aboveGroundWallAreaEcond += curArea * mult;
 								}
-							} else if ( ( curAzimuth >= 135. ) && ( curAzimuth < 225. ) ) {
+							} else if ( ( curAzimuth >= 135.0 ) && ( curAzimuth < 225.0 ) ) {
 								wallAreaS += curArea * mult;
 								if ( isConditioned ) wallAreaScond += curArea * mult;
 								if ( isAboveGround ) {
 									aboveGroundWallAreaS += curArea * mult;
 									if ( isConditioned ) aboveGroundWallAreaScond += curArea * mult;
 								}
-							} else if ( ( curAzimuth >= 225. ) && ( curAzimuth < 315. ) ) {
+							} else if ( ( curAzimuth >= 225.0 ) && ( curAzimuth < 315.0 ) ) {
 								wallAreaW += curArea * mult;
 								if ( isConditioned ) wallAreaWcond += curArea * mult;
 								if ( isAboveGround ) {
@@ -9332,40 +9330,40 @@ namespace OutputReportTabular {
 								}
 							}
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Wall," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
+								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Wall," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						} else if ( ( SELECT_CASE_var == SurfaceClass_Window ) || ( SELECT_CASE_var == SurfaceClass_TDD_Dome ) ) {
 							mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier * Surface( iSurf ).Multiplier;
-							if ( ( curAzimuth >= 315. ) || ( curAzimuth < 45. ) ) {
+							if ( ( curAzimuth >= 315.0 ) || ( curAzimuth < 45.0 ) ) {
 								windowAreaN += curArea * mult;
 								if ( isConditioned ) windowAreaNcond += curArea * mult;
-							} else if ( ( curAzimuth >= 45. ) && ( curAzimuth < 135. ) ) {
+							} else if ( ( curAzimuth >= 45.0 ) && ( curAzimuth < 135.0 ) ) {
 								windowAreaE += curArea * mult;
 								if ( isConditioned ) windowAreaEcond += curArea * mult;
-							} else if ( ( curAzimuth >= 135. ) && ( curAzimuth < 225. ) ) {
+							} else if ( ( curAzimuth >= 135.0 ) && ( curAzimuth < 225.0 ) ) {
 								windowAreaS += curArea * mult;
 								if ( isConditioned ) windowAreaScond += curArea * mult;
-							} else if ( ( curAzimuth >= 225. ) && ( curAzimuth < 315. ) ) {
+							} else if ( ( curAzimuth >= 225.0 ) && ( curAzimuth < 315.0 ) ) {
 								windowAreaW += curArea * mult;
 								if ( isConditioned ) windowAreaWcond += curArea * mult;
 							}
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Window," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
+								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Window," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						}}
-					} else if ( Surface( iSurf ).Tilt < 60. ) { //roof and skylights
+					} else if ( Surface( iSurf ).Tilt < 60.0 ) { //roof and skylights
 						{ auto const SELECT_CASE_var( Surface( iSurf ).Class );
 						if ( ( SELECT_CASE_var == SurfaceClass_Wall ) || ( SELECT_CASE_var == SurfaceClass_Floor ) || ( SELECT_CASE_var == SurfaceClass_Roof ) ) {
 							mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier;
 							roofArea += curArea * mult;
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Roof," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
+								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Roof," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						} else if ( ( SELECT_CASE_var == SurfaceClass_Window ) || ( SELECT_CASE_var == SurfaceClass_TDD_Dome ) ) {
 							mult = Zone( zonePt ).Multiplier * Zone( zonePt ).ListMultiplier * Surface( iSurf ).Multiplier;
 							skylightArea += curArea * mult;
 							if ( DetailedWWR ) {
-								gio::write( OutputFileDebug, "(A)" ) << Surface( iSurf ).Name + ",Skylight," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
+								gio::write( OutputFileDebug, fmtA ) << Surface( iSurf ).Name + ",Skylight," + RoundSigDigits( curArea * mult, 1 ) + ',' + RoundSigDigits( Surface( iSurf ).Tilt, 1 );
 							}
 						}}
 					} else { //floors
@@ -9378,11 +9376,11 @@ namespace OutputReportTabular {
 			TotalAboveGroundWallArea = aboveGroundWallAreaN + aboveGroundWallAreaS + aboveGroundWallAreaE + aboveGroundWallAreaW;
 			TotalWindowArea = windowAreaN + windowAreaS + windowAreaE + windowAreaW;
 			if ( DetailedWWR ) {
-				gio::write( OutputFileDebug, "(A)" ) << "========================";
-				gio::write( OutputFileDebug, "(A)" ) << "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW";
-				gio::write( OutputFileDebug, "(A)" ) << "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW";
-				gio::write( OutputFileDebug, "(A)" ) << RoundSigDigits( TotalWallArea, 2 ) + ',' + RoundSigDigits( wallAreaN, 2 ) + ',' + RoundSigDigits( wallAreaS, 2 ) + ',' + RoundSigDigits( wallAreaE, 2 ) + ',' + RoundSigDigits( wallAreaW, 2 );
-				gio::write( OutputFileDebug, "(A)" ) << RoundSigDigits( TotalWindowArea, 2 ) + ',' + RoundSigDigits( windowAreaN, 2 ) + ',' + RoundSigDigits( windowAreaS, 2 ) + ',' + RoundSigDigits( windowAreaE, 2 ) + ',' + RoundSigDigits( windowAreaW, 2 );
+				gio::write( OutputFileDebug, fmtA ) << "========================";
+				gio::write( OutputFileDebug, fmtA ) << "TotalWallArea,WallAreaN,WallAreaS,WallAreaE,WallAreaW";
+				gio::write( OutputFileDebug, fmtA ) << "TotalWindowArea,WindowAreaN,WindowAreaS,WindowAreaE,WindowAreaW";
+				gio::write( OutputFileDebug, fmtA ) << RoundSigDigits( TotalWallArea, 2 ) + ',' + RoundSigDigits( wallAreaN, 2 ) + ',' + RoundSigDigits( wallAreaS, 2 ) + ',' + RoundSigDigits( wallAreaE, 2 ) + ',' + RoundSigDigits( wallAreaW, 2 );
+				gio::write( OutputFileDebug, fmtA ) << RoundSigDigits( TotalWindowArea, 2 ) + ',' + RoundSigDigits( windowAreaN, 2 ) + ',' + RoundSigDigits( windowAreaS, 2 ) + ',' + RoundSigDigits( windowAreaE, 2 ) + ',' + RoundSigDigits( windowAreaW, 2 );
 			}
 
 			tableBody = "";
@@ -9419,7 +9417,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Window-Wall Ratio" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9485,7 +9483,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Conditioned Window-Wall Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Conditioned Window-Wall Ratio" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9506,9 +9504,9 @@ namespace OutputReportTabular {
 			rowHead( 3 ) = "Skylight-Roof Ratio [%]";
 
 			if ( DetailedWWR ) {
-				gio::write( OutputFileDebug, "(A)" ) << "========================";
-				gio::write( OutputFileDebug, "(A)" ) << "TotalRoofArea,SkylightArea";
-				gio::write( OutputFileDebug, "(A)" ) << RoundSigDigits( roofArea, 2 ) + ',' + RoundSigDigits( skylightArea, 2 );
+				gio::write( OutputFileDebug, fmtA ) << "========================";
+				gio::write( OutputFileDebug, fmtA ) << "TotalRoofArea,SkylightArea";
+				gio::write( OutputFileDebug, fmtA ) << RoundSigDigits( roofArea, 2 ) + ',' + RoundSigDigits( skylightArea, 2 );
 			}
 
 			tableBody( 1, 1 ) = RealToStr( roofArea * m2_unitConv, 2 );
@@ -9517,7 +9515,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Skylight-Roof Ratio" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Skylight-Roof Ratio" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9526,9 +9524,9 @@ namespace OutputReportTabular {
 
 			if ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) > 0.0 || sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) > 0.0 ) {
 				pdiff = std::abs( ( wallAreaN + wallAreaS + wallAreaE + wallAreaW ) - ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) ) ) / ( sum( Zone( {1,NumOfZones} ).ExtGrossWallArea_Multiplied() ) + sum( Zone( {1,NumOfZones} ).ExtGrossGroundWallArea_Multiplied() ) );
-				if ( pdiff > .019 ) {
-					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: " "Wall area based on [>=60,<=120] degrees (tilt) as walls " );
-					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100., 1 ) + "% from user entered Wall class surfaces. " "Degree calculation based on ASHRAE 90.1 wall definitions." );
+				if ( pdiff > 0.019 ) {
+					ShowWarningError( "WriteVeriSumTable: InputVerificationsAndResultsSummary: Wall area based on [>=60,<=120] degrees (tilt) as walls" );
+					ShowContinueError( "differs ~" + RoundSigDigits( pdiff * 100.0, 1 ) + "% from user entered Wall class surfaces. " "Degree calculation based on ASHRAE 90.1 wall definitions." );
 					//      CALL ShowContinueError('Calculated based on degrees=['//  &
 					//         TRIM(ADJUSTL(RealToStr((wallAreaN + wallAreaS + wallAreaE + wallAreaW),3)))//  &
 					//         '] m2, Calculated from user entered Wall class surfaces=['//  &
@@ -9707,7 +9705,7 @@ namespace OutputReportTabular {
 
 			WriteSubtitle( "Zone Summary" );
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "InputVerificationandResultsSummary", "Entire Facility", "Zone Summary" );
 
 			columnHead.deallocate();
 			rowHead.deallocate();
@@ -9738,7 +9736,6 @@ namespace OutputReportTabular {
 		// Using/Aliasing
 		using DataHeatBalance::People;
 		using DataHeatBalance::TotPeople;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9804,7 +9801,7 @@ namespace OutputReportTabular {
 			}
 
 			WriteTable( tableBody, rowHead, columnHead, columnWidth );
-			CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary" );
+			sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "AdaptiveComfortReport", "Entire Facility", "People Summary" );
 		}
 
 	}
@@ -9835,7 +9832,6 @@ namespace OutputReportTabular {
 		// na
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -9871,8 +9867,8 @@ namespace OutputReportTabular {
 		int found;
 		int curColTagIndex;
 		int curRowUnqObjIndex;
-		int colCurrent;
-		int rowCurrent;
+		int colCurrent( 0 );
+		int rowCurrent( 0 );
 		int iReportName;
 		int kColumnTag;
 		int lTableEntry;
@@ -10032,7 +10028,7 @@ namespace OutputReportTabular {
 						//create the actual output table
 						WriteSubtitle( subTable( jSubTable ).name );
 						WriteTable( tableBody, rowHead, columnHead, columnWidth, false, subTable( jSubTable ).footnote );
-						CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
+						sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, reportName( iReportName ).name, "Entire Facility", subTable( jSubTable ).name );
 						//clean up the temporary arrays used
 						columnHead.deallocate();
 						rowHead.deallocate();
@@ -10076,7 +10072,6 @@ namespace OutputReportTabular {
 		// na
 
 		// Using/Aliasing
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10262,7 +10257,7 @@ namespace OutputReportTabular {
 				//write the table
 				WriteSubtitle( CompSizeTableEntry( foundEntry ).typeField );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth, false, "User-Specified values were used. " "Design Size values were used if no User-Specified values were provided." );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ComponentSizingSummary", "Entire Facility", CompSizeTableEntry( foundEntry ).typeField );
 				//deallocate these arrays since they are used to create the next
 				//table
 				rowHead.deallocate();
@@ -10285,7 +10280,7 @@ namespace OutputReportTabular {
 		//       DATE WRITTEN   July 2007
 		//       MODIFIED       January 2010, Kyle Benne
 		//                      Added SQLite output
-		//       RE-ENGINEERED  na
+		//       RE-ENGINEERED  June 2014, Stuart Mentzer, Performance tuning
 
 		// PURPOSE OF THIS SUBROUTINE:
 		//   Write out tables based on which surfaces shade subsurfaces.
@@ -10301,7 +10296,6 @@ namespace OutputReportTabular {
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using namespace DataShadowingCombinations;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10318,8 +10312,8 @@ namespace OutputReportTabular {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// all arrays are in the format: (row, column)
-		FArray1D_string columnHead;
-		FArray1D_int columnWidth;
+		FArray1D_string columnHead( 1 );
+		FArray1D_int columnWidth( 1 );
 		FArray1D_string rowHead;
 		FArray2D_string tableBody;
 		//CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
@@ -10336,16 +10330,12 @@ namespace OutputReportTabular {
 		int HTS;
 		int NGSS;
 
-		//displaySurfaceShadowing=.FALSE.  for debugging
+		//displaySurfaceShadowing = false  for debugging
 		if ( displaySurfaceShadowing ) {
 			numreceivingfields = 0;
 			for ( HTS = 1; HTS <= TotSurfaces; ++HTS ) {
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumGenSurf; ++NGSS ) {
-					++numreceivingfields;
-				}
-				for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumSubSurf; ++NGSS ) {
-					++numreceivingfields;
-				}
+				numreceivingfields += ShadowComb( HTS ).NumGenSurf;
+				numreceivingfields += ShadowComb( HTS ).NumSubSurf;
 			}
 
 			ShadowRelate.allocate( numreceivingfields );
@@ -10364,67 +10354,58 @@ namespace OutputReportTabular {
 					ShadowRelate( numShadowRelate ).recKind = recKindSubsurface;
 				}
 			}
+			assert( numreceivingfields == numShadowRelate );
 
 			WriteReportHeaders( "Surface Shadowing Summary", "Entire Facility", isAverage );
 			unique.allocate( numShadowRelate );
-			//do entire process twice, once with surfaces receiving, once with subsurfaces receiving
+			// do entire process twice, once with surfaces receiving, once with subsurfaces receiving
 			for ( iKindRec = recKindSurface; iKindRec <= recKindSubsurface; ++iKindRec ) {
-				numUnique = 0;
-				//first find the number of unique
+
+				// Build map from receiving surface to container of names
+				typedef  std::map< int, std::pair< int, std::vector< std::string const * > > >  ShadowMap;
+				ShadowMap shadow_map;
 				for ( iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel ) {
 					if ( ShadowRelate( iShadRel ).recKind == iKindRec ) {
 						curRecSurf = ShadowRelate( iShadRel ).recSurf;
-						found = 0;
-						for ( jUnique = 1; jUnique <= numUnique; ++jUnique ) {
-							if ( curRecSurf == unique( jUnique ) ) {
-								found = jUnique;
-								break;
-							}
-						}
-						if ( found == 0 ) {
-							++numUnique;
-							unique( numUnique ) = curRecSurf;
-						}
+						std::string const & name( Surface( ShadowRelate( iShadRel ).castSurf ).Name );
+						auto & elem( shadow_map[ curRecSurf ] ); // Creates the entry if not present (and zero-initializes the int in the pair)
+						elem.first += name.length(); // Accumulate total of name lengths
+						elem.second.push_back( &name ); // Add this name
 					}
 				}
+				numUnique = shadow_map.size();
+				if ( numUnique == 0 ) {
+					columnHead( 1 ) = "None";
+				} else {
+					columnHead( 1 ) = "Possible Shadow Receivers";
+				}
+				columnWidth = 14; // array assignment - same for all columns
 				rowHead.allocate( numUnique );
-				columnHead.allocate( 1 );
-				columnWidth.allocate( 1 );
-				columnWidth = 14; //array assignment - same for all columns
 				tableBody.allocate( numUnique, 1 );
-				columnHead( 1 ) = "Possible Shadow Receivers";
-				if ( numUnique == 0 ) columnHead( 1 ) = "None";
-				for ( jUnique = 1; jUnique <= numUnique; ++jUnique ) {
-					curRecSurf = unique( jUnique );
+				jUnique = 0;
+				for ( auto const & elem : shadow_map ) {
+					++jUnique;
+					curRecSurf = elem.first;
 					rowHead( jUnique ) = Surface( curRecSurf ).Name;
-					listOfSurf = "";
-					for ( iShadRel = 1; iShadRel <= numShadowRelate; ++iShadRel ) {
-						if ( ShadowRelate( iShadRel ).recKind == iKindRec ) {
-							if ( curRecSurf == ShadowRelate( iShadRel ).recSurf ) {
-								listOfSurf += Surface( ShadowRelate( iShadRel ).castSurf ).Name + " | "; //'<br>'
-							}
-						}
+					listOfSurf.clear();
+					listOfSurf.reserve( elem.second.first + ( 3 * numUnique ) ); // To avoid string allocations during appends
+					for ( auto const * p : elem.second.second ) {
+						listOfSurf += *p;
+						listOfSurf += " | "; //'<br>' // Separate append to avoid string temporary
 					}
 					tableBody( jUnique, 1 ) = listOfSurf;
 				}
-				//write the table
-				{ auto const SELECT_CASE_var( iKindRec );
-				if ( SELECT_CASE_var == recKindSurface ) {
+
+				// write the table
+				if ( iKindRec == recKindSurface ) {
 					WriteSubtitle( "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
-				} else if ( SELECT_CASE_var == recKindSubsurface ) {
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Surfaces (Walls, Roofs, etc) that may be Shadowed by Other Surfaces" );
+				} else if ( iKindRec == recKindSubsurface ) {
 					WriteSubtitle( "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
-					CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
-				}}
+					sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "SurfaceShadowingSummary", "Entire Facility", "Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces" );
+				}
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				//deallocate these arrays since they are used to create the next
-				//table
-				rowHead.deallocate();
-				columnHead.deallocate();
-				columnWidth.deallocate();
-				tableBody.deallocate();
 			}
-			unique.deallocate();
 		}
 	}
 
@@ -11136,7 +11117,6 @@ namespace OutputReportTabular {
 
 		// Using/Aliasing
 		using DataHeatBalance::Zone;
-		using SQLiteProcedures::CreateSQLiteTabularDataRecords;
 		using DataZoneEquipment::ZoneEquipConfig;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
@@ -11271,8 +11251,8 @@ namespace OutputReportTabular {
 
 			// show the line definition for the decay curves
 			if ( ShowDecayCurvesInEIO ) {
-				gio::write( OutputFileInits, "(A)" ) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time " "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-				gio::write( OutputFileInits, "(A)" ) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time " "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time " "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+				gio::write( OutputFileInits, fmtA ) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time " "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
 			}
 
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
@@ -11600,7 +11580,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Estimated Cooling Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Cooling Peak Load Components" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -11682,7 +11662,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Cooling Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Cooling Peak Conditions" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -12079,7 +12059,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Estimated Heating Peak Load Components" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Estimated Heating Peak Load Components" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -12160,7 +12140,7 @@ namespace OutputReportTabular {
 
 				WriteSubtitle( "Heating Peak Conditions" );
 				WriteTable( tableBody, rowHead, columnHead, columnWidth );
-				CreateSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
+				sqlite->createSQLiteTabularDataRecords( tableBody, rowHead, columnHead, "ZoneComponentLoadSummary", Zone( iZone ).Name, "Heating Peak Conditions" );
 
 				columnHead.deallocate();
 				rowHead.deallocate();
@@ -12268,7 +12248,6 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 		static gio::Fmt const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
 		static gio::Fmt const TimeStampFmt2( "(A,I4.2,A,I2.2,A,I2.2,A)" );
 
@@ -12294,27 +12273,27 @@ namespace OutputReportTabular {
 			curDel = del( iStyle );
 			{ auto const SELECT_CASE_var( TableStyle( iStyle ) );
 			if ( ( SELECT_CASE_var == tableStyleComma ) || ( SELECT_CASE_var == tableStyleTab ) ) {
-				gio::write( curFH, fmta ) << "--------------------------------------------------" "--------------------------------------------------";
-				gio::write( curFH, fmta ) << "REPORT:" + curDel + modifiedReportName;
-				gio::write( curFH, fmta ) << "FOR:" + curDel + objectName;
+				gio::write( curFH, fmtA ) << "--------------------------------------------------" "--------------------------------------------------";
+				gio::write( curFH, fmtA ) << "REPORT:" + curDel + modifiedReportName;
+				gio::write( curFH, fmtA ) << "FOR:" + curDel + objectName;
 			} else if ( SELECT_CASE_var == tableStyleFixed ) {
-				gio::write( curFH, fmta ) << "--------------------------------------------------" "--------------------------------------------------";
-				gio::write( curFH, fmta ) << "REPORT:      " + curDel + modifiedReportName;
-				gio::write( curFH, fmta ) << "FOR:         " + curDel + objectName;
+				gio::write( curFH, fmtA ) << "--------------------------------------------------" "--------------------------------------------------";
+				gio::write( curFH, fmtA ) << "REPORT:      " + curDel + modifiedReportName;
+				gio::write( curFH, fmtA ) << "FOR:         " + curDel + objectName;
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
-				gio::write( curFH, fmta ) << "<hr>";
-				gio::write( curFH, fmta ) << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>";
-				gio::write( curFH, fmta ) << "<a name=" + MakeAnchorName( reportName, objectName ) + "></a>";
-				gio::write( curFH, fmta ) << "<p>Report:<b>" + curDel + modifiedReportName + "</b></p>";
-				gio::write( curFH, fmta ) << "<p>For:<b>" + curDel + objectName + "</b></p>";
+				gio::write( curFH, fmtA ) << "<hr>";
+				gio::write( curFH, fmtA ) << "<p><a href=\"#toc\" style=\"float: right\">Table of Contents</a></p>";
+				gio::write( curFH, fmtA ) << "<a name=" + MakeAnchorName( reportName, objectName ) + "></a>";
+				gio::write( curFH, fmtA ) << "<p>Report:<b>" + curDel + modifiedReportName + "</b></p>";
+				gio::write( curFH, fmtA ) << "<p>For:<b>" + curDel + objectName + "</b></p>";
 				gio::write( curFH, TimeStampFmt1 ) << "<p>Timestamp: <b>" << td( 1 ) << "-" << td( 2 ) << "-" << td( 3 );
 				gio::write( curFH, TimeStampFmt2 ) << "  " << td( 5 ) << ":" << td( 6 ) << ":" << td( 7 ) << "</b></p>";
 			} else if ( SELECT_CASE_var == tableStyleXML ) {
 				if ( len( prevReportName ) != 0 ) {
-					gio::write( curFH, fmta ) << "</" + prevReportName + '>'; //close the last element if it was used.
+					gio::write( curFH, fmtA ) << "</" + prevReportName + '>'; //close the last element if it was used.
 				}
-				gio::write( curFH, fmta ) << "<" + ConvertToElementTag( modifiedReportName ) + '>';
-				gio::write( curFH, fmta ) << "  <for>" + objectName + "</for>";
+				gio::write( curFH, fmtA ) << "<" + ConvertToElementTag( modifiedReportName ) + '>';
+				gio::write( curFH, fmtA ) << "  <for>" + objectName + "</for>";
 				prevReportName = ConvertToElementTag( modifiedReportName ); //save the name for next time
 			}}
 		}
@@ -12342,7 +12321,6 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12356,11 +12334,11 @@ namespace OutputReportTabular {
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			{ auto const SELECT_CASE_var( TableStyle( iStyle ) );
 			if ( ( SELECT_CASE_var == tableStyleComma ) || ( SELECT_CASE_var == tableStyleTab ) || ( SELECT_CASE_var == tableStyleFixed ) ) {
-				gio::write( TabularOutputFile( iStyle ), fmta ) << subtitle;
-				gio::write( TabularOutputFile( iStyle ), fmta ) << "";
+				gio::write( TabularOutputFile( iStyle ), fmtA ) << subtitle;
+				gio::write( TabularOutputFile( iStyle ), fmtA ) << "";
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
-				gio::write( TabularOutputFile( iStyle ), fmta ) << "<b>" + subtitle + "</b><br><br>";
-				gio::write( TabularOutputFile( iStyle ), fmta ) << "<!-- FullName:" + activeReportName + '_' + activeForName + '_' + subtitle + "-->";
+				gio::write( TabularOutputFile( iStyle ), fmtA ) << "<b>" + subtitle + "</b><br><br>";
+				gio::write( TabularOutputFile( iStyle ), fmtA ) << "<!-- FullName:" + activeReportName + '_' + activeForName + '_' + subtitle + "-->";
 			} else if ( SELECT_CASE_var == tableStyleXML ) {
 				//save the active subtable name for the XML reporting
 				activeSubTableName = subtitle;
@@ -12388,7 +12366,6 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12409,16 +12386,16 @@ namespace OutputReportTabular {
 		for ( iStyle = 1; iStyle <= numStyles; ++iStyle ) {
 			{ auto const SELECT_CASE_var( TableStyle( iStyle ) );
 			if ( ( SELECT_CASE_var == tableStyleComma ) || ( SELECT_CASE_var == tableStyleTab ) || ( SELECT_CASE_var == tableStyleFixed ) ) {
-				gio::write( TabularOutputFile( iStyle ), fmta ) << lineOfText;
+				gio::write( TabularOutputFile( iStyle ), fmtA ) << lineOfText;
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
 				if ( useBold ) {
-					gio::write( TabularOutputFile( iStyle ), fmta ) << "<b>" + lineOfText + "</b><br><br>";
+					gio::write( TabularOutputFile( iStyle ), fmtA ) << "<b>" + lineOfText + "</b><br><br>";
 				} else {
-					gio::write( TabularOutputFile( iStyle ), fmta ) << lineOfText + "<br>";
+					gio::write( TabularOutputFile( iStyle ), fmtA ) << lineOfText + "<br>";
 				}
 			} else if ( SELECT_CASE_var == tableStyleXML ) {
 				if ( len( lineOfText ) != 0 ) {
-					gio::write( TabularOutputFile( iStyle ), fmta ) << "<note>" + lineOfText + "</note>";
+					gio::write( TabularOutputFile( iStyle ), fmtA ) << "<note>" + lineOfText + "</note>";
 				}
 			}}
 		}
@@ -12459,7 +12436,6 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmta( "(A)" );
 		static std::string const blank;
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -12512,11 +12488,11 @@ namespace OutputReportTabular {
 		// create blank string
 		spaces = blank; // REPEAT(' ',1000)
 		// get sizes of arrays
-		rowsBody = size( body, 1 );
-		colsBody = size( body, 2 );
-		rowsRowLabels = size( rowLabels );
-		colsColumnLabels = size( columnLabels );
-		colsWidthColumn = size( widthColumn );
+		rowsBody = isize( body, 1 );
+		colsBody = isize( body, 2 );
+		rowsRowLabels = isize( rowLabels );
+		colsColumnLabels = isize( columnLabels );
+		colsWidthColumn = isize( widthColumn );
 		// check size of arrays for consistancy and if inconsistent use smaller value
 		// and display warning
 		if ( rowsBody != rowsRowLabels ) {
@@ -12594,7 +12570,7 @@ namespace OutputReportTabular {
 					for ( iCol = 1; iCol <= colsColumnLabels; ++iCol ) {
 						outputLine += curDel + stripped( colLabelMulti( jRow, iCol ) );
 					}
-					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
+					gio::write( curFH, fmtA ) << InsertCurrencySymbol( outputLine, false );
 				}
 				// body with row headers
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
@@ -12602,11 +12578,11 @@ namespace OutputReportTabular {
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
 						outputLine += curDel + stripped( body( jRow, iCol ) );
 					}
-					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
+					gio::write( curFH, fmtA ) << InsertCurrencySymbol( outputLine, false );
 				}
 				if ( present( footnoteText ) ) {
 					if ( len( footnoteText ) > 0 ) {
-						gio::write( curFH, fmta ) << footnoteText;
+						gio::write( curFH, fmtA ) << footnoteText;
 					}
 				}
 				gio::write( curFH );
@@ -12624,7 +12600,7 @@ namespace OutputReportTabular {
 							outputLine = std::string( col1start - 1, ' ' ) + "  " + rjustified( sized( colLabelMulti( jRow, iCol ), widthColumn( iCol ) ) );
 						}
 					}
-					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
+					gio::write( curFH, fmtA ) << InsertCurrencySymbol( outputLine, false );
 				}
 				// body with row headers
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
@@ -12637,11 +12613,11 @@ namespace OutputReportTabular {
 							outputLine += "   " + rjustified( sized( body( jRow, iCol ), widthColumn( iCol ) ) );
 						}
 					}
-					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, false );
+					gio::write( curFH, fmtA ) << InsertCurrencySymbol( outputLine, false );
 				}
 				if ( present( footnoteText ) ) {
 					if ( len( footnoteText ) > 0 ) {
-						gio::write( curFH, fmta ) << footnoteText;
+						gio::write( curFH, fmtA ) << footnoteText;
 					}
 				}
 				gio::write( curFH );
@@ -12649,9 +12625,9 @@ namespace OutputReportTabular {
 
 			} else if ( SELECT_CASE_var == tableStyleHTML ) {
 				// set up it being a table
-				gio::write( curFH, fmta ) << "<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\">";
+				gio::write( curFH, fmtA ) << "<table border=\"1\" cellpadding=\"4\" cellspacing=\"0\">";
 				// column headers
-				gio::write( curFH, fmta ) << "  <tr><td></td>"; // start new row and leave empty cell
+				gio::write( curFH, fmtA ) << "  <tr><td></td>"; // start new row and leave empty cell
 				for ( iCol = 1; iCol <= colsColumnLabels; ++iCol ) {
 					outputLine = "    <td align=\"right\">";
 					for ( jRow = 1; jRow <= maxNumColLabelRows; ++jRow ) {
@@ -12660,34 +12636,34 @@ namespace OutputReportTabular {
 							outputLine += "<br>";
 						}
 					}
-					gio::write( curFH, fmta ) << InsertCurrencySymbol( outputLine, true ) + "</td>";
+					gio::write( curFH, fmtA ) << InsertCurrencySymbol( outputLine, true ) + "</td>";
 				}
-				gio::write( curFH, fmta ) << "  </tr>";
+				gio::write( curFH, fmtA ) << "  </tr>";
 				// body with row headers
 				for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
-					gio::write( curFH, fmta ) << "  <tr>";
+					gio::write( curFH, fmtA ) << "  <tr>";
 					if ( rowLabels( jRow ) != "" ) {
-						gio::write( curFH, fmta ) << "    <td align=\"right\">" + InsertCurrencySymbol( rowLabels( jRow ), true ) + "</td>";
+						gio::write( curFH, fmtA ) << "    <td align=\"right\">" + InsertCurrencySymbol( rowLabels( jRow ), true ) + "</td>";
 					} else {
-						gio::write( curFH, fmta ) << "    <td align=\"right\">&nbsp;</td>";
+						gio::write( curFH, fmtA ) << "    <td align=\"right\">&nbsp;</td>";
 					}
 					for ( iCol = 1; iCol <= colsBody; ++iCol ) {
 						if ( body( jRow, iCol ) != "" ) {
-							gio::write( curFH, fmta ) << "    <td align=\"right\">" + InsertCurrencySymbol( body( jRow, iCol ), true ) + "</td>";
+							gio::write( curFH, fmtA ) << "    <td align=\"right\">" + InsertCurrencySymbol( body( jRow, iCol ), true ) + "</td>";
 						} else {
-							gio::write( curFH, fmta ) << "    <td align=\"right\">&nbsp;</td>";
+							gio::write( curFH, fmtA ) << "    <td align=\"right\">&nbsp;</td>";
 						}
 					}
-					gio::write( curFH, fmta ) << "  </tr>";
+					gio::write( curFH, fmtA ) << "  </tr>";
 				}
 				// end the table
-				gio::write( curFH, fmta ) << "</table>";
+				gio::write( curFH, fmtA ) << "</table>";
 				if ( present( footnoteText ) ) {
 					if ( len( footnoteText ) > 0 ) {
-						gio::write( curFH, fmta ) << "<i>" + footnoteText + "</i>";
+						gio::write( curFH, fmtA ) << "<i>" + footnoteText + "</i>";
 					}
 				}
-				gio::write( curFH, fmta ) << "<br><br>";
+				gio::write( curFH, fmtA ) << "<br><br>";
 			} else if ( SELECT_CASE_var == tableStyleXML ) {
 				//check if entire table is blank and it if is skip generating anything
 				isTableBlank = true;
@@ -12755,9 +12731,9 @@ namespace OutputReportTabular {
 								}
 							}
 							if ( ! isRecordBlank ) {
-								gio::write( curFH, fmta ) << "  <" + activeSubTableName + '>';
+								gio::write( curFH, fmtA ) << "  <" + activeSubTableName + '>';
 								if ( len( rowLabelTags( jRow ) ) > 0 ) {
-									gio::write( curFH, fmta ) << "    <name>" + rowLabelTags( jRow ) + "</name>";
+									gio::write( curFH, fmtA ) << "    <name>" + rowLabelTags( jRow ) + "</name>";
 								}
 								for ( iCol = 1; iCol <= colsBody; ++iCol ) {
 									if ( len( stripped( bodyEsc( jRow, iCol ) ) ) > 0 ) { //skip blank cells
@@ -12767,10 +12743,10 @@ namespace OutputReportTabular {
 										} else {
 											tagWithAttrib += ">";
 										}
-										gio::write( curFH, fmta ) << "    " + tagWithAttrib + stripped( bodyEsc( jRow, iCol ) ) + "</" + columnLabelTags( iCol ) + '>';
+										gio::write( curFH, fmtA ) << "    " + tagWithAttrib + stripped( bodyEsc( jRow, iCol ) ) + "</" + columnLabelTags( iCol ) + '>';
 									}
 								}
-								gio::write( curFH, fmta ) << "  </" + activeSubTableName + '>';
+								gio::write( curFH, fmtA ) << "  </" + activeSubTableName + '>';
 							}
 						}
 					} else { //transpose XML table
@@ -12785,13 +12761,13 @@ namespace OutputReportTabular {
 								}
 							}
 							if ( ! isRecordBlank ) {
-								gio::write( curFH, fmta ) << "  <" + activeSubTableName + '>';
+								gio::write( curFH, fmtA ) << "  <" + activeSubTableName + '>';
 								// if the column has units put them into the name tag
 								if ( len( columnLabelTags( iCol ) ) > 0 ) {
 									if ( len( columnUnitStrings( iCol ) ) > 0 ) {
-										gio::write( curFH, fmta ) << "    <name units=" + CHAR( 34 ) + columnUnitStrings( iCol ) + CHAR( 34 ) + '>' + columnLabelTags( iCol ) + "</name>";
+										gio::write( curFH, fmtA ) << "    <name units=" + CHAR( 34 ) + columnUnitStrings( iCol ) + CHAR( 34 ) + '>' + columnLabelTags( iCol ) + "</name>";
 									} else {
-										gio::write( curFH, fmta ) << "    <name>" + columnLabelTags( iCol ) + "</name>";
+										gio::write( curFH, fmtA ) << "    <name>" + columnLabelTags( iCol ) + "</name>";
 									}
 								}
 								for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
@@ -12802,16 +12778,16 @@ namespace OutputReportTabular {
 										} else {
 											tagWithAttrib += ">";
 										}
-										gio::write( curFH, fmta ) << "    " + tagWithAttrib + stripped( bodyEsc( jRow, iCol ) ) + "</" + rowLabelTags( jRow ) + '>';
+										gio::write( curFH, fmtA ) << "    " + tagWithAttrib + stripped( bodyEsc( jRow, iCol ) ) + "</" + rowLabelTags( jRow ) + '>';
 									}
 								}
-								gio::write( curFH, fmta ) << "  </" + activeSubTableName + '>';
+								gio::write( curFH, fmtA ) << "  </" + activeSubTableName + '>';
 							}
 						}
 					}
 					if ( present( footnoteText ) ) {
 						if ( len( footnoteText ) > 0 ) {
-							gio::write( curFH, fmta ) << "  <footnote>" + footnoteText + "</footnote>";
+							gio::write( curFH, fmtA ) << "  <footnote>" + footnoteText + "</footnote>";
 						}
 					}
 				}
@@ -13301,9 +13277,8 @@ namespace OutputReportTabular {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static FArray1D_string const formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
+		static FArray1D< gio::Fmt > const formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
 		static FArray1D< Real64 > const maxvalDigits( {0,9}, { 9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0 } ); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) | maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) | maxvalDigits(8) | maxvalDigits(9)
-
 		static gio::Fmt const fmtd( "(E12.6)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -13350,7 +13325,7 @@ namespace OutputReportTabular {
 		// Return value
 		std::string StringOut;
 
-		gio::write( StringOut, "*" ) << intIn;
+		gio::write( StringOut, fmtLD ) << intIn;
 		return StringOut;
 	}
 
@@ -13369,7 +13344,7 @@ namespace OutputReportTabular {
 		// Return value
 		Real64 realValue;
 
-		{ IOFlags flags; gio::read( stringIn, "*", flags ) >> realValue; if ( flags.err() ) goto Label900; }
+		{ IOFlags flags; gio::read( stringIn, fmtLD, flags ) >> realValue; if ( flags.err() ) goto Label900; }
 		return realValue;
 Label900: ;
 		realValue = -99999.0;
@@ -13791,10 +13766,10 @@ Label900: ;
 		UnitConv( 49 ).mult = 264.172;
 		UnitConv( 50 ).mult = 3.281;
 		UnitConv( 51 ).mult = 2118.6438;
-		UnitConv( 52 ).mult = 15852.;
+		UnitConv( 52 ).mult = 15852.0;
 		UnitConv( 53 ).mult = 196.85;
 		UnitConv( 54 ).mult = 2118.6438;
-		UnitConv( 55 ).mult = 15852.;
+		UnitConv( 55 ).mult = 15852.0;
 		UnitConv( 56 ).mult = 0.0001450377;
 		UnitConv( 57 ).mult = 0.00029613;
 		UnitConv( 58 ).mult = 0.00401463;
@@ -13835,8 +13810,8 @@ Label900: ;
 		UnitConv( 93 ).mult = 0.94708628903179 / 10.764961;
 		UnitConv( 94 ).mult = 1.0;
 
-		UnitConv( 2 ).offset = 32.;
-		UnitConv( 11 ).offset = 32.;
+		UnitConv( 2 ).offset = 32.0;
+		UnitConv( 11 ).offset = 32.0;
 		UnitConv( 25 ).offset = 7.6736;
 		UnitConv( 80 ).offset = 7.6736; // 80 is KJ/KG -- should this be multiplied by 1000?
 
@@ -14427,7 +14402,7 @@ Label900: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

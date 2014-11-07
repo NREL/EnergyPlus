@@ -28,23 +28,29 @@ class Fmt
 
 public: // Creation
 
-	// String Constructor
+	// Default Constructor
 	inline
-	Fmt( std::string const & format_string ) :
-		format_( FormatFactory::create( format_string ) )
+	Fmt() :
+	 format_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	Fmt( Fmt const & fmt ) :
-		format_( fmt.format_->clone() )
+	 format_( fmt.format_ ? fmt.format_->clone() : nullptr )
+	{}
+
+	// String Constructor
+	inline
+	Fmt( std::string const & format_string ) :
+	 format_( FormatFactory::create( format_string ) )
 	{}
 
 	// Destructor
 	inline
 	~Fmt()
 	{
-		delete format_;
+		if ( format_ ) delete format_;
 	}
 
 public: // Assignment
@@ -55,9 +61,19 @@ public: // Assignment
 	operator =( Fmt const & fmt )
 	{
 		if ( this != &fmt ) {
-			delete format_;
-			format_ = fmt.format_->clone();
+			if ( format_ ) delete format_;
+			format_ = ( fmt.format_ ? fmt.format_->clone() : nullptr );
 		}
+		return *this;
+	}
+
+	// String Assignment
+	inline
+	Fmt &
+	operator =( std::string const & format_string )
+	{
+		if ( format_ ) delete format_;
+		format_ = FormatFactory::create( format_string );
 		return *this;
 	}
 
@@ -76,7 +92,7 @@ public: // Properties
 	Format *
 	format_clone() const
 	{
-		return format_->clone();
+		return ( format_ ? format_->clone() : nullptr );
 	}
 
 private: // Data

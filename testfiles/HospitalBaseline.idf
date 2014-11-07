@@ -100,7 +100,7 @@
 ! End SimMetaData
 ! Number of Zones: 130
 
-  Version,8.1;
+  Version,8.2;
 
   Timestep,6;
 
@@ -5622,7 +5622,7 @@
   Fan:ZoneExhaust,
     Floor 1 Gas Storage Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.3927,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Gas Storage Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -6505,7 +6505,7 @@
   Fan:ZoneExhaust,
     Floor 1 Kitchen Exhaust Fan 1,  !- Name
     KITCHEN_EXH_SCH,         !- Availability Schedule Name
-    0.5500,                  !- Fan Efficiency
+    0.5500,                  !- Fan Total Efficiency
     573.0000,                !- Pressure Rise {Pa}
     4.7700,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Kitchen Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -6515,7 +6515,7 @@
   Fan:ZoneExhaust,
     Floor 1 Kitchen Exhaust Fan 2,  !- Name
     KITCHEN_EXH_SCH,         !- Availability Schedule Name
-    0.5600,                  !- Fan Efficiency
+    0.5600,                  !- Fan Total Efficiency
     473.0000,                !- Pressure Rise {Pa}
     5.9000,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Kitchen Exhaust Fan 2 Inlet Node,  !- Air Inlet Node Name
@@ -6525,7 +6525,7 @@
   Fan:ZoneExhaust,
     Floor 1 Kitchen Exhaust Fan 3,  !- Name
     KITCHEN_EXH_SCH,         !- Availability Schedule Name
-    0.4700,                  !- Fan Efficiency
+    0.4700,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.4700,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Kitchen Exhaust Fan 3 Inlet Node,  !- Air Inlet Node Name
@@ -7873,7 +7873,7 @@
   Fan:ZoneExhaust,
     Floor 1 Laundry Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     1.7588,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Laundry Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -14612,7 +14612,7 @@
   Fan:ZoneExhaust,
     Floor 1 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.3776,                  !- Maximum Flow Rate {m3/s}
     Floor 1 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -22059,7 +22059,7 @@
   Fan:ZoneExhaust,
     Floor 2 Lockers Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.5899,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Lockers Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -28944,7 +28944,7 @@
   Fan:ZoneExhaust,
     Floor 2 Restroom 1 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.5034,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Restroom 1 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -29392,7 +29392,7 @@
   Fan:ZoneExhaust,
     Floor 2 Restroom 2 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7079,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Restroom 2 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -29767,7 +29767,7 @@
   Fan:ZoneExhaust,
     Floor 2 Soil 1 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.3799,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Soil 1 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -30142,7 +30142,7 @@
   Fan:ZoneExhaust,
     Floor 2 Soil 2 Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.2517,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Soil 2 Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -30565,7 +30565,7 @@
   Fan:ZoneExhaust,
     Floor 2 Sterilizing Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     1.0697,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Sterilizing Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -32128,7 +32128,7 @@
   Fan:ZoneExhaust,
     Floor 2 Triage Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.8259,                  !- Maximum Flow Rate {m3/s}
     Floor 2 Triage Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -39987,7 +39987,7 @@
   Fan:ZoneExhaust,
     Floor 3 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7866,                  !- Maximum Flow Rate {m3/s}
     Floor 3 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -40834,7 +40834,7 @@
   Fan:ZoneExhaust,
     Floor 3 Triage Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     1.4158,                  !- Maximum Flow Rate {m3/s}
     Floor 3 Triage Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -45976,7 +45976,7 @@
   Fan:ZoneExhaust,
     Floor 4-6 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7866,                  !- Maximum Flow Rate {m3/s}
     Floor 4-6 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -51081,7 +51081,7 @@
   Fan:ZoneExhaust,
     Floor 7 Soil Exhaust Fan 1,  !- Name
     Hours_of_operation,      !- Availability Schedule Name
-    0.5000,                  !- Fan Efficiency
+    0.5000,                  !- Fan Total Efficiency
     187.0000,                !- Pressure Rise {Pa}
     0.7866,                  !- Maximum Flow Rate {m3/s}
     Floor 7 Soil Exhaust Fan 1 Inlet Node,  !- Air Inlet Node Name
@@ -57631,8 +57631,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -57890,7 +57897,7 @@
   Fan:ConstantVolume,
     AHU2_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.748,                   !- Fan Efficiency
+    0.748,                   !- Fan Total Efficiency
     2421,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -58188,8 +58195,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -58447,7 +58461,7 @@
   Fan:ConstantVolume,
     AHU1_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.748,                   !- Fan Efficiency
+    0.748,                   !- Fan Total Efficiency
     2421,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -58747,8 +58761,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -59006,7 +59027,7 @@
   Fan:ConstantVolume,
     AHU3_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.702,                   !- Fan Efficiency
+    0.702,                   !- Fan Total Efficiency
     3007,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -59238,8 +59259,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -59497,7 +59525,7 @@
   Fan:ConstantVolume,
     AHU5_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.682,                   !- Fan Efficiency
+    0.682,                   !- Fan Total Efficiency
     2364,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9620,                  !- Motor Efficiency
@@ -59761,8 +59789,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -60020,7 +60055,7 @@
   Fan:ConstantVolume,
     AHU4_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.682,                   !- Fan Efficiency
+    0.682,                   !- Fan Total Efficiency
     2364,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9620,                  !- Motor Efficiency
@@ -60277,8 +60312,15 @@
     0.0080,                  !- Central Heating Design Supply Air Humidity Ratio {kgWater/kgDryAir}
     DesignDay,               !- Cooling Design Air Flow Method
     0.0,                     !- Cooling Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Cooling Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Cooling Capacity {m3/s-W}
     DesignDay,               !- Heating Design Air Flow Method
     0.0,                     !- Heating Design Air Flow Rate {m3/s}
+    ,                        !- Supply Air Flow Rate Per Floor Area During Heating Operation {m3/s-m2}
+    ,                        !- Fraction of Autosized Design Heating Supply Air Flow Rate
+    ,                        !- Fraction of Autosized Design Cooling Supply Air Flow Rate
+    ,                        !- Design Supply Air Flow Rate Per Unit Heating Capacity {m3/s-W}
     ;                        !- System Outdoor Air Method
 
   AvailabilityManagerAssignmentList,
@@ -60531,7 +60573,7 @@
   Fan:ConstantVolume,
     AHU6_Fan,                !- Name
     HVACOperationSchd,       !- Availability Schedule Name
-    0.64,                    !- Fan Efficiency
+    0.64,                    !- Fan Total Efficiency
     2008,                    !- Pressure Rise {Pa}
     AUTOSIZE,                !- Maximum Flow Rate {m3/s}
     0.9540,                  !- Motor Efficiency
@@ -65276,7 +65318,7 @@
     CoolSys1 Chiller TowerSys Demand Outlet Node,  !- Demand Side Outlet Node Name
     CoolSys1 Chiller TowerSys Demand Branches,  !- Condenser Demand Side Branch List Name
     CoolSys1 Chiller TowerSys Demand Connectors,  !- Condenser Demand Side Connector List Name
-    Sequential;              !- Load Distribution Scheme
+    SequentialLoad;          !- Load Distribution Scheme
 
   SetpointManager:FollowOutdoorAirTemperature,
     MyCondenserControl,      !- Name

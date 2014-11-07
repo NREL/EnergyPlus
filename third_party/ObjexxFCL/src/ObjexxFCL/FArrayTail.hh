@@ -18,7 +18,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< typename > class FArray;
 
 // FArrayTail: Fortran-Compatible Contiguous Array Tail Proxy
@@ -55,42 +55,42 @@ public: // Creation
 	// Copy Constructor
 	inline
 	FArrayTail( FArrayTail const & s ) :
-		data_( s.data_ ),
-		size_( s.size_ )
+	 data_( s.data_ ),
+	 size_( s.size_ )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( true )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
-	{}
-
-	// Copy from Non-Const Constructor
-	inline
-	FArrayTail( FArrayTail & s ) :
-		data_( s.data_ ),
-		size_( s.size_ )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
-#endif // OBJEXXFCL_PROXY_CONST_CHECKS
-	{}
-
-	// Const Pointer + Size Constructor
-	inline
-	FArrayTail( T const * array, size_type const size ) :
-		data_( const_cast< T * >( array ) ),
-		size_( size )
-#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( true )
+	 , const_proxy_( true )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
 
 	// Pointer + Size Constructor
 	inline
-	FArrayTail( T * array, size_type const size ) :
-		data_( array ),
-		size_( size )
+	FArrayTail( T const * array, size_type const size ) :
+	 data_( const_cast< T * >( array ) ),
+	 size_( size )
 #ifdef OBJEXXFCL_PROXY_CONST_CHECKS
-		, const_proxy_( false )
+	 , const_proxy_( true )
 #endif // OBJEXXFCL_PROXY_CONST_CHECKS
 	{}
+
+#ifdef OBJEXXFCL_PROXY_CONST_CHECKS
+
+	// Non-Const Copy Constructor
+	inline
+	FArrayTail( FArrayTail & s ) :
+	 data_( s.data_ ),
+	 size_( s.size_ ),
+	 const_proxy_( false )
+	{}
+
+	// Non-Const Pointer + Size Constructor
+	inline
+	FArrayTail( T * array, size_type const size ) :
+	 data_( array ),
+	 size_( size ),
+	 const_proxy_( false )
+	{}
+
+#endif // OBJEXXFCL_PROXY_CONST_CHECKS
 
 	// Destructor
 	inline
@@ -122,6 +122,14 @@ public: // Inspector
 	size() const
 	{
 		return size_;
+	}
+
+	// Size
+	inline
+	int
+	isize() const
+	{
+		return static_cast< int >( size_ );
 	}
 
 private: // Data

@@ -3,6 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <EarthTube.hh>
@@ -60,6 +61,8 @@ namespace EarthTube {
 	// DERIVED TYPE DEFINITIONS
 
 	// MODULE VARIABLES DECLARATIONS:
+	static std::string const BlankString;
+
 	int TotEarthTube( 0 ); // Total EarthTube Statements in input
 	// Parameters for Ventilation
 	int const NaturalEarthTube( 0 );
@@ -173,7 +176,6 @@ namespace EarthTube {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		Real64 const EarthTubeTempLimit( 100.0 ); // degrees Celsius
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -249,7 +251,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).FanType = ExhaustEarthTube;
 			} else if ( SELECT_CASE_var == "INTAKE" ) {
 				EarthTubeSys( Loop ).FanType = IntakeEarthTube;
-			} else if ( ( SELECT_CASE_var == "NATURAL" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == Blank ) ) {
+			} else if ( ( SELECT_CASE_var == "NATURAL" ) || ( SELECT_CASE_var == "NONE" ) || ( SELECT_CASE_var == BlankString ) ) {
 				EarthTubeSys( Loop ).FanType = NaturalEarthTube;
 			} else {
 				ShowSevereError( cCurrentModuleObject + ": " + cAlphaFieldNames( 1 ) + '=' + cAlphaArgs( 1 ) + ", " + cAlphaFieldNames( 3 ) + " invalid=" + cAlphaArgs( 3 ) );
@@ -280,7 +282,7 @@ namespace EarthTube {
 				ErrorsFound = true;
 			}
 
-			EarthTubeSys( Loop ).r3 = 2. * EarthTubeSys( Loop ).r1;
+			EarthTubeSys( Loop ).r3 = 2.0 * EarthTubeSys( Loop ).r1;
 
 			EarthTubeSys( Loop ).PipeLength = rNumericArgs( 9 );
 			if ( EarthTubeSys( Loop ).PipeLength <= 0.0 ) {
@@ -345,8 +347,8 @@ namespace EarthTube {
 					SetupOutputVariable( "Earth Tube Zone Sensible Heating Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGain, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Zone Sensible Heating Rate [W]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeHeatGainRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Flow Volume [m3]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolume, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Current Density Volumetric Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
-					SetupOutputVariable( "Earth Tube Standard Density Volumetric Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRateStd, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Current Density Air Volume Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
+					SetupOutputVariable( "Earth Tube Standard Density Air Volume Flow Rate [m3/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeVolFlowRateStd, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Flow Mass [kg]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMass, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Air Mass Flow Rate [kg/s]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeMassFlowRate, "System", "State", Zone( EarthTubeSys( Loop ).ZonePtr ).Name );
 					SetupOutputVariable( "Earth Tube Fan Electric Energy [J]", ZnRptET( EarthTubeSys( Loop ).ZonePtr ).EarthTubeFanElec, "System", "NonState", Zone( EarthTubeSys( Loop ).ZonePtr ).Name, _, "Electricity", _, _, "Building" );
@@ -469,7 +471,7 @@ namespace EarthTube {
 				EarthTubeSys( Loop ).FanPower = EAMFL( NZ ) * EarthTubeSys( Loop ).FanPressure / ( EarthTubeSys( Loop ).FanEfficiency * AirDensity );
 			}
 
-			AverPipeAirVel = EVF( NZ ) / Pi / ( std::pow( EarthTubeSys( Loop ).r1, 2 ) );
+			AverPipeAirVel = EVF( NZ ) / Pi / pow_2( EarthTubeSys( Loop ).r1 );
 			AirMassFlowRate = EVF( NZ ) * AirDensity;
 
 			// Calculation of Average Ground Temperature between Depth z1 and z2 at time t
@@ -477,27 +479,27 @@ namespace EarthTube {
 			EarthTubeSys( Loop ).GroundTempz1z2t = GroundTempz1z2t;
 
 			// Calculation of Convective Heat Transfer Coefficient at Inner Pipe Surface
-			AirThermCond = 0.02442 + 0.6992 * OutDryBulbTemp / 10000.;
-			AirKinemVisco = ( 0.1335 + 0.000925 * OutDryBulbTemp ) / 10000.;
-			AirThermDiffus = ( 0.0014 * OutDryBulbTemp + 0.1872 ) / 10000.;
-			Re = 2. * EarthTubeSys( Loop ).r1 * AverPipeAirVel / AirKinemVisco;
+			AirThermCond = 0.02442 + 0.6992 * OutDryBulbTemp / 10000.0;
+			AirKinemVisco = ( 0.1335 + 0.000925 * OutDryBulbTemp ) / 10000.0;
+			AirThermDiffus = ( 0.0014 * OutDryBulbTemp + 0.1872 ) / 10000.0;
+			Re = 2.0 * EarthTubeSys( Loop ).r1 * AverPipeAirVel / AirKinemVisco;
 			Pr = AirKinemVisco / AirThermDiffus;
-			if ( Re <= 2300. ) {
+			if ( Re <= 2300.0 ) {
 				Nu = 3.66;
-			} else if ( Re <= 4000. ) {
-				fa = std::pow( ( 1.58 * std::log( Re ) - 3.28 ), ( -2. ) );
-				Process1 = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( std::pow( ( fa / 2.0 ), 0.5 ) ) * ( std::pow( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
-				Nu = ( Process1 - 3.66 ) / ( 1700. ) * Re + ( 4000. * 3.66 - 2300. * Process1 ) / 1700.;
+			} else if ( Re <= 4000.0 ) {
+				fa = std::pow( 1.58 * std::log( Re ) - 3.28, -2 );
+				Process1 = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * std::sqrt( fa / 2.0 ) * ( std::pow( Pr, 2.0 / 3.0 ) - 1.0 ) );
+				Nu = ( Process1 - 3.66 ) / ( 1700.0 ) * Re + ( 4000.0 * 3.66 - 2300.0 * Process1 ) / 1700.0;
 			} else {
-				fa = std::pow( ( 1.58 * std::log( Re ) - 3.28 ), ( -2. ) );
-				Nu = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * ( std::pow( ( fa / 2.0 ), 0.5 ) ) * ( std::pow( Pr, ( 2.0 / 3.0 ) ) - 1.0 ) );
+				fa = std::pow( 1.58 * std::log( Re ) - 3.28, -2 );
+				Nu = ( fa / 2.0 ) * ( Re - 1000.0 ) * Pr / ( 1.0 + 12.7 * std::sqrt( fa / 2.0 ) * ( std::pow( Pr, 2.0 / 3.0 ) - 1.0 ) );
 			}
-			PipeHeatTransCoef = Nu * AirThermCond / 2. / EarthTubeSys( Loop ).r1;
+			PipeHeatTransCoef = Nu * AirThermCond / 2.0 / EarthTubeSys( Loop ).r1;
 
 			// Claculation of Thermal Resistance and Overall Heat Transger Coefficient
 			Rc = 1.0 / 2.0 / Pi / EarthTubeSys( Loop ).r1 / PipeHeatTransCoef;
-			Rp = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) / EarthTubeSys( Loop ).r1 ) / 2. / Pi / EarthTubeSys( Loop ).PipeThermCond;
-			Rs = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 + EarthTubeSys( Loop ).r3 ) / ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) ) / 2. / Pi / EarthTubeSys( Loop ).SoilThermCond;
+			Rp = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) / EarthTubeSys( Loop ).r1 ) / 2.0 / Pi / EarthTubeSys( Loop ).PipeThermCond;
+			Rs = std::log( ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 + EarthTubeSys( Loop ).r3 ) / ( EarthTubeSys( Loop ).r1 + EarthTubeSys( Loop ).r2 ) ) / 2.0 / Pi / EarthTubeSys( Loop ).SoilThermCond;
 			Rt = Rc + Rp + Rs;
 			OverallHeatTransCoef = 1.0 / Rt;
 
@@ -653,14 +655,14 @@ namespace EarthTube {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -74,6 +74,8 @@ namespace PollutionModule {
 	int const OtherFuel2PollFactor( 10 );
 	int const PollFactorNumTypes( 10 );
 
+	static std::string const BlankString;
+
 	// DERIVED TYPE DEFINITIONS:
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -1191,7 +1193,7 @@ namespace PollutionModule {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
+		// na
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1209,7 +1211,7 @@ namespace PollutionModule {
 
 		for ( Loop = 1; Loop <= PollFactorNumTypes; ++Loop ) {
 
-			if ( FuelType.FuelTypeNames( Loop ) == Blank ) continue;
+			if ( FuelType.FuelTypeNames( Loop ).empty() ) continue;
 
 			{ auto const SELECT_CASE_var( MakeUPPERCase( FuelType.FuelTypeNames( Loop ) ) );
 			if ( ( SELECT_CASE_var == "NATURALGAS" ) || ( SELECT_CASE_var == "NATURAL GAS" ) || ( SELECT_CASE_var == "GAS" ) ) {
@@ -3684,7 +3686,7 @@ namespace PollutionModule {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

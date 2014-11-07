@@ -3,6 +3,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
+#include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <ThermalChimney.hh>
@@ -61,6 +62,8 @@ namespace ThermalChimney {
 	// DERIVED TYPE DEFINITIONS
 
 	int TotThermalChimney( 0 ); // Total ThermalChimney Statements in input
+
+	static std::string const BlankString;
 
 	// Subroutine Specifications for the Heat Balance Module
 	// Driver Routines
@@ -167,7 +170,6 @@ namespace ThermalChimney {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static std::string const Blank;
 		Real64 const FlowFractionTolerance( 0.0001 ); // Smallest deviation from unity for the sum of all fractions
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -323,8 +325,8 @@ namespace ThermalChimney {
 
 		// Set up the output variables for thermal chimneys
 		for ( Loop = 1; Loop <= TotThermalChimney; ++Loop ) {
-			SetupOutputVariable( "Zone Thermal Chimney Current Conditions Volumetric Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
-			SetupOutputVariable( "Zone Thermal Chimney Standard Conditions Volumetric Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlowStd, "System", "Average", ThermalChimneySys( Loop ).Name );
+			SetupOutputVariable( "Zone Thermal Chimney Current Density Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
+			SetupOutputVariable( "Zone Thermal Chimney Standard Density Air Volume Flow Rate [m3/s]", ThermalChimneyReport( Loop ).OverallTCVolumeFlowStd, "System", "Average", ThermalChimneySys( Loop ).Name );
 			SetupOutputVariable( "Zone Thermal Chimney Mass Flow Rate [kg/s]", ThermalChimneyReport( Loop ).OverallTCMassFlow, "System", "Average", ThermalChimneySys( Loop ).Name );
 			SetupOutputVariable( "Zone Thermal Chimney Outlet Temperature [C]", ThermalChimneyReport( Loop ).OutletAirTempThermalChim, "System", "Average", ThermalChimneySys( Loop ).Name );
 
@@ -602,9 +604,9 @@ namespace ThermalChimney {
 				} // IF (IterationLoop == 1) THEN
 
 				// Calculation of Thermal Chimney Discharge Air Temperature
-				Process1 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid - 2. * TempTCMassAirFlowRate( IterationLoop ) * AirSpecHeatThermalChim;
-				Process2 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid + 2. * TempTCMassAirFlowRate( IterationLoop ) * AirSpecHeatThermalChim;
-				Process3 = 2. * AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid * SurfTempGlassCover + 2. * AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid * SurfTempAbsorberWall;
+				Process1 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid - 2.0 * TempTCMassAirFlowRate( IterationLoop ) * AirSpecHeatThermalChim;
+				Process2 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid + 2.0 * TempTCMassAirFlowRate( IterationLoop ) * AirSpecHeatThermalChim;
+				Process3 = 2.0 * AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid * SurfTempGlassCover + 2.0 * AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid * SurfTempAbsorberWall;
 
 				for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 					for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
@@ -626,15 +628,15 @@ namespace ThermalChimney {
 				if ( ThermChimSubTemp( NTC ) <= RoomAirTemp ) {
 					TempTCVolumeAirFlowRate( IterationLoop ) = 0.0;
 				} else {
-					TempTCVolumeAirFlowRate( IterationLoop ) = DischargeCoeffTC * AirOutletCrossAreaTC * ( std::pow( ( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / ( std::pow( ( 1.0 + AirRelativeCrossArea ), 2 ) ) ), 0.5 ) );
+					TempTCVolumeAirFlowRate( IterationLoop ) = DischargeCoeffTC * AirOutletCrossAreaTC * std::sqrt( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / pow_2( 1.0 + AirRelativeCrossArea ) );
 				}
 
 			} // DO IterationLoop = 1,10
 
 			// Calculation of Thermal Chimney Discharge Temperature
-			Process1 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid - 2. * TCMassAirFlowRate * AirSpecHeatThermalChim;
-			Process2 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid + 2. * TCMassAirFlowRate * AirSpecHeatThermalChim;
-			Process3 = 2. * AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid * SurfTempGlassCover + 2. * AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid * SurfTempAbsorberWall;
+			Process1 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid - 2.0 * TCMassAirFlowRate * AirSpecHeatThermalChim;
+			Process2 = AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid + AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid + 2.0 * TCMassAirFlowRate * AirSpecHeatThermalChim;
+			Process3 = 2.0 * AbsorberWallWidthTC * DeltaL * ConvTransCoeffGlassFluid * SurfTempGlassCover + 2.0 * AbsorberWallWidthTC * DeltaL * ConvTransCoeffWallFluid * SurfTempAbsorberWall;
 
 			for ( ThermChimLoop1 = 1; ThermChimLoop1 <= NTC; ++ThermChimLoop1 ) {
 				for ( ThermChimLoop2 = 1; ThermChimLoop2 <= NTC; ++ThermChimLoop2 ) {
@@ -656,7 +658,7 @@ namespace ThermalChimney {
 			if ( ThermChimSubTemp( NTC ) <= RoomAirTemp ) {
 				TCVolumeAirFlowRate = 0.0;
 			} else {
-				TCVolumeAirFlowRate = DischargeCoeffTC * AirOutletCrossAreaTC * ( std::pow( ( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / ( std::pow( ( 1.0 + AirRelativeCrossArea ), 2 ) ) ), 0.5 ) );
+				TCVolumeAirFlowRate = DischargeCoeffTC * AirOutletCrossAreaTC * std::sqrt( 2.0 * ( ( ThermChimSubTemp( NTC ) - RoomAirTemp ) / RoomAirTemp ) * 9.8 * OverallThermalChimLength / pow_2( 1.0 + AirRelativeCrossArea ) );
 			}
 
 			// Now assignment of the overall mass flow rate into each zone
@@ -872,14 +874,14 @@ namespace ThermalChimney {
 	//*****************************************************************************************
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

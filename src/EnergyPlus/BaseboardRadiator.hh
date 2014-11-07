@@ -23,7 +23,6 @@ namespace BaseboardRadiator {
 	// Data
 	//MODULE PARAMETER DEFINITIONS
 	extern Real64 const SimpConvAirFlowSpeed; // m/s
-	extern std::string const cCMO_BBRadiator_Water;
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -72,6 +71,8 @@ namespace BaseboardRadiator {
 		int BBLoadReSimIndex;
 		int BBMassFlowReSimIndex;
 		int BBInletTempFlowReSimIndex;
+		int HeatingCapMethod; // - Method for water baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // -  water baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		BaseboardParams() :
@@ -104,7 +105,9 @@ namespace BaseboardRadiator {
 			CompNum( 0 ),
 			BBLoadReSimIndex( 0 ),
 			BBMassFlowReSimIndex( 0 ),
-			BBInletTempFlowReSimIndex( 0 )
+			BBInletTempFlowReSimIndex( 0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -140,7 +143,10 @@ namespace BaseboardRadiator {
 			int const CompNum, // plant loop component index
 			int const BBLoadReSimIndex,
 			int const BBMassFlowReSimIndex,
-			int const BBInletTempFlowReSimIndex
+			int const BBInletTempFlowReSimIndex,
+			int const HeatingCapMethod, // - Method for steam baseboard Radiator system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity // -  steam baseboard Radiator system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+
 		) :
 			EquipID( EquipID ),
 			Schedule( Schedule ),
@@ -173,13 +179,33 @@ namespace BaseboardRadiator {
 			CompNum( CompNum ),
 			BBLoadReSimIndex( BBLoadReSimIndex ),
 			BBMassFlowReSimIndex( BBMassFlowReSimIndex ),
-			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex )
+			BBInletTempFlowReSimIndex( BBInletTempFlowReSimIndex ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
 
 	};
 
+	struct BaseboardParamsNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		BaseboardParamsNumericFieldData()
+		{}
+
+		// Member Constructor
+		BaseboardParamsNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
 	// Object Data
 	extern FArray1D< BaseboardParams > Baseboard;
+	extern FArray1D< BaseboardParamsNumericFieldData > BaseboardParamsNumericFields;
+
 
 	// Functions
 
@@ -250,7 +276,7 @@ namespace BaseboardRadiator {
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

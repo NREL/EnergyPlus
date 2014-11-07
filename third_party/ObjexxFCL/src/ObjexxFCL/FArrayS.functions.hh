@@ -431,7 +431,7 @@ count( FArray2S< bool > const & a, int const dim )
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< FArray2S< bool >::size_type > v( a.size2() );
+			FArray1D< FArray2S< bool >::size_type > v( a.isize2() );
 			for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 				FArray2S< bool >::size_type c( 0u );
 				for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
@@ -443,7 +443,7 @@ count( FArray2S< bool > const & a, int const dim )
 		}
 	case 2:
 		{
-			FArray1D< FArray2S< bool >::size_type > v( a.size1() );
+			FArray1D< FArray2S< bool >::size_type > v( a.isize1() );
 			for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1 ) {
 				FArray2S< bool >::size_type c( 0u );
 				for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
@@ -464,7 +464,7 @@ count( FArray2S< bool > const & a, int const dim )
 template< typename T >
 inline
 bool
-is_contiguous( FArrayS< T > const & a )
+is_contiguous( FArrayS< T > const & )
 {
 	return false; //Do Replace by method call once we support it
 }
@@ -474,7 +474,7 @@ is_contiguous( FArrayS< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray1S< T > const & a )
+lbound( FArray1S< T > const & )
 {
 	return FArray1D< int >( 1, 1 );
 }
@@ -482,7 +482,7 @@ lbound( FArray1S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray2S< T > const & a )
+lbound( FArray2S< T > const & )
 {
 	return FArray1D< int >( 2, 1 );
 }
@@ -490,7 +490,7 @@ lbound( FArray2S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray3S< T > const & a )
+lbound( FArray3S< T > const & )
 {
 	return FArray1D< int >( 3, 1 );
 }
@@ -498,7 +498,7 @@ lbound( FArray3S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray4S< T > const & a )
+lbound( FArray4S< T > const & )
 {
 	return FArray1D< int >( 4, 1 );
 }
@@ -506,7 +506,7 @@ lbound( FArray4S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray5S< T > const & a )
+lbound( FArray5S< T > const & )
 {
 	return FArray1D< int >( 5, 1 );
 }
@@ -514,7 +514,7 @@ lbound( FArray5S< T > const & a )
 template< typename T >
 inline
 FArray1D< int >
-lbound( FArray6S< T > const & a )
+lbound( FArray6S< T > const & )
 {
 	return FArray1D< int >( 6, 1 );
 }
@@ -522,7 +522,7 @@ lbound( FArray6S< T > const & a )
 template< typename T >
 inline
 int
-lbound( FArray1S< T > const & a, int const dim )
+lbound( FArray1S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -536,7 +536,7 @@ lbound( FArray1S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray2S< T > const & a, int const dim )
+lbound( FArray2S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -552,7 +552,7 @@ lbound( FArray2S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray3S< T > const & a, int const dim )
+lbound( FArray3S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -570,7 +570,7 @@ lbound( FArray3S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray4S< T > const & a, int const dim )
+lbound( FArray4S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -590,7 +590,7 @@ lbound( FArray4S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray5S< T > const & a, int const dim )
+lbound( FArray5S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -612,7 +612,7 @@ lbound( FArray5S< T > const & a, int const dim )
 template< typename T >
 inline
 int
-lbound( FArray6S< T > const & a, int const dim )
+lbound( FArray6S< T > const &, int const dim )
 {
 	switch ( dim ) {
 	case 1:
@@ -804,7 +804,7 @@ inline
 FArray1D< int >
 shape( FArray1S< T > const & a )
 {
-	return FArray1D< int >( 1, a.size1() );
+	return FArray1D< int >( 1, a.isize1() );
 }
 
 template< typename T >
@@ -812,7 +812,7 @@ inline
 FArray1D< int >
 shape( FArray2S< T > const & a )
 {
-	return FArray1D< int >( 2, { a.size1(), a.size2() } );
+	return FArray1D< int >( 2, { a.isize1(), a.isize2() } );
 }
 
 template< typename T >
@@ -820,7 +820,7 @@ inline
 FArray1D< int >
 shape( FArray3S< T > const & a )
 {
-	return FArray1D< int >( 3, { a.size1(), a.size2(), a.size3() } );
+	return FArray1D< int >( 3, { a.isize1(), a.isize2(), a.isize3() } );
 }
 
 template< typename T >
@@ -828,7 +828,7 @@ inline
 FArray1D< int >
 shape( FArray4S< T > const & a )
 {
-	return FArray1D< int >( 4, { a.size1(), a.size2(), a.size3(), a.size4() } );
+	return FArray1D< int >( 4, { a.isize1(), a.isize2(), a.isize3(), a.isize4() } );
 }
 
 template< typename T >
@@ -836,7 +836,7 @@ inline
 FArray1D< int >
 shape( FArray5S< T > const & a )
 {
-	return FArray1D< int >( 5, { a.size1(), a.size2(), a.size3(), a.size4(), a.size5() } );
+	return FArray1D< int >( 5, { a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5() } );
 }
 
 template< typename T >
@@ -844,7 +844,7 @@ inline
 FArray1D< int >
 shape( FArray6S< T > const & a )
 {
-	return FArray1D< int >( 6, { a.size1(), a.size2(), a.size3(), a.size4(), a.size5(), a.size6() } );
+	return FArray1D< int >( 6, { a.isize1(), a.isize2(), a.isize3(), a.isize4(), a.isize5(), a.isize6() } );
 }
 
 // size /////
@@ -976,15 +976,15 @@ inline
 int
 isize( FArrayS< T > const & a )
 {
-	return size( a );
+	return static_cast< int >( size( a ) );
 }
 
-template< template< typename > class A, typename T >
+template< template< typename > class A, typename T, class = typename std::enable_if< std::is_base_of< FArrayS< T >, A< T > >::value >::type >
 inline
-typename std::enable_if< std::is_base_of< FArrayS< T >, A< T > >::value, int >::type // Restrict to FArrayS
+int
 isize( A< T > const & a, int const dim )
 {
-	return size( a, dim );
+	return static_cast< int >( size( a, dim ) );
 }
 
 // contig /////
@@ -1146,7 +1146,7 @@ pack( FArray1S< T > const & a, FArray1< bool > const & mask )
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
-	FArray1D< T > r( n );
+	FArray1D< T > r( static_cast< int >( n ) );
 	size_type l( 0 ), k( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i, ++l ) {
 		if ( mask[ l ] ) r[ k++ ] = a( i );
@@ -1165,7 +1165,7 @@ pack( FArray2S< T > const & a, FArray2< bool > const & mask )
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
-	FArray1D< T > r( n );
+	FArray1D< T > r( static_cast< int >( n ) );
 	size_type l( 0 ), k( 0 );
 	for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
 		for ( int i1 = 1, e1 = a.u1(); i1 <= e1; ++i1, ++l ) {
@@ -1186,7 +1186,7 @@ pack( FArray3S< T > const & a, FArray3< bool > const & mask )
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
-	FArray1D< T > r( n );
+	FArray1D< T > r( static_cast< int >( n ) );
 	size_type l( 0 ), k( 0 );
 	for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
 		for ( int i2 = 1, e2 = a.u2(); i2 <= e2; ++i2 ) {
@@ -1209,7 +1209,7 @@ pack( FArray4S< T > const & a, FArray4< bool > const & mask )
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
-	FArray1D< T > r( n );
+	FArray1D< T > r( static_cast< int >( n ) );
 	size_type l( 0 ), k( 0 );
 	for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
 		for ( int i3 = 1, e3 = a.u3(); i3 <= e3; ++i3 ) {
@@ -1234,7 +1234,7 @@ pack( FArray5S< T > const & a, FArray5< bool > const & mask )
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
-	FArray1D< T > r( n );
+	FArray1D< T > r( static_cast< int >( n ) );
 	size_type l( 0 ), k( 0 );
 	for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
 		for ( int i4 = 1, e4 = a.u4(); i4 <= e4; ++i4 ) {
@@ -1261,7 +1261,7 @@ pack( FArray6S< T > const & a, FArray6< bool > const & mask )
 	for ( size_type l = 0, e = mask.size(); l < e; ++l ) {
 		if ( mask[ l ] ) ++n;
 	}
-	FArray1D< T > r( n );
+	FArray1D< T > r( static_cast< int >( n ) );
 	size_type l( 0 ), k( 0 );
 	for ( int i6 = 1, e6 = a.u6(); i6 <= e6; ++i6 ) {
 		for ( int i5 = 1, e5 = a.u5(); i5 <= e5; ++i5 ) {
@@ -1287,10 +1287,13 @@ FArray1D< T >
 cshift( FArray1S< T > const & a, int const shift, int const dim = 1 )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
-			int const b( a.l() ), e( a.u() ), s( a.size() );
+			int const b( a.l() ), e( a.u() ), s( a.isize() );
 			for ( int i = b, j = 0; i <= e; ++i, ++j ) {
 				o[ ( ( ( j - shift ) % s ) + s ) % s ] = a( i );
 			}
@@ -1312,14 +1315,14 @@ cshift( FArray2S< T > const & a, int const shift, int const dim = 1 )
 			int const b2( a.l2() ), e2( a.u2() );
 			int const sp( shift + 1 );
 			if ( dim == 1 ) {
-				int const s1( a.size1() );
+				int const s1( a.isize1() );
 				for ( int i2 = b2, j2 = 1; i2 <= e2; ++i2, ++j2 ) {
 					for ( int i1 = b1, j1 = 1; i1 <= e1; ++i1, ++j1 ) {
 						o( 1 + ( ( ( j1 - sp ) % s1 ) + s1 ) % s1, j2 ) = a( i1, i2 );
 					}
 				}
 			} else if ( dim == 2 ) {
-				int const s2( a.size1() );
+				int const s2( a.isize2() );
 				for ( int i2 = b2, j2 = 1; i2 <= e2; ++i2, ++j2 ) {
 					for ( int i1 = b1, j1 = 1; i1 <= e1; ++i1, ++j1 ) {
 						o( j1, 1 + ( ( ( j2 - sp ) % s2 ) + s2 ) % s2 ) = a( i1, i2 );
@@ -1344,7 +1347,7 @@ cshift( FArray2S< T > const & a, FArray1< int > const & shift, int const dim = 1
 			int const b2( a.l2() ), e2( a.u2() );
 			if ( dim == 1 ) {
 				assert( shift.size() == a.size2() );
-				int const s1( a.size1() );
+				int const s1( a.isize1() );
 				for ( int i2 = b2, j2 = 1, k2 = shift.l(); i2 <= e2; ++i2, ++j2, ++k2 ) {
 					int const sp( shift( k2 ) + 1 );
 					for ( int i1 = b1, j1 = 1; i1 <= e1; ++i1, ++j1 ) {
@@ -1353,7 +1356,7 @@ cshift( FArray2S< T > const & a, FArray1< int > const & shift, int const dim = 1
 				}
 			} else if ( dim == 2 ) {
 				assert( shift.size() == a.size1() );
-				int const s2( a.size2() );
+				int const s2( a.isize2() );
 				for ( int i1 = b1, j1 = 1, k1 = shift.l(); i1 <= e1; ++i1, ++j1, ++k1 ) {
 					int const sp( shift( k1 ) + 1 );
 					for ( int i2 = b2, j2 = 1; i2 <= e2; ++i2, ++j2 ) {
@@ -1374,6 +1377,9 @@ FArray1D< T >
 eoshift( FArray1S< T > const & a, int const shift, T const bdy = TypeTraits< T >::initial_value(), int const dim = 1 )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	FArray1D< T > o( FArray1D< T >::shape( a, bdy ) );
 	if ( a.dimensions_initialized() ) {
 		if ( o.dimensions_initialized() ) {
@@ -1554,6 +1560,9 @@ T
 sum( FArray1S< T > const & a, int const dim )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	T s( 0 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		s += a( i );
@@ -1815,6 +1824,9 @@ T
 product( FArray1S< T > const & a, int const dim )
 {
 	assert( dim == 1 );
+#ifdef NDEBUG
+	static_cast< void >( dim ); // Suppress unused warning
+#endif
 	T p( 1 );
 	for ( int i = 1, e = a.u(); i <= e; ++i ) {
 		p *= a( i );
@@ -3105,7 +3117,7 @@ FArray2D< T >
 matmul( FArray1S< T > const & a, FArray1S< T > const & b )
 {
 	assert( conformable( a, b ) );
-	FArray2D< T > m( a.size(), b.size() );
+	FArray2D< T > m( a.isize(), b.isize() );
 	for ( int j = 1, ej = b.u(); j <= ej; ++j ) {
 		T const b_j( b( j ) );
 		for ( int i = 1, ei = a.u(); i <= ei; ++i ) {
@@ -3121,7 +3133,7 @@ FArray2D< bool >
 matmul( FArray1S< bool > const & a, FArray1S< bool > const & b )
 {
 	assert( conformable( a, b ) );
-	FArray2D< bool > m( a.size(), b.size() );
+	FArray2D< bool > m( a.isize(), b.isize() );
 	for ( int j = 1, ej = b.u(); j <= ej; ++j ) {
 		bool const b_j( b( j ) );
 		for ( int i = 1, ei = a.u(); i <= ei; ++i ) {
@@ -3138,7 +3150,7 @@ FArray1D< T >
 matmul( FArray1S< T > const & a, FArray2S< T > const & b )
 {
 	assert( a.size() == b.size1() );
-	FArray1D< T > m( b.size2() );
+	FArray1D< T > m( b.isize2() );
 	for ( int j = 1, ej = b.u2(); j <= ej; ++j ) {
 		T dot( 0 );
 		for ( int i = 1, ei = a.u(); i <= ei; ++i ) {
@@ -3155,7 +3167,7 @@ FArray1D< bool >
 matmul( FArray1S< bool > const & a, FArray2S< bool > const & b )
 {
 	assert( a.size() == b.size1() );
-	FArray1D< bool > m( b.size2() );
+	FArray1D< bool > m( b.isize2() );
 	for ( int j = 1, ej = b.u2(); j <= ej; ++j ) {
 		bool dot( false );
 		for ( int i = 1, ei = a.u(); i <= ei; ++i ) {
@@ -3176,7 +3188,7 @@ FArray1D< T >
 matmul( FArray2S< T > const & a, FArray1S< T > const & b )
 {
 	assert( a.size2() == b.size() );
-	FArray1D< T > m( a.size1() );
+	FArray1D< T > m( a.isize1() );
 	for ( int i = 1, ei = a.u1(); i <= ei; ++i ) {
 		T dot( 0 );
 		for ( int j = 1, ej = b.u(); j <= ej; ++j ) {
@@ -3193,7 +3205,7 @@ FArray1D< bool >
 matmul( FArray2S< bool > const & a, FArray1S< bool > const & b )
 {
 	assert( a.size2() == b.size() );
-	FArray1D< bool > m( a.size1() );
+	FArray1D< bool > m( a.isize1() );
 	for ( int i = 1, ei = a.u1(); i <= ei; ++i ) {
 		bool dot( false );
 		for ( int j = 1, ej = b.u(); j <= ej; ++j ) {
@@ -3214,7 +3226,7 @@ FArray2D< T >
 matmul( FArray2S< T > const & a, FArray2S< T > const & b )
 {
 	assert( a.size2() == b.size1() );
-	FArray2D< T > m( a.size1(), b.size2() );
+	FArray2D< T > m( a.isize1(), b.isize2() );
 	for ( int j = 1, ej = b.u2(); j <= ej; ++j ) {
 		for ( int i = 1, ei = a.u1(); i <= ei; ++i ) {
 			T dot( 0 );
@@ -3233,7 +3245,7 @@ FArray2D< bool >
 matmul( FArray2S< bool > const & a, FArray2S< bool > const & b )
 {
 	assert( a.size2() == b.size1() );
-	FArray2D< bool > m( a.size1(), b.size2() );
+	FArray2D< bool > m( a.isize1(), b.isize2() );
 	for ( int j = 1, ej = b.u2(); j <= ej; ++j ) {
 		for ( int i = 1, ei = a.u1(); i <= ei; ++i ) {
 			bool dot( false );
