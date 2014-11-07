@@ -520,7 +520,6 @@ ShadowCalculation,
        \key SimpleSkyDiffuseModeling
        \key DetailedSkyDiffuseModeling
 
-
 SurfaceConvectionAlgorithm:Inside,
        \memo Default indoor surface heat transfer convection algorithm to be used for all zones
        \unique-object
@@ -557,7 +556,6 @@ SurfaceConvectionAlgorithm:Outside,
        \note MoWiTT = correlation from measurements by Klems and Yazdanian for smooth surfaces
        \note DOE-2 = correlation from measurements by Klems and Yazdanian for rough surfaces
        \note AdaptiveConvectionAlgorithm = dynamic selection of correlations based on conditions
-
 
 HeatBalanceAlgorithm,
        \memo Determines which Heat Balance Algorithm will be used ie.
@@ -778,7 +776,6 @@ ProgramControl,
        \minimum 0
        \note This is currently used only in the Interior Radiant Exchange module -- view factors on # surfaces
        \note if value is 0, then maximum number allowed will be used.
-
 
 \group Compliance Objects
 
@@ -2904,7 +2901,6 @@ Schedule:Day:Interval,
        \note "until" includes the time entered.
        \units hh:mm
  N144; \field Value Until Time 144
-
 
 Schedule:Day:List,
       \memo Schedule:Day:List will allow the user to list 24 hours worth of values, which can be sub-hourly in nature.
@@ -6585,7 +6581,6 @@ WindowMaterial:Gap:EquivalentLayer,
        \note Used only if Gas Type = Custom
        \minimum >1.0
 
-
 MaterialProperty:MoisturePenetrationDepth:Settings,
     \memo Additional properties for moisture using EMPD procedure
     \memo HeatBalanceAlgorithm choice=MoisturePenetrationDepthConductionTransferFunction only
@@ -8305,7 +8300,6 @@ WindowThermalModel:Params,
        \units Pa
        \minimum >0
        \default 101325
-
 
 Construction:ComplexFenestrationState,
        \memo Describes one state for a complex glazing system
@@ -15845,7 +15839,6 @@ SurfaceProperty:OtherSideCoefficients,
       \type real
       \units C
 
-
 SurfaceProperty:OtherSideConditionsModel,
       \memo This object sets up modifying the other side conditions for a surface from other model results.
   A1, \field Name
@@ -15865,7 +15858,6 @@ SurfaceProperty:OtherSideConditionsModel,
       \note GroundCoupledSurface provides boundary conditions for surfaces
       \note  in contact with GroundDomain objects
       \default GapConvectionRadiation
-
 
 SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
        \unique-object
@@ -16578,7 +16570,6 @@ SurfaceConvectionAlgorithm:Outside:AdaptiveModelSelections,
        \note The SurfaceConvectionAlgorithm:Outside:UserCurve named in this field is used when the previous field is set to UserCurve
        \type object-list
        \object-list UserConvectionOutsideModels
-
 
 SurfaceConvectionAlgorithm:Inside:UserCurve,
        \memo Used to describe a custom model equation for surface convection heat transfer coefficient
@@ -20524,7 +20515,6 @@ ZoneInfiltration:EffectiveLeakageArea,
        \type real
        \required-field
 
-
 ZoneInfiltration:FlowCoefficient,
        \min-fields 8
        \memo  Infiltration is specified as flow coefficient, schedule fraction, stack and wind coefficients, and
@@ -20567,7 +20557,6 @@ ZoneInfiltration:FlowCoefficient,
        \minimum> 0
        \type real
        \required-field
-
 
 ZoneVentilation:DesignFlowRate,
    \memo  Ventilation is specified as a design level which is modified by a schedule fraction, temperature difference and wind speed:
@@ -30136,7 +30125,6 @@ Sizing:Zone,
       \type object-list
       \object-list DesignSpecificationZoneAirDistributionNames
 
-
 DesignSpecification:ZoneHVAC:Sizing,
   \min-fields 1
   \memo This object is used to describe general scalable zone HVAC equipment sizing which
@@ -31458,7 +31446,6 @@ ZoneHVAC:FourPipeFanCoil,
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
 
-
 ZoneHVAC:WindowAirConditioner,
         \memo Window air conditioner. Forced-convection cooling-only unit with supply fan, direct
         \memo expansion (DX) cooling coil, and fixed-position outdoor air mixer.
@@ -31543,7 +31530,6 @@ ZoneHVAC:WindowAirConditioner,
         \note Enter the name of a DesignSpecificationZoneHVACSizing object.
         \type object-list
         \object-list DesignSpecificationZoneHVACSizingName
-
 
 ZoneHVAC:PackagedTerminalAirConditioner,
         \memo Packaged terminal air conditioner (PTAC).  Forced-convection heating-cooling unit
@@ -38355,7 +38341,6 @@ AirTerminal:DualDuct:VAV:OutdoorAir,
        \key DesignOccupancy
        \note CurrentOccupancy models demand controlled ventilation using the current number of people
        \note DesignOccupancy uses the total Number of People in the zone and is constant
-
 
 ZoneHVAC:AirDistributionUnit,
        \memo Central air system air distribution unit, serves as a wrapper for a specific type of
@@ -46602,7 +46587,6 @@ CoilSystem:Cooling:DX:HeatExchangerAssisted,
        \type object-list
        \object-list CoolingCoilsDXSingleSpeed
 
-
 Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \memo Direct expansion (DX) cooling coil and condensing unit (includes electric compressor
        \memo and condenser fan), single-speed with packaged integrated thermal storage for cooling.
@@ -47438,7 +47422,6 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \units C
        \note For fluid storage tanks only, maximum limit for storage tank
        \note If omitted,then the maximum temperature limit is that used for fluid property data.
-
 
 \Group Evaporative Coolers
 
@@ -50164,8 +50147,6 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \minimum> 0
         \note Enter the operating supply air flow rate during cooling
         \note operation or specify autosize.
-
-
 
 \group Variable Refrigerant Flow Equipment
 
@@ -55608,7 +55589,6 @@ Pump:ConstantSpeed,
         \minimum 0.0
         \maximum 1.0
 
-
 Pump:VariableSpeed:Condensate,
        \memo This pump model is described in the ASHRAE secondary HVAC toolkit.
        \memo Variable Speed Condensate pump for Steam Systems
@@ -55855,7 +55835,6 @@ TemperingValve,
       \required-field
       \type node
 
-
 \Group Non-Zone Equipment
 
 LoadProfile:Plant,
@@ -55885,7 +55864,6 @@ LoadProfile:Plant,
        \required-field
        \type object-list
        \object-list ScheduleNames
-
 
 \Group Solar Collectors
 
@@ -56795,7 +56773,6 @@ Chiller:Electric:EIR,
        \note Using this triggers a model more suited to series bundle and chillers with higher temperature heat recovery
        \note If this field is not used, the bundles are modeled as being in parallel
        \type node
-
 
 Chiller:Electric:ReformulatedEIR,
 \min-fields 21
@@ -57824,7 +57801,6 @@ Chiller:CombustionTurbine,
        \note air dry-bulb temperature is below the basin heater setpoint temperature.
        \note If a schedule name is not entered, the basin heater is allowed to operate
        \note throughout the entire simulation.
-
 
 ChillerHeater:Absorption:DirectFired,
   \min-fields 35
@@ -65626,7 +65602,6 @@ EnergyManagementSystem:MeteredOutputVariable,
        \note EnergyPlus units are standard SI units
        \type alpha
 
-
 EnergyManagementSystem:TrendVariable,
        \memo This object sets up an EMS trend variable from an Erl variable
        \memo A trend variable logs values across timesteps
@@ -65863,7 +65838,6 @@ ExternalInterface:FunctionalMockupUnitImport:To:Actuator,
        \type real
        \required-field
        \note Used during the first call of EnergyPlus.
-
 
 ExternalInterface:FunctionalMockupUnitImport:To:Variable,
        \memo Declares Erl variable as having global scope
@@ -66824,7 +66798,6 @@ AvailabilityManagerAssignmentList,
        \type object-list
        \object-list SystemAvailabilityManagers
 
-
 \group Setpoint Managers
 ! We have a two level hierarchy: Setpoint Managers and Controllers.  Set
 ! Point Managers are simulated at a high level - they resemble the function
@@ -66856,7 +66829,6 @@ SetpointManager:Scheduled,
        \note Node(s) at which control variable will be set
        \required-field
        \type node
-
 
 SetpointManager:Scheduled:DualSetpoint,
      \memo This setpoint manager places a high and low schedule value
@@ -67671,7 +67643,6 @@ SetpointManager:SingleZone:OneStageHeating,
        \required-field
        \type node
 
-
 \group Refrigeration
 
 Refrigeration:Case,
@@ -68039,8 +68010,6 @@ Refrigeration:CompressorRack,
         \note AND the heat rejection location is "Zone"
         \type object-list
         \object-list ZoneNames
-
-
 
 Refrigeration:CaseAndWalkInList,
         \memo Provides a list of all the refrigerated cases, walk in coolers, or air chillers
@@ -69347,7 +69316,6 @@ Refrigeration:SecondarySystem,
         \retaincase
         \default General
 
-
  Refrigeration:WalkIn,
         \memo Works in conjunction with a compressor rack, a refrigeration system, or a
         \memo refrigeration secondary system to simulate the performance of a walk-in cooler.
@@ -70609,7 +70577,6 @@ DemandManager:Thermostats,
        \note can be selected by entering <Zone Name><space><Global Thermostat Object Name>.
        \type object-list
        \object-list ZoneControlThermostaticNames
-
 
 \Group Electric Load Center-Generator Specifications
 
@@ -73987,7 +73954,6 @@ FaultModel:Fouling:Coil,
 
 \group General Data Entry
 
-
 Matrix:TwoDimension,
        \extensible:1
        \memo matrix data in row-major order
@@ -76398,7 +76364,6 @@ Table:OneIndependentVariable,
   N80,N81,N82,N83,N84,N85,N86,N87,N88,N89,N90,N91,N92,N93,N94,N95,N96,N97,N98,N99, \note fields as indicated
   N100,N101,N102,N103,N104,N105,N106,N107,N108,N109,N110,N111,N112,N113,N114,N115,N116,N117,N118,N119; \note fields as indicated
 
-
 Table:TwoIndependentVariables,
        \extensible:3 repeat last three fields
        \min-fields 22
@@ -78438,7 +78403,6 @@ FluidProperties:Saturated,
   N250; \field Property Value 250
         \type real
         \unitsBasedOnField A2
-
 
 FluidProperties:Superheated,
       \memo fluid properties for the superheated region
@@ -81505,7 +81469,6 @@ Parametric:SetValueForRun,
         \type  alpha
   A101; \field Value for Run 100
         \type  alpha
-
 
 Parametric:Logic,
        \memo This object allows some types of objects to be included for some parametric cases and
