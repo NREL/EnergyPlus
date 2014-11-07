@@ -19582,7 +19582,6 @@ HotWaterEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference HotWaterEquipmentNames
   A2 , \field Zone or ZoneList Name
        \required-field
        \type object-list
@@ -19775,7 +19774,6 @@ ZoneBaseboard:OutdoorTemperatureControlled,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference BaseboardHeatNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -23189,7 +23187,6 @@ Exterior:FuelEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ExteriorFuelEquipmentNames
   A2 , \field Fuel Use Type
        \required-field
        \type choice
@@ -30751,7 +30748,6 @@ ZoneControl:Thermostat:ThermalComfort,
        \min-fields 9
   A1 , \field Name
        \required-field
-       \reference ZoneControlThermalComfortNames
   A2 , \field Zone or ZoneList Name
        \required-field
        \type object-list
@@ -42618,7 +42614,6 @@ Coil:Heating:DX:SingleSpeed,
        \required-field
        \type alpha
        \reference HeatingCoilsDX
-       \reference HeatingCoilsGasElecDXSS
        \reference HeatingCoilsDXSingleSpeed
        \reference AFNCoilNames
   A2 , \field Availability Schedule Name
@@ -65920,7 +65915,6 @@ ExternalInterface:FunctionalMockupUnitExport:To:Schedule,
        \required-field
        \type alpha
        \reference ScheduleNames
-       \reference ExternalInterfaceScheduleNames
   A2 , \field Schedule Type Limits Names
        \type object-list
   A3 , \field FMU Variable Name
@@ -66375,7 +66369,7 @@ AvailabilityManager:OptimumStart,
        \memo Determines the optimal start of HVAC systems before occupancy.
   A1 , \field Name
        \required-field
-       \reference SystemAvailabilityManager
+       \reference SystemAvailabilityManagers
   A2 , \field Applicability Schedule Name
        \required-field
        \object-list ScheduleNames
