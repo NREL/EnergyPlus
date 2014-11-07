@@ -166,8 +166,8 @@ namespace RoomAirModelManager {
 		} else if ( SELECT_CASE_var == RoomAirModel_UCSDUFE ) { // UCSD UFAD exterior zone model
 			// simulate room airflow using the UCSDUFE model
 			ManageUCSDUFModels( ZoneNum, RoomAirModel_UCSDUFE );
-		}
-		else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) { // RoomAirflowNetwork zone model
+
+		} else if ( SELECT_CASE_var == RoomAirModel_AirflowNetwork ) { // RoomAirflowNetwork zone model
 			// simulate room airflow using the AirflowNetwork - based model
 			SimRoomAirModelAirflowNetwork( ZoneNum );
 
@@ -1718,7 +1718,7 @@ namespace RoomAirModelManager {
 			} // loop thru TotNumOfRAFNNodeGainsLists
 
 
-			// Need to debug this section ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?
+			// Need to debug this section ? 
 			cCurrentModuleObject = "RoomAir:Node:AirflowNetwork:HVACEquipment";
 			TotNumOfRAFNNodeHVACLists = GetNumObjectsFound( cCurrentModuleObject );
 			for ( Loop = 1; Loop <= TotNumOfRAFNNodeHVACLists; ++Loop ) {
@@ -1797,7 +1797,7 @@ namespace RoomAirModelManager {
 				}
 			}  // loop thru TotNumOfRAFNNodeHVACLists
 
-					// do some checks on input data
+			// do some checks on input data
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				if ( RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes > 0 ) {
 					// Check zone volume fraction
@@ -2622,10 +2622,10 @@ namespace RoomAirModelManager {
 	}
 
 	bool
-		GetRoomAirflowNetworkZoneNum(
+	GetRoomAirflowNetworkZoneNum(
 		int RoomAirNodeNum, // The node number associate with the node name
 		int & ZoneNum // The zone number associate with the node name
-		)
+	)
 	{
 
 			// FUNCTION INFORMATION:
@@ -2668,28 +2668,28 @@ namespace RoomAirModelManager {
 			int J;  // RoomAir node index
 
 			//Obtains and Allocates RoomAirSettings : AirflowNetwork
-			if (GetAirModelData) {
-				GetAirModelDatas();
+			if ( GetAirModelData ) {
+				GetAirModelDatas(  );
 				GetAirModelData = false;
 			}
 
 			Errorfound = false;
 			ZoneNum = 0;
 
-			for (I = 1; I <= NumOfZones; ++I) {
-				if (RoomAirflowNetworkZoneInfo(I).ZoneID > 0) {
-					for (J = 1; J <= RoomAirflowNetworkZoneInfo(I).NumOfAirNodes; ++J) {
-						if (RoomAirflowNetworkZoneInfo(I).Node(J).AirflowNetworkNodeID == RoomAirNodeNum) {
-							ZoneNum = RoomAirflowNetworkZoneInfo(I).ZoneID;
+			for ( I = 1; I <= NumOfZones; ++I ) {
+				if ( RoomAirflowNetworkZoneInfo( I ).ZoneID > 0 ) {
+					for ( J = 1; J <= RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes; ++J ) {
+						if ( RoomAirflowNetworkZoneInfo( I ).Node( J ).AirflowNetworkNodeID == RoomAirNodeNum ) {
+							ZoneNum = RoomAirflowNetworkZoneInfo( I ).ZoneID;
 							break;
 						}
 					}
 				}
 			}
 
-			if (ZoneNum == 0) {
+			if ( ZoneNum == 0 ) {
 				Errorfound = true;
-				ShowSevereError("Could not find ZoneNum in RoomAirSettings:AirflowNetwork with NodeNum='" + RoundSigDigits(RoomAirNodeNum));
+				ShowSevereError( "Could not find ZoneNum in RoomAirSettings:AirflowNetwork with NodeNum='" + RoundSigDigits( RoomAirNodeNum ) );
 			}
 
 			return Errorfound;
@@ -2697,9 +2697,9 @@ namespace RoomAirModelManager {
 		}
 
 	int
-		GetRoomAirflowNetworkNodeNum(
+	GetRoomAirflowNetworkNodeNum(
 		std::string & RoomAirNodeName // Name of RoomAir node
-		)
+	)
 	{
 
 			// FUNCTION INFORMATION:
@@ -2742,17 +2742,17 @@ namespace RoomAirModelManager {
 			// na
 
 			//Obtains and Allocates RoomAirSettings : AirflowNetwork
-			if (GetAirModelData) {
-				GetAirModelDatas();
+			if ( GetAirModelData ) {
+				GetAirModelDatas(  );
 				GetAirModelData = false;
 			}
 
-			RoomAirNodeNum = FindItemInList(RoomAirNodeName, AirNode.Name(), TotNumOfAirNodes);
+			RoomAirNodeNum = FindItemInList( RoomAirNodeName, AirNode.Name(  ), TotNumOfAirNodes );
 
-			if (RoomAirNodeNum > 0) {
-				if (AirNode(RoomAirNodeNum).ClassType != AirflowNetworkRoomAirNode) {
+			if ( RoomAirNodeNum > 0 ) {
+				if ( AirNode( RoomAirNodeNum ).ClassType != AirflowNetworkRoomAirNode ) {
 					RoomAirNodeNum = 0;
-					ShowWarningError("The node type is not AirflowNetworkRoomAirNode at RoomAir:Node = " + RoomAirNodeName);
+					ShowWarningError( "The node type is not AirflowNetworkRoomAirNode at RoomAir:Node = " + RoomAirNodeName );
 				}
 			}
 
@@ -2761,12 +2761,12 @@ namespace RoomAirModelManager {
 		}
 
 	void
-		GetRAFNNodeNum(
+	GetRAFNNodeNum(
 		std::string const & RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
 		int & ZoneNum, // The zone number associate with the node name
 		int & RAFNNodeNum, // RoomAir:Node:AirflowNetwork Number
 		bool & Errorfound // true if an error is found
-		)
+	)
 	{
 
 			// FUNCTION INFORMATION:
@@ -2805,32 +2805,32 @@ namespace RoomAirModelManager {
 			int I;  // Zone index
 
 			//Obtains and Allocates RoomAirSettings : AirflowNetwork
-			if (GetAirModelData) {
-				GetAirModelDatas();
+			if ( GetAirModelData ) {
+				GetAirModelDatas(  );
 				GetAirModelData = false;
 			}
 
 			Errorfound = false;
 			RAFNNodeNum = 0; 
-			for (I = 1; I <= NumOfZones; ++I) {
-				if (RoomAirflowNetworkZoneInfo(I).NumOfAirNodes > 0) {
-					RAFNNodeNum = FindItemInList(RAFNNodeName, RoomAirflowNetworkZoneInfo(I).Node.Name(), RoomAirflowNetworkZoneInfo(I).NumOfAirNodes);
-					if (RAFNNodeNum > 0) {
+			for ( I = 1; I <= NumOfZones; ++I ) {
+				if ( RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes > 0 ) {
+					RAFNNodeNum = FindItemInList( RAFNNodeName, RoomAirflowNetworkZoneInfo( I ).Node.Name(  ), RoomAirflowNetworkZoneInfo( I ).NumOfAirNodes );
+					if ( RAFNNodeNum > 0 ) {
 						ZoneNum = I;
 						break;
 					}
 				}
 			}
 
-			if (RAFNNodeNum == 0) {
+			if ( RAFNNodeNum == 0 ) {
 				Errorfound = true;
-				ShowSevereError("Could not find RoomAir:Node:AirflowNetwork number with AirflowNetwork:IntraZone:Node Name='" + RAFNNodeName);
+				ShowSevereError( "Could not find RoomAir:Node:AirflowNetwork number with AirflowNetwork:IntraZone:Node Name='" + RAFNNodeName );
 			}
 		}
 
 
 	bool
-		CheckEquipName(
+	CheckEquipName(
 		int ZoneNum,  // Zone number
 		std::string const & EquipType, // Equipment type
 		std::string const & EquipName, // Equipment Name
@@ -2838,7 +2838,7 @@ namespace RoomAirModelManager {
 		std::string & ReturnNodeName, // Return node name
 		int TotNumEquip, // equipment type number
 		int TypeNum // Supply air node number 
-		)
+	)
 	{
 
 			// FUNCTION INFORMATION:
@@ -2905,41 +2905,41 @@ namespace RoomAirModelManager {
 
 			SupplyNodeName = "";
 
-			if (TypeNum == 0) return EquipFind;
+			if ( TypeNum == 0 ) return EquipFind;
 
-			GetObjectDefMaxArgs(EquipType, TotalArgs, NumAlphas, NumNumbers);
+			GetObjectDefMaxArgs( EquipType, TotalArgs, NumAlphas, NumNumbers );
 
-			MaxNums = max(MaxNums, NumNumbers);
-			MaxAlphas = max(MaxAlphas, NumAlphas);
+			MaxNums = max( MaxNums, NumNumbers );
+			MaxAlphas = max( MaxAlphas, NumAlphas );
 
-			if (MaxNums > NumNumbers) {
-				Numbers.allocate(MaxNums);
+			if ( MaxNums > NumNumbers ) {
+				Numbers.allocate( MaxNums );
 				Numbers = 0.0;
-			} else if ( !allocated(Numbers) ) {
-				Numbers.allocate(MaxNums);
+			} else if (  !allocated( Numbers )  ) {
+				Numbers.allocate( MaxNums );
 			}
 
-			if (MaxAlphas > NumAlphas) {
-				Alphas.allocate(MaxAlphas);
+			if ( MaxAlphas > NumAlphas ) {
+				Alphas.allocate( MaxAlphas );
 				Alphas = "";
 			}
-			else if (!allocated(Alphas)) {
-				Alphas.allocate(NumAlphas);
+			else if ( !allocated( Alphas ) ) {
+				Alphas.allocate( NumAlphas );
 			}
 
-			for (I = 1; I <= TotNumEquip; ++I) {
-				GetObjectItem(EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status);
-				if (SameString(Alphas(1), EquipName)) {
+			for ( I = 1; I <= TotNumEquip; ++I ) {
+				GetObjectItem( EquipType, I, Alphas, NumAlphas, Numbers, NumNumbers, Status );
+				if ( SameString( Alphas( 1 ), EquipName ) ) {
 					EquipFind = true;
 					break;
 				}
 			}
 
-			if (TypeNum == 1) {  // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
+			if ( TypeNum == 1 ) {  // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
 				SupplyNodeName = Alphas( 4 );
 				ReturnNodeName = ""; // Zone return node
 			}
-			else if (TypeNum == 2) {  // ZoneHVAC : EnergyRecoveryVentilator
+			else if ( TypeNum == 2 ) {  // ZoneHVAC : EnergyRecoveryVentilator
 				I = GetFanOutletNode( "Fan:OnOff", Alphas( 4 ), errorfound );
 				if ( errorfound ) {
 
@@ -2947,19 +2947,19 @@ namespace RoomAirModelManager {
 				SupplyNodeName = NodeID( I ); // ?????
 				ReturnNodeName = ""; // Zone exhaust node
 			}
-			else if (TypeNum == 3) {  // ZoneHVAC : FourPipeFanCoil
+			else if ( TypeNum == 3 ) {  // ZoneHVAC : FourPipeFanCoil
 				SupplyNodeName = Alphas( 6 );
 				ReturnNodeName = Alphas( 5 ); 
 			}
-			else if (TypeNum == 4) {  // ZoneHVAC : OutdoorAirUnit
+			else if ( TypeNum == 4 ) {  // ZoneHVAC : OutdoorAirUnit
 				SupplyNodeName = Alphas( 13 );
 				ReturnNodeName = Alphas( 14 );
 			}
-			else if (TypeNum == 5) {  // ZoneHVAC : PackagedTerminalAirConditioner
+			else if ( TypeNum == 5 ) {  // ZoneHVAC : PackagedTerminalAirConditioner
 				SupplyNodeName = Alphas( 4 );
 				ReturnNodeName = Alphas( 3 );
 			}
-			else if (TypeNum == 6) {  // ZoneHVAC : PackagedTerminalHeatPump
+			else if ( TypeNum == 6 ) {  // ZoneHVAC : PackagedTerminalHeatPump
 				SupplyNodeName = Alphas( 4 );
 				ReturnNodeName = Alphas( 3 );
 			}
@@ -2985,17 +2985,17 @@ namespace RoomAirModelManager {
 			}
 			else if ( TypeNum == 12 ) {  // ZoneHVAC : Baseboard : RadiantConvective : Electric
 				SupplyNodeName = ""; // convection only
-			} else if (TypeNum == 13) {  // ZoneHVAC : Baseboard : RadiantConvective : Water
+			} else if ( TypeNum == 13 ) {  // ZoneHVAC : Baseboard : RadiantConvective : Water
 				SupplyNodeName = ""; 
-			} else if (TypeNum == 14) {  // ZoneHVAC : Baseboard : RadiantConvective : Steam
+			} else if ( TypeNum == 14 ) {  // ZoneHVAC : Baseboard : RadiantConvective : Steam
 				SupplyNodeName = "";
-			} else if (TypeNum == 15) {  // ZoneHVAC : Baseboard : Convective : Electric
+			} else if ( TypeNum == 15 ) {  // ZoneHVAC : Baseboard : Convective : Electric
 				SupplyNodeName = "";
-			} else if (TypeNum == 16) {  // ZoneHVAC : Baseboard : Convective : Water
+			} else if ( TypeNum == 16 ) {  // ZoneHVAC : Baseboard : Convective : Water
 				SupplyNodeName = "";
-			} else if (TypeNum == 17) {  // ZoneHVAC : HighTemperatureRadiant
+			} else if ( TypeNum == 17 ) {  // ZoneHVAC : HighTemperatureRadiant
 				SupplyNodeName = "";
-			} else if (TypeNum == 18) {  // ZoneHVAC : Dehumidifier : DX
+			} else if ( TypeNum == 18 ) {  // ZoneHVAC : Dehumidifier : DX
 				SupplyNodeName = Alphas( 4 );
 				ReturnNodeName = Alphas( 3 );
 			}
@@ -3014,71 +3014,71 @@ namespace RoomAirModelManager {
 				ReturnNodeName = Alphas( 7 );
 			}
 			else if ( TypeNum == 23 ) {  // AirTerminal : SingleDuct : Uncontrolled
-				SupplyNodeName = Alphas(3);
+				SupplyNodeName = Alphas( 3 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 24 ) {  // AirTerminal : DualDuct : ConstantVolume
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 25 ) {  // AirTerminal : DualDuct : VAV
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 26 ) {  // AirTerminal : SingleDuct : ConstantVolume : Reheat
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 27 ) {  // AirTerminal : SingleDuct : VAV : Reheat
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 28 ) {  // AirTerminal : SingleDuct : VAV : NoReheat
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 29 ) {  // AirTerminal : SingleDuct : SeriesPIU : Reheat
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 30 ) {  // AirTerminal : SingleDuct : ParallelPIU : Reheat
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 31 ) {  // AirTerminal : SingleDuct : ConstantVolume : FourPipeInduction
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 32 ) {  // AirTerminal : SingleDuct : VAV : Reheat : VariableSpeedFan
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 33 ) {  // AirTerminal : SingleDuct : VAV : HeatAndCool : Reheat
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 34 ) {  // AirTerminal : SingleDuct : VAV : HeatAndCool : NoReheat
-				SupplyNodeName = Alphas(1);
+				SupplyNodeName = Alphas( 1 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 35 ) {  // AirTerminal : SingleDuct : ConstantVolume : CooledBeam
-				SupplyNodeName = Alphas(5);
+				SupplyNodeName = Alphas( 5 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 36 ) {  // AirTerminal : DualDuct : VAV : OutdoorAir
-				SupplyNodeName = Alphas(3);
+				SupplyNodeName = Alphas( 3 );
 				ReturnNodeName = NodeID( ZoneEquipConfig( ZoneNum ).ReturnAirNode ); // Zone return node
 			}
 			else if ( TypeNum == 37 ) {  // AirLoopHVACReturnAir
-				SupplyNodeName = Alphas(4); // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ?
+				SupplyNodeName = Alphas( 4 ); // ? ? ? ? ? 
 				ReturnNodeName = ""; // ???????????????
 			}
 
 			// Need to find a better to handle allocate and deallocate
-			if (MaxAlphas > NumAlphas) {
+			if ( MaxAlphas > NumAlphas ) {
 				Alphas.deallocate();
 			}
-			if (MaxNums > NumNumbers) {
+			if ( MaxNums > NumNumbers ) {
 				Numbers.deallocate();
 			}
 

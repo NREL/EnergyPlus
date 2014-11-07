@@ -73,31 +73,31 @@ namespace InternalHeatGains {
 		std::string const & IntGainName, // Internal gain name
 		int & DeviceIndex, // Device index
 		bool & ErrorFound
-		);
+	);
 
 	void
-		SumInternalConvectionGainsByIndices(
+	SumInternalConvectionGainsByIndices(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
 		FArray1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
 		FArray1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
 		Real64 & SumConvGainRate
-		);
+	);
 
 	void
-		SumInternalLatentGainsByIndices(
+	SumInternalLatentGainsByIndices(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
 		FArray1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
 		FArray1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
 		Real64 & SumLatentGainRate
-		);
+	);
 
 	void
-		SumReturnAirConvectionGainsByIndices(
+	SumReturnAirConvectionGainsByIndices(
 		int const ZoneNum, // zone index pointer for which zone to sum gains for
 		FArray1S_int const DeviceIndexARR, // variable length 1-d array of integer device index pointers to include in summation
 		FArray1A< Real64 > const FractionARR, // array of fractional multipliers to apply to devices
 		Real64 & SumReturnAirGainRate
-		);
+	);
 
 	void
 	SumAllReturnAirConvectionGains(

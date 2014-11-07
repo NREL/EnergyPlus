@@ -26,42 +26,42 @@ namespace RoomAirModelAirflowNetwork {
 	// Functions
 
 	void
-	SimRoomAirModelAirflowNetwork(int const ZoneNum); // index number for the specified zone
+	SimRoomAirModelAirflowNetwork( int const ZoneNum ); // index number for the specified zone
 
 	//****************************************************
 
 	void
-	InitRoomAirModelAirflowNetwork(int const ZoneNum, int const RoomAirNode); // index number for the specified zone and room air node
+	InitRoomAirModelAirflowNetwork( int const ZoneNum, int const RoomAirNode ); // index number for the specified zone and room air node
 
 	//*****************************************************************************************
 	void
-	CalcRoomAirModelAirflowNetwork(int const ZoneNum, int const ThisRoomAirNode); // index number for the specified zone and room air node
+	CalcRoomAirModelAirflowNetwork( int const ZoneNum, int const ThisRoomAirNode ); // index number for the specified zone and room air node
 
 
 	//*****************************************************************************************
 	void
-	UpdateRoomAirModelAirflowNetwork(int const ZoneNum); // index number for the specified zone
+	UpdateRoomAirModelAirflowNetwork( int const ZoneNum ); // index number for the specified zone
 
 	//*****************************************************************************************
 	void
-	ReportRoomAirModelAirflowNetwork(int const ZoneNum); // index number for the specified zone
-
-	//*****************************************************************************************
-
-	void
-	CalcNodeSums(int const ZoneNum, int const RoomAirNode); // index number for the specified zone and room air node
-
-	//*****************************************************************************************
-	void
-		SumNonAirSystemResponseForNode(int const ZoneNum, int const RoomAirNode); // index number for the specified zone and room air node
-	//*****************************************************************************************
-	void
-		SumSystemDepResponseForNode(int const ZoneNum, int const RoomAirNode); // index number for the specified zone and room air node
+	ReportRoomAirModelAirflowNetwork( int const ZoneNum ); // index number for the specified zone
 
 	//*****************************************************************************************
 
 	void
-		CalcSurfaceMoistureSums(
+	CalcNodeSums( int const ZoneNum, int const RoomAirNode ); // index number for the specified zone and room air node
+
+	//*****************************************************************************************
+	void
+		SumNonAirSystemResponseForNode( int const ZoneNum, int const RoomAirNode ); // index number for the specified zone and room air node
+	//*****************************************************************************************
+	void
+		SumSystemDepResponseForNode( int const ZoneNum, int const RoomAirNode ); // index number for the specified zone and room air node
+
+	//*****************************************************************************************
+
+	void
+	CalcSurfaceMoistureSums(
 		int const ZoneNum, 
 		int const RoomAirNode,
 		Real64 & SumHmAW,
@@ -69,8 +69,7 @@ namespace RoomAirModelAirflowNetwork {
 		Real64 & SumHmARaW,
 		FArray1< bool > const & SurfMask
 		//		Optional< FArray1D< bool > const > SurfMask // par(1) = design coil load [W]
-
-		);
+	);
 
 
 	//*****************************************************************************************

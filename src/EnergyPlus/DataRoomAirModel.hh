@@ -292,7 +292,7 @@ namespace DataRoomAirModel {
 			ClassType( 0 ),
 			Height( 0.0 ),
 			ZoneVolumeFraction( 0 ),
-			IsZone(false)
+			IsZone( false )
 		{}
 
 		// Member Constructor
@@ -313,7 +313,7 @@ namespace DataRoomAirModel {
 			Height( Height ),
 			ZoneVolumeFraction( ZoneVolumeFraction ),
 			SurfMask( SurfMask ),
-			IsZone(IsZone)
+			IsZone( IsZone )
 		{}
 
 	};
@@ -1009,12 +1009,12 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		AirflowLinkagesInfoNestedStruct() :
-			AirflowNetworkLinkSimuID(0),
-			AirflowNetworkLinkageDataID(0),
-			AirflowNetworkLinkReportID(0),
-			MdotIn(0.0),
-			TempIn(0.0),
-			HumRatIn(0.0)
+			AirflowNetworkLinkSimuID( 0 ),
+			AirflowNetworkLinkageDataID( 0 ),
+			AirflowNetworkLinkReportID( 0 ),
+			MdotIn( 0.0 ),
+			TempIn( 0.0 ),
+			HumRatIn( 0.0 )
 		{}
 
 		// Member Constructor
@@ -1026,12 +1026,12 @@ namespace DataRoomAirModel {
 			Real64 const TempIn, // dryblub temperature of air into control volume
 			Real64 const HumRatIn // humidity ratio of air into control volume
 			) :
-				AirflowNetworkLinkSimuID(AirflowNetworkLinkSimuID),
-				AirflowNetworkLinkageDataID(AirflowNetworkLinkageDataID),
-				AirflowNetworkLinkReportID(AirflowNetworkLinkReportID),
-				MdotIn(MdotIn),
-				TempIn(TempIn),
-				HumRatIn(HumRatIn)
+				AirflowNetworkLinkSimuID( AirflowNetworkLinkSimuID ),
+				AirflowNetworkLinkageDataID( AirflowNetworkLinkageDataID ),
+				AirflowNetworkLinkReportID( AirflowNetworkLinkReportID ),
+				MdotIn( MdotIn ),
+				TempIn( TempIn ),
+				HumRatIn( HumRatIn )
 		{}
 
 	};
@@ -1191,16 +1191,16 @@ namespace DataRoomAirModel {
 			HasSurfacesAssigned( false ),
 			HasIntGainsAssigned( false ),
 			NumIntGains( 0 ),
-			HasHVACAssigned(false),
-			NumHVACs(0),
-			AirflowNetworkNodeID(0),  // pointer to AirflowNetworkNodeData structure
-			NumOfAirflowLinks(0),
-			AirVolume(0.0),  // air volume in control volume associated with this node(m3 / s)
-			RhoAir(0.0),  // current density of air for nodal control volume
-			CpAir(0.0),  // current heat capacity of air for nodal control volume
-			AirTemp(0.0), // node air temperature
-			AirTempX1(0.0),  // node air temperature at t minus 1 zone timestep
-			AirTempX2(0.0),  // node air temperature at t minus 2 zone timestep
+			HasHVACAssigned( false ),
+			NumHVACs( 0 ),
+			AirflowNetworkNodeID( 0 ),  // pointer to AirflowNetworkNodeData structure
+			NumOfAirflowLinks( 0 ),
+			AirVolume( 0.0 ),  // air volume in control volume associated with this node(m3 / s)
+			RhoAir( 0.0 ),  // current density of air for nodal control volume
+			CpAir( 0.0 ),  // current heat capacity of air for nodal control volume
+			AirTemp( 0.0 ), // node air temperature
+			AirTempX1( 0.0 ),  // node air temperature at t minus 1 zone timestep
+			AirTempX2( 0.0 ),  // node air temperature at t minus 2 zone timestep
 			AirTempX3( 0.0 ), // node air temperature at t minus 3 zone timestep
 			AirTempX4( 0.0 ), // node air temperature at t minus 4 zone timestep
 			AirTempDSX1( 0.0 ), // node air temperature at t minus 1 system timestep
@@ -1219,23 +1219,23 @@ namespace DataRoomAirModel {
 			//sensible heat balance terms for node
 			SumIntSensibleGain( 0.0 ), // rate of heat gain from internal sensible gains(after fraction)
 			SumHA( 0.0 ), // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
-			SumHATsurf(0.0),
+			SumHATsurf( 0.0 ),
 			SumHATref( 0.0 ), // sum of Hc * Area * Temp for surfaces associated with this node
-			SumLinkMCp(0.0),
-			SumLinkMCpT(0.0),
-			SumSysMCp(0.0),
-			SumSysMCpT(0.0),
-			SumSysM(0.0),
-			SumSysMW(0.0),
-			NonAirSystemResponse(0.0),
-			SysDepZoneLoadsLagged(0.0),
+			SumLinkMCp( 0.0 ),
+			SumLinkMCpT( 0.0 ),
+			SumSysMCp( 0.0 ),
+			SumSysMCpT( 0.0 ),
+			SumSysM( 0.0 ),
+			SumSysMW( 0.0 ),
+			NonAirSystemResponse( 0.0 ),
+			SysDepZoneLoadsLagged( 0.0 ),
 			//latent moisture balance terms for node
 			SumIntLatentGain( 0.0 ), // rate of heat gain form internal latent gains(after fraction)
 			SumHmAW( 0.0 ), // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
 			SumHmARa( 0.0 ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
 			SumHmARaW( 0.0 ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
-			SumLinkM(0.0),
-			SumLinkMW(0.0)
+			SumLinkM( 0.0 ),
+			SumLinkMW( 0.0 )
 		{}
 
 		// Member Constructor
@@ -1290,8 +1290,8 @@ namespace DataRoomAirModel {
 			Real64 const SumLinkMCpT, // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
 			Real64 const SumSysMCp, // sum of mdor*Cp for incoming supply airflows for this node 
 			Real64 const SumSysMCpT, // sum of mdor*Cp for incoming supply airflows and temperature for this node 
-		    Real64 const SumSysM, // sum of mdot for incoming supply airflows for this node 
-		    Real64 const SumSysMW, // sum of mdot*W for incoming supply airflows and temperature for this node 
+			Real64 const SumSysM, // sum of mdot for incoming supply airflows for this node 
+			Real64 const SumSysMW, // sum of mdot*W for incoming supply airflows and temperature for this node 
 			Real64 const NonAirSystemResponse, // sum of convective system load 
 			Real64 const SysDepZoneLoadsLagged, // sum of system lagged load
 			// latent moisture balance terms for node
@@ -1302,67 +1302,67 @@ namespace DataRoomAirModel {
 			Real64 const SumLinkM, // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
 			Real64 const SumLinkMW // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
 			) :
-				Name(Name), // name of the node itself
-				ZoneVolumeFraction(ZoneVolumeFraction), // Zone volume fraction applied to this specific node
-				NodeSurfListName(NodeSurfListName), // name of nodes' adjacent surface list
-				HasSurfacesAssigned(HasSurfacesAssigned), // True if this node has surfaces assigned
-				SurfMask(SurfMask), // Sized to num of surfs in Zone, true if surface is associated with this node
-				NodeIntGainsListName(NodeIntGainsListName), // name of node's internal gains list
-				HasIntGainsAssigned(HasIntGainsAssigned), // True if this node has internal gain assigned
-				NumIntGains(NumIntGains), // Number of internal gain objects
-				IntGainsDeviceIndices(IntGainsDeviceIndices), // sized to NumIntGains, index pointers to internal gains struct
-				IntGainsFractions(IntGainsFractions), // sized to NumIntGains, gain fractions to this node
-				IntGain(IntGain), // Internal gain struct
-				NodeHVACListName(NodeHVACListName), // name of node's HVAC list
-				HasHVACAssigned(HasHVACAssigned), // True if HVAC systems are assigned to this node
-				NumHVACs(NumHVACs), // Number of HVAC systems
-				HVAC(  ), // HVAC struct
-				AirflowNetworkNodeID(  ), // pointer to AirflowNetworkNodeData structure
-				NumOfAirflowLinks(  ), // Number of intra zone links
-				Link(Link), // Linkage struct
-				AirVolume(AirVolume), // air volume in control volume associated with this node(m3 / s)
-				RhoAir(RhoAir), // current density of air for nodal control volume
-				CpAir(CpAir), // current heat capacity of air for nodal control volume
+				Name( Name ), // name of the node itself
+				ZoneVolumeFraction( ZoneVolumeFraction ), // Zone volume fraction applied to this specific node
+				NodeSurfListName( NodeSurfListName ), // name of nodes' adjacent surface list
+				HasSurfacesAssigned( HasSurfacesAssigned ), // True if this node has surfaces assigned
+				SurfMask( SurfMask ), // Sized to num of surfs in Zone, true if surface is associated with this node
+				NodeIntGainsListName( NodeIntGainsListName ), // name of node's internal gains list
+				HasIntGainsAssigned( HasIntGainsAssigned ), // True if this node has internal gain assigned
+				NumIntGains( NumIntGains ), // Number of internal gain objects
+				IntGainsDeviceIndices( IntGainsDeviceIndices ), // sized to NumIntGains, index pointers to internal gains struct
+				IntGainsFractions( IntGainsFractions ), // sized to NumIntGains, gain fractions to this node
+				IntGain( IntGain ), // Internal gain struct
+				NodeHVACListName( NodeHVACListName ), // name of node's HVAC list
+				HasHVACAssigned( HasHVACAssigned ), // True if HVAC systems are assigned to this node
+				NumHVACs( NumHVACs ), // Number of HVAC systems
+				HVAC( ), // HVAC struct
+				AirflowNetworkNodeID( ), // pointer to AirflowNetworkNodeData structure
+				NumOfAirflowLinks( ), // Number of intra zone links
+				Link( Link ), // Linkage struct
+				AirVolume( AirVolume ), // air volume in control volume associated with this node( m3 / s )
+				RhoAir( RhoAir ), // current density of air for nodal control volume
+				CpAir( CpAir ), // current heat capacity of air for nodal control volume
 
-				AirTemp(AirTemp), // node air temperature
-				AirTempX1(AirTempX1), // node air temperature at t minus 1 zone timestep
-				AirTempX2(AirTempX2), // node air temperature at t minus 2 zone timestep
-				AirTempX3(AirTempX3), // node air temperature at t minus 3 zone timestep
-				AirTempX4(AirTempX4), // node air temperature at t minus 4 zone timestep
-				AirTempDSX1(AirTempDSX1), // node air temperature at t minus 1 system timestep
-				AirTempDSX2(AirTempDSX2), // node air temperature at t minus 2 system timestep
-				AirTempDSX3(AirTempDSX3), // node air temperature at t minus 3 system timestep
-				AirTempDSX4(AirTempDSX4), // node air temperature at t minus 4 system timestep
+				AirTemp( AirTemp ), // node air temperature
+				AirTempX1( AirTempX1 ), // node air temperature at t minus 1 zone timestep
+				AirTempX2( AirTempX2 ), // node air temperature at t minus 2 zone timestep
+				AirTempX3( AirTempX3 ), // node air temperature at t minus 3 zone timestep
+				AirTempX4( AirTempX4 ), // node air temperature at t minus 4 zone timestep
+				AirTempDSX1( AirTempDSX1 ), // node air temperature at t minus 1 system timestep
+				AirTempDSX2( AirTempDSX2 ), // node air temperature at t minus 2 system timestep
+				AirTempDSX3( AirTempDSX3 ), // node air temperature at t minus 3 system timestep
+				AirTempDSX4( AirTempDSX4 ), // node air temperature at t minus 4 system timestep
 
-				HumRat(HumRat), // node air humidity ratio
-				HumRatX1(HumRatX1), // node air humidity ratio at t minus 1 zone timestep
-				HumRatX2(HumRatX2), // node air humidity ratio at t minus 2 zone timestep
-				HumRatX3(HumRatX3), // node air humidity ratio at t minus 3 zone timestep
-				HumRatX4(HumRatX4), // node air humidity ratio at t minus 4 zone timestep
-				HumRatDSX1(HumRatDSX1), // node air humidity ratio at t minus 1 system timestep
-				HumRatDSX2(HumRatDSX2), // node air humidity ratio at t minus 2 system timestep
-				HumRatDSX3(HumRatDSX3), // node air humidity ratio at t minus 3 system timestep
-				HumRatDSX4(HumRatDSX4), // node air humidity ratio at t minus 4 system timestep
+				HumRat( HumRat ), // node air humidity ratio
+				HumRatX1( HumRatX1 ), // node air humidity ratio at t minus 1 zone timestep
+				HumRatX2( HumRatX2 ), // node air humidity ratio at t minus 2 zone timestep
+				HumRatX3( HumRatX3 ), // node air humidity ratio at t minus 3 zone timestep
+				HumRatX4( HumRatX4 ), // node air humidity ratio at t minus 4 zone timestep
+				HumRatDSX1( HumRatDSX1 ), // node air humidity ratio at t minus 1 system timestep
+				HumRatDSX2( HumRatDSX2 ), // node air humidity ratio at t minus 2 system timestep
+				HumRatDSX3( HumRatDSX3 ), // node air humidity ratio at t minus 3 system timestep
+				HumRatDSX4( HumRatDSX4 ), // node air humidity ratio at t minus 4 system timestep
 				// sensible heat balance terms for node
-				SumIntSensibleGain(SumIntSensibleGain), // rate of heat gain from internal sensible gains(after fraction)
-				SumHA(SumHA), // sum of Hc * Area for surfaces associated with this node(surface convection sensible gain term)
-				SumHATsurf(SumHATsurf), // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
-				SumHATref(SumHATref), // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
-				SumLinkMCp(SumLinkMCp), // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
-				SumLinkMCpT(SumLinkMCpT), // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
-				SumSysMCp(SumSysMCp), // sum of mdor*Cp for incoming supply airflows for this node 
-				SumSysMCpT(SumSysMCpT), // sum of mdor*Cp for incoming supply airflows and temperature for this node 
-				SumSysM(SumSysM), // sum of mdot for incoming supply airflows for this node 
-				SumSysMW(SumSysMW), // sum of mdot*W for incoming supply airflows and temperature for this node 
-				NonAirSystemResponse(NonAirSystemResponse), // sum of convective system load 
-				SysDepZoneLoadsLagged(SysDepZoneLoadsLagged), // sum of system lagged load
+				SumIntSensibleGain( SumIntSensibleGain ), // rate of heat gain from internal sensible gains( after fraction )
+				SumHA( SumHA ), // sum of Hc * Area for surfaces associated with this node( surface convection sensible gain term )
+				SumHATsurf( SumHATsurf ), // sum of Hc * Area * Temp for surfaces associated with this node for convective heat transfer
+				SumHATref( SumHATref ), // sum of Hc * Area * Temp for surfaces associated with this node for radiation exchange
+				SumLinkMCp( SumLinkMCp ), // sum of mdor*Cp for incoming airflows for this node derived from the AirflowNetwork model  
+				SumLinkMCpT( SumLinkMCpT ), // sum of mdor*Cp*T for incoming airflows and source temperature for this node derived from the AirflowNetwork model 
+				SumSysMCp( SumSysMCp ), // sum of mdor*Cp for incoming supply airflows for this node 
+				SumSysMCpT( SumSysMCpT ), // sum of mdor*Cp for incoming supply airflows and temperature for this node 
+				SumSysM( SumSysM ), // sum of mdot for incoming supply airflows for this node 
+				SumSysMW( SumSysMW ), // sum of mdot*W for incoming supply airflows and temperature for this node 
+				NonAirSystemResponse( NonAirSystemResponse ), // sum of convective system load 
+				SysDepZoneLoadsLagged( SysDepZoneLoadsLagged ), // sum of system lagged load
 				// latent moisture balance terms for node
-				SumIntLatentGain(SumIntLatentGain), // rate of heat gain form internal latent gains(after fraction)
-				SumHmAW(SumHmAW), // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
-				SumHmARa(SumHmARa), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
-				SumHmARaW(SumHmARaW), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
-				SumLinkM(SumLinkM), // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
-				SumLinkMW(SumLinkMW) // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
+				SumIntLatentGain( SumIntLatentGain ), // rate of heat gain form internal latent gains( after fraction )
+				SumHmAW( SumHmAW ), // sum of AREA*Moist CONVECTION COEFF*INSIDE Humidity Ratio
+				SumHmARa( SumHmARa ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air
+				SumHmARaW( SumHmARaW ), // SUM OF ZONE AREA*Moist CONVECTION COEFF*Rho Air* Inside Humidity Ratio
+				SumLinkM( SumLinkM ), // sum of mdor for incoming airflows for this node derived from the AirflowNetwork model
+				SumLinkMW( SumLinkMW ) // sum of mdor*Cp*T for incoming airflows and source humidity ratio for this node derived from the AirflowNetwork model 
 
 		{}
 
@@ -1394,20 +1394,20 @@ namespace DataRoomAirModel {
 
 		// Default Constructor
 		RoomAirflowNetworkInfoByZoneStruct() :
-			IsUsed( false), // true. if RoomAirflowNetwork model used in zone
-			ZoneID(0), // Index of Zone in Heat Balance
-			ActualZoneID(0), // Index of controlled zones in ZoneCOnfigure
-			AvailSchedID(0), // index of availability schedule
-			ControlAirNodeID(0), // index of roomair node that is HVAC control sensor location
-			NumOfAirNodes(0), // Number of air nodes
-			ReturnAirNodeID(0), // index in system Node array
-			ZoneNodeID(0), // index in system Node array for this zone
-			TairMean(23.0), // comes from MAT
-			Tstat(23.0), // temperature for thermostat
-			Tleaving(23.0), // temperature for return air node
-			Texhaust(23.0), // temperature for exhaust air node
-			totNumSurfs(0), // total surfs for this zone
-			firstSurfID(0) // Index of first surface
+			IsUsed( false ), // true. if RoomAirflowNetwork model used in zone
+			ZoneID( 0 ), // Index of Zone in Heat Balance
+			ActualZoneID( 0 ), // Index of controlled zones in ZoneCOnfigure
+			AvailSchedID( 0 ), // index of availability schedule
+			ControlAirNodeID( 0 ), // index of roomair node that is HVAC control sensor location
+			NumOfAirNodes( 0 ), // Number of air nodes
+			ReturnAirNodeID( 0 ), // index in system Node array
+			ZoneNodeID( 0 ), // index in system Node array for this zone
+			TairMean( 23.0 ), // comes from MAT
+			Tstat( 23.0 ), // temperature for thermostat
+			Tleaving( 23.0 ), // temperature for return air node
+			Texhaust( 23.0 ), // temperature for exhaust air node
+			totNumSurfs( 0 ), // total surfs for this zone
+			firstSurfID( 0 ) // Index of first surface
 		{}
 
 		// Member Constructor
@@ -1432,25 +1432,25 @@ namespace DataRoomAirModel {
 			int const totNumSurfs, // total surfs for this zone
 			int const firstSurfID // Index of first surface
 			) :
-				IsUsed(IsUsed),
-				Name(Name),
-				ZoneName(ZoneName),
-				ZoneID(ZoneID),
-				ActualZoneID(ActualZoneID), // Index of controlled zones in ZoneCOnfigure
-				AvailSched(AvailSched), // Name of availability schedule
-				AvailSchedID(AvailSchedID), // index of availability schedule
-				ControlAirNodeID(ControlAirNodeID), // index of roomair node that is HVAC control sensor location
-				NumOfAirNodes(NumOfAirNodes), // Number of air nodes
-				Node(Node), // Node struct
-				ReturnAirNodeID(ReturnAirNodeID), // index in system Node array
-				ZoneNodeID(ZoneNodeID), // index in system Node array for this zone
-				TairMean(TairMean), // comes from MAT
-				Tstat(Tstat), // temperature for thermostat
-				Tleaving(Tleaving), // temperature for return air node
-				Texhaust(Texhaust), // temperature for exhaust air node
-				Surf(Surf), // Surface struct
-				totNumSurfs(totNumSurfs), // total surfs for this zone
-				firstSurfID(firstSurfID) // Index of first surface
+				IsUsed( IsUsed ),
+				Name( Name ),
+				ZoneName( ZoneName ),
+				ZoneID( ZoneID ),
+				ActualZoneID( ActualZoneID ), // Index of controlled zones in ZoneCOnfigure
+				AvailSched( AvailSched ), // Name of availability schedule
+				AvailSchedID( AvailSchedID ), // index of availability schedule
+				ControlAirNodeID( ControlAirNodeID ), // index of roomair node that is HVAC control sensor location
+				NumOfAirNodes( NumOfAirNodes ), // Number of air nodes
+				Node( Node ), // Node struct
+				ReturnAirNodeID( ReturnAirNodeID ), // index in system Node array
+				ZoneNodeID( ZoneNodeID ), // index in system Node array for this zone
+				TairMean( TairMean ), // comes from MAT
+				Tstat( Tstat ), // temperature for thermostat
+				Tleaving( Tleaving ), // temperature for return air node
+				Texhaust( Texhaust ), // temperature for exhaust air node
+				Surf( Surf ), // Surface struct
+				totNumSurfs( totNumSurfs ), // total surfs for this zone
+				firstSurfID( firstSurfID ) // Index of first surface
 		{}
 
 	};

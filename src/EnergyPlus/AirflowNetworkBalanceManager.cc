@@ -2108,9 +2108,6 @@ namespace AirflowNetworkBalanceManager {
 			}
 		}
 
-		// Override error check due to RoomAirNode for the time being
-		// If(ErrorsFound) ErrorsFound = .False.
-
 		// Read AirflowNetwork Intra linkage
 		CurrentModuleObject = "AirflowNetwork:IntraZone:Linkage";
 		IntraZoneNumOfLinks = GetNumObjectsFound( CurrentModuleObject );
@@ -2144,7 +2141,6 @@ namespace AirflowNetworkBalanceManager {
 					}
 					// Check unique name for surface
 
-					//					VerifyName(Alphas(5), IntraZoneLinkageData.SurfaceName(), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name");
 					// *****************************
 					VerifyName( Alphas( 5 ), IntraZoneLinkageData.ma( &IntraZoneLinkageProp::SurfaceName ), i - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 					if ( IsNotOK ) {
@@ -2166,8 +2162,7 @@ namespace AirflowNetworkBalanceManager {
 							" in AirflowNetwork:IntraZone:Node and AirflowNetwork:MultiZone:Zone objects" );
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					IntraZoneLinkageData( i ).NodeHeights( 1 ) = IntraZoneNodeData( IntraZoneLinkageData( i ).NodeNums( 1 ) ).Height;
 					IntraZoneLinkageData( i ).NodeNums( 1 ) = IntraZoneLinkageData( i ).NodeNums( 1 ) + AirflowNetworkNumOfZones + AirflowNetworkNumOfExtNode;
 				}
@@ -2180,8 +2175,7 @@ namespace AirflowNetworkBalanceManager {
 							" in AirflowNetwork:IntraZone:Node and AirflowNetwork:MultiZone:Zone objects" );
 						ErrorsFound = true;
 					}
-				}
-				else {
+				} else {
 					IntraZoneLinkageData( i ).NodeHeights( 2 ) = IntraZoneNodeData( IntraZoneLinkageData( i ).NodeNums( 2 ) ).Height;
 					IntraZoneLinkageData( i ).NodeNums( 2 ) = IntraZoneLinkageData( i ).NodeNums( 2 ) + AirflowNetworkNumOfZones + AirflowNetworkNumOfExtNode;
 				}
@@ -2901,7 +2895,6 @@ namespace AirflowNetworkBalanceManager {
 			AirflowNetworkNumOfLinks = NumOfLinksMultiZone + DisSysNumOfLinks;
 			AirflowNetworkLinkageData.allocate( DisSysNumOfLinks + AirflowNetworkNumOfSurfaces );
 		} else { // Multizone + IntraZone only
-			//	AirflowNetworkLinkageData.allocate( AirflowNetworkNumOfSurfaces );
 			AirflowNetworkLinkageData.allocate( AirflowNetworkNumOfLinks );
 		}
 
@@ -3071,7 +3064,6 @@ namespace AirflowNetworkBalanceManager {
 				if ( AirflowNetworkNodeData( i ).RAFNNodeNum > 0 ) {
 					for ( j = 1; j <= RoomAirflowNetworkZoneInfo( n ).NumOfAirNodes; ++j ) {
 						if ( RoomAirflowNetworkZoneInfo( n ).Node( j ).AirflowNetworkNodeID == AirflowNetworkNodeData( i ).RAFNNodeNum ) {
-							// RoomAirflowNetworkZoneInfo(n).Node(j).AirflowNetworkNodeID = I
 							RoomAirflowNetworkZoneInfo( n ).Node( j ).NumOfAirflowLinks = AirflowNetworkNodeData( i ).NumOfLinks;
 							RoomAirflowNetworkZoneInfo( n ).Node( j ).Link.allocate( AirflowNetworkNodeData( i ).NumOfLinks );
 							k = 1;
@@ -3098,7 +3090,6 @@ namespace AirflowNetworkBalanceManager {
 				n = AirflowNetworkNodeData( i ).EPlusZoneNum;
 				if ( AirflowNetworkNodeData( i ).RAFNNodeNum == 0 && AirflowNetworkNodeData( i ).NumOfLinks > 0 ) {
 					j = RoomAirflowNetworkZoneInfo( n ).ControlAirNodeID;
-					// ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? How ?
 					if ( RoomAirflowNetworkZoneInfo( n ).Node( j ).NumOfAirflowLinks == 0 ) {
 						RoomAirflowNetworkZoneInfo( n ).Node( j ).AirflowNetworkNodeID = i;
 						RoomAirflowNetworkZoneInfo( n ).Node( j ).NumOfAirflowLinks = AirflowNetworkNodeData( i ).NumOfLinks;
@@ -4981,13 +4972,6 @@ namespace AirflowNetworkBalanceManager {
 				MA( ( i - 1 ) * AirflowNetworkNumOfNodes + i ) = 1.0e10;
 				MV( i ) = OutdoorCO2 * 1.0e10;
 			}
-			// Need CO2 for the room air model
-			/*if (AirflowNetworkNodeData(I) % RAFNNodeNum > 0.AND. &
-				!MA((I - 1)*AirflowNetworkNumOfNodes + I).LT. 0.9d10) then
-				!MA((I - 1)*AirflowNetworkNumOfNodes + I) = 1.0d10
-				!ZoneNum = AirflowNetworkNodeData(I) % EPlusZoneNum
-				!MV(I) = RoomAirflowNetworkZoneInfo(ZoneNum) % Node(AirflowNetworkNodeData(I) % RAFNNodeNum) % CO2*1.0d10
-				!end if */
 		}
 
 		// Check singularity

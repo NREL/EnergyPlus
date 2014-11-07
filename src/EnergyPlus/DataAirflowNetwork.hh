@@ -996,10 +996,10 @@ namespace DataAirflowNetwork {
 
 		// Default Constructor
 		IntraZoneNodeProp() :
-			Height(0.0),
-			RAFNNodeNum(0),
-			ZoneNum(0),
-			AFNZoneNum(0)
+			Height( 0.0 ),
+			RAFNNodeNum( 0 ),
+			ZoneNum( 0 ),
+			AFNZoneNum( 0 )
 		{}
 
 		// Member Constructor
@@ -1010,12 +1010,12 @@ namespace DataAirflowNetwork {
 			int const RAFNNodeNum, // RoomAir model node number
 			int const ZoneNum // Zone number
 			) :
-			Name(Name),
-			RAFNNodeName(RAFNNodeName),
+			Name( Name ),
+			RAFNNodeName( RAFNNodeName ),
 			Height( Height ),
-			RAFNNodeNum(RAFNNodeNum),
-			ZoneNum(ZoneNum),
-			AFNZoneNum(AFNZoneNum)
+			RAFNNodeNum( RAFNNodeNum ),
+			ZoneNum( ZoneNum ),
+			AFNZoneNum( AFNZoneNum )
 		{}
 
 	};
@@ -1034,11 +1034,11 @@ namespace DataAirflowNetwork {
 
 		// Default Constructor
 		IntraZoneLinkageProp() :
-			NodeNames(2),
-			NodeHeights(2, 0.0),
-			CompNum(0),
-			NodeNums(2, 0),
-			LinkNum(0)
+			NodeNames( 2 ),
+			NodeHeights( 2, 0.0 ),
+			CompNum( 0 ),
+			NodeNums( 2, 0 ),
+			LinkNum( 0 )
 		{}
 
 		// Member Constructor
@@ -1052,14 +1052,14 @@ namespace DataAirflowNetwork {
 			std::string const & SurfaceName, // Connection Surface Name
 			int const LinkNum // Linkage number
 			) :
-			Name(Name),
-			NodeNames(2, NodeNames),
-			NodeHeights(2, NodeHeights),
-			CompName(CompName),
-			CompNum(CompNum),
-			NodeNums(2, NodeNums),
-			SurfaceName(SurfaceName),
-			LinkNum(LinkNum)
+			Name( Name ),
+			NodeNames( 2, NodeNames ),
+			NodeHeights( 2, NodeHeights ),
+			CompName( CompName ),
+			CompNum( CompNum ),
+			NodeNums( 2, NodeNums ),
+			SurfaceName( SurfaceName ),
+			LinkNum( LinkNum )
 		{}
 
 	};

@@ -102,8 +102,8 @@ namespace DataAirflowNetwork {
 	int NumOfNodesDistribution( 0 ); // Number of nodes for distribution system calculation
 	int NumOfLinksMultiZone( 0 ); // Number of links for multizone calculation
 	int NumOfLinksDistribution( 0 ); // Number of links for distribution system calculation
-	int NumOfNodesIntraZone(0); // Number of nodes for intrazone calculation
-	int NumOfLinksIntraZone(0); // Number of links for intrazone calculation
+	int NumOfNodesIntraZone( 0 ); // Number of nodes for intrazone calculation
+	int NumOfLinksIntraZone( 0 ); // Number of links for intrazone calculation
 
 	int AirflowNetworkNumOfNodes( 0 ); // Number of nodes for AirflowNetwork calculation
 	// = NumOfNodesMultiZone+NumOfNodesDistribution

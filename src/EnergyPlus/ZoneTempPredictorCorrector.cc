@@ -4141,9 +4141,9 @@ namespace ZoneTempPredictorCorrector {
 
 			}
 
-			XMAT(ZoneNum) = XM2T(ZoneNum);
-			XM2T(ZoneNum) = XM3T(ZoneNum);
-			XM3T(ZoneNum) = XM4T(ZoneNum);
+			XMAT( ZoneNum ) = XM2T( ZoneNum );
+			XM2T( ZoneNum ) = XM3T( ZoneNum );
+			XM3T( ZoneNum ) = XM4T( ZoneNum );
 
 			if ( AirModel( ZoneNum ).AirModelType == RoomAirModel_AirflowNetwork ) {
 				for ( LoopNode = 1; LoopNode <= RoomAirflowNetworkZoneInfo( ZoneNum ).NumOfAirNodes; ++LoopNode ) {
