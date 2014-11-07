@@ -638,17 +638,17 @@ ScheduleTypeLimits,
   HVACTemplate Any Number; !- Name
 
 Schedule:Compact,
-  HVACTemplate-Always 40, !- Name
+  HVACTemplate-Always 21, !- Name
   HVACTemplate Any Number, !- Schedule Type Limits Name
   Through: 12/31, !- Field 1
   For: AllDays, !- Field 2
   Until: 24:00, !- Field 3
-  40; !- Field 4
+  21; !- Field 4
 
 ThermostatSetpoint:DualSetpoint,
   Always21 Dual SP Control, !- Name
-  HVACTemplate-Always 40, !- Heating Setpoint Temperature Schedule Name
-  HVACTemplate-Always 40; !- Cooling Setpoint Temperature Schedule Name
+  HVACTemplate-Always 21, !- Heating Setpoint Temperature Schedule Name
+  HVACTemplate-Always 21; !- Cooling Setpoint Temperature Schedule Name
 
 Schedule:Compact,
   HVACTemplate-Always 4, !- Name
