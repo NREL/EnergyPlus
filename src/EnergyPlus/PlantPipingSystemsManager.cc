@@ -1692,11 +1692,20 @@ namespace PlantPipingSystemsManager {
 			//additional evapotranspiration parameter, min/max validated by IP
 			PipingSystemDomains( DomainNum ).Moisture.GroundCoverCoefficient = rNumericArgs( 12 );
 
-			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = rNumericArgs( 16 );
+			// assign the mesh count
+			int meshCount;
+			if ( lNumericFieldBlanks( 16 ) ) {
+				meshCount = 4;
+			} else {
+				meshCount = rNumericArgs( 16 );
+			}
+			
+			PipingSystemDomains( DomainNum ).Mesh.X.RegionMeshCount = meshCount;
+			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = meshCount;
+			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = meshCount;
+
 			PipingSystemDomains( DomainNum ).Mesh.X.MeshDistribution = MeshDistribution_Uniform;
-			PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount = rNumericArgs( 16 );
 			PipingSystemDomains( DomainNum ).Mesh.Y.MeshDistribution = MeshDistribution_Uniform;
-			PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount = rNumericArgs( 16 );
 			PipingSystemDomains( DomainNum ).Mesh.Z.MeshDistribution = MeshDistribution_Uniform;
 			
 			//Initialize properties for basement interface cells
