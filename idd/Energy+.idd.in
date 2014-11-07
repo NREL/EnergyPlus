@@ -842,7 +842,6 @@ SizingPeriod:DesignDay,
   A1, \field Name
        \type alpha
        \required-field
-       \reference DesignDays
        \reference RunPeriodsAndDesignDays
   N1,  \field Month
        \required-field
@@ -1034,7 +1033,6 @@ SizingPeriod:DesignDay,
 SizingPeriod:WeatherFileDays,
        \memo Use a weather file period for design sizing calculations.
   A1 , \field Name
-       \reference DesignDays
        \reference RunPeriodsAndDesignDays
        \required-field
        \note user supplied name for reporting
@@ -1097,7 +1095,6 @@ SizingPeriod:WeatherFileConditionType,
        \memo details on these periods, see AuxiliaryPrograms document.
   A1 , \field Name
        \required-field
-       \reference DesignDays
        \reference RunPeriodsAndDesignDays
        \note user supplied name for reporting
   A2 , \field Period Selection
@@ -1160,7 +1157,6 @@ RunPeriod,
        \memo Multiple run periods may be input, but they may not overlap.
        \min-fields 11
   A1 , \field Name
-       \reference RunPeriods
        \reference RunPeriodsAndDesignDays
        \note descriptive name (used in reporting mainly)
        \note if blank, weather file title is used.  if not blank, must be unique
@@ -1245,7 +1241,6 @@ RunPeriod:CustomRange,
        \memo run simulation for a custom created weather file
        \min-fields 13
   A1 , \field Name
-       \reference RunPeriods
        \reference RunPeriodsAndDesignDays
        \note descriptive name (used in reporting mainly)
        \note if blank, weather file title is used.  if not blank, must be unique
@@ -2042,10 +2037,8 @@ Site:SolarAndVisibleSpectrum,
       \default Default
   A3, \field Solar Spectrum Data Object Name
       \type alpha
-      \reference SpectrumDataNames
   A4; \field Visible Spectrum Data Object Name
       \type alpha
-      \reference SpectrumDataNames
 
 Site:SpectrumData,
       \min-fields 8
@@ -5757,7 +5750,6 @@ WindowMaterial:Shade:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference WindowEquivalentLayerMaterialNames
   N1 , \field Shade Beam-Beam Solar Transmittance
        \note The beam-beam solar transmittance at normal incidence.  This value is
        \note the same as the openness area fraction of the shade material. Assumed
@@ -5859,7 +5851,6 @@ WindowMaterial:Drape:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference WindowEquivalentLayerMaterialNames
   N1 , \field Drape Beam-Beam Solar Transmittance at Normal Incidence
        \note The beam-beam solar transmittance at normal incidence. This value is the
        \note same as the openness area fraction of the drape fabric. Assumed to be
@@ -5978,7 +5969,6 @@ WindowMaterial:Blind:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference WindowEquivalentLayerMaterialNames
   A2 , \field Slat Orientation
        \type choice
        \key Horizontal
@@ -6164,7 +6154,6 @@ WindowMaterial:Screen:EquivalentLayer,
        \note Enter a unique name for this window screen material.
        \required-field
        \type alpha
-       \reference WindowEquivalentLayerMaterialNames
   N1 , \field Screen Beam-Beam Solar Transmittance
        \note The beam-beam transmittance of the screen material at normal incidence.
        \note This input field is the same as the material oppenness area fraction
@@ -6261,7 +6250,6 @@ WindowMaterial:Glazing:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference WindowEquivalentLayerMaterialNames
   A2 , \field Optical Data Type
        \required-field
        \type choice
@@ -6480,7 +6468,6 @@ Construction:WindowEquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference WindowEquivalentLayerMaterialNames
        \reference ConstructionNames
   A2 , \field Outside Layer
        \required-field
@@ -6524,7 +6511,6 @@ WindowMaterial:Gap:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference WindowEquivalentLayerMaterialNames
   A2 , \field Gas Type
        \required-field
        \type choice
@@ -9021,11 +9007,9 @@ BuildingSurface:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Surface Type
        \required-field
@@ -10209,11 +10193,9 @@ Wall:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10398,11 +10380,9 @@ RoofCeiling:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10586,11 +10566,9 @@ Floor:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10773,10 +10751,8 @@ Wall:Exterior,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10819,10 +10795,8 @@ Wall:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10865,10 +10839,8 @@ Wall:Underground,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10913,11 +10885,9 @@ Wall:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -10968,10 +10938,8 @@ Roof,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11016,10 +10984,8 @@ Ceiling:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11066,10 +11032,8 @@ Ceiling:Interzone,
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11122,10 +11086,8 @@ Floor:GroundContact,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11173,10 +11135,8 @@ Floor:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11221,11 +11181,9 @@ Floor:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11282,7 +11240,6 @@ FenestrationSurface:Detailed,
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Surface Type
        \required-field
@@ -11408,7 +11365,6 @@ Window,
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11462,7 +11418,6 @@ Door,
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11502,7 +11457,6 @@ GlazedDoor,
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11557,7 +11511,6 @@ Window:Interzone,
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11606,7 +11559,6 @@ Door:Interzone,
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -11655,7 +11607,6 @@ GlazedDoor:Interzone,
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
-       \reference SurfGroupAndHTSurfNames
        \reference AllShadingAndHTSurfNames
   A2 , \field Construction Name
        \required-field
@@ -12095,7 +12046,6 @@ InternalMass,
        \type alpha
        \reference AllHeatTranSurfNames
        \reference AllHeatTranAngFacNames
-       \reference SurfGroupAndHTSurfNames
   A2 , \field Construction Name
        \required-field
        \note To be matched with a construction in this input file
@@ -15830,7 +15780,6 @@ SurfaceProperty:OtherSideCoefficients,
       \min-fields 8
   A1, \field Name
       \required-field
-      \reference OSCNames
       \reference OutFaceEnvNames
   N1, \field Combined Convective/Radiative Film Coefficient
       \units W/m2-K
@@ -16645,7 +16594,7 @@ SurfaceConvectionAlgorithm:Inside:UserCurve,
        \key SupplyAirTemperature
   A3 , \field Hc Function of Temperature Difference Curve Name
        \note  Curve's "x" is absolute value of delta-T (Surface temperature minus reference temperature, (C))
-       \type alpha
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -16655,6 +16604,7 @@ SurfaceConvectionAlgorithm:Inside:UserCurve,
   A4 , \field Hc Function of Temperature Difference Divided by Height Curve Name
        \note Curve's "x" is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m)
        \note when used for an inside face the vertical length scale is the zone's interior height
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -17047,7 +16997,6 @@ SurfaceProperty:ExteriorNaturalVentedCavity,
   A1,  \field Name
        \required-field
        \type alpha
-       \reference VentedCavityNames
   A2,  \field Boundary Conditions Model Name
        \note Enter the name of a SurfaceProperty:OtherSideConditionsModel object
        \required-field
@@ -19554,7 +19503,6 @@ GasEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference GasEquipmentNames
   A2 , \field Zone or ZoneList Name
        \required-field
        \type object-list
@@ -19701,7 +19649,6 @@ SteamEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference SteamEquipmentNames
   A2 , \field Zone or ZoneList Name
        \required-field
        \type object-list
@@ -19768,7 +19715,6 @@ OtherEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference OtherEquipmentNames
   A2 , \field Zone or ZoneList Name
        \required-field
        \type object-list
@@ -19873,7 +19819,6 @@ ZoneContaminantSourceAndSink:CarbonDioxide,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference CO2GenerationNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -19892,8 +19837,6 @@ ZoneContaminantSourceAndSink:Generic:Constant,
    \memo Sets internal generic contaminant gains and sinks in a zone with constant values.
   A1 , \field Name
        \required-field
-       \type alpha
-       \reference GenericContaminantSourceAndSinkNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -19924,8 +19867,6 @@ SurfaceContaminantSourceAndSink:Generic:PressureDriven,
    \memo Simulate generic contaminant source driven by the pressure difference across a surface.
   A1 , \field Name
        \required-field
-       \type alpha
-       \reference GenericContaminantGenerationNames
   A2 , \field Surface Name
        \required-field
        \type object-list
@@ -19950,8 +19891,6 @@ ZoneContaminantSourceAndSink:Generic:CutoffModel,
    \memo Simulate generic contaminant source driven by the cutoff concentration model.
   A1 , \field Name
        \required-field
-       \type alpha
-       \reference GenericContaminantGenerationNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -19977,8 +19916,6 @@ ZoneContaminantSourceAndSink:Generic:DecaySource,
    \memo Simulate generic contaminant source driven by the cutoff concentration model.
   A1 , \field Name
        \required-field
-       \type alpha
-       \reference GenericContaminantGenerationNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -20003,8 +19940,6 @@ SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
    \memo Simulate generic contaminant source driven by the boundary layer diffusion controlled model.
   A1 , \field Name
        \required-field
-       \type alpha
-       \reference GenericContaminantGenerationNames
   A2 , \field Surface Name
        \required-field
        \type object-list
@@ -20029,8 +19964,6 @@ SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
    \memo Simulate generic contaminant source driven by the boundary layer diffusion controlled model.
   A1 , \field Name
        \required-field
-       \type alpha
-       \reference GenericContaminantGenerationNames
   A2 , \field Surface Name
        \required-field
        \type object-list
@@ -20051,8 +19984,6 @@ ZoneContaminantSourceAndSink:Generic:DepositionRateSink,
    \memo Simulate generic contaminant source driven by the boundary layer diffusion controlled model.
   A1 , \field Name
        \required-field
-       \type alpha
-       \reference GenericContaminantGenerationNames
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -23296,7 +23227,6 @@ Exterior:WaterEquipment,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ExteriorWaterEquipmentNames
   A2 , \field Fuel Use Type
        \type choice
        \key Water
@@ -38437,7 +38367,6 @@ ZoneHVAC:AirDistributionUnit,
        \min-fields 4
   A1 , \field Name
        \required-field
-       \reference AirDistributionUnits
   A2 , \field Air Distribution Unit Outlet Node Name
        \required-field
        \type node
@@ -41846,7 +41775,6 @@ Coil:Cooling:DX:TwoStageWithHumidityControlMode,
        \required-field
        \type alpha
        \reference CoolingCoilsDX
-       \reference CoolingCoilsDXMultiMode
        \reference CoolingCoilsDXMultiModeOrSingleSpeed
        \reference DesuperHeatingCoilSources
        \reference AFNCoilNames
@@ -42366,9 +42294,6 @@ Coil:Heating:Electric,
        \type alpha
        \required-field
        \reference HeatingCoilName
-       \reference HeatingCoilsGasElec
-       \reference HeatingCoilsGasElecDXSS
-       \reference HeatingCoilsGasElecDesup
        \reference AFNCoilNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -42475,9 +42400,6 @@ Coil:Heating:Gas,
        \required-field
        \type alpha
        \reference HeatingCoilName
-       \reference HeatingCoilsGasElec
-       \reference HeatingCoilsGasElecDXSS
-       \reference HeatingCoilsGasElecDesup
        \reference AFNCoilNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -42647,8 +42569,6 @@ Coil:Heating:Desuperheater,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference HeatingCoilsGasElecDesup
-       \reference HeatingCoilsDesuperheater
        \reference AFNCoilNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -46374,7 +46294,6 @@ Coil:WaterHeating:Desuperheater,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference WaterHeatingCoilsDesuperheater
        \note Unique name for this instance of a desuperheater water heating coil.
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -48080,7 +47999,6 @@ HeatExchanger:AirToAir:FlatPlate,
       \required-field
       \type alpha
       \reference HXAirToAirNames
-      \reference HXAirToAirFlatPlateNames
       \reference AFNHeatExchangerNames
   A2, \field Availability Schedule Name
       \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -51890,7 +51808,6 @@ AirLoopHVAC:ZoneSplitter,
        \memo cannot be duplicated within a single zone splitter (AirLoopHVAC:ZoneSplitter) list.
    A1, \field Name
        \required-field
-       \reference ZoneSplitters
        \reference SupplyPathComponentNames
    A2, \field Inlet Node Name
        \required-field
@@ -52144,7 +52061,6 @@ AirLoopHVAC:SupplyPlenum,
        \memo Node names cannot be duplicated within a single supply plenum list.
    A1, \field Name
        \required-field
-       \reference ZonePlenums
        \reference SupplyPathComponentNames
    A2, \field Zone Name
        \required-field
@@ -52405,7 +52321,6 @@ AirLoopHVAC:SupplyPath,
        \memo which may be in series or parallel.
    A1, \field Name
        \required-field
-       \reference ZoneSupplyAirPaths
    A2, \field Supply Air Path Inlet Node Name
        \required-field
        \type node
@@ -53112,7 +53027,6 @@ AirLoopHVAC:ReturnPath,
        \memo and one or more AirLoopHVAC:ReturnPlenum objects.
    A1, \field Name
        \required-field
-       \reference ZoneReturnAirPaths
    A2, \field Return Air Path Outlet Node Name
        \required-field
        \type node
@@ -54501,7 +54415,6 @@ NodeList,
   A1 , \field Name
        \required-field
        \type node
-       \reference NodeLists
   A2 , \field Node 1 Name
        \required-field
        \begin-extensible
@@ -55157,7 +55070,6 @@ PipingSystem:Underground:Domain,
    A1,  \field Name
         \required-field
         \type alpha
-        \reference PipingSystemUndergroundDomainNames
    N1,  \field Xmax
         \required-field
         \type real
@@ -58695,7 +58607,6 @@ PlantComponent:TemperatureSource,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference RiverWellOrSeawaterSourceNames
        \note Component Name
   A2 , \field Inlet Node
        \required-field
@@ -62231,7 +62142,6 @@ WaterHeater:Stratified,
        \required-field
        \type alpha
        \reference WaterHeaterNames
-       \reference WaterHeaterStratifiedNames
   A2 , \field End-Use Subcategory
        \type alpha
        \retaincase
@@ -62990,7 +62900,6 @@ ThermalStorage:ChilledWater:Mixed,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ChilledWaterStorageNames
   N1 , \field Tank Volume
        \type real
        \units m3
@@ -63087,7 +62996,6 @@ ThermalStorage:ChilledWater:Stratified,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ChilledWaterStorageNames
   N1 , \field Tank Volume
        \required-field
        \type real
@@ -63505,9 +63413,8 @@ PlantEquipmentList,
     \memo should be OFF (not operate) within the specified lower/upper limit.
     \min-fields 1
   A1 , \field Name
-        \required-field
-        \reference PlantAndCondenserEquipmentLists
-        \reference PlantEquipmentLists
+       \required-field
+       \reference PlantAndCondenserEquipmentLists
   A2 , \field Equipment 1 Object Type
   A3 , \field Equipment 1 Name
   A4 , \field Equipment 2 Object Type
@@ -65537,7 +65444,7 @@ EnergyManagementSystem:Subroutine,
   A1 , \field Name
        \required-field
        \type alpha
-       \reference ErlSubProgramNames
+       \reference ErlProgramNames
        \note no spaces allowed in name
   A2 , \field Program Line 1
        \begin-extensible
@@ -65808,7 +65715,6 @@ ExternalInterface:Schedule,
        \required-field
        \type alpha
        \reference ScheduleNames
-       \reference ExternalInterfaceScheduleNames
   A2 , \field Schedule Type Limits Name
        \type object-list
        \object-list ScheduleTypeLimitsNames
@@ -65906,7 +65812,6 @@ ExternalInterface:FunctionalMockupUnitImport:To:Schedule,
        \required-field
        \type alpha
        \reference ScheduleNames
-       \reference ExternalInterfaceScheduleNames
   A2 , \field Schedule Type Limits Names
        \type object-list
        \object-list ScheduleTypeLimitsNames
@@ -66018,7 +65923,6 @@ ExternalInterface:FunctionalMockupUnitExport:To:Schedule,
        \reference ExternalInterfaceScheduleNames
   A2 , \field Schedule Type Limits Names
        \type object-list
-       \object-list ScheduleTypeLimitsNames
   A3 , \field FMU Variable Name
        \required-field
        \type alpha
@@ -66471,7 +66375,7 @@ AvailabilityManager:OptimumStart,
        \memo Determines the optimal start of HVAC systems before occupancy.
   A1 , \field Name
        \required-field
-       \reference AvailabilityManager
+       \reference SystemAvailabilityManager
   A2 , \field Applicability Schedule Name
        \required-field
        \object-list ScheduleNames
@@ -66938,7 +66842,6 @@ SetpointManager:Scheduled,
      \memo or more setpoints. Values of the nodes are not used as input.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -66966,7 +66869,6 @@ SetpointManager:Scheduled:DualSetpoint,
      \memo on one or more nodes.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -66989,7 +66891,6 @@ SetpointManager:OutdoorAirReset,
      \memo temperature according to the outdoor air temperature using a reset rule.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67036,7 +66937,6 @@ SetpointManager:SingleZone:Reheat,
        \memo manager is not limited to reheat applications.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67070,7 +66970,6 @@ SetpointManager:SingleZone:Heating,
        \min-fields 8
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67104,7 +67003,6 @@ SetpointManager:SingleZone:Cooling,
        \min-fields 8
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67137,7 +67035,6 @@ SetpointManager:SingleZone:Humidity:Minimum,
      \memo object ZoneControl:Humidistat to detect humidity levels.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \deprecated
   A3 , \field Schedule Name
@@ -67159,7 +67056,6 @@ SetpointManager:SingleZone:Humidity:Maximum,
        \min-fields 5
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \deprecated
   A3 , \field Schedule Name
@@ -67179,7 +67075,6 @@ SetpointManager:MixedAir,
      \memo to establish a temperature setpoint at the mixed air node.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67206,7 +67101,6 @@ SetpointManager:OutdoorAirPretreat,
        \memo mixed air node when mixed with the return air stream
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67263,7 +67157,6 @@ SetpointManager:Warmest,
      \memo cooling demand of the warmest zone.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67299,7 +67192,6 @@ SetpointManager:Coldest,
      \memo resetting the temperature of the air in the cooling supply duct.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67335,7 +67227,6 @@ SetpointManager:ReturnAirBypassFlow,
        \memo to meet the specified temperature setpoint
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Flow
@@ -67355,7 +67246,6 @@ SetpointManager:WarmestTemperatureFlow,
        \memo and the supply air flow rate.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67405,7 +67295,6 @@ SetpointManager:MultiZone:Heating:Average,
        \memo requirements of all controlled zones in an air loop served by a central air-conditioner.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field HVAC Air Loop Name
        \note Enter the name of an AirLoopHVAC object
        \required-field
@@ -67432,7 +67321,6 @@ SetpointManager:MultiZone:Cooling:Average,
        \memo requirements of all controlled zones in an air loop served by a central air-conditioner.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field HVAC Air Loop Name
        \note Enter the name of an AirLoopHVAC object
        \required-field
@@ -67459,7 +67347,6 @@ SetpointManager:MultiZone:MinimumHumidity:Average,
        \memo load requirements of all controlled zones in an air loop served by a central air-conditioner.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field HVAC Air Loop Name
        \note Enter the name of an AirLoopHVAC object
        \required-field
@@ -67486,7 +67373,6 @@ SetpointManager:MultiZone:MaximumHumidity:Average,
        \memo load requirements of all controlled zones in an air loop served by a central air-conditioner.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field HVAC Air Loop Name
        \note Enter the name of an AirLoopHVAC object
        \required-field
@@ -67514,7 +67400,6 @@ SetpointManager:MultiZone:Humidity:Minimum,
        \memo the highest humidity ratio setpoint) in an air loop served by a central air-conditioner.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field HVAC Air Loop Name
        \note Enter the name of an AirLoopHVAC object
        \required-field
@@ -67542,7 +67427,6 @@ SetpointManager:MultiZone:Humidity:Maximum,
        \memo the lowest humidity ratio setpoint) in an air loop served by a central air-conditioner.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field HVAC Air Loop Name
        \note Enter the name of an AirLoopHVAC object
        \required-field
@@ -67569,7 +67453,6 @@ SetpointManager:FollowOutdoorAirTemperature,
      \memo The outdoor air conditions are obtained from the weather information during the simulation.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67605,7 +67488,6 @@ SetpointManager:FollowSystemNodeTemperature,
      \memo that are adjusted for altitude.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67642,7 +67524,6 @@ SetpointManager:FollowGroundTemperature,
      \memo using some type of ground heat exchanger.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \key Temperature
@@ -67676,7 +67557,6 @@ SetpointManager:CondenserEnteringReset,
   A1 , \field Name
        \type alpha
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \required-field
@@ -67728,7 +67608,6 @@ SetpointManager:CondenserEnteringReset:Ideal,
   A1 , \field Name
        \type alpha
        \required-field
-       \reference SetpointManagers
   A2 , \field Control Variable
        \type choice
        \required-field
@@ -67753,7 +67632,6 @@ SetpointManager:SingleZone:OneStageCooling,
        \memo depending on zone conditions. Intended for use with ZoneControl:Thermostat:StagedDualSetpoint
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   N1 , \field Cooling Stage On Supply Air Setpoint Temperature
        \note This is the setpoint value applied when cooling device is to cycle ON
        \required-field
@@ -67780,7 +67658,6 @@ SetpointManager:SingleZone:OneStageHeating,
        \memo Intended for use with ZoneControl:Thermostat:StagedDualSetpoint.
   A1 , \field Name
        \required-field
-       \reference SetpointManagers
   N1 , \field Heating Stage On Supply Air Setpoint Temperature
        \note This is the setpoint value applied when heating device is to cycle ON
        \required-field
@@ -68022,7 +67899,6 @@ Refrigeration:CompressorRack,
   A1 ,  \field Name
         \required-field
         \type alpha
-        \reference RefrigeratedCaseCompressorRack
         \reference DesuperHeatingCoilSources
   A2 ,  \field Heat Rejection Location
         \type choice
@@ -71952,7 +71828,6 @@ Generator:MicroCHP,
       \memo for both internal combustion and Stirling cycle
       \memo engines, but might be used for other types of residential CHP devices.
   A1, \field Name
-      \reference MicroCHPNames
       \reference GeneratorNames
   A2, \field Performance Parameters Name
       \note Enter the name of a Generator:MicroCHP:NonNormalizedParameters object.
@@ -77016,9 +76891,7 @@ FluidProperties:Name,
 FluidProperties:GlycolConcentration,
        \memo glycol and what concentration it is
   A1,  \field Name
-       \type alpha
        \required-field
-       \reference GlycolConcentrations
   A2,  \field Glycol Type
        \required-field
        \type choice
@@ -90544,7 +90417,6 @@ Output:Table:Monthly,
    A1, \field Name
        \required-field
        \type alpha
-       \reference StandardReportNames
    N1, \field Digits After Decimal
        \type integer
        \default 2
