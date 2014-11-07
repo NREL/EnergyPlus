@@ -528,7 +528,7 @@ namespace RoomAirModelAirflowNetwork {
 				LinkInTemp = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).Link( linkNum ).TempIn;
 				LinkInHumRat = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).Link( linkNum ).HumRatIn;
 				LinkInMdot = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).Link( linkNum ).MdotIn;
-				CpAir = PsyCpAirFnWTdb( LinkInHumRat, LinkInTemp, "InitRoomAirModelAirflowNetwork" );
+				CpAir = PsyCpAirFnWTdb( LinkInHumRat, LinkInTemp );
 				SumLinkMCp = SumLinkMCp + CpAir * LinkInMdot;
 				SumLinkMCpT = SumLinkMCpT + CpAir * LinkInMdot * LinkInTemp;
 				SumLinkM = SumLinkM + LinkInMdot;
@@ -548,7 +548,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).CpAir =
 			PsyCpAirFnWTdb( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HumRat,
-			RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirTemp, "InitRoomAirModelAirflowNetwork" );
+			RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirTemp );
 
 	} // InitRoomAirModelAirflowNetwork
 
@@ -657,7 +657,7 @@ namespace RoomAirModelAirflowNetwork {
 
 		// solve for node humidity ratio using 3rd order derivative
 		H2OHtOfVap = PsyHgAirFnWTdb( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).HumRat,
-			RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirTemp,"CalcRoomAirModelAirflowNetwork" );
+			RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).AirTemp );
 		A = RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumLinkM + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumHmARa +
 			RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumSysM;
 		B = ( RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumIntLatentGain / H2OHtOfVap ) + RoomAirflowNetworkZoneInfo( ZoneNum ).Node( RoomAirNode ).SumSysMW
