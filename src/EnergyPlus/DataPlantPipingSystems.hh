@@ -1324,7 +1324,7 @@ namespace DataPlantPipingSystems {
 		int SlabMaterialNum;
 		Real64 SlabWidth;
 		Real64 SlabLength;
-		Real64 SlabThickness; 
+		Real64 SlabThickness;
 		Real64 XIndex;
 		Real64 YIndex;
 		Real64 ZIndex;

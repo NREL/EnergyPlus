@@ -455,7 +455,7 @@ namespace SimulationManager {
 					EndHourFlag = false;
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
-						if ( AnySlabsInModel || AnyBasementsInModel){
+						if ( AnySlabsInModel || AnyBasementsInModel ){
 							InitAndSimGroundDomains();
 						}
 						
