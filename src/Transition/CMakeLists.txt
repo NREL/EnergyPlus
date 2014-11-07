@@ -7,6 +7,8 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/../../Products"
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_2_0.f90" )
 configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_2_0.f90" )
+configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_3_0.f90" )
+configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_3_0.f90" )
 
 SET(SRC
   Transition.f90
@@ -49,6 +51,7 @@ list( APPEND VERSIONS 7_2_0 )
 list( APPEND VERSIONS 8_0_0 )
 list( APPEND VERSIONS 8_1_0 )
 list( APPEND VERSIONS 8_2_0 )
+list( APPEND VERSIONS 8_3_0 )
 
 IF(${CMAKE_Fortran_COMPILER_ID} STREQUAL "GNU")
   IF( WIN32 )
