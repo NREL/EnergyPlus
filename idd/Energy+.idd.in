@@ -4550,6 +4550,7 @@ WindowMaterial:Glazing,
        \key BSDF
   A3 , \field Window Glass Spectral Data Set Name
        \note Used only when Optical Data Type = Spectral
+       \type object-list
        \object-list SpectralDataSets
   N1 , \field Thickness
        \required-field
@@ -6253,6 +6254,7 @@ WindowMaterial:Glazing:EquivalentLayer,
        \key Spectral (not supported now)
   A3 , \field Window Glass Spectral Data Set Name
        \note Used only when Optical Data Type = Spectral
+       \type object-list
        \object-list SpectralDataSets
   N1 , \field Front Side Beam-Beam Solar Transmittance
        \note Used only when Optical Data Type = SpectralAverage
@@ -11996,7 +11998,7 @@ WindowProperty:StormWindow,
        \note Must be the name of a FenestrationSurface:Detailed object with Surface Type = WINDOW.
        \note The WindowProperty:StormWindow object can only be used with exterior windows.
        \required-field
-       \type alpha
+       \type object-list
        \object-list SubSurfNames
   A2,  \field Storm Glass Layer Name
        \note Must be a WindowMaterial:Glazing or WindowMaterial:Glazing:RefractionExtinctionMethod
@@ -15763,6 +15765,7 @@ SurfaceControl:MovableInsulation,
       \object-list SurfaceNames
   A3, \field Material Name
       \required-field
+      \type object-list
       \object-list MaterialName
   A4; \field Schedule Name
        \required-field
@@ -16604,6 +16607,7 @@ SurfaceConvectionAlgorithm:Inside:UserCurve,
        \note Table:OneIndependentVariable object can also be used
   A5 , \field Hc Function of Air Change Rate Curve Name
        \note Curve's "x" is mechanical ACH (Air Changes per hour from mechanical air system), (1/hr)
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -16613,6 +16617,7 @@ SurfaceConvectionAlgorithm:Inside:UserCurve,
   A6 ; \field Hc Function of Air System Volume Flow Rate Divided by Zone Perimeter Length Curve Name
        \note Curve's "x" is mechanical system air flow rate (m3/s) divided by zone's length along
        \note exterior walls (m).
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -16634,6 +16639,7 @@ SurfaceConvectionAlgorithm:Outside:UserCurve,
        \default HeightAdjust
   A3 , \field Hf Function of Wind Speed Curve Name
        \note Curve's "x" is wind speed of the type determined in the previous field (m/s)
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -16642,6 +16648,7 @@ SurfaceConvectionAlgorithm:Outside:UserCurve,
        \note Table:OneIndependentVariable objects can also be used
   A4 , \field Hn Function of Temperature Difference Curve Name
        \note  Curve's "x" is absolute value of delta-T (Surface temperature minus air temperature, (C))
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -16651,6 +16658,7 @@ SurfaceConvectionAlgorithm:Outside:UserCurve,
   A5 ; \field Hn Function of Temperature Difference Divided by Height Curve Name
        \note Curve's "x" is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m)
        \note when used for an outside face the vertical length scale is the exterior facade's overall height
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -20316,7 +20324,7 @@ DaylightingDevice:LightWell,
        \memo Generally used with skylights.
   A1,  \field Exterior Window Name
        \required-field
-       \type alpha
+       \type object-list
        \object-list SubSurfNames
   N1,  \field Height of Well
        \note Distance from Bottom of Window to Bottom of Well
@@ -23120,12 +23128,12 @@ AirflowNetwork:Distribution:Linkage,
       \reference AirflowNetwork LinkageNames
  A2 , \field Node 1 Name
       \required-field
-      \type alpha
+      \type object-list
       \object-list AirflowNetworkNodeAndZoneNames
       \note Enter the name of zone or AirflowNetwork Node.
  A3 , \field Node 2 Name
       \required-field
-      \type alpha
+      \type object-list
       \object-list AirflowNetworkNodeAndZoneNames
       \note Enter the name of zone or AirflowNetwork Node.
  A4 , \field Component Name
@@ -26046,7 +26054,7 @@ HVACTemplate:System:VRF,
       \note Choose a thermostat control logic scheme. If these control types fail to control zone
       \note temperature within a reasonable limit, consider using multiple VRF systems
   A5, \field Thermostat Priority Schedule Name
-      \type alpha
+      \type object-list
       \object-list ScheduleNames
       \note this field is required if Master Thermostat Priority Control Type is Scheduled.
       \note Schedule values of 0 denote cooling, 1 for heating, and all other values disable the system.
@@ -32379,6 +32387,7 @@ ZoneHVAC:UnitVentilator,
         \key Cooling
         \key HeatingAndCooling
    A14, \field Supply Air Fan Operating Mode Schedule Name
+        \type object-list
         \object-list ScheduleNames
         \note Enter the name of a schedule that controls fan operation. Schedule
         \note name values of 0 denote cycling fan operation (fan cycles with
@@ -32463,6 +32472,7 @@ ZoneHVAC:UnitHeater,
         \type object-list
         \object-list HeatingCoilName
    A9 , \field Supply Air Fan Operating Mode Schedule Name
+        \type object-list
         \object-list ScheduleNames
         \note Enter the name of a schedule that controls fan operation. Schedule
         \note name values of 0 denote cycling fan operation (fan cycles with the
@@ -46351,7 +46361,7 @@ Coil:WaterHeating:Desuperheater,
        \note Specify the type of water heater tank used by this desuperheater water heating coil.
   A8 , \field Tank Name
        \required-field
-       \type alpha
+       \type object-list
        \note The name of the water heater tank used by this desuperheater water heating coil.
        \note Needs to match the name used in the corresponding water heater object.
        \object-list WaterHeaterMixedNames
@@ -47961,7 +47971,7 @@ Dehumidifier:Desiccant:System,
        \type real
        \units W
   A15; \field Exhaust Fan Power Curve Name
-       \type alpha
+       \type object-list
        \note Curve object type must be Curve:Quadratic or Curve:Cubic
        \note Table:OneIndependentVariable object can also be used
        \object-list QuadraticCurves
@@ -49796,7 +49806,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
         \note If this field is left blank or zero, the outdoor air flow rate from the previous on cycle
         \note (either cooling or heating) is used.
    A3 , \field Outdoor Air Flow Rate Multiplier Schedule Name
-        \type alpha
+        \type object-list
         \object-list ScheduleNames
         \note Enter the name of a schedule that contains multipliers for the outdoor air
         \note flow rates. Schedule values must be from 0 to 1.
@@ -50425,7 +50435,7 @@ AirConditioner:VariableRefrigerantFlow,
        \note Choose a thermostat control logic scheme. If these control types fail to control zone
        \note temperature within a reasonable limit, consider using multiple VRF systems
   A26, \field Thermostat Priority Schedule Name
-       \type alpha
+       \type object-list
        \object-list ScheduleNames
        \note this field is required if Master Thermostat Priority Control Type is Scheduled.
        \note Schedule values of 0 denote cooling, 1 for heating, and all other values disable the system.
@@ -55500,7 +55510,7 @@ Pump:VariableSpeed,
         \object-list ScheduleNames
   A13,  \field Zone Name
         \note optional, if used pump losses transfered to zone as internal gains
-        \type Object-list
+        \type object-list
         \object-list ZoneNames
   N12;  \field Skin Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
@@ -55580,7 +55590,7 @@ Pump:ConstantSpeed,
         \note "N" in above expression in field A6
   A7,   \field Zone Name
         \note optional, if used pump losses transfered to zone as internal gains
-        \type Object-list
+        \type object-list
         \object-list ZoneNames
   N8;   \field Skin Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
@@ -55644,7 +55654,7 @@ Pump:VariableSpeed:Condensate,
         \object-list ScheduleNames
   A5 ,  \field Zone Name
         \note optional, if used pump losses transfered to zone as internal gains
-        \type Object-list
+        \type object-list
         \object-list ZoneNames
   N10;  \field Skin Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
@@ -55714,7 +55724,7 @@ HeaderedPumps:ConstantSpeed,
         \object-list ScheduleNames
   A7 ,  \field Zone Name
         \note optional, if used pump losses transfered to zone as internal gains
-        \type Object-list
+        \type object-list
         \object-list ZoneNames
   N7 ;  \field Skin Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
@@ -55797,7 +55807,7 @@ HeaderedPumps:VariableSpeed,
         \object-list ScheduleNames
   A7 ,  \field Zone Name
         \note optional, if used pump losses transfered to zone as internal gains
-        \type Object-list
+        \type object-list
         \object-list ZoneNames
   N12;  \field Skin Loss Radiative Fraction
         \note optional. If zone identified in previous field then this determines
@@ -57915,6 +57925,7 @@ ChillerHeater:Absorption:DirectFired,
             \note value of the curve should be 1.0.  This is a biquadratic curve with the
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
+            \type object-list
             \object-list LinearCurves
             \object-list QuadraticCurves
             \object-list CubicCurves
@@ -57927,6 +57938,7 @@ ChillerHeater:Absorption:DirectFired,
             \note value of the curve should be 1.0.  This is a biquadratic curve with the
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
+            \type object-list
             \object-list LinearCurves
             \object-list QuadraticCurves
             \object-list CubicCurves
@@ -57938,6 +57950,7 @@ ChillerHeater:Absorption:DirectFired,
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
+            \type object-list
             \object-list LinearCurves
             \object-list QuadraticCurves
             \object-list CubicCurves
@@ -57950,6 +57963,7 @@ ChillerHeater:Absorption:DirectFired,
             \note value of the curve should be 1.0.  This is a biquadratic curve with the
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
+            \type object-list
             \object-list LinearCurves
             \object-list QuadraticCurves
             \object-list CubicCurves
@@ -57961,6 +57975,7 @@ ChillerHeater:Absorption:DirectFired,
             \note the chiller varies but the operating temperatures remain at the design values.
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
+            \type object-list
             \object-list LinearCurves
             \object-list QuadraticCurves
             \object-list CubicCurves
@@ -57973,6 +57988,7 @@ ChillerHeater:Absorption:DirectFired,
             \note so an input of 1.0 represents the nominal cooling capacity and an output of 1.0
             \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
             \note The curve is usually linear or quadratic.
+            \type object-list
             \object-list LinearCurves
             \object-list QuadraticCurves
             \object-list CubicCurves
@@ -57984,6 +58000,7 @@ ChillerHeater:Absorption:DirectFired,
             \note fraction of fuel used as the heating load varies.  It is normalized so that a value
             \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
             \note will probably be similar to a boiler curve for most chillers.
+            \type object-list
             \object-list LinearCurves
             \object-list QuadraticCurves
             \object-list CubicCurves
@@ -58148,6 +58165,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note value of the curve should be 1.0.  This is a biquadratic curve with the
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -58160,6 +58178,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note value of the curve should be 1.0.  This is a biquadratic curve with the
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -58171,6 +58190,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -58183,6 +58203,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note value of the curve should be 1.0.  This is a biquadratic curve with the
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -58194,6 +58215,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note the chiller varies but the operating temperatures remain at the design values.
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -58206,6 +58228,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note so an input of 1.0 represents the nominal cooling capacity and an output of 1.0
        \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
        \note The curve is usually linear or quadratic.
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -58217,6 +58240,7 @@ ChillerHeater:Absorption:DoubleEffect,
        \note fraction of fuel used as the heating load varies.  It is normalized so that a value
        \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
        \note will probably be similar to a boiler curve for most chillers.
+       \type object-list
        \object-list LinearCurves
        \object-list QuadraticCurves
        \object-list CubicCurves
@@ -62826,7 +62850,7 @@ ThermalStorage:Ice:Detailed,
        \note Table:OneIndependentVariable object can also be used
        \key Curve:CubicLinear
   A6 , \field Discharging Curve Name
-       \type alpha
+       \type object-list
        \object-list QuadraticLinearCurves
        \object-list CubicLinearCurves
        \note Table:OneIndependentVariable object can also be used
@@ -62836,7 +62860,7 @@ ThermalStorage:Ice:Detailed,
        \key Curve:CubicLinear
        \note Table:OneIndependentVariable object can also be used
   A8 , \field Charging Curve Name
-       \type alpha
+       \type object-list
        \object-list QuadraticLinearCurves
        \object-list CubicLinearCurves
        \note Table:OneIndependentVariable object can also be used
@@ -66153,6 +66177,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key ReceivesWhateverFlowAvailable
         \required-field
    A7 , \field Plant Connection 1 Initialization Program Calling Manager Name
+        \type object-list
         \object-list ProgramNames
    A8  ,\field Plant Connection 1 Simulation Program Calling Manager Name
         \type object-list
@@ -66346,6 +66371,7 @@ AvailabilityManager:OptimumStart,
        \reference SystemAvailabilityManagers
   A2 , \field Applicability Schedule Name
        \required-field
+       \type object-list
        \object-list ScheduleNames
   A3 , \field Fan Schedule Name
        \required-field
@@ -69934,83 +69960,83 @@ ZoneHVAC:RefrigerationChillerSet,
         \note which must be one of the inlet air nodes for the zone which is being cooled.
   A6 ,  \field Air Chiller 1 Name
         \begin-extensible
-        \type alpha
+        \type object-list
         \note This is the first chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A7 ,  \field Air Chiller 2 Name
-        \type alpha
+        \type object-list
         \note This is the second chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A8 ,  \field Air Chiller 3 Name
-        \type alpha
+        \type object-list
         \note This is the third chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A9 ,  \field Air Chiller 4 Name
-        \type alpha
+        \type object-list
         \note This is the fourth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A10,  \field Air Chiller 5 Name
-        \type alpha
+        \type object-list
         \note This is the fifth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A11,  \field Air Chiller 6 Name
-        \type alpha
+        \type object-list
         \note This is the sixth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A12,  \field Air Chiller 7 Name
-        \type alpha
+        \type object-list
         \note This is the seventh chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A13,  \field Air Chiller 8 Name
-        \type alpha
+        \type object-list
         \note This is the eighth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A14,  \field Air Chiller 9 Name
-        \type alpha
+        \type object-list
         \note This is the ninth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A15,  \field Air Chiller 10 Name
-        \type alpha
+        \type object-list
         \note This is the tenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A16,  \field Air Chiller 11 Name
-        \type alpha
+        \type object-list
         \note This is the eleventh chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A17,  \field Air Chiller 12 Name
-        \type alpha
-        \note This is the twelth chiller turned on to meet the zone load
+        \type object-list
+        \note This is the twelfth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A18,  \field Air Chiller 13 Name
-        \type alpha
+        \type object-list
         \note This is the thirteenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A19,  \field Air Chiller 14 Name
-        \type alpha
+        \type object-list
         \note This is the fourteenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A20,  \field Air Chiller 15 Name
-        \type alpha
+        \type object-list
         \note This is the fifteenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A21,  \field Air Chiller 16 Name
-        \type alpha
+        \type object-list
         \note This is the sixteenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A22,  \field Air Chiller 17 Name
-        \type alpha
+        \type object-list
         \note This is the seventeenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A23,  \field Air Chiller 18 Name
-        \type alpha
+        \type object-list
         \note This is the eighteenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A24,  \field Air Chiller 19 Name
-        \type alpha
+        \type object-list
         \note This is the nineteenth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
   A25,  \field Air Chiller 20 Name
-        \type alpha
+        \type object-list
         \note This is the twentieth chiller turned on to meet the zone load
         \object-list RefrigerationAirChillerNames
      A26,A27,A28,A29,A30,A31,A32,A33,A34,A35,A36,A37,A38,A39,A40,A41,A42,A43,A44,A45, \note fields as indicated
@@ -71902,7 +71928,7 @@ Generator:FuelSupply,
   A3, \field Fuel Temperature Reference Node Name
       \type node
   A4, \field Fuel Temperature Schedule Name
-      \type alpha
+      \type object-list
       \object-list ScheduleNames
   A5, \field Compressor Power Function of Fuel Rate Curve Name
       \type object-list
@@ -72983,6 +73009,7 @@ ElectricLoadCenter:Inverter:FunctionOfPower,
    A4 , \field Efficiency Function of Power Curve Name
         \note curve describes efficiency as a function of power
         \note curve is normalized relative to rated power in next field
+        \type object-list
         \object-list LinearCurves
         \object-list QuadraticCurves
         \note Table:OneIndependentVariable object can also be used
@@ -80277,11 +80304,13 @@ UtilityCost:Tariff,
         \note Used with real time pricing rates. The name of a schedule that contains the cost of
         \note energy for that particular time period of the year. Real time rates can be modeled using a charge
         \note schedule with the actual real time prices entered in the schedule.
+        \type object-list
         \object-list ScheduleNames
    A11, \field Customer Baseline Load Schedule Name
         \note Used with real time pricing rates. The name of a schedule that contains the baseline
         \note energy use for the customer. Many real time rates apply the charges as a credit or debit only to the
         \note difference between the baseline use and the actual use.
+        \type object-list
         \object-list ScheduleNames
    A12, \field Group Name
         \note The group name of the tariff such as distribution transmission supplier etc. If more than one tariff
@@ -80310,6 +80339,7 @@ UtilityCost:Qualify,
         \note Displayed in the report if the tariff does not qualify
    A2,  \field Tariff Name
         \required-field
+        \type object-list
         \object-list UtilityCostTariffs
         \note The name of the UtilityCost:Tariff that is associated with this UtilityCost:Qualify.
    A3,  \field Variable Name
@@ -80367,6 +80397,7 @@ UtilityCost:Charge:Simple,
         \note Charge variable names. They are removed during the utility bill calculation process.
    A2,  \field Tariff Name
         \required-field
+        \type object-list
         \object-list UtilityCostTariffs
         \note The name of the UtilityCost:Tariff that is associated with this UtilityCost:Charge:Simple.
    A3,  \field Source Variable
@@ -80423,6 +80454,7 @@ UtilityCost:Charge:Block,
         \note That way the results may be used for further calculation.
    A2,  \field Tariff Name
         \required-field
+        \type object-list
         \object-list UtilityCostTariffs
         \note The name of the UtilityCost:Tariff that is associated with this UtilityCost:Charge:Block.
    A3,  \field Source Variable
@@ -80588,6 +80620,7 @@ UtilityCost:Ratchet,
         \note The name of the ratchet and the name of the result of this single ratchet.
    A2,  \field Tariff Name
         \required-field
+        \type object-list
         \object-list UtilityCostTariffs
         \note The name of the UtilityCost:Tariff that is associated with this UtilityCost:Ratchet.
    A3,  \field Baseline Source Variable
@@ -80639,6 +80672,7 @@ UtilityCost:Variable,
         \required-field
   A2,   \field Tariff Name
         \required-field
+        \type object-list
         \object-list UtilityCostTariffs
         \note The name of the UtilityCost:Tariff that is associated with this UtilityCost:Variable.
   A3,   \field Variable Type
@@ -80672,6 +80706,7 @@ UtilityCost:Computation,
         \required-field
   A2,   \field Tariff Name
         \required-field
+        \type object-list
         \object-list UtilityCostTariffs
         \note The name of the UtilityCost:Tariff that is associated with this UtilityCost:Variable.
   A3,   \field Compute Step 1
