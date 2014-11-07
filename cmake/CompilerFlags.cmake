@@ -74,6 +74,18 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
             add_definitions(-fwhole-program)
     endif()
 
+    option(PROFILE_GENERATE "Generate profile data" FALSE)
+    if (PROFILE_GENERATE)
+      add_definitions(-fprofile-generate)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-generate")
+    endif()
+
+    option(PROFILE_USE "Use profile data" FALSE)
+    if (PROFILE_USE)
+      add_definitions(-fprofile-use)
+      set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-use")
+    endif()
+
 
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
