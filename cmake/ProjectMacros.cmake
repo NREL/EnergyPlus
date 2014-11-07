@@ -64,7 +64,8 @@ macro(ADD_GOOGLE_TESTS executable)
       string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
       foreach(hit ${found_tests})
         string(REGEX REPLACE ".*\\(( )*([A-Za-z_0-9]+)( )*,( )*([A-Za-z_0-9]+)( )*\\).*" "\\2.\\5" test_name ${hit})
-        add_test(${test_name} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${executable}" --gtest_filter=${test_name})
+        add_test(NAME ${test_name} 
+                 COMMAND "${executable}" "--gtest_filter=${test_name}")
       endforeach(hit)
     endif()
   endforeach()
@@ -110,7 +111,7 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
 endmacro()
 
 function( ADD_SIMULATION_TEST )
-  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY)
+  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
   set(oneValueArgs IDF_FILE EPW_FILE)
   set(multiValueArgs "")
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -136,10 +137,16 @@ function( ADD_SIMULATION_TEST )
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
   )  
 
-  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+  # Added the expect_fatal here to detect files that are expected to fatal error properly
+  if( ADD_SIM_TEST_EXPECT_FATAL )
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
+  else()
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+  endif()
 
-  if( DO_REGRESSION_TESTING )
+  if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
     add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
       -DBINARY_DIR=${CMAKE_BINARY_DIR}
       -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
@@ -157,7 +164,6 @@ function( ADD_SIMULATION_TEST )
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
-
 
 endfunction()
 

@@ -153,6 +153,10 @@ namespace DataGlobals {
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
 	extern bool AnyBasementsInModel; // true if there are any basements in the input file
 
+	extern int Progress; 
+	extern void ( *fProgressPtr )( int );
+	extern void ( *fMessagePtr )( std::string );
+
 } // DataGlobals
 
 } // EnergyPlus

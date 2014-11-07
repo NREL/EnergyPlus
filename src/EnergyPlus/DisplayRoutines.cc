@@ -8,6 +8,7 @@
 #include <DisplayRoutines.hh>
 #include <DataGlobals.hh>
 #include <DataSystemVariables.hh>
+#include <sstream>
 
 namespace EnergyPlus {
 
@@ -32,6 +33,7 @@ DisplayString( std::string const & String ) // String to be displayed
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
+	using DataGlobals::fMessagePtr;
 	using DataSystemVariables::DeveloperFlag;
 
 	// Locals
@@ -47,6 +49,8 @@ DisplayString( std::string const & String ) // String to be displayed
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
+
+	if ( fMessagePtr ) fMessagePtr(String);
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << '\n';
@@ -79,7 +83,8 @@ DisplayNumberAndString(
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
 	using DataSystemVariables::DeveloperFlag;
-
+	using DataGlobals::fMessagePtr;
+	
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -92,7 +97,10 @@ DisplayNumberAndString(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+	std::stringstream sstm;
+	sstm << String << " " << Number;
+	if ( fMessagePtr ) fMessagePtr( sstm.str() );
+	
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << ' ' << Number << '\n';
 }
@@ -122,6 +130,7 @@ DisplaySimDaysProgress( // This doesn't do anything!
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
+	using DataGlobals::fProgressPtr;
 	using DataSystemVariables::DeveloperFlag;
 
 	// Locals
@@ -141,11 +150,13 @@ DisplaySimDaysProgress( // This doesn't do anything!
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	if ( TotalSimDays > 0 ) {
-		percent = nint( ( CurrentSimDay / TotalSimDays ) * 100.0 );
+		percent = nint( ( ( float ) CurrentSimDay / ( float ) TotalSimDays ) * 100.0 );
 		percent = min( percent, 100 );
 	} else {
 		percent = 0;
 	}
+
+	if ( fProgressPtr ) fProgressPtr( percent );
 
 }
 

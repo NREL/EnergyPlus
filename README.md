@@ -7,7 +7,7 @@ This is the EnergyPlus Development Repository.
 
  - The Department of Energy maintains a [public website for EnergyPlus](www.energyplus.gov) where you can find much more information about the program.  
  - For detailed developer information, consult the [wiki](https://github.com/nrel/EnergyPlusTeam/wiki).  
- - For support questions, plese utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
+ - For support questions, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
 
 # Releases
 Although iteration **(pre-)releases** will be posted to this repository during a development cycle, users should generally avoid these, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.  If a release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will accompany this type of release.
