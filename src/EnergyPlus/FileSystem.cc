@@ -148,7 +148,7 @@ makeDirectory(std::string directoryPath)
 			exit(EXIT_FAILURE);
 		}
 #ifdef _WIN32
-		CreateDirectory(directoryName.c_str(), NULL);
+		CreateDirectory(directoryPath.c_str(), NULL);
 #else
 		mkdir(directoryPath.c_str(), 0755);
 #endif
