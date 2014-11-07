@@ -49,22 +49,55 @@ getFileName( std::string const& filePath )
 }
 
 std::string 
-getDirectoryPath( std::string const& filePath )
+getParentDirectoryPath( std::string const& path )
 {
-	int pathCharPosition = filePath.find_last_of(pathChar);
-	return filePath.substr(0, pathCharPosition + 1);
+	std::string tempPath = path;
+	if (path.at(path.size()-1) == pathChar)
+		tempPath = path.substr(0, path.size()-1);
+
+	int pathCharPosition = tempPath.find_last_of(pathChar);
+	tempPath = tempPath.substr(0, pathCharPosition + 1);
+
+	if (tempPath == "")
+		tempPath = ".";
+
+	return tempPath;
 }
 
 std::string
-getAbsolutePath( std::string const& filePath )
+getAbsolutePath( std::string const& path )
 {
-	char absolutePath[1024];
+
 #ifdef _WIN32
-	GetFullPathName(filePath.c_str(), sizeof(absolutePath), absolutePath, NULL);
-#else
-	char *result = realpath(filePath.c_str(), absolutePath);
-#endif
+	char absolutePath[1024];
+	GetFullPathName(path.c_str(), sizeof(absolutePath), absolutePath, NULL);
 	return std::string(absolutePath);
+#else
+	// If the path doesn't exist, find which of it's parents' paths does exist
+	std::string parentPath = path;
+	while(!pathExists(parentPath)) {
+		parentPath = getParentDirectoryPath(parentPath);
+	}
+
+	std::string pathTail;
+	if ( parentPath == "." )
+		pathTail = pathChar + path;
+	else
+		pathTail = pathChar + path.substr(parentPath.size(), path.size() - parentPath.size());
+
+	char *absolutePathTemp = realpath(parentPath.c_str(), NULL);
+	if (absolutePathTemp != NULL) {
+		std::string absoluteParentPath(absolutePathTemp);
+	    free(absolutePathTemp);
+		return absoluteParentPath + pathTail;
+	}
+	else {
+		DisplayString("ERROR: Could not resolve path for " + path + ".");
+		exit(EXIT_FAILURE);
+	}
+#endif
+
+
 }
 
 std::string
@@ -97,24 +130,58 @@ removeFileExtension(const std::string& fileName){
 }
 
 void
-makeDirectory(std::string directoryName)
+makeDirectory(std::string directoryPath)
 {
-	struct stat info;
-
-	if ( stat(getAbsolutePath(directoryName).c_str(), &info) == 0){ // path already exists
-		if ( !(info.st_mode & S_IFDIR) )
+	// Create a directory if doesn't already exist
+	if ( pathExists(directoryPath) ){ // path already exists
+		if ( !(directoryExists(directoryPath)) )
 		{
-			DisplayString("ERROR: " + getAbsolutePath(directoryName) + " is not a directory.");
+			DisplayString("ERROR: " + getAbsolutePath(directoryPath) + " is not a directory.");
 			exit(EXIT_FAILURE);
 		}
 	}
 	else { // directory does not already exist
+		std::string parentDirectoryPath = getParentDirectoryPath(directoryPath);
+		if (!pathExists(parentDirectoryPath))
+		{
+			DisplayString("ERROR: " + getAbsolutePath(parentDirectoryPath) + " is not a directory.");
+			exit(EXIT_FAILURE);
+		}
 #ifdef _WIN32
 		CreateDirectory(directoryName.c_str(), NULL);
 #else
-		mkdir(directoryName.c_str(), 0755);
+		mkdir(directoryPath.c_str(), 0755);
 #endif
 	}
+}
+
+bool
+pathExists(std::string path)
+{
+	struct stat info;
+	return (stat(path.c_str(), &info) == 0);
+}
+
+bool
+directoryExists(std::string directoryPath)
+{
+	struct stat info;
+	if ( stat(directoryPath.c_str(), &info) == 0){
+		return (info.st_mode & S_IFDIR);
+	}
+	else
+		return false;
+}
+
+bool
+fileExists(std::string filePath)
+{
+	struct stat info;
+	if ( stat(filePath.c_str(), &info) == 0){
+		return !(info.st_mode & S_IFDIR);
+	}
+	else
+		return false;
 }
 
 void

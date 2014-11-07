@@ -16,7 +16,7 @@ std::string
 getFileName( std::string const& filePath );
 
 std::string
-getDirectoryPath( std::string const& filePath );
+getParentDirectoryPath( std::string const& filePath );
 
 std::string
 getAbsolutePath( std::string const& filePath );
@@ -30,7 +30,16 @@ std::string
 removeFileExtension(const std::string& fileName);
 
 void
-makeDirectory(std::string directoryName);
+makeDirectory(std::string directoryPath);
+
+bool
+pathExists(std::string path);
+
+bool
+directoryExists(std::string directoryPath);
+
+bool
+fileExists(std::string filePath);
 
 void
 moveFile(std::string filePath, std::string destination);

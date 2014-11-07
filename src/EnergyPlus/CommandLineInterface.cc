@@ -181,7 +181,7 @@ ProcessArgs(int argc, const char * argv[])
 	opt.getUsage(usage);
 
 	// Set path of EnergyPlus program path
-	exeDirectory = getDirectoryPath(getAbsolutePath(getProgramPath()));
+	exeDirectory = getParentDirectoryPath(getAbsolutePath(getProgramPath()));
 
 	opt.get("-w")->getString(inputWeatherFileName);
 
@@ -252,7 +252,7 @@ ProcessArgs(int argc, const char * argv[])
 	}
 
 	idfFileNameOnly = removeFileExtension(getFileName(inputIdfFileName));
-	idfDirPathName = getDirectoryPath(inputIdfFileName);
+	idfDirPathName = getParentDirectoryPath(inputIdfFileName);
 
 	std::string weatherFilePathWithoutExtension = removeFileExtension(inputWeatherFileName);
 
