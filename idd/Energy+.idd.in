@@ -33037,11 +33037,11 @@ ZoneHVAC:UnitHeater,
         \key Yes
         \key No
         \note This choice field allows the user to define how the unit heater will operate 
-        \note under “no heating load” or cooling conditions. If the “No” is selected, then 
+        \note under "no heating load" or cooling conditions. If the "No" is selected, then 
         \note the fan will not run unless there is a heating load. If the fan does not run, 
         \note this effectively shuts the unit heater system off when there is no heating load. 
-        \note If the “Yes” is selected, the unit heater is available and has a ConstantVolume 
-        \note fan, or has an OnOff fan with “Supply Air Fan Operating Mode Schedule” value 
+        \note If the "Yes" is selected, the unit heater is available and has a ConstantVolume 
+        \note fan, or has an OnOff fan with "Supply Air Fan Operating Mode Schedule" value 
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -74588,7 +74588,7 @@ FaultModel:Fouling:Coil,
        \type real       
        \minimum> 0.0
        \default 0.07
-       
+
 \group General Data Entry
 
 
