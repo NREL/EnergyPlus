@@ -1,6 +1,7 @@
 // C++ Headers
 #include <cassert>
 #include <cmath>
+#include <set>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -432,7 +433,7 @@ namespace PlantPipingSystemsManager {
 				//Write eio data
 				for ( DomainNum = 1; DomainNum <= isize( PipingSystemDomains ); ++DomainNum ) {
 					gio::write( OutputFileInits, DomainCellsToEIO ) << PipingSystemDomains( DomainNum ).Name << PipingSystemDomains( DomainNum ).NumDomainCells 
-						<< PipingSystemDomains( DomainNum).NumGroundSurfCells << PipingSystemDomains( DomainNum ).NumInsulationCells;
+						<< PipingSystemDomains( DomainNum ).NumGroundSurfCells << PipingSystemDomains( DomainNum ).NumInsulationCells;
 				}
 				WriteEIOFlag = false;
 			}
@@ -1318,7 +1319,7 @@ namespace PlantPipingSystemsManager {
 				// Check horizontal insulation width so as to prevent overlapping insulation. VertInsThickness is used here since it is used for vertical partition thickness.
 				if ( 2 * PipingSystemDomains( DomainCtr ).HorizInsWidth + PipingSystemDomains( DomainCtr ).VertInsThickness > PipingSystemDomains( DomainCtr ).SlabWidth || 2 * PipingSystemDomains( DomainCtr ).HorizInsWidth + PipingSystemDomains( DomainCtr ).VertInsThickness > PipingSystemDomains( DomainCtr ).SlabLength ){
 					ShowSevereError( "PipingSystems:" + RoutineName + ": Perimeter Insulation Width is too high" );
-					ShowFatalError( "Preceding error( s ) cause program termination." );
+					ShowFatalError( "Preceding error(s) cause program termination." );
 				}
 
 				// Set ground domain dimensions
@@ -1816,7 +1817,7 @@ namespace PlantPipingSystemsManager {
 			if ( PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness > PipingSystemDomains( DomainNum ).BasementZone.Width / 2.0 
 				|| PipingSystemDomains( DomainNum ).HorizInsWidth + PipingSystemDomains( DomainNum ).VertInsThickness > PipingSystemDomains( DomainNum ).BasementZone.Width /2.0  ){
 				ShowSevereError( "PipingSystems:" + RoutineName + ": Perimeter Horizontal Insulation Width is too high compared to basement floor dimensions" );
-				ShowFatalError( "Preceding error( s ) cause program termination." );
+				ShowFatalError( "Preceding error(s) cause program termination." );
 			}
 
 			//******* We'll first set up the domain ********
@@ -2034,8 +2035,8 @@ namespace PlantPipingSystemsManager {
 
 			//Read in the pipe location, validated as positive by IP
 			// -- note that these values will be altered by the main GetInput routine in two ways:
-			//   1 ) shift for basement wall if selected
-			//   2 ) invert y direction to be measured from domain bottom surface for calculations
+			//   1) shift for basement wall if selected
+			//   2) invert y direction to be measured from domain bottom surface for calculations
 			PipingSystemSegments( SegmentCtr ).PipeLocation = PointF( rNumericArgs( 1 ), rNumericArgs( 2 ) );
 
 			//Read in the flow direction
@@ -2662,7 +2663,7 @@ namespace PlantPipingSystemsManager {
 			ScanPlantLoopsForObject( PipingSystemCircuits( CircuitNum ).Name, TypeToLookFor, PipingSystemCircuits( CircuitNum ).LoopNum, PipingSystemCircuits( CircuitNum ).LoopSideNum, PipingSystemCircuits( CircuitNum ).BranchNum, PipingSystemCircuits( CircuitNum ).CompNum, _, _, _, _, _, errFlag );
 
 			if ( errFlag ) {
-				ShowFatalError( "PipingSystems:" + RoutineName + ": Program terminated due to previous condition( s )." );
+				ShowFatalError( "PipingSystems:" + RoutineName + ": Program terminated due to previous condition(s)." );
 			}
 
 			//Once we find ourselves on the plant loop, we can do other things
@@ -3108,11 +3109,11 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	bool
-		IsInRange_BasementModel(
+	IsInRange_BasementModel(
 		Real64 const r,
 		Real64 const lower,
 		Real64 const upper
-		)
+	)
 	{
 
 		// FUNCTION INFORMATION:
@@ -4590,8 +4591,7 @@ namespace PlantPipingSystemsManager {
 			ZRegions.allocate( { 0, RegionListCount - 1 } );
 			ZRegions = CreateRegionList( DomainNum, ZPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Zmax, RegionType_ZDirection, RegionListCount - 1, ZPartitionsExist, _, _, _, _, _, _, _, _, PipingSystemDomains( DomainNum ).ZIndex, PipingSystemDomains( DomainNum ).ZWallIndex, PipingSystemDomains( DomainNum ).InsulationZIndex );
 
-		}
-		 else if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ){
+		} else if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ){
 			 RegionListCount = CreateRegionListCount( XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, XPartitionsExist );
 			XRegions.allocate( { 0, RegionListCount - 1 } );
 			XRegions = CreateRegionList( DomainNum, XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, RegionType_XDirection, RegionListCount - 1, XPartitionsExist, _, _, PipingSystemDomains( DomainNum ).XIndex, _, PipingSystemDomains( DomainNum ).InsulationXIndex );
@@ -4604,7 +4604,7 @@ namespace PlantPipingSystemsManager {
 			ZRegions.allocate( { 0, RegionListCount - 1 } );
 			ZRegions = CreateRegionList( DomainNum, ZPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Zmax, RegionType_ZDirection, RegionListCount - 1, ZPartitionsExist, _, _, _, _, _, _, _, _, PipingSystemDomains( DomainNum ).ZIndex, _, PipingSystemDomains( DomainNum ).InsulationZIndex );
 
-		} else{
+		} else {
 			RegionListCount = CreateRegionListCount( XPartitionRegions, PipingSystemDomains( DomainNum ).Extents.Xmax, XPartitionsExist );
 			XRegions.allocate( {0,RegionListCount - 1} );
 
@@ -5076,7 +5076,7 @@ namespace PlantPipingSystemsManager {
 
 				if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
 					SlabDistFromBottom = PipingSystemDomains( DomainNum ).Extents.Ymax - PipingSystemDomains( DomainNum ).SlabThickness - CellWidth / 2.0;
-				} else{
+				} else {
 					//Create underslab partition such that interface cell thickness is constant and consistent with other slab configurations regardless of the mesh count.
 					SlabDistFromBottom = PipingSystemDomains( DomainNum ).Extents.Ymax - ( PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount * CellWidth + CellWidth / 2.0 );
 				}
@@ -5091,7 +5091,7 @@ namespace PlantPipingSystemsManager {
 						PipingSystemDomains( DomainNum ).Partitions.Y( 0 ) = MeshPartition( SlabDistFromBottom, PartitionType_UnderFloor, CellWidth );
 						//Vertical-Insulation edge partition
 						PipingSystemDomains( DomainNum ).Partitions.Y( 1 ) = MeshPartition( YInsulationLocation, PartitionType_VertInsLowerEdge, CellWidth );
-					} else{
+					} else {
 						PipingSystemDomains( DomainNum ).Partitions.Y.allocate( { 0, 0 } );
 						// Underslab partition
 						PipingSystemDomains( DomainNum ).Partitions.Y( 0 ) = MeshPartition( SlabDistFromBottom, PartitionType_UnderFloor, CellWidth );
@@ -5277,8 +5277,9 @@ namespace PlantPipingSystemsManager {
 						ShowFatalError( "Preceding error causes program termination" );
 
 					}
-				}
-				else{
+
+				} else {
+
 					if ( IsInRange( CellLeft, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) || IsInRange( CellRight, ThesePartitionRegions( SubIndex ).Min, ThesePartitionRegions( SubIndex ).Max ) ) {
 
 						ShowSevereError( "PlantPipingSystems::" + RoutineName + ": Invalid partition location in domain." );
@@ -5488,22 +5489,14 @@ namespace PlantPipingSystemsManager {
 					for ( SubIndex = lbound( TempRegions, 1 ); SubIndex <= PreviousUbound; ++SubIndex ) {
 						PreviousRegion = TempRegions( SubIndex );
 
-						{ auto const SELECT_CASE_var( PreviousRegion.RegionType );
-						if ( ( SELECT_CASE_var == RegionType_Pipe ) || ( SELECT_CASE_var == RegionType_BasementFloor )
-							|| ( SELECT_CASE_var == RegionType_BasementWall ) || ( SELECT_CASE_var == RegionType_XSide )
-							|| ( SELECT_CASE_var == RegionType_XSideWall ) || ( SELECT_CASE_var == RegionType_ZSide )
-							|| ( SELECT_CASE_var == RegionType_ZSideWall ) || ( SELECT_CASE_var == RegionType_HorizInsXSide )
-							|| ( SELECT_CASE_var == RegionType_HorizInsZSide ) || ( SELECT_CASE_var == RegionType_FloorInside )
-							|| ( SELECT_CASE_var == RegionType_UnderFloor ) || ( SELECT_CASE_var == RegionType_VertInsLowerEdge ) ) {
+						if ( std::set< int >( { RegionType_Pipe, RegionType_BasementFloor, RegionType_BasementWall, RegionType_XSide, RegionType_XSideWall, RegionType_ZSide, RegionType_ZSideWall,
+										RegionType_HorizInsXSide, RegionType_HorizInsZSide, RegionType_FloorInside, RegionType_UnderFloor, RegionType_VertInsLowerEdge } ).count( PreviousRegion.RegionType ) != 0 ) {
 							++CellCountUpToNow;
-						}
-						else {
+						} else {
 							CellCountUpToNow += GetCellWidthsCount( DomainNum, DirDirection );
-						}}
-
+						}
 					}
-				}
-				else{
+				} else {
 					//alert calling routines to the location of the cell for ThesePartitionRegions( 1 ) in the coupled-basement model. - SA
 					++CellCountUpToNow;
 				}
@@ -5626,13 +5619,9 @@ namespace PlantPipingSystemsManager {
 		RetVal = 0;
 
 		for ( Index = lbound( RegionList, 1 ); Index <= ubound( RegionList, 1 ); ++Index ) {
-			{ auto const SELECT_CASE_var( RegionList( Index ).RegionType );
-			if ( ( SELECT_CASE_var == RegionType_Pipe ) || ( SELECT_CASE_var == RegionType_BasementFloor ) 
-				|| ( SELECT_CASE_var == RegionType_BasementWall ) || ( SELECT_CASE_var == RegionType_XSide ) 
-				|| ( SELECT_CASE_var == RegionType_XSideWall ) || ( SELECT_CASE_var == RegionType_ZSide ) 
-				|| ( SELECT_CASE_var == RegionType_ZSideWall ) || ( SELECT_CASE_var == RegionType_HorizInsXSide )
-				|| ( SELECT_CASE_var == RegionType_HorizInsZSide ) || ( SELECT_CASE_var == RegionType_FloorInside )
-				|| ( SELECT_CASE_var == RegionType_UnderFloor ) || ( SELECT_CASE_var == RegionType_VertInsLowerEdge ) ) {
+			
+			if ( std::set< int >( { RegionType_Pipe, RegionType_BasementFloor, RegionType_BasementWall, RegionType_XSide, RegionType_XSideWall, RegionType_ZSide, RegionType_ZSideWall,
+							RegionType_HorizInsXSide, RegionType_HorizInsZSide, RegionType_FloorInside, RegionType_UnderFloor, RegionType_VertInsLowerEdge } ).count( RegionList( Index ).RegionType ) != 0 ) {
 				++RetVal;
 			} else {
 				if ( RegionList( Index ).RegionType == DirDirection ) {
@@ -5640,7 +5629,7 @@ namespace PlantPipingSystemsManager {
 						++RetVal;
 					}
 				}
-			}}
+			}
 		}
 		++RetVal;
 
@@ -5698,13 +5687,8 @@ namespace PlantPipingSystemsManager {
 
 		Counter = -1;
 		for ( Index = lbound( RegionList, 1 ); Index <= ubound( RegionList, 1 ); ++Index ) {
-			{ auto const SELECT_CASE_var( RegionList( Index ).RegionType );
-			if ( ( SELECT_CASE_var == RegionType_Pipe ) || ( SELECT_CASE_var == RegionType_BasementFloor ) 
-				|| ( SELECT_CASE_var == RegionType_BasementWall ) || ( SELECT_CASE_var == RegionType_XSide ) 
-				|| ( SELECT_CASE_var == RegionType_XSideWall ) || ( SELECT_CASE_var == RegionType_ZSide ) 
-				|| ( SELECT_CASE_var == RegionType_ZSideWall ) || ( SELECT_CASE_var == RegionType_HorizInsXSide )
-				|| ( SELECT_CASE_var == RegionType_HorizInsZSide ) || ( SELECT_CASE_var == RegionType_FloorInside )
-				|| ( SELECT_CASE_var == RegionType_UnderFloor ) || ( SELECT_CASE_var == RegionType_VertInsLowerEdge ) ) {
+			if ( std::set< int >( { RegionType_Pipe, RegionType_BasementFloor, RegionType_BasementWall, RegionType_XSide, RegionType_XSideWall, RegionType_ZSide, RegionType_ZSideWall,
+							RegionType_HorizInsXSide, RegionType_HorizInsZSide, RegionType_FloorInside, RegionType_UnderFloor, RegionType_VertInsLowerEdge } ).count( RegionList( Index ).RegionType ) != 0 ) {
 				++Counter;
 				RetVal( Counter ) = RegionList( Index ).Min;
 			} else {
@@ -5716,7 +5700,7 @@ namespace PlantPipingSystemsManager {
 						StartingPointCounter += RegionList( Index ).CellWidths( CellWidthCtr );
 					}
 				}
-			}}
+			}
 		}
 		RetVal( ubound( RetVal, 1 ) ) = DirExtentMax;
 
@@ -5920,39 +5904,27 @@ namespace PlantPipingSystemsManager {
 					//'apply boundary conditions
 
 					// For zone-coupled ground domain
-					if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ){
-						//Slab in-grade 
-						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ){
-							//Farfield cells
-							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+					if ( PipingSystemDomains( DomainNum ).IsZoneCoupledSlab ) {
+						if ( PipingSystemDomains( DomainNum ).SlabInGradeFlag ) { //Slab in-grade 
+							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) { //Farfield cells
 								CellType = CellType_FarfieldBoundary;
 								TotNumCells++;
-							}
-							//Slab cells
-							else if ( CellXIndex > MinXIndex && CellZIndex > MinZIndex ) {
-								//General slab cells
-								if ( CellYIndex < ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YIndex ){
+							} else if ( CellXIndex > MinXIndex && CellZIndex > MinZIndex ) { //Slab cells
+								if ( CellYIndex < ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YIndex ) { //General slab cells
 									CellType = CellType_Slab;
 									TotNumCells++;
-								}
-								//Surface cells
-								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
+								} else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) { //Surface cells
 									CellType = CellType_ZoneGroundInterface;
 									TotNumCells++;
-								}
-								//Underslab insulation cells
-								else if ( CellYIndex == YIndex ){
+								} else if ( CellYIndex == YIndex ) { //Underslab insulation cells
 									//Check if horizontal insulation present
-									if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-										//Entire underslab insulation
-										if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
+									if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
+										if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { //Entire underslab insulation
 											CellType = CellType_HorizInsulation;
 											TotNumCells++;
 											NumInsulationCells++;
-										}
-										//Perimeter insulation
-										else{
-											if ( CellXIndex <= InsulationXIndex || CellZIndex <= InsulationZIndex ){
+										} else { //Perimeter insulation
+											if ( CellXIndex <= InsulationXIndex || CellZIndex <= InsulationZIndex ) {
 												CellType = CellType_HorizInsulation;
 												TotNumCells++;
 												NumInsulationCells++;
@@ -5960,68 +5932,50 @@ namespace PlantPipingSystemsManager {
 										}
 									}
 								}
-							}
-							//X side interface 
-							else if ( CellXIndex == MinXIndex &&  CellZIndex > MinZIndex ) {
+							} else if ( CellXIndex == MinXIndex &&  CellZIndex > MinZIndex ) { //X side interface 
 								//Check if vertical insulation present
-								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
+								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
 									//Check depth of vertical insulation
-									if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
+									if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ) {
 										CellType = CellType_VertInsulation;
 										TotNumCells++;
 										NumInsulationCells++;
 									}
-								}
-								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+								} else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
 									CellType = CellType_GroundSurface;
 									TotNumCells++;
 									NumGroundSurfaceCells++;
 								}
-							}
-							//Z side interface
-							else if ( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex ){
+							} else if ( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex ) { //Z side interface
 								//Check if vertical insulation present
-								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
+								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
 									//Check depth of vertical insulation
-									if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ){
+									if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex >= InsulationYIndex ) {
 										CellType = CellType_VertInsulation;
 										TotNumCells++;
 										NumInsulationCells++;
 									}
-								}
-								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+								} else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
 									CellType = CellType_GroundSurface;
 									TotNumCells++;
 									NumGroundSurfaceCells++;
 								}
-							}
-							//Surface cells
-							else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							} else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) { //Surface cells
 								CellType = CellType_GroundSurface;
 								TotNumCells++;
 								NumGroundSurfaceCells++;
-							}
-							//Farfield boundary
-							else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
-								CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) {
+							} else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) || CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) { //Farfield boundary
 								CellType = CellType_FarfieldBoundary;
 								TotNumCells++;
 							}
-
-						}
-						//Slab on-grade situations
-						else {
-							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+						} else { //Slab on-grade situations
+							if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
 								CellType = CellType_FarfieldBoundary;
 								TotNumCells++;
-							}
-							else if ( CellXIndex > MinXIndex  && CellZIndex > MinZIndex && CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							} else if ( CellXIndex > MinXIndex  && CellZIndex > MinZIndex && CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
 								CellType = CellType_ZoneGroundInterface;
 								TotNumCells++;
-							}
-							//Vertical insulation 
-							else if ( ( CellXIndex == MinXIndex  &&  CellZIndex > MinZIndex ) ||
-								( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex ) ){
+							} else if ( ( CellXIndex == MinXIndex  &&  CellZIndex > MinZIndex ) || ( CellZIndex == MinZIndex  &&  CellXIndex > MinXIndex ) ) { //Vertical insulation 
 								//Check if vertical insulation present
 								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
 									if ( CellYIndex >= InsulationYIndex ){
@@ -6029,61 +5983,41 @@ namespace PlantPipingSystemsManager {
 										TotNumCells++;
 										NumInsulationCells++;
 									}
-								}
-								else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
+								} else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) {
 									CellType = CellType_GroundSurface;
 									TotNumCells++;
 									NumGroundSurfaceCells++;
 								}
-							}
-							//Surface Cells
-							else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+							} else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) { //Surface Cells
 								CellType = CellType_GroundSurface;
 								TotNumCells++;
 								NumGroundSurfaceCells++;
-							}
-							//Domain 'bottom' surface
-							else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
-								CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ){
+							} else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) || CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) { //Domain 'bottom' surface
 								CellType = CellType_FarfieldBoundary;
 								TotNumCells++;
 							}
-
 						}
-					}
-
-					//basement model, zone-coupled
-					else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ){
+					} else if ( PipingSystemDomains( DomainNum ).HasCoupledBasement ) { //basement model, zone-coupled
 						//Set the appropriate cell type
-						//Farfield cells
-						if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+						if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) { //Farfield cells
 							CellType = CellType_FarfieldBoundary;
 							TotNumCells++;
-						}
-						//Basement cutaway
-						else if ( CellXIndex > XWallIndex && CellZIndex > ZWallIndex ) {
-							//General basement cells
-							if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ){
+						} else if ( CellXIndex > XWallIndex && CellZIndex > ZWallIndex ) { //Basement cutaway
+							if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ) { //General basement cells
 								CellType = CellType_BasementCutaway;
 								// Not counting basement cutaway cells.
-							}
-							//Basement Floor cells
-							else if ( CellYIndex == YFloorIndex ){
+							} else if ( CellYIndex == YFloorIndex ) { //Basement Floor cells
 								CellType = CellType_BasementFloor;
 								TotNumCells++;
-							}
-							else if ( CellYIndex == YIndex ){
+							} else if ( CellYIndex == YIndex ) {
 								//Check if horizontal insulation present
-								if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ){
-									//Entire underfloor insulated
-									if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ){
+								if ( PipingSystemDomains( DomainNum ).HorizInsPresentFlag ) {
+									if ( PipingSystemDomains( DomainNum ).FullHorizInsPresent ) { //Entire underfloor insulated
 										CellType = CellType_HorizInsulation;
 										TotNumCells++;
 										NumInsulationCells++;
-									}
-									//Perimeter insulation
-									else{
-										if ( CellXIndex < InsulationXIndex || CellZIndex < InsulationZIndex ){
+									} else { //Perimeter insulation
+										if ( CellXIndex < InsulationXIndex || CellZIndex < InsulationZIndex ) {
 											CellType = CellType_HorizInsulation;
 											TotNumCells++;
 											NumInsulationCells++;
@@ -6091,30 +6025,23 @@ namespace PlantPipingSystemsManager {
 									}
 								}
 							}
-						}
-						//Basement Walls
-						else if ( ( CellXIndex == XWallIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == ZWallIndex && CellXIndex > XWallIndex ) ) {
-							if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ){
+						} else if ( ( CellXIndex == XWallIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == ZWallIndex && CellXIndex > XWallIndex ) ) { //Basement Walls
+							if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ) {
 								CellType = CellType_BasementWall;
 								TotNumCells++;
 							}
-						}
-						//Insulation cells
-						else if ( ( CellXIndex == MinXIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == MinZIndex && CellXIndex > XWallIndex ) ) {
-							if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ){
+						} else if ( ( CellXIndex == MinXIndex && CellZIndex > ZWallIndex ) || ( CellZIndex == MinZIndex && CellXIndex > XWallIndex ) ) { //Insulation cells
+							if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ) {
 								//Check if vertical insulation present
-								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ){
-									//Partial vertical insulation 
-									if ( InsulationYIndex != 0 ){
-										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > InsulationYIndex ){
+								if ( PipingSystemDomains( DomainNum ).VertInsPresentFlag ) {
+									if ( InsulationYIndex != 0 ){ //Partial vertical insulation 
+										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > InsulationYIndex ) {
 											CellType = CellType_VertInsulation;
 											TotNumCells++;
 											NumInsulationCells++;
 										}
-									}
-									//Vertical insulation extends to depth of basement floor 
-									else{
-										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ){
+									} else { //Vertical insulation extends to depth of basement floor 
+										if ( CellYIndex <= ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) && CellYIndex > YFloorIndex ) {
 											CellType = CellType_VertInsulation;
 											TotNumCells++;
 											NumInsulationCells++;
@@ -6122,22 +6049,15 @@ namespace PlantPipingSystemsManager {
 									}
 								}
 							}
-						}
-						//Surface cells
-						else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ){
+						} else if ( CellYIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 2 ) ) { //Surface cells
 							CellType = CellType_GroundSurface;
 							TotNumCells++;
 							NumGroundSurfaceCells++;
-						}
-						//Farfield boundary
-						else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) ||
-							CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) {
+						} else if ( CellYIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 2 ) || CellXIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 1 ) || CellZIndex == lbound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) { //Farfield boundary
 							CellType = CellType_FarfieldBoundary;
 							TotNumCells++;
 						}
-					}
-										
-					else if ( CellXIndex == MaxBasementXNodeIndex && CellYIndex == MinBasementYNodeIndex ) {
+					} else if ( CellXIndex == MaxBasementXNodeIndex && CellYIndex == MinBasementYNodeIndex ) {
 						CellType = CellType_BasementCorner;
 						TotNumCells++;
 					} else if ( CellXIndex == MaxBasementXNodeIndex && CellYIndex > MinBasementYNodeIndex ) {
@@ -6691,7 +6611,7 @@ namespace PlantPipingSystemsManager {
 				CellWidth *= ThisMesh.GeometricSeriesCoefficient;
 				RetVal( I ) = CellWidth;
 			}
-			SubIndex = NumCellsOnEachSide;  
+			SubIndex = NumCellsOnEachSide;
 			for ( I = NumCellsOnEachSide - 1; I >= 0; --I ) {
 				RetVal( SubIndex ) = RetVal( I );
 				++SubIndex;  //SubIndex should be incremented here - After RetVal (SubIndex) is assigned a value. -SA
@@ -7660,10 +7580,10 @@ namespace PlantPipingSystemsManager {
 
 	//*********************************************************************************************!
 	Real64
-		EvaluateZoneInterfaceTemperature(
+	EvaluateZoneInterfaceTemperature(
 		int const DomainNum,
 		CartesianCell const & cell
-		)
+	)
 	{
 
 			// FUNCTION INFORMATION:
@@ -7711,28 +7631,26 @@ namespace PlantPipingSystemsManager {
 			Numerator += cell.MyBase.Temperature_PrevTimeStep;
 			++Denominator;
 
-			{ auto const SELECT_CASE_var( cell.CellType );
-			if ( SELECT_CASE_var == CellType_BasementWall ) {
+			// catch invalid types
+			assert( std::set< int >( { CellType_BasementWall, CellType_BasementFloor, CellType_ZoneGroundInterface, CellType_BasementCorner } ).count(cell.CellType) != 0 );
+
+			if ( cell.CellType == CellType_BasementWall ) {
 				// Get the average basement wall heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains( DomainNum ).WallHeatFlux;
-
 				if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex ){
 					Numerator += Beta * HeatFlux * Depth( cell ) * Height( cell );
 				} else if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex ){
 					Numerator += Beta * HeatFlux * Width( cell ) * Height( cell );
 				}
-
-			}
-			if ( SELECT_CASE_var == CellType_BasementFloor ) {
+			} else if ( cell.CellType == CellType_BasementFloor ) {
 				// Get the average basement floor heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains( DomainNum ).FloorHeatFlux;
 				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
-			}
-			if ( SELECT_CASE_var == CellType_ZoneGroundInterface ) {
+			} else if ( cell.CellType ==  CellType_ZoneGroundInterface ) {
 				// Get the average slab heat flux and add it to the tally
 				HeatFlux = PipingSystemDomains( DomainNum ).HeatFlux;
 				Numerator += Beta * HeatFlux * Width( cell ) * Depth( cell );
-			}}
+			}
 
 			//determine the neighbor types based on cell location
 			EvaluateCellNeighborDirections( DomainNum, cell );
@@ -7743,44 +7661,36 @@ namespace PlantPipingSystemsManager {
 				CurDirection = NeighborFieldCells( DirectionCounter );
 
 				//Have to be careful here to make sure heat conduction happens only in the appropriate directions
-				{ auto const SELECT_CASE_var( cell.CellType );
-				if ( SELECT_CASE_var == CellType_BasementWall ) {
+				if ( cell.CellType == CellType_BasementWall ) {
 					//No heat conduction from the X-side basementwall cell to the +x cell ( basement cutaway )
 					if ( cell.X_index == PipingSystemDomains( DomainNum ).XWallIndex && CurDirection != Direction_PositiveX ){
-
 						//Evaluate the transient expression terms
 						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 						Numerator +=  ( Beta / Resistance ) * NeighborTemp;
 						Denominator +=  ( Beta / Resistance );
 					}
-
 					//No heat conduction from the Z-side basementwall cell to the +z cell ( basement cutaway )
 					if ( cell.Z_index == PipingSystemDomains( DomainNum ).ZWallIndex && CurDirection != Direction_PositiveZ ){
-
 						//Evaluate the transient expression terms
 						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 						Numerator +=  ( Beta / Resistance ) * NeighborTemp;
 						Denominator +=  ( Beta / Resistance );
 					}
-				}
-				else if ( SELECT_CASE_var == CellType_BasementFloor ) {
+				} else if ( cell.CellType == CellType_BasementFloor ) {
 					//No heat conduction from the basement floorcell to the +y cell ( basement cutaway )
 					if ( CurDirection != Direction_PositiveY ){
-
 						//Evaluate the transient expression terms
 						EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 						Numerator +=  ( Beta / Resistance ) * NeighborTemp;
 						Denominator +=  ( Beta / Resistance );
 					}
-				}
-				
-				else if ( SELECT_CASE_var == CellType_BasementCorner || SELECT_CASE_var == CellType_ZoneGroundInterface ) {
+				} else if ( cell.CellType == CellType_ZoneGroundInterface || cell.CellType == CellType_BasementCorner ) {
 					//Heat conduction in all directions
 					//Evaluate the transient expression terms
 					EvaluateNeighborCharacteristics( DomainNum, cell, CurDirection, NeighborTemp, Resistance );
 					Numerator +=  ( Beta / Resistance ) * NeighborTemp;
 					Denominator +=  ( Beta / Resistance );
-				}}
+				}
 			}
 
 			//now that we have passed all directions, update the temperature
@@ -7796,7 +7706,7 @@ namespace PlantPipingSystemsManager {
 	//*********************************************************************************************!
 
 	Real64
-		GetZoneInterfaceHeatFlux( int const DomainNum )
+	GetZoneInterfaceHeatFlux( int const DomainNum )
 	{
 
 			// FUNCTION INFORMATION:
@@ -9575,7 +9485,7 @@ namespace PlantPipingSystemsManager {
 			ShowSevereError( "PipingSystems:" + RoutineName + ": Out of range temperatures detected in piping system simulation." );
 			ShowContinueError( "This could be due to the size of the pipe circuit in relation to the loads being imposed." );
 			ShowContinueError( "Try increasing the size of the pipe circuit and investigate sizing effects." );
-			ShowFatalError( "Preceding error( s ) cause program termination" );
+			ShowFatalError( "Preceding error(s) cause program termination" );
 		}
 
 	}
