@@ -9,6 +9,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <Shlwapi.h>
 #else
 #include <unistd.h>
 #endif
@@ -118,20 +119,24 @@ getProgramPath()
 }
 
 std::string
-getFileExtension(const std::string& fileName){
+getFileExtension(std::string const &fileName){
 	int extensionPosition = fileName.find_last_of(".");
 	return fileName.substr(extensionPosition + 1, fileName.size() - 1);
 }
 
 std::string
-removeFileExtension(const std::string& fileName){
+removeFileExtension(std::string const &fileName){
 	int extensionPosition = fileName.find_last_of(".");
 	return fileName.substr(0, extensionPosition);
 }
 
 void
-makeDirectory(std::string directoryPath)
+makeDirectory(std::string const &directoryPath)
 {
+	if (!directoryExists(directoryPath))
+		DisplayString("ERROR: " + getAbsolutePath(directoryPath) + " is not a directory.");
+
+		
 	// Create a directory if doesn't already exist
 	if ( pathExists(directoryPath) ){ // path already exists
 		if ( !(directoryExists(directoryPath)) )
@@ -156,53 +161,71 @@ makeDirectory(std::string directoryPath)
 }
 
 bool
-pathExists(std::string path)
+pathExists(std::string const &path)
 {
+#ifdef _WIN32
+	return PathFileExists(path.c_str());
+#else
 	struct stat info;
 	return (stat(path.c_str(), &info) == 0);
+#endif
 }
 
 bool
-directoryExists(std::string directoryPath)
+directoryExists(std::string const &directoryPath)
 {
+#ifdef _WIN32
+	if (PathFileExists(directoryPath.c_str()))
+		return PathIsDirectory(directoryPath.c_str());
+	else
+		return false;
+#else
 	struct stat info;
 	if ( stat(directoryPath.c_str(), &info) == 0){
 		return (info.st_mode & S_IFDIR);
 	}
 	else
 		return false;
+#endif
 }
 
 bool
-fileExists(std::string filePath)
+fileExists(std::string const &filePath)
 {
+#ifdef _WIN32
+	if (PathFileExists(filePath.c_str()))
+		return !PathIsDirectory(filePath.c_str());
+	else
+		return false;
+#else
 	struct stat info;
 	if ( stat(filePath.c_str(), &info) == 0){
 		return !(info.st_mode & S_IFDIR);
 	}
 	else
 		return false;
+#endif
 }
 
 void
-moveFile(std::string filePath, std::string destination){
+moveFile(std::string const &filePath, std::string const &destination){
 	rename(filePath.c_str(), destination.c_str());
 }
 
 int
-systemCall(std::string command)
+systemCall(std::string const &command)
 {
 	return system(command.c_str());
 }
 
 void
-removeFile(std::string fileName)
+removeFile(std::string const &fileName)
 {
 	remove(fileName.c_str());
 }
 
 void
-linkFile(std::string fileName, std::string link)
+linkFile(std::string const &fileName, std::string const &link)
 {
 #ifdef _WIN32
 	CopyFile(fileName.c_str(), link.c_str(), false);

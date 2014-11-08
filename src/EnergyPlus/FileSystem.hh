@@ -13,45 +13,45 @@ void
 makeNativePath(std::string &path);
 
 std::string
-getFileName( std::string const& filePath );
+getFileName( std::string const &filePath );
 
 std::string
-getParentDirectoryPath( std::string const& filePath );
+getParentDirectoryPath( std::string const &filePath );
 
 std::string
-getAbsolutePath( std::string const& filePath );
+getAbsolutePath( std::string const &filePath );
 
 std::string getProgramPath();
 
 std::string
-getFileExtension(const std::string& fileName);
+getFileExtension(std::string const &fileName);
 
 std::string
-removeFileExtension(const std::string& fileName);
+removeFileExtension(std::string const &fileName);
 
 void
-makeDirectory(std::string directoryPath);
+makeDirectory(std::string const &directoryPath);
 
 bool
-pathExists(std::string path);
+pathExists(std::string const &path);
 
 bool
-directoryExists(std::string directoryPath);
+directoryExists(std::string const &directoryPath);
 
 bool
-fileExists(std::string filePath);
+fileExists(std::string const &filePath);
 
 void
-moveFile(std::string filePath, std::string destination);
+moveFile(std::string const &filePath, std::string const &destination);
 
 int
-systemCall(std::string command);
+systemCall(std::string const &command);
 
 void
-removeFile(std::string fileName);
+removeFile(std::string const &fileName);
 
 void
-linkFile(std::string fileName, std::string link);
+linkFile(std::string const &fileName, std::string const &link);
 
 
 }

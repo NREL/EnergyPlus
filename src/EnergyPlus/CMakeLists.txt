@@ -530,6 +530,9 @@ target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport DEl
 if(UNIX AND NOT APPLE)
   target_link_libraries( energypluslib dl )
 endif()
+if (WIN32)
+  target_link_libraries( energypluslib Shlwapi )
+endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
 add_library( energyplusapi SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
