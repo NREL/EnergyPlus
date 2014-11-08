@@ -669,12 +669,12 @@ namespace HeatBalanceHAMTManager {
 		bool DoReport;
 
 		// Formats
-		static gio::Fmt const Format_1966( "('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')" );
-		static gio::Fmt const Format_1965( "('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')" );
-		static gio::Fmt const Format_1968( "('HAMT cells, ',A,',',A,400(,:,',',i4))" );
-		static gio::Fmt const Format_1967( "('HAMT origins,',A,',',A,400(,:,',',f10.7))" );
-		static gio::Fmt const Format_108( "('! <Material Nominal Resistance>, Material Name,  Nominal R')" );
-		static gio::Fmt const Format_111( "('Material Nominal Resistance's,2(',',A))" );
+		static gio::Fmt Format_1966( "('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')" );
+		static gio::Fmt Format_1965( "('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')" );
+		static gio::Fmt Format_1968( "('HAMT cells, ',A,',',A,400(,:,',',i4))" );
+		static gio::Fmt Format_1967( "('HAMT origins,',A,',',A,400(,:,',',f10.7))" );
+		static gio::Fmt Format_108( "('! <Material Nominal Resistance>, Material Name,  Nominal R')" );
+		static gio::Fmt Format_111( "('Material Nominal Resistance's,2(',',A))" );
 
 		deltat = TimeStepZone * 3600.0;
 

@@ -10650,37 +10650,37 @@ namespace RefrigeratedCase {
 		std::string ChrOut2;
 
 		// Formats
-		static gio::Fmt const Format_101( "(A)" );
-		static gio::Fmt const Format_102( "(4X,A)" );
-		static gio::Fmt const Format_103( "(2X,A)" );
-		static gio::Fmt const Format_104( "('! <Refrigeration Compressor Rack>,Compressor Rack Name,',' # Refrigerated Cases Connected,# WalkIn Coolers Connected, Heat Rejection Location, ','Condenser Type, COP')" );
-		static gio::Fmt const Format_105( "('!',2x,'<Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,','Zone Node #,Zone Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),','Installed Lighting (W/m),Anti-Sweat (W/m),Defrost (W/m)')" );
-		static gio::Fmt const Format_108( "('!',2x,'<Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)')" );
-		static gio::Fmt const Format_109( "('! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks')" );
-		static gio::Fmt const Format_114( "(',',1X,F7.1)" );
-		static gio::Fmt const Format_117( "('! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems')" );
-		static gio::Fmt const Format_118( "('! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used',', # Refrigerated Cases Connected, # WalkInCoolers Connected, #Air Chillers Connected',', # Secondary Loops Served, # Cascade Condensers Served',', # Mechanical Subcoolers Served, # Compressors Connected',', # Compression Stages, Intercooler Type, Intercooler Effectiveness',', # Subcoolers Connected, Minimum Condensing Temperature (C)')" );
-		static gio::Fmt const Format_119( "('!',2x,'<Refrigeration Walk In Cooler>, Walk In Number, Walk In Name,','Capacity (W),Temperature (C),Coil Fan (W), Circulating Fan (W), ','Lighting (W),Heaters (W),Defrost (W), # Zones')" );
-		static gio::Fmt const Format_120( "('! <#Detailed Transcritical Refrigeration Systems>,Number of Detailed Transcritical Refrigeration Systems')" );
-		static gio::Fmt const Format_121( "('! <Detailed Transcritical Refrigeration System>,Transcritical Refrigeration System Name,Refrigerant Used',', # Medium Temperature Refrigerated Cases Connected, # Low Temperature Refrigerated Cases Connected',', # Medium Temperature WalkInCoolers Connected, # Low Temperature WalkInCoolers Connected',', # High Pressure Compressors Connected, # Low Pressure Compressors Connected',', Minimum Condensing Temperature (C)')" );
-		static gio::Fmt const Format_123( "('!',2x,'<Secondary Load>, Secondary System Served Name, Secondary Number')" );
-		static gio::Fmt const Format_126( "('!',2x,'<Refrigeration Mechanical Subcooler>, Subcooler Number, Subcooler Name, ','Name of System Providing Cooling, Design Outlet Temperature (C)')" );
-		static gio::Fmt const Format_127( "('!',2x,'<Refrigeration Liquid Suction Subcooler>, Subcooler Number, Subcooler Name, ','Design Subcooling (DeltaC),','Design liquid inlet temperature (C), Design vapor inlet temperature (C)')" );
-		static gio::Fmt const Format_128( "('!',2x,'<Cascade Load>, System Name Connected, Condenser Number, Condenser Name')" );
-		static gio::Fmt const Format_129( "('!',2x,'<Refrigeration Condenser:Air-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature (C),','Rated Capacity (W), Rated Fan Power (W)')" );
-		static gio::Fmt const Format_130( "('!',2x,'<Refrigeration Condenser:Water-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature (C),','Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)')" );
-		static gio::Fmt const Format_131( "('!',2x,'<Refrigeration Condenser:Evaporative-Cooled>,Condenser Number,Condenser Name,','Rated Capacity (W), Rated Fan Power (W)')" );
-		static gio::Fmt const Format_132( "('!',2x,'<Refrigeration Condenser:Cascade>, Condenser Number, Condenser Name,',' Condensing Temperature Control Type, Rated Condensing Temperature (C),',' Capacity (W), Approach Temperature Difference (DeltaC)')" );
-		static gio::Fmt const Format_133( "('! <Secondary Refrigeration System: Fluid Always Liquid>, Secondary Number, Secondary Name,',' # Refrigerated Cases Connected, # WalkIn Coolers Connected,',' Fluid Name, Capacity (W),Evap Temperature in Secondary Evaporator (C),',' Approach Temperature Difference (DeltaC), Temperature Range (DeltaC), TotalPumpPower (W)')" );
-		static gio::Fmt const Format_134( "('!',6x,'<Walk-In Surfaces Facing Zone>, ZoneName,',' Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors (m2), HeightStockDoors,',' UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m), ',' UValueGlassDoors (W/m2-C)')" );
-		static gio::Fmt const Format_141( "('!',2x,'<Mechanical Subcooler Load>, Subcooler Number, Subcooler Name')" );
-		static gio::Fmt const Format_142( "('! <#Secondary Refrigeration Systems>,Number of Secondary Refrigeration Systems')" );
-		static gio::Fmt const Format_146( "('! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name,',' # Refrigerated Cases Connected, # WalkIn Coolers Connected, #Air Coils Connected',' Fluid Name, Capacity (W),Evap Temperature in Secondary Evaporator (C),',' Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)')" );
-		static gio::Fmt const Format_148( "('! <#ZoneHVAC/Refrigeration Air Chiller Sets>,Number of ZoneHVAC/Refrigeration Air Chiller Sets')" );
-		static gio::Fmt const Format_149( "('! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name,',' # Air Chillers Connected, Zone Location')" );
-		static gio::Fmt const Format_151( "('!',2x,'<Refrigeration Air Chiller>,Refrigeration Chiller Number, Refrigeration Chiller Name,Zone Name,','Zone Node #,Zone Node Name,Sensible Capacity (W/C),Sensible Capacity (W),Evaporating Temperature (C),DT1 (C),','Fan Power (W),Heater (W),Defrost (W), Air Flow Rate (m3/s)')" );
-		static gio::Fmt const Format_152( "('!',2x,'<Air Chiller Load>, Air Chiller Name, Air Chiller Number, Zone Name,')" );
-		static gio::Fmt const Format_160( "('!',2x,'<Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure (Pa),','Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)')" );
+		static gio::Fmt Format_101( "(A)" );
+		static gio::Fmt Format_102( "(4X,A)" );
+		static gio::Fmt Format_103( "(2X,A)" );
+		static gio::Fmt Format_104( "('! <Refrigeration Compressor Rack>,Compressor Rack Name,',' # Refrigerated Cases Connected,# WalkIn Coolers Connected, Heat Rejection Location, ','Condenser Type, COP')" );
+		static gio::Fmt Format_105( "('!',2x,'<Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,','Zone Node #,Zone Node Name,Capacity (W/m),LHR,Temperature (C),Length (m),Fan (W/m),','Installed Lighting (W/m),Anti-Sweat (W/m),Defrost (W/m)')" );
+		static gio::Fmt Format_108( "('!',2x,'<Refrigeration Compressor>,Compressor Number,Compressor Name,Nominal Capacity (W)')" );
+		static gio::Fmt Format_109( "('! <#Refrigeration Compressor Racks>,Number of Refrigeration Compressor Racks')" );
+		static gio::Fmt Format_114( "(',',1X,F7.1)" );
+		static gio::Fmt Format_117( "('! <#Detailed Refrigeration Systems>,Number of Detailed Refrigeration Systems')" );
+		static gio::Fmt Format_118( "('! <Detailed Refrigeration System>,Refrigeration System Name,Refrigerant Used',', # Refrigerated Cases Connected, # WalkInCoolers Connected, #Air Chillers Connected',', # Secondary Loops Served, # Cascade Condensers Served',', # Mechanical Subcoolers Served, # Compressors Connected',', # Compression Stages, Intercooler Type, Intercooler Effectiveness',', # Subcoolers Connected, Minimum Condensing Temperature (C)')" );
+		static gio::Fmt Format_119( "('!',2x,'<Refrigeration Walk In Cooler>, Walk In Number, Walk In Name,','Capacity (W),Temperature (C),Coil Fan (W), Circulating Fan (W), ','Lighting (W),Heaters (W),Defrost (W), # Zones')" );
+		static gio::Fmt Format_120( "('! <#Detailed Transcritical Refrigeration Systems>,Number of Detailed Transcritical Refrigeration Systems')" );
+		static gio::Fmt Format_121( "('! <Detailed Transcritical Refrigeration System>,Transcritical Refrigeration System Name,Refrigerant Used',', # Medium Temperature Refrigerated Cases Connected, # Low Temperature Refrigerated Cases Connected',', # Medium Temperature WalkInCoolers Connected, # Low Temperature WalkInCoolers Connected',', # High Pressure Compressors Connected, # Low Pressure Compressors Connected',', Minimum Condensing Temperature (C)')" );
+		static gio::Fmt Format_123( "('!',2x,'<Secondary Load>, Secondary System Served Name, Secondary Number')" );
+		static gio::Fmt Format_126( "('!',2x,'<Refrigeration Mechanical Subcooler>, Subcooler Number, Subcooler Name, ','Name of System Providing Cooling, Design Outlet Temperature (C)')" );
+		static gio::Fmt Format_127( "('!',2x,'<Refrigeration Liquid Suction Subcooler>, Subcooler Number, Subcooler Name, ','Design Subcooling (DeltaC),','Design liquid inlet temperature (C), Design vapor inlet temperature (C)')" );
+		static gio::Fmt Format_128( "('!',2x,'<Cascade Load>, System Name Connected, Condenser Number, Condenser Name')" );
+		static gio::Fmt Format_129( "('!',2x,'<Refrigeration Condenser:Air-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature (C),','Rated Capacity (W), Rated Fan Power (W)')" );
+		static gio::Fmt Format_130( "('!',2x,'<Refrigeration Condenser:Water-Cooled>,Condenser Number,Condenser Name,Rated Condensing Temperature (C),','Rated Capacity (W), Rated Water Inlet Temperature (C), Rated Water Flow Rate (m3/s)')" );
+		static gio::Fmt Format_131( "('!',2x,'<Refrigeration Condenser:Evaporative-Cooled>,Condenser Number,Condenser Name,','Rated Capacity (W), Rated Fan Power (W)')" );
+		static gio::Fmt Format_132( "('!',2x,'<Refrigeration Condenser:Cascade>, Condenser Number, Condenser Name,',' Condensing Temperature Control Type, Rated Condensing Temperature (C),',' Capacity (W), Approach Temperature Difference (DeltaC)')" );
+		static gio::Fmt Format_133( "('! <Secondary Refrigeration System: Fluid Always Liquid>, Secondary Number, Secondary Name,',' # Refrigerated Cases Connected, # WalkIn Coolers Connected,',' Fluid Name, Capacity (W),Evap Temperature in Secondary Evaporator (C),',' Approach Temperature Difference (DeltaC), Temperature Range (DeltaC), TotalPumpPower (W)')" );
+		static gio::Fmt Format_134( "('!',6x,'<Walk-In Surfaces Facing Zone>, ZoneName,',' Wall/Ceiling Area (m2), UValue (W/m2-C), AreaStockDoors (m2), HeightStockDoors,',' UValueStockDoors (W/m2-C), AreaGlassDoors (m2), HeightGlassDoors (m), ',' UValueGlassDoors (W/m2-C)')" );
+		static gio::Fmt Format_141( "('!',2x,'<Mechanical Subcooler Load>, Subcooler Number, Subcooler Name')" );
+		static gio::Fmt Format_142( "('! <#Secondary Refrigeration Systems>,Number of Secondary Refrigeration Systems')" );
+		static gio::Fmt Format_146( "('! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name,',' # Refrigerated Cases Connected, # WalkIn Coolers Connected, #Air Coils Connected',' Fluid Name, Capacity (W),Evap Temperature in Secondary Evaporator (C),',' Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)')" );
+		static gio::Fmt Format_148( "('! <#ZoneHVAC/Refrigeration Air Chiller Sets>,Number of ZoneHVAC/Refrigeration Air Chiller Sets')" );
+		static gio::Fmt Format_149( "('! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name,',' # Air Chillers Connected, Zone Location')" );
+		static gio::Fmt Format_151( "('!',2x,'<Refrigeration Air Chiller>,Refrigeration Chiller Number, Refrigeration Chiller Name,Zone Name,','Zone Node #,Zone Node Name,Sensible Capacity (W/C),Sensible Capacity (W),Evaporating Temperature (C),DT1 (C),','Fan Power (W),Heater (W),Defrost (W), Air Flow Rate (m3/s)')" );
+		static gio::Fmt Format_152( "('!',2x,'<Air Chiller Load>, Air Chiller Name, Air Chiller Number, Zone Name,')" );
+		static gio::Fmt Format_160( "('!',2x,'<Refrigeration GasCooler:Air-Cooled>,Gas Cooler Number, Gas Cooler Name, Rated Outlet Pressure (Pa),','Rated Outlet Temperature (C), Rated Approach Temperature (C), Rated Capacity (W), Rated Fan Power (W)')" );
 
 		// 111 FORMAT(',',1X,F6.3) ! compressor rack output line
 		// 112 FORMAT(',',1X,F16.0)! compressor output line

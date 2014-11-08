@@ -236,7 +236,7 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// Formats
-		static gio::Fmt const Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
+		static gio::Fmt Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -365,7 +365,7 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		Real64 const VentilTempLimit( 100.0 ); // degrees Celsius
 		Real64 const MixingTempLimit( 100.0 ); // degrees Celsius
 		Real64 const VentilWSLimit( 40.0 ); // m/s
@@ -434,11 +434,11 @@ namespace HeatBalanceAirManager {
 		int IsSourceZone;
 
 		// Formats
-		static gio::Fmt const Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt const Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
-		static gio::Fmt const Format_722( "(' ',A,', ',A)" );
-		static gio::Fmt const Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
+		static gio::Fmt Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
+		static gio::Fmt Format_722( "(' ',A,', ',A)" );
+		static gio::Fmt Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
 
 		RepVarSet.dimension( NumOfZones, true );
 
@@ -2805,8 +2805,8 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
-		static gio::Fmt const RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
+		static gio::Fmt RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
+		static gio::Fmt RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

@@ -169,7 +169,7 @@ namespace DataSystemVariables {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const blank;
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

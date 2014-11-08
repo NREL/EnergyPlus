@@ -2410,7 +2410,7 @@ namespace ThermalComfort {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2670,7 +2670,7 @@ namespace ThermalComfort {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 const alpha( 0.8 );
 		static FArray1D< Real64 > const alpha_pow( { pow_6( alpha ), pow_5( alpha ), pow_4( alpha ), pow_3( alpha ), pow_2( alpha ), alpha, 1.0 } ); // alpha^(7-i)
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

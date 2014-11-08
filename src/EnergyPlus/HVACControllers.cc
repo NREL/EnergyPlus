@@ -205,9 +205,9 @@ namespace HVACControllers {
 	FArray1D< RootFinderDataType > RootFinders;
 	FArray1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmtAA( "(A,A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmtAA( "(A,A)" );
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************

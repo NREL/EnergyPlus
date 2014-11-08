@@ -742,14 +742,14 @@ namespace ZoneEquipmentManager {
 		int DSOAPtr; // index to DesignSpecification:OutdoorAir object
 
 		// Formats
-		static gio::Fmt const Format_890( "('! <Load Timesteps in Zone Design Calculation Averaging Window>, Value')" );
-		static gio::Fmt const Format_891( "(' Load Timesteps in Zone Design Calculation Averaging Window, ',I4)" );
-		static gio::Fmt const Format_990( "('! <Heating Sizing Factor Information>, Sizing Factor ID, Value')" );
-		static gio::Fmt const Format_991( "(' Heating Sizing Factor Information, Global, ',G12.5)" );
-		static gio::Fmt const Format_992( "(' Heating Sizing Factor Information, Zone ',A,', ',G12.5)" );
-		static gio::Fmt const Format_993( "('! <Cooling Sizing Factor Information>, Sizing Factor ID, Value')" );
-		static gio::Fmt const Format_994( "(' Cooling Sizing Factor Information, Global, ',G12.5)" );
-		static gio::Fmt const Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
+		static gio::Fmt Format_890( "('! <Load Timesteps in Zone Design Calculation Averaging Window>, Value')" );
+		static gio::Fmt Format_891( "(' Load Timesteps in Zone Design Calculation Averaging Window, ',I4)" );
+		static gio::Fmt Format_990( "('! <Heating Sizing Factor Information>, Sizing Factor ID, Value')" );
+		static gio::Fmt Format_991( "(' Heating Sizing Factor Information, Global, ',G12.5)" );
+		static gio::Fmt Format_992( "(' Heating Sizing Factor Information, Zone ',A,', ',G12.5)" );
+		static gio::Fmt Format_993( "('! <Cooling Sizing Factor Information>, Sizing Factor ID, Value')" );
+		static gio::Fmt Format_994( "(' Cooling Sizing Factor Information, Global, ',G12.5)" );
+		static gio::Fmt Format_995( "(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)" );
 
 		for ( ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex ) {
 			ZoneIndex = FindItemInList( ZoneSizingInput( ZoneSizIndex ).ZoneName, Zone.Name(), NumOfZones );
@@ -1741,15 +1741,15 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const ZSizeFmt10( "('Time')" );
-		static gio::Fmt const ZSizeFmt11( "(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )" );
-		static gio::Fmt const ZSizeFmt20( "(I2.2,':',I2.2,':00')" );
-		static gio::Fmt const ZSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
-		static gio::Fmt const ZSizeFmt30( "('Peak')" );
-		static gio::Fmt const ZSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static gio::Fmt const ZSizeFmt40( "(/'Peak Vol Flow (m3/s)')" );
-		static gio::Fmt const ZSizeFmt41( "(A1,A1,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt ZSizeFmt10( "('Time')" );
+		static gio::Fmt ZSizeFmt11( "(A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A,A1,A,':',A,A )" );
+		static gio::Fmt ZSizeFmt20( "(I2.2,':',I2.2,':00')" );
+		static gio::Fmt ZSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
+		static gio::Fmt ZSizeFmt30( "('Peak')" );
+		static gio::Fmt ZSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt ZSizeFmt40( "(/'Peak Vol Flow (m3/s)')" );
+		static gio::Fmt ZSizeFmt41( "(A1,A1,A1,ES12.6,A1,ES12.6)" );
 		static std::string const RoutineName( "UpdateZoneSizing" );
 
 		// INTERFACE BLOCK SPECIFICATIONS

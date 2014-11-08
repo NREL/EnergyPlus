@@ -399,8 +399,8 @@ namespace OutputReportTabular {
 	FArray1D< TOCEntriesType > TOCEntries;
 	FArray1D< UnitConvType > UnitConv;
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// Functions
 
@@ -3048,8 +3048,8 @@ namespace OutputReportTabular {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
-		static gio::Fmt const TimeStampFmt2( "(A,I2.2,A,I2.2,A,I2.2,A)" );
+		static gio::Fmt TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
+		static gio::Fmt TimeStampFmt2( "(A,I2.2,A,I2.2,A,I2.2,A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -12202,8 +12202,8 @@ namespace OutputReportTabular {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
-		static gio::Fmt const TimeStampFmt2( "(A,I4.2,A,I2.2,A,I2.2,A)" );
+		static gio::Fmt TimeStampFmt1( "(A,I4,A,I2.2,A,I2.2)" );
+		static gio::Fmt TimeStampFmt2( "(A,I4.2,A,I2.2,A,I2.2,A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -13233,7 +13233,7 @@ namespace OutputReportTabular {
 		// FUNCTION PARAMETER DEFINITIONS:
 		static FArray1D< gio::Fmt > const formDigits( {0,9}, { "(F12.0)", "(F12.1)", "(F12.2)", "(F12.3)", "(F12.4)", "(F12.5)", "(F12.6)", "(F12.7)", "(F12.8)", "(F12.9)" } ); // formDigits(0) | formDigits(1) | formDigits(2) | formDigits(3) | formDigits(4) | formDigits(5) | formDigits(6) | formDigits(7) | formDigits(8) | formDigits(9)
 		static FArray1D< Real64 > const maxvalDigits( {0,9}, { 9999999999.0, 999999999.0, 99999999.0, 9999999.0, 999999.0, 99999.0, 9999.0, 999.0, 99.0, 9.0 } ); // maxvalDigits(0) | maxvalDigits(1) | maxvalDigits(2) | maxvalDigits(3) | maxvalDigits(4) | maxvalDigits(5) | maxvalDigits(6) | maxvalDigits(7) | maxvalDigits(8) | maxvalDigits(9)
-		static gio::Fmt const fmtd( "(E12.6)" );
+		static gio::Fmt fmtd( "(E12.6)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -13326,7 +13326,7 @@ Label900: ;
 
 		// Locals
 		// ((month*100 + day)*100 + hour)*100 + minute
-		static gio::Fmt const DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
+		static gio::Fmt DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
 
 		int Month; // month in integer format (1-12)
 		int Day; // day in integer format (1-31)

@@ -90,9 +90,9 @@ AbortEnergyPlus(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const OutFmt( "('Press ENTER to continue after reading above message>')" );
-	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt OutFmt( "('Press ENTER to continue after reading above message>')" );
+	static gio::Fmt ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -387,8 +387,8 @@ EndEnergyPlus()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -1572,8 +1572,8 @@ ShowErrorMessage(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const ErrorFormat( "(2X,A)" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt ErrorFormat( "(2X,A)" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -1702,7 +1702,7 @@ ShowRecurringErrors()
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
     using General::strip_trailing_zeros;
-	
+
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 	// na

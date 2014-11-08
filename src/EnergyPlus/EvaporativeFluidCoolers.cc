@@ -2367,7 +2367,7 @@ namespace EvaporativeFluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const LowTempFmt( "(' ',F6.2)" );
+		static gio::Fmt LowTempFmt( "(' ',F6.2)" );
 		Real64 const TempAllowance( 0.02 ); // Minimum difference b/w fluid cooler water outlet temp and
 		// minimum condenser loop temp [C]
 

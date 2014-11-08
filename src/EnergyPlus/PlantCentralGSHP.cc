@@ -933,8 +933,8 @@ namespace PlantCentralGSHP {
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 
 		// Formats
-		static gio::Fmt const Format_530( "('Curve Output = ',11(F7.2))" );
-		static gio::Fmt const Format_550( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_530( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
 		NumChillerHeaters = GetNumObjectsFound( cCurrentModuleObject );

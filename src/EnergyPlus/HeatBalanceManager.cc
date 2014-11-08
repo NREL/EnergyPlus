@@ -128,7 +128,7 @@ namespace HeatBalanceManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS
 	static std::string const BlankString;
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtA( "(A)" );
 
 	FArray1D_string const PassFail( 2, { "Fail", "Pass" } );
 
@@ -551,9 +551,9 @@ namespace HeatBalanceManager {
 			int numLayersInThisConstruct( NumAlpha - 1 );
 			MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
 		}
-		
+
 		// construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor, Construction:InternalSource
-		
+
 
 	}
 
@@ -611,19 +611,19 @@ namespace HeatBalanceManager {
 		std::string::size_type TMP;
 
 		// Formats
-		static gio::Fmt const Format_721( "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days')" );
-		static gio::Fmt const Format_720( "(' Building Information',8(',',A))" );
-		static gio::Fmt const Format_722( "('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)" );
-		static gio::Fmt const Format_723( "('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)" );
-		static gio::Fmt const Format_724( "('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')" );
-		static gio::Fmt const Format_726( "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')" );
-		static gio::Fmt const Format_727( "(' Zone Air Solution Algorithm, ',A)" );
-		static gio::Fmt const Format_728( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
-		static gio::Fmt const Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
-		static gio::Fmt const Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
-		static gio::Fmt const Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
-		static gio::Fmt const Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
-		static gio::Fmt const Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
+		static gio::Fmt Format_721( "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum Number of Warmup Days')" );
+		static gio::Fmt Format_720( "(' Building Information',8(',',A))" );
+		static gio::Fmt Format_722( "('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)" );
+		static gio::Fmt Format_723( "('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)" );
+		static gio::Fmt Format_724( "('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')" );
+		static gio::Fmt Format_726( "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')" );
+		static gio::Fmt Format_727( "(' Zone Air Solution Algorithm, ',A)" );
+		static gio::Fmt Format_728( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')" );
+		static gio::Fmt Format_730( "(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)" );
+		static gio::Fmt Format_729( "('! <Zone Air Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')" );
+		static gio::Fmt Format_731( "(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)" );
+		static gio::Fmt Format_732( "('! <Zone Air Mass Flow Balance Simulation>, Simulation {Yes/No}')");
+		static gio::Fmt Format_733( "(' Zone Air Mass Flow Balance Simulation, ',A)");
 
 		//Assign the values to the building data
 
@@ -1142,7 +1142,7 @@ namespace HeatBalanceManager {
 		FArray1D< Real64 > NumArray( 3 ); // Numeric data
 
 		// Formats
-		static gio::Fmt const Format_720( "('Environment:Site Atmospheric Variation',3(',',A))" );
+		static gio::Fmt Format_720( "('Environment:Site Atmospheric Variation',3(',',A))" );
 
 		// FLOW:
 		CurrentModuleObject = "Site:HeightVariation";
@@ -1267,8 +1267,8 @@ namespace HeatBalanceManager {
 		int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
 		// Formats
-		static gio::Fmt const Format_701( "(' Material Details',10(',',A))" );
-		static gio::Fmt const Format_702( "(' Material:Air',2(',',A))" );
+		static gio::Fmt Format_701( "(' Material Details',10(',',A))" );
+		static gio::Fmt Format_702( "(' Material:Air',2(',',A))" );
 
 		// FLOW:
 
@@ -4598,8 +4598,8 @@ namespace HeatBalanceManager {
 		static bool FirstWarmupWrite( true );
 
 		// Formats
-		static gio::Fmt const Format_731( "(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_732( "('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {deltaC},','Warmup Load Difference {W}')" );
+		static gio::Fmt Format_731( "(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_732( "('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {deltaC},','Warmup Load Difference {W}')" );
 
 		// FLOW:
 
@@ -4870,8 +4870,8 @@ namespace HeatBalanceManager {
 		int Num; // loop control
 
 		// Formats
-		static gio::Fmt const Format_730( "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference {deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference {W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')" );
-		static gio::Fmt const Format_731( "(' Warmup Convergence Information',10(',',A))" );
+		static gio::Fmt Format_730( "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference {deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference {W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')" );
+		static gio::Fmt Format_731( "(' Warmup Convergence Information',10(',',A))" );
 
 		if ( ! WarmupFlag ) { // Report out average/std dev
 			// Write Warmup Convervence Information to the initialization output file
@@ -4955,8 +4955,8 @@ namespace HeatBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
-		static gio::Fmt const EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
+		static gio::Fmt EndOfHeaderFormat( "('End of Data Dictionary')" ); // End of data dictionary marker
+		static gio::Fmt EnvironmentStampFormat( "(a,',',a,3(',',f7.2),',',f7.2)" ); // Format descriptor for environ stamp
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

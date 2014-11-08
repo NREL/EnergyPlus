@@ -318,7 +318,7 @@ namespace ChillerElectricEIR {
 		bool Okay;
 
 		// Formats
-		static gio::Fmt const Format_530( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_530( "('Curve Output = ',11(F7.2))" );
 
 		// FLOW
 
@@ -653,7 +653,7 @@ namespace ChillerElectricEIR {
 					ShowContinueError( "EIR as a function of PLR curve output at various part-load ratios shown below:" );
 					ShowContinueError( "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
 					gio::write( StringVar, "'Curve Output = '" );
-					gio::Fmt const fmtF72( "((F7.2),$)" );
+					static gio::Fmt fmtF72( "((F7.2),$)" );
 					for ( CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr ) {
 						gio::write( StringVar, fmtF72 ) << CurveValArray( CurveValPtr );
 					}
@@ -1367,7 +1367,7 @@ namespace ChillerElectricEIR {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcElectricEIRChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS

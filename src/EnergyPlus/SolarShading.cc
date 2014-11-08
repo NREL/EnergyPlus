@@ -201,7 +201,7 @@ namespace SolarShading {
 	FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
 	FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
 
-	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt fmtLD( "*" );
 
 	// MODULE SUBROUTINES:
 
@@ -437,7 +437,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1321,7 +1321,7 @@ namespace SolarShading {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ValFmt( "(F20.4)" );
+		static gio::Fmt ValFmt( "(F20.4)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1532,10 +1532,10 @@ namespace SolarShading {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// MSG - for error message
 		static FArray1D_string const MSG( 4, { "misses", "", "within", "overlaps" } );
-		static gio::Fmt const AFormat( "(1X,A)" );
-		static gio::Fmt const A4Format( "(1X,A,A,A,A)" );
-		static gio::Fmt const A2I2Format( "(1X,A,I5,A,I5)" );
-		static gio::Fmt const VFormat( "(1X,A,I5,A,\"(\",2(F15.2,\",\"),F15.2,\")\")" );
+		static gio::Fmt AFormat( "(1X,A)" );
+		static gio::Fmt A4Format( "(1X,A,A,A,A)" );
+		static gio::Fmt A2I2Format( "(1X,A,I5,A,I5)" );
+		static gio::Fmt VFormat( "(1X,A,I5,A,\"(\",2(F15.2,\",\"),F15.2,\")\")" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3634,7 +3634,7 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

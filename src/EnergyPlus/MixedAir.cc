@@ -1225,8 +1225,8 @@ namespace MixedAir {
 		int i;
 
 		// Formats
-		static gio::Fmt const Format_700( "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation {Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA Name,DSZAD Name')" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt Format_700( "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation {Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA Name,DSZAD Name')" );
+		static gio::Fmt fmtA( "(A)" );
 
 		//First, call other get input routines in this module to make sure data is filled during this routine.
 		if ( GetOASysInputFlag ) { // Gets input for object  first time Sim routine is called

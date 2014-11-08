@@ -46,6 +46,13 @@ struct EntryFormatLD
 
 	typedef  std::size_t  Size;
 
+	// Default Constructor
+	inline
+	EntryFormatLD() :
+	 h( false ),
+	 r( 0ul )
+	{}
+
 	// Constructor
 	inline
 	explicit
@@ -66,6 +73,16 @@ struct EntryFormatLD
 		} else { // Counter was at zero
 			return false;
 		}
+	}
+
+	// Reset
+	inline
+	void
+	reset()
+	{
+		s.clear();
+		h = false;
+		r = 0ul;
 	}
 
 	std::string s; // Entry string
@@ -446,8 +463,6 @@ public: // Properties
 		return p_->spacer();
 	}
 
-public: // Methods
-
 	// Current Format
 	virtual
 	Format *
@@ -463,12 +478,16 @@ public: // Methods
 	Format *
 	next_up() = 0;
 
+public: // Methods
+
 	// Reset
+	inline
 	virtual
-	void
+	Format &
 	reset()
 	{
 		i_ = 0ul;
+		return *this;
 	}
 
 public: // Input Methods
@@ -1219,6 +1238,18 @@ public: // Properties
 		formats_ = f;
 	}
 
+public: // Methods
+
+	// Reset
+	inline
+	FormatList &
+	reset()
+	{
+		FormatCombo::reset();
+		for ( Format * format : formats_ ) format->reset();
+		return *this;
+	}
+
 private: // Data
 
 	Formats formats_;
@@ -1341,6 +1372,18 @@ public: // Properties
 		format_ = f;
 	}
 
+public: // Methods
+
+	// Reset
+	inline
+	FormatGroup &
+	reset()
+	{
+		FormatCombo::reset();
+		if ( format_ ) format_->reset();
+		return *this;
+	}
+
 private: // Data
 
 	Format * format_;
@@ -1412,11 +1455,11 @@ public: // Creation
 	inline
 	FormatGroupTop( FormatGroupTop const & f, Format * p = nullptr ) :
 	 FormatGroup( f, p ),
-	 P_( f.P_ ),
-	 blank_zero_( f.blank_zero_ ),
-	 colon_terminated_( f.colon_terminated_ ),
-	 slash_terminated_( f.slash_terminated_ ),
-	 non_advancing_( f.non_advancing_ ),
+	 P_( 0 ),
+	 blank_zero_( false ),
+	 colon_terminated_( false ),
+	 slash_terminated_( false ),
+	 non_advancing_( false ),
 	 reverted_( false ),
 	 reverts_( 0ul ),
 	 ir_( 0ul ),
@@ -1428,11 +1471,11 @@ public: // Creation
 	inline
 	FormatGroupTop( FormatGroupTop && f ) :
 	 FormatGroup( std::move( f ) ),
-	 P_( f.P_ ),
-	 blank_zero_( f.blank_zero_ ),
-	 colon_terminated_( f.colon_terminated_ ),
-	 slash_terminated_( f.slash_terminated_ ),
-	 non_advancing_( f.non_advancing_ ),
+	 P_( 0 ),
+	 blank_zero_( false ),
+	 colon_terminated_( false ),
+	 slash_terminated_( false ),
+	 non_advancing_( false ),
 	 reverted_( false ),
 	 reverts_( 0ul ),
 	 ir_( 0ul ),
@@ -1465,11 +1508,11 @@ public: // Assignment
 	{
 		if ( this != &f ) {
 			FormatGroup::operator =( f );
-			P_ = f.P_;
-			blank_zero_ = f.blank_zero_;
-			colon_terminated_ = f.colon_terminated_;
-			slash_terminated_ = f.slash_terminated_;
-			non_advancing_ = f.non_advancing_;
+			P_ = 0;
+			blank_zero_ = false;
+			colon_terminated_ = false;
+			slash_terminated_ = false;
+			non_advancing_ = false;
 			reverted_ = false;
 			reverts_ = 0ul;
 			ir_ = 0ul;
@@ -1477,17 +1520,6 @@ public: // Assignment
 			spacer_ = false;
 		}
 		return *this;
-	}
-
-	// Reset
-	virtual
-	void
-	reset()
-	{
-		FormatGroup::reset();
-		ir_ = 0ul;
-		fr_ = nullptr;
-		spacer_ = false;
 	}
 
 public: // Properties
@@ -1628,6 +1660,27 @@ public: // Properties
 		reverted_ = true;
 		++reverts_;
 		return revert();
+	}
+
+public: // Methods
+
+	// Reset
+	inline
+	FormatGroupTop &
+	reset()
+	{
+		FormatGroup::reset();
+		P_ = 0;
+		blank_zero_ = false;
+		colon_terminated_ = false;
+		slash_terminated_ = false;
+		non_advancing_ = false;
+		reverted_ = false;
+		reverts_ = 0ul;
+		ir_ = 0ul;
+		fr_ = nullptr;
+		spacer_ = false;
+		return *this;
 	}
 
 private: // Methods
@@ -2673,7 +2726,7 @@ public: // Properties
 		return ( w_ != NOSIZE );
 	}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -2803,6 +2856,8 @@ public: // Methods
 	// Input
 	void
 	in( std::istream & stream, Fstring & s );
+
+public: // Output Methods
 
 	// Output
 	inline
@@ -3175,7 +3230,7 @@ public: // Properties
 		return m_;
 	}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -3414,7 +3469,7 @@ public: // Creation
 	~FormatI()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -3520,7 +3575,7 @@ public: // Creation
 	~FormatB()
 	{}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -3635,6 +3690,8 @@ public: // Methods
 	{
 		read_binary_reinterpret( stream, v );
 	}
+
+public: // Output Methods
 
 	// Output
 	void
@@ -3759,7 +3816,7 @@ public: // Creation
 	~FormatO()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -3864,7 +3921,7 @@ public: // Creation
 	~FormatZ()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4087,7 +4144,7 @@ public: // Properties
 		return d_;
 	}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -4305,7 +4362,7 @@ public: // Creation
 	~FormatF()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4425,7 +4482,7 @@ public: // Creation
 	~FormatG()
 	{}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	void
@@ -4526,6 +4583,8 @@ public: // Methods
 	// Input
 	void
 	in( std::istream & stream, Fstring & s );
+
+public: // Output Methods
 
 	// Output
 	void
@@ -4636,7 +4695,7 @@ public: // Creation
 	~FormatE()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4690,7 +4749,7 @@ public: // Creation
 	~FormatEN()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4744,7 +4803,7 @@ public: // Creation
 	~FormatES()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4798,7 +4857,7 @@ public: // Creation
 	~FormatD()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4829,16 +4888,14 @@ public: // Creation
 	inline
 	explicit
 	FormatLD( Format * p ) :
-	 FormatLeaf( p ),
-	 entry_( std::string(), true, 0ul )
+	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
 	inline
 	explicit
 	FormatLD( FormatLD const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 entry_( f.entry_ )
+	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -4854,6 +4911,19 @@ public: // Creation
 	virtual
 	~FormatLD()
 	{}
+
+public: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( FormatLD const & f )
+	{
+		if ( this != &f ) {
+			FormatLeaf::operator =( f );
+			entry_.reset(); // Don't assign entry
+		}
+	}
 
 public: // Properties
 
@@ -4904,6 +4974,18 @@ public: // Properties
 	}
 
 public: // Methods
+
+	// Reset
+	inline
+	FormatLD &
+	reset()
+	{
+		FormatLeaf::reset();
+		entry_.reset();
+		return *this;
+	}
+
+public: // Input Methods
 
 	// Input
 	inline
@@ -5036,6 +5118,8 @@ public: // Methods
 	// Input
 	void
 	in( std::istream & stream, Fstring & s );
+
+public: // Output Methods
 
 	// Output
 	void

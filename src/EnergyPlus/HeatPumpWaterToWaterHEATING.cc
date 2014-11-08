@@ -576,7 +576,7 @@ namespace HeatPumpWaterToWaterHEATING {
 		static std::string const RoutineNameCompressInletTemp( "CalcGSHPModel:CompressInletTemp" );
 		static std::string const RoutineNameSuctionPr( "CalcGSHPModel:SuctionPr" );
 		static std::string const RoutineNameCompSuctionTemp( "CalcGSHPModel:CompSuctionTemp" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

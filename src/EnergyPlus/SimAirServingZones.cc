@@ -2418,7 +2418,7 @@ namespace SimAirServingZones {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// Maximum iterations of an air system/controllers simulation sequence
 		int const MaxIter( 50 );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK DEFINITIONS: None
 
@@ -4440,15 +4440,15 @@ namespace SimAirServingZones {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const SSizeFmt10( "('Time')" );
-		static gio::Fmt const SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
-		static gio::Fmt const SSizeFmt20( "(I2.2,':',I2.2,':00')" );
-		static gio::Fmt const SSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static gio::Fmt const SSizeFmt30( "('Coinc Peak   ')" );
-		static gio::Fmt const SSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static gio::Fmt const SSizeFmt40( "('NonCoinc Peak')" );
-		static gio::Fmt const SSizeFmt41( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt SSizeFmt10( "('Time')" );
+		static gio::Fmt SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
+		static gio::Fmt SSizeFmt20( "(I2.2,':',I2.2,':00')" );
+		static gio::Fmt SSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt SSizeFmt30( "('Coinc Peak   ')" );
+		static gio::Fmt SSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt SSizeFmt40( "('NonCoinc Peak')" );
+		static gio::Fmt SSizeFmt41( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

@@ -386,7 +386,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "GetAirflowNetworkInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -439,8 +439,8 @@ namespace AirflowNetworkBalanceManager {
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 
 		// Formats
-		static gio::Fmt const Format_110( "('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone without Distribution/Multizone with Distribution only during Fan Operation')" );
-		static gio::Fmt const Format_120( "('AirflowNetwork Model:Control,',A)" );
+		static gio::Fmt Format_110( "('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone without Distribution/Multizone with Distribution only during Fan Operation')" );
+		static gio::Fmt Format_120( "('AirflowNetwork Model:Control,',A)" );
 
 		// Set the maximum numbers of input fields
 		GetObjectDefMaxArgs( "AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers );
@@ -3218,12 +3218,12 @@ namespace AirflowNetworkBalanceManager {
 		int SurfNum;
 
 		// Formats
-		static gio::Fmt const Format_900( "(1X,i2)" );
-		static gio::Fmt const Format_901( "(1X,2I4,4F9.4)" );
-		static gio::Fmt const Format_902( "(1X,2I4,4F9.4)" );
-		static gio::Fmt const Format_903( "(9X,4F9.4)" );
-		static gio::Fmt const Format_904( "(1X,2I4,1F9.4)" );
-		static gio::Fmt const Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
+		static gio::Fmt Format_900( "(1X,i2)" );
+		static gio::Fmt Format_901( "(1X,2I4,4F9.4)" );
+		static gio::Fmt Format_902( "(1X,2I4,4F9.4)" );
+		static gio::Fmt Format_903( "(9X,4F9.4)" );
+		static gio::Fmt Format_904( "(1X,2I4,1F9.4)" );
+		static gio::Fmt Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
 
 		AirflowNetworkNodeSimu.allocate( AirflowNetworkNumOfNodes ); // Node simulation variable in air distribution system
 		AirflowNetworkLinkSimu.allocate( AirflowNetworkNumOfLinks ); // Link simulation variable in air distribution system

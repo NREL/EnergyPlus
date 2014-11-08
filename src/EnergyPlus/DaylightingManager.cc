@@ -423,7 +423,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -460,7 +460,7 @@ namespace DaylightingManager {
 		static bool doSkyReporting( true );
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')" );
+		static gio::Fmt Format_700( "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')" );
 
 		// FLOW:
 		if ( firstTime ) {
@@ -4020,7 +4020,7 @@ namespace DaylightingManager {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -4295,7 +4295,7 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: na
 		// DERIVED TYPE DEFINITIONS: na
@@ -4903,7 +4903,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9254,8 +9254,8 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
-		static gio::Fmt const HrFmt( "(I2.2)" );
+		static gio::Fmt FmtA( "(A)" );
+		static gio::Fmt HrFmt( "(I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -9463,7 +9463,7 @@ Label903: ;
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
+		static gio::Fmt FmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9639,11 +9639,11 @@ Label903: ;
 		int MapNum;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones')" );
-		static gio::Fmt const Format_701( "('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)" );
-		static gio::Fmt const Format_702( "('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent Zone Names - 1st 100 (max)')" );
-		static gio::Fmt const Format_703( "('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)" );
-		static gio::Fmt const fmtCommaA( "(',',A,$)" );
+		static gio::Fmt Format_700( "('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones')" );
+		static gio::Fmt Format_701( "('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)" );
+		static gio::Fmt Format_702( "('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent Zone Names - 1st 100 (max)')" );
+		static gio::Fmt Format_703( "('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)" );
+		static gio::Fmt fmtCommaA( "(',',A,$)" );
 
 		// FLOW:
 		// Count number of exterior Windows (use to allocate arrays)
@@ -10257,7 +10257,7 @@ Label903: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
+		static gio::Fmt FmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

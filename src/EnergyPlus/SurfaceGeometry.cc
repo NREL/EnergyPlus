@@ -80,9 +80,9 @@ namespace SurfaceGeometry {
 	int const UnreconciledZoneSurface( -999 ); // interim value between entering surfaces ("Surface") and reconciling
 	// surface names in other zones
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmt3( "(A,3(1x,f18.13))" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmt3( "(A,3(1x,f18.13))" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -146,8 +146,8 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ValFmt( "(F20.2)" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt ValFmt( "(F20.2)" );
+		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "SetUpZoneGeometry: " );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -187,8 +187,8 @@ namespace SurfaceGeometry {
 		bool DetailedWWR;
 
 		// Formats
-		static gio::Fmt const Format_720( "(' Zone Information, ',A,28(',',A))" );
-		static gio::Fmt const Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
+		static gio::Fmt Format_720( "(' Zone Information, ',A,28(',',A))" );
+		static gio::Fmt Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
 
 		// FLOW:
 		// Allocations and initializations...
@@ -2093,7 +2093,7 @@ namespace SurfaceGeometry {
 		std::string OutMsg;
 
 		// Formats
-		static gio::Fmt const Format_720( "(A)" );
+		static gio::Fmt Format_720( "(A)" );
 
 		cCurrentModuleObject = "GlobalGeometryRules";
 		NumStmt = GetNumObjectsFound( cCurrentModuleObject );
@@ -5030,7 +5030,7 @@ namespace SurfaceGeometry {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const cModuleObjects( 4, { "Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection" } );
-		static gio::Fmt const dfmt( "(A,3(2x,f6.2))" );
+		static gio::Fmt dfmt( "(A,3(2x,f6.2))" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5934,7 +5934,7 @@ namespace SurfaceGeometry {
 		std::string AlgoName;
 
 		// Formats
-		static gio::Fmt const Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
 
 		// first initialize each heat transfer surface with the overall model type, array assignment
 		Surface.HeatTransferAlgorithm() = HeatTransferAlgosUsed( 1 );
@@ -6323,7 +6323,7 @@ namespace SurfaceGeometry {
 		using namespace DataErrorTracking;
 
 		// Locals
-		static gio::Fmt const fmt3( "(A,I5,A,3(1X,F18.13))" );
+		static gio::Fmt fmt3( "(A,I5,A,3(1X,F18.13))" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -6632,7 +6632,7 @@ namespace SurfaceGeometry {
 		using General::RoundSigDigits;
 
 		// Locals
-		static gio::Fmt const fmt3( "(A,I5,A,3(1X,F18.13))" );
+		static gio::Fmt fmt3( "(A,I5,A,3(1X,F18.13))" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -7661,7 +7661,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OSCFormat1( "('! <Other Side Coefficients>,Name," "Combined convective/radiative film coefficient {W/m2-K}," "User selected Constant Temperature {C},Coefficient modifying the constant temperature term," "Coefficient modifying the external dry bulb temperature term," "Coefficient modifying the ground temperature term," "Coefficient modifying the wind speed term {s/m}," "Coefficient modifying the zone air temperature term," "Constant Temperature Schedule Name," "Sinusoidal Variation," "Period of Sinusoidal Variation," "Previous Other Side Temperature Coefficient," "Minimum Other Side Temperature {C}," "Maximum Other Side Temperature {C}')" );
+		static gio::Fmt OSCFormat1( "('! <Other Side Coefficients>,Name," "Combined convective/radiative film coefficient {W/m2-K}," "User selected Constant Temperature {C},Coefficient modifying the constant temperature term," "Coefficient modifying the external dry bulb temperature term," "Coefficient modifying the ground temperature term," "Coefficient modifying the wind speed term {s/m}," "Coefficient modifying the zone air temperature term," "Constant Temperature Schedule Name," "Sinusoidal Variation," "Period of Sinusoidal Variation," "Previous Other Side Temperature Coefficient," "Minimum Other Side Temperature {C}," "Maximum Other Side Temperature {C}')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -7822,7 +7822,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OSCMFormat1( "('! <Other Side Conditions Model>,Name,Class')" );
+		static gio::Fmt OSCMFormat1( "('! <Other Side Conditions Model>,Name,Class')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8088,7 +8088,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const VolFmt( "(F20.2)" );
+		static gio::Fmt VolFmt( "(F20.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8841,7 +8841,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
+		static gio::Fmt ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -10444,7 +10444,7 @@ namespace SurfaceGeometry {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const TurnThreshold( 0.000001 ); // Sensitivity of convexity test, in radians
-		static gio::Fmt const ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
+		static gio::Fmt ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

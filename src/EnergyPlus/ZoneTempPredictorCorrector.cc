@@ -404,8 +404,8 @@ namespace ZoneTempPredictorCorrector {
 		FArray1D< NeededComfortControlTypes > TComfortControlTypes;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
-		static gio::Fmt const Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
+		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
+		static gio::Fmt Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
 
 		// FLOW:
 		cCurrentModuleObject = cZControlTypes( iZC_TStat );

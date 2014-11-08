@@ -2530,8 +2530,8 @@ namespace CurveManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2567,12 +2567,12 @@ namespace CurveManager {
 		IOFlags non_adv; non_adv.na_on(); // For non-advancing list-directed output
 
 		// Formats
-		static gio::Fmt const Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_110( "('! <READING LOOKUP TABLE DATA>')" );
-		static gio::Fmt const Format_130( "('READING LOOKUP TABLE DATA')" );
-		static gio::Fmt const Format_131( "('END READING LOOKUP TABLE DATA')" );
-		static gio::Fmt const Format_160( "(1X,10(I2,:,2X))" );
+		static gio::Fmt Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_110( "('! <READING LOOKUP TABLE DATA>')" );
+		static gio::Fmt Format_130( "('READING LOOKUP TABLE DATA')" );
+		static gio::Fmt Format_131( "('END READING LOOKUP TABLE DATA')" );
+		static gio::Fmt Format_160( "(1X,10(I2,:,2X))" );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		TotalDataSets = 0; //Autodesk:Uninit Force default initialization
@@ -4181,31 +4181,31 @@ Label999: ;
 		bool EchoTableDataToEio; // logical set equal to global and used to report to eio file
 
 		// Formats
-		static gio::Fmt const Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
-		static gio::Fmt const Format_130( "('CREATING NEW CURVE OBJECT')" );
-		static gio::Fmt const Format_140( "('! Input as ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_150( "('! RSquared       = ',A)" );
-		static gio::Fmt const Format_160( "('! Standard Error = ',A)" );
-		static gio::Fmt const Format_170( "('! Sample Size    = ',A)" );
-		static gio::Fmt const Format_180( "('Curve:',A,',')" );
-		static gio::Fmt const Format_190( "('FromTable_',A,',  !- Name')" );
-		static gio::Fmt const Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
-		static gio::Fmt const Format_210( "('  ',A,',  !- Coefficient2 x')" );
-		static gio::Fmt const Format_300( "('  ',A,',  !- Minimum Value of x')" );
-		static gio::Fmt const Format_310( "('  ',A,',  !- Maximum Value of x')" );
-		static gio::Fmt const Format_340( "('  ',A,',  !- Minimum Curve Output')" );
-		static gio::Fmt const Format_350( "('  ',A,';  !- Maximum Curve Output')" );
-		static gio::Fmt const Format_360( "('END CREATING NEW CURVE OBJECT')" );
-		static gio::Fmt const Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
-		static gio::Fmt const Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
-		static gio::Fmt const Format_240( "('  ',A,',  !- Coefficient4 y')" );
-		static gio::Fmt const Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
-		static gio::Fmt const Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
-		static gio::Fmt const Format_270( "('  ',A,',  !- Coefficient5 xy')" );
-		static gio::Fmt const Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
-		static gio::Fmt const Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
-		static gio::Fmt const Format_320( "('  ',A,',  !- Minimum Value of y')" );
-		static gio::Fmt const Format_330( "('  ',A,',  !- Maximum Value of y')" );
+		static gio::Fmt Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
+		static gio::Fmt Format_130( "('CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt Format_140( "('! Input as ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_150( "('! RSquared       = ',A)" );
+		static gio::Fmt Format_160( "('! Standard Error = ',A)" );
+		static gio::Fmt Format_170( "('! Sample Size    = ',A)" );
+		static gio::Fmt Format_180( "('Curve:',A,',')" );
+		static gio::Fmt Format_190( "('FromTable_',A,',  !- Name')" );
+		static gio::Fmt Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
+		static gio::Fmt Format_210( "('  ',A,',  !- Coefficient2 x')" );
+		static gio::Fmt Format_300( "('  ',A,',  !- Minimum Value of x')" );
+		static gio::Fmt Format_310( "('  ',A,',  !- Maximum Value of x')" );
+		static gio::Fmt Format_340( "('  ',A,',  !- Minimum Curve Output')" );
+		static gio::Fmt Format_350( "('  ',A,';  !- Maximum Curve Output')" );
+		static gio::Fmt Format_360( "('END CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
+		static gio::Fmt Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
+		static gio::Fmt Format_240( "('  ',A,',  !- Coefficient4 y')" );
+		static gio::Fmt Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
+		static gio::Fmt Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
+		static gio::Fmt Format_270( "('  ',A,',  !- Coefficient5 xy')" );
+		static gio::Fmt Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
+		static gio::Fmt Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
+		static gio::Fmt Format_320( "('  ',A,',  !- Minimum Value of y')" );
+		static gio::Fmt Format_330( "('  ',A,',  !- Maximum Value of y')" );
 
 		EchoTableDataToEio = DisplayAdvancedReportVariables;
 

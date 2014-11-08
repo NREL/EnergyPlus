@@ -612,7 +612,7 @@ namespace MoistureBalanceEMPDManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -627,7 +627,7 @@ namespace MoistureBalanceEMPDManager {
 		int MatNum;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
+		static gio::Fmt Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 

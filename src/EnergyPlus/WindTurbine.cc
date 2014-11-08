@@ -596,7 +596,7 @@ namespace WindTurbine {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char const TabChr( '\t' ); // Tab character
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

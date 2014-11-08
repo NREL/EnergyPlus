@@ -468,7 +468,7 @@ namespace ThermalISO15099Calc {
 		static Real64 fluxs( 0.0 );
 		static Real64 qeff( 0.0 );
 		static Real64 flux_nonsolar( 0.0 );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		shgc_NOSD = 0.0; //Autodesk:Uninit Force default initialization
@@ -1053,8 +1053,8 @@ namespace ThermalISO15099Calc {
 		//logical :: TurnOnNewton
 
 		// Formats
-		static gio::Fmt const Format_1111( "('Outdoor: ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
-		static gio::Fmt const Format_1112( "('Indoor:  ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
+		static gio::Fmt Format_1111( "('Outdoor: ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
+		static gio::Fmt Format_1112( "('Indoor:  ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
 
 		SDLayerIndex = -1;
 
@@ -2729,7 +2729,7 @@ namespace ThermalISO15099Calc {
 		int i;
 
 		// Formats
-		static gio::Fmt const Format_1000( "(I3)" );
+		static gio::Fmt Format_1000( "(I3)" );
 
 		//open(unit=InArgumentsFile,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
 		//          &  form='formatted', iostat=nperr)

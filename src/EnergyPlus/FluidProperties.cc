@@ -2848,7 +2848,7 @@ namespace FluidProperties {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		Real64 const incr( 10.0 );
 		static std::string const RoutineName( "ReportAndTestGlycols" );
 
@@ -3091,7 +3091,7 @@ namespace FluidProperties {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		Real64 const incr( 10.0 );
 		Real64 const Quality( 1.0 );
 		static std::string const RoutineName( "ReportAndTestRefrigerants" );

@@ -136,7 +136,7 @@ namespace NodeInputManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "GetNodeNums: " );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -343,11 +343,11 @@ namespace NodeInputManager {
 		std::string ChrOut2;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! #Nodes,<Number of Unique Nodes>')" );
-		static gio::Fmt const Format_701( "(A)" );
-		static gio::Fmt const Format_702( "('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
-		static gio::Fmt const Format_703( "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt Format_700( "('! #Nodes,<Number of Unique Nodes>')" );
+		static gio::Fmt Format_701( "(A)" );
+		static gio::Fmt Format_702( "('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
+		static gio::Fmt Format_703( "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')" );
+		static gio::Fmt fmtLD( "*" );
 
 		if ( ! NodeVarsSetup ) {
 			if ( ! AbortProcessing ) {
@@ -623,7 +623,7 @@ namespace NodeInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

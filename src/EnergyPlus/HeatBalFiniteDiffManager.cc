@@ -1247,8 +1247,8 @@ namespace HeatBalFiniteDiffManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtLD( "*" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1266,9 +1266,9 @@ namespace HeatBalFiniteDiffManager {
 		int Inodes;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' Construction CondFD,',A,2(',',A),',',A,',',A)" );
-		static gio::Fmt const Format_701( "(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_702( "(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_700( "(' Construction CondFD,',A,2(',',A),',',A,',',A)" );
+		static gio::Fmt Format_701( "(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_702( "(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)" );
 
 		gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant," "Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
 		gio::write( OutputFileInits, fmtA ) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType( CondFDSchemeType ) + ',' + RoundSigDigits( SpaceDescritConstant, 2 ) + ',' + RoundSigDigits( CondFDRelaxFactorInput, 2 ) + ',' + RoundSigDigits( MaxAllowedDelTempCondFD, 4 );

@@ -1179,7 +1179,7 @@ namespace SolarCollectors {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 s; // Intermediate variable

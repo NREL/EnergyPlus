@@ -7092,7 +7092,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const Roughness( 6, { "VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth" } );
 		static FArray1D_string const GasTypeName( {0,4}, { "Custom", "Air", "Argon", "Krypton", "Xenon" } );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7137,20 +7137,20 @@ namespace WindowManager {
 		std::string GapVentType;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' WindowConstruction',8(',',A))" );
-		static gio::Fmt const Format_702( "(' WindowMaterial:Gas',3(',',A))" );
-		static gio::Fmt const Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
-		static gio::Fmt const Format_704( "(' WindowMaterial:Blind',8(',',A))" );
-		static gio::Fmt const Format_706( "(' WindowMaterial:Screen',11(',',A))" );
-		static gio::Fmt const Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
-		static gio::Fmt const Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
-		static gio::Fmt const Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
-		static gio::Fmt const Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
-		static gio::Fmt const Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
-		static gio::Fmt const Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
-		static gio::Fmt const Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
-		static gio::Fmt const Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
-		static gio::Fmt const Format_800( "(' WindowConstruction:Complex',5(',',A))" );
+		static gio::Fmt Format_700( "(' WindowConstruction',8(',',A))" );
+		static gio::Fmt Format_702( "(' WindowMaterial:Gas',3(',',A))" );
+		static gio::Fmt Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
+		static gio::Fmt Format_704( "(' WindowMaterial:Blind',8(',',A))" );
+		static gio::Fmt Format_706( "(' WindowMaterial:Screen',11(',',A))" );
+		static gio::Fmt Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
+		static gio::Fmt Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
+		static gio::Fmt Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
+		static gio::Fmt Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
+		static gio::Fmt Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
+		static gio::Fmt Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
+		static gio::Fmt Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
+		static gio::Fmt Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
+		static gio::Fmt Format_800( "(' WindowConstruction:Complex',5(',',A))" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
@@ -7582,7 +7582,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const M( 18 );
 		int const N( 18 );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

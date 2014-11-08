@@ -50,7 +50,7 @@
 
 namespace EnergyPlus {
 
-static gio::Fmt const fmtLD( "*" );
+static gio::Fmt fmtLD( "*" );
 
 void
 ControlCompOutput(
@@ -1460,15 +1460,15 @@ TestSupplyAirPathIntegrity( bool & ErrFound )
 	int WAirLoop;
 
 	// Formats
-	static gio::Fmt const Format_700( "('! <#Supply Air Paths>,<Number of Supply Air Paths>')" );
-	static gio::Fmt const Format_701( "(A)" );
-	static gio::Fmt const Format_702( "('! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_703( "('! <#Components on Supply Air Path>,<Number of Components>')" );
-	static gio::Fmt const Format_704( "('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_705( "('! <#Nodes on Supply Air Path>,<Number of Nodes>')" );
-	static gio::Fmt const Format_706( "('! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_707( "('! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>')" );
-	static gio::Fmt const Format_708( "('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_700( "('! <#Supply Air Paths>,<Number of Supply Air Paths>')" );
+	static gio::Fmt Format_701( "(A)" );
+	static gio::Fmt Format_702( "('! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_703( "('! <#Components on Supply Air Path>,<Number of Components>')" );
+	static gio::Fmt Format_704( "('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_705( "('! <#Nodes on Supply Air Path>,<Number of Nodes>')" );
+	static gio::Fmt Format_706( "('! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_707( "('! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>')" );
+	static gio::Fmt Format_708( "('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
 
 	// Do by Paths
 	ShowMessage( "Testing Individual Supply Air Path Integrity" );
@@ -1758,15 +1758,15 @@ TestReturnAirPathIntegrity(
 	int WAirLoop;
 
 	// Formats
-	static gio::Fmt const Format_700( "('! <#Return Air Paths>,<Number of Return Air Paths>')" );
-	static gio::Fmt const Format_701( "(A)" );
-	static gio::Fmt const Format_702( "('! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_703( "('! <#Components on Return Air Path>,<Number of Components>')" );
-	static gio::Fmt const Format_704( "('! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_705( "('! <#Nodes on Return Air Path>,<Number of Nodes>')" );
-	static gio::Fmt const Format_706( "('! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
-	static gio::Fmt const Format_707( "('! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>')" );
-	static gio::Fmt const Format_708( "('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_700( "('! <#Return Air Paths>,<Number of Return Air Paths>')" );
+	static gio::Fmt Format_701( "(A)" );
+	static gio::Fmt Format_702( "('! <Return Air Path>,<Return Air Path Count>,<Return Air Path Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_703( "('! <#Components on Return Air Path>,<Number of Components>')" );
+	static gio::Fmt Format_704( "('! <Return Air Path Component>,<Component Count>,<Component Type>,<Component Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_705( "('! <#Nodes on Return Air Path>,<Number of Nodes>')" );
+	static gio::Fmt Format_706( "('! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')" );
+	static gio::Fmt Format_707( "('! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>')" );
+	static gio::Fmt Format_708( "('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet Node Name>,<AirLoopHVAC Name>')" );
 
 	// Do by Paths
 	ShowMessage( "Testing Individual Return Air Path Integrity" );

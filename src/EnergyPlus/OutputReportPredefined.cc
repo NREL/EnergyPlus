@@ -1438,7 +1438,7 @@ namespace OutputReportPredefined {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtI1( "(I1)" );
+		static gio::Fmt fmtI1( "(I1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -1556,7 +1556,7 @@ namespace OutputReportPredefined {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

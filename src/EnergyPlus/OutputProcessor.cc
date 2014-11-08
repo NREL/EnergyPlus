@@ -110,12 +110,12 @@ namespace OutputProcessor {
 	int const MeterType_CustomDec( 2 ); // Type value for custom meters that decrement another meter
 	int const MeterType_CustomDiff( 3 ); // Type value for custom meters that difference another meter
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const TimeStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',i2,',',f5.2,',',f5.2,',',A)" );
-	static gio::Fmt const DailyStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',A)" );
-	static gio::Fmt const MonthlyStampFormat( "(A,',',A,',',i2)" );
-	static gio::Fmt const RunPeriodStampFormat( "(A,',',A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt TimeStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',i2,',',f5.2,',',f5.2,',',A)" );
+	static gio::Fmt DailyStampFormat( "(A,',',A,',',i2,',',i2,',',i2,',',A)" );
+	static gio::Fmt MonthlyStampFormat( "(A,',',A,',',i2)" );
+	static gio::Fmt RunPeriodStampFormat( "(A,',',A)" );
 	FArray1D_string const DayTypes( 12, { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2" } );
 	static std::string const BlankString;
 	int const UnitsStringLength( 16 );
@@ -740,8 +740,8 @@ namespace OutputProcessor {
 		FArray1D_bool lNumericFieldBlanks( 1 );
 
 		// Formats
-		static gio::Fmt const Format_800( "('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')" );
-		static gio::Fmt const Format_801( "(' Minimum Reporting Frequency, ',A,',',A)" );
+		static gio::Fmt Format_800( "('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')" );
+		static gio::Fmt Format_801( "(' Minimum Reporting Frequency, ',A,',',A)" );
 
 		// First check environment variable to see of possible override for minimum reporting frequency
 		if ( cMinReportFrequency != "" ) {
@@ -904,9 +904,9 @@ namespace OutputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const DayFormat( "(A,',',I2,',',I2)" );
-		static gio::Fmt const MonthFormat( "(A,',',I2,',',I2,',',I2)" );
-		static gio::Fmt const EnvrnFormat( "(A,',',I2,',',I2,',',I2,',',I2)" );
+		static gio::Fmt DayFormat( "(A,',',I2,',',I2)" );
+		static gio::Fmt MonthFormat( "(A,',',I2,',',I2,',',I2)" );
+		static gio::Fmt EnvrnFormat( "(A,',',I2,',',I2,',',I2,',',I2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -976,10 +976,10 @@ namespace OutputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const HrFormat( "(A,',',I2.2,':',I2.2)" );
-		static gio::Fmt const DayFormat( "(A,',',I2,',',I2.2,':',I2.2)" );
-		static gio::Fmt const MonthFormat( "(A,',',I2,',',I2,',',I2.2,':',I2.2)" );
-		static gio::Fmt const EnvrnFormat( "(A,',',I2,',',I2,',',I2,',',I2.2,':',I2.2)" );
+		static gio::Fmt HrFormat( "(A,',',I2.2,':',I2.2)" );
+		static gio::Fmt DayFormat( "(A,',',I2,',',I2.2,':',I2.2)" );
+		static gio::Fmt MonthFormat( "(A,',',I2,',',I2,',',I2.2,':',I2.2)" );
+		static gio::Fmt EnvrnFormat( "(A,',',I2,',',I2,',',I2,',',I2.2,':',I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3449,7 +3449,7 @@ namespace OutputProcessor {
 
 		// Locals
 		// ((month*100 + day)*100 + hour)*100 + minute
-		static gio::Fmt const DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
+		static gio::Fmt DateFmt( "(I2.2,'-',A3,'-',I2.2,':',I2.2)" );
 
 		int Month; // month in integer format (1-12)
 		int Day; // day in integer format (1-31)
@@ -5441,7 +5441,7 @@ SetupOutputVariable(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt fmtLD( "*" );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na

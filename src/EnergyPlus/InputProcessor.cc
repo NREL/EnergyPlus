@@ -84,8 +84,8 @@ namespace InputProcessor {
 	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
 	Real64 const DefAutoSizeValue( AutoSize );
 	Real64 const DefAutoCalculateValue( AutoCalculate );
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -2616,10 +2616,10 @@ namespace InputProcessor {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char const TabChar( '\t' );
-		static gio::Fmt const fmt_1( "(I7,1X,A)" );
-		static gio::Fmt const fmt_2( "(1X,A,1X,A)" );
-		static gio::Fmt const fmt_3( "('      ***** Tabs eliminated from above line')" );
-		static gio::Fmt const fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
+		static gio::Fmt fmt_1( "(I7,1X,A)" );
+		static gio::Fmt fmt_2( "(1X,A,1X,A)" );
+		static gio::Fmt fmt_3( "('      ***** Tabs eliminated from above line')" );
+		static gio::Fmt fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2817,10 +2817,10 @@ namespace InputProcessor {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char const TabChar( '\t' );
-		static gio::Fmt const fmt_1( "(I7,1X,A)" );
-		static gio::Fmt const fmt_2( "(1X,A,1X,A)" );
-		static gio::Fmt const fmt_3( "('      ***** Tabs eliminated from above line')" );
-		static gio::Fmt const fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
+		static gio::Fmt fmt_1( "(I7,1X,A)" );
+		static gio::Fmt fmt_2( "(1X,A,1X,A)" );
+		static gio::Fmt fmt_3( "('      ***** Tabs eliminated from above line')" );
+		static gio::Fmt fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4395,7 +4395,7 @@ namespace InputProcessor {
 		}
 
 		// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
-		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if 
+		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if
 		// for now, the list includes:
 		//  - objects that start with "ZONEHVAC:"
 		if ( potentialOrphanedSpecialObjects ) {
@@ -5916,7 +5916,7 @@ namespace InputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ErrorFormat( "(2X,A)" );
+		static gio::Fmt ErrorFormat( "(2X,A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

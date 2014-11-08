@@ -3057,7 +3057,7 @@ namespace BranchInputManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3122,11 +3122,11 @@ namespace BranchInputManager {
 		FArray1D< BranchUniqueNodes > BranchNodes;
 
 		// Formats
-		gio::Fmt const Format_700( "('! <#Branch Lists>,<Number of Branch Lists>')" );
-		gio::Fmt const Format_701( "(A)" );
-		gio::Fmt const Format_702( "('! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>')" );
-		gio::Fmt const Format_704( "('! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>')" );
-		gio::Fmt const Format_706( "('! <# Orphaned Branches>,<Number of Branches not on Branch Lists>')" );
+		static gio::Fmt Format_700( "('! <#Branch Lists>,<Number of Branch Lists>')" );
+		static gio::Fmt Format_701( "(A)" );
+		static gio::Fmt Format_702( "('! <Branch List>,<Branch List Count>,<Branch List Name>,<Loop Name>,<Loop Type>,<Number of Branches>')" );
+		static gio::Fmt Format_704( "('! <Branch>,<Branch Count>,<Branch Name>,<Loop Name>,<Loop Type>,<Branch Inlet Node Name>,<Branch Outlet Node Name>')" );
+		static gio::Fmt Format_706( "('! <# Orphaned Branches>,<Number of Branches not on Branch Lists>')" );
 
 		BranchReported.dimension( NumOfBranches, false );
 

@@ -1450,7 +1450,7 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ZeroTol( 0.0000001 ); // Smallest non-zero value allowed
 		static std::string const RoutineName( "InitLowTempRadiantSystem" );
-		static gio::Fmt const fmtF102( "(F10.2)" );
+		static gio::Fmt fmtF102( "(F10.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

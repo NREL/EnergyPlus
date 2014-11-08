@@ -1753,7 +1753,7 @@ namespace FluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const LowTempFmt( "(' ',F6.2)" );
+		static gio::Fmt LowTempFmt( "(' ',F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

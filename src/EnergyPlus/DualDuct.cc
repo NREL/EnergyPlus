@@ -2022,10 +2022,10 @@ namespace DualDuct {
 		std::string DamperType;
 
 		// Formats
-		static gio::Fmt const Format_100( "('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')" );
-		static gio::Fmt const Format_101( "(A)" );
-		static gio::Fmt const Format_102( "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet Node Type>,<AirLoopHVAC Name>')" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt Format_100( "('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')" );
+		static gio::Fmt Format_101( "(A)" );
+		static gio::Fmt Format_102( "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet Node Type>,<AirLoopHVAC Name>')" );
+		static gio::Fmt fmtLD( "*" );
 
 		if ( ! allocated( Damper ) ) return; //Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDampers either set >0 or uninitialized
 

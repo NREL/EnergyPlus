@@ -3867,8 +3867,8 @@ namespace HVACVariableRefrigerantFlow {
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping Correction Factor')" );
-		static gio::Fmt const Format_991( "(' VRF System Information',6(', ',A))" );
+		static gio::Fmt Format_990( "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping Correction Factor')" );
+		static gio::Fmt Format_991( "(' VRF System Information',6(', ',A))" );
 
 		VRFCond = VRFTU( VRFTUNum ).VRFSysNum;
 		IsAutoSize = false;
@@ -4687,7 +4687,7 @@ namespace HVACVariableRefrigerantFlow {
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
 		Real64 const ErrorTol( 0.001 ); // tolerance for RegulaFalsi iterations
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

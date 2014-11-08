@@ -135,7 +135,7 @@ namespace SizingManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ManageSizing: " );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: none
 
@@ -1018,7 +1018,7 @@ namespace SizingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2498,8 +2498,8 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
-		static gio::Fmt const Format_991( "(' Zone Sizing Information',13(', ',A))" );
+		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
+		static gio::Fmt Format_991( "(' Zone Sizing Information',13(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
@@ -2560,8 +2560,8 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
-		static gio::Fmt const Format_991( "(' System Sizing Information',3(', ',A))" );
+		static gio::Fmt Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
+		static gio::Fmt Format_991( "(' System Sizing Information',3(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );

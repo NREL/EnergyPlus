@@ -224,7 +224,7 @@ main()
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
 	// in "DataGlobals.f90"
-	gio::Fmt const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
+	gio::Fmt EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
 	std::string const BlankString;
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -430,7 +430,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	gio::Fmt const fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
+	gio::Fmt fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -517,7 +517,7 @@ ReadINIFile(
 	bool NewHeading;
 
 	// Formats
-	static gio::Fmt const Format_700( "(A)" );
+	static gio::Fmt Format_700( "(A)" );
 
 	DataOut = "           ";
 

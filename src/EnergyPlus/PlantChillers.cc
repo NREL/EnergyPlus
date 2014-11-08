@@ -4110,7 +4110,7 @@ namespace PlantChillers {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcElectricChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -4660,7 +4660,7 @@ namespace PlantChillers {
 		Real64 const ReferenceTemp( 25.0 ); // Reference temperature by which lower heating
 		// value is reported.  This should be subtracted
 		// off of when calculated exhaust energies.
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcEngineDrivenChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -5260,7 +5260,7 @@ namespace PlantChillers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		Real64 const ExhaustCP( 1.047 ); // Exhaust Gas Specific Heat
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcGTChillerModel" );
 		static std::string const RoutineNameHeatRecovery( "ChillerHeatRecovery" );
 
@@ -5928,7 +5928,7 @@ namespace PlantChillers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
 		Real64 const DeltaTempTol( 0.0001 ); // C - minimum significant mass flow rate
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcConstCOPChillerModel" );
 
 		// DERIVED TYPE DEFINITIONS

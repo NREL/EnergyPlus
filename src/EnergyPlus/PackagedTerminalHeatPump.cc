@@ -3994,7 +3994,7 @@ namespace PackagedTerminalHeatPump {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const MaxIte( 500 ); // maximum number of iterations
 		Real64 const MinPLF( 0.0 ); // minimum part load factor allowed
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

@@ -115,8 +115,8 @@ namespace RuntimeLanguageProcessor {
 	int ActualDateAndTimeNum( 0 );
 	int ActualTimeNum( 0 );
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// SUBROUTINE SPECIFICATIONS:
 

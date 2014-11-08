@@ -2112,15 +2112,15 @@ namespace ConductionTransferFunctionCalc {
 		int I;
 
 		// Formats
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const Format_700( "(' Construction CTF,',A,3(',',I4),',',F8.3,',',G15.4,4(',',F8.3),',',A)" );
-		static gio::Fmt const Format_701( "(' Material CTF Summary,',A,',',F8.4,',',F14.3,',',F11.3,',',F13.3,',',G12.4)" );
-		static gio::Fmt const Format_702( "(' Material:Air,',A,',',G12.4)" );
-		static gio::Fmt const Format_703( "(' CTF,',I4,4(',',G20.8))" );
-		static gio::Fmt const Format_704( "(' CTF,',I4,3(',',G20.8))" );
-		static gio::Fmt const Format_705( "(' QTF,',I4,2(',',G20.8))" );
-		static gio::Fmt const Format_706( "(' Source/Sink Loc Internal Temp QTF,',I4,3(',',G20.8))" );
-		static gio::Fmt const Format_707( "(' User Loc Internal Temp QTF,',I4,3(',',G20.8))" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt Format_700( "(' Construction CTF,',A,3(',',I4),',',F8.3,',',G15.4,4(',',F8.3),',',A)" );
+		static gio::Fmt Format_701( "(' Material CTF Summary,',A,',',F8.4,',',F14.3,',',F11.3,',',F13.3,',',G12.4)" );
+		static gio::Fmt Format_702( "(' Material:Air,',A,',',G12.4)" );
+		static gio::Fmt Format_703( "(' CTF,',I4,4(',',G20.8))" );
+		static gio::Fmt Format_704( "(' CTF,',I4,3(',',G20.8))" );
+		static gio::Fmt Format_705( "(' QTF,',I4,2(',',G20.8))" );
+		static gio::Fmt Format_706( "(' Source/Sink Loc Internal Temp QTF,',I4,3(',',G20.8))" );
+		static gio::Fmt Format_707( "(' User Loc Internal Temp QTF,',I4,3(',',G20.8))" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 

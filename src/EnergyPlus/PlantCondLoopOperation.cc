@@ -1293,7 +1293,7 @@ namespace PlantCondLoopOperation {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const Plant( 1 ); // Used to identify whether the current loop is Plant
 		int const Condenser( 2 ); // Used to identify whether the current loop is Condenser
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

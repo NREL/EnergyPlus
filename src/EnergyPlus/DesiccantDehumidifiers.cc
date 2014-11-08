@@ -2123,7 +2123,7 @@ namespace DesiccantDehumidifiers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MinVolFlowPerRatedTotQ( 0.00002684 ); // m3/s per W = 200 cfm/ton,
 		// min vol flow per rated evaporator capacity
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

@@ -296,8 +296,8 @@ namespace HeatBalanceSurfaceManager {
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const Eps( 1.e-10 ); // Small number
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

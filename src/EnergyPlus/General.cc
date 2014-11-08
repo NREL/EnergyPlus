@@ -898,7 +898,7 @@ namespace General {
 		// FUNCTION PARAMETER DEFINITIONS:
 		static std::string const NAN_string( "NAN" );
 		static std::string const ZEROOOO( "0.000000000000000000000000000" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -971,7 +971,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1022,7 +1022,7 @@ namespace General {
 		static std::string const DigitChar( "01234567890" );
 		static std::string const NAN_string( "NAN" );
 		static std::string const ZEROOOO( "0.000000000000000000000000000" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1160,7 +1160,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1934,8 +1934,8 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const TStmpFmt( "(I2.2,':',F3.0)" );
-		static gio::Fmt const TStmpFmti( "(I2.2,':',I2.2)" );
+		static gio::Fmt TStmpFmt( "(I2.2,':',F3.0)" );
+		static gio::Fmt TStmpFmti( "(I2.2,':',I2.2)" );
 		Real64 const FracToMin( 60.0 );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -2705,7 +2705,7 @@ namespace General {
 		// FUNCTION ARGUMENT DEFINITIONS:
 
 		// FUNCTION PARAMETER DEFINITIONS:
-		static gio::Fmt const TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
+		static gio::Fmt TStampFmt( "(I2.2,':',I2.2,':',F4.1)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

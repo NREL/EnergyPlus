@@ -184,8 +184,8 @@ namespace SystemReports {
 	FArray1D_bool NoLoadFlag;
 	FArray1D_bool UnmetLoadFlag;
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
 
@@ -4491,16 +4491,16 @@ namespace SystemReports {
 		std::string ChrOut5;
 
 		// Formats
-		static gio::Fmt const Format_701( "(A)" );
-		static gio::Fmt const Format_706( "('! <#AirLoopHVACs>,<Number of AirLoopHVACs>')" );
-		static gio::Fmt const Format_707( "(1X,A)" );
-		static gio::Fmt const Format_708( "('! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,','<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>')" );
-		static gio::Fmt const Format_709( "('! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Return Node #>,<Zn Eqp Return Node Name>,','<AirLoop Return Node #>,<Air Loop Return Node Name>')" );
-		static gio::Fmt const Format_710( "('! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Supply Node #>,<Zn Eqp Supply Node Name>,','<AirLoop Supply Node #>,<Air Loop Supply Node Name>')" );
-		static gio::Fmt const Format_711( "('! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,','<Cooled Zone Inlet Node #>,<Cooled Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
-		static gio::Fmt const Format_712( "('! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,','<Heated Zone Inlet Node #>,<Heated Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
-		static gio::Fmt const Format_714( "('! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,','<OA Outlet Node #>,<OA Mixed Air Outlet Node Name>,<AirLoopHVAC Name>'s)" );
-		static gio::Fmt const Format_713( "(A)" );
+		static gio::Fmt Format_701( "(A)" );
+		static gio::Fmt Format_706( "('! <#AirLoopHVACs>,<Number of AirLoopHVACs>')" );
+		static gio::Fmt Format_707( "(1X,A)" );
+		static gio::Fmt Format_708( "('! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,','<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>')" );
+		static gio::Fmt Format_709( "('! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Return Node #>,<Zn Eqp Return Node Name>,','<AirLoop Return Node #>,<Air Loop Return Node Name>')" );
+		static gio::Fmt Format_710( "('! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Supply Node #>,<Zn Eqp Supply Node Name>,','<AirLoop Supply Node #>,<Air Loop Supply Node Name>')" );
+		static gio::Fmt Format_711( "('! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,','<Cooled Zone Inlet Node #>,<Cooled Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
+		static gio::Fmt Format_712( "('! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,','<Heated Zone Inlet Node #>,<Heated Zone Inlet Node Name>,<AirLoopHVAC Name>')" );
+		static gio::Fmt Format_714( "('! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,','<OA Outlet Node #>,<OA Mixed Air Outlet Node Name>,<AirLoopHVAC Name>'s)" );
+		static gio::Fmt Format_713( "(A)" );
 
 		gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
 		gio::write( OutputFileBNDetails, Format_706 );

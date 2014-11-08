@@ -2043,7 +2043,7 @@ namespace ExternalInterface {
 		static bool showContinuationWithoutUpdate( true );
 
 		// Formats
-		static gio::Fmt const Format_1000( "(I2)" );
+		static gio::Fmt Format_1000( "(I2)" );
 
 		if ( firstCall ) {
 			DisplayString( "ExternalInterface starts first data exchange." );

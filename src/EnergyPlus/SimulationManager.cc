@@ -137,8 +137,8 @@ namespace SimulationManager {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	static std::string const BlankString;
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// DERIVED TYPE DEFINITIONS:
 	// na
@@ -260,7 +260,7 @@ namespace SimulationManager {
 		int EnvCount;
 
 		// Formats
-		static gio::Fmt const Format_700( "('Environment:WarmupDays,',I3)" );
+		static gio::Fmt Format_700( "('Environment:WarmupDays,',I3)" );
 
 		// FLOW:
 		PostIPProcessing();
@@ -634,12 +634,12 @@ namespace SimulationManager {
 		int Item;
 
 		// Formats
-		static gio::Fmt const Format_721( "(' Version, ',A)" );
-		static gio::Fmt const Format_731( "(' Timesteps per Hour, ',I2,', ',I2)" );
-		static gio::Fmt const Format_733( "(' System Convergence Limits',4(', ',A))" );
-		static gio::Fmt const Format_741( "(' Simulation Control',$)" );
-		static gio::Fmt const Format_741_1( "(', ',A,$)" );
-		static gio::Fmt const Format_751( "(' Output Reporting Tolerances',5(', ',A))" );
+		static gio::Fmt Format_721( "(' Version, ',A)" );
+		static gio::Fmt Format_731( "(' Timesteps per Hour, ',I2,', ',I2)" );
+		static gio::Fmt Format_733( "(' System Convergence Limits',4(', ',A))" );
+		static gio::Fmt Format_741( "(' Simulation Control',$)" );
+		static gio::Fmt Format_741_1( "(', ',A,$)" );
+		static gio::Fmt Format_751( "(' Output Reporting Tolerances',5(', ',A))" );
 
 		ErrorsFound = false;
 
@@ -1303,7 +1303,7 @@ namespace SimulationManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const EndOfDataFormat( "(\"End of Data\")" ); // Signifies the end of the data block in the output file
+		static gio::Fmt EndOfDataFormat( "(\"End of Data\")" ); // Signifies the end of the data block in the output file
 		static std::string const ThreadingHeader( "! <Program Control Information:Threads/Parallel Sims>, " "Threading Supported,Maximum Number of Threads, Env Set Threads (OMP_NUM_THREADS), " "EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set Threads, Number of Threads Used (Interior Radiant Exchange), " "Number Nominal Surfaces, Number Parallel Sims" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1617,11 +1617,11 @@ namespace SimulationManager {
 		bool ParentComponentFound;
 
 		// Formats
-		static gio::Fmt const Format_701( "(A)" );
-		static gio::Fmt const Format_702( "('! <#',A,' Node Connections>,<Number of ',A,' Node Connections>')" );
-		static gio::Fmt const Format_703( "('! <',A,' Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,','<Node ConnectionType>,<Node FluidStream>')" );
-		static gio::Fmt const Format_705( "('! <#NonConnected Nodes>,<Number of NonConnected Nodes>',/,' #NonConnected Nodes,',A)" );
-		static gio::Fmt const Format_706( "('! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>')" );
+		static gio::Fmt Format_701( "(A)" );
+		static gio::Fmt Format_702( "('! <#',A,' Node Connections>,<Number of ',A,' Node Connections>')" );
+		static gio::Fmt Format_703( "('! <',A,' Node Connection>,<Node Name>,<Node ObjectType>,<Node ObjectName>,','<Node ConnectionType>,<Node FluidStream>')" );
+		static gio::Fmt Format_705( "('! <#NonConnected Nodes>,<Number of NonConnected Nodes>',/,' #NonConnected Nodes,',A)" );
+		static gio::Fmt Format_706( "('! <NonConnected Node>,<NonConnected Node Number>,<NonConnected Node Name>')" );
 
 		NonConnectedNodes.dimension( NumOfNodes, true );
 
@@ -1777,15 +1777,15 @@ namespace SimulationManager {
 		int NumOfControlledZones;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <#Component Sets>,<Number of Component Sets>')" );
-		static gio::Fmt const Format_701( "(A)" );
-		static gio::Fmt const Format_702( "('! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,','<Component Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>')" );
-		static gio::Fmt const Format_707( "(1X,A)" );
-		static gio::Fmt const Format_713( "(A)" );
-		static gio::Fmt const Format_720( "('! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>')" );
-		static gio::Fmt const Format_721( "(A)" );
-		static gio::Fmt const Format_722( "('! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>')" );
-		static gio::Fmt const Format_723( "('! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,','<Zone Name>,<Heating Priority>,<Cooling Priority>')" );
+		static gio::Fmt Format_700( "('! <#Component Sets>,<Number of Component Sets>')" );
+		static gio::Fmt Format_701( "(A)" );
+		static gio::Fmt Format_702( "('! <Component Set>,<Component Set Count>,<Parent Object Type>,<Parent Object Name>,','<Component Type>,<Component Name>,<Inlet Node ID>,<Outlet Node ID>,<Description>')" );
+		static gio::Fmt Format_707( "(1X,A)" );
+		static gio::Fmt Format_713( "(A)" );
+		static gio::Fmt Format_720( "('! <#Zone Equipment Lists>,<Number of Zone Equipment Lists>')" );
+		static gio::Fmt Format_721( "(A)" );
+		static gio::Fmt Format_722( "('! <Zone Equipment List>,<Zone Equipment List Count>,<Zone Equipment List Name>,<Zone Name>,<Number of Components>')" );
+		static gio::Fmt Format_723( "('! <Zone Equipment Component>,<Component Count>,<Component Type>,<Component Name>,','<Zone Name>,<Heating Priority>,<Cooling Priority>')" );
 
 		// Report outside air node names on the Branch-Node Details file
 		gio::write( OutputFileBNDetails, Format_701 ) << "! ===============================================================";
