@@ -803,22 +803,6 @@ public: // Properties
 		return stream_;
 	}
 
-	// Stream Position
-	inline
-	std::streampos
-	pos() const
-	{
-		return pos_;
-	}
-
-	// Stream Position
-	inline
-	std::streampos &
-	pos()
-	{
-		return pos_;
-	}
-
 	// Format
 	inline
 	Format const *
@@ -1210,12 +1194,12 @@ private: // Data
 	std::string ter_; // Line terminator
 	IOFlags * flags_; // Internal i/o flags
 	std::ostringstream stream_; // Internal stream
-	std::streampos pos_; // Virtual stream position
+	std::streampos pos_; // Stream position
 	Format::Size reverts_; // Reversion count before last next() call
 
 public: // Static Data
 
-	static std::string const LF;
+	static std::string const LF; // Linefeed
 
 }; // Write
 

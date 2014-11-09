@@ -1026,7 +1026,7 @@ protected: // Static Methods
 	inline
 	static
 	void
-	output_pad( std::ostream & stream, std::streampos const & pos )
+	output_pad( std::ostream & stream, std::streampos const pos )
 	{
 		stream.seekp( 0, std::ios::end );
 		std::streampos const end( stream.tellp() );

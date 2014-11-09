@@ -62,8 +62,8 @@ public: // Creation
 	 format_( r.format_ ),
 	 format_own_( r.format_own_ ),
 	 flags_( r.flags_ ? &r.flags_->clear_status() : nullptr ),
-	 poa_( 0 ),
-	 por_( 0 )
+	 poa_( r.poa_ ),
+	 por_( r.por_ )
 	{
 #if defined(__GNUC__) && __GNUC__ < 5 // Finish copying state
 		sstream_.copyfmt( r.sstream_ );
@@ -280,8 +280,8 @@ public: // Creation
 
 	// Fstring + Format Constructor
 	inline
-	Read( Fstring const & fst, std::string const & fmt ) :
-	 sstream_( fst ),
+	Read( Fstring const & str, std::string const & fmt ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
@@ -292,8 +292,8 @@ public: // Creation
 
 	// Fstring + Format Constructor
 	inline
-	Read( Fstring const & fst, gio::Fmt const & fmt ) :
-	 sstream_( fst ),
+	Read( Fstring const & str, gio::Fmt const & fmt ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
@@ -304,8 +304,8 @@ public: // Creation
 
 	// Fstring + Format Constructor
 	inline
-	Read( Fstring const & fst, gio::Fmt & fmt ) :
-	 sstream_( fst ),
+	Read( Fstring const & str, gio::Fmt & fmt ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
@@ -316,8 +316,8 @@ public: // Creation
 
 	// Fstring + Format + Flags Constructor
 	inline
-	Read( Fstring const & fst, std::string const & fmt, IOFlags & flags ) :
-	 sstream_( fst ),
+	Read( Fstring const & str, std::string const & fmt, IOFlags & flags ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
@@ -330,8 +330,8 @@ public: // Creation
 
 	// Fstring + Format + Flags Constructor
 	inline
-	Read( Fstring const & fst, gio::Fmt const & fmt, IOFlags & flags ) :
-	 sstream_( fst ),
+	Read( Fstring const & str, gio::Fmt const & fmt, IOFlags & flags ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
@@ -344,8 +344,8 @@ public: // Creation
 
 	// Fstring + Format + Flags Constructor
 	inline
-	Read( Fstring const & fst, gio::Fmt & fmt, IOFlags & flags ) :
-	 sstream_( fst ),
+	Read( Fstring const & str, gio::Fmt & fmt, IOFlags & flags ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
@@ -358,8 +358,8 @@ public: // Creation
 
 	// C-String + Format Constructor
 	inline
-	Read( char const * cst, std::string const & fmt ) :
-	 sstream_( cst ),
+	Read( char const * str, std::string const & fmt ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
@@ -370,8 +370,8 @@ public: // Creation
 
 	// C-String + Format Constructor
 	inline
-	Read( char const * cst, gio::Fmt const & fmt ) :
-	 sstream_( cst ),
+	Read( char const * str, gio::Fmt const & fmt ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
@@ -382,8 +382,8 @@ public: // Creation
 
 	// C-String + Format Constructor
 	inline
-	Read( char const * cst, gio::Fmt & fmt ) :
-	 sstream_( cst ),
+	Read( char const * str, gio::Fmt & fmt ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
@@ -394,8 +394,8 @@ public: // Creation
 
 	// C-String + Format + Flags Constructor
 	inline
-	Read( char const * cst, std::string const & fmt, IOFlags & flags ) :
-	 sstream_( cst ),
+	Read( char const * str, std::string const & fmt, IOFlags & flags ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( FormatFactory::create( fmt ) ),
 	 format_own_( true ),
@@ -408,8 +408,8 @@ public: // Creation
 
 	// C-String + Format + Flags Constructor
 	inline
-	Read( char const * cst, gio::Fmt const & fmt, IOFlags & flags ) :
-	 sstream_( cst ),
+	Read( char const * str, gio::Fmt const & fmt, IOFlags & flags ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_clone() ),
 	 format_own_( true ),
@@ -422,8 +422,8 @@ public: // Creation
 
 	// C-String + Format + Flags Constructor
 	inline
-	Read( char const * cst, gio::Fmt & fmt, IOFlags & flags ) :
-	 sstream_( cst ),
+	Read( char const * str, gio::Fmt & fmt, IOFlags & flags ) :
+	 sstream_( str ),
 	 stream_( sstream_ ),
 	 format_( fmt.format_reset() ),
 	 format_own_( false ),
@@ -441,7 +441,7 @@ public: // Creation
 		if ( format_ ) {
 			if ( stream_ && ( &stream_ != &sstream_ ) ) {
 				if ( format_->non_advancing() ) { // Non-advancing
-					format_->input_pos( stream_, pos() ); // Set final stream position
+					format_->input_pos( stream_, poa_ + por_ ); // Set final stream position
 				} else { // Advancing
 					stream_ >> Format::skip; // Advance to next line
 				}
@@ -477,46 +477,6 @@ public: // Properties
 	stream()
 	{
 		return stream_;
-	}
-
-	// Absolute Stream Position
-	inline
-	std::streampos
-	poa() const
-	{
-		return poa_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos
-	por() const
-	{
-		return por_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos &
-	por()
-	{
-		return por_;
-	}
-
-	// Stream Position
-	inline
-	std::streampos
-	pos() const
-	{
-		return poa_ + por_;
-	}
-
-	// Stream Position Set
-	inline
-	void
-	pos( std::streampos const pos )
-	{
-		por_ = pos - poa_;
 	}
 
 	// Format
@@ -611,7 +571,7 @@ public: // Operators
 				}
 			}
 		}
-		pos( stream_.tellg() );
+		por_ = stream_.tellg() - poa_;
 		set_status();
 		return *this;
 	}

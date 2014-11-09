@@ -39,6 +39,9 @@ typedef  int  Unit;
 typedef  std::string  Name;
 typedef  char const *  c_cstring;
 
+// Data
+extern std::string const LF; // Linefeed
+
 // Unit /////
 
 int
@@ -166,18 +169,6 @@ open();
 
 // Read from Unit
 Read
-read( Unit const unit, std::string const & fmt, IOFlags & flags );
-
-// Read from Unit
-Read
-read( Unit const unit, Fmt const & fmt, IOFlags & flags );
-
-// Read from Unit
-Read
-read( Unit const unit, Fmt & fmt, IOFlags & flags );
-
-// Read from Unit
-Read
 read( Unit const unit, std::string const & fmt );
 
 // Read from Unit
@@ -188,17 +179,17 @@ read( Unit const unit, Fmt const & fmt );
 Read
 read( Unit const unit, Fmt & fmt );
 
-// Read from stdin
+// Read from Unit
 Read
-read( std::string const & fmt, IOFlags & flags );
+read( Unit const unit, std::string const & fmt, IOFlags & flags );
 
-// Read from stdin
+// Read from Unit
 Read
-read( Fmt const & fmt, IOFlags & flags );
+read( Unit const unit, Fmt const & fmt, IOFlags & flags );
 
-// Read from stdin
+// Read from Unit
 Read
-read( Fmt & fmt, IOFlags & flags );
+read( Unit const unit, Fmt & fmt, IOFlags & flags );
 
 // Read from stdin
 Read
@@ -212,29 +203,17 @@ read( Fmt const & fmt );
 Read
 read( Fmt & fmt );
 
-// Read from String
-inline
+// Read from stdin
 Read
-read( std::string const & str, std::string const & fmt, IOFlags & flags )
-{
-	return Read( str, fmt, flags );
-}
+read( std::string const & fmt, IOFlags & flags );
 
-// Read from String
-inline
+// Read from stdin
 Read
-read( std::string const & str, Fmt const & fmt, IOFlags & flags )
-{
-	return Read( str, fmt, flags );
-}
+read( Fmt const & fmt, IOFlags & flags );
 
-// Read from String
-inline
+// Read from stdin
 Read
-read( std::string const & str, Fmt & fmt, IOFlags & flags )
-{
-	return Read( str, fmt, flags );
-}
+read( Fmt & fmt, IOFlags & flags );
 
 // Read from String
 inline
@@ -260,27 +239,39 @@ read( std::string const & str, Fmt & fmt )
 	return Read( str, fmt );
 }
 
-// Read Line from Unit
-void
-read_line( Unit const unit, IOFlags & flags, std::string & line );
+// Read from String
+inline
+Read
+read( std::string const & str, std::string const & fmt, IOFlags & flags )
+{
+	return Read( str, fmt, flags );
+}
+
+// Read from String
+inline
+Read
+read( std::string const & str, Fmt const & fmt, IOFlags & flags )
+{
+	return Read( str, fmt, flags );
+}
+
+// Read from String
+inline
+Read
+read( std::string const & str, Fmt & fmt, IOFlags & flags )
+{
+	return Read( str, fmt, flags );
+}
 
 // Read Line from Unit
 void
 read_line( Unit const unit, std::string & line );
 
+// Read Line from Unit
+void
+read_line( Unit const unit, IOFlags & flags, std::string & line );
+
 // Write /////
-
-// Write to Unit
-Write
-write( Unit const unit, std::string const & fmt, IOFlags & flags );
-
-// Write to Unit
-Write
-write( Unit const unit, Fmt const & fmt, IOFlags & flags );
-
-// Write to Unit
-Write
-write( Unit const unit, Fmt & fmt, IOFlags & flags );
 
 // Write to Unit
 Write
@@ -294,21 +285,21 @@ write( Unit const unit, Fmt const & fmt );
 Write
 write( Unit const unit, Fmt & fmt );
 
+// Write to Unit
+Write
+write( Unit const unit, std::string const & fmt, IOFlags & flags );
+
+// Write to Unit
+Write
+write( Unit const unit, Fmt const & fmt, IOFlags & flags );
+
+// Write to Unit
+Write
+write( Unit const unit, Fmt & fmt, IOFlags & flags );
+
 // Write End-of-Line to Unit
 void
 write( Unit const unit );
-
-// Write to stdout
-Write
-write( std::string const & fmt, IOFlags & flags );
-
-// Write to stdout
-Write
-write( Fmt const & fmt, IOFlags & flags );
-
-// Write to stdout
-Write
-write( Fmt & fmt, IOFlags & flags );
 
 // Write to stdout
 Write
@@ -322,28 +313,24 @@ write( Fmt const & fmt );
 Write
 write( Fmt & fmt );
 
-// Write to String
-inline
+// Write to stdout
 Write
-write( std::string & str, std::string const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
+write( std::string const & fmt, IOFlags & flags );
 
-// Write to String
-inline
+// Write to stdout
 Write
-write( std::string & str, Fmt const & fmt, IOFlags & flags )
-{
-	return Write( str, fmt, flags );
-}
+write( Fmt const & fmt, IOFlags & flags );
 
-// Write to String
-inline
+// Write to stdout
 Write
-write( std::string & str, Fmt & fmt, IOFlags & flags )
+write( Fmt & fmt, IOFlags & flags );
+
+// Write End-of-Line to stdout
+inline
+void
+write()
 {
-	return Write( str, fmt, flags );
+	std::cout << LF;
 }
 
 // Write to String
@@ -370,26 +357,26 @@ write( std::string & str, Fmt & fmt )
 	return Write( str, fmt );
 }
 
-// Write to Fstring
+// Write to String
 inline
 Write
-write( Fstring & str, std::string const & fmt, IOFlags & flags )
+write( std::string & str, std::string const & fmt, IOFlags & flags )
 {
 	return Write( str, fmt, flags );
 }
 
-// Write to Fstring
+// Write to String
 inline
 Write
-write( Fstring & str, Fmt const & fmt, IOFlags & flags )
+write( std::string & str, Fmt const & fmt, IOFlags & flags )
 {
 	return Write( str, fmt, flags );
 }
 
-// Write to Fstring
+// Write to String
 inline
 Write
-write( Fstring & str, Fmt & fmt, IOFlags & flags )
+write( std::string & str, Fmt & fmt, IOFlags & flags )
 {
 	return Write( str, fmt, flags );
 }
@@ -416,6 +403,30 @@ Write
 write( Fstring & str, Fmt & fmt )
 {
 	return Write( str, fmt );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, std::string const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, Fmt const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, Fmt & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
 }
 
 // Print /////
