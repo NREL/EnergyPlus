@@ -291,6 +291,10 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+)
+
+SET( SRC_2
+  Timer.h
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -531,9 +535,15 @@ if(UNIX AND NOT APPLE)
   target_link_libraries( EnergyPlusLib dl )
 endif()
 
+add_library( EnergyPlusLib2 STATIC ${SRC_2} )
+target_link_libraries( EnergyPlusLib2 )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( EnergyPlusLib2 dl )
+endif()
+
 # second we will create the shared library that is actually packaged with EnergyPlus
 add_library( EnergyPlusAPI SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-target_link_libraries( EnergyPlusAPI EnergyPlusLib )
+target_link_libraries( EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 )
 set_target_properties(
   EnergyPlusAPI
   PROPERTIES
@@ -544,9 +554,9 @@ install( TARGETS EnergyPlusAPI
   LIBRARY DESTINATION ./ 
 )
 
-if(ENABLE_LTO)
+if(ENABLE_LTO AND NOT MSVC)
   message("For some reason we cannot get the EnergyPlusPgm symbols from the .so visible when building with -flto")
-  add_executable( EnergyPlus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+  add_executable( EnergyPlus main.cc "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
 else()
   add_executable( EnergyPlus main.cc  )
 endif()

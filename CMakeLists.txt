@@ -163,3 +163,20 @@ if( BUILD_PACKAGE )
   include(cmake/Install.cmake)
 endif()
 
+if(ENABLE_LTO AND MSVC)
+  set_target_properties(sqlite objexx objexx_tests bcvtb epexpat epfmiimport miniziplib DElight parser TestEnergyPlusCallbacks EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2
+                        PROPERTIES LINK_FLAGS "/LTCG" STATIC_LIBRARY_FLAGS "/LTCG")
+endif()
+
+if (PROFILE_GENERATE AND MSVC)
+  set_target_properties(sqlite objexx objexx_tests bcvtb epexpat epfmiimport miniziplib DElight parser TestEnergyPlusCallbacks EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
+                        PROPERTIES LINK_FLAGS "/LTCG:PGI" STATIC_LIBRARY_FLAGS "/LTCG")
+endif()
+
+if (PROFILE_USE AND MSVC)
+  set_target_properties(sqlite objexx objexx_tests bcvtb epexpat epfmiimport miniziplib DElight parser TestEnergyPlusCallbacks EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
+                        PROPERTIES LINK_FLAGS "/LTCG:PGO" STATIC_LIBRARY_FLAGS "/LTCG")
+endif()
+
+
+

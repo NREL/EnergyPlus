@@ -30,7 +30,34 @@ IF ( MSVC ) # visual c++ (VS 2013)
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     ADD_CXX_RELEASE_DEFINITIONS("-GS-") # Disable buffer overrun checks for performance in release mode
-    
+   
+    option(ENABLE_LTO "Enable link-time-optimization" FALSE)
+    if(ENABLE_LTO)
+      set(LINKER_FLAGS "${LINKER_FLAGS} /LTCG")
+    endif()
+
+    option(PROFILE_GENERATE "Generate profile data" FALSE)
+    if (PROFILE_GENERATE)
+      set(LINKER_FLAGS "${LINKER_FLAGS} /LTCG:PGI")
+    endif()
+
+    option(PROFILE_USE "Use profile data" FALSE)
+    if (PROFILE_USE)
+      set(LINKER_FLAGS "${LINKER_FLAGS} /LTCG:PGO")
+    endif()
+
+    if (PROFILE_USE OR PROFILE_GENERATE OR ENABLE_LTO)
+      add_definitions(-GL)
+    endif()
+
+
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
+
+
+
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
