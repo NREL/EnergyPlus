@@ -120,6 +120,9 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       if (CMAKE_COMPILER_IS_GNUCXX) 
         add_definitions(-fprofile-use)
         set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-use")
+      else()
+        add_definitions(-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata)
+        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
       endif()
     endif()
 
