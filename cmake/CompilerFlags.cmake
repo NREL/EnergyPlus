@@ -31,32 +31,6 @@ IF ( MSVC ) # visual c++ (VS 2013)
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     ADD_CXX_RELEASE_DEFINITIONS("-GS-") # Disable buffer overrun checks for performance in release mode
    
-    option(ENABLE_LTO "Enable link-time-optimization" FALSE)
-    if(ENABLE_LTO)
-      set(LINKER_FLAGS "${LINKER_FLAGS} /LTCG")
-    endif()
-
-    option(PROFILE_GENERATE "Generate profile data" FALSE)
-    if (PROFILE_GENERATE)
-      set(LINKER_FLAGS "${LINKER_FLAGS} /LTCG:PGI")
-    endif()
-
-    option(PROFILE_USE "Use profile data" FALSE)
-    if (PROFILE_USE)
-      set(LINKER_FLAGS "${LINKER_FLAGS} /LTCG:PGO")
-    endif()
-
-    if (PROFILE_USE OR PROFILE_GENERATE OR ENABLE_LTO)
-      add_definitions(-GL)
-    endif()
-
-
-
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
-
-
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
@@ -90,46 +64,10 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       endif()
     endif()
 
-    option(ENABLE_LTO "Enable link-time-optimization in gcc/clang" FALSE)
-
-    if(ENABLE_LTO)
-      if (CMAKE_COMPILER_IS_GNUCXX)
-        set(LINKER_FLAGS "${LINKER_FLAGS} -flto=7")
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fwhole-program")
-        add_definitions(-flto=7)
-        add_definitions(-fwhole-program)      
-      else()
-        set(LINKER_FLAGS "${LINKER_FLAGS} -flto")
-        add_definitions(-flto)
-      endif()
-    endif()
-
-    option(PROFILE_GENERATE "Generate profile data" FALSE)
-    if (PROFILE_GENERATE)
-      if (CMAKE_COMPILER_IS_GNUCXX) 
-        add_definitions(-fprofile-generate)
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-generate")
-      else()
-        add_definitions(-fprofile-instr-generate)
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-instr-generate")
-      endif()
-    endif()
-
-    option(PROFILE_USE "Use profile data" FALSE)
-    if (PROFILE_USE)
-      if (CMAKE_COMPILER_IS_GNUCXX) 
-        add_definitions(-fprofile-use)
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-use")
-      else()
-        add_definitions(-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata)
-        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
-      endif()
-    endif()
-
-
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS}")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${LINKER_FLAGS}")
     set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} ${LINKER_FLAGS}")
+
 
     # COMPILER FLAGS
     ADD_CXX_DEFINITIONS("-std=c++11") # Enable C++11 features in g++

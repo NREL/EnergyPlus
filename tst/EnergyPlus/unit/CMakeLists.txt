@@ -13,7 +13,7 @@ set( test_src
 )
 
 set( test_dependencies
-  EnergyPlusLib
+  EnergyPlusAPI
   objexx
   sqlite
   bcvtb 

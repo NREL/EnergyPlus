@@ -88,6 +88,18 @@ set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 
+# Advanced, time consuming compiler optimization options
+
+option(ENABLE_LTO "Enable link-time-optimization" FALSE)
+option(PROFILE_GENERATE "Generate profile data" FALSE)
+option(PROFILE_USE "Use profile data" FALSE)
+
+
+if (PROFILE_USE AND PROFILE_GENERATE)
+  message(SEND_ERROR "Cannot enable PROFILE_USE and PROFILE_GENERATE simultaneously")
+endif()
+
+
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
@@ -163,20 +175,92 @@ if( BUILD_PACKAGE )
   include(cmake/Install.cmake)
 endif()
 
-if(ENABLE_LTO AND MSVC)
-  set_target_properties(sqlite objexx objexx_tests bcvtb epexpat epfmiimport miniziplib DElight parser TestEnergyPlusCallbacks EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2
-                        PROPERTIES LINK_FLAGS "/LTCG" STATIC_LIBRARY_FLAGS "/LTCG")
+
+set(OPTIMIZABLE_TARGETS
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight parser EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 objexx_tests
+    )
+
+  #if(MSVC)
+  #  list(APPEND OPTIMIZABLE_TARGETS EnergyPlusLib2 )
+  #endif()
+
+  message (${OPTIMIZABLE_TARGETS})
+if(MSVC)
+  if (PROFILE_USE OR PROFILE_GENERATE OR ENABLE_LTO)
+    add_definitions(-GL)
+  endif()
+
+  if(ENABLE_LTO)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "/LTCG" STATIC_LIBRARY_FLAGS "/LTCG")
+  endif()
+
+  if (PROFILE_GENERATE)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "/LTCG:PGI" STATIC_LIBRARY_FLAGS "/LTCG")
+  endif()
+
+  if (PROFILE_USE)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "/LTCG:PGO" STATIC_LIBRARY_FLAGS "/LTCG")
+  endif()
+elseif (CMAKE_COMPILER_IS_GNUCXX)
+  if(ENABLE_LTO)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin")
+    set_target_properties(EnergyPlus
+      PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program")
+  endif()
+
+  if (PROFILE_GENERATE)
+    set_target_properties(${OPTIMIZABLE_TARGETS} EnergyPlus_tests TestEnergyPlusCallbacks
+      PROPERTIES LINK_FLAGS "-fprofile-generate"  COMPILE_FLAGS "-fprofile-generate")
+  endif()
+
+  if (PROFILE_USE)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "-fprofile-use"  COMPILE_FLAGS "-fprofile-use")
+  endif()
+
+  if (PROFILE_USE AND ENABLE_LTO)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use" COMPILE_FLAGS "-flto=7 -fno-use-linker-plugin -fprofile-use")
+    set_target_properties(EnergyPlus
+      PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use")
+  endif()
 endif()
 
-if (PROFILE_GENERATE AND MSVC)
-  set_target_properties(sqlite objexx objexx_tests bcvtb epexpat epfmiimport miniziplib DElight parser TestEnergyPlusCallbacks EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
-                        PROPERTIES LINK_FLAGS "/LTCG:PGI" STATIC_LIBRARY_FLAGS "/LTCG")
-endif()
+#    if(ENABLE_LTO)
+#      if (CMAKE_COMPILER_IS_GNUCXX)
+#        set(LINKER_FLAGS "${LINKER_FLAGS} -flto=7")
+#        set(LINKER_FLAGS "${LINKER_FLAGS} -fwhole-program")
+#        add_definitions(-flto=7)
+#        add_definitions(-fwhole-program)
+#      else()
+#        set(LINKER_FLAGS "${LINKER_FLAGS} -flto")
+#        add_definitions(-flto)
+#      endif()
+#    endif()
 
-if (PROFILE_USE AND MSVC)
-  set_target_properties(sqlite objexx objexx_tests bcvtb epexpat epfmiimport miniziplib DElight parser TestEnergyPlusCallbacks EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
-                        PROPERTIES LINK_FLAGS "/LTCG:PGO" STATIC_LIBRARY_FLAGS "/LTCG")
-endif()
+#    if (PROFILE_GENERATE)
+#      if (CMAKE_COMPILER_IS_GNUCXX) 
+#        add_definitions(-fprofile-generate)
+#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-generate")
+#      else()
+#        add_definitions(-fprofile-instr-generate)
+#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-instr-generate")
+#      endif()
+#    endif()
+
+#    if (PROFILE_USE)
+#      if (CMAKE_COMPILER_IS_GNUCXX) 
+#        add_definitions(-fprofile-use)
+#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-use")
+#      else()
+#        add_definitions(-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata)
+#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
+#      endif()
+#    endif()
 
 
 
