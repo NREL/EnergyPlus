@@ -6092,7 +6092,7 @@ namespace PlantPipingSystemsManager {
 						}
 					} else if ( CellXIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 1 ) || CellYIndex == 0 ) {
 						CellType = CellType_FarfieldBoundary;
-						TotNumCells;
+						TotNumCells++;
 					} else if ( CellZIndex == 0 || CellZIndex == ubound( PipingSystemDomains( DomainNum ).Cells, 3 ) ) {
 						CellType = ZWallCellType;
 						TotNumCells++;
