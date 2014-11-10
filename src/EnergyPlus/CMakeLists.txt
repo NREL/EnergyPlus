@@ -572,7 +572,7 @@ install( TARGETS EnergyPlusAPI
 )
 
 
-if (NOT MSVC AND ENABLE_LTO)
+if (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
   target_link_libraries( EnergyPlusLib2 EnergyPlusLib )
   target_link_libraries( EnergyPlusLib EnergyPlusLib2 )
   add_executable( EnergyPlus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )

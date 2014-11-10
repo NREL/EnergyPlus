@@ -177,14 +177,17 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight parser EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 objexx_tests
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 objexx_tests
     )
+if(NOT APPLE)
+  list(APPEND OPTIMIZABLE_TARGETS parser)
+endif()
 
   #if(MSVC)
   #  list(APPEND OPTIMIZABLE_TARGETS EnergyPlusLib2 )
   #endif()
 
-  message (${OPTIMIZABLE_TARGETS})
+  #message (${OPTIMIZABLE_TARGETS})
 if(MSVC)
   if (PROFILE_USE OR PROFILE_GENERATE OR ENABLE_LTO)
     add_definitions(-GL)
@@ -228,39 +231,29 @@ elseif (CMAKE_COMPILER_IS_GNUCXX)
     set_target_properties(EnergyPlus
       PROPERTIES LINK_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use" COMPILE_FLAGS "-flto=7 -fuse-linker-plugin -fwhole-program -fprofile-use")
   endif()
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # Clang
+  if(ENABLE_LTO)
+    set_target_properties(EnergyPlus
+      PROPERTIES LINK_FLAGS "-flto" COMPILE_FLAGS "-flto")
+  endif()
+
+  if (PROFILE_GENERATE)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "-fprofile-instr-generate" COMPILE_FLAGS "-fprofile-instr-generate") 
+  endif()
+
+  if (PROFILE_USE)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata" COMPILE_FLAGS "-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
+  endif()
+
+  if (PROFILE_USE AND ENABLE_LTO)
+    set_target_properties(${OPTIMIZABLE_TARGETS}
+      PROPERTIES LINK_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata" COMPILE_FLAGS "-flto -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
+  endif()
+
+ 
 endif()
-
-#    if(ENABLE_LTO)
-#      if (CMAKE_COMPILER_IS_GNUCXX)
-#        set(LINKER_FLAGS "${LINKER_FLAGS} -flto=7")
-#        set(LINKER_FLAGS "${LINKER_FLAGS} -fwhole-program")
-#        add_definitions(-flto=7)
-#        add_definitions(-fwhole-program)
-#      else()
-#        set(LINKER_FLAGS "${LINKER_FLAGS} -flto")
-#        add_definitions(-flto)
-#      endif()
-#    endif()
-
-#    if (PROFILE_GENERATE)
-#      if (CMAKE_COMPILER_IS_GNUCXX) 
-#        add_definitions(-fprofile-generate)
-#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-generate")
-#      else()
-#        add_definitions(-fprofile-instr-generate)
-#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-instr-generate")
-#      endif()
-#    endif()
-
-#    if (PROFILE_USE)
-#      if (CMAKE_COMPILER_IS_GNUCXX) 
-#        add_definitions(-fprofile-use)
-#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-use")
-#      else()
-#        add_definitions(-fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata)
-#        set(LINKER_FLAGS "${LINKER_FLAGS} -fprofile-instr-use=${CMAKE_BINARY_DIR}/profdata")
-#      endif()
-#    endif()
 
 
 
