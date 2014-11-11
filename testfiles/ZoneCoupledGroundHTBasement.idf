@@ -7,20 +7,20 @@
 
 !- =========== ALL OBJECTS IN CLASS: VERSION ===========
 
-! GroundDomain.idf
+! ZoneCoupledGroundHTBasement.idf
 ! Basic File Description:
-! This input file exemplifies the use of the PipingSystem:Underground
-! collection of objects to perform the simulation of foundation heat
+! This input file exemplifies the use of the Site:GroundDomain:Basement
+! object to perform the simulation of ground coupled heat transfer.
 ! exchangers
-! Highlights: Simulate a foundation heat exchanger in close proximity to a basement
+! Highlights: Simulates ground coupled heat transfer with basement zone.
 ! Simulation Location/Run:
 ! Location: Denver, CO
 ! Design Days SummerDesignDay and WinterDesignDay
 ! Run Period: Annual simulation
-! Run Control: Zone, Sys, Plant sizing; Run sizing periods, don't run annual simulation
+! Run Control: Annual simulation
 !
 ! Building: Idealized approximation of simple residential building with basement
-! Floor Area: 150 m2 per floor
+! Floor Area: 100 m2 per floor
 ! Number of Stories: 2, one below ground
 !
 ! Zone Description Details:
@@ -38,20 +38,20 @@
 ! Compact Schedules (preferred): Yes
 ! Solar Distribution: FullInteriorAndExterior
 !
-! HVAC: Water source heat pump for each floor
+! HVAC: Ideal air system
 ! Purchased Air: No
-! Zonal Equipment: ZoneHVAC:WaterToAirHeatPump
+! Zonal Equipment: No
 ! Central Air Handling Equipment: No
-! System Equipment Autosize: Yes
+! System Equipment Autosize: No
 ! Purchased Cooling: No
 ! Purchased Heating: No
-! Coils: Water-to-air heating and cooling coils
-! Pumps: Variable speed
+! Coils: No
+! Pumps: No
 ! Boilers: No
 ! Chillers: No
 ! Towers: No
 !
-! Results: Standard hourly variables for zone, fluid, and heat exchanger conditions
+! Results: Standard hourly variables for zone.
 ! Standard Reports: No
 ! Timestep or Hourly Variables: Hourly
 ! Time bins Report: No
@@ -219,10 +219,10 @@ RunPeriod,
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    10,0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    10,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,10.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Wall 2,         !- Name
@@ -235,10 +235,10 @@ RunPeriod,
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    10,10,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    10,10,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,10,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,0.0,0.0;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Wall 3,         !- Name
@@ -251,10 +251,10 @@ RunPeriod,
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    10,0,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    10,10,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    10,10,0,  !- X,Y,Z ==> Vertex 3 {m}
-    10,0,0;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,0.0,0.0,  !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,0.0,  !- X,Y,Z ==> Vertex 2 {m}
+    10.0,10.0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
+    10.0,0.0,-3.1;  !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Wall 4,         !- Name
@@ -267,10 +267,10 @@ RunPeriod,
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    0,10,0,  !- X,Y,Z ==> Vertex 3 {m}
-    0,10,-3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,0.0,            !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,0.0,             !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,-3.1,            !- X,Y,Z ==> Vertex 3 {m}
+    0.0,10.0,-3.1;           !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Floor,          !- Name
@@ -283,10 +283,10 @@ RunPeriod,
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10,-3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    10,10,-3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    10,0,-3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,-3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,-3.1,          !- X,Y,Z ==> Vertex 1 {m}
+    0.0,10.0,-3.1,           !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,-3.1,            !- X,Y,Z ==> Vertex 3 {m}
+    10.0,0.0,-3.1;           !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Ceiling,        !- Name
@@ -299,10 +299,10 @@ RunPeriod,
     NoWind,                  !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10,0,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    10,0,0,  !- X,Y,Z ==> Vertex 3 {m}
-    10,10,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,0.0,            !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,0.0,           !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,0.0,            !- X,Y,Z ==> Vertex 3 {m}
+    0.0,0.0,0.0;             !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:OtherSideConditionsModel,
     BasementWallOSCM,        !- Name
@@ -342,10 +342,10 @@ Zone,
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    10,0,0,  !- X,Y,Z ==> Vertex 2 {m}
-    10,0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,3.1,            !- X,Y,Z ==> Vertex 1 {m}
+    0.0,10.0,0.0,            !- X,Y,Z ==> Vertex 2 {m}
+    10.0,10.0,0.0,           !- X,Y,Z ==> Vertex 3 {m}
+    10.0,10.0,3.1;           !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 2,       !- Name
@@ -358,10 +358,10 @@ Zone,
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10,0,  !- X,Y,Z ==> Vertex 1 {m}
-    10,10,0,  !- X,Y,Z ==> Vertex 2 {m}
-    10,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,10,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,0.0,3.1,             !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,0.0,             !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,0.0,            !- X,Y,Z ==> Vertex 3 {m}
+    10.0,0.0,3.1;            !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 3,       !- Name
@@ -374,10 +374,10 @@ Zone,
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    10,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    10,10,0,  !- X,Y,Z ==> Vertex 2 {m}
-    10,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    10,0,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    10.0,0.0,3.1,            !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,3.1,           !- X,Y,Z ==> Vertex 2 {m}
+    10.0,10.0,0.0,           !- X,Y,Z ==> Vertex 3 {m}
+    10.0,0.0,0.0;            !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Wall 4,       !- Name
@@ -390,10 +390,10 @@ Zone,
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,0,0,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    0,10,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    0,10,0;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,3.1,            !- X,Y,Z ==> Vertex 1 {m}
+    0.0,0.0,3.1,             !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,0.0,             !- X,Y,Z ==> Vertex 3 {m}
+    0.0,10.0,0.0;            !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Main Floor Roof,         !- Name
@@ -406,10 +406,10 @@ Zone,
     WindExposed,             !- Wind Exposure
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
-    0,10,3.1,  !- X,Y,Z ==> Vertex 1 {m}
-    0,0,3.1,  !- X,Y,Z ==> Vertex 2 {m}
-    10,0,3.1,  !- X,Y,Z ==> Vertex 3 {m}
-    10,10,3.1;  !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,3.1,            !- X,Y,Z ==> Vertex 1 {m}
+    10.0,10.0,3.1,           !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,3.1,            !- X,Y,Z ==> Vertex 3 {m}
+    0.0,0.0,3.1;             !- X,Y,Z ==> Vertex 4 {m}
     
 !- =========== ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
@@ -562,10 +562,10 @@ Material,
     836,                     !- Soil Specific Heat {J/kg-K}
     30,                      !- Soil Moisture Content Volume Fraction {percent}
     50,                      !- Soil Moisture Content Volume Fraction at Saturation {percent}
-    5,                       !- Kusuda-Achenbach Average Surface Temperature {C}
-    0,                       !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
-    0,                       !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
-    0,                       !- Evapotranspiration Ground Cover Parameter
+    15.5, !- Kusuda-Achenbach Average Surface Temperature {C}
+    12.8, !- Kusuda-Achenbach Average Amplitude of Surface Temperature {C}
+    17.3, !- Kusuda-Achenbach Phase Shift of Minimum Surface Temperature {days}
+    0.5,  !- Evapotranspiration Ground Cover Parameter
     BasementFloorOSCM,       !- Name of Basement Floor Boundary Condition Model
     Yes,                     !- Basement Horizontal Underfloor Insulation Present (Yes/No)
     Basement Insulation,     !- Basement Horizontal Insulation Underfloor Material Name

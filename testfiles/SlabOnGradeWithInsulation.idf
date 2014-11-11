@@ -9,7 +9,7 @@
 
 ! SlabOnGradeWithInsulation.idf
 ! Basic File Description:
-! This input file exemplifies the use of the Site:GroundDomain
+! This input file exemplifies the use of the Site:GroundDomain:Slab
 ! object to perform the simulation of ground coupled heat transfer.
 
 ! Highlights: Simulate a heat transfer interaction with the slab
@@ -303,17 +303,17 @@ BuildingSurface:Detailed,
     WindExposed, !- Wind Exposure
     autocalculate, !- View Factor to Ground
     4, !- Number of Vertices
-    0, !- Vertex 1 X-coordinate {m}
-    0, !- Vertex 1 Y-coordinate {m}
-    0, !- Vertex 1 Z-coordinate {m}
-    15, !- Vertex 2 X-coordinate {m}
-    0, !- Vertex 2 Y-coordinate {m}
-    0, !- Vertex 2 Z-coordinate {m}
-    15, !- Vertex 3 X-coordinate {m}
-    0, !- Vertex 3 Y-coordinate {m}
-    3.1, !- Vertex 3 Z-coordinate {m}
-    0, !- Vertex 4 X-coordinate {m}
-    0, !- Vertex 4 Y-coordinate {m}
+    0.0, !- Vertex 1 X-coordinate {m}
+    0.0, !- Vertex 1 Y-coordinate {m}
+    3.1, !- Vertex 1 Z-coordinate {m}
+    0.0, !- Vertex 2 X-coordinate {m}
+    0.0, !- Vertex 2 Y-coordinate {m}
+    0.0, !- Vertex 2 Z-coordinate {m}
+    10.0, !- Vertex 3 X-coordinate {m}
+    0.0, !- Vertex 3 Y-coordinate {m}
+    0.0, !- Vertex 3 Z-coordinate {m}
+    10.0, !- Vertex 4 X-coordinate {m}
+    0.0, !- Vertex 4 Y-coordinate {m}
     3.1; !- Vertex 4 Z-coordinate {m}
 
 BuildingSurface:Detailed,
@@ -327,17 +327,17 @@ BuildingSurface:Detailed,
     WindExposed, !- Wind Exposure
     autocalculate, !- View Factor to Ground
     4, !- Number of Vertices
-    0, !- Vertex 1 X-coordinate {m}
-    10, !- Vertex 1 Y-coordinate {m}
-    0, !- Vertex 1 Z-coordinate {m}
-    15, !- Vertex 2 X-coordinate {m}
-    10, !- Vertex 2 Y-coordinate {m}
-    0, !- Vertex 2 Z-coordinate {m}
-    15, !- Vertex 3 X-coordinate {m}
-    10, !- Vertex 3 Y-coordinate {m}
-    3.1, !- Vertex 3 Z-coordinate {m}
-    0, !- Vertex 4 X-coordinate {m}
-    10, !- Vertex 4 Y-coordinate {m}
+    10.0, !- Vertex 1 X-coordinate {m}
+    10.0, !- Vertex 1 Y-coordinate {m}
+    3.1, !- Vertex 1 Z-coordinate {m}
+    10.0, !- Vertex 2 X-coordinate {m}
+    10.0, !- Vertex 2 Y-coordinate {m}
+    0.0, !- Vertex 2 Z-coordinate {m}
+    0.0, !- Vertex 3 X-coordinate {m}
+    10.0, !- Vertex 3 Y-coordinate {m}
+    0.0, !- Vertex 3 Z-coordinate {m}
+    0.0, !- Vertex 4 X-coordinate {m}
+    10.0, !- Vertex 4 Y-coordinate {m}
     3.1; !- Vertex 4 Z-coordinate {m}
 
 BuildingSurface:Detailed,
@@ -351,17 +351,17 @@ BuildingSurface:Detailed,
     WindExposed, !- Wind Exposure
     autocalculate, !- View Factor to Ground
     4, !- Number of Vertices
-    15, !- Vertex 1 X-coordinate {m}
-    0, !- Vertex 1 Y-coordinate {m}
-    0, !- Vertex 1 Z-coordinate {m}
-    15, !- Vertex 2 X-coordinate {m}
-    10, !- Vertex 2 Y-coordinate {m}
-    0, !- Vertex 2 Z-coordinate {m}
-    15, !- Vertex 3 X-coordinate {m}
-    10, !- Vertex 3 Y-coordinate {m}
-    3.1, !- Vertex 3 Z-coordinate {m}
-    15, !- Vertex 4 X-coordinate {m}
-    0, !- Vertex 4 Y-coordinate {m}
+    10.0, !- Vertex 1 X-coordinate {m}
+    0.0, !- Vertex 1 Y-coordinate {m}
+    3.1, !- Vertex 1 Z-coordinate {m}
+    10.0, !- Vertex 2 X-coordinate {m}
+    0.0, !- Vertex 2 Y-coordinate {m}
+    0.0, !- Vertex 2 Z-coordinate {m}
+    10.0, !- Vertex 3 X-coordinate {m}
+    10.0, !- Vertex 3 Y-coordinate {m}
+    0.0, !- Vertex 3 Z-coordinate {m}
+    10.0, !- Vertex 4 X-coordinate {m}
+    10.0, !- Vertex 4 Y-coordinate {m}
     3.1; !- Vertex 4 Z-coordinate {m}
 
 BuildingSurface:Detailed,
@@ -375,18 +375,18 @@ BuildingSurface:Detailed,
     WindExposed, !- Wind Exposure
     autocalculate, !- View Factor to Ground
     4, !- Number of Vertices
-    0, !- Vertex 1 X-coordinate {m}
-    0, !- Vertex 1 Y-coordinate {m}
-    0, !- Vertex 1 Z-coordinate {m}
-    0, !- Vertex 2 X-coordinate {m}
-    0, !- Vertex 2 Y-coordinate {m}
-    3.1, !- Vertex 2 Z-coordinate {m}
-    0, !- Vertex 3 X-coordinate {m}
-    10, !- Vertex 3 Y-coordinate {m}
-    3.1, !- Vertex 3 Z-coordinate {m}
-    0, !- Vertex 4 X-coordinate {m}
-    10, !- Vertex 4 Y-coordinate {m}
-    0; !- Vertex 4 Z-coordinate {m}
+    0.0, !- Vertex 1 X-coordinate {m}
+    10.0, !- Vertex 1 Y-coordinate {m}
+    3.1, !- Vertex 1 Z-coordinate {m}
+    0.0, !- Vertex 2 X-coordinate {m}
+    10.0, !- Vertex 2 Y-coordinate {m}
+    0.0, !- Vertex 2 Z-coordinate {m}
+    0.0, !- Vertex 3 X-coordinate {m}
+    0.0, !- Vertex 3 Y-coordinate {m}
+    0.0, !- Vertex 3 Z-coordinate {m}
+    0.0, !- Vertex 4 X-coordinate {m}
+    0.0, !- Vertex 4 Y-coordinate {m}
+    3.1; !- Vertex 4 Z-coordinate {m}
 
 BuildingSurface:Detailed,
     Main Floor Roof, !- Name
@@ -399,17 +399,17 @@ BuildingSurface:Detailed,
     WindExposed, !- Wind Exposure
     autocalculate, !- View Factor to Ground
     4, !- Number of Vertices
-    0, !- Vertex 1 X-coordinate {m}
-    10, !- Vertex 1 Y-coordinate {m}
+    0.0, !- Vertex 1 X-coordinate {m}
+    10.0, !- Vertex 1 Y-coordinate {m}
     3.1, !- Vertex 1 Z-coordinate {m}
-    0, !- Vertex 2 X-coordinate {m}
-    0, !- Vertex 2 Y-coordinate {m}
+    0.0, !- Vertex 2 X-coordinate {m}
+    0.0, !- Vertex 2 Y-coordinate {m}
     3.1, !- Vertex 2 Z-coordinate {m}
-    10, !- Vertex 3 X-coordinate {m}
-    0, !- Vertex 3 Y-coordinate {m}
+    10.0, !- Vertex 3 X-coordinate {m}
+    0.0, !- Vertex 3 Y-coordinate {m}
     3.1, !- Vertex 3 Z-coordinate {m}
-    10, !- Vertex 4 X-coordinate {m}
-    10, !- Vertex 4 Y-coordinate {m}
+    10.0, !- Vertex 4 X-coordinate {m}
+    10.0, !- Vertex 4 Y-coordinate {m}
     3.1; !- Vertex 4 Z-coordinate {m}
 
 BuildingSurface:Detailed,
@@ -423,18 +423,18 @@ BuildingSurface:Detailed,
     NoWind, !- Wind Exposure
     autocalculate, !- View Factor to Ground
     4, !- Number of Vertices
-    0, !- Vertex 1 X-coordinate {m}
-    10, !- Vertex 1 Y-coordinate {m}
-    0, !- Vertex 1 Z-coordinate {m}
-    10, !- Vertex 2 X-coordinate {m}
-    10, !- Vertex 2 Y-coordinate {m}
-    0, !- Vertex 2 Z-coordinate {m}
-    10, !- Vertex 3 X-coordinate {m}
-    0, !- Vertex 3 Y-coordinate {m}
-    0, !- Vertex 3 Z-coordinate {m}
-    0, !- Vertex 4 X-coordinate {m}
-    0, !- Vertex 4 Y-coordinate {m}
-    0; !- Vertex 4 Z-coordinate {m}
+    10.0, !- Vertex 1 X-coordinate {m}
+    10.0, !- Vertex 1 Y-coordinate {m}
+    0.0, !- Vertex 1 Z-coordinate {m}
+    10.0, !- Vertex 2 X-coordinate {m}
+    0.0, !- Vertex 2 Y-coordinate {m}
+    0.0, !- Vertex 2 Z-coordinate {m}
+    0.0, !- Vertex 3 X-coordinate {m}
+    0.0, !- Vertex 3 Y-coordinate {m}
+    0.0, !- Vertex 3 Z-coordinate {m}
+    0.0, !- Vertex 4 X-coordinate {m}
+    10.0, !- Vertex 4 Y-coordinate {m}
+    0.0; !- Vertex 4 Z-coordinate {m}
 
 
 !- =========== ALL OBJECTS IN CLASS: SURFACEPROPERTY:OTHERSIDECONDITIONSMODEL ===========
