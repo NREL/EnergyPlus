@@ -29,13 +29,11 @@
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 
-#ifdef __unix__
-#include <unistd.h>
-#endif
-
 #ifdef _WIN32
-#include <stdlib.h>
-#include <direct.h>
+ #include <stdlib.h>
+ #include <direct.h>
+#else //Mac or Linux
+ #include <unistd.h>
 #endif
 
 void 
@@ -385,11 +383,10 @@ EnergyPlusPgm( std::string filepath )
 	}
 
 	if( ! filepath.empty() ) {
-#ifdef __unix__
-		int status = chdir(filepath.c_str());
-#endif
 #ifdef _WIN32
 		int status = _chdir(filepath.c_str());
+#else
+		int status = chdir(filepath.c_str());
 #endif
 		ProgramPath = filepath + pathChar;
 	}
