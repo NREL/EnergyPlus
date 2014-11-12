@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -501,7 +502,7 @@ namespace EvaporativeCoolers {
 		cCurrentModuleObject = "EvaporativeCooler:Indirect:ResearchSpecial";
 		for ( IndEvapCoolNum = 1; IndEvapCoolNum <= NumRDDEvapCool; ++IndEvapCoolNum ) {
 			EvapCoolNum = NumDirectEvapCool + NumDryInDirectEvapCool + NumWetInDirectEvapCool + IndEvapCoolNum;
-			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, IndEvapCoolNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), EvapCond.EvapCoolerName(), EvapCoolNum - 1, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -907,7 +908,7 @@ namespace EvaporativeCoolers {
 				}
 
 				// would like search for this componenent in some OutsideAirSys structure
-				// but thats not so easy becuase of circular USE with MixedAir.f90
+				// but thats not so easy becuase of circular USE with MixedAir.cc
 				//  So assume if its not on main air path, its on OA path (for now)
 				if ( ! CoolerOnMainAirLoop ) CoolerOnOApath = true;
 
@@ -1385,8 +1386,8 @@ namespace EvaporativeCoolers {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
 		std::string CompName;
-		Real64 FullOutput;
-		Real64 ReqOutput;
+		Real64 FullOutput( 0.0 );
+		Real64 ReqOutput( 0.0 );
 		int InletNode;
 		int OutletNode;
 		int ControlNode;
@@ -1427,6 +1428,8 @@ namespace EvaporativeCoolers {
 				// now reinit after test call
 				InitEvapCooler( EvapCoolNum );
 
+			} else {
+				assert( false );
 			}}
 
 			// Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
@@ -3300,7 +3303,7 @@ namespace EvaporativeCoolers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

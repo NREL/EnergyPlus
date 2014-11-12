@@ -46,7 +46,7 @@ namespace DataHeatBalance {
 	// Parameters for the definition and limitation of arrays:
 	extern int const MaxLayersInConstruct; // Maximum number of layers allowed in a single construction
 	extern int const MaxCTFTerms; // Maximum number of CTF terms allowed to still allow stability
-	extern int const MaxSolidWinLayers; // Maximum number of solid layers in a window construction
+	extern int MaxSolidWinLayers; // Maximum number of solid layers in a window construction
 	extern int const MaxSpectralDataElements; // Maximum number in Spectral Data arrays.
 
 	// Parameters to indicate material group type for use with the Material
@@ -5377,7 +5377,7 @@ namespace DataHeatBalance {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

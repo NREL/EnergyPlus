@@ -3664,6 +3664,7 @@ namespace HVACUnitarySystem {
 		FArray1D_string cAlphaFields; // Alpha field names
 		FArray1D_string cNumericFields; // Numeric field names
 		std::string CurrentModuleObject; // for ease in getting objects
+		std::string UnitarySysHeatPumpPerformanceObjectType; // Used for warning messages
 		std::string CoolingCoilType; // Used in mining function calls
 		std::string CoolingCoilName; // Used in mining function calls
 		std::string HeatingCoilType; // Used in mining function calls
@@ -3823,6 +3824,7 @@ namespace HVACUnitarySystem {
 
 		// Get the data for the DesignSpecification object
 		CurrentModuleObject = "UnitarySystemPerformance:HeatPump:Multispeed";
+		UnitarySysHeatPumpPerformanceObjectType = CurrentModuleObject;
 		DesignSpecMSHP.allocate( NumDesignSpecMultiSpeedHP );
 
 		for ( DesignSpecNum = 1; DesignSpecNum <= NumDesignSpecMultiSpeedHP; ++DesignSpecNum ) {
@@ -6535,7 +6537,7 @@ namespace HVACUnitarySystem {
 
 				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedCooling == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "... Cooling coil object type requires valid number of speeds for cooling to be specified" );
+					ShowContinueError( "... Cooling coil object type requires valid " + UnitarySysHeatPumpPerformanceObjectType + " for cooling to be specified with number of speeds > 0" );
 					ErrorsFound = true;
 				}
 			}
@@ -6546,7 +6548,7 @@ namespace HVACUnitarySystem {
 
 				if ( UnitarySystem( UnitarySysNum ).NumOfSpeedHeating == 0 ) {
 					ShowSevereError( CurrentModuleObject + " = " + UnitarySystem( UnitarySysNum ).Name );
-					ShowContinueError( "... Heating coil object type requires valid number of speeds for heating to be specified" );
+					ShowContinueError( "... Heating coil object type requires valid " + UnitarySysHeatPumpPerformanceObjectType + " for heating to be specified with number of speeds > 0" );
 					ErrorsFound = true;
 				}
 			}
@@ -9191,7 +9193,7 @@ namespace HVACUnitarySystem {
 					//           IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 					//           do not run the compressor
 					if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc ) {
-						PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+						//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 						//           If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 						//           run the compressor at PartLoadFrac = 1.
 						//        ELSEIF ((DesOutHumRat-FullLoadHumRatOut) .LT. HumRatAcc) THEN
@@ -9214,7 +9216,7 @@ namespace HVACUnitarySystem {
 							//               IF NoLoadHumRatOut is lower than (more dehumidification than required) or very near the DesOutHumRat,
 							//               do not run the compressor
 							if ( ( NoLoadHumRatOut - DesOutHumRat ) < HumRatAcc * 2.0 ) {
-								PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation
+								//PartLoadFrac = PartLoadFrac; // keep part-load fraction from sensible calculation // Self-assignment commented out
 								//                If the FullLoadHumRatOut is greater than (insufficient dehumidification) or very near the DesOutHumRat,
 								//                run the compressor at PartLoadFrac = 1.
 							} else if ( ( DesOutHumRat - FullLoadHumRatOut ) < HumRatAcc * 2.0 ) {
@@ -11427,7 +11429,7 @@ namespace HVACUnitarySystem {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
 		int UnitarySysNum; // index to Unitary System
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 CycRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11473,7 +11475,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11532,7 +11534,7 @@ namespace HVACUnitarySystem {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
 		int UnitarySysNum; // index to Unitary System
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 CycRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11591,7 +11593,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11648,7 +11650,7 @@ namespace HVACUnitarySystem {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
 		int UnitarySysNum; // index to Unitary System
-		Real64 OutletAirHumRat; // outlet air humidity ratio
+		Real64 OutletAirHumRat( 0.0 ); // outlet air humidity ratio
 		Real64 CycRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11693,7 +11695,7 @@ namespace HVACUnitarySystem {
 			OutletAirHumRat = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).HumRat;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirHumRat;
@@ -11749,7 +11751,7 @@ namespace HVACUnitarySystem {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 SpeedRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11804,7 +11806,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11863,7 +11865,7 @@ namespace HVACUnitarySystem {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
-		Real64 OutletAirTemp; // outlet air temperature [C]
+		Real64 OutletAirTemp( 0.0 ); // outlet air temperature [C]
 		Real64 SpeedRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -11933,7 +11935,7 @@ namespace HVACUnitarySystem {
 			OutletAirTemp = Node( UnitarySystem( UnitarySysNum ).HeatCoilOutletNodeNum ).Temp;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirTemp;
@@ -11990,7 +11992,7 @@ namespace HVACUnitarySystem {
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		int CoilIndex; // index of this coil
-		Real64 OutletAirHumRat; // outlet air humidity ratio [kg/kg]
+		Real64 OutletAirHumRat( 0.0 ); // outlet air humidity ratio [kg/kg]
 		Real64 SpeedRatio;
 		int SpeedNum;
 		int FanOpMode;
@@ -12037,7 +12039,7 @@ namespace HVACUnitarySystem {
 			OutletAirHumRat = Node( UnitarySystem( UnitarySysNum ).CoolCoilOutletNodeNum ).HumRat;
 
 		} else {
-
+			assert( false );
 		}}
 
 		Residuum = Par()( 2 ) - OutletAirHumRat;
@@ -12961,7 +12963,7 @@ namespace HVACUnitarySystem {
 			HXUnitOn = false;
 		}
 		FanOpMode = int( Par()( 5 ) );
-		CalcHXAssistedCoolingCoil( CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, EconomizerFlag = EconomizerFlag );
+		CalcHXAssistedCoolingCoil( CoilIndex, FirstHVACIteration, On, PartLoadRatio, HXUnitOn, FanOpMode, _, EconomizerFlag );
 		OutletAirHumRat = HXAssistedCoilOutletHumRat( CoilIndex );
 		Residuum = Par()( 2 ) - OutletAirHumRat;
 		return Residuum;
@@ -13457,7 +13459,7 @@ namespace HVACUnitarySystem {
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

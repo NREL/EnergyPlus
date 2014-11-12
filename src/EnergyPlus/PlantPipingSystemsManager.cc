@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -3677,7 +3678,7 @@ namespace PlantPipingSystemsManager {
 		// <description>
 
 		// Return value
-		Real64 RetVal;
+		Real64 RetVal( 0.0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -3689,6 +3690,8 @@ namespace PlantPipingSystemsManager {
 			RetVal = XNormalArea( c );
 		} else if ( ( SELECT_CASE_var == Direction_PositiveZ ) || ( SELECT_CASE_var == Direction_NegativeZ ) ) {
 			RetVal = ZNormalArea( c );
+		} else {
+			assert( false );
 		}}
 		//Autodesk:Return Check/enforce that one of these CASEs holds to assure return value is set
 
@@ -5605,7 +5608,7 @@ namespace PlantPipingSystemsManager {
 		// na
 
 		// Return value
-		int RetVal;
+		int RetVal( 0 );
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -5617,6 +5620,8 @@ namespace PlantPipingSystemsManager {
 			RetVal = PipingSystemDomains( DomainNum ).Mesh.Y.RegionMeshCount;
 		} else if ( SELECT_CASE_var == RegionType_ZDirection ) {
 			RetVal = PipingSystemDomains( DomainNum ).Mesh.Z.RegionMeshCount;
+		} else {
+			assert( false );
 		}}
 		//Autodesk:Return Check/enforce that one of these CASEs holds to assure return value is set
 
@@ -7100,7 +7105,7 @@ namespace PlantPipingSystemsManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		Real64 distance;
+		Real64 distance( 0.0 );
 
 		{ auto const SELECT_CASE_var( direction );
 		if ( ( SELECT_CASE_var == Direction_NegativeX ) || ( SELECT_CASE_var == Direction_PositiveX ) ) {
@@ -7109,6 +7114,8 @@ namespace PlantPipingSystemsManager {
 			distance = ( Height( cell ) / 2.0 );
 		} else if ( ( SELECT_CASE_var == Direction_NegativeZ ) || ( SELECT_CASE_var == Direction_PositiveZ ) ) {
 			distance = ( Depth( cell ) / 2.0 );
+		} else {
+			assert( false );
 		}}
 
 		resistance = ( distance / 2.0 ) / ( cell.MyBase.Properties.Conductivity * NormalArea( cell, direction ) );
@@ -8778,9 +8785,9 @@ namespace PlantPipingSystemsManager {
 		Real64 NeighborConductivity;
 		Real64 ThisNormalArea;
 
-		int NX;
-		int NY;
-		int NZ;
+		int NX( 0 );
+		int NY( 0 );
+		int NZ( 0 );
 		int X;
 		int Y;
 		int Z;
@@ -8818,6 +8825,8 @@ namespace PlantPipingSystemsManager {
 			NX = X;
 			NY = Y;
 			NZ = Z - 1;
+		} else {
+			assert( false );
 		}}
 
 		//'split effects between the two cells so we can carefully calculate resistance values
@@ -8996,7 +9005,7 @@ namespace PlantPipingSystemsManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

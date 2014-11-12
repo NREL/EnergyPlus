@@ -89,7 +89,7 @@ namespace DataSurfaces {
 	// SHADING (includes OVERHANG, WING), DETACHED, INTMASS),
 	// TDD:DOME, TDD:DIFFUSER (for tubular daylighting device)
 	// (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
-	// in SurfaceGeometry.f90, SurfaceWindow%OriginalClass holds the true value)
+	// in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
 	// why aren't these sequential (LKL - 13 Aug 2007)
 	extern int const SurfaceClass_Wall;
 	extern int const SurfaceClass_Floor;
@@ -1222,7 +1222,7 @@ namespace DataSurfaces {
 		Real64 SpecTemp; // The specification temperature of the TC layer glass
 		// Added for W6 integration June 2010
 		int WindowModelType; // if set to WindowBSDFModel, then uses BSDF methods
-		BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.f90 for declaration
+		BSDFWindowDescript ComplexFen; // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 
 		// Default Constructor
 		SurfaceWindowCalc() :
@@ -1552,7 +1552,7 @@ namespace DataSurfaces {
 			Real64 const TCLayerTemp, // The temperature of the thermochromic layer of the window
 			Real64 const SpecTemp, // The specification temperature of the TC layer glass
 			int const WindowModelType, // if set to WindowBSDFModel, then uses BSDF methods
-			BSDFWindowDescript const & ComplexFen // Data for complex fenestration, see DataBSDFWindow.f90 for declaration
+			BSDFWindowDescript const & ComplexFen // Data for complex fenestration, see DataBSDFWindow.cc for declaration
 		) :
 			ExtIntShadePrevTS( ExtIntShadePrevTS ), 
 			ShadingFlagEMSOn( ShadingFlagEMSOn ),
@@ -2507,7 +2507,7 @@ namespace DataSurfaces {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

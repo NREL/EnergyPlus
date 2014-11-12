@@ -77,7 +77,6 @@ namespace WindowEquivalentLayer {
 	using namespace DataSurfaces;
 	using DataGlobals::TimeStep;
 	using DataGlobals::HourOfDay;
-	using DataGlobals::Pi;
 	using DataGlobals::PiOvr2;
 	using DataGlobals::StefanBoltzmann;
 	using DataGlobals::KelvinConv;
@@ -90,7 +89,7 @@ namespace WindowEquivalentLayer {
 	using General::TrimSigDigits;
 
 	// Data
-	Real64 const RadiansToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
+	Real64 const RadiansToDeg( 180.0 / 3.141592653589793 ); // Conversion for Radians to Degrees: Not using DataGlobals::Pi to avoid initialization order bug
 	Real64 const PAtmSeaLevel( 101325.0 ); // Standard atmospheric pressure at sea level (Pa)
 	int const hipRHO( 1 ); // return reflectance
 	int const hipTAU( 2 ); // return transmittance
@@ -4265,6 +4264,7 @@ namespace WindowEquivalentLayer {
 					YD = YA;
 					XE = 0.0;
 					YE = YD;
+					//Bug XF, YF not set but used below (XE, YE are set but NOT used)
 				} else {
 					if ( ( PHI + OMEGA ) < 0.0 ) {
 						XC = -XC;
@@ -4338,6 +4338,7 @@ namespace WindowEquivalentLayer {
 						YD = YA;
 						XE = 0.0;
 						YE = YD;
+						//Bug XF, YF not set but used below (XE, YE are set but NOT used)
 					} else {
 						if ( ( PHI + OMEGA ) < 0.0 ) {
 							XC = -XC;
@@ -9512,7 +9513,7 @@ namespace WindowEquivalentLayer {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -63,7 +63,7 @@ namespace VentilatedSlab {
 
 	// REFERENCES:
 	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
-	// Fred Buhl's fan coil module (FanCoilUnits.f90)
+	// Fred Buhl's fan coil module (FanCoilUnits.cc)
 
 	// OTHER NOTES: none
 
@@ -273,9 +273,9 @@ namespace VentilatedSlab {
 		// Standard EnergyPlus methodology.
 
 		// REFERENCES:
-		// Fred Buhl's fan coil module (FanCoilUnits.f90)
-		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.f90)
-		// Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.f90)
+		// Fred Buhl's fan coil module (FanCoilUnits.cc)
+		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.cc)
+		// Rick Strand's Low temperature Radiant system (RadiantSystemLowTemp.cc)
 
 		// Using/Aliasing
 		using InputProcessor::GetNumObjectsFound;
@@ -2227,8 +2227,8 @@ namespace VentilatedSlab {
 			SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
 		} else if ( SELECT_CASE_var == DPTZControl ) {
 			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
-
 		} else { // Should never get here
+			SetPointTemp = 0.0; // Suppress uninitialized warning
 			ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
 			ShowFatalError( "Preceding condition causes termination." );
 		}}
@@ -4096,7 +4096,7 @@ namespace VentilatedSlab {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

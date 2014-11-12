@@ -1,6 +1,9 @@
 INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 INCLUDE_DIRECTORIES(  /usr/include/atlas )
 
+# public API headers go in the src/EnergyPlus/public folder
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/public )
+
 if(MSVC)
 #  add_definitions(/Za)
 endif()
@@ -523,19 +526,50 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
-ADD_LIBRARY(EnergyPlusLib STATIC ${SRC})
-ADD_EXECUTABLE(EnergyPlus main.cc main.hh)
-
-#TARGET_LINK_LIBRARIES( EnergyPlus DElight )
-LINK_DIRECTORIES( /usr/lib/atlas-base/ )
-LINK_DIRECTORIES( /usr/lib/x86_64-linux-gnu/ )
-TARGET_LINK_LIBRARIES( EnergyPlus EnergyPlusLib objexx sqlite lapack_atlas rt bcvtb epexpat epfmiimport )
-
-if(CMAKE_HOST_UNIX)
-  if(NOT APPLE)
-    TARGET_LINK_LIBRARIES( EnergyPlus dl )
-  endif()
+# first we will create a static library of EnergyPlus
+# this will be linked statically to create the DLL and also the unit tests
+add_library( EnergyPlusLib STATIC ${SRC} )
+target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight lapack_atlas rt )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( EnergyPlusLib dl )
 endif()
 
+# second we will create the shared library that is actually packaged with EnergyPlus
+add_library( EnergyPlusAPI SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+if (UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
+target_link_libraries( EnergyPlusAPI EnergyPlusLib )
+set_target_properties(
+  EnergyPlusAPI
+  PROPERTIES
+  INSTALL_NAME_DIR "@executable_path"
+)
+install( TARGETS EnergyPlusAPI 
+  RUNTIME DESTINATION ./ 
+  LIBRARY DESTINATION ./ 
+)
 
-INSTALL( TARGETS EnergyPlus DESTINATION ./ )
+add_executable( EnergyPlus main.cc )
+target_link_libraries( EnergyPlus EnergyPlusAPI )
+
+set_target_properties(EnergyPlus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+set_target_properties(EnergyPlusAPI PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+
+install( TARGETS EnergyPlus EnergyPlusAPI DESTINATION ./ )
+
+if( BUILD_TESTING )
+  # Build the test executable
+  add_executable( TestEnergyPlusCallbacks test_ep_as_library.cc )
+  target_link_libraries( TestEnergyPlusCallbacks EnergyPlusAPI )
+  add_test(NAME "integration.TestEnergyPlusCallbacks" 
+           COMMAND ${CMAKE_COMMAND} 
+           -DSOURCE_DIR=${CMAKE_SOURCE_DIR} 
+           -DBINARY_DIR=${CMAKE_BINARY_DIR} 
+           -DIDF_FILE=1ZoneUncontrolled.idf
+           -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
+           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)  
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+  set_tests_properties("integration.TestEnergyPlusCallbacks" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+endif()
+

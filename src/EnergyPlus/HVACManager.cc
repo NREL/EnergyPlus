@@ -662,7 +662,7 @@ namespace HVACManager {
 			AirLoopControlInfo.HeatingActiveFlag() = false;
 			// reset outside air system HX to off first time through
 			AirLoopControlInfo.HeatRecoveryBypass() = true;
-			// set HX check status flag to check for custom control in MixedAir.f90
+			// set HX check status flag to check for custom control in MixedAir.cc
 			AirLoopControlInfo.CheckHeatRecoveryBypassStatus() = true;
 			// set OA comp simulated flag to false
 			AirLoopControlInfo.OASysComponentsSimulated() = false;
@@ -1394,12 +1394,12 @@ namespace HVACManager {
 					Node.HumRatSetPoint() = SensedNodeFlagValue;
 					Node.HumRatMin() = SensedNodeFlagValue;
 					Node.HumRatMax() = SensedNodeFlagValue;
-					Node.MassFlowRateSetPoint() = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.f90)
+					Node.MassFlowRateSetPoint() = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
 					DefaultNodeValues.TempSetPoint = SensedNodeFlagValue;
 					DefaultNodeValues.HumRatSetPoint = SensedNodeFlagValue;
 					DefaultNodeValues.HumRatMin = SensedNodeFlagValue;
 					DefaultNodeValues.HumRatMax = SensedNodeFlagValue;
-					DefaultNodeValues.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.f90)
+					DefaultNodeValues.MassFlowRateSetPoint = SensedNodeFlagValue; // BG 5-26-2009 (being checked in HVACControllers.cc)
 				}
 				MySetPointInit = false;
 				DoSetPointTest = true;
@@ -2649,7 +2649,7 @@ namespace HVACManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

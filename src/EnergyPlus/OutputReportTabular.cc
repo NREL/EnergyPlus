@@ -1773,7 +1773,7 @@ namespace OutputReportTabular {
 					//the sizing period reports
 					displayZoneComponentLoadSummary = true;
 				}
-				//check the reports that are predefined and are created by outputreportpredefined.f90
+				//check the reports that are predefined and are created by outputreportpredefined.cc
 				for ( jReport = 1; jReport <= numReportName; ++jReport ) {
 					lenAlpha = len( AlphArray( iReport ) );
 					lenReport = len( reportName( jReport ).name );
@@ -5929,8 +5929,8 @@ namespace OutputReportTabular {
 		Real64 veryLarge;
 		Real64 verySmall;
 
-		Real64 static const storedMaxVal = std::numeric_limits< Real64 >::max();
-		Real64 static const storedMinVal = std::numeric_limits< Real64 >::lowest();
+		static Real64 const storedMaxVal( std::numeric_limits< Real64 >::max() );
+		static Real64 const storedMinVal( std::numeric_limits< Real64 >::lowest() );
 
 		rowHead( 1 ) = "January";
 		rowHead( 2 ) = "February";
@@ -14376,7 +14376,7 @@ Label900: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

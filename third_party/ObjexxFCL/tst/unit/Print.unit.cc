@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Print.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <sstream>
@@ -66,6 +67,12 @@ TEST_F( PrintTest, PrintStringLiteralToStream )
 TEST_F( PrintTest, PrintLDGeneral )
 {
 	Print( "*" ) << "Text" << "ual" << 123 << "Done";
+	EXPECT_EQ( " Textual         123 Done\n", buf.str() );
+}
+
+TEST_F( PrintTest, PrintLDDefaultGeneral )
+{
+	Print() << "Text" << "ual" << 123 << "Done";
 	EXPECT_EQ( " Textual         123 Done\n", buf.str() );
 }
 

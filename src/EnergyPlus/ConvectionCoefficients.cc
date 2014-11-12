@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -4377,7 +4378,7 @@ namespace ConvectionCoefficients {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 HExt; // Will become the returned value
+		Real64 HExt( 0.0 ); // Will become the returned value
 
 		{ auto const SELECT_CASE_var( UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).OverrideType );
 
@@ -4398,6 +4399,8 @@ namespace ConvectionCoefficients {
 			EvaluateExtHcModels( SurfNum, UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq, UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq, HExt );
 			Surface( SurfNum ).OutConvHfModelEq = UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq; //reporting
 			Surface( SurfNum ).OutConvHnModelEq = UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq; //reporting
+		} else {
+			assert( false );
 		}}
 
 		SetExtConvectionCoeff = HExt;
@@ -4449,7 +4452,7 @@ namespace ConvectionCoefficients {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		Real64 HInt; // Will become the returned value
+		Real64 HInt( 0.0 ); // Will become the returned value
 
 		{ auto const SELECT_CASE_var( UserIntConvectionCoeffs( Surface( SurfNum ).IntConvCoeff ).OverrideType );
 
@@ -4468,6 +4471,8 @@ namespace ConvectionCoefficients {
 
 			EvaluateIntHcModels( SurfNum, UserIntConvectionCoeffs( Surface( SurfNum ).IntConvCoeff ).HcModelEq, HInt );
 			Surface( SurfNum ).IntConvHcModelEq = UserIntConvectionCoeffs( Surface( SurfNum ).IntConvCoeff ).HcModelEq;
+		} else {
+			assert( false );
 		}}
 
 		SetIntConvectionCoeff = HInt;
@@ -4538,7 +4543,7 @@ namespace ConvectionCoefficients {
 		Real64 RaCV; // Rayleigh number for slanted cavity
 		Real64 TiltDeg; // glazing tilt in degrees
 		Real64 sineTilt; // sine of glazing tilt
-		Real64 Nuint; // Nusselt number for interior surface convection
+		Real64 Nuint( 0.0 ); // Nusselt number for interior surface convection
 		Real64 SurfTempKelvin; // surface temperature in Kelvin
 		Real64 AirTempKelvin; // air temperature in Kelvin
 		Real64 AirHumRat; // air humidity ratio
@@ -4622,6 +4627,8 @@ namespace ConvectionCoefficients {
 				Nuint = 0.58 * std::pow( RaH, 0.2 );
 			}
 
+		} else {
+			assert( false );
 		}
 
 		HConvIn( SurfNum ) = Nuint * lambda / Height;
@@ -9920,7 +9927,7 @@ namespace ConvectionCoefficients {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

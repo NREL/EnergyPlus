@@ -179,7 +179,7 @@ namespace HeatingCoils {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int CoilNum; // The HeatingCoil that you are currently loading input into
+		int CoilNum( 0 ); // The HeatingCoil that you are currently loading input into
 		Real64 QCoilActual2; // coil load actually delivered returned from specific coil
 		int OpMode; // fan operating mode
 		Real64 PartLoadFrac; // part-load fraction of heating coil
@@ -2846,7 +2846,7 @@ namespace HeatingCoils {
 		bool GetCoilErrFlag;
 		bool SuppressWarning;
 		int NumCoil;
-		int CoilNum;
+		int CoilNum( 0 );
 
 		// Obtains and Allocates HeatingCoil related parameters from input file
 		if ( GetCoilsInputFlag ) { //First time subroutine has been entered
@@ -3261,7 +3261,7 @@ namespace HeatingCoils {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -1,3 +1,6 @@
+// C++ Headers
+#include <cassert>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -2979,7 +2982,7 @@ namespace PlantManager {
 		Real64 MaxSizFac;
 		Real64 BranchSizFac;
 		Real64 NumBrSizFac;
-		Real64 FluidDensity; // local value from glycol routine
+		Real64 FluidDensity( 0.0 ); // local value from glycol routine
 		bool Finalize;
 
 		Finalize = OkayToFinish;
@@ -3112,6 +3115,8 @@ namespace PlantManager {
 			FluidDensity = GetDensityGlycol( PlantLoop( LoopNum ).FluidName, InitConvTemp, PlantLoop( LoopNum ).FluidIndex, RoutineName );
 		} else if ( PlantLoop( LoopNum ).FluidType == NodeType_Steam ) {
 			FluidDensity = GetSatDensityRefrig( fluidNameSteam, 100.0, 1.0, PlantLoop( LoopNum ).FluidIndex, RoutineName );
+		} else {
+			assert( false );
 		}
 
 		PlantLoop( LoopNum ).Mass = PlantLoop( LoopNum ).Volume * FluidDensity;
@@ -4203,7 +4208,7 @@ namespace PlantManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
