@@ -102,7 +102,7 @@ namespace DataRuntimeLanguage {
 	extern int const FuncWFnTdbRhPb; // accessor for E+ psych routine
 	extern int const FuncPsatFnTemp; // accessor for E+ psych routine
 	extern int const FuncTsatFnHPb; // accessor for E+ psych routine
-	extern int const FuncTsatFnPb; // not public in PsychRoutines.f90 so not really available in EMS.
+	extern int const FuncTsatFnPb; // not public in PsychRoutines.cc so not really available in EMS.
 	extern int const FuncCpCW; // accessor for E+ psych routine
 	extern int const FuncCpHW; // accessor for E+ psych routine
 	extern int const FuncRhoH2O; // accessor for E+ psych routine
@@ -701,7 +701,7 @@ namespace DataRuntimeLanguage {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -576,7 +576,7 @@ namespace WeatherManager {
 					MaxNumberSimYears = max( MaxNumberSimYears, Environment( Loop ).NumSimYears );
 				}
 			}
-//			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); // Doesn't do anything!
+			DisplaySimDaysProgress( CurrentOverallSimDay, TotalOverallSimDays ); 
 		}
 
 		CloseWeatherFile(); // will only close if opened.
@@ -3380,7 +3380,7 @@ Label903: ;
 		static std::string const RoutineNamePsyWFnTdpPb( "SetUpDesignDay:PsyWFnTdpPb" );
 		static std::string const RoutineNamePsyWFnTdbH( "SetUpDesignDay:PsyWFnTdbH" );
 		static std::string const WeatherManager( "WeatherManager" );
-		static std::string const RoutineNameLong( "WeatherManager.f90 subroutine SetUpDesignDay" );
+		static std::string const RoutineNameLong( "WeatherManager.cc subroutine SetUpDesignDay" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -9475,7 +9475,7 @@ Label9998: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

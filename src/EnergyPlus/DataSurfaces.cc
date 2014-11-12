@@ -96,7 +96,7 @@ namespace DataSurfaces {
 	// SHADING (includes OVERHANG, WING), DETACHED, INTMASS),
 	// TDD:DOME, TDD:DIFFUSER (for tubular daylighting device)
 	// (Note: GLASSDOOR and TDD:DIFFUSER get overwritten as WINDOW
-	// in SurfaceGeometry.f90, SurfaceWindow%OriginalClass holds the true value)
+	// in SurfaceGeometry.cc, SurfaceWindow%OriginalClass holds the true value)
 	// why aren't these sequential (LKL - 13 Aug 2007)
 	int const SurfaceClass_Wall( 1 );
 	int const SurfaceClass_Floor( 2 );
@@ -533,7 +533,7 @@ namespace DataSurfaces {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

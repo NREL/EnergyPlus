@@ -17,20 +17,23 @@ SET(SRC
 )
 
 IF(UNIX) # Mac and Linux
+  IF( "${CMAKE_Fortran_COMPILER_ID}" MATCHES "GNU" )
+    ADD_DEFINITIONS( " -ffloat-store " )
+  ENDIF()
 ELSE()  # Windows
   IF(CMAKE_Fortran_COMPILER MATCHES "ifort")
     # Set release flags to be empty
     SET(CMAKE_Fortran_FLAGS_RELEASE "")
     SET(CMAKE_Fortran_FLAGS "/nologo /debug:minimal /O2 /Oy- /assume:buffered_io /noaltparam /fpscomp:nolibs /fpe:0 /fp:fast=2  /traceback /check:uninit /libs:static /threads /c /assume:protect-parens /Qprec-div /Qprec-sqrt /Qimf-precision:high /Qimf-arch-consistency:true /Qvec-")
   ELSE()
-    SET(CMAKE_Fortran_FLAGS "-static")
+    SET(CMAKE_Fortran_FLAGS "-static -ffloat-store")
   ENDIF()
 ENDIF()
 
 ADD_EXECUTABLE( Basement ${SRC} )
 
 SET_TARGET_PROPERTIES(Basement PROPERTIES
-  COMPILE_FLAGS "-ffree-line-length-200 ${SHARED_FLAGS}"
+  COMPILE_FLAGS "-O1 -ffree-line-length-200 ${SHARED_FLAGS}"
 )
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/ProjectMacros.cmake")
