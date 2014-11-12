@@ -527,9 +527,6 @@ if (UNIX)
   ADD_DEFINITIONS("-fPIC")
 endif()
 
-#if (NOT MSVC)
-#  list(APPEND SRC ${SRC_2})
-#endif()
 
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
@@ -539,28 +536,18 @@ if(UNIX AND NOT APPLE)
   target_link_libraries( EnergyPlusLib dl )
 endif()
 
-#if (MSVC)
-  add_library( EnergyPlusLib2 STATIC ${SRC_2} )
-  target_link_libraries( EnergyPlusLib2 )
-  if(UNIX AND NOT APPLE)
-    target_link_libraries( EnergyPlusLib2 dl )
-  endif()
-  #endif()
+add_library( EnergyPlusLib2 STATIC ${SRC_2} )
+target_link_libraries( EnergyPlusLib2 )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( EnergyPlusLib2 dl )
+endif()
 
-#target_link_libraries( EnergyPlusLib2 EnergyPlusLib )
-#target_link_libraries( EnergyPlusLib EnergyPlusLib2 )
-
-#add_library( EnergyPlusPgm STATIC "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
 
 # second we will create the shared library that is actually packaged with EnergyPlus
 add_library( EnergyPlusAPI SHARED  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
 target_link_libraries( EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 )
 
-#if (MSVC)
-#  target_link_libraries( EnergyPlusAPI EnergyPlusLib2  )
-#endif()
 
-#target_link_libraries( EnergyPlusAPI EnergyPlusPgm EnergyPlusLib EnergyPlusLib2  )
 set_target_properties(
   EnergyPlusAPI
   PROPERTIES
