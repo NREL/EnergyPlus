@@ -2033,9 +2033,11 @@ Site:SolarAndVisibleSpectrum,
       \key UserDefined
       \default Default
   A3, \field Solar Spectrum Data Object Name
-      \type alpha
+      \type object-list
+      \object-list SpectrumDataNames
   A4; \field Visible Spectrum Data Object Name
-      \type alpha
+      \type object-list
+      \object-list SpectrumDataNames
 
 Site:SpectrumData,
       \min-fields 8
@@ -2045,6 +2047,7 @@ Site:SpectrumData,
   A1, \field Name
       \required-field
       \type alpha
+      \reference SpectrumDataNames
   A2, \field Spectrum Data Type
       \required-field
       \type choice
@@ -5747,6 +5750,7 @@ WindowMaterial:Shade:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference WindowEquivalentLayerMaterialNames
   N1 , \field Shade Beam-Beam Solar Transmittance
        \note The beam-beam solar transmittance at normal incidence.  This value is
        \note the same as the openness area fraction of the shade material. Assumed
@@ -5848,6 +5852,7 @@ WindowMaterial:Drape:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference WindowEquivalentLayerMaterialNames
   N1 , \field Drape Beam-Beam Solar Transmittance at Normal Incidence
        \note The beam-beam solar transmittance at normal incidence. This value is the
        \note same as the openness area fraction of the drape fabric. Assumed to be
@@ -5966,6 +5971,7 @@ WindowMaterial:Blind:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference WindowEquivalentLayerMaterialNames
   A2 , \field Slat Orientation
        \type choice
        \key Horizontal
@@ -6151,6 +6157,7 @@ WindowMaterial:Screen:EquivalentLayer,
        \note Enter a unique name for this window screen material.
        \required-field
        \type alpha
+       \reference WindowEquivalentLayerMaterialNames
   N1 , \field Screen Beam-Beam Solar Transmittance
        \note The beam-beam transmittance of the screen material at normal incidence.
        \note This input field is the same as the material openness area fraction
@@ -6247,6 +6254,7 @@ WindowMaterial:Glazing:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference WindowEquivalentLayerMaterialNames
   A2 , \field Optical Data Type
        \required-field
        \type choice
@@ -6458,50 +6466,6 @@ WindowMaterial:Glazing:EquivalentLayer,
        \maximum< 1.0
        \default 0.84
 
-Construction:WindowEquivalentLayer,
-       \memo Start with outside layer and work your way to the inside Layer
-       \memo Up to 11 layers total. Up to six solid layers and up to five gaps.
-       \memo Enter the material name for each layer
-       \min-fields 2
-  A1 , \field Name
-       \required-field
-       \type alpha
-       \reference ConstructionNames
-  A2 , \field Outside Layer
-       \required-field
-       \type object-list
-       \object-list MaterialName
-  A3 , \field Layer 2
-       \type object-list
-       \object-list MaterialName
-  A4 , \field Layer 3
-       \type object-list
-       \object-list MaterialName
-  A5 , \field Layer 4
-       \type object-list
-       \object-list MaterialName
-  A6 , \field Layer 5
-       \type object-list
-       \object-list MaterialName
-  A7 , \field Layer 6
-       \type object-list
-       \object-list MaterialName
-  A8 , \field Layer 7
-       \type object-list
-       \object-list MaterialName
-  A9 , \field Layer 8
-       \type object-list
-       \object-list MaterialName
-  A10, \field Layer 9
-       \type object-list
-       \object-list MaterialName
-  A11, \field Layer 10
-       \type object-list
-       \object-list MaterialName
-  A12; \field Layer 11
-       \type object-list
-       \object-list MaterialName
-
 WindowMaterial:Gap:EquivalentLayer,
        \memo Gas material properties that are used in Windows Equivalent Layer
        \memo References only WindowMaterial:Gas properties
@@ -6509,6 +6473,7 @@ WindowMaterial:Gap:EquivalentLayer,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference WindowEquivalentLayerMaterialNames
   A2 , \field Gas Type
        \required-field
        \type choice
@@ -8440,6 +8405,50 @@ Construction:ComplexFenestrationState,
        \object-list DataMatrices
   A36; \field Layer 5 Directional Back Absoptance Matrix Name
 
+Construction:WindowEquivalentLayer,
+       \memo Start with outside layer and work your way to the inside Layer
+       \memo Up to 11 layers total. Up to six solid layers and up to five gaps.
+       \memo Enter the material name for each layer
+       \min-fields 2
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference ConstructionNames
+  A2 , \field Outside Layer
+       \required-field
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A3 , \field Layer 2
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A4 , \field Layer 3
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A5 , \field Layer 4
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A6 , \field Layer 5
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A7 , \field Layer 6
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A8 , \field Layer 7
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A9 , \field Layer 8
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A10, \field Layer 9
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A11, \field Layer 10
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+  A12; \field Layer 11
+       \type object-list
+       \object-list WindowEquivalentLayerMaterialNames
+
 Construction:WindowDataFile,
        \memo Initiates search of the Window data file for a window called Name.
   A1 , \field Name
@@ -9003,6 +9012,7 @@ BuildingSurface:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10189,6 +10199,7 @@ Wall:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10376,6 +10387,7 @@ RoofCeiling:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10562,6 +10574,7 @@ Floor:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10747,6 +10760,7 @@ Wall:Exterior,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -10791,6 +10805,7 @@ Wall:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -10835,6 +10850,7 @@ Wall:Underground,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -10881,6 +10897,7 @@ Wall:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10934,6 +10951,7 @@ Roof,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -10980,6 +10998,7 @@ Ceiling:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11028,6 +11047,7 @@ Ceiling:Interzone,
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11082,6 +11102,7 @@ Floor:GroundContact,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11131,6 +11152,7 @@ Floor:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11177,6 +11199,7 @@ Floor:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -11254,7 +11277,7 @@ FenestrationSurface:Detailed,
   A4 , \field Building Surface Name
        \required-field
        \type object-list
-       \object-list SurfaceNames
+       \object-list HeatTranBaseSurfNames
   A5,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11372,7 +11395,7 @@ Window,
        \note Window assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list SurfaceNames
+       \object-list HeatTranBaseSurfNames
   A4, \field Shading Control Name
        \note enter the name of a WindowProperty:ShadingControl object
        \type object-list
@@ -11425,7 +11448,7 @@ Door,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list SurfaceNames
+       \object-list HeatTranBaseSurfNames
   N1 , \field Multiplier
        \note Used only for Surface Type = WINDOW, GLASSDOOR or DOOR
        \note Non-integer values will be truncated to integer
@@ -11464,7 +11487,7 @@ GlazedDoor,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list SurfaceNames
+       \object-list HeatTranBaseSurfNames
   A4, \field Shading Control Name
        \note enter the name of a WindowProperty:ShadingControl object
        \type object-list
@@ -11518,7 +11541,7 @@ Window:Interzone,
        \note Window assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list SurfaceNames
+       \object-list HeatTranBaseSurfNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11566,7 +11589,7 @@ Door:Interzone,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list SurfaceNames
+       \object-list HeatTranBaseSurfNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11614,7 +11637,7 @@ GlazedDoor:Interzone,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list SurfaceNames
+       \object-list HeatTranBaseSurfNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11998,8 +12021,7 @@ WindowProperty:StormWindow,
        \note Must be the name of a FenestrationSurface:Detailed object with Surface Type = WINDOW.
        \note The WindowProperty:StormWindow object can only be used with exterior windows.
        \required-field
-       \type object-list
-       \object-list SubSurfNames
+       \reference SubSurfNames
   A2,  \field Storm Glass Layer Name
        \note Must be a WindowMaterial:Glazing or WindowMaterial:Glazing:RefractionExtinctionMethod
        \note Gap between storm glass layer and adjacent glass layer is assumed to be filled
@@ -18328,7 +18350,7 @@ RoomAir:TemperaturePattern:NondimensionalHeight,
       \note Zeta is the non-dimensional height (in z-direction). on [0..1]
       \note DeltaTai =  (Tai - MAT) in units of deg. C
       \note relative deg C on [-10.0 .. 20.0 ]
-  N5, \field Pair 1 Zeta Non-dimensional Height
+  N5, \field Pair 1 Zeta Non-Dimensional Height
       \begin-extensible
       \type real
       \required-field
@@ -18338,7 +18360,7 @@ RoomAir:TemperaturePattern:NondimensionalHeight,
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N7, \field Pair 2 Zeta Non-dimensional Height
+  N7, \field Pair 2 Zeta Non-Dimensional Height
       \type real
       \required-field
   N8, \field Pair 2 Delta Adjacent Air Temperature
@@ -18347,119 +18369,119 @@ RoomAir:TemperaturePattern:NondimensionalHeight,
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N9, \field Pair 3 Zeta Non-dimensional Height
+  N9, \field Pair 3 Zeta Non-Dimensional Height
       \type real
   N10,\field Pair 3 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N11,\field Pair 4 Zeta Non-dimensional Height
+  N11,\field Pair 4 Zeta Non-Dimensional Height
       \type real
   N12,\field Pair 4 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N13,\field Pair 5 Zeta Non-dimensional Height
+  N13,\field Pair 5 Zeta Non-Dimensional Height
       \type real
   N14,\field Pair 5 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N15,\field Pair 6 Zeta Non-dimensional Height
+  N15,\field Pair 6 Zeta Non-Dimensional Height
       \type real
   N16,\field Pair 6 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N17,\field Pair 7 Zeta Non-dimensional Height
+  N17,\field Pair 7 Zeta Non-Dimensional Height
       \type real
   N18,\field Pair 7 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N19,\field Pair 8 Zeta Non-dimensional Height
+  N19,\field Pair 8 Zeta Non-Dimensional Height
       \type real
   N20,\field Pair 8 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N21,\field Pair 9 Zeta Non-dimensional Height
+  N21,\field Pair 9 Zeta Non-Dimensional Height
       \type real
   N22,\field Pair 9 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N23,\field Pair 10 Zeta Non-dimensional Height
+  N23,\field Pair 10 Zeta Non-Dimensional Height
       \type real
   N24,\field Pair 10 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N25,\field Pair 11 Zeta Non-dimensional Height
+  N25,\field Pair 11 Zeta Non-Dimensional Height
       \type real
   N26,\field Pair 11 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N27,\field Pair 12 Zeta Non-dimensional Height
+  N27,\field Pair 12 Zeta Non-Dimensional Height
       \type real
   N28,\field Pair 12 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N29,\field Pair 13 Zeta Non-dimensional Height
+  N29,\field Pair 13 Zeta Non-Dimensional Height
       \type real
   N30,\field Pair 13 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N31,\field Pair 14 Zeta Non-dimensional Height
+  N31,\field Pair 14 Zeta Non-Dimensional Height
       \type real
   N32,\field Pair 14 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N33,\field Pair 15 Zeta Non-dimensional Height
+  N33,\field Pair 15 Zeta Non-Dimensional Height
       \type real
   N34,\field Pair 15 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N35,\field Pair 16 Zeta Non-dimensional Height
+  N35,\field Pair 16 Zeta Non-Dimensional Height
       \type real
   N36,\field Pair 16 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N37,\field Pair 17 Zeta Non-dimensional Height
+  N37,\field Pair 17 Zeta Non-Dimensional Height
       \type real
   N38,\field Pair 17 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N39,\field Pair 18 Zeta Non-dimensional Height
+  N39,\field Pair 18 Zeta Non-Dimensional Height
       \type real
   N40,\field Pair 18 Delta Adjacent Air Temperature
       \type real
       \units deltaC
       \minimum -10.0
       \maximum 20.0
-  N41,\field Pair 19 Zeta Non-dimensional Height
+  N41,\field Pair 19 Zeta Non-Dimensional Height
       \type real
   N42;\field Pair 19 Delta Adjacent Air Temperature
       \type real
@@ -19534,7 +19556,7 @@ GasEquipment,
        \minimum 0.0
        \maximum 4.0E-7
        \note The default value assumes the equipment is fully vented.
-       \note For un-vented equipment, a suggested value is 3.45E-8 m3/s-W. This value is
+       \note For unvented equipment, a suggested value is 3.45E-8 m3/s-W. This value is
        \note converted from a natural gas CO2 emission rate of 117 lbs CO2 per million Btu.
        \note The maximum value assumes to be 10 times of the recommended value.
   A5 ; \field End-Use Subcategory
@@ -30583,9 +30605,9 @@ Sizing:Plant,
       \minimum> 0.0
 
 OutputControl:Sizing:Style,
-       \memo default style for the Sizing output files is comma -- this works well for
+       \memo Default style for the Sizing output files is comma -- this works well for
        \memo importing into spreadsheet programs such as Excel(tm) but not so well for word
-       \memo processing programs -- there tab may be a better choice.  fixed puts spaces between
+       \memo processing programs -- there tab may be a better choice.  Fixed puts spaces between
        \memo the "columns"
        \unique-object
    A1; \field Column Separator
@@ -40713,7 +40735,7 @@ Coil:Cooling:DX:MultiSpeed,
   A24, \field Speed 2 Waste Heat Function of Temperature Curve Name
        \type object-list
        \object-list BiQuadraticCurves
-       \object-list BiVaraiteCurves
+       \object-list BiVariateCurves
        \note curve = a + b*odb + c*odb**2 + d*db + e*db**2 + f*odb*db
        \note odb = Outdoor air dry-bulb temperature (C)
        \note db = entering coil dry-bulb temperature (C)
@@ -42521,6 +42543,7 @@ Coil:Heating:Desuperheater,
   A1 , \field Name
        \required-field
        \type alpha
+       \reference HeatingCoilsDesuperheater
        \reference AFNCoilNames
   A2 , \field Availability Schedule Name
        \note Availability schedule name for this system. Schedule value > 0 means the system is available.
@@ -46813,7 +46836,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
   A22, \field Cooling And Charge Mode Evaporator Energy Input Ratio Function of Flow Fraction Curve Name
        \note required field if Cooling And Charge Mode is available
        \type object-list
-       \object-list UniVariteCurves
+       \object-list UniVariateCurves
        \note Any curve or table with one independent variable can be used
        \note quadratic curve = a + b*ff + c*ff**2
        \note cubic curve = a + b*ff + c*ff**2 + d*ff**3
@@ -46872,7 +46895,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \note required field if Cooling And Charge Mode is available
        \type object-list
        \object-list BiVariateCurves
-       \object-list MulitVariateCurves
+       \object-list MultiVariateCurves
        \note Curves or tables with either two or three independent variables can be used.
        \note Curve:Biquadratic, Table:TwoIndependentVariables, Curve:Bicubic and Curve:QuadraticLinear allowed
        \note curve = a + b*ewb + c*ewb**2 + d*edb + e*edb**2 + f*ewb*edb
@@ -47181,7 +47204,7 @@ Coil:Cooling:DX:SingleSpeed:ThermalStorage,
        \note required field if Discharge Only Mode is available
        \type object-list
        \object-list BiVariateCurves
-       \object-list MulitVariateCurves
+       \object-list MultiVariateCurves
        \note Curves or tables with either two or three independent variables can be used.
        \note Curve:Biquadratic, Table:TwoIndependentVariables, Curve:Bicubic and Curve:QuadraticLinear allowed
        \note curve = a + b*ewb + c*ewb**2 + d*edb + e*edb**2 + f*ewb*edb
@@ -56337,7 +56360,7 @@ Boiler:HotWater,
        \key LeavingBoiler
   A4 , \field Normalized Boiler Efficiency Curve Name
        \type object-list
-       \object-list UnVariateCurves
+       \object-list UniVariateCurves
        \object-list BiVariateCurves
        \note Linear, Quadratic and Cubic efficiency curves are solely a function of PLR.
        \note All other efficiency curve types are a function of PLR and boiler water temperature.
@@ -59575,7 +59598,7 @@ CoolingTower:VariableSpeed:Merkel,
   A5 , \field Fan Power Modifier Function of Air Flow Rate Ratio Curve Name
        \required-field
        \type object-list
-       \object-list UniVariteCurves
+       \object-list UniVariateCurves
        \note Any curve or table with one independent variable can be used
        \note cubic curve = a + b*AFR + c*AFR**2 + d*AFR**3
        \note quartic curve = a + b*AFR + c*AFR**2 + d*AFR**3 + e*AFR**4
