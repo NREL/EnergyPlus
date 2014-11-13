@@ -4027,7 +4027,7 @@ namespace HeatBalanceManager {
 				} else if ( SELECT_CASE_var == "TROMBEWALL" ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = TrombeWall;
 
-				} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM " ) {
+				} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
 					Zone( ZoneLoop ).InsideConvectionAlgo = AdaptiveConvectionAlgorithm;
 
 				} else {
