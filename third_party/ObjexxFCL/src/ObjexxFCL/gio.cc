@@ -251,129 +251,129 @@ open()
 // Read /////
 
 // Read from Unit
-Read
-read( Unit const unit, std::string const & fmt )
+ReadStream
+read( Unit const unit, std::string const & fmt, bool const beg )
 {
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, beg );
 	}
-	return Read();
+	return ReadStream();
 }
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt const & fmt )
+ReadStream
+read( Unit const unit, Fmt const & fmt, bool const beg )
 {
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, beg );
 	}
-	return Read();
+	return ReadStream();
 }
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt & fmt )
+ReadStream
+read( Unit const unit, Fmt & fmt, bool const beg )
 {
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, beg );
 	}
-	return Read();
+	return ReadStream();
 }
 
 // Read from Unit
-Read
-read( Unit const unit, std::string const & fmt, IOFlags & flags )
+ReadStream
+read( Unit const unit, std::string const & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt, flags );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, flags, beg );
 	}
 	flags.err( true ).ios( 11 );
-	return Read( flags );
+	return ReadStream( flags );
 }
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt const & fmt, IOFlags & flags )
+ReadStream
+read( Unit const unit, Fmt const & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt, flags );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, flags, beg );
 	}
 	flags.err( true ).ios( 11 );
-	return Read( flags );
+	return ReadStream( flags );
 }
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt & fmt, IOFlags & flags )
+ReadStream
+read( Unit const unit, Fmt & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt, flags );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, flags, beg );
 	}
 	flags.err( true ).ios( 11 );
-	return Read( flags );
+	return ReadStream( flags );
 }
 
 // Read from stdin
-Read
+ReadStream
 read( std::string const & fmt )
 {
-	return Read( std::cin, fmt );
+	return ReadStream( std::cin, fmt );
 }
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt const & fmt )
 {
-	return Read( std::cin, fmt );
+	return ReadStream( std::cin, fmt );
 }
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt & fmt )
 {
-	return Read( std::cin, fmt );
+	return ReadStream( std::cin, fmt );
 }
 
 // Read from stdin
-Read
+ReadStream
 read( std::string const & fmt, IOFlags & flags )
 {
-	return Read( std::cin, fmt, flags );
+	return ReadStream( std::cin, fmt, flags );
 }
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt const & fmt, IOFlags & flags )
 {
-	return Read( std::cin, fmt, flags );
+	return ReadStream( std::cin, fmt, flags );
 }
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt & fmt, IOFlags & flags )
 {
-	return Read( std::cin, fmt, flags );
+	return ReadStream( std::cin, fmt, flags );
 }
 
 // Read Line from Unit
@@ -404,6 +404,14 @@ read_line( Unit const unit, IOFlags & flags, std::string & line )
 	} else {
 		flags.err( true ).ios( 11 );
 	}
+}
+
+// Input Stream of Unit
+std::istream *
+inp_stream( Unit const unit )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	return ( Stream_p ? dynamic_cast< std::istream * >( &Stream_p->stream() ) : nullptr );
 }
 
 // Write /////
@@ -555,6 +563,14 @@ write( Fmt & fmt, IOFlags & flags )
 	return Write( std::cout, fmt, flags.ter( LF ) );
 }
 
+// Output Stream of Unit
+std::ostream *
+out_stream( Unit const unit )
+{
+	Stream * const Stream_p( streams()[ unit ] );
+	return ( Stream_p ? dynamic_cast< std::ostream * >( &Stream_p->stream() ) : nullptr );
+}
+
 // Print /////
 
 // Print to stdout
@@ -677,6 +693,36 @@ void
 inquire( c_cstring const name, IOFlags & flags )
 {
 	inquire( std::string( name ), flags );
+}
+
+// File Exists?
+bool
+file_exists( std::string const & file_name )
+{
+	struct stat file_stat;
+	return ( stat( file_name.c_str(), &file_stat ) == 0 );
+}
+
+// File Exists?
+bool
+file_exists( c_cstring const file_name )
+{
+	struct stat file_stat;
+	return ( stat( file_name, &file_stat ) == 0 );
+}
+
+// File Openable?
+bool
+file_openable( std::string const & file_name )
+{
+	return std::ifstream( file_name ).good();
+}
+
+// File Openable?
+bool
+file_openable( c_cstring const file_name )
+{
+	return std::ifstream( file_name ).good();
 }
 
 // Backspace /////

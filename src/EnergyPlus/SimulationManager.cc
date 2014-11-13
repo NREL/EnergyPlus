@@ -623,7 +623,7 @@ namespace SimulationManager {
 		int NumDebugOut;
 		int MinInt;
 		int Num;
-		std::string::size_type Which;
+		int Which;
 		bool ErrorsFound;
 		int Num1;
 		int NumA;
@@ -647,11 +647,11 @@ namespace SimulationManager {
 		Num = GetNumObjectsFound( CurrentModuleObject );
 		if ( Num == 1 ) {
 			GetObjectItem( CurrentModuleObject, 1, Alphas, NumAlpha, Number, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
-			Num1 = len( MatchVersion );
-			if ( MatchVersion[ Num1 - 1 ] == '0' ) {
-				Which = index( Alphas( 1 ).substr( 0, Num1 - 2 ), MatchVersion.substr( 0, Num1 - 2 ) );
+			std::string::size_type const lenVer( len( MatchVersion ) );
+			if ( ( lenVer > 0 ) && ( MatchVersion[ lenVer - 1 ] == '0' ) ) {
+				Which = static_cast< int >( index( Alphas( 1 ).substr( 0, lenVer - 2 ), MatchVersion.substr( 0, lenVer - 2 ) ) );
 			} else {
-				Which = index( Alphas( 1 ), MatchVersion );
+				Which = static_cast< int >( index( Alphas( 1 ), MatchVersion ) );
 			}
 			if ( Which != 0 ) {
 				ShowWarningError( CurrentModuleObject + ": in IDF=\"" + Alphas( 1 ) + "\" not the same as expected=\"" + MatchVersion + "\"" );

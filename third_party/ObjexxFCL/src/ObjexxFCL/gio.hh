@@ -168,99 +168,99 @@ open();
 // Read /////
 
 // Read from Unit
-Read
-read( Unit const unit, std::string const & fmt );
+ReadStream
+read( Unit const unit, std::string const & fmt, bool const beg = false );
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt const & fmt );
+ReadStream
+read( Unit const unit, Fmt const & fmt, bool const beg = false );
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt & fmt );
+ReadStream
+read( Unit const unit, Fmt & fmt, bool const beg = false );
 
 // Read from Unit
-Read
-read( Unit const unit, std::string const & fmt, IOFlags & flags );
+ReadStream
+read( Unit const unit, std::string const & fmt, IOFlags & flags, bool const beg = false );
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt const & fmt, IOFlags & flags );
+ReadStream
+read( Unit const unit, Fmt const & fmt, IOFlags & flags, bool const beg = false );
 
 // Read from Unit
-Read
-read( Unit const unit, Fmt & fmt, IOFlags & flags );
+ReadStream
+read( Unit const unit, Fmt & fmt, IOFlags & flags, bool const beg = false );
 
 // Read from stdin
-Read
+ReadStream
 read( std::string const & fmt );
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt const & fmt );
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt & fmt );
 
 // Read from stdin
-Read
+ReadStream
 read( std::string const & fmt, IOFlags & flags );
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt const & fmt, IOFlags & flags );
 
 // Read from stdin
-Read
+ReadStream
 read( Fmt & fmt, IOFlags & flags );
 
 // Read from String
 inline
-Read
+ReadString
 read( std::string const & str, std::string const & fmt )
 {
-	return Read( str, fmt );
+	return ReadString( str, fmt );
 }
 
 // Read from String
 inline
-Read
+ReadString
 read( std::string const & str, Fmt const & fmt )
 {
-	return Read( str, fmt );
+	return ReadString( str, fmt );
 }
 
 // Read from String
 inline
-Read
+ReadString
 read( std::string const & str, Fmt & fmt )
 {
-	return Read( str, fmt );
+	return ReadString( str, fmt );
 }
 
 // Read from String
 inline
-Read
+ReadString
 read( std::string const & str, std::string const & fmt, IOFlags & flags )
 {
-	return Read( str, fmt, flags );
+	return ReadString( str, fmt, flags );
 }
 
 // Read from String
 inline
-Read
+ReadString
 read( std::string const & str, Fmt const & fmt, IOFlags & flags )
 {
-	return Read( str, fmt, flags );
+	return ReadString( str, fmt, flags );
 }
 
 // Read from String
 inline
-Read
+ReadString
 read( std::string const & str, Fmt & fmt, IOFlags & flags )
 {
-	return Read( str, fmt, flags );
+	return ReadString( str, fmt, flags );
 }
 
 // Read Line from Unit
@@ -270,6 +270,10 @@ read_line( Unit const unit, std::string & line );
 // Read Line from Unit
 void
 read_line( Unit const unit, IOFlags & flags, std::string & line );
+
+// Input Stream of Unit
+std::istream *
+inp_stream( Unit const unit );
 
 // Write /////
 
@@ -429,6 +433,10 @@ write( Fstring & str, Fmt & fmt, IOFlags & flags )
 	return Write( str, fmt, flags );
 }
 
+// Output Stream of Unit
+std::ostream *
+out_stream( Unit const unit );
+
 // Print /////
 
 // Print to stdout
@@ -470,6 +478,22 @@ inquire( Fstring const & name, IOFlags & flags );
 // Inquire by Name
 void
 inquire( c_cstring const name, IOFlags & flags );
+
+// File Exists?
+bool
+file_exists( std::string const & file_name );
+
+// File Exists?
+bool
+file_exists( c_cstring const file_name );
+
+// File Openable?
+bool
+file_openable( std::string const & file_name );
+
+// File Openable?
+bool
+file_openable( c_cstring const file_name );
 
 // Backspace /////
 

@@ -1203,6 +1203,414 @@ public: // Static Data
 
 }; // Write
 
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, std::string const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, gio::Fmt const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, gio::Fmt & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, std::string const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, std::string const & fmt, std::string const & ter )
+{
+	return Write( stream, fmt, ter );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, gio::Fmt const & fmt, std::string const & ter )
+{
+	return Write( stream, fmt, ter );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostream & stream, gio::Fmt & fmt, std::string const & ter )
+{
+	return Write( stream, fmt, ter );
+}
+
+// Write to Stream
+inline
+Write
+write( std::fstream & stream, std::string const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::fstream & stream, gio::Fmt const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::fstream & stream, gio::Fmt & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::fstream & stream, std::string const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::fstream & stream, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::fstream & stream, gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ofstream & stream, std::string const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ofstream & stream, gio::Fmt const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ofstream & stream, gio::Fmt & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ofstream & stream, std::string const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ofstream & stream, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ofstream & stream, gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::stringstream & stream, std::string const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::stringstream & stream, gio::Fmt const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::stringstream & stream, gio::Fmt & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::stringstream & stream, std::string const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::stringstream & stream, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::stringstream & stream, gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostringstream & stream, std::string const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostringstream & stream, gio::Fmt const & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostringstream & stream, gio::Fmt & fmt )
+{
+	return Write( stream, fmt );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostringstream & stream, std::string const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostringstream & stream, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to Stream
+inline
+Write
+write( std::ostringstream & stream, gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( stream, fmt, flags );
+}
+
+// Write to stdout
+inline
+Write
+write( std::string const & fmt )
+{
+	return Write( std::cout, fmt );
+}
+
+// Write to stdout
+inline
+Write
+write( gio::Fmt const & fmt )
+{
+	return Write( std::cout, fmt );
+}
+
+// Write to stdout
+inline
+Write
+write( gio::Fmt & fmt )
+{
+	return Write( std::cout, fmt );
+}
+
+// Write to stdout
+inline
+Write
+write( std::string const & fmt, IOFlags & flags )
+{
+	return Write( std::cout, fmt, flags );
+}
+
+// Write to stdout
+inline
+Write
+write( gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( std::cout, fmt, flags );
+}
+
+// Write to stdout
+inline
+Write
+write( gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( std::cout, fmt, flags );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, std::string const & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, gio::Fmt const & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, gio::Fmt & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, std::string const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to String
+inline
+Write
+write( std::string & str, gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, std::string const & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, gio::Fmt const & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, gio::Fmt & fmt )
+{
+	return Write( str, fmt );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, std::string const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
+// Write to Fstring
+inline
+Write
+write( Fstring & str, gio::Fmt & fmt, IOFlags & flags )
+{
+	return Write( str, fmt, flags );
+}
+
 } // ObjexxFCL
 
 #endif // ObjexxFCL_Write_hh_INCLUDED

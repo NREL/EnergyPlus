@@ -252,6 +252,7 @@ set(src
   src/ObjexxFCL/ProxySentinel.hh
   src/ObjexxFCL/random.cc
   src/ObjexxFCL/random.hh
+  src/ObjexxFCL/Read.cc
   src/ObjexxFCL/Read.fwd.hh
   src/ObjexxFCL/Read.hh
   src/ObjexxFCL/Reference.fwd.hh

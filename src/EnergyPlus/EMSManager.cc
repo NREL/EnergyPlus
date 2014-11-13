@@ -1664,7 +1664,7 @@ namespace EMSManager {
 		lDummy = false;
 
 		if ( allocated( PriAirSysAvailMgr ) ) {
-			numAirLoops = size( PriAirSysAvailMgr );
+			numAirLoops = isize( PriAirSysAvailMgr );
 			for ( Loop = 1; Loop <= numAirLoops; ++Loop ) {
 				SetupEMSActuator( "AirLoopHVAC", PrimaryAirSystem( Loop ).Name, "Availability Status", "[ ]", lDummy, PriAirSysAvailMgr( Loop ).AvailStatus );
 

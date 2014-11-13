@@ -1,6 +1,9 @@
 #ifndef InputProcessor_hh_INCLUDED
 #define InputProcessor_hh_INCLUDED
 
+// C++ Headers
+#include <istream>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
@@ -36,6 +39,7 @@ namespace InputProcessor {
 	extern std::string::size_type const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
 	extern std::string::size_type const MaxFieldNameLength; // Maximum number of characters in a field name string
 	extern std::string const Blank;
+	extern std::string const NL; // Platform newline
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
 
@@ -51,8 +55,6 @@ namespace InputProcessor {
 	extern int NumSectionDefs; // Count of number of section defintions found in the IDD
 	extern int MaxObjectDefs; // Current "max" object defs (IDD), when reached will be reallocated and new Max set
 	extern int MaxSectionDefs; // Current "max" section defs (IDD), when reached will be reallocated and new Max set
-	extern int IDDFile; // Unit number for reading IDD (Energy+.idd)
-	extern int IDFFile; // Unit number for reading IDF (in.idf)
 	extern int NumLines; // Count of number of lines in IDF
 	extern int MaxIDFRecords; // Current "max" IDF records (lines), when reached will be reallocated and new Max set
 	extern int NumIDFRecords; // Count of number of IDF records
@@ -76,12 +78,13 @@ namespace InputProcessor {
 	extern int TotalAuditErrors; // Counting some warnings that go onto only the audit file
 	extern int NumSecretObjects; // Number of objects in "Secret Mode"
 	extern bool ProcessingIDD; // True when processing IDD, false when processing IDF
+	extern std::ostream * echo_stream; // Internal stream used for input file echoing (used for performance)
 
 	//Real Variables for Module
 	//na
 
 	//Character Variables for Module
-	extern std::string InputLine; // Each line can be up to MaxInputLineLength characters long
+	extern std::string InputLine;
 	extern FArray1D_string ListOfSections;
 	extern FArray1D_string ListOfObjects;
 	extern FArray1D_int iListOfObjects;
@@ -414,7 +417,10 @@ namespace InputProcessor {
 	ProcessInput();
 
 	void
-	ProcessDataDicFile( bool & ErrorsFound ); // set to true if any errors flagged during IDD processing
+	ProcessDataDicFile(
+		std::istream & idd_stream,
+		bool & ErrorsFound // set to true if any errors flagged during IDD processing
+	);
 
 	void
 	AddSectionDef(
@@ -424,6 +430,7 @@ namespace InputProcessor {
 
 	void
 	AddObjectDefandParse(
+		std::istream & idd_stream,
 		std::string const & ProposedObject, // Proposed Object to Add
 		std::string::size_type & CurPos, // Current position (initially at first ',') of InputLine
 		bool & EndofFile, // End of File marker
@@ -431,7 +438,7 @@ namespace InputProcessor {
 	);
 
 	void
-	ProcessInputDataFile();
+	ProcessInputDataFile( std::istream & idf_stream );
 
 	void
 	ValidateSection(
@@ -441,6 +448,7 @@ namespace InputProcessor {
 
 	void
 	ValidateObjectandParse(
+		std::istream & idf_stream,
 		std::string const & ProposedObject,
 		std::string::size_type & CurPos,
 		bool & EndofFile
@@ -517,19 +525,17 @@ namespace InputProcessor {
 
 	void
 	ReadInputLine(
-		int const UnitNumber,
+		std::istream & in_stream,
 		std::string::size_type & CurPos,
 		bool & BlankLine,
-		int & InputLineLength,
 		bool & EndofFile
 	);
 
 	void
 	ReadInputLine(
-		int const UnitNumber,
+		std::istream & in_stream,
 		std::string::size_type & CurPos,
 		bool & BlankLine,
-		int & InputLineLength,
 		bool & EndofFile,
 		bool & MinMax,
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<

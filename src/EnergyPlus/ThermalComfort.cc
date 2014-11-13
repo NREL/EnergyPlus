@@ -2697,7 +2697,7 @@ namespace ThermalComfort {
 		int calcStartHr;
 		int calcEndDay;
 		int calcEndHr;
-		int pos;
+		std::string::size_type pos;
 		int ind;
 		int i;
 		int j;

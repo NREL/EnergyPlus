@@ -501,6 +501,15 @@ public: // Input Methods
 		return stream;
 	}
 
+	// Input without Argument
+	inline
+	std::istream &
+	input( std::istream & stream, std::streampos & por )
+	{
+		in( stream, por );
+		return stream;
+	}
+
 	// Input with Argument
 	template< typename T >
 	inline
@@ -510,6 +519,18 @@ public: // Input Methods
 		stream.seekg( poa + por, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
 		in( stream, t );
 		por = stream.tellg() - poa; // After reading a value the current stream position is also the virtual position
+		return stream;
+	}
+
+	// Input with Argument
+	template< typename T >
+	inline
+	std::istream &
+	input( std::istream & stream, std::streampos & por, T & t )
+	{
+		stream.seekg( por, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+		in( stream, t );
+		por = stream.tellg(); // After reading a value the current stream position is also the virtual position
 		return stream;
 	}
 
@@ -526,6 +547,13 @@ public: // Input Methods
 	virtual
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
+	{} // Default implementation
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream &, std::streampos & )
 	{} // Default implementation
 
 	// Input
@@ -723,7 +751,7 @@ public: // Output Methods
 	// Output Pad/Position
 	inline
 	void
-	output_pos( std::ostream & stream, std::streampos & pos )
+	output_pos( std::ostream & stream, std::streampos const pos )
 	{
 		output_pad( stream, pos );
 	}
@@ -1030,8 +1058,11 @@ protected: // Static Methods
 	{
 		stream.seekp( 0, std::ios::end );
 		std::streampos const end( stream.tellp() );
-		if ( pos > end ) stream << std::string( pos - end, ' ' ); // Space fill before output
-		stream.seekp( pos, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+		if ( pos > end ) {
+			stream << std::string( pos - end, ' ' ); // Space fill before output
+		} else if ( pos < end ) {
+			stream.seekp( pos, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+		}
 	}
 
 	// Clear EOF State if No Error
@@ -1873,6 +1904,14 @@ public: // Methods
 		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
+	}
+
 	// Output
 	inline
 	void
@@ -1936,6 +1975,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
 	{
 		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
 	}
@@ -2004,6 +2051,14 @@ public: // Methods
 		blank_zero() = false;
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
+	{
+		blank_zero() = false;
+	}
+
 }; // FormatBN
 
 // Blank=Zero Mode Format
@@ -2050,6 +2105,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		blank_zero() = true;
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
 	{
 		blank_zero() = true;
 	}
@@ -2247,6 +2310,14 @@ public: // Methods
 		por += n_;
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por += n_;
+	}
+
 	// Output
 	inline
 	void
@@ -2351,7 +2422,17 @@ public: // Methods
 	{
 		stream.seekg( poa + por, std::ios::beg );
 		stream >> skip;
-		por = stream.tellg() - poa; // After reading a value the current stream position is also the virtual position
+		por = stream.tellg() - poa; // After skip the current stream position is also the virtual position
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, std::streampos & por )
+	{
+		stream.seekg( por, std::ios::beg );
+		stream >> skip;
+		por = stream.tellg(); // After skip the current stream position is also the virtual position
 	}
 
 	// Output
@@ -2411,6 +2492,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		colon_terminated() = true;
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
 	{
 		colon_terminated() = true;
 	}
@@ -2525,6 +2614,14 @@ public: // Methods
 		por = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
+	}
+
 	// Output
 	inline
 	void
@@ -2589,6 +2686,14 @@ public: // Methods
 		por -= n_;
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por -= n_;
+	}
+
 	// Output
 	inline
 	void
@@ -2649,6 +2754,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += n_;
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
 	{
 		por += n_;
 	}
@@ -4035,6 +4148,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		P() = k_; // Set P scaling
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
 	{
 		P() = k_; // Set P scaling
 	}
