@@ -1,3 +1,6 @@
+// C++ Headers
+#include <algorithm>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/Backspace.hh>
 #include <ObjexxFCL/FArray.functions.hh>
@@ -2611,6 +2614,8 @@ namespace InputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		char const SPC( ' ' );
+		char const TAB( '\t' );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2629,6 +2634,7 @@ namespace InputProcessor {
 		{ IOFlags flags; cross_platform_get_line( in_stream, InputLine ); flags.set_status( in_stream ); ReadStat = flags.ios(); }
 
 		if ( ReadStat != 0 ) InputLine.clear();
+		std::replace( InputLine.begin(), InputLine.end(), TAB, SPC ); // Replace tabs with spaces
 
 		BlankLine = false;
 		CurPos = 0;
@@ -2785,6 +2791,8 @@ namespace InputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
+		char const SPC( ' ' );
+		char const TAB( '\t' );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2805,6 +2813,7 @@ namespace InputProcessor {
 		{ IOFlags flags; cross_platform_get_line( in_stream, InputLine ); flags.set_status( in_stream ); ReadStat = flags.ios(); }
 
 		if ( ReadStat != 0 ) InputLine.clear();
+		std::replace( InputLine.begin(), InputLine.end(), TAB, SPC ); // Replace tabs with spaces
 
 		BlankLine = false;
 		CurPos = 0;
