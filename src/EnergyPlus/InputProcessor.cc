@@ -1,5 +1,6 @@
 // C++ Headers
 #include <algorithm>
+#include <istream>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Backspace.hh>
@@ -85,11 +86,6 @@ namespace InputProcessor {
 	std::string::size_type const MaxInputLineLength( 500 ); // Maximum number of characters in an input line (in.idf, energy+.idd)
 	std::string::size_type const MaxFieldNameLength( 140 ); // Maximum number of characters in a field name string // Not used with std::string
 	std::string const Blank;
-#ifdef _WIN32
-	std::string const NL( "\r\n" ); // Platform newline
-#else
-	std::string const NL( "\n" ); // Platform newline
-#endif
 	static std::string const BlankString;
 	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
 	Real64 const DefAutoSizeValue( AutoSize );
@@ -2528,8 +2524,8 @@ namespace InputProcessor {
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
-		// na
+		// Using
+		using DataStringGlobals::NL;
 
 		// Argument array dimensioning
 
@@ -2607,8 +2603,8 @@ namespace InputProcessor {
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
-		// na
+		// Using
+		using DataStringGlobals::NL;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2784,8 +2780,8 @@ namespace InputProcessor {
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
-		// na
+		// Using
+		using DataStringGlobals::NL;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:

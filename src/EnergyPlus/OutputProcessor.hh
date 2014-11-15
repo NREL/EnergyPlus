@@ -1,6 +1,9 @@
 #ifndef OutputProcessor_hh_INCLUDED
 #define OutputProcessor_hh_INCLUDED
 
+// C++ Headers
+#include <iosfwd>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
@@ -101,8 +104,6 @@ namespace OutputProcessor {
 	extern int MaxIVariable;
 	extern bool OutputInitialized;
 	extern int ProduceReportVDD;
-	extern int OutputFileRVDD; // Unit number for Report Variables Data Dictionary (output)
-	extern int OutputFileMVDD; // Unit number for Meter Variables Data Dictionary (output)
 	extern int OutputFileMeterDetails; // Unit number for Meter Details file (output)
 	extern int NumHoursInDay;
 	extern int NumHoursInMonth;
@@ -1129,7 +1130,7 @@ namespace OutputProcessor {
 
 	void
 	WriteTimeStampFormatData(
-		int const unitNumber, // the Fortran output unit number
+		std::ostream * out_stream_p, // Output stream pointer
 		int const reportingInterval, // See Module Parameter Definitons for ReportEach, ReportTimeStep, ReportHourly, etc.
 		int const reportID, // The ID of the time stamp
 		std::string const & reportIDString, // The ID of the time stamp
@@ -1231,12 +1232,12 @@ namespace OutputProcessor {
 		std::string const & reportIDString, // The variable's reporting ID (character)
 		Real64 const repValue, // The variable's value
 		int const storeType, // Type of item (averaged or summed)
-		Optional< Real64 const > numOfItemsStored = _, // The number of items (hours or timesteps) of data stored //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const reportingInterval = _, // The reporting interval (e.g., monthly) //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const minValue = _, // The variable's minimum value during the reporting interval //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const minValueDate = _, // The date the minimum value occurred //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const MaxValue = _, // The variable's maximum value during the reporting interval //Autodesk:OPTIONAL Used without PRESENT check
-		Optional_int_const maxValueDate = _ // The date the maximum value occurred //Autodesk:OPTIONAL Used without PRESENT check
+		Real64 const numOfItemsStored, // The number of items (hours or timesteps) of data stored
+		int const reportingInterval, // The reporting interval (e.g., monthly)
+		int const minValue, // The variable's minimum value during the reporting interval
+		int const minValueDate, // The date the minimum value occurred
+		int const MaxValue, // The variable's maximum value during the reporting interval
+		int const maxValueDate // The date the maximum value occurred
 	);
 
 	void

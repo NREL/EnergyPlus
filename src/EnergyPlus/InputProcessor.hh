@@ -2,7 +2,7 @@
 #define InputProcessor_hh_INCLUDED
 
 // C++ Headers
-#include <istream>
+#include <iosfwd>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
@@ -39,7 +39,6 @@ namespace InputProcessor {
 	extern std::string::size_type const MaxInputLineLength; // Maximum number of characters in an input line (in.idf, energy+.idd)
 	extern std::string::size_type const MaxFieldNameLength; // Maximum number of characters in a field name string
 	extern std::string const Blank;
-	extern std::string const NL; // Platform newline
 	extern Real64 const DefAutoSizeValue;
 	extern Real64 const DefAutoCalculateValue;
 

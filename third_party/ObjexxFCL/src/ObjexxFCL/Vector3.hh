@@ -746,6 +746,16 @@ public: // Properties: General
 		return ( x * v.x ) + ( y * v.y ) + ( z * v.z );
 	}
 
+	// Dot Product
+	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
+	inline
+	T
+	dot( A const & a ) const
+	{
+		assert( a.size() == 3 );
+		return ( x * a[ 0 ] ) + ( y * a[ 1 ] ) + ( z * a[ 2 ] );
+	}
+
 	// Cross Product
 	inline
 	Vector3
@@ -755,6 +765,20 @@ public: // Properties: General
 		 ( y * v.z ) - ( z * v.y ),
 		 ( z * v.x ) - ( x * v.z ),
 		 ( x * v.y ) - ( y * v.x )
+		);
+	}
+
+	// Cross Product
+	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
+	inline
+	Vector3
+	cross( A const & a ) const
+	{
+		assert( a.size() == 3 );
+		return Vector3(
+		 ( y * a[ 2 ] ) - ( z * a[ 1 ] ),
+		 ( z * a[ 0 ] ) - ( x * a[ 2 ] ),
+		 ( x * a[ 1 ] ) - ( y * a[ 0 ] )
 		);
 	}
 

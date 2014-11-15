@@ -13,6 +13,9 @@ void
 DisplayString( std::string const & String ); // String to be displayed
 
 void
+DisplayString( char const * String ); // String to be displayed
+
+void
 DisplayNumberAndString(
 	int const Number, // number to be displayed
 	std::string const & String // String to be displayed

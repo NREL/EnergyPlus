@@ -3,7 +3,6 @@ extern "C" {
 #include <FMI/main.h>
 }
 
-
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -1215,6 +1214,7 @@ namespace SimulationManager {
 		if ( write_stat != 0 ) {
 			ShowFatalError( "OpenOutputFiles: Could not open file \"eplusout.eso\" for output (write)." );
 		}
+		eso_stream = gio::out_stream( OutputFileStandard );
 		gio::write( OutputFileStandard, fmtA ) << "Program Version," + VerString;
 
 		// Open the Initialization Output File
@@ -1232,6 +1232,7 @@ namespace SimulationManager {
 		if ( write_stat != 0 ) {
 			ShowFatalError( "OpenOutputFiles: Could not open file \"eplusout.mtr\" for output (write)." );
 		}
+		mtr_stream = gio::out_stream( OutputFileMeters );
 		gio::write( OutputFileMeters, fmtA ) << "Program Version," + VerString;
 
 		// Open the Branch-Node Details Output File
@@ -1383,6 +1384,7 @@ namespace SimulationManager {
 		} else {
 			{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileStandard, flags ); }
 		}
+		eso_stream = nullptr;
 
 		if ( any_eq( HeatTransferAlgosUsed, UseCondFD ) ) { // echo out relaxation factor, it may have been changed by the program
 			gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference Numerical Parameters>, " "Starting Relaxation Factor, Final Relaxation Factor";
@@ -1434,6 +1436,7 @@ namespace SimulationManager {
 		} else {
 			{ IOFlags flags; flags.DISPOSE( "DELETE" ); gio::close( OutputFileMeters, flags ); }
 		}
+		mtr_stream = nullptr;
 
 	}
 

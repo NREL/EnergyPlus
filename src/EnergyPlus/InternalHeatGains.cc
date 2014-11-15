@@ -2868,6 +2868,7 @@ namespace InternalHeatGains {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D< Real64 > const C( 9, { 6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532 } );
+		static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2933,7 +2934,7 @@ namespace InternalHeatGains {
 		ZoneIntGain.QSECON() = 0.0;
 		ZoneIntGain.QSELost() = 0.0;
 
-		ZoneIntEEuse = ZoneCatEUseData{}; // Set all member arrays to zeros
+		ZoneIntEEuse = zeroZoneCatEUse; // Set all member arrays to zeros
 
 		ZnRpt.LtsPower() = 0.0;
 		ZnRpt.ElecPower() = 0.0;

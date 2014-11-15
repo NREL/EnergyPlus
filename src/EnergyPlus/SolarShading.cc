@@ -8,6 +8,7 @@
 #include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/MArray.functions.hh>
 #include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Vector3.hh>
 
 // EnergyPlus Headers
 #include <SolarShading.hh>
@@ -4792,9 +4793,9 @@ namespace SolarShading {
 		Real64 SwitchFacBack; // Switching factor for a window that is a back surface
 		Real64 TransBeamWin; // Beam solar transmittance of a window
 		Real64 TransBeamWinSh; // Beam solar transmittance of a shaded window
-		FArray1D< Real64 > AbsBeamWin( MaxSolidWinLayers ); // Glass layer beam solar absorptance of a window
-		FArray1D< Real64 > AbsBeamWinSh( MaxSolidWinLayers ); // Glass layer beam solar absorptance of a shaded window
-		FArray1D< Real64 > AbsBeamWinEQL( CFSMAXNL+1 ); // layers beam solar absorptance of a window
+		static FArray1D< Real64 > AbsBeamWin; // Glass layer beam solar absorptance of a window
+		Real64 AbsBeamWinSh; // Glass layer beam solar absorptance of a shaded window
+		static FArray1D< Real64 > AbsBeamWinEQL( CFSMAXNL+1 ); // layers beam solar absorptance of a window
 		Real64 AbsBeamTotWin; // Sum of window glass layer beam solar absorptances
 		Real64 ProfAng; // Window solar profile angle (radians)
 		Real64 ProfAngBack; // Back window solar profile angle (radians)
@@ -4869,11 +4870,11 @@ namespace SolarShading {
 		Real64 BTOTZone; // (Solar entering a zone as beam or diffuse radiation, originating as beam solar
 		//  incident on exterior windows)/(Beam normal solar) [W/(W/m2)]
 		Real64 BTOTZoneSSG; // Solar entering a zone in case of scheduled surface gains
-		FArray1D< Real64 > AbWin( MaxSolidWinLayers ); // Factor for front beam radiation absorbed in window glass layers
-		Real64 AbWinBack; // Factor for back beam radiation absorbed in window glass layers
-		FArray1D< Real64 > AbWinSh( MaxSolidWinLayers ); // Like AbWin, but for shaded window
-		FArray1D< Real64 > AbWinEQL( CFSMAXNL+1 ); // Factor for front beam radiation absorbed for equivalent layer window model
-		FArray1D< Real64 > AdWinEQL( CFSMAXNL+1 ); // Factor for front diffuse radiation absorbed for equivalent layer window model
+		Real64 AbWin; // Factor for front beam radiation absorbed in window glass layer
+		Real64 AbWinBack; // Factor for back beam radiation absorbed in window glass layer
+		Real64 AbWinSh; // Like AbWin, but for shaded window
+		Real64 AbWinEQL; // Factor for front beam radiation absorbed for equivalent layer window model
+		//FArray1D< Real64 > AdWinEQL( CFSMAXNL+1 ); // Factor for front diffuse radiation absorbed for equivalent layer window model //Unused
 		Real64 BABSZone; // Beam radiation from exterior windows absorbed in a zone or transmitted through
 		Real64 BABSZoneSSG; // Beam radiation from exterior windows absorbed in a zone (only for scheduled surface gains)
 		Real64 AOverlap; // Back surface area irradiated by beam solar from an exterior window,
@@ -4902,8 +4903,8 @@ namespace SolarShading {
 		Real64 SlatAngBack;
 		bool VarSlats; // True if variable slat angle
 		bool VarSlatsBack;
-		FArray1D< Real64 > ADiffWin( 5 ); // Diffuse solar absorptance of glass layers, bare window
-		FArray1D< Real64 > ADiffWinSh( 5 ); // Diffuse solar absorptance of glass layers, window with shading device
+		Real64 ADiffWin; // Diffuse solar absorptance of glass layer, bare window
+		Real64 ADiffWinSh; // Diffuse solar absorptance of glass layer, window with shading device
 		Real64 DiffTrans; // Glazing diffuse solar transmittance (including shade/blind/switching, if present)
 		Real64 DiffTransGnd; // Ground diffuse solar transmittance for glazing with blind with horiz. slats or complex fen
 		Real64 DiffTransBmGnd; // Complex fen: diffuse solar transmittance for ground-reflected beam radiation
@@ -5046,14 +5047,12 @@ namespace SolarShading {
 		int bestTrn; // Direction corresponding best dot product for master window
 		int bestBackTrn; // Direction corresponding best dot product for back surface window
 		int TotSolidLay; // Number of window solid layers
-		FArray1D< Real64 > tempVec1( 3 ); // temporary vector for performing dot_product
-		FArray1D< Real64 > tempVec2( 3 ); // temporary vector for performing dot_product
 
-		FArray2D< Real64 > AbsSolBeamEQL( CFSMAXNL+1, 2 ); // absorbed exterior beam radiation by layers fraction
-		FArray2D< Real64 > AbsSolDiffEQL( CFSMAXNL+1, 2 ); // absorbed exterior diffuse radiation by layers fraction
+		static FArray2D< Real64 > AbsSolBeamEQL( CFSMAXNL+1, 2 ); // absorbed exterior beam radiation by layers fraction
+		static FArray2D< Real64 > AbsSolDiffEQL( CFSMAXNL+1, 2 ); // absorbed exterior diffuse radiation by layers fraction
 		int EQLNum; // equivalent layer fenestration index
-		FArray2D< Real64 > AbsSolBeamBackEQL( CFSMAXNL+1, 2 ); // absorbed interior beam radiation by layers fraction from back
-		FArray2D< Real64 > AbsSolDiffBackEQL( CFSMAXNL+1, 2 ); // absorbed exterior diffuse radiation by layers fraction from back
+		static FArray2D< Real64 > AbsSolBeamBackEQL( CFSMAXNL+1, 2 ); // absorbed interior beam radiation by layers fraction from back
+		//FArray2D< Real64 > AbsSolDiffBackEQL( CFSMAXNL+1, 2 ); // absorbed exterior diffuse radiation by layers fraction from back //Unused
 
 		// scheduled surface gains local variables
 		int FenSolAbsPtr;
@@ -5206,14 +5205,14 @@ namespace SolarShading {
 						NGlass = Construct( ConstrNum ).TotGlassLayers;
 
 						for ( Lay = 1; Lay <= NGlass; ++Lay ) {
-							AbWin( Lay ) = POLYF( CosInc, Construct( ConstrNum ).AbsBeamCoef( Lay, {1,6} ) ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
-							ADiffWin( Lay ) = Construct( ConstrNum ).AbsDiff( Lay );
+							AbWin = POLYF( CosInc, Construct( ConstrNum ).AbsBeamCoef( Lay, {1,6} ) ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+							ADiffWin = Construct( ConstrNum ).AbsDiff( Lay );
 							if ( ShadeFlag <= 0 || ShadeFlag >= 10 ) {
 
 								// Bare window (ShadeFlag = -1 or 0 or shading device of off)
 
 								// Add contribution of beam reflected from outside and inside reveal
-								AWinSurf( SurfNum, Lay ) = AbWin( Lay ) + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * Construct( ConstrNum ).AbsDiff( Lay ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * Construct( ConstrNum ).AbsDiffBack( Lay );
+								AWinSurf( SurfNum, Lay ) = AbWin + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * Construct( ConstrNum ).AbsDiff( Lay ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * Construct( ConstrNum ).AbsDiffBack( Lay );
 
 							} else {
 
@@ -5225,9 +5224,9 @@ namespace SolarShading {
 
 									// Shade or switchable glazing on
 
-									AbWinSh( Lay ) = POLYF( CosInc, Construct( ConstrNumSh ).AbsBeamCoef( Lay, {1,6} ) ) * CosInc * FracSunLit;
+									AbWinSh = POLYF( CosInc, Construct( ConstrNumSh ).AbsBeamCoef( Lay, {1,6} ) ) * CosInc * FracSunLit;
 
-									ADiffWinSh( Lay ) = Construct( ConstrNumSh ).AbsDiff( Lay );
+									ADiffWinSh = Construct( ConstrNumSh ).AbsDiff( Lay );
 
 								} else {
 									// Blind or screen on
@@ -5244,8 +5243,8 @@ namespace SolarShading {
 											RhoBlDiffFront = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolFrontDiffDiffRefl );
 										}
 										AGlDiffBack = Construct( ConstrNum ).AbsDiffBack( Lay );
-										AbWinSh( Lay ) = AbWin( Lay ) + ( TGlBm * AGlDiffBack * RhoBlFront / ( 1.0 - RhoBlFront * RGlDiffBack ) ) * CosInc * FracSunLit;
-										ADiffWinSh( Lay ) = ADiffWin( Lay ) + Construct( ConstrNum ).TransDiff * AGlDiffBack * RhoBlDiffFront / ( 1.0 - RhoBlDiffFront * RGlDiffBack );
+										AbWinSh = AbWin + ( TGlBm * AGlDiffBack * RhoBlFront / ( 1.0 - RhoBlFront * RGlDiffBack ) ) * CosInc * FracSunLit;
+										ADiffWinSh = ADiffWin + Construct( ConstrNum ).TransDiff * AGlDiffBack * RhoBlDiffFront / ( 1.0 - RhoBlDiffFront * RGlDiffBack );
 									} else if ( ShadeFlag == ExtBlindOn ) {
 
 										// Exterior blind on
@@ -5261,10 +5260,10 @@ namespace SolarShading {
 											RhoBlDifDifBk = InterpSlatAng( SlatAng, VarSlats, Blind( BlNum ).SolBackDiffDiffRefl );
 										}
 										AGlDiffFront = Construct( ConstrNum ).AbsDiff( Lay );
-										AbWinSh( Lay ) = TBlBmBm * AbWin( Lay ) + ( ( TBlBmBm * RGlFront * RhoBlBack + TBlBmDiff ) * AGlDiffFront / ( 1 - RGlDiffFront * RhoBlDiffBack ) ) * CosInc * FracSunLit;
-										//ADiffWinSh(Lay) = 0.0  ! Assumes no contribution from reveal reflection when exterior blind in place
+										AbWinSh = TBlBmBm * AbWin + ( ( TBlBmBm * RGlFront * RhoBlBack + TBlBmDiff ) * AGlDiffFront / ( 1 - RGlDiffFront * RhoBlDiffBack ) ) * CosInc * FracSunLit;
+										//ADiffWinSh = 0.0  ! Assumes no contribution from reveal reflection when exterior blind in place
 										//  Replaced above line with (FCW, 2/10/03):
-										ADiffWinSh( Lay ) = ADiffWin( Lay ) * TBlDifDif / ( 1.0 - RGlDifFr * RhoBlDifDifBk );
+										ADiffWinSh = ADiffWin * TBlDifDif / ( 1.0 - RGlDifFr * RhoBlDifDifBk );
 
 									} else if ( ShadeFlag == ExtScreenOn ) {
 
@@ -5282,9 +5281,9 @@ namespace SolarShading {
 										AGlDiffFront = Construct( ConstrNum ).AbsDiff( Lay );
 
 										//             Reduce the bare window absorbed beam by the screen beam transmittance and then account for interreflections
-										AbWinSh( Lay ) = TScBmBm * AbWin( Lay ) + ( TScBmBm * RGlFront * RScBack + TScBmDiff ) * Construct( ConstrNum ).AbsDiff( Lay ) / ( 1.0 - RGlDiffFront * RScDifBack ) * CosInc * FracSunLit;
+										AbWinSh = TScBmBm * AbWin + ( TScBmBm * RGlFront * RScBack + TScBmDiff ) * Construct( ConstrNum ).AbsDiff( Lay ) / ( 1.0 - RGlDiffFront * RScDifBack ) * CosInc * FracSunLit;
 
-										ADiffWinSh( Lay ) = ADiffWin( Lay ) * TScDifDif / ( 1.0 - RGlDifFr * RScDifBack );
+										ADiffWinSh = ADiffWin * TScDifDif / ( 1.0 - RGlDifFr * RScDifBack );
 
 									} else {
 										// Between-glass blind on
@@ -5344,24 +5343,24 @@ namespace SolarShading {
 
 										if ( NGlass == 2 ) {
 											if ( Lay == 1 ) {
-												AbWinSh( 1 ) = CosInc * FracSunLit * ( af1 + t1 * tfshBB * rf2 * tbshBB * ab1 + t1 * ( rfshB + rfshB * rbd1 * rfshd + tfshBB * rf2 * tbshBd + tfshBd * rfd2 * tbshd ) * abd1 );
-												ADiffWinSh( 1 ) = afd1 + td1 * ( rfshd + rfshd * rbd1 * rfshd + tfshd * rfd2 * tbshd ) * abd1;
+												AbWinSh = CosInc * FracSunLit * ( af1 + t1 * tfshBB * rf2 * tbshBB * ab1 + t1 * ( rfshB + rfshB * rbd1 * rfshd + tfshBB * rf2 * tbshBd + tfshBd * rfd2 * tbshd ) * abd1 );
+												ADiffWinSh = afd1 + td1 * ( rfshd + rfshd * rbd1 * rfshd + tfshd * rfd2 * tbshd ) * abd1;
 											} else if ( Lay == 2 ) {
-												AbWinSh( 2 ) = CosInc * FracSunLit * ( t1 * rfshB * af2 + t1 * ( rfshB * rf2 * rbshd + tfshBd * ( 1 + rfd2 * rbshd ) + rfshB * rbd1 * tfshd ) * afd2 );
-												ADiffWinSh( 2 ) = td1 * ( tfshd * ( 1 + rfd2 * rbshd ) + rfshd * rbd1 * tfshd ) * afd2;
+												AbWinSh = CosInc * FracSunLit * ( t1 * rfshB * af2 + t1 * ( rfshB * rf2 * rbshd + tfshBd * ( 1 + rfd2 * rbshd ) + rfshB * rbd1 * tfshd ) * afd2 );
+												ADiffWinSh = td1 * ( tfshd * ( 1 + rfd2 * rbshd ) + rfshd * rbd1 * tfshd ) * afd2;
 											}
 										} // End of check if NGlass = 2
 
 										if ( NGlass == 3 ) {
 											if ( Lay == 1 ) {
-												AbWinSh( 1 ) = CosInc * FracSunLit * ( af1 + t1 * rf2 * ab1 + t1t2 * tfshBB * rf3 * tbshBB * t2 * ab1 + t1t2 * ( rfshB * td2 + rfshB * rbd2 * rfshd * td2 + tfshBd * rfd3 * tbshd * td2 ) * abd1 );
-												ADiffWinSh( 1 ) = afd1 + td1 * rbd2 * abd1 + td1td2 * ( rfshd * ( 1 + rbd2 * rfshd + td2 * rbd1 * td2 * rfshd ) + tfshd * ( rfd3 * tbshd + rfd3 * rbshd * rfd3 * tbshd ) ) * td2 * abd1;
+												AbWinSh = CosInc * FracSunLit * ( af1 + t1 * rf2 * ab1 + t1t2 * tfshBB * rf3 * tbshBB * t2 * ab1 + t1t2 * ( rfshB * td2 + rfshB * rbd2 * rfshd * td2 + tfshBd * rfd3 * tbshd * td2 ) * abd1 );
+												ADiffWinSh = afd1 + td1 * rbd2 * abd1 + td1td2 * ( rfshd * ( 1 + rbd2 * rfshd + td2 * rbd1 * td2 * rfshd ) + tfshd * ( rfd3 * tbshd + rfd3 * rbshd * rfd3 * tbshd ) ) * td2 * abd1;
 											} else if ( Lay == 2 ) {
-												AbWinSh( 2 ) = CosInc * FracSunLit * ( t1 * af2 + t1t2 * ( tfshBB * rf3 * tbshBB * ab2 + rfshB * td2 * rbd1 * afd2 ) + t1t2 * ( rfshB * ( 1 + rbd2 * rfshd ) + tfshBB * rf3 * tbshBd + tfshBd * rfd3 * tbshd ) * abd2 );
-												ADiffWinSh( 2 ) = td1 * afd2 + td1td2 * rfshd * td2 * rbd1 * afd2 + td1td2 * ( rfshd * ( 1 + rbd2 * rfshd ) + tfshd * rfd3 * tbshd ) * abd2;
+												AbWinSh = CosInc * FracSunLit * ( t1 * af2 + t1t2 * ( tfshBB * rf3 * tbshBB * ab2 + rfshB * td2 * rbd1 * afd2 ) + t1t2 * ( rfshB * ( 1 + rbd2 * rfshd ) + tfshBB * rf3 * tbshBd + tfshBd * rfd3 * tbshd ) * abd2 );
+												ADiffWinSh = td1 * afd2 + td1td2 * rfshd * td2 * rbd1 * afd2 + td1td2 * ( rfshd * ( 1 + rbd2 * rfshd ) + tfshd * rfd3 * tbshd ) * abd2;
 											} else if ( Lay == 3 ) {
-												AbWinSh( 3 ) = CosInc * FracSunLit * ( t1t2 * tfshBB * af3 + t1t2 * ( tfshBB * rf3 * rbshB + tfshBd * ( 1 + rfd3 * rbshd ) + rfshB * ( rbd2 * tfshd + td2 * rbd1 * td2 * tfshd ) ) * afd3 );
-												ADiffWinSh( 3 ) = td1td2 * ( tfshd * ( 1 + rfd3 * rbshd ) + rfshd * ( rbd2 * tfshd + td2 * rbd1 * td2 * tfshd ) ) * afd3;
+												AbWinSh = CosInc * FracSunLit * ( t1t2 * tfshBB * af3 + t1t2 * ( tfshBB * rf3 * rbshB + tfshBd * ( 1 + rfd3 * rbshd ) + rfshB * ( rbd2 * tfshd + td2 * rbd1 * td2 * tfshd ) ) * afd3 );
+												ADiffWinSh = td1td2 * ( tfshd * ( 1 + rfd3 * rbshd ) + rfshd * ( rbd2 * tfshd + td2 * rbd1 * td2 * tfshd ) ) * afd3;
 											}
 										} // End of check if NGlass = 3
 
@@ -5372,17 +5371,17 @@ namespace SolarShading {
 
 									// Interior or between glass shade or blind on
 
-									AWinSurf( SurfNum, Lay ) = AbWinSh( Lay );
+									AWinSurf( SurfNum, Lay ) = AbWinSh;
 									// Add contribution of diffuse from beam on outside reveal
-									if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn ) AWinSurf( SurfNum, Lay ) += ADiffWinSh( Lay ) * SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing;
+									if ( ShadeFlag == IntShadeOn || ShadeFlag == IntBlindOn || ShadeFlag == BGShadeOn || ShadeFlag == BGBlindOn ) AWinSurf( SurfNum, Lay ) += ADiffWinSh * SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing;
 
 								} else {
 									// Switchable glazing
 
 									SwitchFac = SurfaceWindow( SurfNum ).SwitchingFactor;
-									AWinSurf( SurfNum, Lay ) = InterpSw( SwitchFac, AbWin( Lay ), AbWinSh( Lay ) );
+									AWinSurf( SurfNum, Lay ) = InterpSw( SwitchFac, AbWin, AbWinSh );
 									// Add contribution of diffuse from beam on outside and inside reveal
-									AWinSurf( SurfNum, Lay ) += InterpSw( SwitchFac, ADiffWin( Lay ), ADiffWinSh( Lay ) ) * SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing + InterpSw( SwitchFac, Construct( ConstrNum ).AbsDiffBack( Lay ), Construct( ConstrNumSh ).AbsDiffBack( Lay ) ) * SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing;
+									AWinSurf( SurfNum, Lay ) += InterpSw( SwitchFac, ADiffWin, ADiffWinSh ) * SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing + InterpSw( SwitchFac, Construct( ConstrNum ).AbsDiffBack( Lay ), Construct( ConstrNumSh ).AbsDiffBack( Lay ) ) * SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing;
 								}
 							} // End of check if window has shading device
 						} // End of loop over window glass layers
@@ -5488,10 +5487,10 @@ namespace SolarShading {
 						if ( FenSolAbsPtr == 0 ) {
 							// Put in the equivalent layer absorptions
 							for ( Lay = 1; Lay <= SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).NLayers; ++Lay ) {
-								AbWin( Lay ) = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( Lay, HourOfDay, TimeStep ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
+								AbWin = SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBmFtAbs( Lay, HourOfDay, TimeStep ) * CosInc * SunLitFract * SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay );
 
 								// Add contribution of beam reflected from outside and inside reveal
-								AWinSurf( SurfNum, Lay ) = AbWin( Lay ) + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinFtHemAbs( Lay ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBkHemAbs( Lay );
+								AWinSurf( SurfNum, Lay ) = AbWin + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinFtHemAbs( Lay ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * SurfaceWindow( SurfNum ).ComplexFen.State( SurfaceWindow( SurfNum ).ComplexFen.CurrentState ).WinBkHemAbs( Lay );
 							}
 						}
 
@@ -5512,17 +5511,17 @@ namespace SolarShading {
 						Construct( ConstrNum ).TransDiff = AbsSolDiffEQL( CFS( EQLNum ).NL + 1, 1 );
 
 						for ( Lay = 1; Lay <= CFS( EQLNum ).NL + 1; ++Lay ) {
-							AbWinEQL( Lay ) = AbsSolBeamEQL( Lay, 1 ) * CosInc * SunLitFract * InOutProjSLFracMult;
+							AbWinEQL = AbsSolBeamEQL( Lay, 1 ) * CosInc * SunLitFract * InOutProjSLFracMult;
 							if ( CFS( EQLNum ).L( 1 ).LTYPE != ltyGLAZE ) {
 								// if the first layer is not glazing (or it is a shade) do not
-								AWinSurf( SurfNum, Lay ) = AbWinEQL( Lay );
+								AWinSurf( SurfNum, Lay ) = AbWinEQL;
 							} else {
 								// the first layer is a glazing, include the outside reveal reflection
 								// and the inside reveal reflection until indoor shade layer is encountered.
 								if ( CFS( EQLNum ).L( Lay ).LTYPE == ltyGLAZE ) {
-									AWinSurf( SurfNum, Lay ) = AbWinEQL( Lay ) + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * AbsSolBeamEQL( Lay, 1 ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * AbsSolDiffEQL( Lay, 2 );
+									AWinSurf( SurfNum, Lay ) = AbWinEQL + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * AbsSolBeamEQL( Lay, 1 ) + SurfaceWindow( SurfNum ).InsRevealDiffOntoGlazing * AbsSolDiffEQL( Lay, 2 );
 								} else {
-									AWinSurf( SurfNum, Lay ) = AbWinEQL( Lay ) + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * AbsSolBeamEQL( Lay, 1 );
+									AWinSurf( SurfNum, Lay ) = AbWinEQL + SurfaceWindow( SurfNum ).OutsRevealDiffOntoGlazing * AbsSolBeamEQL( Lay, 1 );
 								}
 							}
 						}
@@ -6138,7 +6137,7 @@ namespace SolarShading {
 										ConstrNum = Surface( BackSurfNum ).StormWinConstruction;
 										ConstrNumSh = Surface( BackSurfNum ).StormWinShadedConstruction;
 									}
-									AbsBeamWin = 0.0;
+									AbsBeamWin.dimension( MaxSolidWinLayers, 0.0 );
 									TransBeamWin = 0.0;
 
 									// Interior beam absorptance of glass layers and beam transmittance of back exterior  &
@@ -6385,10 +6384,8 @@ namespace SolarShading {
 
 										SwitchFacBack = SurfaceWindow( BackSurfNum ).SwitchingFactor;
 										for ( Lay = 1; Lay <= NBackGlass; ++Lay ) {
-											AbsBeamWinSh( Lay ) = POLYF( CosIncBack, Construct( ConstrNumBackSh ).AbsBeamBackCoef( Lay, {1,6} ) );
-										}
-										for ( Lay = 1; Lay <= NBackGlass; ++Lay ) {
-											AbsBeamWin( Lay ) = InterpSw( SwitchFac, AbsBeamWin( Lay ), AbsBeamWinSh( Lay ) );
+											AbsBeamWinSh = POLYF( CosIncBack, Construct( ConstrNumBackSh ).AbsBeamBackCoef( Lay, {1,6} ) );
+											AbsBeamWin( Lay ) = InterpSw( SwitchFac, AbsBeamWin( Lay ), AbsBeamWinSh );
 										}
 										TransBeamWinSh = POLYF( CosIncBack, Construct( ConstrNumBackSh ).TransSolBeamCoef( {1,6} ) );
 										TransBeamWin = InterpSw( SwitchFac, TransBeamWin, TransBeamWinSh );
@@ -6491,13 +6488,7 @@ namespace SolarShading {
 													for ( CurBackDir = 1; CurBackDir <= ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).Trn.NBasis; ++CurBackDir ) {
 														// Purpose of this part is to find best match for outgoing beam number of window back surface and incoming beam
 														// number of complex fenestration which this beam will hit on (back surface again)
-														tempVec1( 1 ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ).x;
-														tempVec1( 2 ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ).y;
-														tempVec1( 3 ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ).z;
-														tempVec2( 1 ) = ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ).x;
-														tempVec2( 2 ) = ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ).y;
-														tempVec2( 3 ) = ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ).z;
-														curDot = dot( tempVec1, tempVec2 );
+														curDot = dot( ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ), ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ) );
 														if ( CurBackDir == 1 ) {
 															bestDot = curDot;
 															bestTrn = CurTrnDir;
@@ -8468,9 +8459,10 @@ namespace SolarShading {
 		// This is the incidence angle in a plane that is normal to the window
 		// and parallel to the X-axis of the window (the axis along
 		// which the width of the window is measured).
-		FArray1D< Real64 > WinNorm( 3 ); // Unit vector normal to window
-		FArray1D< Real64 > WinNormCrossBase( 3 ); // Cross product of WinNorm and vector along window baseline
-		FArray1D< Real64 > SunPrime( 3 ); // Projection of sun vector onto plane (perpendicular to
+		Vector3< Real64 > WinNorm; // Unit vector normal to window
+		Vector3< Real64 > WinNormCrossBase; // Cross product of WinNorm and vector along window baseline
+		Vector3< Real64 > SunPrime; // Projection of sun vector onto plane (perpendicular to
+		Vector3< Real64 > const SolCosVec( SOLCOS ); // Local Vector3 copy for speed (until SOLCOS mig to Vector3)
 		//  window plane) determined by WinNorm and vector along
 		//  baseline of window
 		Real64 ThWin; // Azimuth angle of WinNorm (radians)
@@ -8478,8 +8470,8 @@ namespace SolarShading {
 		Real64 dot2;
 		Real64 dot3;
 
-		ElevSun = PiOvr2 - std::acos( SOLCOS( 3 ) );
-		AzimSun = std::atan2( SOLCOS( 1 ), SOLCOS( 2 ) );
+		ElevSun = PiOvr2 - std::acos( SolCosVec.z );
+		AzimSun = std::atan2( SolCosVec.x, SolCosVec.y );
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 
@@ -8501,12 +8493,13 @@ namespace SolarShading {
 			//  ELSE
 			WinNorm = Surface( SurfNum ).OutNormVec;
 			ThWin = AzimWin - PiOvr2;
-			WinNormCrossBase( 1 ) = - std::sin( ElevWin ) * std::cos( ThWin );
-			WinNormCrossBase( 2 ) = std::sin( ElevWin ) * std::sin( ThWin );
-			WinNormCrossBase( 3 ) = std::cos( ElevWin );
-			SunPrime = SOLCOS - WinNormCrossBase * dot( SOLCOS, WinNormCrossBase );
+			Real64 const sin_Elevwin( std::sin( ElevWin ) );
+			WinNormCrossBase.x = -( sin_Elevwin * std::cos( ThWin ) );
+			WinNormCrossBase.y = sin_Elevwin * std::sin( ThWin );
+			WinNormCrossBase.z = std::cos( ElevWin );
+			SunPrime = SolCosVec - WinNormCrossBase * dot( SolCosVec, WinNormCrossBase );
 			dot1 = dot( WinNorm, SunPrime );
-			dot2 = magnitude( SunPrime );
+			dot2 = SunPrime.magnitude();
 			dot3 = dot1 / dot2;
 			if ( dot3 > 1.0 ) {
 				dot3 = 1.0;
@@ -8517,7 +8510,7 @@ namespace SolarShading {
 			ProfileAngVert = std::abs( std::acos( dot3 ) );
 			//  END IF
 			// Constrain to 0 to pi
-			if ( ProfileAngVert > Pi ) ProfileAngVert = 2.0 * Pi - ProfileAngVert;
+			if ( ProfileAngVert > Pi ) ProfileAngVert = TwoPi - ProfileAngVert;
 
 			SurfaceWindow( SurfNum ).ProfileAngHor = ProfileAngHor / DegToRadians;
 			SurfaceWindow( SurfNum ).ProfileAngVert = ProfileAngVert / DegToRadians;

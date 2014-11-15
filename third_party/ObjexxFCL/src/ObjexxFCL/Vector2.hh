@@ -697,12 +697,32 @@ public: // Properties: General
 		return ( x * v.x ) + ( y * v.y );
 	}
 
+	// Dot Product
+	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
+	inline
+	T
+	dot( A const & a ) const
+	{
+		assert( a.size() == 2 );
+		return ( x * a[ 0 ] ) + ( y * a[ 1 ] );
+	}
+
 	// Cross Product
 	inline
 	T
 	cross( Vector2 const & v ) const
 	{
 		return ( x * v.y ) - ( y * v.x );
+	}
+
+	// Cross Product
+	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
+	inline
+	T
+	cross( A const & a ) const
+	{
+		assert( a.size() == 2 );
+		return ( x * a[ 1 ] ) - ( y * a[ 0 ] );
 	}
 
 	// Alias for Element 1

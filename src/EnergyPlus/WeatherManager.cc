@@ -1,5 +1,6 @@
 // C++ Headers
 #include <cmath>
+#include <cstdio>
 #include <string>
 
 // ObjexxFCL Headers
@@ -1966,8 +1967,8 @@ namespace WeatherManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt TimeStmpFmt( "(I2.2,'/',I2.2,' ',I2.2,':')" );
-		static gio::Fmt MnDyFmt( "(I2.2,'/',I2.2)" );
+		static char time_stamp[ 10 ];
+		static char day_stamp[ 6 ];
 		static std::string const RoutineName( "SetCurrentWeather" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -1995,8 +1996,10 @@ namespace WeatherManager {
 
 		UpdateScheduleValues();
 
-		gio::write( CurMnDyHr, TimeStmpFmt ) << Month << DayOfMonth << HourOfDay - 1;
-		gio::write( CurMnDy, MnDyFmt ) << Month << DayOfMonth;
+		std::sprintf( time_stamp, "%02d/%02d %02d:", Month, DayOfMonth, HourOfDay - 1 );
+		CurMnDyHr = time_stamp;
+		std::sprintf( day_stamp, "%02d/%02d", Month, DayOfMonth );
+		CurMnDy = day_stamp;
 
 		WeightNow = Interpolation( TimeStep );
 		WeightPreviousHour = 1.0 - WeightNow;
@@ -4928,13 +4931,11 @@ Label9999: ;
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		std::string Title;
 
 		// FLOW:
 
 		// Report the time stamp and the current weather to the output file
 
-		Title = Environment( Envrn ).Title;
 		if ( ! WarmupFlag ) { // Write the required output information
 
 			// The first time through in a non-warmup day, the environment header
@@ -4955,6 +4956,7 @@ Label9999: ;
 					PrintEndDataDictionary = false;
 				}
 				if ( DoOutputReporting ) {
+					std::string const & Title( Environment( Envrn ).Title );
 					gio::write( OutputFileStandard, EnvironmentStampFormat ) << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
 					gio::write( OutputFileMeters, EnvironmentStampFormat ) << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
 					PrintEnvrnStamp = false;

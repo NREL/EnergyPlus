@@ -1,4 +1,5 @@
 // C++ Headers
+#include <iostream>
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -212,6 +213,10 @@ main()
 	using ScheduleManager::ReportOrphanSchedules;
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
+
+	// Disable C++ i/o synching with C methods for speed
+	std::ios_base::sync_with_stdio( false );
+	std::cin.tie( 0 ); // Untie cin and cout: Could cause odd behavior for interactive prompts
 
 // Enable floating point exceptions
 #ifndef NDEBUG

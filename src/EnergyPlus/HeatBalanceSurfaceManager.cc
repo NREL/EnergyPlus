@@ -2005,12 +2005,14 @@ namespace HeatBalanceSurfaceManager {
 			if ( InterZoneWindow ) {
 				for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 					if ( RecDifShortFromZ( ZoneNum ) ) {
+						Real64 QSDifSol_sum( 0.0 ); // Accumulator
 						auto lZone( FractDifShortZtoZ.index( 1, ZoneNum ) ); //Tuned Linear indexing
 						for ( OtherZoneNum = 1; OtherZoneNum <= NumOfZones; ++OtherZoneNum, ++lZone ) {
 							if ( ( OtherZoneNum != ZoneNum ) && ( RecDifShortFromZ( OtherZoneNum ) ) ) {
-								QSDifSol( ZoneNum ) += FractDifShortZtoZ[ lZone ] * QDforDaylight( OtherZoneNum ); // [ lZone ] == ( OtherZoneNum, ZoneNum )
+								QSDifSol_sum += FractDifShortZtoZ[ lZone ] * QDforDaylight( OtherZoneNum ); // [ lZone ] == ( OtherZoneNum, ZoneNum )
 							}
 						}
+						QSDifSol( ZoneNum ) += QSDifSol_sum;
 					}
 				}
 			}

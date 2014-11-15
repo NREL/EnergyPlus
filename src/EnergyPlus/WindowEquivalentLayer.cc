@@ -9226,7 +9226,7 @@ namespace WindowEquivalentLayer {
 		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
 		Real64 IncidAngle; // = ACOS(SOLCOS(3))
-		FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
+		static FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
 		int Lay; // window layer index
 		int EQLNum; // equivalent layer window construction index
 		int ConstrNum; // construction index
