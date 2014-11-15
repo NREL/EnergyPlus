@@ -3765,7 +3765,7 @@ namespace OutputProcessor {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		static int const N( 100 );
 		static char stamp[ N ];
-		assert( ReportIDString.lenth() + DayOfSimChr.length() + ( DayType.present() ? DayType().length() : 0u ) + 26 < N ); // Check will fit in stamp size
+		assert( reportIDString.lenth() + DayOfSimChr.length() + ( DayType.present() ? DayType().length() : 0u ) + 26 < N ); // Check will fit in stamp size
 
 		if ( ( ! out_stream_p ) || ( ! *out_stream_p ) ) return; // Stream
 
