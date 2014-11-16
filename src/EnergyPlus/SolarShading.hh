@@ -1,6 +1,9 @@
 #ifndef SolarShading_hh_INCLUDED
 #define SolarShading_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
@@ -80,7 +83,7 @@ namespace SolarShading {
 	extern int ShadowingCalcFrequency; // Frequency for Shadowing Calculations
 	extern int ShadowingDaysLeft; // Days left in current shadowing period
 	extern bool debugging;
-	extern int OutputFileShading;
+	extern std::ofstream shd_stream; // Shading file stream
 	extern FArray1D_int HCNS; // Surface number of back surface HC figures
 	extern FArray1D_int HCNV; // Number of vertices of each HC figure
 	extern FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides

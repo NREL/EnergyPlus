@@ -155,7 +155,7 @@ namespace SolarShading {
 	int ShadowingCalcFrequency( 0 ); // Frequency for Shadowing Calculations
 	int ShadowingDaysLeft( 0 ); // Days left in current shadowing period
 	bool debugging( false );
-	int OutputFileShading;
+	std::ofstream shd_stream; // Shading file stream
 	FArray1D_int HCNS; // Surface number of back surface HC figures
 	FArray1D_int HCNV; // Number of vertices of each HC figure
 	FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
@@ -253,10 +253,9 @@ namespace SolarShading {
 #endif
 		if ( BeginSimFlag ) {
 
-			OutputFileShading = GetNewUnitNumber();
-			{ IOFlags flags; flags.ACTION( "write" ); gio::open( OutputFileShading, "eplusout.shd", flags ); write_stat = flags.ios(); }
-			if ( write_stat != 0 ) {
-				ShowFatalError( "InitSolarCalculations: Could not open file \"eplustbl.shd\" for output (write)." );
+			shd_stream.open( "eplusout.shd" );
+			if ( ! shd_stream ) {
+				ShowFatalError( "InitSolarCalculations: Could not open file \"eplusout.shd\" for output (write)." );
 			}
 
 			if ( GetInputFlag ) {
@@ -275,6 +274,7 @@ namespace SolarShading {
 
 			if ( firstTime ) DisplayString( "Determining Shadowing Combinations" );
 			DetermineShadowingCombinations();
+			shd_stream.close(); // Done writing to shd file
 
 			if ( firstTime ) DisplayString( "Computing Window Shade Absorption Factors" );
 			ComputeWinShadeAbsorpFactors();
@@ -1533,10 +1533,6 @@ namespace SolarShading {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// MSG - for error message
 		static FArray1D_string const MSG( 4, { "misses", "", "within", "overlaps" } );
-		static gio::Fmt AFormat( "(1X,A)" );
-		static gio::Fmt A4Format( "(1X,A,A,A,A)" );
-		static gio::Fmt A2I2Format( "(1X,A,I5,A,I5)" );
-		static gio::Fmt VFormat( "(1X,A,I5,A,\"(\",2(F15.2,\",\"),F15.2,\")\")" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1743,20 +1739,21 @@ namespace SolarShading {
 				//                       ' SubSurface "'//TRIM(Surface(SBSNR)%Name)//'"',  &
 				//                      TrackBaseSubSurround(SBSNR)%ErrIndex2)
 
-				gio::write( OutputFileShading, AFormat ) << "==== Base does not Surround subsurface details ====";
-				gio::write( OutputFileShading, A4Format ) << "Surface=" << Surface( GRSNR ).Name << " " << cOverLapStatus( OverlapStatus );
-				gio::write( OutputFileShading, A2I2Format ) << "Surface#=" << GRSNR << " NSides=" << Surface( GRSNR ).Sides;
+				shd_stream << "==== Base does not Surround subsurface details ====\n";
+				shd_stream << "Surface=" << Surface( GRSNR ).Name << ' ' << cOverLapStatus( OverlapStatus ) << '\n';
+				shd_stream << "Surface#=" << std::setw( 5 ) << GRSNR << " NSides=" << std::setw( 5 ) << Surface( GRSNR ).Sides << '\n';
+				shd_stream << std::fixed << std::setprecision( 2 );
 				for ( N = 1; N <= Surface( GRSNR ).Sides; ++N ) {
 					Vector const & v( Surface( GRSNR ).Vertex( N ) );
-					gio::write( OutputFileShading, VFormat ) << "Vertex " << N << "=" << v.x << v.y << v.z;
+					shd_stream << "Vertex " << std::setw( 5 ) << N << "=(" << std::setw( 15 ) << v.x << ',' << std::setw( 15 ) << v.y << ',' << std::setw( 15 ) << v.z << ")\n";
 				}
-				gio::write( OutputFileShading, A4Format ) << "SubSurface=" << Surface( SBSNR ).Name;
-				gio::write( OutputFileShading, A2I2Format ) << "Surface#=" << SBSNR << " NSides=" << Surface( SBSNR ).Sides;
+				shd_stream << "SubSurface=" << Surface( SBSNR ).Name << '\n';
+				shd_stream << "Surface#=" << std::setw( 5 ) << SBSNR << " NSides=" << std::setw( 5 ) << Surface( SBSNR ).Sides << '\n';
 				for ( N = 1; N <= Surface( SBSNR ).Sides; ++N ) {
 					Vector const & v( Surface( SBSNR ).Vertex( N ) );
-					gio::write( OutputFileShading, VFormat ) << "Vertex " << N << "=" << v.x << v.y << v.z;
+					shd_stream << "Vertex " << std::setw( 5 ) << N << "=(" << std::setw( 15 ) << v.x << ',' << std::setw( 15 ) << v.y << ',' << std::setw( 15 ) << v.z << ")\n";
 				}
-				gio::write( OutputFileShading, AFormat ) << "================================";
+				shd_stream << "================================\n";
 			}
 		}
 
@@ -2621,16 +2618,16 @@ namespace SolarShading {
 				YUntrunc = ( HCA( M, NS2 ) * HCC( N, NS1 ) - HCC( M, NS2 ) * HCA( N, NS1 ) ) / W;
 				if ( NV3 > isize( XTEMP ) ) {
 					//        write(outputfiledebug,*) 'nv3=',nv3,' SIZE(xtemp)=',SIZE(xtemp)
-					XTEMP1.allocate( size( XTEMP ) + 10 );
-					YTEMP1.allocate( size( YTEMP ) + 10 );
+					XTEMP1.allocate( isize( XTEMP ) + 10 );
+					YTEMP1.allocate( isize( YTEMP ) + 10 );
 					XTEMP1 = 0.0;
 					YTEMP1 = 0.0;
 					XTEMP1( {1,NV3 - 1} ) = XTEMP( {1,NV3 - 1} );
 					YTEMP1( {1,NV3 - 1} ) = YTEMP( {1,NV3 - 1} );
 					XTEMP.deallocate();
 					YTEMP.deallocate();
-					XTEMP.allocate( size( XTEMP1 ) );
-					YTEMP.allocate( size( YTEMP1 ) );
+					XTEMP.allocate( isize( XTEMP1 ) );
+					YTEMP.allocate( isize( YTEMP1 ) );
 					XTEMP = XTEMP1;
 					YTEMP = YTEMP1;
 					XTEMP1.deallocate();
@@ -3896,35 +3893,34 @@ namespace SolarShading {
 		SBS.deallocate();
 		BKS.deallocate();
 
-		gio::write( OutputFileShading, fmtA ) << " Shadowing Combinations";
-		{ auto const SELECT_CASE_var( SolarDistribution );
-		if ( SELECT_CASE_var == MinimalShadowing ) {
-			gio::write( OutputFileShading, fmtA ) << " ..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations";
-		} else if ( SELECT_CASE_var == FullExterior ) {
+		shd_stream << "Shadowing Combinations\n";
+		if ( SolarDistribution == MinimalShadowing ) {
+			shd_stream << "..Solar Distribution=Minimal Shadowing, Detached Shading will not be used in shadowing calculations\n";
+		} else if ( SolarDistribution == FullExterior ) {
 			if ( CalcSolRefl ) {
-				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces";
+				shd_stream << "..Solar Distribution=FullExteriorWithReflectionsFromExteriorSurfaces\n";
 			} else {
-				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullExterior";
+				shd_stream << "..Solar Distribution=FullExterior\n";
 			}
-		} else if ( SELECT_CASE_var == FullInteriorExterior ) {
+		} else if ( SolarDistribution == FullInteriorExterior ) {
 			if ( CalcSolRefl ) {
-				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces";
+				shd_stream << "..Solar Distribution=FullInteriorAndExteriorWithReflectionsFromExteriorSurfaces\n";
 			} else {
-				gio::write( OutputFileShading, fmtA ) << "..Solar Distribution=FullInteriorAndExterior";
+				shd_stream << "..Solar Distribution=FullInteriorAndExterior\n";
 			}
 		} else {
-		}}
+		}
 
-		gio::write( OutputFileShading, fmtA ) << "..In the following, only the first 10 reference surfaces will be shown.";
-		gio::write( OutputFileShading, fmtA ) << "..But all surfaces are used in the calculations.";
+		shd_stream << "..In the following, only the first 10 reference surfaces will be shown.\n";
+		shd_stream << "..But all surfaces are used in the calculations.\n";
 
 		for ( HTS = 1; HTS <= TotSurfaces; ++HTS ) {
-			gio::write( OutputFileShading, fmtA ) << " ==================================";
+			shd_stream << "==================================\n";
 			if ( ShadowComb( HTS ).UseThisSurf ) {
 				if ( Surface( HTS ).IsConvex ) {
-					gio::write( OutputFileShading, fmtA ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is convex.";
+					shd_stream << "Surface=" << Surface( HTS ).Name << " is used as Receiving Surface in calculations and is convex.\n";
 				} else {
-					gio::write( OutputFileShading, fmtA ) << " Surface=" + Surface( HTS ).Name + " is used as Receiving Surface in calculations and is non-convex.";
+					shd_stream << "Surface=" << Surface( HTS ).Name << " is used as Receiving Surface in calculations and is non-convex.\n";
 					if ( ShadowComb( HTS ).NumGenSurf > 0 ) {
 						if ( DisplayExtraWarnings ) {
 							ShowWarningError( "DetermineShadowingCombinations: Surface=\"" + Surface( HTS ).Name + "\" is a receiving surface and is non-convex." );
@@ -3935,20 +3931,20 @@ namespace SolarShading {
 					}
 				}
 			} else {
-				gio::write( OutputFileShading, fmtA ) << " Surface=" + Surface( HTS ).Name + " is not used as Receiving Surface in calculations.";
+				shd_stream << "Surface=" << Surface( HTS ).Name << " is not used as Receiving Surface in calculations.\n";
 			}
-			gio::write( OutputFileShading, fmtLD ) << "Number of general casting surfaces=" << ShadowComb( HTS ).NumGenSurf;
+			shd_stream << "Number of general casting surfaces=" << ShadowComb( HTS ).NumGenSurf << '\n';
 			for ( NGSS = 1; NGSS <= ShadowComb( HTS ).NumGenSurf; ++NGSS ) {
-				if ( NGSS <= 10 ) gio::write( OutputFileShading, fmtA ) << " ..Surface=" + Surface( ShadowComb( HTS ).GenSurf( NGSS ) ).Name;
+				if ( NGSS <= 10 ) shd_stream << "..Surface=" << Surface( ShadowComb( HTS ).GenSurf( NGSS ) ).Name << '\n';
 				CastingSurface( ShadowComb( HTS ).GenSurf( NGSS ) ) = true;
 			}
-			gio::write( OutputFileShading, fmtLD ) << "Number of back surfaces=" << ShadowComb( HTS ).NumBackSurf;
+			shd_stream << "Number of back surfaces=" << ShadowComb( HTS ).NumBackSurf << '\n';
 			for ( NGSS = 1; NGSS <= min( 10, ShadowComb( HTS ).NumBackSurf ); ++NGSS ) {
-				gio::write( OutputFileShading, fmtA ) << " ...Surface=" + Surface( ShadowComb( HTS ).BackSurf( NGSS ) ).Name;
+				shd_stream << "...Surface=" << Surface( ShadowComb( HTS ).BackSurf( NGSS ) ).Name << '\n';
 			}
-			gio::write( OutputFileShading, fmtLD ) << "Number of receiving sub surfaces=" << ShadowComb( HTS ).NumSubSurf;
+			shd_stream << "Number of receiving sub surfaces=" << ShadowComb( HTS ).NumSubSurf << '\n';
 			for ( NGSS = 1; NGSS <= min( 10, ShadowComb( HTS ).NumSubSurf ); ++NGSS ) {
-				gio::write( OutputFileShading, fmtA ) << " ....Surface=" + Surface( ShadowComb( HTS ).SubSurf( NGSS ) ).Name;
+				shd_stream << "....Surface=" << Surface( ShadowComb( HTS ).SubSurf( NGSS ) ).Name << '\n';
 			}
 		}
 
@@ -7217,9 +7213,7 @@ namespace SolarShading {
 
 			// Currently (06May02) windows are either rectangles (NVS=4) or triangles (NVS=3)
 
-			{ auto const SELECT_CASE_var( NVS );
-
-			if ( SELECT_CASE_var == 4 ) { // Rectangular subsurface
+			if ( NVS == 4 ) { // Rectangular subsurface
 
 				// Determine vertices of reveal.
 				// Project the subsurface up to the plane of the wall.
@@ -7261,7 +7255,7 @@ namespace SolarShading {
 
 				}
 
-			} else if ( SELECT_CASE_var == 3 ) { // Triangular window
+			} else if ( NVS == 3 ) { // Triangular window
 
 				// Project window to outside plane of parent surface
 
@@ -7306,7 +7300,7 @@ namespace SolarShading {
 					RevealStatusSet = true;
 				}
 
-			}}
+			}
 
 		}
 

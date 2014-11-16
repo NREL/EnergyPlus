@@ -2,6 +2,7 @@
 #define OutputReportTabular_hh_INCLUDED
 
 // C++ Headers
+#include <fstream>
 #include <string>
 
 // ObjexxFCL Headers
@@ -100,7 +101,12 @@ namespace OutputReportTabular {
 	// From Report:Table:Style
 	extern int unitsStyle; // see list of parameters
 	extern int numStyles;
-	extern FArray1D_int TabularOutputFile; // file number holder for output file
+	extern std::ofstream csv_stream; // CSV table stream
+	extern std::ofstream tab_stream; // Tab table stream
+	extern std::ofstream fix_stream; // Fixed table stream
+	extern std::ofstream htm_stream; // HTML table stream
+	extern std::ofstream xml_stream; // XML table stream
+	extern FArray1D< std::ofstream * > TabularOutputFile; // Table stream array
 	extern FArray1D_string del; // the delimiter to use
 	extern FArray1D_int TableStyle; // see list of parameters
 
