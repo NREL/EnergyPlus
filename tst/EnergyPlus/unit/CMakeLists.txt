@@ -14,12 +14,12 @@ set( test_src
 
 set( test_dependencies
   EnergyPlusAPI
-  objexx
-  sqlite
-  bcvtb 
-  epexpat 
-  epfmiimport 
-  DElight
+#  objexx
+#  sqlite
+#  bcvtb 
+#  epexpat 
+#  epfmiimport 
+#  DElight
  )
 
 if(CMAKE_HOST_UNIX)

@@ -13,7 +13,7 @@
   else()
     set(ECHO_CMD "echo")
   endif()
-  find_program(TEST_EXE TestEnergyPlusCallbacks PATHS "${BINARY_DIR}/Products/" NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH)
+  find_program(TEST_EXE TestEnergyPlusCallbacks PATHS "${BINARY_DIR}/Products/" "${BINARY_DIR}/Products/Release/" "${BINARY_DIR}/Products/Debug/" )
   execute_process(COMMAND ${ECHO_CMD} COMMAND "${TEST_EXE}" "${BINARY_DIR}/${TEST_DIR}")
   
   # Clean up
