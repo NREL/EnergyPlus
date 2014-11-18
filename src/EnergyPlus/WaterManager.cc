@@ -90,7 +90,7 @@ namespace WaterManager {
 		// to a different timestep (with less iteration), then numerical solution
 		// may need to be added.  Iteration is being used to solve interdependecies
 		// of storage, supply, and demand modeling of water system.
-		// Most data are declared in data-only module DataWater.f90
+		// Most data are declared in data-only module DataWater.cc
 		// Calling order,
 		//   storage tanks
 		//   supply
@@ -993,7 +993,7 @@ namespace WaterManager {
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		// see DataWater.f90
+		// see DataWater.cc
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static Real64 OrigVdotDemandRequest( 0.0 );
@@ -1506,7 +1506,7 @@ namespace WaterManager {
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		// see DataWater.f90
+		// see DataWater.cc
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 LossFactor( 0.0 );
@@ -1589,7 +1589,7 @@ namespace WaterManager {
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		// see DataWater.f90
+		// see DataWater.cc
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 VdotDelivered;
@@ -1807,7 +1807,7 @@ namespace WaterManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

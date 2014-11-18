@@ -55,7 +55,7 @@ namespace FuelCellElectricGenerator {
 	// Once the ElectricPowerManager determines that the FuelCell Generator
 	// is available to meet an electric load demand, it calls SimFuelCellGenerator
 	// which in turn calls the FuelCell model.
-	// See DataGenerators.f90 for structures and variables
+	// See DataGenerators.cc for structures and variables
 
 	// REFERENCES:
 	// IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells

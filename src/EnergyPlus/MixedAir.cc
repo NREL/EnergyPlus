@@ -1630,7 +1630,7 @@ namespace MixedAir {
 		}
 
 		if ( NumPrimaryAirSys > 0 ) {
-			AirLoopZoneInfo.allocate( NumPrimaryAirSys ); // Defined in DataAirLoop.f90
+			AirLoopZoneInfo.allocate( NumPrimaryAirSys ); // Defined in DataAirLoop.cc
 		}
 
 		// Find the zones attached to each air loop
@@ -4524,7 +4524,7 @@ namespace MixedAir {
 		} else {
 			// The ERV controller sets the supply and secondary inlet node information for the Stand Alone ERV
 			// Currently, the Stand Alone ERV only has constant air flows (supply and exhaust), and these are
-			// already set in HVACStandAloneERV.f90 (subroutine init). Therefore, these flow assignments below are
+			// already set in HVACStandAloneERV.cc (subroutine init). Therefore, these flow assignments below are
 			// currently redundant but may be useful in the future as mass flow rates can vary based on the controller signal.
 			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
 			Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
@@ -6292,7 +6292,7 @@ namespace MixedAir {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

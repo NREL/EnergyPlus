@@ -48,7 +48,7 @@ namespace RoomAirModelUserTempPattern {
 	// METHODOLOGY EMPLOYED:
 	// This module contains all subroutines required by the
 	// user defined temperature pattern roomair modeling.
-	// See DataRoomAir.f90 for variable declarations
+	// See DataRoomAir.cc for variable declarations
 
 	// REFERENCES:
 	// none
@@ -77,7 +77,7 @@ namespace RoomAirModelUserTempPattern {
 
 	// main subsroutine
 
-	// get input routines are in RoomAirManager.f90
+	// get input routines are in RoomAirManager.cc
 
 	// Routines for transferring data between Heat Balance and Air model domains
 
@@ -602,7 +602,7 @@ namespace RoomAirModelUserTempPattern {
 			} else { // interpolate
 
 				if ( ( RoomAirPattern( PattrnID ).TwoGradPatrn.UpperBoundTempScale - RoomAirPattern( PattrnID ).TwoGradPatrn.LowerBoundTempScale ) != 0.0 ) {
-					// bad user input. should be trapped during get input in RoomAirManager.f90
+					// bad user input. should be trapped during get input in RoomAirManager.cc
 					Grad = RoomAirPattern( PattrnID ).TwoGradPatrn.LowGradient;
 				} else {
 
@@ -787,7 +787,7 @@ namespace RoomAirModelUserTempPattern {
 		// return a non-dimensional height zeta
 
 		// METHODOLOGY EMPLOYED:
-		// figure average floor height (follows code in surfacegeometry.f90
+		// figure average floor height (follows code in surfacegeometry.cc
 		// use ceiling height from Zone structure
 		// non dimensionalize surface's centroid's Z value
 
@@ -841,7 +841,7 @@ namespace RoomAirModelUserTempPattern {
 		Zcm = Surface( thisHBsurf ).Centroid.z;
 		thisZone = Surface( thisHBsurf ).Zone;
 
-		//this next Do block is copied from SurfaceGeometry.f90 with modification for just floor Z
+		//this next Do block is copied from SurfaceGeometry.cc with modification for just floor Z
 		// used find floor z.
 		FloorCount = 0.0;
 		ZFlrAvg = 0.0;
@@ -1154,7 +1154,7 @@ namespace RoomAirModelUserTempPattern {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

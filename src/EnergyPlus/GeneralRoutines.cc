@@ -1142,7 +1142,7 @@ PassiveGapNusseltNumber(
 {
 
 	// SUBROUTINE INFORMATION:
-	//       AUTHOR         Adapted by B. Griffith from Fred Winkelmann's from NusseltNumber in WindowManager.f90
+	//       AUTHOR         Adapted by B. Griffith from Fred Winkelmann's from NusseltNumber in WindowManager.cc
 	//       DATE WRITTEN   September 2001
 	//       MODIFIED       B. Griffith November 2004  (same models but slightly different for general use)
 	//       RE-ENGINEERED  na
@@ -2054,7 +2054,7 @@ TestReturnAirPathIntegrity(
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

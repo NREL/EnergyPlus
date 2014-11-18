@@ -258,10 +258,10 @@ namespace OutdoorAirUnit {
 		// Standard EnergyPlus methodology.
 
 		// REFERENCES:
-		// Fred Buhl's fan coil module (FanCoilUnits.f90)
-		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.f90)
-		// Young Tae Chae's Ventilated Slab System (VentilatedSlab.f90)
-		// Mixed Air.f90
+		// Fred Buhl's fan coil module (FanCoilUnits.cc)
+		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.cc)
+		// Young Tae Chae's Ventilated Slab System (VentilatedSlab.cc)
+		// Mixed Air.cc
 
 		// Using/Aliasing
 		using namespace InputProcessor;
@@ -2672,7 +2672,7 @@ namespace OutdoorAirUnit {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

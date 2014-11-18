@@ -452,7 +452,7 @@ namespace RefrigeratedCase {
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
-		// This subroutine is called from HVACManager.f90, subroutine ManageHVAC to
+		// This subroutine is called from HVACManager.cc, subroutine ManageHVAC to
 		// manage refrigerated cases and associated compressor racks on zone time step
 		// OR from SimAirChillerSet in this module on sys time step (Stovall 2011)
 
@@ -10377,7 +10377,7 @@ namespace RefrigeratedCase {
 
 		// PURPOSE OF THIS SUBROUTINE:
 		// Find the subcooler energy exchange and refrigerant states for a particular detailed
-		// refrigeration system. Use the refrigerant property subroutines in FluidProperties.f90
+		// refrigeration system. Use the refrigerant property subroutines in FluidProperties.cc
 
 		// METHODOLOGY EMPLOYED:
 		// Use refrigerant properties and heat exchanger correlations.  NOTE:  Assumes any Mech subcooler
@@ -12910,7 +12910,7 @@ namespace RefrigeratedCase {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -2245,7 +2245,7 @@ namespace WindowManager {
 			// Reset hcin if necessary since too small a value sometimes causes non-convergence
 			// of window layer heat balance solution.
 			if ( surface.IntConvCoeff == 0 ) {
-				if ( hcin <= LowHConvLimit ) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.f90
+				if ( hcin <= LowHConvLimit ) { // may be redundent now, check is also in HeatBalanceConvectionCoeffs.cc
 					//  hcin = 3.076d0  !BG this is rather high value and abrupt change. changed to set to lower limit
 					hcin = LowHConvLimit;
 					HConvIn( SurfNum ) = hcin; // store for accurate reporting.
@@ -8878,7 +8878,7 @@ Label99999: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

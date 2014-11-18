@@ -1835,7 +1835,7 @@ DetailsForSurfaces( int const RptType ) // (1=Vertices only, 10=Details only, 11
 
 				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( unit, Format_704, flags ) << "HeatTransfer" << Surface( surf ).Name << cSurfaceClass( Surface( surf ).Class ) << BaseSurfName << AlgoName; }
 
-				// NOTE - THIS CODE IS REPEATED IN SurfaceGeometry.F90 IN SetupZoneGeometry
+				// NOTE - THIS CODE IS REPEATED IN SurfaceGeometry.cc IN SetupZoneGeometry
 				// Calculate Nominal U-value with convection/film coefficients for reporting by adding on
 				// prescribed R-values for interior and exterior convection coefficients as found in ASHRAE 90.1-2004, Appendix A
 				if ( Surface( surf ).Construction > 0 && Surface( surf ).Construction <= TotConstructs ) {
@@ -2454,7 +2454,7 @@ VRMLOut(
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

@@ -8,6 +8,7 @@
 #include <DisplayRoutines.hh>
 #include <DataGlobals.hh>
 #include <DataSystemVariables.hh>
+#include <sstream>
 
 namespace EnergyPlus {
 
@@ -72,6 +73,7 @@ DisplayString( char const * String ) // String to be displayed
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
+	using DataGlobals::fMessagePtr;
 	using DataSystemVariables::DeveloperFlag;
 
 	// Locals
@@ -87,6 +89,8 @@ DisplayString( char const * String ) // String to be displayed
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 	// na
+
+	if ( fMessagePtr ) fMessagePtr(String);
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << '\n';
@@ -119,7 +123,8 @@ DisplayNumberAndString(
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
 	using DataSystemVariables::DeveloperFlag;
-
+	using DataGlobals::fMessagePtr;
+	
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -132,7 +137,10 @@ DisplayNumberAndString(
 	// na
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-
+	std::stringstream sstm;
+	sstm << String << " " << Number;
+	if ( fMessagePtr ) fMessagePtr( sstm.str() );
+	
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	std::cout << String << ' ' << Number << '\n';
 }
@@ -162,6 +170,7 @@ DisplaySimDaysProgress( // This doesn't do anything!
 
 	// Using/Aliasing
 	using DataGlobals::KickOffSimulation;
+	using DataGlobals::fProgressPtr;
 	using DataSystemVariables::DeveloperFlag;
 
 	// Locals
@@ -181,11 +190,13 @@ DisplaySimDaysProgress( // This doesn't do anything!
 
 	if ( KickOffSimulation && ! DeveloperFlag ) return;
 	if ( TotalSimDays > 0 ) {
-		percent = nint( ( CurrentSimDay / TotalSimDays ) * 100.0 );
+		percent = nint( ( ( float ) CurrentSimDay / ( float ) TotalSimDays ) * 100.0 );
 		percent = min( percent, 100 );
 	} else {
 		percent = 0;
 	}
+
+	if ( fProgressPtr ) fProgressPtr( percent );
 
 }
 
@@ -196,7 +207,7 @@ DisplaySimDaysProgress( // This doesn't do anything!
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

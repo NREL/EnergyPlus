@@ -1286,7 +1286,7 @@ namespace ZoneEquipmentManager {
 				CalcFinalZoneSizing( CtrlZoneNum ).MinOA = FinalZoneSizing( CtrlZoneNum ).MinOA;
 			}
 			// calculated zone design flow rates automatically take into account zone multipliers, since the zone
-			// loads are multiplied (in ZoneTempPredictorCorrector.f90). Flow rates derived directly from
+			// loads are multiplied (in ZoneTempPredictorCorrector.cc). Flow rates derived directly from
 			// user inputs need to be explicitly multiplied by the zone multipliers.
 			FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2 = FinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea * Zone( ZoneIndex ).FloorArea * Zone( ZoneIndex ).Multiplier * Zone( ZoneIndex ).ListMultiplier;
 			CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlow2 = CalcFinalZoneSizing( CtrlZoneNum ).DesCoolMinAirFlowPerArea * Zone( ZoneIndex ).FloorArea * Zone( ZoneIndex ).Multiplier * Zone( ZoneIndex ).ListMultiplier;
@@ -5019,7 +5019,7 @@ namespace ZoneEquipmentManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

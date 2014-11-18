@@ -52,7 +52,7 @@ namespace HVACControllers {
 	//                      - Added routine to dump controller statistics to a file named
 	//                        'statistics.HVACControllers.csv'
 	//                      - Integrated smart root finder from MODULE RootFinder implemented in
-	//                        file RootFinder.f90.
+	//                        file RootFinder.cc.
 	//       MODIFIED       April 2006, Dimitri Curtil (LBNL)
 	//                      - Added speedup optimization scheme to reuse air loop solution
 	//                        obtained at the current HVAC iteration from solving the previous controller
@@ -73,7 +73,7 @@ namespace HVACControllers {
 	//                      - Replaced $ edit descriptor in WRITE statements with ADVANCE='No'
 	//                      - Replaced the preprocessing directives TRACK_AIRLOOP, TRACE_AIRLOOP,
 	//                        TRACE_CONTROLLER with corresponding environment variables defined
-	//                        in DataSystemVariables.f90.
+	//                        in DataSystemVariables.cc.
 	//       MODIFIED       Feb. 2010, Brent Griffith (NREL)
 	//                       - changed plant loop interactions, Demand Side Update Phase 3
 	//       RE-ENGINEERED  na
@@ -125,7 +125,7 @@ namespace HVACControllers {
 	// define the environment variable TRACE_AIRLOOP=YES or TRACE_AIRLOOP=Y.
 	// To enable generating an individual, detailed trace file for each controller, define the
 	// environment variable TRACE_CONTROLLER=YES or TRACE_CONTROLLER=Y.
-	// See DataSystemVariables.f90 for the definitions of the environment variables used to debug
+	// See DataSystemVariables.cc for the definitions of the environment variables used to debug
 	// the air loop simulation.
 
 	// USE STATEMENTS:
@@ -2333,7 +2333,7 @@ namespace HVACControllers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// See CONTROLLER_WARM_RESTART_<> parameters in DataHVACControllers.f90
+		// See CONTROLLER_WARM_RESTART_<> parameters in DataHVACControllers.cc
 		// If Status<0, no speculative warm restart.
 		// If Status==0, speculative warm restart failed.
 		// If Status>0, speculative warm restart succeeded.
@@ -3535,7 +3535,7 @@ Label100: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

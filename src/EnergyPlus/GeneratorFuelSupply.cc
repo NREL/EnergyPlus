@@ -44,7 +44,7 @@ namespace GeneratorFuelSupply {
 	// <description>
 
 	// METHODOLOGY EMPLOYED:
-	// data defined in DataGenerators.f90
+	// data defined in DataGenerators.cc
 	// this module only provides input and subroutines for other component simulations
 	//  no specific energyplus component is modeled here.  it is used by other generators
 

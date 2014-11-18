@@ -1,38 +1,9 @@
-// C++ Headers
-#include <iostream>
-#ifndef NDEBUG
-#ifdef __unix__
-#include <cfenv>
-#endif
-#endif
-
-// ObjexxFCL Headers
-#include <ObjexxFCL/environment.hh>
-#include <ObjexxFCL/FArray1D.hh>
-#include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
-#include <ObjexxFCL/Time_Date.hh>
-
-// EnergyPlus Headers
-#include <main.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <DataTimings.hh>
-#include <DisplayRoutines.hh>
-#include <FluidProperties.hh>
-#include <InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SimulationManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlusPgm.hh>
 
 int
 main()
 {
+<<<<<<< HEAD
 	// Using/Aliasing
 	using namespace EnergyPlus;
 
@@ -611,3 +582,8 @@ ReadINIFile(
 	}
 
 }
+=======
+	EnergyPlusPgm();
+}
+
+>>>>>>> develop
