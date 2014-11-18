@@ -16611,24 +16611,40 @@ SurfaceConvectionAlgorithm:Inside:UserCurve,
   A3 , \field Hc Function of Temperature Difference Curve Name
        \note  Curve's "x" is absolute value of delta-T (Surface temperature minus reference temperature, (C))
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A4 , \field Hc Function of Temperature Difference Divided by Height Curve Name
        \note Curve's "x" is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m)
        \note when used for an inside face the vertical length scale is the zone's interior height
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A5 , \field Hc Function of Air Change Rate Curve Name
        \note Curve's "x" is mechanical ACH (Air Changes per hour from mechanical air system), (1/hr)
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A6 ; \field Hc Function of Air System Volume Flow Rate Divided by Zone Perimeter Length Curve Name
        \note Curve's "x" is mechanical system air flow rate (m3/s) divided by zone's length along
        \note exterior walls (m).
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
 
 SurfaceConvectionAlgorithm:Outside:UserCurve,
@@ -16647,18 +16663,30 @@ SurfaceConvectionAlgorithm:Outside:UserCurve,
   A3 , \field Hf Function of Wind Speed Curve Name
        \note Curve's "x" is wind speed of the type determined in the previous field (m/s)
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A4 , \field Hn Function of Temperature Difference Curve Name
        \note  Curve's "x" is absolute value of delta-T (Surface temperature minus air temperature, (C))
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A5 ; \field Hn Function of Temperature Difference Divided by Height Curve Name
        \note Curve's "x" is absolute value of delta-T/Height (Surface temp minus Air temp)/(vertical length scale), (C/m)
        \note when used for an outside face the vertical length scale is the exterior facade's overall height
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
 
 SurfaceProperty:ConvectionCoefficients,
@@ -19830,6 +19858,7 @@ ZoneContaminantSourceAndSink:Generic:Constant,
    \memo Sets internal generic contaminant gains and sinks in a zone with constant values.
   A1 , \field Name
        \required-field
+       \type alpha
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -19860,6 +19889,7 @@ SurfaceContaminantSourceAndSink:Generic:PressureDriven,
    \memo Simulate generic contaminant source driven by the pressure difference across a surface.
   A1 , \field Name
        \required-field
+       \type alpha
   A2 , \field Surface Name
        \required-field
        \type object-list
@@ -19884,6 +19914,7 @@ ZoneContaminantSourceAndSink:Generic:CutoffModel,
    \memo Simulate generic contaminant source driven by the cutoff concentration model.
   A1 , \field Name
        \required-field
+       \type alpha
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -19909,6 +19940,7 @@ ZoneContaminantSourceAndSink:Generic:DecaySource,
    \memo Simulate generic contaminant source driven by the cutoff concentration model.
   A1 , \field Name
        \required-field
+       \type alpha
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -19933,6 +19965,7 @@ SurfaceContaminantSourceAndSink:Generic:BoundaryLayerDiffusion,
    \memo Simulate generic contaminant source driven by the boundary layer diffusion controlled model.
   A1 , \field Name
        \required-field
+       \type alpha
   A2 , \field Surface Name
        \required-field
        \type object-list
@@ -19957,6 +19990,7 @@ SurfaceContaminantSourceAndSink:Generic:DepositionVelocitySink,
    \memo Simulate generic contaminant source driven by the boundary layer diffusion controlled model.
   A1 , \field Name
        \required-field
+       \type alpha
   A2 , \field Surface Name
        \required-field
        \type object-list
@@ -19977,6 +20011,7 @@ ZoneContaminantSourceAndSink:Generic:DepositionRateSink,
    \memo Simulate generic contaminant source driven by the boundary layer diffusion controlled model.
   A1 , \field Name
        \required-field
+       \type alpha
   A2 , \field Zone Name
        \required-field
        \type object-list
@@ -32249,14 +32284,14 @@ ZoneHVAC:EnergyRecoveryVentilator:Controller,
        \units J/kg
        \note Enter the maximum outdoor enthalpy limit for economizer operation.
        \note No input or blank input means this limit is not operative
-  N4 , \field Dew point Temperature Limit
+  N4 , \field Dewpoint Temperature Limit
        \type real
        \units C
        \note Enter the maximum outdoor dew point temperature limit for economizer operation.
        \note No input or blank input means this limit is not operative
   A2 , \field Electronic Enthalpy Limit Curve Name
        \type object-list
-       \object-list UniVariateCurves
+       \object-list QuadraticCubicCurves
        \object-list UniVariateTables
        \note Enter the name of a quadratic or cubic curve which defines the maximum outdoor
        \note humidity ratio (function of outdoor dry-bulb temperature) for economizer operation.
@@ -39337,11 +39372,11 @@ Fan:OnOff,
        \required-field
   A5 , \field Fan Power Ratio Function of Speed Ratio Curve Name
        \type object-list
-       \object-list UniVariateCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A6 , \field Fan Efficiency Ratio Function of Speed Ratio Curve Name
        \type object-list
-       \object-list UniVariateCurves
+       \object-list QuadraticCubicCurves
        \object-list UniVariateTables
   A7 ; \field End-Use Subcategory
        \type alpha
@@ -39578,7 +39613,7 @@ Fan:ComponentModel,
   A7 , \field Duct Static Pressure Reset Curve Name
        \required-field
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
        \object-list UniVariateTables
        \note Function of fan volumetric flow
        \note Minimum and maximum fan airflows correspond respectively to
@@ -39613,7 +39648,7 @@ Fan:ComponentModel,
         \note Curve should have maximum of 1.0
   A12 , \field Maximum Belt Efficiency Curve Name
         \type object-list
-        \object-list UniVariateCurves
+        \object-list QuarticCurves
         \object-list UniVariateTables
         \note Determines maximum fan drive belt efficiency in log space
         \note as function of xbelt,max
@@ -39947,7 +39982,7 @@ Coil:Cooling:DX:SingleSpeed,
   A7 , \field Energy Input Ratio Function of Temperature Curve Name
        \required-field
        \type object-list
-       \object-list BiVariateCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*wb + c*wb**2 + d*edb + e*edb**2 + f*wb*edb
        \note wb = entering wet-bulb temperature (C)
@@ -40175,7 +40210,7 @@ Coil:Cooling:DX:TwoSpeed,
   A7 , \field Energy Input Ratio Function of Temperature Curve Name
        \required-field
        \type object-list
-       \object-list BiQuadraticCurves
+       \object-list BiquadraticCurves
        \object-list BiVariateTables
        \note curve = a + b*wb + c*wb**2 + d*edb + e*edb**2 + f*wb*edb
        \note wb = entering wet-bulb temperature (C)
@@ -41286,25 +41321,22 @@ Coil:Cooling:DX:VariableSpeed,
         \note odb = air entering temperature seen by the condenser (C)
    A15, \field Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
         \type object-list
-        \object-list UniVariateCurves
-        \object-list UniVariateTables
         \object-list QuadraticCubicCurves
+        \object-list UniVariateTables
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
    A16, \field Speed 2 Energy Input Ratio Function of Temperature Curve Name
         \type object-list
-        \object-list BiVariateCurves
-        \object-list BiVariateTables
         \object-list BiquadraticCurves
+        \object-list BiVariateTables
         \note curve = a + b*wb + c*wb**2 + d*odb + e*odb**2 + f*wb*odb
         \note wb = entering wet-bulb temperature (C)
         \note odb = air entering temperature seen by the condenser (C)
    A17, \field Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
         \type object-list
-        \object-list UniVariateCurves
-        \object-list UniVariateTables
         \object-list QuadraticCubicCurves
+        \object-list UniVariateTables
         \note quadratic curve = a + b*ffa + c*ffa**2
         \note cubic curve = a + b*ffa + c*ffa**2 + d*ffa**3
         \note ffa = Fraction of the full load Air Flow
@@ -57878,7 +57910,11 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list UniVariateCurves
+            \object-list LinearCurves
+            \object-list QuadraticCurves
+            \object-list CubicCurves
+            \object-list QuarticCurves
+            \object-list ExponentCurves
             \object-list UniVariateTables
   A9   ,  \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -57887,7 +57923,11 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list UniVariateCurves
+            \object-list LinearCurves
+            \object-list QuadraticCurves
+            \object-list CubicCurves
+            \object-list QuarticCurves
+            \object-list ExponentCurves
             \object-list UniVariateTables
   A10  ,  \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -57895,7 +57935,11 @@ ChillerHeater:Absorption:DirectFired,
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list UniVariateCurves
+            \object-list LinearCurves
+            \object-list QuadraticCurves
+            \object-list CubicCurves
+            \object-list QuarticCurves
+            \object-list ExponentCurves
             \object-list UniVariateTables
   A11  ,  \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
             \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -57904,7 +57948,11 @@ ChillerHeater:Absorption:DirectFired,
             \note input variables being the leaving chilled water temperature and either
             \note the entering or leaving condenser water temperature.
             \type object-list
-            \object-list UniVariateCurves
+            \object-list LinearCurves
+            \object-list QuadraticCurves
+            \object-list CubicCurves
+            \object-list QuarticCurves
+            \object-list ExponentCurves
             \object-list UniVariateTables
   A12  ,  \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
             \note The curve represents the fraction of the electricity to the chiller as the load on
@@ -57912,7 +57960,11 @@ ChillerHeater:Absorption:DirectFired,
             \note The curve is normalized so that at full load the value of the curve should be 1.0.
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list UniVariateCurves
+            \object-list LinearCurves
+            \object-list QuadraticCurves
+            \object-list CubicCurves
+            \object-list QuarticCurves
+            \object-list ExponentCurves
             \object-list UniVariateTables
   A13  ,  \field Heating Capacity Function of Cooling Capacity Curve Name
             \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -57921,7 +57973,11 @@ ChillerHeater:Absorption:DirectFired,
             \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
             \note The curve is usually linear or quadratic.
             \type object-list
-            \object-list UniVariateCurves
+            \object-list LinearCurves
+            \object-list QuadraticCurves
+            \object-list CubicCurves
+            \object-list QuarticCurves
+            \object-list ExponentCurves
             \object-list UniVariateTables
   A14  ,  \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
             \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -57929,7 +57985,11 @@ ChillerHeater:Absorption:DirectFired,
             \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
             \note will probably be similar to a boiler curve for most chillers.
             \type object-list
-            \object-list UniVariateCurves
+            \object-list LinearCurves
+            \object-list QuadraticCurves
+            \object-list CubicCurves
+            \object-list QuarticCurves
+            \object-list ExponentCurves
             \object-list UniVariateTables
   A15  ,  \field Temperature Curve Input Variable
             \type choice
@@ -58090,7 +58150,11 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A9 , \field Fuel Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the fuel input to the chiller at full load as
@@ -58099,7 +58163,11 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A10, \field Fuel Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the fuel input to the chiller as the load on
@@ -58107,7 +58175,11 @@ ChillerHeater:Absorption:DoubleEffect,
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A11, \field Electric Input to Cooling Output Ratio Function of Temperature Curve Name
        \note The curve represents the fraction of the electricity to the chiller at full load as
@@ -58116,7 +58188,11 @@ ChillerHeater:Absorption:DoubleEffect,
        \note input variables being the leaving chilled water temperature and either
        \note the entering or leaving condenser water temperature.
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A12, \field Electric Input to Cooling Output Ratio Function of Part Load Ratio Curve Name
        \note The curve represents the fraction of the electricity to the chiller as the load on
@@ -58124,7 +58200,11 @@ ChillerHeater:Absorption:DoubleEffect,
        \note The curve is normalized so that at full load the value of the curve should be 1.0.
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A13, \field Heating Capacity Function of Cooling Capacity Curve Name
        \note The curve represents how the heating capacity of the chiller varies with cooling
@@ -58133,7 +58213,11 @@ ChillerHeater:Absorption:DoubleEffect,
        \note represents the full heating capacity (see the Heating to cooling capacity ratio input)
        \note The curve is usually linear or quadratic.
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A14, \field Fuel Input to Heat Output Ratio During Heating Only Operation Curve Name
        \note When the chiller is operating as only a heater, this curve is used to represent the
@@ -58141,7 +58225,11 @@ ChillerHeater:Absorption:DoubleEffect,
        \note of 1.0 is the full heating capacity.  The curve is usually linear or quadratic and
        \note will probably be similar to a boiler curve for most chillers.
        \type object-list
-       \object-list UniVariateCurves
+       \object-list LinearCurves
+       \object-list QuadraticCurves
+       \object-list CubicCurves
+       \object-list QuarticCurves
+       \object-list ExponentCurves
        \object-list UniVariateTables
   A15, \field Temperature Curve Input Variable
        \type choice
@@ -71328,7 +71416,7 @@ Generator:FuelCell:PowerModule,
       \key Normalized
   A3, \field Efficiency Curve Name
       \type object-list
-      \object-list UniVariateCurves
+      \object-list QuadraticCurves
       \object-list UniVariateTables
       \required-field
   N1, \field Nominal Efficiency
