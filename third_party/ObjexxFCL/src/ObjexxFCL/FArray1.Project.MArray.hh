@@ -371,6 +371,7 @@
 	inline MA1c_double CoolingDemand() const { return ma( &T::CoolingDemand ); }
 	inline MA1c_double MixHumRatAtCoolPeak() const { return ma( &T::MixHumRatAtCoolPeak ); }
 	inline MA1c_double MixTempAtCoolPeak() const { return ma( &T::MixTempAtCoolPeak ); }
+	inline MA1c_double MassFlowAtCoolPeak() const { return ma( &T::MassFlowAtCoolPeak ); }
 	inline MA1c_double CoolPower1() const { return ma( &T::CoolPower1 ); }
 	inline MA1c_double CoolPower2() const { return ma( &T::CoolPower2 ); }
 	inline MA1c_double CoolPower3() const { return ma( &T::CoolPower3 ); }
@@ -961,6 +962,7 @@
 	inline MA1_double CoolingDemand() { return ma( &T::CoolingDemand ); }
 	inline MA1_double MixHumRatAtCoolPeak() { return ma( &T::MixHumRatAtCoolPeak ); }
 	inline MA1_double MixTempAtCoolPeak() { return ma( &T::MixTempAtCoolPeak ); }
+	inline MA1_double MassFlowAtCoolPeak() { return ma( &T::MassFlowAtCoolPeak ); }
 	inline MA1_double CoolPower1() { return ma( &T::CoolPower1 ); }
 	inline MA1_double CoolPower2() { return ma( &T::CoolPower2 ); }
 	inline MA1_double CoolPower3() { return ma( &T::CoolPower3 ); }

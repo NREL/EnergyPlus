@@ -37,8 +37,8 @@ namespace ReportSizingManager {
 
 	void
 	GetCoilDesFlowT(
-		int CoolCapCtrl, // type of coil capacity control
 		int SysNum, // central air system index
+		Real64 CpAir, // specific heat to be used in calculations [J/kgC]
 		Real64 & DesFlow, // returned design mass flow [kg/s]
 		Real64 & DesExitTemp // returned design coil exit temperature [kg/s]
 	);

@@ -4589,6 +4589,8 @@ namespace SimAirServingZones {
 		static FArray1D< Real64 > VotHtgBySys; // saved value of heating ventilation required at primary AHU, used in 62.1 tabular report
 		static FArray1D< Real64 > VozSumClgBySys; // saved value of cooling ventilation required at clg zones
 		static FArray1D< Real64 > VozSumHtgBySys; // saved value of cooling ventilation required at htg zones
+		static FArray1D< Real64 > TotCoolCapTemp; // scratch variable used for calulating peak load [W]
+		static FArray1D< Real64 > SensCoolCapTemp; // scratch variable used for calulating peak load [W]
 		static Real64 Evz( 1.0 ); // zone ventilation efficiency
 		static Real64 MinHeatingEvz( 1.0 ); // minimum zone ventilation efficiency for heating (to be used as system efficiency)
 		static FArray1D< Real64 > EvzMinBySysHeat; // saved value of EvzMin used in 62.1 tabular report
@@ -4612,6 +4614,14 @@ namespace SimAirServingZones {
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 		//  NumZonesCooled=0
 		//  NumZonesHeated=0
+
+		// allocate scratch arrays
+		if ( !allocated( SensCoolCapTemp ) ) {
+			SensCoolCapTemp.allocate( NumPrimaryAirSys );
+			SensCoolCapTemp = 0.0;
+			TotCoolCapTemp.allocate( NumPrimaryAirSys );
+			TotCoolCapTemp = 0.0;
+		}
 
 		// allocate arrays used to store values for standard 62.1 tabular report
 		if ( ! allocated( FaByZoneCool ) ) {
@@ -4691,6 +4701,8 @@ namespace SimAirServingZones {
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
 				SysSizing( AirLoopNum, CurOverallSimDay ).CoolDesDay = EnvironmentName;
 				SysSizing( AirLoopNum, CurOverallSimDay ).HeatDesDay = EnvironmentName;
+				SensCoolCapTemp( AirLoopNum ) = 0.0;
+				TotCoolCapTemp( AirLoopNum ) = 0.0;
 
 				for ( ZonesCooledNum = 1; ZonesCooledNum <= NumZonesCooled; ++ZonesCooledNum ) { // loop over cooled zones
 					CtrlZoneNum = AirToZoneNodeInfo( AirLoopNum ).CoolCtrlZoneNums( ZonesCooledNum );
@@ -4798,8 +4810,9 @@ namespace SimAirServingZones {
 				} // end of system mass flow check
 
 				// get the maximum system sensible cooling capacity
-				if ( SysSensCoolCap > SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap ) {
+				if ( SysSensCoolCap > SensCoolCapTemp(AirLoopNum) ) {
 					SysSizPeakDDNum( AirLoopNum ).TimeStepAtSensCoolPk( CurOverallSimDay ) = TimeStepInDay;
+					SensCoolCapTemp( AirLoopNum ) = SysSensCoolCap;
 					if ( SysSizing( AirLoopNum, CurOverallSimDay ).CoolingPeakLoadType == SensibleCoolingLoad ) {
 						SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap = SysSensCoolCap;
 						SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap = SysTotCoolCap;
@@ -4813,8 +4826,9 @@ namespace SimAirServingZones {
 					}
 				}
 				// get the maximum system total cooling capacity
-				if ( SysTotCoolCap > SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap ) {
+				if ( SysTotCoolCap > TotCoolCapTemp( AirLoopNum ) ) {
 					SysSizPeakDDNum( AirLoopNum ).TimeStepAtTotCoolPk( CurOverallSimDay ) = TimeStepInDay;
+					TotCoolCapTemp( AirLoopNum ) = SysTotCoolCap;
 					if ( SysSizing( AirLoopNum, CurOverallSimDay ).CoolingPeakLoadType == TotalCoolingLoad ) {
 						SysSizing( AirLoopNum, CurOverallSimDay ).SensCoolCap = SysSensCoolCap;
 						SysSizing( AirLoopNum, CurOverallSimDay ).TotCoolCap = SysTotCoolCap;
@@ -5730,6 +5744,7 @@ namespace SimAirServingZones {
 			FinalSysSizing.DesMainVolFlow() = CalcSysSizing.DesMainVolFlow();
 			FinalSysSizing.DesHeatVolFlow() = CalcSysSizing.DesHeatVolFlow();
 			FinalSysSizing.DesCoolVolFlow() = CalcSysSizing.DesCoolVolFlow();
+			FinalSysSizing.MassFlowAtCoolPeak() = CalcSysSizing.MassFlowAtCoolPeak();
 			FinalSysSizing.SensCoolCap() = CalcSysSizing.SensCoolCap();
 			FinalSysSizing.TotCoolCap() = CalcSysSizing.TotCoolCap();
 			FinalSysSizing.HeatCap() = CalcSysSizing.HeatCap();
@@ -5815,6 +5830,7 @@ namespace SimAirServingZones {
 					FinalSysSizing( AirLoopNum ).CoinCoolMassFlow = SysCoolSizingRat * CalcSysSizing( AirLoopNum ).CoinCoolMassFlow;
 					FinalSysSizing( AirLoopNum ).NonCoinCoolMassFlow = SysCoolSizingRat * CalcSysSizing( AirLoopNum ).NonCoinCoolMassFlow;
 					FinalSysSizing( AirLoopNum ).DesCoolVolFlow = SysCoolSizingRat * CalcSysSizing( AirLoopNum ).DesCoolVolFlow;
+					FinalSysSizing( AirLoopNum ).MassFlowAtCoolPeak = SysCoolSizingRat * CalcSysSizing( AirLoopNum ).MassFlowAtCoolPeak;
 
 					if ( FinalSysSizing( AirLoopNum ).DesCoolVolFlow > 0.0 ) {
 
