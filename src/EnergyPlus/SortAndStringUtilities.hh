@@ -28,19 +28,19 @@ namespace SortAndStringUtilities {
 	void
 	SetupAndSort(
 		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
+		FArray1S_int iAlphas // Indexes of sorted array
 	);
 
 	void
 	QsortC(
 		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
+		FArray1S_int iAlphas // Indexes of sorted array
 	);
 
 	void
 	QsortPartition(
 		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas, // Pointers -- this is the array that is actually sorted
+		FArray1S_int iAlphas, // Indexes of sorted array
 		int & marker
 	);
 

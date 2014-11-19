@@ -192,7 +192,7 @@ namespace InternalHeatGains {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "GetInternalHeatGains: " );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -244,11 +244,11 @@ namespace InternalHeatGains {
 		int MaxZoneNameLengthInZoneList;
 
 		// Formats
-		static gio::Fmt const Format_720( "(' Zone Internal Gains, ',A,',',A,',',A,',')" );
-		static gio::Fmt const Format_721( "('! <Zone Internal Gains/Equipment Information - Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant {m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard Heat')" );
-		static gio::Fmt const Format_722( "(' ',A,' Internal Gains, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt const Format_723( "('! <',A,' Internal Gains - Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)" );
-		static gio::Fmt const Format_724( "(' ',A,', ',A)" );
+		static gio::Fmt Format_720( "(' Zone Internal Gains, ',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <Zone Internal Gains/Equipment Information - Nominal>,Zone Name, Floor Area {m2},# Occupants,','Area per Occupant {m2/person},Occupant per Area {person/m2},Interior Lighting {W/m2},','Electric Load {W/m2},Gas Load {W/m2},Other Load {W/m2},Hot Water Eq {W/m2},','Steam Equipment {W/m2},Sum Loads per Area {W/m2},Outdoor Controlled Baseboard Heat')" );
+		static gio::Fmt Format_722( "(' ',A,' Internal Gains, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_723( "('! <',A,' Internal Gains - Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {m2},# Zone Occupants,',A)" );
+		static gio::Fmt Format_724( "(' ',A,', ',A)" );
 
 		// FLOW:
 		ZoneIntGain.allocate( NumOfZones );
@@ -256,8 +256,7 @@ namespace InternalHeatGains {
 		ZoneIntEEuse.allocate( NumOfZones );
 		RefrigCaseCredit.allocate( NumOfZones );
 
-		RepVarSet.allocate( NumOfZones );
-		RepVarSet = true;
+		RepVarSet.dimension( NumOfZones, true );
 
 		// Determine argument length of objects gotten by this routine
 		MaxAlpha = -100;
@@ -2869,6 +2868,7 @@ namespace InternalHeatGains {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D< Real64 > const C( 9, { 6.4611027, 0.946892, 0.0000255737, 7.139322, -0.0627909, 0.0000589271, -0.198550, 0.000940018, -0.00000149532 } );
+		static ZoneCatEUseData const zeroZoneCatEUse; // For initialization
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2934,7 +2934,7 @@ namespace InternalHeatGains {
 		ZoneIntGain.QSECON() = 0.0;
 		ZoneIntGain.QSELost() = 0.0;
 
-		ZoneIntEEuse = ZoneCatEUseData{}; // Set all member arrays to zeros
+		ZoneIntEEuse = zeroZoneCatEUse; // Set all member arrays to zeros
 
 		ZnRpt.LtsPower() = 0.0;
 		ZnRpt.ElecPower() = 0.0;

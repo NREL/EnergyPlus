@@ -581,28 +581,4 @@ operator !=( Chunk< T > const & a, Chunk< T > const & b )
 
 } // ObjexxFCL
 
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add template functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.  The legal alternative would be
-// to add specializations of swap for each anticipated instantiation.
-
-namespace std {
-
-// std::swap( Chunk, Chunk )
-template< typename T >
-inline
-void
-swap( ObjexxFCL::Chunk< T > & a, ObjexxFCL::Chunk< T > & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
-
 #endif // ObjexxFCL_Chunk_hh_INCLUDED
