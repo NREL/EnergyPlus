@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/floops.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <cstddef>

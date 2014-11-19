@@ -15,9 +15,13 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/MArrayR.hh>
+#include <ObjexxFCL/Vector2.hh>
+#include <ObjexxFCL/Vector3.hh>
 
 // C++ Headers
+#include <array>
 #include <cmath>
+#include <vector>
 
 namespace ObjexxFCL {
 
@@ -75,13 +79,13 @@ public: // Creation
 	// Copy Constructor
 	inline
 	MArray1( MArray1 const & a ) :
-		Super( a )
+	 Super( a )
 	{}
 
 	// Constructor
 	inline
 	MArray1( A & a, T Class::* pmem ) :
-		Super( a, pmem )
+	 Super( a, pmem )
 	{}
 
 	// Destructor
@@ -90,7 +94,7 @@ public: // Creation
 	~MArray1()
 	{}
 
-public: // Assignment
+public: // Assignment: Array
 
 	// Copy Assignment
 	inline
@@ -120,7 +124,7 @@ public: // Assignment
 	}
 
 	// Array Assignment Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
 	operator =( ArrayType< U > const & a )
@@ -129,6 +133,73 @@ public: // Assignment
 		for ( int i = 1, j = a.l(), e = u(); i <= e; ++i, ++j ) {
 			operator ()( i ) = a( j ); // Not overlap-safe
 		}
+		return *this;
+	}
+
+	// Initializer List Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator =( std::initializer_list< U > const l )
+	{
+		assert( size() == l.size() );
+		auto r( l.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = *r;
+		}
+		return *this;
+	}
+
+	// std::array Assignment Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator =( std::array< U, s > const & a )
+	{
+		assert( size() == s );
+		auto r( a.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = *r;
+		}
+		return *this;
+	}
+
+	// std::vector Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator =( std::vector< U > const & v )
+	{
+		assert( size() == v.size() );
+		auto r( v.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = *r;
+		}
+		return *this;
+	}
+
+	// Vector2 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator =( Vector2< U > const & v )
+	{
+		assert( size() == 2u );
+		operator ()( 1 ) = v[ 0 ];
+		operator ()( 2 ) = v[ 1 ];
+		return *this;
+	}
+
+	// Vector3 Assignment Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator =( Vector3< U > const & v )
+	{
+		assert( size() == 3u );
+		operator ()( 1 ) = v[ 0 ];
+		operator ()( 2 ) = v[ 1 ];
+		operator ()( 3 ) = v[ 2 ];
 		return *this;
 	}
 
@@ -186,7 +257,7 @@ public: // Assignment
 	}
 
 	// += Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
 	operator +=( ArrayType< U > const & a )
@@ -199,7 +270,7 @@ public: // Assignment
 	}
 
 	// -= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
 	operator -=( ArrayType< U > const & a )
@@ -212,7 +283,7 @@ public: // Assignment
 	}
 
 	// *= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
 	operator *=( ArrayType< U > const & a )
@@ -225,7 +296,7 @@ public: // Assignment
 	}
 
 	// /= Array Template
-	template< template< typename > class ArrayType, typename U >
+	template< template< typename > class ArrayType, typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
 	operator /=( ArrayType< U > const & a )
@@ -237,6 +308,446 @@ public: // Assignment
 		}
 		return *this;
 	}
+
+	// += Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator +=( std::initializer_list< U > const l )
+	{
+		assert( size() == l.size() );
+		auto r( l.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) += *r;
+		}
+		return *this;
+	}
+
+	// -= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator -=( std::initializer_list< U > const l )
+	{
+		assert( size() == l.size() );
+		auto r( l.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) -= *r;
+		}
+		return *this;
+	}
+
+	// *= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator *=( std::initializer_list< U > const l )
+	{
+		assert( size() == l.size() );
+		auto r( l.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) *= *r;
+		}
+		return *this;
+	}
+
+	// /= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator /=( std::initializer_list< U > const l )
+	{
+		assert( size() == l.size() );
+		auto r( l.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			assert( *r != T( 0 ) );
+			operator ()( i ) /= *r;
+		}
+		return *this;
+	}
+
+	// += std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator +=( std::array< U, s > const & a )
+	{
+		assert( size() == s );
+		auto r( a.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) += *r;
+		}
+		return *this;
+	}
+
+	// -= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator -=( std::array< U, s > const & a )
+	{
+		assert( size() == s );
+		auto r( a.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) -= *r;
+		}
+		return *this;
+	}
+
+	// *= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator *=( std::array< U, s > const & a )
+	{
+		assert( size() == s );
+		auto r( a.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) *= *r;
+		}
+		return *this;
+	}
+
+	// /= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator /=( std::array< U, s > const & a )
+	{
+		assert( size() == s );
+		auto r( a.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			assert( *r != T( 0 ) );
+			operator ()( i ) /= *r;
+		}
+		return *this;
+	}
+
+	// += std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator +=( std::vector< U > const & v )
+	{
+		assert( size() == v.size() );
+		auto r( v.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) += *r;
+		}
+		return *this;
+	}
+
+	// -= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator -=( std::vector< U > const & v )
+	{
+		assert( size() == v.size() );
+		auto r( v.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) -= *r;
+		}
+		return *this;
+	}
+
+	// *= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator *=( std::vector< U > const & v )
+	{
+		assert( size() == v.size() );
+		auto r( v.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) *= *r;
+		}
+		return *this;
+	}
+
+	// /= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator /=( std::vector< U > const & v )
+	{
+		assert( size() == v.size() );
+		auto r( v.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			assert( *r != T( 0 ) );
+			operator ()( i ) /= *r;
+		}
+		return *this;
+	}
+
+	// += Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator +=( Vector2< U > const & v )
+	{
+		assert( size() == 2u );
+		operator ()( 1 ) += v[ 0 ];
+		operator ()( 2 ) += v[ 1 ];
+		return *this;
+	}
+
+	// -= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator -=( Vector2< U > const & v )
+	{
+		assert( size() == 2u );
+		operator ()( 1 ) -= v[ 0 ];
+		operator ()( 2 ) -= v[ 1 ];
+		return *this;
+	}
+
+	// *= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator *=( Vector2< U > const & v )
+	{
+		assert( size() == 2u );
+		operator ()( 1 ) *= v[ 0 ];
+		operator ()( 2 ) *= v[ 1 ];
+		return *this;
+	}
+
+	// /= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator /=( Vector2< U > const & v )
+	{
+		assert( size() == 2u );
+		assert( v[ 0 ] != T( 0 ) );
+		assert( v[ 1 ] != T( 0 ) );
+		operator ()( 1 ) /= v[ 0 ];
+		operator ()( 2 ) /= v[ 1 ];
+		return *this;
+	}
+
+	// += Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator +=( Vector3< U > const & v )
+	{
+		assert( size() == 3u );
+		operator ()( 1 ) += v[ 0 ];
+		operator ()( 2 ) += v[ 1 ];
+		operator ()( 3 ) += v[ 2 ];
+		return *this;
+	}
+
+	// -= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator -=( Vector3< U > const & v )
+	{
+		assert( size() == 3u );
+		operator ()( 1 ) -= v[ 0 ];
+		operator ()( 2 ) -= v[ 1 ];
+		operator ()( 3 ) -= v[ 2 ];
+		return *this;
+	}
+
+	// *= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator *=( Vector3< U > const & v )
+	{
+		assert( size() == 3u );
+		operator ()( 1 ) *= v[ 0 ];
+		operator ()( 2 ) *= v[ 1 ];
+		operator ()( 3 ) *= v[ 2 ];
+		return *this;
+	}
+
+	// /= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	operator /=( Vector3< U > const & v )
+	{
+		assert( size() == 3u );
+		assert( v[ 0 ] != T( 0 ) );
+		assert( v[ 1 ] != T( 0 ) );
+		assert( v[ 2 ] != T( 0 ) );
+		operator ()( 1 ) /= v[ 0 ];
+		operator ()( 2 ) /= v[ 1 ];
+		operator ()( 3 ) /= v[ 2 ];
+		return *this;
+	}
+
+public: // Assignment: Logical
+
+	// &&= MArray1 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	and_equals( MArray1 const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i = 1, e = u(); i <= e; ++i ) {
+			operator ()( i ) = operator ()( i ) && a( i ); // Not overlap-safe
+		}
+		return *this;
+	}
+
+	// ||= MArray1 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	or_equals( MArray1 const & a )
+	{
+		assert( conformable( a ) );
+		for ( int i = 1, e = u(); i <= e; ++i ) {
+			operator ()( i ) = operator ()( i ) || a( i ); // Not overlap-safe
+		}
+		return *this;
+	}
+
+	// &&= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	and_equals( std::initializer_list< U > const l )
+	{
+		assert( size() == l.size() );
+		auto r( l.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = operator ()( i ) && *r;
+		}
+		return *this;
+	}
+
+	// ||= Initializer List Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	or_equals( std::initializer_list< U > const l )
+	{
+		assert( size() == l.size() );
+		auto r( l.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = operator ()( i ) || *r;
+		}
+		return *this;
+	}
+
+	// &&= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	and_equals( std::array< U, s > const & a )
+	{
+		assert( size() == s );
+		auto r( a.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = operator ()( i ) && *r;
+		}
+		return *this;
+	}
+
+	// ||= std::array Template
+	template< typename U, Size s, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	or_equals( std::array< U, s > const & a )
+	{
+		assert( size() == s );
+		auto r( a.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = operator ()( i ) || *r;
+		}
+		return *this;
+	}
+
+	// &&= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	and_equals( std::vector< U > const & v )
+	{
+		assert( size() == v.size() );
+		auto r( v.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = operator ()( i ) && *r;
+		}
+		return *this;
+	}
+
+	// ||= std::vector Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	or_equals( std::vector< U > const & v )
+	{
+		assert( size() == v.size() );
+		auto r( v.begin() );
+		for ( int i = 1, e = u(); i <= e; ++i, ++r ) {
+			operator ()( i ) = operator ()( i ) || *r;
+		}
+		return *this;
+	}
+
+	// &&= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	and_equals( Vector2< U > const & v )
+	{
+		assert( size() == 2u );
+		operator ()( 1 ) = operator ()( 1 ) && v[ 0 ];
+		operator ()( 2 ) = operator ()( 2 ) && v[ 1 ];
+		return *this;
+	}
+
+	// ||= Vector2 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	or_equals( Vector2< U > const & v )
+	{
+		assert( size() == 2u );
+		operator ()( 1 ) = operator ()( 1 ) || v[ 0 ];
+		operator ()( 2 ) = operator ()( 2 ) || v[ 1 ];
+		return *this;
+	}
+
+	// &&= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	and_equals( Vector3< U > const & v )
+	{
+		assert( size() == 3u );
+		operator ()( 1 ) = operator ()( 1 ) && v[ 0 ];
+		operator ()( 2 ) = operator ()( 2 ) && v[ 1 ];
+		operator ()( 3 ) = operator ()( 3 ) && v[ 2 ];
+		return *this;
+	}
+
+	// ||= Vector3 Template
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
+	inline
+	MArray1 &
+	or_equals( Vector3< U > const & v )
+	{
+		assert( size() == 3u );
+		operator ()( 1 ) = operator ()( 1 ) || v[ 0 ];
+		operator ()( 2 ) = operator ()( 2 ) || v[ 1 ];
+		operator ()( 3 ) = operator ()( 3 ) || v[ 2 ];
+		return *this;
+	}
+
+public: // Assignment: Value
 
 	// = Value
 	inline
@@ -250,7 +761,7 @@ public: // Assignment
 	}
 
 	// = Value Template
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
 	operator =( U const & t )
@@ -295,13 +806,28 @@ public: // Assignment
 	}
 
 	// /= Value
+	template< typename U, class = typename std::enable_if< std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type >
 	inline
 	MArray1 &
-	operator /=( T const & t )
+	operator /=( U const & u )
 	{
-		assert( t != T( 0 ) );
+		assert( u != U( 0 ) );
+		U const inv_u( U( 1 ) / u );
 		for ( int i = 1, e = u(); i <= e; ++i ) {
-			operator ()( i ) /= t;
+			operator ()( i ) *= inv_u;
+		}
+		return *this;
+	}
+
+	// /= Value
+	template< typename U, class = typename std::enable_if< !std::is_floating_point< U >::value && std::is_assignable< T&, U >::value >::type, typename = void >
+	inline
+	MArray1 &
+	operator /=( U const & u )
+	{
+		assert( u != U( 0 ) );
+		for ( int i = 1, e = u(); i <= e; ++i ) {
+			operator ()( i ) /= u;
 		}
 		return *this;
 	}
@@ -1091,7 +1617,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) == b( i ) ) ++n;
@@ -1107,7 +1633,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) != b( i ) ) ++n;
@@ -1123,7 +1649,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) < b( i ) ) ++n;
@@ -1139,7 +1665,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) <= b( i ) ) ++n;
@@ -1155,7 +1681,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return 0;
 		size_type n( 0 );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) > b( i ) ) ++n;
@@ -1171,7 +1697,7 @@ public: // Comparison: Count
 	{
 		assert( a.conformable( b ) );
 		if ( a.empty() ) return 0;
-		if ( &a == &b ) return a.size_;
+		if ( &a == &b ) return a.size();
 		size_type n( 0 );
 		for ( int i = 1, e = a.u(); i <= e; ++i ) {
 			if ( a( i ) >= b( i ) ) ++n;
