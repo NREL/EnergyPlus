@@ -534,7 +534,7 @@ namespace Psychrometrics {
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		struct cached_twb_t
+		struct cached_t
 		{
 			// Members
 		  	Int64 iTdb;
@@ -543,19 +543,10 @@ namespace Psychrometrics {
 		  	Real64 Twb;
 
 		  	// Default Constructor
-		  	cached_twb_t() : iTdb( 0 ), iW( 0 ), iPb( 0 ), Twb( 0.0 ) {}
-
-		  	// Member Constructor
-		  	cached_twb_t(
-				Int64 const iTdb,
-			       	Int64 const iW,
-			       	Int64 const iPb,
-			       	Real64 const Twb
-			       	) : iTdb( iTdb ), iW( iW ), iPb( iPb ), Twb( Twb ) {}
-
+		  	cached_t() : iTdb( 0 ), iW( 0 ), iPb( 0 ), Twb( 0.0 ) {}
 		};
 		
-		static FArray1D< cached_twb_t > cache; // DIMENSION(0:twbcache_size)
+		static FArray1D< cached_t > cache; // DIMENSION(0:twbcache_size)
 		static bool cache_init = false;
 		// na
 
@@ -807,7 +798,7 @@ namespace Psychrometrics {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		int const cache_size( 64 * 1024 );
-		int const precision_bits( 24 ); // 28  // 24  // 32
+		int const precision_bits( 20 ); // 28  // 24  // 32
 		Int64 const shift = (64 - 12 - precision_bits); 
 
 		struct cached_t
@@ -818,13 +809,6 @@ namespace Psychrometrics {
 
 			// Default Constructor
 			cached_t() : iTdb( -1000 ), Psat( 0.0 ) {}
-
-		// Member Constructor
-		cached_t(
-			Int64 const iTdb,
-			Real64 const Psat
-		) : iTdb( iTdb ), Psat( Psat ){}
-
 		};
 
 
@@ -1178,8 +1162,38 @@ Label170: ;
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
 
-		// FUNCTION PARAMETER DEFINITIONS:
-		// na
+		// FUNCTION TYPE AND CONSTANT DEFINITIONS:
+	        // Critical note: by using H_exponent_bits and
+	        // Pb_exponent_bits < 12, we are assuming that H and
+	        // Pb never go negative and don't vary by factors of
+	        // more than 16.
+
+		struct cache_entry_t
+		{	
+			// Members
+			Int32 iH_tag;
+			Int32 iPb_tag;
+			Real64 Tsat;
+
+			// Default Constructor
+			cache_entry_t() : iH_tag ( 0 ), iPb_tag( 0 ), Tsat( 0.0 ) {}
+		};
+
+		Int32 const cache_set_bits = 20;
+		Int32 const cache_sets = Int32(1 << cache_set_bits);
+		Int32 const cache_assoc = 4;
+
+		Int32 const H_significand_bits = 16; // 28  // 24  // 32
+		Int32 const H_exponent_bits = 4;
+		Int32 const Pb_significand_bits = 8;
+		Int32 const Pb_exponent_bits = 4;
+		Int32 const H_shift_bits = 64 - (12 + H_significand_bits);
+		Int32 const Pb_shift_bits = 64 - (12 + Pb_significand_bits);
+		Int32 const H_hash_mask = Int32(1 << (H_significand_bits + H_exponent_bits)) - 1;
+		Int32 const Pb_hash_mask = Int32(1 << (Pb_significand_bits + Pb_exponent_bits)) - 1;
+
+		assert(H_significand_bits <= 20);
+		assert(Pb_significand_bits <= 20);
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1188,66 +1202,62 @@ Label170: ;
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int const cache_size( 64 * 1024 );
-		int const precision_bits( 24 ); // 28  // 24  // 32
-		int const shift = 64 - 12 - precision_bits;
 
-		struct cached_t
-		{	
-			// Members
-			Int64 iH;
-			Int64 iPb;
-			Real64 Tsat;
-
-			// Default Constructor
-			cached_t() : iH ( 0 ), iPb( -1000 ), Tsat( 0.0 ) {}
-
-			// Member Constructor
-			cached_t(
-				Int64 const iH,
-				Int64 const iPb,
-				Real64 const Tsat
-				) : iH ( iH ), iPb( iPb ), Tsat( Tsat ) {}
-
-		};
-
-		static FArray1D< cached_t > cache; // DIMENSION(0:tsatcache_size)
+		static FArray1D< cache_entry_t > cache; // DIMENSION(0:tsatcache_size)
+		static FArray1D< char > cache_mru;
 		static bool cache_init = false;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Int64 H_tag;
-		Int64 Pb_tag;
-		Int64 hash;
-		Real64 H_tag_r;
-		Real64 Pb_tag_r;
 
 #ifdef EP_psych_stats
 		++NumTimesCalled( iPsyTsatFnHPb_cache );
 #endif // EP_psych_stats
+		
 
 		if (!cache_init)
 		{
-			cache.allocate( { 0, cache_size } );
+			cache.allocate( { 0, cache_sets * cache_assoc } );
+			cache_mru.allocate( { 0, cache_sets } );
 			cache_init = true;
 		}
 
-		H_tag = (*reinterpret_cast<const Int64 *>( &H )) >> shift;
-		Pb_tag = (*reinterpret_cast<const Int64 *>( &Pb )) >> shift;
+		Int32 iH_tag = Int32((*reinterpret_cast<const Int64 *>( &H )) >> H_shift_bits);
+		Int32 iPb_tag = Int32((*reinterpret_cast<const Int64 *>( &Pb )) >> Pb_shift_bits);
 
-		hash = ( H_tag ^ Pb_tag) & Int64( cache_size - 1 );
+		Int32 hash = ((iH_tag & H_hash_mask) ^ (iPb_tag & Pb_hash_mask)) & Int32( cache_sets - 1 );
 
-		if ( cache( hash ).iH != H_tag || cache( hash ).iPb != Pb_tag ) {
-			cache( hash ).iH = H_tag;
-			cache( hash ).iPb = Pb_tag;
+		int a;
 
-			H_tag <<= shift;
-			Pb_tag <<= shift;
-			H_tag_r = *reinterpret_cast<Real64 *>( &H_tag );
-			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
-
-			cache( hash ).Tsat = PsyTsatFnHPb_raw( H_tag_r, Pb_tag_r, CalledFrom );
+		for (a = 0; a < cache_assoc; a++) {
+		  cache_entry_t & ce = cache[hash * cache_assoc + a];
+		  
+		  if ( ce.iH_tag == iH_tag && ce.iPb_tag == iPb_tag ) {
+		    cache_mru[hash] = a;
+		    return ce.Tsat;
+		  }
 		}
-		return cache( hash ).Tsat;
+
+		// Try to find an empty entry
+		for (a = 0; a < cache_assoc; a++) {
+		  cache_entry_t & ce = cache[hash * cache_assoc + a];
+		  if ( ce.iH_tag == 0 && ce.iPb_tag == 0 ) 
+		    break;
+		}
+
+		cache_mru[hash] = (a < cache_assoc) ? a : cache_assoc - 1 - cache_mru[hash];
+
+		cache_entry_t & ce = cache[hash * cache_assoc + cache_mru[hash]];
+
+		ce.iH_tag = iH_tag;
+		ce.iPb_tag = iPb_tag;
+
+		Int64 iH_tag_2 = Int64(iH_tag) << H_shift_bits;
+		Int64 iPb_tag_2 = Int64(iPb_tag) << Pb_shift_bits;
+		Real64 H_tag_r = *reinterpret_cast<Real64 *>( &iH_tag_2 );
+		Real64 Pb_tag_r = *reinterpret_cast<Real64 *>( &iPb_tag_2 );
+
+		ce.Tsat = PsyTsatFnHPb_raw( H_tag_r, Pb_tag_r, CalledFrom );
+		return ce.Tsat;
 	}
 #endif // EP_psych_cache
 
@@ -1602,57 +1612,63 @@ Label170: ;
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		int const cache_size( 64 * 1024 );
-		int const precision_bits( 24 ); // 28  // 24  // 32
-		int const shift = 64 - 12 - precision_bits;
+		Int32 const cache_set_bits = 20;
+		Int32 const cache_sets = Int32(1 << cache_set_bits);
+		Int32 const cache_assoc = 2;
+		Int32 const cache_size = cache_sets * cache_assoc;
 
-		struct cached_t
+		Int32 const Pb_significand_bits = 16; // 28  // 24  // 32
+		Int32 const Pb_exponent_bits = 4; // 28  // 24  // 32
+		Int32 const Pb_shift = 64 - 12 - Pb_significand_bits;
+
+		struct cache_entry_t
 		{	
 			// Members
-			Int64 iPb;
+			Int32 iPb_tag;
 			Real64 Tsat;
 
 			// Default Constructor
-			cached_t() : iPb( -1000 ), Tsat( 0.0 ) {}
-
-			// Member Constructor
-			cached_t(
-				Int64 const iPb,
-				Real64 const Tsat
-				) : iPb( iPb ),	Tsat( Tsat ) {}
-
+			cache_entry_t() : iPb_tag( 0 ), Tsat( 0.0 ) {}
 		};
 
-		static FArray1D< cached_t > cache; // DIMENSION(0:tsatcache_size)
+		static FArray1D< cache_entry_t > cache; // DIMENSION(0:tsatcache_size)
+		static FArray1D< char > cache_mru; // DIMENSION(0:tsatcache_size)
 		static bool cache_init = false;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Int64 Pb_tag;
-		Int64 hash;
-		Real64 Pb_tag_r;
-
 #ifdef EP_psych_stats
 		++NumTimesCalled( iPsyTsatFnPb_cache );
 #endif // EP_psych_stats
 
 		if (!cache_init)
 		{
-			cache.allocate( { 0, cache_size } );
-			cache_init = true;
+		  cache.allocate( { 0, cache_size } );
+		  cache_mru.allocate( { 0, cache_sets } );
+		  cache_init = true;
 		}
 
-		Pb_tag = (*reinterpret_cast<const Int64 *>( &Pb )) >> shift;
-		hash = Pb_tag & Int64( cache_size - 1 );
+		Int32 iPb_tag = Int32(*reinterpret_cast<const Int64 *>( &Pb ) >> Pb_shift);
+		Int32 hash = iPb_tag & Int32( cache_sets - 1 );
 
-		if ( cache( hash ).iPb != Pb_tag ) {
-			cache( hash ).iPb = Pb_tag;
-
-			Pb_tag <<= shift;
-			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
-
-			cache( hash ).Tsat = PsyTsatFnPb_raw( Pb_tag_r, CalledFrom );
+		int a;
+		for (a = 0; a < cache_assoc; a++) {
+		  cache_entry_t & ce = cache[hash * cache_assoc + a];
+		  if (ce.iPb_tag == iPb_tag) {
+		    cache_mru[hash] = a;
+		    return ce.Tsat;
+		  }
 		}
-		return cache( hash ).Tsat;
+
+		cache_mru[hash] = cache_assoc - 1 - cache_mru[hash];
+
+		cache_entry_t & ce = cache[hash * cache_assoc + cache_mru[hash]];
+		ce.iPb_tag = iPb_tag;
+
+		Int64 iPb_tag_2 = Int64(iPb_tag) << Pb_shift;
+		Real64 Pb_tag_r = *reinterpret_cast<Real64 *>( &iPb_tag_2 );
+
+		ce.Tsat = PsyTsatFnPb_raw( Pb_tag_r, CalledFrom );
+		return ce.Tsat;
 	}
 #endif // EP_psych_cache
 
@@ -1753,7 +1769,7 @@ Label170: ;
 		// na
 
 		// DERIVED TYPE DEFINITIONS:
-		int const cache_size( 64 * 1024 );
+		int const cache_size( 1024 * 1024 );
 		int const precision_bits( 24 ); // 28  // 24  // 32
 		int const shift = 64 - 12 - precision_bits;
 
@@ -1767,15 +1783,6 @@ Label170: ;
 
 			// Default Constructor
 			cached_t() : iTdb( 0 ), iTwb( 0 ), iPb( 0 ), W( 0.0 ) {}
-
-			// Member Constructor
-			cached_t(
-				Int64 const iTdb,
-				Int64 const iTwb,
-				Int64 const iPb,
-				Real64 const W
-				) : iTdb( iTdb ), iTwb( iTwb ), iPb( iPb ), W( W ) {}
-
 		};
 
 		static FArray1D< cached_t > cache; // DIMENSION(0:tsatcache_size)
@@ -1804,9 +1811,23 @@ Label170: ;
 		Twb_tag = (*reinterpret_cast<const Int64 *>( &Twb )) >> shift;
 		Pb_tag = (*reinterpret_cast<const Int64 *>( &Pb )) >> shift;
 
-		hash = (Tdb_tag ^ Twb_tag ^ Pb_tag) & Int64( cache_size - 1 );
+		// XOR'ing Tdb with Twb is a poor strategy because
+		// these are often the same (or very close) meaning
+		// the XOR will be 0 (or very close)
+		hash = (Tdb_tag ^ Pb_tag) & Int64( cache_size - 1 );
 
 		if ( cache( hash ).iTdb != Tdb_tag || cache( hash ).iTwb != Twb_tag || cache( hash ).iPb != Pb_tag ) {
+#ifdef W_DEBUG
+		  Int64 Tdb_tag_2 = cache(hash).iTdb << shift;
+		  Int64 Twb_tag_2 = cache(hash).iTwb << shift;
+		  Int64 Pb_tag_2 = cache(hash).iPb << shift;
+
+		  Real64 Tdb_r = *reinterpret_cast<Real64 *>( &Tdb_tag_2 );
+		  Real64 Twb_r = *reinterpret_cast<Real64 *>( &Twb_tag_2 );
+		  Real64 Pb_r = *reinterpret_cast<Real64 *>( &Pb_tag_2 );
+
+		  fprintf(stderr, "Miss: Tdb: %8.3f (%8.3f), Twb: %8.3f (%8.3f), Pb: %8.3f (%8.3f)\n", Tdb, Tdb_r, Twb, Twb_r, Pb, Pb_r);
+#endif // W_DEBUG
 			cache( hash ).iTdb = Tdb_tag;
 			cache( hash ).iTwb = Twb_tag;
 			cache( hash ).iPb = Pb_tag;
@@ -1818,6 +1839,7 @@ Label170: ;
 			Tdb_tag_r = *reinterpret_cast<Real64 *>( &Tdb_tag );
 			Twb_tag_r = *reinterpret_cast<Real64 *>( &Twb_tag );
 			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
+
 
 			cache( hash ).W = PsyWFnTdbTwbPb_raw( Tdb_tag_r, Twb_tag_r, Pb_tag_r, CalledFrom );
 		}

@@ -30,10 +30,10 @@ namespace DataViewFactorInformation {
 		// Members
 		std::string Name; // Zone name
 		int NumOfSurfaces; // Number of surfaces in the zone
-		FArray2D< Real64 > F; // View Factors
-		FArray2D< Real64 > ScriptF; // Hottel's Script F
-		FArray1D< Real64 > Area; // Surface area
-		FArray1D< Real64 > Emissivity; // Surface emissivity
+		FArray2D< Real64 > F; // View Factors (N * N)
+		FArray2D< Real64 > ScriptF; // Hottel's Script F (N * N)
+		FArray1D< Real64 > Area; // Surface area (N)
+		FArray1D< Real64 > Emissivity; // Surface emissivity (N)
 		FArray1D< Real64 > Azimuth; // Azimuth angle of the surface (in degrees)
 		FArray1D< Real64 > Tilt; // Tilt angle of the surface (in degrees)
 		FArray1D_int SurfacePtr; // Surface ALLOCATABLE (to Surface derived type)
@@ -48,10 +48,10 @@ namespace DataViewFactorInformation {
 		ZoneViewFactorInformation(
 			std::string const & Name, // Zone name
 			int const NumOfSurfaces, // Number of surfaces in the zone
-			FArray2< Real64 > const & F, // View Factors
-			FArray2< Real64 > const & ScriptF, // Hottel's Script F
-			FArray1< Real64 > const & Area, // Surface area
-			FArray1< Real64 > const & Emissivity, // Surface emissivity
+			FArray2D< Real64 > const & F, // View Factors
+			FArray2D< Real64 > const & ScriptF, // Hottel's Script F
+			FArray1D< Real64 > const & Area, // Surface area
+			FArray1D< Real64 > const & Emissivity, // Surface emissivity
 			FArray1< Real64 > const & Azimuth, // Azimuth angle of the surface (in degrees)
 			FArray1< Real64 > const & Tilt, // Tilt angle of the surface (in degrees)
 			FArray1_int const & SurfacePtr, // Surface ALLOCATABLE (to Surface derived type)
