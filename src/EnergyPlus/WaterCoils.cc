@@ -1697,11 +1697,13 @@ namespace WaterCoils {
 				if ( CurSysNum == 0 ) bPRINT = false;
 				if ( CurSysNum > 0 ) {
 					GetCoilDesFlowT( CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp );
+					DataFlowUsedForSizing = DesCoilAirFlow;
+					DataDesOutletAirTemp = DesCoilExitTemp;
 				}
-				DataFlowUsedForSizing = DesCoilAirFlow;
 				SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should always print this!)
 				RequestSizing( CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil( CoilNum ).DesWaterCoolingCoilRate = TempSize;
+				WaterCoil( CoilNum ).InletAirMassFlowRate = StdRhoAir * DataFlowUsedForSizing; // inlet air mass flow rate is the autosized value
 				DataCapacityUsedForSizing = WaterCoil( CoilNum ).DesWaterCoolingCoilRate;
 
 				// Why isn't the water volume flow rate based on the user inputs for inlet/outlet air/water temps? Water volume flow rate is always based on autosized inputs.

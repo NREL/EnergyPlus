@@ -1286,7 +1286,11 @@ namespace ReportSizingManager {
 					if ( CurOASysNum > 0 ) {
 						AutosizeDes = FinalSysSizing( CurSysNum ).PrecoolTemp;
 					} else {
-						AutosizeDes = FinalSysSizing( CurSysNum ).CoolSupTemp;
+						if ( DataDesOutletAirTemp > 0.0 ) {
+							AutosizeDes = DataDesOutletAirTemp;
+						} else {
+							AutosizeDes = FinalSysSizing( CurSysNum ).CoolSupTemp;
+						}
 					}
 					if ( AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0 ) {
 						ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving air temperature > entering water temperature." );

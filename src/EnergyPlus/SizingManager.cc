@@ -1804,6 +1804,7 @@ namespace SizingManager {
 		//Sizing:System;
 		int const iNameAlphaNum = 1; // A1, \field AirLoop Name
 		int const iLoadTypeSizeAlphaNum = 2; // A2, \field Type of Load to Size On
+		int const iCoolCapControlAlphaNum = 11; // A11 \field Central Cooling Capacity Control Method
 		int const iDesignOAVolFlowNumericNum = 1; // N1, \field Design Outdoor Air Flow Rate
 		int const iMinSysAirFlowRatioNumericNum = 2; // N2, \field Minimum System Air Flow Ratio
 		int const iPreheatDesignTempNumericNum = 3; // N3, \field Preheat Design Temperature
@@ -1899,8 +1900,37 @@ namespace SizingManager {
 				ShowContinueError( "... valid values are Sensible, Latent, Total, or VentilationRequirement." );
 				ErrorsFound = true;
 			}}
-			SysSizInput( SysSizIndex ).CoolingPeakLoadType = SensibleCoolingLoad; // wfb
-			SysSizInput( SysSizIndex ).CoolCapControl = VAV; // wfb
+			// assign CoolingPeakLoadType based on LoadSizeType for now
+			if ( SysSizInput( SysSizIndex ).LoadSizeType == Sensible ) {
+				SysSizInput( SysSizIndex ).CoolingPeakLoadType = SensibleCoolingLoad;
+			}
+			else if ( SysSizInput( SysSizIndex ).LoadSizeType == Total ) {
+				SysSizInput( SysSizIndex ).CoolingPeakLoadType = TotalCoolingLoad;
+			}
+			else {
+				SysSizInput( SysSizIndex ).CoolingPeakLoadType = SensibleCoolingLoad;
+			}
+			// set the CoolCapControl input
+			SysSizInput( SysSizIndex ).CoolCapControl = VAV;
+			{ auto const CoolCapCtrl( cAlphaArgs( iCoolCapControlAlphaNum ) );
+			if ( CoolCapCtrl == "VAV" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = VAV;
+			}
+			else if ( CoolCapCtrl == "BYPASS" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = Bypass;
+			}
+			else if ( CoolCapCtrl == "VT" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = VT;
+			}
+			else if ( CoolCapCtrl == "ONOFF" ) {
+				SysSizInput( SysSizIndex ).CoolCapControl = OnOff;
+			}
+			else {
+				// ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( iNameAlphaNum ) + "\", invalid data." );
+				// ShowContinueError( "... incorrect " + cAlphaFieldNames( iCoolCapControlAlphaNum ) + "=\"" + cAlphaArgs( iCoolCapControlAlphaNum ) + "\"." );
+				// ShowContinueError( "... valid values are VAV, Bypass, VT, or OnOff." );
+				// ErrorsFound = true;
+			}}
  			{ auto const sizingOption( cAlphaArgs( iSizingOptionAlphaNum ) );
 			if ( sizingOption == "COINCIDENT" ) {
 				SysSizInput( SysSizIndex ).SizingOption = Coincident;
