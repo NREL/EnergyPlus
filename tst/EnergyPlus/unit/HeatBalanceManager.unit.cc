@@ -72,21 +72,21 @@ TEST( ProcessZoneDataTest, Test1 )
 
 	ErrorsFound = false;
 	ProcessZoneData( cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
-	EXPECT_EQ( false, ErrorsFound );
+	EXPECT_FALSE( ErrorsFound );
 
 	ZoneNum = 2;
 	cAlphaArgs( 1 ) = "Zone Two"; // Name
 	cAlphaArgs( 2 ) = "InvalidChoice"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 	ErrorsFound = false;
 	ProcessZoneData( cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
-	EXPECT_EQ( true, ErrorsFound );
+	EXPECT_TRUE( ErrorsFound );
 
 	ZoneNum = 2;
 	cAlphaArgs( 1 ) = "Zone Two"; // Name
 	cAlphaArgs( 2 ) = "TARP"; // Zone Inside Convection Algorithm - Must be UPPERCASE by this point
 	ErrorsFound = false;
 	ProcessZoneData( cCurrentModuleObject, ZoneNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
-	EXPECT_EQ( false, ErrorsFound );
+	EXPECT_FALSE( ErrorsFound );
 
 	EXPECT_EQ( "Zone One", Zone( 1 ).Name );
 	EXPECT_EQ( AdaptiveConvectionAlgorithm, Zone( 1 ).InsideConvectionAlgo );
