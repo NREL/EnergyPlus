@@ -6844,110 +6844,18 @@ namespace WaterThermalTanks {
 		// set the heat pump air- and water-side mass flow rate
 		MdotWater = HPWaterHeater( HPNum ).OperatingWaterFlowRate * RhoH2O( TankTemp );
 
-		//     select mode of operation (float mode or heat mode)
+		// Select mode of operation (float mode or heat mode) from last iteration.
+		// Determine if heating will occur this iteration and get an estimate of the PLR
 		{ auto const SELECT_CASE_var( HPWaterHeater( HPNum ).Mode );
-		//       HPWH was heating last iteration and will continue to heat until the set point is reached
 		if ( SELECT_CASE_var == HeatMode ) {
-
+			// HPWH was heating last iteration and will continue to heat until the set point is reached
+			
 			HPPartLoadRatio = 1.0;
-
-			//         set up full air flow on DX coil inlet node
-			Node( DXCoilAirInletNode ).MassFlowRate = MdotAir;
-
-			//         set the condenser inlet node mass flow rate prior to calling the HPWH DX coil
-			Node( HPWaterInletNode ).MassFlowRate = MdotWater;
-			WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater;
-
-			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-			HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
-			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
-			for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
-				CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
-				//       Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
-				//       If HPWH is ever allowed to vary fan speed, this next sub should be called.
-				//       (possibly with an iteration loop to converge on a solution)
-				//       CALL CalcDOE2DXCoil(DXCoilNum, HPPartLoadRatio, FirstHVACIteration,PartLoadRatio, FanOpMode)
-				CondenserDeltaT = Node( HPWaterOutletNode ).Temp - Node( HPWaterInletNode ).Temp;
-
-				//           move the full load outlet temperature rate to the water heater structure variables
-				//           (water heaters source inlet node temperature/mdot are set in Init, set it here after CalcHPWHDXCoil has been called)
-				WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
-
-				//           this CALL does not update node temps, must use WaterThermalTank variables
-				// select tank type
-				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
-				if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-					CalcWaterThermalTankMixed( WaterThermalTankNum );
-					NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-					CalcWaterThermalTankStratified( WaterThermalTankNum );
-					NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( HPNum ).ControlSensorLocation );
-				}}
-				Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
-				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
-				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-			}
-
-			//         if tank temperature is greater than set point, calculate a PLR needed to exactly reach the set point
-			if ( NewTankTemp > SetPointTemp ) {
-				HPWaterHeater( HPNum ).Mode = FloatMode;
-				Par( 1 ) = SetPointTemp;
-				Par( 2 ) = HPWaterHeater( HPNum ).SaveWHMode;
-				Par( 3 ) = WaterThermalTankNum;
-				if ( FirstHVACIteration ) {
-					Par( 4 ) = 1.0;
-				} else {
-					Par( 4 ) = 0.0;
-				}
-				Par( 5 ) = MdotWater;
-				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
-				if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par );
-				} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
-					SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par );
-				} else {
-					assert( false );
-				}}
-				if ( SolFla == -1 ) {
-					gio::write( IterNum, fmtLD ) << MaxIte;
-					strip( IterNum );
-					if ( ! WarmupFlag ) {
-						++HPWaterHeater( HPNum ).IterLimitExceededNum1;
-						if ( HPWaterHeater( HPNum ).IterLimitExceededNum1 == 1 ) {
-							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-							ShowContinueErrorTimeStamp( "This error occurred in heating mode." );
-						} else {
-							ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex1, HPPartLoadRatio, HPPartLoadRatio );
-						}
-					}
-				} else if ( SolFla == -2 ) {
-					HPPartLoadRatio = max( 0.0, min( 1.0, ( SetPointTemp - TankTemp ) / ( NewTankTemp - TankTemp ) ) );
-					if ( ! WarmupFlag ) {
-						++HPWaterHeater( HPNum ).RegulaFalsiFailedNum1;
-						if ( HPWaterHeater( HPNum ).RegulaFalsiFailedNum1 == 1 ) {
-							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-							ShowContinueError( "Please send this information to the EnergyPlus support group." );
-							ShowContinueErrorTimeStamp( "This error occured in heating mode." );
-						} else {
-							ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Part-load ratio calculation failed in heating mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).RegulaFalsiFailedIndex1, HPPartLoadRatio, HPPartLoadRatio );
-						}
-					}
-				}
-
-				// Re-calculate the HPWH Coil to get the correct heat transfer rate
-				Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
-				CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
-
-			} else {
-				HPPartLoadRatio = 1.0;
-			}
-
-			//       HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
+			
 		} else if ( SELECT_CASE_var == FloatMode ) {
-
-			//         set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
+			// HPWH was floating last iteration and will continue to float until the cut-in temperature is reached
+			
+			// set the condenser inlet node temperature and full mass flow rate prior to calling the HPWH DX coil
 			{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
 			if ( SELECT_CASE_var1 == MixedWaterHeater ) {
 				Node( HPWaterInletNode ).Temp = TankTemp;
@@ -6959,16 +6867,16 @@ namespace WaterThermalTanks {
 			Node( HPWaterInletNode ).MassFlowRate = 0.0;
 			Node( HPWaterOutletNode ).MassFlowRate = 0.0;
 
-			//         check tank temperature by setting source inlet mass flow rate to zero
+			// Check tank temperature by setting source inlet mass flow rate to zero.
 			HPPartLoadRatio = 0.0;
 
-			//         set the full load outlet temperature on the water heater source inlet node (init has already been called)
+			// Set the full load outlet temperature on the water heater source inlet node (init has already been called).
 			WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = Node( HPWaterOutletNode ).Temp;
 
-			//         check tank temperature by setting source inlet mass flow rate to zero
+			// Check tank temperature by setting source inlet mass flow rate to zero.
 			WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = 0.0;
 
-			//         disable the tank's internal heating element to find PLR of the HPWH using floating temperatures
+			// Disable the tank's internal heating element to find PLR of the HPWH using floating temperatures.
 			WaterThermalTank( WaterThermalTankNum ).MaxCapacity = 0.0;
 			WaterThermalTank( WaterThermalTankNum ).MinCapacity = 0.0;
 			{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
@@ -6982,45 +6890,59 @@ namespace WaterThermalTanks {
 				assert( false );
 			}}
 
-			//         reset the tank's internal heating element capacity
+			// Reset the tank's internal heating element capacity.
 			WaterThermalTank( WaterThermalTankNum ).MaxCapacity = HPWaterHeater( HPNum ).BackupElementCapacity;
 			WaterThermalTank( WaterThermalTankNum ).MinCapacity = HPWaterHeater( HPNum ).BackupElementCapacity;
 
+			// Check to see if the tank drifts below set point if no heating happens.
 			if ( NewTankTemp <= ( SetPointTemp - DeadBandTempDiff ) ) {
 
-				//           HPWH is now in heating mode
+				// HPWH is now in heating mode
 				HPWaterHeater( HPNum ).Mode = HeatMode;
-				//           reset the water heater's mode (call above may have changed modes)
+				
+				// Reset the water heater's mode (call above may have changed modes)
 				WaterThermalTank( WaterThermalTankNum ).Mode = HPWaterHeater( HPNum ).SaveWHMode;
 
-				//           estimate portion of time step that the HP operates based on a linear interpolation of the tank temperature decay
-				//           this assumes that all heating sources are off
+				// Estimate portion of time step that the HP operates based on a linear interpolation of the tank temperature decay
+				// assuming that all heating sources are off.
 				if ( TankTemp != NewTankTemp ) {
 					HPPartLoadRatio = max( 0.0, min( 1.0, ( ( SetPointTemp - DeadBandTempDiff ) - NewTankTemp ) / ( TankTemp - NewTankTemp ) ) );
 				} else {
 					HPPartLoadRatio = 1.0;
 				}
+			}
 
-				//           set the condenser inlet node mass flow rate prior to calling the CalcHPWHDXCoil
-				Node( HPWaterInletNode ).MassFlowRate = MdotWater * HPPartLoadRatio;
-				WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater * HPPartLoadRatio;
+		} else {
+			// Never gets here, only allowed modes for HPWH are float and heat
+			assert(0);
+		}}
+		
+		// If the HPWH was in heating mode during the last timestep or if it was determined that
+		// heating would be needed during this timestep to maintain setpoint, do the heating calculation.
+		if ( HPWaterHeater( HPNum ).Mode == HeatMode) {
+			
+			// set up air flow on DX coil inlet node
+			Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
 
-				Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
-
-				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
-				HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
-				for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
-					CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
-					//         Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
-					//         If HPWH is ever allowed to vary fan speed, this next sub should be called.
-					//         CALL CalcDOE2DXCoil(DXCoilNum, HPPartLoadRatio, FirstHVACIteration,PartLoadRatio, FanOpMode)
-					//         (possibly with an iteration loop to converge on a solution)
-					CondenserDeltaT = Node( HPWaterOutletNode ).Temp - Node( HPWaterInletNode ).Temp;
-					WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
-
-					//             this CALL does not update node temps, must use WaterThermalTank variables
-					// select tank type
-					{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
+			// set the condenser inlet node mass flow rate prior to calling the CalcHPWHDXCoil
+			Node( HPWaterInletNode ).MassFlowRate = MdotWater * HPPartLoadRatio;
+			WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate = MdotWater * HPPartLoadRatio;
+			
+			HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+			HPWaterInletNodeTempSaved = Node( HPWaterInletNode ).Temp;
+			// This for loop is intended to iterate and converge on a condenser operating temperature so that the evaporator model correctly calculates performance.
+			for ( loopIter = 1; loopIter <= 4; ++loopIter ) {
+				CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
+				// Currently, HPWH heating rate is only a function of inlet evap conditions and air flow rate
+				// If HPWH is ever allowed to vary fan speed, this next sub should be called.
+				// CALL CalcDOE2DXCoil(DXCoilNum, HPPartLoadRatio, FirstHVACIteration,PartLoadRatio, FanOpMode)
+				// (possibly with an iteration loop to converge on a solution)
+				CondenserDeltaT = Node( HPWaterOutletNode ).Temp - Node( HPWaterInletNode ).Temp;
+				WaterThermalTank( WaterThermalTankNum ).SourceInletTemp = HPWaterInletNodeTempSaved + CondenserDeltaT;
+				
+				// this CALL does not update node temps, must use WaterThermalTank variables
+				// select tank type
+				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
 					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
 						CalcWaterThermalTankMixed( WaterThermalTankNum );
 						NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
@@ -7028,66 +6950,67 @@ namespace WaterThermalTanks {
 						CalcWaterThermalTankStratified( WaterThermalTankNum );
 						NewTankTemp = FindStratifiedTankSensedTemp( WaterThermalTankNum, HPWaterHeater( HPNum ).ControlSensorLocation );
 					}}
-					Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
-					if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
-					HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+				Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
+				if ( std::abs( Node( HPWaterInletNode ).Temp - HPWHCondInletNodeLast ) < SmallTempDiff ) break;
+				HPWHCondInletNodeLast = Node( HPWaterInletNode ).Temp;
+			}
+			
+			// if tank temperature is greater than set point, calculate a PLR needed to exactly reach the set point
+			if ( NewTankTemp > SetPointTemp ) {
+				HPWaterHeater( HPNum ).Mode = FloatMode;
+				Par( 1 ) = SetPointTemp;
+				Par( 2 ) = HPWaterHeater( HPNum ).SaveWHMode;
+				Par( 3 ) = WaterThermalTankNum;
+				if ( FirstHVACIteration ) {
+					Par( 4 ) = 1.0;
+				} else {
+					Par( 4 ) = 0.0;
 				}
-
-				//           if tank temperature is greater than set point, calculate a PLR needed to exactly reach the set point
-				if ( NewTankTemp > SetPointTemp ) {
-					HPWaterHeater( HPNum ).Mode = FloatMode;
-					Par( 1 ) = SetPointTemp;
-					Par( 2 ) = HPWaterHeater( HPNum ).SaveWHMode;
-					Par( 3 ) = WaterThermalTankNum;
-					if ( FirstHVACIteration ) {
-						Par( 4 ) = 1.0;
-					} else {
-						Par( 4 ) = 0.0;
-					}
-					Par( 5 ) = MdotWater;
-					{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
+				Par( 5 ) = MdotWater;
+				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
 					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par );
 					} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualStratifiedTank, 0.0, 1.0, Par );
 					}}
-					if ( SolFla == -1 ) {
-						gio::write( IterNum, fmtLD ) << MaxIte;
-						strip( IterNum );
-						if ( ! WarmupFlag ) {
-							++HPWaterHeater( HPNum ).IterLimitExceededNum2;
-							if ( HPWaterHeater( HPNum ).IterLimitExceededNum2 == 1 ) {
-								ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-								ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-								ShowContinueErrorTimeStamp( "This error occurred in float mode." );
-							} else {
-								ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
-							}
-						}
-					} else if ( SolFla == -2 ) {
-						HPPartLoadRatio = max( 0.0, min( 1.0, ( SetPointTemp - TankTemp ) / ( NewTankTemp - TankTemp ) ) );
-						if ( ! WarmupFlag ) {
-							++HPWaterHeater( HPNum ).RegulaFalsiFailedNum2;
-							if ( HPWaterHeater( HPNum ).RegulaFalsiFailedNum2 == 1 ) {
-								ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
-								ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
-								ShowContinueError( "Please send this information to the EnergyPlus support group." );
-								ShowContinueErrorTimeStamp( "This error occured in float mode." );
-							} else {
-								ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio );
-							}
+				if ( SolFla == -1 ) {
+					gio::write( IterNum, fmtLD ) << MaxIte;
+					strip( IterNum );
+					if ( ! WarmupFlag ) {
+						++HPWaterHeater( HPNum ).IterLimitExceededNum2;
+						if ( HPWaterHeater( HPNum ).IterLimitExceededNum2 == 1 ) {
+							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
+							ShowContinueError( "Iteration limit exceeded calculating heat pump water heater compressor" " part-load ratio, maximum iterations = " + IterNum + ". Part-load ratio returned = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
+							ShowContinueErrorTimeStamp( "This error occurred in float mode." );
+						} else {
+							ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\":  Iteration limit exceeded in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).IterLimitErrIndex2, HPPartLoadRatio, HPPartLoadRatio );
 						}
 					}
-					// Re-calculate the HPWH Coil to get the correct heat transfer rate
-					Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
-					CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
+				} else if ( SolFla == -2 ) {
+					HPPartLoadRatio = max( 0.0, min( 1.0, ( SetPointTemp - TankTemp ) / ( NewTankTemp - TankTemp ) ) );
+					if ( ! WarmupFlag ) {
+						++HPWaterHeater( HPNum ).RegulaFalsiFailedNum2;
+						if ( HPWaterHeater( HPNum ).RegulaFalsiFailedNum2 == 1 ) {
+							ShowWarningError( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\"" );
+							ShowContinueError( "Heat pump water heater compressor part-load ratio calculation failed: PLR limits " "of 0 to 1 exceeded. Part-load ratio used = " + RoundSigDigits( HPPartLoadRatio, 3 ) );
+							ShowContinueError( "Please send this information to the EnergyPlus support group." );
+							ShowContinueErrorTimeStamp( "This error occured in float mode." );
+						} else {
+							ShowRecurringWarningErrorAtEnd( HPWaterHeater( HPNum ).Type + " \"" + HPWaterHeater( HPNum ).Name + "\": Part-load ratio calculation failed in float mode warning continues. Part-load ratio statistics follow.", HPWaterHeater( HPNum ).RegulaFalsiFailedIndex2, HPPartLoadRatio, HPPartLoadRatio );
+						}
+					}
 				}
+				
+				// Re-calculate the HPWH Coil to get the correct heat transfer rate.
+				Node( HPWaterInletNode ).Temp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
+				CalcHPWHDXCoil( HPWaterHeater( HPNum ).DXCoilNum, HPPartLoadRatio );
+				
+			} else {
+				// Set the PLR to 1 if we're not going to reach setpoint during this timestep.
+				HPPartLoadRatio = 1.0;
 			}
-
-		} else {
-			//         Never gets here, only allowed modes for HPWH are float and heat
-		}}
-
+		}
+		
 		// set air-side mass flow rate for final calculation
 		if ( InletAirMixerNode > 0 ) {
 			Node( InletAirMixerNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
