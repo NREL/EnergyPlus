@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 // C++ Headers
+#include <iostream>
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -31,17 +36,15 @@
 #include <SimulationManager.hh>
 #include <UtilityRoutines.hh>
 
-#ifdef __unix__
-#include <unistd.h>
-#endif
-
 #ifdef _WIN32
-#include <stdlib.h>
-#include <direct.h>
+ #include <stdlib.h>
+ #include <direct.h>
+#else //Mac or Linux
+ #include <unistd.h>
 #endif
 
 void 
-EnergyPlusPgm(int argc, const char * argv[])
+EnergyPlusPgm( std::string filepath )
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
@@ -226,11 +229,21 @@ EnergyPlusPgm(int argc, const char * argv[])
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
 
+	// Disable C++ i/o synching with C methods for speed
+	std::ios_base::sync_with_stdio( false );
+	std::cin.tie( 0 ); // Untie cin and cout: Could cause odd behavior for interactive prompts
+
 // Enable floating point exceptions
 #ifndef NDEBUG
 #ifdef __unix__
 	feenableexcept( FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW );
 #endif
+#endif
+
+#ifdef _WIN32
+	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 #endif
 
 	// Locals
@@ -252,9 +265,6 @@ EnergyPlusPgm(int argc, const char * argv[])
 #ifdef EP_Detailed_Timings
 	epStartTime( "EntireRun=" );
 #endif
-
-	// Process command line arguments
-	ProcessArgs(argc, argv);
 
 	CreateCurrentDateTimeString( CurrentDateTime );
 	VerString += "," + CurrentDateTime;
@@ -338,6 +348,20 @@ EnergyPlusPgm(int argc, const char * argv[])
 
 	get_environment_variable( TraceHVACControllerEnvVar, cEnvValue );
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
+
+	if( ! filepath.empty() ) {
+#ifdef _WIN32
+		int status = _chdir(filepath.c_str());
+#else
+		std::cout << "Trying to change directory to: " << filepath << std::endl;
+		int status = chdir(filepath.c_str());
+		std::cout << "Chdir status = " << status << std::endl;
+#endif
+		ProgramPath = filepath + pathChar;
+		int dummy_argc = 0;
+		const char ** dummy_argv( 0 );
+		ProcessArgs( dummy_argc, dummy_argv );
+	}
 
 	TestAllPaths = true;
 
@@ -458,7 +482,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	gio::Fmt const fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
+	gio::Fmt fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na

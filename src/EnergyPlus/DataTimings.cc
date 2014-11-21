@@ -307,7 +307,7 @@ namespace DataTimings {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na

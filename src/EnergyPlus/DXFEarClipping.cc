@@ -193,7 +193,7 @@ namespace DXFEarClipping {
 
 		// Subroutine parameter definitions:
 		Real64 const point_tolerance( 0.00001 );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// Interface block specifications:
 		// na
@@ -549,7 +549,7 @@ namespace DXFEarClipping {
 		// Subroutine argument definitions:
 
 		// Subroutine parameter definitions:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// Interface block specifications:
 		// na

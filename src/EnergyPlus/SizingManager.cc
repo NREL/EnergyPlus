@@ -137,7 +137,7 @@ namespace SizingManager {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ManageSizing: " );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: none
 
@@ -740,17 +740,11 @@ namespace SizingManager {
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		if ( NumOARequirements > 0 ) {
 			OARequirements.allocate( NumOARequirements );
@@ -912,17 +906,11 @@ namespace SizingManager {
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		if ( NumZoneAirDistribution > 0 ) {
 			ZoneAirDistribution.allocate( NumZoneAirDistribution );
@@ -1032,7 +1020,7 @@ namespace SizingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2055,7 +2043,7 @@ namespace SizingManager {
 			if ( coolAirDesMethod == "DESIGNDAY" ) {
 				SysSizInput( SysSizIndex ).CoolAirDesMethod = FromDDCalc;
 			} else if ( coolAirDesMethod == "FLOW/SYSTEM" ) {
-				SysSizInput( SysSizIndex ).CoolAirDesMethod = InpDesAirFlow;			
+				SysSizInput( SysSizIndex ).CoolAirDesMethod = InpDesAirFlow;
 			} else if ( coolAirDesMethod == "FLOWPERFLOORAREA") {
 				SysSizInput(SysSizIndex).CoolAirDesMethod = InpDesAirFlow;
 				SysSizInput(SysSizIndex).ScaleCoolSAFMethod = FlowPerFloorArea;
@@ -2078,7 +2066,7 @@ namespace SizingManager {
 			if ( heatAirDesMethod == "DESIGNDAY" ) {
 				SysSizInput( SysSizIndex ).HeatAirDesMethod = FromDDCalc;
 			} else if ( heatAirDesMethod == "FLOW/SYSTEM" ) {
-				SysSizInput( SysSizIndex ).HeatAirDesMethod = InpDesAirFlow;			
+				SysSizInput( SysSizIndex ).HeatAirDesMethod = InpDesAirFlow;
 			} else if (heatAirDesMethod == "FLOWPERFLOORAREA") {
 				SysSizInput(SysSizIndex).HeatAirDesMethod = InpDesAirFlow;
 				SysSizInput(SysSizIndex).ScaleHeatSAFMethod = FlowPerFloorArea;
@@ -2512,8 +2500,8 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
-		static gio::Fmt const Format_991( "(' Zone Sizing Information',13(', ',A))" );
+		static gio::Fmt Format_990( "('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, ','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}')" );
+		static gio::Fmt Format_991( "(' Zone Sizing Information',13(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
@@ -2574,8 +2562,8 @@ namespace SizingManager {
 		static bool MyOneTimeFlag( true );
 
 		// Formats
-		static gio::Fmt const Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
-		static gio::Fmt const Format_991( "(' System Sizing Information',3(', ',A))" );
+		static gio::Fmt Format_990( "('! <System Sizing Information>, System Name, ','Field Description, Value')" );
+		static gio::Fmt Format_991( "(' System Sizing Information',3(', ',A))" );
 
 		if ( MyOneTimeFlag ) {
 			gio::write( OutputFileInits, Format_990 );
@@ -2662,7 +2650,7 @@ namespace SizingManager {
 			int iCoolCapacityPerFloorAreaNumericNum; // get input index to Zone HVAC sizing cooling capacity per floor area
 			int iCoolFracOfAutosizedCapacityNumericNum;  // get input index to Zone HVAC sizing capacity as fraction autozized cooling capacity
 
-			int iHeatCAPMAlphaNum; // get input index to Zone HVAC sizing heating capacity 
+			int iHeatCAPMAlphaNum; // get input index to Zone HVAC sizing heating capacity
 			int iHeatDesignCapacityNumericNum; // get input index to Zone HVAC sizing heating design capacity
 			int iHeatCapacityPerFloorAreaNumericNum; // get input index to Zone HVAC sizing heating capacity per floor area
 			int iHeatFracOfAutosizedCapacityNumericNum; // get input index to Zone HVAC sizing capacity as fraction autozized cooling capacity
@@ -2702,7 +2690,7 @@ namespace SizingManager {
 			int NumNumbers; // Number of Numbers for each GetObjectItem call
 			int TotalArgs; // Total number of alpha and numeric arguments (max) for a
 			int IOStatus; // Used in GetObjectItem
-			int zSIndex;  // index of "DesignSpecification:ZoneHVAC:Sizing" objects 
+			int zSIndex;  // index of "DesignSpecification:ZoneHVAC:Sizing" objects
 			static bool ErrorsFound( false ); // If errors detected in input
 			bool IsNotOK; // Flag to verify name
 			bool IsBlank; // Flag for blank name
@@ -2721,17 +2709,11 @@ namespace SizingManager {
 			GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 			Alphas.allocate( NumAlphas );
-			Alphas = "";
 			cAlphaFields.allocate( NumAlphas );
-			cAlphaFields = "";
 			cNumericFields.allocate( NumNumbers );
-			cNumericFields = "";
-			Numbers.allocate( NumNumbers );
-			Numbers = 0.0;
-			lAlphaBlanks.allocate( NumAlphas );
-			lAlphaBlanks = true;
-			lNumericBlanks.allocate( NumNumbers );
-			lNumericBlanks = true;
+			Numbers.dimension( NumNumbers, 0.0 );
+			lAlphaBlanks.dimension( NumAlphas, true );
+			lNumericBlanks.dimension( NumNumbers, true );
 
 			if( NumZoneHVACSizing > 0 ) {
 				ZoneHVACSizing.allocate( NumZoneHVACSizing );
@@ -2853,7 +2835,7 @@ namespace SizingManager {
 					} else if( SameString( Alphas( iCoolSAFMAlphaNum ), "None" ) || lAlphaBlanks( iCoolSAFMAlphaNum ) ) {
 						ZoneHVACSizing( zSIndex ).CoolingSAFMethod = None;
 						ZoneHVACSizing( zSIndex ).MaxCoolAirVolFlow = 0.0;
-						// cooling supply air flow rate will not be sized, may be cooling coil does not exist 
+						// cooling supply air flow rate will not be sized, may be cooling coil does not exist
 					} else {
 						ShowSevereError( CurrentModuleObject + " = " + ZoneHVACSizing( zSIndex ).Name );
 						ShowContinueError( "Illegal " + cAlphaFields( iCoolSAFMAlphaNum ) + " = " + Alphas( iCoolSAFMAlphaNum ) );

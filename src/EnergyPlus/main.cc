@@ -1,7 +1,10 @@
 #include <EnergyPlusPgm.hh>
+#include <CommandLineInterface.hh>
+using EnergyPlus::CommandLineInterface::ProcessArgs;
 
 int
-main(int argc, const char * argv[])
+main( int argc, const char * argv[] )
 {
-	EnergyPlusPgm(argc, argv);
+	ProcessArgs( argc, argv );
+	EnergyPlusPgm();
 }

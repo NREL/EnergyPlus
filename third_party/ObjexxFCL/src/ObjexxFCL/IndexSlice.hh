@@ -676,26 +676,4 @@ swap( IndexSlice & a, IndexSlice & b );
 
 } // ObjexxFCL
 
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.
-
-namespace std {
-
-// std::swap( IndexSlice, IndexSlice )
-inline
-void
-swap( ObjexxFCL::IndexSlice & a, ObjexxFCL::IndexSlice & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
-
 #endif // ObjexxFCL_IndexSlice_hh_INCLUDED

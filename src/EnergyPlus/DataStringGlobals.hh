@@ -21,6 +21,7 @@ namespace DataStringGlobals {
 	extern std::string const AccentedUpperCase;
 	extern std::string const AccentedLowerCase;
 	extern std::string const AllCase;
+	extern std::string const NL; // Platform newline
 	extern char const pathChar;
 	extern char const altpathChar;
 	extern char const CharComma; // comma

@@ -17,5 +17,11 @@ int main( int argc, const char* argv[] )
 	StoreMessageCallback(message_callback_handler);
 	StoreProgressCallback(progress_callback_handler);
 	
-	EnergyPlusPgm( argc, argv );
+	if ( argc < 2)
+	{
+		std::cout << "Call this with a path to run EnergyPlus as the only argument" << std::endl;
+		return 1;
+	} else {
+		EnergyPlusPgm( argv[1] );
+	}
 }
