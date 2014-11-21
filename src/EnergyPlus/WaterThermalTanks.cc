@@ -4865,7 +4865,7 @@ namespace WaterThermalTanks {
 	}
 
 	void
-	CalcWaterThermalTankMixed( int const WaterThermalTankNum ) // Water Heater being simulated
+	CalcWaterThermalTankMixed( int const WaterThermalTankNum, Real64 const HPWHCondenserDeltaT ) // Water Heater being simulated
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4921,6 +4921,7 @@ namespace WaterThermalTanks {
 		Real64 Qlosszone; // Heating rate of fraction of losses added to the zone as a gain (W)
 		Real64 Qheat; // Net heating rate for non-temp dependent sources, i.e. heater and parasitics (W)
 		Real64 Qheater; // Heating rate of the burner or electric heating element (W)
+		Real64 Qheatpump; // Heating rate of the heat pump (W)
 		Real64 Qmaxcap; // Maximum capacity heating rate of the burner or electric heating element (W)
 		Real64 Qmincap; // Minimum capacity heating rate of the burner or electric heating element (W)
 		Real64 Qoffcycfuel; // Fuel consumption rate of off-cycle parasitics (W)
@@ -5047,9 +5048,20 @@ namespace WaterThermalTanks {
 		Qnet = 0.0;
 		Qfuel = 0.0;
 
-		// Calculate steady-state heat rates
+		// Calculate the heating rate from the heat pump.
+		assert( HPWHCondenserDeltaT >= 0 );
+		Qheatpump = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
+		
+		// Calculate steady-state heat rates.
 		Quse = UseMassFlowRate * Cp * ( UseInletTemp - SetPointTemp );
-		Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - SetPointTemp );
+
+		// Determine if the source side heating is coming from a heat pump.
+		if (Qheatpump > 0.0) {
+			SourceMassFlowRate = 0.0; // Handle this heating as a constant heat source
+			Qsource = Qheatpump;
+		} else {
+			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - SetPointTemp );
+		}
 
 		while ( TimeRemaining > 0.0 ) {
 
@@ -5082,7 +5094,7 @@ namespace WaterThermalTanks {
 					// Qneeded does not account for the extra energy needed to recover to the setpoint
 					Qheater = Qmaxcap;
 					Qunmet = max( Qneeded - Qheater, 0.0 );
-					Qheat = Qoncycheat + Qheater;
+					Qheat = Qoncycheat + Qheater + Qheatpump;
 
 					// Calculate time needed to recover to the setpoint at maximum heater capacity
 					TimeNeeded = CalcTimeNeeded( TankTemp, SetPointTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat );
@@ -5212,7 +5224,7 @@ namespace WaterThermalTanks {
 
 				} else if ( ( TankTemp >= DeadBandTemp ) && ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
 
-					Qheat = Qoffcycheat;
+					Qheat = Qoffcycheat + Qheatpump;
 
 					// Calculate time needed for tank temperature to fall to minimum (setpoint - deadband)
 					TimeNeeded = CalcTimeNeeded( TankTemp, DeadBandTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat );
@@ -5249,7 +5261,7 @@ namespace WaterThermalTanks {
 
 				} else if ( ( TankTemp > DeadBandTemp ) && ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
 					Mode = CoolMode;
-					Qheat = 0.0;
+					Qheat = Qheatpump;
 
 					NewTankTemp = CalcTankTemp( TankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeRemaining );
 					TimeNeeded = TimeRemaining;
@@ -5257,7 +5269,7 @@ namespace WaterThermalTanks {
 
 					if ( TankTemp < SetPointTemp ) Mode = FloatMode;
 
-					Qheat = 0.0;
+					Qheat = Qheatpump;
 
 					NewTankTemp = CalcTankTemp( TankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeRemaining );
 					TimeNeeded = TimeRemaining;
@@ -5272,7 +5284,7 @@ namespace WaterThermalTanks {
 
 				LossCoeff = WaterThermalTank( WaterThermalTankNum ).OffCycLossCoeff;
 				LossFracToZone = WaterThermalTank( WaterThermalTankNum ).OffCycLossFracToZone;
-				Qheat = Qoffcycheat;
+				Qheat = Qoffcycheat + Qheatpump;
 
 				NewTankTemp = CalcTankTemp( TankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeRemaining );
 
@@ -5302,6 +5314,7 @@ namespace WaterThermalTanks {
 
 			} else {
 				// No default
+				assert(0);
 			}}
 
 			deltaTsum = CalcTempIntegral( TankTemp, NewTankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeNeeded );
@@ -5311,7 +5324,11 @@ namespace WaterThermalTanks {
 			Eloss += LossCoeff * ( AmbientTemp * TimeNeeded - deltaTsum );
 			Elosszone += LossFracToZone * LossCoeff * ( AmbientTemp * TimeNeeded - deltaTsum );
 			Euse += UseMassFlowRate * Cp * ( UseInletTemp * TimeNeeded - deltaTsum );
-			Esource += SourceMassFlowRate * Cp * ( SourceInletTemp * TimeNeeded - deltaTsum );
+			if (Qheatpump > 0.0) {
+				Esource += Qheatpump * TimeNeeded;
+			} else {
+				Esource += SourceMassFlowRate * Cp * ( SourceInletTemp * TimeNeeded - deltaTsum );
+			}
 
 			TankTemp = NewTankTemp; // Update tank temperature
 
@@ -6730,7 +6747,7 @@ namespace WaterThermalTanks {
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int HPNum; // Index to heat pump water heater
 		int SolFla( 0 ); // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
+		FArray1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
 		Real64 HPMinTemp; // used for error messages, C
 		std::string HPMinTempChar; // used for error messages
 		std::string IterNum; // Max number of iterations for warning message
@@ -6919,7 +6936,7 @@ namespace WaterThermalTanks {
 		
 		// If the HPWH was in heating mode during the last timestep or if it was determined that
 		// heating would be needed during this timestep to maintain setpoint, do the heating calculation.
-		if ( HPWaterHeater( HPNum ).Mode == HeatMode) {
+		if ( HPWaterHeater( HPNum ).Mode == HeatMode ) {
 			
 			// set up air flow on DX coil inlet node
 			Node( DXCoilAirInletNode ).MassFlowRate = MdotAir * HPPartLoadRatio;
@@ -6944,7 +6961,7 @@ namespace WaterThermalTanks {
 				// select tank type
 				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
 					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-						CalcWaterThermalTankMixed( WaterThermalTankNum );
+						CalcWaterThermalTankMixed( WaterThermalTankNum, CondenserDeltaT );
 						NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 					} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
 						CalcWaterThermalTankStratified( WaterThermalTankNum );
@@ -6967,6 +6984,7 @@ namespace WaterThermalTanks {
 					Par( 4 ) = 0.0;
 				}
 				Par( 5 ) = MdotWater;
+				Par( 6 ) = CondenserDeltaT;
 				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
 					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par );
@@ -7129,6 +7147,7 @@ namespace WaterThermalTanks {
 		// par(3) = water heater num
 		// par(4) = FirstHVACIteration
 		// par(5) = MdotWater
+		// par(6) = CondenserDeltaT
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		//  na
@@ -7153,7 +7172,7 @@ namespace WaterThermalTanks {
 		} else {
 			FirstHVACIteration = false;
 		}
-		CalcWaterThermalTankMixed( WaterThermalTankNum );
+		CalcWaterThermalTankMixed( WaterThermalTankNum, Par()( 6 ) );
 		NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 		PLRResidualMixedTank = Par()( 1 ) - NewTankTemp;
 		return PLRResidualMixedTank;
@@ -7197,6 +7216,7 @@ namespace WaterThermalTanks {
 		// par(3) = water heater num
 		// par(4) = FirstHVACIteration
 		// par(5) = MdotWater
+		// par(6) = CondenserDeltaT
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		//  na
