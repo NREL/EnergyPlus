@@ -186,7 +186,6 @@ namespace EconomicTariff {
 
 	// holds the outbound connections for each variable
 	extern FArray1D_int operand; // sized to sizeOperand
-	extern FArray1D_int operandCopy;
 	extern int numOperand;
 	extern int sizeOperand;
 
@@ -959,7 +958,6 @@ namespace EconomicTariff {
 
 	// Object Data
 	extern FArray1D< EconVarType > econVar;
-	extern FArray1D< EconVarType > econVarCopy;
 	extern FArray1D< TariffType > tariff;
 	extern FArray1D< QualifyType > qualify;
 	extern FArray1D< ChargeSimpleType > chargeSimple;
@@ -967,7 +965,6 @@ namespace EconomicTariff {
 	extern FArray1D< RatchetType > ratchet;
 	extern FArray1D< ComputationType > computation;
 	extern FArray1D< StackType > stack;
-	extern FArray1D< StackType > stackCopy;
 
 	// Functions
 

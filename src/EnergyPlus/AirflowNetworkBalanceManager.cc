@@ -386,7 +386,7 @@ namespace AirflowNetworkBalanceManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "GetAirflowNetworkInput: " ); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS:
@@ -439,8 +439,8 @@ namespace AirflowNetworkBalanceManager {
 		static int TotalArgs( 0 ); // Total number of alpha and numeric arguments (max) for a
 
 		// Formats
-		static gio::Fmt const Format_110( "('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone without Distribution/Multizone with Distribution only during Fan Operation')" );
-		static gio::Fmt const Format_120( "('AirflowNetwork Model:Control,',A)" );
+		static gio::Fmt Format_110( "('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone without Distribution/Multizone with Distribution only during Fan Operation')" );
+		static gio::Fmt Format_120( "('AirflowNetwork Model:Control,',A)" );
 
 		// Set the maximum numbers of input fields
 		GetObjectDefMaxArgs( "AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers );
@@ -508,17 +508,11 @@ namespace AirflowNetworkBalanceManager {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		ErrorsFound = false;
 		AirflowNetworkInitFlag = false;
@@ -721,8 +715,7 @@ namespace AirflowNetworkBalanceManager {
 		AirflowNetworkNumOfZones = GetNumObjectsFound( CurrentModuleObject );
 		if ( AirflowNetworkNumOfZones > 0 ) {
 			MultizoneZoneData.allocate( AirflowNetworkNumOfZones );
-			AirflowNetworkZoneFlag.allocate( NumOfZones ); // AirflowNetwork zone flag
-			AirflowNetworkZoneFlag = false;
+			AirflowNetworkZoneFlag.dimension( NumOfZones, false ); // AirflowNetwork zone flag
 			for ( i = 1; i <= AirflowNetworkNumOfZones; ++i ) {
 				GetObjectItem( CurrentModuleObject, i, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 				IsNotOK = false;
@@ -3225,12 +3218,12 @@ namespace AirflowNetworkBalanceManager {
 		int SurfNum;
 
 		// Formats
-		static gio::Fmt const Format_900( "(1X,i2)" );
-		static gio::Fmt const Format_901( "(1X,2I4,4F9.4)" );
-		static gio::Fmt const Format_902( "(1X,2I4,4F9.4)" );
-		static gio::Fmt const Format_903( "(9X,4F9.4)" );
-		static gio::Fmt const Format_904( "(1X,2I4,1F9.4)" );
-		static gio::Fmt const Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
+		static gio::Fmt Format_900( "(1X,i2)" );
+		static gio::Fmt Format_901( "(1X,2I4,4F9.4)" );
+		static gio::Fmt Format_902( "(1X,2I4,4F9.4)" );
+		static gio::Fmt Format_903( "(9X,4F9.4)" );
+		static gio::Fmt Format_904( "(1X,2I4,1F9.4)" );
+		static gio::Fmt Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
 
 		AirflowNetworkNodeSimu.allocate( AirflowNetworkNumOfNodes ); // Node simulation variable in air distribution system
 		AirflowNetworkLinkSimu.allocate( AirflowNetworkNumOfLinks ); // Link simulation variable in air distribution system
@@ -6093,8 +6086,7 @@ Label90: ;
 
 		// Validate supply and return connections
 		if ( OneTimeFlag ) {
-			NodeFound.allocate( NumOfNodes );
-			NodeFound = false;
+			NodeFound.dimension( NumOfNodes, false );
 			// Validate inlet and outlet nodes for zone exhaust fans
 			for ( i = 1; i <= AirflowNetworkNumOfExhFan; ++i ) {
 				NodeFound( MultizoneCompExhaustFanData( i ).InletNode ) = true;
@@ -6569,8 +6561,7 @@ Label90: ;
 		if ( OneTimeFlag ) {
 			CurrentModuleObject = "AirflowNetwork:MultiZone:Component:ZoneExhaustFan";
 			if ( any( ZoneEquipConfig.IsControlled() ) ) {
-				AirflowNetworkZoneExhaustFan.allocate( NumOfZones );
-				AirflowNetworkZoneExhaustFan = false;
+				AirflowNetworkZoneExhaustFan.dimension( NumOfZones, false );
 			}
 			// Ensure the number of exhaust fan defined in the AirflowNetwork model matches the number of Zone Exhaust Fan objects
 			if ( NumOfExhaustFans != AirflowNetworkNumOfExhFan ) {
@@ -6921,8 +6912,7 @@ Label90: ;
 		//count the total number of exterior simple and detailed openings and the number in each zone
 		//verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
 		//if it doesn't have two openings, change "ADVANCED" to "STANDARD"
-		NumofExtSurfInZone.allocate( AirflowNetworkNumOfZones );
-		NumofExtSurfInZone = 0;
+		NumofExtSurfInZone.dimension( AirflowNetworkNumOfZones, 0 );
 		for ( AFNZnNum = 1; AFNZnNum <= AirflowNetworkNumOfZones; ++AFNZnNum ) {
 			if ( MultizoneZoneData( AFNZnNum ).SingleSidedCpType == "ADVANCED" ) {
 				for ( SrfNum = 1; SrfNum <= AirflowNetworkNumOfSurfaces; ++SrfNum ) {

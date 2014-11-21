@@ -1,4 +1,4 @@
-// Formatted Write Support
+// Formatted Read Support
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //
@@ -11,12 +11,13 @@
 // Licensing is available from Objexx Engineering, Inc.:  http://objexx.com
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Write.hh>
+#include <ObjexxFCL/Read.hh>
 
 namespace ObjexxFCL {
 
 // Static Data Member Definitions
 
-	std::string const Write::LF = std::string( "\n" ); // Linefeed
+	// ReadStream
+	std::istringstream ReadStream::internal_stream_; // Internal stream
 
 } // ObjexxFCL

@@ -340,8 +340,7 @@ namespace WaterToAirHeatPumpSimple {
 		// Allocate Arrays
 		if ( NumWatertoAirHPs > 0 ) {
 			SimpleWatertoAirHP.allocate( NumWatertoAirHPs );
-			SimpleHPTimeStepFlag.allocate( NumWatertoAirHPs );
-			SimpleHPTimeStepFlag = true;
+			SimpleHPTimeStepFlag.dimension( NumWatertoAirHPs, true );
 		}
 
 		GetObjectDefMaxArgs( "Coil:Cooling:WaterToAirHeatPump:EquationFit", NumParams, NumAlphas, NumNums );
@@ -351,17 +350,11 @@ namespace WaterToAirHeatPumpSimple {
 		MaxNums = max( MaxNums, NumNums );
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		lNumericBlanks.dimension( MaxNums, true );
+		NumArray.dimension( MaxNums, 0.0 );
 
 		// Get the data for cooling coil
 		CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:EquationFit";
