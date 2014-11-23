@@ -14,8 +14,6 @@ INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat/lib")
 
 ADD_LIBRARY( bcvtb STATIC ${SRC} )
 
-TARGET_LINK_LIBRARIES( bcvtb epexpat )
-
 IF( WIN32 )
   TARGET_LINK_LIBRARIES( bcvtb wsock32 )
 ENDIF()

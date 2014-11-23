@@ -2,6 +2,9 @@
 # Compiler-agnostic compiler flags first
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_FARRAY_INIT -DOBJEXXFCL_FARRAY_INIT_DEBUG") # Objexx DEFinition
     
+# Make sure expat is compiled as a static library
+ADD_DEFINITIONS("-DXML_STATIC")
+
 IF ( MSVC ) # visual c++ (VS 2013)
 
     # Disabled Warnings:
