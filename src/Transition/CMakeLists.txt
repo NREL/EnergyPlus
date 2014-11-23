@@ -8,8 +8,8 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 configure_file( CreateNewIDFUsingRulesV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/CreateNewIDFUsingRulesV8_2_0.f90" )
 configure_file( IDDAssignV8_2_0.in.f90 "${CMAKE_CURRENT_BINARY_DIR}/IDDAssignV8_2_0.f90" )
 
-SET(SRC
-  Transition.f90
+# first create a static library of shared stuff
+SET(LIB_SRC
   DataGlobals.f90
   DataStringGlobals.f90
   DataVCompareGlobals.f90
@@ -21,6 +21,12 @@ SET(SRC
   UtilityRoutines.f90
   VCompareGlobalRoutines.f90
   VCompareUtilityRoutines.f90
+)
+add_library( TransitionLib STATIC ${LIB_SRC} )
+
+# then create all the binaries using just the Transition source that brings in other files
+SET(SRC
+  Transition.f90
 )
 
 list( APPEND VERSIONS 1_0_0 )
@@ -85,6 +91,8 @@ SET(LAST_NAME "Transition-V${OLD-VERSION}-to-V${NEW-VERSION}" )
 
 SET(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${LAST_NAME} )
 ADD_EXECUTABLE( "${LAST_NAME}" ${SRC} )
+TARGET_LINK_LIBRARIES( "${LAST_NAME}" TransitionLib )
+
 SET_PROPERTY( TARGET "${LAST_NAME}"
               PROPERTY COMPILE_DEFINITIONS V${NEW_VERSION} )
 

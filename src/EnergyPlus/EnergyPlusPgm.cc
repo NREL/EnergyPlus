@@ -1,3 +1,7 @@
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 // C++ Headers
 #include <iostream>
 #ifndef NDEBUG
@@ -230,6 +234,12 @@ EnergyPlusPgm( std::string filepath )
 #ifdef __unix__
 	feenableexcept( FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW );
 #endif
+#endif
+
+#ifdef _WIN32
+	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
 #endif
 
 	// Locals
