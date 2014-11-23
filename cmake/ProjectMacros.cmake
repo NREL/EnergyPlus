@@ -137,13 +137,18 @@ function( ADD_SIMULATION_TEST )
     -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
   )  
 
+  # MSVC's profile generator does not work with parallel runs
+  if( MSVC AND PROFILE_GENERATE )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
+  endif()
+
   # Added the expect_fatal here to detect files that are expected to fatal error properly
   if( ADD_SIM_TEST_EXPECT_FATAL )
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
   else()
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
 
   if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
