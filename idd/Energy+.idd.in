@@ -1875,13 +1875,13 @@ Site:GroundDomain:Basement,
    N2,  \field Aspect Ratio
         \type real
         \default 1
-        \This defines the height to width ratio of the basement zone.
+        \note This defines the height to width ratio of the basement zone.
    N3,  \field Perimeter Offset
         \type real
         \default 5
         \units m
         \minimum> 0.0
-        \The distance from the basement wall edge to the edge of the ground domain
+        \note The distance from the basement wall edge to the edge of the ground domain
    N4,  \field Soil Thermal Conductivity
         \type real
         \default 1.5
@@ -1947,6 +1947,7 @@ Site:GroundDomain:Basement,
         \type choice
         \key Yes
         \key No
+        \default No
         \note This field specifies the presence of insulation beneath the basement floor.
    A4,  \field Horizontal Insulation Material Name
         \type object-list
