@@ -233,7 +233,7 @@ namespace SimulationManager {
 		using namespace FaultsManager;
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
-
+		using PlantPipingSystemsManager::CheckIfAnyBasements;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -288,6 +288,7 @@ namespace SimulationManager {
 		CheckIfAnyEMS();
 		CheckIfAnyPlant();
 		CheckIfAnySlabs();
+		CheckIfAnyBasements();
 		CheckIfAnyIdealCondEntSetPoint();
 
 		CheckAndReadFaults();
@@ -453,7 +454,7 @@ namespace SimulationManager {
 					EndHourFlag = false;
 
 					for ( TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep ) {
-						if ( AnySlabsInModel ){
+						if ( AnySlabsInModel || AnyBasementsInModel ){
 							InitAndSimGroundDomains();
 						}
 
