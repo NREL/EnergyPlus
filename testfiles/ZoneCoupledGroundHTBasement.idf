@@ -284,9 +284,9 @@ RunPeriod,
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     10.0,10.0,-3.1,          !- X,Y,Z ==> Vertex 1 {m}
-    0.0,10.0,-3.1,           !- X,Y,Z ==> Vertex 2 {m}
+    10.0,0.0,-3.1,           !- X,Y,Z ==> Vertex 2 {m}
     0.0,0.0,-3.1,            !- X,Y,Z ==> Vertex 3 {m}
-    10.0,0.0,-3.1;           !- X,Y,Z ==> Vertex 4 {m}
+    0.0,10.0,-3.1;           !- X,Y,Z ==> Vertex 4 {m}
 
   BuildingSurface:Detailed,
     Basement Ceiling,        !- Name
@@ -300,9 +300,9 @@ RunPeriod,
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     0.0,10.0,0.0,            !- X,Y,Z ==> Vertex 1 {m}
-    10.0,10.0,0.0,           !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,0.0,           !- X,Y,Z ==> Vertex 2 {m}
     10.0,0.0,0.0,            !- X,Y,Z ==> Vertex 3 {m}
-    0.0,0.0,0.0;             !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,0.0;             !- X,Y,Z ==> Vertex 4 {m}
 
   SurfaceProperty:OtherSideConditionsModel,
     BasementWallOSCM,        !- Name
@@ -407,9 +407,9 @@ Zone,
     autocalculate,           !- View Factor to Ground
     4,                       !- Number of Vertices
     0.0,10.0,3.1,            !- X,Y,Z ==> Vertex 1 {m}
-    10.0,10.0,3.1,           !- X,Y,Z ==> Vertex 2 {m}
+    0.0,0.0,3.1,           !- X,Y,Z ==> Vertex 2 {m}
     10.0,0.0,3.1,            !- X,Y,Z ==> Vertex 3 {m}
-    0.0,0.0,3.1;             !- X,Y,Z ==> Vertex 4 {m}
+    10.0,10.0,3.1;             !- X,Y,Z ==> Vertex 4 {m}
     
 !- =========== ALL OBJECTS IN CLASS: CONSTRUCTION ===========
 
