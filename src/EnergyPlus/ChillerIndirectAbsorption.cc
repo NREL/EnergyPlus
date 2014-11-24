@@ -312,8 +312,7 @@ namespace ChillerIndirectAbsorption {
 
 		IndirectAbsorberReport.allocate( NumIndirectAbsorbers );
 
-		GenInputOutputNodesUsed.allocate( NumIndirectAbsorbers );
-		GenInputOutputNodesUsed = false;
+		GenInputOutputNodesUsed.dimension( NumIndirectAbsorbers, false );
 
 		//LOAD ARRAYS WITH BLAST CURVE FIT Absorber DATA
 		for ( AbsorberNum = 1; AbsorberNum <= NumIndirectAbsorbers; ++AbsorberNum ) {

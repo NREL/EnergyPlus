@@ -383,8 +383,7 @@ namespace EvaporativeFluidCoolers {
 		SimpleEvapFluidCooler.allocate( NumSimpleEvapFluidCoolers );
 		SimpleEvapFluidCoolerReport.allocate( NumSimpleEvapFluidCoolers );
 		SimpleEvapFluidCoolerInlet.allocate( NumSimpleEvapFluidCoolers );
-		CheckEquipName.allocate( NumSimpleEvapFluidCoolers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSimpleEvapFluidCoolers, true );
 
 		// Load data structures with evaporative fluid cooler input data
 		cCurrentModuleObject = cEvapFluidCooler_SingleSpeed;
@@ -2368,7 +2367,7 @@ namespace EvaporativeFluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const LowTempFmt( "(' ',F6.2)" );
+		static gio::Fmt LowTempFmt( "(' ',F6.2)" );
 		Real64 const TempAllowance( 0.02 ); // Minimum difference b/w fluid cooler water outlet temp and
 		// minimum condenser loop temp [C]
 

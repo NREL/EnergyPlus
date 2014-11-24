@@ -69748,8 +69748,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69772,8 +69772,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69790,8 +69790,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 1.136
         \minimum> 0.0
-        \note The default value corresponds to R5
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R5 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
   A11 , \field Glass Reach In Door Opening Schedule Name Facing Zone 1
         \type object-list
         \object-list ScheduleNames
@@ -69813,8 +69813,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3785
         \minimum> 0.0
-        \note The default value corresponds to R15
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R15 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R5 is U 1.136 W/m2-K
         \note R18 is U 0.3154 W/m2-K
@@ -69849,8 +69849,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69867,8 +69867,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 1.136
         \minimum> 0.0
-        \note The default value corresponds to R5
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R5 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
   A15 , \field Glass Reach In Door Opening Schedule Name Facing Zone 2
         \type object-list
         \object-list ScheduleNames
@@ -69890,8 +69890,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3785
         \minimum> 0.0
-        \note The default value corresponds to R15
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R15 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R5 is U 1.136 W/m2-K
         \note R18 is U 0.3154 W/m2-K
@@ -69929,8 +69929,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69947,8 +69947,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 1.136
         \minimum> 0.0
-        \note The default value corresponds to R5
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R5 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
   A19,  \field Glass Reach In Door Opening Schedule Name Facing Zone 3
         \type object-list
         \object-list ScheduleNames
@@ -69970,8 +69970,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3785
         \minimum> 0.0
-        \note The default value corresponds to R15
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R15 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R5 is U 1.136 W/m2-K
         \note R18 is U 0.3154 W/m2-K

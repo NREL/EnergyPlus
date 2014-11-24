@@ -312,6 +312,18 @@ namespace HVACInterfaceManager {
 
 	//***************
 
+	// In-Place Right Shift by 1 of Array Elements
+	void
+	rshift1( FArray1< Real64 > & a )
+	{
+		assert( a.size_bounded() );
+		if ( a.dimensions_initialized() ) {
+			for ( int i = a.u(), e = a.l(); i > e; --i ) {
+				a( i ) = a( i - 1 );
+			}
+		}
+	}
+
 	void
 	UpdatePlantLoopInterface(
 		int const LoopNum, // The 'inlet/outlet node' loop number
@@ -319,7 +331,7 @@ namespace HVACInterfaceManager {
 		int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
 		int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
 		bool & OutOfToleranceFlag, // True when the other side of the loop need to be (re)simulated
-		Optional_int_const CommonPipeType
+		int const CommonPipeType
 	)
 	{
 
@@ -376,14 +388,15 @@ namespace HVACInterfaceManager {
 		Real64 Cp;
 		Real64 MixedOutletTemp;
 		int ThisLoopSideInletNode;
-		FArray1D< Real64 > TmpRealARR( ConvergLogStackDepth );
 		int ZoneInSysIndex;
 
 		// FLOW:
 
+		auto & convergence( PlantConvergence( LoopNum ) );
+
 		//reset out of tolerance flags
-		PlantConvergence( LoopNum ).PlantMassFlowNotConverged = false;
-		PlantConvergence( LoopNum ).PlantTempNotConverged = false;
+		convergence.PlantMassFlowNotConverged = false;
+		convergence.PlantTempNotConverged = false;
 
 		//set the LoopSide inlet node
 		ThisLoopSideInletNode = PlantLoop( LoopNum ).LoopSide( ThisLoopSideNum ).NodeNumIn;
@@ -399,24 +412,24 @@ namespace HVACInterfaceManager {
 		Node( OtherLoopSideInletNode ).Enthalpy = Cp * Node( OtherLoopSideInletNode ).Temp;
 
 		//update the temperatures and flow rates
+		auto & flow_demand_to_supply_tol( convergence.PlantFlowDemandToSupplyTolValue );
+		auto & flow_supply_to_demand_tol( convergence.PlantFlowSupplyToDemandTolValue );
 		if ( CommonPipeType == 1 || CommonPipeType == 2 ) {
 			//update the temperature
 			UpdateCommonPipe( LoopNum, ThisLoopSideNum, CommonPipeType, MixedOutletTemp );
 			Node( OtherLoopSideInletNode ).Temp = MixedOutletTemp;
 			TankOutletTemp = MixedOutletTemp;
 			if ( ThisLoopSideNum == DemandSide ) {
-				TmpRealARR = PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue;
-				PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue( 1 ) = std::abs( OldOtherLoopSideInletMdot - Node( OtherLoopSideInletNode ).MassFlowRate );
-				PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
-				if ( PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue( 1 ) > PlantFlowRateToler ) {
-					PlantConvergence( LoopNum ).PlantMassFlowNotConverged = true;
+				rshift1( flow_demand_to_supply_tol );
+				flow_demand_to_supply_tol( 1 ) = std::abs( OldOtherLoopSideInletMdot - Node( OtherLoopSideInletNode ).MassFlowRate );
+				if ( flow_demand_to_supply_tol( 1 ) > PlantFlowRateToler ) {
+					convergence.PlantMassFlowNotConverged = true;
 				}
 			} else {
-				TmpRealARR = PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue;
-				PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue( 1 ) = std::abs( OldOtherLoopSideInletMdot - Node( OtherLoopSideInletNode ).MassFlowRate );
-				PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
-				if ( PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue( 1 ) > PlantFlowRateToler ) {
-					PlantConvergence( LoopNum ).PlantMassFlowNotConverged = true;
+				rshift1( flow_supply_to_demand_tol );
+				flow_supply_to_demand_tol( 1 ) = std::abs( OldOtherLoopSideInletMdot - Node( OtherLoopSideInletNode ).MassFlowRate );
+				if ( flow_supply_to_demand_tol( 1 ) > PlantFlowRateToler ) {
+					convergence.PlantMassFlowNotConverged = true;
 				}
 			}
 			//Set the flow rate.  Continuity requires that the flow rates at the half loop inlet and outlet match
@@ -431,18 +444,16 @@ namespace HVACInterfaceManager {
 			Node( OtherLoopSideInletNode ).Temp = TankOutletTemp;
 			//Set the flow tolerance array
 			if ( ThisLoopSideNum == DemandSide ) {
-				TmpRealARR = PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue;
-				PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue( 1 ) = std::abs( Node( ThisLoopSideOutletNode ).MassFlowRate - Node( OtherLoopSideInletNode ).MassFlowRate );
-				PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
-				if ( PlantConvergence( LoopNum ).PlantFlowDemandToSupplyTolValue( 1 ) > PlantFlowRateToler ) {
-					PlantConvergence( LoopNum ).PlantMassFlowNotConverged = true;
+				rshift1( flow_demand_to_supply_tol );
+				flow_demand_to_supply_tol( 1 ) = std::abs( Node( ThisLoopSideOutletNode ).MassFlowRate - Node( OtherLoopSideInletNode ).MassFlowRate );
+				if ( flow_demand_to_supply_tol( 1 ) > PlantFlowRateToler ) {
+					convergence.PlantMassFlowNotConverged = true;
 				}
 			} else {
-				TmpRealARR = PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue;
-				PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue( 1 ) = std::abs( Node( ThisLoopSideOutletNode ).MassFlowRate - Node( OtherLoopSideInletNode ).MassFlowRate );
-				PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
-				if ( PlantConvergence( LoopNum ).PlantFlowSupplyToDemandTolValue( 1 ) > PlantFlowRateToler ) {
-					PlantConvergence( LoopNum ).PlantMassFlowNotConverged = true;
+				rshift1( flow_supply_to_demand_tol );
+				flow_supply_to_demand_tol( 1 ) = std::abs( Node( ThisLoopSideOutletNode ).MassFlowRate - Node( OtherLoopSideInletNode ).MassFlowRate );
+				if ( flow_supply_to_demand_tol( 1 ) > PlantFlowRateToler ) {
+					convergence.PlantMassFlowNotConverged = true;
 				}
 			}
 			//    PlantFlowTolValue(PlantQuePtr)  = ABS(Node(ThisLoopSideOutletNode)%MassFlowRate-Node(OtherLoopSideInletNode)%MassFlowRate)
@@ -464,28 +475,28 @@ namespace HVACInterfaceManager {
 
 		//temperature
 		if ( ThisLoopSideNum == DemandSide ) {
-			TmpRealARR = PlantConvergence( LoopNum ).PlantTempDemandToSupplyTolValue;
-			PlantConvergence( LoopNum ).PlantTempDemandToSupplyTolValue( 1 ) = std::abs( OldTankOutletTemp - Node( OtherLoopSideInletNode ).Temp );
-			PlantConvergence( LoopNum ).PlantTempDemandToSupplyTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
-			if ( PlantConvergence( LoopNum ).PlantTempDemandToSupplyTolValue( 1 ) > PlantTemperatureToler ) {
-				PlantConvergence( LoopNum ).PlantTempNotConverged = true;
+			auto & temp_demand_to_supply_tol( convergence.PlantTempDemandToSupplyTolValue );
+			rshift1( temp_demand_to_supply_tol );
+			temp_demand_to_supply_tol( 1 ) = std::abs( OldTankOutletTemp - Node( OtherLoopSideInletNode ).Temp );
+			if ( temp_demand_to_supply_tol( 1 ) > PlantTemperatureToler ) {
+				convergence.PlantTempNotConverged = true;
 			}
 		} else {
-			TmpRealARR = PlantConvergence( LoopNum ).PlantTempSupplyToDemandTolValue;
-			PlantConvergence( LoopNum ).PlantTempSupplyToDemandTolValue( 1 ) = std::abs( OldTankOutletTemp - Node( OtherLoopSideInletNode ).Temp );
-			PlantConvergence( LoopNum ).PlantTempSupplyToDemandTolValue( {2,ConvergLogStackDepth} ) = TmpRealARR( {1,ConvergLogStackDepth - 1} );
-			if ( PlantConvergence( LoopNum ).PlantTempSupplyToDemandTolValue( 1 ) > PlantTemperatureToler ) {
-				PlantConvergence( LoopNum ).PlantTempNotConverged = true;
+			auto & temp_supply_to_demand_tol( convergence.PlantTempSupplyToDemandTolValue );
+			rshift1( temp_supply_to_demand_tol );
+			temp_supply_to_demand_tol( 1 ) = std::abs( OldTankOutletTemp - Node( OtherLoopSideInletNode ).Temp );
+			if ( temp_supply_to_demand_tol( 1 ) > PlantTemperatureToler ) {
+				convergence.PlantTempNotConverged = true;
 			}
 		}
 
 		//Set out of tolerance flags
 		if ( ThisLoopSideNum == DemandSide ) {
-			if ( PlantConvergence( LoopNum ).PlantMassFlowNotConverged || PlantConvergence( LoopNum ).PlantTempNotConverged ) {
+			if ( convergence.PlantMassFlowNotConverged || convergence.PlantTempNotConverged ) {
 				OutOfToleranceFlag = true;
 			}
 		} else {
-			if ( PlantConvergence( LoopNum ).PlantMassFlowNotConverged ) {
+			if ( convergence.PlantMassFlowNotConverged ) {
 				OutOfToleranceFlag = true;
 			}
 		}
@@ -854,8 +865,7 @@ namespace HVACInterfaceManager {
 		//One time call to set up report variables and set common pipe 'type' flag
 		if ( OneTimeData ) {
 			if ( ! CommonPipeSetupFinished ) SetupCommonPipes();
-			MyEnvrnFlag.allocate( TotNumLoops );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( TotNumLoops, true );
 			OneTimeData = false;
 		}
 
@@ -1033,8 +1043,7 @@ namespace HVACInterfaceManager {
 		// one time setups
 		if ( OneTimeData ) {
 			if ( ! CommonPipeSetupFinished ) SetupCommonPipes();
-			MyEnvrnFlag.allocate( TotNumLoops );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( TotNumLoops, true );
 			OneTimeData = false;
 		}
 

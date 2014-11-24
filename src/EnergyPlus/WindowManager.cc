@@ -1272,16 +1272,20 @@ namespace WindowManager {
 					Construct( ConstrNum ).AbsBeamBackCoef( IGlass, {1,6} ) = CoeffsCurveFit;
 				}
 
-				// To check goodness of fit
+				// To check goodness of fit //Tuned
+				auto const & solBeamCoef( Construct( ConstrNum ).TransSolBeamCoef );
+				auto const & visBeamCoef( Construct( ConstrNum ).TransVisBeamCoef );
 				for ( IPhi = 1; IPhi <= 10; ++IPhi ) {
 					tsolPhiFit( IPhi ) = 0.0;
 					tvisPhiFit( IPhi ) = 0.0;
 					Phi = double( IPhi - 1 ) * 10.0;
 					CosPhi = std::cos( Phi * DegToRadians );
 					if ( std::abs( CosPhi ) < 0.0001 ) CosPhi = 0.0;
+					Real64 cos_pow( 1.0 );
 					for ( CoefNum = 1; CoefNum <= 6; ++CoefNum ) {
-						tsolPhiFit( IPhi ) += Construct( ConstrNum ).TransSolBeamCoef( CoefNum ) * std::pow( CosPhi, CoefNum );
-						tvisPhiFit( IPhi ) += Construct( ConstrNum ).TransVisBeamCoef( CoefNum ) * std::pow( CosPhi, CoefNum );
+						cos_pow *= CosPhi;
+						tsolPhiFit( IPhi ) += solBeamCoef( CoefNum ) * cos_pow;
+						tvisPhiFit( IPhi ) += visBeamCoef( CoefNum ) * cos_pow;
 					}
 				}
 			}
@@ -5385,7 +5389,7 @@ namespace WindowManager {
 				rfp = 0.5 * ( rfp1 + rfp2 );
 				tmp9 = -abb;
 				if ( tmp9 != 0.0 ) {
-					expmabbdivcgb = std::exp( ( tmp9 / cgb ) );
+					expmabbdivcgb = std::exp( tmp9 / cgb );
 				} else {
 					expmabbdivcgb = 0.0;
 				}
@@ -7088,7 +7092,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const Roughness( 6, { "VeryRough", "Rough", "MediumRough", "MediumSmooth", "Smooth", "VerySmooth" } );
 		static FArray1D_string const GasTypeName( {0,4}, { "Custom", "Air", "Argon", "Krypton", "Xenon" } );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -7133,20 +7137,20 @@ namespace WindowManager {
 		std::string GapVentType;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' WindowConstruction',8(',',A))" );
-		static gio::Fmt const Format_702( "(' WindowMaterial:Gas',3(',',A))" );
-		static gio::Fmt const Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
-		static gio::Fmt const Format_704( "(' WindowMaterial:Blind',8(',',A))" );
-		static gio::Fmt const Format_706( "(' WindowMaterial:Screen',11(',',A))" );
-		static gio::Fmt const Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
-		static gio::Fmt const Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
-		static gio::Fmt const Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
-		static gio::Fmt const Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
-		static gio::Fmt const Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
-		static gio::Fmt const Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
-		static gio::Fmt const Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
-		static gio::Fmt const Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
-		static gio::Fmt const Format_800( "(' WindowConstruction:Complex',5(',',A))" );
+		static gio::Fmt Format_700( "(' WindowConstruction',8(',',A))" );
+		static gio::Fmt Format_702( "(' WindowMaterial:Gas',3(',',A))" );
+		static gio::Fmt Format_703( "(' WindowMaterial:Shade,',7(',',A))" );
+		static gio::Fmt Format_704( "(' WindowMaterial:Blind',8(',',A))" );
+		static gio::Fmt Format_706( "(' WindowMaterial:Screen',11(',',A))" );
+		static gio::Fmt Format_707( "(' WindowMaterial:Glazing',16(',',A))" );
+		static gio::Fmt Format_708( "(' WindowMaterial:Glazing:EquivalentLayer',17(',',A))" );
+		static gio::Fmt Format_709( "(' WindowMaterial:Shade:EquivalentLayer',10(',',A))" );
+		static gio::Fmt Format_710( "(' WindowMaterial:Drape:EquivalentLayer',11(',',A))" );
+		static gio::Fmt Format_711( "(' WindowMaterial:Screen:EquivalentLayer',11(',',A))" );
+		static gio::Fmt Format_712( "(' WindowMaterial:Blind:EquivalentLayer',16(',',A))" );
+		static gio::Fmt Format_713( "(' WindowMaterial:Gap:EquivalentLayer',4(',',A))" );
+		static gio::Fmt Format_799( "(' Construction:WindowEquivalentLayer',6(',',A))" );
+		static gio::Fmt Format_800( "(' WindowConstruction:Complex',5(',',A))" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
@@ -7578,7 +7582,7 @@ namespace WindowManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		int const M( 18 );
 		int const N( 18 );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -8776,9 +8780,7 @@ Label99999: ;
 
 		GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
 
 		if ( NumSiteSpectrum == 1 ) {
 			GetObjectItem( cCurrentModuleObject, 1, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus );
@@ -8805,9 +8807,7 @@ Label99999: ;
 
 			GetObjectDefMaxArgs( cCurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 			cAlphaArgs.allocate( NumAlphas );
-			cAlphaArgs = "";
-			rNumericArgs.allocate( NumNumbers );
-			rNumericArgs = 0.0;
+			rNumericArgs.dimension( NumNumbers, 0.0 );
 
 			iSolarSpectrum = 0;
 			iVisibleSpectrum = 0;

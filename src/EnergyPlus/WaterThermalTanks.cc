@@ -204,7 +204,7 @@ namespace WaterThermalTanks {
 	FArray1D< HeatPumpWaterHeaterData > HPWaterHeater;
 	FArray1D< WaterHeaterDesuperheaterData > WaterHeaterDesuperheater;
 
-	static gio::Fmt const fmtLD( "*" );
+	static gio::Fmt fmtLD( "*" );
 
 	// MODULE SUBROUTINES:
 
@@ -916,13 +916,13 @@ namespace WaterThermalTanks {
 		FArray1D< WaterHeaterSaveNodes > CoilSaveNodeNames; // temporary for coil node names used in later checks
 
 		// Formats
-		static gio::Fmt const Format_720( "('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, ','Standard Rated Energy Factor')" );
-		static gio::Fmt const Format_721( "('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {W, HPWH Only}\"')" );
-		static gio::Fmt const Format_722( "('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity {W},','Off-Cycle UA {W/K},On-Cycle UA {W/K},Number Of Inlets,Number Of Outlets')" );
-		static gio::Fmt const Format_725( "('! <Chilled Water Tank Information>,Type,Name,Volume {m3},Use Side Design Flow Rate {m3/s}, ','Source Side Design Flow Rate {m3/s}')" );
-		static gio::Fmt const Format_726( "('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of Inlets,Number Of Outlets')" );
-		static gio::Fmt const Format_723( "('Water Heater Stratified Node Information',8(',',A))" );
-		static gio::Fmt const Format_724( "('Chilled Water Tank Stratified Node Information',6(',',A))" );
+		static gio::Fmt Format_720( "('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, ','Standard Rated Energy Factor')" );
+		static gio::Fmt Format_721( "('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {W, HPWH Only}\"')" );
+		static gio::Fmt Format_722( "('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity {W},','Off-Cycle UA {W/K},On-Cycle UA {W/K},Number Of Inlets,Number Of Outlets')" );
+		static gio::Fmt Format_725( "('! <Chilled Water Tank Information>,Type,Name,Volume {m3},Use Side Design Flow Rate {m3/s}, ','Source Side Design Flow Rate {m3/s}')" );
+		static gio::Fmt Format_726( "('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of Inlets,Number Of Outlets')" );
+		static gio::Fmt Format_723( "('Water Heater Stratified Node Information',8(',',A))" );
+		static gio::Fmt Format_724( "('Chilled Water Tank Stratified Node Information',6(',',A))" );
 
 		// FLOW:
 
@@ -951,21 +951,17 @@ namespace WaterThermalTanks {
 			if ( NumWaterThermalTank > 0 ) {
 				WaterThermalTank.allocate( NumWaterThermalTank );
 				WHSaveNodeNames.allocate( NumWaterThermalTank );
-				CheckWTTEquipName.allocate( NumWaterThermalTank );
-				CheckWTTEquipName = true;
+				CheckWTTEquipName.dimension( NumWaterThermalTank, true );
 			}
 			if ( NumHeatPumpWaterHeater > 0 ) {
 				HPWaterHeater.allocate( NumHeatPumpWaterHeater );
-				MyHPSizeFlag.allocate( NumHeatPumpWaterHeater );
-				MyHPSizeFlag = true;
-				CheckHPWHEquipName.allocate( NumHeatPumpWaterHeater );
-				CheckHPWHEquipName = true;
+				MyHPSizeFlag.dimension( NumHeatPumpWaterHeater, true );
+				CheckHPWHEquipName.dimension( NumHeatPumpWaterHeater, true );
 				HPWHSaveNodeNames.allocate( NumHeatPumpWaterHeater );
 			}
 			if ( NumWaterHeaterDesuperheater > 0 ) {
 				WaterHeaterDesuperheater.allocate( NumWaterHeaterDesuperheater );
-				ValidSourceType.allocate( NumWaterHeaterDesuperheater );
-				ValidSourceType = false;
+				ValidSourceType.dimension( NumWaterHeaterDesuperheater, false );
 				CoilSaveNodeNames.allocate( NumWaterHeaterDesuperheater );
 			}
 
@@ -4273,8 +4269,7 @@ namespace WaterThermalTanks {
 			MyWarmupFlag.allocate( NumWaterThermalTank );
 			SetLoopIndexFlag.allocate( NumWaterThermalTank );
 			MySizingDoneFlag.allocate( NumWaterThermalTank );
-			AlreadyRated.allocate( NumWaterThermalTank );
-			AlreadyRated = false;
+			AlreadyRated.dimension( NumWaterThermalTank, false );
 			MyEnvrnFlag = true;
 			MyWarmupFlag = false;
 			InitWaterThermalTanksOnce = false;
@@ -9055,8 +9050,8 @@ namespace WaterThermalTanks {
 		static bool MyOneTimeSetupFlag( true ); // one time setup flag
 
 		// Formats
-		static gio::Fmt const Format_720( "('Water Heater Information',6(',',A))" );
-		static gio::Fmt const Format_721( "('Heat Pump Water Heater Information',7(',',A))" );
+		static gio::Fmt Format_720( "('Water Heater Information',6(',',A))" );
+		static gio::Fmt Format_721( "('Heat Pump Water Heater Information',7(',',A))" );
 
 		if ( AlreadyRated( WaterThermalTankNum ) ) { // bail we already did this one
 			return;
@@ -9321,11 +9316,10 @@ namespace WaterThermalTanks {
 		static FArray1D_bool AlreadyReported; // control so we don't repeat again
 
 		// Formats
-		static gio::Fmt const Format_728( "('Chilled Water Tank Information',5(',',A))" );
+		static gio::Fmt Format_728( "('Chilled Water Tank Information',5(',',A))" );
 
 		if ( MyOneTimeSetupFlag ) {
-			AlreadyReported.allocate( NumWaterThermalTank );
-			AlreadyReported = false;
+			AlreadyReported.dimension( NumWaterThermalTank, false );
 			MyOneTimeSetupFlag = false;
 		}
 

@@ -148,17 +148,11 @@ namespace DataSurfaceLists {
 
 			GetObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = "";
-			lAlphaBlanks.allocate( MaxAlphas );
-			lAlphaBlanks = false;
+			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = "";
-			Numbers.allocate( MaxNumbers );
-			Numbers = 0.0;
+			Numbers.dimension( MaxNumbers, 0.0 );
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = "";
-			lNumericBlanks.allocate( MaxNumbers );
-			lNumericBlanks = false;
+			lNumericBlanks.dimension( MaxNumbers, false );
 
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
@@ -239,17 +233,11 @@ namespace DataSurfaceLists {
 		if ( NumOfSurfListVentSlab > 0 ) {
 			GetObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = "";
-			lAlphaBlanks.allocate( MaxAlphas );
-			lAlphaBlanks = false;
+			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = "";
-			Numbers.allocate( MaxNumbers );
-			Numbers = 0.0;
+			Numbers.dimension( MaxNumbers, 0.0 );
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = "";
-			lNumericBlanks.allocate( MaxNumbers );
-			lNumericBlanks = false;
+			lNumericBlanks.dimension( MaxNumbers, false );
 
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 

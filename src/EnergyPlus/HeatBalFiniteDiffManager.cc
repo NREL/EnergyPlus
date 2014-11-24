@@ -379,8 +379,7 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempEnth ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp - 1 ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempEnth.allocate( MaterialFD( MaterNum ).numTempEnth, 2 );
-				MaterialFD( MaterNum ).TempEnth = 0.0;
+				MaterialFD( MaterNum ).TempEnth.dimension( MaterialFD( MaterNum ).numTempEnth, 2, 0.0 );
 				propNum = 2;
 				// Temperature first
 				for ( pcount = 1; pcount <= MaterialFD( MaterNum ).numTempEnth; ++pcount ) {
@@ -453,8 +452,7 @@ namespace HeatBalFiniteDiffManager {
 					ShowContinueError( "...expected " + RoundSigDigits( MaterialFD( MaterNum ).numTempCond ) + " pairs, but only entered " + RoundSigDigits( MaterialNumProp ) + " numbers." );
 					ErrorsFound = true;
 				}
-				MaterialFD( MaterNum ).TempCond.allocate( MaterialFD( MaterNum ).numTempCond, 2 );
-				MaterialFD( MaterNum ).TempCond = 0.0;
+				MaterialFD( MaterNum ).TempCond.dimension( MaterialFD( MaterNum ).numTempCond, 2, 0.0 );
 				propNum = 1;
 				// Temperature first
 				for ( pcount = 1; pcount <= MaterialFD( MaterNum ).numTempCond; ++pcount ) {
@@ -486,13 +484,11 @@ namespace HeatBalFiniteDiffManager {
 		for ( MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum ) {
 			if ( MaterialFD( MaterNum ).numTempEnth == 0 ) {
 				MaterialFD( MaterNum ).numTempEnth = 3;
-				MaterialFD( MaterNum ).TempEnth.allocate( MaterialFD( MaterNum ).numTempEnth, 2 );
-				MaterialFD( MaterNum ).TempEnth = -100.0;
+				MaterialFD( MaterNum ).TempEnth.dimension( 3, 2, -100.0 );
 			}
 			if ( MaterialFD( MaterNum ).numTempCond == 0 ) {
 				MaterialFD( MaterNum ).numTempCond = 3;
-				MaterialFD( MaterNum ).TempCond.allocate( MaterialFD( MaterNum ).numTempCond, 2 );
-				MaterialFD( MaterNum ).TempCond = -100.0;
+				MaterialFD( MaterNum ).TempCond.dimension( 3, 2, -100.0 );
 			}
 		}
 
@@ -1251,8 +1247,8 @@ namespace HeatBalFiniteDiffManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtLD( "*" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1270,9 +1266,9 @@ namespace HeatBalFiniteDiffManager {
 		int Inodes;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' Construction CondFD,',A,2(',',A),',',A,',',A)" );
-		static gio::Fmt const Format_701( "(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_702( "(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_700( "(' Construction CondFD,',A,2(',',A),',',A,',',A)" );
+		static gio::Fmt Format_701( "(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_702( "(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)" );
 
 		gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant," "Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
 		gio::write( OutputFileInits, fmtA ) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType( CondFDSchemeType ) + ',' + RoundSigDigits( SpaceDescritConstant, 2 ) + ',' + RoundSigDigits( CondFDRelaxFactorInput, 2 ) + ',' + RoundSigDigits( MaxAllowedDelTempCondFD, 4 );
