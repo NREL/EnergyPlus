@@ -380,8 +380,7 @@ namespace SingleDuct {
 		Sys.allocate( NumSys );
 		SysInlet.allocate( NumSys );
 		SysOutlet.allocate( NumSys );
-		CheckEquipName.allocate( NumSys );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSys, true );
 
 		MassFlow1.allocate( NumSys );
 		MassFlow2.allocate( NumSys );
@@ -413,17 +412,11 @@ namespace SingleDuct {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		//Start Loading the System Input
 		for ( SysIndex = 1; SysIndex <= NumVAVSys; ++SysIndex ) {
@@ -5075,7 +5068,7 @@ namespace SingleDuct {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

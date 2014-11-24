@@ -155,6 +155,20 @@ namespace HeatBalanceManager {
 	void
 	GetZoneData( bool & ErrorsFound ); // If errors found in input
 
+	void
+	ProcessZoneData(
+		std::string const & cCurrentModuleObject,
+		int const ZoneLoop,
+		FArray1S_string cAlphaArgs,
+		int & NumAlphas,
+		FArray1S< Real64 > rNumericArgs,
+		int & NumNumbers,
+		FArray1S_bool lNumericFieldBlanks,
+		FArray1S_bool lAlphaFieldBlanks,
+		FArray1S_string cAlphaFieldNames,
+		FArray1S_string cNumericFieldNames,
+		bool & ErrorsFound ); // If errors found in input
+
 	// End of Get Input subroutines for the HB Module
 	//******************************************************************************
 
@@ -249,7 +263,7 @@ namespace HeatBalanceManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

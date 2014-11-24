@@ -106,41 +106,28 @@ namespace GlobalNames {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
 
 		// Object Data
-		FArray1D< ComponentNameData > TempChillerNames;
 
 		ErrorFound = false;
-		Found = 0;
+		int Found = 0;
 		if ( NumChillers > 0 ) Found = FindItemInList( NameToVerify, ChillerNames.CompName(), NumChillers );
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Chiller Type=\"" + ChillerNames( Found ).CompType + "\"." );
 			ShowContinueError( "...Current entry is Chiller Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
-		} else if ( NumChillers == 0 ) {
-			CurMaxChillers = 4;
-			ChillerNames.allocate( CurMaxChillers );
-			++NumChillers;
-			ChillerNames( NumChillers ).CompType = MakeUPPERCase( TypeToVerify );
-			ChillerNames( NumChillers ).CompName = NameToVerify;
-		} else if ( NumChillers == CurMaxChillers ) {
-			TempChillerNames.allocate( CurMaxChillers + 4 );
-			TempChillerNames( {1,CurMaxChillers} ) = ChillerNames( {1,CurMaxChillers} );
-			ChillerNames.deallocate();
-			CurMaxChillers += 4;
-			ChillerNames.allocate( CurMaxChillers );
-			ChillerNames = TempChillerNames;
-			TempChillerNames.deallocate();
-			++NumChillers;
-			ChillerNames( NumChillers ).CompType = MakeUPPERCase( TypeToVerify );
-			ChillerNames( NumChillers ).CompName = NameToVerify;
 		} else {
+			if ( NumChillers == 0 ) {
+				CurMaxChillers = 4;
+				ChillerNames.allocate( CurMaxChillers );
+			} else if ( NumChillers == CurMaxChillers ) {
+				CurMaxChillers += 4;
+				ChillerNames.redimension( CurMaxChillers );
+			}
 			++NumChillers;
 			ChillerNames( NumChillers ).CompType = MakeUPPERCase( TypeToVerify );
 			ChillerNames( NumChillers ).CompName = NameToVerify;
 		}
-
 	}
 
 	void
@@ -184,13 +171,11 @@ namespace GlobalNames {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
 
 		// Object Data
-		FArray1D< ComponentNameData > TempBaseboardNames;
 
 		ErrorFound = false;
-		Found = 0;
+		int Found = 0;
 
 		if ( NumBaseboards > 0 ) Found = FindItemInList( NameToVerify, BaseboardNames.CompName(), NumBaseboards );
 
@@ -198,24 +183,14 @@ namespace GlobalNames {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Baseboard Type=\"" + BaseboardNames( Found ).CompType + "\"." );
 			ShowContinueError( "...Current entry is Baseboard Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
-		} else if ( NumBaseboards == 0 ) {
-			CurMaxBaseboards = 4;
-			BaseboardNames.allocate( CurMaxBaseboards );
-			++NumBaseboards;
-			BaseboardNames( NumBaseboards ).CompType = TypeToVerify;
-			BaseboardNames( NumBaseboards ).CompName = NameToVerify;
-		} else if ( NumBaseboards == CurMaxBaseboards ) {
-			TempBaseboardNames.allocate( CurMaxBaseboards + 4 );
-			TempBaseboardNames( {1,CurMaxBaseboards} ) = BaseboardNames( {1,CurMaxBaseboards} );
-			BaseboardNames.deallocate();
-			CurMaxBaseboards += 4;
-			BaseboardNames.allocate( CurMaxBaseboards );
-			BaseboardNames = TempBaseboardNames;
-			TempBaseboardNames.deallocate();
-			++NumBaseboards;
-			BaseboardNames( NumBaseboards ).CompType = TypeToVerify;
-			BaseboardNames( NumBaseboards ).CompName = NameToVerify;
 		} else {
+			if ( NumBaseboards == 0 ) {
+				CurMaxBaseboards = 4;
+				BaseboardNames.allocate( CurMaxBaseboards );
+			} else if ( NumBaseboards == CurMaxBaseboards ) {
+				CurMaxBaseboards += 4;
+				BaseboardNames.redimension( CurMaxBaseboards );
+			}
 			++NumBaseboards;
 			BaseboardNames( NumBaseboards ).CompType = TypeToVerify;
 			BaseboardNames( NumBaseboards ).CompName = NameToVerify;
@@ -264,37 +239,26 @@ namespace GlobalNames {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
 
 		// Object Data
-		FArray1D< ComponentNameData > TempBoilerNames;
 
 		ErrorFound = false;
-		Found = 0;
+		int Found = 0;
+
 		if ( NumBoilers > 0 ) Found = FindItemInList( NameToVerify, BoilerNames.CompName(), NumBoilers );
 
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Boiler Type=\"" + BoilerNames( Found ).CompType + "\"." );
 			ShowContinueError( "...Current entry is Boiler Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
-		} else if ( NumBoilers == 0 ) {
-			CurMaxBoilers = 4;
-			BoilerNames.allocate( CurMaxBoilers );
-			++NumBoilers;
-			BoilerNames( NumBoilers ).CompType = TypeToVerify;
-			BoilerNames( NumBoilers ).CompName = NameToVerify;
-		} else if ( NumBoilers == CurMaxBoilers ) {
-			TempBoilerNames.allocate( CurMaxBoilers + 4 );
-			TempBoilerNames( {1,CurMaxBoilers} ) = BoilerNames( {1,CurMaxBoilers} );
-			BoilerNames.deallocate();
-			CurMaxBoilers += 4;
-			BoilerNames.allocate( CurMaxBoilers );
-			BoilerNames = TempBoilerNames;
-			TempBoilerNames.deallocate();
-			++NumBoilers;
-			BoilerNames( NumBoilers ).CompType = TypeToVerify;
-			BoilerNames( NumBoilers ).CompName = NameToVerify;
 		} else {
+			if ( NumBoilers == 0 ) {
+				CurMaxBoilers = 4;
+				BoilerNames.allocate( CurMaxBoilers );
+			} else if ( NumBoilers == CurMaxBoilers ) {
+				CurMaxBoilers += 4;
+				BoilerNames.redimension( CurMaxBoilers );
+			}
 			++NumBoilers;
 			BoilerNames( NumBoilers ).CompType = TypeToVerify;
 			BoilerNames( NumBoilers ).CompName = NameToVerify;
@@ -343,36 +307,26 @@ namespace GlobalNames {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int Found;
 
 		// Object Data
-		FArray1D< ComponentNameData > TempCoilNames;
 
 		ErrorFound = false;
-		Found = 0;
+		int Found = 0;
+
 		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames.CompName(), NumCoils );
+
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
 			ShowContinueError( "...Current entry is Coil Type=\"" + TypeToVerify + "\"." );
 			ErrorFound = true;
-		} else if ( NumCoils == 0 ) {
-			CurMaxCoils = 4;
-			CoilNames.allocate( CurMaxCoils );
-			++NumCoils;
-			CoilNames( NumCoils ).CompType = MakeUPPERCase( TypeToVerify );
-			CoilNames( NumCoils ).CompName = NameToVerify;
-		} else if ( NumCoils == CurMaxCoils ) {
-			TempCoilNames.allocate( CurMaxCoils + 4 );
-			TempCoilNames( {1,CurMaxCoils} ) = CoilNames( {1,CurMaxCoils} );
-			CoilNames.deallocate();
-			CurMaxCoils += 4;
-			CoilNames.allocate( CurMaxCoils );
-			CoilNames = TempCoilNames;
-			TempCoilNames.deallocate();
-			++NumCoils;
-			CoilNames( NumCoils ).CompType = MakeUPPERCase( TypeToVerify );
-			CoilNames( NumCoils ).CompName = NameToVerify;
 		} else {
+			if ( NumCoils == 0 ) {
+				CurMaxCoils = 4;
+				CoilNames.allocate( CurMaxCoils );
+			} else if ( NumCoils == CurMaxCoils ) {
+				CurMaxCoils += 4;
+				CoilNames.redimension( CurMaxCoils );
+			}
 			++NumCoils;
 			CoilNames( NumCoils ).CompType = MakeUPPERCase( TypeToVerify );
 			CoilNames( NumCoils ).CompName = NameToVerify;
@@ -389,7 +343,7 @@ namespace GlobalNames {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

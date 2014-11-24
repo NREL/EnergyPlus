@@ -336,8 +336,7 @@ namespace ICEngineElectricGenerator {
 
 		//ALLOCATE ARRAYS
 		ICEngineGenerator.allocate( NumICEngineGenerators );
-		CheckEquipName.allocate( NumICEngineGenerators );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumICEngineGenerators, true );
 
 		ICEngineGeneratorReport.allocate( NumICEngineGenerators );
 

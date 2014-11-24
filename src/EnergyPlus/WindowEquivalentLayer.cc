@@ -9226,7 +9226,7 @@ namespace WindowEquivalentLayer {
 		Real64 ProfAngVer; // Solar profile angle (radians) for vertical blind
 		Real64 IncAng; // incident angle degree
 		Real64 IncidAngle; // = ACOS(SOLCOS(3))
-		FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
+		static FArray2D< Real64 > Abs1( CFSMAXNL+1, 2 );
 		int Lay; // window layer index
 		int EQLNum; // equivalent layer window construction index
 		int ConstrNum; // construction index
@@ -9513,7 +9513,7 @@ namespace WindowEquivalentLayer {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -1,5 +1,5 @@
-// ObjexxFCL Headers
-#include <ObjexxFCL/FArrayS.functions.hh>
+// C++ Headers
+#include <utility>
 
 // EnergyPlus Headers
 #include <SortAndStringUtilities.hh>
@@ -50,7 +50,7 @@ namespace SortAndStringUtilities {
 	void
 	SetupAndSort(
 		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
+		FArray1S_int iAlphas // Indexes of sorted array
 	)
 	{
 
@@ -88,7 +88,7 @@ namespace SortAndStringUtilities {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		for ( int Loop = 1; Loop <= Alphas.u(); ++Loop ) {
+		for ( int Loop = 1, Loop_end = Alphas.u(); Loop <= Loop_end; ++Loop ) {
 			iAlphas( Loop ) = Loop;
 		}
 
@@ -99,7 +99,7 @@ namespace SortAndStringUtilities {
 	void
 	QsortC(
 		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas // Pointers -- this is the array that is actually sorted
+		FArray1S_int iAlphas // Indexes of sorted array
 	)
 	{
 
@@ -138,9 +138,9 @@ namespace SortAndStringUtilities {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int iq;
 
-		if ( size( Alphas ) > 1 ) {
+		if ( Alphas.size() > 1 ) {
+			int iq;
 			QsortPartition( Alphas, iAlphas, iq );
 			QsortC( Alphas( {_,iq-1} ), iAlphas( {_,iq-1} ) );
 			QsortC( Alphas( {iq,_} ), iAlphas( {iq,_} ) );
@@ -151,7 +151,7 @@ namespace SortAndStringUtilities {
 	void
 	QsortPartition(
 		FArray1S_string Alphas, // Alphas to be sorted
-		FArray1S_int iAlphas, // Pointers -- this is the array that is actually sorted
+		FArray1S_int iAlphas, // Indexes of sorted array
 		int & marker
 	)
 	{
@@ -188,15 +188,10 @@ namespace SortAndStringUtilities {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int i;
-		int j;
-		int itemp;
-		std::string ctemp;
-		std::string cpivot; // pivot point
 
-		cpivot = Alphas( 1 );
-		i = 0;
-		j = size( Alphas ) + 1;
+		std::string const & cpivot( Alphas( 1 ) );
+		int i = 0;
+		int j = Alphas.size() + 1;
 
 		while ( true ) {
 			--j;
@@ -209,14 +204,9 @@ namespace SortAndStringUtilities {
 				if ( Alphas( i ) >= cpivot ) break;
 				++i;
 			}
-			if ( i < j ) {
-				// exchange iAlphas(i) and iAlphas(j)
-				ctemp = Alphas( i );
-				Alphas( i ) = Alphas( j );
-				Alphas( j ) = ctemp;
-				itemp = iAlphas( i );
-				iAlphas( i ) = iAlphas( j );
-				iAlphas( j ) = itemp;
+			if ( i < j ) { // Swap the strings at index i and j
+				Alphas( i ).swap( Alphas( j ) );
+				std::swap( iAlphas( i ), iAlphas( j ) );
 			} else if ( i == j ) {
 				marker = i + 1;
 				return;
@@ -237,7 +227,7 @@ namespace SortAndStringUtilities {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

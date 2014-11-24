@@ -319,8 +319,7 @@ namespace DualDuct {
 		NumDualDuctVarVolOA = GetNumObjectsFound( cCMO_DDVarVolOA );
 		NumDampers = NumDualDuctConstVolDampers + NumDualDuctVarVolDampers + NumDualDuctVarVolOA;
 		Damper.allocate( NumDampers );
-		CheckEquipName.allocate( NumDampers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDampers, true );
 
 		DamperInlet.allocate( NumDampers );
 		DamperHotAirInlet.allocate( NumDampers );
@@ -701,8 +700,7 @@ namespace DualDuct {
 
 			MyEnvrnFlag.allocate( NumDampers );
 			MySizeFlag.allocate( NumDampers );
-			MyAirLoopFlag.allocate( NumDampers );
-			MyAirLoopFlag = true;
+			MyAirLoopFlag.dimension( NumDampers, true );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 			MassFlowSetToler = HVACFlowRateToler * 0.00001;
@@ -2024,10 +2022,10 @@ namespace DualDuct {
 		std::string DamperType;
 
 		// Formats
-		static gio::Fmt const Format_100( "('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')" );
-		static gio::Fmt const Format_101( "(A)" );
-		static gio::Fmt const Format_102( "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet Node Type>,<AirLoopHVAC Name>')" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt Format_100( "('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')" );
+		static gio::Fmt Format_101( "(A)" );
+		static gio::Fmt Format_102( "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet Node Type>,<AirLoopHVAC Name>')" );
+		static gio::Fmt fmtLD( "*" );
 
 		if ( ! allocated( Damper ) ) return; //Autodesk Bug: Can arrive here with Damper unallocated (SimulateDualDuct not yet called) with NumDampers either set >0 or uninitialized
 
@@ -2202,7 +2200,7 @@ namespace DualDuct {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

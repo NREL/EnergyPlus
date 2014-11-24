@@ -2,6 +2,7 @@
 #define DataGlobals_hh_INCLUDED
 
 // C++ Headers
+#include <iosfwd>
 #include <string>
 
 // EnergyPlus Headers
@@ -107,12 +108,14 @@ namespace DataGlobals {
 	extern Real64 TimeStepZone; // Zone time step in fractional hours
 	extern bool WarmupFlag; // True during the warmup portion of a simulation
 	extern int OutputFileStandard; // Unit number for the standard output file (hourly data only)
+	extern std::ostream * eso_stream; // Internal stream used for eso output (used for performance)
 	extern int StdOutputRecordCount; // Count of Standard output records
 	extern int OutputFileInits; // Unit number for the standard Initialization output file
 	extern int OutputFileDebug; // Unit number for debug outputs
 	extern int OutputFileZoneSizing; // Unit number of zone sizing calc output file
 	extern int OutputFileSysSizing; // Unit number of system sizing calc output file
 	extern int OutputFileMeters; // Unit number for meters output
+	extern std::ostream * mtr_stream; // Internal stream used for mtr output (used for performance)
 	extern int StdMeterRecordCount; // Count of Meter output records
 	extern int OutputFileBNDetails; // Unit number for Branch-Node Details
 	extern bool ZoneSizingCalc; // TRUE if zone sizing calculation
@@ -151,6 +154,11 @@ namespace DataGlobals {
 	extern bool doLoadComponentPulseNow; // true for the time step that is the "pulse" for the load component report
 	extern bool ShowDecayCurvesInEIO; // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	extern bool AnySlabsInModel; // true if there are any zone-coupled ground domains in the input file
+	extern bool AnyBasementsInModel; // true if there are any basements in the input file
+
+	extern int Progress; 
+	extern void ( *fProgressPtr )( int );
+	extern void ( *fMessagePtr )( std::string );
 
 } // DataGlobals
 

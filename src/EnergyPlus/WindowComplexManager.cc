@@ -216,12 +216,11 @@ namespace WindowComplexManager {
 		};
 
 		// Object Data
-		FArray1D< BasisStruct > TempList; // Temporary Basis List
 		FArray1D< TempBasisIdx > IHold; // Temporary array
 
 		if ( TotComplexFenStates <= 0 ) return; //Nothing to do if no complex fenestration states
 		//Construct Basis List
-		TempList.allocate( TotComplexFenStates );
+		BasisList.allocate( TotComplexFenStates );
 
 		//Note:  Construction of the basis list contains the assumption of identical incoming and outgoing bases in
 		//            that the complex fenestration state definition contains only one basis description, hence
@@ -233,22 +232,20 @@ namespace WindowComplexManager {
 			MatrixNo = Construct( IConst ).BSDFInput.BasisMatIndex;
 			if ( NumBasis == 0 ) {
 				NumBasis = 1;
-				ConstructBasis( IConst, TempList( 1 ) );
+				ConstructBasis( IConst, BasisList( 1 ) );
 			} else {
 				BLsLp: for ( IBasis = 1; IBasis <= NumBasis; ++IBasis ) {
-					if ( MatrixNo == TempList( IBasis ).BasisMatIndex ) goto BsLoop_loop;
+					if ( MatrixNo == BasisList( IBasis ).BasisMatIndex ) goto BsLoop_loop;
 					BLsLp_loop: ;
 				}
 				BLsLp_exit: ;
 				++NumBasis;
-				ConstructBasis( IConst, TempList( NumBasis ) );
+				ConstructBasis( IConst, BasisList( NumBasis ) );
 			}
 			BsLoop_loop: ;
 		}
 		BsLoop_exit: ;
-		BasisList.allocate( NumBasis );
-		BasisList = TempList( {1,NumBasis} );
-		TempList.deallocate();
+		BasisList.redimension( NumBasis );
 		//  Proceed to set up geometry for complex fenestration states
 		ComplexWind.allocate( TotSurfaces ); //Set up companion array to SurfaceWindow to hold window
 		//     geometry for each state.  This is an allocatable array of
@@ -515,46 +512,20 @@ namespace WindowComplexManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int NumOfStates;
 
-		// Object Data
-		FArray1D< BSDFGeomDescr > tempGeom;
-		FArray1D< BSDFDaylghtGeomDescr > tempDaylightGeom;
-		FArray1D< BSDFStateDescr > tempState;
+		// Expands states by one
+		int NumOfStates = SurfaceWindow( iSurf ).ComplexFen.NumStates;
 
-		// Read all previous states into temporary locations and then expands them by one
-		NumOfStates = SurfaceWindow( iSurf ).ComplexFen.NumStates;
-
-		if ( ! allocated( tempGeom ) ) tempGeom.allocate( NumOfStates );
-		if ( ! allocated( tempState ) ) tempState.allocate( NumOfStates );
-
-		tempGeom = ComplexWind( iSurf ).Geom;
-		tempState = SurfaceWindow( iSurf ).ComplexFen.State;
-
-		if ( allocated( ComplexWind( iSurf ).Geom ) ) ComplexWind( iSurf ).Geom.deallocate();
-		if ( allocated( SurfaceWindow( iSurf ).ComplexFen.State ) ) SurfaceWindow( iSurf ).ComplexFen.State.deallocate();
-
-		ComplexWind( iSurf ).Geom.allocate( NumOfStates + 1 );
-		SurfaceWindow( iSurf ).ComplexFen.State.allocate( NumOfStates + 1 );
-
-		ComplexWind( iSurf ).Geom( {1,NumOfStates} ) = tempGeom;
-		SurfaceWindow( iSurf ).ComplexFen.State( {1,NumOfStates} ) = tempState;
-
-		if ( allocated( tempGeom ) ) tempGeom.deallocate();
-		if ( allocated( tempState ) ) tempState.deallocate();
+		ComplexWind( iSurf ).Geom.redimension( NumOfStates + 1 );
+		SurfaceWindow( iSurf ).ComplexFen.State.redimension( NumOfStates + 1 );
 
 		// Do daylighting geometry only in case it is initialized. If daylighting is not used then no need to expand state for that
-		//if (ComplexWind(iSurf)%DaylightingInitialized) then
-		if ( ! allocated( tempDaylightGeom ) ) tempDaylightGeom.allocate( NumOfStates );
-		tempDaylightGeom = ComplexWind( iSurf ).DaylghtGeom;
-		if ( allocated( ComplexWind( iSurf ).DaylghtGeom ) ) ComplexWind( iSurf ).DaylghtGeom.deallocate();
-		ComplexWind( iSurf ).DaylghtGeom.allocate( NumOfStates + 1 );
 		if ( ComplexWind( iSurf ).DaylightingInitialized ) {
-			ComplexWind( iSurf ).DaylghtGeom( {1,NumOfStates} ) = tempDaylightGeom;
+			ComplexWind( iSurf ).DaylghtGeom.redimension( NumOfStates + 1 );
+			ComplexWind( iSurf ).DaylightingInitialized = false;
+		} else {
+			ComplexWind( iSurf ).DaylghtGeom.allocate( NumOfStates + 1 );
 		}
-		if ( allocated( tempDaylightGeom ) ) tempDaylightGeom.deallocate();
-		ComplexWind( iSurf ).DaylightingInitialized = false;
-		//end if
 
 		// Increase number of states and insert new state
 		++NumOfStates;
@@ -4298,7 +4269,7 @@ namespace WindowComplexManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

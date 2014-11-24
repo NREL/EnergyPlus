@@ -1,7 +1,8 @@
 // C++ Headers
 #include <cassert>
-#include <cmath>
+#include <cstddef>
 #include <functional>
+#include <limits>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -1661,8 +1662,7 @@ namespace FluidProperties {
 
 		NumOfGlyConcs = NumOfOptionalInput + 1;
 		GlycolData.allocate( NumOfGlyConcs );
-		GlycolUsed.allocate( NumOfGlyConcs );
-		GlycolUsed = false;
+		GlycolUsed.dimension( NumOfGlyConcs, false );
 		GlycolUsed( 1 ) = true; // mark Water as always used
 
 		// First "glycol" is always pure water.  Load data from default arrays
@@ -2848,7 +2848,7 @@ namespace FluidProperties {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		Real64 const incr( 10.0 );
 		static std::string const RoutineName( "ReportAndTestGlycols" );
 
@@ -3091,7 +3091,7 @@ namespace FluidProperties {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		Real64 const incr( 10.0 );
 		Real64 const Quality( 1.0 );
 		static std::string const RoutineName( "ReportAndTestRefrigerants" );
@@ -4727,7 +4727,6 @@ namespace FluidProperties {
 		// na
 
 		// Return value
-		Real64 ReturnValue; // Value for function
 
 		// Locals
 		// FUNCTION ARGUMENT DEFINITIONS:
@@ -4742,16 +4741,10 @@ namespace FluidProperties {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int Loop; // DO loop counter
 		static int HighTempLimitErr( 0 );
 		static int LowTempLimitErr( 0 );
 		static int HighTempLimitIndex( 0 );
 		static int LowTempLimitIndex( 0 );
-		int GlycolNum;
-
-		// FLOW:
-		bool LowErrorThisTime( false );
-		bool HighErrorThisTime( false );
 
 		// Get the input if we haven't already
 		if ( GetInput ) {
@@ -4760,7 +4753,7 @@ namespace FluidProperties {
 		}
 
 		// If no glycols, no fluid properties can be evaluated
-		GlycolNum = 0;
+		int GlycolNum( 0 );
 		if ( NumOfGlycols == 0 ) ReportFatalGlycolErrors( NumOfGlycols, GlycolNum, true, Glycol, "GetSpecificHeatGlycol", "specific heat", CalledFrom );
 
 		// If glycol index has not yet been found for this fluid, find its value now
@@ -4782,40 +4775,8 @@ namespace FluidProperties {
 
 		// Now determine the value of specific heat using interpolation
 		if ( Temperature < glycol_data.CpLowTempValue ) { // Temperature too low
-			LowErrorThisTime = true;
-			if ( ! WarmupFlag ) LowTempLimitErr = ++GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrCount;
-			ReturnValue = glycol_data.CpValues( glycol_data.CpLowTempIndex );
-		} else if ( Temperature > glycol_data.CpHighTempValue ) { // Temperature too high
-			HighErrorThisTime = true;
-			if ( ! WarmupFlag ) HighTempLimitErr = ++GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrCount;
-			ReturnValue = glycol_data.CpValues( glycol_data.CpHighTempIndex );
-		} else { // Temperature somewhere between the lowest and highest value
-			// make sure there is a return value
-			ReturnValue = glycol_data.CpValues( glycol_data.CpLowTempIndex );
-			// bracket is temp > low, <= high (for interpolation
-			auto const & glycol_CpTemps( glycol_data.CpTemps );
-			auto const & glycol_CpValues( glycol_data.CpValues );
-			//for ( Loop = glycol_data.CpLowTempIndex + 1; Loop <= glycol_data.CpHighTempIndex; ++Loop ) { //Tuned Replaced by binary search below
-			//	if ( Temperature > glycol_data.CpTemps( Loop ) ) continue;
-			//	ReturnValue = GetInterpValue( Temperature, glycol_CpTemps( Loop - 1 ), glycol_CpTemps( Loop ), glycol_CpValues( Loop - 1 ), glycol_CpValues( Loop ) );
-			//	break; // DO loop
-			//}
-			//assert( std::is_sorted( glycol_CpTemps.begin(), glycol_CpTemps.end() ) ); // Sorted temperature array is assumed: Enable if/when arrays have begin()/end()
-			typedef  FArray1D< Real64 >::size_type  size_type;
-			size_type const a_size( glycol_CpTemps.size() );
-			assert( a_size > 0 );
-			size_type beg( 0 ), mid, end( a_size - 1 ); // Zero-based indexing
-			while ( beg + 1 < end ) {
-				mid = ( ( beg + end ) >> 1 ); // bit shifting is faster than /2
-				( Temperature > glycol_CpTemps[ mid ] ? beg : end ) = mid;
-			} // Invariant: glycol_CpTemps[beg] <= Temperature <= glycol_CpTemps[end]
-			ReturnValue = GetInterpValue( Temperature, glycol_CpTemps[ beg ], glycol_CpTemps[ end ], glycol_CpValues[ beg ], glycol_CpValues[ end ] );
-		}
-
-		// Error handling
-		if ( ! WarmupFlag ) {
-
-			if ( LowErrorThisTime ) {
+			if ( ! WarmupFlag ) {
+				LowTempLimitErr = ++GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrCount;
 				if ( LowTempLimitErr <= GlycolErrorLimitTest ) {
 					ShowWarningMessage( RoutineName + "Temperature is out of range (too low) for fluid [" + glycol_data.Name + "] specific heat supplied values **" );
 					ShowContinueError( "..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits( Temperature, 2 ) + "], supplied data range=[" + RoundSigDigits( glycol_data.CpLowTempValue, 2 ) + ',' + RoundSigDigits( glycol_data.CpHighTempValue, 2 ) + ']' );
@@ -4823,8 +4784,10 @@ namespace FluidProperties {
 				}
 				ShowRecurringWarningErrorAtEnd( RoutineName + "Temperature out of range (too low) for fluid [" + glycol_data.Name + "] specific heat **", GlycolErrorTracking( GlycolIndex ).SpecHeatLowErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
-
-			if ( HighErrorThisTime ) {
+			return glycol_data.CpValues( glycol_data.CpLowTempIndex );
+		} else if ( Temperature > glycol_data.CpHighTempValue ) { // Temperature too high
+			if ( ! WarmupFlag ) {
+				HighTempLimitErr = ++GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrCount;
 				if ( HighTempLimitErr <= GlycolErrorLimitTest ) {
 					ShowWarningMessage( RoutineName + "Temperature is out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **" );
 					ShowContinueError( "..Called From:" + CalledFrom + ",Temperature=[" + RoundSigDigits( Temperature, 2 ) + "], supplied data range=[" + RoundSigDigits( glycol_data.CpLowTempValue, 2 ) + ',' + RoundSigDigits( glycol_data.CpHighTempValue, 2 ) + ']' );
@@ -4832,9 +4795,26 @@ namespace FluidProperties {
 				}
 				ShowRecurringWarningErrorAtEnd( RoutineName + "Temperature out of range (too high) for fluid [" + glycol_data.Name + "] specific heat **", GlycolErrorTracking( GlycolIndex ).SpecHeatHighErrIndex, Temperature, Temperature, _, "{C}", "{C}" );
 			}
+			return glycol_data.CpValues( glycol_data.CpHighTempIndex );
+		} else { // Temperature somewhere between the lowest and highest value
+			auto const & glycol_CpTemps( glycol_data.CpTemps );
+			auto const & glycol_CpValues( glycol_data.CpValues );
+			// bracket is temp > low, <= high (for interpolation
+			//for ( int Loop = glycol_data.CpLowTempIndex + 1; Loop <= glycol_data.CpHighTempIndex; ++Loop ) { //Tuned Replaced by binary search below
+			//	if ( Temperature > glycol_data.CpTemps( Loop ) ) continue;
+			//	return GetInterpValue( Temperature, glycol_CpTemps( Loop - 1 ), glycol_CpTemps( Loop ), glycol_CpValues( Loop - 1 ), glycol_CpValues( Loop ) );
+			//	break; // DO loop
+			//}
+			//assert( std::is_sorted( glycol_CpTemps.begin(), glycol_CpTemps.end() ) ); // Sorted temperature array is assumed: Enable if/when arrays have begin()/end()
+			assert( glycol_CpTemps.size() <= static_cast< std::size_t >( std::numeric_limits< int >::max() ) ); // Array indexes are int now so this is future protection
+			int beg( 1 ), mid, end( static_cast< int >( glycol_CpTemps.size() ) ); // 1-based indexing
+			assert( end > 0 );
+			while ( beg + 1 < end ) {
+				mid = ( ( beg + end ) >> 1 ); // bit shifting is faster than /2
+				( Temperature > glycol_CpTemps( mid ) ? beg : end ) = mid;
+			} // Invariant: glycol_CpTemps[beg] <= Temperature <= glycol_CpTemps[end]
+			return GetInterpValue_fast( Temperature, glycol_CpTemps( beg ), glycol_CpTemps( end ), glycol_CpValues( beg ), glycol_CpValues( end ) );
 		}
-
-		return ReturnValue;
 
 	}
 
@@ -5269,58 +5249,10 @@ namespace FluidProperties {
 
 	//*****************************************************************************
 
-	Real64
-	GetInterpValue(
-		Real64 const Tact, // actual temperature at which we want the property of interest
-		Real64 const Tlo, // temperature below Tact for which we have property data
-		Real64 const Thi, // temperature above Tact for which we have property data
-		Real64 const Xlo, // value of property at Tlo
-		Real64 const Xhi // value of property at Thi
-	)
+	void
+	GetInterpValue_error()
 	{
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Rick Strand
-		//       DATE WRITTEN   June 2004
-		//       MODIFIED       N/A
-		//       RE-ENGINEERED  N/A
-
-		// PURPOSE OF THIS FUNCTION:
-		// This subroutine does a simple linear interpolation.
-
-		// METHODOLOGY EMPLOYED:
-		// No mysteries here...just plain-old linear interpolation.
-
-		// REFERENCES:
-		// Any basic engineering mathematic text.
-
-		// USE STATEMENTS:
-		// na
-
-		// Return value
-		// na
-
-		// Locals
-		// FUNCTION ARGUMENT DEFINITIONS:
-
-		// SUBROUTINE PARAMETER DEFINITIONS:
-		static Real64 const TempToler( 0.001 ); // Some reasonable value for comparisons
-
-		// INTERFACE BLOCK SPECIFICATIONS:
-		// na
-
-		// DERIVED TYPE DEFINITIONS:
-		// na
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		// na
-
-		// FLOW:
-		if ( std::abs( Thi - Tlo ) > TempToler ) {
-			return Xhi - ( ( ( Thi - Tact ) / ( Thi - Tlo ) ) * ( Xhi - Xlo ) );
-		} else {
-			ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );
-			return 0.0;
-		}
+		ShowFatalError( "GetInterpValue: Temperatures for fluid property data too close together, division by zero" );
 	}
 
 	//*****************************************************************************
@@ -6241,7 +6173,7 @@ namespace FluidProperties {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

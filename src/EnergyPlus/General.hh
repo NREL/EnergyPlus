@@ -329,12 +329,16 @@ namespace General {
 		Optional_string Option2 = _
 	);
 
+	inline
 	void
 	ReallocateRealArray(
 		FArray1D< Real64 > & Array,
 		int & ArrayMax, // Current and resultant dimension for Array
 		int const ArrayInc // increment for redimension
-	);
+	)
+	{
+		Array.redimension( ArrayMax += ArrayInc, 0.0 );
+	}
 
 	void
 	CheckCreatedZoneItemName(
@@ -376,7 +380,7 @@ namespace General {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

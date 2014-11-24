@@ -819,17 +819,11 @@ namespace MixedAir {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		NumArray.dimension( MaxNums, 0.0 );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_ControllerList );
 		NumControllerLists = GetNumObjectsFound( CurrentModuleObject );
@@ -837,7 +831,7 @@ namespace MixedAir {
 		ControllerLists.allocate( NumControllerLists );
 
 		for ( Item = 1; Item <= NumControllerLists; ++Item ) {
-			
+
 			// create a reference for convenience
 			auto & thisControllerList( ControllerLists( Item ) );
 			GetObjectItem( CurrentModuleObject, Item, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
@@ -853,9 +847,7 @@ namespace MixedAir {
 			IsBlank = false;
 			thisControllerList.NumControllers = ( NumAlphas - 1 ) / 2;
 			thisControllerList.ControllerType.allocate( thisControllerList.NumControllers );
-			thisControllerList.ControllerType = "";
 			thisControllerList.ControllerName.allocate( thisControllerList.NumControllers );
-			thisControllerList.ControllerName = "";
 			AlphaNum = 2;
 			for ( CompNum = 1; CompNum <= thisControllerList.NumControllers; ++CompNum ) {
 				if ( SameString( AlphArray( AlphaNum ), "Controller:WaterCoil" ) || SameString( AlphArray( AlphaNum ), "Controller:OutdoorAir" ) ) {
@@ -890,10 +882,8 @@ namespace MixedAir {
 
 		OutsideAirSys.allocate( NumOASystems );
 		OASysEqSizing.allocate( NumOASystems );
-		MyOneTimeErrorFlag.allocate( NumOASystems );
-		MyOneTimeCheckUnitarySysFlag.allocate( NumOASystems );
-		MyOneTimeErrorFlag = true;
-		MyOneTimeCheckUnitarySysFlag = true;
+		MyOneTimeErrorFlag.dimension( NumOASystems, true );
+		MyOneTimeCheckUnitarySysFlag.dimension( NumOASystems,true );
 
 		for ( OASysNum = 1; OASysNum <= NumOASystems; ++OASysNum ) {
 
@@ -930,10 +920,8 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).NumComponents = NumInList;
 					OutsideAirSys( OASysNum ).ComponentName.allocate( NumInList );
 					OutsideAirSys( OASysNum ).ComponentType.allocate( NumInList );
-					OutsideAirSys( OASysNum ).ComponentType_Num.allocate( NumInList );
-					OutsideAirSys( OASysNum ).ComponentType_Num = 0;
-					OutsideAirSys( OASysNum ).ComponentIndex.allocate( NumInList );
-					OutsideAirSys( OASysNum ).ComponentIndex = 0;
+					OutsideAirSys( OASysNum ).ComponentType_Num.dimension( NumInList, 0 );
+					OutsideAirSys( OASysNum ).ComponentIndex.dimension( NumInList, 0 );
 					for ( InListNum = 1; InListNum <= NumInList; ++InListNum ) {
 						OutsideAirSys( OASysNum ).ComponentName( InListNum ) = AlphArray( InListNum * 2 + 1 );
 						OutsideAirSys( OASysNum ).ComponentType( InListNum ) = AlphArray( InListNum * 2 );
@@ -960,8 +948,7 @@ namespace MixedAir {
 					OutsideAirSys( OASysNum ).NumControllers = NumInList;
 					OutsideAirSys( OASysNum ).ControllerName.allocate( NumInList );
 					OutsideAirSys( OASysNum ).ControllerType.allocate( NumInList );
-					OutsideAirSys( OASysNum ).ControllerIndex.allocate( NumInList );
-					OutsideAirSys( OASysNum ).ControllerIndex = 0;
+					OutsideAirSys( OASysNum ).ControllerIndex.dimension( NumInList, 0 );
 					for ( InListNum = 1; InListNum <= NumInList; ++InListNum ) {
 						OutsideAirSys( OASysNum ).ControllerName( InListNum ) = AlphArray( InListNum * 2 + 1 );
 						OutsideAirSys( OASysNum ).ControllerType( InListNum ) = AlphArray( InListNum * 2 );
@@ -1238,8 +1225,8 @@ namespace MixedAir {
 		int i;
 
 		// Formats
-		static gio::Fmt const Format_700( "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation {Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA Name,DSZAD Name')" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt Format_700( "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation {Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA Name,DSZAD Name')" );
+		static gio::Fmt fmtA( "(A)" );
 
 		//First, call other get input routines in this module to make sure data is filled during this routine.
 		if ( GetOASysInputFlag ) { // Gets input for object  first time Sim routine is called
@@ -1262,17 +1249,11 @@ namespace MixedAir {
 		MaxNums = max( MaxNums, NumNums );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
 
 		NumOAControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_OAController ) );
 		NumERVControllers = GetNumObjectsFound( CurrentModuleObjects( CMO_ERVController ) );
@@ -1649,7 +1630,7 @@ namespace MixedAir {
 		}
 
 		if ( NumPrimaryAirSys > 0 ) {
-			AirLoopZoneInfo.allocate( NumPrimaryAirSys ); // Defined in DataAirLoop.f90
+			AirLoopZoneInfo.allocate( NumPrimaryAirSys ); // Defined in DataAirLoop.cc
 		}
 
 		// Find the zones attached to each air loop
@@ -1716,7 +1697,7 @@ namespace MixedAir {
 					}
 				}
 
-				//   Adding new flag for DCV
+				// Adding new flag for DCV
 				if ( SameString( AlphArray( 3 ), "Yes" ) ) {
 					VentilationMechanical( VentMechNum ).DCVFlag = true;
 				} else if ( SameString( AlphArray( 3 ), "No" ) || lAlphaBlanks( 3 ) ) {
@@ -1785,34 +1766,20 @@ namespace MixedAir {
 
 				VentMechZoneName.allocate( NumGroups );
 				DesignSpecOAObjName.allocate( NumGroups );
-				DesignSpecOAObjIndex.allocate( NumGroups );
-				VentMechZoneOAAreaRate.allocate( NumGroups );
-				VentMechZoneOAPeopleRate.allocate( NumGroups );
+				DesignSpecOAObjIndex.dimension( NumGroups, 0 );
+				VentMechZoneOAAreaRate.dimension( NumGroups, 0.0 );
+				VentMechZoneOAPeopleRate.dimension( NumGroups, 0.0 );
 				VentMechZoneOAFlow.allocate( NumGroups );
 				VentMechZoneOAACH.allocate( NumGroups );
-				VentMechZoneADEffCooling.allocate( NumGroups );
-				VentMechZoneADEffHeating.allocate( NumGroups );
-				VentMechZoneADEffSchPtr.allocate( NumGroups );
+				// use defaults for Cooling and Heating Effectiveness
+				VentMechZoneADEffCooling.dimension( NumGroups, 1.0 );
+				VentMechZoneADEffHeating.dimension( NumGroups, 1.0 );
+				VentMechZoneADEffSchPtr.dimension( NumGroups, 0 );
 				VentMechZoneADEffSchName.allocate( NumGroups );
 
-				VentMechZoneSecondaryRecirculation.allocate( NumGroups );
+				VentMechZoneSecondaryRecirculation.dimension( NumGroups, 0.0 );
 				DesignSpecZoneADObjName.allocate( NumGroups );
-				DesignSpecZoneADObjIndex.allocate( NumGroups );
-
-				VentMechZoneName = "";
-				DesignSpecOAObjName = "";
-				DesignSpecOAObjIndex = 0;
-				VentMechZoneOAAreaRate = 0.0;
-				VentMechZoneOAPeopleRate = 0.0;
-
-				// use defaults for Cooling and Heating Effectiveness
-				VentMechZoneADEffCooling = 1.0;
-				VentMechZoneADEffHeating = 1.0;
-				VentMechZoneADEffSchPtr = 0;
-				VentMechZoneADEffSchName = "";
-				VentMechZoneSecondaryRecirculation = 0.0;
-				DesignSpecZoneADObjName = "";
-				DesignSpecZoneADObjIndex = 0;
+				DesignSpecZoneADObjIndex.dimension( NumGroups, 0 );
 
 				//   First time through find the total number of zones requiring mechanical ventilation
 				//   May include duplicate zones. Will check for duplicate zones further down in this subroutine.
@@ -1984,42 +1951,27 @@ namespace MixedAir {
 
 				VentilationMechanical( VentMechNum ).NumofVentMechZones = MechVentZoneCount;
 
-				//   Now allocate and store unique zone and associated ventilation rate information
-				VentilationMechanical( VentMechNum ).Zone.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneOAAreaRate.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneOAPeopleRate.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneOAFlow.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneOAACH.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).Zone = 0;
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName = "";
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex = 0;
-				VentilationMechanical( VentMechNum ).ZoneOAAreaRate = 0.0;
-				VentilationMechanical( VentMechNum ).ZoneOAPeopleRate = 0.0;
-				VentilationMechanical( VentMechNum ).ZoneOAFlow = 0.0;
-				VentilationMechanical( VentMechNum ).ZoneOAACH = 0.0;
+				// Now allocate and store unique zone and associated ventilation rate information
+				VentilationMechanical( VentMechNum ).Zone.dimension( MechVentZoneCount, 0 );
+				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjName.dimension( MechVentZoneCount );
+				VentilationMechanical( VentMechNum ).ZoneDesignSpecOAObjIndex.dimension( MechVentZoneCount, 0 );
+				VentilationMechanical( VentMechNum ).ZoneOAAreaRate.dimension( MechVentZoneCount, 0.0 );
+				VentilationMechanical( VentMechNum ).ZoneOAPeopleRate.dimension( MechVentZoneCount, 0.0 );
+				VentilationMechanical( VentMechNum ).ZoneOAFlow.dimension( MechVentZoneCount, 0.0 );
+				VentilationMechanical( VentMechNum ).ZoneOAACH.dimension( MechVentZoneCount, 0.0 );
 
 				// added for new DCV, 2/12/2009
-				VentilationMechanical( VentMechNum ).ZoneADEffCooling.allocate( MechVentZoneCount );
+				VentilationMechanical( VentMechNum ).ZoneADEffCooling.dimension( MechVentZoneCount, 1.0 );
 				// Zone air distribution effectiveness in heating mode
-				VentilationMechanical( VentMechNum ).ZoneADEffHeating.allocate( MechVentZoneCount );
+				VentilationMechanical( VentMechNum ).ZoneADEffHeating.dimension( MechVentZoneCount, 1.0 );
 				// Indices to the zone air distribution effectiveness schedules
-				VentilationMechanical( VentMechNum ).ZoneADEffSchPtr.allocate( MechVentZoneCount );
+				VentilationMechanical( VentMechNum ).ZoneADEffSchPtr.dimension( MechVentZoneCount, 0 );
 				// Zone air distribution effectiveness schedule names
 				VentilationMechanical( VentMechNum ).ZoneADEffSchName.allocate( MechVentZoneCount );
 				// Zone air secondary recirculation ratio, added 3/2012
-				VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation.allocate( MechVentZoneCount );
+				VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation.dimension( MechVentZoneCount, 0.0 );
 				VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName.allocate( MechVentZoneCount );
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex.allocate( MechVentZoneCount );
-
-				VentilationMechanical( VentMechNum ).ZoneADEffCooling = 1.0;
-				VentilationMechanical( VentMechNum ).ZoneADEffHeating = 1.0;
-				VentilationMechanical( VentMechNum ).ZoneADEffSchPtr = 0;
-				VentilationMechanical( VentMechNum ).ZoneADEffSchName = "";
-				VentilationMechanical( VentMechNum ).ZoneSecondaryRecirculation = 0.0;
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjName = "";
-				VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex = 0;
+				VentilationMechanical( VentMechNum ).ZoneDesignSpecADObjIndex.dimension( MechVentZoneCount, 0 );
 
 				MechVentZoneCount = 0;
 
@@ -2412,17 +2364,11 @@ namespace MixedAir {
 		GetObjectDefMaxArgs( CurrentModuleObjects( CMO_OAMixer ), NumArg, NumAlphas, NumNums );
 
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
+		NumArray.dimension( NumNums, 0.0 );
+		lNumericBlanks.dimension( NumNums, true );
+		lAlphaBlanks.dimension( NumAlphas, true );
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
 
 		CurrentModuleObject = CurrentModuleObjects( CMO_OAMixer );
 
@@ -2484,13 +2430,6 @@ namespace MixedAir {
 		}
 
 		GetOAMixerInputFlag = false;
-
-		AlphArray.deallocate();
-		NumArray.deallocate();
-		lNumericBlanks.deallocate();
-		lAlphaBlanks.deallocate();
-		cAlphaFields.deallocate();
-		cNumericFields.deallocate();
 
 	}
 
@@ -2640,21 +2579,6 @@ namespace MixedAir {
 		int CompNum; // Temporary array counter
 		std::string equipName; // Temporary equipment name
 		std::string airloopName; // Temporary equipment name
-		FArray1D< Real64 > TempZoneOAAreaRate; // Temporary array for mechanical ventilation rate (m3/s/m2) per zone
-		FArray1D< Real64 > TempZoneOAPeopleRate; // Temporary array for mechanical ventilation rate (m3/s/person) per zone
-		FArray1D< Real64 > TempZoneOAFlow; // Temporary array for mechanical ventilation rate (m3/s/flow) per zone
-		FArray1D< Real64 > TempZoneOAACH; // Temporary array for mechanical ventilation rate (m3/s/volume) per zone
-		FArray1D_int TempZoneOADSOAIndex; // Temporary array for mechanical ventilation rate (m3/s/volume) per zone
-		FArray1D_string TempZoneOADSOAName; // Temporary array for mechanical ventilation rate (m3/s/volume) per zone
-		FArray1D_int TempZone; // Temporary array for zones requiring mechanical ventilation
-		FArray1D< Real64 > TempZoneADEffCooling; // Temporary array for zone air distribution effectiveness
-		//  in cooling mode for each zone
-		FArray1D< Real64 > TempZoneADEffHeating; // Temporary array for zone air distribution effectiveness
-		// in heating mode for each zone
-		FArray1D_int TempZoneADEffSchPtr; // Temporary array for pointer to the zone air distribution
-		//  effectiveness schedule for each zone
-		FArray1D_string TempZoneADEffSchName; // Temporary array for zone air distribution
-		// effectiveness schedule name for each zone
 		std::string zoneName;
 		int jZone;
 
@@ -2668,12 +2592,9 @@ namespace MixedAir {
 
 		if ( MyOneTimeFlag ) {
 
-			MyEnvrnFlag.allocate( NumOAControllers );
-			MySizeFlag.allocate( NumOAControllers );
-			MechVentCheckFlag.allocate( NumOAControllers );
-			MyEnvrnFlag = true;
-			MySizeFlag = true;
-			MechVentCheckFlag = true;
+			MyEnvrnFlag.dimension( NumOAControllers, true );
+			MySizeFlag.dimension( NumOAControllers, true );
+			MechVentCheckFlag.dimension( NumOAControllers, true );
 
 			// Determine Inlet node index for OAController, not a user input for controller, but is obtained from OutsideAirSys and OAMixer
 			// This input setup needs to happen for all controllers, not just the one first passed into this init routine
@@ -2857,33 +2778,13 @@ namespace MixedAir {
 			// Make sure all air loop zones and air loop zones with people objects are covered by mechanical ventilation
 			// Issue a warning only if the zone is not accounted for in the associated mechanical ventilation object
 			if ( VentMechObjectNum > 0 ) {
+				auto & vent_mech( VentilationMechanical( VentMechObjectNum ) );
 
-				TempZoneOAAreaRate.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneOAPeopleRate.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneOAFlow.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneOAACH.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneOADSOAName.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneOADSOAIndex.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZone.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneADEffCooling.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneADEffHeating.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneADEffSchPtr.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneADEffSchName.allocate( VentilationMechanical( VentMechObjectNum ).NumofVentMechZones );
-				TempZoneOAAreaRate = 0.0;
-				TempZoneOAPeopleRate = 0.0;
-				TempZoneOAFlow = 0.0;
-				TempZoneOAACH = 0.0;
-				TempZoneOADSOAName = "";
-				TempZoneOADSOAIndex = 0;
-				TempZone = 0;
-				TempZoneADEffCooling = 1.0;
-				TempZoneADEffHeating = 1.0;
-				TempZoneADEffSchPtr = 0;
-				TempZoneADEffSchName = "";
 				// Make sure all zones with mechanical ventilation are on the correct air loop
 				TempMechVentArrayCounter = 0;
-				for ( NumMechVentZone = 1; NumMechVentZone <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++NumMechVentZone ) {
-					ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( NumMechVentZone );
+				for ( NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone ) {
+					ZoneNum = vent_mech.Zone( NumMechVentZone );
+					auto const & zone( Zone( ZoneNum ) );
 					FoundZone = false;
 
 					for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
@@ -2891,114 +2792,76 @@ namespace MixedAir {
 						if ( ZoneNum == NumZone ) {
 							FoundZone = true;
 							++TempMechVentArrayCounter;
-							TempZone( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).Zone( NumMechVentZone );
-							TempZoneOAAreaRate( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( NumMechVentZone );
-							TempZoneOAPeopleRate( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( NumMechVentZone );
-							TempZoneOAFlow( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( NumMechVentZone );
-							TempZoneOAACH( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneOAACH( NumMechVentZone );
-							TempZoneOADSOAIndex( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex( NumMechVentZone );
-							TempZoneOADSOAName( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjName( NumMechVentZone );
+							if ( TempMechVentArrayCounter < NumMechVentZone ) { // Copy to lower index
+								vent_mech.Zone( TempMechVentArrayCounter ) = vent_mech.Zone( NumMechVentZone );
+								vent_mech.ZoneOAAreaRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAAreaRate( NumMechVentZone );
+								vent_mech.ZoneOAPeopleRate( TempMechVentArrayCounter ) = vent_mech.ZoneOAPeopleRate( NumMechVentZone );
+								vent_mech.ZoneOAFlow( TempMechVentArrayCounter ) = vent_mech.ZoneOAFlow( NumMechVentZone );
+								vent_mech.ZoneOAACH( TempMechVentArrayCounter ) = vent_mech.ZoneOAACH( NumMechVentZone );
+								vent_mech.ZoneDesignSpecOAObjIndex( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjIndex( NumMechVentZone );
+								vent_mech.ZoneDesignSpecOAObjName( TempMechVentArrayCounter ) = vent_mech.ZoneDesignSpecOAObjName( NumMechVentZone );
 
-							// new DCV
-							TempZoneADEffCooling( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneADEffCooling( NumMechVentZone );
-							TempZoneADEffHeating( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneADEffHeating( NumMechVentZone );
-							TempZoneADEffSchPtr( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneADEffSchPtr( NumMechVentZone );
-							TempZoneADEffSchName( TempMechVentArrayCounter ) = VentilationMechanical( VentMechObjectNum ).ZoneADEffSchName( NumMechVentZone );
+								// new DCV
+								vent_mech.ZoneADEffCooling( TempMechVentArrayCounter ) = vent_mech.ZoneADEffCooling( NumMechVentZone );
+								vent_mech.ZoneADEffHeating( TempMechVentArrayCounter ) = vent_mech.ZoneADEffHeating( NumMechVentZone );
+								vent_mech.ZoneADEffSchPtr( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchPtr( NumMechVentZone );
+								vent_mech.ZoneADEffSchName( TempMechVentArrayCounter ) = vent_mech.ZoneADEffSchName( NumMechVentZone );
+							}
 
-							//       Sum outside air per unit floor area for each mechanical ventilation object only once per simulation
-							VentilationMechanical( VentMechObjectNum ).TotAreaOAFlow += Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( NumMechVentZone );
-							VentilationMechanical( VentMechObjectNum ).TotZoneOAFlow += Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( NumMechVentZone );
-							VentilationMechanical( VentMechObjectNum ).TotZoneOAACH += Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * ( VentilationMechanical( VentMechObjectNum ).ZoneOAACH( NumMechVentZone ) * Zone( ZoneNum ).Volume / 3600.0 );
+							// Sum outside air per unit floor area for each mechanical ventilation object only once per simulation
+							vent_mech.TotAreaOAFlow += zone.FloorArea * zone.Multiplier * zone.ListMultiplier * vent_mech.ZoneOAAreaRate( NumMechVentZone );
+							vent_mech.TotZoneOAFlow += zone.Multiplier * zone.ListMultiplier * vent_mech.ZoneOAFlow( NumMechVentZone );
+							vent_mech.TotZoneOAACH += zone.Multiplier * zone.ListMultiplier * ( vent_mech.ZoneOAACH( NumMechVentZone ) * zone.Volume / 3600.0 );
 							break;
 						}
 					}
 					if ( ! FoundZone ) {
-						ShowWarningError( "Zone name = " + Zone( ZoneNum ).Name + " in " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + OAController( OAControllerNum ).VentilationMechanicalName + " is not on the same air loop as Controller:OutdoorAir = " + OAController( OAControllerNum ).Name );
+						ShowWarningError( "Zone name = " + zone.Name + " in " + CurrentModuleObjects( CMO_MechVentilation ) + " object name = " + OAController( OAControllerNum ).VentilationMechanicalName + " is not on the same air loop as Controller:OutdoorAir = " + OAController( OAControllerNum ).Name );
 						ShowContinueError( "This zone will not be used and the simulation will continue..." );
 					}
 				}
 
-				// Re-size final array to conserve environment space
-				VentilationMechanical( VentMechObjectNum ).Zone.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneOAFlow.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneOAACH.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjName.deallocate();
+				// Shrink final arrays to conserve environment space
+				if ( TempMechVentArrayCounter < vent_mech.NumofVentMechZones ) {
+					vent_mech.Zone.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneOAAreaRate.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneOAPeopleRate.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneOAFlow.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneOAACH.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneDesignSpecOAObjIndex.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneDesignSpecOAObjName.redimension( TempMechVentArrayCounter );
 
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffCooling.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffHeating.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffSchPtr.deallocate();
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffSchName.deallocate();
+					vent_mech.ZoneADEffCooling.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneADEffHeating.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneADEffSchPtr.redimension( TempMechVentArrayCounter );
+					vent_mech.ZoneADEffSchName.redimension( TempMechVentArrayCounter );
 
-				VentilationMechanical( VentMechObjectNum ).Zone.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneOAFlow.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneOAACH.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjName.allocate( TempMechVentArrayCounter );
-
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffCooling.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffHeating.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffSchPtr.allocate( TempMechVentArrayCounter );
-				VentilationMechanical( VentMechObjectNum ).ZoneADEffSchName.allocate( TempMechVentArrayCounter );
-
-				for ( NumMechVentZone = 1; NumMechVentZone <= TempMechVentArrayCounter; ++NumMechVentZone ) {
-					VentilationMechanical( VentMechObjectNum ).Zone( NumMechVentZone ) = TempZone( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( NumMechVentZone ) = TempZoneOAAreaRate( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( NumMechVentZone ) = TempZoneOAPeopleRate( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneOAFlow( NumMechVentZone ) = TempZoneOAFlow( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneOAACH( NumMechVentZone ) = TempZoneOAACH( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjName( NumMechVentZone ) = TempZoneOADSOAName( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneDesignSpecOAObjIndex( NumMechVentZone ) = TempZoneOADSOAIndex( NumMechVentZone );
-
-					VentilationMechanical( VentMechObjectNum ).ZoneADEffCooling( NumMechVentZone ) = TempZoneADEffCooling( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneADEffHeating( NumMechVentZone ) = TempZoneADEffHeating( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneADEffSchPtr( NumMechVentZone ) = TempZoneADEffSchPtr( NumMechVentZone );
-					VentilationMechanical( VentMechObjectNum ).ZoneADEffSchName( NumMechVentZone ) = TempZoneADEffSchName( NumMechVentZone );
+					vent_mech.NumofVentMechZones = TempMechVentArrayCounter;
 				}
 
-				VentilationMechanical( VentMechObjectNum ).NumofVentMechZones = TempMechVentArrayCounter;
-
-				//predefined report
-				for ( jZone = 1; jZone <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++jZone ) {
-					zoneName = Zone( VentilationMechanical( VentMechObjectNum ).Zone( jZone ) ).Name;
-					PreDefTableEntry( pdchDCVventMechName, zoneName, VentilationMechanical( VentMechObjectNum ).Name );
-					PreDefTableEntry( pdchDCVperPerson, zoneName, VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( jZone ), 6 );
-					PreDefTableEntry( pdchDCVperArea, zoneName, VentilationMechanical( VentMechObjectNum ).ZoneOAAreaRate( jZone ), 6 );
+				// predefined report
+				for ( jZone = 1; jZone <= vent_mech.NumofVentMechZones; ++jZone ) {
+					zoneName = Zone( vent_mech.Zone( jZone ) ).Name;
+					PreDefTableEntry( pdchDCVventMechName, zoneName, vent_mech.Name );
+					PreDefTableEntry( pdchDCVperPerson, zoneName, vent_mech.ZoneOAPeopleRate( jZone ), 6 );
+					PreDefTableEntry( pdchDCVperArea, zoneName, vent_mech.ZoneOAAreaRate( jZone ), 6 );
 
 					// added for new DCV inputs
-					PreDefTableEntry( pdchDCVZoneADEffCooling, zoneName, VentilationMechanical( VentMechObjectNum ).ZoneADEffCooling( jZone ), 2 );
-					PreDefTableEntry( pdchDCVZoneADEffHeating, zoneName, VentilationMechanical( VentMechObjectNum ).ZoneADEffHeating( jZone ), 2 );
-					PreDefTableEntry( pdchDCVZoneADEffSchName, zoneName, GetScheduleName( VentilationMechanical( VentMechObjectNum ).ZoneADEffSchPtr( jZone ) ) );
+					PreDefTableEntry( pdchDCVZoneADEffCooling, zoneName, vent_mech.ZoneADEffCooling( jZone ), 2 );
+					PreDefTableEntry( pdchDCVZoneADEffHeating, zoneName, vent_mech.ZoneADEffHeating( jZone ), 2 );
+					PreDefTableEntry( pdchDCVZoneADEffSchName, zoneName, GetScheduleName( vent_mech.ZoneADEffSchPtr( jZone ) ) );
 				}
-
-				// Delete temporary array
-				TempZone.deallocate();
-				TempZoneOAAreaRate.deallocate();
-				TempZoneOAPeopleRate.deallocate();
-				TempZoneOAFlow.deallocate();
-				TempZoneOAACH.deallocate();
-				TempZoneOADSOAIndex.deallocate();
-				TempZoneOADSOAName.deallocate();
-
-				TempZoneADEffCooling.deallocate();
-				TempZoneADEffHeating.deallocate();
-				TempZoneADEffSchPtr.deallocate();
-				TempZoneADEffSchName.deallocate();
 
 				// Check to see if any zones on an air loop are not accounted for by a mechanical ventilation object
 				for ( AirLoopZoneInfoZoneNum = 1; AirLoopZoneInfoZoneNum <= AirLoopZoneInfo( AirLoopNum ).NumZones; ++AirLoopZoneInfoZoneNum ) {
 					NumZone = AirLoopZoneInfo( AirLoopNum ).ActualZoneNumber( AirLoopZoneInfoZoneNum );
 					FoundAreaZone = false;
 					FoundPeopleZone = false;
-					for ( NumMechVentZone = 1; NumMechVentZone <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++NumMechVentZone ) {
-						ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( NumMechVentZone );
+					for ( NumMechVentZone = 1; NumMechVentZone <= vent_mech.NumofVentMechZones; ++NumMechVentZone ) {
+						ZoneNum = vent_mech.Zone( NumMechVentZone );
 						if ( ZoneNum == NumZone ) {
 							FoundAreaZone = true;
-							if ( VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( NumMechVentZone ) > 0.0 ) {
+							if ( vent_mech.ZoneOAPeopleRate( NumMechVentZone ) > 0.0 ) {
 								FoundPeopleZone = true;
 							}
 							break;
@@ -3154,13 +3017,14 @@ namespace MixedAir {
 
 				TotalPeopleOAFlow = 0.0;
 				if ( VentMechObjectNum != 0 ) {
-					for ( ZoneIndex = 1; ZoneIndex <= VentilationMechanical( VentMechObjectNum ).NumofVentMechZones; ++ZoneIndex ) {
-						ZoneNum = VentilationMechanical( VentMechObjectNum ).Zone( ZoneIndex );
+					auto & vent_mech( VentilationMechanical( VentMechObjectNum ) );
+					for ( ZoneIndex = 1; ZoneIndex <= vent_mech.NumofVentMechZones; ++ZoneIndex ) {
+						ZoneNum = vent_mech.Zone( ZoneIndex );
 
 						// ZoneIntGain(ZoneNum)%NOFOCC is the number of occupants of a zone at each time step, already counting the occupant schedule
-						TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * VentilationMechanical( VentMechObjectNum ).ZoneOAPeopleRate( ZoneIndex );
+						TotalPeopleOAFlow += ZoneIntGain( ZoneNum ).NOFOCC * Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier * vent_mech.ZoneOAPeopleRate( ZoneIndex );
 					}
-					VentilationMechanical( VentMechObjectNum ).TotPeopleOAFlow = TotalPeopleOAFlow;
+					vent_mech.TotPeopleOAFlow = TotalPeopleOAFlow;
 				}
 			} else {
 				// Stand Alone ERV does not require a termperature setpoint schedule, make setpoint equal to lower economizer limit
@@ -3519,15 +3383,11 @@ namespace MixedAir {
 		ZoneOAMin = 0.0;
 		ZoneOAMax = 0.0;
 		ZoneContamControllerSched = 0.0;
-		
+
 		if ( AirLoopNum > 0 ) {
 			AirLoopEconoLockout = AirLoopControlInfo( AirLoopNum ).EconoLockout;
 			AirLoopNightVent = AirLoopControlInfo( AirLoopNum ).NightVent;
-			if( AirLoopControlInfo( AirLoopNum ).FanOpMode == CycFanCycCoil ) {
-				AirLoopCyclingFan = true;
-			} else {
-				AirLoopCyclingFan = false;
-			}
+			AirLoopCyclingFan = ( AirLoopControlInfo( AirLoopNum ).FanOpMode == CycFanCycCoil );
 		} else {
 			AirLoopEconoLockout = false;
 			AirLoopNightVent = false;
@@ -3953,10 +3813,9 @@ namespace MixedAir {
 						if ( SysEv <= 0.0 ) SysEv = 1.0;
 
 						// Calc system outdoor air requirement
-						if (VentilationMechanical(VentMechObjectNum).SystemOAMethod == SOAM_ProportionalControl) {
+						if ( VentilationMechanical(VentMechObjectNum).SystemOAMethod == SOAM_ProportionalControl ) {
 							SysOA = SysOA / SysEv;
-						}
-						else {
+						} else {
 							SysOA = SysOAuc / SysEv;
 						}
 					}
@@ -4665,7 +4524,7 @@ namespace MixedAir {
 		} else {
 			// The ERV controller sets the supply and secondary inlet node information for the Stand Alone ERV
 			// Currently, the Stand Alone ERV only has constant air flows (supply and exhaust), and these are
-			// already set in HVACStandAloneERV.f90 (subroutine init). Therefore, these flow assignments below are
+			// already set in HVACStandAloneERV.cc (subroutine init). Therefore, these flow assignments below are
 			// currently redundant but may be useful in the future as mass flow rates can vary based on the controller signal.
 			Node( OutAirNodeNum ).MassFlowRate = OAController( OAControllerNum ).OAMassFlow;
 			Node( OutAirNodeNum ).MassFlowRateMaxAvail = OAController( OAControllerNum ).OAMassFlow;
@@ -6433,7 +6292,7 @@ namespace MixedAir {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

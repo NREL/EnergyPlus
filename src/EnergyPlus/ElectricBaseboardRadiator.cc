@@ -299,7 +299,7 @@ namespace ElectricBaseboardRadiator {
 					ErrorsFound = true;
 				}
 			}
-			
+
 			// Determine HW radiant baseboard heating design capacity sizing method
 			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
 				ElecBaseboard( BaseboardNum ).HeatingCapMethod = HeatingDesignCapacity;
@@ -531,18 +531,12 @@ namespace ElectricBaseboardRadiator {
 			// initialize the environment and sizing flags
 			MyEnvrnFlag.allocate( NumElecBaseboards );
 			MySizeFlag.allocate( NumElecBaseboards );
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QBBElecRadSource.allocate( NumElecBaseboards );
-			QBBElecRadSource = 0.0;
-			QBBElecRadSrcAvg.allocate( NumElecBaseboards );
-			QBBElecRadSrcAvg = 0.0;
-			LastQBBElecRadSrc.allocate( NumElecBaseboards );
-			LastQBBElecRadSrc = 0.0;
-			LastSysTimeElapsed.allocate( NumElecBaseboards );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( NumElecBaseboards );
-			LastTimeStepSys = 0.0;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QBBElecRadSource.dimension( NumElecBaseboards, 0.0 );
+			QBBElecRadSrcAvg.dimension( NumElecBaseboards, 0.0 );
+			LastQBBElecRadSrc.dimension( NumElecBaseboards, 0.0 );
+			LastSysTimeElapsed.dimension( NumElecBaseboards, 0.0 );
+			LastTimeStepSys.dimension( NumElecBaseboards, 0.0 );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 
@@ -719,7 +713,7 @@ namespace ElectricBaseboardRadiator {
 				ElecBaseboard( BaseboardNum ).NominalCapacity = TempSize;
 				DataScalableCapSizingON = false;
 			}
-		
+
 		}
 
 	}
@@ -1200,7 +1194,7 @@ namespace ElectricBaseboardRadiator {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

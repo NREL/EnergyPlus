@@ -347,22 +347,15 @@ namespace FanCoilUnits {
 		// allocate the data structures
 		FanCoil.allocate( NumFanCoils );
 		FanCoilNumericFields.allocate( NumFanCoils );
-		CheckEquipName.allocate( NumFanCoils );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumFanCoils, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// loop over 4 pipe fan coil units; get and load the input data
 		for ( FanCoilIndex = 1; FanCoilIndex <= Num4PipeFanCoils; ++FanCoilIndex ) {
@@ -1072,7 +1065,7 @@ namespace FanCoilUnits {
 		DataFracOfAutosizedHeatingAirflow = 1.0;
 		DataFracOfAutosizedCoolingCapacity = 1.0;
 		DataFracOfAutosizedHeatingCapacity = 1.0;
-		
+
 		CompType = FanCoil(FanCoilNum).UnitType;
 		CompName = FanCoil(FanCoilNum).Name;
 		DataZoneNumber = FanCoil(FanCoilNum).ZonePtr;
@@ -1171,7 +1164,7 @@ namespace FanCoilUnits {
 						HeatingAirVolFlowDes = TempSize;
 					}
 				}
-				
+
 				if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow == AutoSize || ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow == AutoSize ) {
 					IsAutoSize = true;
 					FanCoil( FanCoilNum ).MaxAirVolFlow = AutoSize;
@@ -1194,12 +1187,12 @@ namespace FanCoilUnits {
 				} else {
 					MaxAirVolFlowDes = 0.0;
 				}
-				
+
 			}
 		}
 
 		if ( CurZoneEqNum > 0 ) {
-			
+
 			if ( !IsAutoSize && !ZoneSizingRunDone ) {
 
 			} else {
@@ -1305,7 +1298,7 @@ namespace FanCoilUnits {
 				}
 			} else {
 				CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
-				CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );				
+				CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, ErrorsFound );
 				if ( IsAutoSize ) {
 					PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", FanCoil( FanCoilNum ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
 					if ( PltSizHeatNum > 0 ) {
@@ -1345,7 +1338,7 @@ namespace FanCoilUnits {
 							PrintFlag = false;
 							TempSize = AutoSize;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
-							DesCoilLoad = TempSize;						
+							DesCoilLoad = TempSize;
 						}
 						FanCoil( FanCoilNum ).DesHeatingLoad = DesCoilLoad;
 						if ( DesCoilLoad >= SmallLoad ) {
@@ -1437,7 +1430,7 @@ namespace FanCoilUnits {
 									TempSize = AutoSize;
 									DataScalableCapSizingON = true;
 								}
-							}	
+							}
 							SizingString = "";
 							PrintFlag = false;
 							RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -2531,7 +2524,7 @@ namespace FanCoilUnits {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
