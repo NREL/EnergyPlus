@@ -184,6 +184,15 @@ if(NOT APPLE)
 endif()
 
 if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
+  get_filename_component(LINKER_DIR "${CMAKE_LINKER}" PATH)
+  if (MSVC12)
+    set(PGORTVER "120")
+  elseif(MSVC14)
+    set(PGORTVER "140")
+  endif()
+  
+  file(COPY "${LINKER_DIR}/pgort${PGORTVER}.dll" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release" )
+
   foreach(target ${OPTIMIZABLE_TARGETS})
     get_target_property(targ_link_flags ${target} LINK_FLAGS)
     get_target_property(targ_static_link_flags ${target} STATIC_LIBRARY_FLAGS)
