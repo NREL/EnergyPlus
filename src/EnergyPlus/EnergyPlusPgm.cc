@@ -350,16 +350,24 @@ EnergyPlusPgm( std::string filepath )
 	if ( ! cEnvValue.empty() ) TraceHVACControllerEnvFlag = env_var_on( cEnvValue ); // Yes or True
 
 	if( ! filepath.empty() ) {
+		// if filepath is not empty, then we are using E+ as a library API call
+		// change the directory to the specified folder, and pass in dummy args to command line parser
+		// this will initialize the paths throughout E+ to the defaults
 #ifdef _WIN32
-		int status = _chdir(filepath.c_str());
+		int status = _chdir( filepath.c_str() );
 #else
-		std::cout << "Trying to change directory to: " << filepath << std::endl;
-		int status = chdir(filepath.c_str());
-		std::cout << "Chdir status = " << status << std::endl;
+		DisplayString( "EnergyPlus Library: Changing directory to: " + filepath );
+		int status = chdir( filepath.c_str() );
+		if ( status == 0 ) {
+			DisplayString( "Directory change successful." );
+		} else {
+			DisplayString( "Couldn't change directory; aborting EnergyPlus" );
+			return 1;
+		}
 #endif
 		ProgramPath = filepath + pathChar;
 		int dummy_argc = 0;
-		const char ** dummy_argv( 0 );
+		const char * dummy_argv[] = { NULL };
 		ProcessArgs( dummy_argc, dummy_argv );
 	}
 
