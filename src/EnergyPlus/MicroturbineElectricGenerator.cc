@@ -325,8 +325,7 @@ namespace MicroturbineElectricGenerator {
 		// ALLOCATE ARRAYS
 		MTGenerator.allocate( NumMTGenerators );
 		MTGeneratorReport.allocate( NumMTGenerators );
-		CheckEquipName.allocate( NumMTGenerators );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumMTGenerators, true );
 
 		// LOAD ARRAYS WITH MICROTURBINE GENERATOR DATA
 		for ( GeneratorNum = 1; GeneratorNum <= NumMTGenerators; ++GeneratorNum ) {

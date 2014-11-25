@@ -799,7 +799,7 @@ public: // Slice Proxy Generators
 
 public: // Predicate
 
-	// contains( i1, i2 )
+	// Contains Indexed Element?
 	inline
 	bool
 	contains( int const i1, int const i2 ) const

@@ -205,9 +205,9 @@ namespace HVACControllers {
 	FArray1D< RootFinderDataType > RootFinders;
 	FArray1D< AirLoopStatsType > AirLoopStats; // Statistics array to analyze computational profile for
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmtAA( "(A,A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmtAA( "(A,A)" );
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -567,22 +567,15 @@ namespace HVACControllers {
 
 		ControllerProps.allocate( NumControllers );
 		RootFinders.allocate( NumControllers );
-		CheckEquipName.allocate( NumControllers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumControllers, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		NumArray.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		// Now find and load all of the simple controllers.
 		if ( NumSimpleControllers > 0 ) {

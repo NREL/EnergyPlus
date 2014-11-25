@@ -1,4 +1,9 @@
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 // C++ Headers
+#include <iostream>
 #ifndef NDEBUG
 #ifdef __unix__
 #include <cfenv>
@@ -220,6 +225,10 @@ EnergyPlusPgm( std::string filepath )
 	using FluidProperties::ReportOrphanFluids;
 	using Psychrometrics::ShowPsychrometricSummary;
 
+	// Disable C++ i/o synching with C methods for speed
+	std::ios_base::sync_with_stdio( false );
+	std::cin.tie( 0 ); // Untie cin and cout: Could cause odd behavior for interactive prompts
+
 // Enable floating point exceptions
 #ifndef NDEBUG
 #ifdef __unix__
@@ -227,11 +236,17 @@ EnergyPlusPgm( std::string filepath )
 #endif
 #endif
 
+#ifdef _WIN32
+	SetErrorMode(SEM_NOGPFAULTERRORBOX);
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+#endif
+
 	// Locals
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
 	// in "DataGlobals.f90"
-	gio::Fmt const EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
+	gio::Fmt EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
 	std::string const BlankString;
 
 	// INTERFACE BLOCK SPECIFICATIONS
@@ -460,7 +475,7 @@ CreateCurrentDateTimeString( std::string & CurrentDateTimeString )
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	gio::Fmt const fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
+	gio::Fmt fmtDate( "(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS:
 	// na
@@ -547,7 +562,7 @@ ReadINIFile(
 	bool NewHeading;
 
 	// Formats
-	static gio::Fmt const Format_700( "(A)" );
+	static gio::Fmt Format_700( "(A)" );
 
 	DataOut = "           ";
 

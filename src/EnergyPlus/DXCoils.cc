@@ -204,7 +204,7 @@ namespace DXCoils {
 	// Object Data
 	FArray1D< DXCoilData > DXCoil;
 	FArray1D< DXCoilNumericFieldData > DXCoilNumericFields;
-	
+
 	// Functions
 
 	void
@@ -960,30 +960,18 @@ namespace DXCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNumbers, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 
 		Alphas2.allocate( MaxAlphas );
-		Alphas2 = "";
 		cAlphaFields2.allocate( MaxAlphas );
-		cAlphaFields2 = "";
 		cNumericFields2.allocate( MaxNumbers );
-		cNumericFields2 = "";
-		Numbers2.allocate( MaxNumbers );
-		Numbers2 = 0.0;
-		lAlphaBlanks2.allocate( MaxAlphas );
-		lAlphaBlanks2 = true;
-		lNumericBlanks2.allocate( MaxNumbers );
-		lNumericBlanks2 = true;
+		Numbers2.dimension( MaxNumbers, 0.0 );
+		lAlphaBlanks2.dimension( MaxAlphas, true );
+		lNumericBlanks2.dimension( MaxNumbers, true );
 
 		// allocate the data structure
 
@@ -991,8 +979,7 @@ namespace DXCoils {
 		DXCoil.allocate( NumDXCoils );
 		DXCoilNumericFields.allocate( NumDXCoils );
 		HeatReclaimDXCoil.allocate( NumDXCoils );
-		CheckEquipName.allocate( NumDXCoils );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDXCoils, true );
 
 		// Module level variable arrays
 		DXCoilOutletTemp.allocate( NumDXCoils );
@@ -1022,7 +1009,7 @@ namespace DXCoils {
 		for ( DXCoilIndex = 1; DXCoilIndex <= NumDoe2DXCoils; ++DXCoilIndex ) {
 
 			GetObjectItem( CurrentModuleObject, DXCoilIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
-			
+
 			++DXCoilNum;
 			// allocate single performance mode for numeric field strings used for sizing routine
 			DXCoilNumericFields ( DXCoilNum ).PerfMode.allocate ( 1 );
@@ -1520,7 +1507,7 @@ namespace DXCoils {
 							// allocate performance mode numeric field strings used for sizing routine
 							DXCoilNumericFields( DXCoilNum ).PerfMode( PerfModeNum ).FieldNames.allocate ( NumNumbers2 ); // use MaxNumbers here??
 							DXCoilNumericFields ( DXCoilNum ).PerfMode ( PerfModeNum ).FieldNames = cNumericFields2;
-							
+
 							DXCoil( DXCoilNum ).RatedTotCap( PerfModeNum ) = Numbers2( 1 );
 							DXCoil( DXCoilNum ).RatedSHR( PerfModeNum ) = Numbers2( 2 );
 							DXCoil( DXCoilNum ).RatedCOP( PerfModeNum ) = Numbers2( 3 );
@@ -10929,8 +10916,8 @@ Label50: ;
 		int index;
 
 		// Formats
-		static gio::Fmt const Format_890( "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, ','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity {Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')" );
-		static gio::Fmt const Format_891( "(' VAV DX Cooling Coil Standard Rating Information, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_890( "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, ','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity {Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')" );
+		static gio::Fmt Format_891( "(' VAV DX Cooling Coil Standard Rating Information, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
 
 		// Get fan index and name if not already available
 		if ( DXCoil( DXCoilNum ).SupplyFanIndex == 0 ) GetFanIndexForTwoSpeedCoil( DXCoilNum, DXCoil( DXCoilNum ).SupplyFanIndex, DXCoil( DXCoilNum ).SupplyFanName );

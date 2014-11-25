@@ -277,17 +277,11 @@ namespace WindTurbine {
 		// Initializations and allocations
 		GetObjectDefMaxArgs( CurrentModuleObject, NumArgs, NumAlphas, NumNumbers );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		NumWindTurbines = GetNumObjectsFound( CurrentModuleObject );
 
@@ -602,7 +596,7 @@ namespace WindTurbine {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static char const TabChr( '\t' ); // Tab character
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

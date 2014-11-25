@@ -1718,37 +1718,37 @@ Site:GroundTemperature:Deep,
        \type real
        \default 16
 
-Site:GroundDomain,
-        \memo Ground coupled slab model for on-grade and
+Site:GroundDomain:Slab,
+        \memo Ground-coupled slab model for on-grade and
         \memo in-grade cases with or without insulation.
    A1,  \field Name
         \required-field
    N1,  \field Ground Domain Depth
-        \required-field
         \type real
+        \default 10
         \units m
         \minimum> 0.0
    N2,  \field Aspect Ratio
         \type real
         \default 1
    N3,  \field Perimeter Offset
-        \required-field
         \type real
+        \default 5
         \units m
         \minimum> 0.0
-   N4,  \field Soil Thermal Conductivity
-        \required-field
+   N4, \field Soil Thermal Conductivity
         \type real
+        \default 1.5
         \units W/m-K
         \minimum> 0.0
-   N5,  \field Soil Density
-        \required-field
+   N5, \field Soil Density
         \type real
+        \default 2800
         \units kg/m3
         \minimum> 0.0
-   N6,  \field Soil Specific Heat
-        \required-field
+   N6, \field Soil Specific Heat
         \type real
+        \default 850
         \units J/kg-K
         \minimum> 0.0
    N7,  \field Soil Moisture Content Volume Fraction
@@ -1763,22 +1763,25 @@ Site:GroundDomain,
         \minimum 0
         \maximum 100
         \default 50
-   N9,  \field Kusuda-Achenbach Average Surface Temperature
-        \required-field
+   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
         \type real
         \units C
-        \note Annual average surface temperature.
-   N10, \field Kusuda-Achenbach Average Amplitude of Surface Temperature
-        \required-field
+        \note Annual average ground surface temperature.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
         \type real
         \units deltaC
-        \note Annual average surface temperature variation from average.
-   N11, \field Kusuda-Achenbach Phase Shift of Minimum Surface Temperature
-        \required-field
+        \note Annual average ground surface temperature variation from average.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
         \type real
         \units days
-        \note The phase shift of minimum surface temperature, or the day
-        \note of the year when the minimum surface temperature occurs.
+        \note The phase shift of minimum ground surface temperature, or the day
+        \note of the year when the minimum ground surface temperature occurs.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
    N12, \field Evapotranspiration Ground Cover Parameter
         \type real
         \minimum 0
@@ -1828,7 +1831,6 @@ Site:GroundDomain,
         \minimum> 0.0
         \note This field specifies the width of the underfloor perimeter insulation
    A8,  \field Vertical Insulation
-        \required-field
         \type choice
         \key Yes
         \key No
@@ -1845,12 +1847,148 @@ Site:GroundDomain,
         \note Only used when including vertical insulation
         \note This field specifies the depth of the vertical insulation
    A10; \field Simulation Timestep
-        \required-field
         \type choice
         \key Hourly
         \key Timestep
         \default Hourly
-        \note This field specifies the domain simulation timestep.
+        \note This field specifies the ground domain simulation timestep.
+
+Site:GroundDomain:Basement,
+        \memo Ground-coupled basement model for simulating basements
+        \memo or other underground zones.
+   A1,  \field Name
+        \required-field
+   N1,  \field Ground Domain Depth
+        \type real
+        \default 10
+        \units m
+        \minimum> 0.0
+        \note The depth from ground surface to the deep ground boundary of the domain.
+   N2,  \field Aspect Ratio
+        \type real
+        \default 1
+        \note This defines the height to width ratio of the basement zone.
+   N3,  \field Perimeter Offset
+        \type real
+        \default 5
+        \units m
+        \minimum> 0.0
+        \note The distance from the basement wall edge to the edge of the ground domain
+   N4,  \field Soil Thermal Conductivity
+        \type real
+        \default 1.5
+        \units W/m-K
+        \minimum> 0.0
+   N5,  \field Soil Density
+        \type real
+        \default 2800
+        \units kg/m3
+        \minimum> 0.0
+   N6,  \field Soil Specific Heat
+        \type real
+        \default 850
+        \units J/kg-K
+        \minimum> 0.0
+   N7, \field Soil Moisture Content Volume Fraction
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 30
+   N8, \field Soil Moisture Content Volume Fraction at Saturation
+        \type real
+        \units percent
+        \minimum 0
+        \maximum 100
+        \default 50
+   N9,  \field Kusuda-Achenbach Average Ground Surface Temperature
+        \type real
+        \units C
+        \note Annual average ground surface temperature.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N10, \field Kusuda-Achenbach Average Amplitude of Ground Surface Temperature
+        \type real
+        \units deltaC
+        \note Annual average ground surface temperature variation from average.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N11, \field Kusuda-Achenbach Phase Shift of Minimum Ground Surface Temperature
+        \type real
+        \units days
+        \note The phase shift of minimum ground surface temperature, or the day
+        \note of the year when the minimum ground surface temperature occurs.
+        \note If left blank, Site:GroundTemperature:Shallow must be used to provied
+        \note monthly average ground surface temperatures.
+   N12, \field Evapotranspiration Ground Cover Parameter
+        \type real
+        \minimum 0
+        \maximum 1.5
+        \default 0.4
+        \note This specifies the ground cover effects during evapotranspiration
+        \note  calculations.  The value roughly represents the following cases:
+        \note  = 0   : concrete or other solid, non-permeable ground surface material
+        \note  = 0.5 : short grass, much like a manicured lawn
+        \note  = 1   : standard reference state (12 cm grass)
+        \note  = 1.5 : wild growth
+   A2,  \field Basement Floor Boundary Condition Model Name
+        \required-field
+        \type object-list
+        \object-list OSCMNames
+   A3,  \field Horizontal Insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+        \note This field specifies the presence of insulation beneath the basement floor.
+   A4,  \field Horizontal Insulation Material Name
+        \type object-list
+        \object-list MaterialName
+   A5,  \field Horizontal Insulation Extents
+        \type choice
+        \key Perimeter
+        \key Full
+        \default Full
+        \note This field specifies whether the horizontal insulation fully insulates 
+        \note the surface or is perimeter only insulation
+   N13, \field Perimeter Horizontal Insulation Width
+        \type real
+        \units m
+        \minimum> 0.0
+        \note Width of horizontal perimeter insulation measured from
+        \note foundation wall inside surface.
+   N14, \field Basement Wall Depth
+        \type real
+        \units m
+        \minimum> 0.0
+        \note Depth measured from ground surface.
+   A6,  \field Basement Wall Boundary Condition Model Name
+        \required-field
+        \type object-list
+        \object-list OSCMNames
+   A7,  \field Vertical Insulation
+        \type choice
+        \key Yes
+        \key No
+        \default No
+   A8, \field Basement Wall Vertical Insulation Material Name
+        \type object-list
+        \object-list MaterialName
+   N15, \field Vertical Insulation Depth
+        \type real
+        \units m
+        \minimum> 0.0
+        \note Depth measured from the ground surface.
+   A9, \field Simulation Timestep
+        \type choice
+        \key Timestep
+        \key Hourly
+        \default Hourly
+        \note This field specifies the basement domain simulation interval.
+   N16; \field Mesh Density Parameter
+        \type integer
+        \default 4
+        \minimum 2
 
 Site:GroundReflectance,
         \memo Specifies the ground reflectance values used to calculate ground reflected solar.
@@ -69451,8 +69589,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69475,8 +69613,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69493,8 +69631,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 1.136
         \minimum> 0.0
-        \note The default value corresponds to R5
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R5 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
   A11 , \field Glass Reach In Door Opening Schedule Name Facing Zone 1
         \type object-list
         \object-list ScheduleNames
@@ -69516,8 +69654,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3785
         \minimum> 0.0
-        \note The default value corresponds to R15
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R15 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R5 is U 1.136 W/m2-K
         \note R18 is U 0.3154 W/m2-K
@@ -69552,8 +69690,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69570,8 +69708,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 1.136
         \minimum> 0.0
-        \note The default value corresponds to R5
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R5 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
   A15 , \field Glass Reach In Door Opening Schedule Name Facing Zone 2
         \type object-list
         \object-list ScheduleNames
@@ -69593,8 +69731,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3785
         \minimum> 0.0
-        \note The default value corresponds to R15
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R15 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R5 is U 1.136 W/m2-K
         \note R18 is U 0.3154 W/m2-K
@@ -69632,8 +69770,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3154
         \minimum> 0.0
-        \note The default value corresponds to R18
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R18 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R15 is U 0.3785 W/m2-K
         \note R5 is U 1.136 W/m2-K
@@ -69650,8 +69788,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 1.136
         \minimum> 0.0
-        \note The default value corresponds to R5
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R5 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
   A19,  \field Glass Reach In Door Opening Schedule Name Facing Zone 3
         \type object-list
         \object-list ScheduleNames
@@ -69673,8 +69811,8 @@ Refrigeration:SecondarySystem,
         \units W/m2-K
         \default 0.3785
         \minimum> 0.0
-        \note The default value corresponds to R15
-        \note To convert other Archaic American R-values to U, divide 5.678 by the R-value
+        \note The default value corresponds to R15 [ft2-F-hr/Btu]
+        \note To convert other IP R-values to U, divide 5.678 by the R-value
         \note Some examples:
         \note R5 is U 1.136 W/m2-K
         \note R18 is U 0.3154 W/m2-K

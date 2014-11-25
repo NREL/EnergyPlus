@@ -285,8 +285,7 @@ namespace DataZoneEquipment {
 		NumOfZoneEquipLists = GetNumObjectsFound( "ZoneHVAC:EquipmentList" ); // Look for lists of equipment data - there should
 		// be as many of these as there are controlled zones
 		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNums );
-		NodeNums.allocate( NumParams );
-		NodeNums = 0;
+		NodeNums.dimension( NumParams, 0 );
 		GetObjectDefMaxArgs( "ZoneHVAC:EquipmentList", NumParams, NumAlphas, NumNums );
 		MaxAlphas = NumAlphas;
 		MaxNums = NumNums;
@@ -300,17 +299,11 @@ namespace DataZoneEquipment {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 		MaxNums = max( MaxNums, NumNums );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		NumArray.dimension( MaxNums, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		if ( ! allocated( SupplyAirPath ) ) {
 			// Look for and read in the air supply path
@@ -331,8 +324,7 @@ namespace DataZoneEquipment {
 		// found in the input file.  This may or may not
 		// be the same as the number of zones in the building
 		ZoneEquipList.allocate( NumOfZones );
-		ZoneEquipAvail.allocate( NumOfZones );
-		ZoneEquipAvail = NoAction;
+		ZoneEquipAvail.dimension( NumOfZones, NoAction );
 
 		if ( NumOfZoneEquipLists != NumOfControlledZones ) {
 			ShowSevereError( RoutineName + "Number of Zone Equipment lists [" + TrimSigDigits( NumOfZoneEquipLists ) + "] not equal Number of Controlled Zones [" + TrimSigDigits( NumOfControlledZones ) + ']' );

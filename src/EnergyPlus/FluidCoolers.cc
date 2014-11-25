@@ -347,8 +347,7 @@ namespace FluidCoolers {
 		SimpleFluidCooler.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerReport.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerInlet.allocate( NumSimpleFluidCoolers );
-		CheckEquipName.allocate( NumSimpleFluidCoolers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSimpleFluidCoolers, true );
 
 		// Load data structures with fluid cooler input data
 		cCurrentModuleObject = cFluidCooler_SingleSpeed;
@@ -1754,7 +1753,7 @@ namespace FluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const LowTempFmt( "(' ',F6.2)" );
+		static gio::Fmt LowTempFmt( "(' ',F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
