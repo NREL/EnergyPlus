@@ -1042,7 +1042,7 @@ namespace PlantLoopEquip {
 
 			} else if ( EquipTypeNum == TypeOf_UnitarySystemRecovery ) {
 
-			} else if ( SELECT_CASE_var1 == TypeOf_SwimmingPool_Indoor ) {
+			} else if ( EquipTypeNum == TypeOf_SwimmingPool_Indoor ) {
 				
 			} else {
 
