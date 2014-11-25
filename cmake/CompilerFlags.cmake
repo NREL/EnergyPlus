@@ -33,7 +33,11 @@ IF ( MSVC ) # visual c++ (VS 2013)
 
     # ADDITIONAL RELEASE-MODE-SPECIFIC FLAGS
     ADD_CXX_RELEASE_DEFINITIONS("-GS-") # Disable buffer overrun checks for performance in release mode
-   
+
+#    if (PROFILE_USE OR PROFILE_GENERATE OR ENABLE_LTO)
+#	    ADD_DEFINITIONS("-GL" )
+#    endif()
+	
 
 ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)

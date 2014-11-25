@@ -177,36 +177,55 @@ endif()
 
 
 set(OPTIMIZABLE_TARGETS
-  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 objexx_tests
+  sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
     )
 if(NOT APPLE)
   list(APPEND OPTIMIZABLE_TARGETS parser)
 endif()
 
-  #if(MSVC)
-  #  list(APPEND OPTIMIZABLE_TARGETS EnergyPlusLib2 )
-  #endif()
+if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
+  foreach(target ${OPTIMIZABLE_TARGETS})
+    get_target_property(targ_link_flags ${target} LINK_FLAGS)
+    get_target_property(targ_static_link_flags ${target} STATIC_LIBRARY_FLAGS)
+    get_target_property(targ_compile_flags ${target} COMPILE_FLAGS)
 
-  #message (${OPTIMIZABLE_TARGETS})
-if(MSVC)
-  if (PROFILE_USE OR PROFILE_GENERATE OR ENABLE_LTO)
-    add_definitions(-GL)
-  endif()
+    # message("${target}: ${targ_link_flags}; ${targ_static_link_flags}; ${targ_compile_flags}")
+    if(targ_link_flags STREQUAL "targ_link_flags-NOTFOUND")
+      set(targ_link_flags "")
+    endif()
+    
+    if(targ_static_link_flags STREQUAL "targ_static_link_flags-NOTFOUND")
+      set(targ_static_link_flags "")
+    endif()
 
-  if(ENABLE_LTO)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "/LTCG" STATIC_LIBRARY_FLAGS "/LTCG")
-  endif()
+    if(targ_compile_flags STREQUAL "targ_compile_flags-NOTFOUND")
+      set(targ_compile_flags "")
+    endif()
 
-  if (PROFILE_GENERATE)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "/LTCG:PGI" STATIC_LIBRARY_FLAGS "/LTCG")
-  endif()
+    if (ENABLE_LTO OR PROFILE_GENERATE OR PROFILE_USE)
+      set(targ_compile_flags "${targ_compile_flags} /GL")
+    endif()
+    
+    if(ENABLE_LTO AND NOT PROFILE_GENERATE AND NOT PROFILE_USE)
+      set(targ_link_flags "${targ_link_flags} /LTCG")
+      set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
+    endif()
 
-  if (PROFILE_USE)
-    set_target_properties(${OPTIMIZABLE_TARGETS}
-      PROPERTIES LINK_FLAGS "/LTCG:PGO" STATIC_LIBRARY_FLAGS "/LTCG")
-  endif()
+    if (PROFILE_GENERATE)
+      set(targ_link_flags "${targ_link_flags} /LTCG:PGI")
+      set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
+    endif()
+
+    if (PROFILE_USE)
+      set(targ_link_flags "${targ_link_flags} /LTCG:PGO")
+      set(targ_static_link_flags "${targ_static_link_flags} /LTCG")
+    endif()
+
+    set_target_properties(${target} PROPERTIES LINK_FLAGS "${targ_link_flags}" STATIC_LIBRARY_FLAGS "${targ_static_link_flags}" 
+       COMPILE_FLAGS "${targ_compile_flags}")
+
+  endforeach()
+
 elseif (CMAKE_COMPILER_IS_GNUCXX)
   if(ENABLE_LTO)
     set_target_properties(${OPTIMIZABLE_TARGETS}
