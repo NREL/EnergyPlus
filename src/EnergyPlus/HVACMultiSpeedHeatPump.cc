@@ -585,17 +585,11 @@ namespace HVACMultiSpeedHeatPump {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNums, 0.0 );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		NumMSHeatPumps = GetNumObjectsFound( CurrentModuleObject );
 
@@ -607,8 +601,7 @@ namespace HVACMultiSpeedHeatPump {
 		// ALLOCATE ARRAYS
 		MSHeatPump.allocate( NumMSHeatPumps );
 		MSHeatPumpReport.allocate( NumMSHeatPumps );
-		CheckEquipName.allocate( NumMSHeatPumps );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumMSHeatPumps, true );
 		AllocatedFlag = true;
 
 		// Load arrays with reformulated electric EIR chiller data

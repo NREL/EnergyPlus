@@ -38,6 +38,11 @@ namespace DataStringGlobals {
 	std::string const AccentedLowerCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüı" );
 	std::string const AllCase( "àáâãäåæçèéêëìíîïğñòóôõöøùúûüıÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖØÙÚÛÜİABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz" );
 #ifdef _WIN32
+	std::string const NL( "\r\n" ); // Platform newline
+#else
+	std::string const NL( "\n" ); // Platform newline
+#endif
+#ifdef _WIN32
 	char const pathChar( '\\' );
 	char const altpathChar( '/' );
 #elif __linux__

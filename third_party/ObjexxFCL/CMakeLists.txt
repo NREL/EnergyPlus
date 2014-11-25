@@ -4,6 +4,9 @@ if(MSVC)
   ADD_DEFINITIONS("-Za") # Disables MS language extensions
 endif()
 
+if (UNIX)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
 
 set(src
   src/ObjexxFCL/array.iterator.hh
@@ -252,6 +255,7 @@ set(src
   src/ObjexxFCL/ProxySentinel.hh
   src/ObjexxFCL/random.cc
   src/ObjexxFCL/random.hh
+  src/ObjexxFCL/Read.cc
   src/ObjexxFCL/Read.fwd.hh
   src/ObjexxFCL/Read.hh
   src/ObjexxFCL/Reference.fwd.hh
