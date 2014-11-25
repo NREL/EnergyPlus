@@ -260,7 +260,7 @@ namespace DataHVACGlobals {
 	extern Real64 DXElecHeatingPower; // Electric power consumed by DX heating coil last DX simulation
 	extern Real64 ElecHeatingCoilPower; // Electric power consumed by electric heating coil
 	extern Real64 AirToAirHXElecPower; // Electric power consumed by Heat Exchanger:Air To Air (Generic or Flat Plate)
-	// from last simulation in HeatRecovery.f90
+	// from last simulation in HeatRecovery.cc
 	extern Real64 UnbalExhMassFlow; // unbalanced zone exhaust from a zone equip component [kg/s]
 	extern Real64 BalancedExhMassFlow; // balanced zone exhaust (declared as so by user)  [kg/s]
 	extern Real64 PlenumInducedMassFlow; // secondary air mass flow rate induced from a return plenum [kg/s]

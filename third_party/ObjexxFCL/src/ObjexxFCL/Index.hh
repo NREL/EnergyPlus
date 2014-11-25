@@ -33,29 +33,29 @@ public: // Creation
 	// Default Constructor
 	inline
 	Index() :
-		i_init_( false ),
-		i_( 0 )
+	 i_init_( false ),
+	 i_( 0 )
 	{}
 
 	// Copy Constructor
 	inline
 	Index( Index const & I ) :
-		i_init_( I.i_init_ ),
-		i_( I.i_ )
+	 i_init_( I.i_init_ ),
+	 i_( I.i_ )
 	{}
 
 	// Index Constructor
 	inline
 	Index( int const i ) :
-		i_init_( true ),
-		i_( i )
+	 i_init_( true ),
+	 i_( i )
 	{}
 
 	// Omit Constructor
 	inline
 	Index( Omit ) :
-		i_init_( false ),
-		i_( 0 )
+	 i_init_( false ),
+	 i_( 0 )
 	{}
 
 	// Destructor
@@ -227,27 +227,5 @@ std::ostream &
 operator <<( std::ostream & stream, Index const & a );
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.
-
-namespace std {
-
-// std::swap( Index, Index )
-inline
-void
-swap( ObjexxFCL::Index & a, ObjexxFCL::Index & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_Index_hh_INCLUDED

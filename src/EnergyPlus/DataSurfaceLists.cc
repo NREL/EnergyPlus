@@ -148,17 +148,11 @@ namespace DataSurfaceLists {
 
 			GetObjectDefMaxArgs( CurrentModuleObject1, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = "";
-			lAlphaBlanks.allocate( MaxAlphas );
-			lAlphaBlanks = false;
+			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = "";
-			Numbers.allocate( MaxNumbers );
-			Numbers = 0.0;
+			Numbers.dimension( MaxNumbers, 0.0 );
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = "";
-			lNumericBlanks.allocate( MaxNumbers );
-			lNumericBlanks = false;
+			lNumericBlanks.dimension( MaxNumbers, false );
 
 			for ( Item = 1; Item <= NumOfSurfaceLists; ++Item ) {
 
@@ -239,17 +233,11 @@ namespace DataSurfaceLists {
 		if ( NumOfSurfListVentSlab > 0 ) {
 			GetObjectDefMaxArgs( CurrentModuleObject2, NumArgs, MaxAlphas, MaxNumbers );
 			Alphas.allocate( MaxAlphas );
-			Alphas = "";
-			lAlphaBlanks.allocate( MaxAlphas );
-			lAlphaBlanks = false;
+			lAlphaBlanks.dimension( MaxAlphas, false );
 			cAlphaFields.allocate( MaxAlphas );
-			cAlphaFields = "";
-			Numbers.allocate( MaxNumbers );
-			Numbers = 0.0;
+			Numbers.dimension( MaxNumbers, 0.0 );
 			cNumericFields.allocate( MaxNumbers );
-			cNumericFields = "";
-			lNumericBlanks.allocate( MaxNumbers );
-			lNumericBlanks = false;
+			lNumericBlanks.dimension( MaxNumbers, false );
 
 			for ( Item = 1; Item <= NumOfSurfListVentSlab; ++Item ) {
 
@@ -452,7 +440,7 @@ namespace DataSurfaceLists {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

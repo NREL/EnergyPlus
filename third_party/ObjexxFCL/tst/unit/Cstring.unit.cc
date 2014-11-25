@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Cstring.hh>
+#include "ObjexxFCL.unit.hh"
 
 // C++ Headers
 #include <cstring>

@@ -809,17 +809,11 @@ namespace OutputReportPredefined {
 
 	// Object Data
 	extern FArray1D< reportNameType > reportName;
-	extern FArray1D< reportNameType > reportNameCopy;
 	extern FArray1D< SubTableType > subTable;
-	extern FArray1D< SubTableType > subTableCopy;
 	extern FArray1D< ColumnTagType > columnTag;
-	extern FArray1D< ColumnTagType > columnTagCopy;
 	extern FArray1D< TableEntryType > tableEntry;
-	extern FArray1D< TableEntryType > tableEntryCopy;
 	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntry;
-	extern FArray1D< CompSizeTableEntryType > CompSizeTableEntryCopy;
 	extern FArray1D< ShadowRelateType > ShadowRelate;
-	extern FArray1D< ShadowRelateType > ShadowRelateCopy;
 
 	// Functions
 
@@ -900,7 +894,7 @@ namespace OutputReportPredefined {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

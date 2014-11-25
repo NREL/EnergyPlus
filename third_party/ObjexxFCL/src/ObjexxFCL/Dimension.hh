@@ -42,9 +42,9 @@ public: // Creation
 	// Default Constructor
 	inline
 	Dimension() :
-		exp_p_( nullptr ),
-		initialized_( false ),
-		value_( 0 )
+	 exp_p_( nullptr ),
+	 initialized_( false ),
+	 value_( 0 )
 	{}
 
 	// Copy Constructor
@@ -64,9 +64,9 @@ public: // Creation
 	inline
 	explicit
 	Dimension( Expression const & exp ) :
-		exp_p_( exp.clone() ),
-		initialized_( exp_p_->initialized() ),
-		value_( initialized_ ? exp_p_->ivalue() : 0 )
+	 exp_p_( exp.clone() ),
+	 initialized_( exp_p_->initialized() ),
+	 value_( initialized_ ? exp_p_->ivalue() : 0 )
 	{
 		insert_as_observer();
 	}
@@ -75,9 +75,9 @@ public: // Creation
 	inline
 	explicit
 	Dimension( Expression * exp_p ) :
-		exp_p_( exp_p ),
-		initialized_( exp_p_ ? exp_p_->initialized() : false ),
-		value_( initialized_ ? exp_p_->ivalue() : 0 )
+	 exp_p_( exp_p ),
+	 initialized_( exp_p_ ? exp_p_->initialized() : false ),
+	 value_( initialized_ ? exp_p_->ivalue() : 0 )
 	{
 		reduce_expression();
 		insert_as_observer();
@@ -824,27 +824,5 @@ std::ostream &
 operator <<( std::ostream & stream, Dimension const & dim );
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.
-
-namespace std {
-
-// std::swap( Dimension, Dimension )
-inline
-void
-swap( ObjexxFCL::Dimension & a, ObjexxFCL::Dimension & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_Dimension_hh_INCLUDED

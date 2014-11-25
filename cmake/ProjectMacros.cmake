@@ -64,7 +64,8 @@ macro(ADD_GOOGLE_TESTS executable)
       string(REGEX MATCHALL "TEST_?F?\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
       foreach(hit ${found_tests})
         string(REGEX REPLACE ".*\\(( )*([A-Za-z_0-9]+)( )*,( )*([A-Za-z_0-9]+)( )*\\).*" "\\2.\\5" test_name ${hit})
-        add_test(${test_name} "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${executable}" --gtest_filter=${test_name})
+        add_test(NAME ${test_name} 
+                 COMMAND "${executable}" "--gtest_filter=${test_name}")
       endforeach(hit)
     endif()
   endforeach()
@@ -110,7 +111,7 @@ macro( CREATE_TEST_TARGETS BASE_NAME SRC DEPENDENCIES )
 endmacro()
 
 function( ADD_SIMULATION_TEST )
-  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY)
+  set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
   set(oneValueArgs IDF_FILE EPW_FILE)
   set(multiValueArgs "")
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -124,35 +125,28 @@ function( ADD_SIMULATION_TEST )
   endif()
 
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
-  if(BUILD_FORTRAN) #only do ExpandObjects in Fortran/Full builds
-    add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
-      -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DBINARY_DIR=${CMAKE_BINARY_DIR}
-      -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
-      #-DEXPANDOBJECTS_EXE=$<TARGET_FILE:ExpandObjects>
-      -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
-      -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
-      -DANNUAL_SIMULATION=${ANNUAL_SIMULATION}
-      -DBUILD_FORTRAN=${BUILD_FORTRAN}
-      -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
-    )
+  
+  add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
+    -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+    -DBINARY_DIR=${CMAKE_BINARY_DIR}
+    -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
+    -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
+    -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
+    -DANNUAL_SIMULATION=${ANNUAL_SIMULATION}
+    -DBUILD_FORTRAN=${BUILD_FORTRAN}
+    -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
+  )  
+
+  # Added the expect_fatal here to detect files that are expected to fatal error properly
+  if( ADD_SIM_TEST_EXPECT_FATAL )
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Failed")
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Passed")
   else()
-    add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
-      -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-      -DBINARY_DIR=${CMAKE_BINARY_DIR}
-      -DENERGYPLUS_EXE=$<TARGET_FILE:EnergyPlus>
-      -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
-      -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
-      -DANNUAL_SIMULATION=${ANNUAL_SIMULATION}
-      -DBUILD_FORTRAN=${BUILD_FORTRAN}
-      -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
-    )  
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
+    SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
 
-  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Test Passed")
-  SET_TESTS_PROPERTIES("integration.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
-
-  if( DO_REGRESSION_TESTING )
+  if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
     add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
       -DBINARY_DIR=${CMAKE_BINARY_DIR}
       -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
@@ -170,7 +164,6 @@ function( ADD_SIMULATION_TEST )
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES PASS_REGULAR_EXPRESSION "Success")
     set_tests_properties("regression.${IDF_NAME}" PROPERTIES FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test Failed")
   endif()
-
 
 endfunction()
 

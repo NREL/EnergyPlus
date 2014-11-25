@@ -37,6 +37,7 @@ namespace CurveManager {
 	//                       RR added exponential curve
 	//                      May 2009 Brent griffith add EMS actuator registry and override (for custom equations)
 	//                      August 2010, Richard Raustad, FSEC, added Table:* objects
+	//                      August 2014, Rick Strand, added a curve type (cubic-linear)
 	//                      Future Improvements:
 	//                       1) Merge TableData and TableLookup arrays. Care is needed here since the
 	//                          Table:OneIndependentVariable (and Two) use different data patterns.
@@ -103,6 +104,7 @@ namespace CurveManager {
 	int const ExponentialDecay( 18 );
 	int const DoubleExponentialDecay( 19 );
 	int const QuadLinear( 20 );
+	int const CubicLinear( 21 );
 
 	// Interpolation Types
 	int const LinearInterpolationOfTable( 1 );
@@ -117,7 +119,7 @@ namespace CurveManager {
 	int const DESCENDING( 2 );
 
 	// parameters describing curve object/table types
-	int const NumAllCurveTypes( 21 );
+	int const NumAllCurveTypes( 22 );
 
 	// curve object/table types (used for warning messages)
 	int const CurveType_Linear( 1 );
@@ -141,8 +143,9 @@ namespace CurveManager {
 	int const CurveType_ExponentialDecay( 19 );
 	int const CurveType_DoubleExponentialDecay( 20 );
 	int const CurveType_QuadLinear( 21 );
+	int const CurveType_CubicLinear( 22 );
 
-	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear" } );
+	FArray1D_string const cCurveTypes( NumAllCurveTypes, { "Curve:Linear", "Curve:Quadratic", "Curve:Cubic", "Curve:Quartic", "Curve:Exponent", "Curve:BiCubic", "Curve:BiQuadratic", "Curve:QuadraitcLinear", "Curve:TriQuadratic", "Curve:Functional:PressureDrop", "Table:OneIndependentVariable", "Table:TwoIndependentVariables", "Table:MultiVariableLookup", "Curve:FanPressureRise", "Curve:ExponentialSkewNormal", "Curve:Sigmoid", "Curve:RectangularHyperbola1", "Curve:RectangularHyperbola2", "Curve:ExponentialDecay", "Curve:DoubleExponentialDecay", "Curve:QuadLinear", "Curve:CubicLinear" } );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -353,6 +356,7 @@ namespace CurveManager {
 		int NumQuartic; // Number of quartic (4th order polynomial) objects in the input data file
 		int NumQuad; // Number of quadratic curve objects in the input data file
 		int NumQuadLinear; // Number of quadratic linear curve objects in the input data file
+		int NumCubicLinear; // Number of cubic linear curve objects in the input file
 		int NumQLinear; // Number of quad linear curve objects in the input data file
 		int NumLinear; // Number of linear curve objects in the input data file
 		int NumBicubic; // Number of bicubic curve objects in the input data file
@@ -415,6 +419,7 @@ namespace CurveManager {
 		NumQuad = GetNumObjectsFound( "Curve:Quadratic" );
 		NumQLinear = GetNumObjectsFound( "Curve:QuadLinear" );
 		NumQuadLinear = GetNumObjectsFound( "Curve:QuadraticLinear" );
+		NumCubicLinear = GetNumObjectsFound( "Curve:CubicLinear" );
 		NumLinear = GetNumObjectsFound( "Curve:Linear" );
 		NumBicubic = GetNumObjectsFound( "Curve:Bicubic" );
 		NumTriQuad = GetNumObjectsFound( "Curve:Triquadratic" );
@@ -430,7 +435,9 @@ namespace CurveManager {
 		NumOneVarTab = GetNumObjectsFound( "Table:OneIndependentVariable" );
 		NumTwoVarTab = GetNumObjectsFound( "Table:TwoIndependentVariables" );
 
-		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic + NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 + NumExpDecay + NumDoubleExpDecay + NumQLinear; //cpw22Aug2010
+		NumCurves = NumBiQuad + NumCubic + NumQuad + NumQuadLinear + NumCubicLinear + NumLinear + NumBicubic + NumTriQuad + NumExponent + NumQuartic +
+					NumOneVarTab + NumTwoVarTab + NumMultVarLookup + NumFanPressRise + NumExpSkewNorm + NumSigmoid + NumRectHyper1 + NumRectHyper2 +
+					NumExpDecay + NumDoubleExpDecay + NumQLinear;
 
 		// intermediate count for one and two variable performance tables
 		NumTables = NumOneVarTab + NumTwoVarTab;
@@ -729,6 +736,77 @@ namespace CurveManager {
 			PerfCurve( CurveNum ).Name = Alphas( 1 );
 			PerfCurve( CurveNum ).CurveType = QuadraticLinear;
 			PerfCurve( CurveNum ).ObjectType = CurveType_QuadraticLinear;
+			PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
+			PerfCurve( CurveNum ).Coeff1 = Numbers( 1 );
+			PerfCurve( CurveNum ).Coeff2 = Numbers( 2 );
+			PerfCurve( CurveNum ).Coeff3 = Numbers( 3 );
+			PerfCurve( CurveNum ).Coeff4 = Numbers( 4 );
+			PerfCurve( CurveNum ).Coeff5 = Numbers( 5 );
+			PerfCurve( CurveNum ).Coeff6 = Numbers( 6 );
+			PerfCurve( CurveNum ).Var1Min = Numbers( 7 );
+			PerfCurve( CurveNum ).Var1Max = Numbers( 8 );
+			PerfCurve( CurveNum ).Var2Min = Numbers( 9 );
+			PerfCurve( CurveNum ).Var2Max = Numbers( 10 );
+			if ( NumNumbers > 10 && ! lNumericFieldBlanks( 11 ) ) {
+				PerfCurve( CurveNum ).CurveMin = Numbers( 11 );
+				PerfCurve( CurveNum ).CurveMinPresent = true;
+			}
+			if ( NumNumbers > 11 && ! lNumericFieldBlanks( 12 ) ) {
+				PerfCurve( CurveNum ).CurveMax = Numbers( 12 );
+				PerfCurve( CurveNum ).CurveMaxPresent = true;
+			}
+
+			if ( Numbers( 7 ) > Numbers( 8 ) ) { // error
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 7 ) + " [" + RoundSigDigits( Numbers( 7 ), 2 ) + "] > " + cNumericFieldNames( 8 ) + " [" + RoundSigDigits( Numbers( 8 ), 2 ) + ']' );
+				ErrorsFound = true;
+			}
+			if ( Numbers( 9 ) > Numbers( 10 ) ) { // error
+				ShowSevereError( "GetCurveInput: For " + CurrentModuleObject + ": " + Alphas( 1 ) );
+				ShowContinueError( cNumericFieldNames( 9 ) + " [" + RoundSigDigits( Numbers( 9 ), 2 ) + "] > " + cNumericFieldNames( 10 ) + " [" + RoundSigDigits( Numbers( 10 ), 2 ) + ']' );
+				ErrorsFound = true;
+			}
+			if ( NumAlphas >= 2 ) {
+				if ( ! IsCurveInputTypeValid( Alphas( 2 ) ) ) {
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for X is invalid." );
+				}
+			}
+			if ( NumAlphas >= 3 ) {
+				if ( ! IsCurveInputTypeValid( Alphas( 3 ) ) ) {
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Input Unit Type for Y is invalid." );
+				}
+			}
+			if ( NumAlphas >= 4 ) {
+				if ( ! IsCurveOutputTypeValid( Alphas( 4 ) ) ) {
+					ShowWarningError( "In " + CurrentModuleObject + " named " + Alphas( 1 ) + " the Output Unit Type is invalid." );
+				}
+			}
+		}
+
+		// Loop over cubic-linear curves and load data
+		CurrentModuleObject = "Curve:CubicLinear";
+		for ( CurveIndex = 1; CurveIndex <= NumCubicLinear; ++CurveIndex ) {
+			GetObjectItem( CurrentModuleObject, CurveIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, _, cAlphaFieldNames, cNumericFieldNames );
+			++CurveNum;
+			IsNotOK = false;
+			IsBlank = false;
+			VerifyName( Alphas( 1 ), PerfCurve.Name(), CurveNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+			if ( IsNotOK ) {
+				ErrorsFound = true;
+				if ( IsBlank ) Alphas( 1 ) = "xxxxx";
+			}
+			// Need to verify that this name isn't used in Pressure Curves as well.
+			if ( NumPressureCurves > 0 ) {
+				CurveFound = FindItemInList( Alphas( 1 ), PressureCurve.Name(), NumPressureCurves );
+				if ( CurveFound != 0 ) {
+					ShowSevereError( "GetCurveInput: " + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", duplicate curve name." );
+					ShowContinueError( "...Curve name duplicates one of the Pressure Curves. Names must be unique across all curves." );
+					ErrorsFound = true;
+				}
+			}
+			PerfCurve( CurveNum ).Name = Alphas( 1 );
+			PerfCurve( CurveNum ).CurveType = CubicLinear;
+			PerfCurve( CurveNum ).ObjectType = CurveType_CubicLinear;
 			PerfCurve( CurveNum ).InterpolationType = EvaluateCurveToLimits;
 			PerfCurve( CurveNum ).Coeff1 = Numbers( 1 );
 			PerfCurve( CurveNum ).Coeff2 = Numbers( 2 );
@@ -1732,7 +1810,6 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 				if ( ( SELECT_CASE_var == Linear ) || ( SELECT_CASE_var == Quadratic ) || ( SELECT_CASE_var == Cubic ) || ( SELECT_CASE_var == Quartic ) || ( SELECT_CASE_var == Exponent ) ) {
-					TempArray1.allocate( size( PerfCurveTableData( TableNum ).X1 ) );
 					TempArray1 = PerfCurveTableData( TableNum ).X1;
 					TempArray2.allocate( size( PerfCurveTableData( TableNum ).Y ) );
 					for ( VarIndex = 1; VarIndex <= isize( PerfCurveTableData( TableNum ).Y ); ++VarIndex ) {
@@ -1978,9 +2055,7 @@ namespace CurveManager {
 			if ( PerfCurve( CurveNum ).InterpolationType == EvaluateCurveToLimits ) {
 				{ auto const SELECT_CASE_var( PerfCurve( CurveNum ).CurveType );
 				if ( ( SELECT_CASE_var == BiQuadratic ) || ( SELECT_CASE_var == QuadraticLinear ) ) {
-					TempArray1.allocate( size( TableData( TableNum ).X1 ) );
 					TempArray1 = TableData( TableNum ).X1;
-					TempArray3.allocate( size( TableData( TableNum ).X2 ) );
 					TempArray3 = TableData( TableNum ).X2;
 					TempArray2.allocate( size( TableData( TableNum ).Y ) );
 					for ( VarIndex = 1; VarIndex <= isize( TableData( TableNum ).Y ); ++VarIndex ) {
@@ -2368,8 +2443,8 @@ namespace CurveManager {
 				if ( ( SELECT_CASE_var1 == Linear ) || ( SELECT_CASE_var1 == Quadratic ) || ( SELECT_CASE_var1 == Cubic ) || ( SELECT_CASE_var1 == Quartic ) || ( SELECT_CASE_var1 == Exponent ) || ( SELECT_CASE_var1 == FuncPressDrop ) ) {
 					// CurrentModuleObject='Curve:Linear/Quadratic/Cubic/Quartic/Exponent/Functional:PressureDrop'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
-				} else if ( ( SELECT_CASE_var1 == BiQuadratic ) || ( SELECT_CASE_var1 == QuadraticLinear ) || ( SELECT_CASE_var1 == BiCubic ) ) {
-					// CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic'
+				} else if ( ( SELECT_CASE_var1 == BiQuadratic ) || ( SELECT_CASE_var1 == QuadraticLinear ) || ( SELECT_CASE_var1 == BiCubic ) || ( SELECT_CASE_var1 == CubicLinear ) ) {
+					// CurrentModuleObject='Curve:BiQuadratic/QuadraticLinear/BiCubic/CubicLinear'
 					SetupOutputVariable( "Performance Curve Input Variable 1 Value []", PerfCurve( CurveIndex ).CurveInput1, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 					SetupOutputVariable( "Performance Curve Input Variable 2 Value []", PerfCurve( CurveIndex ).CurveInput2, "HVAC", "Average", PerfCurve( CurveIndex ).Name );
 				} else if ( SELECT_CASE_var1 == TriQuadratic ) {
@@ -2455,8 +2530,8 @@ namespace CurveManager {
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2492,12 +2567,12 @@ namespace CurveManager {
 		IOFlags non_adv; non_adv.na_on(); // For non-advancing list-directed output
 
 		// Formats
-		static gio::Fmt const Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_110( "('! <READING LOOKUP TABLE DATA>')" );
-		static gio::Fmt const Format_130( "('READING LOOKUP TABLE DATA')" );
-		static gio::Fmt const Format_131( "('END READING LOOKUP TABLE DATA')" );
-		static gio::Fmt const Format_160( "(1X,10(I2,:,2X))" );
+		static gio::Fmt Format_140( "('! Reading external file tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_150( "('! Reading tabular data for ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_110( "('! <READING LOOKUP TABLE DATA>')" );
+		static gio::Fmt Format_130( "('READING LOOKUP TABLE DATA')" );
+		static gio::Fmt Format_131( "('END READING LOOKUP TABLE DATA')" );
+		static gio::Fmt Format_160( "(1X,10(I2,:,2X))" );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		TotalDataSets = 0; //Autodesk:Uninit Force default initialization
@@ -3451,6 +3526,8 @@ Label999: ;
 			CurveValue = Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * Curve.Coeff3 ) + V2 * ( Curve.Coeff4 + V2 * Curve.Coeff5 ) + V1 * V2 * Curve.Coeff6;
 		} else if ( SELECT_CASE_var == QuadraticLinear ) {
 			CurveValue = ( Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * Curve.Coeff3 ) ) + ( Curve.Coeff4 + V1 * ( Curve.Coeff5 + V1 * Curve.Coeff6 ) ) * V2;
+		} else if ( SELECT_CASE_var == CubicLinear ) {
+			CurveValue = ( Curve.Coeff1 + V1 * ( Curve.Coeff2 + V1 * ( Curve.Coeff3 + V1 * Curve.Coeff4 ) ) ) + ( Curve.Coeff5 + V1 * Curve.Coeff6 ) * V2;
 		} else if ( SELECT_CASE_var == BiCubic ) {
 			CurveValue = Curve.Coeff1 + V1 * Curve.Coeff2 + V1 * V1 * Curve.Coeff3 + V2 * Curve.Coeff4 + V2 * V2 * Curve.Coeff5 + V1 * V2 * Curve.Coeff6 + V1 * V1 * V1 * Curve.Coeff7 + V2 * V2 * V2 * Curve.Coeff8 + V1 * V1 * V2 * Curve.Coeff9 + V1 * V2 * V2 * Curve.Coeff10;
 		} else if ( SELECT_CASE_var == TriQuadratic ) {
@@ -4104,31 +4181,31 @@ Label999: ;
 		bool EchoTableDataToEio; // logical set equal to global and used to report to eio file
 
 		// Formats
-		static gio::Fmt const Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
-		static gio::Fmt const Format_130( "('CREATING NEW CURVE OBJECT')" );
-		static gio::Fmt const Format_140( "('! Input as ',A,' \"',A,'\"')" );
-		static gio::Fmt const Format_150( "('! RSquared       = ',A)" );
-		static gio::Fmt const Format_160( "('! Standard Error = ',A)" );
-		static gio::Fmt const Format_170( "('! Sample Size    = ',A)" );
-		static gio::Fmt const Format_180( "('Curve:',A,',')" );
-		static gio::Fmt const Format_190( "('FromTable_',A,',  !- Name')" );
-		static gio::Fmt const Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
-		static gio::Fmt const Format_210( "('  ',A,',  !- Coefficient2 x')" );
-		static gio::Fmt const Format_300( "('  ',A,',  !- Minimum Value of x')" );
-		static gio::Fmt const Format_310( "('  ',A,',  !- Maximum Value of x')" );
-		static gio::Fmt const Format_340( "('  ',A,',  !- Minimum Curve Output')" );
-		static gio::Fmt const Format_350( "('  ',A,';  !- Maximum Curve Output')" );
-		static gio::Fmt const Format_360( "('END CREATING NEW CURVE OBJECT')" );
-		static gio::Fmt const Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
-		static gio::Fmt const Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
-		static gio::Fmt const Format_240( "('  ',A,',  !- Coefficient4 y')" );
-		static gio::Fmt const Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
-		static gio::Fmt const Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
-		static gio::Fmt const Format_270( "('  ',A,',  !- Coefficient5 xy')" );
-		static gio::Fmt const Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
-		static gio::Fmt const Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
-		static gio::Fmt const Format_320( "('  ',A,',  !- Minimum Value of y')" );
-		static gio::Fmt const Format_330( "('  ',A,',  !- Maximum Value of y')" );
+		static gio::Fmt Format_110( "('! <CREATING NEW CURVE OBJECT>')" );
+		static gio::Fmt Format_130( "('CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt Format_140( "('! Input as ',A,' \"',A,'\"')" );
+		static gio::Fmt Format_150( "('! RSquared       = ',A)" );
+		static gio::Fmt Format_160( "('! Standard Error = ',A)" );
+		static gio::Fmt Format_170( "('! Sample Size    = ',A)" );
+		static gio::Fmt Format_180( "('Curve:',A,',')" );
+		static gio::Fmt Format_190( "('FromTable_',A,',  !- Name')" );
+		static gio::Fmt Format_200( "('  ',A,',  !- Coefficient1 Constant')" );
+		static gio::Fmt Format_210( "('  ',A,',  !- Coefficient2 x')" );
+		static gio::Fmt Format_300( "('  ',A,',  !- Minimum Value of x')" );
+		static gio::Fmt Format_310( "('  ',A,',  !- Maximum Value of x')" );
+		static gio::Fmt Format_340( "('  ',A,',  !- Minimum Curve Output')" );
+		static gio::Fmt Format_350( "('  ',A,';  !- Maximum Curve Output')" );
+		static gio::Fmt Format_360( "('END CREATING NEW CURVE OBJECT')" );
+		static gio::Fmt Format_220( "('  ',A,',  !- Coefficient3 x**2')" );
+		static gio::Fmt Format_230( "('  ',A,',  !- !- Coefficient4 x**3')" );
+		static gio::Fmt Format_240( "('  ',A,',  !- Coefficient4 y')" );
+		static gio::Fmt Format_250( "('  ',A,',  !- !- Coefficient5 x**4')" );
+		static gio::Fmt Format_260( "('  ',A,',  !- Coefficient5 y**2')" );
+		static gio::Fmt Format_270( "('  ',A,',  !- Coefficient5 xy')" );
+		static gio::Fmt Format_280( "('  ',A,',  !- Coefficient6 x*y')" );
+		static gio::Fmt Format_290( "('  ',A,',  !- Coefficient6 x**2y')" );
+		static gio::Fmt Format_320( "('  ',A,',  !- Minimum Value of y')" );
+		static gio::Fmt Format_330( "('  ',A,',  !- Maximum Value of y')" );
 
 		EchoTableDataToEio = DisplayAdvancedReportVariables;
 
@@ -4174,8 +4251,7 @@ Label999: ;
 			return;
 		}
 
-		Results.allocate( MatrixSize );
-		Results = 0.0;
+		Results.dimension( MatrixSize, 0.0 );
 		A.allocate( MatrixSize, MatrixSize );
 		//   ' Sum data
 		N = 0;
@@ -4803,6 +4879,8 @@ Label999: ;
 				GetCurveType = "BIQUADRATIC";
 			} else if ( SELECT_CASE_var == QuadraticLinear ) {
 				GetCurveType = "QUADRATICLINEAR";
+			} else if ( SELECT_CASE_var == CubicLinear ) {
+				GetCurveType = "CUBICLINEAR";
 			} else if ( SELECT_CASE_var == BiCubic ) {
 				GetCurveType = "BICUBIC";
 			} else if ( SELECT_CASE_var == TriQuadratic ) {
@@ -5564,7 +5642,7 @@ Label999: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

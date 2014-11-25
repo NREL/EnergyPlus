@@ -274,8 +274,7 @@ namespace HVACCooledBeam {
 		NumCB = GetNumObjectsFound( CurrentModuleObject );
 		// allocate the data structures
 		CoolBeam.allocate( NumCB );
-		CheckEquipName.allocate( NumCB );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumCB, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 		NumAlphas = 7;
@@ -283,17 +282,11 @@ namespace HVACCooledBeam {
 		TotalArgs = 23;
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// loop over cooled beam units; get and load the input data
 		for ( CBIndex = 1; CBIndex <= NumCB; ++CBIndex ) {
@@ -1273,7 +1266,7 @@ namespace HVACCooledBeam {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

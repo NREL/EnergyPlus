@@ -17,6 +17,6 @@ namespace ObjexxFCL {
 
 // Static Data Member Definitions
 
-	std::string const Write::LF = std::string( "\n" );
+	std::string const Write::LF = std::string( "\n" ); // Linefeed
 
 } // ObjexxFCL

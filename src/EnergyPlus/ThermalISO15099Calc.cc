@@ -468,7 +468,7 @@ namespace ThermalISO15099Calc {
 		static Real64 fluxs( 0.0 );
 		static Real64 qeff( 0.0 );
 		static Real64 flux_nonsolar( 0.0 );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		//Autodesk:Uninit Initialize variables used uninitialized
 		shgc_NOSD = 0.0; //Autodesk:Uninit Force default initialization
@@ -1053,8 +1053,8 @@ namespace ThermalISO15099Calc {
 		//logical :: TurnOnNewton
 
 		// Formats
-		static gio::Fmt const Format_1111( "('Outdoor: ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
-		static gio::Fmt const Format_1112( "('Indoor:  ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
+		static gio::Fmt Format_1111( "('Outdoor: ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
+		static gio::Fmt Format_1112( "('Indoor:  ',F9.6,' ;  alt2: ',F9.6,' ; alt3: ',F9.6,' ; alt4: ',F9.6)" );
 
 		SDLayerIndex = -1;
 
@@ -1453,20 +1453,6 @@ namespace ThermalISO15099Calc {
 				ShadeHcModifiedIn = hc_modified_in;
 			}
 		} // IF dir = 0
-
-		if ( allocated( FRes ) ) FRes.deallocate();
-		if ( allocated( FResOld ) ) FResOld.deallocate();
-		if ( allocated( FResDiff ) ) FResDiff.deallocate();
-		if ( allocated( Radiation ) ) Radiation.deallocate();
-		if ( allocated( RadiationSave ) ) RadiationSave.deallocate();
-		if ( allocated( thetaSave ) ) thetaSave.deallocate();
-		if ( allocated( x ) ) x.deallocate();
-		if ( allocated( dX ) ) dX.deallocate();
-		if ( allocated( Jacobian ) ) Jacobian.deallocate();
-		if ( allocated( DRes ) ) DRes.deallocate();
-
-		if ( allocated( LeftHandSide ) ) LeftHandSide.deallocate();
-		if ( allocated( RightHandSide ) ) RightHandSide.deallocate();
 
 		//do i=1, nlayer-1
 		//  if (((LayerType(i).eq.VENETBLIND)  &
@@ -2743,7 +2729,7 @@ namespace ThermalISO15099Calc {
 		int i;
 
 		// Formats
-		static gio::Fmt const Format_1000( "(I3)" );
+		static gio::Fmt Format_1000( "(I3)" );
 
 		//open(unit=InArgumentsFile,  file=TRIM(DBGD)//'TarcogIterations.dbg',  status='unknown', position='APPEND',  &
 		//          &  form='formatted', iostat=nperr)
@@ -2931,7 +2917,7 @@ namespace ThermalISO15099Calc {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

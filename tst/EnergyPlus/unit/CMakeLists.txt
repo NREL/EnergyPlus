@@ -7,6 +7,7 @@ endif()
 
 set( test_src
   DataPlant.unit.cc
+  HeatBalanceManager.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
@@ -19,7 +20,8 @@ set( test_dependencies
   bcvtb 
   epexpat 
   epfmiimport 
-)
+  DElight
+ )
 
 if(CMAKE_HOST_UNIX)
   if(NOT APPLE)

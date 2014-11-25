@@ -2224,7 +2224,7 @@ namespace PurchasedAirManager {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         M. Witte (GARD)
-		//       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.f90 and adapted for Ideal Loads System)
+		//       DATE WRITTEN   Jun 2011 (taken from HVACSingleDuctSystem.cc and adapted for Ideal Loads System)
 		//       MODIFIED       na
 		//       RE-ENGINEERED  na
 
@@ -2853,7 +2853,7 @@ namespace PurchasedAirManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

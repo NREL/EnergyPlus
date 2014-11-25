@@ -151,7 +151,7 @@ namespace HVACInterfaceManager {
 		int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
 		int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
 		bool & OutOfToleranceFlag, // True when the other side of the loop need to be (re)simulated
-		Optional_int_const CommonPipeType = _
+		int const CommonPipeType
 	);
 
 	//***************
@@ -198,7 +198,7 @@ namespace HVACInterfaceManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

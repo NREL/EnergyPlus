@@ -429,17 +429,11 @@ namespace LowTempRadiantSystem {
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 
 		NumOfHydrLowTempRadSys = GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:VariableFlow" );
 		NumOfCFloLowTempRadSys = GetNumObjectsFound( "ZoneHVAC:LowTemperatureRadiant:ConstantFlow" );
@@ -447,8 +441,7 @@ namespace LowTempRadiantSystem {
 
 		TotalNumOfRadSystems = NumOfHydrLowTempRadSys + NumOfElecLowTempRadSys + NumOfCFloLowTempRadSys;
 		RadSysTypes.allocate( TotalNumOfRadSystems );
-		CheckEquipName.allocate( TotalNumOfRadSystems );
-		CheckEquipName = true;
+		CheckEquipName.dimension( TotalNumOfRadSystems, true );
 
 		HydrRadSys.allocate( NumOfHydrLowTempRadSys );
 		if ( NumOfHydrLowTempRadSys > 0 ) {
@@ -488,7 +481,7 @@ namespace LowTempRadiantSystem {
 
 			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			
+
 			HydronicRadiantSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HydronicRadiantSysNumericFields( Item ).FieldNames = "";
 			HydronicRadiantSysNumericFields( Item ).FieldNames = cNumericFields;
@@ -1081,7 +1074,7 @@ namespace LowTempRadiantSystem {
 
 			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			
+
 			ElecRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			ElecRadSysNumericFields( Item ).FieldNames = "";
 			ElecRadSysNumericFields( Item ).FieldNames = cNumericFields;
@@ -1283,8 +1276,7 @@ namespace LowTempRadiantSystem {
 		// and thus indicative that there is an error in the input file.  This is to make sure that two
 		// different radiant systems are competing for the same surface.  Allowing this to happen would
 		// result in lost energy somewhere and the situation really is not physically possible anyway.
-		AssignedAsRadiantSurface.allocate( TotSurfaces );
-		AssignedAsRadiantSurface = false;
+		AssignedAsRadiantSurface.dimension( TotSurfaces, false );
 
 		for ( Item = 1; Item <= NumOfHydrLowTempRadSys; ++Item ) {
 			for ( SurfNum = 1; SurfNum <= HydrRadSys( Item ).NumOfSurfaces; ++SurfNum ) {
@@ -1466,7 +1458,7 @@ namespace LowTempRadiantSystem {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const ZeroTol( 0.0000001 ); // Smallest non-zero value allowed
 		static std::string const RoutineName( "InitLowTempRadiantSystem" );
-		static gio::Fmt const fmtF102( "(F10.2)" );
+		static gio::Fmt fmtF102( "(F10.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1515,16 +1507,11 @@ namespace LowTempRadiantSystem {
 
 		if ( firstTime ) {
 
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QRadSysSrcAvg.allocate( TotSurfaces );
-			QRadSysSrcAvg = 0.0;
-			LastQRadSysSrc.allocate( TotSurfaces );
-			LastQRadSysSrc = 0.0;
-			LastSysTimeElapsed.allocate( TotSurfaces );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( TotSurfaces );
-			LastTimeStepSys = 0.0;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QRadSysSrcAvg.dimension( TotSurfaces, 0.0 );
+			LastQRadSysSrc.dimension( TotSurfaces, 0.0 );
+			LastSysTimeElapsed.dimension( TotSurfaces, 0.0 );
+			LastTimeStepSys.dimension( TotSurfaces, 0.0 );
 			MySizeFlagHydr.allocate( NumOfHydrLowTempRadSys );
 			MySizeFlagCFlo.allocate( NumOfCFloLowTempRadSys );
 			MySizeFlagElec.allocate( NumOfElecLowTempRadSys );
@@ -1970,7 +1957,7 @@ namespace LowTempRadiantSystem {
 		int SizingMethod; // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-		Real64 DesCoilLoad; // design autosized or user specified capacity   
+		Real64 DesCoilLoad; // design autosized or user specified capacity
 
 		ErrorsFound = false;
 		IsAutoSize = false;
@@ -2029,7 +2016,7 @@ namespace LowTempRadiantSystem {
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					ElecRadSys(RadSysNum).MaxElecPower = TempSize;
-				}			
+				}
 			}
 		}
 
@@ -2098,7 +2085,7 @@ namespace LowTempRadiantSystem {
 							} else {
 								WaterVolFlowMaxHeatDes = 0.0;
 							}
-												
+
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
 							ShowContinueError( "Occurs in " "ZoneHVAC:LowTemperatureRadiant:VariableFlow" " Object=" + HydrRadSys( RadSysNum ).Name );
@@ -4916,7 +4903,7 @@ namespace LowTempRadiantSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

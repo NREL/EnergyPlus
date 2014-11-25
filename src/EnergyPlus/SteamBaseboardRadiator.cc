@@ -297,7 +297,7 @@ namespace SteamBaseboardRadiator {
 		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to steam baseboard Radiator system electric heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
-		
+
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 
@@ -323,8 +323,7 @@ namespace SteamBaseboardRadiator {
 		// Count total number of baseboard units
 
 		SteamBaseboard.allocate( NumSteamBaseboards );
-		CheckEquipName.allocate( NumSteamBaseboards );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSteamBaseboards, true );
 		SteamBaseboardNumericFields.allocate( NumSteamBaseboards );
 
 		// Get the data from the user input related to baseboard heaters
@@ -642,18 +641,12 @@ namespace SteamBaseboardRadiator {
 			// initialize the environment and sizing flags
 			MyEnvrnFlag.allocate( NumSteamBaseboards );
 			MySizeFlag.allocate( NumSteamBaseboards );
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QBBSteamRadSource.allocate( NumSteamBaseboards );
-			QBBSteamRadSource = 0.0;
-			QBBSteamRadSrcAvg.allocate( NumSteamBaseboards );
-			QBBSteamRadSrcAvg = 0.0;
-			LastQBBSteamRadSrc.allocate( NumSteamBaseboards );
-			LastQBBSteamRadSrc = 0.0;
-			LastSysTimeElapsed.allocate( NumSteamBaseboards );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( NumSteamBaseboards );
-			LastTimeStepSys = 0.0;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QBBSteamRadSource.dimension( NumSteamBaseboards, 0.0 );
+			QBBSteamRadSrcAvg.dimension( NumSteamBaseboards, 0.0 );
+			LastQBBSteamRadSrc.dimension( NumSteamBaseboards, 0.0 );
+			LastSysTimeElapsed.dimension( NumSteamBaseboards, 0.0 );
+			LastTimeStepSys.dimension( NumSteamBaseboards, 0.0 );
 			SetLoopIndexFlag.allocate( NumSteamBaseboards );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
@@ -1498,7 +1491,7 @@ namespace SteamBaseboardRadiator {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

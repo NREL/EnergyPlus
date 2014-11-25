@@ -16,7 +16,7 @@
 // Notes:
 //  These are convenience methods to provide near-Fortran syntax for MArray usage
 
-// Forward Declarations
+// Forward
 template< typename > class FArray1D;
 
 	// Types
@@ -106,6 +106,9 @@ template< typename > class FArray1D;
 	inline MA1S_double z() { return ma( &T::z ); }
 
 	// string const Members
+	inline MA1Sc_string ComponentTypeName() const { return ma( &T::ComponentTypeName ); }
+	inline MA1Sc_string ControlTypeName() const { return ma( &T::ControlTypeName ); }
+	inline MA1Sc_string DataTypeName() const { return ma( &T::DataTypeName ); }
 	inline MA1Sc_string EquipName() const { return ma( &T::EquipName ); }
 	inline MA1Sc_string EquipType() const { return ma( &T::EquipType ); }
 	inline MA1Sc_string FieldName() const { return ma( &T::FieldName ); }
@@ -115,6 +118,9 @@ template< typename > class FArray1D;
 	inline MA1Sc_string VarNameOnly() const { return ma( &T::VarNameOnly ); }
 
 	// string Members
+	inline MA1S_string ComponentTypeName() { return ma( &T::ComponentTypeName ); }
+	inline MA1S_string ControlTypeName() { return ma( &T::ControlTypeName ); }
+	inline MA1S_string DataTypeName() { return ma( &T::DataTypeName ); }
 	inline MA1S_string EquipName() { return ma( &T::EquipName ); }
 	inline MA1S_string EquipType() { return ma( &T::EquipType ); }
 	inline MA1S_string FieldName() { return ma( &T::FieldName ); }

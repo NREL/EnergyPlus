@@ -1,9 +1,14 @@
+// C++ Headers
+#include <ostream>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
 #include <DataGlobals.hh>
 #include <DataPrecisionGlobals.hh>
+
+#include <string>
 
 namespace EnergyPlus {
 
@@ -54,10 +59,13 @@ namespace DataGlobals {
 	int const HVACTSReporting( 2 ); // value for HVAC Time Step Reporting (UpdateDataAndReport)
 
 	Real64 const MaxEXPArg( 709.78 ); // maximum exponent in EXP() function
-	Real64 const Pi( 3.141592653589793 ); // Pi 3.1415926535897932384626435
+	Real64 const Pi( 3.14159265358979324 ); // Pi 3.1415926535897932384626435
 	Real64 const PiOvr2( Pi / 2.0 ); // Pi/2
+	Real64 const TwoPi( 2.0 * Pi ); // 2*Pi 6.2831853071795864769252868
 	Real64 const GravityConstant( 9.807 );
 	Real64 const DegToRadians( Pi / 180.0 ); // Conversion for Degrees to Radians
+	Real64 const DegToRad( Pi / 180.0 ); // Conversion for Degrees to Radians
+	Real64 const RadToDeg( 180.0 / Pi ); // Conversion for Radians to Degrees
 	Real64 const SecInHour( 3600.0 ); // Conversion for hours to seconds
 	Real64 const HoursInDay( 24.0 ); // Number of Hourse in Day
 	Real64 const SecsInDay( SecInHour * HoursInDay ); // Number of seconds in Day
@@ -127,12 +135,14 @@ namespace DataGlobals {
 	Real64 TimeStepZone( 0.0 ); // Zone time step in fractional hours
 	bool WarmupFlag( false ); // True during the warmup portion of a simulation
 	int OutputFileStandard( 0 ); // Unit number for the standard output file (hourly data only)
+	std::ostream * eso_stream( nullptr ); // Internal stream used for eso output (used for performance)
 	int StdOutputRecordCount( 0 ); // Count of Standard output records
 	int OutputFileInits( 0 ); // Unit number for the standard Initialization output file
 	int OutputFileDebug( 0 ); // Unit number for debug outputs
 	int OutputFileZoneSizing( 0 ); // Unit number of zone sizing calc output file
 	int OutputFileSysSizing( 0 ); // Unit number of system sizing calc output file
 	int OutputFileMeters( 0 ); // Unit number for meters output
+	std::ostream * mtr_stream( nullptr ); // Internal stream used for mtr output (used for performance)
 	int StdMeterRecordCount( 0 ); // Count of Meter output records
 	int OutputFileBNDetails( 0 ); // Unit number for Branch-Node Details
 	bool ZoneSizingCalc( false ); // TRUE if zone sizing calculation
@@ -171,6 +181,11 @@ namespace DataGlobals {
 	bool doLoadComponentPulseNow( false ); // true for the time step that is the "pulse" for the load component report
 	bool ShowDecayCurvesInEIO( false ); // true if the Radiant to Convective Decay Curves should appear in the EIO file
 	bool AnySlabsInModel ( false ); // true if there are any zone-coupled ground domains in the input file
+	bool AnyBasementsInModel( false ); // true if there are any basements in the input file
+
+	int Progress( 0 ); // current progress (0-100)
+	void ( *fProgressPtr )( int );
+	void ( *fMessagePtr )( std::string );
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
@@ -179,7 +194,7 @@ namespace DataGlobals {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

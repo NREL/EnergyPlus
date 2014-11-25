@@ -377,10 +377,8 @@ namespace DemandManager {
 		NumDemandManagerList = GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumDemandManagerList > 0 ) {
-			AlphArray.allocate( NumAlphas );
-			AlphArray = BlankString;
-			NumArray.allocate( NumNums );
-			NumArray = 0.0;
+			AlphArray.dimension( NumAlphas, BlankString );
+			NumArray.dimension( NumNums, 0.0 );
 
 			DemandManagerList.allocate( NumDemandManagerList );
 
@@ -638,10 +636,8 @@ namespace DemandManager {
 		NumDemandMgr = NumDemandMgrExtLights + NumDemandMgrLights + NumDemandMgrElecEquip + NumDemandMgrThermostats;
 
 		if ( NumDemandMgr > 0 ) {
-			AlphArray.allocate( MaxAlphas );
-			AlphArray = BlankString;
-			NumArray.allocate( MaxNums );
-			NumArray = 0.0;
+			AlphArray.dimension( MaxAlphas, BlankString );
+			NumArray.dimension( MaxNums, 0.0 );
 
 			DemandMgr.allocate( NumDemandMgr );
 
@@ -1627,7 +1623,7 @@ namespace DemandManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
