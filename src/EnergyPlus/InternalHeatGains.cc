@@ -3805,7 +3805,7 @@ namespace InternalHeatGains {
 				}
 				TRecirc = MAT( NZ );
 				WRecirc = ZoneAirHumRat( NZ );
-				TAirIn = TRecirc * RecircFrac + TSupply * (1.0 - RecircFrac );
+				TAirIn = TRecirc * RecircFrac + TSupply * ( 1.0 - RecircFrac );
 				WAirIn = WRecirc * RecircFrac + WSupply * ( 1.0 - RecircFrac );
 			} else if ( AirConnection == ITEInletRoomAirModel ) {
 				// Room air model option not implemented yet
@@ -3898,8 +3898,8 @@ namespace InternalHeatGains {
 
 			ZnRpt( NZ ).ITEqAirVolFlowStdDensity += ZoneITEq( Loop ).AirVolFlowStdDensity;
 			ZnRpt( NZ ).ITEqAirMassFlow += ZoneITEq( Loop ).AirMassFlow;
-			ZoneSumTinMinusTSup( NZ ) += (TAirIn - TSupply) * AirVolFlowRate;
-			ZoneSumToutMinusTSup( NZ ) += (TAirOut - TSupply) * AirVolFlowRate;
+			ZoneSumTinMinusTSup( NZ ) += ( TAirIn - TSupply ) * AirVolFlowRate;
+			ZoneSumToutMinusTSup( NZ ) += ( TAirOut - TSupply ) * AirVolFlowRate;
 
 			// Check environmental class operating range limits (defined as parameters in this subroutine)
 			EnvClass = ZoneITEq( Loop ).Class;
