@@ -1190,22 +1190,22 @@ TEST( FArray1FunctionsTest, Sum )
 {
 	FArray1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
 	double const E1 = 15.0;
-	EXPECT_TRUE( E1 == sum( A ) );
-	EXPECT_TRUE( E1 == sum( A, 1 ) );
+	EXPECT_EQ( E1, sum( A ) );
+	EXPECT_EQ( E1, sum( A, 1 ) );
 	FArray1D_bool M( { true, false, true, false, true } );
 	double const E2 = 9.0;
-	EXPECT_TRUE( E2 == sum( A, M ) );
+	EXPECT_EQ( E2, sum( A, M ) );
 }
 
 TEST( FArray1FunctionsTest, Product )
 {
 	FArray1D_double A( { 1.0, 2.0, 3.0, 4.0, 5.0 } );
 	double const E1 = 120.0;
-	EXPECT_TRUE( E1 == product( A ) );
-	EXPECT_TRUE( E1 == product( A, 1 ) );
+	EXPECT_EQ( E1, product( A ) );
+	EXPECT_EQ( E1, product( A, 1 ) );
 	FArray1D_bool M( { true, false, true, false, true } );
 	double const E2 = 15.0;
-	EXPECT_TRUE( E2 == product( A, M ) );
+	EXPECT_EQ( E2, product( A, M ) );
 }
 
 TEST( FArray1FunctionsTest, Abs )

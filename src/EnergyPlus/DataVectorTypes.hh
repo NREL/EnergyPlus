@@ -7,6 +7,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
+#include <ObjexxFCL/Vector3.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -96,6 +97,17 @@ namespace DataVectorTypes {
 			x = a( 1 );
 			y = a( 2 );
 			z = a( 3 );
+			return *this;
+		}
+
+		// Vector3 Assignment
+		inline
+		Vector &
+		operator =( Vector3< Real64 > const & v )
+		{
+			x = v.x;
+			y = v.y;
+			z = v.z;
 			return *this;
 		}
 
@@ -373,11 +385,55 @@ namespace DataVectorTypes {
 			return ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z );
 		}
 
+		// Dot Product
+		inline
+		friend
+		Real64
+		dot( Vector const & a, Vector3< Real64 > const & b )
+		{
+			return ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z );
+		}
+
+		// Dot Product
+		inline
+		friend
+		Real64
+		dot( Vector3< Real64 > const & a, Vector const & b )
+		{
+			return ( a.x * b.x ) + ( a.y * b.y ) + ( a.z * b.z );
+		}
+
 		// Cross Product
 		inline
 		friend
 		Vector
 		cross( Vector const & a, Vector const & b )
+		{
+			Vector c;
+			c.x = ( a.y * b.z ) - ( a.z * b.y );
+			c.y = ( a.z * b.x ) - ( a.x * b.z );
+			c.z = ( a.x * b.y ) - ( a.y * b.x );
+			return c;
+		}
+
+		// Cross Product
+		inline
+		friend
+		Vector
+		cross( Vector const & a, Vector3< Real64 > const & b )
+		{
+			Vector c;
+			c.x = ( a.y * b.z ) - ( a.z * b.y );
+			c.y = ( a.z * b.x ) - ( a.x * b.z );
+			c.z = ( a.x * b.y ) - ( a.y * b.x );
+			return c;
+		}
+
+		// Cross Product
+		inline
+		friend
+		Vector
+		cross( Vector3< Real64 > const & a, Vector const & b )
 		{
 			Vector c;
 			c.x = ( a.y * b.z ) - ( a.z * b.y );
@@ -392,6 +448,43 @@ namespace DataVectorTypes {
 		FArray() const
 		{
 			return FArray1D< Real64 >( 3, { x, y, z } );
+		}
+
+		// Array Generator
+		inline
+		FArray1D< Real64 >
+		as_FArray() const
+		{
+			return FArray1D< Real64 >( 3, { x, y, z } );
+		}
+
+		// Vector3 Generator
+		inline
+		Vector3< Real64 >
+		as_Vector3() const
+		{
+			return Vector3< Real64 >( x, y, z );
+		}
+
+		// Assign to an FArray
+		inline
+		void
+		assign_to( FArray1D< Real64 > & a ) const
+		{
+			a.dimension( 3 );
+			a( 1 ) = x;
+			a( 2 ) = y;
+			a( 3 ) = z;
+		}
+
+		// Assign to a Vector3
+		inline
+		void
+		assign_to( Vector3< Real64 > & v ) const
+		{
+			v.x = x;
+			v.y = y;
+			v.z = z;
 		}
 
 	private: // Static Functions

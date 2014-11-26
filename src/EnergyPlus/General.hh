@@ -329,12 +329,16 @@ namespace General {
 		Optional_string Option2 = _
 	);
 
+	inline
 	void
 	ReallocateRealArray(
 		FArray1D< Real64 > & Array,
 		int & ArrayMax, // Current and resultant dimension for Array
 		int const ArrayInc // increment for redimension
-	);
+	)
+	{
+		Array.redimension( ArrayMax += ArrayInc, 0.0 );
+	}
 
 	void
 	CheckCreatedZoneItemName(

@@ -270,8 +270,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		// Allocate Arrays
 		GSHP.allocate( NumGSHPs );
 		GSHPReport.allocate( NumGSHPs );
-		CheckEquipName.allocate( NumGSHPs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumGSHPs, true );
 
 		for ( GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum ) {
 			GetObjectItem( ModuleCompNameUC, GSHPNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat );
@@ -594,7 +593,7 @@ namespace HeatPumpWaterToWaterCOOLING {
 		static std::string const RoutineNameCompressInletTemp( "CalcGSHPModel:CompressInletTemp" );
 		static std::string const RoutineNameSuctionPr( "CalcGSHPModel:SuctionPr" );
 		static std::string const RoutineNameCompSuctionTemp( "CalcGSHPModel:CompSuctionTemp" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

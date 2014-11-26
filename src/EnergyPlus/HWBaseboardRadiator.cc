@@ -658,18 +658,12 @@ namespace HWBaseboardRadiator {
 			// Initialize the environment and sizing flags
 			MyEnvrnFlag.allocate( NumHWBaseboards );
 			MySizeFlag.allocate( NumHWBaseboards );
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QBBRadSource.allocate( NumHWBaseboards );
-			QBBRadSource = 0.0;
-			QBBRadSrcAvg.allocate( NumHWBaseboards );
-			QBBRadSrcAvg = 0.0;
-			LastQBBRadSrc.allocate( NumHWBaseboards );
-			LastQBBRadSrc = 0.0;
-			LastSysTimeElapsed.allocate( NumHWBaseboards );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( NumHWBaseboards );
-			LastTimeStepSys = 0.0;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QBBRadSource.dimension( NumHWBaseboards, 0.0 );
+			QBBRadSrcAvg.dimension( NumHWBaseboards, 0.0 );
+			LastQBBRadSrc.dimension( NumHWBaseboards, 0.0 );
+			LastSysTimeElapsed.dimension( NumHWBaseboards, 0.0 );
+			LastTimeStepSys.dimension( NumHWBaseboards, 0.0 );
 			SetLoopIndexFlag.allocate( NumHWBaseboards );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;

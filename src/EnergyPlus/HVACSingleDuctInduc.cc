@@ -287,23 +287,16 @@ namespace HVACSingleDuctInduc {
 		NumIndUnits = NumFourPipes;
 		// allocate the data structures
 		IndUnit.allocate( NumIndUnits );
-		CheckEquipName.allocate( NumIndUnits );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumIndUnits, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// loop over Series PIUs; get and load the input data
 		for ( IUIndex = 1; IUIndex <= NumFourPipes; ++IUIndex ) {
