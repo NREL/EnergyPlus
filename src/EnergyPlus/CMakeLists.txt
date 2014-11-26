@@ -7,7 +7,10 @@ if(MSVC)
 #  add_definitions(/Za)
 endif()
 
-configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+# Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
+if(NOT PROFILE_USE)
+  configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+endif()
 
 SET( SRC
   Timer.h
