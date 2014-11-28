@@ -335,7 +335,7 @@ int SQLite::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationInde
 
 int SQLite::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert)
 {
-	return sqliteBindInteger(stmt,stmtInsertLocationIndex,logicalToInteger(valueToInsert));
+	return sqliteBindInteger(stmt,stmtInsertLocationIndex, valueToInsert ? 1 : 0);
 }
 
 int SQLite::sqliteStepCommand(sqlite3_stmt * stmt)
@@ -1232,7 +1232,7 @@ void SQLite::createSQLiteReportDictionaryRecord (
 {
 	if( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_reportDictionaryInsertStmt, 1, reportVariableReportID);
-		sqliteBindInteger(m_reportDictionaryInsertStmt, 2, isMeter ? 1 : 0);
+		sqliteBindLogical(m_reportDictionaryInsertStmt, 2, isMeter);
 		sqliteBindText(m_reportDictionaryInsertStmt, 3, storageType(storeTypeIndex));
 		sqliteBindText(m_reportDictionaryInsertStmt, 4, indexGroup);
 		sqliteBindText(m_reportDictionaryInsertStmt, 5, timestepTypeName(indexType));
@@ -1265,16 +1265,6 @@ void SQLite::createSQLiteReportDataRecord(
 )
 {
 	if( m_writeOutputToSQLite ) {
-
-		int minMonth;
-		int minDay;
-		int minHour;
-		int minMinute;
-		int maxMonth;
-		int maxDay;
-		int maxHour;
-		int maxMinute;
-
 		static int dataIndex = 0;
 		static int extendedDataIndex = 0;
 
@@ -1285,7 +1275,16 @@ void SQLite::createSQLiteReportDataRecord(
 		sqliteBindInteger(m_reportDataInsertStmt, 3, recordIndex);
 		sqliteBindDouble(m_reportDataInsertStmt, 4, value);
 
-		if(reportingInterval.present()) {
+		if(reportingInterval.present() && minValueDate != 0 && maxValueDate != 0) {
+			int minMonth;
+			int minDay;
+			int minHour;
+			int minMinute;
+			int maxMonth;
+			int maxDay;
+			int maxHour;
+			int maxMinute;
+
 			General::DecodeMonDayHrMin(minValueDate, minMonth, minDay, minHour, minMinute);
 			General::DecodeMonDayHrMin(maxValueDate, maxMonth, maxDay, maxHour, maxMinute);
 
@@ -1331,8 +1330,7 @@ void SQLite::createSQLiteReportDataRecord(
 						ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
 						sqliteWriteMessage(ss.str());
 				}
-			}
-			else if (minValue.present() || minValueDate.present() || maxValue.present() || maxValueDate.present()) { // This is for data created by a 'Report Variable' statement
+			} else { // This is for data created by a 'Report Variable' statement
 				switch(reportingInterval()) {
 					case LocalReportDaily:
 					case LocalReportMonthly:
@@ -1364,8 +1362,6 @@ void SQLite::createSQLiteReportDataRecord(
 						ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
 						sqliteWriteMessage(ss.str());
 				}
-			} else {
-				--extendedDataIndex; // Reset the data index to account for no extended data
 			}
 		}
 
