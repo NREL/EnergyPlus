@@ -35,7 +35,7 @@ public:
 	// Commit a transaction
 	void sqliteCommit();
 
-	void createSQLiteReportVariableDictionaryRecord(
+	void createSQLiteReportDictionaryRecord(
 		int const reportVariableReportID,
 		int const storeTypeIndex,
 		std::string const & indexGroup,
@@ -44,10 +44,11 @@ public:
 		int const indexType,
 		std::string const & units,
 		int const reportingFreq,
+		bool isMeter,
 		Optional_string_const ScheduleName = _
 	);
 
-	void createSQLiteReportVariableDataRecord(
+	void createSQLiteReportDataRecord(
 		int const recordIndex,
 		Real64 const value,
 		Optional_int_const reportingInterval = _,
@@ -57,6 +58,29 @@ public:
 		Optional_int_const maxValueDate = _,
 		Optional_int_const minutesPerTimeStep = _
 	);
+
+//	void createSQLiteReportVariableDictionaryRecord(
+//		int const reportVariableReportID,
+//		int const storeTypeIndex,
+//		std::string const & indexGroup,
+//		std::string const & keyedValueString,
+//		std::string const & variableName,
+//		int const indexType,
+//		std::string const & units,
+//		int const reportingFreq,
+//		Optional_string_const ScheduleName = _
+//	);
+
+//	void createSQLiteReportVariableDataRecord(
+//		int const recordIndex,
+//		Real64 const value,
+//		Optional_int_const reportingInterval = _,
+//		Optional< Real64 const > minValue = _,
+//		Optional_int_const minValueDate = _,
+//		Optional< Real64 const > maxValue = _,
+//		Optional_int_const maxValueDate = _,
+//		Optional_int_const minutesPerTimeStep = _
+//	);
 
 	void createSQLiteTimeIndexRecord(
 		int const reportingInterval,
@@ -100,28 +124,28 @@ public:
 
 	void createSQLiteRoomAirModelTable();
 
-	void createSQLiteMeterDictionaryRecord(
-		int const meterReportID,
-		int const storeTypeIndex,
-		std::string const & indexGroup,
-		std::string const & keyedValueString,
-		std::string const & variableName,
-		int const indexType,
-		std::string const & units,
-		int const reportingFreq,
-		Optional_string_const ScheduleName = _
-	);
-
-	void createSQLiteMeterRecord(
-		int const recordIndex,
-		Real64 const value,
-		Optional_int_const reportingInterval = _,
-		Optional< Real64 const > minValue = _,
-		Optional_int_const minValueDate = _,
-		Optional< Real64 const > maxValue = _,
-		Optional_int_const maxValueDate = _,
-		Optional_int_const minutesPerTimeStep = _
-	);
+//	void createSQLiteMeterDictionaryRecord(
+//		int const meterReportID,
+//		int const storeTypeIndex,
+//		std::string const & indexGroup,
+//		std::string const & keyedValueString,
+//		std::string const & variableName,
+//		int const indexType,
+//		std::string const & units,
+//		int const reportingFreq,
+//		Optional_string_const ScheduleName = _
+//	);
+//
+//	void createSQLiteMeterRecord(
+//		int const recordIndex,
+//		Real64 const value,
+//		Optional_int_const reportingInterval = _,
+//		Optional< Real64 const > minValue = _,
+//		Optional_int_const minValueDate = _,
+//		Optional< Real64 const > maxValue = _,
+//		Optional_int_const maxValueDate = _,
+//		Optional_int_const minutesPerTimeStep = _
+//	);
 
 	void createSQLiteDaylightMapTitle(
 		int const mapNum,
@@ -212,7 +236,7 @@ private:
 	int sqliteClearBindings(sqlite3_stmt * stmt);
 	int sqliteFinalizeCommand(sqlite3_stmt * stmt);
 
-	int createSQLiteStringTableRecord(std::string const & stringValue,std::string const & stringType);
+	int createSQLiteStringTableRecord(std::string const & stringValue, int const stringType);
 
 	static std::string storageType(const int storageTypeIndex);
 	static std::string timestepTypeName(const int timestepType);
@@ -226,10 +250,12 @@ private:
 
 	static int logicalToInteger(const bool value);
 
-	void initializeReportVariableDataDictionaryTable();
-	void initializeReportVariableDataTables();
-	void initializeReportMeterDataDictionaryTable();
-	void initializeReportMeterDataTables();
+	void initializeReportDataDictionaryTable();
+	void initializeReportDataTables();
+//	void initializeReportVariableDataDictionaryTable();
+//	void initializeReportVariableDataTables();
+//	void initializeReportMeterDataDictionaryTable();
+//	void initializeReportMeterDataTables();
 	void initializeTimeIndicesTable();
 	void initializeZoneInfoTable();
 	void initializeNominalPeopleTable();
@@ -266,10 +292,13 @@ private:
 	std::ofstream m_errorStream;
 	sqlite3 * m_db;
 	std::string m_dbName;
-	sqlite3_stmt * m_reportVariableDataInsertStmt;
-	sqlite3_stmt * m_reportVariableExtendedDataInsertStmt;
+	sqlite3_stmt * m_reportDataInsertStmt;
+	sqlite3_stmt * m_reportExtendedDataInsertStmt;
+	sqlite3_stmt * m_reportDictionaryInsertStmt;
+//	sqlite3_stmt * m_reportVariableDataInsertStmt;
+//	sqlite3_stmt * m_reportVariableExtendedDataInsertStmt;
 	sqlite3_stmt * m_timeIndexInsertStmt;
-	sqlite3_stmt * m_reportVariableDictionaryInsertStmt;
+//	sqlite3_stmt * m_reportVariableDictionaryInsertStmt;
 	sqlite3_stmt * m_zoneInfoInsertStmt;
 	sqlite3_stmt * m_nominalLightingInsertStmt;
 	sqlite3_stmt * m_nominalElectricEquipmentInsertStmt;
@@ -293,9 +322,9 @@ private:
 	sqlite3_stmt * m_roomAirModelInsertStmt;
 	sqlite3_stmt * m_groundTemperatureInsertStmt;
 	sqlite3_stmt * m_weatherFileInsertStmt;
-	sqlite3_stmt * m_meterDictionaryInsertStmt;
-	sqlite3_stmt * m_reportMeterDataInsertStmt;
-	sqlite3_stmt * m_meterExtendedDataInsertStmt;
+//	sqlite3_stmt * m_meterDictionaryInsertStmt;
+//	sqlite3_stmt * m_reportMeterDataInsertStmt;
+//	sqlite3_stmt * m_meterExtendedDataInsertStmt;
 	sqlite3_stmt * m_scheduleInsertStmt;
 	sqlite3_stmt * m_daylightMapTitleInsertStmt;
 	sqlite3_stmt * m_daylightMapHorlyTitleInsertStmt;
@@ -315,12 +344,12 @@ private:
 	static const int LocalReportDaily;     //  Write out at 'EndDayFlag'
 	static const int LocalReportMonthly;   //  Write out at end of month (must be determined)
 	static const int LocalReportSim;       //  Write out once per environment 'EndEnvrnFlag'
-	static const std::string ReportNameId;         // These should be integers.  Why is this?
-	static const std::string ReportForStringId;
-	static const std::string TableNameId;
-	static const std::string RowNameId;
-	static const std::string ColumnNameId;
-	static const std::string UnitsId;
+	static const int ReportNameId;
+	static const int ReportForStringId;
+	static const int TableNameId;
+	static const int RowNameId;
+	static const int ColumnNameId;
+	static const int UnitsId;
 };
 
 extern std::unique_ptr<SQLite> sqlite;

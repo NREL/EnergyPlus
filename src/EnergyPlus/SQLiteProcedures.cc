@@ -25,12 +25,12 @@ const int SQLite::LocalReportHourly   =  1;   // Write out at 'EndHourFlag'
 const int SQLite::LocalReportDaily    =  2;   // Write out at 'EndDayFlag'
 const int SQLite::LocalReportMonthly  =  3;   // Write out at end of month (must be determined)
 const int SQLite::LocalReportSim      =  4;   // Write out once per environment 'EndEnvrnFlag'
-const std::string SQLite::ReportNameId        = "1";  // These should be integers.  Why is this?
-const std::string SQLite::ReportForStringId   = "2";
-const std::string SQLite::TableNameId         = "3";
-const std::string SQLite::RowNameId           = "4";
-const std::string SQLite::ColumnNameId        = "5";
-const std::string SQLite::UnitsId             = "6";
+const int SQLite::ReportNameId        =  1;
+const int SQLite::ReportForStringId   =  2;
+const int SQLite::TableNameId         =  3;
+const int SQLite::RowNameId           =  4;
+const int SQLite::ColumnNameId        =  5;
+const int SQLite::UnitsId             =  6;
 
 std::unique_ptr<SQLite> sqlite;
 
@@ -41,10 +41,13 @@ SQLite::SQLite()
 	m_sqlDBTimeIndex(0),
 	m_db(nullptr),
 	m_dbName("eplusout.sql"),
-	m_reportVariableDataInsertStmt(nullptr),
-	m_reportVariableExtendedDataInsertStmt(nullptr),
+	m_reportDataInsertStmt(nullptr),
+	m_reportExtendedDataInsertStmt(nullptr),
+	m_reportDictionaryInsertStmt(nullptr),
+//	m_reportVariableDataInsertStmt(nullptr),
+//	m_reportVariableExtendedDataInsertStmt(nullptr),
 	m_timeIndexInsertStmt(nullptr),
-	m_reportVariableDictionaryInsertStmt(nullptr),
+//	m_reportVariableDictionaryInsertStmt(nullptr),
 	m_zoneInfoInsertStmt(nullptr),
 	m_nominalLightingInsertStmt(nullptr),
 	m_nominalElectricEquipmentInsertStmt(nullptr),
@@ -68,9 +71,9 @@ SQLite::SQLite()
 	m_roomAirModelInsertStmt(nullptr),
 	m_groundTemperatureInsertStmt(nullptr),
 	m_weatherFileInsertStmt(nullptr),
-	m_meterDictionaryInsertStmt(nullptr),
-	m_reportMeterDataInsertStmt(nullptr),
-	m_meterExtendedDataInsertStmt(nullptr),
+	// m_meterDictionaryInsertStmt(nullptr),
+//	m_reportMeterDataInsertStmt(nullptr),
+//	m_meterExtendedDataInsertStmt(nullptr),
 	m_scheduleInsertStmt(nullptr),
 	m_daylightMapTitleInsertStmt(nullptr),
 	m_daylightMapHorlyTitleInsertStmt(nullptr),
@@ -139,7 +142,7 @@ SQLite::SQLite()
 				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_db) << std::endl;
 				ok = false;
 			} else {
-				// Remmove test db
+				// Remove test db
 				rc = remove( m_dbName.c_str() );
 				if( rc ) {
 					m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_db) << std::endl;
@@ -164,10 +167,12 @@ SQLite::SQLite()
 			sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
 			sqliteExecuteCommand("PRAGMA synchronous = OFF;");
 
-			initializeReportVariableDataDictionaryTable();
-			initializeReportVariableDataTables();
-			initializeReportMeterDataDictionaryTable();
-			initializeReportMeterDataTables();
+//			initializeReportVariableDataDictionaryTable();
+//			initializeReportVariableDataTables();
+			// initializeReportMeterDataDictionaryTable();
+//			initializeReportMeterDataTables();
+			initializeReportDataDictionaryTable();
+			initializeReportDataTables();
 			initializeTimeIndicesTable();
 			initializeZoneInfoTable();
 			initializeNominalPeopleTable();
@@ -208,12 +213,13 @@ SQLite::SQLite()
 
 SQLite::~SQLite()
 {
-	sqlite3_close(m_db);
-
-	sqlite3_finalize(m_reportVariableDataInsertStmt);
-	sqlite3_finalize(m_reportVariableExtendedDataInsertStmt);
+	sqlite3_finalize(m_reportDataInsertStmt);
+	sqlite3_finalize(m_reportExtendedDataInsertStmt);
+	sqlite3_finalize(m_reportDictionaryInsertStmt);
+//	sqlite3_finalize(m_reportVariableDataInsertStmt);
+//	sqlite3_finalize(m_reportVariableExtendedDataInsertStmt);
 	sqlite3_finalize(m_timeIndexInsertStmt);
-	sqlite3_finalize(m_reportVariableDictionaryInsertStmt);
+//	sqlite3_finalize(m_reportVariableDictionaryInsertStmt);
 	sqlite3_finalize(m_zoneInfoInsertStmt);
 	sqlite3_finalize(m_nominalLightingInsertStmt);
 	sqlite3_finalize(m_nominalElectricEquipmentInsertStmt);
@@ -237,9 +243,9 @@ SQLite::~SQLite()
 	sqlite3_finalize(m_roomAirModelInsertStmt);
 	sqlite3_finalize(m_groundTemperatureInsertStmt);
 	sqlite3_finalize(m_weatherFileInsertStmt);
-	sqlite3_finalize(m_meterDictionaryInsertStmt);
-	sqlite3_finalize(m_reportMeterDataInsertStmt);
-	sqlite3_finalize(m_meterExtendedDataInsertStmt);
+	// sqlite3_finalize(m_meterDictionaryInsertStmt);
+//	sqlite3_finalize(m_reportMeterDataInsertStmt);
+//	sqlite3_finalize(m_meterExtendedDataInsertStmt);
 	sqlite3_finalize(m_scheduleInsertStmt);
 	sqlite3_finalize(m_daylightMapTitleInsertStmt);
 	sqlite3_finalize(m_daylightMapHorlyTitleInsertStmt);
@@ -252,6 +258,8 @@ SQLite::~SQLite()
 	sqlite3_finalize(m_errorInsertStmt);
 	sqlite3_finalize(m_errorUpdateStmt);
 	sqlite3_finalize(m_simulationUpdateStmt);
+
+	sqlite3_close(m_db);
 }
 
 bool SQLite::writeOutputToSQLite() const
@@ -281,9 +289,9 @@ void SQLite::sqliteCommit()
 int SQLite::sqliteExecuteCommand(const std::string & commandBuffer)
 {
 	char *zErrMsg = 0;
-	int rc = -1;
+//	int rc = -1;
 
-	rc = sqlite3_exec(m_db, commandBuffer.c_str(), NULL, 0, &zErrMsg);
+	int rc = sqlite3_exec(m_db, commandBuffer.c_str(), NULL, 0, &zErrMsg);
 	if( rc != SQLITE_OK ) {
 		m_errorStream << zErrMsg;
 	}
@@ -294,9 +302,9 @@ int SQLite::sqliteExecuteCommand(const std::string & commandBuffer)
 
 int SQLite::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stmtBuffer)
 {
-	int rc = -1;
+//	int rc = -1;
 
-	rc = sqlite3_prepare_v2(m_db, stmtBuffer.c_str(), -1, &stmt, nullptr);
+	int rc = sqlite3_prepare_v2(m_db, stmtBuffer.c_str(), -1, &stmt, nullptr);
 	if( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
 	}
@@ -306,9 +314,9 @@ int SQLite::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stm
 
 int SQLite::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const std::string & textBuffer)
 {
-	int rc = -1;
+//	int rc = -1;
 
-	rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
+	int rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
 	if( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
 	}
@@ -318,9 +326,9 @@ int SQLite::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationInde
 
 int SQLite::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert)
 {
-	int rc = -1;
+//	int rc = -1;
 
-	rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
+	int rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
 	if( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
 	}
@@ -330,9 +338,9 @@ int SQLite::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationI
 
 int SQLite::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert)
 {
-	int rc = -1;
+//	int rc = -1;
 
-	rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
+	int rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
 	if( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
 	}
@@ -342,9 +350,9 @@ int SQLite::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIn
 
 int SQLite::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex)
 {
-	int rc = -1;
+//	int rc = -1;
 
-	rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
+	int rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
 	if( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
 	}
@@ -359,9 +367,9 @@ int SQLite::sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationI
 
 int SQLite::sqliteStepCommand(sqlite3_stmt * stmt)
 {
-	int rc = -1;
+//	int rc = -1;
 
-	rc = sqlite3_step(stmt);
+	int rc = sqlite3_step(stmt);
 	switch(rc) {
 	case SQLITE_DONE:
 	case SQLITE_OK:
@@ -398,140 +406,239 @@ void SQLite::sqliteWriteMessage(const std::string & message)
 	}
 }
 
-void SQLite::initializeReportVariableDataDictionaryTable()
+void SQLite::initializeReportDataDictionaryTable()
 {
 	const std::string newTableSQL =
-		"CREATE TABLE ReportVariableDataDictionary("
-		"ReportVariableDataDictionaryIndex INTEGER PRIMARY KEY, "
-		"VariableType TEXT, "
-		"IndexGroup TEXT, "
-		"TimestepType TEXT, "
-		"KeyValue TEXT, "
-		"VariableName TEXT, "
-		"ReportingFrequency TEXT, "
-		"ScheduleName TEXT, "
-		"VariableUnits TEXT);";
+			"CREATE TABLE ReportDataDictionary("
+					"ReportDataDictionaryIndex INTEGER PRIMARY KEY, "
+					"IsMeter INTEGER, "
+					"Type TEXT, "
+					"IndexGroup TEXT, "
+					"TimestepType TEXT, "
+					"KeyValue TEXT, "
+					"Name TEXT, "
+					"ReportingFrequency TEXT, "
+					"ScheduleName TEXT, "
+					"Units TEXT);";
 
 	sqliteExecuteCommand(newTableSQL);
 
 	const std::string preparedSQL =
-		"INSERT INTO ReportVariableDataDictionary ("
-		"ReportVariableDataDictionaryIndex, "
-		"VariableType, "
-		"IndexGroup, "
-		"TimestepType, "
-		"KeyValue, "
-		"VariableName, "
-		"ReportingFrequency, "
-		"ScheduleName, "
-		"VariableUnits) "
-		"VALUES(?,?,?,?,?,?,?,?,?);";
+			"INSERT INTO ReportDataDictionary ("
+					"ReportDataDictionaryIndex, "
+					"IsMeter, "
+					"Type, "
+					"IndexGroup, "
+					"TimestepType, "
+					"KeyValue, "
+					"Name, "
+					"ReportingFrequency, "
+					"ScheduleName, "
+					"Units) "
+					"VALUES(?,?,?,?,?,?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_reportVariableDictionaryInsertStmt,preparedSQL);
+	sqlitePrepareStatement(m_reportDictionaryInsertStmt,preparedSQL);
 }
 
-void SQLite::initializeReportVariableDataTables()
+void SQLite::initializeReportDataTables()
 {
-	const std::string reportVariableDataTableSQL =
-		"CREATE TABLE ReportVariableData ("
-		"TimeIndex INTEGER, "
-		"ReportVariableDataDictionaryIndex INTEGER, "
-		"VariableValue REAL, "
-		"ReportVariableExtendedDataIndex INTEGER);";
+	const std::string reportDataTableSQL =
+			"CREATE TABLE ReportData ("
+					"ReportDataIndex INTEGER PRIMARY KEY, "
+					"TimeIndex INTEGER, "
+					"ReportDataDictionaryIndex INTEGER, "
+					"Value REAL);";
+//					"IsMeter INTEGER;";
+//					"ReportExtendedDataIndex INTEGER);";
 
-	sqliteExecuteCommand(reportVariableDataTableSQL);
+	sqliteExecuteCommand(reportDataTableSQL);
 
-	const std::string reportVariableDataInsertSQL =
-		"INSERT INTO ReportVariableData ("
-		"TimeIndex, "
-		"ReportVariableDataDictionaryIndex, "
-		"VariableValue, "
-		"ReportVariableExtendedDataIndex) "
-		"VALUES(?,?,?,?);";
+	const std::string reportDataInsertSQL =
+			"INSERT INTO ReportData ("
+					"ReportDataIndex, "
+					"TimeIndex, "
+					"ReportDataDictionaryIndex, "
+					"Value) "
+//					"IsMeter INTEGER) "
+//					"ReportExtendedDataIndex) "
+					"VALUES(?,?,?,?);";
 
-	sqlitePrepareStatement(m_reportVariableDataInsertStmt,reportVariableDataInsertSQL);
+	sqlitePrepareStatement(m_reportDataInsertStmt,reportDataInsertSQL);
 
-	const std::string reportVariableExtendedDataTableSQL =
-		"CREATE TABLE ReportVariableExtendedData ("
-		"ReportVariableExtendedDataIndex INTEGER PRIMARY KEY, "
-		"MaxValue REAL, "
-		"MaxMonth INTEGER, "
-		"MaxDay INTEGER, "
-		"MaxHour INTEGER, "
-		"MaxStartMinute INTEGER, "
-		"MaxMinute INTEGER, "
-		"MinValue REAL, "
-		"MinMonth INTEGER, "
-		"MinDay INTEGER, "
-		"MinHour INTEGER, "
-		"MinStartMinute INTEGER, "
-		"MinMinute INTEGER);";
+	const std::string reportExtendedDataTableSQL =
+			"CREATE TABLE ReportExtendedData ("
+					"ReportExtendedDataIndex INTEGER PRIMARY KEY, "
+					"ReportDataIndex INTEGER, "
+					"MaxValue REAL, "
+					"MaxMonth INTEGER, "
+					"MaxDay INTEGER, "
+					"MaxHour INTEGER, "
+					"MaxStartMinute INTEGER, "
+					"MaxMinute INTEGER, "
+					"MinValue REAL, "
+					"MinMonth INTEGER, "
+					"MinDay INTEGER, "
+					"MinHour INTEGER, "
+					"MinStartMinute INTEGER, "
+					"MinMinute INTEGER);";
 
-	sqliteExecuteCommand(reportVariableExtendedDataTableSQL);
+	sqliteExecuteCommand(reportExtendedDataTableSQL);
 
-	const std::string reportVariableExtendedDataInsertSQL =
-		"INSERT INTO ReportVariableExtendedData ("
-		"ReportVariableExtendedDataIndex, "
-		"MaxValue, "
-		"MaxMonth, "
-		"MaxDay, "
-		"MaxHour, "
-		"MaxStartMinute, "
-		"MaxMinute, "
-		"MinValue, "
-		"MinMonth, "
-		"MinDay, "
-		"MinHour, "
-		"MinStartMinute, "
-		"MinMinute) "
-		"VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
+	const std::string reportExtendedDataInsertSQL =
+			"INSERT INTO ReportExtendedData ("
+					"ReportExtendedDataIndex, "
+					"ReportDataIndex, "
+					"MaxValue, "
+					"MaxMonth, "
+					"MaxDay, "
+					"MaxHour, "
+					"MaxStartMinute, "
+					"MaxMinute, "
+					"MinValue, "
+					"MinMonth, "
+					"MinDay, "
+					"MinHour, "
+					"MinStartMinute, "
+					"MinMinute) "
+					"VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_reportVariableExtendedDataInsertStmt,reportVariableExtendedDataInsertSQL);
+	sqlitePrepareStatement(m_reportExtendedDataInsertStmt,reportExtendedDataInsertSQL);
 }
 
-void SQLite::initializeReportMeterDataDictionaryTable()
-{
-	const std::string reportMeterDataDictionaryTableSQL =
-		"CREATE TABLE ReportMeterDataDictionary (ReportMeterDataDictionaryIndex INTEGER PRIMARY KEY, "
-		"VariableType TEXT, IndexGroup TEXT, TimestepType TEXT, KeyValue TEXT, "
-		"VariableName TEXT, ReportingFrequency TEXT, ScheduleName TEXT, VariableUnits TEXT);";
+//void SQLite::initializeReportVariableDataDictionaryTable()
+//{
+//	const std::string newTableSQL =
+//		"CREATE TABLE ReportVariableDataDictionary("
+//		"ReportVariableDataDictionaryIndex INTEGER PRIMARY KEY, "
+//		"VariableType TEXT, "
+//		"IndexGroup TEXT, "
+//		"TimestepType TEXT, "
+//		"KeyValue TEXT, "
+//		"VariableName TEXT, "
+//		"ReportingFrequency TEXT, "
+//		"ScheduleName TEXT, "
+//		"VariableUnits TEXT);";
+//
+//	sqliteExecuteCommand(newTableSQL);
+//
+//	const std::string preparedSQL =
+//		"INSERT INTO ReportVariableDataDictionary ("
+//		"ReportVariableDataDictionaryIndex, "
+//		"VariableType, "
+//		"IndexGroup, "
+//		"TimestepType, "
+//		"KeyValue, "
+//		"VariableName, "
+//		"ReportingFrequency, "
+//		"ScheduleName, "
+//		"VariableUnits) "
+//		"VALUES(?,?,?,?,?,?,?,?,?);";
+//
+//	sqlitePrepareStatement(m_reportVariableDictionaryInsertStmt,preparedSQL);
+//}
 
-	sqliteExecuteCommand(reportMeterDataDictionaryTableSQL);
+//void SQLite::initializeReportVariableDataTables()
+//{
+//	const std::string reportVariableDataTableSQL =
+//		"CREATE TABLE ReportVariableData ("
+//		"TimeIndex INTEGER, "
+//		"ReportVariableDataDictionaryIndex INTEGER, "
+//		"VariableValue REAL, "
+//		"ReportVariableExtendedDataIndex INTEGER);";
+//
+//	sqliteExecuteCommand(reportVariableDataTableSQL);
+//
+//	const std::string reportVariableDataInsertSQL =
+//		"INSERT INTO ReportVariableData ("
+//		"TimeIndex, "
+//		"ReportVariableDataDictionaryIndex, "
+//		"VariableValue, "
+//		"ReportVariableExtendedDataIndex) "
+//		"VALUES(?,?,?,?);";
+//
+//	sqlitePrepareStatement(m_reportVariableDataInsertStmt,reportVariableDataInsertSQL);
+//
+//	const std::string reportVariableExtendedDataTableSQL =
+//		"CREATE TABLE ReportVariableExtendedData ("
+//		"ReportVariableExtendedDataIndex INTEGER PRIMARY KEY, "
+//		"MaxValue REAL, "
+//		"MaxMonth INTEGER, "
+//		"MaxDay INTEGER, "
+//		"MaxHour INTEGER, "
+//		"MaxStartMinute INTEGER, "
+//		"MaxMinute INTEGER, "
+//		"MinValue REAL, "
+//		"MinMonth INTEGER, "
+//		"MinDay INTEGER, "
+//		"MinHour INTEGER, "
+//		"MinStartMinute INTEGER, "
+//		"MinMinute INTEGER);";
+//
+//	sqliteExecuteCommand(reportVariableExtendedDataTableSQL);
+//
+//	const std::string reportVariableExtendedDataInsertSQL =
+//		"INSERT INTO ReportVariableExtendedData ("
+//		"ReportVariableExtendedDataIndex, "
+//		"MaxValue, "
+//		"MaxMonth, "
+//		"MaxDay, "
+//		"MaxHour, "
+//		"MaxStartMinute, "
+//		"MaxMinute, "
+//		"MinValue, "
+//		"MinMonth, "
+//		"MinDay, "
+//		"MinHour, "
+//		"MinStartMinute, "
+//		"MinMinute) "
+//		"VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
+//
+//	sqlitePrepareStatement(m_reportVariableExtendedDataInsertStmt,reportVariableExtendedDataInsertSQL);
+//}
 
-	const std::string meterDictionaryInsertSQL =
-		"INSERT INTO ReportMeterDataDictionary (ReportMeterDataDictionaryIndex, VariableType, IndexGroup, "
-		"timestepType, KeyValue, VariableName, ReportingFrequency, ScheduleName, VariableUnits) "
-		"VALUES(?,?,?,?,?,?,?,?,?);";
-
-	sqlitePrepareStatement(m_meterDictionaryInsertStmt,meterDictionaryInsertSQL);
-}
-
-void SQLite::initializeReportMeterDataTables()
-{
-	const std::string reportMeterDataTableSQL =
-		"CREATE TABLE ReportMeterData(TimeIndex INTEGER, ReportMeterDataDictionaryIndex INTEGER, VariableValue REAL, "
-		"ReportVariableExtendedDataIndex INTEGER);";
-
-	sqliteExecuteCommand(reportMeterDataTableSQL);
-
-	const std::string reportMeterDataInsertSQL =
-		"INSERT INTO ReportMeterData VALUES(?,?,?,?);";
-
-	sqlitePrepareStatement(m_reportMeterDataInsertStmt,reportMeterDataInsertSQL);
-
-	const std::string reportMeterExtendedDataTableSQL =
-		"CREATE TABLE ReportMeterExtendedData (ReportMeterExtendedDataIndex INTEGER PRIMARY KEY, "
-		"MaxValue REAL, MaxMonth INTEGER, MaxDay INTEGER, MaxHour INTEGER, MaxStartMinute INTEGER, "
-		"MaxMinute INTEGER, MinValue REAL, MinMonth INTEGER, MinDay INTEGER, MinHour INTEGER, "
-		"MinStartMinute INTEGER, MinMinute INTEGER);";
-
-	sqliteExecuteCommand(reportMeterExtendedDataTableSQL);
-
-	const std::string meterExtendedDataInsertSQL =
-		"INSERT INTO ReportMeterExtendedData VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
-
-	sqlitePrepareStatement(m_meterExtendedDataInsertStmt,meterExtendedDataInsertSQL);
-}
+// void SQLite::initializeReportMeterDataDictionaryTable()
+// {
+// 	const std::string reportMeterDataDictionaryTableSQL =
+// 		"CREATE TABLE ReportMeterDataDictionary (ReportMeterDataDictionaryIndex INTEGER PRIMARY KEY, "
+// 		"VariableType TEXT, IndexGroup TEXT, TimestepType TEXT, KeyValue TEXT, "
+// 		"VariableName TEXT, ReportingFrequency TEXT, ScheduleName TEXT, VariableUnits TEXT);";
+//
+// 	sqliteExecuteCommand(reportMeterDataDictionaryTableSQL);
+//
+// 	const std::string meterDictionaryInsertSQL =
+// 		"INSERT INTO ReportMeterDataDictionary (ReportMeterDataDictionaryIndex, VariableType, IndexGroup, "
+// 		"timestepType, KeyValue, VariableName, ReportingFrequency, ScheduleName, VariableUnits) "
+// 		"VALUES(?,?,?,?,?,?,?,?,?);";
+//
+// 	sqlitePrepareStatement(m_meterDictionaryInsertStmt,meterDictionaryInsertSQL);
+// }
+//
+//void SQLite::initializeReportMeterDataTables()
+//{
+//	const std::string reportMeterDataTableSQL =
+//		"CREATE TABLE ReportMeterData(TimeIndex INTEGER, ReportMeterDataDictionaryIndex INTEGER, VariableValue REAL, "
+//		"ReportVariableExtendedDataIndex INTEGER);";
+//
+//	sqliteExecuteCommand(reportMeterDataTableSQL);
+//
+//	const std::string reportMeterDataInsertSQL =
+//		"INSERT INTO ReportMeterData VALUES(?,?,?,?);";
+//
+//	sqlitePrepareStatement(m_reportMeterDataInsertStmt,reportMeterDataInsertSQL);
+//
+//	const std::string reportMeterExtendedDataTableSQL =
+//		"CREATE TABLE ReportMeterExtendedData (ReportMeterExtendedDataIndex INTEGER PRIMARY KEY, "
+//		"MaxValue REAL, MaxMonth INTEGER, MaxDay INTEGER, MaxHour INTEGER, MaxStartMinute INTEGER, "
+//		"MaxMinute INTEGER, MinValue REAL, MinMonth INTEGER, MinDay INTEGER, MinHour INTEGER, "
+//		"MinStartMinute INTEGER, MinMinute INTEGER);";
+//
+//	sqliteExecuteCommand(reportMeterExtendedDataTableSQL);
+//
+//	const std::string meterExtendedDataInsertSQL =
+//		"INSERT INTO ReportMeterExtendedData VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?);";
+//
+//	sqlitePrepareStatement(m_meterExtendedDataInsertStmt,meterExtendedDataInsertSQL);
+//}
 
 void SQLite::initializeTimeIndicesTable()
 {
@@ -1132,12 +1239,12 @@ void SQLite::initializeTabularDataTable()
 
 	sqliteExecuteCommand(sql6);
 
-	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + ReportNameId + ",'ReportName');");
-	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + ReportForStringId + ",'ReportForString');");
-	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + TableNameId + ",'TableName');");
-	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + RowNameId + ",'RowName');");
-	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + ColumnNameId + ",'ColumnName');");
-	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + UnitsId + ",'Units');");
+	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(ReportNameId) + ",'ReportName');");
+	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(ReportForStringId) + ",'ReportForString');");
+	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(TableNameId) + ",'TableName');");
+	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(RowNameId) + ",'RowName');");
+	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(ColumnNameId) + ",'ColumnName');");
+	sqliteExecuteCommand("INSERT INTO StringTypes VALUES(" + std::to_string(UnitsId) + ",'Units');");
 }
 
 void SQLite::initializeTabularDataView()
@@ -1172,12 +1279,12 @@ void SQLite::initializeTabularDataView()
 void SQLite::initializeIndexes()
 {
 	if( m_writeOutputToSQLite ) {
-		sqliteExecuteCommand("CREATE INDEX rvdTI ON ReportVariableData (TimeIndex ASC);");
-		sqliteExecuteCommand("CREATE INDEX rvdDI ON ReportVariableData (ReportVariableDataDictionaryIndex ASC);");
-		sqliteExecuteCommand("CREATE INDEX rmdTI ON ReportMeterData (TimeIndex ASC);");
-		sqliteExecuteCommand("CREATE INDEX rmdDI ON ReportMeterData (ReportMeterDataDictionaryIndex ASC);");
-		sqliteExecuteCommand("CREATE INDEX tiTI ON Time (TimeIndex ASC);");
-		sqliteExecuteCommand("CREATE INDEX dmhdHRI ON DaylightMapHourlyData (HourlyReportIndex ASC);");
+		// sqliteExecuteCommand("CREATE INDEX rvdTI ON ReportVariableData (TimeIndex ASC);");
+		// sqliteExecuteCommand("CREATE INDEX rvdDI ON ReportVariableData (ReportVariableDataDictionaryIndex ASC);");
+		// sqliteExecuteCommand("CREATE INDEX rmdTI ON ReportMeterData (TimeIndex ASC);");
+		// sqliteExecuteCommand("CREATE INDEX rmdDI ON ReportMeterData (ReportMeterDataDictionaryIndex ASC);");
+//		sqliteExecuteCommand("CREATE INDEX tiTI ON Time (TimeIndex ASC);");
+		// sqliteExecuteCommand("CREATE INDEX dmhdHRI ON DaylightMapHourlyData (HourlyReportIndex ASC);");
 	}
 }
 
@@ -1278,53 +1385,55 @@ int SQLite::logicalToInteger(const bool value)
 	return value ? 1 : 0;
 }
 
-void SQLite::createSQLiteReportVariableDictionaryRecord(
-	int const reportVariableReportID,
-	int const storeTypeIndex,
-	std::string const & indexGroup,
-	std::string const & keyedValueString,
-	std::string const & variableName,
-	int const indexType,
-	std::string const & units,
-	int const reportingFreq,
-	Optional_string_const scheduleName
+void SQLite::createSQLiteReportDictionaryRecord (
+		int const reportVariableReportID,
+		int const storeTypeIndex,
+		std::string const & indexGroup,
+		std::string const & keyedValueString,
+		std::string const & variableName,
+		int const indexType,
+		std::string const & units,
+		int const reportingFreq,
+		bool isMeter,
+		Optional_string_const scheduleName
 )
 {
 	if( m_writeOutputToSQLite ) {
-		sqliteBindInteger(m_reportVariableDictionaryInsertStmt, 1, reportVariableReportID);
-		sqliteBindText(m_reportVariableDictionaryInsertStmt, 2, storageType(storeTypeIndex));
-		sqliteBindText(m_reportVariableDictionaryInsertStmt, 3, indexGroup);
-		sqliteBindText(m_reportVariableDictionaryInsertStmt, 4, timestepTypeName(indexType));
-		sqliteBindText(m_reportVariableDictionaryInsertStmt, 5, keyedValueString);
-		sqliteBindText(m_reportVariableDictionaryInsertStmt, 6, variableName);
-		sqliteBindText(m_reportVariableDictionaryInsertStmt, 7, reportingFreqName(reportingFreq));
+		sqliteBindInteger(m_reportDictionaryInsertStmt, 1, reportVariableReportID);
+		sqliteBindInteger(m_reportDictionaryInsertStmt, 2, isMeter ? 1 : 0);
+		sqliteBindText(m_reportDictionaryInsertStmt, 3, storageType(storeTypeIndex));
+		sqliteBindText(m_reportDictionaryInsertStmt, 4, indexGroup);
+		sqliteBindText(m_reportDictionaryInsertStmt, 5, timestepTypeName(indexType));
+		sqliteBindText(m_reportDictionaryInsertStmt, 6, keyedValueString);
+		sqliteBindText(m_reportDictionaryInsertStmt, 7, variableName);
+		sqliteBindText(m_reportDictionaryInsertStmt, 8, reportingFreqName(reportingFreq));
 
 		if(scheduleName.present()) {
-			sqliteBindText(m_reportVariableDictionaryInsertStmt, 8, scheduleName());
+			sqliteBindText(m_reportDictionaryInsertStmt, 9, scheduleName());
 		} else {
-			sqliteBindNULL(m_reportVariableDictionaryInsertStmt, 8);
+			sqliteBindNULL(m_reportDictionaryInsertStmt, 9);
 		}
 
-		sqliteBindText(m_reportVariableDictionaryInsertStmt, 9, units);
+		sqliteBindText(m_reportDictionaryInsertStmt, 10, units);
 
-		sqliteStepCommand(m_reportVariableDictionaryInsertStmt);
-		sqliteResetCommand(m_reportVariableDictionaryInsertStmt);
+		sqliteStepCommand(m_reportDictionaryInsertStmt);
+		sqliteResetCommand(m_reportDictionaryInsertStmt);
 	}
 }
 
-void SQLite::createSQLiteReportVariableDataRecord(
-	int const recordIndex,
-	Real64 const value,
-	Optional_int_const reportingInterval,
-	Optional< Real64 const > minValue,
-	Optional_int_const minValueDate,
-	Optional< Real64 const > maxValue,
-	Optional_int_const maxValueDate,
-	Optional_int_const minutesPerTimeStep
+void SQLite::createSQLiteReportDataRecord(
+		int const recordIndex,
+		Real64 const value,
+		Optional_int_const reportingInterval,
+		Optional< Real64 const > minValue,
+		Optional_int_const minValueDate,
+		Optional< Real64 const > maxValue,
+		Optional_int_const maxValueDate,
+		Optional_int_const minutesPerTimeStep
 )
 {
 	if( m_writeOutputToSQLite ) {
-		int result;
+//		int result;
 
 		int minMonth;
 		int minDay;
@@ -1335,15 +1444,18 @@ void SQLite::createSQLiteReportVariableDataRecord(
 		int maxHour;
 		int maxMinute;
 
-		static int oid = 0;
+//		static int oid = 0;
+		static int dataIndex = 0;
 		static int extendedDataIndex = 0;
 
-		++oid;
+//		++oid;
+		++dataIndex;
 
-		sqliteBindInteger(m_reportVariableDataInsertStmt, 1, m_sqlDBTimeIndex);
-		sqliteBindInteger(m_reportVariableDataInsertStmt, 2, recordIndex);
-		sqliteBindDouble(m_reportVariableDataInsertStmt, 3, value);
-		sqliteBindInteger(m_reportVariableDataInsertStmt, 4, oid);
+		sqliteBindInteger(m_reportDataInsertStmt, 1, dataIndex);
+		sqliteBindInteger(m_reportDataInsertStmt, 2, m_sqlDBTimeIndex);
+		sqliteBindInteger(m_reportDataInsertStmt, 3, recordIndex);
+		sqliteBindDouble(m_reportDataInsertStmt, 4, value);
+//		sqliteBindInteger(m_reportDataInsertStmt, 4, oid);
 
 		if(reportingInterval.present()) {
 			General::DecodeMonDayHrMin(minValueDate, minMonth, minDay, minHour, minMinute);
@@ -1356,83 +1468,244 @@ void SQLite::createSQLiteReportVariableDataRecord(
 
 			if(minutesPerTimeStep.present()) { // This is for data created by a 'Report Meter' statement
 				switch(reportingInterval()) {
-				case LocalReportHourly:
-				case LocalReportDaily:
-				case LocalReportMonthly:
-				case LocalReportSim:
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 1, extendedDataIndex);
+					case LocalReportHourly:
+					case LocalReportDaily:
+					case LocalReportMonthly:
+					case LocalReportSim:
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 2, dataIndex);
 
-					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 2, maxValue);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 3, maxMonth);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 4, maxDay);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 5, maxHour);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 6, maxMinute - minutesPerTimeStep + 1);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 7, maxMinute);
+						sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 7, maxMinute - minutesPerTimeStep + 1);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
 
-					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 8, minValue);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 9, minMonth);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 10, minDay);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 11, minHour);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 12, minMinute - minutesPerTimeStep + 1);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 13, minMinute);
+						sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 13, minMinute - minutesPerTimeStep + 1);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
 
-					sqliteStepCommand(m_reportVariableExtendedDataInsertStmt);
-					sqliteResetCommand(m_reportVariableExtendedDataInsertStmt);
-					break;
+						sqliteStepCommand(m_reportExtendedDataInsertStmt);
+						sqliteResetCommand(m_reportExtendedDataInsertStmt);
+						break;
 
-				case LocalReportTimeStep:
-					--extendedDataIndex; // Reset the data index to account for the error
-					sqliteBindNULL(m_reportVariableDataInsertStmt, 4);
-					break;
+					case LocalReportTimeStep:
+						--extendedDataIndex; // Reset the data index to account for the error
+//						sqliteBindNULL(m_reportDataInsertStmt, 4);
+						break;
 
-				default:
-					--extendedDataIndex; // Reset the data index to account for the error
-					sqliteBindNULL(m_reportVariableDataInsertStmt, 4);
-					std::stringstream ss;
-					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
-					sqliteWriteMessage(ss.str());
-				}
-			} else { // This is for data created by a 'Report Variable' statement
-				switch(reportingInterval()) {
-				case LocalReportDaily:
-				case LocalReportMonthly:
-				case LocalReportSim:
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 1, extendedDataIndex);
-
-					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 2, maxValue);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 3, maxMonth);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 4, maxDay);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 5, maxHour);
-					sqliteBindNULL(m_reportVariableExtendedDataInsertStmt, 6);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 7, maxMinute);
-
-					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 8, minValue);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 9, minMonth);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 10, minDay);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 11, minHour);
-					sqliteBindNULL(m_reportVariableExtendedDataInsertStmt, 12);
-					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 13, minMinute);
-
-					sqliteStepCommand(m_reportVariableExtendedDataInsertStmt);
-					sqliteResetCommand(m_reportVariableExtendedDataInsertStmt);
-					break;
-
-				default:
-					--extendedDataIndex; // Reset the data index to account for the error
-					sqliteBindNULL(m_reportVariableDataInsertStmt, 4); // don't report the erroneous data
-					std::stringstream ss;
-					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
-					sqliteWriteMessage(ss.str());
+					default:
+						--extendedDataIndex; // Reset the data index to account for the error
+//						sqliteBindNULL(m_reportDataInsertStmt, 4);
+						std::stringstream ss;
+						ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
+						sqliteWriteMessage(ss.str());
 				}
 			}
+			else if (minValue.present() || minValueDate.present() || maxValue.present() || maxValueDate.present()) { // This is for data created by a 'Report Variable' statement
+				switch(reportingInterval()) {
+					case LocalReportDaily:
+					case LocalReportMonthly:
+					case LocalReportSim:
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 1, extendedDataIndex);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 2, dataIndex);
+
+						sqliteBindDouble(m_reportExtendedDataInsertStmt, 3, maxValue);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 4, maxMonth);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 5, maxDay);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 6, maxHour);
+						sqliteBindNULL(m_reportExtendedDataInsertStmt, 7);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 8, maxMinute);
+
+						sqliteBindDouble(m_reportExtendedDataInsertStmt, 9, minValue);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 10, minMonth);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 11, minDay);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 12, minHour);
+						sqliteBindNULL(m_reportExtendedDataInsertStmt, 13);
+						sqliteBindInteger(m_reportExtendedDataInsertStmt, 14, minMinute);
+
+						sqliteStepCommand(m_reportExtendedDataInsertStmt);
+						sqliteResetCommand(m_reportExtendedDataInsertStmt);
+						break;
+
+					default:
+						--extendedDataIndex; // Reset the data index to account for the error
+//						sqliteBindNULL(m_reportDataInsertStmt, 4); // don't report the erroneous data
+						std::stringstream ss;
+						ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
+						sqliteWriteMessage(ss.str());
+				}
+			} else {
+				--extendedDataIndex; // Reset the data index to account for no extended data
+			}
 		} else {
-			sqliteBindNULL(m_reportVariableDataInsertStmt, 4);
+//			sqliteBindNULL(m_reportDataInsertStmt, 4);
 		}
 
-		sqliteStepCommand(m_reportVariableDataInsertStmt);
-		sqliteResetCommand(m_reportVariableDataInsertStmt);
+		sqliteStepCommand(m_reportDataInsertStmt);
+		sqliteResetCommand(m_reportDataInsertStmt);
 	}
 }
+
+//void SQLite::createSQLiteReportVariableDictionaryRecord(
+//	int const reportVariableReportID,
+//	int const storeTypeIndex,
+//	std::string const & indexGroup,
+//	std::string const & keyedValueString,
+//	std::string const & variableName,
+//	int const indexType,
+//	std::string const & units,
+//	int const reportingFreq,
+//	Optional_string_const scheduleName
+//)
+//{
+//	if( m_writeOutputToSQLite ) {
+//		sqliteBindInteger(m_reportVariableDictionaryInsertStmt, 1, reportVariableReportID);
+//		sqliteBindText(m_reportVariableDictionaryInsertStmt, 2, storageType(storeTypeIndex));
+//		sqliteBindText(m_reportVariableDictionaryInsertStmt, 3, indexGroup);
+//		sqliteBindText(m_reportVariableDictionaryInsertStmt, 4, timestepTypeName(indexType));
+//		sqliteBindText(m_reportVariableDictionaryInsertStmt, 5, keyedValueString);
+//		sqliteBindText(m_reportVariableDictionaryInsertStmt, 6, variableName);
+//		sqliteBindText(m_reportVariableDictionaryInsertStmt, 7, reportingFreqName(reportingFreq));
+//
+//		if(scheduleName.present()) {
+//			sqliteBindText(m_reportVariableDictionaryInsertStmt, 8, scheduleName());
+//		} else {
+//			sqliteBindNULL(m_reportVariableDictionaryInsertStmt, 8);
+//		}
+//
+//		sqliteBindText(m_reportVariableDictionaryInsertStmt, 9, units);
+//
+//		sqliteStepCommand(m_reportVariableDictionaryInsertStmt);
+//		sqliteResetCommand(m_reportVariableDictionaryInsertStmt);
+//	}
+//}
+//
+//void SQLite::createSQLiteReportVariableDataRecord(
+//	int const recordIndex,
+//	Real64 const value,
+//	Optional_int_const reportingInterval,
+//	Optional< Real64 const > minValue,
+//	Optional_int_const minValueDate,
+//	Optional< Real64 const > maxValue,
+//	Optional_int_const maxValueDate,
+//	Optional_int_const minutesPerTimeStep
+//)
+//{
+//	if( m_writeOutputToSQLite ) {
+////		int result;
+//
+//		int minMonth;
+//		int minDay;
+//		int minHour;
+//		int minMinute;
+//		int maxMonth;
+//		int maxDay;
+//		int maxHour;
+//		int maxMinute;
+//
+//		static int oid = 0;
+//		static int extendedDataIndex = 0;
+//
+//		++oid;
+//
+//		sqliteBindInteger(m_reportVariableDataInsertStmt, 1, m_sqlDBTimeIndex);
+//		sqliteBindInteger(m_reportVariableDataInsertStmt, 2, recordIndex);
+//		sqliteBindDouble(m_reportVariableDataInsertStmt, 3, value);
+//		sqliteBindInteger(m_reportVariableDataInsertStmt, 4, oid);
+//
+//		if(reportingInterval.present()) {
+//			General::DecodeMonDayHrMin(minValueDate, minMonth, minDay, minHour, minMinute);
+//			General::DecodeMonDayHrMin(maxValueDate, maxMonth, maxDay, maxHour, maxMinute);
+//
+//			adjustReportingHourAndMinutes(minHour, minMinute);
+//			adjustReportingHourAndMinutes(maxHour, maxMinute);
+//
+//			++extendedDataIndex;
+//
+//			if(minutesPerTimeStep.present()) { // This is for data created by a 'Report Meter' statement
+//				switch(reportingInterval()) {
+//				case LocalReportHourly:
+//				case LocalReportDaily:
+//				case LocalReportMonthly:
+//				case LocalReportSim:
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 1, extendedDataIndex);
+//
+//					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 2, maxValue);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 3, maxMonth);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 4, maxDay);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 5, maxHour);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 6, maxMinute - minutesPerTimeStep + 1);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 7, maxMinute);
+//
+//					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 8, minValue);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 9, minMonth);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 10, minDay);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 11, minHour);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 12, minMinute - minutesPerTimeStep + 1);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 13, minMinute);
+//
+//					sqliteStepCommand(m_reportVariableExtendedDataInsertStmt);
+//					sqliteResetCommand(m_reportVariableExtendedDataInsertStmt);
+//					break;
+//
+//				case LocalReportTimeStep:
+//					--extendedDataIndex; // Reset the data index to account for the error
+//					sqliteBindNULL(m_reportVariableDataInsertStmt, 4);
+//					break;
+//
+//				default:
+//					--extendedDataIndex; // Reset the data index to account for the error
+//					sqliteBindNULL(m_reportVariableDataInsertStmt, 4);
+//					std::stringstream ss;
+//					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
+//					sqliteWriteMessage(ss.str());
+//				}
+//			} else { // This is for data created by a 'Report Variable' statement
+//				switch(reportingInterval()) {
+//				case LocalReportDaily:
+//				case LocalReportMonthly:
+//				case LocalReportSim:
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 1, extendedDataIndex);
+//
+//					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 2, maxValue);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 3, maxMonth);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 4, maxDay);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 5, maxHour);
+//					sqliteBindNULL(m_reportVariableExtendedDataInsertStmt, 6);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 7, maxMinute);
+//
+//					sqliteBindDouble(m_reportVariableExtendedDataInsertStmt, 8, minValue);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 9, minMonth);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 10, minDay);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 11, minHour);
+//					sqliteBindNULL(m_reportVariableExtendedDataInsertStmt, 12);
+//					sqliteBindInteger(m_reportVariableExtendedDataInsertStmt, 13, minMinute);
+//
+//					sqliteStepCommand(m_reportVariableExtendedDataInsertStmt);
+//					sqliteResetCommand(m_reportVariableExtendedDataInsertStmt);
+//					break;
+//
+//				default:
+//					--extendedDataIndex; // Reset the data index to account for the error
+//					sqliteBindNULL(m_reportVariableDataInsertStmt, 4); // don't report the erroneous data
+//					std::stringstream ss;
+//					ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
+//					sqliteWriteMessage(ss.str());
+//				}
+//			}
+//		} else {
+//			sqliteBindNULL(m_reportVariableDataInsertStmt, 4);
+//		}
+//
+//		sqliteStepCommand(m_reportVariableDataInsertStmt);
+//		sqliteResetCommand(m_reportVariableDataInsertStmt);
+//	}
+//}
 
 void SQLite::createSQLiteTimeIndexRecord(
 	int const reportingInterval,
@@ -1448,20 +1721,20 @@ void SQLite::createSQLiteTimeIndexRecord(
 )
 {
 	if( m_writeOutputToSQLite ) {
-		int iOut = -1;
+//		int iOut = -1;
 
-		int intEndMinute = 60;
+//		int intEndMinute = 60;
 		int intStartMinute = 0;
 		int intervalInMinutes = 60;
 
-		const std::vector<int> lastDayOfMonth = {31,28,31,30,31,30,31,31,30,31,30,31};
+		static const std::vector<int> lastDayOfMonth = {31,28,31,30,31,30,31,31,30,31,30,31};
 
 		switch(reportingInterval) {
 		case LocalReportEach:
 		case LocalReportTimeStep: {
 			++m_sqlDBTimeIndex;
 
-			intEndMinute = static_cast<int>(endMinute() + 0.5);
+			int intEndMinute = static_cast<int>(endMinute() + 0.5);
 			intStartMinute = static_cast<int>(startMinute() + 0.5);
 			int t_hour = hour();
 			intervalInMinutes = intEndMinute - intStartMinute;
@@ -1487,7 +1760,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
 
-			iOut = m_sqlDBTimeIndex;
+//			iOut = m_sqlDBTimeIndex;
 			break;
 		}
 		case LocalReportHourly: {
@@ -1508,7 +1781,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
 
-			iOut = m_sqlDBTimeIndex;
+//			iOut = m_sqlDBTimeIndex;
 			break;
 		}
 		case LocalReportDaily: {
@@ -1530,7 +1803,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
 
-			iOut = m_sqlDBTimeIndex;
+//			iOut = m_sqlDBTimeIndex;
 			break;
 		}
 		case LocalReportMonthly: {
@@ -1552,7 +1825,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
 
-			iOut = m_sqlDBTimeIndex;
+//			iOut = m_sqlDBTimeIndex;
 			break;
 		}
 		case LocalReportSim: {
@@ -1574,14 +1847,14 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteStepCommand (m_timeIndexInsertStmt);
 			sqliteResetCommand (m_timeIndexInsertStmt);
 
-			iOut = m_sqlDBTimeIndex;
+//			iOut = m_sqlDBTimeIndex;
 			break;
 		}
 		default: {
 			std::stringstream ss;
 			ss << "Illegal reportingInterval passed to CreateSQLiteTimeIndexRecord: " << reportingInterval;
 			sqliteWriteMessage(ss.str());
-			iOut = -1;  // this is an error condition
+//			iOut = -1;  // this is an error condition
 		}
 		}
 	}
@@ -1684,115 +1957,115 @@ void SQLite::createSQLiteRoomAirModelTable()
 	}
 }
 
-void SQLite::createSQLiteMeterDictionaryRecord(
-	int const meterReportID,
-	int const storeTypeIndex,
-	std::string const & indexGroup,
-	std::string const & keyedValueString,
-	std::string const & variableName,
-	int const indexType,
-	std::string const & units,
-	int const reportingFreq,
-	Optional_string_const scheduleName
-)
-{
-	if( m_writeOutputToSQLite ) {
-		sqliteBindInteger(m_meterDictionaryInsertStmt, 1, meterReportID);
-		sqliteBindText(m_meterDictionaryInsertStmt, 2, storageType(storeTypeIndex));
-		sqliteBindText(m_meterDictionaryInsertStmt, 3, indexGroup);
-		sqliteBindText(m_meterDictionaryInsertStmt, 4, timestepTypeName(indexType));
-		sqliteBindText(m_meterDictionaryInsertStmt, 5, keyedValueString);
-		sqliteBindText(m_meterDictionaryInsertStmt, 6, variableName);
-		sqliteBindText(m_meterDictionaryInsertStmt, 7, reportingFreqName(reportingFreq));
-
-		if(scheduleName.present()) {
-			sqliteBindText(m_meterDictionaryInsertStmt, 8, scheduleName());
-		} else {
-			sqliteBindNULL(m_meterDictionaryInsertStmt, 8);
-		}
-
-		sqliteBindText(m_meterDictionaryInsertStmt, 9, units);
-
-		sqliteStepCommand(m_meterDictionaryInsertStmt);
-		sqliteResetCommand(m_meterDictionaryInsertStmt);
-	}
-}
-
-void SQLite::createSQLiteMeterRecord(
-	int const recordIndex,
-	Real64 const value,
-	Optional_int_const reportingInterval,
-	Optional< Real64 const > minValue,
-	Optional_int_const minValueDate,
-	Optional< Real64 const > maxValue,
-	Optional_int_const maxValueDate,
-	Optional_int_const minutesPerTimeStep
-)
-{
-	if( m_writeOutputToSQLite ) {
-		static int extendedDataIndex = 0;
-		static int oid = 0;
-
-		++oid;
-
-		sqliteBindInteger(m_reportMeterDataInsertStmt, 1, m_sqlDBTimeIndex);
-		sqliteBindInteger(m_reportMeterDataInsertStmt, 2, recordIndex);
-		sqliteBindDouble(m_reportMeterDataInsertStmt, 3, value);
-		sqliteBindInteger(m_reportMeterDataInsertStmt, 4, oid);
-
-		if(reportingInterval.present()) {
-			int minMonth;
-			int minDay;
-			int minHour;
-			int minMinute;
-			int maxMonth;
-			int maxDay;
-			int maxHour;
-			int maxMinute;
-
-			General::DecodeMonDayHrMin(minValueDate, minMonth, minDay, minHour, minMinute);
-			General::DecodeMonDayHrMin(maxValueDate, maxMonth, maxDay, maxHour, maxMinute);
-
-			++extendedDataIndex;
-
-			switch(reportingInterval()) {
-			case LocalReportHourly:
-			case LocalReportDaily:
-			case LocalReportMonthly:
-			case LocalReportSim:
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 1, extendedDataIndex);
-				sqliteBindDouble(m_meterExtendedDataInsertStmt, 2, maxValue);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 3, maxMonth);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 4, maxDay);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 5, maxHour);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 6, maxMinute - minutesPerTimeStep + 1);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 7, maxMinute);
-
-				sqliteBindDouble(m_meterExtendedDataInsertStmt, 8, minValue);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 9, minMonth);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 10, minDay);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 11, minHour);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 12, minMinute - minutesPerTimeStep + 1);
-				sqliteBindInteger(m_meterExtendedDataInsertStmt, 13, minMinute);
-
-				sqliteStepCommand(m_meterExtendedDataInsertStmt);
-				sqliteResetCommand(m_meterExtendedDataInsertStmt);
-				break;
-			case LocalReportTimeStep:
-				--extendedDataIndex; // Reset the data index to account for the error
-				sqliteBindNULL(m_reportMeterDataInsertStmt, 4);
-			default:
-				--extendedDataIndex; // Reset the data index to account for the error
-				std::stringstream ss;
-				ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
-				sqliteWriteMessage(ss.str());
-			}
-		}
-
-		sqliteStepCommand(m_reportMeterDataInsertStmt);
-		sqliteResetCommand(m_reportMeterDataInsertStmt);
-	}
-}
+// void SQLite::createSQLiteMeterDictionaryRecord(
+// 	int const meterReportID,
+// 	int const storeTypeIndex,
+// 	std::string const & indexGroup,
+// 	std::string const & keyedValueString,
+// 	std::string const & variableName,
+// 	int const indexType,
+// 	std::string const & units,
+// 	int const reportingFreq,
+// 	Optional_string_const scheduleName
+// )
+// {
+// 	if( m_writeOutputToSQLite ) {
+// 		sqliteBindInteger(m_meterDictionaryInsertStmt, 1, meterReportID);
+// 		sqliteBindText(m_meterDictionaryInsertStmt, 2, storageType(storeTypeIndex));
+// 		sqliteBindText(m_meterDictionaryInsertStmt, 3, indexGroup);
+// 		sqliteBindText(m_meterDictionaryInsertStmt, 4, timestepTypeName(indexType));
+// 		sqliteBindText(m_meterDictionaryInsertStmt, 5, keyedValueString);
+// 		sqliteBindText(m_meterDictionaryInsertStmt, 6, variableName);
+// 		sqliteBindText(m_meterDictionaryInsertStmt, 7, reportingFreqName(reportingFreq));
+//
+// 		if(scheduleName.present()) {
+// 			sqliteBindText(m_meterDictionaryInsertStmt, 8, scheduleName());
+// 		} else {
+// 			sqliteBindNULL(m_meterDictionaryInsertStmt, 8);
+// 		}
+//
+// 		sqliteBindText(m_meterDictionaryInsertStmt, 9, units);
+//
+// 		sqliteStepCommand(m_meterDictionaryInsertStmt);
+// 		sqliteResetCommand(m_meterDictionaryInsertStmt);
+// 	}
+// }
+//
+//void SQLite::createSQLiteMeterRecord(
+//	int const recordIndex,
+//	Real64 const value,
+//	Optional_int_const reportingInterval,
+//	Optional< Real64 const > minValue,
+//	Optional_int_const minValueDate,
+//	Optional< Real64 const > maxValue,
+//	Optional_int_const maxValueDate,
+//	Optional_int_const minutesPerTimeStep
+//)
+//{
+//	if( m_writeOutputToSQLite ) {
+//		static int extendedDataIndex = 0;
+//		static int oid = 0;
+//
+//		++oid;
+//
+//		sqliteBindInteger(m_reportMeterDataInsertStmt, 1, m_sqlDBTimeIndex);
+//		sqliteBindInteger(m_reportMeterDataInsertStmt, 2, recordIndex);
+//		sqliteBindDouble(m_reportMeterDataInsertStmt, 3, value);
+//		sqliteBindInteger(m_reportMeterDataInsertStmt, 4, oid);
+//
+//		if(reportingInterval.present()) {
+//			int minMonth;
+//			int minDay;
+//			int minHour;
+//			int minMinute;
+//			int maxMonth;
+//			int maxDay;
+//			int maxHour;
+//			int maxMinute;
+//
+//			General::DecodeMonDayHrMin(minValueDate, minMonth, minDay, minHour, minMinute);
+//			General::DecodeMonDayHrMin(maxValueDate, maxMonth, maxDay, maxHour, maxMinute);
+//
+//			++extendedDataIndex;
+//
+//			switch(reportingInterval()) {
+//			case LocalReportHourly:
+//			case LocalReportDaily:
+//			case LocalReportMonthly:
+//			case LocalReportSim:
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 1, extendedDataIndex);
+//				sqliteBindDouble(m_meterExtendedDataInsertStmt, 2, maxValue);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 3, maxMonth);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 4, maxDay);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 5, maxHour);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 6, maxMinute - minutesPerTimeStep + 1);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 7, maxMinute);
+//
+//				sqliteBindDouble(m_meterExtendedDataInsertStmt, 8, minValue);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 9, minMonth);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 10, minDay);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 11, minHour);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 12, minMinute - minutesPerTimeStep + 1);
+//				sqliteBindInteger(m_meterExtendedDataInsertStmt, 13, minMinute);
+//
+//				sqliteStepCommand(m_meterExtendedDataInsertStmt);
+//				sqliteResetCommand(m_meterExtendedDataInsertStmt);
+//				break;
+//			case LocalReportTimeStep:
+//				--extendedDataIndex; // Reset the data index to account for the error
+//				sqliteBindNULL(m_reportMeterDataInsertStmt, 4);
+//			default:
+//				--extendedDataIndex; // Reset the data index to account for the error
+//				std::stringstream ss;
+//				ss << "Illegal reportingInterval passed to CreateSQLiteMeterRecord: " << reportingInterval;
+//				sqliteWriteMessage(ss.str());
+//			}
+//		}
+//
+//		sqliteStepCommand(m_reportMeterDataInsertStmt);
+//		sqliteResetCommand(m_reportMeterDataInsertStmt);
+//	}
+//}
 
 void SQLite::createSQLiteDaylightMapTitle(
 	int const mapNum,
@@ -1918,12 +2191,12 @@ void SQLite::createSQLiteTabularDataRecords(
 	}
 }
 
-int SQLite::createSQLiteStringTableRecord(std::string const & stringValue,std::string const & stringType)
+int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int const stringType)
 {
 	int iOut = 0;
 	int errcode;
 
-	errcode = sqliteBindText(m_stringsLookUpStmt, 1, stringType);
+	errcode = sqliteBindInteger(m_stringsLookUpStmt, 1, stringType);
 	errcode = sqliteBindText(m_stringsLookUpStmt, 2, stringValue);
 	errcode = sqliteStepCommand(m_stringsLookUpStmt);
 
@@ -1934,7 +2207,7 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue,std::s
 		// If the stringKey is not already in the database we create a new record
 		// using the next available ID
 
-		errcode = sqliteBindText(m_stringsInsertStmt, 1, stringType);
+		errcode = sqliteBindInteger(m_stringsInsertStmt, 1, stringType);
 		errcode = sqliteBindText(m_stringsInsertStmt, 2, stringValue);
 		errcode = sqliteStepCommand(m_stringsInsertStmt);
 		errcode = sqliteResetCommand(m_stringsInsertStmt);

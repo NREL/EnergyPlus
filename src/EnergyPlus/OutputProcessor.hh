@@ -1142,7 +1142,8 @@ namespace OutputProcessor {
 		Optional< Real64 const > EndMinute = _, // The last minute in the reporting interval
 		Optional< Real64 const > StartMinute = _, // The starting minute of the reporting interval
 		Optional_int_const DST = _, // A flag indicating whether daylight savings time is observed
-		Optional_string_const DayType = _ // The day tied for the data (e.g., Monday)
+		Optional_string_const DayType = _, // The day tied for the data (e.g., Monday)
+		bool writeToSQL = true
 	);
 
 	void
@@ -1428,7 +1429,7 @@ AddToOutputVariableList(
 );
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted
