@@ -3774,29 +3774,27 @@ namespace OutputProcessor {
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), StartMinute(), EndMinute(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL && sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
 		} else if ( reportingInterval == ReportHourly ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), 0.0, 60.0, DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL && sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
 		} else if ( reportingInterval == ReportDaily ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL && sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
 		} else if ( reportingInterval == ReportMonthly ) {
 			std::sprintf( stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month() );
 			out_stream << stamp << NL;
-			if ( writeToSQL && sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
 		} else if ( reportingInterval == ReportSim ) {
 			std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
 			out_stream << stamp << NL;
-			if ( writeToSQL && sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
 		} else {
-			if ( sqlite->writeOutputToSQLite() ) {
-				std::ostringstream ss;
-				ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
-				sqlite->sqliteWriteMessage( ss.str() );
-			}
+			std::ostringstream ss;
+			ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
+			sqlite->sqliteWriteMessage( ss.str() );
 		}
 	}
 
@@ -3872,16 +3870,7 @@ namespace OutputProcessor {
 			if ( eso_stream ) *eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false, ScheduleName );
-// 			if ( ! present( ScheduleName ) ) {
-// 				sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false );
-// //				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval );
-// 			} else {
-// 				sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false, ScheduleName );
-// //				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, ScheduleName );
-// 			}
-		}
+		sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false, ScheduleName );
 
 	}
 
@@ -4005,18 +3994,11 @@ namespace OutputProcessor {
 
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			static std::string const keyedValueStringCum( "Cumulative " );
-			static std::string const keyedValueStringNon( "" );
-			std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
+		static std::string const keyedValueStringCum( "Cumulative " );
+		static std::string const keyedValueStringNon( "" );
+		std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
 
-//			sqlite->createSQLiteMeterDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
-			sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval, true );
-
-//			if ( ! meterFileOnlyFlag ) {
-//				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
-//			}
-		}
+		sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval, true );
 
 	}
 
@@ -4162,10 +4144,7 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
-		if ( sqlite->writeOutputToSQLite() ) {
-//			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
-			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
@@ -4232,19 +4211,12 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-//			sqlite->createSQLiteMeterRecord( reportID, repValue );
-			sqlite->createSQLiteReportDataRecord( reportID, repValue );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue );
 
 		if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
 		++StdMeterRecordCount;
 
 		if ( ! meterOnlyFlag ) {
-//			if ( sqlite->writeOutputToSQLite() ) {
-//				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-//			}
-
 			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
 			++StdOutputRecordCount;
 		}
@@ -4328,10 +4300,7 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( MinOut ) );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-//			sqlite->createSQLiteMeterRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
-			sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 
 		// Append the min and max strings with date information
 		//    CALL ProduceMinMaxStringWStartMinute(MinOut, minValueDate, reportingInterval)
@@ -4350,10 +4319,6 @@ namespace OutputProcessor {
 		}
 
 		if ( ! meterOnlyFlag ) {
-//			if ( sqlite->writeOutputToSQLite() ) {
-//				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
-//			}
-
 			if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
 				++StdOutputRecordCount;
@@ -4520,10 +4485,7 @@ namespace OutputProcessor {
 			strip_number( s );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-//			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-			sqlite->createSQLiteReportDataRecord( reportID, repValue );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue );
 
 		if ( eso_stream ) *eso_stream << creportID << ',' << s << NL;
 
@@ -4665,12 +4627,9 @@ namespace OutputProcessor {
 		ProduceMinMaxString( MinOut, minValueDate, reportingInterval );
 		ProduceMinMaxString( MaxOut, maxValueDate, reportingInterval );
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			rminValue = minValue;
-			rmaxValue = MaxValue;
-//			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
-			sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
-		}
+		rminValue = minValue;
+		rmaxValue = MaxValue;
+		sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
@@ -4735,10 +4694,7 @@ namespace OutputProcessor {
 			}
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-//			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-			sqlite->createSQLiteReportDataRecord( reportID, repValue );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue );
 
 		if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
 

@@ -59,29 +59,6 @@ public:
 		Optional_int_const minutesPerTimeStep = _
 	);
 
-//	void createSQLiteReportVariableDictionaryRecord(
-//		int const reportVariableReportID,
-//		int const storeTypeIndex,
-//		std::string const & indexGroup,
-//		std::string const & keyedValueString,
-//		std::string const & variableName,
-//		int const indexType,
-//		std::string const & units,
-//		int const reportingFreq,
-//		Optional_string_const ScheduleName = _
-//	);
-
-//	void createSQLiteReportVariableDataRecord(
-//		int const recordIndex,
-//		Real64 const value,
-//		Optional_int_const reportingInterval = _,
-//		Optional< Real64 const > minValue = _,
-//		Optional_int_const minValueDate = _,
-//		Optional< Real64 const > maxValue = _,
-//		Optional_int_const maxValueDate = _,
-//		Optional_int_const minutesPerTimeStep = _
-//	);
-
 	void createSQLiteTimeIndexRecord(
 		int const reportingInterval,
 		int const recordIndex,
@@ -123,29 +100,6 @@ public:
 	);
 
 	void createSQLiteRoomAirModelTable();
-
-//	void createSQLiteMeterDictionaryRecord(
-//		int const meterReportID,
-//		int const storeTypeIndex,
-//		std::string const & indexGroup,
-//		std::string const & keyedValueString,
-//		std::string const & variableName,
-//		int const indexType,
-//		std::string const & units,
-//		int const reportingFreq,
-//		Optional_string_const ScheduleName = _
-//	);
-//
-//	void createSQLiteMeterRecord(
-//		int const recordIndex,
-//		Real64 const value,
-//		Optional_int_const reportingInterval = _,
-//		Optional< Real64 const > minValue = _,
-//		Optional_int_const minValueDate = _,
-//		Optional< Real64 const > maxValue = _,
-//		Optional_int_const maxValueDate = _,
-//		Optional_int_const minutesPerTimeStep = _
-//	);
 
 	void createSQLiteDaylightMapTitle(
 		int const mapNum,
@@ -252,10 +206,6 @@ private:
 
 	void initializeReportDataDictionaryTable();
 	void initializeReportDataTables();
-//	void initializeReportVariableDataDictionaryTable();
-//	void initializeReportVariableDataTables();
-//	void initializeReportMeterDataDictionaryTable();
-//	void initializeReportMeterDataTables();
 	void initializeTimeIndicesTable();
 	void initializeZoneInfoTable();
 	void initializeNominalPeopleTable();
@@ -295,10 +245,7 @@ private:
 	sqlite3_stmt * m_reportDataInsertStmt;
 	sqlite3_stmt * m_reportExtendedDataInsertStmt;
 	sqlite3_stmt * m_reportDictionaryInsertStmt;
-//	sqlite3_stmt * m_reportVariableDataInsertStmt;
-//	sqlite3_stmt * m_reportVariableExtendedDataInsertStmt;
 	sqlite3_stmt * m_timeIndexInsertStmt;
-//	sqlite3_stmt * m_reportVariableDictionaryInsertStmt;
 	sqlite3_stmt * m_zoneInfoInsertStmt;
 	sqlite3_stmt * m_nominalLightingInsertStmt;
 	sqlite3_stmt * m_nominalElectricEquipmentInsertStmt;
@@ -322,9 +269,6 @@ private:
 	sqlite3_stmt * m_roomAirModelInsertStmt;
 	sqlite3_stmt * m_groundTemperatureInsertStmt;
 	sqlite3_stmt * m_weatherFileInsertStmt;
-//	sqlite3_stmt * m_meterDictionaryInsertStmt;
-//	sqlite3_stmt * m_reportMeterDataInsertStmt;
-//	sqlite3_stmt * m_meterExtendedDataInsertStmt;
 	sqlite3_stmt * m_scheduleInsertStmt;
 	sqlite3_stmt * m_daylightMapTitleInsertStmt;
 	sqlite3_stmt * m_daylightMapHorlyTitleInsertStmt;
