@@ -1189,6 +1189,7 @@ namespace SwimmingPool {
 		using DataHVACGlobals::TimeStepSys;
 		using DataSurfaces::Surface;
 		using FluidProperties::GetSpecificHeatGlycol;
+		using FluidProperties::GetDensityGlycol;
 		using DataHeatBalSurface::TH;
 
 		// Locals
@@ -1196,6 +1197,7 @@ namespace SwimmingPool {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const RoutineName( "ReportSwimmingPool" );
+		Real64 const MinDensity = 1.0;	// to avoid a divide by zero
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1207,6 +1209,7 @@ namespace SwimmingPool {
 		int PoolNum; // pool number index
 		int SurfNum; // surface number index
 		Real64 Cp; // specific heat of water
+		Real64 Density; // density of water
 
 		// FLOW:
 		for ( PoolNum = 1; PoolNum <= NumSwimmingPools; ++PoolNum ) {
@@ -1221,7 +1224,12 @@ namespace SwimmingPool {
 			Pool( PoolNum ).HeatPower = Pool( PoolNum ).WaterMassFlowRate * Cp * ( Pool( PoolNum ).WaterInletTemp - Pool( PoolNum ).PoolWaterTemp );
 			
 			// Now the power consumption of miscellaneous equipment
-			Pool( PoolNum ).MiscEquipPower = Pool( PoolNum ).MiscPowerFactor * Pool( PoolNum ).WaterMassFlowRate;
+			Density = GetDensityGlycol("WATER", Pool( PoolNum ).PoolWaterTemp, Pool( PoolNum ).GlycolIndex, RoutineName );
+			if ( Density > MinDensity ) {
+				Pool( PoolNum ).MiscEquipPower = Pool( PoolNum ).MiscPowerFactor * Pool( PoolNum ).WaterMassFlowRate / Density;
+			} else {
+				Pool( PoolNum ).MiscEquipPower = 0.0;
+			}
 			
 			// Also the radiant exchange converted to convection by the pool cover
 			Pool( PoolNum ).RadConvertToConvectRep = Pool( PoolNum ).RadConvertToConvect * Surface( SurfNum ).Area;

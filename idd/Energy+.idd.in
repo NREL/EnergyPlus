@@ -20072,7 +20072,7 @@ SwimmingPool:Indoor,
        \units m3/s
        \minimum 0.0
   N7,  \field Pool Miscellaneous Equipment Power
-       \units W/(kg/s of pool water flow)
+       \units W/(m3/s of pool water flow)
        \type real
        \minimum 0.0
   A8,  \field Setpoint Temperature Schedule
