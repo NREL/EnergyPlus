@@ -1053,11 +1053,12 @@ void SQLite::initializeTabularDataTable()
 	const std::string sql3 = "CREATE TABLE Strings "
 							 "(StringIndex INTEGER PRIMARY KEY, "
 							 "StringTypeIndex  INTEGER, "
-							 "Value TEXT);";
+							 "Value TEXT, "
+							 "UNIQUE(StringTypeIndex, Value));";
 
 	sqliteExecuteCommand(sql3);
 
-	const std::string sql4 = "INSERT INTO Strings (StringTypeIndex,Value) VALUES(?,?);";
+	const std::string sql4 = "INSERT INTO Strings (StringIndex,StringTypeIndex,Value) VALUES(?,?,?);";
 
 	sqlitePrepareStatement(m_stringsInsertStmt,sql4);
 
@@ -1411,11 +1412,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
 			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
 			sqliteBindInteger(m_timeIndexInsertStmt, 11, DataEnvironment::CurEnvirNum);
-			if(DataGlobals::WarmupFlag) {
-				sqliteBindInteger(m_timeIndexInsertStmt, 12, 1);
-			} else {
-				sqliteBindInteger(m_timeIndexInsertStmt, 12, 0);
-			}
+			sqliteBindLogical(m_timeIndexInsertStmt, 12, DataGlobals::WarmupFlag);
 
 			sqliteStepCommand(m_timeIndexInsertStmt);
 			sqliteResetCommand(m_timeIndexInsertStmt);
@@ -1599,11 +1596,12 @@ void SQLite::createSQLiteRoomAirModelTable()
 {
 	if( m_writeOutputToSQLite ) {
 		for(int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+			auto& zoneAirModel = DataRoomAirModel::AirModel(zoneNum);
 			sqliteBindInteger(m_roomAirModelInsertStmt, 1, zoneNum);
-			sqliteBindText(m_roomAirModelInsertStmt, 2, DataRoomAirModel::AirModel(zoneNum).AirModelName);
-			sqliteBindInteger(m_roomAirModelInsertStmt, 3, DataRoomAirModel::AirModel(zoneNum).AirModelType);
-			sqliteBindInteger(m_roomAirModelInsertStmt, 4, DataRoomAirModel::AirModel(zoneNum).TempCoupleScheme);
-			sqliteBindLogical(m_roomAirModelInsertStmt, 5, DataRoomAirModel::AirModel(zoneNum).SimAirModel);
+			sqliteBindText(m_roomAirModelInsertStmt, 2, zoneAirModel.AirModelName);
+			sqliteBindInteger(m_roomAirModelInsertStmt, 3, zoneAirModel.AirModelType);
+			sqliteBindInteger(m_roomAirModelInsertStmt, 4, zoneAirModel.TempCoupleScheme);
+			sqliteBindLogical(m_roomAirModelInsertStmt, 5, zoneAirModel.SimAirModel);
 
 			sqliteStepCommand(m_roomAirModelInsertStmt);
 			sqliteResetCommand(m_roomAirModelInsertStmt);
@@ -1737,35 +1735,20 @@ void SQLite::createSQLiteTabularDataRecords(
 
 int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int const stringType)
 {
-	int iOut = 0;
-	int errcode;
+	static int stringIndex = 1;
+	if( m_writeOutputToSQLite ) {
+		sqliteBindInteger(m_stringsInsertStmt, 1, stringIndex);
+		sqliteBindInteger(m_stringsInsertStmt, 2, stringType);
+		sqliteBindText(m_stringsInsertStmt, 3, stringValue);
 
-	errcode = sqliteBindInteger(m_stringsLookUpStmt, 1, stringType);
-	errcode = sqliteBindText(m_stringsLookUpStmt, 2, stringValue);
-	errcode = sqliteStepCommand(m_stringsLookUpStmt);
+		int errorcode = sqliteStepCommand(m_stringsInsertStmt);
+		sqliteResetCommand(m_stringsInsertStmt);
 
-	if(errcode == SQLITE_ROW) {
-		// If the stringKey is already in the database we just return its ID
-		iOut = sqlite3_column_int(m_stringsLookUpStmt,0);
-	} else {
-		// If the stringKey is not already in the database we create a new record
-		// using the next available ID
-
-		errcode = sqliteBindInteger(m_stringsInsertStmt, 1, stringType);
-		errcode = sqliteBindText(m_stringsInsertStmt, 2, stringValue);
-		errcode = sqliteStepCommand(m_stringsInsertStmt);
-		errcode = sqliteResetCommand(m_stringsInsertStmt);
-		errcode = sqliteClearBindings(m_stringsInsertStmt);
-
-		errcode = sqliteResetCommand(m_stringsLookUpStmt);
-		errcode = sqliteStepCommand(m_stringsLookUpStmt);
-		iOut = sqlite3_column_int(m_stringsLookUpStmt,0);
+		if( errorcode != SQLITE_CONSTRAINT ) {
+			stringIndex++;
+		}
 	}
-
-	errcode = sqliteResetCommand(m_stringsLookUpStmt);
-	errcode = sqliteClearBindings(m_stringsLookUpStmt);
-
-	return iOut;
+	return stringIndex;
 }
 
 void SQLite::createSQLiteSimulationsRecord( int const id )
@@ -1830,42 +1813,37 @@ void SQLite::updateSQLiteSimulationRecord(
 
 void SQLite::createSQLiteZoneTable()
 {
-	int isPartOfTotalArea;
-
 	for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-		if(DataHeatBalance::Zone(zoneNum).isPartOfTotalArea) {
-			isPartOfTotalArea = 1;
-		} else {
-			isPartOfTotalArea = 0;
-		}
+		auto& zoneHB = DataHeatBalance::Zone(zoneNum);
 
 		sqliteBindInteger(m_zoneInfoInsertStmt, 1, zoneNum);
-		sqliteBindText(m_zoneInfoInsertStmt, 2, DataHeatBalance::Zone(zoneNum).Name);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 3, DataHeatBalance::Zone(zoneNum).RelNorth);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 4, DataHeatBalance::Zone(zoneNum).OriginX);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 5, DataHeatBalance::Zone(zoneNum).OriginY);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 6, DataHeatBalance::Zone(zoneNum).OriginZ);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 7, DataHeatBalance::Zone(zoneNum).Centroid.x);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 8, DataHeatBalance::Zone(zoneNum).Centroid.y);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 9, DataHeatBalance::Zone(zoneNum).Centroid.z);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 10, DataHeatBalance::Zone(zoneNum).OfType);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 11, DataHeatBalance::Zone(zoneNum).Multiplier);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 12, DataHeatBalance::Zone(zoneNum).ListMultiplier);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 13, DataHeatBalance::Zone(zoneNum).MinimumX);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 14, DataHeatBalance::Zone(zoneNum).MaximumX);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 15, DataHeatBalance::Zone(zoneNum).MinimumY);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 16, DataHeatBalance::Zone(zoneNum).MaximumY);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 17, DataHeatBalance::Zone(zoneNum).MinimumZ);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 18, DataHeatBalance::Zone(zoneNum).MaximumZ);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 19, DataHeatBalance::Zone(zoneNum).CeilingHeight);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 20, DataHeatBalance::Zone(zoneNum).Volume);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 21, DataHeatBalance::Zone(zoneNum).InsideConvectionAlgo);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 22, DataHeatBalance::Zone(zoneNum).OutsideConvectionAlgo);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 23, DataHeatBalance::Zone(zoneNum).FloorArea);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 24, DataHeatBalance::Zone(zoneNum).ExtGrossWallArea);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 25, DataHeatBalance::Zone(zoneNum).ExtNetWallArea);
-		sqliteBindDouble(m_zoneInfoInsertStmt, 26, DataHeatBalance::Zone(zoneNum).ExtWindowArea);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 27, isPartOfTotalArea);
+		sqliteBindText(m_zoneInfoInsertStmt, 2, zoneHB.Name);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 3, zoneHB.RelNorth);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 4, zoneHB.OriginX);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 5, zoneHB.OriginY);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 6, zoneHB.OriginZ);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 7, zoneHB.Centroid.x);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 8, zoneHB.Centroid.y);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 9, zoneHB.Centroid.z);
+		sqliteBindInteger(m_zoneInfoInsertStmt, 10, zoneHB.OfType);
+		sqliteBindInteger(m_zoneInfoInsertStmt, 11, zoneHB.Multiplier);
+		sqliteBindInteger(m_zoneInfoInsertStmt, 12, zoneHB.ListMultiplier);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 13, zoneHB.MinimumX);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 14, zoneHB.MaximumX);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 15, zoneHB.MinimumY);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 16, zoneHB.MaximumY);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 17, zoneHB.MinimumZ);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 18, zoneHB.MaximumZ);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 19, zoneHB.CeilingHeight);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 20, zoneHB.Volume);
+		sqliteBindInteger(m_zoneInfoInsertStmt, 21, zoneHB.InsideConvectionAlgo);
+		sqliteBindInteger(m_zoneInfoInsertStmt, 22, zoneHB.OutsideConvectionAlgo);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 23, zoneHB.FloorArea);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 24, zoneHB.ExtGrossWallArea);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 25, zoneHB.ExtNetWallArea);
+		sqliteBindDouble(m_zoneInfoInsertStmt, 26, zoneHB.ExtWindowArea);
+		sqliteBindLogical(m_zoneInfoInsertStmt, 27, zoneHB.isPartOfTotalArea);
+		sqliteBindInteger(m_zoneInfoInsertStmt, 27, zoneHB.isPartOfTotalArea);
 
 		sqliteStepCommand(m_zoneInfoInsertStmt);
 		sqliteResetCommand(m_zoneInfoInsertStmt);
@@ -1875,17 +1853,18 @@ void SQLite::createSQLiteZoneTable()
 void SQLite::createSQLiteNominalLightingTable()
 {
 	for(int lightNum = 1; lightNum <= DataHeatBalance::TotLights; ++lightNum) {
+		auto& lightsHB = DataHeatBalance::Lights(lightNum);
 		sqliteBindInteger(m_nominalLightingInsertStmt, 1, lightNum);
-		sqliteBindText(m_nominalLightingInsertStmt, 2, DataHeatBalance::Lights(lightNum).Name);
-		sqliteBindInteger(m_nominalLightingInsertStmt, 3, DataHeatBalance::Lights(lightNum).ZonePtr);
-		sqliteBindInteger(m_nominalLightingInsertStmt, 4, DataHeatBalance::Lights(lightNum).SchedPtr);
-		sqliteBindDouble(m_nominalLightingInsertStmt, 5, DataHeatBalance::Lights(lightNum).DesignLevel);
-		sqliteBindDouble(m_nominalLightingInsertStmt, 6, DataHeatBalance::Lights(lightNum).FractionReturnAir);
-		sqliteBindDouble(m_nominalLightingInsertStmt, 7, DataHeatBalance::Lights(lightNum).FractionRadiant);
-		sqliteBindDouble(m_nominalLightingInsertStmt, 8, DataHeatBalance::Lights(lightNum).FractionShortWave);
-		sqliteBindDouble(m_nominalLightingInsertStmt, 9, DataHeatBalance::Lights(lightNum).FractionReplaceable);
-		sqliteBindDouble(m_nominalLightingInsertStmt, 10, DataHeatBalance::Lights(lightNum).FractionConvected);
-		sqliteBindText(m_nominalLightingInsertStmt, 11, DataHeatBalance::Lights(lightNum).EndUseSubcategory);
+		sqliteBindText(m_nominalLightingInsertStmt, 2, lightsHB.Name);
+		sqliteBindInteger(m_nominalLightingInsertStmt, 3, lightsHB.ZonePtr);
+		sqliteBindInteger(m_nominalLightingInsertStmt, 4, lightsHB.SchedPtr);
+		sqliteBindDouble(m_nominalLightingInsertStmt, 5, lightsHB.DesignLevel);
+		sqliteBindDouble(m_nominalLightingInsertStmt, 6, lightsHB.FractionReturnAir);
+		sqliteBindDouble(m_nominalLightingInsertStmt, 7, lightsHB.FractionRadiant);
+		sqliteBindDouble(m_nominalLightingInsertStmt, 8, lightsHB.FractionShortWave);
+		sqliteBindDouble(m_nominalLightingInsertStmt, 9, lightsHB.FractionReplaceable);
+		sqliteBindDouble(m_nominalLightingInsertStmt, 10, lightsHB.FractionConvected);
+		sqliteBindText(m_nominalLightingInsertStmt, 11, lightsHB.EndUseSubcategory);
 
 		sqliteStepCommand(m_nominalLightingInsertStmt);
 		sqliteResetCommand(m_nominalLightingInsertStmt);
@@ -1895,26 +1874,27 @@ void SQLite::createSQLiteNominalLightingTable()
 void SQLite::createSQLiteNominalPeopleTable()
 {
 	for(int peopleNum = 1; peopleNum <= DataHeatBalance::TotPeople; ++peopleNum) {
+		auto& peopleHB = DataHeatBalance::People(peopleNum);
 		sqliteBindInteger(m_nominalPeopleInsertStmt, 1, peopleNum);
-		sqliteBindText(m_nominalPeopleInsertStmt, 2, DataHeatBalance::People(peopleNum).Name);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 3, DataHeatBalance::People(peopleNum).ZonePtr);
-		sqliteBindDouble(m_nominalPeopleInsertStmt, 4, DataHeatBalance::People(peopleNum).NumberOfPeople);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 5, DataHeatBalance::People(peopleNum).NumberOfPeoplePtr);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 6, DataHeatBalance::People(peopleNum).ActivityLevelPtr);
-		sqliteBindDouble(m_nominalPeopleInsertStmt, 7, DataHeatBalance::People(peopleNum).FractionRadiant);
-		sqliteBindDouble(m_nominalPeopleInsertStmt, 8, DataHeatBalance::People(peopleNum).FractionConvected);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 9, DataHeatBalance::People(peopleNum).WorkEffPtr);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 10, DataHeatBalance::People(peopleNum).ClothingPtr);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 11, DataHeatBalance::People(peopleNum).AirVelocityPtr);
-		sqliteBindLogical(m_nominalPeopleInsertStmt, 12, DataHeatBalance::People(peopleNum).Fanger);
-		sqliteBindLogical(m_nominalPeopleInsertStmt, 13, DataHeatBalance::People(peopleNum).Pierce);
-		sqliteBindLogical(m_nominalPeopleInsertStmt, 14, DataHeatBalance::People(peopleNum).KSU);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 15, DataHeatBalance::People(peopleNum).MRTCalcType);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 16, DataHeatBalance::People(peopleNum).SurfacePtr);
-		sqliteBindText(m_nominalPeopleInsertStmt, 17, DataHeatBalance::People(peopleNum).AngleFactorListName);
-		sqliteBindInteger(m_nominalPeopleInsertStmt, 18, DataHeatBalance::People(peopleNum).AngleFactorListPtr);
-		sqliteBindDouble(m_nominalPeopleInsertStmt, 19, DataHeatBalance::People(peopleNum).UserSpecSensFrac);
-		sqliteBindLogical(m_nominalPeopleInsertStmt, 20, DataHeatBalance::People(peopleNum).Show55Warning);
+		sqliteBindText(m_nominalPeopleInsertStmt, 2, peopleHB.Name);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 3, peopleHB.ZonePtr);
+		sqliteBindDouble(m_nominalPeopleInsertStmt, 4, peopleHB.NumberOfPeople);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 5, peopleHB.NumberOfPeoplePtr);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 6, peopleHB.ActivityLevelPtr);
+		sqliteBindDouble(m_nominalPeopleInsertStmt, 7, peopleHB.FractionRadiant);
+		sqliteBindDouble(m_nominalPeopleInsertStmt, 8, peopleHB.FractionConvected);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 9, peopleHB.WorkEffPtr);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 10, peopleHB.ClothingPtr);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 11, peopleHB.AirVelocityPtr);
+		sqliteBindLogical(m_nominalPeopleInsertStmt, 12, peopleHB.Fanger);
+		sqliteBindLogical(m_nominalPeopleInsertStmt, 13, peopleHB.Pierce);
+		sqliteBindLogical(m_nominalPeopleInsertStmt, 14, peopleHB.KSU);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 15, peopleHB.MRTCalcType);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 16, peopleHB.SurfacePtr);
+		sqliteBindText(m_nominalPeopleInsertStmt, 17, peopleHB.AngleFactorListName);
+		sqliteBindInteger(m_nominalPeopleInsertStmt, 18, peopleHB.AngleFactorListPtr);
+		sqliteBindDouble(m_nominalPeopleInsertStmt, 19, peopleHB.UserSpecSensFrac);
+		sqliteBindLogical(m_nominalPeopleInsertStmt, 20, peopleHB.Show55Warning);
 
 		sqliteStepCommand(m_nominalPeopleInsertStmt);
 		sqliteResetCommand(m_nominalPeopleInsertStmt);
@@ -1924,16 +1904,17 @@ void SQLite::createSQLiteNominalPeopleTable()
 void SQLite::createSQLiteNominalElectricEquipmentTable()
 {
 	for(int elecEquipNum = 1; elecEquipNum <= DataHeatBalance::TotElecEquip; ++elecEquipNum) {
+		auto& elecEquipHB = DataHeatBalance::ZoneElectric(elecEquipNum);
 		sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 1, elecEquipNum);
-		sqliteBindText(m_nominalElectricEquipmentInsertStmt, 2, DataHeatBalance::ZoneElectric(elecEquipNum).Name);
-		sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 3, DataHeatBalance::ZoneElectric(elecEquipNum).ZonePtr);
-		sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 4, DataHeatBalance::ZoneElectric(elecEquipNum).SchedPtr);
-		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 5, DataHeatBalance::ZoneElectric(elecEquipNum).DesignLevel);
-		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 6, DataHeatBalance::ZoneElectric(elecEquipNum).FractionLatent);
-		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 7, DataHeatBalance::ZoneElectric(elecEquipNum).FractionRadiant);
-		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 8, DataHeatBalance::ZoneElectric(elecEquipNum).FractionLost);
-		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 9, DataHeatBalance::ZoneElectric(elecEquipNum).FractionConvected);
-		sqliteBindText(m_nominalElectricEquipmentInsertStmt, 10, DataHeatBalance::ZoneElectric(elecEquipNum).EndUseSubcategory);
+		sqliteBindText(m_nominalElectricEquipmentInsertStmt, 2, elecEquipHB.Name);
+		sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 3, elecEquipHB.ZonePtr);
+		sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 4, elecEquipHB.SchedPtr);
+		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 5, elecEquipHB.DesignLevel);
+		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 6, elecEquipHB.FractionLatent);
+		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 7, elecEquipHB.FractionRadiant);
+		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 8, elecEquipHB.FractionLost);
+		sqliteBindDouble(m_nominalElectricEquipmentInsertStmt, 9, elecEquipHB.FractionConvected);
+		sqliteBindText(m_nominalElectricEquipmentInsertStmt, 10, elecEquipHB.EndUseSubcategory);
 
 		sqliteStepCommand(m_nominalElectricEquipmentInsertStmt);
 		sqliteResetCommand(m_nominalElectricEquipmentInsertStmt);
@@ -1943,16 +1924,17 @@ void SQLite::createSQLiteNominalElectricEquipmentTable()
 void SQLite::createSQLiteNominalGasEquipmentTable()
 {
 	for(int gasEquipNum = 1; gasEquipNum <= DataHeatBalance::TotGasEquip; ++gasEquipNum) {
+		auto& gasEquipHB = DataHeatBalance::ZoneGas(gasEquipNum);
 		sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 1, gasEquipNum);
-		sqliteBindText(m_nominalGasEquipmentInsertStmt, 2, DataHeatBalance::ZoneGas(gasEquipNum).Name);
-		sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 3, DataHeatBalance::ZoneGas(gasEquipNum).ZonePtr);
-		sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 4, DataHeatBalance::ZoneGas(gasEquipNum).SchedPtr);
-		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 5, DataHeatBalance::ZoneGas(gasEquipNum).DesignLevel);
-		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 6, DataHeatBalance::ZoneGas(gasEquipNum).FractionLatent);
-		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 7, DataHeatBalance::ZoneGas(gasEquipNum).FractionRadiant);
-		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 8, DataHeatBalance::ZoneGas(gasEquipNum).FractionLost);
-		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 9, DataHeatBalance::ZoneGas(gasEquipNum).FractionConvected);
-		sqliteBindText(m_nominalGasEquipmentInsertStmt, 10, DataHeatBalance::ZoneGas(gasEquipNum).EndUseSubcategory);
+		sqliteBindText(m_nominalGasEquipmentInsertStmt, 2, gasEquipHB.Name);
+		sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 3, gasEquipHB.ZonePtr);
+		sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 4, gasEquipHB.SchedPtr);
+		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 5, gasEquipHB.DesignLevel);
+		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 6, gasEquipHB.FractionLatent);
+		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 7, gasEquipHB.FractionRadiant);
+		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 8, gasEquipHB.FractionLost);
+		sqliteBindDouble(m_nominalGasEquipmentInsertStmt, 9, gasEquipHB.FractionConvected);
+		sqliteBindText(m_nominalGasEquipmentInsertStmt, 10, gasEquipHB.EndUseSubcategory);
 
 		sqliteStepCommand(m_nominalGasEquipmentInsertStmt);
 		sqliteResetCommand(m_nominalGasEquipmentInsertStmt);
@@ -1962,16 +1944,17 @@ void SQLite::createSQLiteNominalGasEquipmentTable()
 void SQLite::createSQLiteNominalSteamEquipmentTable()
 {
 	for(int steamEquipNum = 1; steamEquipNum <= DataHeatBalance::TotStmEquip; ++steamEquipNum) {
+		auto& steamEquipHB = DataHeatBalance::ZoneSteamEq(steamEquipNum);
 		sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 1, steamEquipNum);
-		sqliteBindText(m_nominalSteamEquipmentInsertStmt, 2, DataHeatBalance::ZoneSteamEq(steamEquipNum).Name);
-		sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 3, DataHeatBalance::ZoneSteamEq(steamEquipNum).ZonePtr);
-		sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 4, DataHeatBalance::ZoneSteamEq(steamEquipNum).SchedPtr);
-		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 5, DataHeatBalance::ZoneSteamEq(steamEquipNum).DesignLevel);
-		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 6, DataHeatBalance::ZoneSteamEq(steamEquipNum).FractionLatent);
-		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 7, DataHeatBalance::ZoneSteamEq(steamEquipNum).FractionRadiant);
-		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 8, DataHeatBalance::ZoneSteamEq(steamEquipNum).FractionLost);
-		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 9, DataHeatBalance::ZoneSteamEq(steamEquipNum).FractionConvected);
-		sqliteBindText(m_nominalSteamEquipmentInsertStmt, 10, DataHeatBalance::ZoneSteamEq(steamEquipNum).EndUseSubcategory);
+		sqliteBindText(m_nominalSteamEquipmentInsertStmt, 2, steamEquipHB.Name);
+		sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 3, steamEquipHB.ZonePtr);
+		sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 4, steamEquipHB.SchedPtr);
+		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 5, steamEquipHB.DesignLevel);
+		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 6, steamEquipHB.FractionLatent);
+		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 7, steamEquipHB.FractionRadiant);
+		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 8, steamEquipHB.FractionLost);
+		sqliteBindDouble(m_nominalSteamEquipmentInsertStmt, 9, steamEquipHB.FractionConvected);
+		sqliteBindText(m_nominalSteamEquipmentInsertStmt, 10, steamEquipHB.EndUseSubcategory);
 
 		sqliteStepCommand(m_nominalSteamEquipmentInsertStmt);
 		sqliteResetCommand(m_nominalSteamEquipmentInsertStmt);
@@ -1981,16 +1964,17 @@ void SQLite::createSQLiteNominalSteamEquipmentTable()
 void SQLite::createSQLiteNominalHotWaterEquipmentTable()
 {
 	for(int hWEquipNum = 1; hWEquipNum <= DataHeatBalance::TotHWEquip; ++hWEquipNum) {
+		auto& zoneHW = DataHeatBalance::ZoneHWEq(hWEquipNum);
 		sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 1, hWEquipNum);
-		sqliteBindText(m_nominalHotWaterEquipmentInsertStmt, 2, DataHeatBalance::ZoneHWEq(hWEquipNum).Name);
-		sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 3, DataHeatBalance::ZoneHWEq(hWEquipNum).ZonePtr);
-		sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 4, DataHeatBalance::ZoneHWEq(hWEquipNum).SchedPtr);
-		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 5, DataHeatBalance::ZoneHWEq(hWEquipNum).DesignLevel);
-		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 6, DataHeatBalance::ZoneHWEq(hWEquipNum).FractionLatent);
-		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 7, DataHeatBalance::ZoneHWEq(hWEquipNum).FractionRadiant);
-		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 8, DataHeatBalance::ZoneHWEq(hWEquipNum).FractionLost);
-		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 9, DataHeatBalance::ZoneHWEq(hWEquipNum).FractionConvected);
-		sqliteBindText(m_nominalHotWaterEquipmentInsertStmt, 10, DataHeatBalance::ZoneHWEq(hWEquipNum).EndUseSubcategory);
+		sqliteBindText(m_nominalHotWaterEquipmentInsertStmt, 2, zoneHW.Name);
+		sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 3, zoneHW.ZonePtr);
+		sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 4, zoneHW.SchedPtr);
+		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 5, zoneHW.DesignLevel);
+		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 6, zoneHW.FractionLatent);
+		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 7, zoneHW.FractionRadiant);
+		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 8, zoneHW.FractionLost);
+		sqliteBindDouble(m_nominalHotWaterEquipmentInsertStmt, 9, zoneHW.FractionConvected);
+		sqliteBindText(m_nominalHotWaterEquipmentInsertStmt, 10, zoneHW.EndUseSubcategory);
 
 		sqliteStepCommand(m_nominalHotWaterEquipmentInsertStmt);
 		sqliteResetCommand(m_nominalHotWaterEquipmentInsertStmt);
@@ -2000,16 +1984,17 @@ void SQLite::createSQLiteNominalHotWaterEquipmentTable()
 void SQLite::createSQLiteNominalOtherEquipmentTable()
 {
 	for(int otherEquipNum = 1; otherEquipNum <= DataHeatBalance::TotOthEquip; ++otherEquipNum) {
+		auto& otherEquip = DataHeatBalance::ZoneOtherEq(otherEquipNum);
 		sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 1, otherEquipNum);
-		sqliteBindText(m_nominalOtherEquipmentInsertStmt, 2, DataHeatBalance::ZoneOtherEq(otherEquipNum).Name);
-		sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 3, DataHeatBalance::ZoneOtherEq(otherEquipNum).ZonePtr);
-		sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 4, DataHeatBalance::ZoneOtherEq(otherEquipNum).SchedPtr);
-		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 5, DataHeatBalance::ZoneOtherEq(otherEquipNum).DesignLevel);
-		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 6, DataHeatBalance::ZoneOtherEq(otherEquipNum).FractionLatent);
-		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 7, DataHeatBalance::ZoneOtherEq(otherEquipNum).FractionRadiant);
-		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 8, DataHeatBalance::ZoneOtherEq(otherEquipNum).FractionLost);
-		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 9, DataHeatBalance::ZoneOtherEq(otherEquipNum).FractionConvected);
-		sqliteBindText(m_nominalOtherEquipmentInsertStmt, 10, DataHeatBalance::ZoneOtherEq(otherEquipNum).EndUseSubcategory);
+		sqliteBindText(m_nominalOtherEquipmentInsertStmt, 2, otherEquip.Name);
+		sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 3, otherEquip.ZonePtr);
+		sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 4, otherEquip.SchedPtr);
+		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 5, otherEquip.DesignLevel);
+		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 6, otherEquip.FractionLatent);
+		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 7, otherEquip.FractionRadiant);
+		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 8, otherEquip.FractionLost);
+		sqliteBindDouble(m_nominalOtherEquipmentInsertStmt, 9, otherEquip.FractionConvected);
+		sqliteBindText(m_nominalOtherEquipmentInsertStmt, 10, otherEquip.EndUseSubcategory);
 
 		sqliteStepCommand(m_nominalOtherEquipmentInsertStmt);
 		sqliteResetCommand(m_nominalOtherEquipmentInsertStmt);
@@ -2019,17 +2004,18 @@ void SQLite::createSQLiteNominalOtherEquipmentTable()
 void SQLite::createSQLiteNominalBaseboardHeatTable()
 {
 	for(int bBHeatNum = 1; bBHeatNum <= DataHeatBalance::TotBBHeat; ++bBHeatNum) {
+		auto& baseboardHeat = DataHeatBalance::ZoneBBHeat(bBHeatNum);
 		sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 1, bBHeatNum);
-		sqliteBindText(m_nominalBaseboardHeatInsertStmt, 2, DataHeatBalance::ZoneBBHeat(bBHeatNum).Name);
-		sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 3, DataHeatBalance::ZoneBBHeat(bBHeatNum).ZonePtr);
-		sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 4, DataHeatBalance::ZoneBBHeat(bBHeatNum).SchedPtr);
-		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 5, DataHeatBalance::ZoneBBHeat(bBHeatNum).CapatLowTemperature);
-		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 6, DataHeatBalance::ZoneBBHeat(bBHeatNum).LowTemperature);
-		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 7, DataHeatBalance::ZoneBBHeat(bBHeatNum).CapatHighTemperature);
-		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 8, DataHeatBalance::ZoneBBHeat(bBHeatNum).HighTemperature);
-		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 9, DataHeatBalance::ZoneBBHeat(bBHeatNum).FractionRadiant);
-		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 10, DataHeatBalance::ZoneBBHeat(bBHeatNum).FractionConvected);
-		sqliteBindText(m_nominalBaseboardHeatInsertStmt, 11, DataHeatBalance::ZoneBBHeat(bBHeatNum).EndUseSubcategory);
+		sqliteBindText(m_nominalBaseboardHeatInsertStmt, 2, baseboardHeat.Name);
+		sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 3, baseboardHeat.ZonePtr);
+		sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 4, baseboardHeat.SchedPtr);
+		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 5, baseboardHeat.CapatLowTemperature);
+		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 6, baseboardHeat.LowTemperature);
+		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 7, baseboardHeat.CapatHighTemperature);
+		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 8, baseboardHeat.HighTemperature);
+		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 9, baseboardHeat.FractionRadiant);
+		sqliteBindDouble(m_nominalBaseboardHeatInsertStmt, 10, baseboardHeat.FractionConvected);
+		sqliteBindText(m_nominalBaseboardHeatInsertStmt, 11, baseboardHeat.EndUseSubcategory);
 
 		sqliteStepCommand(m_nominalBaseboardHeatInsertStmt);
 		sqliteResetCommand(m_nominalBaseboardHeatInsertStmt);
@@ -2039,11 +2025,12 @@ void SQLite::createSQLiteNominalBaseboardHeatTable()
 void SQLite::createSQLiteInfiltrationTable()
 {
 	for(int stmtNum = 1; stmtNum <= DataHeatBalance::TotInfiltration; ++stmtNum) {
+		auto& infiltration = DataHeatBalance::Infiltration(stmtNum);
 		sqliteBindInteger(m_infiltrationInsertStmt, 1, stmtNum);
-		sqliteBindText(m_infiltrationInsertStmt, 2, DataHeatBalance::Infiltration(stmtNum).Name);
-		sqliteBindInteger(m_infiltrationInsertStmt, 3, DataHeatBalance::Infiltration(stmtNum).ZonePtr);
-		sqliteBindInteger(m_infiltrationInsertStmt, 4, DataHeatBalance::Infiltration(stmtNum).SchedPtr);
-		sqliteBindDouble(m_infiltrationInsertStmt, 5, DataHeatBalance::Infiltration(stmtNum).DesignLevel);
+		sqliteBindText(m_infiltrationInsertStmt, 2, infiltration.Name);
+		sqliteBindInteger(m_infiltrationInsertStmt, 3, infiltration.ZonePtr);
+		sqliteBindInteger(m_infiltrationInsertStmt, 4, infiltration.SchedPtr);
+		sqliteBindDouble(m_infiltrationInsertStmt, 5, infiltration.DesignLevel);
 
 		sqliteStepCommand(m_infiltrationInsertStmt);
 		sqliteResetCommand(m_infiltrationInsertStmt);
@@ -2053,11 +2040,12 @@ void SQLite::createSQLiteInfiltrationTable()
 void SQLite::createSQLiteVentilationTable()
 {
 	for(int stmtNum = 1; stmtNum <= DataHeatBalance::TotVentilation; ++stmtNum) {
+		auto& ventilation = DataHeatBalance::Ventilation(stmtNum);
 		sqliteBindInteger(m_ventilationInsertStmt, 1, stmtNum);
-		sqliteBindText(m_ventilationInsertStmt, 2, DataHeatBalance::Ventilation(stmtNum).Name);
-		sqliteBindInteger(m_ventilationInsertStmt, 3, DataHeatBalance::Ventilation(stmtNum).ZonePtr);
-		sqliteBindInteger(m_ventilationInsertStmt, 4, DataHeatBalance::Ventilation(stmtNum).SchedPtr);
-		sqliteBindDouble(m_ventilationInsertStmt, 5, DataHeatBalance::Ventilation(stmtNum).DesignLevel);
+		sqliteBindText(m_ventilationInsertStmt, 2, ventilation.Name);
+		sqliteBindInteger(m_ventilationInsertStmt, 3, ventilation.ZonePtr);
+		sqliteBindInteger(m_ventilationInsertStmt, 4, ventilation.SchedPtr);
+		sqliteBindDouble(m_ventilationInsertStmt, 5, ventilation.DesignLevel);
 
 		sqliteStepCommand(m_ventilationInsertStmt);
 		sqliteResetCommand(m_ventilationInsertStmt);
@@ -2067,26 +2055,27 @@ void SQLite::createSQLiteVentilationTable()
 void SQLite::createSQLiteSurfacesTable()
 {
 	for(int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
+		auto& surface = DataSurfaces::Surface(surfaceNumber);
 		sqliteBindInteger(m_surfaceInsertStmt, 1, surfaceNumber);
-		sqliteBindText(m_surfaceInsertStmt, 2, DataSurfaces::Surface(surfaceNumber).Name);
-		sqliteBindInteger(m_surfaceInsertStmt, 3, DataSurfaces::Surface(surfaceNumber).Construction);
-		sqliteBindText(m_surfaceInsertStmt, 4, DataSurfaces::cSurfaceClass(DataSurfaces::Surface(surfaceNumber).Class));
-		sqliteBindDouble(m_surfaceInsertStmt, 5, DataSurfaces::Surface(surfaceNumber).Area);
-		sqliteBindDouble(m_surfaceInsertStmt, 6, DataSurfaces::Surface(surfaceNumber).GrossArea);
-		sqliteBindDouble(m_surfaceInsertStmt, 7, DataSurfaces::Surface(surfaceNumber).Perimeter);
-		sqliteBindDouble(m_surfaceInsertStmt, 8, DataSurfaces::Surface(surfaceNumber).Azimuth);
-		sqliteBindDouble(m_surfaceInsertStmt, 9, DataSurfaces::Surface(surfaceNumber).Height);
-		sqliteBindDouble(m_surfaceInsertStmt, 10, DataSurfaces::Surface(surfaceNumber).Reveal);
-		sqliteBindInteger(m_surfaceInsertStmt, 11, DataSurfaces::Surface(surfaceNumber).Shape);
-		sqliteBindInteger(m_surfaceInsertStmt, 12, DataSurfaces::Surface(surfaceNumber).Sides);
-		sqliteBindDouble(m_surfaceInsertStmt, 13, DataSurfaces::Surface(surfaceNumber).Tilt);
-		sqliteBindDouble(m_surfaceInsertStmt, 14, DataSurfaces::Surface(surfaceNumber).Width);
-		sqliteBindLogical(m_surfaceInsertStmt, 15, DataSurfaces::Surface(surfaceNumber).HeatTransSurf);
-		sqliteBindInteger(m_surfaceInsertStmt, 16, DataSurfaces::Surface(surfaceNumber).BaseSurf);
-		sqliteBindInteger(m_surfaceInsertStmt, 17, DataSurfaces::Surface(surfaceNumber).Zone);
-		sqliteBindInteger(m_surfaceInsertStmt, 18, DataSurfaces::Surface(surfaceNumber).ExtBoundCond);
-		sqliteBindLogical(m_surfaceInsertStmt, 19, DataSurfaces::Surface(surfaceNumber).ExtSolar);
-		sqliteBindLogical(m_surfaceInsertStmt, 20, DataSurfaces::Surface(surfaceNumber).ExtWind);
+		sqliteBindText(m_surfaceInsertStmt, 2, surface.Name);
+		sqliteBindInteger(m_surfaceInsertStmt, 3, surface.Construction);
+		sqliteBindText(m_surfaceInsertStmt, 4, DataSurfaces::cSurfaceClass(surface.Class));
+		sqliteBindDouble(m_surfaceInsertStmt, 5, surface.Area);
+		sqliteBindDouble(m_surfaceInsertStmt, 6, surface.GrossArea);
+		sqliteBindDouble(m_surfaceInsertStmt, 7, surface.Perimeter);
+		sqliteBindDouble(m_surfaceInsertStmt, 8, surface.Azimuth);
+		sqliteBindDouble(m_surfaceInsertStmt, 9, surface.Height);
+		sqliteBindDouble(m_surfaceInsertStmt, 10, surface.Reveal);
+		sqliteBindInteger(m_surfaceInsertStmt, 11, surface.Shape);
+		sqliteBindInteger(m_surfaceInsertStmt, 12, surface.Sides);
+		sqliteBindDouble(m_surfaceInsertStmt, 13, surface.Tilt);
+		sqliteBindDouble(m_surfaceInsertStmt, 14, surface.Width);
+		sqliteBindLogical(m_surfaceInsertStmt, 15, surface.HeatTransSurf);
+		sqliteBindInteger(m_surfaceInsertStmt, 16, surface.BaseSurf);
+		sqliteBindInteger(m_surfaceInsertStmt, 17, surface.Zone);
+		sqliteBindInteger(m_surfaceInsertStmt, 18, surface.ExtBoundCond);
+		sqliteBindLogical(m_surfaceInsertStmt, 19, surface.ExtSolar);
+		sqliteBindLogical(m_surfaceInsertStmt, 20, surface.ExtWind);
 
 		sqliteStepCommand(m_surfaceInsertStmt);
 		sqliteResetCommand(m_surfaceInsertStmt);
@@ -2096,32 +2085,33 @@ void SQLite::createSQLiteSurfacesTable()
 void SQLite::createSQLiteConstructionsTable()
 {
 	for(int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
+		auto& construction = DataHeatBalance::Construct(constructNum);
 		sqliteBindInteger(m_constructionInsertStmt, 1, constructNum);
-		sqliteBindText(m_constructionInsertStmt, 2, DataHeatBalance::Construct(constructNum).Name);
-		sqliteBindInteger(m_constructionInsertStmt, 3, DataHeatBalance::Construct(constructNum).TotLayers);
-		sqliteBindInteger(m_constructionInsertStmt, 4, DataHeatBalance::Construct(constructNum).TotSolidLayers);
-		sqliteBindInteger(m_constructionInsertStmt, 5, DataHeatBalance::Construct(constructNum).TotGlassLayers);
+		sqliteBindText(m_constructionInsertStmt, 2, construction.Name);
+		sqliteBindInteger(m_constructionInsertStmt, 3, construction.TotLayers);
+		sqliteBindInteger(m_constructionInsertStmt, 4, construction.TotSolidLayers);
+		sqliteBindInteger(m_constructionInsertStmt, 5, construction.TotGlassLayers);
 
-		for(int layerNum = 1; layerNum <= DataHeatBalance::Construct(constructNum).TotLayers; ++layerNum) {
+		for(int layerNum = 1; layerNum <= construction.TotLayers; ++layerNum) {
 			sqliteBindInteger(m_constructionLayerInsertStmt, 1, constructNum);
 			sqliteBindInteger(m_constructionLayerInsertStmt, 2, layerNum);
-			sqliteBindInteger(m_constructionLayerInsertStmt, 3, DataHeatBalance::Construct(constructNum).LayerPoint(layerNum));
+			sqliteBindInteger(m_constructionLayerInsertStmt, 3, construction.LayerPoint(layerNum));
 
 			sqliteStepCommand(m_constructionLayerInsertStmt);
 			sqliteResetCommand(m_constructionLayerInsertStmt);
 		}
 
-		sqliteBindDouble(m_constructionInsertStmt, 6, DataHeatBalance::Construct(constructNum).InsideAbsorpVis);
-		sqliteBindDouble(m_constructionInsertStmt, 7, DataHeatBalance::Construct(constructNum).OutsideAbsorpVis);
-		sqliteBindDouble(m_constructionInsertStmt, 8, DataHeatBalance::Construct(constructNum).InsideAbsorpSolar);
-		sqliteBindDouble(m_constructionInsertStmt, 9, DataHeatBalance::Construct(constructNum).OutsideAbsorpSolar);
-		sqliteBindDouble(m_constructionInsertStmt, 10, DataHeatBalance::Construct(constructNum).InsideAbsorpThermal);
-		sqliteBindDouble(m_constructionInsertStmt, 11, DataHeatBalance::Construct(constructNum).OutsideAbsorpThermal);
-		sqliteBindInteger(m_constructionInsertStmt, 12, DataHeatBalance::Construct(constructNum).OutsideRoughness);
-		sqliteBindLogical(m_constructionInsertStmt, 13, DataHeatBalance::Construct(constructNum).TypeIsWindow);
+		sqliteBindDouble(m_constructionInsertStmt, 6, construction.InsideAbsorpVis);
+		sqliteBindDouble(m_constructionInsertStmt, 7, construction.OutsideAbsorpVis);
+		sqliteBindDouble(m_constructionInsertStmt, 8, construction.InsideAbsorpSolar);
+		sqliteBindDouble(m_constructionInsertStmt, 9, construction.OutsideAbsorpSolar);
+		sqliteBindDouble(m_constructionInsertStmt, 10, construction.InsideAbsorpThermal);
+		sqliteBindDouble(m_constructionInsertStmt, 11, construction.OutsideAbsorpThermal);
+		sqliteBindInteger(m_constructionInsertStmt, 12, construction.OutsideRoughness);
+		sqliteBindLogical(m_constructionInsertStmt, 13, construction.TypeIsWindow);
 
-		if(DataHeatBalance::Construct(constructNum).TotGlassLayers == 0) {
-			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::Construct(constructNum).UValue);
+		if(construction.TotGlassLayers == 0) {
+			sqliteBindDouble(m_constructionInsertStmt, 14, construction.UValue);
 		} else {
 			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::NominalU(constructNum));
 		}
@@ -2134,20 +2124,21 @@ void SQLite::createSQLiteConstructionsTable()
 void SQLite::createSQLiteMaterialsTable()
 {
 	for(int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
+		auto& material = DataHeatBalance::Material(materialNum);
 		sqliteBindInteger(m_materialInsertStmt, 1, materialNum);
-		sqliteBindText(m_materialInsertStmt, 2, DataHeatBalance::Material(materialNum).Name);
-		sqliteBindInteger(m_materialInsertStmt, 3, DataHeatBalance::Material(materialNum).Group);
-		sqliteBindInteger(m_materialInsertStmt, 4, DataHeatBalance::Material(materialNum).Roughness);
-		sqliteBindDouble(m_materialInsertStmt, 5, DataHeatBalance::Material(materialNum).Conductivity);
-		sqliteBindDouble(m_materialInsertStmt, 6, DataHeatBalance::Material(materialNum).Density);
-		sqliteBindDouble(m_materialInsertStmt, 7, DataHeatBalance::Material(materialNum).IsoMoistCap);
-		sqliteBindDouble(m_materialInsertStmt, 8, DataHeatBalance::Material(materialNum).Porosity);
-		sqliteBindDouble(m_materialInsertStmt, 9, DataHeatBalance::Material(materialNum).Resistance);
-		sqliteBindLogical(m_materialInsertStmt, 10, DataHeatBalance::Material(materialNum).ROnly);
-		sqliteBindDouble(m_materialInsertStmt, 11, DataHeatBalance::Material(materialNum).SpecHeat);
-		sqliteBindDouble(m_materialInsertStmt, 12, DataHeatBalance::Material(materialNum).ThermGradCoef);
-		sqliteBindDouble(m_materialInsertStmt, 13, DataHeatBalance::Material(materialNum).Thickness);
-		sqliteBindDouble(m_materialInsertStmt, 14, DataHeatBalance::Material(materialNum).VaporDiffus);
+		sqliteBindText(m_materialInsertStmt, 2, material.Name);
+		sqliteBindInteger(m_materialInsertStmt, 3, material.Group);
+		sqliteBindInteger(m_materialInsertStmt, 4, material.Roughness);
+		sqliteBindDouble(m_materialInsertStmt, 5, material.Conductivity);
+		sqliteBindDouble(m_materialInsertStmt, 6, material.Density);
+		sqliteBindDouble(m_materialInsertStmt, 7, material.IsoMoistCap);
+		sqliteBindDouble(m_materialInsertStmt, 8, material.Porosity);
+		sqliteBindDouble(m_materialInsertStmt, 9, material.Resistance);
+		sqliteBindLogical(m_materialInsertStmt, 10, material.ROnly);
+		sqliteBindDouble(m_materialInsertStmt, 11, material.SpecHeat);
+		sqliteBindDouble(m_materialInsertStmt, 12, material.ThermGradCoef);
+		sqliteBindDouble(m_materialInsertStmt, 13, material.Thickness);
+		sqliteBindDouble(m_materialInsertStmt, 14, material.VaporDiffus);
 
 		sqliteStepCommand(m_materialInsertStmt);
 		sqliteResetCommand(m_materialInsertStmt);
@@ -2157,10 +2148,11 @@ void SQLite::createSQLiteMaterialsTable()
 void SQLite::createSQLiteZoneListTable()
 {
 	for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
-		for(int zoneNum = 1; zoneNum <= DataHeatBalance::ZoneList(listNum).NumOfZones; ++zoneNum) {
+		auto& zoneList = DataHeatBalance::ZoneList(listNum);
+		for(int zoneNum = 1; zoneNum <= zoneList.NumOfZones; ++zoneNum) {
 			sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
-			sqliteBindText(m_zoneListInsertStmt, 2, DataHeatBalance::ZoneList(listNum).Name);
-			sqliteBindInteger(m_zoneListInsertStmt, 3, DataHeatBalance::ZoneList(listNum).Zone(zoneNum));
+			sqliteBindText(m_zoneListInsertStmt, 2, zoneList.Name);
+			sqliteBindInteger(m_zoneListInsertStmt, 3, zoneList.Zone(zoneNum));
 
 			sqliteStepCommand(m_zoneListInsertStmt);
 			sqliteResetCommand(m_zoneListInsertStmt);
@@ -2171,9 +2163,10 @@ void SQLite::createSQLiteZoneListTable()
 void SQLite::createSQLiteZoneGroupTable()
 {
 	for(int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum) {
+		auto& zoneGroup = DataHeatBalance::ZoneGroup(groupNum);
 		sqliteBindInteger(m_zoneGroupInsertStmt, 1, groupNum);
-		sqliteBindText(m_zoneGroupInsertStmt, 2, DataHeatBalance::ZoneGroup(groupNum).Name);
-		sqliteBindInteger(m_zoneGroupInsertStmt, 3, DataHeatBalance::ZoneGroup(groupNum).ZoneList);
+		sqliteBindText(m_zoneGroupInsertStmt, 2, zoneGroup.Name);
+		sqliteBindInteger(m_zoneGroupInsertStmt, 3, zoneGroup.ZoneList);
 
 		sqliteStepCommand(m_zoneGroupInsertStmt);
 		sqliteResetCommand(m_zoneGroupInsertStmt);
