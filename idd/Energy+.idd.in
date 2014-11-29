@@ -4772,8 +4772,8 @@ WindowMaterial:Glazing,
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
-       \minimum > 0.0
-       \maximum < 1.0
+       \minimum>  0.0
+       \maximum<  1.0
        \default 0.22
 
 WindowMaterial:GlazingGroup:Thermochromic,
@@ -5233,7 +5233,7 @@ WindowMaterial:Gas,
   N12 ;\field Specific Heat Ratio
        \type real
        \note Used only if Gas Type = Custom
-       \minimum >1.0
+       \minimum> 1.0
 
 WindowGap:SupportPillar,
     \memo used to define pillar geometry for support pillars
@@ -5353,7 +5353,7 @@ WindowMaterial:Gap,
        \required-field
        \units m
        \type real
-       \minimum >0
+       \minimum> 0
   A2 , \field Gas (or Gas Mixture)
        \note This field should reference only WindowMaterial:Gas
        \note or WindowMaterial:GasMixture objects
@@ -6684,7 +6684,7 @@ WindowMaterial:Gap:EquivalentLayer,
   N12 ;\field Specific Heat Ratio
        \type real
        \note Used only if Gas Type = Custom
-       \minimum >1.0
+       \minimum> 1.0
 
 MaterialProperty:MoisturePenetrationDepth:Settings,
     \memo Additional properties for moisture using EMPD procedure
@@ -8391,19 +8391,19 @@ WindowThermalModel:Params,
   N2 , \field Vacuum Pressure Limit
        \type real
        \units Pa
-       \minimum >0
+       \minimum> 0
        \default 13.238
   N3 , \field Initial temperature
        \note This is temperature in time of window fabrication
        \type real
        \units C
-       \minimum >0
+       \minimum> 0
        \default 25
   N4 ; \field Initial pressure
        \note This is pressure in time of window fabrication
        \type real
        \units Pa
-       \minimum >0
+       \minimum> 0
        \default 101325
 
 Construction:ComplexFenestrationState,
