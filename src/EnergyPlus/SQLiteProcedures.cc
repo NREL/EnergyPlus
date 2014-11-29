@@ -967,21 +967,6 @@ void SQLite::initializeViews()
 		"INNER JOIN Time As t "
 			"ON rd.TimeIndex = t.TimeIndex;";
 
-		// const std::string reportVariableWithTimeViewSQL =
-		// "CREATE VIEW ReportVariableWithTime AS "
-		// "SELECT rd.ReportDataIndex, rd.TimeIndex, rd.ReportDataDictionaryIndex, red.ReportExtendedDataIndex, rd.Value, "
-		// "t.Month, t.Day, t.Hour, t.Minute, t.Dst, t.Interval, t.IntervalType, t.SimulationDays, t.DayType, t.EnvironmentPeriodIndex, t.WarmupFlag, "
-		// "rdd.IsMeter, rdd.Type, rdd.IndexGroup, rdd.TimestepType, rdd.KeyValue, rdd.Name, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units, "
-		// "red.MaxValue, red.MaxMonth, red.MaxDay, red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
-		// "FROM ReportData As rd, Time As t, ReportDataDictionary As rdd "
-		// "LEFT OUTER JOIN ReportExtendedData As red "
-		// "ON rd.ReportDataIndex = red.ReportDataIndex "
-		// "WHERE rd.TimeIndex = t.TimeIndex AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
-		// "INNER JOIN Time As t "
-		// "ON rd.TimeIndex = t.TimeIndex "
-		// "INNER JOIN ReportDataDictionary As rdd "
-		// "ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
-
 	sqliteExecuteCommand(reportVariableWithTimeViewSQL);
 
 	const std::string reportVariableDataViewSQL =
@@ -1021,15 +1006,6 @@ void SQLite::initializeViews()
 			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
 		"WHERE rdd.IsMeter = 1;";
 
-		// const std::string reportMeterDataViewSQL =
-		// "CREATE VIEW ReportMeterData AS "
-		// "SELECT rd.ReportDataIndex As rowid, rd.TimeIndex, rd.ReportDataDictionaryIndex As ReportMeterDataDictionaryIndex, "
-		// "rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
-		// "FROM ReportData As rd, ReportDataDictionary As rdd "
-		// "LEFT OUTER JOIN ReportExtendedData As red "
-		// "ON rd.ReportDataIndex = red.ReportDataIndex "
-		// "WHERE rdd.IsMeter = 1 AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
-
 	sqliteExecuteCommand(reportMeterDataViewSQL);
 
 	const std::string reportMeterDataDictionaryViewSQL =
@@ -1051,22 +1027,6 @@ void SQLite::initializeViews()
 		"INNER JOIN ReportDataDictionary As rdd "
 			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
 		"WHERE rdd.IsMeter = 1;";
-
-		// const std::string reportMeterExtendedDataViewSQL =
-		// "CREATE VIEW ReportMeterExtendedData AS "
-		// "SELECT red.ReportExtendedDataIndex As ReportMeterExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
-		// "red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
-		// "FROM ReportExtendedData As red, ReportDataDictionary As rdd "
-		// "LEFT OUTER JOIN ReportData As rd "
-		// "ON rd.ReportDataIndex = red.ReportDataIndex "
-		// "WHERE rdd.IsMeter = 1 AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
-
-		// const std::string reportMeterExtendedDataViewSQL =
-		// "CREATE VIEW ReportMeterExtendedData AS "
-		// "SELECT red.ReportExtendedDataIndex As ReportMeterExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
-		// "red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
-		// "FROM ReportExtendedData As red, ReportDataDictionary As rdd, ReportData As rd "
-		// "WHERE rdd.IsMeter = 1 AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex AND rd.ReportDataIndex = red.ReportDataIndex;";
 
 	sqliteExecuteCommand(reportMeterExtendedDataViewSQL);
 }
@@ -1205,21 +1165,11 @@ void SQLite::initializeIndexes()
 {
 	if( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("CREATE INDEX rddMTR ON ReportDataDictionary (IsMeter);");
-		// sqliteExecuteCommand("CREATE INDEX rddMTR2 ON ReportDataDictionary (ReportDataDictionaryIndex, IsMeter);");
 		sqliteExecuteCommand("CREATE INDEX redRD ON ReportExtendedData (ReportDataIndex);");
-		// sqliteExecuteCommand("CREATE INDEX tdI ON TabularData (ReportNameIndex, ReportForStringIndex, TableNameIndex, RowNameIndex, ColumnNameIndex, UnitsIndex, Value);");
-		// sqliteExecuteCommand("CREATE INDEX redRD2 ON ReportExtendedData (ReportExtendedDataIndex, ReportDataIndex);");
-		// sqliteExecuteCommand("CREATE INDEX rdTI ON ReportData (TimeIndex);");
-		// sqliteExecuteCommand("CREATE INDEX rdDI ON ReportData (ReportDataDictionaryIndex);");
-		// sqliteExecuteCommand("CREATE INDEX rdVI ON ReportData (Value);");
-		// sqliteExecuteCommand("CREATE INDEX rdI ON ReportData (ReportDataIndex, TimeIndex, ReportDataDictionaryIndex);");
-		// sqliteExecuteCommand("CREATE INDEX rdI3 ON ReportData (TimeIndex, ReportDataDictionaryIndex);");
-		// sqliteExecuteCommand("CREATE INDEX rdI2 ON ReportData (ReportDataIndex, TimeIndex, ReportDataDictionaryIndex, Value);");
-		// sqliteExecuteCommand("CREATE INDEX errEI ON Errors (ErrorIndex DSC);");
-		// sqliteExecuteCommand("CREATE INDEX rmdTI ON ReportMeterData (TimeIndex ASC);");
-		// sqliteExecuteCommand("CREATE INDEX rmdDI ON ReportMeterData (ReportMeterDataDictionaryIndex ASC);");
-//		sqliteExecuteCommand("CREATE INDEX tiTI ON Time (TimeIndex ASC);");
 		sqliteExecuteCommand("CREATE INDEX dmhdHRI ON DaylightMapHourlyData (HourlyReportIndex);");
+
+		// This following index is used by sqlite, but doesn't seem to increase performance in my testing
+		// sqliteExecuteCommand("CREATE INDEX tdI ON TabularData (ReportNameIndex, ReportForStringIndex, TableNameIndex, RowNameIndex, ColumnNameIndex, UnitsIndex, Value);");
 	}
 }
 
