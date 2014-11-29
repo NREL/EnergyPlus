@@ -954,23 +954,121 @@ void SQLite::initializeDaylightMapTables()
 void SQLite::initializeViews()
 {
 	const std::string reportVariableWithTimeViewSQL =
-		"CREATE VIEW ReportVariableWithTime "
-		"AS "
-		"SELECT ReportVariableData.*, Time.*, ReportVariableDataDictionary.*, ReportVariableExtendedData.* "
-		"FROM "
-		"ReportVariableData LEFT OUTER JOIN ReportVariableExtendedData "
-		"INNER JOIN Time "
-		"INNER JOIN ReportVariableDataDictionary "
-		"ON "
-		"(ReportVariableData.ReportVariableExtendedDataIndex "
-		"= ReportVariableExtendedData.ReportVariableExtendedDataIndex) "
-		"AND "
-		"(ReportVariableData.TimeIndex = Time.TimeIndex) "
-		"AND "
-		"(ReportVariableDataDictionary.ReportVariableDataDictionaryIndex "
-		"= ReportVariableData.ReportVariableDataDictionaryIndex);";
+		"CREATE VIEW ReportVariableWithTime AS "
+		"SELECT rd.ReportDataIndex, rd.TimeIndex, rd.ReportDataDictionaryIndex, red.ReportExtendedDataIndex, rd.Value, "
+			"t.Month, t.Day, t.Hour, t.Minute, t.Dst, t.Interval, t.IntervalType, t.SimulationDays, t.DayType, t.EnvironmentPeriodIndex, t.WarmupFlag, "
+			"rdd.IsMeter, rdd.Type, rdd.IndexGroup, rdd.TimestepType, rdd.KeyValue, rdd.Name, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units, "
+			"red.MaxValue, red.MaxMonth, red.MaxDay, red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		"FROM ReportData As rd "
+		"INNER JOIN ReportDataDictionary As rdd "
+			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
+		"LEFT OUTER JOIN ReportExtendedData As red "
+			"ON rd.ReportDataIndex = red.ReportDataIndex "
+		"INNER JOIN Time As t "
+			"ON rd.TimeIndex = t.TimeIndex;";
+
+		// const std::string reportVariableWithTimeViewSQL =
+		// "CREATE VIEW ReportVariableWithTime AS "
+		// "SELECT rd.ReportDataIndex, rd.TimeIndex, rd.ReportDataDictionaryIndex, red.ReportExtendedDataIndex, rd.Value, "
+		// "t.Month, t.Day, t.Hour, t.Minute, t.Dst, t.Interval, t.IntervalType, t.SimulationDays, t.DayType, t.EnvironmentPeriodIndex, t.WarmupFlag, "
+		// "rdd.IsMeter, rdd.Type, rdd.IndexGroup, rdd.TimestepType, rdd.KeyValue, rdd.Name, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units, "
+		// "red.MaxValue, red.MaxMonth, red.MaxDay, red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		// "FROM ReportData As rd, Time As t, ReportDataDictionary As rdd "
+		// "LEFT OUTER JOIN ReportExtendedData As red "
+		// "ON rd.ReportDataIndex = red.ReportDataIndex "
+		// "WHERE rd.TimeIndex = t.TimeIndex AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
+		// "INNER JOIN Time As t "
+		// "ON rd.TimeIndex = t.TimeIndex "
+		// "INNER JOIN ReportDataDictionary As rdd "
+		// "ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
 
 	sqliteExecuteCommand(reportVariableWithTimeViewSQL);
+
+	const std::string reportVariableDataViewSQL =
+		"CREATE VIEW ReportVariableData AS "
+		"SELECT rd.ReportDataIndex As rowid, rd.TimeIndex, rd.ReportDataDictionaryIndex As ReportVariableDataDictionaryIndex, "
+			"rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
+		"FROM ReportData As rd "
+		"LEFT OUTER JOIN ReportExtendedData As red "
+			"ON rd.ReportDataIndex = red.ReportDataIndex;";
+
+	sqliteExecuteCommand(reportVariableDataViewSQL);
+
+	const std::string reportVariableDataDictionaryViewSQL =
+		"CREATE VIEW ReportVariableDataDictionary AS "
+		"SELECT rdd.ReportDataDictionaryIndex As ReportVariableDataDictionaryIndex, rdd.Type As VariableType, rdd.IndexGroup, rdd.TimestepType, "
+			"rdd.KeyValue, rdd.Name As VariableName, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units As VariableUnits "
+		"FROM ReportDataDictionary As rdd;";
+
+	sqliteExecuteCommand(reportVariableDataDictionaryViewSQL);
+
+	const std::string reportVariableExtendedDataViewSQL =
+		"CREATE VIEW ReportVariableExtendedData AS "
+		"SELECT red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
+			"red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		"FROM ReportExtendedData As red;";
+
+	sqliteExecuteCommand(reportVariableExtendedDataViewSQL);
+
+	const std::string reportMeterDataViewSQL =
+		"CREATE VIEW ReportMeterData AS "
+		"SELECT rd.ReportDataIndex As rowid, rd.TimeIndex, rd.ReportDataDictionaryIndex As ReportMeterDataDictionaryIndex, "
+			"rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
+		"FROM ReportData As rd "
+		"LEFT OUTER JOIN ReportExtendedData As red "
+			"ON rd.ReportDataIndex = red.ReportDataIndex "
+		"INNER JOIN ReportDataDictionary As rdd "
+			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
+		"WHERE rdd.IsMeter = 1;";
+
+		// const std::string reportMeterDataViewSQL =
+		// "CREATE VIEW ReportMeterData AS "
+		// "SELECT rd.ReportDataIndex As rowid, rd.TimeIndex, rd.ReportDataDictionaryIndex As ReportMeterDataDictionaryIndex, "
+		// "rd.Value As VariableValue, red.ReportExtendedDataIndex As ReportVariableExtendedDataIndex "
+		// "FROM ReportData As rd, ReportDataDictionary As rdd "
+		// "LEFT OUTER JOIN ReportExtendedData As red "
+		// "ON rd.ReportDataIndex = red.ReportDataIndex "
+		// "WHERE rdd.IsMeter = 1 AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
+
+	sqliteExecuteCommand(reportMeterDataViewSQL);
+
+	const std::string reportMeterDataDictionaryViewSQL =
+		"CREATE VIEW ReportMeterDataDictionary AS "
+		"SELECT rdd.ReportDataDictionaryIndex As ReportMeterDataDictionaryIndex, rdd.Type As VariableType, rdd.IndexGroup, rdd.TimestepType, "
+			"rdd.KeyValue, rdd.Name As VariableName, rdd.ReportingFrequency, rdd.ScheduleName, rdd.Units As VariableUnits "
+		"FROM ReportDataDictionary As rdd "
+		"WHERE rdd.IsMeter = 1;";
+
+	sqliteExecuteCommand(reportMeterDataDictionaryViewSQL);
+
+	const std::string reportMeterExtendedDataViewSQL =
+		"CREATE VIEW ReportMeterExtendedData AS "
+		"SELECT red.ReportExtendedDataIndex As ReportMeterExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
+			"red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		"FROM ReportExtendedData As red "
+		"LEFT OUTER JOIN ReportData As rd "
+			"ON rd.ReportDataIndex = red.ReportDataIndex "
+		"INNER JOIN ReportDataDictionary As rdd "
+			"ON rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex "
+		"WHERE rdd.IsMeter = 1;";
+
+		// const std::string reportMeterExtendedDataViewSQL =
+		// "CREATE VIEW ReportMeterExtendedData AS "
+		// "SELECT red.ReportExtendedDataIndex As ReportMeterExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
+		// "red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		// "FROM ReportExtendedData As red, ReportDataDictionary As rdd "
+		// "LEFT OUTER JOIN ReportData As rd "
+		// "ON rd.ReportDataIndex = red.ReportDataIndex "
+		// "WHERE rdd.IsMeter = 1 AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex;";
+
+		// const std::string reportMeterExtendedDataViewSQL =
+		// "CREATE VIEW ReportMeterExtendedData AS "
+		// "SELECT red.ReportExtendedDataIndex As ReportMeterExtendedDataIndex, red.MaxValue, red.MaxMonth, red.MaxDay, "
+		// "red.MaxStartMinute, red.MaxMinute, red.MinValue, red.MinMonth, red.MinDay, red.MinStartMinute, red.MinMinute "
+		// "FROM ReportExtendedData As red, ReportDataDictionary As rdd, ReportData As rd "
+		// "WHERE rdd.IsMeter = 1 AND rd.ReportDataDictionaryIndex = rdd.ReportDataDictionaryIndex AND rd.ReportDataIndex = red.ReportDataIndex;";
+
+	sqliteExecuteCommand(reportMeterExtendedDataViewSQL);
 }
 
 void SQLite::initializeSimulationsTable()
@@ -991,7 +1089,7 @@ void SQLite::initializeSimulationsTable()
 	const std::string simulationUpdateSQL =
 		"UPDATE Simulations SET "
 		"Completed = ?, CompletedSuccessfully = ? "
-		"WHERE SimulationIndex = (SELECT count(*) FROM Simulations)";
+		"WHERE SimulationIndex = ?";
 
 	sqlitePrepareStatement(m_simulationUpdateStmt,simulationUpdateSQL);
 }
@@ -1011,7 +1109,7 @@ void SQLite::initializeErrorsTable()
 
 	const std::string errorUpdateSQL =
 		"UPDATE Errors SET "
-		"ErrorMessage = ErrorMessage || ? WHERE ErrorIndex = (SELECT count(*) FROM Errors)";
+		"ErrorMessage = ErrorMessage || ? WHERE ErrorIndex = (SELECT ErrorIndex FROM Errors ORDER BY ErrorIndex DESC LIMIT 1)";
 
 	sqlitePrepareStatement(m_errorUpdateStmt,errorUpdateSQL);
 }
@@ -1033,20 +1131,21 @@ void SQLite::initializeEnvironmentPeriodsTable()
 void SQLite::initializeTabularDataTable()
 {
 	const std::string sql = "CREATE TABLE TabularData "
-							"(ReportNameIndex INTEGER, "
+							"(TabularDataIndex INTEGER PRIMARY KEY, "
+							"ReportNameIndex INTEGER, "
 							"ReportForStringIndex INTEGER, "
 							"TableNameIndex INTEGER, "
-							"SimulationIndex INTEGER, "
 							"RowNameIndex INTEGER, "
 							"ColumnNameIndex INTEGER, "
+							"UnitsIndex INTEGER, "
+							"SimulationIndex INTEGER, "
 							"RowId INTEGER, "
 							"ColumnId INTEGER, "
-							"Value TEXT, "
-							"UnitsIndex INTEGER);";
+							"Value TEXT);";
 
 	sqliteExecuteCommand(sql);
 
-	const std::string sql2 = "INSERT INTO TabularData VALUES(?,?,?,?,?,?,?,?,?,?);";
+	const std::string sql2 = "INSERT INTO TabularData VALUES(?,?,?,?,?,?,?,?,?,?,?);";
 
 	sqlitePrepareStatement(m_tabularDataInsertStmt,sql2);
 
@@ -1083,28 +1182,21 @@ void SQLite::initializeTabularDataTable()
 void SQLite::initializeTabularDataView()
 {
 	const std::string sql = "CREATE VIEW TabularDataWithStrings AS SELECT "
-							"td.Value Value, "
-							"reportn.Value ReportName, "
-							"fs.Value ReportForString, "
-							"tn.Value TableName, "
-							"rn.Value RowName, "
-							"cn.Value ColumnName, "
-							"u.Value Units, "
-							"RowId "
-							"FROM TabularData td "
-							"INNER JOIN Strings reportn ON reportn.StringIndex=td.ReportNameIndex "
-							"INNER JOIN Strings fs ON fs.StringIndex=td.ReportForStringIndex "
-							"INNER JOIN Strings tn ON tn.StringIndex=td.TableNameIndex "
-							"INNER JOIN Strings rn ON rn.StringIndex=td.RowNameIndex "
-							"INNER JOIN Strings cn ON cn.StringIndex=td.ColumnNameIndex "
-							"INNER JOIN Strings u ON u.StringIndex=td.UnitsIndex "
-							"WHERE "
-							"reportn.StringTypeIndex=1 AND "
-							"fs.StringTypeIndex=2 AND "
-							"tn.StringTypeIndex=3 AND "
-							"rn.StringTypeIndex=4 AND "
-							"cn.StringTypeIndex=5 AND "
-							"u.StringTypeIndex=6;";
+		"td.TabularDataIndex, "
+		"td.Value As Value, "
+		"reportn.Value As ReportName, "
+		"fs.Value As ReportForString, "
+		"tn.Value As TableName, "
+		"rn.Value As RowName, "
+		"cn.Value As ColumnName, "
+		"u.Value As Units "
+		"FROM TabularData As td "
+		"INNER JOIN Strings As reportn ON reportn.StringIndex=td.ReportNameIndex "
+		"INNER JOIN Strings As fs ON fs.StringIndex=td.ReportForStringIndex "
+		"INNER JOIN Strings As tn ON tn.StringIndex=td.TableNameIndex "
+		"INNER JOIN Strings As rn ON rn.StringIndex=td.RowNameIndex "
+		"INNER JOIN Strings As cn ON cn.StringIndex=td.ColumnNameIndex "
+		"INNER JOIN Strings As u ON u.StringIndex=td.UnitsIndex;";
 
 	sqliteExecuteCommand(sql);
 }
@@ -1112,12 +1204,22 @@ void SQLite::initializeTabularDataView()
 void SQLite::initializeIndexes()
 {
 	if( m_writeOutputToSQLite ) {
-		// sqliteExecuteCommand("CREATE INDEX rvdTI ON ReportVariableData (TimeIndex ASC);");
-		// sqliteExecuteCommand("CREATE INDEX rvdDI ON ReportVariableData (ReportVariableDataDictionaryIndex ASC);");
+		sqliteExecuteCommand("CREATE INDEX rddMTR ON ReportDataDictionary (IsMeter);");
+		// sqliteExecuteCommand("CREATE INDEX rddMTR2 ON ReportDataDictionary (ReportDataDictionaryIndex, IsMeter);");
+		sqliteExecuteCommand("CREATE INDEX redRD ON ReportExtendedData (ReportDataIndex);");
+		// sqliteExecuteCommand("CREATE INDEX tdI ON TabularData (ReportNameIndex, ReportForStringIndex, TableNameIndex, RowNameIndex, ColumnNameIndex, UnitsIndex, Value);");
+		// sqliteExecuteCommand("CREATE INDEX redRD2 ON ReportExtendedData (ReportExtendedDataIndex, ReportDataIndex);");
+		// sqliteExecuteCommand("CREATE INDEX rdTI ON ReportData (TimeIndex);");
+		// sqliteExecuteCommand("CREATE INDEX rdDI ON ReportData (ReportDataDictionaryIndex);");
+		// sqliteExecuteCommand("CREATE INDEX rdVI ON ReportData (Value);");
+		// sqliteExecuteCommand("CREATE INDEX rdI ON ReportData (ReportDataIndex, TimeIndex, ReportDataDictionaryIndex);");
+		// sqliteExecuteCommand("CREATE INDEX rdI3 ON ReportData (TimeIndex, ReportDataDictionaryIndex);");
+		// sqliteExecuteCommand("CREATE INDEX rdI2 ON ReportData (ReportDataIndex, TimeIndex, ReportDataDictionaryIndex, Value);");
+		// sqliteExecuteCommand("CREATE INDEX errEI ON Errors (ErrorIndex DSC);");
 		// sqliteExecuteCommand("CREATE INDEX rmdTI ON ReportMeterData (TimeIndex ASC);");
 		// sqliteExecuteCommand("CREATE INDEX rmdDI ON ReportMeterData (ReportMeterDataDictionaryIndex ASC);");
 //		sqliteExecuteCommand("CREATE INDEX tiTI ON Time (TimeIndex ASC);");
-		// sqliteExecuteCommand("CREATE INDEX dmhdHRI ON DaylightMapHourlyData (HourlyReportIndex ASC);");
+		sqliteExecuteCommand("CREATE INDEX dmhdHRI ON DaylightMapHourlyData (HourlyReportIndex);");
 	}
 }
 
@@ -1683,8 +1785,13 @@ void SQLite::createSQLiteTabularDataRecords(
 )
 {
 	if(m_writeTabularDataToSQLite) {
+		static int tabularDataIndex = 0;
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
+
+		int reportNameIndex = createSQLiteStringTableRecord(reportName,ReportNameId);
+		int reportForStringIndex = createSQLiteStringTableRecord(reportForString,ReportForStringId);
+		int tableNameIndex = createSQLiteStringTableRecord(tableName,TableNameId);
 
 		for(size_t iRow = 0, k = body.index(1,1); iRow < sizeRowLabels; ++iRow) {
 			std::string rowLabel = rowLabels[iRow];
@@ -1692,42 +1799,34 @@ void SQLite::createSQLiteTabularDataRecords(
 			std::string rowDescription;
 			parseUnitsAndDescription(rowLabel,rowUnits,rowDescription);
 
+			int rowLabelIndex = createSQLiteStringTableRecord(rowDescription,RowNameId);
+
 			for(size_t iCol = 0; iCol < sizeColumnLabels; ++iCol) {
+				++tabularDataIndex;
 				std::string colLabel = columnLabels[iCol];
 				std::string colUnits;
 				std::string colDescription;
 				parseUnitsAndDescription(colLabel,colUnits,colDescription);
 
-				std::string units;
-				if( colUnits.empty() ) {
-					units = rowUnits;
-				} else {
-					units = colUnits;
-				}
-
-				int reportNameIndex = createSQLiteStringTableRecord(reportName,ReportNameId);
-				int reportForStringIndex = createSQLiteStringTableRecord(reportForString,ReportForStringId);
-				int tableNameIndex = createSQLiteStringTableRecord(tableName,TableNameId);
-				int rowLabelIndex = createSQLiteStringTableRecord(rowDescription,RowNameId);
 				int columnLabelIndex = createSQLiteStringTableRecord(colDescription,ColumnNameId);
-				int unitsIndex = createSQLiteStringTableRecord(units,UnitsId);
+				int unitsIndex = createSQLiteStringTableRecord(colUnits.empty() ? rowUnits : colUnits,UnitsId);
 
-				sqliteBindInteger(m_tabularDataInsertStmt,1,reportNameIndex);
-				sqliteBindInteger(m_tabularDataInsertStmt,2,reportForStringIndex);
-				sqliteBindInteger(m_tabularDataInsertStmt,3,tableNameIndex);
-				sqliteBindInteger(m_tabularDataInsertStmt,4,1);
+				sqliteBindInteger(m_tabularDataInsertStmt,1,tabularDataIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,2,reportNameIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,3,reportForStringIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,4,tableNameIndex);
 				sqliteBindInteger(m_tabularDataInsertStmt,5,rowLabelIndex);
 				sqliteBindInteger(m_tabularDataInsertStmt,6,columnLabelIndex);
-				sqliteBindInteger(m_tabularDataInsertStmt,7,iRow);
-				sqliteBindInteger(m_tabularDataInsertStmt,8,iCol);
-				sqliteBindText(m_tabularDataInsertStmt,9,body[k]);
-				sqliteBindInteger(m_tabularDataInsertStmt,10,unitsIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,7,unitsIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,8,1);
+				sqliteBindInteger(m_tabularDataInsertStmt,9,iRow);
+				sqliteBindInteger(m_tabularDataInsertStmt,10,iCol);
+				sqliteBindText(m_tabularDataInsertStmt,11,body[k]);
 
 				++k;
 
 				sqliteStepCommand(m_tabularDataInsertStmt);
 				sqliteResetCommand(m_tabularDataInsertStmt);
-				sqliteClearBindings(m_tabularDataInsertStmt);
 			}
 		}
 	}
@@ -1736,6 +1835,7 @@ void SQLite::createSQLiteTabularDataRecords(
 int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int const stringType)
 {
 	static int stringIndex = 1;
+	int rowId = -1;
 	if( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_stringsInsertStmt, 1, stringIndex);
 		sqliteBindInteger(m_stringsInsertStmt, 2, stringType);
@@ -1745,10 +1845,16 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue, int c
 		sqliteResetCommand(m_stringsInsertStmt);
 
 		if( errorcode != SQLITE_CONSTRAINT ) {
-			stringIndex++;
+			rowId = stringIndex++;
+		} else {
+			sqliteBindInteger(m_stringsLookUpStmt, 1, stringType);
+			sqliteBindText(m_stringsLookUpStmt, 2, stringValue);
+			sqliteStepCommand(m_stringsLookUpStmt);
+			rowId = sqlite3_column_int(m_stringsLookUpStmt,0);
+			sqliteResetCommand(m_stringsLookUpStmt);
 		}
 	}
-	return stringIndex;
+	return rowId;
 }
 
 void SQLite::createSQLiteSimulationsRecord( int const id )
@@ -1805,6 +1911,7 @@ void SQLite::updateSQLiteSimulationRecord(
 	if( m_writeOutputToSQLite ) {
 		sqliteBindLogical(m_simulationUpdateStmt, 1, completed);
 		sqliteBindLogical(m_simulationUpdateStmt, 2, completedSuccessfully);
+		sqliteBindInteger(m_simulationUpdateStmt, 3, 1); // seems to always be 1, SimulationManager::ManageSimulation()
 
 		sqliteStepCommand(m_simulationUpdateStmt);
 		sqliteResetCommand(m_simulationUpdateStmt);
