@@ -9150,7 +9150,6 @@ BuildingSurface:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10337,7 +10336,6 @@ Wall:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10525,7 +10523,6 @@ RoofCeiling:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10712,7 +10709,6 @@ Floor:Detailed,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -10898,7 +10894,6 @@ Wall:Exterior,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -10943,7 +10938,6 @@ Wall:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -10988,7 +10982,6 @@ Wall:Underground,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11035,7 +11028,6 @@ Wall:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -11089,7 +11081,6 @@ Roof,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11136,7 +11127,6 @@ Ceiling:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11185,7 +11175,6 @@ Ceiling:Interzone,
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
        \reference OutFaceEnvNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11240,7 +11229,6 @@ Floor:GroundContact,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11290,7 +11278,6 @@ Floor:Adiabatic,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
        \reference AllShadingAndHTSurfNames
@@ -11337,7 +11324,6 @@ Floor:Interzone,
        \reference SurfaceNames
        \reference SurfAndSubSurfNames
        \reference AllHeatTranSurfNames
-       \reference HeatTranBaseSurfNames
        \reference OutFaceEnvNames
        \reference AllHeatTranAngFacNames
        \reference RadGroupAndSurfNames
@@ -11415,7 +11401,7 @@ FenestrationSurface:Detailed,
   A4 , \field Building Surface Name
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A5,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11533,7 +11519,7 @@ Window,
        \note Window assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4, \field Shading Control Name
        \note enter the name of a WindowProperty:ShadingControl object
        \type object-list
@@ -11586,7 +11572,7 @@ Door,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   N1 , \field Multiplier
        \note Used only for Surface Type = WINDOW, GLASSDOOR or DOOR
        \note Non-integer values will be truncated to integer
@@ -11625,7 +11611,7 @@ GlazedDoor,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4, \field Shading Control Name
        \note enter the name of a WindowProperty:ShadingControl object
        \type object-list
@@ -11679,7 +11665,7 @@ Window:Interzone,
        \note Window assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11727,7 +11713,7 @@ Door:Interzone,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
@@ -11775,7 +11761,7 @@ GlazedDoor:Interzone,
        \note Door assumes the azimuth and tilt angles of the surface it is on.
        \required-field
        \type object-list
-       \object-list HeatTranBaseSurfNames
+       \object-list SurfaceNames
   A4,  \field Outside Boundary Condition Object
        \type object-list
        \object-list OutFaceEnvNames
