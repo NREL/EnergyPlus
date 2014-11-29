@@ -1900,7 +1900,6 @@ void SQLite::createSQLiteZoneTable()
 		sqliteBindDouble(m_zoneInfoInsertStmt, 25, zoneHB.ExtNetWallArea);
 		sqliteBindDouble(m_zoneInfoInsertStmt, 26, zoneHB.ExtWindowArea);
 		sqliteBindLogical(m_zoneInfoInsertStmt, 27, zoneHB.isPartOfTotalArea);
-		sqliteBindInteger(m_zoneInfoInsertStmt, 27, zoneHB.isPartOfTotalArea);
 
 		sqliteStepCommand(m_zoneInfoInsertStmt);
 		sqliteResetCommand(m_zoneInfoInsertStmt);

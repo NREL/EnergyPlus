@@ -1136,14 +1136,14 @@ namespace OutputProcessor {
 		std::string const & reportIDString, // The ID of the time stamp
 		int const DayOfSim, // the number of days simulated so far
 		std::string const & DayOfSimChr, // the number of days simulated so far
+		bool writeToSQL, // write to SQLite
 		Optional_int_const Month = _, // the month of the reporting interval
 		Optional_int_const DayOfMonth = _, // The day of the reporting interval
 		Optional_int_const Hour = _, // The hour of the reporting interval
 		Optional< Real64 const > EndMinute = _, // The last minute in the reporting interval
 		Optional< Real64 const > StartMinute = _, // The starting minute of the reporting interval
 		Optional_int_const DST = _, // A flag indicating whether daylight savings time is observed
-		Optional_string_const DayType = _, // The day tied for the data (e.g., Monday)
-		bool writeToSQL = true
+		Optional_string_const DayType = _ // The day tied for the data (e.g., Monday)
 	);
 
 	void
