@@ -117,10 +117,10 @@ public:
 		int const dayOfMonth,
 		int const hourOfDay,
 		int const nX,
-		FArray1S< Real64 > const x,
+		FArray1S< Real64 > const & x,
 		int const nY,
-		FArray1S< Real64 > const y,
-		FArray2S< Real64 > const illuminance
+		FArray1S< Real64 > const & y,
+		FArray2S< Real64 > const & illuminance
 	);
 
 	void createSQLiteTabularDataRecords(
