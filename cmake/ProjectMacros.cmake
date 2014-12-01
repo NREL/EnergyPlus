@@ -149,9 +149,9 @@ function( ADD_SIMULATION_TEST )
   )  
 
   # MSVC's profile generator does not work with parallel runs
-  if( MSVC AND PROFILE_GENERATE )
-    set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
-  endif()
+  #if( MSVC AND PROFILE_GENERATE )
+    #set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
+  #endif()
 
   # Added the expect_fatal here to detect files that are expected to fatal error properly
   if( ADD_SIM_TEST_EXPECT_FATAL )
