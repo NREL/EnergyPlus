@@ -123,9 +123,20 @@ function( ADD_SIMULATION_TEST )
   else()
     set(ANNUAL_SIMULATION false)
   endif()
+  
 
   get_filename_component(IDF_NAME "${ADD_SIM_TEST_IDF_FILE}" NAME_WE)
   
+  if ( PROFILE_GENERATE AND IDF_NAME MATCHES "^(ChilledWaterStorage-Mixed|AirflowNetwork3zVent|AirflowNetwork3zVentAutoWPC|DElightCFSWindow|EMSConstantVolumePurchasedAir|PipeHeatTransfer_Outair|RadHiTempElecTermReheat|RadLoTempCFloTermReheat|RadLoTempHydrMulti10|RefBldgSmallOfficeNew2004_Chicago|WindowTestsSimple|.*CentralChillerHeaterSystem.*)$")
+    message("Setting ANNUAL_SIMULATION to true for ${IDF_NAME} for the purpose of PGO training")
+    set(ANNUAL_SIMULATION true)
+  endif()
+  
+
+
+
+
+
   add_test(NAME "integration.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
     -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
     -DBINARY_DIR=${CMAKE_BINARY_DIR}
