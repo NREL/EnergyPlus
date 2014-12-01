@@ -843,8 +843,8 @@ namespace HeatBalFiniteDiffManager {
 						DeltaTimestep = TimeStepZone * SecInHour;
 						ThicknessThreshold = std::sqrt( Alpha * DeltaTimestep * 3.0 );
 						if ( Material( CurrentLayer ).Thickness < ThicknessThreshold ) {
-							ShowSevereError( "InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too highly conductive," " material name = " + Material( CurrentLayer ).Name );
-							ShowContinueError( "High conductivity Material layers are not well supported by Conduction Finite Difference, " " material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
+							ShowSevereError( "InitialInitHeatBalFiniteDiff: Found Material that is too thin and/or too highly conductive, material name = " + Material( CurrentLayer ).Name );
+							ShowContinueError( "High conductivity Material layers are not well supported by Conduction Finite Difference, material conductivity = " + RoundSigDigits( Material( CurrentLayer ).Conductivity, 3 ) + " [W/m-K]" );
 							ShowContinueError( "Material thermal diffusivity = " + RoundSigDigits( Alpha, 3 ) + " [m2/s]" );
 							ShowContinueError( "Material with this thermal diffusivity should have thickness > " + RoundSigDigits( ThicknessThreshold, 5 ) + " [m]" );
 							if ( Material( CurrentLayer ).Thickness < ThinMaterialLayerThreshold ) {
@@ -1270,7 +1270,7 @@ namespace HeatBalFiniteDiffManager {
 		static gio::Fmt Format_701( "(' Material CondFD Summary,',A,',',A,',',A,',',A,',',A,',',A)" );
 		static gio::Fmt Format_702( "(' ConductionFiniteDifference Node,',A,',',A,',',A,',',A,',',A)" );
 
-		gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant," "Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
+		gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface Temperature Convergence Criteria";
 		gio::write( OutputFileInits, fmtA ) << " ConductionFiniteDifference HeatBalanceSettings," + cCondFDSchemeType( CondFDSchemeType ) + ',' + RoundSigDigits( SpaceDescritConstant, 2 ) + ',' + RoundSigDigits( CondFDRelaxFactorInput, 2 ) + ',' + RoundSigDigits( MaxAllowedDelTempCondFD, 4 );
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 
@@ -1278,9 +1278,9 @@ namespace HeatBalFiniteDiffManager {
 
 			//                                      Write Descriptions
 			gio::write( OutputFileInits, fmtA ) << "! <Construction CondFD>,Construction Name,Index,#Layers,#Nodes,Time Step {hours}";
-			gio::write( OutputFileInits, fmtA ) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X," "Layer Alpha*Delt/Delx**2,Layer Moisture Stability";
+			gio::write( OutputFileInits, fmtA ) << "! <Material CondFD Summary>,Material Name,Thickness {m},#Layer Elements,Layer Delta X,Layer Alpha*Delt/Delx**2,Layer Moisture Stability";
 			//HT Algo issue
-			if ( any_eq( HeatTransferAlgosUsed, UseCondFD ) ) gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference Node>,Node Identifier, " " Node Distance From Outside Face {m}, Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
+			if ( any_eq( HeatTransferAlgosUsed, UseCondFD ) ) gio::write( OutputFileInits, fmtA ) << "! <ConductionFiniteDifference Node>,Node Identifier, Node Distance From Outside Face {m}, Construction Name, Outward Material Name (or Face), Inward Material Name (or Face)";
 			for ( ThisNum = 1; ThisNum <= TotConstructs; ++ThisNum ) {
 
 				if ( Construct( ThisNum ).TypeIsWindow ) continue;

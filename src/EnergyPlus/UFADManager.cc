@@ -372,7 +372,7 @@ namespace UFADManager {
 				ZoneUCSDUI( UINum ).E_Kc = 0.0;
 			} else if ( ZoneUCSDUI( UINum ).DiffuserType == DisplVent ) {
 				if ( ZoneUCSDUI( UINum ).A_Kc != AutoCalculate || ZoneUCSDUI( UINum ).B_Kc != AutoCalculate || ZoneUCSDUI( UINum ).C_Kc != AutoCalculate || ZoneUCSDUI( UINum ).D_Kc != AutoCalculate || ZoneUCSDUI( UINum ).E_Kc != AutoCalculate ) {
-					ShowWarningError( "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI( UINum ).ZoneName + ", input for " "Coefficients A - E will be ignored when Floor Diffuser Type = HorizontalDisplacement." );
+					ShowWarningError( "For RoomAirSettings:UnderFloorAirDistributionInterior for Zone " + ZoneUCSDUI( UINum ).ZoneName + ", input for Coefficients A - E will be ignored when Floor Diffuser Type = HorizontalDisplacement." );
 					ShowContinueError( "  To input these Coefficients, use Floor Diffuser Type = Custom." );
 				}
 				ZoneUCSDUI( UINum ).A_Kc = 0.0;

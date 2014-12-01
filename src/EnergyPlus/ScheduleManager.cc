@@ -712,7 +712,7 @@ namespace ScheduleManager {
 			}
 			if ( NumNumbers < 25 ) {
 				ShowSevereError( RoutineName + CurrentModuleObject + "=\"" + Alphas( 1 ) + "\", Insufficient data entered for a full schedule day." );
-				ShowContinueError( "...Minutes per Item field = [" + RoundSigDigits( int( Numbers( 1 ) ) ) + "] and " " only [" + RoundSigDigits( NumNumbers - 1 ) + "] to apply to list fields." );
+				ShowContinueError( "...Minutes per Item field = [" + RoundSigDigits( int( Numbers( 1 ) ) ) + "] and only [" + RoundSigDigits( NumNumbers - 1 ) + "] to apply to list fields." );
 				ErrorsFound = true;
 				continue;
 			}
@@ -1686,7 +1686,7 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitImport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitImport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitImport." );
 			} else {
 				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
@@ -1742,7 +1742,7 @@ namespace ScheduleManager {
 			IsBlank = false;
 
 			if ( NumExternalInterfaceSchedules >= 1 ) {
-				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and " "ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten" " by PtolemyServer and FunctionalMockUpUnitExport." );
+				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, "The schedule object with the name \"" + Alphas( 1 ) + "\" is defined as an ExternalInterface:Schedule and ExternalInterface:FunctionalMockupUnitExport:To:Schedule. This will cause the schedule to be overwritten by PtolemyServer and FunctionalMockUpUnitExport." );
 			} else {
 				VerifyName( Alphas( 1 ), Schedule( {1,NumSchedules} ).Name(), SchNum, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
 			}
@@ -2233,7 +2233,7 @@ namespace ScheduleManager {
 					ShowContinueError( "...1) Remove RunperiodControl:DaylightSavingTime object or remove DST period from Weather File." );
 					ShowContinueError( "...2) Configure other schedules and Schedule:File to account for occupant behavior during DST." );
 					ShowContinueError( "...   If you have already done this, you can ignore this message." );
-					ShowContinueError( "...When active, DaylightSavingTime will shift all scheduled items by one hour, " "retaining the same day type as the original." );
+					ShowContinueError( "...When active, DaylightSavingTime will shift all scheduled items by one hour, retaining the same day type as the original." );
 					ScheduleDSTSFileWarningIssued = true;
 				}
 			}
@@ -2916,7 +2916,7 @@ namespace ScheduleManager {
 		sFld = 0;
 
 		if ( NumUntils != NumNumbers ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "  number of Time fields does not match number of value fields, " + ErrContext + '=' + DayScheduleName );
+			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, number of Time fields does not match number of value fields, " + ErrContext + '=' + DayScheduleName );
 			ErrorsFound = true;
 			return;
 		}
@@ -2933,20 +2933,20 @@ namespace ScheduleManager {
 			} else if ( Pos == std::string::npos ) {
 				DecodeHHMMField( Untils( Count ), HHField, MMField, ErrorsFound, DayScheduleName, Untils( Count ) );
 			} else { // Until found but wasn't first field
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				continue;
 			}
 			// Field decoded
 			if ( HHField < 0 || HHField > 24 || MMField < 0 || MMField > 60 ) {
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				continue;
 			}
 			if ( HHField == 24 && MMField > 0 && MMField < 60 ) {
-				ShowWarningError( "ProcessScheduleInput: ProcessIntervalFields, " "Invalid \"Until\" field encountered=" + Untils( Count ) );
+				ShowWarningError( "ProcessScheduleInput: ProcessIntervalFields, Invalid \"Until\" field encountered=" + Untils( Count ) );
 				ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 				ShowContinueError( "Terminating the field at 24:00" );
 				MMField = 0;
@@ -2965,7 +2965,7 @@ namespace ScheduleManager {
 			if ( SHr == EHr ) {
 				for ( Min = SMin; Min <= EMin; ++Min ) {
 					if ( SetMinuteValue( SHr, Min ) ) {
-						ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
+						ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 						ErrorsFound = true;
 						goto UntilLoop_exit;
 					}
@@ -2978,7 +2978,7 @@ namespace ScheduleManager {
 					SMin = 1;
 				}
 			} else if ( EHr < SHr ) {
-				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
+				ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, overlapping times detected, " + ErrContext + '=' + DayScheduleName );
 				ErrorsFound = true;
 			} else {
 				for ( Min = SMin; Min <= 60; ++Min ) {
@@ -3006,7 +3006,7 @@ namespace ScheduleManager {
 		UntilLoop_exit: ;
 
 		if ( ! all( SetMinuteValue ) ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, " "Processing time fields, incomplete day detected, " + ErrContext + '=' + DayScheduleName );
+			ShowSevereError( "ProcessScheduleInput: ProcessIntervalFields, Processing time fields, incomplete day detected, " + ErrContext + '=' + DayScheduleName );
 			ErrorsFound = true;
 		}
 
@@ -3066,7 +3066,7 @@ namespace ScheduleManager {
 		std::string::size_type const Pos = index( String, ':' );
 		nonIntegral = false;
 		if ( Pos == std::string::npos ) {
-			ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (no : separator in hh:mm)=" + stripped( FullFieldValue ) );
+			ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (no : separator in hh:mm)=" + stripped( FullFieldValue ) );
 			ShowContinueError( "Occurred in Day Schedule=" + DayScheduleName );
 			ErrorsFound = true;
 			return;
@@ -3077,11 +3077,11 @@ namespace ScheduleManager {
 			RetHH = int( rRetHH );
 			if ( double( RetHH ) != rRetHH || IOS != 0 || rRetHH < 0.0 ) {
 				if ( double( RetHH ) != rRetHH && rRetHH >= 0.0 ) {
-					ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in HH)=" + stripped( FullFieldValue ) );
+					ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in HH)=" + stripped( FullFieldValue ) );
 					ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
 					nonIntegral = true;
 				} else {
-					ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in HH)=" + stripped( FullFieldValue ) );
+					ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in HH)=" + stripped( FullFieldValue ) );
 					ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName );
 					ErrorsFound = true;
 					return;
@@ -3094,11 +3094,11 @@ namespace ScheduleManager {
 		RetMM = int( rRetMM );
 		if ( double( RetMM ) != rRetMM || IOS != 0 || rRetMM < 0.0 ) {
 			if ( double( RetMM ) != rRetMM && rRetMM >= 0.0 ) {
-				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (non-integer numeric in MM)=" + stripped( FullFieldValue ) );
+				ShowWarningError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (non-integer numeric in MM)=" + stripped( FullFieldValue ) );
 				ShowContinueError( "Other errors may result. Occurred in Day Schedule=" + DayScheduleName );
 				nonIntegral = true;
 			} else {
-				ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, " "Invalid \"until\" field submitted (invalid numeric in MM)=" + stripped( FullFieldValue ) );
+				ShowSevereError( "ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field submitted (invalid numeric in MM)=" + stripped( FullFieldValue ) );
 				ShowContinueError( "Field values must be integer and represent hours:minutes. Occurred in Day Schedule=" + DayScheduleName );
 				ErrorsFound = true;
 				return;
@@ -3316,11 +3316,11 @@ namespace ScheduleManager {
 		}
 
 		if ( DupAssignment ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "Duplicate assignment attempted in \"for\" days field=" + ForDayField );
+			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, Duplicate assignment attempted in \"for\" days field=" + ForDayField );
 			ErrorsFound = true;
 		}
 		if ( ! OneValid ) {
-			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, " "No valid day assignments found in \"for\" days field=" + ForDayField );
+			ShowSevereError( "ProcessScheduleInput: ProcessForDayTypes, No valid day assignments found in \"for\" days field=" + ForDayField );
 			ErrorsFound = true;
 		}
 

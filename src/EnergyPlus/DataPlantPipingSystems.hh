@@ -78,7 +78,6 @@ namespace DataPlantPipingSystems {
 	extern int const CellType_BasementWallInsu;
 	extern int const CellType_BasementFloorInsu;
 
-
 	// DERIVED TYPE DEFINITIONS:
 
 	//Input data structure
@@ -1075,7 +1074,7 @@ namespace DataPlantPipingSystems {
 		int NumRadialCells;
 		BaseThermalPropertySet PipeProperties;
 		BaseThermalPropertySet InsulationProperties;
-		// A list of 3d cell indeces that span the entire length of this pipe circuit ( useful for reporting )
+		// A list of 3d cell indices that span the entire length of this pipe circuit (useful for reporting)
 		FArray1D< Point3DInteger > ListOfCircuitPoints;
 		// Flags
 		bool CheckEquipName;

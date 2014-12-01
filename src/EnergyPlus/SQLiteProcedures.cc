@@ -86,7 +86,7 @@ SQLite::SQLite()
 {
 	int numberOfSQLiteObjects = InputProcessor::GetNumObjectsFound("Output:SQLite");
 
-	if((numberOfSQLiteObjects == 1) && (! DataSystemVariables::DDOnly)) {
+	if ( ( numberOfSQLiteObjects == 1 ) && ( ! DataSystemVariables::DDOnly ) ) {
 		FArray1D_string alphas(5);
 		int numAlphas;
 		FArray1D< Real64 > numbers(2);
@@ -94,34 +94,34 @@ SQLite::SQLite()
 		int status;
 
 		InputProcessor::GetObjectItem("Output:SQLite",1,alphas,numAlphas,numbers,numNumbers,status);
-		if( numAlphas > 0 ) {
+		if ( numAlphas > 0 ) {
 			std::string option = alphas(1);
-			if( InputProcessor::SameString(option,"SimpleAndTabular") ) {
+			if ( InputProcessor::SameString(option,"SimpleAndTabular" ) ) {
 				m_writeTabularDataToSQLite = true;
 				m_writeOutputToSQLite = true;
-			} else if( InputProcessor::SameString(option,"Simple") ) {
+			} else if ( InputProcessor::SameString(option,"Simple" ) ) {
 				m_writeOutputToSQLite = true;
 			}
 		}
 	}
 
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		int rc = -1;
 		bool ok = true;
 		m_errorStream.open("sqlite.err", std::ofstream::out | std::ofstream::trunc);
 
 		// Test if we can write to the sqlite error file
 		//  Does there need to be a seperate sqlite.err file at all?  Consider using eplusout.err
-		if( m_errorStream.is_open() ) {
+		if ( m_errorStream.is_open() ) {
 			m_errorStream << "SQLite3 message, sqlite.err open for processing!" << std::endl;
 		} else {
 			ok = false;
 		}
 
 		// Test if we can create a new file named m_dbName
-		if( ok ) {
+		if ( ok ) {
 			std::ofstream test(m_dbName, std::ofstream::out | std::ofstream::trunc);
-			if( test.is_open() ) {
+			if ( test.is_open() ) {
 				test.close();
 			} else {
 				ok = false;
@@ -130,18 +130,18 @@ SQLite::SQLite()
 
 		// Test if we can write to the database
 		// If we can't then there are probably locks on the database
-		if( ok ) {
+		if ( ok ) {
 			sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE, nullptr);
 			char * zErrMsg = nullptr;
 			rc = sqlite3_exec(m_db, "CREATE TABLE Test(x INTEGER PRIMARY KEY)", nullptr, 0, &zErrMsg);
 			sqlite3_close(m_db);
-			if( rc ) {
+			if ( rc ) {
 				m_errorStream << "SQLite3 message, can't get exclusive lock on existing database: " << sqlite3_errmsg(m_db) << std::endl;
 				ok = false;
 			} else {
 				// Remmove test db
 				rc = remove( m_dbName.c_str() );
-				if( rc ) {
+				if ( rc ) {
 					m_errorStream << "SQLite3 message, can't remove old database: " << sqlite3_errmsg(m_db) << std::endl;
 					ok = false;
 				}
@@ -149,17 +149,17 @@ SQLite::SQLite()
 			sqlite3_free(zErrMsg);
 		}
 
-		if( ok ) {
+		if ( ok ) {
 			// Now open the output db for the duration of the simulation
 			rc = sqlite3_open_v2(m_dbName.c_str(), &m_db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
-			if( rc ) {
+			if ( rc ) {
 				m_errorStream << "SQLite3 message, can't open new database: " << sqlite3_errmsg(m_db) << std::endl;
 				sqlite3_close(m_db);
 				ok = false;
 			}
 		}
 
-		if( ok ) {
+		if ( ok ) {
 			sqliteExecuteCommand("PRAGMA locking_mode = EXCLUSIVE;");
 			sqliteExecuteCommand("PRAGMA journal_mode = OFF;");
 			sqliteExecuteCommand("PRAGMA synchronous = OFF;");
@@ -196,7 +196,7 @@ SQLite::SQLite()
 			initializeEnvironmentPeriodsTable();
 			initializeErrorsTable();
 
-			if(m_writeTabularDataToSQLite) {
+			if ( m_writeTabularDataToSQLite ) {
 				initializeTabularDataTable();
 				initializeTabularDataView();
 			}
@@ -266,14 +266,14 @@ bool SQLite::writeTabularDataToSQLite() const
 
 void SQLite::sqliteBegin()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("BEGIN;");
 	}
 }
 
 void SQLite::sqliteCommit()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("COMMIT;");
 	}
 }
@@ -284,7 +284,7 @@ int SQLite::sqliteExecuteCommand(const std::string & commandBuffer)
 	int rc = -1;
 
 	rc = sqlite3_exec(m_db, commandBuffer.c_str(), NULL, 0, &zErrMsg);
-	if( rc != SQLITE_OK ) {
+	if ( rc != SQLITE_OK ) {
 		m_errorStream << zErrMsg;
 	}
 	sqlite3_free(zErrMsg);
@@ -297,7 +297,7 @@ int SQLite::sqlitePrepareStatement(sqlite3_stmt* & stmt, const std::string & stm
 	int rc = -1;
 
 	rc = sqlite3_prepare_v2(m_db, stmtBuffer.c_str(), -1, &stmt, nullptr);
-	if( rc != SQLITE_OK ) {
+	if ( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_prepare_v2 message: " << stmtBuffer << std::endl;
 	}
 
@@ -309,7 +309,7 @@ int SQLite::sqliteBindText(sqlite3_stmt * stmt, const int stmtInsertLocationInde
 	int rc = -1;
 
 	rc = sqlite3_bind_text(stmt, stmtInsertLocationIndex, textBuffer.c_str(), -1, SQLITE_TRANSIENT);
-	if( rc != SQLITE_OK ) {
+	if ( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_text failed: " << textBuffer << std::endl;
 	}
 
@@ -321,7 +321,7 @@ int SQLite::sqliteBindInteger(sqlite3_stmt * stmt, const int stmtInsertLocationI
 	int rc = -1;
 
 	rc = sqlite3_bind_int(stmt, stmtInsertLocationIndex, intToInsert);
-	if( rc != SQLITE_OK ) {
+	if ( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_int failed: " << intToInsert << std::endl;
 	}
 
@@ -333,7 +333,7 @@ int SQLite::sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIn
 	int rc = -1;
 
 	rc = sqlite3_bind_double(stmt, stmtInsertLocationIndex, doubleToInsert);
-	if( rc != SQLITE_OK ) {
+	if ( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_double failed: " << doubleToInsert << std::endl;
 	}
 
@@ -345,7 +345,7 @@ int SQLite::sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationInde
 	int rc = -1;
 
 	rc = sqlite3_bind_null(stmt, stmtInsertLocationIndex);
-	if( rc != SQLITE_OK ) {
+	if ( rc != SQLITE_OK ) {
 		m_errorStream << "SQLite3 message, sqlite3_bind_null failed" << std::endl;
 	}
 
@@ -393,7 +393,7 @@ int SQLite::sqliteFinalizeCommand(sqlite3_stmt * stmt)
 
 void SQLite::sqliteWriteMessage(const std::string & message)
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		m_errorStream << "SQLite3 message, " << message << std::endl;
 	}
 }
@@ -1112,9 +1112,9 @@ void SQLite::initializeTabularDataTable()
 	sqlitePrepareStatement(m_tabularDataInsertStmt,sql2);
 
 	const std::string sql3 = "CREATE TABLE Strings "
-							 "(StringIndex INTEGER PRIMARY KEY, "
-							 "StringTypeIndex  INTEGER, "
-							 "Value TEXT);";
+							"(StringIndex INTEGER PRIMARY KEY, "
+							"StringTypeIndex  INTEGER, "
+							"Value TEXT);";
 
 	sqliteExecuteCommand(sql3);
 
@@ -1127,8 +1127,8 @@ void SQLite::initializeTabularDataTable()
 	sqlitePrepareStatement(m_stringsLookUpStmt,sql5);
 
 	const std::string sql6 = "CREATE TABLE StringTypes "
-							 "(StringTypeIndex INTEGER PRIMARY KEY, "
-							 "Value TEXT);";
+							"(StringTypeIndex INTEGER PRIMARY KEY, "
+							"Value TEXT);";
 
 	sqliteExecuteCommand(sql6);
 
@@ -1171,7 +1171,7 @@ void SQLite::initializeTabularDataView()
 
 void SQLite::initializeIndexes()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteExecuteCommand("CREATE INDEX rvdTI ON ReportVariableData (TimeIndex ASC);");
 		sqliteExecuteCommand("CREATE INDEX rvdDI ON ReportVariableData (ReportVariableDataDictionaryIndex ASC);");
 		sqliteExecuteCommand("CREATE INDEX rmdTI ON ReportMeterData (TimeIndex ASC);");
@@ -1264,7 +1264,7 @@ void SQLite::parseUnitsAndDescription(const std::string & combinedString, std::s
 	std::size_t leftPos = combinedString.find("[");
 	std::size_t rightPos = combinedString.find("]");
 
-	if( (leftPos < rightPos) && (leftPos != std::string::npos) && (rightPos != std::string::npos) ) {
+	if ( (leftPos < rightPos) && (leftPos != std::string::npos) && (rightPos != std::string::npos) ) {
 		units = combinedString.substr(leftPos + 1,rightPos - leftPos - 1);
 		description = combinedString.substr(0,leftPos - 1);
 	} else {
@@ -1290,7 +1290,7 @@ void SQLite::createSQLiteReportVariableDictionaryRecord(
 	Optional_string_const scheduleName
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_reportVariableDictionaryInsertStmt, 1, reportVariableReportID);
 		sqliteBindText(m_reportVariableDictionaryInsertStmt, 2, storageType(storeTypeIndex));
 		sqliteBindText(m_reportVariableDictionaryInsertStmt, 3, indexGroup);
@@ -1299,7 +1299,7 @@ void SQLite::createSQLiteReportVariableDictionaryRecord(
 		sqliteBindText(m_reportVariableDictionaryInsertStmt, 6, variableName);
 		sqliteBindText(m_reportVariableDictionaryInsertStmt, 7, reportingFreqName(reportingFreq));
 
-		if(scheduleName.present()) {
+		if ( scheduleName.present() ) {
 			sqliteBindText(m_reportVariableDictionaryInsertStmt, 8, scheduleName());
 		} else {
 			sqliteBindNULL(m_reportVariableDictionaryInsertStmt, 8);
@@ -1323,7 +1323,7 @@ void SQLite::createSQLiteReportVariableDataRecord(
 	Optional_int_const minutesPerTimeStep
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		int result;
 
 		int minMonth;
@@ -1345,7 +1345,7 @@ void SQLite::createSQLiteReportVariableDataRecord(
 		sqliteBindDouble(m_reportVariableDataInsertStmt, 3, value);
 		sqliteBindInteger(m_reportVariableDataInsertStmt, 4, oid);
 
-		if(reportingInterval.present()) {
+		if ( reportingInterval.present() ) {
 			General::DecodeMonDayHrMin(minValueDate, minMonth, minDay, minHour, minMinute);
 			General::DecodeMonDayHrMin(maxValueDate, maxMonth, maxDay, maxHour, maxMinute);
 
@@ -1354,7 +1354,7 @@ void SQLite::createSQLiteReportVariableDataRecord(
 
 			++extendedDataIndex;
 
-			if(minutesPerTimeStep.present()) { // This is for data created by a 'Report Meter' statement
+			if ( minutesPerTimeStep.present() ) { // This is for data created by a 'Report Meter' statement
 				switch(reportingInterval()) {
 				case LocalReportHourly:
 				case LocalReportDaily:
@@ -1447,7 +1447,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 	Optional_string_const dayType
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		int iOut = -1;
 
 		int intEndMinute = 60;
@@ -1478,7 +1478,7 @@ void SQLite::createSQLiteTimeIndexRecord(
 			sqliteBindInteger(m_timeIndexInsertStmt, 9, cumlativeSimulationDays);
 			sqliteBindText(m_timeIndexInsertStmt, 10, dayType());
 			sqliteBindInteger(m_timeIndexInsertStmt, 11, DataEnvironment::CurEnvirNum);
-			if(DataGlobals::WarmupFlag) {
+			if ( DataGlobals::WarmupFlag ) {
 				sqliteBindInteger(m_timeIndexInsertStmt, 12, 1);
 			} else {
 				sqliteBindInteger(m_timeIndexInsertStmt, 12, 0);
@@ -1601,7 +1601,7 @@ void SQLite::addSQLiteZoneSizingRecord(
 	Real64 const minOAVolFlow // zone design minimum outside air flow rate [m3/s]
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindText(m_zoneSizingInsertStmt, 1, zoneName);
 		sqliteBindText(m_zoneSizingInsertStmt, 2, loadType);
 
@@ -1628,7 +1628,7 @@ void SQLite::addSQLiteSystemSizingRecord(
 	Real64 const varValue // the value from the sizing calculation
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		std::string description;
 		std::string units;
 
@@ -1651,7 +1651,7 @@ void SQLite::addSQLiteComponentSizingRecord(
 	Real64 const varValue // the value from the sizing calculation
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		std::string description;
 		std::string units;
 
@@ -1670,8 +1670,8 @@ void SQLite::addSQLiteComponentSizingRecord(
 
 void SQLite::createSQLiteRoomAirModelTable()
 {
-	if( m_writeOutputToSQLite ) {
-		for(int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+	if ( m_writeOutputToSQLite ) {
+		for ( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum ) {
 			sqliteBindInteger(m_roomAirModelInsertStmt, 1, zoneNum);
 			sqliteBindText(m_roomAirModelInsertStmt, 2, DataRoomAirModel::AirModel(zoneNum).AirModelName);
 			sqliteBindInteger(m_roomAirModelInsertStmt, 3, DataRoomAirModel::AirModel(zoneNum).AirModelType);
@@ -1696,7 +1696,7 @@ void SQLite::createSQLiteMeterDictionaryRecord(
 	Optional_string_const scheduleName
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_meterDictionaryInsertStmt, 1, meterReportID);
 		sqliteBindText(m_meterDictionaryInsertStmt, 2, storageType(storeTypeIndex));
 		sqliteBindText(m_meterDictionaryInsertStmt, 3, indexGroup);
@@ -1705,7 +1705,7 @@ void SQLite::createSQLiteMeterDictionaryRecord(
 		sqliteBindText(m_meterDictionaryInsertStmt, 6, variableName);
 		sqliteBindText(m_meterDictionaryInsertStmt, 7, reportingFreqName(reportingFreq));
 
-		if(scheduleName.present()) {
+		if ( scheduleName.present() ) {
 			sqliteBindText(m_meterDictionaryInsertStmt, 8, scheduleName());
 		} else {
 			sqliteBindNULL(m_meterDictionaryInsertStmt, 8);
@@ -1729,7 +1729,7 @@ void SQLite::createSQLiteMeterRecord(
 	Optional_int_const minutesPerTimeStep
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		static int extendedDataIndex = 0;
 		static int oid = 0;
 
@@ -1740,7 +1740,7 @@ void SQLite::createSQLiteMeterRecord(
 		sqliteBindDouble(m_reportMeterDataInsertStmt, 3, value);
 		sqliteBindInteger(m_reportMeterDataInsertStmt, 4, oid);
 
-		if(reportingInterval.present()) {
+		if ( reportingInterval.present() ) {
 			int minMonth;
 			int minDay;
 			int minHour;
@@ -1804,7 +1804,7 @@ void SQLite::createSQLiteDaylightMapTitle(
 	Real64 const zCoord
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_daylightMapTitleInsertStmt, 1, mapNum);
 		sqliteBindText(m_daylightMapTitleInsertStmt, 2, mapName);
 		sqliteBindText(m_daylightMapTitleInsertStmt, 3, environmentName);
@@ -1830,7 +1830,7 @@ void SQLite::createSQLiteDaylightMap(
 	FArray2S< Real64 > const illuminance
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		static int hourlyReportIndex = 1;
 
 		sqliteBindInteger(m_daylightMapHorlyTitleInsertStmt, 1, hourlyReportIndex);
@@ -1842,8 +1842,8 @@ void SQLite::createSQLiteDaylightMap(
 		sqliteStepCommand(m_daylightMapHorlyTitleInsertStmt);
 		sqliteResetCommand(m_daylightMapHorlyTitleInsertStmt);
 
-		for(int yIndex = 1; yIndex <= nY; ++yIndex) {
-			for(int xIndex = 1; xIndex <= nX; ++xIndex) {
+		for ( int yIndex = 1; yIndex <= nY; ++yIndex ) {
+			for ( int xIndex = 1; xIndex <= nX; ++xIndex ) {
 				sqliteBindInteger(m_daylightMapHorlyDataInsertStmt, 1, hourlyReportIndex);
 				sqliteBindDouble(m_daylightMapHorlyDataInsertStmt, 2, x(xIndex));
 				sqliteBindDouble(m_daylightMapHorlyDataInsertStmt, 3, y(yIndex));
@@ -1867,24 +1867,24 @@ void SQLite::createSQLiteTabularDataRecords(
 	std::string const & tableName
 )
 {
-	if(m_writeTabularDataToSQLite) {
+	if ( m_writeTabularDataToSQLite ) {
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
 
-		for(size_t iRow = 0, k = body.index(1,1); iRow < sizeRowLabels; ++iRow) {
+		for ( size_t iRow = 0, k = body.index(1,1); iRow < sizeRowLabels; ++iRow ) {
 			std::string rowLabel = rowLabels[iRow];
 			std::string rowUnits;
 			std::string rowDescription;
 			parseUnitsAndDescription(rowLabel,rowUnits,rowDescription);
 
-			for(size_t iCol = 0; iCol < sizeColumnLabels; ++iCol) {
+			for ( size_t iCol = 0; iCol < sizeColumnLabels; ++iCol ) {
 				std::string colLabel = columnLabels[iCol];
 				std::string colUnits;
 				std::string colDescription;
 				parseUnitsAndDescription(colLabel,colUnits,colDescription);
 
 				std::string units;
-				if( colUnits.empty() ) {
+				if ( colUnits.empty() ) {
 					units = rowUnits;
 				} else {
 					units = colUnits;
@@ -1927,7 +1927,7 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue,std::s
 	errcode = sqliteBindText(m_stringsLookUpStmt, 2, stringValue);
 	errcode = sqliteStepCommand(m_stringsLookUpStmt);
 
-	if(errcode == SQLITE_ROW) {
+	if ( errcode == SQLITE_ROW ) {
 		// If the stringKey is already in the database we just return its ID
 		iOut = sqlite3_column_int(m_stringsLookUpStmt,0);
 	} else {
@@ -1953,7 +1953,7 @@ int SQLite::createSQLiteStringTableRecord(std::string const & stringValue,std::s
 
 void SQLite::createSQLiteSimulationsRecord( int const id )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_simulationsInsertStmt, 1, id);
 		sqliteBindText(m_simulationsInsertStmt, 2, DataStringGlobals::VerString);
 		sqliteBindText(m_simulationsInsertStmt, 3, DataStringGlobals::CurrentDateTime);
@@ -1971,7 +1971,7 @@ void SQLite::createSQLiteErrorRecord(
 	int const cnt
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		static int errorIndex = 0;
 
 		++errorIndex;
@@ -1989,7 +1989,7 @@ void SQLite::createSQLiteErrorRecord(
 
 void SQLite::updateSQLiteErrorRecord( std::string const & errorMessage )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindText(m_errorUpdateStmt, 1, "  " + errorMessage);
 
 		sqliteStepCommand(m_errorUpdateStmt);
@@ -2002,7 +2002,7 @@ void SQLite::updateSQLiteSimulationRecord(
 	bool const completedSuccessfully
 )
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindLogical(m_simulationUpdateStmt, 1, completed);
 		sqliteBindLogical(m_simulationUpdateStmt, 2, completedSuccessfully);
 
@@ -2015,8 +2015,8 @@ void SQLite::createSQLiteZoneTable()
 {
 	int isPartOfTotalArea;
 
-	for( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
-		if(DataHeatBalance::Zone(zoneNum).isPartOfTotalArea) {
+	for ( int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+		if ( DataHeatBalance::Zone(zoneNum).isPartOfTotalArea ) {
 			isPartOfTotalArea = 1;
 		} else {
 			isPartOfTotalArea = 0;
@@ -2057,7 +2057,7 @@ void SQLite::createSQLiteZoneTable()
 
 void SQLite::createSQLiteNominalLightingTable()
 {
-	for(int lightNum = 1; lightNum <= DataHeatBalance::TotLights; ++lightNum) {
+	for ( int lightNum = 1; lightNum <= DataHeatBalance::TotLights; ++lightNum ) {
 		sqliteBindInteger(m_nominalLightingInsertStmt, 1, lightNum);
 		sqliteBindText(m_nominalLightingInsertStmt, 2, DataHeatBalance::Lights(lightNum).Name);
 		sqliteBindInteger(m_nominalLightingInsertStmt, 3, DataHeatBalance::Lights(lightNum).ZonePtr);
@@ -2077,7 +2077,7 @@ void SQLite::createSQLiteNominalLightingTable()
 
 void SQLite::createSQLiteNominalPeopleTable()
 {
-	for(int peopleNum = 1; peopleNum <= DataHeatBalance::TotPeople; ++peopleNum) {
+	for ( int peopleNum = 1; peopleNum <= DataHeatBalance::TotPeople; ++peopleNum ) {
 		sqliteBindInteger(m_nominalPeopleInsertStmt, 1, peopleNum);
 		sqliteBindText(m_nominalPeopleInsertStmt, 2, DataHeatBalance::People(peopleNum).Name);
 		sqliteBindInteger(m_nominalPeopleInsertStmt, 3, DataHeatBalance::People(peopleNum).ZonePtr);
@@ -2106,7 +2106,7 @@ void SQLite::createSQLiteNominalPeopleTable()
 
 void SQLite::createSQLiteNominalElectricEquipmentTable()
 {
-	for(int elecEquipNum = 1; elecEquipNum <= DataHeatBalance::TotElecEquip; ++elecEquipNum) {
+	for ( int elecEquipNum = 1; elecEquipNum <= DataHeatBalance::TotElecEquip; ++elecEquipNum ) {
 		sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 1, elecEquipNum);
 		sqliteBindText(m_nominalElectricEquipmentInsertStmt, 2, DataHeatBalance::ZoneElectric(elecEquipNum).Name);
 		sqliteBindInteger(m_nominalElectricEquipmentInsertStmt, 3, DataHeatBalance::ZoneElectric(elecEquipNum).ZonePtr);
@@ -2125,7 +2125,7 @@ void SQLite::createSQLiteNominalElectricEquipmentTable()
 
 void SQLite::createSQLiteNominalGasEquipmentTable()
 {
-	for(int gasEquipNum = 1; gasEquipNum <= DataHeatBalance::TotGasEquip; ++gasEquipNum) {
+	for ( int gasEquipNum = 1; gasEquipNum <= DataHeatBalance::TotGasEquip; ++gasEquipNum ) {
 		sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 1, gasEquipNum);
 		sqliteBindText(m_nominalGasEquipmentInsertStmt, 2, DataHeatBalance::ZoneGas(gasEquipNum).Name);
 		sqliteBindInteger(m_nominalGasEquipmentInsertStmt, 3, DataHeatBalance::ZoneGas(gasEquipNum).ZonePtr);
@@ -2144,7 +2144,7 @@ void SQLite::createSQLiteNominalGasEquipmentTable()
 
 void SQLite::createSQLiteNominalSteamEquipmentTable()
 {
-	for(int steamEquipNum = 1; steamEquipNum <= DataHeatBalance::TotStmEquip; ++steamEquipNum) {
+	for ( int steamEquipNum = 1; steamEquipNum <= DataHeatBalance::TotStmEquip; ++steamEquipNum ) {
 		sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 1, steamEquipNum);
 		sqliteBindText(m_nominalSteamEquipmentInsertStmt, 2, DataHeatBalance::ZoneSteamEq(steamEquipNum).Name);
 		sqliteBindInteger(m_nominalSteamEquipmentInsertStmt, 3, DataHeatBalance::ZoneSteamEq(steamEquipNum).ZonePtr);
@@ -2163,7 +2163,7 @@ void SQLite::createSQLiteNominalSteamEquipmentTable()
 
 void SQLite::createSQLiteNominalHotWaterEquipmentTable()
 {
-	for(int hWEquipNum = 1; hWEquipNum <= DataHeatBalance::TotHWEquip; ++hWEquipNum) {
+	for ( int hWEquipNum = 1; hWEquipNum <= DataHeatBalance::TotHWEquip; ++hWEquipNum ) {
 		sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 1, hWEquipNum);
 		sqliteBindText(m_nominalHotWaterEquipmentInsertStmt, 2, DataHeatBalance::ZoneHWEq(hWEquipNum).Name);
 		sqliteBindInteger(m_nominalHotWaterEquipmentInsertStmt, 3, DataHeatBalance::ZoneHWEq(hWEquipNum).ZonePtr);
@@ -2182,7 +2182,7 @@ void SQLite::createSQLiteNominalHotWaterEquipmentTable()
 
 void SQLite::createSQLiteNominalOtherEquipmentTable()
 {
-	for(int otherEquipNum = 1; otherEquipNum <= DataHeatBalance::TotOthEquip; ++otherEquipNum) {
+	for ( int otherEquipNum = 1; otherEquipNum <= DataHeatBalance::TotOthEquip; ++otherEquipNum ) {
 		sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 1, otherEquipNum);
 		sqliteBindText(m_nominalOtherEquipmentInsertStmt, 2, DataHeatBalance::ZoneOtherEq(otherEquipNum).Name);
 		sqliteBindInteger(m_nominalOtherEquipmentInsertStmt, 3, DataHeatBalance::ZoneOtherEq(otherEquipNum).ZonePtr);
@@ -2201,7 +2201,7 @@ void SQLite::createSQLiteNominalOtherEquipmentTable()
 
 void SQLite::createSQLiteNominalBaseboardHeatTable()
 {
-	for(int bBHeatNum = 1; bBHeatNum <= DataHeatBalance::TotBBHeat; ++bBHeatNum) {
+	for ( int bBHeatNum = 1; bBHeatNum <= DataHeatBalance::TotBBHeat; ++bBHeatNum ) {
 		sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 1, bBHeatNum);
 		sqliteBindText(m_nominalBaseboardHeatInsertStmt, 2, DataHeatBalance::ZoneBBHeat(bBHeatNum).Name);
 		sqliteBindInteger(m_nominalBaseboardHeatInsertStmt, 3, DataHeatBalance::ZoneBBHeat(bBHeatNum).ZonePtr);
@@ -2221,7 +2221,7 @@ void SQLite::createSQLiteNominalBaseboardHeatTable()
 
 void SQLite::createSQLiteInfiltrationTable()
 {
-	for(int stmtNum = 1; stmtNum <= DataHeatBalance::TotInfiltration; ++stmtNum) {
+	for ( int stmtNum = 1; stmtNum <= DataHeatBalance::TotInfiltration; ++stmtNum ) {
 		sqliteBindInteger(m_infiltrationInsertStmt, 1, stmtNum);
 		sqliteBindText(m_infiltrationInsertStmt, 2, DataHeatBalance::Infiltration(stmtNum).Name);
 		sqliteBindInteger(m_infiltrationInsertStmt, 3, DataHeatBalance::Infiltration(stmtNum).ZonePtr);
@@ -2235,7 +2235,7 @@ void SQLite::createSQLiteInfiltrationTable()
 
 void SQLite::createSQLiteVentilationTable()
 {
-	for(int stmtNum = 1; stmtNum <= DataHeatBalance::TotVentilation; ++stmtNum) {
+	for ( int stmtNum = 1; stmtNum <= DataHeatBalance::TotVentilation; ++stmtNum ) {
 		sqliteBindInteger(m_ventilationInsertStmt, 1, stmtNum);
 		sqliteBindText(m_ventilationInsertStmt, 2, DataHeatBalance::Ventilation(stmtNum).Name);
 		sqliteBindInteger(m_ventilationInsertStmt, 3, DataHeatBalance::Ventilation(stmtNum).ZonePtr);
@@ -2249,7 +2249,7 @@ void SQLite::createSQLiteVentilationTable()
 
 void SQLite::createSQLiteSurfacesTable()
 {
-	for(int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber) {
+	for ( int surfaceNumber = 1; surfaceNumber <= DataSurfaces::TotSurfaces; ++surfaceNumber ) {
 		sqliteBindInteger(m_surfaceInsertStmt, 1, surfaceNumber);
 		sqliteBindText(m_surfaceInsertStmt, 2, DataSurfaces::Surface(surfaceNumber).Name);
 		sqliteBindInteger(m_surfaceInsertStmt, 3, DataSurfaces::Surface(surfaceNumber).Construction);
@@ -2278,14 +2278,14 @@ void SQLite::createSQLiteSurfacesTable()
 
 void SQLite::createSQLiteConstructionsTable()
 {
-	for(int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum) {
+	for ( int constructNum = 1; constructNum <= DataHeatBalance::TotConstructs; ++constructNum ) {
 		sqliteBindInteger(m_constructionInsertStmt, 1, constructNum);
 		sqliteBindText(m_constructionInsertStmt, 2, DataHeatBalance::Construct(constructNum).Name);
 		sqliteBindInteger(m_constructionInsertStmt, 3, DataHeatBalance::Construct(constructNum).TotLayers);
 		sqliteBindInteger(m_constructionInsertStmt, 4, DataHeatBalance::Construct(constructNum).TotSolidLayers);
 		sqliteBindInteger(m_constructionInsertStmt, 5, DataHeatBalance::Construct(constructNum).TotGlassLayers);
 
-		for(int layerNum = 1; layerNum <= DataHeatBalance::Construct(constructNum).TotLayers; ++layerNum) {
+		for ( int layerNum = 1; layerNum <= DataHeatBalance::Construct(constructNum).TotLayers; ++layerNum ) {
 			sqliteBindInteger(m_constructionLayerInsertStmt, 1, constructNum);
 			sqliteBindInteger(m_constructionLayerInsertStmt, 2, layerNum);
 			sqliteBindInteger(m_constructionLayerInsertStmt, 3, DataHeatBalance::Construct(constructNum).LayerPoint(layerNum));
@@ -2303,7 +2303,7 @@ void SQLite::createSQLiteConstructionsTable()
 		sqliteBindInteger(m_constructionInsertStmt, 12, DataHeatBalance::Construct(constructNum).OutsideRoughness);
 		sqliteBindLogical(m_constructionInsertStmt, 13, DataHeatBalance::Construct(constructNum).TypeIsWindow);
 
-		if(DataHeatBalance::Construct(constructNum).TotGlassLayers == 0) {
+		if ( DataHeatBalance::Construct(constructNum).TotGlassLayers == 0 ) {
 			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::Construct(constructNum).UValue);
 		} else {
 			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::NominalU(constructNum));
@@ -2316,7 +2316,7 @@ void SQLite::createSQLiteConstructionsTable()
 
 void SQLite::createSQLiteMaterialsTable()
 {
-	for(int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum) {
+	for ( int materialNum = 1; materialNum <= DataHeatBalance::TotMaterials; ++materialNum ) {
 		sqliteBindInteger(m_materialInsertStmt, 1, materialNum);
 		sqliteBindText(m_materialInsertStmt, 2, DataHeatBalance::Material(materialNum).Name);
 		sqliteBindInteger(m_materialInsertStmt, 3, DataHeatBalance::Material(materialNum).Group);
@@ -2339,8 +2339,8 @@ void SQLite::createSQLiteMaterialsTable()
 
 void SQLite::createSQLiteZoneListTable()
 {
-	for(int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum) {
-		for(int zoneNum = 1; zoneNum <= DataHeatBalance::ZoneList(listNum).NumOfZones; ++zoneNum) {
+	for ( int listNum = 1; listNum <= DataHeatBalance::NumOfZoneLists; ++listNum ) {
+		for ( int zoneNum = 1; zoneNum <= DataHeatBalance::ZoneList(listNum).NumOfZones; ++zoneNum ) {
 			sqliteBindInteger(m_zoneListInsertStmt, 1, listNum);
 			sqliteBindText(m_zoneListInsertStmt, 2, DataHeatBalance::ZoneList(listNum).Name);
 			sqliteBindInteger(m_zoneListInsertStmt, 3, DataHeatBalance::ZoneList(listNum).Zone(zoneNum));
@@ -2353,7 +2353,7 @@ void SQLite::createSQLiteZoneListTable()
 
 void SQLite::createSQLiteZoneGroupTable()
 {
-	for(int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum) {
+	for ( int groupNum = 1; groupNum <= DataHeatBalance::NumOfZoneGroups; ++groupNum ) {
 		sqliteBindInteger(m_zoneGroupInsertStmt, 1, groupNum);
 		sqliteBindText(m_zoneGroupInsertStmt, 2, DataHeatBalance::ZoneGroup(groupNum).Name);
 		sqliteBindInteger(m_zoneGroupInsertStmt, 3, DataHeatBalance::ZoneGroup(groupNum).ZoneList);
@@ -2366,7 +2366,7 @@ void SQLite::createSQLiteZoneGroupTable()
 void SQLite::createSQLiteSchedulesTable()
 {
 	int numberOfSchedules = ScheduleManager::GetNumberOfSchedules();
-	for(int scheduleNumber = 1; scheduleNumber <= numberOfSchedules; ++scheduleNumber) {
+	for ( int scheduleNumber = 1; scheduleNumber <= numberOfSchedules; ++scheduleNumber ) {
 		sqliteBindInteger(m_scheduleInsertStmt, 1, scheduleNumber);
 		sqliteBindText(m_scheduleInsertStmt, 2, ScheduleManager::GetScheduleName(scheduleNumber));
 		sqliteBindText(m_scheduleInsertStmt, 3, ScheduleManager::GetScheduleType(scheduleNumber));
@@ -2380,7 +2380,7 @@ void SQLite::createSQLiteSchedulesTable()
 
 void SQLite::createZoneExtendedOutput()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		createSQLiteZoneTable();
 		createSQLiteNominalLightingTable();
 		createSQLiteNominalPeopleTable();
@@ -2404,7 +2404,7 @@ void SQLite::createZoneExtendedOutput()
 
 void SQLite::createSQLiteEnvironmentPeriodRecord()
 {
-	if( m_writeOutputToSQLite ) {
+	if ( m_writeOutputToSQLite ) {
 		sqliteBindInteger(m_environmentPeriodInsertStmt, 1, DataEnvironment::CurEnvirNum);
 		sqliteBindInteger(m_environmentPeriodInsertStmt, 2, 1);
 		sqliteBindText(m_environmentPeriodInsertStmt, 3, DataEnvironment::EnvironmentName);

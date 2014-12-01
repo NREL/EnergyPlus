@@ -1409,7 +1409,7 @@ namespace HeatBalanceIntRadExchange {
 		for ( int k = u; k >= l; --k ) {
 			Real64 const Akk_inv( 1.0 / A( k, k ) );
 			auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
-			for( int j = l; j <= u; ++j, kj += n ) {
+			for ( int j = l; j <= u; ++j, kj += n ) {
 				I[ kj ] *= Akk_inv;
 			}
 			auto ik( A.index( l, k ) ); // [ ik ] == ( i, k )
@@ -1417,7 +1417,7 @@ namespace HeatBalanceIntRadExchange {
 				Real64 const Aik( A[ ik ] );
 				auto ij( A.index( i, l ) ); // [ ij ] == ( i, j )
 				auto kj( A.index( k, l ) ); // [ kj ] == ( k, j )
-				for( int j = l; j <= u; ++j, ij += n, kj += n ) {
+				for ( int j = l; j <= u; ++j, ij += n, kj += n ) {
 					I[ ij ] -= Aik * I[ kj ];
 				}
 			}

@@ -6382,7 +6382,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptTS ) {
@@ -6395,7 +6395,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccTS ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (TimeStep), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccTS ) {
@@ -6410,7 +6410,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptHR ) {
@@ -6424,7 +6424,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccHR ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccHR ) {
@@ -6440,7 +6440,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Daily), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptDY ) {
@@ -6454,7 +6454,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccDY ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Hourly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccDY ) {
@@ -6470,7 +6470,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptMN ) {
@@ -6484,7 +6484,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccMN ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (Monthly), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccMN ) {
@@ -6500,7 +6500,7 @@ SetInitialMeterReportingAndOutputNames(
 		if ( ! CumulativeIndicator ) {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"" + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptSM ) {
@@ -6514,7 +6514,7 @@ SetInitialMeterReportingAndOutputNames(
 		} else {
 			if ( MeterFileOnlyIndicator ) {
 				if ( EnergyMeters( WhichMeter ).RptAccSM ) {
-					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), " "already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
+					ShowWarningError( "Output:Meter:MeterFileOnly requested for \"Cumulative " + EnergyMeters( WhichMeter ).Name + "\" (RunPeriod), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr." );
 				}
 			}
 			if ( ! EnergyMeters( WhichMeter ).RptAccSM ) {

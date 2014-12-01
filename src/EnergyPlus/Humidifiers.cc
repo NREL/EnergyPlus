@@ -428,16 +428,16 @@ namespace Humidifiers {
 					if ( Node( OutNode ).HumRatMin == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
 							ShowSevereError( "Humidifiers: Missing humidity setpoint for " + HumidifierType( Humidifier( NumHum ).HumType_Code ) + " = " + Humidifier( HumNum ).Name );
-							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish" "a setpoint at the humidifier outlet node." );
+							ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the humidifier outlet node." );
 							ShowContinueError( "  expecting it on Node=\"" + NodeID( OutNode ) + "\"." );
 							SetPointErrorFlag = true;
 						} else {
 							CheckIfNodeSetPointManagedByEMS( OutNode, iHumidityRatioMinSetPoint, SetPointErrorFlag );
 							if ( SetPointErrorFlag ) {
 								ShowSevereError( "Humidifiers: Missing humidity setpoint for " + HumidifierType( Humidifier( NumHum ).HumType_Code ) + " = " + Humidifier( HumNum ).Name );
-								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish" "a setpoint at the humidifier outlet node." );
+								ShowContinueError( "  use a Setpoint Manager with Control Variable = \"MinimumHumidityRatio\" to establish a setpoint at the humidifier outlet node." );
 								ShowContinueError( "  expecting it on Node=\"" + NodeID( OutNode ) + "\"." );
-								ShowContinueError( "  or use an EMS actuator to control minimum humidity ratio to establish" "a setpoint at the humidifier outlet node." );
+								ShowContinueError( "  or use an EMS actuator to control minimum humidity ratio to establish a setpoint at the humidifier outlet node." );
 							}
 						}
 					}
@@ -537,12 +537,12 @@ namespace Humidifiers {
 				ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Rated Power [W]", Humidifier( HumNum ).NomPower );
 			} else if ( Humidifier( HumNum ).NomPower >= 0.0 && Humidifier( HumNum ).NomCap > 0.0 ) {
 				if ( Humidifier( HumNum ).NomPower < NominalPower ) {
-					ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated " " Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+					ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
 					ShowContinueError( " specified Rated Power = " + RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) );
 					ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
 				}
 			} else {
-				ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero " " for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+				ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
 				ShowContinueError( " For zero rated capacity humidifier the rated power is zero." );
 			}
 		}
