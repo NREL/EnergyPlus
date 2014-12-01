@@ -663,15 +663,15 @@ ZoneAirMassFlowConservation,
        \key No
        \default No
        \note This optional choice input field allows users triggering the zone air mass flow
-       \note balance calculation when desired. This global object has two choice KEYs: ¬ìYes¬î and
-       \note ¬ìNo¬î. If this input field is specified as ¬ìYes¬î, then EnergyPlus attempts to enforce
-       \note the zone air mass flow conservation, or else if it is specified as ¬ìNo¬î, then EnergyPlus
+       \note balance calculation when desired. This global object has two choice KEYs: ìYesî and
+       \note ìNoî. If this input field is specified as ìYesî, then EnergyPlus attempts to enforce
+       \note the zone air mass flow conservation, or else if it is specified as ìNoî, then EnergyPlus
        \note calculation defaults to zone air mass flow balance that does not include zone mixing
        \note objects and that assumes self-balanced simple flow objects per the default procedure,
        \note which may not necessarily enforce zone mass conservation unless the user specified
        \note a balanced flow to begin with. Mass conservation is enforced both for the receiving
        \note and source zones if there is at least one mixing object defined. The default input
-       \note is ¬ìNo¬î. (Note that ¬ìNo¬î input may also results in balanced flow depending on the
+       \note is ìNoî. (Note that ìNoî input may also results in balanced flow depending on the
        \note system specified).
   A2;  \field Source Zone Infiltration Treatment
        \note This input field allows user to choose how zone infiltration flow is treated during
@@ -680,12 +680,12 @@ ZoneAirMassFlowConservation,
        \key AddInfiltrationFlow
        \key AdjustInfiltrationFlow
        \default AddInfiltrationFlow
-       \note It has two choice KEYs: ¬ìAddInfiltrationFlow¬î and ¬ìAdjustInfiltrationFlow¬î.  If this
-       \note input is specified as ¬ìAddInfiltrationFlow¬î, then energy plus adds infiltration air
+       \note It has two choice KEYs: ìAddInfiltrationFlowî and ìAdjustInfiltrationFlowî.  If this
+       \note input is specified as ìAddInfiltrationFlowî, then energy plus adds infiltration air
        \note mass flow on top of the base flow, which is calculated using the infiltration object
        \note user inputs, in order to balance the zone air mass flow.  The additional infiltration
        \note air mass flow is not self-balanced.  If this input is specified as
-       \note ¬ìAdjustInfiltrationFlow¬î, then energy plus may adjust the base flow calculated using
+       \note ìAdjustInfiltrationFlowî, then energy plus may adjust the base flow calculated using
        \note the infiltration object user inputs in order to balance the zone air mass flow. If it
        \note is not required to adjust the base infiltration air flow calculated from the user
        \note specified infiltration object inputs, then the base infiltration air mass flow
@@ -4761,14 +4761,14 @@ WindowMaterial:Glazing,
        \key No
        \key Yes
        \default No
-  N13, \field Young¬ís modulus
+  N13, \field Youngís modulus
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \units Pa
        \type real
        \minimum> 0.0
        \default 7.2e10
-  N14; \field Poisson¬ís ratio
+  N14; \field Poissonís ratio
        \note coefficient used for deflection calculations. Used only with complex
        \note fenestration when deflection model is set to TemperatureAndPressureInput
        \type real
@@ -6133,7 +6133,7 @@ WindowMaterial:Blind:EquivalentLayer,
   N3 , \field Slat Crown
        \note Perpendicular length between the cord and the curve.
        \note Slat is assumed to be rectangular in cross section
-       \note and flat. Crown=0.0625x¬ìSlat width¬î
+       \note and flat. Crown=0.0625xìSlat widthî
        \type real
        \units m
        \minimum 0
@@ -6636,7 +6636,7 @@ WindowMaterial:Gap:EquivalentLayer,
        \note Sealed means the gap is enclosed and gas tight, i.e., no venting to indoor or
        \note outdoor environment.  VentedIndoor means the gap is vented to indoor environment, and
        \note VentedOutdoor means the gap is vented to the outdoor environment. The gap types
-       \note VentedIndoor and VentedOutdoor are used with gas type ¬ìAir¬î only.
+       \note VentedIndoor and VentedOutdoor are used with gas type ìAirî only.
   N2 , \field Conductivity Coefficient A
        \units W/m-K
        \type real
@@ -31566,7 +31566,7 @@ ZoneHVAC:FourPipeFanCoil,
         \note For ConstantFanVariableFlow a Fan:OnOff or Fan:ConstantVolume is valid.
         \note For CyclingFan, a Fan:OnOff is valid.
         \note For VariableFanVariableFlow or VariableFanConstantFlow a Fan:VariableVolume is valid.
-        \note The fan¬ís inlet node should be the same as the outdoor air mixer¬ís mixed air node.
+        \note The fanís inlet node should be the same as the outdoor air mixerís mixed air node.
    A10, \field Supply Air Fan Name
         \required-field
         \type object-list
@@ -32656,11 +32656,11 @@ ZoneHVAC:UnitHeater,
         \key Yes
         \key No
         \note This choice field allows the user to define how the unit heater will operate
-        \note under ¬ìno heating load¬î or cooling conditions. If the ¬ìNo¬î is selected, then
+        \note under ìno heating loadî or cooling conditions. If the ìNoî is selected, then
         \note the fan will not run unless there is a heating load. If the fan does not run,
         \note this effectively shuts the unit heater system off when there is no heating load.
-        \note If the ¬ìYes¬î is selected, the unit heater is available and has a ConstantVolume
-        \note fan, or has an OnOff fan with ¬ìSupply Air Fan Operating Mode Schedule¬î value
+        \note If the ìYesî is selected, the unit heater is available and has a ConstantVolume
+        \note fan, or has an OnOff fan with ìSupply Air Fan Operating Mode Scheduleî value
         \note greater than zero, then the fan will always run regardless of the zone load.
    N2 , \field Maximum Hot Water or Steam Flow Rate
         \note Not used when heating coil is gas or electric
@@ -49595,7 +49595,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         \units m3/s
         \minimum 0.0
         \autosizable
-        \note Must be less than or equal to the fan¬ís maximum flow rate.
+        \note Must be less than or equal to the fanís maximum flow rate.
         \note Only used when fan operating mode is continuous (disregarded for cycling fan mode).
         \note This air flow rate is used when no heating or cooling is required (i.e., the DX coil
         \note compressor and supplemental heating coil are off). If this field is left blank or zero,
@@ -60707,7 +60707,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \default 0.008
        \units percent
        \note Rate of drift loss as a percentage of circulating spray water flow rate
-       \note Default value for this field in under investigation. For now Cooling tower¬ís drift loss
+       \note Default value for this field in under investigation. For now Cooling towerís drift loss
        \note percent default value is taken here.
   A8 , \field Blowdown Calculation Mode
        \type choice
@@ -60722,7 +60722,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \note Blowdown is water intentionally drained from the basin in order to offset the build
        \note up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value for this field in under investigation. For now Cooling tower¬ís
+       \note Default value for this field in under investigation. For now Cooling towerís
        \note Blowdown Concentration Ratio percent default value is taken here.
   A9 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
@@ -60948,7 +60948,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \type real
        \units percent
        \default 0.008
-       \note Default value is under investigation. For now cooling tower¬ís default value is taken.
+       \note Default value is under investigation. For now cooling towerís default value is taken.
   A7 , \field Blowdown Calculation Mode
        \type choice
        \key ConcentrationRatio
@@ -60962,7 +60962,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \note Blowdown is water intentionally drained from the Evaporative Fluid Cooler in order to offset the
        \note build up of solids in the water that would otherwise occur because of evaporation.
        \note Ratio of solids in the blowdown water to solids in the make up water.
-       \note Default value is under investigation. For now cooling tower¬ís default value is taken.
+       \note Default value is under investigation. For now cooling towerís default value is taken.
   A8 , \field Blowdown Makeup Water Usage Schedule Name
        \type object-list
        \object-list ScheduleNames
@@ -69917,14 +69917,14 @@ Refrigeration:AirChiller,
         \minimum 0.0
         \maximum 20.
         \note The rated difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in ¬∞C.
+        \note cooling source temperature in ∞C.
   N6 ,  \field Maximum Temperature Difference Between Inlet Air and Evaporating Temperature
         \type real
         \units deltaC
         \minimum 0.0
         \maximum 25.
         \note The maximum difference between the air entering the refrigeration chiller and the
-        \note cooling source temperature in ¬∞C used to limit capacity during pull-down.
+        \note cooling source temperature in ∞C used to limit capacity during pull-down.
         \note defaults to 1.3 times the Rated Temperature Difference DT1
   N7 ,  \field Coil Material Correction Factor
         \type real
@@ -71909,7 +71909,7 @@ Generator:FuelCell:Inverter,
 
 Generator:MicroCHP,
       \memo Small-scale combined heat and power (micro CHP) electric generator using the model
-      \memo developed by IEA/ECBCS Annex 42 √ê see www.cogen-sim.net. The model was developed
+      \memo developed by IEA/ECBCS Annex 42 – see www.cogen-sim.net. The model was developed
       \memo for both internal combustion and Stirling cycle
       \memo engines, but might be used for other types of residential CHP devices.
   A1, \field Name
@@ -91612,3 +91612,4 @@ Output:PreprocessorMessage,
         \retaincase
    A12; \field Message Line 10
         \retaincase
+
