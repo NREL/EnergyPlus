@@ -319,9 +319,7 @@ int sendclientmessage(const int *sockfd, const int *flaWri);
 ///
 ///\param sockfd Socket file descripter
 ///\param flaWri should be set to a negative value.
-inline int sendclienterror(const int *sockfd, const int *flaWri){
-    return sendclientmessage(sockfd, flaWri);
-}
+int sendclienterror(const int *sockfd, const int *flaWri);
 
 /////////////////////////////////////////////////////////////////
 /// Returns the required socket buffer length by reading from

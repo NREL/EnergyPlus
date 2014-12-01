@@ -802,6 +802,20 @@ int sendclientmessage(const int *sockfd, const int *flaWri){
 }
 
 /////////////////////////////////////////////////////////////////
+/// Writes an error flag to the socket stream.
+///
+/// This method should be used by clients if they experience an
+/// error and need to terminate the socket connection.
+///
+///\deprecated Use \c sendclientmessage instead
+///
+///\param sockfd Socket file descripter
+///\param flaWri should be set to a negative value.
+int sendclienterror(const int *sockfd, const int *flaWri){
+    return sendclientmessage(sockfd, flaWri);
+}
+
+/////////////////////////////////////////////////////////////////
 /// Returns the required socket buffer length by reading from
 /// the socket how many data it contains.
 /// This method also set the global variable \c SERVER_VERSION
