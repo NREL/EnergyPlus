@@ -4965,54 +4965,55 @@ namespace WaterThermalTanks {
 		bool SetPointRecovered; // Flag to indicate when setpoint is recovered for the first time
 		Real64 rho;
 		static int DummyWaterIndex( 1 );
+        WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
 
 		// FLOW:
 		TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
 
-		if ( WaterThermalTank( WaterThermalTankNum ).TimeElapsed != TimeElapsed ) {
+		if ( Tank.TimeElapsed != TimeElapsed ) {
 			// The simulation has advanced to the next system timestep.  Save conditions from the end of the previous system
 			// timestep for use as the initial conditions of each iteration that does not advance the system timestep.
-			WaterThermalTank( WaterThermalTankNum ).SavedTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
-			WaterThermalTank( WaterThermalTankNum ).SavedMode = WaterThermalTank( WaterThermalTankNum ).Mode;
+			Tank.SavedTankTemp = Tank.TankTemp;
+			Tank.SavedMode = Tank.Mode;
 
 			// Save outlet temperatures for demand-side flow control
-			WaterThermalTank( WaterThermalTankNum ).SavedUseOutletTemp = WaterThermalTank( WaterThermalTankNum ).UseOutletTemp;
-			WaterThermalTank( WaterThermalTankNum ).SavedSourceOutletTemp = WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp;
+			Tank.SavedUseOutletTemp = Tank.UseOutletTemp;
+			Tank.SavedSourceOutletTemp = Tank.SourceOutletTemp;
 
-			WaterThermalTank( WaterThermalTankNum ).TimeElapsed = TimeElapsed;
+			Tank.TimeElapsed = TimeElapsed;
 		}
 
-		TankTemp = WaterThermalTank( WaterThermalTankNum ).SavedTankTemp;
-		Mode = WaterThermalTank( WaterThermalTankNum ).SavedMode;
+		TankTemp = Tank.SavedTankTemp;
+		Mode = Tank.SavedMode;
 
-		Qmaxcap = WaterThermalTank( WaterThermalTankNum ).MaxCapacity;
-		Qmincap = WaterThermalTank( WaterThermalTankNum ).MinCapacity;
-		Qoffcycfuel = WaterThermalTank( WaterThermalTankNum ).OffCycParaLoad;
-		Qoffcycheat = Qoffcycfuel * WaterThermalTank( WaterThermalTankNum ).OffCycParaFracToTank;
-		Qoncycfuel = WaterThermalTank( WaterThermalTankNum ).OnCycParaLoad;
-		Qoncycheat = Qoncycfuel * WaterThermalTank( WaterThermalTankNum ).OnCycParaFracToTank;
+		Qmaxcap = Tank.MaxCapacity;
+		Qmincap = Tank.MinCapacity;
+		Qoffcycfuel = Tank.OffCycParaLoad;
+		Qoffcycheat = Qoffcycfuel * Tank.OffCycParaFracToTank;
+		Qoncycfuel = Tank.OnCycParaLoad;
+		Qoncycheat = Qoncycfuel * Tank.OnCycParaFracToTank;
 
-		SetPointTemp = WaterThermalTank( WaterThermalTankNum ).SetPointTemp;
-		DeadBandTemp = SetPointTemp - WaterThermalTank( WaterThermalTankNum ).DeadBandDeltaTemp;
-		MaxTemp = WaterThermalTank( WaterThermalTankNum ).TankTempLimit;
-		AmbientTemp = WaterThermalTank( WaterThermalTankNum ).AmbientTemp;
+		SetPointTemp = Tank.SetPointTemp;
+		DeadBandTemp = SetPointTemp - Tank.DeadBandDeltaTemp;
+		MaxTemp = Tank.TankTempLimit;
+		AmbientTemp = Tank.AmbientTemp;
 
-		UseInletTemp = WaterThermalTank( WaterThermalTankNum ).UseInletTemp;
-		UseMassFlowRate = WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate * WaterThermalTank( WaterThermalTankNum ).UseEffectiveness;
-		MinMassFlowRate = WaterThermalTank( WaterThermalTankNum ).MassFlowRateMin;
-		SourceInletTemp = WaterThermalTank( WaterThermalTankNum ).SourceInletTemp;
-		SourceMassFlowRate = WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate * WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness;
+		UseInletTemp = Tank.UseInletTemp;
+		UseMassFlowRate = Tank.UseMassFlowRate * Tank.UseEffectiveness;
+		MinMassFlowRate = Tank.MassFlowRateMin;
+		SourceInletTemp = Tank.SourceInletTemp;
+		SourceMassFlowRate = Tank.SourceMassFlowRate * Tank.SourceEffectiveness;
 
-		if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
-			rho = GetDensityGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, TankTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
+		if ( Tank.UseSidePlantLoopNum > 0 ) {
+			rho = GetDensityGlycol( PlantLoop( Tank.UseSidePlantLoopNum ).FluidName, TankTemp, PlantLoop( Tank.UseSidePlantLoopNum ).FluidIndex, RoutineName );
 		} else {
 			rho = GetDensityGlycol( fluidNameWater, TankTemp, DummyWaterIndex, RoutineName );
 		}
 
-		TankMass = rho * WaterThermalTank( WaterThermalTankNum ).Volume;
+		TankMass = rho * Tank.Volume;
 
-		if ( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum > 0 ) {
-			Cp = GetSpecificHeatGlycol( PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidName, TankTemp, PlantLoop( WaterThermalTank( WaterThermalTankNum ).UseSidePlantLoopNum ).FluidIndex, RoutineName );
+		if ( Tank.UseSidePlantLoopNum > 0 ) {
+			Cp = GetSpecificHeatGlycol( PlantLoop( Tank.UseSidePlantLoopNum ).FluidName, TankTemp, PlantLoop( Tank.UseSidePlantLoopNum ).FluidIndex, RoutineName );
 		} else {
 			Cp = GetSpecificHeatGlycol( fluidNameWater, TankTemp, DummyWaterIndex, RoutineName );
 		}
@@ -5074,8 +5075,8 @@ namespace WaterThermalTanks {
 			if ( SELECT_CASE_var == HeatMode ) { // Heater is on
 
 				// Calculate heat rate needed to maintain the setpoint at steady-state conditions
-				LossCoeff = WaterThermalTank( WaterThermalTankNum ).OnCycLossCoeff;
-				LossFracToZone = WaterThermalTank( WaterThermalTankNum ).OnCycLossFracToZone;
+				LossCoeff = Tank.OnCycLossCoeff;
+				LossFracToZone = Tank.OnCycLossFracToZone;
 				Qloss = LossCoeff * ( AmbientTemp - SetPointTemp );
 				Qneeded = -Quse - Qsource - Qloss - Qoncycheat;
 
@@ -5133,7 +5134,7 @@ namespace WaterThermalTanks {
 						// Heater is required at less than the minimum capacity
 						// If cycling, Qmincap = Qmaxcap.  Once the setpoint is reached, heater will almost always be shut off here
 
-						{ auto const SELECT_CASE_var1( WaterThermalTank( WaterThermalTankNum ).ControlType );
+						{ auto const SELECT_CASE_var1( Tank.ControlType );
 
 						if ( SELECT_CASE_var1 == ControlTypeCycle ) {
 							// Control will cycle on and off based on DeadBandTemp
@@ -5194,35 +5195,35 @@ namespace WaterThermalTanks {
 
 				if ( Qmaxcap > 0.0 ) PLR = Qheater / Qmaxcap;
 				PLF = PartLoadFactor( WaterThermalTankNum, PLR );
-				Efuel += Qheater * TimeNeeded / ( PLF * WaterThermalTank( WaterThermalTankNum ).Efficiency );
+				Efuel += Qheater * TimeNeeded / ( PLF * Tank.Efficiency );
 
 				Runtime += TimeNeeded;
 				PLRsum += PLR * TimeNeeded;
 
-				if ( ! WaterThermalTank( WaterThermalTankNum ).FirstRecoveryDone ) {
-					WaterThermalTank( WaterThermalTankNum ).FirstRecoveryFuel += Efuel + Eoffcycfuel + Eoncycfuel;
-					if ( SetPointRecovered ) WaterThermalTank( WaterThermalTankNum ).FirstRecoveryDone = true;
+				if ( ! Tank.FirstRecoveryDone ) {
+					Tank.FirstRecoveryFuel += Efuel + Eoffcycfuel + Eoncycfuel;
+					if ( SetPointRecovered ) Tank.FirstRecoveryDone = true;
 				}
 
 			} else if ( ( SELECT_CASE_var == FloatMode ) || ( SELECT_CASE_var == CoolMode ) ) { // Heater is off
 
 				// Calculate heat rate needed to maintain the setpoint at steady-state conditions
-				LossCoeff = WaterThermalTank( WaterThermalTankNum ).OffCycLossCoeff;
-				LossFracToZone = WaterThermalTank( WaterThermalTankNum ).OffCycLossFracToZone;
+				LossCoeff = Tank.OffCycLossCoeff;
+				LossFracToZone = Tank.OffCycLossFracToZone;
 				Qloss = LossCoeff * ( AmbientTemp - SetPointTemp );
 				Qneeded = -Quse - Qsource - Qloss - Qoffcycheat;
 
 				// This section really needs to work differently depending on ControlType
 				// CYCLE will look at TankTemp, MODULATE will look at Qneeded
 
-				if ( ( TankTemp < DeadBandTemp ) && ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
+				if ( ( TankTemp < DeadBandTemp ) && ( ! Tank.IsChilledWaterTank ) ) {
 					// Tank temperature is already below the minimum, possibly due to step change in scheduled SetPointTemp
 
 					Mode = HeatMode;
 					++CycleOnCount;
 					continue;
 
-				} else if ( ( TankTemp >= DeadBandTemp ) && ( ! WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
+				} else if ( ( TankTemp >= DeadBandTemp ) && ( ! Tank.IsChilledWaterTank ) ) {
 
 					Qheat = Qoffcycheat + Qheatpump;
 
@@ -5241,7 +5242,7 @@ namespace WaterThermalTanks {
 
 						NewTankTemp = CalcTankTemp( TankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeRemaining );
 
-						if ( ( NewTankTemp < MaxTemp ) || ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
+						if ( ( NewTankTemp < MaxTemp ) || ( Tank.IsChilledWaterTank ) ) {
 							// Neither heating nor venting is needed for all of the remaining time
 
 							TimeNeeded = TimeRemaining;
@@ -5259,13 +5260,13 @@ namespace WaterThermalTanks {
 
 					} // TimeNeeded <= TimeRemaining
 
-				} else if ( ( TankTemp > DeadBandTemp ) && ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
+				} else if ( ( TankTemp > DeadBandTemp ) && ( Tank.IsChilledWaterTank ) ) {
 					Mode = CoolMode;
 					Qheat = Qheatpump;
 
 					NewTankTemp = CalcTankTemp( TankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeRemaining );
 					TimeNeeded = TimeRemaining;
-				} else if ( ( TankTemp <= DeadBandTemp ) && ( WaterThermalTank( WaterThermalTankNum ).IsChilledWaterTank ) ) {
+				} else if ( ( TankTemp <= DeadBandTemp ) && ( Tank.IsChilledWaterTank ) ) {
 
 					if ( TankTemp < SetPointTemp ) Mode = FloatMode;
 
@@ -5282,8 +5283,8 @@ namespace WaterThermalTanks {
 
 			} else if ( SELECT_CASE_var == VentMode ) { // Excess heat is vented
 
-				LossCoeff = WaterThermalTank( WaterThermalTankNum ).OffCycLossCoeff;
-				LossFracToZone = WaterThermalTank( WaterThermalTankNum ).OffCycLossFracToZone;
+				LossCoeff = Tank.OffCycLossCoeff;
+				LossFracToZone = Tank.OffCycLossFracToZone;
 				Qheat = Qoffcycheat + Qheatpump;
 
 				NewTankTemp = CalcTankTemp( TankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeRemaining );
@@ -5337,12 +5338,12 @@ namespace WaterThermalTanks {
 			if ( CycleOnCount > MaxCycles ) {
 
 				if ( ! WarmupFlag ) {
-					if ( WaterThermalTank( WaterThermalTankNum ).MaxCycleErrorIndex == 0 ) {
-						ShowWarningError( "WaterHeater:Mixed = " + WaterThermalTank( WaterThermalTankNum ).Name + ":  Heater is cycling on and off more than once per second." );
+					if ( Tank.MaxCycleErrorIndex == 0 ) {
+						ShowWarningError( "WaterHeater:Mixed = " + Tank.Name + ":  Heater is cycling on and off more than once per second." );
 						ShowContinueError( "Try increasing Deadband Temperature Difference or Tank Volume" );
 						ShowContinueErrorTimeStamp( "" );
 					}
-					ShowRecurringWarningErrorAtEnd( "WaterHeater:Mixed = " + WaterThermalTank( WaterThermalTankNum ).Name + " Heater is cycling on and off more than once per second:", WaterThermalTank( WaterThermalTankNum ).MaxCycleErrorIndex );
+					ShowRecurringWarningErrorAtEnd( "WaterHeater:Mixed = " + Tank.Name + " Heater is cycling on and off more than once per second:", Tank.MaxCycleErrorIndex );
 				}
 
 				break;
@@ -5359,51 +5360,51 @@ namespace WaterThermalTanks {
 		Qsource = Esource / SecInTimeStep;
 		Qheater = Eheater / SecInTimeStep;
 		Qoffcycfuel = Eoffcycfuel / SecInTimeStep;
-		Qoffcycheat = Qoffcycfuel * WaterThermalTank( WaterThermalTankNum ).OffCycParaFracToTank;
+		Qoffcycheat = Qoffcycfuel * Tank.OffCycParaFracToTank;
 		Qoncycfuel = Eoncycfuel / SecInTimeStep;
-		Qoncycheat = Qoncycfuel * WaterThermalTank( WaterThermalTankNum ).OnCycParaFracToTank;
+		Qoncycheat = Qoncycfuel * Tank.OnCycParaFracToTank;
 		Qvent = Event / SecInTimeStep;
 		Qneeded = Eneeded / SecInTimeStep;
 		Qunmet = Eunmet / SecInTimeStep;
 		RTF = Runtime / SecInTimeStep;
 		PLR = PLRsum / SecInTimeStep;
 
-		if ( WaterThermalTank( WaterThermalTankNum ).ControlType == ControlTypeCycle ) {
+		if ( Tank.ControlType == ControlTypeCycle ) {
 			// Recalculate Part Load Factor and fuel energy based on Runtime Fraction, instead of Part Load Ratio
 			PLF = PartLoadFactor( WaterThermalTankNum, RTF );
-			Efuel = Eheater / ( PLF * WaterThermalTank( WaterThermalTankNum ).Efficiency );
+			Efuel = Eheater / ( PLF * Tank.Efficiency );
 		}
 
 		Qfuel = Efuel / SecInTimeStep;
 
-		WaterThermalTank( WaterThermalTankNum ).Mode = Mode; // Operating mode for carry-over to next timestep
+		Tank.Mode = Mode; // Operating mode for carry-over to next timestep
 
-		WaterThermalTank( WaterThermalTankNum ).TankTemp = TankTemp; // Final tank temperature for carry-over to next timestep
-		WaterThermalTank( WaterThermalTankNum ).TankTempAvg = TankTempAvg; // Average tank temperature over the timestep for reporting
-		WaterThermalTank( WaterThermalTankNum ).UseOutletTemp = TankTempAvg; // Because entire tank is at same temperature
-		WaterThermalTank( WaterThermalTankNum ).SourceOutletTemp = TankTempAvg; // Because entire tank is at same temperature
+		Tank.TankTemp = TankTemp; // Final tank temperature for carry-over to next timestep
+		Tank.TankTempAvg = TankTempAvg; // Average tank temperature over the timestep for reporting
+		Tank.UseOutletTemp = TankTempAvg; // Because entire tank is at same temperature
+		Tank.SourceOutletTemp = TankTempAvg; // Because entire tank is at same temperature
 
-		WaterThermalTank( WaterThermalTankNum ).LossRate = Qloss;
-		WaterThermalTank( WaterThermalTankNum ).UseRate = Quse;
-		WaterThermalTank( WaterThermalTankNum ).SourceRate = Qsource;
-		WaterThermalTank( WaterThermalTankNum ).OffCycParaRateToTank = Qoffcycheat;
-		WaterThermalTank( WaterThermalTankNum ).OnCycParaRateToTank = Qoncycheat;
-		WaterThermalTank( WaterThermalTankNum ).TotalDemandRate = -Quse - Qsource - Qloss - Qoffcycheat - Qoncycheat;
-		WaterThermalTank( WaterThermalTankNum ).HeaterRate = Qheater;
-		WaterThermalTank( WaterThermalTankNum ).UnmetRate = Qunmet;
-		WaterThermalTank( WaterThermalTankNum ).VentRate = Qvent;
-		WaterThermalTank( WaterThermalTankNum ).NetHeatTransferRate = Quse + Qsource + Qloss + Qoffcycheat + Qoncycheat + Qheater + Qvent;
+		Tank.LossRate = Qloss;
+		Tank.UseRate = Quse;
+		Tank.SourceRate = Qsource;
+		Tank.OffCycParaRateToTank = Qoffcycheat;
+		Tank.OnCycParaRateToTank = Qoncycheat;
+		Tank.TotalDemandRate = -Quse - Qsource - Qloss - Qoffcycheat - Qoncycheat;
+		Tank.HeaterRate = Qheater;
+		Tank.UnmetRate = Qunmet;
+		Tank.VentRate = Qvent;
+		Tank.NetHeatTransferRate = Quse + Qsource + Qloss + Qoffcycheat + Qoncycheat + Qheater + Qvent;
 
-		WaterThermalTank( WaterThermalTankNum ).CycleOnCount = CycleOnCount;
-		WaterThermalTank( WaterThermalTankNum ).RuntimeFraction = RTF;
-		WaterThermalTank( WaterThermalTankNum ).PartLoadRatio = PLR;
+		Tank.CycleOnCount = CycleOnCount;
+		Tank.RuntimeFraction = RTF;
+		Tank.PartLoadRatio = PLR;
 
-		WaterThermalTank( WaterThermalTankNum ).FuelRate = Qfuel;
-		WaterThermalTank( WaterThermalTankNum ).OffCycParaFuelRate = Qoffcycfuel;
-		WaterThermalTank( WaterThermalTankNum ).OnCycParaFuelRate = Qoncycfuel;
+		Tank.FuelRate = Qfuel;
+		Tank.OffCycParaFuelRate = Qoffcycfuel;
+		Tank.OnCycParaFuelRate = Qoncycfuel;
 
 		// Add water heater skin losses and venting losses to ambient zone, if specified
-		if ( WaterThermalTank( WaterThermalTankNum ).AmbientTempZone > 0 ) WaterThermalTank( WaterThermalTankNum ).AmbientZoneGain = -Qlosszone - Qvent;
+		if ( Tank.AmbientTempZone > 0 ) Tank.AmbientZoneGain = -Qlosszone - Qvent;
 
 	}
 
