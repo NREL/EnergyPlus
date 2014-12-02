@@ -183,6 +183,10 @@ if(NOT APPLE)
   list(APPEND OPTIMIZABLE_TARGETS parser)
 endif()
 
+if(NOT MSVC)
+  list(APPEND OPTIMIZABLE_TARGETS objexx_tests EnergyPlus_tests)
+endif()
+
 if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   get_filename_component(LINKER_DIR "${CMAKE_LINKER}" PATH)
   if (MSVC12)
