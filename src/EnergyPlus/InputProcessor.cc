@@ -1,7 +1,14 @@
+// C++ Headers
+#include <algorithm>
+#include <istream>
+
 // ObjexxFCL Headers
+#include <ObjexxFCL/Backspace.hh>
 #include <ObjexxFCL/FArray.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/gio.hh>
+#include <ObjexxFCL/stream.functions.hh>
+#include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
 #include <InputProcessor.hh>
@@ -83,8 +90,8 @@ namespace InputProcessor {
 	static std::string const AlphaNum( "ANan" ); // Valid indicators for Alpha or Numeric fields (A or N)
 	Real64 const DefAutoSizeValue( AutoSize );
 	Real64 const DefAutoCalculateValue( AutoCalculate );
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -98,8 +105,6 @@ namespace InputProcessor {
 	int NumSectionDefs( 0 ); // Count of number of section defintions found in the IDD
 	int MaxObjectDefs( 0 ); // Current "max" object defs (IDD), when reached will be reallocated and new Max set
 	int MaxSectionDefs( 0 ); // Current "max" section defs (IDD), when reached will be reallocated and new Max set
-	int IDDFile( 0 ); // Unit number for reading IDD (Energy+.idd)
-	int IDFFile( 0 ); // Unit number for reading IDF (in.idf)
 	int NumLines( 0 ); // Count of number of lines in IDF
 	int MaxIDFRecords( 0 ); // Current "max" IDF records (lines), when reached will be reallocated and new Max set
 	int NumIDFRecords( 0 ); // Count of number of IDF records
@@ -123,6 +128,7 @@ namespace InputProcessor {
 	int TotalAuditErrors( 0 ); // Counting some warnings that go onto only the audit file
 	int NumSecretObjects( 0 ); // Number of objects in "Secret Mode"
 	bool ProcessingIDD( false ); // True when processing IDD, false when processing IDF
+	std::ostream * echo_stream( nullptr ); // Internal stream used for input file echoing (used for performance)
 
 	//Real Variables for Module
 	//na
@@ -220,7 +226,7 @@ namespace InputProcessor {
 		int Loop;
 		int CountErr;
 		int Num1;
-		std::string::size_type Which;
+		int Which;
 		int endcol;
 		int write_stat;
 		int read_stat;
@@ -233,6 +239,7 @@ namespace InputProcessor {
 			DisplayString( "Could not open (write) eplusout.audit." );
 			ShowFatalError( "ProcessInput: Could not open file \"eplusout.audit\" for output (write)." );
 		}
+		echo_stream = gio::out_stream( EchoInputFile );
 
 		{ IOFlags flags; gio::inquire( "eplusout.iperr", flags ); FileExists = flags.exists(); }
 		if ( FileExists ) {
@@ -250,55 +257,40 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: Could not open file \"eplusout.audit\" for output (write)." );
 		}
 
-		//               FullName from StringGlobals is used to build file name with Path
+		// FullName from StringGlobals is used to build file name with Path
 		if ( len( ProgramPath ) == 0 ) {
 			FullName = "Energy+.idd";
 		} else {
 			FullName = ProgramPath + "Energy+.idd";
 		}
-		{ IOFlags flags; gio::inquire( FullName, flags ); FileExists = flags.exists(); }
-		if ( ! FileExists ) {
-			DisplayString( "Missing " + FullName );
-			ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + FullName );
-		}
-		IDDFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "read" ); gio::open( IDDFile, FullName, flags ); read_stat = flags.ios(); }
-		if ( read_stat != 0 ) {
-			DisplayString( "Could not open (read) Energy+.idd." );
-			ShowFatalError( "ProcessInput: Could not open file \"Energy+.idd\" for input (read)." );
-		}
-		gio::read( IDDFile, fmtA ) >> InputLine;
-		endcol = len( InputLine );
-		if ( endcol > 0 ) {
-			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: \"Energy+.idd\" appears to be a Unicode or binary file." );
-				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
+		std::ifstream idd_stream( FullName, std::ios_base::in | std::ios_base::binary );
+		if ( ! idd_stream ) {
+			if ( idd_stream.is_open() ) idd_stream.close();
+			if ( ! gio::file_exists( FullName ) ) { // No such file
+				DisplayString( "Missing " + FullName );
+				ShowFatalError( "ProcessInput: Energy+.idd missing. Program terminates. Fullname=" + FullName );
+			} else {
+				DisplayString( "Could not open (read) Energy+.idd." );
+				ShowFatalError( "ProcessInput: Could not open file \"Energy+.idd\" for input (read)." );
 			}
 		}
-		gio::backspace( IDDFile );
 		NumLines = 0;
 
 		DoingInputProcessing = true;
 		gio::write( EchoInputFile, fmtLD ) << " Processing Data Dictionary (Energy+.idd) File -- Start";
 		DisplayString( "Processing Data Dictionary" );
 		ProcessingIDD = true;
-
-		ProcessDataDicFile( ErrorsInIDD );
+		ProcessDataDicFile( idd_stream, ErrorsInIDD );
+		idd_stream.close();
 
 		ListOfObjects.allocate( NumObjectDefs );
 		ListOfObjects = ObjectDef( {1,NumObjectDefs} ).Name();
 		if ( SortedIDD ) {
 			iListOfObjects.allocate( NumObjectDefs );
-			iListOfObjects = 0;
 			SetupAndSort( ListOfObjects, iListOfObjects );
 		}
-		ObjectStartRecord.allocate( NumObjectDefs );
-		ObjectStartRecord = 0;
-		ObjectGotCount.allocate( NumObjectDefs );
-		ObjectGotCount = 0;
-
-		gio::close( IDDFile );
+		ObjectStartRecord.dimension( NumObjectDefs, 0 );
+		ObjectGotCount.dimension( NumObjectDefs, 0 );
 
 		if ( NumObjectDefs == 0 ) {
 			ShowFatalError( "ProcessInput: No objects found in IDD.  Program will terminate." );
@@ -328,48 +320,29 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: in.idf missing. Program terminates." );
 		}
 
-		IDFFile = GetNewUnitNumber();
-		{ IOFlags flags; flags.ACTION( "READ" ); gio::open( IDFFile, "in.idf", flags ); read_stat = flags.ios(); }
-		if ( read_stat != 0 ) {
+		std::ifstream idf_stream( "in.idf", std::ios_base::in | std::ios_base::binary );
+		if ( ! idf_stream ) {
+			if ( idf_stream.is_open() ) idf_stream.close();
 			DisplayString( "Could not open (read) in.idf." );
 			ShowFatalError( "ProcessInput: Could not open file \"in.idf\" for input (read)." );
 		}
-		gio::read( IDFFile, fmtA ) >> InputLine;
-		endcol = len( InputLine );
-		if ( endcol > 0 ) {
-			if ( int( InputLine[ endcol - 1 ] ) == iUnicode_end ) {
-				ShowSevereError( "ProcessInput: \"in.idf\" appears to be a Unicode or binary file." );
-				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
-				ShowFatalError( "Program terminates due to previous condition." );
-			}
-		}
-		gio::backspace( IDFFile );
 		NumLines = 0;
 		EchoInputLine = true;
 		DisplayString( "Processing Input File" );
-
-		ProcessInputDataFile();
+		ProcessInputDataFile( idf_stream );
+		idf_stream.close();
 
 		ListOfSections.allocate( NumSectionDefs );
 		ListOfSections = SectionDef( {1,NumSectionDefs} ).Name();
 
-		gio::close( IDFFile );
-
 		cAlphaFieldNames.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaFieldNames = BlankString;
 		cAlphaArgs.allocate( MaxAlphaIDFDefArgsFound );
-		cAlphaArgs = BlankString;
-		lAlphaFieldBlanks.allocate( MaxAlphaIDFDefArgsFound );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxAlphaIDFDefArgsFound, false );
 		cNumericFieldNames.allocate( MaxNumericIDFDefArgsFound );
-		cNumericFieldNames = BlankString;
-		rNumericArgs.allocate( MaxNumericIDFDefArgsFound );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumericIDFDefArgsFound );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumericIDFDefArgsFound, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumericIDFDefArgsFound, false );
 
-		IDFRecordsGotten.allocate( NumIDFRecords );
-		IDFRecordsGotten = false;
+		IDFRecordsGotten.dimension( NumIDFRecords, false );
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Complete";
 		//   WRITE(EchoInputFile,*) ' Number of IDF "Lines"=',NumIDFRecords
@@ -445,11 +418,11 @@ namespace InputProcessor {
 			ShowContinueError( "IDD Version:\"" + IDDVerString + "\"" );
 			for ( Loop = 1; Loop <= NumIDFRecords; ++Loop ) {
 				if ( SameString( IDFRecords( Loop ).Name, "Version" ) ) {
-					Num1 = len( MatchVersion );
-					if ( MatchVersion[ Num1 ] == '0' ) {
-						Which = index( IDFRecords( Loop ).Alphas( 1 ).substr( 0, Num1 - 2 ), MatchVersion.substr( 0, Num1 - 2 ) );
+					std::string::size_type const lenVer( len( MatchVersion ) );
+					if ( ( lenVer > 0 ) && ( MatchVersion[ lenVer - 1 ] == '0' ) ) {
+						Which = static_cast< int >( index( IDFRecords( Loop ).Alphas( 1 ).substr( 0, lenVer - 2 ), MatchVersion.substr( 0, lenVer - 2 ) ) );
 					} else {
-						Which = index( IDFRecords( Loop ).Alphas( 1 ), MatchVersion );
+						Which = static_cast< int >( index( IDFRecords( Loop ).Alphas( 1 ), MatchVersion ) );
 					}
 					if ( Which != 1 ) {
 						ShowContinueError( "Version in IDF=\"" + IDFRecords( Loop ).Alphas( 1 ) + "\" not the same as expected=\"" + MatchVersion + "\"" );
@@ -464,7 +437,10 @@ namespace InputProcessor {
 	}
 
 	void
-	ProcessDataDicFile( bool & ErrorsFound ) // set to true if any errors flagged during IDD processing
+	ProcessDataDicFile(
+		std::istream & idd_stream,
+		bool & ErrorsFound // set to true if any errors flagged during IDD processing
+	)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -499,71 +475,54 @@ namespace InputProcessor {
 		// DERIVED TYPE DEFINITIONS
 		// na
 
-		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		static bool EndofFile( false ); // True when End of File has been reached (IDD or IDF)
+		bool EndofFile( false ); // True when End of File has been reached (IDD or IDF)
+		bool BlankLine( false );
 		std::string::size_type Pos; // Test of scanning position on the current input line
-		bool BlankLine;
-
-		// Object Data
-		FArray1D< SectionsDefinition > TempSectionDef; // Like SectionDef, used during Re-allocation
-		FArray1D< ObjectsDefinition > TempObjectDef; // Like ObjectDef, used during Re-allocation
 
 		MaxSectionDefs = SectionDefAllocInc;
 		MaxObjectDefs = ObjectDefAllocInc;
 
 		SectionDef.allocate( MaxSectionDefs );
-
 		ObjectDef.allocate( MaxObjectDefs );
 
 		NumObjectDefs = 0;
 		NumSectionDefs = 0;
-		EndofFile = false;
 
-		// Read/process first line (Version info)
-		while ( ! EndofFile ) {
-			ReadInputLine( IDDFile, Pos, BlankLine, InputLineLength, EndofFile );
-			if ( EndofFile ) continue;
+		// Get version
+		cross_platform_get_line( idd_stream, InputLine );
+		std::string::size_type const len_line( InputLine.length() );
+		if ( idd_stream && ( len_line > 0 ) ) {
+			if ( int( InputLine[ len_line - 1 ] ) == iUnicode_end ) {
+				ShowSevereError( "ProcessInput: \"Energy+.idd\" appears to be a Unicode or binary file." );
+				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
+				ShowFatalError( "Program terminates due to previous condition." );
+			}
 			if ( has( InputLine, "!IDD_Version" ) ) {
 				IDDVerString = InputLine.substr( 1, len( InputLine ) - 1 );
 			}
-			break;
 		}
+		if ( idd_stream ) idd_stream.seekg( 0, std::ios::beg );
 
 		while ( ! EndofFile ) {
-			ReadInputLine( IDDFile, Pos, BlankLine, InputLineLength, EndofFile );
+			ReadInputLine( idd_stream, Pos, BlankLine, EndofFile );
 			if ( BlankLine || EndofFile ) continue;
-			Pos = scan( InputLine.substr( 0, InputLineLength ), ",;" );
+			Pos = scan( InputLine, ",;" );
 			if ( Pos != std::string::npos ) {
-
 				if ( InputLine[ Pos ] == ';' ) {
 					AddSectionDef( InputLine.substr( 0, Pos ), ErrorsFound );
 					if ( NumSectionDefs == MaxSectionDefs ) {
-						TempSectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-						TempSectionDef( {1,MaxSectionDefs} ) = SectionDef;
-						SectionDef.deallocate();
-						SectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-						SectionDef = TempSectionDef;
-						TempSectionDef.deallocate();
-						MaxSectionDefs += SectionDefAllocInc;
+						SectionDef.redimension( MaxSectionDefs += SectionDefAllocInc );
 					}
 				} else {
-					AddObjectDefandParse( InputLine.substr( 0, Pos ), Pos, EndofFile, ErrorsFound );
+					AddObjectDefandParse( idd_stream, InputLine.substr( 0, Pos ), Pos, EndofFile, ErrorsFound );
 					if ( NumObjectDefs == MaxObjectDefs ) {
-						TempObjectDef.allocate( MaxObjectDefs + ObjectDefAllocInc );
-						TempObjectDef( {1,MaxObjectDefs} ) = ObjectDef;
-						ObjectDef.deallocate();
-						ObjectDef.allocate( MaxObjectDefs + ObjectDefAllocInc );
-						ObjectDef = TempObjectDef;
-						TempObjectDef.deallocate();
-						MaxObjectDefs += ObjectDefAllocInc;
+						ObjectDef.redimension( MaxObjectDefs += ObjectDefAllocInc );
 					}
 				}
-
 			} else {
 				ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line", EchoInputFile );
 				ErrorsFound = true;
 			}
-
 		}
 
 	}
@@ -639,6 +598,7 @@ namespace InputProcessor {
 
 	void
 	AddObjectDefandParse(
+		std::istream & idd_stream,
 		std::string const & ProposedObject, // Proposed Object to Add
 		std::string::size_type & CurPos, // Current position (initially at first ',') of InputLine
 		bool & EndofFile, // End of File marker
@@ -688,15 +648,10 @@ namespace InputProcessor {
 		bool BlankLine; // True when this line is "blank" (may have comment characters as first character on line)
 		static FArray1D_bool AlphaOrNumeric; // Array of argument designations, True is Alpha,
 		// False is numeric, saved in ObjectDef when done
-		static FArray1D_bool TempAN; // Array (ref: AlphaOrNumeric) for re-allocation procedure
 		static FArray1D_bool RequiredFields; // Array of argument required fields
-		static FArray1D_bool TempRqF; // Array (ref: RequiredFields) for re-allocation procedure
 		static FArray1D_bool AlphRetainCase; // Array of argument for retain case
-		static FArray1D_bool TempRtC; // Array (ref: AlphRetainCase) for re-allocation procedure
 		static FArray1D_string AlphFieldChecks; // Array with alpha field names
-		static FArray1D_string TempAFC; // Array (ref: AlphFieldChecks) for re-allocation procedure
 		static FArray1D_string AlphFieldDefaults; // Array with alpha field defaults
-		static FArray1D_string TempAFD; // Array (ref: AlphFieldDefaults) for re-allocation procedure
 		bool MinMax; // Set to true when MinMax field has been found by ReadInputLine
 		bool Default; // Set to true when Default field has been found by ReadInputLine
 		bool AutoSize; // Set to true when Autosizable field has been found by ReadInputLine
@@ -833,48 +788,14 @@ namespace InputProcessor {
 					RetainCaseFlag = false;
 
 					if ( Count > MaxANArgs ) { // Reallocation
-						TempAN.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						TempAN = false;
-						TempAN( {0,MaxANArgs} ) = AlphaOrNumeric;
-						AlphaOrNumeric.deallocate();
-						TempRqF.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						TempRqF = false;
-						TempRqF( {0,MaxANArgs} ) = RequiredFields;
-						RequiredFields.deallocate();
-						TempRtC.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						TempRtC = false;
-						TempRtC( {0,MaxANArgs} ) = AlphRetainCase;
-						AlphRetainCase.deallocate();
-						TempChecks.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempChecks( {1,MaxANArgs} ) = NumRangeChecks( {1,MaxANArgs} );
-						NumRangeChecks.deallocate();
-						TempAFC.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFC = BlankString;
-						TempAFC( {1,MaxANArgs} ) = AlphFieldChecks;
-						AlphFieldChecks.deallocate();
-						TempAFD.allocate( MaxANArgs + ANArgsDefAllocInc );
-						TempAFD = BlankString;
-						TempAFD( {1,MaxANArgs} ) = AlphFieldDefaults;
-						AlphFieldDefaults.deallocate();
-						AlphaOrNumeric.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						AlphaOrNumeric = TempAN;
-						TempAN.deallocate();
-						RequiredFields.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						RequiredFields = TempRqF;
-						TempRqF.deallocate();
-						AlphRetainCase.allocate( {0,MaxANArgs + ANArgsDefAllocInc} );
-						AlphRetainCase = TempRtC;
-						TempRtC.deallocate();
-						NumRangeChecks.allocate( MaxANArgs + ANArgsDefAllocInc );
-						NumRangeChecks = TempChecks;
-						TempChecks.deallocate();
-						AlphFieldChecks.allocate( MaxANArgs + ANArgsDefAllocInc );
-						AlphFieldChecks = TempAFC;
-						TempAFC.deallocate();
-						AlphFieldDefaults.allocate( MaxANArgs + ANArgsDefAllocInc );
-						AlphFieldDefaults = TempAFD;
-						TempAFD.deallocate();
-						MaxANArgs += ANArgsDefAllocInc;
+						int const newANArgs( MaxANArgs + ANArgsDefAllocInc );
+						AlphaOrNumeric.redimension( {0,newANArgs}, false );
+						RequiredFields.redimension( {0,newANArgs}, false );
+						AlphRetainCase.redimension( {0,newANArgs}, false );
+						NumRangeChecks.redimension( newANArgs );
+						AlphFieldChecks.redimension( newANArgs );
+						AlphFieldDefaults.redimension( newANArgs );
+						MaxANArgs = newANArgs;
 					}
 
 					TargetChar = InputLine[ CurPos + Pos ];
@@ -893,7 +814,7 @@ namespace InputProcessor {
 					}
 
 				} else {
-					ReadInputLine( IDDFile, CurPos, BlankLine, InputLineLength, EndofFile, MinMax, WhichMinMax, MinMaxString, Value, Default, AlphDefaultString, AutoSize, AutoCalculate, RetainCaseFlag, ErrorsFoundFlag );
+					ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile, MinMax, WhichMinMax, MinMaxString, Value, Default, AlphDefaultString, AutoSize, AutoCalculate, RetainCaseFlag, ErrorsFoundFlag );
 					if ( ! AlphaOrNumeric( Count ) ) {
 						// only record for numeric fields
 						if ( MinMax ) {
@@ -959,18 +880,18 @@ namespace InputProcessor {
 						ShowWarningError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " \\ expected on this line", EchoInputFile );
 					}
 				} else {
-					ReadInputLine( IDDFile, CurPos, BlankLine, InputLineLength, EndofFile );
+					ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile );
 					if ( BlankLine || EndofFile ) continue;
 					Pos = scan( InputLine.substr( CurPos, InputLineLength - CurPos ), ",;" );
 				}
 			} else {
-				ReadInputLine( IDDFile, CurPos, BlankLine, InputLineLength, EndofFile );
+				ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile );
 				continue;
 			}
 
 			if ( Pos == std::string::npos ) {
 				// must be time to read another line
-				ReadInputLine( IDDFile, CurPos, BlankLine, InputLineLength, EndofFile );
+				ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile );
 				if ( BlankLine || EndofFile ) continue;
 			} else {
 				if ( InputLine[ CurPos + Pos ] == ';' ) {
@@ -982,12 +903,12 @@ namespace InputProcessor {
 		}
 
 		// Reached end of object def but there may still be more \ lines to parse....
-		// Goes until next object is encountered ("not blankline") or end of IDDFile
+		// Goes until next object is encountered ("not blankline") or end of idd file
 		// If last object is not numeric, then exit immediately....
 		BlankLine = true;
 		while ( BlankLine && ! EndofFile ) {
 			// It's a numeric object as last one...
-			ReadInputLine( IDDFile, CurPos, BlankLine, InputLineLength, EndofFile, MinMax, WhichMinMax, MinMaxString, Value, Default, AlphDefaultString, AutoSize, AutoCalculate, RetainCaseFlag, ErrorsFoundFlag );
+			ReadInputLine( idd_stream, CurPos, BlankLine, EndofFile, MinMax, WhichMinMax, MinMaxString, Value, Default, AlphDefaultString, AutoSize, AutoCalculate, RetainCaseFlag, ErrorsFoundFlag );
 			if ( MinMax ) {
 				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).MinMaxChk = true;
 				NumRangeChecks( ObjectDef( NumObjectDefs ).NumNumeric ).FieldNumber = Count;
@@ -1024,7 +945,7 @@ namespace InputProcessor {
 		}
 
 		if ( ! BlankLine ) {
-			gio::backspace( IDDFile );
+			Backspace( idd_stream );
 			EchoInputLine = false;
 		}
 
@@ -1039,17 +960,9 @@ namespace InputProcessor {
 		ObjectDef( NumObjectDefs ).NumParams = Count; // Also the total of ObjectDef(..)%NumAlpha+ObjectDef(..)%NumNumeric
 		ObjectDef( NumObjectDefs ).MinNumFields = MinimumNumberOfFields;
 		if ( ObsoleteObject ) {
-			TempAFD.allocate( NumObsoleteObjects + 1 );
-			if ( NumObsoleteObjects > 0 ) {
-				TempAFD( {1,NumObsoleteObjects} ) = ObsoleteObjectsRepNames;
-			}
-			TempAFD( NumObsoleteObjects + 1 ) = ReplacementName;
-			ObsoleteObjectsRepNames.deallocate();
-			++NumObsoleteObjects;
-			ObsoleteObjectsRepNames.allocate( NumObsoleteObjects );
-			ObsoleteObjectsRepNames = TempAFD;
+			ObsoleteObjectsRepNames.redimension( ++NumObsoleteObjects );
+			ObsoleteObjectsRepNames( NumObsoleteObjects ) = ReplacementName;
 			ObjectDef( NumObjectDefs ).ObsPtr = NumObsoleteObjects;
-			TempAFD.deallocate();
 		}
 		if ( RequiredObject ) {
 			ObjectDef( NumObjectDefs ).RequiredObject = true;
@@ -1177,7 +1090,7 @@ namespace InputProcessor {
 	}
 
 	void
-	ProcessInputDataFile()
+	ProcessInputDataFile( std::istream & idf_stream )
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -1211,13 +1124,9 @@ namespace InputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-		static bool EndofFile( false );
-		bool BlankLine;
+		bool EndofFile( false );
+		bool BlankLine( false );
 		std::string::size_type Pos;
-
-		// Object Data
-		FArray1D< FileSectionsDefinition > TempSectionsonFile; // Used during reallocation procedure
-		FArray1D< LineDefinition > TempIDFRecords; // Used during reallocation procedure
 
 		MaxIDFRecords = ObjectsIDFAllocInc;
 		NumIDFRecords = 0;
@@ -1230,42 +1139,39 @@ namespace InputProcessor {
 		LineItem.NumBlank.allocate( MaxNumericArgsFound );
 		LineItem.Alphas.allocate( MaxAlphaArgsFound );
 		LineItem.AlphBlank.allocate( MaxAlphaArgsFound );
-		EndofFile = false;
+
+		// Check file
+		cross_platform_get_line( idf_stream, InputLine );
+		std::string::size_type const len_line( InputLine.length() );
+		if ( idf_stream && ( len_line > 0 ) ) {
+			if ( int( InputLine[ len_line - 1 ] ) == iUnicode_end ) {
+				ShowSevereError( "ProcessInput: \"in.idf\" appears to be a Unicode or binary file." );
+				ShowContinueError( "...This file cannot be read by this program. Please save as PC or Unix file and try again" );
+				ShowFatalError( "Program terminates due to previous condition." );
+			}
+		}
+		if ( idf_stream ) idf_stream.seekg( 0, std::ios::beg );
 
 		while ( ! EndofFile ) {
-			ReadInputLine( IDFFile, Pos, BlankLine, InputLineLength, EndofFile );
+			ReadInputLine( idf_stream, Pos, BlankLine, EndofFile );
 			if ( BlankLine || EndofFile ) continue;
 			Pos = scan( InputLine, ",;" );
 			if ( Pos != std::string::npos ) {
 				if ( InputLine[ Pos ] == ';' ) {
 					ValidateSection( InputLine.substr( 0, Pos ), NumLines );
 					if ( NumIDFSections == MaxIDFSections ) {
-						TempSectionsonFile.allocate( MaxIDFSections + SectionsIDFAllocInc );
-						TempSectionsonFile( {1,MaxIDFSections} ) = SectionsOnFile;
-						SectionsOnFile.deallocate();
-						SectionsOnFile.allocate( MaxIDFSections + SectionsIDFAllocInc );
-						SectionsOnFile = TempSectionsonFile;
-						TempSectionsonFile.deallocate();
-						MaxIDFSections += SectionsIDFAllocInc;
+						SectionsOnFile.redimension( MaxIDFSections += SectionsIDFAllocInc );
 					}
 				} else {
-					ValidateObjectandParse( InputLine.substr( 0, Pos ), Pos, EndofFile );
+					ValidateObjectandParse( idf_stream, InputLine.substr( 0, Pos ), Pos, EndofFile );
 					if ( NumIDFRecords == MaxIDFRecords ) {
-						TempIDFRecords.allocate( MaxIDFRecords + ObjectsIDFAllocInc );
-						TempIDFRecords( {1,MaxIDFRecords} ) = IDFRecords;
-						IDFRecords.deallocate();
-						IDFRecords.allocate( MaxIDFRecords + ObjectsIDFAllocInc );
-						IDFRecords = TempIDFRecords;
-						TempIDFRecords.deallocate();
-						MaxIDFRecords += ObjectsIDFAllocInc;
+						IDFRecords.redimension( MaxIDFRecords += ObjectsIDFAllocInc );
 					}
 				}
-			} else {
-				//Error condition, no , or ; on first line
+			} else { // Error condition, no , or ; on first line
 				ShowMessage( "IP: IDF Line~" + IPTrimSigDigits( NumLines ) + ' ' + InputLine );
 				ShowSevereError( ", or ; expected on this line", EchoInputFile );
 			}
-
 		}
 
 		//   IF (NumIDFSections > 0) THEN
@@ -1327,9 +1233,6 @@ namespace InputProcessor {
 		int Found;
 		int OFound;
 
-		// Object Data
-		FArray1D< SectionsDefinition > TempSectionDef; // Like SectionDef, used during Re-allocation
-
 		SqueezedSection = MakeUPPERCase( stripped( ProposedSection ) );
 		if ( len( stripped( ProposedSection ) ) > static_cast< std::string::size_type >( MaxSectionNameLength ) ) {
 			ShowWarningError( "IP: Section length exceeds maximum, will be truncated=" + ProposedSection, EchoInputFile );
@@ -1348,13 +1251,7 @@ namespace InputProcessor {
 				if ( OFound != 0 ) {
 					AddRecordFromSection( OFound );
 				} else if ( NumSectionDefs == MaxSectionDefs ) {
-					TempSectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-					TempSectionDef( {1,MaxSectionDefs} ) = SectionDef;
-					SectionDef.deallocate();
-					SectionDef.allocate( MaxSectionDefs + SectionDefAllocInc );
-					SectionDef = TempSectionDef;
-					TempSectionDef.deallocate();
-					MaxSectionDefs += SectionDefAllocInc;
+					SectionDef.redimension( MaxSectionDefs += SectionDefAllocInc );
 				}
 				++NumSectionDefs;
 				SectionDef( NumSectionDefs ).Name = SqueezedSection;
@@ -1393,6 +1290,7 @@ namespace InputProcessor {
 
 	void
 	ValidateObjectandParse(
+		std::istream & idf_stream,
 		std::string const & ProposedObject,
 		std::string::size_type & CurPos,
 		bool & EndofFile
@@ -1441,7 +1339,7 @@ namespace InputProcessor {
 		bool EndofObject;
 		bool BlankLine;
 		static bool errFlag( false );
-		int LenLeft;
+		std::string::size_type LenLeft;
 		int Count;
 		std::string FieldString;
 		std::string FieldNameString;
@@ -1646,7 +1544,7 @@ namespace InputProcessor {
 					}
 				}
 			} else {
-				ReadInputLine( IDFFile, CurPos, BlankLine, InputLineLength, EndofFile );
+				ReadInputLine( idf_stream, CurPos, BlankLine, EndofFile );
 				continue;
 			}
 			if ( Pos != std::string::npos ) {
@@ -1888,12 +1786,12 @@ namespace InputProcessor {
 			IDFRecords( NumIDFRecords ).NumAlphas = LineItem.NumAlphas;
 			IDFRecords( NumIDFRecords ).ObjectDefPtr = LineItem.ObjectDefPtr;
 			IDFRecords( NumIDFRecords ).Alphas.allocate( LineItem.NumAlphas );
-			IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
-			IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
-			IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
 			IDFRecords( NumIDFRecords ).Alphas = LineItem.Alphas( {1,LineItem.NumAlphas} );
+			IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
 			IDFRecords( NumIDFRecords ).AlphBlank = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
+			IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
 			IDFRecords( NumIDFRecords ).Numbers = LineItem.Numbers( {1,LineItem.NumNumbers} );
+			IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
 			IDFRecords( NumIDFRecords ).NumBlank = LineItem.NumBlank( {1,LineItem.NumNumbers} );
 			if ( LineItem.NumNumbers > 0 ) {
 				for ( Count = 1; Count <= LineItem.NumNumbers; ++Count ) {
@@ -2294,8 +2192,8 @@ namespace InputProcessor {
 		NumAlphas = 0; //Autodesk:Uninit Force default initialization
 		NumNumbers = 0; //Autodesk:Uninit Force default initialization
 
-		MaxAlphas = size( Alphas, 1 );
-		MaxNumbers = size( Numbers, 1 );
+		MaxAlphas = isize( Alphas, 1 );
+		MaxNumbers = isize( Numbers, 1 );
 		GoodItem = false;
 
 		if ( ! allocated( AlphaArgs ) ) {
@@ -2626,8 +2524,8 @@ namespace InputProcessor {
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
-		// na
+		// Using
+		using DataStringGlobals::NL;
 
 		// Argument array dimensioning
 
@@ -2674,7 +2572,7 @@ namespace InputProcessor {
 				}
 			}
 		} else {
-			gio::write( EchoInputFile, fmtLD ) << " Requested Record" << Which << " not in range, 1 -- " << NumIDFRecords;
+			if ( echo_stream ) *echo_stream << " Requested Record " << Which << " not in range, 1 -- " << NumIDFRecords << NL;
 		}
 
 	}
@@ -2683,10 +2581,9 @@ namespace InputProcessor {
 
 	void
 	ReadInputLine(
-		int const UnitNumber,
+		std::istream & in_stream,
 		std::string::size_type & CurPos,
 		bool & BlankLine,
-		int & InputLineLength,
 		bool & EndofFile
 	)
 	{
@@ -2706,18 +2603,15 @@ namespace InputProcessor {
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
-		// na
+		// Using
+		using DataStringGlobals::NL;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static char const TabChar( '\t' );
-		static gio::Fmt const fmt_1( "(I7,1X,A)" );
-		static gio::Fmt const fmt_2( "(1X,A,1X,A)" );
-		static gio::Fmt const fmt_3( "('      ***** Tabs eliminated from above line')" );
-		static gio::Fmt const fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
+		char const SPC( ' ' );
+		char const TAB( '\t' );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2729,31 +2623,15 @@ namespace InputProcessor {
 		int ReadStat;
 		std::string::size_type Pos;
 		std::string::size_type Slash;
-		std::string::size_type P1;
-		bool TabsInLine;
 		std::string::size_type NSpace;
 		bool errFlag;
-		std::string cNumLines;
-		bool LineTooLong;
 
 		errFlag = false;
-		LineTooLong = false;
-		{ IOFlags flags; gio::read_line( UnitNumber, flags, InputLine ); ReadStat = flags.ios(); }
+		{ IOFlags flags; cross_platform_get_line( in_stream, InputLine ); flags.set_status( in_stream ); ReadStat = flags.ios(); }
 
 		if ( ReadStat != 0 ) InputLine.clear();
+		std::replace( InputLine.begin(), InputLine.end(), TAB, SPC ); // Replace tabs with spaces
 
-		if ( len_trim( InputLine ) > MaxInputLineLength ) {
-			LineTooLong = true;
-			InputLine.erase( MaxInputLineLength );
-		}
-
-		P1 = scan( InputLine, TabChar );
-		TabsInLine = false;
-		while ( P1 != std::string::npos ) {
-			TabsInLine = true;
-			InputLine[ P1 ] = ' ';
-			P1 = scan( InputLine, TabChar );
-		}
 		BlankLine = false;
 		CurPos = 0;
 		if ( ReadStat < 0 ) {
@@ -2761,33 +2639,17 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( NumLines < 10000000 ) {
-					gio::write( EchoInputFile, fmt_1 ) << NumLines << InputLine;
-				} else {
-					cNumLines = IPTrimSigDigits( NumLines );
-					gio::write( EchoInputFile, fmt_2 ) << cNumLines << InputLine;
-				}
-				if ( TabsInLine ) gio::write( EchoInputFile, fmt_3 );
-				if ( LineTooLong ) {
-					ShowSevereError( "Input line longer than maximum length allowed=" + IPTrimSigDigits( MaxInputLineLength ) + " characters. Other errors may follow." );
-					ShowContinueError( ".. at line=" + IPTrimSigDigits( NumLines ) + ", first 50 characters=" + InputLine.substr( 0, 50 ) );
-					gio::write( EchoInputFile, fmt_4 );
-				}
+				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
 			}
 			EchoInputLine = true;
-			InputLineLength = len_trim( InputLine );
+			InputLineLength = static_cast< int >( len_trim( InputLine ) );
 			if ( InputLineLength == 0 ) {
 				BlankLine = true;
 			}
-			if ( ProcessingIDD ) {
-				Pos = scan( InputLine, "!\\" ); // 4/30/09 remove ~
-				Slash = index( InputLine, '\\' );
-			} else {
-				Pos = scan( InputLine, '!' ); // 4/30/09 remove ~
-				Slash = std::string::npos;
-			}
+			Pos = ( ProcessingIDD ? InputLine.find_first_of( "!\\" ) : InputLine.find( '!' ) ); // 4/30/09 remove ~
 			if ( Pos != std::string::npos ) {
-				InputLineLength = Pos + 1;
+				Slash = ( ProcessingIDD ? InputLine.find( '\\' ) : std::string::npos );
+				InputLineLength = static_cast< int >( Pos + 1 );
 				if ( Pos > 0 ) {
 					if ( is_blank( InputLine.substr( 0, Pos ) ) ) {
 						BlankLine = true;
@@ -2795,76 +2657,88 @@ namespace InputProcessor {
 				} else {
 					BlankLine = true;
 				}
-				if ( Slash != std::string::npos && Pos == Slash ) {
+				if ( ( Slash != std::string::npos ) && ( Pos == Slash ) ) {
 					std::string UCInputLine( InputLine, Pos );
 					uppercase( UCInputLine ); // With this many comparisons probably faster to uppercase once vs many c-i comparisons
 					FieldSet = false;
-					if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
-						// Capture Field Name
-						CurrentFieldName = InputLine.substr( Slash + 6 );
-						strip( CurrentFieldName );
-						P1 = scan( CurrentFieldName, '!' );
-						if ( P1 != std::string::npos ) CurrentFieldName.erase( P1 );
-						FieldSet = true;
-					} else if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
-						RequiredField = true;
-					} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
-						RequiredObject = true;
-					} else if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
-						UniqueObject = true;
-					} else if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
-						ExtensibleObject = true;
-						if ( UCInputLine[ 11 ] != ':' ) {
-							ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
-						} else { // process number
-							std::string const number_str( UCInputLine.substr( 12 ) );
-							NSpace = scan( number_str, " !" );
-							if ( NSpace != std::string::npos ) {
-								ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
-								if ( errFlag ) {
-									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
+					switch ( UCInputLine.length() > 1 ? UCInputLine[ 1 ] : ' ' ) { //Performance Switch to reduce expensive string operations
+					case 'E':
+						if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
+							ExtensibleObject = true;
+							if ( UCInputLine[ 11 ] != ':' ) {
+								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
+							} else { // process number
+								std::string const number_str( UCInputLine.substr( 12 ) );
+								NSpace = scan( number_str, " !" );
+								if ( NSpace != std::string::npos ) {
+									ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+									if ( errFlag ) {
+										ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
+									}
+								} else {
+									ExtensibleNumFields = 0.0;
+									errFlag = false;
 								}
-							} else {
-								ExtensibleNumFields = 0.0;
-								errFlag = false;
 							}
 						}
-					} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
-						//RetainCase = true; // Arg not present
-					} else if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
-						//RequiredField = true;
-						NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
-						if ( NSpace == std::string::npos ) {
-							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
-							errFlag = true;
-							MinimumNumberOfFields = 0;
-						} else {
-							std::string const number_str( UCInputLine.substr( 11 + NSpace ) );
-							NSpace = scan( number_str, " !" );
+						break;
+					case 'F':
+						if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
+							// Capture Field Name
+							CurrentFieldName = InputLine.substr( Slash + 6 );
+							strip( CurrentFieldName );
+							FieldSet = true;
+						}
+						break;
+					case 'M':
+						if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
+							//RequiredField = true;
+							NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
 							if ( NSpace == std::string::npos ) {
-								MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
+								errFlag = true;
+								MinimumNumberOfFields = 0;
 							} else {
-								MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
-							}
-							if ( errFlag ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
+								std::string const number_str( trimmed( UCInputLine.substr( 11 + NSpace ) ) );
+								NSpace = scan( number_str, " !" );
+								if ( NSpace == std::string::npos ) {
+									MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
+								} else {
+									MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+								}
+								if ( errFlag ) {
+									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
+								}
 							}
 						}
-					} else if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
-						NSpace = index( UCInputLine.substr( 9 ), "=>" );
-						if ( NSpace == std::string::npos ) {
-							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
-							errFlag = true;
-						} else {
-							std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
-							NSpace = scan( name_str, '!' );
+						break;
+					case 'O':
+						if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
+							NSpace = index( UCInputLine.substr( 9 ), "=>" );
 							if ( NSpace == std::string::npos ) {
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
+								errFlag = true;
+							} else {
+								std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
 								ReplacementName = trimmed( name_str );
-							} else {
-								ReplacementName = trimmed( name_str.substr( 0, NSpace ) );
+								ObsoleteObject = true;
 							}
-							ObsoleteObject = true;
 						}
+						break;
+					case 'R':
+						if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
+							RequiredField = true;
+						} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
+							RequiredObject = true;
+//						} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
+//							//RetainCase = true; // Arg not present
+						}
+						break;
+					case 'U':
+						if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
+							UniqueObject = true;
+						}
+						break;
 					}
 				}
 			}
@@ -2874,10 +2748,9 @@ namespace InputProcessor {
 
 	void
 	ReadInputLine(
-		int const UnitNumber,
+		std::istream & in_stream,
 		std::string::size_type & CurPos,
 		bool & BlankLine,
-		int & InputLineLength,
 		bool & EndofFile,
 		bool & MinMax,
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
@@ -2907,18 +2780,15 @@ namespace InputProcessor {
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
-		// na
+		// Using
+		using DataStringGlobals::NL;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static char const TabChar( '\t' );
-		static gio::Fmt const fmt_1( "(I7,1X,A)" );
-		static gio::Fmt const fmt_2( "(1X,A,1X,A)" );
-		static gio::Fmt const fmt_3( "('      ***** Tabs eliminated from above line')" );
-		static gio::Fmt const fmt_4( "('      ***** Previous line is longer than allowed length for input line')" );
+		char const SPC( ' ' );
+		char const TAB( '\t' );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2931,31 +2801,16 @@ namespace InputProcessor {
 		std::string::size_type Pos;
 		std::string::size_type Slash;
 		std::string::size_type P1;
-		bool TabsInLine;
 		std::string::size_type NSpace;
 		bool errFlag;
-		std::string cNumLines;
-		bool LineTooLong;
 		int ErrLevel;
 
 		errFlag = false;
-		LineTooLong = false;
-		{ IOFlags flags; gio::read_line( UnitNumber, flags, InputLine ); ReadStat = flags.ios(); }
+		{ IOFlags flags; cross_platform_get_line( in_stream, InputLine ); flags.set_status( in_stream ); ReadStat = flags.ios(); }
 
 		if ( ReadStat != 0 ) InputLine.clear();
+		std::replace( InputLine.begin(), InputLine.end(), TAB, SPC ); // Replace tabs with spaces
 
-		if ( len_trim( InputLine ) > MaxInputLineLength ) {
-			LineTooLong = true;
-			InputLine.erase( MaxInputLineLength );
-		}
-
-		P1 = scan( InputLine, TabChar );
-		TabsInLine = false;
-		while ( P1 != std::string::npos ) {
-			TabsInLine = true;
-			InputLine[ P1 ] = ' ';
-			P1 = scan( InputLine, TabChar );
-		}
 		BlankLine = false;
 		CurPos = 0;
 		if ( ReadStat < 0 ) {
@@ -2963,33 +2818,17 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if ( NumLines < 10000000 ) {
-					gio::write( EchoInputFile, fmt_1 ) << NumLines << InputLine;
-				} else {
-					cNumLines = IPTrimSigDigits( NumLines );
-					gio::write( EchoInputFile, fmt_2 ) << cNumLines << InputLine;
-				}
-				if ( TabsInLine ) gio::write( EchoInputFile, fmt_3 );
-				if ( LineTooLong ) {
-					ShowSevereError( "Input line longer than maximum length allowed=" + IPTrimSigDigits( MaxInputLineLength ) + " characters. Other errors may follow." );
-					ShowContinueError( ".. at line=" + IPTrimSigDigits( NumLines ) + ", first 50 characters=" + InputLine.substr( 0, 50 ) );
-					gio::write( EchoInputFile, fmt_4 );
-				}
+				if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
 			}
 			EchoInputLine = true;
-			InputLineLength = len_trim( InputLine );
+			InputLineLength = static_cast< int >( len_trim( InputLine ) );
 			if ( InputLineLength == 0 ) {
 				BlankLine = true;
 			}
-			if ( ProcessingIDD ) {
-				Pos = scan( InputLine, "!\\" ); // 4/30/09 remove ~
-				Slash = index( InputLine, '\\' );
-			} else {
-				Pos = scan( InputLine, '!' ); // 4/30/09 remove ~
-				Slash = std::string::npos;
-			}
+			Pos = ( ProcessingIDD ? InputLine.find_first_of( "!\\" ) : InputLine.find( '!' ) ); // 4/30/09 remove ~
 			if ( Pos != std::string::npos ) {
-				InputLineLength = Pos + 1;
+				Slash = ( ProcessingIDD ? InputLine.find( '\\' ) : std::string::npos );
+				InputLineLength = static_cast< int >( Pos + 1 );
 				if ( Pos > 0 ) {
 					if ( is_blank( InputLine.substr( 0, Pos ) ) ) {
 						BlankLine = true;
@@ -2997,7 +2836,7 @@ namespace InputProcessor {
 				} else {
 					BlankLine = true;
 				}
-				if ( Slash != std::string::npos && Pos == Slash ) {
+				if ( ( Slash != std::string::npos ) && ( Pos == Slash ) ) {
 					std::string UCInputLine( InputLine, Pos );
 					uppercase( UCInputLine ); // With this many comparisons probably faster to uppercase once vs many c-i comparisons
 					FieldSet = false;
@@ -3005,102 +2844,127 @@ namespace InputProcessor {
 					Default = false;
 					AutoSizable = false;
 					AutoCalculatable = false;
-					if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
-						// Capture Field Name
-						CurrentFieldName = InputLine.substr( Slash + 6 );
-						strip( CurrentFieldName );
-						P1 = scan( CurrentFieldName, '!' );
-						if ( P1 != std::string::npos ) CurrentFieldName.erase( P1 );
-						FieldSet = true;
-					} else if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
-						RequiredField = true;
-					} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
-						RequiredObject = true;
-					} else if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
-						UniqueObject = true;
-					} else if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
-						ExtensibleObject = true;
-						if ( UCInputLine[ 11 ] != ':' ) {
-							ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
-						} else { // process number
-							std::string const number_str( UCInputLine.substr( 12 ) );
-							NSpace = scan( number_str, " !" );
-							if ( NSpace != std::string::npos ) {
-								ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
-								if ( errFlag ) {
-									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
+					switch ( UCInputLine.length() > 1 ? UCInputLine[ 1 ] : ' ' ) { //Performance Switch to reduce expensive string operations
+					case 'A':
+						if ( has_prefix( UCInputLine, "\\AUTOS" ) ) { // AutoSizable arg
+							AutoSizable = true;
+							ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+							if ( ErrLevel > 0 ) {
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autosize designation -- invalid number=" + UCInputLine, EchoInputFile );
+								errFlag = true;
+							}
+						} else if ( has_prefix( UCInputLine, "\\AUTOC" ) ) { // AutoCalculatable arg
+							AutoCalculatable = true;
+							ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+							if ( ErrLevel > 0 ) {
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autocalculate designation -- invalid number=" + UCInputLine, EchoInputFile );
+								errFlag = true;
+							}
+						}
+						break;
+					case 'D':
+						if ( has_prefix( UCInputLine, "\\DEFAULT" ) ) { // Default arg
+							// WhichMinMax, MinMaxString not filled here
+							Default = true;
+							ProcessMinMaxDefLine( InputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+							if ( ( ! RetainCase ) && ( ! DefString.empty() ) ) uppercase( DefString );
+							if ( ErrLevel > 1 ) {
+								ShowContinueError( "Blank Default Field Encountered", EchoInputFile );
+								errFlag = true;
+							}
+						}
+						break;
+					case 'E':
+						if ( has_prefix( UCInputLine, "\\EXTENSIBLE" ) ) { // Extensible arg
+							ExtensibleObject = true;
+							if ( UCInputLine[ 11 ] != ':' ) {
+								ShowFatalError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal definition for extensible object, should be \"\\extensible:<num>\"", EchoInputFile );
+							} else { // process number
+								std::string const number_str( UCInputLine.substr( 12 ) );
+								NSpace = scan( number_str, " !" );
+								if ( NSpace != std::string::npos ) {
+									ExtensibleNumFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+									if ( errFlag ) {
+										ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\extensible:<num>", EchoInputFile );
+									}
+								} else {
+									ExtensibleNumFields = 0.0;
+									errFlag = false;
 								}
-							} else {
-								ExtensibleNumFields = 0.0;
-								errFlag = false;
 							}
 						}
-					} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
-						RetainCase = true;
-					} else if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
-						//RequiredField = true;
-						NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
-						if ( NSpace == std::string::npos ) {
-							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
-							errFlag = true;
-							MinimumNumberOfFields = 0;
-						} else {
-							std::string const number_str( UCInputLine.substr( 11 + NSpace ) );
-							NSpace = scan( number_str, " !" );
+						break;
+					case 'F':
+						if ( has_prefix( UCInputLine, "\\FIELD" ) ) {
+							// Capture Field Name
+							CurrentFieldName = InputLine.substr( Slash + 6 );
+							strip( CurrentFieldName );
+							P1 = scan( CurrentFieldName, '!' );
+							if ( P1 != std::string::npos ) CurrentFieldName.erase( P1 );
+							FieldSet = true;
+						}
+						break;
+					case 'M':
+						if ( has_prefix( UCInputLine, "\\MIN-FIELDS" ) ) { // Min-Fields arg
+							//RequiredField = true;
+							NSpace = FindNonSpace( UCInputLine.substr( 11 ) );
 							if ( NSpace == std::string::npos ) {
-								MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need number for \\Min-Fields", EchoInputFile );
+								errFlag = true;
+								MinimumNumberOfFields = 0;
 							} else {
-								MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+								std::string const number_str( UCInputLine.substr( 11 + NSpace ) );
+								NSpace = scan( number_str, " !" );
+								if ( NSpace == std::string::npos ) {
+									MinimumNumberOfFields = int( ProcessNumber( number_str, errFlag ) );
+								} else {
+									MinimumNumberOfFields = int( ProcessNumber( number_str.substr( 0, NSpace ), errFlag ) );
+								}
+								if ( errFlag ) {
+									ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
+								}
 							}
-							if ( errFlag ) {
-								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Illegal Number for \\Min-Fields", EchoInputFile );
+						} else if ( has_prefix( UCInputLine, "\\MINIMUM" ) || has_prefix( UCInputLine, "\\MAXIMUM" ) ) { // Min/Max args
+							MinMax = true;
+							ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
+							if ( ErrLevel > 0 ) {
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Minimum/Maximum designation -- invalid number=" + UCInputLine, EchoInputFile );
+								errFlag = true;
 							}
 						}
-					} else if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
-						NSpace = index( UCInputLine.substr( 9 ), "=>" );
-						if ( NSpace == std::string::npos ) {
-							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
-							errFlag = true;
-						} else {
-							std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
-							NSpace = scan( name_str, '!' );
+						break;
+					case 'O':
+						if ( has_prefix( UCInputLine, "\\OBSOLETE" ) ) { // Obsolete arg
+							NSpace = index( UCInputLine.substr( 9 ), "=>" );
 							if ( NSpace == std::string::npos ) {
-								ReplacementName = trimmed( name_str );
+								ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Need replacement object for \\Obsolete objects", EchoInputFile );
+								errFlag = true;
 							} else {
-								ReplacementName = trimmed( name_str.substr( 0, NSpace ) );
+								std::string const name_str( InputLine.substr( Pos + 9 + NSpace + 2 ) );
+								NSpace = scan( name_str, '!' );
+								if ( NSpace == std::string::npos ) {
+									ReplacementName = trimmed( name_str );
+								} else {
+									ReplacementName = trimmed( name_str.substr( 0, NSpace ) );
+								}
+								ObsoleteObject = true;
 							}
-							ObsoleteObject = true;
 						}
-					} else if ( has_prefix( UCInputLine, "\\MINIMUM" ) || has_prefix( UCInputLine, "\\MAXIMUM" ) ) { // Min/Max args
-						MinMax = true;
-						ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-						if ( ErrLevel > 0 ) {
-							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Minimum/Maximum designation -- invalid number=" + UCInputLine, EchoInputFile );
-							errFlag = true;
+						break;
+					case 'R':
+						if ( has_prefix( UCInputLine, "\\REQUIRED-FIELD" ) ) { // Required-field arg
+							RequiredField = true;
+						} else if ( has_prefix( UCInputLine, "\\REQUIRED-OBJECT" ) ) { // Required-object arg
+							RequiredObject = true;
+						} else if ( has_prefix( UCInputLine, "\\RETAINCASE" ) ) {
+							RetainCase = true;
 						}
-					} else if ( has_prefix( UCInputLine, "\\DEFAULT" ) ) { // Default arg
-						// WhichMinMax, MinMaxString not filled here
-						Default = true;
-						ProcessMinMaxDefLine( InputLine.substr( Pos ), WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-						if ( ( ! RetainCase ) && ( ! DefString.empty() ) ) uppercase( DefString );
-						if ( ErrLevel > 1 ) {
-							ShowContinueError( "Blank Default Field Encountered", EchoInputFile );
-							errFlag = true;
+						break;
+					case 'U':
+						if ( has_prefix( UCInputLine, "\\UNIQUE-OBJECT" ) ) { // Unique-object arg
+							UniqueObject = true;
 						}
-					} else if ( has_prefix( UCInputLine, "\\AUTOS" ) ) { // AutoSizable arg
-						AutoSizable = true;
-						ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-						if ( ErrLevel > 0 ) {
-							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autosize designation -- invalid number=" + UCInputLine, EchoInputFile );
-							errFlag = true;
-						}
-					} else if ( has_prefix( UCInputLine, "\\AUTOC" ) ) { // AutoCalculatable arg
-						AutoCalculatable = true;
-						ProcessMinMaxDefLine( UCInputLine, WhichMinMax, MinMaxString, Value, DefString, ErrLevel );
-						if ( ErrLevel > 0 ) {
-							ShowSevereError( "IP: IDD Line=" + IPTrimSigDigits( NumLines ) + " Error in Autocalculate designation -- invalid number=" + UCInputLine, EchoInputFile );
-							errFlag = true;
-						}
+						break;
 					}
 				}
 			}
@@ -3175,20 +3039,10 @@ namespace InputProcessor {
 		int NumNewParams;
 		int NumExtendFields;
 		int NumParams;
-		int Loop;
 		int Count;
-		int Item;
 		//  LOGICAL :: MaxArgsChanged
-		FArray1D_bool AorN;
-		FArray1D_bool TempLogical;
-		FArray1D< Real64 > TempReals;
-		FArray1D_string TempFieldCharacter;
-		FArray1D_string TempCharacter;
 		std::string charout;
 		static std::string CurObject;
-
-		// Object Data
-		FArray1D< RangeCheckDef > TempChecks;
 
 		gio::write( EchoInputFile, fmtA ) << "Attempting to auto-extend object=" + ObjectDef( ObjectNum ).Name;
 		if ( CurObject != ObjectDef( ObjectNum ).Name ) {
@@ -3202,92 +3056,46 @@ namespace InputProcessor {
 		Count = NumParams - ObjectDef( ObjectNum ).ExtensibleNum + 1;
 		//  MaxArgsChanged=.FALSE.
 
-		AorN.allocate( ObjectDef( ObjectNum ).ExtensibleNum );
-		AorN = false;
-		for ( Loop = NumParams; Loop >= Count; --Loop ) {
-			if ( ObjectDef( ObjectNum ).AlphaOrNumeric( Loop ) ) {
+		FArray1D_bool AorN( ObjectDef( ObjectNum ).ExtensibleNum, false );
+		for ( int Loop = Count, Item = 1; Loop <= NumParams; ++Loop, ++Item ) {
+			bool const AON_Loop( ObjectDef( ObjectNum ).AlphaOrNumeric( Loop ) );
+			if ( AON_Loop ) {
 				++NumAlphaField;
 			} else {
 				++NumNumericField;
 			}
-		}
-		Item = 0;
-		for ( Loop = Count; Loop <= NumParams; ++Loop ) {
-			++Item;
-			AorN( Item ) = ObjectDef( ObjectNum ).AlphaOrNumeric( Loop );
+			AorN( Item ) = AON_Loop;
 		}
 		NumNewAlphas = NumAlphaField * NewAlloc;
 		NumNewNumerics = NumNumericField * NewAlloc;
 		NumNewParams = NumParams + NumNewAlphas + NumNewNumerics;
 		NumExtendFields = NumAlphaField + NumNumericField;
-		TempLogical.allocate( NumNewParams );
-		TempLogical( {1,NumParams} ) = ObjectDef( ObjectNum ).AlphaOrNumeric;
-		TempLogical( {NumParams + 1,NumNewParams} ) = false;
-		ObjectDef( ObjectNum ).AlphaOrNumeric.deallocate();
-		ObjectDef( ObjectNum ).AlphaOrNumeric.allocate( NumNewParams );
-		ObjectDef( ObjectNum ).AlphaOrNumeric = TempLogical;
-		TempLogical.deallocate();
-		for ( Loop = NumParams + 1; Loop <= NumNewParams; Loop += NumExtendFields ) {
+		ObjectDef( ObjectNum ).AlphaOrNumeric.redimension( NumNewParams, false );
+		for ( int Loop = NumParams + 1; Loop <= NumNewParams; Loop += NumExtendFields ) {
 			ObjectDef( ObjectNum ).AlphaOrNumeric( {Loop,Loop+NumExtendFields-1} ) = AorN;
 		}
 		AorN.deallocate(); // done with this object AorN array.
 
 		// required fields -- can't be extended and required.
-		TempLogical.allocate( NumNewParams );
-		TempLogical( {1,NumParams} ) = ObjectDef( ObjectNum ).ReqField;
-		TempLogical( {NumParams + 1,NumNewParams} ) = false;
-		ObjectDef( ObjectNum ).ReqField.deallocate();
-		ObjectDef( ObjectNum ).ReqField.allocate( NumNewParams );
-		ObjectDef( ObjectNum ).ReqField = TempLogical;
-		TempLogical.deallocate();
+		ObjectDef( ObjectNum ).ReqField.redimension( NumNewParams, false );
 
-		TempLogical.allocate( NumNewParams );
-		TempLogical( {1,NumParams} ) = ObjectDef( ObjectNum ).AlphRetainCase;
-		TempLogical( {NumParams + 1,NumNewParams} ) = false;
-		ObjectDef( ObjectNum ).AlphRetainCase.deallocate();
-		ObjectDef( ObjectNum ).AlphRetainCase.allocate( NumNewParams );
-		ObjectDef( ObjectNum ).AlphRetainCase = TempLogical;
-		TempLogical.deallocate();
+		ObjectDef( ObjectNum ).AlphRetainCase.redimension( NumNewParams, false );
 
 		if ( NumAlphaField > 0 ) {
-			TempFieldCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			TempFieldCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldChks;
-			TempFieldCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
-			ObjectDef( ObjectNum ).AlphFieldChks.deallocate();
-			ObjectDef( ObjectNum ).AlphFieldChks.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			ObjectDef( ObjectNum ).AlphFieldChks = TempFieldCharacter;
-			TempFieldCharacter.deallocate();
-			for ( Loop = ObjectDef( ObjectNum ).NumAlpha + 1; Loop <= ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas; ++Loop ) {
+			ObjectDef( ObjectNum ).AlphFieldChks.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
+			for ( int Loop = ObjectDef( ObjectNum ).NumAlpha + 1, Loop_end = ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas; Loop <= Loop_end; ++Loop ) {
 				++ObjectDef( ObjectNum ).LastExtendAlpha;
 				charout = IPTrimSigDigits( ObjectDef( ObjectNum ).LastExtendAlpha );
 				ObjectDef( ObjectNum ).AlphFieldChks( Loop ) = "Extended Alpha Field " + charout;
 			}
 
-			TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = ObjectDef( ObjectNum ).AlphFieldDefs;
-			TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
-			ObjectDef( ObjectNum ).AlphFieldDefs.deallocate();
-			ObjectDef( ObjectNum ).AlphFieldDefs.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-			ObjectDef( ObjectNum ).AlphFieldDefs = TempCharacter;
-			TempCharacter.deallocate();
+			ObjectDef( ObjectNum ).AlphFieldDefs.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 
 			if ( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas > MaxAlphaArgsFound ) {
 				// must redimension LineItem args
-				TempCharacter.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				TempCharacter( {1,ObjectDef( ObjectNum ).NumAlpha} ) = LineItem.Alphas;
-				TempCharacter( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = BlankString;
-				LineItem.Alphas.deallocate();
-				LineItem.Alphas.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				LineItem.Alphas = TempCharacter;
-				TempCharacter.deallocate();
+				LineItem.Alphas.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
 
-				TempLogical.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				TempLogical( {1,ObjectDef( ObjectNum ).NumAlpha} ) = LineItem.AlphBlank;
-				TempLogical( {ObjectDef( ObjectNum ).NumAlpha + 1,ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas} ) = true;
-				LineItem.AlphBlank.deallocate();
-				LineItem.AlphBlank.allocate( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas );
-				LineItem.AlphBlank = TempLogical;
-				TempLogical.deallocate();
+				LineItem.AlphBlank.redimension( ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas, true );
 
 				MaxAlphaArgsFound = ObjectDef( ObjectNum ).NumAlpha + NumNewAlphas;
 				//      MaxArgsChanged=.TRUE.
@@ -3296,13 +3104,8 @@ namespace InputProcessor {
 		}
 
 		if ( NumNumericField > 0 ) {
-			TempChecks.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-			TempChecks( {1,ObjectDef( ObjectNum ).NumNumeric} ) = ObjectDef( ObjectNum ).NumRangeChks;
-			ObjectDef( ObjectNum ).NumRangeChks.deallocate();
-			ObjectDef( ObjectNum ).NumRangeChks.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-			ObjectDef( ObjectNum ).NumRangeChks = TempChecks;
-			TempChecks.deallocate();
-			for ( Loop = ObjectDef( ObjectNum ).NumNumeric + 1; Loop <= ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics; ++Loop ) {
+			ObjectDef( ObjectNum ).NumRangeChks.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
+			for ( int Loop = ObjectDef( ObjectNum ).NumNumeric + 1, Loop_end = ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics; Loop <= Loop_end; ++Loop ) {
 				ObjectDef( ObjectNum ).NumRangeChks( Loop ).FieldNumber = Loop;
 				++ObjectDef( ObjectNum ).LastExtendNum;
 				charout = IPTrimSigDigits( ObjectDef( ObjectNum ).LastExtendNum );
@@ -3311,21 +3114,9 @@ namespace InputProcessor {
 
 			if ( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics > MaxNumericArgsFound ) {
 				// must redimension LineItem args
-				TempReals.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				TempReals( {1,ObjectDef( ObjectNum ).NumNumeric} ) = LineItem.Numbers;
-				TempReals( {ObjectDef( ObjectNum ).NumNumeric + 1,ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics} ) = 0.0;
-				LineItem.Numbers.deallocate();
-				LineItem.Numbers.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				LineItem.Numbers = TempReals;
-				TempReals.deallocate();
+				LineItem.Numbers.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics, 0.0 );
 
-				TempLogical.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				TempLogical( {1,ObjectDef( ObjectNum ).NumNumeric} ) = LineItem.NumBlank;
-				TempLogical( {ObjectDef( ObjectNum ).NumNumeric + 1,ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics} ) = true;
-				LineItem.NumBlank.deallocate();
-				LineItem.NumBlank.allocate( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics );
-				LineItem.NumBlank = TempLogical;
-				TempLogical.deallocate();
+				LineItem.NumBlank.redimension( ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics, true );
 
 				MaxNumericArgsFound = ObjectDef( ObjectNum ).NumNumeric + NumNewNumerics;
 				//      MaxArgsChanged=.TRUE.
@@ -3623,9 +3414,7 @@ namespace InputProcessor {
 		// PURPOSE OF THIS FUNCTION:
 		// This function looks up a string in a similar list of
 		// items and returns the index of the item in the list, if
-		// found.  This routine is not case insensitive and doesn't need
-		// for most inputs -- they are automatically turned to UPPERCASE.
-		// If you need case insensitivity use FindItem.
+		// found.  This routine is case insensitive.
 
 		// METHODOLOGY EMPLOYED:
 		// na
@@ -4511,18 +4300,14 @@ namespace InputProcessor {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		// na
-		FArray1D_string OrphanObjectNames;
-		FArray1D_string OrphanNames;
 		int Count;
 		int Found;
 		int ObjFound;
 		int NumOrphObjNames;
 		bool potentialOrphanedSpecialObjects( false );
 
-		OrphanObjectNames.allocate( NumIDFRecords );
-		OrphanNames.allocate( NumIDFRecords );
-		OrphanObjectNames = BlankString;
-		OrphanNames = BlankString;
+		FArray1D_string OrphanObjectNames( NumIDFRecords );
+		FArray1D_string OrphanNames( NumIDFRecords );
 		NumOrphObjNames = 0;
 
 		for ( Count = 1; Count <= NumIDFRecords; ++Count ) {
@@ -4542,7 +4327,7 @@ namespace InputProcessor {
 					OrphanObjectNames( NumOrphObjNames ) = IDFRecords( Count ).Name;
 					// To avoid looking up potential things later when they *definitely* aren't there, we'll trap for specific flags here first
 					//  and set the potential flag.  If the potential flag is false, nothing else is looked up later to save time
-					if ( OrphanObjectNames( NumOrphObjNames ).substr( 0, 1 ) == "Z" ) {
+					if ( ( ! potentialOrphanedSpecialObjects ) && ( ! OrphanObjectNames( NumOrphObjNames ).empty() )  && ( OrphanObjectNames( NumOrphObjNames )[ 0 ] == 'Z' ) ) {
 						potentialOrphanedSpecialObjects = true;
 					}
 					if ( ObjectDef( ObjFound ).NameAlpha1 ) {
@@ -4572,13 +4357,13 @@ namespace InputProcessor {
 		}
 
 		// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
-		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if 
+		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if
 		// for now, the list includes:
 		//  - objects that start with "ZONEHVAC:"
 		if ( potentialOrphanedSpecialObjects ) {
 			for ( Count = 1; Count <= NumOrphObjNames; ++Count ) {
-				if ( OrphanObjectNames( Count ).substr( 0, 9 ) == "ZONEHVAC:" ) {
-					ShowSevereError( "Orphaned ZoneHVAC object found.  This object was never referenced in the idf, and was not used." );
+				if ( has_prefix( OrphanObjectNames( Count ), "ZONEHVAC:" ) ) {
+					ShowSevereError( "Orphaned ZoneHVAC object found.  This was object never referenced in the idf, and was not used." );
 					ShowContinueError( " -- Object type: " + OrphanObjectNames( Count ) );
 					ShowContinueError( " -- Object name: " + OrphanNames( Count ) );
 				}
@@ -4941,13 +4726,13 @@ namespace InputProcessor {
 		IDFRecords( NumIDFRecords ).NumAlphas = LineItem.NumAlphas;
 		IDFRecords( NumIDFRecords ).ObjectDefPtr = LineItem.ObjectDefPtr;
 		IDFRecords( NumIDFRecords ).Alphas.allocate( LineItem.NumAlphas );
+		IDFRecords( NumIDFRecords ).Alphas = LineItem.Alphas( {1,LineItem.NumAlphas} );
 		IDFRecords( NumIDFRecords ).AlphBlank.allocate( LineItem.NumAlphas );
+		IDFRecords( NumIDFRecords ).AlphBlank = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
 		IDFRecords( NumIDFRecords ).Numbers.allocate( LineItem.NumNumbers );
+		IDFRecords( NumIDFRecords ).Numbers = LineItem.Numbers( {1,LineItem.NumNumbers} );
 		IDFRecords( NumIDFRecords ).NumBlank.allocate( LineItem.NumNumbers );
-		IDFRecords( NumIDFRecords ).Alphas( {1,LineItem.NumAlphas} ) = LineItem.Alphas( {1,LineItem.NumAlphas} );
-		IDFRecords( NumIDFRecords ).AlphBlank( {1,LineItem.NumAlphas} ) = LineItem.AlphBlank( {1,LineItem.NumAlphas} );
-		IDFRecords( NumIDFRecords ).Numbers( {1,LineItem.NumNumbers} ) = LineItem.Numbers( {1,LineItem.NumNumbers} );
-		IDFRecords( NumIDFRecords ).NumBlank( {1,LineItem.NumNumbers} ) = LineItem.NumBlank( {1,LineItem.NumNumbers} );
+		IDFRecords( NumIDFRecords ).NumBlank = LineItem.NumBlank( {1,LineItem.NumNumbers} );
 		if ( LineItem.NumNumbers > 0 ) {
 			for ( Count = 1; Count <= LineItem.NumNumbers; ++Count ) {
 				if ( ObjectDef( Which ).NumRangeChks( Count ).MinMaxChk && ! LineItem.NumBlank( Count ) ) {
@@ -5339,12 +5124,7 @@ namespace InputProcessor {
 		}
 
 		if ( NumConsideredOutputVariables > 0 ) {
-			TempOutputVariablesForSimulation.allocate( NumConsideredOutputVariables );
-			TempOutputVariablesForSimulation( {1,NumConsideredOutputVariables} ) = OutputVariablesForSimulation( {1,NumConsideredOutputVariables} );
-			OutputVariablesForSimulation.deallocate();
-			OutputVariablesForSimulation.allocate( NumConsideredOutputVariables );
-			OutputVariablesForSimulation( {1,NumConsideredOutputVariables} ) = TempOutputVariablesForSimulation( {1,NumConsideredOutputVariables} );
-			TempOutputVariablesForSimulation.deallocate();
+			OutputVariablesForSimulation.redimension( NumConsideredOutputVariables );
 			MaxConsideredOutputVariables = NumConsideredOutputVariables;
 		}
 
@@ -5974,14 +5754,7 @@ namespace InputProcessor {
 		// na
 
 		// up allocation by OutputVarAllocInc
-		TempOutputVariablesForSimulation.allocate( MaxConsideredOutputVariables + OutputVarAllocInc );
-		TempOutputVariablesForSimulation( {1,NumConsideredOutputVariables} ) = OutputVariablesForSimulation( {1,NumConsideredOutputVariables} );
-		OutputVariablesForSimulation.deallocate();
-		MaxConsideredOutputVariables += OutputVarAllocInc;
-		OutputVariablesForSimulation.allocate( MaxConsideredOutputVariables );
-		OutputVariablesForSimulation( {1,MaxConsideredOutputVariables} ) = TempOutputVariablesForSimulation( {1,MaxConsideredOutputVariables} );
-		TempOutputVariablesForSimulation.deallocate();
-
+		OutputVariablesForSimulation.redimension( MaxConsideredOutputVariables += OutputVarAllocInc );
 	}
 
 	void
@@ -6105,7 +5878,7 @@ namespace InputProcessor {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ErrorFormat( "(2X,A)" );
+		static gio::Fmt ErrorFormat( "(2X,A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

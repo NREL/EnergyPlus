@@ -361,7 +361,7 @@
                 else
                   OutArgs(19)=InArgs(19) ! Redundant, but clear
                 endif
-                
+              
               CASE('SIZING:SYSTEM')
                 nodiff = .false.
                 CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -483,8 +483,7 @@
                 OutArgs(7:8) = ""
                 OutArgs(9:11) = InArgs(6:8)
                 CurArgs = CurArgs + 3     
-                
-                
+                                
     !!!   Changes for report variables, meters, tables -- update names
 
               CASE('OUTPUT:VARIABLE')

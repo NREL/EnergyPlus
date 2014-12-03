@@ -247,10 +247,8 @@ namespace BoilerSteam {
 
 		// Boiler will have fuel input to it , that is it !
 		Boiler.allocate( NumBoilers );
-		CheckEquipName.allocate( NumBoilers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumBoilers, true );
 		BoilerFuelTypeForOutputVariable.allocate( NumBoilers );
-		BoilerFuelTypeForOutputVariable = "";
 
 		BoilerReport.allocate( NumBoilers );
 

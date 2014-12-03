@@ -466,8 +466,7 @@ namespace SimAirServingZones {
 		NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 
 		GetObjectDefMaxArgs( "NodeList", NumParams, NumAlphas, NumNumbers );
-		NodeNums.allocate( NumParams );
-		NodeNums = 0;
+		NodeNums.dimension( NumParams, 0 );
 
 		// Find number of primary air systems
 		NumPrimaryAirSys = GetNumObjectsFound( "AirLoopHVAC" );
@@ -683,17 +682,11 @@ namespace SimAirServingZones {
 					continue;
 				}
 				CompTypes.allocate( NumCompsOnBranch );
-				CompTypes = "";
 				CompNames.allocate( NumCompsOnBranch );
-				CompNames = "";
 				InletNodeNames.allocate( NumCompsOnBranch );
-				InletNodeNames = "";
-				InletNodeNumbers.allocate( NumCompsOnBranch );
-				InletNodeNumbers = 0;
+				InletNodeNumbers.dimension( NumCompsOnBranch, 0 );
 				OutletNodeNames.allocate( NumCompsOnBranch );
-				OutletNodeNames = "";
-				OutletNodeNumbers.allocate( NumCompsOnBranch );
-				OutletNodeNumbers = 0;
+				OutletNodeNumbers.dimension( NumCompsOnBranch, 0 );
 
 				GetBranchData( PrimaryAirSystem( AirSysNum ).Name, BranchNames( BranchNum ), PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).MaxVolFlowRate, DummyInteger( 1 ), DummyInteger( 2 ), NumCompsOnBranch, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); //Placeholders for plant branch pressure data (not used in air loops)
 				PrimaryAirSystem( AirSysNum ).Branch( BranchNum ).Comp.allocate( NumCompsOnBranch );
@@ -1806,9 +1799,9 @@ namespace SimAirServingZones {
 				RetFanIndex = 0;
 				FoundOASys = false;
 				PrimaryAirSystem(AirLoopNum).FanDesCoolLoad = 0.0;
-				
+
 				for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-				
+
 					for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
 					    CompTypeNum = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
 						if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num == OAMixer_Num) {
@@ -2425,7 +2418,7 @@ namespace SimAirServingZones {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// Maximum iterations of an air system/controllers simulation sequence
 		int const MaxIter( 50 );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK DEFINITIONS: None
 
@@ -3531,36 +3524,21 @@ namespace SimAirServingZones {
 
 		// allocate arrays used to store values for standard 62.1 tabular report
 		if ( ! allocated( VpzClgByZone ) ) {
-			VdzClgByZone.allocate( NumOfZones );
-			VdzClgByZone = 0.0;
-			VdzHtgByZone.allocate( NumOfZones );
-			VdzHtgByZone = 0.0;
-			VpzClgByZone.allocate( NumOfZones );
-			VpzClgByZone = 0.0;
-			VpzMinClgByZone.allocate( NumOfZones );
-			VpzMinClgByZone = 0.0;
-			VpzHtgByZone.allocate( NumOfZones );
-			VpzHtgByZone = 0.0;
-			VpzMinHtgByZone.allocate( NumOfZones );
-			VpzMinHtgByZone = 0.0;
-			VpzClgSumBySys.allocate( NumPrimaryAirSys );
-			VpzClgSumBySys = 0.0;
-			VpzHtgSumBySys.allocate( NumPrimaryAirSys );
-			VpzHtgSumBySys = 0.0;
-			VbzByZone.allocate( NumOfZones );
-			VbzByZone = 0.0;
-			PzSumBySysCool.allocate( NumPrimaryAirSys );
-			PzSumBySysCool = 0.0;
-			PzSumBySysHeat.allocate( NumPrimaryAirSys );
-			PzSumBySysHeat = 0.0;
-			PsBySysCool.allocate( NumPrimaryAirSys );
-			PsBySysCool = 0.0;
-			PsBySysHeat.allocate( NumPrimaryAirSys );
-			PsBySysHeat = 0.0;
-			DBySysCool.allocate( NumPrimaryAirSys );
-			DBySysCool = 0.0;
-			DBySysHeat.allocate( NumPrimaryAirSys );
-			DBySysHeat = 0.0;
+			VdzClgByZone.dimension( NumOfZones, 0.0 );
+			VdzHtgByZone.dimension( NumOfZones, 0.0 );
+			VpzClgByZone.dimension( NumOfZones, 0.0 );
+			VpzMinClgByZone.dimension( NumOfZones, 0.0 );
+			VpzHtgByZone.dimension( NumOfZones, 0.0 );
+			VpzMinHtgByZone.dimension( NumOfZones, 0.0 );
+			VpzClgSumBySys.dimension( NumPrimaryAirSys, 0.0 );
+			VpzHtgSumBySys.dimension( NumPrimaryAirSys, 0.0 );
+			VbzByZone.dimension( NumOfZones, 0.0 );
+			PzSumBySysCool.dimension( NumPrimaryAirSys, 0.0 );
+			PzSumBySysHeat.dimension( NumPrimaryAirSys, 0.0 );
+			PsBySysCool.dimension( NumPrimaryAirSys, 0.0 );
+			PsBySysHeat.dimension( NumPrimaryAirSys, 0.0 );
+			DBySysCool.dimension( NumPrimaryAirSys, 0.0 );
+			DBySysHeat.dimension( NumPrimaryAirSys, 0.0 );
 		}
 
 		for ( SysSizIndex = 1; SysSizIndex <= NumSysSizInput; ++SysSizIndex ) {
@@ -4066,11 +4044,11 @@ namespace SimAirServingZones {
 					if ( Ep > 1.0 ) Ep = 1.0;
 					FinalZoneSizing( CtrlZoneNum ).ZonePrimaryAirFraction = Ep;
 					FinalZoneSizing(CtrlZoneNum).ZoneOAFracCooling = ZoneOAFracCooling;
-				
+
 				    // determined cooled zone floor area in an airloop
-					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {							
+					if ( ZoneEquipConfig( CtrlZoneNum ).AirLoopNum == AirLoopNum) {
 						FinalSysSizing( AirLoopNum ).FloorAreaOnAirLoopCooled += Zone( ZoneEquipConfig( CtrlZoneNum ).ActualZoneNum ).FloorArea;
-					}			
+					}
 				}
 
 				NumZonesHeated = AirToZoneNodeInfo( AirLoopNum ).NumZonesHeated;
@@ -4462,15 +4440,15 @@ namespace SimAirServingZones {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const SSizeFmt10( "('Time')" );
-		static gio::Fmt const SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
-		static gio::Fmt const SSizeFmt20( "(I2.2,':',I2.2,':00')" );
-		static gio::Fmt const SSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static gio::Fmt const SSizeFmt30( "('Coinc Peak   ')" );
-		static gio::Fmt const SSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static gio::Fmt const SSizeFmt40( "('NonCoinc Peak')" );
-		static gio::Fmt const SSizeFmt41( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt SSizeFmt10( "('Time')" );
+		static gio::Fmt SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
+		static gio::Fmt SSizeFmt20( "(I2.2,':',I2.2,':00')" );
+		static gio::Fmt SSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt SSizeFmt30( "('Coinc Peak   ')" );
+		static gio::Fmt SSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt SSizeFmt40( "('NonCoinc Peak')" );
+		static gio::Fmt SSizeFmt41( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4572,46 +4550,26 @@ namespace SimAirServingZones {
 
 		// allocate arrays used to store values for standard 62.1 tabular report
 		if ( ! allocated( FaByZoneCool ) ) {
-			FaByZoneCool.allocate( NumOfZones );
-			FaByZoneCool = 0.0;
-			FaByZoneHeat.allocate( NumOfZones );
-			FaByZoneHeat = 0.0;
-			FbByZoneCool.allocate( NumOfZones );
-			FbByZoneCool = 0.0;
-			FbByZoneHeat.allocate( NumOfZones );
-			FbByZoneHeat = 0.0;
-			FcByZoneCool.allocate( NumOfZones );
-			FcByZoneCool = 0.0;
-			FcByZoneHeat.allocate( NumOfZones );
-			FcByZoneHeat = 0.0;
-			EvBySysCool.allocate( NumPrimaryAirSys );
-			EvBySysCool = 1.0;
-			EvBySysHeat.allocate( NumPrimaryAirSys );
-			EvBySysHeat = 1.0;
-			XsBySysCool.allocate( NumPrimaryAirSys );
-			XsBySysCool = 1.0;
-			XsBySysHeat.allocate( NumPrimaryAirSys );
-			XsBySysHeat = 1.0;
-			EvzByZoneCool.allocate( NumOfZones );
-			EvzByZoneCool = 1.0;
-			EvzByZoneCoolPrev.allocate( NumOfZones );
-			EvzByZoneCoolPrev = 1.0;
-			EvzByZoneHeat.allocate( NumOfZones );
-			EvzByZoneHeat = 1.0;
-			EvzByZoneHeatPrev.allocate( NumOfZones );
-			EvzByZoneHeatPrev = 1.0;
-			EvzMinBySysCool.allocate( NumPrimaryAirSys );
-			EvzMinBySysCool = 1.0;
-			EvzMinBySysHeat.allocate( NumPrimaryAirSys );
-			EvzMinBySysHeat = 1.0;
-			VotClgBySys.allocate( NumPrimaryAirSys );
-			VotClgBySys = 0.0;
-			VotHtgBySys.allocate( NumPrimaryAirSys );
-			VotHtgBySys = 0.0;
-			VozSumClgBySys.allocate( NumPrimaryAirSys );
-			VozSumClgBySys = 0.0;
-			VozSumHtgBySys.allocate( NumPrimaryAirSys );
-			VozSumHtgBySys = 0.0;
+			FaByZoneCool.dimension( NumOfZones, 0.0 );
+			FaByZoneHeat.dimension( NumOfZones, 0.0 );
+			FbByZoneCool.dimension( NumOfZones, 0.0 );
+			FbByZoneHeat.dimension( NumOfZones, 0.0 );
+			FcByZoneCool.dimension( NumOfZones, 0.0 );
+			FcByZoneHeat.dimension( NumOfZones, 0.0 );
+			EvBySysCool.dimension( NumPrimaryAirSys, 1.0 );
+			EvBySysHeat.dimension( NumPrimaryAirSys, 1.0 );
+			XsBySysCool.dimension( NumPrimaryAirSys, 1.0 );
+			XsBySysHeat.dimension( NumPrimaryAirSys, 1.0 );
+			EvzByZoneCool.dimension( NumOfZones, 1.0 );
+			EvzByZoneCoolPrev.dimension( NumOfZones, 1.0 );
+			EvzByZoneHeat.dimension( NumOfZones, 1.0 );
+			EvzByZoneHeatPrev.dimension( NumOfZones, 1.0 );
+			EvzMinBySysCool.dimension( NumPrimaryAirSys, 1.0 );
+			EvzMinBySysHeat.dimension( NumPrimaryAirSys, 1.0 );
+			VotClgBySys.dimension( NumPrimaryAirSys, 0.0 );
+			VotHtgBySys.dimension( NumPrimaryAirSys, 0.0 );
+			VozSumClgBySys.dimension( NumPrimaryAirSys, 0.0 );
+			VozSumHtgBySys.dimension( NumPrimaryAirSys, 0.0 );
 		}
 
 		{ auto const SELECT_CASE_var( CallIndicator );
@@ -6018,7 +5976,7 @@ namespace SimAirServingZones {
 		std::string CompName; // component name
 		std::string CompType; // component type
 		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
-		Real64 TempSize; // autosized value 
+		Real64 TempSize; // autosized value
 		Real64 CoilInTemp; // entering coil air temperature [C]
 		Real64 CoilInHumRat; // entering coil air humidity ratio [kg/kg]
 		Real64 CoilInEnth; // entering coil air enthalpy [J/kg]
@@ -6028,7 +5986,7 @@ namespace SimAirServingZones {
 		Real64 OutAirFrac; // outdoor air fraction [-]
 		Real64 CpAirStd; // specific heat of air at standard condition
 		Real64 FractionOfAutosize; // user specified autosized fraction for capacity and supply air flow
-		Real64 AutosizedCapacity; // autosized heating and cooling capacity  
+		Real64 AutosizedCapacity; // autosized heating and cooling capacity
 		int NumZonesHeated; // number of zones heated by a system
 		int NumZonesCooled; // numberof zones cooled by a system
 		int ZonesHeatedNum; // loop index of zones heated in a system

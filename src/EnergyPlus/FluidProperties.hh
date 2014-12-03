@@ -1,6 +1,9 @@
 #ifndef FluidProperties_hh_INCLUDED
 #define FluidProperties_hh_INCLUDED
 
+// C++ Headers
+#include <cmath>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
@@ -910,6 +913,10 @@ namespace FluidProperties {
 
 	//*****************************************************************************
 
+	void
+	GetInterpValue_error();
+
+	inline
 	Real64
 	GetInterpValue(
 		Real64 const Tact, // actual temperature at which we want the property of interest
@@ -917,7 +924,65 @@ namespace FluidProperties {
 		Real64 const Thi, // temperature above Tact for which we have property data
 		Real64 const Xlo, // value of property at Tlo
 		Real64 const Xhi // value of property at Thi
-	);
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Rick Strand
+		//       DATE WRITTEN   June 2004
+		//       MODIFIED       N/A
+		//       RE-ENGINEERED  N/A
+
+		// PURPOSE OF THIS FUNCTION:
+		// This subroutine does a simple linear interpolation.
+
+		// METHODOLOGY EMPLOYED:
+		// No mysteries here...just plain-old linear interpolation.
+
+		// REFERENCES:
+		// Any basic engineering mathematic text.
+
+		// USE STATEMENTS:
+		// na
+
+		// Return value
+		// na
+
+		// Locals
+		// FUNCTION ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static Real64 const TempToler( 0.001 ); // Some reasonable value for comparisons
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		// na
+
+		// FLOW:
+		if ( std::abs( Thi - Tlo ) > TempToler ) {
+			return Xhi - ( ( ( Thi - Tact ) / ( Thi - Tlo ) ) * ( Xhi - Xlo ) );
+		} else {
+			GetInterpValue_error();
+			return 0.0;
+		}
+	}
+
+	inline
+	Real64
+	GetInterpValue_fast(
+		Real64 const Tact, // actual temperature at which we want the property of interest
+		Real64 const Tlo, // temperature below Tact for which we have property data
+		Real64 const Thi, // temperature above Tact for which we have property data
+		Real64 const Xlo, // value of property at Tlo
+		Real64 const Xhi // value of property at Thi
+	)
+	{
+		return Xhi - ( ( ( Thi - Tact ) / ( Thi - Tlo ) ) * ( Xhi - Xlo ) );
+	}
 
 	//*****************************************************************************
 

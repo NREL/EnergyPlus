@@ -46,6 +46,13 @@ struct EntryFormatLD
 
 	typedef  std::size_t  Size;
 
+	// Default Constructor
+	inline
+	EntryFormatLD() :
+	 h( false ),
+	 r( 0ul )
+	{}
+
 	// Constructor
 	inline
 	explicit
@@ -66,6 +73,16 @@ struct EntryFormatLD
 		} else { // Counter was at zero
 			return false;
 		}
+	}
+
+	// Reset
+	inline
+	void
+	reset()
+	{
+		s.clear();
+		h = false;
+		r = 0ul;
 	}
 
 	std::string s; // Entry string
@@ -446,8 +463,6 @@ public: // Properties
 		return p_->spacer();
 	}
 
-public: // Methods
-
 	// Current Format
 	virtual
 	Format *
@@ -463,12 +478,16 @@ public: // Methods
 	Format *
 	next_up() = 0;
 
+public: // Methods
+
 	// Reset
+	inline
 	virtual
-	void
+	Format &
 	reset()
 	{
 		i_ = 0ul;
+		return *this;
 	}
 
 public: // Input Methods
@@ -482,6 +501,15 @@ public: // Input Methods
 		return stream;
 	}
 
+	// Input without Argument
+	inline
+	std::istream &
+	input( std::istream & stream, std::streampos & por )
+	{
+		in( stream, por );
+		return stream;
+	}
+
 	// Input with Argument
 	template< typename T >
 	inline
@@ -491,6 +519,18 @@ public: // Input Methods
 		stream.seekg( poa + por, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
 		in( stream, t );
 		por = stream.tellg() - poa; // After reading a value the current stream position is also the virtual position
+		return stream;
+	}
+
+	// Input with Argument
+	template< typename T >
+	inline
+	std::istream &
+	input( std::istream & stream, std::streampos & por, T & t )
+	{
+		stream.seekg( por, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+		in( stream, t );
+		por = stream.tellg(); // After reading a value the current stream position is also the virtual position
 		return stream;
 	}
 
@@ -507,6 +547,13 @@ public: // Input Methods
 	virtual
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
+	{} // Default implementation
+
+	// Input
+	inline
+	virtual
+	void
+	in( std::istream &, std::streampos & )
 	{} // Default implementation
 
 	// Input
@@ -704,7 +751,7 @@ public: // Output Methods
 	// Output Pad/Position
 	inline
 	void
-	output_pos( std::ostream & stream, std::streampos & pos )
+	output_pos( std::ostream & stream, std::streampos const pos )
 	{
 		output_pad( stream, pos );
 	}
@@ -1007,12 +1054,15 @@ protected: // Static Methods
 	inline
 	static
 	void
-	output_pad( std::ostream & stream, std::streampos const & pos )
+	output_pad( std::ostream & stream, std::streampos const pos )
 	{
 		stream.seekp( 0, std::ios::end );
 		std::streampos const end( stream.tellp() );
-		if ( pos > end ) stream << std::string( pos - end, ' ' ); // Space fill before output
-		stream.seekp( pos, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+		if ( pos > end ) {
+			stream << std::string( pos - end, ' ' ); // Space fill before output
+		} else if ( pos < end ) {
+			stream.seekp( pos, std::ios::beg ); // Position the stream at the virtual position: Could check that it is <= end but read could still exceed stream bounds
+		}
 	}
 
 	// Clear EOF State if No Error
@@ -1219,6 +1269,18 @@ public: // Properties
 		formats_ = f;
 	}
 
+public: // Methods
+
+	// Reset
+	inline
+	FormatList &
+	reset()
+	{
+		FormatCombo::reset();
+		for ( Format * format : formats_ ) format->reset();
+		return *this;
+	}
+
 private: // Data
 
 	Formats formats_;
@@ -1341,6 +1403,18 @@ public: // Properties
 		format_ = f;
 	}
 
+public: // Methods
+
+	// Reset
+	inline
+	FormatGroup &
+	reset()
+	{
+		FormatCombo::reset();
+		if ( format_ ) format_->reset();
+		return *this;
+	}
+
 private: // Data
 
 	Format * format_;
@@ -1412,11 +1486,11 @@ public: // Creation
 	inline
 	FormatGroupTop( FormatGroupTop const & f, Format * p = nullptr ) :
 	 FormatGroup( f, p ),
-	 P_( f.P_ ),
-	 blank_zero_( f.blank_zero_ ),
-	 colon_terminated_( f.colon_terminated_ ),
-	 slash_terminated_( f.slash_terminated_ ),
-	 non_advancing_( f.non_advancing_ ),
+	 P_( 0 ),
+	 blank_zero_( false ),
+	 colon_terminated_( false ),
+	 slash_terminated_( false ),
+	 non_advancing_( false ),
 	 reverted_( false ),
 	 reverts_( 0ul ),
 	 ir_( 0ul ),
@@ -1428,11 +1502,11 @@ public: // Creation
 	inline
 	FormatGroupTop( FormatGroupTop && f ) :
 	 FormatGroup( std::move( f ) ),
-	 P_( f.P_ ),
-	 blank_zero_( f.blank_zero_ ),
-	 colon_terminated_( f.colon_terminated_ ),
-	 slash_terminated_( f.slash_terminated_ ),
-	 non_advancing_( f.non_advancing_ ),
+	 P_( 0 ),
+	 blank_zero_( false ),
+	 colon_terminated_( false ),
+	 slash_terminated_( false ),
+	 non_advancing_( false ),
 	 reverted_( false ),
 	 reverts_( 0ul ),
 	 ir_( 0ul ),
@@ -1465,11 +1539,11 @@ public: // Assignment
 	{
 		if ( this != &f ) {
 			FormatGroup::operator =( f );
-			P_ = f.P_;
-			blank_zero_ = f.blank_zero_;
-			colon_terminated_ = f.colon_terminated_;
-			slash_terminated_ = f.slash_terminated_;
-			non_advancing_ = f.non_advancing_;
+			P_ = 0;
+			blank_zero_ = false;
+			colon_terminated_ = false;
+			slash_terminated_ = false;
+			non_advancing_ = false;
 			reverted_ = false;
 			reverts_ = 0ul;
 			ir_ = 0ul;
@@ -1477,17 +1551,6 @@ public: // Assignment
 			spacer_ = false;
 		}
 		return *this;
-	}
-
-	// Reset
-	virtual
-	void
-	reset()
-	{
-		FormatGroup::reset();
-		ir_ = 0ul;
-		fr_ = nullptr;
-		spacer_ = false;
 	}
 
 public: // Properties
@@ -1628,6 +1691,27 @@ public: // Properties
 		reverted_ = true;
 		++reverts_;
 		return revert();
+	}
+
+public: // Methods
+
+	// Reset
+	inline
+	FormatGroupTop &
+	reset()
+	{
+		FormatGroup::reset();
+		P_ = 0;
+		blank_zero_ = false;
+		colon_terminated_ = false;
+		slash_terminated_ = false;
+		non_advancing_ = false;
+		reverted_ = false;
+		reverts_ = 0ul;
+		ir_ = 0ul;
+		fr_ = nullptr;
+		spacer_ = false;
+		return *this;
 	}
 
 private: // Methods
@@ -1820,6 +1904,14 @@ public: // Methods
 		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
+	}
+
 	// Output
 	inline
 	void
@@ -1883,6 +1975,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
 	{
 		por += s_.length(); // Some Fortran versions/compilers allow literal strings on input to skip the string's length
 	}
@@ -1951,6 +2051,14 @@ public: // Methods
 		blank_zero() = false;
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
+	{
+		blank_zero() = false;
+	}
+
 }; // FormatBN
 
 // Blank=Zero Mode Format
@@ -1997,6 +2105,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		blank_zero() = true;
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
 	{
 		blank_zero() = true;
 	}
@@ -2194,6 +2310,14 @@ public: // Methods
 		por += n_;
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por += n_;
+	}
+
 	// Output
 	inline
 	void
@@ -2298,7 +2422,17 @@ public: // Methods
 	{
 		stream.seekg( poa + por, std::ios::beg );
 		stream >> skip;
-		por = stream.tellg() - poa; // After reading a value the current stream position is also the virtual position
+		por = stream.tellg() - poa; // After skip the current stream position is also the virtual position
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream & stream, std::streampos & por )
+	{
+		stream.seekg( por, std::ios::beg );
+		stream >> skip;
+		por = stream.tellg(); // After skip the current stream position is also the virtual position
 	}
 
 	// Output
@@ -2358,6 +2492,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & )
+	{
+		colon_terminated() = true;
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
 	{
 		colon_terminated() = true;
 	}
@@ -2472,6 +2614,14 @@ public: // Methods
 		por = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por = n_ - 1; // Stream positions are zero-based but Fortran tab positions are 1-based
+	}
+
 	// Output
 	inline
 	void
@@ -2536,6 +2686,14 @@ public: // Methods
 		por -= n_;
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
+	{
+		por -= n_;
+	}
+
 	// Output
 	inline
 	void
@@ -2596,6 +2754,14 @@ public: // Methods
 	inline
 	void
 	in( std::istream &, std::streampos const, std::streampos & por )
+	{
+		por += n_;
+	}
+
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & por )
 	{
 		por += n_;
 	}
@@ -2673,7 +2839,7 @@ public: // Properties
 		return ( w_ != NOSIZE );
 	}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -2803,6 +2969,8 @@ public: // Methods
 	// Input
 	void
 	in( std::istream & stream, Fstring & s );
+
+public: // Output Methods
 
 	// Output
 	inline
@@ -3175,7 +3343,7 @@ public: // Properties
 		return m_;
 	}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -3414,7 +3582,7 @@ public: // Creation
 	~FormatI()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -3520,7 +3688,7 @@ public: // Creation
 	~FormatB()
 	{}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -3635,6 +3803,8 @@ public: // Methods
 	{
 		read_binary_reinterpret( stream, v );
 	}
+
+public: // Output Methods
 
 	// Output
 	void
@@ -3759,7 +3929,7 @@ public: // Creation
 	~FormatO()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -3864,7 +4034,7 @@ public: // Creation
 	~FormatZ()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -3982,6 +4152,14 @@ public: // Methods
 		P() = k_; // Set P scaling
 	}
 
+	// Input
+	inline
+	void
+	in( std::istream &, std::streampos & )
+	{
+		P() = k_; // Set P scaling
+	}
+
 	// Output
 	inline
 	void
@@ -4087,7 +4265,7 @@ public: // Properties
 		return d_;
 	}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	inline
@@ -4305,7 +4483,7 @@ public: // Creation
 	~FormatF()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4425,7 +4603,7 @@ public: // Creation
 	~FormatG()
 	{}
 
-public: // Methods
+public: // Input Methods
 
 	// Input
 	void
@@ -4526,6 +4704,8 @@ public: // Methods
 	// Input
 	void
 	in( std::istream & stream, Fstring & s );
+
+public: // Output Methods
 
 	// Output
 	void
@@ -4636,7 +4816,7 @@ public: // Creation
 	~FormatE()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4690,7 +4870,7 @@ public: // Creation
 	~FormatEN()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4744,7 +4924,7 @@ public: // Creation
 	~FormatES()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4798,7 +4978,7 @@ public: // Creation
 	~FormatD()
 	{}
 
-public: // Methods
+public: // Output Methods
 
 	// Output
 	void
@@ -4829,16 +5009,14 @@ public: // Creation
 	inline
 	explicit
 	FormatLD( Format * p ) :
-	 FormatLeaf( p ),
-	 entry_( std::string(), true, 0ul )
+	 FormatLeaf( p )
 	{}
 
 	// Copy Constructor
 	inline
 	explicit
 	FormatLD( FormatLD const & f, Format * p = nullptr ) :
-	 FormatLeaf( f, p ),
-	 entry_( f.entry_ )
+	 FormatLeaf( f, p )
 	{}
 
 	// Clone
@@ -4854,6 +5032,19 @@ public: // Creation
 	virtual
 	~FormatLD()
 	{}
+
+public: // Assignment
+
+	// Copy Assignment
+	inline
+	void
+	operator =( FormatLD const & f )
+	{
+		if ( this != &f ) {
+			FormatLeaf::operator =( f );
+			entry_.reset(); // Don't assign entry
+		}
+	}
 
 public: // Properties
 
@@ -4904,6 +5095,18 @@ public: // Properties
 	}
 
 public: // Methods
+
+	// Reset
+	inline
+	FormatLD &
+	reset()
+	{
+		FormatLeaf::reset();
+		entry_.reset();
+		return *this;
+	}
+
+public: // Input Methods
 
 	// Input
 	inline
@@ -5036,6 +5239,8 @@ public: // Methods
 	// Input
 	void
 	in( std::istream & stream, Fstring & s );
+
+public: // Output Methods
 
 	// Output
 	void
