@@ -185,13 +185,25 @@ endif()
 
 if(MSVC AND (PROFILE_GENERATE OR PROFILE_USE OR ENABLE_LTO) )
   get_filename_component(LINKER_DIR "${CMAKE_LINKER}" PATH)
+  get_filename_component(LINKER_DIR_NAME "${LINKER_DIR}" NAME)
+  
   if (MSVC12)
     set(PGORTVER "120")
   elseif(MSVC14)
     set(PGORTVER "140")
   endif()
+
+  message("Examining ${LINKER_DIR_NAME} for PGO RT DLL")
   
-  file(COPY "${LINKER_DIR}/pgort${PGORTVER}.dll" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release" )
+  if ("${LINKER_DIR_NAME}" MATCHES ".*amd64.*")
+    get_filename_component(LINKER_PARENT_DIR "${LINKER_DIR}" PATH)
+    set(PGORTDIR "${LINKER_PARENT_DIR}/amd64")
+    message("Retrieving amd64 PGO dll from: ${PGORTDIR}")
+  else()
+    set(PGORTDIR "${LINKER_DIR}")
+  endif()
+  
+  file(COPY "${PGORTDIR}/pgort${PGORTVER}.dll" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release" )
 
   foreach(target ${OPTIMIZABLE_TARGETS})
     get_target_property(targ_link_flags ${target} LINK_FLAGS)
