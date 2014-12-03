@@ -987,7 +987,7 @@ void SQLite::initializeDaylightMapTables()
 	const std::string daylightMapTitleInsertSQL =
 		"INSERT INTO DaylightMaps VALUES(?,?,?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_daylightMapHorlyTitleInsertStmt,daylightMapTitleInsertSQL);
+	sqlitePrepareStatement(m_daylightMapTitleInsertStmt,daylightMapTitleInsertSQL);
 
 	const std::string daylightMapHourlyReportsTableSQL =
 		"CREATE TABLE DaylightMapHourlyReports (HourlyReportIndex INTEGER PRIMARY KEY, "
