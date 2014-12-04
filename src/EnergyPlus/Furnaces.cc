@@ -8311,7 +8311,7 @@ namespace Furnaces {
 			// compressor on
 			CompOp = On;
 
-			//     if (QZnReq < -1000.0 .AND. FurnaceNum == 1 ) then
+			//     if ( QZnReq < -1000.0 .AND. FurnaceNum == 1 ) then
 			//       CompOp      = On
 			//     end if
 			ControlVSHPOutput( FurnaceNum, FirstHVACIteration, CompOp, OpMode, TotalZoneSensibleLoad, TotalZoneLatentLoad, ZoneNum, SpeedNum, SpeedRatio, PartLoadFrac, OnOffAirFlowRatio, SupHeaterLoad );

@@ -519,7 +519,7 @@ namespace EconomicLifeCycleCost {
 			if ( lastDateMonth == 0 ) lastDateMonth = 12;
 			lastDateYear = baseDateYear + lengthStudyYears - 1;
 		} else {
-			ShowWarningError( CurrentModuleObject + ": Only one instance of this object is allowed. No life-cycle cost reports will be generated. " );
+			ShowWarningError( CurrentModuleObject + ": Only one instance of this object is allowed. No life-cycle cost reports will be generated." );
 			LCCparamPresent = false;
 		}
 	}

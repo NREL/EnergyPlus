@@ -3487,7 +3487,6 @@ namespace HeatBalanceSurfaceManager {
 			} else {
 				Material( MaterNum ).AbsorpVisible = Material( MaterNum ).AbsorpVisibleInput;
 			}
-
 		} // loop over materials
 
 		// second, loop over constructions
@@ -3508,7 +3507,6 @@ namespace HeatBalanceSurfaceManager {
 				Construct( ConstrNum ).OutsideAbsorpSolar = Material( OutsideMaterNum ).AbsorpSolar;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( OutsideMaterNum ).AbsorpThermal;
 			}
-
 		}
 
 	}
