@@ -86,11 +86,11 @@ namespace SolarShading {
 	extern std::ofstream shd_stream; // Shading file stream
 	extern FArray1D_int HCNS; // Surface number of back surface HC figures
 	extern FArray1D_int HCNV; // Number of vertices of each HC figure
-	extern FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCB; // 'B' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCC; // 'C' homogeneous coordinates of sides
-	extern FArray2D< Int64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
-	extern FArray2D< Int64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
+	extern FArray2D< Real64 > HCA; // 'A' homogeneous coordinates of sides
+	extern FArray2D< Real64 > HCB; // 'B' homogeneous coordinates of sides
+	extern FArray2D< Real64 > HCC; // 'C' homogeneous coordinates of sides
+	extern FArray2D< Real64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
+	extern FArray2D< Real64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
 	extern FArray3D_int WindowRevealStatus;
 	extern FArray1D< Real64 > HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
 	// - Positive, Shadow - Negative, Overlap between two shadows
@@ -437,9 +437,9 @@ namespace SolarShading {
 
 	void
 	CalcInteriorWinTransDifSolInitialDistribution(
-		int & ZoneNum, // Zone index number
-		int & IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
-		Real64 & IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
+		int const ZoneNum, // Zone index number
+		int const IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
+		Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
 	);
 
 	void
