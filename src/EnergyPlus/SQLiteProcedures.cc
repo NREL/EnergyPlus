@@ -70,8 +70,8 @@ SQLite::SQLite()
 	m_weatherFileInsertStmt(nullptr),
 	m_scheduleInsertStmt(nullptr),
 	m_daylightMapTitleInsertStmt(nullptr),
-	m_daylightMapHorlyTitleInsertStmt(nullptr),
-	m_daylightMapHorlyDataInsertStmt(nullptr),
+	m_daylightMapHourlyTitleInsertStmt(nullptr),
+	m_daylightMapHourlyDataInsertStmt(nullptr),
 	m_environmentPeriodInsertStmt(nullptr),
 	m_simulationsInsertStmt(nullptr),
 	m_tabularDataInsertStmt(nullptr),
@@ -232,8 +232,8 @@ SQLite::~SQLite()
 	sqlite3_finalize(m_weatherFileInsertStmt);
 	sqlite3_finalize(m_scheduleInsertStmt);
 	sqlite3_finalize(m_daylightMapTitleInsertStmt);
-	sqlite3_finalize(m_daylightMapHorlyTitleInsertStmt);
-	sqlite3_finalize(m_daylightMapHorlyDataInsertStmt);
+	sqlite3_finalize(m_daylightMapHourlyTitleInsertStmt);
+	sqlite3_finalize(m_daylightMapHourlyDataInsertStmt);
 	sqlite3_finalize(m_environmentPeriodInsertStmt);
 	sqlite3_finalize(m_simulationsInsertStmt);
 	sqlite3_finalize(m_tabularDataInsertStmt);
@@ -933,10 +933,10 @@ void SQLite::initializeDaylightMapTables()
 
 	sqliteExecuteCommand(daylightMapHourlyReportsTableSQL);
 
-	const std::string daylightMapHorlyTitleInsertSQL =
+	const std::string daylightMapHourlyTitleInsertSQL =
 		"INSERT INTO DaylightMapHourlyReports VALUES(?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_daylightMapHorlyTitleInsertStmt,daylightMapHorlyTitleInsertSQL);
+	sqlitePrepareStatement(m_daylightMapHourlyTitleInsertStmt,daylightMapHourlyTitleInsertSQL);
 
 	const std::string daylightMapHourlyDataTableSQL =
 		"CREATE TABLE DaylightMapHourlyData (HourlyDataIndex INTEGER PRIMARY KEY, HourlyReportIndex INTEGER, "
@@ -944,10 +944,10 @@ void SQLite::initializeDaylightMapTables()
 
 	sqliteExecuteCommand(daylightMapHourlyDataTableSQL);
 
-	const std::string daylightMapHorlyDataInsertSQL =
+	const std::string daylightMapHourlyDataInsertSQL =
 		"INSERT INTO DaylightMapHourlyData VALUES(?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_daylightMapHorlyDataInsertStmt,daylightMapHorlyDataInsertSQL);
+	sqlitePrepareStatement(m_daylightMapHourlyDataInsertStmt,daylightMapHourlyDataInsertSQL);
 }
 
 void SQLite::initializeViews()
@@ -1712,26 +1712,26 @@ void SQLite::createSQLiteDaylightMap(
 
 	if( m_writeOutputToSQLite ) {
 		++hourlyReportIndex;
-		sqliteBindInteger(m_daylightMapHorlyTitleInsertStmt, 1, hourlyReportIndex);
-		sqliteBindInteger(m_daylightMapHorlyTitleInsertStmt, 2, mapNum);
-		sqliteBindInteger(m_daylightMapHorlyTitleInsertStmt, 3, month);
-		sqliteBindInteger(m_daylightMapHorlyTitleInsertStmt, 4, dayOfMonth);
-		sqliteBindInteger(m_daylightMapHorlyTitleInsertStmt, 5, hourOfDay);
+		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 1, hourlyReportIndex);
+		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 2, mapNum);
+		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 3, month);
+		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 4, dayOfMonth);
+		sqliteBindInteger(m_daylightMapHourlyTitleInsertStmt, 5, hourOfDay);
 
-		sqliteStepCommand(m_daylightMapHorlyTitleInsertStmt);
-		sqliteResetCommand(m_daylightMapHorlyTitleInsertStmt);
+		sqliteStepCommand(m_daylightMapHourlyTitleInsertStmt);
+		sqliteResetCommand(m_daylightMapHourlyTitleInsertStmt);
 
 		for(int yIndex = 1; yIndex <= nY; ++yIndex) {
 			for(int xIndex = 1; xIndex <= nX; ++xIndex) {
 				++hourlyDataIndex;
-				sqliteBindInteger(m_daylightMapHorlyDataInsertStmt, 1, hourlyDataIndex);
-				sqliteBindInteger(m_daylightMapHorlyDataInsertStmt, 2, hourlyReportIndex);
-				sqliteBindDouble(m_daylightMapHorlyDataInsertStmt, 3, x(xIndex));
-				sqliteBindDouble(m_daylightMapHorlyDataInsertStmt, 4, y(yIndex));
-				sqliteBindDouble(m_daylightMapHorlyDataInsertStmt, 5, illuminance(xIndex, yIndex));
+				sqliteBindInteger(m_daylightMapHourlyDataInsertStmt, 1, hourlyDataIndex);
+				sqliteBindInteger(m_daylightMapHourlyDataInsertStmt, 2, hourlyReportIndex);
+				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 3, x(xIndex));
+				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 4, y(yIndex));
+				sqliteBindDouble(m_daylightMapHourlyDataInsertStmt, 5, illuminance(xIndex, yIndex));
 
-				sqliteStepCommand(m_daylightMapHorlyDataInsertStmt);
-				sqliteResetCommand(m_daylightMapHorlyDataInsertStmt);
+				sqliteStepCommand(m_daylightMapHourlyDataInsertStmt);
+				sqliteResetCommand(m_daylightMapHourlyDataInsertStmt);
 			}
 		}
 	}

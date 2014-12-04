@@ -271,8 +271,8 @@ private:
 	sqlite3_stmt * m_weatherFileInsertStmt;
 	sqlite3_stmt * m_scheduleInsertStmt;
 	sqlite3_stmt * m_daylightMapTitleInsertStmt;
-	sqlite3_stmt * m_daylightMapHorlyTitleInsertStmt;
-	sqlite3_stmt * m_daylightMapHorlyDataInsertStmt;
+	sqlite3_stmt * m_daylightMapHourlyTitleInsertStmt;
+	sqlite3_stmt * m_daylightMapHourlyDataInsertStmt;
 	sqlite3_stmt * m_environmentPeriodInsertStmt;
 	sqlite3_stmt * m_simulationsInsertStmt;
 	sqlite3_stmt * m_tabularDataInsertStmt;
