@@ -421,7 +421,6 @@ namespace DataSurfaces {
 	{
 		// Members
 		std::string Name; // User supplied name of the surface (must be unique)
-		//		int Construction; // Pointer to the construction in the Construct derived type
 		bool EMSConstructionOverrideON; // if true, EMS is calling to override the construction value
 		int EMSConstructionOverrideValue; // pointer value to use for Construction when overridden
 		int ConstructionStoredInputValue; // holds the original value for Construction per surface input
@@ -1471,8 +1470,6 @@ namespace DataSurfaces {
 			Real64 const DividerConduction, // Conduction through divider from outside to inside face (W)
 			Real64 const OtherConvHeatGain, // other convective = total conv - standard model prediction for EQL window model (W)
 			int const BlindNumber, // Blind number for a window with a blind
-			FArray1< Real64 > const & EffShBlindEmiss, // Effective emissivity of interior blind or shade
-			bool const MovableSlats, // True if window has a blind with movable slats
 			Real64 const SlatAngThisTSDeg, // Slat angle this time step for window with blind on (deg)
 			bool const SlatAngThisTSDegEMSon, // flag that indicate EMS system is actuating SlatAngThisTSDeg
 			Real64 const SlatAngThisTSDegEMSValue, // value that EMS sets for slat angle in degrees

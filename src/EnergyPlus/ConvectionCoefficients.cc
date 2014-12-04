@@ -3152,7 +3152,7 @@ namespace ConvectionCoefficients {
 			for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 				if ( ! Surface( SurfNum ).HeatTransSurf ) continue;
 				if ( Surface( SurfNum ).ExtBoundCond > 0 ) continue; // Interior surfaces
-				if ( ! Construct( Construction[ SurfNum  - 1] ).TypeIsWindow ) continue;
+				if ( ! ConstrWin[ Construction[ SurfNum  - 1] - 1 ].TypeIsWindow ) continue;
 				SurfacesOfType = true;
 				if ( ConvectionType == "OUTSIDE" ) {
 					if ( Surface( SurfNum ).OSCPtr > 0 ) continue;

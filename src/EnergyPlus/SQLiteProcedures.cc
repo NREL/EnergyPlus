@@ -2283,7 +2283,7 @@ void SQLite::createSQLiteConstructionsTable()
 		sqliteBindText(m_constructionInsertStmt, 2, DataHeatBalance::Construct(constructNum).Name);
 		sqliteBindInteger(m_constructionInsertStmt, 3, DataHeatBalance::Construct(constructNum).TotLayers);
 		sqliteBindInteger(m_constructionInsertStmt, 4, DataHeatBalance::Construct(constructNum).TotSolidLayers);
-		sqliteBindInteger(m_constructionInsertStmt, 5, DataHeatBalance::Construct(constructNum).TotGlassLayers);
+		sqliteBindInteger(m_constructionInsertStmt, 5, DataHeatBalance::ConstrWin[ constructNum - 1 ].TotGlassLayers);
 
 		for(int layerNum = 1; layerNum <= DataHeatBalance::Construct(constructNum).TotLayers; ++layerNum) {
 			sqliteBindInteger(m_constructionLayerInsertStmt, 1, constructNum);
@@ -2298,12 +2298,12 @@ void SQLite::createSQLiteConstructionsTable()
 		sqliteBindDouble(m_constructionInsertStmt, 7, DataHeatBalance::Construct(constructNum).OutsideAbsorpVis);
 		sqliteBindDouble(m_constructionInsertStmt, 8, DataHeatBalance::Construct(constructNum).InsideAbsorpSolar);
 		sqliteBindDouble(m_constructionInsertStmt, 9, DataHeatBalance::Construct(constructNum).OutsideAbsorpSolar);
-		sqliteBindDouble(m_constructionInsertStmt, 10, DataHeatBalance::Construct(constructNum).InsideAbsorpThermal);
+		sqliteBindDouble(m_constructionInsertStmt, 10, DataHeatBalance::ConstrWin[ constructNum - 1 ].InsideAbsorpThermal);
 		sqliteBindDouble(m_constructionInsertStmt, 11, DataHeatBalance::Construct(constructNum).OutsideAbsorpThermal);
 		sqliteBindInteger(m_constructionInsertStmt, 12, DataHeatBalance::Construct(constructNum).OutsideRoughness);
-		sqliteBindLogical(m_constructionInsertStmt, 13, DataHeatBalance::Construct(constructNum).TypeIsWindow);
+		sqliteBindLogical(m_constructionInsertStmt, 13, DataHeatBalance::ConstrWin[ constructNum - 1 ].TypeIsWindow);
 
-		if(DataHeatBalance::Construct(constructNum).TotGlassLayers == 0) {
+		if(DataHeatBalance::ConstrWin[ constructNum - 1 ].TotGlassLayers == 0) {
 			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::Construct(constructNum).UValue);
 		} else {
 			sqliteBindDouble(m_constructionInsertStmt, 14, DataHeatBalance::NominalU(constructNum));

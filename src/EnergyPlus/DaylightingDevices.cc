@@ -415,6 +415,7 @@ namespace DaylightingDevices {
 		using General::RoundSigDigits;
 		using General::SafeDivide;
 		using DataSurfaces::Construction;
+		using DataHeatBalance::ConstrWin;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
 
@@ -470,7 +471,7 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Construction[ SurfNum - 1 ] ).TotGlassLayers > 1 ) {
+					if ( ConstrWin[ Construction[ SurfNum - 1 ] - 1 ].TotGlassLayers > 1 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Dome " + cAlphaArgs( 2 ) + " construction (" + Construct( Construction[ SurfNum - 1 ] ).Name + ") must have only 1 glass layer." );
 						ErrorsFound = true;
 					}
@@ -665,6 +666,7 @@ namespace DaylightingDevices {
 		using InputProcessor::VerifyName;
 		using namespace DataIPShortCuts;
 		using DataSurfaces::Construction;
+		using DataHeatBalance::ConstrWin;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS: na
@@ -795,7 +797,7 @@ namespace DaylightingDevices {
 							if ( ConstrNum == 0 ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " not found." );
 								ErrorsFound = true;
-							} else if ( Construct( ConstrNum ).TypeIsWindow ) {
+							} else if ( ConstrWin[ ConstrNum - 1 ].TypeIsWindow ) {
 								ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Outside shelf construction " + cAlphaArgs( 5 ) + " must not have WindowMaterial:Glazing." );
 								ErrorsFound = true;
 							} else {

@@ -6835,6 +6835,7 @@ Label1000: ;
 					Construct( NumNewConst ).TCMasterConst = Loop;
 					Construct( NumNewConst ).TCLayerID = Construct( Loop ).TCLayerID;
 					Construct( NumNewConst ).TCGlassID = Construct( Loop ).TCGlassID;
+               ConstrWin[ NumNewConst - 1 ] = ConstrWin[ Loop - 1 ];
 					ConstrWin[ NumNewConst  - 1 ].TypeIsWindow = true;
 				}
 			}

@@ -46,7 +46,7 @@ extern "C"{
 namespace EnergyPlus {
 
 #define EP_HBIRE_SEQ
-
+#define DEBUG_SH
 namespace HeatBalanceIntRadExchange {
 	// Module containing the routines dealing with the interior radiant exchange
 	// between surfaces.
@@ -140,9 +140,9 @@ namespace HeatBalanceIntRadExchange {
 		}
 		timer.stopTimer();
 		++count;
-#ifdef DEBUG_SH
- 				EppPerformance::Utility::doDataDump();
-#endif
+// #ifdef DEBUG_SH
+// 		EppPerformance::Utility::doDataDump();
+// #endif
 	}
 
 	void
@@ -431,9 +431,9 @@ namespace HeatBalanceIntRadExchange {
 		timer.startTimer();
 
 		// FLOW:
-#ifdef DEBUG_SH
-		//		EppPerformance::Utility::doDataDump();
-#endif
+// #ifdef DEBUG_SH
+// 		//		EppPerformance::Utility::doDataDump();
+// #endif
 
 
 		ZoneInfo.resize( NumOfZones ); // Allocate the entire derived type

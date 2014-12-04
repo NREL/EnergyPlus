@@ -334,8 +334,8 @@ namespace DElightManagerF {
 				// Zone Surface Data Section
 				// Count the number of opaque surfaces bounding the current zone
 				iNumOpaqueSurfs = 0;
-				iSurfaceFirst = Zone( izone ).SurfaceFirst;
-				int const iSurfaceLast = Zone( izone ).SurfaceLast; // ending loop variable for surfaces
+				iSurfaceFirst = ZoneSpecs[ izone - 1 ].SurfaceFirst;
+				int const iSurfaceLast = ZoneSpecs[ izone - 1 ].SurfaceLast; // ending loop variable for surfaces
 
 				for ( int isurf = iSurfaceFirst; isurf <= iSurfaceLast; ++isurf ) {
 					if ( Surface( isurf ).Class == SurfaceClass_Wall ) ++iNumOpaqueSurfs;
@@ -352,7 +352,7 @@ namespace DElightManagerF {
 					if ( ( Surface( isurf ).Class == SurfaceClass_Wall ) || ( Surface( isurf ).Class == SurfaceClass_Roof ) || ( Surface( isurf ).Class == SurfaceClass_Floor ) ) {
 
 						// Get the Construction index for this Surface
-						iconstruct = Surface( isurf ).Construction;
+						iconstruct = Construction[ isurf - 1 ];
 
 						// Is this Surface exposed to the exterior?
 						if ( Surface( isurf ).ExtSolar ) {
@@ -448,7 +448,7 @@ namespace DElightManagerF {
 											// the library section of DElight input file
 
 											// Get the Construction index for this Window Surface
-											iconstruct = Surface( iwndo2 ).Construction;
+											iconstruct = Construction[ iwndo2 - 1 ];
 
 											// Has the current Construction index been encountered before?
 											lWndoConstFound = false;

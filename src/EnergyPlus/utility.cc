@@ -39,14 +39,12 @@ Utility::getProcElementCount(){
 
 void
 Utility::doDataDump(){
-  //delme
-  return;
-  //end delme
   using namespace EnergyPlus::DataHeatBalance;
   using namespace EnergyPlus::DataSurfaces;
   using namespace EnergyPlus::DataHeatBalSurface;
 	using namespace EnergyPlus::DataViewFactorInformation;
 
+	
 	static bool numhit = 0;
 	const int max(100);
 	if (numhit > max){
@@ -120,10 +118,15 @@ Utility::doDataDump(){
 
   static int counter = 0;
 
-  if (counter > 125){
+  if (counter >= 125){
     return;
   }
 
+	file << "Iteration " << counter << " of WinHeatGain" << std::endl;
+	for(int s = 1; s <= TotSurfaces; ++s){
+		file << s << ":" << WinHeatGain( s ) << ";";
+	}
+	file << std::endl;
   // file << "Iteration " << counter << " of IRfromParentZone" << std::endl;
   // for(auto ir : IRfromParentZone){
   //   file << ir << std::endl;
@@ -135,24 +138,28 @@ Utility::doDataDump(){
   // for(auto r : NetLWRadToSurf){
   //   file << r << std::endl;
   // }
-  for(auto& z: ZoneInfo){
-    for(auto& s: z.surfaces){
-      int construct = Construction[ s() ];
-      file << "count " << counter << " rec surf: " << s() << std::endl;
-      file << " temp: " << s.temperature << " emis: "
-	   << s.emissivity << " surfCount: " << z.NumOfSurfaces << std::endl;
-      file << " is window " << s.isWindow << " is TDD Dif " << 
-	(SurfaceRadiantWin[ s() ].OriginalClass == SurfaceClass_TDD_Diffuser) <<
-	" is WindowTypeEQL " << Construct( Construction[ s() ] ).WindowTypeEQL << 
-	" shadeFlag IntShadeOn " << (SurfaceRadiantWin[ s() ].getShadingFlag() == IntShadeOn) 
-	   << " shadeFlag IntBlindOn " << (SurfaceRadiantWin[ s() ].getShadingFlag() == IntBlindOn) << std::endl;
-      file << " script_f: ";
-      for(auto snd : z.surfaces){
-	file << snd(false) << "::" << z.ScriptF(s(false) + 1, snd(false) + 1) << ":";
-      }
-      file << std::endl;
-    }
-  }
+  // if (counter == 123) {
+  //   std::cout << "Counter just hit 123" << std::endl;
+  // }
+
+  // for(auto& z: ZoneInfo){
+  //   for(auto& s: z.surfaces){
+  //     int construct = Construction[ s() ];
+  //     file << "count " << counter << " rec surf: " << s() << std::endl;
+  //     file << " temp: " << s.temperature << " emis: "
+  // 	   << s.emissivity << " surfCount: " << z.NumOfSurfaces << std::endl;
+  //     file << " is window " << s.isWindow << " is TDD Dif " << 
+  // 	(SurfaceRadiantWin[ s() ].OriginalClass == SurfaceClass_TDD_Diffuser) <<
+  // 	" is WindowTypeEQL " << Construct( Construction[ s() ] ).WindowTypeEQL << 
+  // 	" shadeFlag IntShadeOn " << (SurfaceRadiantWin[ s() ].getShadingFlag() == IntShadeOn) 
+  // 	   << " shadeFlag IntBlindOn " << (SurfaceRadiantWin[ s() ].getShadingFlag() == IntBlindOn) << std::endl;
+  //     file << " script_f: ";
+  //     for(auto snd : z.surfaces){
+  // 	file << snd(false) << "::" << z.ScriptF(s(false) + 1, snd(false) + 1) << ":";
+  //     }
+  //     file << std::endl;
+  //   }
+  // }
 
   file.flush();
   counter++;

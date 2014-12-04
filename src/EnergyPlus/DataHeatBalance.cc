@@ -733,7 +733,7 @@ namespace DataHeatBalance {
 				case ScreenEquivalentLayer:
 				case BlindEquivalentLayer:
 				case GapEquivalentLayer:
-					Construct( ConstrNum ).TypeIsWindow = true;
+				  ConstrWin[ ConstrNum - 1 ].TypeIsWindow = true;
 			}
 		}
 
@@ -1132,6 +1132,7 @@ namespace DataHeatBalance {
 			NewConstrNum = TotConstructs;
 			Construct( NewConstrNum ).IsUsed = true;
 			Construct( TotConstructs ) = Construct( ConstrNum ); // preserve some of the attributes.
+         ConstrWin[ TotConstructs - 1 ] = ConstrWin[ ConstrNum - 1 ];
 			// replace others...
 			Construct( TotConstructs ).Name = "iz-" + Construct( ConstrNum ).Name;
 			Construct( TotConstructs ).TotLayers = Construct( ConstrNum ).TotLayers;

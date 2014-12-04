@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 #include <string>
+#include <algorithm>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray.functions.hh>
@@ -3806,9 +3807,9 @@ namespace WindowManager {
 
 		ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
 		ShadeFlag = SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag();
-		nglassfaces = 2 * Construct( ConstrNumSh ).TotGlassLayers;
+		nglassfaces = 2 * ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers;
 
-		if ( Construct( ConstrNumSh ).TotGlassLayers == 2 ) { // Double glazing
+		if ( ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers == 2 ) { // Double glazing
 			MatNumSh = Construct( ConstrNumSh ).LayerPoint( 3 );
 			IGapInc = 0;
 			for ( IGap = 1; IGap <= 2; ++IGap ) {
@@ -4000,7 +4001,7 @@ namespace WindowManager {
 		//DATA AirProps / 1.29, -0.4d-2, 2.41d-2, 7.6d-5, 1.73d-5, 1.0d-7, 0.72,   1.8d-3  /
 
 		ConstrNum = Construction[ SurfNum - 1 ];
-		NGlass = Construct( ConstrNum ).TotGlassLayers;
+		NGlass = ConstrWin[ ConstrNum - 1 ].TotGlassLayers;
 		TGlassFace1 = thetas( 2 * NGlass - 2 );
 		TGlassFace2 = thetas( 2 * NGlass - 1 );
 		GapNum = NGlass - 1;
@@ -4136,7 +4137,7 @@ namespace WindowManager {
 		ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
 		ShadeFlag = SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag();
 
-		if ( Construct( ConstrNumSh ).TotGlassLayers == 2 ) { // Double glazing
+		if ( ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers == 2 ) { // Double glazing
 			MatNumSh = Construct( ConstrNumSh ).LayerPoint( 3 );
 			IGapInc = 0;
 			for ( IGap = 1; IGap <= 2; ++IGap ) {
@@ -7159,8 +7160,12 @@ namespace WindowManager {
 		//    HasWindows=.true.
 		//    EXIT
 		//  ENDDO
-
-		if ( any( Construct.TypeIsWindow() ) ) HasWindows = true;
+		if ( std::any_of (ConstrWin.begin(), 
+				  ConstrWin.end(), 
+				  [](WindowAbsThermLay e)
+				  {return e.TypeIsWindow == true;})) 
+		  HasWindows = true;
+		// if ( any( Construct.TypeIsWindow() ) ) HasWindows = true;
 		if ( any( Construct.WindowTypeBSDF() ) ) HasComplexWindows = true; // Yes, this is a bit different than actually using them.
 		if ( any( Construct.WindowTypeEQL() ) ) HasEQLWindows = true; // for reporting purpose only
 

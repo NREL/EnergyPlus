@@ -172,7 +172,7 @@ namespace WindowEquivalentLayer {
 		CFSDiffAbsTrans = 0.0;
 
 		for ( ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum ) {
-			if ( ! Construct( ConstrNum ).TypeIsWindow ) continue;
+			if ( ! ConstrWin[ ConstrNum - 1 ].TypeIsWindow ) continue;
 			if ( ! Construct( ConstrNum ).WindowTypeEQL ) continue; // skip if not equivalent layer window
 
 			SetEquivalentLayerWindowProperties( ConstrNum );
@@ -180,7 +180,7 @@ namespace WindowEquivalentLayer {
 		} //  end do for TotConstructs
 
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
-			if ( ! Construct( Construction[ SurfNum - 1 ] ).TypeIsWindow ) continue;
+			if ( ! ConstrWin[ Construction[ SurfNum - 1 ] - 1 ].TypeIsWindow ) continue;
 			if ( ! Construct( Construction[ SurfNum - 1 ] ).WindowTypeEQL ) continue;
 
 			SurfaceWindow( SurfNum ).WindowModelType = WindowEQLModel;

@@ -6715,7 +6715,7 @@ namespace SolarShading {
 								if ( SurfaceWindow( IBack ).WindowModelType != WindowEQLModel ) continue; // only EQL back window is allowed
 
 								ConstrNumBack = Construction[ BackSurfNum - 1 ];
-								NBackGlass = Construct( ConstrNumBack ).TotGlassLayers;
+								NBackGlass = ConstrWin[ ConstrNumBack - 1 ].TotGlassLayers;
 								// Irradiated (overlap) area for this back surface, projected onto window plane
 								// (includes effect of shadowing on exterior window)
 								AOverlap = OverlapAreas( SurfNum, IBack, HourOfDay, TimeStep );
@@ -6851,13 +6851,13 @@ namespace SolarShading {
 								// diffuse layer absorptions have already been put into the construction
 								if ( SurfaceWindow( FloorNum ).StormWinFlag == 1 ) FlConstrNum = Surface( FloorNum ).StormWinConstruction;
 								AbsBeamTotWin = 0.0;
-								for ( Lay = 1; Lay <= Construct( FlConstrNum ).TotGlassLayers; ++Lay ) {
+								for ( Lay = 1; Lay <= ConstrWin[ FlConstrNum - 1 ].TotGlassLayers; ++Lay ) {
 									AbsBeamTotWin += Construct( FlConstrNum ).AbsDiffBack( Lay );
 								}
 								// In the following we have to multiply by the AbsDiffBack(Lay)/AbsBeamTotWin ratio to get the
 								// layer by layer absorbed beam since ISABSF(FloorNum) is proportional to AbsBeamTotWin
 								// (see ComputeIntSolarAbsorpFactors).
-								for ( Lay = 1; Lay <= Construct( FlConstrNum ).TotGlassLayers; ++Lay ) {
+								for ( Lay = 1; Lay <= ConstrWin[ FlConstrNum - 1 ].TotGlassLayers; ++Lay ) {
 									AWinSurf( FloorNum, Lay ) += Construct( FlConstrNum ).AbsDiffBack( Lay ) / AbsBeamTotWin * BTOTWinZone * ISABSF( FloorNum ) / Surface( FloorNum ).Area; //[-]
 								}
 							}
@@ -10028,7 +10028,7 @@ namespace SolarShading {
 								auto const & construct_sh( Construct( ConstrNumSh ) );
 								auto const & construct_sh_AbsDiffBack( construct_sh.AbsDiffBack );
 								auto const & construct_sh_BlAbsDiffBack( construct_sh.BlAbsDiffBack );
-								for ( IGlass = 1; IGlass <= construct_sh.TotGlassLayers; ++IGlass ) {
+								for ( IGlass = 1; IGlass <= ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers; ++IGlass ) {
 									if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
 										// Calc diffuse solar absorbed in each window glass layer and shade
 										WinDifSolLayAbsW = WinDifSolarTrans_Factor * construct_sh_AbsDiffBack( IGlass );

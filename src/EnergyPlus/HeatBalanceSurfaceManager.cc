@@ -2784,7 +2784,7 @@ namespace HeatBalanceSurfaceManager {
 
 					} else if ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) {
 						// Interior, exterior or between-glass shade, screen or blind in place
-						for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
+						for ( IGlass = 1; IGlass <= ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers; ++IGlass ) {
 							if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) QRadSWwinAbs( SurfNum, IGlass ) += QS( ZoneNum ) * Construct( ConstrNumSh ).AbsDiffBack( IGlass );
 							if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn ) {
 							  BlAbsDiffBk = InterpSlatAng( SurfaceRadiantWin[ SurfNum - 1 ].SlatAngThisTS, SurfaceRadiantWin[ SurfNum - 1 ].MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( IGlass, _ ) ); //delme -- changed by geof (_ for {1,MaxSlatAngs} in BlAbsDiffBack)
@@ -2932,7 +2932,7 @@ namespace HeatBalanceSurfaceManager {
 						ConstrNum = Surface( SurfNum ).StormWinConstruction;
 						ConstrNumSh = Surface( SurfNum ).StormWinShadedConstruction;
 					}
-					TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
+					TotGlassLayers = ConstrWin[ ConstrNum - 1 ].TotGlassLayers;
 					ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag(); //SurfaceWindow( SurfNum ).ShadingFlag;
 					if ( ShadeFlag <= 0 ) { // No window shading
 						for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
@@ -2940,7 +2940,7 @@ namespace HeatBalanceSurfaceManager {
 						}
 					} else if ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) {
 						// Interior, exterior or between-glass shade, screen or blind in place
-						for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
+						for ( IGlass = 1; IGlass <= ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers; ++IGlass ) {
 							QRadSWwinAbs( SurfNum, IGlass ) += InitialDifSolwinAbs( SurfNum, IGlass );
 						}
 						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) SurfaceWindow( SurfNum ).IntSWAbsByShade += SurfaceWindow( SurfNum ).InitialDifSolAbsByShade;
@@ -2953,7 +2953,7 @@ namespace HeatBalanceSurfaceManager {
 						}
 					} // End of shading flag check
 				} else if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
-					TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
+					TotGlassLayers = ConstrWin[ ConstrNum - 1 ].TotGlassLayers;
 					for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 						QRadSWwinAbs( SurfNum, IGlass ) += InitialDifSolwinAbs( SurfNum, IGlass );
 					}
@@ -2997,7 +2997,7 @@ namespace HeatBalanceSurfaceManager {
 					if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) {
 						TotGlassLayers = Construct( ConstrNum ).TotSolidLayers;
 					} else {
-						TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
+						TotGlassLayers = ConstrWin[ ConstrNum - 1 ].TotGlassLayers;
 					}
 					ShadeFlag = SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag(); //SurfaceWindow( SurfNum ).ShadingFlag;
 					if ( ShadeFlag <= 0 ) { // No window shading
@@ -3011,7 +3011,7 @@ namespace HeatBalanceSurfaceManager {
 						}
 					} else if ( ShadeFlag == IntShadeOn || ShadeFlag >= 3 ) {
 						// Interior, exterior or between-glass shade, screen or blind in place
-						for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
+						for ( IGlass = 1; IGlass <= ConstrWin[ ConstrNumSh - 1 ].TotGlassLayers; ++IGlass ) {
 							// Initial Transmitted Diffuse Solar Absorbed on Inside of Surface[W]
 							InitialDifSolInAbsReport( SurfNum ) += InitialDifSolwinAbs( SurfNum, IGlass ) * Surface( SurfNum ).Area;
 							// Total Shortwave Radiation Absorbed on Inside of Surface[W]
@@ -3319,7 +3319,7 @@ namespace HeatBalanceSurfaceManager {
 						SwitchFac = SurfaceWindow( SurfNum ).SwitchingFactor;
 
 						// Sum of absorptances of glass layers
-						for ( Lay = 1; Lay <= Construct( ConstrNum ).TotGlassLayers; ++Lay ) {
+						for ( Lay = 1; Lay <= ConstrWin[ ConstrNum - 1 ].TotGlassLayers; ++Lay ) {
 							AbsDiffLayWin = Construct( ConstrNum ).AbsDiffBack( Lay );
 
 							// Window with shade, screen or blind
@@ -5711,6 +5711,14 @@ CalcHeatBalanceInsideSurf( int ZoneToResimulate ) // if passed in, then only cal
 				}
 			}
 		} // ...end of loop over all surfaces for inside heat balances
+
+		//DELME debug by Geof
+// #define DEBUG_SH
+// #ifdef DEBUG_SH
+// 		EppPerformance::Utility::doDataDump();
+// #endif
+// #undef DEBUG_SH
+		//end DELME
 
 		// Interzone surface updating: interzone surfaces have other side temperatures
 		// which can vary as the simulation iterates through the inside heat
