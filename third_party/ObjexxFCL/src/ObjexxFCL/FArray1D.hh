@@ -409,7 +409,7 @@ public: // Creation
 	 Super( l ),
 	 I_( I )
 	{
-		assert( size_ == l.size() );
+		assert( size_of( I ) == l.size() );
 		setup_real();
 		insert_as_observer();
 	}
@@ -1755,9 +1755,10 @@ public: // Modifier
 	FArray1D &
 	swap( FArray1D & v )
 	{
+		using std::swap;
 		swap1DB( v );
 		I_.swap_no_notify( v.I_ );
-		std::swap( initializer_, v.initializer_ );
+		swap( initializer_, v.initializer_ );
 		notify(); // So proxy FArrays can reattach
 		v.notify(); // So proxy FArrays can reattach
 		return *this;
@@ -3638,29 +3639,5 @@ cross_product( FArray1< T > const & a, FArray1< T > const & b )
 }
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add template functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.  The legal alternative would be
-// to add specializations of swap for each anticipated instantiation.
-
-namespace std {
-
-// std::swap( FArray1D, FArray1D )
-template< typename T >
-inline
-void
-swap( ObjexxFCL::FArray1D< T > & a, ObjexxFCL::FArray1D< T > & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_FArray1D_hh_INCLUDED

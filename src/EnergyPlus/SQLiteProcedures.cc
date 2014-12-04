@@ -987,7 +987,7 @@ void SQLite::initializeDaylightMapTables()
 	const std::string daylightMapTitleInsertSQL =
 		"INSERT INTO DaylightMaps VALUES(?,?,?,?,?,?,?);";
 
-	sqlitePrepareStatement(m_daylightMapHorlyTitleInsertStmt,daylightMapTitleInsertSQL);
+	sqlitePrepareStatement(m_daylightMapTitleInsertStmt,daylightMapTitleInsertSQL);
 
 	const std::string daylightMapHourlyReportsTableSQL =
 		"CREATE TABLE DaylightMapHourlyReports (HourlyReportIndex INTEGER PRIMARY KEY, "
@@ -1859,7 +1859,7 @@ void SQLite::createSQLiteDaylightMap(
 }
 
 void SQLite::createSQLiteTabularDataRecords(
-	FArray2D_string const & body, // row,column
+	FArray2D_string const & body, // html table row, html table column
 	FArray1D_string const & rowLabels,
 	FArray1D_string const & columnLabels,
 	std::string const & reportName,
@@ -1871,17 +1871,17 @@ void SQLite::createSQLiteTabularDataRecords(
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
 
-		for(size_t iRow = 0, k = body.index(1,1); iRow < sizeRowLabels; ++iRow) {
-			std::string rowLabel = rowLabels[iRow];
-			std::string rowUnits;
-			std::string rowDescription;
-			parseUnitsAndDescription(rowLabel,rowUnits,rowDescription);
+		for(size_t iCol = 0, k = body.index(1,1); iCol < sizeColumnLabels; ++iCol) {
+			std::string colLabel = columnLabels[iCol];
+			std::string colUnits;
+			std::string colDescription;
+			parseUnitsAndDescription(colLabel,colUnits,colDescription);
 
-			for(size_t iCol = 0; iCol < sizeColumnLabels; ++iCol) {
-				std::string colLabel = columnLabels[iCol];
-				std::string colUnits;
-				std::string colDescription;
-				parseUnitsAndDescription(colLabel,colUnits,colDescription);
+			for(size_t iRow = 0; iRow < sizeRowLabels; ++iRow) {
+				std::string rowLabel = rowLabels[iRow];
+				std::string rowUnits;
+				std::string rowDescription;
+				parseUnitsAndDescription(rowLabel,rowUnits,rowDescription);
 
 				std::string units;
 				if( colUnits.empty() ) {

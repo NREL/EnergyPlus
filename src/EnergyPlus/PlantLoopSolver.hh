@@ -158,7 +158,7 @@ namespace PlantLoopSolver {
 		Real64 const FlowRequest,
 		bool const FirstHVACIteration,
 		bool & LoopShutDownFlag,
-		Optional_bool_const StartingNewLoopSidePass = _
+		bool const StartingNewLoopSidePass = false
 	);
 
 	//==================================================================!

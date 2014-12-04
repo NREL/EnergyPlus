@@ -40,6 +40,14 @@ public: // Creation
 	 format_( fmt.format_ ? fmt.format_->clone() : nullptr )
 	{}
 
+	// Move Constructor
+	inline
+	Fmt( Fmt && fmt ) :
+	 format_( fmt.format_ )
+	{
+		fmt.format_ = nullptr;
+	}
+
 	// String Constructor
 	inline
 	Fmt( std::string const & format_string ) :
@@ -93,6 +101,16 @@ public: // Properties
 	format_clone() const
 	{
 		return ( format_ ? format_->clone() : nullptr );
+	}
+
+public: // Methods
+
+	// Reset
+	inline
+	Format *
+	format_reset()
+	{
+		return ( format_ ? &format_->reset() : nullptr );
 	}
 
 private: // Data
