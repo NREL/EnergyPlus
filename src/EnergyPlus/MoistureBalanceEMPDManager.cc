@@ -195,8 +195,7 @@ namespace MoistureBalanceEMPDManager {
 		}
 
 		// Ensure at least one interior EMPD surface for each zone
-		EMPDzone.allocate( NumOfZones );
-		EMPDzone = false;
+		EMPDzone.dimension( NumOfZones, false );
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf || Surface( SurfNum ).Class == SurfaceClass_Window ) continue; // Heat transfer surface only and not a window
 			if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_EMPD ) continue;
@@ -615,7 +614,7 @@ namespace MoistureBalanceEMPDManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -630,7 +629,7 @@ namespace MoistureBalanceEMPDManager {
 		int MatNum;
 
 		// Formats
-		static gio::Fmt const Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
+		static gio::Fmt Format_700( "(' Construction EMPD, ',A,', ',A,', ',4(F8.4,', '),F8.4)" );
 
 		ScanForReports( "Constructions", DoReport, "Constructions" );
 

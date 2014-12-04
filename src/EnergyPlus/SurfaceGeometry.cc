@@ -81,9 +81,9 @@ namespace EnergyPlus {
     int const UnreconciledZoneSurface( -999 ); // interim value between entering surfaces ("Surface") and reconciling
     // surface names in other zones
 
-    static gio::Fmt const fmtLD( "*" );
-    static gio::Fmt const fmtA( "(A)" );
-    static gio::Fmt const fmt3( "(A,3(1x,f18.13))" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmt3( "(A,3(1x,f18.13))" );
 
     // DERIVED TYPE DEFINITIONS
 
@@ -107,9 +107,8 @@ namespace EnergyPlus {
 
     //SUBROUTINE SPECIFICATIONS FOR MODULE SurfaceGeometry
 
-    // Object Data
+	// Object Data
     FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
-    FArray1D< SurfaceData > SurfaceTmpSave; // Allocated/Deallocated during input processing
 
     std::vector<int> TmpConstruction;
 
@@ -150,8 +149,8 @@ namespace EnergyPlus {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ValFmt( "(F20.2)" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt ValFmt( "(F20.2)" );
+		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "SetUpZoneGeometry: " );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -191,8 +190,8 @@ namespace EnergyPlus {
 		bool DetailedWWR;
 
 		// Formats
-		static gio::Fmt const Format_720( "(' Zone Information, ',A,28(',',A))" );
-		static gio::Fmt const Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
+		static gio::Fmt Format_720( "(' Zone Information, ',A,28(',',A))" );
+		static gio::Fmt Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
 
 		// FLOW:
 		// Allocations and initializations...
@@ -212,10 +211,8 @@ namespace EnergyPlus {
 		CosZoneRelNorth.allocate( NumOfZones );
 		SinZoneRelNorth.allocate( NumOfZones );
 
-		ZoneCeilingHeightEntered.allocate( NumOfZones );
-		ZoneCeilingHeightEntered = false;
-		ZoneCeilingArea.allocate( NumOfZones );
-		ZoneCeilingArea = 0.0;
+		ZoneCeilingHeightEntered.dimension( NumOfZones, false );
+		ZoneCeilingArea.dimension( NumOfZones, 0.0 );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -242,8 +239,7 @@ namespace EnergyPlus {
 
 		AllocateModuleArrays(); // This needs to be moved to the main manager routine of SSG at a later date
 
-		AirSkyRadSplit.allocate( TotSurfaces );
-		AirSkyRadSplit = 0.0;
+		AirSkyRadSplit.dimension( TotSurfaces, 0.0 );
 
 		CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
 		// is requested for one or more exterior windows.
@@ -460,8 +456,7 @@ namespace EnergyPlus {
 		ZoneCeilingHeightEntered.deallocate();
 		ZoneCeilingArea.deallocate();
 
-		AdjacentZoneToSurface.allocate( TotSurfaces );
-		AdjacentZoneToSurface = 0;
+		AdjacentZoneToSurface.dimension( TotSurfaces, 0 );
 		// note -- adiabatic surfaces will show same zone as surface
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
         if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue;
@@ -621,35 +616,21 @@ namespace EnergyPlus {
 		ShadeV.allocate( TotSurfaces );
 		ShadeV.NVert() = 0;
 		// Individual components (XV,YV,ZV) allocated in routine ProcessSurfaceVertices
-		X0.allocate( TotSurfaces );
-		X0 = 0.0;
-		Y0.allocate( TotSurfaces );
-		Y0 = 0.0;
-		Z0.allocate( TotSurfaces );
-		Z0 = 0.0;
+		X0.dimension( TotSurfaces, 0.0 );
+		Y0.dimension( TotSurfaces, 0.0 );
+		Z0.dimension( TotSurfaces, 0.0 );
 
-		CBZone.allocate( NumOfZones );
-		CBZone = 0.0;
-		DSZone.allocate( NumOfZones );
-		DSZone = 0.0;
-		DGZone.allocate( NumOfZones );
-		DGZone = 0.0;
-		DBZone.allocate( NumOfZones );
-		DBZone = 0.0;
-		DBZoneSSG.allocate( NumOfZones );
-		DBZoneSSG = 0.0;
-		QSDifSol.allocate( NumOfZones );
-		QSDifSol = 0.0;
-		AISurf.allocate( TotSurfaces );
-		AISurf = 0.0;
-		AOSurf.allocate( TotSurfaces );
-		AOSurf = 0.0;
-		BmToBmReflFacObs.allocate( TotSurfaces );
-		BmToBmReflFacObs = 0.0;
-		BmToDiffReflFacObs.allocate( TotSurfaces );
-		BmToDiffReflFacObs = 0.0;
-		BmToDiffReflFacGnd.allocate( TotSurfaces );
-		BmToDiffReflFacGnd = 0.0;
+		CBZone.dimension( NumOfZones, 0.0 );
+		DSZone.dimension( NumOfZones, 0.0 );
+		DGZone.dimension( NumOfZones, 0.0 );
+		DBZone.dimension( NumOfZones, 0.0 );
+		DBZoneSSG.dimension( NumOfZones, 0.0 );
+		QSDifSol.dimension( NumOfZones, 0.0 );
+		AISurf.dimension( TotSurfaces, 0.0 );
+		AOSurf.dimension( TotSurfaces, 0.0 );
+		BmToBmReflFacObs.dimension( TotSurfaces, 0.0 );
+		BmToDiffReflFacObs.dimension( TotSurfaces, 0.0 );
+		BmToDiffReflFacGnd.dimension( TotSurfaces, 0.0 );
 		AWinSurf.allocate( TotSurfaces, CFSMAXNL + 1 );
 		AWinSurf = 0.0;
 		AWinCFOverlap.allocate( TotSurfaces, MaxSolidWinLayers );
@@ -983,12 +964,7 @@ namespace EnergyPlus {
 		// Have to make room for added surfaces, if needed
 		FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
 		if ( NeedToAddSurfaces + NeedToAddSubSurfaces > 0 ) {
-        SurfaceTmpSave.allocate( TotSurfaces );
-        SurfaceTmpSave( {1,FirstTotalSurfaces} ) = SurfaceTmp;
-        SurfaceTmp.deallocate();
-        SurfaceTmp.allocate( TotSurfaces );
-        SurfaceTmp = SurfaceTmpSave;
-        SurfaceTmpSave.deallocate();
+			SurfaceTmp.redimension( TotSurfaces );
 		}
 
 		SurfaceWindow.allocate( TotSurfaces );
@@ -2130,7 +2106,7 @@ namespace EnergyPlus {
 		std::string OutMsg;
 
 		// Formats
-		static gio::Fmt const Format_720( "(A)" );
+		static gio::Fmt Format_720( "(A)" );
 
 		cCurrentModuleObject = "GlobalGeometryRules";
 		NumStmt = GetNumObjectsFound( cCurrentModuleObject );
@@ -5093,7 +5069,7 @@ namespace EnergyPlus {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const cModuleObjects( 4, { "Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection" } );
-		static gio::Fmt const dfmt( "(A,3(2x,f6.2))" );
+		static gio::Fmt dfmt( "(A,3(2x,f6.2))" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5984,7 +5960,6 @@ namespace EnergyPlus {
 		bool SurfacesOfType;
 		int SurfNum;
 		//  INTEGER :: Index
-		FArray1D_int tmpHeatTransferAlgosUsed;
 		int NumEMPDMat;
 		int NumPCMat;
 		int NumVTCMat;
@@ -5999,7 +5974,7 @@ namespace EnergyPlus {
 		std::string AlgoName;
 
 		// Formats
-		static gio::Fmt const Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
 
 		// first initialize each heat transfer surface with the overall model type, array assignment
 		Surface.HeatTransferAlgorithm() = HeatTransferAlgosUsed( 1 );
@@ -6034,25 +6009,19 @@ namespace EnergyPlus {
           } else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
 				ErrorsFoundSingleSurf = true;
-          }}
+			}}
 
-        if ( ! ErrorsFoundSingleSurf ) {
-          Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
+			if ( ! ErrorsFoundSingleSurf ) {
+				Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
 
-          if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-            tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-            tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-            ++NumberOfHeatTransferAlgosUsed;
-            HeatTransferAlgosUsed.deallocate();
-            HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-            HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
-            HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-            tmpHeatTransferAlgosUsed.deallocate();
-          }
+				if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
+					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
+					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
+				}
 
-        } else {
-          ErrorsFound = true;
-        }
+			} else {
+				ErrorsFound = true;
+			}
 		} // single surface heat transfer algorithm override
 
 		cCurrentModuleObject = "SurfaceProperty:HeatTransferAlgorithm:MultipleSurface";
@@ -6176,23 +6145,17 @@ namespace EnergyPlus {
 				SurfacesOfType = false;
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
 				ErrorsFoundMultiSurf = true;
-          }}
+			}}
 
-        if ( ! SurfacesOfType ) {
-          ShowWarningError( "In " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", for Multiple Surface Assignment=\"" + cAlphaArgs( 2 ) + "\", there were no surfaces of that type found for assignment." );
-        } else {
-          if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-            tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-            tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-            ++NumberOfHeatTransferAlgosUsed;
-            HeatTransferAlgosUsed.deallocate();
-            HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-            HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
-            HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-            tmpHeatTransferAlgosUsed.deallocate();
-          }
-        }
-        if ( ErrorsFoundMultiSurf ) ErrorsFound = true;
+			if ( ! SurfacesOfType ) {
+				ShowWarningError( "In " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", for Multiple Surface Assignment=\"" + cAlphaArgs( 2 ) + "\", there were no surfaces of that type found for assignment." );
+			} else {
+				if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
+					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
+					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
+				}
+			}
+			if ( ErrorsFoundMultiSurf ) ErrorsFound = true;
 
 		} // multi surface heat transfer algo override
 
@@ -6227,21 +6190,15 @@ namespace EnergyPlus {
 
           }
 
-          if ( ! ErrorsFoundSurfList ) {
-            Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
-            if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-              tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-              tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-              ++NumberOfHeatTransferAlgosUsed;
-              HeatTransferAlgosUsed.deallocate();
-              HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-              HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
-              HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-              tmpHeatTransferAlgosUsed.deallocate();
-            }
-          } else {
-            ErrorsFound = true;
-          }
+				if ( ! ErrorsFoundSurfList ) {
+					Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
+					if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
+						HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
+						HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
+					}
+				} else {
+					ErrorsFound = true;
+				}
 
         }
 
@@ -6265,32 +6222,26 @@ namespace EnergyPlus {
           } else {
 				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) );
 				ErrorsFoundByConstruct = true;
-          }}
+			}}
 
-        Found = 0;
-        Found = FindItemInList( cAlphaArgs( 3 ), Construct_Name, TotConstructs );
-        if ( Found == 0 ) {
-          ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
-          ErrorsFoundByConstruct = true;
-        }
+			Found = 0;
+			Found = FindItemInList( cAlphaArgs( 3 ), Construct_Name, TotConstructs );
+			if ( Found == 0 ) {
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) );
+				ErrorsFoundByConstruct = true;
+			}
 
-        if ( ! ErrorsFoundByConstruct ) {
-          for ( Item1 = 1; Item1 <= TotSurfaces; ++Item1 ) {
-            if ( Construction[ Item1  - 1 ] == Found ) {
-              Surface( Item1 ).HeatTransferAlgorithm = tmpAlgoInput;
-              if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-                tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-                tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-                ++NumberOfHeatTransferAlgosUsed;
-                HeatTransferAlgosUsed.deallocate();
-                HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-                HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
-                HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-                tmpHeatTransferAlgosUsed.deallocate();
-              }
-            }
-          }
-        }
+			if ( ! ErrorsFoundByConstruct ) {
+				for ( Item1 = 1; Item1 <= TotSurfaces; ++Item1 ) {
+          if ( Construction[ Item1  - 1 ] == Found ) {
+						Surface( Item1 ).HeatTransferAlgorithm = tmpAlgoInput;
+						if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
+							HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
+							HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
+						}
+					}
+				}
+			}
 		}
 
 		// test for missing materials for algorithms selected
@@ -6412,7 +6363,7 @@ namespace EnergyPlus {
 		using namespace DataErrorTracking;
 
 		// Locals
-		static gio::Fmt const fmt3( "(A,I5,A,3(1X,F18.13))" );
+		static gio::Fmt fmt3( "(A,I5,A,3(1X,F18.13))" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -6721,7 +6672,7 @@ namespace EnergyPlus {
 		using General::RoundSigDigits;
 
 		// Locals
-		static gio::Fmt const fmt3( "(A,I5,A,3(1X,F18.13))" );
+		static gio::Fmt fmt3( "(A,I5,A,3(1X,F18.13))" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -7751,7 +7702,7 @@ namespace EnergyPlus {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OSCFormat1( "('! <Other Side Coefficients>,Name," "Combined convective/radiative film coefficient {W/m2-K}," "User selected Constant Temperature {C},Coefficient modifying the constant temperature term," "Coefficient modifying the external dry bulb temperature term," "Coefficient modifying the ground temperature term," "Coefficient modifying the wind speed term {s/m}," "Coefficient modifying the zone air temperature term," "Constant Temperature Schedule Name," "Sinusoidal Variation," "Period of Sinusoidal Variation," "Previous Other Side Temperature Coefficient," "Minimum Other Side Temperature {C}," "Maximum Other Side Temperature {C}')" );
+		static gio::Fmt OSCFormat1( "('! <Other Side Coefficients>,Name," "Combined convective/radiative film coefficient {W/m2-K}," "User selected Constant Temperature {C},Coefficient modifying the constant temperature term," "Coefficient modifying the external dry bulb temperature term," "Coefficient modifying the ground temperature term," "Coefficient modifying the wind speed term {s/m}," "Coefficient modifying the zone air temperature term," "Constant Temperature Schedule Name," "Sinusoidal Variation," "Period of Sinusoidal Variation," "Previous Other Side Temperature Coefficient," "Minimum Other Side Temperature {C}," "Maximum Other Side Temperature {C}')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -7912,7 +7863,7 @@ namespace EnergyPlus {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OSCMFormat1( "('! <Other Side Conditions Model>,Name,Class')" );
+		static gio::Fmt OSCMFormat1( "('! <Other Side Conditions Model>,Name,Class')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8178,7 +8129,7 @@ namespace EnergyPlus {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const VolFmt( "(F20.2)" );
+		static gio::Fmt VolFmt( "(F20.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8213,135 +8164,134 @@ namespace EnergyPlus {
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
-        if ( ! Zone( ZoneNum ).HasFloor ) {
-          ShowWarningError( "No floor exists in Zone=\"" + Zone( ZoneNum ).Name + "\", zone floor area is zero. All values for this zone that are entered per floor area will be zero." );
-        }
+			if ( ! Zone( ZoneNum ).HasFloor ) {
+				ShowWarningError( "No floor exists in Zone=\"" + Zone( ZoneNum ).Name + "\", zone floor area is zero. All values for this zone that are entered per floor area will be zero." );
+			}
 
-        SumAreas = 0.0;
-        SurfCount = 0.0;
-        NFaces = ZoneSpecs[ZoneNum - 1 ].SurfaceLast - ZoneSpecs[ZoneNum - 1 ].SurfaceFirst + 1;
-        notused = 0;
-        ZoneStruct.NumSurfaceFaces = NFaces;
-        ZoneStruct.SurfaceFace.allocate( NFaces );
-        NActFaces = 0;
-        surfacenotused.allocate( NFaces );
-        surfacenotused = 0;
+			SumAreas = 0.0;
+			SurfCount = 0.0;
+      NFaces = ZoneSpecs[ZoneNum - 1 ].SurfaceLast - ZoneSpecs[ZoneNum - 1 ].SurfaceFirst + 1;
+			notused = 0;
+			ZoneStruct.NumSurfaceFaces = NFaces;
+			ZoneStruct.SurfaceFace.allocate( NFaces );
+			NActFaces = 0;
+			surfacenotused.dimension( NFaces, 0 );
 
-        for ( SurfNum = ZoneSpecs[ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
+      for ( SurfNum = ZoneSpecs[ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
 
-          // Only include Base Surfaces in Calc.
+				// Only include Base Surfaces in Calc.
 
-          if ( Surface( SurfNum ).Class != SurfaceClass_Wall && Surface( SurfNum ).Class != SurfaceClass_Floor && Surface( SurfNum ).Class != SurfaceClass_Roof ) {
-            ++notused;
-            surfacenotused( notused ) = SurfNum;
-            continue;
-          }
+				if ( Surface( SurfNum ).Class != SurfaceClass_Wall && Surface( SurfNum ).Class != SurfaceClass_Floor && Surface( SurfNum ).Class != SurfaceClass_Roof ) {
+					++notused;
+					surfacenotused( notused ) = SurfNum;
+					continue;
+				}
 
-          ++NActFaces;
-          ZoneStruct.SurfaceFace( NActFaces ).FacePoints.allocate( Surface( SurfNum ).Sides );
-          ZoneStruct.SurfaceFace( NActFaces ).NSides = Surface( SurfNum ).Sides;
-          ZoneStruct.SurfaceFace( NActFaces ).SurfNum = SurfNum;
-          ZoneStruct.SurfaceFace( NActFaces ).FacePoints( {1,Surface( SurfNum ).Sides} ) = Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} );
-          CreateNewellAreaVector( ZoneStruct.SurfaceFace( NActFaces ).FacePoints, ZoneStruct.SurfaceFace( NActFaces ).NSides, ZoneStruct.SurfaceFace( NActFaces ).NewellAreaVector );
-          SumAreas += VecLength( ZoneStruct.SurfaceFace( NActFaces ).NewellAreaVector );
-        }
-        ZoneStruct.NumSurfaceFaces = NActFaces;
-        SurfCount = double( NActFaces );
-        CalcPolyhedronVolume( ZoneStruct, CalcVolume );
+				++NActFaces;
+				ZoneStruct.SurfaceFace( NActFaces ).FacePoints.allocate( Surface( SurfNum ).Sides );
+				ZoneStruct.SurfaceFace( NActFaces ).NSides = Surface( SurfNum ).Sides;
+				ZoneStruct.SurfaceFace( NActFaces ).SurfNum = SurfNum;
+				ZoneStruct.SurfaceFace( NActFaces ).FacePoints( {1,Surface( SurfNum ).Sides} ) = Surface( SurfNum ).Vertex( {1,Surface( SurfNum ).Sides} );
+				CreateNewellAreaVector( ZoneStruct.SurfaceFace( NActFaces ).FacePoints, ZoneStruct.SurfaceFace( NActFaces ).NSides, ZoneStruct.SurfaceFace( NActFaces ).NewellAreaVector );
+				SumAreas += VecLength( ZoneStruct.SurfaceFace( NActFaces ).NewellAreaVector );
+			}
+			ZoneStruct.NumSurfaceFaces = NActFaces;
+			SurfCount = double( NActFaces );
+			CalcPolyhedronVolume( ZoneStruct, CalcVolume );
 
-        if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
-          MinimumVolume = Zone( ZoneNum ).FloorArea * 2.5;
-          if ( Zone( ZoneNum ).CeilingHeight > 0.0 ) {
-            MinimumVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
-          }
-        } else {
-          if ( SurfCount > 0 ) {
-            MinimumVolume = pow_3( std::sqrt( SumAreas / SurfCount ) );
-          } else {
-            MinimumVolume = 0.0;
-          }
-        }
-        if ( CalcVolume > 0.0 ) {
-          TempVolume = CalcVolume;
-        } else {
-          TempVolume = MinimumVolume;
-        }
+			if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
+				MinimumVolume = Zone( ZoneNum ).FloorArea * 2.5;
+				if ( Zone( ZoneNum ).CeilingHeight > 0.0 ) {
+					MinimumVolume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
+				}
+			} else {
+				if ( SurfCount > 0 ) {
+					MinimumVolume = pow_3( std::sqrt( SumAreas / SurfCount ) );
+				} else {
+					MinimumVolume = 0.0;
+				}
+			}
+			if ( CalcVolume > 0.0 ) {
+				TempVolume = CalcVolume;
+			} else {
+				TempVolume = MinimumVolume;
+			}
 
-        if ( Zone( ZoneNum ).Volume > 0.0 ) { // User entered zone volume, produce message if not near calculated
-          if ( TempVolume > 0.0 ) {
-            if ( std::abs( TempVolume - Zone( ZoneNum ).Volume ) / Zone( ZoneNum ).Volume > 0.05 ) {
-              ++ErrCount;
-              if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
-                if ( initmsg ) {
-                  ShowMessage( "Note that the following warning(s) may/will occur if you have not enclosed your zone completely." );
-                  initmsg = false;
-                }
-                ShowWarningError( "Entered Zone Volumes differ from calculated zone volume(s)." );
-                ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones." );
-              }
-              if ( DisplayExtraWarnings ) {
-                if ( initmsg ) {
-                  ShowMessage( "Note that the following warning(s) may/will occur if you have not enclosed your zone completely." );
-                  initmsg = false;
-                }
-                // Warn user of using specified Zone Volume
-                ShowWarningError( "Entered Volume entered for Zone=\"" + Zone( ZoneNum ).Name + "\" significantly different from calculated Volume" );
-                ShowContinueError( "Entered Zone Volume value=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) + ", Calculated Zone Volume value=" + RoundSigDigits( TempVolume, 2 ) + ", entered volume will be used in calculations." );
-              }
-            }
-          }
-        } else if ( CeilingHeightEntered( ZoneNum ) ) { // User did not enter zone volume, but entered ceiling height
-          if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
-            Zone( ZoneNum ).Volume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
-          } else { // ceiling height entered but floor area zero
-            Zone( ZoneNum ).Volume = TempVolume;
-          }
-        } else { // Neither ceiling height nor volume entered
-          Zone( ZoneNum ).Volume = TempVolume;
-        }
+			if ( Zone( ZoneNum ).Volume > 0.0 ) { // User entered zone volume, produce message if not near calculated
+				if ( TempVolume > 0.0 ) {
+					if ( std::abs( TempVolume - Zone( ZoneNum ).Volume ) / Zone( ZoneNum ).Volume > 0.05 ) {
+						++ErrCount;
+						if ( ErrCount == 1 && ! DisplayExtraWarnings ) {
+							if ( initmsg ) {
+								ShowMessage( "Note that the following warning(s) may/will occur if you have not enclosed your zone completely." );
+								initmsg = false;
+							}
+							ShowWarningError( "Entered Zone Volumes differ from calculated zone volume(s)." );
+							ShowContinueError( "...use Output:Diagnostics,DisplayExtraWarnings; to show more details on individual zones." );
+						}
+						if ( DisplayExtraWarnings ) {
+							if ( initmsg ) {
+								ShowMessage( "Note that the following warning(s) may/will occur if you have not enclosed your zone completely." );
+								initmsg = false;
+							}
+							// Warn user of using specified Zone Volume
+							ShowWarningError( "Entered Volume entered for Zone=\"" + Zone( ZoneNum ).Name + "\" significantly different from calculated Volume" );
+							ShowContinueError( "Entered Zone Volume value=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) + ", Calculated Zone Volume value=" + RoundSigDigits( TempVolume, 2 ) + ", entered volume will be used in calculations." );
+						}
+					}
+				}
+			} else if ( CeilingHeightEntered( ZoneNum ) ) { // User did not enter zone volume, but entered ceiling height
+				if ( Zone( ZoneNum ).FloorArea > 0.0 ) {
+					Zone( ZoneNum ).Volume = Zone( ZoneNum ).FloorArea * Zone( ZoneNum ).CeilingHeight;
+				} else { // ceiling height entered but floor area zero
+					Zone( ZoneNum ).Volume = TempVolume;
+				}
+			} else { // Neither ceiling height nor volume entered
+				Zone( ZoneNum ).Volume = TempVolume;
+			}
 
-        if ( Zone( ZoneNum ).Volume <= 0.0 ) {
-          ShowSevereError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
-          ShowContinueError( "Zone Volume calculated was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
-        }
+			if ( Zone( ZoneNum ).Volume <= 0.0 ) {
+				ShowSevereError( "Indicated Zone Volume <= 0.0 for Zone=" + Zone( ZoneNum ).Name );
+				ShowContinueError( "Zone Volume calculated was=" + RoundSigDigits( Zone( ZoneNum ).Volume, 2 ) );
+			}
 
-        if ( ShowZoneSurfaces ) {
-          if ( ShowZoneSurfaceHeaders ) {
-            gio::write( OutputFileDebug, fmtLD  ) << "===================================";
-            gio::write( OutputFileDebug, fmtLD  ) << "showing zone surfaces used and not used in volume calculation";
-            gio::write( OutputFileDebug, fmtLD  ) << "for volume calculation, only floors, walls and roofs/ceilings are used";
-            gio::write( OutputFileDebug, fmtLD  ) << "surface class, 1=wall, 2=floor, 3=roof/ceiling";
-            gio::write( OutputFileDebug, fmtLD  ) << "unused surface class(es), 5=internal mass, 11=window, 12=glass door";
-            gio::write( OutputFileDebug, fmtLD  ) << "                          13=door, 14=shading, 15=overhang, 16=fin";
-            gio::write( OutputFileDebug, fmtLD  ) << "                          17=TDD Dome, 18=TDD Diffuser";
-            ShowZoneSurfaceHeaders = false;
-          }
-          gio::write( OutputFileDebug, fmtLD  ) << "===================================";
-          gio::write( OutputFileDebug, fmtLD  ) << "zone=" << Zone( ZoneNum ).Name << " calc volume=" << CalcVolume;
-          gio::write( OutputFileDebug, fmtLD  ) << " nsurfaces=" << NFaces << " nactual=" << NActFaces;
-        }
-        for ( SurfNum = 1; SurfNum <= ZoneStruct.NumSurfaceFaces; ++SurfNum ) {
-          if ( ShowZoneSurfaces ) {
-            if ( SurfNum <= NActFaces ) {
-              gio::write( OutputFileDebug, fmtLD  ) << "surface=" << ZoneStruct.SurfaceFace( SurfNum ).SurfNum << " nsides=" << ZoneStruct.SurfaceFace( SurfNum ).NSides;
-              gio::write( OutputFileDebug, fmtLD  ) << "surface name=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Name << " class=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Class;
-              gio::write( OutputFileDebug, fmtLD  ) << "area=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).GrossArea;
-              for ( iside = 1; iside <= ZoneStruct.SurfaceFace( SurfNum ).NSides; ++iside ) {
-                auto const & FacePoint( ZoneStruct.SurfaceFace( SurfNum ).FacePoints( iside ) );
-                gio::write( OutputFileDebug, fmtLD  ) << FacePoint.x << FacePoint.y << FacePoint.z;
-              }
-            }
-          }
-          ZoneStruct.SurfaceFace( SurfNum ).FacePoints.deallocate();
-        }
-        if ( ShowZoneSurfaces ) {
-          for ( SurfNum = 1; SurfNum <= notused; ++SurfNum ) {
-            gio::write( OutputFileDebug, fmtLD  ) << "notused:surface=" << surfacenotused( SurfNum ) << " name=" << Surface( surfacenotused( SurfNum ) ).Name << " class=" << Surface( surfacenotused( SurfNum ) ).Class;
-          }
-        }
+			if ( ShowZoneSurfaces ) {
+				if ( ShowZoneSurfaceHeaders ) {
+					gio::write( OutputFileDebug, fmtLD  ) << "===================================";
+					gio::write( OutputFileDebug, fmtLD  ) << "showing zone surfaces used and not used in volume calculation";
+					gio::write( OutputFileDebug, fmtLD  ) << "for volume calculation, only floors, walls and roofs/ceilings are used";
+					gio::write( OutputFileDebug, fmtLD  ) << "surface class, 1=wall, 2=floor, 3=roof/ceiling";
+					gio::write( OutputFileDebug, fmtLD  ) << "unused surface class(es), 5=internal mass, 11=window, 12=glass door";
+					gio::write( OutputFileDebug, fmtLD  ) << "                          13=door, 14=shading, 15=overhang, 16=fin";
+					gio::write( OutputFileDebug, fmtLD  ) << "                          17=TDD Dome, 18=TDD Diffuser";
+					ShowZoneSurfaceHeaders = false;
+				}
+				gio::write( OutputFileDebug, fmtLD  ) << "===================================";
+				gio::write( OutputFileDebug, fmtLD  ) << "zone=" << Zone( ZoneNum ).Name << " calc volume=" << CalcVolume;
+				gio::write( OutputFileDebug, fmtLD  ) << " nsurfaces=" << NFaces << " nactual=" << NActFaces;
+			}
+			for ( SurfNum = 1; SurfNum <= ZoneStruct.NumSurfaceFaces; ++SurfNum ) {
+				if ( ShowZoneSurfaces ) {
+					if ( SurfNum <= NActFaces ) {
+						gio::write( OutputFileDebug, fmtLD  ) << "surface=" << ZoneStruct.SurfaceFace( SurfNum ).SurfNum << " nsides=" << ZoneStruct.SurfaceFace( SurfNum ).NSides;
+						gio::write( OutputFileDebug, fmtLD  ) << "surface name=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Name << " class=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).Class;
+						gio::write( OutputFileDebug, fmtLD  ) << "area=" << Surface( ZoneStruct.SurfaceFace( SurfNum ).SurfNum ).GrossArea;
+						for ( iside = 1; iside <= ZoneStruct.SurfaceFace( SurfNum ).NSides; ++iside ) {
+							auto const & FacePoint( ZoneStruct.SurfaceFace( SurfNum ).FacePoints( iside ) );
+							gio::write( OutputFileDebug, fmtLD  ) << FacePoint.x << FacePoint.y << FacePoint.z;
+						}
+					}
+				}
+				ZoneStruct.SurfaceFace( SurfNum ).FacePoints.deallocate();
+			}
+			if ( ShowZoneSurfaces ) {
+				for ( SurfNum = 1; SurfNum <= notused; ++SurfNum ) {
+					gio::write( OutputFileDebug, fmtLD  ) << "notused:surface=" << surfacenotused( SurfNum ) << " name=" << Surface( surfacenotused( SurfNum ) ).Name << " class=" << Surface( surfacenotused( SurfNum ) ).Class;
+				}
+			}
 
-        ZoneStruct.SurfaceFace.deallocate();
-        surfacenotused.deallocate();
+			ZoneStruct.SurfaceFace.deallocate();
+			surfacenotused.deallocate();
 
 		}
 
@@ -8932,7 +8882,7 @@ namespace EnergyPlus {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
+		static gio::Fmt ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9033,114 +8983,101 @@ namespace EnergyPlus {
         SurfaceTmp( SurfNum ).ShadedConstruction = ConstrNewSh;
 		} else {
 
-        // Create new construction
+			// Create new construction
 
-        ConstrNewSh = TotConstructs + 1;
-        SurfaceTmp( SurfNum ).ShadedConstruction = ConstrNewSh;
-        ConstructSave.allocate( TotConstructs );
-        NominalRSave.allocate( TotConstructs );
-        NominalUSave.allocate( TotConstructs );
-        ConstructSave( {1,TotConstructs} ) = Construct( {1,TotConstructs} );
-        NominalRSave( {1,TotConstructs} ) = NominalRforNominalUCalculation( {1,TotConstructs} );
-        NominalUSave( {1,TotConstructs} ) = NominalU( {1,TotConstructs} );
-        Construct.deallocate();
-        NominalRforNominalUCalculation.deallocate();
-        NominalU.deallocate();
-        TotConstructs = ConstrNewSh;
-        Construct.allocate( TotConstructs );
-        ConstrWin.resize( TotConstructs );
-        NominalU.allocate( TotConstructs );
-        NominalRforNominalUCalculation.allocate( TotConstructs );
-        NominalRforNominalUCalculation = 0.0;
-        NominalU = 0.0;
-        Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );
-        NominalRforNominalUCalculation( {1,TotConstructs - 1} ) = NominalRSave( {1,TotConstructs - 1} );
-        NominalU( {1,TotConstructs - 1} ) = NominalUSave( {1,TotConstructs - 1} );
-        ConstructSave.deallocate();
-        NominalRSave.deallocate();
-        NominalUSave.deallocate();
+			ConstrNewSh = TotConstructs + 1;
+			SurfaceTmp( SurfNum ).ShadedConstruction = ConstrNewSh;
+			TotConstructs = ConstrNewSh;
+			Construct.redimension( TotConstructs );
+      ConstrWin.resize( TotConstructs );
+			NominalRforNominalUCalculation.redimension( TotConstructs );
+			NominalRforNominalUCalculation( TotConstructs ) = 0.0;
+			NominalU.redimension( TotConstructs );
+			NominalU( TotConstructs ) = 0.0;
 
-        TotLayersOld = Construct( ConstrNum ).TotLayers;
-        TotLayersNew = TotLayersOld + 1;
+			TotLayersOld = Construct( ConstrNum ).TotLayers;
+			TotLayersNew = TotLayersOld + 1;
 
-        Construct( ConstrNewSh ).LayerPoint = 0;
+			Construct( ConstrNewSh ).LayerPoint = 0;
 
-        if ( WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorShade || WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorBlind ) {
-          // Interior shading device
-          Construct( ConstrNewSh ).LayerPoint( {1,TotLayersOld} ) = Construct( ConstrNum ).LayerPoint( {1,TotLayersOld} );
-          Construct( ConstrNewSh ).LayerPoint( TotLayersNew ) = ShDevNum;
-          Construct( ConstrNewSh ).InsideAbsorpSolar = Material( ShDevNum ).AbsorpSolar;
-          Construct( ConstrNewSh ).OutsideAbsorpSolar = Material( Construct( ConstrNewSh ).LayerPoint( 1 ) ).AbsorpSolar;
-          Construct( ConstrNewSh ).OutsideAbsorpThermal = Material( Construct( ConstrNewSh ).LayerPoint( 1 ) ).AbsorpThermalFront;
-        } else {
-          // Exterior shading device
-          Construct( ConstrNewSh ).LayerPoint( 1 ) = ShDevNum;
-          Construct( ConstrNewSh ).LayerPoint( {2,TotLayersNew} ) = Construct( ConstrNum ).LayerPoint( {1,TotLayersOld} );
-          Construct( ConstrNewSh ).InsideAbsorpSolar = Material( Construct( ConstrNewSh ).LayerPoint( TotLayersNew ) ).AbsorpSolar;
-          Construct( ConstrNewSh ).OutsideAbsorpSolar = Material( ShDevNum ).AbsorpSolar;
-          Construct( ConstrNewSh ).OutsideAbsorpThermal = Material( ShDevNum ).AbsorpThermalFront;
-        }
-        // The following InsideAbsorpThermal applies only to inside glass; it is corrected
-        //  later in InitGlassOpticalCalculations if construction has inside shade or blind.
-        ConstrWin[ ConstrNewSh  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( TotLayersOld ) ).AbsorpThermalBack;
-        Construct( ConstrNewSh ).OutsideRoughness = VerySmooth;
-        Construct( ConstrNewSh ).DayltPropPtr = 0;
-        Construct( ConstrNewSh ).CTFCross = 0.0;
-        Construct( ConstrNewSh ).CTFFlux = 0.0;
-        Construct( ConstrNewSh ).CTFInside = 0.0;
-        Construct( ConstrNewSh ).CTFOutside = 0.0;
-        Construct( ConstrNewSh ).CTFSourceIn = 0.0;
-        Construct( ConstrNewSh ).CTFSourceOut = 0.0;
-        Construct( ConstrNewSh ).CTFTimeStep = 0.0;
-        Construct( ConstrNewSh ).CTFTSourceOut = 0.0;
-        Construct( ConstrNewSh ).CTFTSourceIn = 0.0;
-        Construct( ConstrNewSh ).CTFTSourceQ = 0.0;
-        Construct( ConstrNewSh ).CTFTUserOut = 0.0;
-        Construct( ConstrNewSh ).CTFTUserIn = 0.0;
-        Construct( ConstrNewSh ).CTFTUserSource = 0.0;
-        Construct( ConstrNewSh ).NumHistories = 0;
-        Construct( ConstrNewSh ).NumCTFTerms = 0;
-        Construct( ConstrNewSh ).UValue = 0.0;
-        Construct( ConstrNewSh ).SourceSinkPresent = false;
-        Construct( ConstrNewSh ).SolutionDimensions = 0;
-        Construct( ConstrNewSh ).SourceAfterLayer = 0;
-        Construct( ConstrNewSh ).TempAfterLayer = 0;
-        Construct( ConstrNewSh ).ThicknessPerpend = 0.0;
-        Construct( ConstrNewSh ).AbsDiff = 0.0;
-        Construct( ConstrNewSh ).AbsDiffBack = 0.0;
-        Construct( ConstrNewSh ).AbsDiffShade = 0.0;
-        Construct( ConstrNewSh ).AbsDiffBackShade = 0.0;
-        Construct( ConstrNewSh ).ShadeAbsorpThermal = 0.0;
-        Construct( ConstrNewSh ).AbsBeamCoef = 0.0;
-        Construct( ConstrNewSh ).AbsBeamBackCoef = 0.0;
-        Construct( ConstrNewSh ).AbsBeamShadeCoef = 0.0;
-        Construct( ConstrNewSh ).TransDiff = 0.0;
-        Construct( ConstrNewSh ).TransDiffVis = 0.0;
-        Construct( ConstrNewSh ).ReflectSolDiffBack = 0.0;
-        Construct( ConstrNewSh ).ReflectSolDiffFront = 0.0;
-        Construct( ConstrNewSh ).ReflectVisDiffBack = 0.0;
-        Construct( ConstrNewSh ).ReflectVisDiffFront = 0.0;
-        Construct( ConstrNewSh ).TransSolBeamCoef = 0.0;
-        Construct( ConstrNewSh ).TransVisBeamCoef = 0.0;
-        Construct( ConstrNewSh ).ReflSolBeamFrontCoef = 0.0;
-        Construct( ConstrNewSh ).ReflSolBeamBackCoef = 0.0;
-        Construct( ConstrNewSh ).W5FrameDivider = 0;
-        Construct( ConstrNewSh ).FromWindow5DataFile = false;
+			if ( WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorShade || WindowShadingControl( WSCPtr ).ShadingType == WSC_ST_InteriorBlind ) {
+				// Interior shading device
+				Construct( ConstrNewSh ).LayerPoint( {1,TotLayersOld} ) = Construct( ConstrNum ).LayerPoint( {1,TotLayersOld} );
+				Construct( ConstrNewSh ).LayerPoint( TotLayersNew ) = ShDevNum;
+				Construct( ConstrNewSh ).InsideAbsorpSolar = Material( ShDevNum ).AbsorpSolar;
+				Construct( ConstrNewSh ).OutsideAbsorpSolar = Material( Construct( ConstrNewSh ).LayerPoint( 1 ) ).AbsorpSolar;
+				Construct( ConstrNewSh ).OutsideAbsorpThermal = Material( Construct( ConstrNewSh ).LayerPoint( 1 ) ).AbsorpThermalFront;
+			} else {
+				// Exterior shading device
+				Construct( ConstrNewSh ).LayerPoint( 1 ) = ShDevNum;
+				Construct( ConstrNewSh ).LayerPoint( {2,TotLayersNew} ) = Construct( ConstrNum ).LayerPoint( {1,TotLayersOld} );
+				Construct( ConstrNewSh ).InsideAbsorpSolar = Material( Construct( ConstrNewSh ).LayerPoint( TotLayersNew ) ).AbsorpSolar;
+				Construct( ConstrNewSh ).OutsideAbsorpSolar = Material( ShDevNum ).AbsorpSolar;
+				Construct( ConstrNewSh ).OutsideAbsorpThermal = Material( ShDevNum ).AbsorpThermalFront;
+			}
+			// The following InsideAbsorpThermal applies only to inside glass; it is corrected
+			//  later in InitGlassOpticalCalculations if construction has inside shade or blind.
+      ConstrWin[ ConstrNewSh  - 1 ].InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( TotLayersOld ) ).AbsorpThermalBack;
+			//Construct( ConstrNewSh ).InsideAbsorpThermal = Material( Construct( ConstrNum ).LayerPoint( TotLayersOld ) ).AbsorpThermalBack;
+			Construct( ConstrNewSh ).OutsideRoughness = VerySmooth;
+			Construct( ConstrNewSh ).DayltPropPtr = 0;
+			Construct( ConstrNewSh ).CTFCross = 0.0;
+			Construct( ConstrNewSh ).CTFFlux = 0.0;
+			Construct( ConstrNewSh ).CTFInside = 0.0;
+			Construct( ConstrNewSh ).CTFOutside = 0.0;
+			Construct( ConstrNewSh ).CTFSourceIn = 0.0;
+			Construct( ConstrNewSh ).CTFSourceOut = 0.0;
+			Construct( ConstrNewSh ).CTFTimeStep = 0.0;
+			Construct( ConstrNewSh ).CTFTSourceOut = 0.0;
+			Construct( ConstrNewSh ).CTFTSourceIn = 0.0;
+			Construct( ConstrNewSh ).CTFTSourceQ = 0.0;
+			Construct( ConstrNewSh ).CTFTUserOut = 0.0;
+			Construct( ConstrNewSh ).CTFTUserIn = 0.0;
+			Construct( ConstrNewSh ).CTFTUserSource = 0.0;
+			Construct( ConstrNewSh ).NumHistories = 0;
+			Construct( ConstrNewSh ).NumCTFTerms = 0;
+			Construct( ConstrNewSh ).UValue = 0.0;
+			Construct( ConstrNewSh ).SourceSinkPresent = false;
+			Construct( ConstrNewSh ).SolutionDimensions = 0;
+			Construct( ConstrNewSh ).SourceAfterLayer = 0;
+			Construct( ConstrNewSh ).TempAfterLayer = 0;
+			Construct( ConstrNewSh ).ThicknessPerpend = 0.0;
+			Construct( ConstrNewSh ).AbsDiff = 0.0;
+			Construct( ConstrNewSh ).AbsDiffBack = 0.0;
+			Construct( ConstrNewSh ).AbsDiffShade = 0.0;
+			Construct( ConstrNewSh ).AbsDiffBackShade = 0.0;
+			Construct( ConstrNewSh ).ShadeAbsorpThermal = 0.0;
+			Construct( ConstrNewSh ).AbsBeamCoef = 0.0;
+			Construct( ConstrNewSh ).AbsBeamBackCoef = 0.0;
+			Construct( ConstrNewSh ).AbsBeamShadeCoef = 0.0;
+			Construct( ConstrNewSh ).TransDiff = 0.0;
+			Construct( ConstrNewSh ).TransDiffVis = 0.0;
+			Construct( ConstrNewSh ).ReflectSolDiffBack = 0.0;
+			Construct( ConstrNewSh ).ReflectSolDiffFront = 0.0;
+			Construct( ConstrNewSh ).ReflectVisDiffBack = 0.0;
+			Construct( ConstrNewSh ).ReflectVisDiffFront = 0.0;
+			Construct( ConstrNewSh ).TransSolBeamCoef = 0.0;
+			Construct( ConstrNewSh ).TransVisBeamCoef = 0.0;
+			Construct( ConstrNewSh ).ReflSolBeamFrontCoef = 0.0;
+			Construct( ConstrNewSh ).ReflSolBeamBackCoef = 0.0;
+			Construct( ConstrNewSh ).W5FrameDivider = 0;
+			Construct( ConstrNewSh ).FromWindow5DataFile = false;
 
-        Construct( ConstrNewSh ).Name = ConstrNameSh;
-        Construct( ConstrNewSh ).TotLayers = TotLayersNew;
-        Construct( ConstrNewSh ).TotSolidLayers = Construct( ConstrNum ).TotSolidLayers + 1;
-        ConstrWin[ ConstrNewSh - 1 ].TotGlassLayers = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
-        ConstrWin[ ConstrNewSh  - 1 ].TypeIsWindow = true;
-        Construct( ConstrNewSh ).IsUsed = true;
+			Construct( ConstrNewSh ).Name = ConstrNameSh;
+			Construct( ConstrNewSh ).TotLayers = TotLayersNew;
+			Construct( ConstrNewSh ).TotSolidLayers = Construct( ConstrNum ).TotSolidLayers + 1;
+      ConstrWin[ ConstrNewSh - 1 ].TotGlassLayers = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
+      //Construct( ConstrNewSh ).TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
+			Construct( ConstrNewSh ).TypeIsWindow = true;
+			Construct( ConstrNewSh ).IsUsed = true;
 
 		}
 
-    }
+	}
 
-    void
-    CreateStormWindowConstructions()
-    {
+	void
+	CreateStormWindowConstructions()
+	{
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Fred Winkelmann
@@ -9200,248 +9137,228 @@ namespace EnergyPlus {
 		DisplayString( "Creating Storm Window Constructions" );
 
 		for ( StormWinNum = 1; StormWinNum <= TotStormWin; ++StormWinNum ) {
-        SurfNum = StormWindow( StormWinNum ).BaseWindowNum;
-        ConstrNum = Construction[ SurfNum  - 1 ];
-        // Fatal error if base construction has more than three glass layers
-        if ( ConstrWin[ ConstrNum  - 1 ].TotGlassLayers > 3 ) {
-          ShowFatalError( "Window=" + Surface( SurfNum ).Name + " has more than 3 glass layers; a storm window cannot be applied." );
-        }
-        ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
-        ConstrName = Construct( ConstrNum ).Name;
-        StormWinMatNum = StormWindow( StormWinNum ).StormWinMaterialNum;
-        IntDistance = int( 1000 * StormWindow( StormWinNum ).StormWinDistance );
-        gio::write( ChrIntDistance, fmtLD  ) << IntDistance;
-        strip( ChrIntDistance );
-        // Set ShAndSt, which is true if the window has a shaded construction to which a storm window
-        // can be added. (A storm window can be added if there is an interior shade or blind and up to three
-        // glass layers, or there is a between-glass shade or blind and two glass layers.)
-        ShAndSt = false;
-        if ( ConstrNumSh > 0 ) {
-          ConstrNameSh = Construct( ConstrNumSh ).Name;
-          TotLayers = Construct( ConstrNumSh ).TotLayers;
-          TotGlassLayers = ConstrWin[ ConstrNumSh  - 1 ].TotGlassLayers;
-          MatIntSh = Construct( ConstrNumSh ).LayerPoint( TotLayers );
-          MatBGsh = 0;
-          if ( TotLayers == 5 ) MatBGsh = Construct( ConstrNumSh ).LayerPoint( 3 );
-          if ( TotGlassLayers <= 3 && ( Material( MatIntSh ).Group == Shade || Material( MatIntSh ).Group == WindowBlind ) ) ShAndSt = true;
-          if ( MatBGsh > 0 ) {
-            if ( Material( MatBGsh ).Group == Shade || Material( MatBGsh ).Group == WindowBlind ) ShAndSt = true;
-          }
-          if ( ! ShAndSt ) {
-            ShowContinueError( "Window=" + Surface( SurfNum ).Name + " has a shaded construction to which a storm window cannot be applied." );
-            ShowContinueError( "Storm windows can only be applied to shaded constructions that:" );
-            ShowContinueError( "have an interior shade or blind and up to three glass layers, or" );
-            ShowContinueError( "have a between-glass shade or blind and two glass layers." );
-            ShowFatalError( "EnergyPlus is exiting due to reason stated above." );
-          }
-        }
+			SurfNum = StormWindow( StormWinNum ).BaseWindowNum;
+      ConstrNum = Construction[ SurfNum  - 1 ];
+			//ConstrNum = Surface( SurfNum ).Construction;
+			// Fatal error if base construction has more than three glass layers
+      if ( ConstrWin[ ConstrNum  - 1 ].TotGlassLayers > 3 ) {
+        //if ( Construct( ConstrNum ).TotGlassLayers > 3 ) {
+				ShowFatalError( "Window=" + Surface( SurfNum ).Name + " has more than 3 glass layers; a storm window cannot be applied." );
+			}
+			ConstrNumSh = Surface( SurfNum ).ShadedConstruction;
+			ConstrName = Construct( ConstrNum ).Name;
+			StormWinMatNum = StormWindow( StormWinNum ).StormWinMaterialNum;
+			IntDistance = int( 1000 * StormWindow( StormWinNum ).StormWinDistance );
+			gio::write( ChrIntDistance, fmtLD  ) << IntDistance;
+			strip( ChrIntDistance );
+			// Set ShAndSt, which is true if the window has a shaded construction to which a storm window
+			// can be added. (A storm window can be added if there is an interior shade or blind and up to three
+			// glass layers, or there is a between-glass shade or blind and two glass layers.)
+			ShAndSt = false;
+			if ( ConstrNumSh > 0 ) {
+				ConstrNameSh = Construct( ConstrNumSh ).Name;
+				TotLayers = Construct( ConstrNumSh ).TotLayers;
+        TotGlassLayers = ConstrWin[ ConstrNumSh  - 1 ].TotGlassLayers;
+				//TotGlassLayers = Construct( ConstrNumSh ).TotGlassLayers;
+				MatIntSh = Construct( ConstrNumSh ).LayerPoint( TotLayers );
+				MatBGsh = 0;
+				if ( TotLayers == 5 ) MatBGsh = Construct( ConstrNumSh ).LayerPoint( 3 );
+				if ( TotGlassLayers <= 3 && ( Material( MatIntSh ).Group == Shade || Material( MatIntSh ).Group == WindowBlind ) ) ShAndSt = true;
+				if ( MatBGsh > 0 ) {
+					if ( Material( MatBGsh ).Group == Shade || Material( MatBGsh ).Group == WindowBlind ) ShAndSt = true;
+				}
+				if ( ! ShAndSt ) {
+					ShowContinueError( "Window=" + Surface( SurfNum ).Name + " has a shaded construction to which a storm window cannot be applied." );
+					ShowContinueError( "Storm windows can only be applied to shaded constructions that:" );
+					ShowContinueError( "have an interior shade or blind and up to three glass layers, or" );
+					ShowContinueError( "have a between-glass shade or blind and two glass layers." );
+					ShowFatalError( "EnergyPlus is exiting due to reason stated above." );
+				}
+			}
 
-        // Loop over unshaded (loop=1) and shaded (loop=2) constructions and create new constructions
-        // with storm window and air gap added on outside
-        for ( loop = 1; loop <= 2; ++loop ) {
-          if ( loop == 1 ) {
-            gio::write( ChrNum, fmtLD  ) << StormWinNum;
-            strip( ChrNum );
-            ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
-            // If this construction name already exists, set the surface's storm window construction number to it
-            ConstrNewSt = FindItemInList( ConstrNameSt, Construct_Name, TotConstructs );
-            ConstrNewStSh = 0;
-            if ( ConstrNewSt > 0 ) Surface( SurfNum ).StormWinConstruction = ConstrNewSt;
-          } else {
-            if ( ! ShAndSt ) break;
-            ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + ChrNum;
-            ConstrNewStSh = FindItemInList( ConstrNameStSh, Construct_Name, TotConstructs );
-            if ( ConstrNewStSh > 0 ) Surface( SurfNum ).StormWinShadedConstruction = ConstrNewStSh;
-          }
+			// Loop over unshaded (loop=1) and shaded (loop=2) constructions and create new constructions
+			// with storm window and air gap added on outside
+			for ( loop = 1; loop <= 2; ++loop ) {
+				if ( loop == 1 ) {
+					gio::write( ChrNum, fmtLD  ) << StormWinNum;
+					strip( ChrNum );
+					ConstrNameSt = "BARECONSTRUCTIONWITHSTORMWIN:" + ChrNum;
+					// If this construction name already exists, set the surface's storm window construction number to it
+					ConstrNewSt = FindItemInList( ConstrNameSt, Construct_Name, TotConstructs );
+					ConstrNewStSh = 0;
+					if ( ConstrNewSt > 0 ) Surface( SurfNum ).StormWinConstruction = ConstrNewSt;
+				} else {
+					if ( ! ShAndSt ) break;
+					ConstrNameStSh = "SHADEDCONSTRUCTIONWITHSTORMWIN:" + ChrNum;
+					ConstrNewStSh = FindItemInList( ConstrNameStSh, Construct_Name, TotConstructs );
+					if ( ConstrNewStSh > 0 ) Surface( SurfNum ).StormWinShadedConstruction = ConstrNewStSh;
+				}
 
-          if ( loop == 1 && ConstrNewSt == 0 ) {
-            // If necessary, create new material corresponding to the air layer between the storm winddow
-            // and the rest of the window
-            MatNameStAir = "AIR:STORMWIN:" + ChrIntDistance + "MM";
-            MatNewStAir = FindItemInList( MatNameStAir, Material_Name, TotMaterials );
-            if ( MatNewStAir == 0 ) {
-              // Create new material
-              MatNewStAir = TotMaterials + 1;
-              MaterialSave.allocate( TotMaterials );
-              NominalRSave.allocate( TotMaterials );
-              MaterialSave( {1,TotMaterials} ) = Material( {1,TotMaterials} );
-              NominalRSave( {1,TotMaterials} ) = NominalR( {1,TotMaterials} );
-              Material.deallocate();
-              NominalR.deallocate();
-              TotMaterials = MatNewStAir;
-              Material.allocate( TotMaterials );
-              NominalR.allocate( TotMaterials );
-              Material( {1,TotMaterials - 1} ) = MaterialSave( {1,TotMaterials - 1} );
-              NominalR( {1,TotMaterials - 1} ) = NominalRSave( {1,TotMaterials - 1} );
-              MaterialSave.deallocate();
-              NominalRSave.deallocate();
-              Material( TotMaterials ).Name = MatNameStAir;
-              Material( TotMaterials ).Group = WindowGas;
-              Material( TotMaterials ).Roughness = 3;
-              Material( TotMaterials ).Conductivity = 0.0;
-              Material( TotMaterials ).Density = 0.0;
-              Material( TotMaterials ).IsoMoistCap = 0.0;
-              Material( TotMaterials ).Porosity = 0.0;
-              Material( TotMaterials ).Resistance = 0.0;
-              Material( TotMaterials ).SpecHeat = 0.0;
-              Material( TotMaterials ).ThermGradCoef = 0.0;
-              Material( TotMaterials ).Thickness = StormWindow( StormWinNum ).StormWinDistance;
-              Material( TotMaterials ).VaporDiffus = 0.0;
-              Material( TotMaterials ).GasType = 0;
-              Material( TotMaterials ).GasCon = 0.0;
-              Material( TotMaterials ).GasVis = 0.0;
-              Material( TotMaterials ).GasCp = 0.0;
-              Material( TotMaterials ).GasWght = 0.0;
-              Material( TotMaterials ).GasFract = 0.0;
-              Material( TotMaterials ).GasType( 1 ) = 1;
-              Material( TotMaterials ).GlassSpectralDataPtr = 0;
-              Material( TotMaterials ).NumberOfGasesInMixture = 1;
-              Material( TotMaterials ).GasCon( 1, 1 ) = 2.873e-3;
-              Material( TotMaterials ).GasCon( 1, 2 ) = 7.760e-5;
-              Material( TotMaterials ).GasVis( 1, 1 ) = 3.723e-6;
-              Material( TotMaterials ).GasVis( 1, 2 ) = 4.940e-8;
-              Material( TotMaterials ).GasCp( 1, 1 ) = 1002.737;
-              Material( TotMaterials ).GasCp( 1, 2 ) = 1.2324e-2;
-              Material( TotMaterials ).GasWght( 1 ) = 28.97;
-              Material( TotMaterials ).GasFract( 1 ) = 1.0;
-              Material( TotMaterials ).AbsorpSolar = 0.0;
-              Material( TotMaterials ).AbsorpThermal = 0.0;
-              Material( TotMaterials ).AbsorpVisible = 0.0;
-              Material( TotMaterials ).Trans = 0.0;
-              Material( TotMaterials ).TransVis = 0.0;
-              Material( TotMaterials ).GlassTransDirtFactor = 0.0;
-              Material( TotMaterials ).ReflectShade = 0.0;
-              Material( TotMaterials ).ReflectShadeVis = 0.0;
-              Material( TotMaterials ).AbsorpThermalBack = 0.0;
-              Material( TotMaterials ).AbsorpThermalFront = 0.0;
-              Material( TotMaterials ).ReflectSolBeamBack = 0.0;
-              Material( TotMaterials ).ReflectSolBeamFront = 0.0;
-              Material( TotMaterials ).ReflectSolDiffBack = 0.0;
-              Material( TotMaterials ).ReflectSolDiffFront = 0.0;
-              Material( TotMaterials ).ReflectVisBeamBack = 0.0;
-              Material( TotMaterials ).ReflectVisBeamFront = 0.0;
-              Material( TotMaterials ).ReflectVisDiffBack = 0.0;
-              Material( TotMaterials ).ReflectVisDiffFront = 0.0;
-              Material( TotMaterials ).TransSolBeam = 0.0;
-              Material( TotMaterials ).TransThermal = 0.0;
-              Material( TotMaterials ).TransVisBeam = 0.0;
-              Material( TotMaterials ).BlindDataPtr = 0;
-              Material( TotMaterials ).WinShadeToGlassDist = 0.0;
-              Material( TotMaterials ).WinShadeTopOpeningMult = 0.0;
-              Material( TotMaterials ).WinShadeBottomOpeningMult = 0.0;
-              Material( TotMaterials ).WinShadeLeftOpeningMult = 0.0;
-              Material( TotMaterials ).WinShadeRightOpeningMult = 0.0;
-              Material( TotMaterials ).WinShadeAirFlowPermeability = 0.0;
-              Material( TotMaterials ).EMPDVALUE = 0.0;
-              Material( TotMaterials ).MoistACoeff = 0.0;
-              Material( TotMaterials ).MoistBCoeff = 0.0;
-              Material( TotMaterials ).MoistCCoeff = 0.0;
-              Material( TotMaterials ).MoistDCoeff = 0.0;
-              Material( TotMaterials ).EMPDaCoeff = 0.0;
-              Material( TotMaterials ).EMPDbCoeff = 0.0;
-              Material( TotMaterials ).EMPDcCoeff = 0.0;
-              Material( TotMaterials ).EMPDdCoeff = 0.0;
-            } // End of check if new air layer material has to be created
-          }
+				if ( loop == 1 && ConstrNewSt == 0 ) {
+					// If necessary, create new material corresponding to the air layer between the storm winddow
+					// and the rest of the window
+					MatNameStAir = "AIR:STORMWIN:" + ChrIntDistance + "MM";
+					MatNewStAir = FindItemInList( MatNameStAir, Material_Name, TotMaterials );
+					if ( MatNewStAir == 0 ) {
+						// Create new material
+						MatNewStAir = TotMaterials + 1;
+						TotMaterials = MatNewStAir;
+						Material.redimension( TotMaterials );
+						NominalR.redimension( TotMaterials );
+						Material( TotMaterials ).Name = MatNameStAir;
+						Material( TotMaterials ).Group = WindowGas;
+						Material( TotMaterials ).Roughness = 3;
+						Material( TotMaterials ).Conductivity = 0.0;
+						Material( TotMaterials ).Density = 0.0;
+						Material( TotMaterials ).IsoMoistCap = 0.0;
+						Material( TotMaterials ).Porosity = 0.0;
+						Material( TotMaterials ).Resistance = 0.0;
+						Material( TotMaterials ).SpecHeat = 0.0;
+						Material( TotMaterials ).ThermGradCoef = 0.0;
+						Material( TotMaterials ).Thickness = StormWindow( StormWinNum ).StormWinDistance;
+						Material( TotMaterials ).VaporDiffus = 0.0;
+						Material( TotMaterials ).GasType = 0;
+						Material( TotMaterials ).GasCon = 0.0;
+						Material( TotMaterials ).GasVis = 0.0;
+						Material( TotMaterials ).GasCp = 0.0;
+						Material( TotMaterials ).GasWght = 0.0;
+						Material( TotMaterials ).GasFract = 0.0;
+						Material( TotMaterials ).GasType( 1 ) = 1;
+						Material( TotMaterials ).GlassSpectralDataPtr = 0;
+						Material( TotMaterials ).NumberOfGasesInMixture = 1;
+						Material( TotMaterials ).GasCon( 1, 1 ) = 2.873e-3;
+						Material( TotMaterials ).GasCon( 1, 2 ) = 7.760e-5;
+						Material( TotMaterials ).GasVis( 1, 1 ) = 3.723e-6;
+						Material( TotMaterials ).GasVis( 1, 2 ) = 4.940e-8;
+						Material( TotMaterials ).GasCp( 1, 1 ) = 1002.737;
+						Material( TotMaterials ).GasCp( 1, 2 ) = 1.2324e-2;
+						Material( TotMaterials ).GasWght( 1 ) = 28.97;
+						Material( TotMaterials ).GasFract( 1 ) = 1.0;
+						Material( TotMaterials ).AbsorpSolar = 0.0;
+						Material( TotMaterials ).AbsorpThermal = 0.0;
+						Material( TotMaterials ).AbsorpVisible = 0.0;
+						Material( TotMaterials ).Trans = 0.0;
+						Material( TotMaterials ).TransVis = 0.0;
+						Material( TotMaterials ).GlassTransDirtFactor = 0.0;
+						Material( TotMaterials ).ReflectShade = 0.0;
+						Material( TotMaterials ).ReflectShadeVis = 0.0;
+						Material( TotMaterials ).AbsorpThermalBack = 0.0;
+						Material( TotMaterials ).AbsorpThermalFront = 0.0;
+						Material( TotMaterials ).ReflectSolBeamBack = 0.0;
+						Material( TotMaterials ).ReflectSolBeamFront = 0.0;
+						Material( TotMaterials ).ReflectSolDiffBack = 0.0;
+						Material( TotMaterials ).ReflectSolDiffFront = 0.0;
+						Material( TotMaterials ).ReflectVisBeamBack = 0.0;
+						Material( TotMaterials ).ReflectVisBeamFront = 0.0;
+						Material( TotMaterials ).ReflectVisDiffBack = 0.0;
+						Material( TotMaterials ).ReflectVisDiffFront = 0.0;
+						Material( TotMaterials ).TransSolBeam = 0.0;
+						Material( TotMaterials ).TransThermal = 0.0;
+						Material( TotMaterials ).TransVisBeam = 0.0;
+						Material( TotMaterials ).BlindDataPtr = 0;
+						Material( TotMaterials ).WinShadeToGlassDist = 0.0;
+						Material( TotMaterials ).WinShadeTopOpeningMult = 0.0;
+						Material( TotMaterials ).WinShadeBottomOpeningMult = 0.0;
+						Material( TotMaterials ).WinShadeLeftOpeningMult = 0.0;
+						Material( TotMaterials ).WinShadeRightOpeningMult = 0.0;
+						Material( TotMaterials ).WinShadeAirFlowPermeability = 0.0;
+						Material( TotMaterials ).EMPDVALUE = 0.0;
+						Material( TotMaterials ).MoistACoeff = 0.0;
+						Material( TotMaterials ).MoistBCoeff = 0.0;
+						Material( TotMaterials ).MoistCCoeff = 0.0;
+						Material( TotMaterials ).MoistDCoeff = 0.0;
+						Material( TotMaterials ).EMPDaCoeff = 0.0;
+						Material( TotMaterials ).EMPDbCoeff = 0.0;
+						Material( TotMaterials ).EMPDcCoeff = 0.0;
+						Material( TotMaterials ).EMPDdCoeff = 0.0;
+					} // End of check if new air layer material has to be created
+				}
 
-          if ( ( loop == 1 && ConstrNewSt == 0 ) || ( loop == 2 && ConstrNewStSh == 0 ) ) {
-            // Create new constructions
-            ConstrNew = TotConstructs + 1;
-            if ( loop == 1 ) {
-              Surface( SurfNum ).StormWinConstruction = ConstrNew;
-            } else {
-              Surface( SurfNum ).StormWinShadedConstruction = ConstrNew;
-            }
-            ConstructSave.allocate( TotConstructs );
-            NominalRSave.allocate( TotConstructs );
-            NominalUSave.allocate( TotConstructs );
-            ConstructSave( {1,TotConstructs} ) = Construct( {1,TotConstructs} );
-            NominalRSave( {1,TotConstructs} ) = NominalRforNominalUCalculation( {1,TotConstructs} );
-            NominalUSave( {1,TotConstructs} ) = NominalU( {1,TotConstructs} );
-            Construct.deallocate();
-            NominalRforNominalUCalculation.deallocate();
-            NominalU.deallocate();
-            TotConstructs = ConstrNew;
-            Construct.allocate( TotConstructs );
-            ConstrWin.resize( TotConstructs );
-            NominalU.allocate( TotConstructs );
-            Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );
-            NominalRforNominalUCalculation( {1,TotConstructs - 1} ) = NominalRSave( {1,TotConstructs - 1} );
-            NominalU( {1,TotConstructs - 1} ) = NominalUSave( {1,TotConstructs - 1} );
-            ConstructSave.deallocate();
-            NominalRSave.deallocate();
-            NominalUSave.deallocate();
+				if ( ( loop == 1 && ConstrNewSt == 0 ) || ( loop == 2 && ConstrNewStSh == 0 ) ) {
+					// Create new constructions
+					ConstrNew = TotConstructs + 1;
+					if ( loop == 1 ) {
+						Surface( SurfNum ).StormWinConstruction = ConstrNew;
+					} else {
+						Surface( SurfNum ).StormWinShadedConstruction = ConstrNew;
+					}
+					TotConstructs = ConstrNew;
+					Construct.redimension( TotConstructs );
+					NominalRforNominalUCalculation.redimension( TotConstructs );
+					NominalU.redimension( TotConstructs );
 
-            ConstrOld = ConstrNum;
-            if ( loop == 2 ) ConstrOld = ConstrNumSh;
-            TotLayersOld = Construct( ConstrOld ).TotLayers;
-            Construct( ConstrNew ).LayerPoint( {1,MaxLayersInConstruct} ) = 0;
-            Construct( ConstrNew ).LayerPoint( 1 ) = StormWinMatNum;
-            Construct( ConstrNew ).LayerPoint( 2 ) = MatNewStAir;
-            Construct( ConstrNew ).LayerPoint( {3,TotLayersOld + 2} ) = Construct( ConstrOld ).LayerPoint( {1,TotLayersOld} );
-            Construct( ConstrNew ).Name = ConstrNameSt;
-            if ( loop == 2 ) Construct( ConstrNew ).Name = ConstrNameStSh;
-            Construct( ConstrNew ).TotLayers = TotLayersOld + 2;
-            Construct( ConstrNew ).TotSolidLayers = Construct( ConstrOld ).TotSolidLayers + 1;
-            ConstrWin[ ConstrNew - 1 ].TotGlassLayers = ConstrWin[ ConstrOld  - 1 ].TotGlassLayers + 1;
-            ConstrWin[ ConstrNew  - 1 ].TypeIsWindow = true;
-            Construct( ConstrNew ).InsideAbsorpVis = 0.0;
-            Construct( ConstrNew ).OutsideAbsorpVis = 0.0;
-            Construct( ConstrNew ).InsideAbsorpSolar = 0.0;
-            Construct( ConstrNew ).OutsideAbsorpSolar = 0.0;
-            ConstrWin[ ConstrNew - 1 ].InsideAbsorpThermal = ConstrWin[ ConstrOld  - 1 ].InsideAbsorpThermal;
-            Construct( ConstrNew ).OutsideAbsorpThermal = Material( StormWinMatNum ).AbsorpThermalFront;
-            Construct( ConstrNew ).OutsideRoughness = VerySmooth;
-            Construct( ConstrNew ).DayltPropPtr = 0;
-            Construct( ConstrNew ).CTFCross = 0.0;
-            Construct( ConstrNew ).CTFFlux = 0.0;
-            Construct( ConstrNew ).CTFInside = 0.0;
-            Construct( ConstrNew ).CTFOutside = 0.0;
-            Construct( ConstrNew ).CTFSourceIn = 0.0;
-            Construct( ConstrNew ).CTFSourceOut = 0.0;
-            Construct( ConstrNew ).CTFTimeStep = 0.0;
-            Construct( ConstrNew ).CTFTSourceOut = 0.0;
-            Construct( ConstrNew ).CTFTSourceIn = 0.0;
-            Construct( ConstrNew ).CTFTSourceQ = 0.0;
-            Construct( ConstrNew ).CTFTUserOut = 0.0;
-            Construct( ConstrNew ).CTFTUserIn = 0.0;
-            Construct( ConstrNew ).CTFTUserSource = 0.0;
-            Construct( ConstrNew ).NumHistories = 0;
-            Construct( ConstrNew ).NumCTFTerms = 0;
-            Construct( ConstrNew ).UValue = 0.0;
-            Construct( ConstrNew ).SourceSinkPresent = false;
-            Construct( ConstrNew ).SolutionDimensions = 0;
-            Construct( ConstrNew ).SourceAfterLayer = 0;
-            Construct( ConstrNew ).TempAfterLayer = 0;
-            Construct( ConstrNew ).ThicknessPerpend = 0.0;
-            Construct( ConstrNew ).AbsDiffIn = 0.0;
-            Construct( ConstrNew ).AbsDiffOut = 0.0;
-            Construct( ConstrNew ).AbsDiff = 0.0;
-            Construct( ConstrNew ).AbsDiffBack = 0.0;
-            Construct( ConstrNew ).AbsDiffShade = 0.0;
-            Construct( ConstrNew ).AbsDiffBackShade = 0.0;
-            Construct( ConstrNew ).ShadeAbsorpThermal = 0.0;
-            Construct( ConstrNew ).AbsBeamCoef = 0.0;
-            Construct( ConstrNew ).AbsBeamBackCoef = 0.0;
-            Construct( ConstrNew ).AbsBeamShadeCoef = 0.0;
-            Construct( ConstrNew ).TransDiff = 0.0;
-            Construct( ConstrNew ).TransDiffVis = 0.0;
-            Construct( ConstrNew ).ReflectSolDiffBack = 0.0;
-            Construct( ConstrNew ).ReflectSolDiffFront = 0.0;
-            Construct( ConstrNew ).ReflectVisDiffBack = 0.0;
-            Construct( ConstrNew ).ReflectVisDiffFront = 0.0;
-            Construct( ConstrNew ).TransSolBeamCoef = 0.0;
-            Construct( ConstrNew ).TransVisBeamCoef = 0.0;
-            Construct( ConstrNew ).ReflSolBeamFrontCoef = 0.0;
-            Construct( ConstrNew ).ReflSolBeamBackCoef = 0.0;
-            Construct( ConstrNew ).W5FrameDivider = 0;
-            Construct( ConstrNew ).FromWindow5DataFile = false;
-            Construct( ConstrNew ).W5FileMullionWidth = 0.0;
-            Construct( ConstrNew ).W5FileMullionOrientation = 0;
-            Construct( ConstrNew ).W5FileGlazingSysWidth = 0.0;
-            Construct( ConstrNew ).W5FileGlazingSysHeight = 0.0;
-          } // End of check if new window constructions have to be created
-        } // End of loop over unshaded and shaded window constructions
+					ConstrOld = ConstrNum;
+					if ( loop == 2 ) ConstrOld = ConstrNumSh;
+					TotLayersOld = Construct( ConstrOld ).TotLayers;
+					Construct( ConstrNew ).LayerPoint( {1,MaxLayersInConstruct} ) = 0;
+					Construct( ConstrNew ).LayerPoint( 1 ) = StormWinMatNum;
+					Construct( ConstrNew ).LayerPoint( 2 ) = MatNewStAir;
+					Construct( ConstrNew ).LayerPoint( {3,TotLayersOld + 2} ) = Construct( ConstrOld ).LayerPoint( {1,TotLayersOld} );
+					Construct( ConstrNew ).Name = ConstrNameSt;
+					if ( loop == 2 ) Construct( ConstrNew ).Name = ConstrNameStSh;
+					Construct( ConstrNew ).TotLayers = TotLayersOld + 2;
+					Construct( ConstrNew ).TotSolidLayers = Construct( ConstrOld ).TotSolidLayers + 1;
+          ConstrWin[ ConstrNew - 1 ].TotGlassLayers = ConstrWin[ ConstrOld  - 1 ].TotGlassLayers + 1;
+					//Construct( ConstrNew ).TotGlassLayers = Construct( ConstrOld ).TotGlassLayers + 1;
+          ConstrWin[ ConstrNew  - 1 ].TypeIsWindow = true;
+					//Construct( ConstrNew ).TypeIsWindow = true;
+					Construct( ConstrNew ).InsideAbsorpVis = 0.0;
+					Construct( ConstrNew ).OutsideAbsorpVis = 0.0;
+					Construct( ConstrNew ).InsideAbsorpSolar = 0.0;
+					Construct( ConstrNew ).OutsideAbsorpSolar = 0.0;
+					Construct( ConstrNew ).InsideAbsorpThermal = Construct( ConstrOld ).InsideAbsorpThermal;
+					Construct( ConstrNew ).OutsideAbsorpThermal = Material( StormWinMatNum ).AbsorpThermalFront;
+					Construct( ConstrNew ).OutsideRoughness = VerySmooth;
+					Construct( ConstrNew ).DayltPropPtr = 0;
+					Construct( ConstrNew ).CTFCross = 0.0;
+					Construct( ConstrNew ).CTFFlux = 0.0;
+					Construct( ConstrNew ).CTFInside = 0.0;
+					Construct( ConstrNew ).CTFOutside = 0.0;
+					Construct( ConstrNew ).CTFSourceIn = 0.0;
+					Construct( ConstrNew ).CTFSourceOut = 0.0;
+					Construct( ConstrNew ).CTFTimeStep = 0.0;
+					Construct( ConstrNew ).CTFTSourceOut = 0.0;
+					Construct( ConstrNew ).CTFTSourceIn = 0.0;
+					Construct( ConstrNew ).CTFTSourceQ = 0.0;
+					Construct( ConstrNew ).CTFTUserOut = 0.0;
+					Construct( ConstrNew ).CTFTUserIn = 0.0;
+					Construct( ConstrNew ).CTFTUserSource = 0.0;
+					Construct( ConstrNew ).NumHistories = 0;
+					Construct( ConstrNew ).NumCTFTerms = 0;
+					Construct( ConstrNew ).UValue = 0.0;
+					Construct( ConstrNew ).SourceSinkPresent = false;
+					Construct( ConstrNew ).SolutionDimensions = 0;
+					Construct( ConstrNew ).SourceAfterLayer = 0;
+					Construct( ConstrNew ).TempAfterLayer = 0;
+					Construct( ConstrNew ).ThicknessPerpend = 0.0;
+					Construct( ConstrNew ).AbsDiffIn = 0.0;
+					Construct( ConstrNew ).AbsDiffOut = 0.0;
+					Construct( ConstrNew ).AbsDiff = 0.0;
+					Construct( ConstrNew ).AbsDiffBack = 0.0;
+					Construct( ConstrNew ).AbsDiffShade = 0.0;
+					Construct( ConstrNew ).AbsDiffBackShade = 0.0;
+					Construct( ConstrNew ).ShadeAbsorpThermal = 0.0;
+					Construct( ConstrNew ).AbsBeamCoef = 0.0;
+					Construct( ConstrNew ).AbsBeamBackCoef = 0.0;
+					Construct( ConstrNew ).AbsBeamShadeCoef = 0.0;
+					Construct( ConstrNew ).TransDiff = 0.0;
+					Construct( ConstrNew ).TransDiffVis = 0.0;
+					Construct( ConstrNew ).ReflectSolDiffBack = 0.0;
+					Construct( ConstrNew ).ReflectSolDiffFront = 0.0;
+					Construct( ConstrNew ).ReflectVisDiffBack = 0.0;
+					Construct( ConstrNew ).ReflectVisDiffFront = 0.0;
+					Construct( ConstrNew ).TransSolBeamCoef = 0.0;
+					Construct( ConstrNew ).TransVisBeamCoef = 0.0;
+					Construct( ConstrNew ).ReflSolBeamFrontCoef = 0.0;
+					Construct( ConstrNew ).ReflSolBeamBackCoef = 0.0;
+					Construct( ConstrNew ).W5FrameDivider = 0;
+					Construct( ConstrNew ).FromWindow5DataFile = false;
+					Construct( ConstrNew ).W5FileMullionWidth = 0.0;
+					Construct( ConstrNew ).W5FileMullionOrientation = 0;
+					Construct( ConstrNew ).W5FileGlazingSysWidth = 0.0;
+					Construct( ConstrNew ).W5FileGlazingSysHeight = 0.0;
+				} // End of check if new window constructions have to be created
+			} // End of loop over unshaded and shaded window constructions
 		} // End of loop over storm window objects
 
     }
@@ -9674,7 +9591,6 @@ namespace EnergyPlus {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TotSurfacesPrev; // Total number of surfaces before splitting window
 		int loop; // DO loop index
 		Real64 H; // Height and width of original window (m)
 		Real64 W;
@@ -9738,18 +9654,7 @@ namespace EnergyPlus {
 		IConst2 = FindItemInList( Const2Name, Construct.Name(), TotConstructs );
 
 		++AddedSubSurfaces;
-		TotSurfacesPrev = TotSurfaces;
-		SurfaceTmpSave.allocate( TotSurfacesPrev );
-		for ( loop = 1; loop <= TotSurfacesPrev; ++loop ) {
-        SurfaceTmpSave( loop ) = SurfaceTmp( loop );
-		}
-		SurfaceTmp.deallocate();
-		++TotSurfaces;
-		SurfaceTmp.allocate( TotSurfaces );
-		for ( loop = 1; loop <= TotSurfacesPrev; ++loop ) {
-        SurfaceTmp( loop ) = SurfaceTmpSave( loop );
-		}
-		SurfaceTmpSave.deallocate();
+		SurfaceTmp.redimension( ++TotSurfaces );
 
 		TmpConstruction.resize(TotSurfaces);
 
@@ -10550,12 +10455,7 @@ namespace EnergyPlus {
 
 		}
 
-		TmpCandidateSurfaceNames.deallocate();
-		TmpCandidateICSBCTypeNames.deallocate();
-		TmpCandidateICSSurfaceNames.deallocate();
-
-    }
-
+	}
     void
     CheckConvexity(
                    int const SurfNum, // Current surface number
@@ -10595,7 +10495,7 @@ namespace EnergyPlus {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const TurnThreshold( 0.000001 ); // Sensitivity of convexity test, in radians
-		static gio::Fmt const ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
+		static gio::Fmt ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

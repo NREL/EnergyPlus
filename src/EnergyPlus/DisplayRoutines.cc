@@ -26,7 +26,47 @@ DisplayString( std::string const & String ) // String to be displayed
 	// This subroutine provides a call to display strings during program execution.
 
 	// METHODOLOGY EMPLOYED:
-	// usage:=  call DisplayString(string)
+
+	// REFERENCES:
+	// na
+
+	// Using/Aliasing
+	using DataGlobals::KickOffSimulation;
+	using DataSystemVariables::DeveloperFlag;
+
+	// Locals
+	// SUBROUTINE ARGUMENT DEFINITIONS:
+
+	// SUBROUTINE PARAMETER DEFINITIONS:
+
+	// INTERFACE BLOCK SPECIFICATIONS
+	// na
+
+	// DERIVED TYPE DEFINITIONS
+	// na
+
+	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+	// na
+
+	if ( KickOffSimulation && ! DeveloperFlag ) return;
+	std::cout << String << '\n';
+
+}
+
+void
+DisplayString( char const * String ) // String to be displayed
+{
+
+	// SUBROUTINE INFORMATION:
+	//       AUTHOR         Linda Lawrie
+	//       DATE WRITTEN   Version 1.0
+	//       MODIFIED       na
+	//       RE-ENGINEERED  Overload to avoid std::string creation overhead
+
+	// PURPOSE OF THIS SUBROUTINE:
+	// This subroutine provides a call to display strings during program execution.
+
+	// METHODOLOGY EMPLOYED:
 
 	// REFERENCES:
 	// na

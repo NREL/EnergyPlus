@@ -89,10 +89,10 @@ namespace HeatBalanceIntRadExchange {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
-	static gio::Fmt const fmty( "(A,1x,6f16.8)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmtx( "(A,I4,1x,A,1x,6f16.8)" );
+	static gio::Fmt fmty( "(A,1x,6f16.8)" );
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -139,10 +139,6 @@ namespace HeatBalanceIntRadExchange {
 			for(auto& z: ZoneInfo){z.ready = false;}
 		}
 		timer.stopTimer();
-		++count;
-// #ifdef DEBUG_SH
-// 		EppPerformance::Utility::doDataDump();
-// #endif
 	}
 
 	void
@@ -213,9 +209,6 @@ namespace HeatBalanceIntRadExchange {
 #endif
 			tIR = tLWR = 0;
 		}
-#ifdef DEBUG_CI
-		++ranCount;
-#endif
 	}
 
 	void
@@ -271,7 +264,6 @@ namespace HeatBalanceIntRadExchange {
 		jMatrix = new Real64[surfCount * surfCount];
 
 
-
 		if(cMatrix == nullptr || jMatrix == nullptr){
 			throw noMoreMemCalcSF();
 		}
@@ -295,43 +287,13 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		int *ipiv = new int[surfCount];
-// #ifdef DEBUG_CI
-// 		std::cout << "Dumping prelims in CalcScriptF Zone:" << Zone() << std::endl;
-// 		std::cout << "jMatrix first." << std::endl;
-// 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-// 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-// 				std::cout << jMatrix[ x * surfCount + y] << " ";
-// 			}
-// 			std::cout << std::endl;
-// 		}
-// 		std::cout << "Now cMatrix." << std::endl;
-// 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-// 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-// 				std::cout << cMatrix[ x * surfCount + y] << " ";
-// 			}
-// 			std::cout << std::endl;
-// 		}
-
-// #endif
 		int result = clapack_dgesv(CblasRowMajor, surfCount, 
 															 surfCount, cMatrix, surfCount, 
 															 ipiv, jMatrix, surfCount);
-		delete[] cMatrix; //made this as early as possible -- it appears that having 8 threads allocate NxN all at once for large zones 
-		//is having an acute impact on system memory
+		delete[] cMatrix; 
 		delete[] ipiv;
 
 		if( result == 0){ //success
-// #ifdef DEBUG_CI
-// 			std::cout << "Finished calculating linear system.  Here's the result: " << 
-// 				std::endl;
-// 			for(int x = 0; x < Zone.NumOfSurfaces; ++x){
-// 				for(int y = 0; y < Zone.NumOfSurfaces; ++y){
-// 					std::cout << jMatrix[ y * surfCount + x] << " ";
-// 				}
-// 				std::cout << std::endl;
-// 			}
-
-// #endif
 			for(auto i: Zone.surfaces){
 				Real64 emiss = Zone.Emissivity( i(false) + 1 );
 				emiss = emiss > MAX_EMISS ? MAX_EMISS : emiss;
@@ -397,7 +359,7 @@ namespace HeatBalanceIntRadExchange {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const AFormat( "(A)" );
+		static gio::Fmt AFormat( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -443,7 +405,7 @@ namespace HeatBalanceIntRadExchange {
 		if ( ViewFactorReport ) { // Print heading
 			gio::write( OutputFileInits, fmtA ) << "! <Surface View Factor and Grey Interchange Information>";
 			gio::write( OutputFileInits, fmtA ) << "! <View Factor - Zone Information>,Zone Name,Number of Surfaces";
-			gio::write( OutputFileInits, fmtA ) << "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth," "Tilt,Thermal Emissivity,#Sides,Vertices";
+			gio::write( OutputFileInits, fmtA ) << "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Thermal Emissivity,#Sides,Vertices";
 			gio::write( OutputFileInits, fmtA ) << "! <View Factor / Grey Interchange Type>,Surface Name(s)";
 			gio::write( OutputFileInits, fmtA ) << "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface";
 		}
@@ -458,7 +420,7 @@ namespace HeatBalanceIntRadExchange {
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
 			if ( ZoneNum == 1 ) {
-				if ( DisplayAdvancedReportVariables ) gio::write( OutputFileInits, fmtA ) << "! <Surface View Factor Check Values>,Zone Name,Original Check Value," "Calculated Fixed Check Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence," "Used RowSum Convergence";
+				if ( DisplayAdvancedReportVariables ) gio::write( OutputFileInits, fmtA ) << "! <Surface View Factor Check Values>,Zone Name,Original Check Value,Calculated Fixed Check Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum Convergence";
 			}
 
 			ZoneInfo[ ZoneNum - 1 ].Name = Zone( ZoneNum ).Name;
@@ -538,7 +500,7 @@ namespace HeatBalanceIntRadExchange {
 			if ( NoUserInputF ) {
 
 				// Calculate the view factors and make sure they satisfy reciprocity
-				CalcApproximateViewFactors( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].Area, ZoneInfo[ ZoneNum - 1 ].Azimuth, ZoneInfo[ ZoneNum - 1 ].Tilt, ZoneInfo[ ZoneNum - 1 ].F, ZoneInfo[ ZoneNum - 1 ].SurfacePtr );
+				CalcApproximateViewFactors( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].Area, ZoneInfo[ ZoneNum - 1 ].Azmuth, ZoneInfo[ ZoneNum - 1 ].Tilt, ZoneInfo[ ZoneNum - 1 ].F, ZoneInfo[ ZoneNum - 1 ].SurfacePtr );
 			}
 
 			if ( ViewFactorReport ) { // Allocate and save user or approximate view factors for reporting.
@@ -1041,8 +1003,7 @@ namespace HeatBalanceIntRadExchange {
 
 		// FLOW:
 		// Calculate the sum of the areas seen by all zone surfaces
-		ZoneArea.allocate( N );
-		ZoneArea = 0.0;
+		ZoneArea.dimension( N, 0.0 );
 		for ( i = 1; i <= N; ++i ) {
 			for ( j = 1; j <= N; ++j ) {
 				// Assumption is that a surface cannot see itself or any other surface
@@ -1158,13 +1119,6 @@ namespace HeatBalanceIntRadExchange {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		FArray2D< Real64 > AF; // = (AREA * DIRECT VIEW FACTOR) MATRIX
-		FArray2D< Real64 > AFTranspose;
-		FArray2D< Real64 > AFAverage;
-		FArray2D< Real64 > FixedAF;
-		FArray2D< Real64 > FixedF; // CORRECTED MATRIX OF VIEW FACTORS (N X N)
-		FArray2D< Real64 > FixedAFTranspose;
-		FArray1D< Real64 > RowCoefficient;
 		Real64 LargestArea;
 		Real64 ConvrgNew;
 		Real64 ConvrgOld;
@@ -1180,20 +1134,11 @@ namespace HeatBalanceIntRadExchange {
 		OriginalCheckValue = std::abs( sum( F ) - N );
 
 		//  Allocate and zero arrays
-		AF.allocate( N, N );
-		AFTranspose.allocate( N, N );
-		AFAverage.allocate( N, N );
-		FixedAF.allocate( N, N );
-		FixedAFTranspose.allocate( N, N );
+		FArray2D< Real64 > FixedAF( F ); // store for largest area check
 
-		AF = 0.0;
-		AFTranspose = 0.0;
-		FixedAF = 0.0;
 		Accelerator = 1.0;
 		ConvrgOld = 10.0;
 		LargestArea = maxval( A );
-
-		FixedAF = F; // store for largest area check
 
 		//  Check for Strange Geometry
 		if ( LargestArea > ( sum( A ) - LargestArea ) ) {
@@ -1206,6 +1151,7 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		//  Set up AF matrix.
+		FArray2D< Real64 > AF( N, N ); // = (AREA * DIRECT VIEW FACTOR) MATRIX
 		for ( i = 1; i <= N; ++i ) {
 			for ( j = 1; j <= N; ++j ) {
 				AF( i, j ) = FixedAF( i, j ) * A( i );
@@ -1213,19 +1159,11 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		//  Enforce reciprocity by averaging AiFij and AjFji
-		AFTranspose = transpose( AF );
-		AFAverage = 0.5 * ( AF + AFTranspose );
-
-		FixedAF = AFAverage; //Initialize Fixed Matrix
+		FixedAF = 0.5 * ( AF + transpose( AF ) ); //Performance Slow way to average with transpose (heap use)
 
 		AF.deallocate();
-		AFTranspose.deallocate();
-		AFAverage.deallocate();
 
-		FixedF.allocate( N, N );
-		RowCoefficient.allocate( N );
-		FixedF = 0.0;
-		RowCoefficient = 1.0;
+		FArray2D< Real64 > FixedF( N, N ); // CORRECTED MATRIX OF VIEW FACTORS (N X N)
 
 		NumIterations = 0;
 		RowSum = 0.0;
@@ -1242,38 +1180,31 @@ namespace HeatBalanceIntRadExchange {
 			ShowContinueError( "Number of surfaces <= 3, view factors are set to force reciprocity." );
 
 			F = FixedF;
-			FixedCheckValue = std::abs( sum( FixedF ) - N );
-			FinalCheckValue = FixedCheckValue;
-			RowSum = 0.0;
-			for ( i = 1; i <= N; ++i ) {
-				RowSum += sum( FixedF( i, _ ) );
-			}
+			RowSum = sum( FixedF );
+			FinalCheckValue = FixedCheckValue = std::abs( RowSum - N );
 			Zone( ZoneNum ).EnforcedReciprocity = true;
-			FixedAF.deallocate();
-			FixedF.deallocate();
-			FixedAFTranspose.deallocate();
-			RowCoefficient.deallocate();
 			return; // Do not iterate, stop with reciprocity satisfied.
 
 		} //  N <= 3 Case
 
 		//  Regular fix cases
+		FArray1D< Real64 > RowCoefficient( N );
 		Converged = false;
 		while ( ! Converged ) {
 			++NumIterations;
 			for ( i = 1; i <= N; ++i ) {
 				// Determine row coefficients which will enforce closure.
-				if ( std::abs( sum( FixedAF( i, {1,N} ) ) ) > 1.0e-10 ) {
-					RowCoefficient( i ) = A( i ) / sum( FixedAF( i, {1,N} ) );
+				Real64 const sum_FixedAF_i( sum( FixedAF( i, _ ) ) );
+				if ( std::abs( sum_FixedAF_i ) > 1.0e-10 ) {
+					RowCoefficient( i ) = A( i ) / sum_FixedAF_i;
 				} else {
 					RowCoefficient( i ) = 1.0;
 				}
-				FixedAF( i, {1,N} ) *= RowCoefficient( i );
+				FixedAF( i, _ ) *= RowCoefficient( i );
 			}
 
 			//  Enforce reciprocity by averaging AiFij and AjFji
-			FixedAFTranspose = transpose( FixedAF );
-			FixedAF = 0.5 * ( FixedAFTranspose + FixedAF );
+			FixedAF = 0.5 * ( FixedAF + transpose( FixedAF ) );
 
 			//  Form FixedF matrix
 			for ( i = 1; i <= N; ++i ) {
@@ -1293,8 +1224,7 @@ namespace HeatBalanceIntRadExchange {
 			ConvrgOld = ConvrgNew;
 			if ( NumIterations > 400 ) { //  If everything goes bad,enforce reciprocity and go home.
 				//  Enforce reciprocity by averaging AiFij and AjFji
-				FixedAFTranspose = transpose( FixedAF );
-				FixedAF = 0.5 * ( FixedAFTranspose + FixedAF );
+				FixedAF = 0.5 * ( FixedAF + transpose( FixedAF ) );
 
 				//  Form FixedF matrix
 				for ( i = 1; i <= N; ++i ) {
@@ -1302,26 +1232,18 @@ namespace HeatBalanceIntRadExchange {
 						FixedF( i, j ) = FixedAF( i, j ) / A( i );
 					}
 				}
-				CheckConvergeTolerance = std::abs( sum( FixedF ) - N );
+				Real64 const sum_FixedF( sum( FixedF ) );
+				FinalCheckValue = FixedCheckValue = CheckConvergeTolerance = std::abs( sum_FixedF - N );
 				if ( CheckConvergeTolerance > 0.005 ) {
-					ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
+					ShowWarningError( "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
 					ShowContinueError( "Enforced reciprocity has tolerance (ideal is 0)=[" + RoundSigDigits( CheckConvergeTolerance, 6 ) + "], Row Sum (ideal is " + RoundSigDigits( N ) + ")=[" + RoundSigDigits( RowSum, 2 ) + "]." );
 					ShowContinueError( "If zone is unusual, or tolerance is on the order of 0.001, view factors are probably OK." );
 				}
-				FixedCheckValue = std::abs( sum( FixedF ) - N );
-				FinalCheckValue = FixedCheckValue;
 				if ( std::abs( FixedCheckValue ) < std::abs( OriginalCheckValue ) ) {
 					F = FixedF;
 					FinalCheckValue = FixedCheckValue;
 				}
-				RowSum = 0.0;
-				for ( i = 1; i <= N; ++i ) {
-					RowSum += sum( FixedF( i, _ ) );
-				}
-				FixedAF.deallocate();
-				FixedF.deallocate();
-				FixedAFTranspose.deallocate();
-				RowCoefficient.deallocate();
+				RowSum = sum_FixedF;
 				return;
 			}
 		}
@@ -1331,22 +1253,14 @@ namespace HeatBalanceIntRadExchange {
 			FinalCheckValue = FixedCheckValue;
 		} else {
 			FinalCheckValue = OriginalCheckValue;
-			RowSum = 0.0;
-			for ( i = 1; i <= N; ++i ) {
-				RowSum += sum( FixedF( i, _ ) );
-			}
+			RowSum = sum( FixedF );
 			if ( std::abs( RowSum - N ) < PrimaryConvergence ) {
 				F = FixedF;
 				FinalCheckValue = FixedCheckValue;
 			} else {
-				ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
+				ShowWarningError( "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
 			}
 		}
-
-		FixedAF.deallocate();
-		FixedF.deallocate();
-		FixedAFTranspose.deallocate();
-		RowCoefficient.deallocate();
 
 	}
 

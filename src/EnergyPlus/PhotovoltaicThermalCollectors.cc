@@ -316,8 +316,7 @@ namespace PhotovoltaicThermalCollectors {
 		cCurrentModuleObject = "SolarCollector:FlatPlate:PhotovoltaicThermal";
 		NumPVT = GetNumObjectsFound( cCurrentModuleObject );
 		PVT.allocate( NumPVT );
-		CheckEquipName.allocate( NumPVT );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumPVT, true );
 
 		for ( Item = 1; Item <= NumPVT; ++Item ) {
 			GetObjectItem( cCurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -547,8 +546,7 @@ namespace PhotovoltaicThermalCollectors {
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
-			SetLoopIndexFlag.allocate( NumPVT );
-			SetLoopIndexFlag = true;
+			SetLoopIndexFlag.dimension( NumPVT, true );
 			MyOneTimeFlag = false;
 		}
 

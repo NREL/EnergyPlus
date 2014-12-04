@@ -275,8 +275,7 @@ namespace FuelCellElectricGenerator {
 
 			//ALLOCATE ARRAYS
 			FuelCell.allocate( NumFuelCellGenerators ); // inits handeled in derived type definitions
-			CheckEquipName.allocate( NumFuelCellGenerators );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumFuelCellGenerators, true );
 
 			// first load in FuelCell names
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {

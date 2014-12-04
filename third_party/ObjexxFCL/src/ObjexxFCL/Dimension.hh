@@ -825,26 +825,4 @@ operator <<( std::ostream & stream, Dimension const & dim );
 
 } // ObjexxFCL
 
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.
-
-namespace std {
-
-// std::swap( Dimension, Dimension )
-inline
-void
-swap( ObjexxFCL::Dimension & a, ObjexxFCL::Dimension & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
-
 #endif // ObjexxFCL_Dimension_hh_INCLUDED

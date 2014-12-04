@@ -102,8 +102,8 @@ namespace ScheduleManager {
 	FArray1D< WeekScheduleData > WeekSchedule; // Week Schedule Storage
 	FArray1D< ScheduleData > Schedule; // Schedule Storage
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// MODULE SUBROUTINES:
 	//*************************************************************************
@@ -382,17 +382,11 @@ namespace ScheduleManager {
 		MaxAlps = max( MaxAlps, NumAlphas );
 
 		Alphas.allocate( MaxAlps ); // Maximum Alphas possible
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlps );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums ); // Maximum Numbers possible
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlps );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 ); // Maximum Numbers possible
+		lAlphaBlanks.dimension( MaxAlps, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// Prescan to determine extra day and week schedules due to compact schedule input
 		AddWeekSch = 0;
@@ -415,11 +409,8 @@ namespace ScheduleManager {
 			Numbers.deallocate();
 			lNumericBlanks.deallocate();
 			cNumericFields.allocate( MaxNums );
-			cNumericFields = "";
-			Numbers.allocate( MaxNums ); // Maximum Numbers possible
-			Numbers = 0.0;
-			lNumericBlanks.allocate( MaxNums );
-			lNumericBlanks = true;
+			Numbers.dimension( MaxNums, 0.0 ); // Maximum Numbers possible
+			lNumericBlanks.dimension( MaxNums, true );
 		}
 		// add week and day schedules for each FILE:COMMA schedule
 		AddWeekSch += NumCommaFileSchedules * 366; //number of days/year because need a week for each day
@@ -1887,15 +1878,15 @@ namespace ScheduleManager {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const Months( 12, { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" } );
 		static FArray1D_string const HrField( {0,24}, { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24" } );
-		static gio::Fmt const SchTFmt0( "('! Schedule Details Report=',A,' =====================')" );
-		static gio::Fmt const SchTFmt( "('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')" );
-		static gio::Fmt const SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
-		static gio::Fmt const SchTFmtdata( "('ScheduleTypeLimits',5(',',A))" );
-		static gio::Fmt const SchWFmtdata( "('Schedule:Week:Daily',',',A,$)" );
-		static gio::Fmt const CMinFmt( "(I2.2)" );
-		static gio::Fmt const ThruFmt( "(',Through ',A,1X,I2.2,',',A)" );
-		static gio::Fmt const SchDFmt0( "('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)" );
-		static gio::Fmt const SchDFmtdata0( "('DaySchedule,',A,',',A,',',A,',',A,$)" );
+		static gio::Fmt SchTFmt0( "('! Schedule Details Report=',A,' =====================')" );
+		static gio::Fmt SchTFmt( "('! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,',   'Continuous? {Yes/No - Discrete}')" );
+		static gio::Fmt SchSFmt( "('! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31')" );
+		static gio::Fmt SchTFmtdata( "('ScheduleTypeLimits',5(',',A))" );
+		static gio::Fmt SchWFmtdata( "('Schedule:Week:Daily',',',A,$)" );
+		static gio::Fmt CMinFmt( "(I2.2)" );
+		static gio::Fmt ThruFmt( "(',Through ',A,1X,I2.2,',',A)" );
+		static gio::Fmt SchDFmt0( "('! <DaySchedule>,Name,ScheduleType,Interpolated {Yes/No},Time (HH:MM) =>',$)" );
+		static gio::Fmt SchDFmtdata0( "('DaySchedule,',A,',',A,',',A,',',A,$)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -3055,7 +3046,7 @@ namespace ScheduleManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const hhmmFormat( "(I2.2)" );
+		static gio::Fmt hhmmFormat( "(I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

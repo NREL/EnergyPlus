@@ -395,7 +395,7 @@ namespace CondenserLoopTowers {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OutputFormat( "(F5.2)" );
+		static gio::Fmt OutputFormat( "(F5.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -449,8 +449,7 @@ namespace CondenserLoopTowers {
 		SimpleTower.allocate( NumSimpleTowers );
 		SimpleTowerReport.allocate( NumSimpleTowers );
 		SimpleTowerInlet.allocate( NumSimpleTowers );
-		CheckEquipName.allocate( NumSimpleTowers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSimpleTowers, true );
 		// Allocate variable-speed tower structure with data specific to this type
 		if ( NumVariableSpeedTowers > 0 ) {
 			VSTower.allocate( NumVariableSpeedTowers );
@@ -2182,8 +2181,8 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OutputFormat( "(F6.2)" );
-		static gio::Fmt const OutputFormat2( "(F9.6)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat2( "(F9.6)" );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const RoutineName( "SizeTower" );
@@ -4078,8 +4077,8 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OutputFormat( "(F5.2)" );
-		static gio::Fmt const OutputFormat2( "(F8.5)" );
+		static gio::Fmt OutputFormat( "(F5.2)" );
+		static gio::Fmt OutputFormat2( "(F8.5)" );
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const RoutineName( "CalcVariableSpeedTower" );
@@ -5328,7 +5327,7 @@ namespace CondenserLoopTowers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const LowTempFmt( "(' ',F6.2)" );
+		static gio::Fmt LowTempFmt( "(' ',F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

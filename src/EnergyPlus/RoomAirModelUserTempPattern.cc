@@ -183,8 +183,7 @@ namespace RoomAirModelUserTempPattern {
 		int SurfNum; // do loop counter
 
 		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.allocate( NumOfZones );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumOfZones, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -579,8 +578,7 @@ namespace RoomAirModelUserTempPattern {
 		static bool MyOneTimeFlag( true );
 
 		if ( MyOneTimeFlag ) {
-			SetupOutputFlag.allocate( NumOfZones );
-			SetupOutputFlag = true; // init
+			SetupOutputFlag.dimension( NumOfZones, true ); // init
 			MyOneTimeFlag = false;
 		}
 

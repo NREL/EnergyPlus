@@ -186,7 +186,7 @@ namespace DaylightingDevices {
 
 		// DERIVED TYPE DEFINITIONS:
 
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int PipeNum; // TDD pipe object number

@@ -219,8 +219,7 @@ namespace UFADManager {
 			ThickOccupiedSubzoneMin = 0.2;
 			HeightIntMassDefault = 2.0;
 			MyOneTimeFlag = false;
-			MySizeFlag.allocate( NumOfZones );
-			MySizeFlag = true;
+			MySizeFlag.dimension( NumOfZones, true );
 		}
 
 		if ( MySizeFlag( ZoneNum ) ) {

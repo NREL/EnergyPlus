@@ -1,7 +1,7 @@
 #ifndef ObjexxFCL_floops_hh_INCLUDED
 #define ObjexxFCL_floops_hh_INCLUDED
 
-// Fortran Compatible DO Loop Support
+// Fortran-Compatible DO Loop Support
 //
 // Project: Objexx Fortran Compatibility Library (ObjexxFCL)
 //

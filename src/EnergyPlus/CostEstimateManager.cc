@@ -631,10 +631,8 @@ namespace CostEstimateManager {
 				ThisConstructStr = CostLineItem( Item ).ParentObjName;
 				ThisConstructID = FindItem( ThisConstructStr, Construct.Name(), TotConstructs );
 				// need to determine unique surfacs... some surfaces are shared by zones and hence doubled
-				uniqueSurfMask.allocate( TotSurfaces );
-				uniqueSurfMask = true; //init to true and change duplicates to false
-				SurfMultipleARR.allocate( TotSurfaces );
-				SurfMultipleARR = 1.0;
+				uniqueSurfMask.dimension( TotSurfaces, true ); //init to true and change duplicates to false
+				SurfMultipleARR.dimension( TotSurfaces, 1.0 );
 				for ( surf = 1; surf <= TotSurfaces; ++surf ) {
 					if ( Surface( surf ).ExtBoundCond >= 1 ) {
 						if ( Surface( surf ).ExtBoundCond < surf ) { //already cycled through
