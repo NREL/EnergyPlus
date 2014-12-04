@@ -1692,8 +1692,7 @@ namespace WaterThermalTanks {
 
 	void
 	CalcWaterThermalTankMixed(
-        int const WaterThermalTankNum, // Water Heater being simulated
-        Real64 const HPWHCondenserDeltaT=0.0 // If > 0, use HPWH mode
+        int const WaterThermalTankNum // Water Heater being simulated
     );
 
 	Real64

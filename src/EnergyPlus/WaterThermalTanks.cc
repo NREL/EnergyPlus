@@ -4865,7 +4865,7 @@ namespace WaterThermalTanks {
 	}
 
 	void
-	CalcWaterThermalTankMixed( int const WaterThermalTankNum, Real64 const HPWHCondenserDeltaT ) // Water Heater being simulated
+	CalcWaterThermalTankMixed( int const WaterThermalTankNum ) // Water Heater being simulated
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4965,8 +4965,9 @@ namespace WaterThermalTanks {
 		bool SetPointRecovered; // Flag to indicate when setpoint is recovered for the first time
 		Real64 rho;
 		static int DummyWaterIndex( 1 );
-        WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
-
+		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Reference to the tank object to save typing
+		Real64 HPWHCondenserDeltaT;
+		
 		// FLOW:
 		TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
 
@@ -5050,14 +5051,22 @@ namespace WaterThermalTanks {
 		Qfuel = 0.0;
 
 		// Calculate the heating rate from the heat pump.
-		assert( HPWHCondenserDeltaT >= 0 );
+		if ( Tank.HeatPumpNum > 0 ) {
+            HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
+		} else {
+			HPWHCondenserDeltaT = 0.0;
+		}
+        assert( HPWHCondenserDeltaT >= 0 );
 		Qheatpump = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
 		
 		// Calculate steady-state heat rates.
 		Quse = UseMassFlowRate * Cp * ( UseInletTemp - SetPointTemp );
 
 		// Determine if the source side heating is coming from a heat pump.
-		if (Qheatpump > 0.0) {
+		if ( Tank.HeatPumpNum > 0 ) {
 			SourceMassFlowRate = 0.0; // Handle this heating as a constant heat source
 			Qsource = Qheatpump;
 		} else {
@@ -5179,7 +5188,7 @@ namespace WaterThermalTanks {
 
 						Qheater = Qmaxcap;
 						Qunmet = Qneeded - Qheater;
-						Qheat = Qoncycheat + Qheater;
+						Qheat = Qoncycheat + Qheater + Qheatpump;
 
 						NewTankTemp = CalcTankTemp( TankTemp, AmbientTemp, UseInletTemp, SourceInletTemp, TankMass, Cp, UseMassFlowRate, SourceMassFlowRate, LossCoeff, Qheat, TimeNeeded );
 
@@ -5325,7 +5334,7 @@ namespace WaterThermalTanks {
 			Eloss += LossCoeff * ( AmbientTemp * TimeNeeded - deltaTsum );
 			Elosszone += LossFracToZone * LossCoeff * ( AmbientTemp * TimeNeeded - deltaTsum );
 			Euse += UseMassFlowRate * Cp * ( UseInletTemp * TimeNeeded - deltaTsum );
-			if (Qheatpump > 0.0) {
+			if ( Tank.HeatPumpNum > 0 ) {
 				Esource += Qheatpump * TimeNeeded;
 			} else {
 				Esource += SourceMassFlowRate * Cp * ( SourceInletTemp * TimeNeeded - deltaTsum );
@@ -5383,6 +5392,9 @@ namespace WaterThermalTanks {
 		Tank.TankTempAvg = TankTempAvg; // Average tank temperature over the timestep for reporting
 		Tank.UseOutletTemp = TankTempAvg; // Because entire tank is at same temperature
 		Tank.SourceOutletTemp = TankTempAvg; // Because entire tank is at same temperature
+		if ( Tank.HeatPumpNum > 0 ) {
+			Tank.SourceInletTemp = TankTempAvg + HPWHCondenserDeltaT; // Update the source inlet temperature to the average over the timestep
+		}
 
 		Tank.LossRate = Qloss;
 		Tank.UseRate = Quse;
@@ -6748,14 +6760,14 @@ namespace WaterThermalTanks {
 		int DXCoilAirInletNode; // Inlet air node number of DX coil
 		int HPNum; // Index to heat pump water heater
 		int SolFla( 0 ); // Flag of RegulaFalsi solver
-		FArray1D< Real64 > Par( 6 ); // Parameters passed to RegulaFalsi
+		FArray1D< Real64 > Par( 5 ); // Parameters passed to RegulaFalsi
 		Real64 HPMinTemp; // used for error messages, C
 		std::string HPMinTempChar; // used for error messages
 		std::string IterNum; // Max number of iterations for warning message
 		int CompOp; // DX compressor operation; 1=on, 0=off
 		Real64 CondenserDeltaT; // HPWH condenser water temperature difference
 		Real64 HPWHCondInletNodeLast; // Water temp sent from WH on last iteration
-        Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
+		Real64 HPWaterInletNodeTempSaved; // Water temp saved from previous timestep
 		int loopIter; // iteration loop counter
 
 		// FLOW:
@@ -6962,7 +6974,7 @@ namespace WaterThermalTanks {
 				// select tank type
 				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
 					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
-						CalcWaterThermalTankMixed( WaterThermalTankNum, CondenserDeltaT );
+						CalcWaterThermalTankMixed( WaterThermalTankNum );
 						NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 					} else if ( SELECT_CASE_var1 == StratifiedWaterHeater ) {
 						CalcWaterThermalTankStratified( WaterThermalTankNum );
@@ -6985,7 +6997,6 @@ namespace WaterThermalTanks {
 					Par( 4 ) = 0.0;
 				}
 				Par( 5 ) = MdotWater;
-				Par( 6 ) = CondenserDeltaT;
 				{ auto const SELECT_CASE_var1( HPWaterHeater( HPNum ).TankTypeNum );
 					if ( SELECT_CASE_var1 == MixedWaterHeater ) {
 						SolveRegulaFalsi( Acc, MaxIte, SolFla, HPPartLoadRatio, PLRResidualMixedTank, 0.0, 1.0, Par );
@@ -7148,7 +7159,6 @@ namespace WaterThermalTanks {
 		// par(3) = water heater num
 		// par(4) = FirstHVACIteration
 		// par(5) = MdotWater
-		// par(6) = CondenserDeltaT
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		//  na
@@ -7173,7 +7183,7 @@ namespace WaterThermalTanks {
 		} else {
 			FirstHVACIteration = false;
 		}
-		CalcWaterThermalTankMixed( WaterThermalTankNum, Par()( 6 ) );
+		CalcWaterThermalTankMixed( WaterThermalTankNum );
 		NewTankTemp = WaterThermalTank( WaterThermalTankNum ).TankTemp;
 		PLRResidualMixedTank = Par()( 1 ) - NewTankTemp;
 		return PLRResidualMixedTank;
@@ -7217,7 +7227,6 @@ namespace WaterThermalTanks {
 		// par(3) = water heater num
 		// par(4) = FirstHVACIteration
 		// par(5) = MdotWater
-		// par(6) = CondenserDeltaT
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		//  na
