@@ -228,8 +228,7 @@ namespace DirectAirManager {
 		if ( NumDirectAir > 0 ) {
 
 			DirectAir.allocate( NumDirectAir );
-			CheckEquipName.allocate( NumDirectAir );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumDirectAir, true );
 
 			for ( DirectAirNum = 1; DirectAirNum <= NumDirectAir; ++DirectAirNum ) {
 				DirectAir( DirectAirNum ).cObjectName = cCurrentModuleObject; // push Object Name into data array
@@ -654,7 +653,7 @@ namespace DirectAirManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

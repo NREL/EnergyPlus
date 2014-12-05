@@ -247,10 +247,8 @@ namespace BoilerSteam {
 
 		// Boiler will have fuel input to it , that is it !
 		Boiler.allocate( NumBoilers );
-		CheckEquipName.allocate( NumBoilers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumBoilers, true );
 		BoilerFuelTypeForOutputVariable.allocate( NumBoilers );
-		BoilerFuelTypeForOutputVariable = "";
 
 		BoilerReport.allocate( NumBoilers );
 
@@ -1048,7 +1046,7 @@ namespace BoilerSteam {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

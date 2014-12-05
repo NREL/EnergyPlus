@@ -332,17 +332,11 @@ namespace HeatBalanceHAMTManager {
 		ErrorsFound = false;
 
 		AlphaArray.allocate( MaxAlphas );
-		AlphaArray = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = "";
 		cNumericFieldNames.allocate( MaxNums );
-		cNumericFieldNames = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = false;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = false;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, false );
+		lNumericBlanks.dimension( MaxNums, false );
 
 		HAMTitems = GetNumObjectsFound( cHAMTObject1 ); // MaterialProperty:HeatAndMoistureTransfer:Settings
 		for ( item = 1; item <= HAMTitems; ++item ) {
@@ -675,12 +669,12 @@ namespace HeatBalanceHAMTManager {
 		bool DoReport;
 
 		// Formats
-		static gio::Fmt const Format_1966( "('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')" );
-		static gio::Fmt const Format_1965( "('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')" );
-		static gio::Fmt const Format_1968( "('HAMT cells, ',A,',',A,400(,:,',',i4))" );
-		static gio::Fmt const Format_1967( "('HAMT origins,',A,',',A,400(,:,',',f10.7))" );
-		static gio::Fmt const Format_108( "('! <Material Nominal Resistance>, Material Name,  Nominal R')" );
-		static gio::Fmt const Format_111( "('Material Nominal Resistance's,2(',',A))" );
+		static gio::Fmt Format_1966( "('! <HAMT cells>, Surface Name, Construction Name, Cell Numbers')" );
+		static gio::Fmt Format_1965( "('! <HAMT origins>, Surface Name, Construction Name, Cell origins (m) ')" );
+		static gio::Fmt Format_1968( "('HAMT cells, ',A,',',A,400(,:,',',i4))" );
+		static gio::Fmt Format_1967( "('HAMT origins,',A,',',A,400(,:,',',f10.7))" );
+		static gio::Fmt Format_108( "('! <Material Nominal Resistance>, Material Name,  Nominal R')" );
+		static gio::Fmt Format_111( "('Material Nominal Resistance's,2(',',A))" );
 
 		deltat = TimeStepZone * 3600.0;
 
@@ -1690,7 +1684,7 @@ namespace HeatBalanceHAMTManager {
 	//     copyrighted by other individuals, companies and institutions.  These
 	//     portions have been incorporated into the EnergyPlus software package
 	//     under license.  For a complete list of contributors, see "Notice"
-	//     located in EnergyPlus.f90.
+	//     located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting
 	//     on its behalf a paid-up, nonexclusive, irrevocable, worldwide license

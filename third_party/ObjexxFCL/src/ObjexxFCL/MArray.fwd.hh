@@ -15,7 +15,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 template< class, typename > class MArray;
 
 } // ObjexxFCL

@@ -175,8 +175,8 @@ namespace Psychrometrics {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtLD( "*" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -324,7 +324,7 @@ namespace Psychrometrics {
 		int const itmax( 100 ); // Maximum No of Iterations
 		static Real64 convTol( 0.0001 );
 		static std::string const RoutineName( "PsyTwbFnTdbWPb" );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1516,11 +1516,12 @@ Label170: ;
 			Real64 X1; // Previous value of independent variable in ITERATE
 			Real64 Y1; // Previous value of dependent variable in ITERATE
 			Real64 ResultX; // ResultX is the final Iteration result passed back to the calling routine
+			bool const CalledFrom_empty( CalledFrom.empty() );
 			int icvg; // Iteration convergence flag
 			for ( iter = 1; iter <= itmax; ++iter ) {
 
 				// Calculate saturation pressure for estimated boiling temperature
-				pSat = PsyPsatFnTemp( tSat, ( CalledFrom.empty() ? RoutineName : CalledFrom ) );
+				pSat = PsyPsatFnTemp( tSat, ( CalledFrom_empty ? RoutineName : CalledFrom ) );
 
 				// Compare with specified pressure and update estimate of temperature
 				error = Press - pSat;
@@ -1856,7 +1857,7 @@ Label170: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

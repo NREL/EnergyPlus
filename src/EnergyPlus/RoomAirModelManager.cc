@@ -1232,8 +1232,7 @@ namespace RoomAirModelManager {
 
 		ZoneUCSDUI.allocate( TotUCSDUI );
 		ZoneUCSDUE.allocate( TotUCSDUE );
-		ZoneUFPtr.allocate( NumOfZones );
-		ZoneUFPtr = 0;
+		ZoneUFPtr.dimension( NumOfZones, 0 );
 
 		cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
 		for ( Loop = 1; Loop <= TotUCSDUI; ++Loop ) {
@@ -2128,7 +2127,7 @@ namespace RoomAirModelManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

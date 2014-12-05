@@ -585,17 +585,11 @@ namespace HVACMultiSpeedHeatPump {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNums, 0.0 );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		NumMSHeatPumps = GetNumObjectsFound( CurrentModuleObject );
 
@@ -607,8 +601,7 @@ namespace HVACMultiSpeedHeatPump {
 		// ALLOCATE ARRAYS
 		MSHeatPump.allocate( NumMSHeatPumps );
 		MSHeatPumpReport.allocate( NumMSHeatPumps );
-		CheckEquipName.allocate( NumMSHeatPumps );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumMSHeatPumps, true );
 		AllocatedFlag = true;
 
 		// Load arrays with reformulated electric EIR chiller data
@@ -3650,7 +3643,7 @@ namespace HVACMultiSpeedHeatPump {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

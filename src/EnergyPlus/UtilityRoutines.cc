@@ -90,9 +90,9 @@ AbortEnergyPlus(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const OutFmt( "('Press ENTER to continue after reading above message>')" );
-	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt OutFmt( "('Press ENTER to continue after reading above message>')" );
+	static gio::Fmt ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -387,8 +387,8 @@ EndEnergyPlus()
 	// na
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt ETimeFmt( "(I2.2,'hr ',I2.2,'min ',F5.2,'sec')" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 
@@ -1479,23 +1479,10 @@ StoreRecurringErrorMessage(
 
 	// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-	// Object Data
-	FArray1D< RecurringErrorData > TempRecurringErrors;
-
 	// If Index is zero, then assign next available index and reallocate array
 	if ( ErrorMsgIndex == 0 ) {
-		++NumRecurringErrors;
+		RecurringErrors.redimension( ++NumRecurringErrors );
 		ErrorMsgIndex = NumRecurringErrors;
-		if ( NumRecurringErrors == 1 ) {
-			RecurringErrors.allocate( NumRecurringErrors );
-		} else if ( NumRecurringErrors > 1 ) {
-			TempRecurringErrors.allocate( NumRecurringErrors );
-			TempRecurringErrors( {1,NumRecurringErrors - 1} ) = RecurringErrors( {1,NumRecurringErrors - 1} );
-			RecurringErrors.deallocate();
-			RecurringErrors.allocate( NumRecurringErrors );
-			RecurringErrors = TempRecurringErrors;
-			TempRecurringErrors.deallocate();
-		}
 		// The message string only needs to be stored once when a new recurring message is created
 		RecurringErrors( ErrorMsgIndex ).Message = ErrorMessage;
 		RecurringErrors( ErrorMsgIndex ).Count = 1;
@@ -1585,8 +1572,8 @@ ShowErrorMessage(
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 
 	// SUBROUTINE PARAMETER DEFINITIONS:
-	static gio::Fmt const ErrorFormat( "(2X,A)" );
-	static gio::Fmt const fmtA( "(A)" );
+	static gio::Fmt ErrorFormat( "(2X,A)" );
+	static gio::Fmt fmtA( "(A)" );
 
 	// INTERFACE BLOCK SPECIFICATIONS
 	// na
@@ -1715,7 +1702,7 @@ ShowRecurringErrors()
 	using namespace DataErrorTracking;
 	using General::RoundSigDigits;
     using General::strip_trailing_zeros;
-	
+
 	// Locals
 	// SUBROUTINE ARGUMENT DEFINITIONS:
 	// na
@@ -1797,7 +1784,7 @@ ShowRecurringErrors()
 //     Portions of the EnergyPlus software package have been developed and copyrighted
 //     by other individuals, companies and institutions.  These portions have been
 //     incorporated into the EnergyPlus software package under license.   For a complete
-//     list of contributors, see "Notice" located in EnergyPlus.f90.
+//     list of contributors, see "Notice" located in main.cc.
 //     NOTICE: The U.S. Government is granted for itself and others acting on its
 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 //     reproduce, prepare derivative works, and perform publicly and display publicly.

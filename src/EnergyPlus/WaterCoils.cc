@@ -369,12 +369,9 @@ namespace WaterCoils {
 		if ( NumWaterCoils > 0 ) {
 			WaterCoil.allocate( NumWaterCoils );
 			WaterCoilNumericFields.allocate( NumWaterCoils );
-			WaterTempCoolCoilErrs.allocate( NumWaterCoils );
-			WaterTempCoolCoilErrs = 0;
-			PartWetCoolCoilErrs.allocate( NumWaterCoils );
-			PartWetCoolCoilErrs = 0;
-			CheckEquipName.allocate( NumWaterCoils );
-			CheckEquipName = true;
+			WaterTempCoolCoilErrs.dimension( NumWaterCoils, 0 );
+			PartWetCoolCoilErrs.dimension( NumWaterCoils, 0 );
+			CheckEquipName.dimension( NumWaterCoils, true );
 		}
 
 		GetObjectDefMaxArgs( "Coil:Heating:Water", TotalArgs, NumAlphas, NumNums );
@@ -388,17 +385,11 @@ namespace WaterCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		CurrentModuleObject = "Coil:Heating:Water";
 		// Get the data for simple heating coils
@@ -799,7 +790,7 @@ namespace WaterCoils {
 		int const MaxIte( 500 ); // Maximum number of iterations
 		Real64 const Acc( 0.0001 ); // Accuracy of result
 		static std::string const RoutineName( "InitWaterCoil" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2499,16 +2490,16 @@ namespace WaterCoils {
 			//             Deleted code by J.C. Vanderzee
 			//       dry coil fin efficiency
 			DryCoilEfficiency = 0.0;
-//Tuned Replaced by below for faster pow calls
+//Tuned Replaced by below to eliminate pow calls
 //			for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
 //				DryCoilEfficiency += WaterCoil( CoilNum ).DryFinEfficncyCoef( CoefPointer ) * std::pow( DryFinEfficncy, CoefPointer - 1 );
 //			} // CoefPointer
 			auto const & dry_fin_eff_coef( WaterCoil( CoilNum ).DryFinEfficncyCoef );
-			DryCoilEfficiency += dry_fin_eff_coef( 1 );
-			DryCoilEfficiency += dry_fin_eff_coef( 2 ) * DryFinEfficncy;
-			DryCoilEfficiency += dry_fin_eff_coef( 3 ) * pow_2( DryFinEfficncy );
-			DryCoilEfficiency += dry_fin_eff_coef( 4 ) * pow_3( DryFinEfficncy );
-			DryCoilEfficiency += dry_fin_eff_coef( 5 ) * pow_4( DryFinEfficncy );
+			auto DryFinEfficncy_pow( 1.0 );
+			for ( CoefPointer = 1; CoefPointer <= 5; ++CoefPointer ) {
+				DryCoilEfficiency += dry_fin_eff_coef( CoefPointer ) * DryFinEfficncy_pow;
+				DryFinEfficncy_pow *= DryFinEfficncy;
+			} // CoefPointer
 			DryCoilEfficiency = 1.0 + FinToTotSurfAreaRatio * ( DryCoilEfficiency - 1.0 );
 			//       dry coil outside thermal resistance = [1/UA] (dry coil)
 			CoilToAirThermResistDrySurf = 1.0 / ( WaterCoil( CoilNum ).TotCoilOutsideSurfArea * AirSideDrySurfFilmCoef * DryCoilEfficiency );
@@ -4400,8 +4391,11 @@ Label999: ;
 			S2 = 0.0;
 			for ( CurrentOrdPair = 1; CurrentOrdPair <= MaxOrderedPairs; ++CurrentOrdPair ) {
 				S1 = OrdPairSumMatrix( 1, PolynomOrder + 2 );
+				auto const OrderedPair1C( OrderedPair( 1, CurrentOrdPair ) );
+				auto OrderedPair1C_pow( 1.0 );
 				for ( CurrentOrder = 1; CurrentOrder <= PolynomOrder; ++CurrentOrder ) {
-					S1 += OrdPairSumMatrix( CurrentOrder + 1, PolynomOrder + 2 ) * std::pow( OrderedPair( 1, CurrentOrdPair ), CurrentOrder );
+					OrderedPair1C_pow *= OrderedPair1C;
+					S1 += OrdPairSumMatrix( CurrentOrder + 1, PolynomOrder + 2 ) * OrderedPair1C_pow;
 				} //End of CurrentOrder loop
 				S2 += ( S1 - OrderedPair( 2, CurrentOrdPair ) ) * ( S1 - OrderedPair( 2, CurrentOrdPair ) );
 			} //End of CurrentOrdPair loop
@@ -4411,16 +4405,20 @@ Label999: ;
 				PolynomCoef( CurrentOrder ) = OrdPairSumMatrix( CurrentOrder, PolynomOrder + 2 );
 			} //End of CurrentOrder loop
 
-			if ( ( PolynomOrder - MaxPolynomOrder < 0.0 ) && ( S2 - PolyConvgTol > 0.0 ) ) {
+			if ( ( PolynomOrder - MaxPolynomOrder < 0 ) && ( S2 - PolyConvgTol > 0.0 ) ) {
 				++PolynomOrder;
 				J = 2 * PolynomOrder;
-				OrdPairSum( 1, {J,J + 1} ) = 0.0;
-				OrdPairSum( 2, PolynomOrder + 1 ) = 0.0;
+				OrdPairSum( 1, J ) = OrdPairSum( 1, J + 1 ) = 0.0;
+				auto OrdPairSum2P = OrdPairSum( 2, PolynomOrder + 1 ) = 0.0;
 				for ( I = 1; I <= MaxOrderedPairs; ++I ) {
-					OrdPairSum( 1, J ) += std::pow( OrderedPair( 1, I ), J - 1 );
-					OrdPairSum( 1, J + 1 ) += std::pow( OrderedPair( 1, I ), J );
-					OrdPairSum( 2, PolynomOrder + 1 ) += OrderedPair( 2, I ) * std::pow( OrderedPair( 1, I ), PolynomOrder );
+					auto const OrderedPair1I( OrderedPair( 1, I ) );
+					auto OrderedPair_pow( std::pow( OrderedPair1I, J - 1 ) );
+					OrdPairSum( 1, J ) += OrderedPair_pow;
+					OrderedPair_pow *= OrderedPair1I;
+					OrdPairSum( 1, J + 1 ) += OrderedPair_pow;
+					OrdPairSum2P += OrderedPair( 2, I ) * std::pow( OrderedPair1I, PolynomOrder );
 				}
+				OrdPairSum( 2, PolynomOrder + 1 ) = OrdPairSum2P;
 			} else {
 				Converged = true;
 			}
@@ -5999,7 +5997,7 @@ Label10: ;
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

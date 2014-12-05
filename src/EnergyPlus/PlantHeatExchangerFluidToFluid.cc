@@ -290,22 +290,15 @@ namespace PlantHeatExchangerFluidToFluid {
 		MaxNumAlphas = NumAlphas;
 
 		cAlphaFieldNames.allocate( MaxNumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( MaxNumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( MaxNumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxNumAlphas, false );
 		cNumericFieldNames.allocate( MaxNumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( MaxNumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( MaxNumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( MaxNumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( MaxNumNumbers, false );
 
 		if ( NumberOfPlantFluidHXs > 0 ) {
 			FluidHX.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs.allocate( NumberOfPlantFluidHXs );
-			CheckFluidHXs = true;
+			CheckFluidHXs.dimension( NumberOfPlantFluidHXs, true );
 			for ( CompLoop = 1; CompLoop <= NumberOfPlantFluidHXs; ++CompLoop ) {
 				GetObjectItem( cCurrentModuleObject, CompLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 				IsNotOK = false;
@@ -1883,7 +1876,7 @@ namespace PlantHeatExchangerFluidToFluid {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

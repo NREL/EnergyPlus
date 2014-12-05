@@ -218,7 +218,6 @@ namespace EconomicTariff {
 
 	// holds the outbound connections for each variable
 	FArray1D_int operand; // sized to sizeOperand
-	FArray1D_int operandCopy;
 	int numOperand( 0 );
 	int sizeOperand( 0 );
 
@@ -249,7 +248,6 @@ namespace EconomicTariff {
 
 	// Object Data
 	FArray1D< EconVarType > econVar;
-	FArray1D< EconVarType > econVarCopy;
 	FArray1D< TariffType > tariff;
 	FArray1D< QualifyType > qualify;
 	FArray1D< ChargeSimpleType > chargeSimple;
@@ -257,7 +255,6 @@ namespace EconomicTariff {
 	FArray1D< RatchetType > ratchet;
 	FArray1D< ComputationType > computation;
 	FArray1D< StackType > stack;
-	FArray1D< StackType > stackCopy;
 
 	//======================================================================================================================
 	//======================================================================================================================
@@ -2161,16 +2158,9 @@ namespace EconomicTariff {
 			numEconVar = 1;
 		} else {
 			++numEconVar;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numEconVar > sizeEconVar ) {
-				econVarCopy.allocate( sizeEconVar );
-				econVarCopy = econVar;
-				econVar.deallocate();
-				econVar.allocate( sizeEconVar + sizeIncrement );
-				econVar( {1,sizeEconVar} ) = econVarCopy;
-				econVarCopy.deallocate();
-				sizeEconVar += sizeIncrement;
+				econVar.redimension( sizeEconVar += sizeIncrement );
 			}
 		}
 		// initialize new record) //Autodesk Most of these match default initialization so not needed
@@ -2232,19 +2222,12 @@ namespace EconomicTariff {
 			numSteps = 1;
 		} else {
 			++numSteps;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( numSteps > sizeSteps ) {
-				stepsCopy.allocate( sizeSteps );
-				stepsCopy = steps;
-				steps.deallocate();
-				steps.allocate( sizeSteps + sizeIncrement );
-				steps( {1,sizeSteps} ) = stepsCopy;
-				stepsCopy.deallocate();
-				sizeSteps += sizeIncrement;
+				steps.redimension( sizeSteps += sizeIncrement );
 			}
 		}
-		// initialize new record)
+		// initialize new record
 		steps( numSteps ) = 0;
 	}
 
@@ -2913,16 +2896,9 @@ namespace EconomicTariff {
 				numOperand = 1;
 			} else {
 				++numOperand;
-				// if larger then current size then make a temporary array of the same
-				// type and put stuff into it while reallocating the main array
+				// if larger than current size grow the array
 				if ( numOperand > sizeOperand ) {
-					operandCopy.allocate( sizeOperand );
-					operandCopy = operand;
-					operand.deallocate();
-					operand.allocate( sizeOperand + sizeIncrement );
-					operand( {1,sizeOperand} ) = operandCopy;
-					operandCopy.deallocate();
-					sizeOperand += sizeIncrement;
+					operand.redimension( sizeOperand += sizeIncrement );
 				}
 			}
 			//now add the dependancy relationship
@@ -3665,16 +3641,9 @@ namespace EconomicTariff {
 			topOfStack = 1;
 		} else {
 			++topOfStack;
-			// if larger then current size then make a temporary array of the same
-			// type and put stuff into it while reallocating the main array
+			// if larger than current size grow the array
 			if ( topOfStack > sizeStack ) {
-				stackCopy.allocate( sizeStack );
-				stackCopy = stack;
-				stack.deallocate();
-				stack.allocate( sizeStack + sizeIncrement );
-				stack( {1,sizeStack} ) = stackCopy;
-				stackCopy.deallocate();
-				sizeStack += sizeIncrement;
+				stack.redimension( sizeStack += sizeIncrement );
 			}
 		}
 		//now push the values on to the stack
@@ -5516,12 +5485,10 @@ namespace EconomicTariff {
 		int lowestSurplusSoldTariff;
 		int lowestNetMeterTariff;
 
-		groupIndex.allocate( numTariff );
-		groupIndex = 0;
+		groupIndex.dimension( numTariff, 0 );
 		groupCount = 0;
 		numMins = 0;
-		MinTariffIndex.allocate( numTariff );
-		MinTariffIndex = 0;
+		MinTariffIndex.dimension( numTariff, 0 );
 		for ( iTariff = 1; iTariff <= numTariff; ++iTariff ) {
 			//determine if this is meter related to electricity
 			if ( tariff( iTariff ).reportMeterIndx != 0 ) {
@@ -5760,7 +5727,7 @@ namespace EconomicTariff {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

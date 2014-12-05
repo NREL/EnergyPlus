@@ -326,8 +326,7 @@ namespace ChillerExhaustAbsorption {
 		ExhaustAbsorber.allocate( NumExhaustAbsorbers );
 
 		ExhaustAbsorberReport.allocate( NumExhaustAbsorbers );
-		CheckEquipName.allocate( NumExhaustAbsorbers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumExhaustAbsorbers, true );
 
 		//LOAD ARRAYS
 
@@ -580,8 +579,7 @@ namespace ChillerExhaustAbsorption {
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
 			MyPlantScanFlag.allocate( NumExhaustAbsorbers );
-			MyEnvrnFlag.allocate( NumExhaustAbsorbers );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumExhaustAbsorbers, true );
 			MyOneTimeFlag = false;
 			MyPlantScanFlag = true;
 		}
@@ -2046,7 +2044,7 @@ namespace ChillerExhaustAbsorption {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

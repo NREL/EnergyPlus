@@ -360,23 +360,16 @@ namespace HVACDXSystem {
 		NumDXSystem = GetNumObjectsFound( CurrentModuleObject );
 
 		DXCoolingSystem.allocate( NumDXSystem );
-		CheckEquipName.allocate( NumDXSystem );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDXSystem, true );
 
 		GetObjectDefMaxArgs( "CoilSystem:Cooling:DX", TotalArgs, NumAlphas, NumNums );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		Numbers.allocate( NumNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		// Get the data for the DX Cooling System
 		for ( DXCoolSysNum = 1; DXCoolSysNum <= NumDXSystem; ++DXCoolSysNum ) {
@@ -3300,7 +3293,7 @@ namespace HVACDXSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -319,17 +319,11 @@ namespace HVACStandAloneERV {
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = false;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = false;
+		lNumericBlanks.dimension( MaxNumbers, false );
+		lAlphaBlanks.dimension( MaxAlphas, false );
 
 		GetERVInputFlag = false;
 
@@ -340,8 +334,7 @@ namespace HVACStandAloneERV {
 
 		// allocate the data structures
 		StandAloneERV.allocate( NumStandAloneERVs );
-		CheckEquipName.allocate( NumStandAloneERVs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumStandAloneERVs, true );
 
 		// loop over Stand Alone ERV units; get and load the input data
 		for ( StandAloneERVIndex = 1; StandAloneERVIndex <= NumStandAloneERVs; ++StandAloneERVIndex ) {
@@ -2105,7 +2098,7 @@ namespace HVACStandAloneERV {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

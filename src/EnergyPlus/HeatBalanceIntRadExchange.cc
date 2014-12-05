@@ -71,10 +71,10 @@ namespace HeatBalanceIntRadExchange {
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
-	static gio::Fmt const fmty( "(A,1x,6f16.8)" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmtx( "(A,I4,1x,A,1x,6f16.8)" );
+	static gio::Fmt fmty( "(A,1x,6f16.8)" );
 
 	// DERIVED TYPE DEFINITIONS
 	// na
@@ -128,7 +128,7 @@ namespace HeatBalanceIntRadExchange {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const StefanBoltzmannConst( 5.6697e-8 ); // Stefan-Boltzmann constant in W/(m2*K4)
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -417,7 +417,7 @@ namespace HeatBalanceIntRadExchange {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const AFormat( "(A)" );
+		static gio::Fmt AFormat( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1434,7 +1434,7 @@ namespace HeatBalanceIntRadExchange {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
