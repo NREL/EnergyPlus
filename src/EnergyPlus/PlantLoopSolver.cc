@@ -1132,20 +1132,13 @@ namespace PlantLoopSolver {
 
 		LoadToLoopSetPoint = 0.0; //Autodesk:Init Fix possible use uninitialized
 
-		//~ Debug variables
-
-		// We only need to reallocate the accessible array and reset the LastComponentSimulated if
-		//  either is currently NOT allocated, or if we are coming into this routine with a
-		//  new simulation region.  Otherwise leave it alone and save computation time
-		if ( ( ! allocated( LastComponentSimulated ) ) || ( LoopNum != LastLoopNum ) || ( LoopSideNum != LastLoopSideNum ) || ( FirstBranchNum != LastFirstBranchNum ) || ( LastBranchNum != LastLastBranchNum ) || StartingNewLoopSidePass ) { //we need to reallocate // ( ! allocated( AccessibleBranches ) ) ||
-
 		// Split allocation from initialization and allocate only if arrays need to grow. 
 
 		// How many will we need?
 		NumBranchesInRegion = LastBranchNum - FirstBranchNum + 1;
 
-		if ( ( ! allocated( AccessibleBranches ) ) || ( ! allocated( LastComponentSimulated ) ) || ( LastNumBranchesInRegion < NumBranchesInRegion ) ) { //we need to reallocate the accessible branch array
-			// Reallocate for the number of locations we have available // No heap if size is unchanged
+		if ( ( ! allocated( LastComponentSimulated ) ) || ( LoopNum != LastLoopNum ) || ( LoopSideNum != LastLoopSideNum ) || ( FirstBranchNum != LastFirstBranchNum ) || ( LastBranchNum != LastLastBranchNum ) || StartingNewLoopSidePass ) { //we need to reallocate // ( ! allocated( AccessibleBranches ) ) ||
+		// Reallocate for the number of locations we have available // No heap if size is unchanged
 			if ( NumBranchesInRegion > LastComponentSimulated.isize() ) { //Tuned Changed to grow-only strategy
 				LastComponentSimulated.allocate( NumBranchesInRegion );
 			}
