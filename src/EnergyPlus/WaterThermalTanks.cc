@@ -6154,24 +6154,27 @@ namespace WaterThermalTanks {
 		int Step; // DO loop step direction, 1 or -1
 		Real64 DeltaTemp; // Temperature difference between node and inlet (delta C)
 		Real64 MinDeltaTemp; // Smallest temperature difference found so far (delta C)
+        
+        // References to objects
+        WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
 
 		// FLOW:
-		NumNodes = WaterThermalTank( WaterThermalTankNum ).Nodes;
+		NumNodes = Tank.Nodes;
 
-		UseInletStratNode = WaterThermalTank( WaterThermalTankNum ).UseInletStratNode;
-		UseOutletStratNode = WaterThermalTank( WaterThermalTankNum ).UseOutletStratNode;
-		SourceInletStratNode = WaterThermalTank( WaterThermalTankNum ).SourceInletStratNode;
-		SourceOutletStratNode = WaterThermalTank( WaterThermalTankNum ).SourceOutletStratNode;
+		UseInletStratNode = Tank.UseInletStratNode;
+		UseOutletStratNode = Tank.UseOutletStratNode;
+		SourceInletStratNode = Tank.SourceInletStratNode;
+		SourceOutletStratNode = Tank.SourceOutletStratNode;
 
-		UseMassFlowRate = WaterThermalTank( WaterThermalTankNum ).UseMassFlowRate * WaterThermalTank( WaterThermalTankNum ).UseEffectiveness;
-		SourceMassFlowRate = WaterThermalTank( WaterThermalTankNum ).SourceMassFlowRate * WaterThermalTank( WaterThermalTankNum ).SourceEffectiveness;
+		UseMassFlowRate = Tank.UseMassFlowRate * Tank.UseEffectiveness;
+		SourceMassFlowRate = Tank.SourceMassFlowRate * Tank.SourceEffectiveness;
 
-		WaterThermalTank( WaterThermalTankNum ).Node.UseMassFlowRate() = 0.0;
-		WaterThermalTank( WaterThermalTankNum ).Node.SourceMassFlowRate() = 0.0;
-		WaterThermalTank( WaterThermalTankNum ).Node.MassFlowFromUpper() = 0.0;
-		WaterThermalTank( WaterThermalTankNum ).Node.MassFlowFromLower() = 0.0;
-		WaterThermalTank( WaterThermalTankNum ).Node.MassFlowToUpper() = 0.0;
-		WaterThermalTank( WaterThermalTankNum ).Node.MassFlowToLower() = 0.0;
+		Tank.Node.UseMassFlowRate() = 0.0;
+		Tank.Node.SourceMassFlowRate() = 0.0;
+		Tank.Node.MassFlowFromUpper() = 0.0;
+		Tank.Node.MassFlowFromLower() = 0.0;
+		Tank.Node.MassFlowToUpper() = 0.0;
+		Tank.Node.MassFlowToLower() = 0.0;
 
 		if ( InletMode == InletModeSeeking ) {
 			// 'Seek' the node with the temperature closest to the inlet temperature
@@ -6186,7 +6189,7 @@ namespace WaterThermalTanks {
 				MinDeltaTemp = 1.0e6; // Some big number
 				int const NodeNum_stop( floop_end( UseInletStratNode, UseOutletStratNode, Step ) );
 				for ( NodeNum = UseInletStratNode; NodeNum != NodeNum_stop; NodeNum += Step ) {
-					DeltaTemp = std::abs( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp - WaterThermalTank( WaterThermalTankNum ).UseInletTemp );
+					DeltaTemp = std::abs( Tank.Node( NodeNum ).Temp - Tank.UseInletTemp );
 					if ( DeltaTemp < MinDeltaTemp ) {
 						MinDeltaTemp = DeltaTemp;
 						UseInletStratNode = NodeNum;
@@ -6205,7 +6208,7 @@ namespace WaterThermalTanks {
 				MinDeltaTemp = 1.0e6; // Some big number
 				int const NodeNum_stop( floop_end( SourceInletStratNode, SourceOutletStratNode, Step ) );
 				for ( NodeNum = SourceInletStratNode; NodeNum != NodeNum_stop; NodeNum += Step ) {
-					DeltaTemp = std::abs( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).Temp - WaterThermalTank( WaterThermalTankNum ).SourceInletTemp );
+					DeltaTemp = std::abs( Tank.Node( NodeNum ).Temp - Tank.SourceInletTemp );
 					if ( DeltaTemp < MinDeltaTemp ) {
 						MinDeltaTemp = DeltaTemp;
 						SourceInletStratNode = NodeNum;
@@ -6217,26 +6220,26 @@ namespace WaterThermalTanks {
 
 		}
 
-		if ( UseInletStratNode > 0 ) WaterThermalTank( WaterThermalTankNum ).Node( UseInletStratNode ).UseMassFlowRate = UseMassFlowRate;
-		if ( SourceInletStratNode > 0 ) WaterThermalTank( WaterThermalTankNum ).Node( SourceInletStratNode ).SourceMassFlowRate = SourceMassFlowRate;
+		if ( UseInletStratNode > 0 ) Tank.Node( UseInletStratNode ).UseMassFlowRate = UseMassFlowRate;
+		if ( SourceInletStratNode > 0 ) Tank.Node( SourceInletStratNode ).SourceMassFlowRate = SourceMassFlowRate;
 
 		if ( UseMassFlowRate > 0.0 ) {
 			if ( UseOutletStratNode > UseInletStratNode ) {
 				// Use-side flow is down
 				for ( NodeNum = UseInletStratNode; NodeNum <= UseOutletStratNode - 1; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowToLower += UseMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowToLower += UseMassFlowRate;
 				}
 				for ( NodeNum = UseInletStratNode + 1; NodeNum <= UseOutletStratNode; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromUpper += UseMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowFromUpper += UseMassFlowRate;
 				}
 
 			} else if ( UseOutletStratNode < UseInletStratNode ) {
 				// Use-side flow is up
 				for ( NodeNum = UseOutletStratNode; NodeNum <= UseInletStratNode - 1; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromLower += UseMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowFromLower += UseMassFlowRate;
 				}
 				for ( NodeNum = UseOutletStratNode + 1; NodeNum <= UseInletStratNode; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowToUpper += UseMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowToUpper += UseMassFlowRate;
 				}
 
 			} else {
@@ -6248,19 +6251,19 @@ namespace WaterThermalTanks {
 			if ( SourceOutletStratNode > SourceInletStratNode ) {
 				// Source-side flow is down
 				for ( NodeNum = SourceInletStratNode; NodeNum <= SourceOutletStratNode - 1; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowToLower += SourceMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowToLower += SourceMassFlowRate;
 				}
 				for ( NodeNum = SourceInletStratNode + 1; NodeNum <= SourceOutletStratNode; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromUpper += SourceMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowFromUpper += SourceMassFlowRate;
 				}
 
 			} else if ( SourceOutletStratNode < SourceInletStratNode ) {
 				// Source-side flow is up
 				for ( NodeNum = SourceOutletStratNode; NodeNum <= SourceInletStratNode - 1; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromLower += SourceMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowFromLower += SourceMassFlowRate;
 				}
 				for ( NodeNum = SourceOutletStratNode + 1; NodeNum <= SourceInletStratNode; ++NodeNum ) {
-					WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowToUpper += SourceMassFlowRate;
+					Tank.Node( NodeNum ).MassFlowToUpper += SourceMassFlowRate;
 				}
 
 			} else {
@@ -6270,8 +6273,8 @@ namespace WaterThermalTanks {
 
 		// Cancel out any up and down flows
 		for ( NodeNum = 1; NodeNum <= NumNodes; ++NodeNum ) {
-			WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromUpper = max( ( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromUpper - WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowToUpper ), 0.0 );
-			WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromLower = max( ( WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowFromLower - WaterThermalTank( WaterThermalTankNum ).Node( NodeNum ).MassFlowToLower ), 0.0 );
+			Tank.Node( NodeNum ).MassFlowFromUpper = max( ( Tank.Node( NodeNum ).MassFlowFromUpper - Tank.Node( NodeNum ).MassFlowToUpper ), 0.0 );
+			Tank.Node( NodeNum ).MassFlowFromLower = max( ( Tank.Node( NodeNum ).MassFlowFromLower - Tank.Node( NodeNum ).MassFlowToLower ), 0.0 );
 		}
 
 	}
