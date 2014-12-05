@@ -92,7 +92,7 @@ namespace HeatBalanceIntRadExchange {
 		FArray2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
 		FArray1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
 		FArray2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
-		    );
+	);
 
 	void
 	CalcMatrixInverse(
