@@ -176,9 +176,9 @@ namespace HeatBalanceSurfaceManager {
 		// Using/Aliasing
 		using HeatBalanceAirManager::ManageAirHeatBalance;
 		using ThermalComfort::ManageThermalComfort;
-		using HeatBalFiniteDiffManager::UpdateMoistureBalanceFD;
 		using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular compoonent loads output reports
 		using DataSystemVariables::DeveloperFlag;
+		using HeatBalFiniteDiffManager::SurfaceFD;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -228,7 +228,7 @@ namespace HeatBalanceSurfaceManager {
 				ConstrNum = Surface( SurfNum ).Construction;
 				if ( Construct( ConstrNum ).TypeIsWindow ) continue; //  Windows simulated in Window module
 				if ( Surface( SurfNum ).HeatTransferAlgorithm != HeatTransferModel_CondFD ) continue;
-				UpdateMoistureBalanceFD( SurfNum );
+				SurfaceFD( SurfNum ).UpdateMoistureBalance();
 			}
 		}
 
