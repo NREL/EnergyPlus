@@ -1258,7 +1258,8 @@ namespace HeatBalanceSurfaceManager {
 		TsrcHistM.dimension( TotSurfaces, MaxCTFTerms, 0.0 );
 		QsrcHistM.dimension( TotSurfaces, MaxCTFTerms, 0.0 );
 
-		NetLWRadToSurf.dimension( TotSurfaces, 0.0 );
+    //		NetLWRadToSurf.dimension( TotSurfaces, 0.0 );
+    NetLWRadToSurf = HeatBalanceIntRadExchange::GetHBREWriteVector< Real64 >( TotSurfaces );
 		QRadSWLightsInAbs.dimension( TotSurfaces, 0.0 );
 
 		RadSysTiHBConstCoef.dimension( TotSurfaces, 0.0 );
@@ -5001,7 +5002,7 @@ CalcHeatBalanceInsideSurf( int ZoneToResimulate ) // if passed in, then only cal
 		MyEnvrnFlag = true;
 	}
 
-	bool const PartialResimulate( present( ZoneToResimulate ) );
+	bool const PartialResimulate( ZoneToResimulate );
 
 	//Tuned Relevant surfaces (set below) for performance/scalability //Do Store this once for all relevant Zones at higher level
 	std::vector< int > SurfToResimulate;
@@ -5779,7 +5780,7 @@ CalcHeatBalanceInsideSurf( int ZoneToResimulate ) // if passed in, then only cal
 		if ( ZoneNum == 0 ) continue;
 		ZoneWinHeatGain( ZoneNum ) += WinHeatGain( SurfNum );
 	}
-	for ( int ZoneNum = ( PartialResimulate ? ZoneToResimulate() : 1 ), ZoneNum_end = ( PartialResimulate ? ZoneToResimulate() : NumOfZones ); ZoneNum <= ZoneNum_end; ++ZoneNum ) {
+	for ( int ZoneNum = ( PartialResimulate ? ZoneToResimulate : 1 ), ZoneNum_end = ( PartialResimulate ? ZoneToResimulate : NumOfZones ); ZoneNum <= ZoneNum_end; ++ZoneNum ) {
 		if ( ZoneWinHeatGain( ZoneNum ) >= 0.0 ) {
 			ZoneWinHeatGainRep( ZoneNum ) = ZoneWinHeatGain( ZoneNum );
 			ZoneWinHeatGainRepEnergy( ZoneNum ) = ZoneWinHeatGainRep( ZoneNum ) * TimeStepZone * SecInHour;
@@ -5942,8 +5943,7 @@ CalcOutsideSurfTemp(
 		}
 		// Outside heat balance case: No movable insulation, quick conduction
 	} else if ( ( ! MovInsulPresent ) && ( QuickConductionSurf ) ) {
-		if ( Surface( SurfNum ).OSCMPtr == 0 ) {
-			TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + Construct( ConstrNum ).CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf[ SurfNum - 1 ] ) ) / ( Construct( ConstrNum ).CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * Construct( ConstrNum ).CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
+		if ( Surface( SurfNum ).OSCMPtr == 0 ) {			TH11 = ( -CTFConstOutPart( SurfNum ) + QRadSWOutAbs( SurfNum ) + ( HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) ) * TempExt + HSkyExtSurf( SurfNum ) * SkyTemp + HGrdExtSurf( SurfNum ) * OutDryBulbTemp + Construct( ConstrNum ).CTFSourceOut( 0 ) * QsrcHist( SurfNum, 1 ) + F1 * ( CTFConstInPart( SurfNum ) + QRadSWInAbs( SurfNum ) + QRadThermInAbs( SurfNum ) + Construct( ConstrNum ).CTFSourceIn( 0 ) * QsrcHist( SurfNum, 1 ) + HConvIn( SurfNum ) * MAT( ZoneNum ) + NetLWRadToSurf[ SurfNum - 1 ] ) ) / ( Construct( ConstrNum ).CTFOutside( 0 ) + HcExtSurf( SurfNum ) + HAirExtSurf( SurfNum ) + HSkyExtSurf( SurfNum ) + HGrdExtSurf( SurfNum ) - F1 * Construct( ConstrNum ).CTFCross( 0 ) ); // ODB used to approx ground surface temp | MAT use here is problem for room air models
 			// Outside Heat Balance case: Other Side Conditions Model
 		} else { //( Surface(SurfNum)%OSCMPtr > 0 ) THEN
 			// local copies of variables for clarity in radiation terms

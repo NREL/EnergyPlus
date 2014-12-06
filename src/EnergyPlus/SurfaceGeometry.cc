@@ -9068,7 +9068,7 @@ namespace EnergyPlus {
 			Construct( ConstrNewSh ).TotSolidLayers = Construct( ConstrNum ).TotSolidLayers + 1;
       ConstrWin[ ConstrNewSh - 1 ].TotGlassLayers = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
       //Construct( ConstrNewSh ).TotGlassLayers = Construct( ConstrNum ).TotGlassLayers;
-			Construct( ConstrNewSh ).TypeIsWindow = true;
+			ConstrWin[ ConstrNewSh - 1 ].TypeIsWindow = true;
 			Construct( ConstrNewSh ).IsUsed = true;
 
 		}
@@ -9306,7 +9306,7 @@ namespace EnergyPlus {
 					Construct( ConstrNew ).OutsideAbsorpVis = 0.0;
 					Construct( ConstrNew ).InsideAbsorpSolar = 0.0;
 					Construct( ConstrNew ).OutsideAbsorpSolar = 0.0;
-					Construct( ConstrNew ).InsideAbsorpThermal = Construct( ConstrOld ).InsideAbsorpThermal;
+					ConstrWin[ ConstrNew - 1 ].InsideAbsorpThermal = ConstrWin[ ConstrOld - 1 ].InsideAbsorpThermal;
 					Construct( ConstrNew ).OutsideAbsorpThermal = Material( StormWinMatNum ).AbsorpThermalFront;
 					Construct( ConstrNew ).OutsideRoughness = VerySmooth;
 					Construct( ConstrNew ).DayltPropPtr = 0;

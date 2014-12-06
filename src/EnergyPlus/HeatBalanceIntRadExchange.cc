@@ -500,7 +500,7 @@ namespace HeatBalanceIntRadExchange {
 			if ( NoUserInputF ) {
 
 				// Calculate the view factors and make sure they satisfy reciprocity
-				CalcApproximateViewFactors( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].Area, ZoneInfo[ ZoneNum - 1 ].Azmuth, ZoneInfo[ ZoneNum - 1 ].Tilt, ZoneInfo[ ZoneNum - 1 ].F, ZoneInfo[ ZoneNum - 1 ].SurfacePtr );
+				CalcApproximateViewFactors( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].Area, ZoneInfo[ ZoneNum - 1 ].Azimuth, ZoneInfo[ ZoneNum - 1 ].Tilt, ZoneInfo[ ZoneNum - 1 ].F, ZoneInfo[ ZoneNum - 1 ].SurfacePtr );
 			}
 
 			if ( ViewFactorReport ) { // Allocate and save user or approximate view factors for reporting.
