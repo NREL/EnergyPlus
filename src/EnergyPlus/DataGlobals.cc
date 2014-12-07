@@ -180,7 +180,8 @@ namespace DataGlobals {
 	int OutputFileZonePulse( 0 ); // file handle for special zone sizing report that contains the result of the "pulse" for the load component report
 	bool doLoadComponentPulseNow( false ); // true for the time step that is the "pulse" for the load component report
 	bool ShowDecayCurvesInEIO( false ); // true if the Radiant to Convective Decay Curves should appear in the EIO file
-	bool AnySlabsInModel( false ); // true if there are any zone-coupled ground domains in the input file
+	bool AnySlabsInModel ( false ); // true if there are any zone-coupled ground domains in the input file
+	bool AnyBasementsInModel( false ); // true if there are any basements in the input file
 
 	int Progress( 0 ); // current progress (0-100)
 	void ( *fProgressPtr )( int );

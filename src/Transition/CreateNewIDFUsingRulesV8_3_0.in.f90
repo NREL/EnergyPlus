@@ -313,177 +313,25 @@
                 nodiff=.false.
 
 !    !!!    Changes for this version
-              CASE('ZONEHVAC:UNITVENTILATOR')
+   ! These will be conflicted, but uncommented when that branch is merged to develop
+   !           CASE('CHILLER:ELECTRIC:REFORMULATEDEIR')
+   !             nodiff=.false.
+   !             CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+   !             ! fields 1-9 aren't affected
+   !             OutArgs(1:9)=InArgs(1:9)
+   !             ! add a blank for the new curve type field
+   !             OutArgs(10)=blank
+   !             ! then we just push the rest of the fields down 1
+   !             OutArgs(11:)=InArgs(10:)
+   !             CurArgs = CurArgs + 1
+                
+                
+              CASE('SITE:GROUNDDOMAIN')
+                ! Object rename
                 nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:16)=InArgs(1:16)
-                if (CurArgs > 16) then
-                  OutArgs(17)=blank
-                  if (CurArgs > 17) then
-                    OutArgs(18:CurArgs+1)=InArgs(17:CurArgs)
-                  endif
-                endif
-                CurArgs = CurArgs + 1
-
-              CASE('ZONEHVAC:UNITHEATER')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                OutArgs(1:7)=InArgs(1:7)
-                ! delete field 8
-                ! ..nothing with InArgs(8) then
-                !move fields 9 and 10 to now be 8 and 9
-                OutArgs(8:9)=InArgs(9:10)
-                ! add blank for the optional schedule
-                OutArgs(10)=blank
-                ! conditionally apply field 11 (A10)
-                if (SameString(InArgs(8), "ONOFF")) then
-                  OutArgs(11)="No"
-                elseif (SameString(InArgs(8), "CONTINUOUS")) then 
-                  OutArgs(11)="Yes"
-                else
-                  CALL ShowWarningError("Invalid fan control type in original v8.1 idf...expected onoff or continuous...assuming onoff")
-                  OutArgs(11)="No"
-                endif
-                ! the net effect here is the addition of 1 field
-                OutArgs(12:)=InArgs(11:)
-                CurArgs = CurArgs + 1
-      
-              CASE('PLANTLOOP', 'CONDENSERLOOP')
-                nodiff=.false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! assign the entire contents of IN to OUT to start
-                OutArgs=InArgs
-                ! then check the value of 19 and make a decision:
-                if (SameString(InArgs(19), "SEQUENTIAL")) then
-                  OutArgs(19)="SequentialLoad"
-                elseif (SameString(InArgs(19), "UNIFORM")) then
-                  OutArgs(19)="UniformLoad"
-                else
-                  OutArgs(19)=InArgs(19) ! Redundant, but clear
-                endif
-              
-              CASE('SIZING:SYSTEM')
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1 - 17
-                OutArgs(1:17) = InArgs(1:17)
-                ! add three more fields for air flow rate entry options
-                OutArgs(18:20) = ""
-                CurArgs = CurArgs + 3
-                ! just shift the next 2 fields
-                OutArgs(21:22) = InArgs(18:19)
-                ! then insert 4 new fields
-                OutArgs(23:26) = ""
-                CurArgs = CurArgs + 4
-                ! then shift the next 2 fields
-                OutArgs(27:28) = InArgs(20:21)
-                ! although there are new fields added to the end, they dont need to be filled out, so dont worry about them
-                !OutArgs(29:36) = ""
-                !CurArgs = CurArgs + 8
+                ObjectName = 'Site:GroundDomain:Slab'
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-6
-                OutArgs(1:6) = InArgs(1:6)
-                ! the new field 7 is a switch and the old 6 is moved into the new 8
-                OutArgs(7) = 'HeatingDesignCapacity'
-                OutArgs(8) = InArgs(7)
-                OutArgs(9:10) = ""
-                OutArgs(11:214) = InArgs(8:211)
-                CurArgs = CurArgs + 3                
-                
-              CASE('ZONEHVAC:HIGHTEMPERATURERADIANT') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-3
-                OutArgs(1:3) = InArgs(1:3)
-                ! the new field 4 is a switch and the old 4 is moved into the new 5
-                OutArgs(4) = 'HeatingDesignCapacity'
-                OutArgs(5) = InArgs(4)
-                OutArgs(6:7) = ""
-                OutArgs(8:216) = InArgs(5:213)
-                CurArgs = CurArgs + 3         
-                
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-4
-                OutArgs(1:4) = InArgs(1:4)
-                ! the new field 5 is a switch and there wasn't an entry before, so leave 6 blank (autosize)
-                OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6) = 'Autosize'
-                OutArgs(7:8) = ''
-                OutArgs(9:213) = InArgs(5:209)
-                CurArgs = CurArgs + 4      
-                
-              CASE('ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:ELECTRIC') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-6
-                OutArgs(1:2) = InArgs(1:2)
-                ! the new field 3 is a switch and the old 4 is moved into the new 4
-                OutArgs(3) = 'HeatingDesignCapacity'
-                OutArgs(4) = InArgs(3)
-                OutArgs(5:6) = ""
-                OutArgs(7:209) = InArgs(4:206)
-                CurArgs = CurArgs + 3                
-                
-              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:WATER') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-4
-                OutArgs(1:4) = InArgs(1:4)
-                ! the new field 5 is a switch and there wasn't an entry before, so leave 6 blank (autosize)
-                OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6) = 'Autosize'
-                OutArgs(7:8) = ''
-                OutArgs(9:11) = InArgs(5:7)
-                CurArgs = CurArgs + 4         
-                
-              CASE('ZONEHVAC:BASEBOARD:CONVECTIVE:ELECTRIC') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-2
-                OutArgs(1:2) = InArgs(1:2)
-                ! the new field 3 is a switch and the old 4 is moved into the new 4
-                OutArgs(3) = 'HeatingDesignCapacity'
-                OutArgs(4) = InArgs(3)
-                OutArgs(5:6) = ""
-                OutArgs(7) = InArgs(4)
-                CurArgs = CurArgs + 3            
-                
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-7
-                OutArgs(1:7) = InArgs(1:7)
-                ! the new field 8 is a switch and there wasn't an entry before, so leave 9 blank (autosize)
-                OutArgs(8) = 'HeatingDesignCapacity'
-                OutArgs(9) = 'Autosize'
-                OutArgs(10:11) = ''
-                CurArgs = CurArgs + 4
-                ! shift 8-12 to 12-16
-                OutArgs(12:16) = InArgs(8:12)
-                ! the new field 17 is a switch and there wasn't an entry before, so leave 18 blank (autosize)
-                OutArgs(17) = 'CoolingDesignCapacity'
-                OutArgs(18) = 'Autosize'
-                OutArgs(19:20) = ''
-                CurArgs = CurArgs + 4
-                OutArgs(21:29) = InArgs(13:21)
-                
-              CASE('ZONEHVAC:LOWTEMPERATURERADIANT:ELECTRIC') 
-                nodiff = .false.
-                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                ! nothing for fields 1-4
-                OutArgs(1:4) = InArgs(1:4)
-                ! the new field 5 is a switch and the old 5 is moved into the new 6
-                OutArgs(5) = 'HeatingDesignCapacity'
-                OutArgs(6) = InArgs(5)
-                OutArgs(7:8) = ""
-                OutArgs(9:11) = InArgs(6:8)
-                CurArgs = CurArgs + 3     
-                                
     !!!   Changes for report variables, meters, tables -- update names
 
               CASE('OUTPUT:VARIABLE')
