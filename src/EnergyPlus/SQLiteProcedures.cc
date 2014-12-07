@@ -1904,7 +1904,7 @@ void SQLite::createSQLiteDaylightMap(
 }
 
 void SQLite::createSQLiteTabularDataRecords(
-	FArray2D_string const & body, // row,column
+	FArray2D_string const & body, // html table row, html table column
 	FArray1D_string const & rowLabels,
 	FArray1D_string const & columnLabels,
 	std::string const & reportName,
@@ -1917,25 +1917,33 @@ void SQLite::createSQLiteTabularDataRecords(
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
 
-		int const reportNameIndex = createSQLiteStringTableRecord(reportName,ReportNameId);
-		int const reportForStringIndex = createSQLiteStringTableRecord(reportForString,ReportForStringId);
-		int const tableNameIndex = createSQLiteStringTableRecord(tableName,TableNameId);
+		int const reportNameIndex = createSQLiteStringTableRecord(reportName, ReportNameId);
+		int const reportForStringIndex = createSQLiteStringTableRecord(reportForString, ReportForStringId);
+		int const tableNameIndex = createSQLiteStringTableRecord(tableName, TableNameId);
+		int unitsIndex;
 
-		for(size_t iRow = 0, k = body.index(1,1); iRow < sizeRowLabels; ++iRow) {
-			std::string rowUnits;
-			std::string rowDescription;
-			parseUnitsAndDescription(rowLabels[iRow], rowUnits, rowDescription);
+		for(size_t iCol = 0, k = body.index(1,1); iCol < sizeColumnLabels; ++iCol) {
+			std::string colUnits;
+			std::string colDescription;
+			parseUnitsAndDescription(columnLabels[iCol], colUnits, colDescription);
 
-			int const rowLabelIndex = createSQLiteStringTableRecord(rowDescription,RowNameId);
+			int const columnLabelIndex = createSQLiteStringTableRecord(colDescription, ColumnNameId);
 
-			for(size_t iCol = 0; iCol < sizeColumnLabels; ++iCol) {
+			if ( !colUnits.empty() ) {
+				unitsIndex = createSQLiteStringTableRecord(colUnits, UnitsId);
+			}
+
+			for(size_t iRow = 0; iRow < sizeRowLabels; ++iRow) {
 				++tabularDataIndex;
-				std::string colUnits;
-				std::string colDescription;
-				parseUnitsAndDescription(columnLabels[iCol], colUnits, colDescription);
+				std::string rowUnits;
+				std::string rowDescription;
+				parseUnitsAndDescription(rowLabels[iRow], rowUnits, rowDescription);
 
-				int const columnLabelIndex = createSQLiteStringTableRecord(colDescription,ColumnNameId);
-				int const unitsIndex = createSQLiteStringTableRecord(colUnits.empty() ? rowUnits : colUnits,UnitsId);
+				int const rowLabelIndex = createSQLiteStringTableRecord(rowDescription, RowNameId);
+
+				if ( colUnits.empty() ) {
+					unitsIndex = createSQLiteStringTableRecord(rowUnits, UnitsId);
+				}
 
 				sqliteBindInteger(m_tabularDataInsertStmt,1,tabularDataIndex);
 				sqliteBindForeignKey(m_tabularDataInsertStmt,2,reportNameIndex);
