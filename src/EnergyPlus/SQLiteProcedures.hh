@@ -148,6 +148,10 @@ public:
 		bool const completedSuccessfully
 	);
 
+	void updateSQLiteSimulationRecord(
+		int const id
+	);
+
 	void createSQLiteEnvironmentPeriodRecord();
 
 	void sqliteWriteMessage(const std::string & message);
@@ -184,6 +188,9 @@ private:
 	int sqliteBindDouble(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const double doubleToInsert);
 	int sqliteBindNULL(sqlite3_stmt * stmt, const int stmtInsertLocationIndex);
 	int sqliteBindLogical(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const bool valueToInsert);
+
+	// This assumes a Foreign Key must be greater than 0 to be a valid Foreign Key, otherwise it sets the field to NULL.
+	int sqliteBindForeignKey(sqlite3_stmt * stmt, const int stmtInsertLocationIndex, const int intToInsert);
 
 	int sqliteStepCommand(sqlite3_stmt * stmt);
 	int sqliteResetCommand(sqlite3_stmt * stmt);
@@ -281,6 +288,7 @@ private:
 	sqlite3_stmt * m_errorInsertStmt;
 	sqlite3_stmt * m_errorUpdateStmt;
 	sqlite3_stmt * m_simulationUpdateStmt;
+	sqlite3_stmt * m_simulationDataUpdateStmt;
 
 	static const int LocalReportEach;      //  Write out each time UpdatedataandLocalReport is called
 	static const int LocalReportTimeStep;  //  Write out at 'EndTimeStepFlag'
