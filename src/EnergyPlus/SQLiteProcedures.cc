@@ -1904,7 +1904,7 @@ void SQLite::createSQLiteDaylightMap(
 }
 
 void SQLite::createSQLiteTabularDataRecords(
-	FArray2D_string const & body, // row,column
+	FArray2D_string const & body, // html table row, html table column
 	FArray1D_string const & rowLabels,
 	FArray1D_string const & columnLabels,
 	std::string const & reportName,
@@ -1917,6 +1917,7 @@ void SQLite::createSQLiteTabularDataRecords(
 		size_t sizeColumnLabels = columnLabels.size();
 		size_t sizeRowLabels = rowLabels.size();
 
+<<<<<<< HEAD
 		int const reportNameIndex = createSQLiteStringTableRecord(reportName,ReportNameId);
 		int const reportForStringIndex = createSQLiteStringTableRecord(reportForString,ReportForStringId);
 		int const tableNameIndex = createSQLiteStringTableRecord(tableName,TableNameId);
@@ -1948,6 +1949,46 @@ void SQLite::createSQLiteTabularDataRecords(
 				sqliteBindInteger(m_tabularDataInsertStmt,9,iRow);
 				sqliteBindInteger(m_tabularDataInsertStmt,10,iCol);
 				sqliteBindText(m_tabularDataInsertStmt,11,body[k]);
+=======
+		for(size_t iCol = 0, k = body.index(1,1); iCol < sizeColumnLabels; ++iCol) {
+			std::string colLabel = columnLabels[iCol];
+			std::string colUnits;
+			std::string colDescription;
+			parseUnitsAndDescription(colLabel,colUnits,colDescription);
+
+			for(size_t iRow = 0; iRow < sizeRowLabels; ++iRow) {
+				std::string rowLabel = rowLabels[iRow];
+				std::string rowUnits;
+				std::string rowDescription;
+				parseUnitsAndDescription(rowLabel,rowUnits,rowDescription);
+
+				std::string units;
+				if( colUnits.empty() ) {
+					units = rowUnits;
+				} else {
+					units = colUnits;
+				}
+
+				int reportNameIndex = createSQLiteStringTableRecord(reportName,ReportNameId);
+				int reportForStringIndex = createSQLiteStringTableRecord(reportForString,ReportForStringId);
+				int tableNameIndex = createSQLiteStringTableRecord(tableName,TableNameId);
+				int rowLabelIndex = createSQLiteStringTableRecord(rowDescription,RowNameId);
+				int columnLabelIndex = createSQLiteStringTableRecord(colDescription,ColumnNameId);
+				int unitsIndex = createSQLiteStringTableRecord(units,UnitsId);
+
+				sqliteBindInteger(m_tabularDataInsertStmt,1,reportNameIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,2,reportForStringIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,3,tableNameIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,4,1);
+				sqliteBindInteger(m_tabularDataInsertStmt,5,rowLabelIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,6,columnLabelIndex);
+				sqliteBindInteger(m_tabularDataInsertStmt,7,iRow);
+				sqliteBindInteger(m_tabularDataInsertStmt,8,iCol);
+				sqliteBindText(m_tabularDataInsertStmt,9,body[k]);
+				sqliteBindInteger(m_tabularDataInsertStmt,10,unitsIndex);
+
+				++k;
+>>>>>>> develop
 
 				sqliteStepCommand(m_tabularDataInsertStmt);
 				sqliteResetCommand(m_tabularDataInsertStmt);
