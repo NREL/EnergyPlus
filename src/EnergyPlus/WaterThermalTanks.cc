@@ -5729,7 +5729,7 @@ namespace WaterThermalTanks {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const dt( 1.0 ); // Sub time step interval (s)
 		static std::string const RoutineName( "CalcWaterThermalTankStratified" );
-        
+
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 TimeElapsed; // Fraction of the current hour that has elapsed (h)
 		Real64 SecInTimeStep; // Seconds in one timestep (s)
@@ -5795,9 +5795,10 @@ namespace WaterThermalTanks {
 		Real64 Efuel; // Energy change for fuel consumed over the timestep (J)
 		bool SetPointRecovered; // Flag to indicate when set point is recovered for the first time
 		static int DummyWaterIndex( 1 );
-        
-        // References
-        WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Tank object
+		Real64 HPWHCondenserDeltaT; // Temperature difference across the condenser for a heat pump water heater
+
+		// References
+		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum ); // Tank object
 
 		// FLOW:
 		TimeElapsed = HourOfDay + TimeStep * TimeStepZone + SysTimeElapsed;
@@ -5826,6 +5827,16 @@ namespace WaterThermalTanks {
 		AmbientTemp = Tank.AmbientTemp;
 		UseInletTemp = Tank.UseInletTemp;
 		SourceInletTemp = Tank.SourceInletTemp;
+
+		// Calculate the heating rate from the heat pump.
+		if ( Tank.HeatPumpNum > 0 ) {
+			HeatPumpWaterHeaterData const &HeatPump = HPWaterHeater(Tank.HeatPumpNum);
+			DataLoopNode::NodeData const &HPWHCondWaterInletNode = DataLoopNode::Node(HeatPump.CondWaterInletNode);
+			DataLoopNode::NodeData const &HPWHCondWaterOutletNode = DataLoopNode::Node(HeatPump.CondWaterOutletNode);
+			HPWHCondenserDeltaT = HPWHCondWaterOutletNode.Temp - HPWHCondWaterInletNode.Temp;
+		} else {
+			HPWHCondenserDeltaT = 0.0;
+		}
 
 		SetPointTemp1 = Tank.SetPointTemp;
 		MinTemp1 = SetPointTemp1 - Tank.DeadBandDeltaTemp;
@@ -5952,6 +5963,9 @@ namespace WaterThermalTanks {
 
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
+				if ( Tank.HeatPumpNum > 0 ) {
+					SourceInletTemp = Tank.Node(Tank.SourceInletStratNode).Temp + HPWHCondenserDeltaT;
+				}
 				Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
 
 				InvMixUp = 0.0;
