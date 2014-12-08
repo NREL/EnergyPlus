@@ -469,10 +469,8 @@ namespace DataHeatBalance {
 	//absorbed on outside of surface (j)
 
 	extern FArray1D< Real64 > NominalR; // Nominal R value of each material -- used in matching interzone surfaces
-	extern FArray1D< Real64 > NominalRSave;
 	extern FArray1D< Real64 > NominalRforNominalUCalculation; // Nominal R values are summed to calculate NominalU values for constructions
 	extern FArray1D< Real64 > NominalU; // Nominal U value for each construction -- used in matching interzone surfaces
-	extern FArray1D< Real64 > NominalUSave;
 
 	// removed variables (these were all arrays):
 	//REAL(r64), ALLOCATABLE, :: DifIncInsSurfIntensRep    !Diffuse sol irradiance from ext wins on inside of surface (W/m2)
@@ -3332,7 +3330,7 @@ namespace DataHeatBalance {
 		Real64 MixingSourceMassFlowRate;  // Zone source mass flow rate for mixing zone, kg/s
 		int NumSourceZonesMixingObject;   // number of zone mixing object references as a source zone
 		int NumReceivingZonesMixingObject;  // number of zone mixing object references as a receiving zone
-		bool IsOnlySourceZone; // true only if used only as a source zone in zone mixing object 
+		bool IsOnlySourceZone; // true only if used only as a source zone in zone mixing object
 		int InfiltrationPtr;             // pointer to infiltration object
 		Real64 InfiltrationMassFlowRate;   // infiltration added to enforced source zone mass balance, kg/s
 		int IncludeInfilToZoneMassBal;     // not self-balanced, include infiltration in zone air mass balance
@@ -5288,8 +5286,6 @@ namespace DataHeatBalance {
 	extern FArray1D< WindowThermalModelParams > WindowThermalModel;
 	extern FArray1D< SurfaceScreenProperties > SurfaceScreens;
 	extern FArray1D< ScreenTransData > ScreenTrans;
-	extern FArray1D< MaterialProperties > MaterialSave;
-	extern FArray1D< ConstructionData > ConstructSave;
 	extern FArray1D< ZoneCatEUseData > ZoneIntEEuse;
 	extern FArray1D< RefrigCaseCreditData > RefrigCaseCredit;
 	extern FArray1D< HeatReclaimRefrigeratedRackData > HeatReclaimRefrigeratedRack;

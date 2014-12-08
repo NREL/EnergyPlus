@@ -118,7 +118,4 @@ TEST( CArrayTest, Swap )
 	swap( a, b );
 	EXPECT_EQ( B, a );
 	EXPECT_EQ( A, b );
-	std::swap( a, b );
-	EXPECT_EQ( A, a );
-	EXPECT_EQ( B, b );
 }

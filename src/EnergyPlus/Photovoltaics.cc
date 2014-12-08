@@ -345,8 +345,7 @@ namespace Photovoltaics {
 		}
 
 		if ( ! allocated( PVarray ) ) PVarray.allocate( NumPVs );
-		CheckEquipName.allocate( NumPVs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumPVs, true );
 
 		cCurrentModuleObject = cPVGeneratorObjectName;
 		for ( PVnum = 1; PVnum <= NumPVs; ++PVnum ) {
@@ -1127,8 +1126,7 @@ namespace Photovoltaics {
 		// perform the one time initializations
 		if ( MyOneTimeFlag ) {
 			// initialize the environment and sizing flags
-			MyEnvrnFlag.allocate( NumPVs );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumPVs, true );
 			MyOneTimeFlag = false;
 		}
 

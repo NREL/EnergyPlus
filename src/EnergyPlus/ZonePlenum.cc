@@ -301,20 +301,13 @@ namespace ZonePlenum {
 		MaxNums = max( NumNums, MaxNums );
 		MaxAlphas = max( NumAlphas, MaxAlphas );
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		NumArray.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 		GetObjectDefMaxArgs( "NodeList", NumArgs, NumAlphas, NumNums );
-		NodeNums.allocate( NumArgs );
-		NodeNums = 0;
+		NodeNums.dimension( NumArgs, 0 );
 
 		InducedNodeListName = "";
 
@@ -324,10 +317,8 @@ namespace ZonePlenum {
 
 		if ( NumZoneReturnPlenums > 0 ) ZoneRetPlenCond.allocate( NumZoneReturnPlenums );
 		if ( NumZoneSupplyPlenums > 0 ) ZoneSupPlenCond.allocate( NumZoneSupplyPlenums );
-		CheckRetEquipName.allocate( NumZoneReturnPlenums );
-		CheckRetEquipName = true;
-		CheckSupEquipName.allocate( NumZoneSupplyPlenums );
-		CheckSupEquipName = true;
+		CheckRetEquipName.dimension( NumZoneReturnPlenums, true );
+		CheckSupEquipName.dimension( NumZoneSupplyPlenums, true );
 
 		ZonePlenumNum = 0;
 

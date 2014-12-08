@@ -53,7 +53,6 @@ namespace DataOutputs {
 
 	// Object Data
 	FArray1D< OutputReportingVariables > OutputVariablesForSimulation;
-	FArray1D< OutputReportingVariables > TempOutputVariablesForSimulation;
 
 	// Functions
 

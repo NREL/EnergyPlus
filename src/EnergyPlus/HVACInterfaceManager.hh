@@ -151,7 +151,7 @@ namespace HVACInterfaceManager {
 		int const ThisLoopSideOutletNode, // Node number for the inlet of the side that needs the outlet node data
 		int const OtherLoopSideInletNode, // Node number for the outlet of the side of the loop just simulated
 		bool & OutOfToleranceFlag, // True when the other side of the loop need to be (re)simulated
-		Optional_int_const CommonPipeType = _
+		int const CommonPipeType
 	);
 
 	//***************

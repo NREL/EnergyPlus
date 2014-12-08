@@ -1232,8 +1232,7 @@ namespace RoomAirModelManager {
 
 		ZoneUCSDUI.allocate( TotUCSDUI );
 		ZoneUCSDUE.allocate( TotUCSDUE );
-		ZoneUFPtr.allocate( NumOfZones );
-		ZoneUFPtr = 0;
+		ZoneUFPtr.dimension( NumOfZones, 0 );
 
 		cCurrentModuleObject = "RoomAirSettings:UnderFloorAirDistributionInterior";
 		for ( Loop = 1; Loop <= TotUCSDUI; ++Loop ) {

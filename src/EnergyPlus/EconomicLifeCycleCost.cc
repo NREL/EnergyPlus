@@ -2022,8 +2022,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numUsePriceEscalation );
 			rowHead.allocate( lengthStudyYears + 2 );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears + 2, numColumns );
 			tableBody = "";
 			columnHead = "none";
@@ -2055,8 +2054,7 @@ namespace EconomicLifeCycleCost {
 				numYears = lengthStudyYears - ( serviceDateYear - baseDateYear );
 				rowHead.allocate( numYears + 1 );
 				columnHead.allocate( numColumns );
-				columnWidth.allocate( numColumns );
-				columnWidth = 14; //array assignment - same for all columns
+				columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 				tableBody.allocate( numYears + 1, numColumns );
 				tableBody = "";
 				columnHead = "none";
@@ -2085,8 +2083,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numRecurringCosts + numNonrecurringCost );
 			rowHead.allocate( lengthStudyYears + 1 );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears + 1, numColumns );
 			tableBody = "";
 			rowHead( 1 ) = "";
@@ -2117,8 +2114,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numResourcesUsed );
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears, numColumns );
 			tableBody = "";
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {

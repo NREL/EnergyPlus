@@ -163,12 +163,12 @@ namespace AirflowNetworkSolver {
 		int n;
 
 		// Formats
-		static gio::Fmt const Format_900( "(1X,i2)" );
-		static gio::Fmt const Format_901( "(1X,2I4,4F9.4)" );
-		static gio::Fmt const Format_902( "(1X,2I4,4F9.4)" );
-		static gio::Fmt const Format_903( "(9X,4F9.4)" );
-		static gio::Fmt const Format_904( "(1X,2I4,1F9.4)" );
-		static gio::Fmt const Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
+		static gio::Fmt Format_900( "(1X,i2)" );
+		static gio::Fmt Format_901( "(1X,2I4,4F9.4)" );
+		static gio::Fmt Format_902( "(1X,2I4,4F9.4)" );
+		static gio::Fmt Format_903( "(9X,4F9.4)" );
+		static gio::Fmt Format_904( "(1X,2I4,1F9.4)" );
+		static gio::Fmt Format_910( "(1X,I4,2(I4,F9.4),I4,2F4.1)" );
 
 		// Assume a network to simulate multizone airflow is a subset of the network to simulate air distribution system.
 		// Network array size is allocated based on the network of air distribution system.
@@ -464,11 +464,11 @@ namespace AirflowNetworkSolver {
 		int ITER;
 
 		// Formats
-		static gio::Fmt const Format_900( "(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')" );
-		static gio::Fmt const Format_901( "(1X,A6,3I5,3F14.6)" );
-		static gio::Fmt const Format_902( "(,/,11X,'n       P',12x,'sumF')" );
-		static gio::Fmt const Format_903( "(1X,A6,I5,3F14.6)" );
-		static gio::Fmt const Format_907( "(,/,' CPU seconds for ',A,F12.3)" );
+		static gio::Fmt Format_900( "(,/,11X,'i    n    m       DP',12x,'F1',12X,'F2')" );
+		static gio::Fmt Format_901( "(1X,A6,3I5,3F14.6)" );
+		static gio::Fmt Format_902( "(,/,11X,'n       P',12x,'sumF')" );
+		static gio::Fmt Format_903( "(1X,A6,I5,3F14.6)" );
+		static gio::Fmt Format_907( "(,/,' CPU seconds for ',A,F12.3)" );
 
 		// FLOW:
 		// Compute zone air properties.
@@ -604,7 +604,7 @@ namespace AirflowNetworkSolver {
 		//REAL(r64), INTENT(INOUT) :: AU(IK(NetworkNumOfNodes+1)-1) ! the upper triangle of [A] before and after factoring
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -642,7 +642,7 @@ namespace AirflowNetworkSolver {
 		FArray1D< Real64 > CCF( NetworkNumOfNodes );
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,2E14.6,0P,F8.4,F24.14)" );
+		static gio::Fmt Format_901( "(A5,I3,2E14.6,0P,F8.4,F24.14)" );
 
 		// FLOW:
 		ACC1 = 0.0;
@@ -845,7 +845,7 @@ namespace AirflowNetworkSolver {
 		FArray1D< Real64 > DF( 2 );
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,3I3,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,3I3,4E16.7)" );
 
 		// FLOW:
 		for ( n = 1; n <= NetworkNumOfNodes; ++n ) {
@@ -1091,7 +1091,7 @@ namespace AirflowNetworkSolver {
 		int CompNum;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
@@ -1219,7 +1219,7 @@ namespace AirflowNetworkSolver {
 		int CompNum;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Crack standard condition from given inputs
@@ -1366,7 +1366,7 @@ namespace AirflowNetworkSolver {
 		Real64 AA1;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
@@ -1546,8 +1546,8 @@ namespace AirflowNetworkSolver {
 		Real64 OpenFactor;
 
 		// Formats
-		static gio::Fmt const Format_900( "(A5,9X,4E16.7)" );
-		static gio::Fmt const Format_903( "(A5,3I3,4E16.7)" );
+		static gio::Fmt Format_900( "(A5,9X,4E16.7)" );
+		static gio::Fmt Format_903( "(A5,3I3,4E16.7)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
@@ -1834,7 +1834,7 @@ namespace AirflowNetworkSolver {
 		Real64 FlowExpo;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,5E14.6)" );
+		static gio::Fmt Format_901( "(A5,I3,5E14.6)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( JA ).TypeNum;
@@ -2048,7 +2048,7 @@ Label999: ;
 		int CompNum;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component number
@@ -2139,7 +2139,7 @@ Label999: ;
 		int CompNum;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2252,7 +2252,7 @@ Label999: ;
 		int CompNum;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2462,7 +2462,7 @@ Label999: ;
 		Real64 area;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2642,7 +2642,7 @@ Label999: ;
 		Real64 area;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		// Get component properties
@@ -2820,7 +2820,7 @@ Label999: ;
 		int InletNode;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,I3,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,I3,6X,4E16.7)" );
 
 		// FLOW:
 		CompNum = AirflowNetworkCompData( j ).TypeNum;
@@ -3287,7 +3287,7 @@ Label999: ;
 		Real64 RhoCor;
 
 		// Formats
-		static gio::Fmt const Format_901( "(A5,6X,4E16.7)" );
+		static gio::Fmt Format_901( "(A5,6X,4E16.7)" );
 
 		// FLOW:
 		// Calculate normal density and viscocity at Crack standard condition: T=20C, p=101325 Pa and 0 g/kg
@@ -3737,8 +3737,8 @@ Label999: ;
 		int i;
 
 		// Formats
-		static gio::Fmt const Format_901( "(1X,A,$)" );
-		static gio::Fmt const Format_902( "(1X,5E15.07,$)" );
+		static gio::Fmt Format_901( "(1X,A,$)" );
+		static gio::Fmt Format_902( "(1X,5E15.07,$)" );
 
 		// FLOW:
 		// Write values for debug
@@ -3797,8 +3797,8 @@ Label999: ;
 		int i;
 
 		// Formats
-		static gio::Fmt const Format_901( "(1X,A,$)" );
-		static gio::Fmt const Format_902( "(1X,5E15.07,$)" );
+		static gio::Fmt Format_901( "(1X,A,$)" );
+		static gio::Fmt Format_902( "(1X,5E15.07,$)" );
 
 		// FLOW:
 		gio::write( UOUT, Format_901 ) << S;
