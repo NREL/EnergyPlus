@@ -13,7 +13,7 @@
 
 extern "C"
 {
-#include "cJSON.h"
+#include "../../third_party/cJSON/cJSON.h"
 }
 
 #include "JSONDataInterface.h"
