@@ -6168,9 +6168,9 @@ namespace WaterThermalTanks {
 		int Step; // DO loop step direction, 1 or -1
 		Real64 DeltaTemp; // Temperature difference between node and inlet (delta C)
 		Real64 MinDeltaTemp; // Smallest temperature difference found so far (delta C)
-        
-        // References to objects
-        WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
+
+		// References to objects
+		WaterThermalTankData &Tank = WaterThermalTank( WaterThermalTankNum );
 
 		// FLOW:
 		NumNodes = Tank.Nodes;
