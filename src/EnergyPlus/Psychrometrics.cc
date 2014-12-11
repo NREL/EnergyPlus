@@ -17,7 +17,12 @@
 
 namespace EnergyPlus {
 
-#define EP_psych_cache
+#define EP_psych_cache_PsyTwbFnTdbWPb
+#define EP_psych_cache_PsyPsatFnTemp
+#define EP_psych_cache_PsyTsatFnHPb
+#define EP_psych_cache_PsyTsatFnPb
+#define EP_psych_cache_PsyWFnTdbTwbPb
+
 #define EP_psych_errors
 
 namespace Psychrometrics {
@@ -282,11 +287,11 @@ namespace Psychrometrics {
 
 
 	Real64
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyTwbFnTdbWPb
 	PsyTwbFnTdbWPb_raw(
-#else // !EP_psych_cache
+#else // !EP_psych_cache_PsyTwbFnTdbWPb
 	PsyTwbFnTdbWPb(
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyTwbFnTdbWPb
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const dW, // humidity ratio
 		Real64 const Patm, // barometric pressure {Pascals}
@@ -490,7 +495,7 @@ namespace Psychrometrics {
 		return TWB;
 	}
 
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyTwbFnTdbWPb
 	Real64
 	PsyTwbFnTdbWPb(
 		Real64 const Tdb, // dry-bulb temperature {C}
@@ -592,7 +597,7 @@ namespace Psychrometrics {
 		return cache( hash ).Twb;
 
 	}
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyTwbFnTdbWPb
 
 #ifdef EP_psych_errors
 	void
@@ -654,11 +659,11 @@ namespace Psychrometrics {
 #endif
 
 	Real64
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyPsatFnTemp
 	PsyPsatFnTemp_raw(
-#else // !EP_psych_cache
+#else // !EP_psych_cache_PsyPsatFnTemp
 	PsyPsatFnTemp(
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyPsatFnTemp
 		Real64 const T, // dry-bulb temperature {C}
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
@@ -776,7 +781,7 @@ namespace Psychrometrics {
 		return Pascal;
 	}
 
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyPsatFnTemp
 	Real64
 	PsyPsatFnTemp(
 		Real64 const T, // dry-bulb temperature {C}
@@ -843,7 +848,7 @@ namespace Psychrometrics {
 
 		return cache( hash ).Psat; // saturation pressure {Pascals}
 	}
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyPsatFnTemp
 
 
 #ifdef EP_psych_errors
@@ -938,11 +943,11 @@ namespace Psychrometrics {
 #endif
 
 	Real64
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyTsatFnHPb
 	PsyTsatFnHPb_raw(
-#else // !EP_psych_cache
+#else // !EP_psych_cache_PsyTsatFnHPb
 	PsyTsatFnHPb(
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyTsatFnHPb
 		Real64 const H, // enthalpy {J/kg}
 		Real64 const PB, // barometric pressure {Pascals}
 		std::string const & CalledFrom // routine this function was called from (error messages)
@@ -1132,7 +1137,7 @@ Label170: ;
 
 	}
 
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyTsatFnHPb
 	Real64
 	PsyTsatFnHPb(
 		Real64 const H, // enthalpy {J/kg}
@@ -1259,7 +1264,7 @@ Label170: ;
 		ce.Tsat = PsyTsatFnHPb_raw( H_tag_r, Pb_tag_r, CalledFrom );
 		return ce.Tsat;
 	}
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyTsatFnHPb
 
 #ifdef EP_psych_errors
 	void
@@ -1407,11 +1412,11 @@ Label170: ;
 #endif
 
 	Real64
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyTsatFnPb
 	PsyTsatFnPb_raw(
-#else // !EP_psych_cache
+#else // !EP_psych_cache_PsyTsatFnPb
 	PsyTsatFnPb(
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyTsatFnPb
 		Real64 const Press, // barometric pressure {Pascals}
 		std::string const & CalledFrom // routine this function was called from (error messages)
 	)
@@ -1575,7 +1580,7 @@ Label170: ;
 
 	}
 
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyTsatFnPb
 	Real64
 	PsyTsatFnPb(
 		Real64 const Pb, // barometric pressure {Pascals}
@@ -1671,14 +1676,14 @@ Label170: ;
 		ce.Tsat = PsyTsatFnPb_raw( Pb_tag_r, CalledFrom );
 		return ce.Tsat;
 	}
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyTsatFnPb
 
 	Real64
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyWFnTdbTwbPb
 	PsyWFnTdbTwbPb_raw(
-#else // !EP_psych_cache
+#else // !EP_psych_cache_PsyWFnTdbTwbPb
 	PsyWFnTdbTwbPb(
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyWFnTdbTwbPb
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const TWBin, // wet-bulb temperature {C}
 		Real64 const PB, // barometric pressure {Pascals}
@@ -1732,7 +1737,7 @@ Label170: ;
 	}
 
 
-#ifdef EP_psych_cache
+#ifdef EP_psych_cache_PsyWFnTdbTwbPb
 	Real64
 	PsyWFnTdbTwbPb(
 		Real64 const Tdb, // dry-bulb temperature {C}
@@ -1846,7 +1851,7 @@ Label170: ;
 		}
 		return cache( hash ).W;
 	}
-#endif // EP_psych_cache
+#endif // EP_psych_cache_PsyWFnTdbTwbPb
 
 	//     NOTICE
 
