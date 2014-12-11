@@ -5964,9 +5964,10 @@ namespace WaterThermalTanks {
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
 				if ( Tank.HeatPumpNum > 0 ) {
-					SourceInletTemp = Tank.Node(Tank.SourceInletStratNode).Temp + HPWHCondenserDeltaT;
+					Qsource = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
+				} else {
+					Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
 				}
-				Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
 
 				InvMixUp = 0.0;
 				if ( NodeNum > 1 ) {
@@ -6089,6 +6090,7 @@ namespace WaterThermalTanks {
 		}
 		NodeNum = Tank.SourceOutletStratNode;
 		if ( NodeNum > 0 ) Tank.SourceOutletTemp = Tank.Node( NodeNum ).TempAvg;
+		if ( Tank.HeatPumpNum > 0 ) Tank.SourceInletTemp = Tank.SourceOutletTemp + HPWHCondenserDeltaT;
 		// Revised use outlet temperature to ensure energy balance. Assumes a constant CP. CR8341/CR8570
 		if ( NodeNum > 0 ) {
 			if ( Tank.SourceMassFlowRate > 0.0 ) {
