@@ -3352,8 +3352,10 @@ namespace SolarShading {
 			AOSurf( {1,TotSurfaces} ) = 0.0;
 			BackSurfaces( {1,TotSurfaces}, {1,MaxBkSurf}, HourOfDay, TimeStep ) = 0;
 			OverlapAreas( {1,TotSurfaces}, {1,MaxBkSurf}, HourOfDay, TimeStep ) = 0.0;
-			SurfaceWindow.OutProjSLFracMult()( HourOfDay ) = 1.0;
-			SurfaceWindow.InOutProjSLFracMult()( HourOfDay ) = 1.0;
+			for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+				SurfaceWindow( SurfNum ).OutProjSLFracMult( HourOfDay ) = 1.0;
+				SurfaceWindow( SurfNum ).InOutProjSLFracMult( HourOfDay ) = 1.0;
+			}
 		}
 
 		if ( ! DetailedSolarTimestepIntegration ) {
