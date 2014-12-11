@@ -16013,11 +16013,14 @@ SurfaceProperty:OtherSideConditionsModel,
       \type choice
       \key GapConvectionRadiation
       \key UndergroundPipingSystemSurface
+      \key GroundCoupledSurface
       \note GapConvectionRadiation provides boundary conditions for convection
       \note  and linearized thermal radiation across a gap or cavity
       \note  on the other side of the surface that are modeled separately.
       \note UndergroundPipingSystemSurface provides boundary conditions for
       \note  surfaces in contact with PipingSystem:Underground domains
+      \note GroundCoupledSurface provides boundary conditions for surfaces
+      \note  in contact with GroundDomain objects
       \default GapConvectionRadiation
 
 SurfaceConvectionAlgorithm:Inside:AdaptiveModelSelections,
@@ -22040,17 +22043,17 @@ AirflowNetwork:MultiZone:Zone,
   A5, \field Single Sided Wind Pressure Coefficient Algorithm
       \type choice
       \key Advanced
-       \key Standard
-       \default Standard
-       \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
-       \note to account for wind direction and turbulence effects on single sided ventilation rates.
-       \note Model is only valid for zones with 2 openings, both of which are on a single facade.
+      \key Standard
+      \default Standard
+      \note Selecting Advanced results in EnergyPlus calculating modified Wind Pressure Coefficients
+      \note to account for wind direction and turbulence effects on single sided ventilation rates.
+      \note Model is only valid for zones with 2 openings, both of which are on a single facade.
   N6; \field Facade Width
       \type real
-       \units m
-       \minimum 0.0
-       \default 10.0
-       \note This is the whole building width along the direction of the facade of this zone.
+      \units m
+      \minimum 0.0
+      \default 10.0
+      \note This is the whole building width along the direction of the facade of this zone.
 
 AirflowNetwork:MultiZone:Surface,
       \min-fields 4
@@ -42973,7 +42976,6 @@ Coil:Heating:DX:MultiSpeed,
        \type node
   N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
        \type real
-       \minimum -20.0
        \default -8.0
        \units C
   N2 , \field Outdoor Dry-Bulb Temperature to Turn On Compressor
@@ -50137,7 +50139,6 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
         \object-list HeatingCoilsGasMultiStage
    N1 , \field Minimum Outdoor Dry-Bulb Temperature for Compressor Operation
         \type real
-        \minimum -20.0
         \default -8.0
         \units C
         \note Needs to match the corresponding minimum outdoor temperature defined
@@ -63384,9 +63385,11 @@ PlantLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key Sequential
-        \key Uniform
-        \default Sequential
+        \key SequentialLoad
+        \key UniformLoad
+        \key UniformPLR
+        \key SequentialUniformPLR
+        \default SequentialLoad
   A15, \field Availability Manager List Name
         \type object-list
         \object-list SystemAvailabilityManagerLists
@@ -63496,8 +63499,11 @@ CondenserLoop,
   A14, \field Load Distribution Scheme
         \type choice
         \key Optimal
-        \key Sequential
-        \default Sequential
+        \key SequentialLoad
+        \key UniformLoad
+        \key UniformPLR
+        \key SequentialUniformPLR
+        \default SequentialLoad
   A15; \field Pressure Simulation Type
         \type choice
         \key PumpPowerCorrection
@@ -91804,5 +91810,4 @@ Output:PreprocessorMessage,
         \retaincase
    A12; \field Message Line 10
         \retaincase
-
 
