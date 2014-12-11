@@ -453,8 +453,8 @@ namespace PlantCondLoopOperation {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = HeatingRBOpSchemeType;
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT" ) { //* Temp Based Control
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CompSetPtBasedSchemeType;
-                        } else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) { //* Simple TES Control
-                            PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CompSetPtBasedSchemeType; // set this to component based as it will be converted to this
+						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) { //* Simple TES Control
+							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = CompSetPtBasedSchemeType; // set this to component based as it will be converted to this
 						} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:USERDEFINED" ) {
 							PlantLoop( LoopNum ).OpScheme( Num ).OpSchemeType = EMSOpSchemeType;
 							AnyEMSPlantOpSchemesInModel = true;
@@ -567,7 +567,7 @@ namespace PlantCondLoopOperation {
 		int DBTDBO; // Number ofDry Bulb Temperature Range Based Operation Inputs
 		int WBTDBO; // Number ofWet Bulb Temperature Range Based Operation Inputs
 		int DPTDBO; // Number ofDewPoint Temperature Range Based Operation Inputs
-        int TESSPBO; // Number of Thermal Energy Storage Setpoint Based Operation Inputs
+		int TESSPBO; // Number of Thermal Energy Storage Setpoint Based Operation Inputs
 		int NumSchemes; // Number of Condenser equipment lists
 		int NumUncontrolledSchemes; // Number of Condenser equipment lists
 		int NumUserDefOpSchemes; // number of user defined EMS op schemes
@@ -593,7 +593,7 @@ namespace PlantCondLoopOperation {
 		DBTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDryBulbDifference" );
 		WBTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorWetBulbDifference" );
 		DPTDBO = GetNumObjectsFound( "PlantEquipmentOperation:OutdoorDewpointDifference" );
-        TESSPBO = GetNumObjectsFound("PlantEquipmentOperation:ThermalEnergyStorage");
+		TESSPBO = GetNumObjectsFound( "PlantEquipmentOperation:ThermalEnergyStorage" );
 		NumSchemes = CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUserDefOpSchemes + TESSPBO;
 		NumUncontrolledSchemes = GetNumObjectsFound( "PlantEquipmentOperation:Uncontrolled" );
 		if ( ( NumSchemes + NumUncontrolledSchemes ) <= 0 ) {
@@ -642,7 +642,7 @@ namespace PlantCondLoopOperation {
 			} else if ( NumUserDefOpSchemes > 0 && Num <= ( CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUncontrolledSchemes + NumUserDefOpSchemes ) ) {
 				CurrentModuleObject = "PlantEquipmentOperation:UserDefined";
 				Count = Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes;
-            } else if ( TESSPBO > 0 && Num <= ( CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUncontrolledSchemes + NumUserDefOpSchemes + TESSPBO ) ) {
+			} else if ( TESSPBO > 0 && Num <= ( CLRBO + HLRBO + DBRBO + WBRBO + DPRBO + RHRBO + CSPBO + DBTDBO + WBTDBO + DPTDBO + NumUncontrolledSchemes + NumUserDefOpSchemes + TESSPBO ) ) {
 				CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
 				Count = Num - CLRBO - HLRBO - DBRBO - WBRBO - DPRBO - RHRBO - CSPBO - DBTDBO - WBTDBO - DPTDBO - NumUncontrolledSchemes - NumUserDefOpSchemes;
 			} else {
@@ -743,7 +743,7 @@ namespace PlantCondLoopOperation {
 					CurrentModuleObject = "PlantEquipmentOperation:Uncontrolled";
 					FindRangeBasedOrUncontrolledInput( CurrentModuleObject, NumUncontrolledSchemes, LoopNum, SchemeNum, ErrorsFound );
 
-                } else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) { //* Temp Based Control
+				} else if ( plantLoopOperation == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) { //* Temp Based Control
 					CurrentModuleObject = "PlantEquipmentOperation:ThermalEnergyStorage";
 					FindCompSPInput( CurrentModuleObject, TESSPBO, LoopNum, SchemeNum, ErrorsFound );
 
@@ -753,11 +753,12 @@ namespace PlantCondLoopOperation {
 					ErrorsFound = true;
 				}}
 
-                // At this point, switch the thermal energy storage controls to setpoint based controls as all of the
-                // internally generated setpoints and schedules have been generated and this can now be handled like
-                // the long form setpoint based control.
-                if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).TypeOf == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" )
-                     PlantLoop( LoopNum ).OpScheme( SchemeNum ).TypeOf =  "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT";
+				// At this point, switch the thermal energy storage controls to setpoint based controls as all of the
+				// internally generated setpoints and schedules have been generated and this can now be handled like
+				// the long form setpoint based control.
+				if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).TypeOf == "PLANTEQUIPMENTOPERATION:THERMALENERGYSTORAGE" ) {
+					PlantLoop( LoopNum ).OpScheme( SchemeNum ).TypeOf =  "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT";
+				}
 			}
 		}
 
@@ -1278,7 +1279,7 @@ namespace PlantCondLoopOperation {
 		//       AUTHOR         Dan Fisher
 		//       DATE WRITTEN   July 2010
 		//       MODIFIED       B. Griffith, check setpoint nodes have setpoint managers on EMS on them.
-        //                      Rick Strand, Aug 2014, added simple thermal energy storage controls
+		//                      Rick Strand, Aug 2014, added simple thermal energy storage controls
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -1289,7 +1290,7 @@ namespace PlantCondLoopOperation {
 		// The format of the Energy+.idd (the EnergyPlus input data dictionary) for the
 		// following keywords is reflected exactly in this subroutine:
 		//    PlantEquipmentOperation:ComponentSetPoint
-        //    PlantEquipmentOperation:ThermalEnergyStorage
+		//    PlantEquipmentOperation:ThermalEnergyStorage
 
 		// REFERENCES:
 		// na
@@ -1306,8 +1307,8 @@ namespace PlantCondLoopOperation {
 		using EMSManager::iTemperatureSetPoint;
 		using EMSManager::iTemperatureMinSetPoint;
 		using EMSManager::iTemperatureMaxSetPoint;
-        using ScheduleManager::GetScheduleIndex;
-        using SetPointManager::SetUpNewScheduledTESSetPtMgr;
+		using ScheduleManager::GetScheduleIndex;
+		using SetPointManager::SetUpNewScheduledTESSetPtMgr;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1333,15 +1334,15 @@ namespace PlantCondLoopOperation {
 		std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
 		bool SchemeNameFound; // Set to FALSE if a match of OpScheme object and OpScheme name is not found
 		bool NodeEMSSetPointMissing;
-        std::string OnPeakSchedName;
-        int OnPeakSchedPtr;
-        std::string ChargeSchedName;
-        int ChargeSchedPtr;
-        Real64 NonChargCHWTemp;
-        Real64 OffPeakCHWTemp;
-        int CompNumA;
-        int CompNumN;
-        int CompOpType; // 1=cooling, 2=dual(or other)
+		std::string OnPeakSchedName;
+		int OnPeakSchedPtr;
+		std::string ChargeSchedName;
+		int ChargeSchedPtr;
+		Real64 NonChargCHWTemp;
+		Real64 OffPeakCHWTemp;
+		int CompNumA;
+		int CompNumN;
+		int CompOpType; // 1=cooling, 2=dual(or other)
 
 		SchemeNameFound = true;
 
@@ -1366,37 +1367,35 @@ namespace PlantCondLoopOperation {
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).NumEquipLists = 1;
 				PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList.allocate( 1 );
 
-                PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps = ( NumAlphas - 1 ) / 5;
-                if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
-                    // Read all of the additional parameters for ice storage control scheme and error check various parameters
-                    OnPeakSchedName = cAlphaArgs ( 2 );
-                    OnPeakSchedPtr  = GetScheduleIndex( OnPeakSchedName );
-                    if ( OnPeakSchedPtr == 0 ) {
-                        ShowSevereError( "Could not find On Peak Schedule " + OnPeakSchedName +
-                                        " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
-                        ErrorsFound = true;
-                    }
-                    ChargeSchedName = cAlphaArgs ( 3 );
-                    ChargeSchedPtr  = GetScheduleIndex( ChargeSchedName );
-                    if ( ChargeSchedPtr == 0 ) {
-                        ShowSevereError( "Could not find Charging Availability Schedule " + ChargeSchedName +
-                                        " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
-                        ErrorsFound = true;
-                    }
-                    NonChargCHWTemp = rNumericArgs ( 1 );
-                    OffPeakCHWTemp  = rNumericArgs ( 2 );
-                }
+				PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps = ( NumAlphas - 1 ) / 5;
+				if (CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+					// Read all of the additional parameters for ice storage control scheme and error check various parameters
+					OnPeakSchedName = cAlphaArgs ( 2 );
+					OnPeakSchedPtr  = GetScheduleIndex( OnPeakSchedName );
+					if ( OnPeakSchedPtr == 0 ) {
+						ShowSevereError( "Could not find On Peak Schedule " + OnPeakSchedName + " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
+						ErrorsFound = true;
+					}
+					ChargeSchedName = cAlphaArgs ( 3 );
+					ChargeSchedPtr  = GetScheduleIndex( ChargeSchedName );
+					if ( ChargeSchedPtr == 0 ) {
+						ShowSevereError( "Could not find Charging Availability Schedule " + ChargeSchedName + " in " + CurrentModuleObject + PlantLoop( LoopNum ).OpScheme( SchemeNum ).Name + "\".");
+						ErrorsFound = true;
+					}
+					NonChargCHWTemp = rNumericArgs ( 1 );
+					OffPeakCHWTemp  = rNumericArgs ( 2 );
+				}
 				
-                if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps > 0 ) {
+				if ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps > 0 ) {
 					PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp.allocate( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps );
 					for ( CompNum = 1; CompNum <= PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).NumComps; ++CompNum ) {
-                        if ( CurrentModuleObject == "PlantEquipmentOperation:ComponentSetPoint" ) {
-                            CompNumA = CompNum * 5;
-                            CompNumN = CompNum;
-                        } else if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
-                            CompNumA = CompNum * 5 + 2;
-                            CompNumN = CompNum + 2;
-                        }
+						if ( CurrentModuleObject == "PlantEquipmentOperation:ComponentSetPoint" ) {
+							CompNumA = CompNum * 5;
+							CompNumN = CompNum;
+						} else if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+							CompNumA = CompNum * 5 + 2;
+							CompNumN = CompNum + 2;
+						}
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).TypeOf = cAlphaArgs( CompNumA - 3 );
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).Name = cAlphaArgs( CompNumA - 2 );
 						PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).DemandNodeName = cAlphaArgs( CompNumA - 1 );
@@ -1423,10 +1422,10 @@ namespace PlantCondLoopOperation {
 						if ( controlType == "COOLING" ) {
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = CoolingOp;
 						} else if ( controlType == "HEATING" ) {
-                            if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
-                                ShowSevereError("Equipment Operation Mode cannot be HEATING for any equipment found in " + cAlphaArgs( 1 ) + " in thermal energy storage control" );
-                                ErrorsFound = true;
-                            }
+							if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+								ShowSevereError("Equipment Operation Mode cannot be HEATING for any equipment found in " + cAlphaArgs( 1 ) + " in thermal energy storage control" );
+								ErrorsFound = true;
+							}
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = HeatingOp;
 						} else if ( controlType == "DUAL" ) {
 							PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum = DualOp;
@@ -1435,14 +1434,13 @@ namespace PlantCondLoopOperation {
 						if ( ( cAlphaArgs( CompNumA + 1 ) != "COOLING" ) && ( cAlphaArgs( CompNumA + 1 ) != "HEATING" ) && ( cAlphaArgs( CompNumA + 1 ) != "DUAL" ) ) {
 							ShowSevereError( "Equipment Operation Mode should be either HEATING or COOLING or DUAL mode, for " + CurrentModuleObject + '=' + cAlphaArgs( 1 ) );
 						}
-                        if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
-                            // for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
-                            // detailed input that is necessary to get thermal energy storage to work from the simpler input.
-                            CompOpType = ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum ) - 1;
-                            if ( ( CompOpType < 1 ) || ( CompOpType > 2 ) ) CompOpType = 2;
-                            SetUpNewScheduledTESSetPtMgr( OnPeakSchedPtr, ChargeSchedPtr, NonChargCHWTemp, OffPeakCHWTemp, CompOpType,
-                                                          PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum );
-                        }
+						if ( CurrentModuleObject == "PlantEquipmentOperation:ThermalEnergyStorage" ) {
+							// for each component, a new scheduled setpoint manager needs to be defined to internally generate the more
+							// detailed input that is necessary to get thermal energy storage to work from the simpler input.
+							CompOpType = ( PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).CtrlTypeNum ) - 1;
+							if ( ( CompOpType < 1 ) || ( CompOpType > 2 ) ) CompOpType = 2;
+							SetUpNewScheduledTESSetPtMgr( OnPeakSchedPtr, ChargeSchedPtr, NonChargCHWTemp, OffPeakCHWTemp, CompOpType, PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeNum );
+						}
 						//check that setpoint node has valid setpoint managers or EMS
 						{ auto const SELECT_CASE_var( PlantLoop( LoopNum ).LoopDemandCalcScheme );
 						if ( SELECT_CASE_var == SingleSetPoint ) {
@@ -1452,7 +1450,8 @@ namespace PlantCondLoopOperation {
 									ShowContinueError( "A temperature setpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 									if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 										ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=SingleSetpoint" );
-									} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+									} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+										// not applicable to Condenser loops
 									}
 									ShowContinueError( " Use a setpoint manager to place a single temperature setpoint on the node" );
 									ErrorsFound = true;
@@ -1465,7 +1464,8 @@ namespace PlantCondLoopOperation {
 										ShowContinueError( "A temperature setpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 										if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 											ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=SingleSetpoint" );
-										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+											// not applicable to Condenser loops
 										}
 										ShowContinueError( " Use a setpoint manager or EMS actuator to place a single temperature setpoint on node" );
 										ErrorsFound = true;
@@ -1480,7 +1480,8 @@ namespace PlantCondLoopOperation {
 										ShowContinueError( "A temperature high setpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 										if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 											ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
-										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+											// not applicable to Condenser loops
 										}
 										ShowContinueError( " Use a setpoint manager to place a dual temperature setpoint on the node" );
 										ErrorsFound = true;
@@ -1493,7 +1494,8 @@ namespace PlantCondLoopOperation {
 											ShowContinueError( "A high temperature setpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 											if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
-											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+												// not applicable to Condenser loops
 											}
 											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or high temperature" " setpoint on node" );
 											ErrorsFound = true;
@@ -1507,7 +1509,8 @@ namespace PlantCondLoopOperation {
 										ShowContinueError( "A temperature low setpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 										if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 											ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
-										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+											// not applicable to Condenser loops
 										}
 										ShowContinueError( " Use a setpoint manager to place a dual temperature setpoint on the node" );
 										ErrorsFound = true;
@@ -1521,7 +1524,8 @@ namespace PlantCondLoopOperation {
 											ShowContinueError( "A low temperature setpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 											if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
-											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+												// not applicable to Condenser loops
 											}
 											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual or low temperature" " setpoint on node" );
 											ErrorsFound = true;
@@ -1535,7 +1539,8 @@ namespace PlantCondLoopOperation {
 										ShowContinueError( "A dual temperaturesetpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 										if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 											ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
-										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+										} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+											// not applicable to Condenser loops
 										}
 										ShowContinueError( " Use a setpoint manager to place a dual temperature setpoint on the node" );
 										ErrorsFound = true;
@@ -1548,7 +1553,8 @@ namespace PlantCondLoopOperation {
 											ShowContinueError( "A dual temperature setpoint is needed at the node named " + PlantLoop( LoopNum ).OpScheme( SchemeNum ).EquipList( 1 ).Comp( CompNum ).SetPointNodeName );
 											if ( PlantLoop( LoopNum ).TypeOfLoop == Plant ) {
 												ShowContinueError( "PlantLoop=\"" + PlantLoop( LoopNum ).Name + "\", Plant Loop Demand Calculation Scheme=DualSetpointDeadband" );
-											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) { // not applicable to Condenser loops
+											} else if ( PlantLoop( LoopNum ).TypeOfLoop == Condenser ) {
+												// not applicable to Condenser loops
 											}
 											ShowContinueError( " Use a setpoint manager or EMS actuator to place a dual temperature" " setpoint on node" );
 											ErrorsFound = true;
@@ -3464,7 +3470,7 @@ namespace PlantCondLoopOperation {
 
 	//     NOTICE
 
-	//     Copyright � 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
