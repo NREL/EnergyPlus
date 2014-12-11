@@ -158,6 +158,8 @@ namespace UnitVentilator {
 		int AvailStatus;
 		Real64 FanPartLoadRatio; // fan part-load ratio for time step
 		Real64 PartLoadFrac; // unit ventilator part-load ratio for time step
+		int ZonePtr; // pointer to a zone served by a unit ventilator
+		int HVACSizingIndex; // index of a HVACSizing object for a unit ventilator
 		// for unit ventilator object
 
 		// Default Constructor
@@ -236,7 +238,9 @@ namespace UnitVentilator {
 			ElecEnergy( 0.0 ),
 			AvailStatus( 0 ),
 			FanPartLoadRatio( 0.0 ),
-			PartLoadFrac( 0.0 )
+			PartLoadFrac( 0.0 ),
+			ZonePtr( 0 ),
+			HVACSizingIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -331,7 +335,9 @@ namespace UnitVentilator {
 			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const AvailStatus,
 			Real64 const FanPartLoadRatio, // fan part-load ratio for time step
-			Real64 const PartLoadFrac // unit ventilator part-load ratio for time step
+			Real64 const PartLoadFrac, // unit ventilator part-load ratio for time step
+			int const ZonePtr, // pointer to a zone served by a unit ventilator
+			int const HVACSizingIndex // index of a HVACSizing object for a unit ventilator
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -423,13 +429,33 @@ namespace UnitVentilator {
 			AvailManagerListName( AvailManagerListName ),
 			AvailStatus( AvailStatus ),
 			FanPartLoadRatio( FanPartLoadRatio ),
-			PartLoadFrac( PartLoadFrac )
+			PartLoadFrac( PartLoadFrac ),
+			ZonePtr( ZonePtr ),
+			HVACSizingIndex( HVACSizingIndex )
 		{}
 
 	};
 
+	struct UnitVentNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		UnitVentNumericFieldData()
+		{}
+
+		// Member Constructor
+		UnitVentNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames( FieldNames )
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< UnitVentilatorData > UnitVent;
+	extern FArray1D< UnitVentNumericFieldData > UnitVentNumericFields;
 
 	// Functions
 
@@ -517,7 +543,7 @@ namespace UnitVentilator {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

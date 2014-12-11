@@ -9,6 +9,7 @@
 #include <WindowAC.hh>
 #include <BranchNodeConnections.hh>
 #include <DataEnvironment.hh>
+#include <DataHeatBalance.hh>
 #include <DataHeatBalFanSys.hh>
 #include <DataHVACGlobals.hh>
 #include <DataLoopNode.hh>
@@ -121,6 +122,7 @@ namespace WindowAC {
 
 	// Object Data
 	FArray1D< WindACData > WindAC;
+	FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name
 
 	// Functions
 
@@ -253,6 +255,7 @@ namespace WindowAC {
 		using InputProcessor::VerifyName;
 		using InputProcessor::SameString;
 		using InputProcessor::GetObjectDefMaxArgs;
+		using InputProcessor::FindItemInList;
 		using NodeInputManager::GetOnlySingleNode;
 		using BranchNodeConnections::SetUpCompSets;
 		using Fans::GetFanIndex;
@@ -274,6 +277,8 @@ namespace WindowAC {
 		using DataHVACGlobals::ZoneComp;
 		using DataZoneEquipment::WindowAC_Num;
 		using DataZoneEquipment::ZoneEquipConfig;
+		using DataSizing::NumZoneHVACSizing;
+		using DataSizing::ZoneHVACSizing;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -326,23 +331,17 @@ namespace WindowAC {
 		NumWindAC = NumWindACCyc;
 		// allocate the data structures
 		WindAC.allocate( NumWindAC );
-		CheckEquipName.allocate( NumWindAC );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumWindAC, true );
+		WindACNumericFields.allocate( NumWindAC );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, TotalArgs, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNumbers, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// loop over window AC units; get and load the input data
 		for ( WindACIndex = 1; WindACIndex <= NumWindACCyc; ++WindACIndex ) {
@@ -350,6 +349,11 @@ namespace WindowAC {
 			GetObjectItem( CurrentModuleObject, WindACIndex, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
 			WindACNum = WindACIndex;
+
+			WindACNumericFields( WindACNum ).FieldNames.allocate( NumNumbers );
+			WindACNumericFields( WindACNum ).FieldNames = "";
+			WindACNumericFields( WindACNum ).FieldNames = cNumericFields;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( Alphas( 1 ), WindAC.Name(), WindACNum - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
@@ -485,6 +489,16 @@ namespace WindowAC {
 				WindAC( WindACNum ).AvailManagerListName = Alphas( 13 );
 			}
 
+			WindAC( WindACNum ).HVACSizingIndex = 0;
+			if ( ! lAlphaBlanks( 14 ) ) {
+				WindAC( WindACNum ).HVACSizingIndex = FindItemInList( Alphas( 14 ), ZoneHVACSizing.Name(), NumZoneHVACSizing);
+				if ( WindAC( WindACNum ).HVACSizingIndex == 0) {
+					ShowSevereError( cAlphaFields( 14 ) + " = " + Alphas( 14 ) + " not found.");
+					ShowContinueError( "Occurs in " + CurrentModuleObject + " = " + WindAC( WindACNum ).Name );
+					ErrorsFound = true;
+				}
+			}
+
 			// Add fan to component sets array
 			if ( WindAC( WindACNum ).FanPlace == BlowThru ) {
 
@@ -512,6 +526,7 @@ namespace WindowAC {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 						if ( WindAC( WindACNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							WindAC(WindACNum).ZonePtr = CtrlZone;
 							ZoneNodeNotFound = false;
 							break;
 						}
@@ -551,6 +566,7 @@ namespace WindowAC {
 					if ( ! ZoneEquipConfig( CtrlZone ).IsControlled ) continue;
 					for ( NodeNum = 1; NodeNum <= ZoneEquipConfig( CtrlZone ).NumInletNodes; ++NodeNum ) {
 						if ( WindAC( WindACNum ).AirOutNode == ZoneEquipConfig( CtrlZone ).InletNode( NodeNum ) ) {
+							WindAC( WindACNum ).ZonePtr = CtrlZone;
 							ZoneNodeNotFound = false;
 							break;
 						}
@@ -802,6 +818,7 @@ namespace WindowAC {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   January 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B. Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -815,15 +832,21 @@ namespace WindowAC {
 		// na
 
 		// Using/Aliasing
+		using namespace DataSizing;
 		using namespace InputProcessor;
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
+		using DataHVACGlobals::SystemAirflowSizing;
+		using DataHVACGlobals::CoolingAirflowSizing;
+		using DataHVACGlobals::CoolingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName("SizeWindowAC: "); // include trailing blank space
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -837,45 +860,114 @@ namespace WindowAC {
 		Real64 OutAirVolFlowDes; // Autosized outdoor air flow for reporting
 		Real64 OutAirVolFlowUser; // Hardsized outdoor ari flow for reporting
 		bool IsAutoSize; // Indicator to autosize
+		std::string CompName; // component name
+		std::string CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 2; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int zoneHVACIndex; // index of zoneHVAC equipment sizing specification
+		int SAFMethod( 0 ); // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow, FractionOfAutosizedHeatingAirflow ...)
+		int CapSizingMethod(0);  // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 
 		IsAutoSize = false;
 		MaxAirVolFlowDes = 0.0;
 		MaxAirVolFlowUser = 0.0;
 		OutAirVolFlowDes = 0.0;
 		OutAirVolFlowUser = 0.0;
+		DataFracOfAutosizedCoolingAirflow = 1.0;
+		DataFracOfAutosizedHeatingAirflow = 1.0;
+		DataFracOfAutosizedCoolingCapacity = 1.0;
+		DataFracOfAutosizedHeatingCapacity = 1.0;
+		DataScalableSizingON = false;
+		ZoneHeatingOnlyFan = false;
+		ZoneCoolingOnlyFan = true;
+		CompType = "ZoneHVAC:WindowAirConditioner";
+		CompName = WindAC( WindACNum ).Name;
+		DataZoneNumber = WindAC( WindACNum ).ZonePtr;
 
-		if ( WindAC( WindACNum ).MaxAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
-		}
 		if ( CurZoneEqNum > 0 ) {
-			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // Simulation continue
-				if ( WindAC( WindACNum ).MaxAirVolFlow > 0.0 ) {
-					ReportSizingOutput( cWindowAC_UnitTypes( WindAC( WindACNum ).UnitType ), WindAC( WindACNum ).Name, "Maximum Supply Air Flow Rate [m3/s]", WindAC( WindACNum ).MaxAirVolFlow );
-				}
-			} else {
-				CheckZoneSizing( cWindowAC_UnitTypes( WindAC( WindACNum ).UnitType ), WindAC( WindACNum ).Name );
-				MaxAirVolFlowDes = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-				if ( MaxAirVolFlowDes < SmallAirVolFlow ) {
-					MaxAirVolFlowDes = 0.0;
-				}
-				if ( IsAutoSize ) {
-					WindAC( WindACNum ).MaxAirVolFlow = MaxAirVolFlowDes;
-					ReportSizingOutput( cWindowAC_UnitTypes( WindAC( WindACNum ).UnitType ), WindAC( WindACNum ).Name, "Design Size Maximum Supply Air Flow Rate [m3/s]", MaxAirVolFlowDes );
-				} else {
-					if ( WindAC( WindACNum ).MaxAirVolFlow > 0.0 && MaxAirVolFlowDes > 0.0 ) {
-						MaxAirVolFlowUser = WindAC( WindACNum ).MaxAirVolFlow;
-						ReportSizingOutput( cWindowAC_UnitTypes( WindAC( WindACNum ).UnitType ), WindAC( WindACNum ).Name, "Design Size Maximum Supply Air Flow Rate [m3/s]", MaxAirVolFlowDes, "User-Specified Maximum Supply Air Flow Rate [m3/s]", MaxAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxAirVolFlowDes - MaxAirVolFlowUser ) / MaxAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeWindowAC: Potential issue with equipment sizing for " + cWindowAC_UnitTypes( WindAC( WindACNum ).UnitType ) + ' ' + WindAC( WindACNum ).Name );
-								ShowContinueError( "User-Specified Maximum Supply Air Flow Rate of " + RoundSigDigits( MaxAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Supply Air Flow Rate of " + RoundSigDigits( MaxAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
+			if ( WindAC( WindACNum ).HVACSizingIndex > 0 ) {
+				zoneHVACIndex = WindAC( WindACNum ).HVACSizingIndex;
+				// N1 , \field Maximum Supply Air Flow Rate
+				SizingMethod = CoolingAirflowSizing;
+				FieldNum = 1;
+				SizingString = WindACNumericFields( WindACNum ).FieldNames( FieldNum ) + " [m3/s]";
+				PrintFlag = true;
+				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+					if ( SAFMethod == SupplyAirFlowRate ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						}
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					} else if ( SAFMethod == FlowPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+						DataScalableSizingON = true;
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+						TempSize = AutoSize;
+						DataScalableSizingON = true;
+					} else {
+						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					}
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					WindAC( WindACNum ).MaxAirVolFlow = TempSize;
+
+				} else if ( SAFMethod == FlowPerCoolingCapacity ) {
+					SizingMethod = CoolingCapacitySizing;
+					TempSize = AutoSize;
+					PrintFlag = false;
+					DataScalableSizingON = true;
+					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+					if ( ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod == FractionOfAutosizedCoolingCapacity ) {
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+					}
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					DataCapacityUsedForSizing = TempSize;
+					DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					SizingMethod = CoolingAirflowSizing;
+					PrintFlag = true;
+					TempSize = AutoSize;
+					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+					WindAC( WindACNum ).MaxAirVolFlow = TempSize;
+				}
+				//DataScalableSizingON = false;
+
+				// initialize capacity sizing variables: cooling
+				CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
+				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+				if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+					if ( CapSizingMethod == HeatingDesignCapacity ){
+						if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
+							ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+						}
+					} else if ( CapSizingMethod == CapacityPerFloorArea ){
+						ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+						ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
+						DataScalableCapSizingON = true;
+					} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+						DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+						DataScalableCapSizingON = true;
 					}
 				}
+			} else {
+				// no scalble sizing method has been specified. Sizing proceeds using the method
+				// specified in the zoneHVAC object
+				// N1 , \field Maximum Supply Air Flow Rate
+				SizingMethod = SystemAirflowSizing;
+				FieldNum = 1;
+				PrintFlag = true;
+				SizingString = WindACNumericFields( WindACNum ).FieldNames( FieldNum ) + " [m3/s]";
+				TempSize = WindAC( WindACNum ).MaxAirVolFlow;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				WindAC( WindACNum ).MaxAirVolFlow = TempSize;
 			}
 		}
 
@@ -1583,7 +1675,7 @@ namespace WindowAC {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

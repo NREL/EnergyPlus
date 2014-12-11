@@ -291,17 +291,11 @@ namespace SolarCollectors {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNumbers, true );
 
 		NumOfCollectors = NumFlatPlateUnits + NumOfICSUnits;
 		NumOfParameters = NumOfFlatPlateParam + NumOfICSParam;
@@ -715,8 +709,7 @@ namespace SolarCollectors {
 			if ( ErrorsFound ) ShowFatalError( "Errors in " + CurrentModuleObject + " input." );
 
 			if ( NumOfCollectors > 0 ) {
-				CheckEquipName.allocate( NumOfCollectors );
-				CheckEquipName = true;
+				CheckEquipName.dimension( NumOfCollectors, true );
 			}
 
 		}
@@ -1073,12 +1066,12 @@ namespace SolarCollectors {
 				if ( ( -FpULTest / mCpA ) < 700.0 ) {
 					FlowMod = mCpA * ( 1.0 - std::exp( -FpULTest / mCpA ) );
 				} else { // avoid EXP(too large #)
-					FlowMod = FlowMod;
+					//FlowMod = FlowMod; // Self-assignment commented out
 				}
 				if ( ( -FpULTest / mCpATest ) < 700.0 ) {
 					FlowMod /= ( mCpATest * ( 1.0 - std::exp( -FpULTest / mCpATest ) ) );
 				} else {
-					FlowMod = FlowMod;
+					//FlowMod = FlowMod; // Self-assignment commented out
 				}
 
 				// Calculate fluid heat gain (or loss)
@@ -1186,7 +1179,7 @@ namespace SolarCollectors {
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 s; // Intermediate variable
@@ -2334,7 +2327,7 @@ namespace SolarCollectors {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

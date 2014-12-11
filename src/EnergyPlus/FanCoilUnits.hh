@@ -145,6 +145,9 @@ namespace FanCoilUnits {
 		int ATMixerPriNode; // primary inlet air node number for the air terminal mixer
 		int ATMixerSecNode; // secondary air inlet node number for the air terminal mixer
 		int ATMixerOutNode; // outlet air node number for the air terminal mixer
+		int ZonePtr; // pointer to a zone served by a fancoil unit
+		int HVACSizingIndex; // index of a HVACSizing object for a fancoil unit
+
 		// Report data
 		Real64 HeatPower; // unit heating output in watts
 		Real64 HeatEnergy; // unit heating output in J
@@ -220,6 +223,8 @@ namespace FanCoilUnits {
 			ATMixerPriNode( 0 ),
 			ATMixerSecNode( 0 ),
 			ATMixerOutNode( 0 ),
+			ZonePtr( 0 ),
+			HVACSizingIndex( 0 ),
 			HeatPower( 0.0 ),
 			HeatEnergy( 0.0 ),
 			TotCoolPower( 0.0 ),
@@ -312,6 +317,8 @@ namespace FanCoilUnits {
 			int const ATMixerPriNode, // primary inlet air node number for the air terminal mixer
 			int const ATMixerSecNode, // secondary air inlet node number for the air terminal mixer
 			int const ATMixerOutNode, // outlet air node number for the air terminal mixer
+			int const ZonePtr, // pointer to a zone served by a fancoil unit
+			int const HVACSizingIndex, // index of a HVACSizing object for a fancoil unit
 			Real64 const HeatPower, // unit heating output in watts
 			Real64 const HeatEnergy, // unit heating output in J
 			Real64 const TotCoolPower, // unit total cooling power output in watts
@@ -401,6 +408,8 @@ namespace FanCoilUnits {
 			ATMixerPriNode( ATMixerPriNode ),
 			ATMixerSecNode( ATMixerSecNode ),
 			ATMixerOutNode( ATMixerOutNode ),
+			ZonePtr( ZonePtr ),
+			HVACSizingIndex( HVACSizingIndex ),
 			HeatPower( HeatPower ),
 			HeatEnergy( HeatEnergy ),
 			TotCoolPower( TotCoolPower ),
@@ -415,8 +424,26 @@ namespace FanCoilUnits {
 
 	};
 
+	struct FanCoilNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		FanCoilNumericFieldData()
+		{}
+
+		// Member Constructor
+		FanCoilNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< FanCoilData > FanCoil;
+	extern FArray1D< FanCoilNumericFieldData > FanCoilNumericFields;
 
 	// Functions
 
@@ -442,6 +469,16 @@ namespace FanCoilUnits {
 
 	void
 	SizeFanCoilUnit( int const FanCoilNum );
+
+	void
+		SizeCoilWaterFlowRate(
+		std::string const & WaterCoilType,
+		std::string const & WaterCoilName,
+		int const WaterCoilType_Num,
+		int const WLoopNum,
+		Real64 & MaxWaterVolFlowDes,
+		Real64 & DesignLoad,
+		bool & ErrorsFound);
 
 	void
 	Sim4PipeFanCoil(
@@ -495,7 +532,7 @@ namespace FanCoilUnits {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

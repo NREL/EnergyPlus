@@ -108,6 +108,7 @@ namespace Fans {
 	bool LocalTurnFansOn( false ); // If True, overrides fan schedule and cycles ZoneHVAC component fans on
 	bool LocalTurnFansOff( false ); // If True, overrides fan schedule and LocalTurnFansOn and
 	// forces ZoneHVAC comp fans off
+	static FArray1D_bool MySizeFlag;
 
 	// Subroutine Specifications for the Module
 	// Driver/Manager Routines
@@ -370,25 +371,18 @@ namespace Fans {
 		}
 
 		cAlphaArgs.allocate( MaxAlphas );
-		cAlphaArgs = "";
 		cAlphaFieldNames.allocate( MaxAlphas );
-		cAlphaFieldNames = "";
-		lAlphaFieldBlanks.allocate( MaxAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( MaxAlphas, false );
 		cNumericFieldNames.allocate( MaxNumbers );
-		cNumericFieldNames = "";
-		lNumericFieldBlanks.allocate( MaxNumbers );
-		lNumericFieldBlanks = false;
-		rNumericArgs.allocate( MaxNumbers );
-		rNumericArgs = 0.0;
+		lNumericFieldBlanks.dimension( MaxNumbers, false );
+		rNumericArgs.dimension( MaxNumbers, 0.0 );
 
 		NumFans = NumSimpFan + NumVarVolFan + NumZoneExhFan + NumOnOff + NumCompModelFan; // cpw1Mar2010 Add NumCompModelFan
 		if ( NumFans > 0 ) {
 			Fan.allocate( NumFans );
 			FanNumericFields.allocate( NumFans );
 		}
-		CheckEquipName.allocate( NumFans );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumFans, true );
 
 		for ( SimpFanNum = 1; SimpFanNum <= NumSimpFan; ++SimpFanNum ) {
 			FanNum = SimpFanNum;
@@ -893,6 +887,7 @@ namespace Fans {
 		}
 
 		ManageEMS( emsCallFromComponentGetInput );
+		MySizeFlag.dimension( NumFans, true );
 
 	}
 
@@ -951,17 +946,13 @@ namespace Fans {
 		static bool MyOneTimeFlag( true );
 		static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
 		static FArray1D_bool MyEnvrnFlag;
-		static FArray1D_bool MySizeFlag;
 		int Loop;
 
 		// FLOW:
 
 		if ( MyOneTimeFlag ) {
 
-			MyEnvrnFlag.allocate( NumFans );
-			MySizeFlag.allocate( NumFans );
-			MyEnvrnFlag = true;
-			MySizeFlag = true;
+			MyEnvrnFlag.dimension( NumFans, true );
 
 			MyOneTimeFlag = false;
 
@@ -3071,6 +3062,122 @@ namespace Fans {
 
 	}
 
+	Real64
+	FanDesDT(
+		int const FanNum, // index of fan in Fan array
+		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   August 2014
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function calculates and returns the design fan delta T from the fan input data
+
+		// METHODOLOGY EMPLOYED:
+		// Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
+		//              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
+		//              Qdot,air = cp,air*rho,air*Vdot*deltaT
+
+		// REFERENCES: EnergyPlus Engineering Reference
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+
+		// Return value
+		Real64 DesignDeltaT; // returned delta T of matched fan [delta deg C]
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 RhoAir; // density of air [kg/m3]
+		Real64 CpAir;  // specific heat of air [J/kg-K]
+		Real64 DeltaP; // fan design pressure rise [N/m2]
+		Real64 TotEff; // fan design total efficiency
+		Real64 MotEff; // fan design motor efficiency
+		Real64 MotInAirFrac; // fraction of motor in the air stream
+		Real64 PowerLossToAir; // fan and motor loss to air stream (W)
+		//
+		if ( FanNum == 0 ) {
+			DesignDeltaT = 0.0;
+		}
+		else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+			DeltaP = Fan( FanNum ).DeltaPress;
+			TotEff = Fan( FanNum ).FanEff;
+			MotEff = Fan( FanNum ).MotEff;
+			MotInAirFrac = Fan( FanNum ).MotInAirFrac;
+			RhoAir = StdRhoAir;
+			CpAir = PsyCpAirFnWTdb( constant_zero, constant_twenty );
+			DesignDeltaT = ( DeltaP / ( RhoAir * CpAir * TotEff ) ) * ( MotEff + MotInAirFrac * ( 1.0 - MotEff ) );
+		}
+		else {
+			DesignDeltaT = 0.0;
+		}
+
+		return DesignDeltaT;
+
+	} // FanDesDT
+
+	Real64
+	FanDesHeatGain(
+		int const FanNum, // index of fan in Fan array
+		Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
+	)
+	{
+		// FUNCTION INFORMATION:
+		//       AUTHOR         Fred Buhl
+		//       DATE WRITTEN   August 2014
+		//       MODIFIED
+		//       RE-ENGINEERED  na
+
+		// PURPOSE OF THIS FUNCTION:
+		// This function calculates and returns the design fan heat gain from the fan input data
+
+		// METHODOLOGY EMPLOYED:
+		// Simple fan:  Qdot,tot = (Vdot*deltaP)/Eff,tot
+		//              Qdot,air = Eff,mot*Qdot,tot + (Qdot,tot - Eff,mot*Qdot,tot)*Frac,mot-in-airstream
+
+		// REFERENCES: EnergyPlus Engineering Reference
+
+		// Using/Aliasing
+		using InputProcessor::FindItemInList;
+		using DataSizing::CurSysNum;
+		using DataAirLoop::AirLoopControlInfo;
+
+		// Return value
+		Real64 DesignHeatGain; // returned heat gain of matched fan [W]
+
+		// FUNCTION LOCAL VARIABLE DECLARATIONS:
+		Real64 RhoAir; // density of air [kg/m3]
+		Real64 CpAir;  // specific heat of air [J/kg-K]
+		Real64 DeltaP; // fan design pressure rise [N/m2]
+		Real64 TotEff; // fan design total efficiency
+		Real64 MotEff; // fan design motor efficiency
+		Real64 MotInAirFrac; // fraction of motor in the air stream
+		Real64 FanPowerTot; // total fan power consumption [W]
+		//
+		if ( FanNum == 0 ) {
+			DesignHeatGain = 0.0;
+		} else if ( Fan( FanNum ).FanType_Num != FanType_ComponentModel ) {
+			DeltaP = Fan( FanNum ).DeltaPress;
+			TotEff = Fan( FanNum ).FanEff;
+			MotEff = Fan( FanNum ).MotEff;
+			MotInAirFrac = Fan( FanNum ).MotInAirFrac;
+			FanPowerTot = ( FanVolFlow * DeltaP ) / TotEff;
+			DesignHeatGain = MotEff*FanPowerTot + ( FanPowerTot - MotEff * FanPowerTot ) * MotInAirFrac;
+		} else {
+			if ( !SysSizingCalc && MySizeFlag( FanNum ) ) {
+				SizeFan( FanNum );
+				MySizeFlag( FanNum ) = false;
+			}
+			DesignHeatGain = Fan( FanNum ).FanShaftPower + ( Fan( FanNum ).MotorInputPower - Fan( FanNum ).FanShaftPower ) * Fan( FanNum ).MotInAirFrac;
+		}
+
+		return DesignHeatGain;
+
+	} // FanDesHeatGain
+
 	// End of Utility subroutines for the Fan Module
 	// *****************************************************************************
 
@@ -3083,7 +3190,7 @@ namespace Fans {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -527,8 +527,7 @@ namespace HVACUnitaryBypassVAV {
 
 		// allocate the data structures
 		CBVAV.allocate( NumCBVAV );
-		CheckEquipName.allocate( NumCBVAV );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumCBVAV, true );
 
 		// loop over CBVAV units; get and load the input data
 		for ( CBVAVIndex = 1; CBVAVIndex <= NumCBVAV; ++CBVAVIndex ) {
@@ -3255,7 +3254,7 @@ namespace HVACUnitaryBypassVAV {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

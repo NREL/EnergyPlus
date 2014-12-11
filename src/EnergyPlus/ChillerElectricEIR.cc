@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -317,7 +318,7 @@ namespace ChillerElectricEIR {
 		bool Okay;
 
 		// Formats
-		static gio::Fmt const Format_530( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_530( "('Curve Output = ',11(F7.2))" );
 
 		// FLOW
 
@@ -333,13 +334,12 @@ namespace ChillerElectricEIR {
 		// ALLOCATE ARRAYS
 		ElectricEIRChiller.allocate( NumElectricEIRChillers );
 		ElectricEIRChillerReport.allocate( NumElectricEIRChillers );
-		CheckEquipName.allocate( NumElectricEIRChillers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumElectricEIRChillers, true );
 		AllocatedFlag = true;
 
 		// Load arrays with electric EIR chiller data
 		for ( EIRChillerNum = 1; EIRChillerNum <= NumElectricEIRChillers; ++EIRChillerNum ) {
-			GetObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, _, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+			GetObjectItem( cCurrentModuleObject, EIRChillerNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 
 			IsNotOK = false;
 			IsBlank = false;
@@ -653,7 +653,7 @@ namespace ChillerElectricEIR {
 					ShowContinueError( "EIR as a function of PLR curve output at various part-load ratios shown below:" );
 					ShowContinueError( "PLR          =    0.00   0.10   0.20   0.30   0.40   0.50   0.60   0.70   0.80   0.90   1.00" );
 					gio::write( StringVar, "'Curve Output = '" );
-					gio::Fmt const fmtF72( "((F7.2),$)" );
+					static gio::Fmt fmtF72( "((F7.2),$)" );
 					for ( CurveValPtr = 1; CurveValPtr <= 11; ++CurveValPtr ) {
 						gio::write( StringVar, fmtF72 ) << CurveValArray( CurveValPtr );
 					}
@@ -822,7 +822,7 @@ namespace ChillerElectricEIR {
 		Real64 rho; // local fluid density
 		Real64 mdot; // local fluid mass flow rate
 		Real64 mdotCond; // local fluid mass flow rate for condenser
-		Real64 THeatRecSetPoint; // tests set point node for proper set point value
+		Real64 THeatRecSetPoint( 0.0 ); // tests set point node for proper set point value
 		int LoopNum;
 		int LoopSideNum;
 		int BranchIndex;
@@ -959,6 +959,8 @@ namespace ChillerElectricEIR {
 						THeatRecSetPoint = Node( ElectricEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum ).TempSetPoint;
 					} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 						THeatRecSetPoint = Node( ElectricEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum ).TempSetPointHi;
+					} else {
+						assert( false );
 					}}
 					if ( THeatRecSetPoint == SensedNodeFlagValue ) {
 						if ( ! AnyEnergyManagementSystemInModel ) {
@@ -1100,8 +1102,7 @@ namespace ChillerElectricEIR {
 		Real64 CondVolFlowRateUser; // Hardsized condenser flow for reporting
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumElectricEIRChillers );
-			MyFlag = true;
+			MyFlag.dimension( NumElectricEIRChillers, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1366,7 +1367,7 @@ namespace ChillerElectricEIR {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcElectricEIRChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
@@ -1382,10 +1383,10 @@ namespace ChillerElectricEIR {
 		Real64 MaxPartLoadRat; // Max allowed operating fraction of full load
 		Real64 EvapInletTemp; // Evaporator inlet temperature [C]
 		Real64 CondInletTemp; // Condenser inlet temperature [C]
-		Real64 EvapOutletTempSetPoint; // Evaporator outlet temperature setpoint [C]
+		Real64 EvapOutletTempSetPoint( 0.0 ); // Evaporator outlet temperature setpoint [C]
 		Real64 AvailChillerCap; // Chiller available capacity at current operating conditions [W]
 		Real64 ChillerRefCap; // Chiller reference capacity
-		Real64 EvapDeltaTemp; // Evaporator temperature difference [C]
+		Real64 EvapDeltaTemp( 0.0 ); // Evaporator temperature difference [C]
 		Real64 ReferenceCOP; // Reference coefficient of performance, from user input
 		Real64 PartLoadRat; // Operating part load ratio
 		Real64 TempLowLimitEout; // Evaporator low temp. limit cut off [C]
@@ -1395,7 +1396,7 @@ namespace ChillerElectricEIR {
 		int CondInletNode; // Condenser inlet node number
 		int CondOutletNode; // Condenser outlet node number
 		//  LOGICAL,SAVE           :: PossibleSubcooling
-		Real64 TempLoad; // Actual load to be met by chiller. This value is compared to MyLoad
+		Real64 TempLoad( 0.0 ); // Actual load to be met by chiller. This value is compared to MyLoad
 		// and reset when necessary since this chiller can cycle, the load passed
 		// should be the actual load. Instead the minimum PLR * RefCap is
 		// passed in. [W]
@@ -1553,6 +1554,8 @@ namespace ChillerElectricEIR {
 			} else { // use plant loop overall setpoint
 				EvapOutletTempSetPoint = Node( PlantLoop( PlantLoopNum ).TempSetPointNodeNum ).TempSetPointHi;
 			}
+		} else {
+			assert( false );
 		}}
 
 		// correct temperature if using heat recovery
@@ -1598,6 +1601,8 @@ namespace ChillerElectricEIR {
 				TempLoad = EvapMassFlowRate * Cp * ( Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPoint );
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				TempLoad = EvapMassFlowRate * Cp * ( Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPointHi );
+			} else {
+				assert( false );
 			}}
 			TempLoad = max( 0.0, TempLoad );
 
@@ -1647,6 +1652,8 @@ namespace ChillerElectricEIR {
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPoint;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPointHi;
+			} else {
+				assert( false );
 			}}
 
 			if ( EvapDeltaTemp != 0 ) {
@@ -1915,7 +1922,7 @@ namespace ChillerElectricEIR {
 		Real64 TAvgOut; // Average outlet temperature [C]
 		Real64 CpHeatRec; // Heat reclaim water inlet specific heat [J/kg-K]
 		Real64 CpCond; // Condenser water inlet specific heat [J/kg-K]
-		Real64 THeatRecSetPoint; // local value for heat recovery leaving setpoint [C]
+		Real64 THeatRecSetPoint( 0.0 ); // local value for heat recovery leaving setpoint [C]
 		Real64 QHeatRecToSetPoint; // load to heat recovery setpoint
 		Real64 HeatRecHighInletLimit; // local value for inlet limit for heat recovery [C]
 
@@ -1951,6 +1958,8 @@ namespace ChillerElectricEIR {
 				THeatRecSetPoint = Node( ElectricEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum ).TempSetPoint;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				THeatRecSetPoint = Node( ElectricEIRChiller( EIRChillNum ).HeatRecSetPointNodeNum ).TempSetPointHi;
+			} else {
+				assert( false );
 			}}
 
 			QHeatRecToSetPoint = HeatRecMassFlowRate * CpHeatRec * ( THeatRecSetPoint - HeatRecInletTemp );

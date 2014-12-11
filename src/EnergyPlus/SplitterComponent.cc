@@ -239,22 +239,15 @@ namespace SplitterComponent {
 		NumSplitters = GetNumObjectsFound( CurrentModuleObject );
 
 		if ( NumSplitters > 0 ) SplitterCond.allocate( NumSplitters );
-		CheckEquipName.allocate( NumSplitters );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSplitters, true );
 
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNums );
 		AlphArray.allocate( NumAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
-		NumArray.allocate( NumNums );
-		NumArray = 0.0;
+		lNumericBlanks.dimension( NumNums, true );
+		NumArray.dimension( NumNums, 0.0 );
 
 		for ( SplitterNum = 1; SplitterNum <= NumSplitters; ++SplitterNum ) {
 			GetObjectItem( CurrentModuleObject, SplitterNum, AlphArray, NumAlphas, NumArray, NumNums, IOStat, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields )  ;
@@ -873,7 +866,7 @@ namespace SplitterComponent {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

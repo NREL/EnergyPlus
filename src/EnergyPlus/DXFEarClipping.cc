@@ -45,13 +45,11 @@ namespace DXFEarClipping {
 	using namespace DataPrecisionGlobals;
 	using namespace DataVectorTypes;
 	using DataGlobals::Pi;
-	using DataGlobals::DegToRadians;
+	using DataGlobals::TwoPi;
+	using DataGlobals::RadToDeg;
 	using DataGlobals::OutputFileDebug;
 
 	// Data
-	// Module parameter definitions:
-	Real64 const twopi( Pi * 2.0 ); // 6.283185307179586476925287D0
-	Real64 const radtodeg( 1.0 / DegToRadians ); // 57.2957795
 
 	// Derived type definitions:
 	// na
@@ -125,7 +123,7 @@ namespace DXFEarClipping {
 			}
 		}
 
-		if ( std::abs( anglesum - twopi ) <= epsilon ) {
+		if ( std::abs( anglesum - TwoPi ) <= epsilon ) {
 			InPolygon = true;
 		}
 
@@ -195,8 +193,7 @@ namespace DXFEarClipping {
 
 		// Subroutine parameter definitions:
 		Real64 const point_tolerance( 0.00001 );
-		Real64 const twopiang( ( 180.0 / radtodeg ) );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// Interface block specifications:
 		// na
@@ -303,8 +300,8 @@ namespace DXFEarClipping {
 					gio::write( line, fmtLD ) << "number of triangles found=" << ncount;
 					ShowMessage( line );
 					for ( j = 1; j <= nrangles; ++j ) {
-						//          write(line,"(' r angle=',i2,' vert=',i2,' deg=',f6.1)") j,r_angles(j),rangles(j)*radtodeg
-						line = " r angle=" + RoundSigDigits( j ) + " vert=" + RoundSigDigits( r_angles( j ) ) + " deg=" + RoundSigDigits( rangles( j ) * radtodeg, 1 );
+						//          write(line,"(' r angle=',i2,' vert=',i2,' deg=',f6.1)") j,r_angles(j),rangles(j)*RadToDeg
+						line = " r angle=" + RoundSigDigits( j ) + " vert=" + RoundSigDigits( r_angles( j ) ) + " deg=" + RoundSigDigits( rangles( j ) * RadToDeg, 1 );
 						ShowMessage( line );
 					}
 				}
@@ -552,8 +549,7 @@ namespace DXFEarClipping {
 		// Subroutine argument definitions:
 
 		// Subroutine parameter definitions:
-		Real64 const twopi_rad( ( 180.0 / radtodeg ) );
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// Interface block specifications:
 		// na
@@ -611,7 +607,7 @@ namespace DXFEarClipping {
 
 			ang = angle_2dvector( vertex( svert ).x, vertex( svert ).y, vertex( mvert ).x, vertex( mvert ).y, vertex( evert ).x, vertex( evert ).y );
 
-			if ( ang > twopi_rad ) { // sufficiently close to 180 degrees.
+			if ( ang > Pi ) { // sufficiently close to 180 degrees.
 				++nrverts;
 				r_vertices( nrverts ) = mvert;
 				rangles( nrverts ) = ang;
@@ -719,7 +715,7 @@ namespace DXFEarClipping {
 		alpha = surfazimuth;
 
 		alpha180 = 180.0 - alpha; // amount to rotate
-		alphrad = alpha180 / radtodeg;
+		alphrad = alpha180 / RadToDeg;
 
 		for ( i = 1; i <= nsides; ++i ) {
 			xvt( i ) = std::cos( alphrad ) * polygon( i ).x + std::sin( alphrad ) * polygon( i ).y;
@@ -785,7 +781,7 @@ namespace DXFEarClipping {
 
 		alpha = -surftilt;
 
-		alphrad = alpha / radtodeg;
+		alphrad = alpha / RadToDeg;
 
 		for ( i = 1; i <= nsides; ++i ) {
 			xvt( i ) = polygon( i ).x;

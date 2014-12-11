@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -246,10 +247,8 @@ namespace BoilerSteam {
 
 		// Boiler will have fuel input to it , that is it !
 		Boiler.allocate( NumBoilers );
-		CheckEquipName.allocate( NumBoilers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumBoilers, true );
 		BoilerFuelTypeForOutputVariable.allocate( NumBoilers );
-		BoilerFuelTypeForOutputVariable = "";
 
 		BoilerReport.allocate( NumBoilers );
 
@@ -746,7 +745,7 @@ namespace BoilerSteam {
 		Real64 BoilerMinPLR; // boiler minimum part load ratio
 		Real64 TheorFuelUse; // Theoretical (stoichiometric) fuel use
 		Real64 OperPLR; // operating part load ratio
-		Real64 BoilerDeltaTemp; // C - boiler inlet to outlet temperature difference
+		Real64 BoilerDeltaTemp( 0.0 ); // C - boiler inlet to outlet temperature difference
 		Real64 TempUpLimitBout; // C - boiler high temperature limit
 		Real64 BoilerMassFlowRateMax; // Max Design Boiler Mass Flow Rate converted from Volume Flow Rate
 		Real64 EnthSteamOutDry;
@@ -818,6 +817,8 @@ namespace BoilerSteam {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPoint - Node( BoilerInletNode ).Temp;
 			} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 				BoilerDeltaTemp = Node( BoilerOutletNode ).TempSetPointLo - Node( BoilerInletNode ).Temp;
+			} else {
+				assert( false );
 			}}
 			BoilerOutletTemp = BoilerDeltaTemp + Node( BoilerInletNode ).Temp;
 
@@ -1045,7 +1046,7 @@ namespace BoilerSteam {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

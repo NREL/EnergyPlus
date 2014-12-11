@@ -186,6 +186,9 @@ namespace PurchasedAirManager {
 		Real64 HtRecTotCoolRate; // Total    cooling rate from heat reocovery [W]
 		Real64 TimeEconoActive; // Time economizer is active [hrs]
 		Real64 TimeHtRecActive; // Time heat reocovery is active [hrs]
+		int ZonePtr; // pointer to a zone served by an Ideal load air system
+		int HVACSizingIndex; // index of a HVAC Sizing object for an Ideal load air system
+
 
 		// Default Constructor
 		ZonePurchasedAir() :
@@ -297,7 +300,9 @@ namespace PurchasedAirManager {
 			HtRecLatCoolRate( 0.0 ),
 			HtRecTotCoolRate( 0.0 ),
 			TimeEconoActive( 0.0 ),
-			TimeHtRecActive( 0.0 )
+			TimeHtRecActive( 0.0 ),
+			ZonePtr( 0 ),
+			HVACSizingIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -415,7 +420,9 @@ namespace PurchasedAirManager {
 			Real64 const HtRecLatCoolRate, // Latent   cooling rate from heat reocovery [W]
 			Real64 const HtRecTotCoolRate, // Total    cooling rate from heat reocovery [W]
 			Real64 const TimeEconoActive, // Time economizer is active [hrs]
-			Real64 const TimeHtRecActive // Time heat reocovery is active [hrs]
+			Real64 const TimeHtRecActive, // Time heat reocovery is active [hrs]
+			int const ZonePtr, // pointer to a zone served by an Ideal load air system
+			int const HVACSizingIndex // index of a HVAC Sizing object for an Ideal load air system
 		) :
 			cObjectName( cObjectName ),
 			Name( Name ),
@@ -530,13 +537,33 @@ namespace PurchasedAirManager {
 			HtRecLatCoolRate( HtRecLatCoolRate ),
 			HtRecTotCoolRate( HtRecTotCoolRate ),
 			TimeEconoActive( TimeEconoActive ),
-			TimeHtRecActive( TimeHtRecActive )
+			TimeHtRecActive( TimeHtRecActive ),
+			ZonePtr( ZonePtr ),
+			HVACSizingIndex( HVACSizingIndex )
 		{}
 
 	};
 
+	struct PurchAirNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		PurchAirNumericFieldData()
+		{}
+
+		// Member Constructor
+		PurchAirNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< ZonePurchasedAir > PurchAir; // Used to specify purchased air parameters
+	extern FArray1D< PurchAirNumericFieldData > PurchAirNumericFields; // Used to save the indecies of scalable sizing object for zone HVAC
 
 	// Functions
 
@@ -622,7 +649,7 @@ namespace PurchasedAirManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

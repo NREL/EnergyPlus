@@ -15,6 +15,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/IndexSlice.hh>
+#include "ObjexxFCL.unit.hh"
 
 using namespace ObjexxFCL;
 

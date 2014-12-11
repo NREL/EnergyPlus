@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -315,8 +316,7 @@ namespace ChillerGasAbsorption {
 		GasAbsorber.allocate( NumGasAbsorbers );
 
 		GasAbsorberReport.allocate( NumGasAbsorbers );
-		CheckEquipName.allocate( NumGasAbsorbers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumGasAbsorbers, true );
 
 		//LOAD ARRAYS
 
@@ -595,8 +595,7 @@ namespace ChillerGasAbsorption {
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
 			MyPlantScanFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag.allocate( NumGasAbsorbers );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumGasAbsorbers, true );
 			MyOneTimeFlag = false;
 			MyPlantScanFlag = true;
 		}
@@ -1199,7 +1198,7 @@ namespace ChillerGasAbsorption {
 
 		// other local variables
 		Real64 ChillDeltaTemp; // chilled water temperature difference
-		Real64 ChillSupplySetPointTemp;
+		Real64 ChillSupplySetPointTemp( 0.0 );
 
 		Real64 calcCondTemp; // the condenser temperature used for curve calculation
 		// either return or supply depending on user input
@@ -1285,6 +1284,8 @@ namespace ChillerGasAbsorption {
 			ChillSupplySetPointTemp = Node( lChillSupplyNodeNum ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			ChillSupplySetPointTemp = Node( lChillSupplyNodeNum ).TempSetPointHi;
+		} else {
+			assert( false );
 		}}
 		ChillDeltaTemp = std::abs( lChillReturnTemp - ChillSupplySetPointTemp );
 
@@ -1595,7 +1596,7 @@ namespace ChillerGasAbsorption {
 		Real64 lHotWaterMassFlowRateMax; // Maximum flow rate through the evaporator
 		// other local variables
 		Real64 HeatDeltaTemp; // hot water temperature difference
-		Real64 HeatSupplySetPointTemp;
+		Real64 HeatSupplySetPointTemp( 0.0 );
 		int LoopNum;
 		int LoopSideNum;
 		Real64 Cp_HW; // local fluid specific heat for hot water
@@ -1661,6 +1662,8 @@ namespace ChillerGasAbsorption {
 			HeatSupplySetPointTemp = Node( lHeatSupplyNodeNum ).TempSetPoint;
 		} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 			HeatSupplySetPointTemp = Node( lHeatSupplyNodeNum ).TempSetPointLo;
+		} else {
+			assert( false );
 		}}
 		HeatDeltaTemp = std::abs( lHotWaterReturnTemp - HeatSupplySetPointTemp );
 
@@ -1976,7 +1979,7 @@ namespace ChillerGasAbsorption {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -926,7 +926,8 @@ namespace HVACVariableRefrigerantFlow {
 		Real64 EMSValueForPartLoadFrac; // user defined value for EMS function
 		int IterLimitExceeded; // index used for warning messages
 		int FirstIterfailed; // index used for warning messages
-
+		int ZonePtr; // pointer to a zone served by a VRF terminal unit
+		int HVACSizingIndex; // index of a HVACSizing object for a VRF terminal
 		// Default Constructor
 		VRFTerminalUnitEquipment() :
 			VRFTUType_Num( 0 ),
@@ -996,7 +997,9 @@ namespace HVACVariableRefrigerantFlow {
 			EMSOverridePartLoadFrac( false ),
 			EMSValueForPartLoadFrac( 0.0 ),
 			IterLimitExceeded( 0 ),
-			FirstIterfailed( 0 )
+			FirstIterfailed( 0 ),
+			ZonePtr( 0 ), 
+			HVACSizingIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -1071,7 +1074,9 @@ namespace HVACVariableRefrigerantFlow {
 			bool const EMSOverridePartLoadFrac, // User defined EMS function
 			Real64 const EMSValueForPartLoadFrac, // user defined value for EMS function
 			int const IterLimitExceeded, // index used for warning messages
-			int const FirstIterfailed // index used for warning messages
+			int const FirstIterfailed, // index used for warning messages
+			int const ZonePtr, // pointer to a zone served by a VRF terminal
+			int const HVACSizingIndex // index of a HVACSizing object for a VRF terminal
 		) :
 			Name( Name ),
 			VRFTUType_Num( VRFTUType_Num ),
@@ -1143,15 +1148,37 @@ namespace HVACVariableRefrigerantFlow {
 			EMSOverridePartLoadFrac( EMSOverridePartLoadFrac ),
 			EMSValueForPartLoadFrac( EMSValueForPartLoadFrac ),
 			IterLimitExceeded( IterLimitExceeded ),
-			FirstIterfailed( FirstIterfailed )
+			FirstIterfailed( FirstIterfailed ),
+			ZonePtr( ZonePtr ), 
+			HVACSizingIndex( HVACSizingIndex )
 		{}
 
 	};
+
+
+	struct VRFTUNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		VRFTUNumericFieldData()
+		{}
+
+		// Member Constructor
+		VRFTUNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames( FieldNames )
+		{}
+	};
+
 
 	// Object Data
 	extern FArray1D< VRFCondenserEquipment > VRF; // AirConditioner:VariableRefrigerantFlow object
 	extern FArray1D< VRFTerminalUnitEquipment > VRFTU; // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
 	extern FArray1D< TerminalUnitListData > TerminalUnitList; // zoneTerminalUnitList object
+	extern FArray1D< VRFTUNumericFieldData > VRFTUNumericFields; // holds VRF TU numeric input fields character field name 
 
 	// Functions
 
@@ -1374,7 +1401,7 @@ namespace HVACVariableRefrigerantFlow {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -726,8 +726,7 @@ namespace GroundHeatExchangers {
 		VerticalGlhe.allocate( NumVerticalGlhes );
 
 		VerticalGlheReport.allocate( NumVerticalGlhes );
-		CheckEquipName.allocate( NumVerticalGlhes );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumVerticalGlhes, true );
 
 		for ( GlheNum = 1; GlheNum <= NumVerticalGlhes; ++GlheNum ) {
 			GetObjectItem( cCurrentModuleObject, GlheNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -1312,7 +1311,7 @@ namespace GroundHeatExchangers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

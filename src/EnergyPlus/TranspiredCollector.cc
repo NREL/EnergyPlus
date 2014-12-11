@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -314,10 +315,8 @@ namespace TranspiredCollector {
 		NumUTSCSplitter = GetNumObjectsFound( CurrentModuleMultiObject );
 
 		UTSC.allocate( NumUTSC );
-		CheckEquipName.allocate( NumUTSC );
-		CheckEquipName = true;
-		SplitterNameOK.allocate( NumUTSCSplitter );
-		SplitterNameOK = false;
+		CheckEquipName.dimension( NumUTSC, true );
+		SplitterNameOK.dimension( NumUTSCSplitter, false );
 
 		for ( Item = 1; Item <= NumUTSC; ++Item ) {
 			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
@@ -673,8 +672,7 @@ namespace TranspiredCollector {
 				}
 			}
 
-			MyEnvrnFlag.allocate( NumUTSC );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumUTSC, true );
 			MyOneTimeFlag = false;
 		} //first time
 
@@ -906,18 +904,13 @@ namespace TranspiredCollector {
 		//loop through underlying surfaces and collect needed data
 		// now collect average values for things associated with the underlying surface(s)
 		NumSurfs = UTSC( UTSCNum ).NumSurfs;
-		HSkyARR.allocate( NumSurfs );
-		HSkyARR = 0.0;
-		HGroundARR.allocate( NumSurfs );
-		HGroundARR = 0.0;
-		HAirARR.allocate( NumSurfs );
-		HAirARR = 0.0;
-		LocalWindArr.allocate( NumSurfs );
-		LocalWindArr = 0.0;
+		HSkyARR.dimension( NumSurfs, 0.0 );
+		HGroundARR.dimension( NumSurfs, 0.0 );
+		HAirARR.dimension( NumSurfs, 0.0 );
+		LocalWindArr.dimension( NumSurfs, 0.0 );
 		// ALLOCATE(IscARR(NumSurfs))
 		// IscARR = 0.0
-		HPlenARR.allocate( NumSurfs );
-		HPlenARR = 0.0;
+		HPlenARR.dimension( NumSurfs, 0.0 );
 		//  ALLOCATE(TsoARR(NumSurfs))
 		//  TsoARR = 0.0
 
@@ -1125,7 +1118,7 @@ namespace TranspiredCollector {
 		TmpTscoll = UTSC( UTSCNum ).TcollLast;
 		TmpTaPlen = UTSC( UTSCNum ).TplenLast;
 
-		// all the work is done in this routine located in GeneralRoutines.f90
+		// all the work is done in this routine located in GeneralRoutines.cc
 
 		CalcPassiveExteriorBaffleGap( UTSC( UTSCNum ).SurfPtrs, holeArea, UTSC( UTSCNum ).Cv, UTSC( UTSCNum ).Cd, UTSC( UTSCNum ).HdeltaNPL, UTSC( UTSCNum ).SolAbsorp, UTSC( UTSCNum ).LWEmitt, UTSC( UTSCNum ).Tilt, AspRat, UTSC( UTSCNum ).PlenGapThick, UTSC( UTSCNum ).CollRoughness, UTSC( UTSCNum ).QdotSource, TmpTscoll, TmpTaPlen, HcPlen, HrPlen, Isc, MdotVent, VdotWind, VdotThermal );
 
@@ -1416,7 +1409,7 @@ namespace TranspiredCollector {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

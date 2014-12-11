@@ -87,6 +87,7 @@ namespace ElectricBaseboardRadiator {
 
 	// Object Data
 	FArray1D< ElecBaseboardParams > ElecBaseboard;
+	FArray1D< ElecBaseboardNumericFieldData > ElecBaseboardNumericFields;
 
 	// Functions
 
@@ -206,6 +207,7 @@ namespace ElectricBaseboardRadiator {
 		using InputProcessor::GetNumObjectsFound;
 		using InputProcessor::GetObjectItem;
 		using InputProcessor::VerifyName;
+		using InputProcessor::SameString;
 		using InputProcessor::FindItemInList;
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
@@ -213,6 +215,12 @@ namespace ElectricBaseboardRadiator {
 		using General::RoundSigDigits;
 		using ScheduleManager::GetScheduleIndex;
 		using namespace DataIPShortCuts;
+		using General::TrimSigDigits;
+		using DataSizing::AutoSize;
+		using DataSizing::FinalZoneSizing;
+		using DataSizing::HeatingDesignCapacity;
+		using DataSizing::CapacityPerFloorArea;
+		using DataSizing::FractionOfAutosizedHeatingCapacity;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -224,6 +232,10 @@ namespace ElectricBaseboardRadiator {
 		Real64 const MinFraction( 0.0 ); // Minimum limit of fractional values
 		//    INTEGER,PARAMETER :: MaxDistribSurfaces   = 20      ! Maximum number of surfaces that a baseboard heater can radiate to
 		int const MinDistribSurfaces( 1 ); // Minimum number of surfaces that a baseboard heater can radiate to
+		int const iHeatCAPMAlphaNum( 3 ); // get input index to HW baseboard heating capacity sizing method
+		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to HW baseboard heating capacity
+		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to HW baseboard heating capacity per floor area sizing
+		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); // get input index to HW baseboard heating capacity sizing as fraction of autozized heating capacity
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -252,11 +264,17 @@ namespace ElectricBaseboardRadiator {
 
 		ElecBaseboard.allocate( NumElecBaseboards );
 		CheckEquipName.allocate( NumElecBaseboards );
+		ElecBaseboardNumericFields.allocate( NumElecBaseboards );
 		CheckEquipName = true;
 
 		for ( BaseboardNum = 1; BaseboardNum <= NumElecBaseboards; ++BaseboardNum ) {
 
 			GetObjectItem( cCurrentModuleObject, BaseboardNum, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
+
+			ElecBaseboardNumericFields( BaseboardNum ).FieldNames.allocate(NumNumbers);
+			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = "";
+			ElecBaseboardNumericFields( BaseboardNum ).FieldNames = cNumericFieldNames;
+
 			IsNotOK = false;
 			IsBlank = false;
 			VerifyName( cAlphaArgs( 1 ), ElecBaseboard.EquipName(), BaseboardNum, IsNotOK, IsBlank, cCurrentModuleObject + " Name" );
@@ -281,18 +299,77 @@ namespace ElectricBaseboardRadiator {
 					ErrorsFound = true;
 				}
 			}
-			// get inlet node number
-			ElecBaseboard( BaseboardNum ).NominalCapacity = rNumericArgs( 1 );
-			ElecBaseboard( BaseboardNum ).BaseboardEfficiency = rNumericArgs( 2 );
 
-			ElecBaseboard( BaseboardNum ).FracRadiant = rNumericArgs( 3 );
+			// Determine HW radiant baseboard heating design capacity sizing method
+			if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "HeatingDesignCapacity" ) ) {
+				ElecBaseboard( BaseboardNum ).HeatingCapMethod = HeatingDesignCapacity;
+
+				if ( !lNumericFieldBlanks( iHeatDesignCapacityNumericNum ) ) {
+					ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatDesignCapacityNumericNum );
+					if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0 && ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity != AutoSize ) {
+						ShowSevereError( cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName );
+						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatDesignCapacityNumericNum ), 7 ) );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName );
+					ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatDesignCapacityNumericNum ) );
+					ErrorsFound = true;
+				}
+			} else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "CapacityPerFloorArea" ) ) {
+				ElecBaseboard( BaseboardNum ).HeatingCapMethod = CapacityPerFloorArea;
+				if ( !lNumericFieldBlanks( iHeatCapacityPerFloorAreaNumericNum ) ) {
+					ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatCapacityPerFloorAreaNumericNum );
+					if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity <= 0.0 ) {
+						ShowSevereError( cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName);
+						ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFieldNames (iHeatCapacityPerFloorAreaNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatCapacityPerFloorAreaNumericNum ), 7 ) );
+						ErrorsFound = true;
+					}
+					else if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
+						ShowSevereError( cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName );
+						ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+						ShowContinueError( "Illegal " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) + " = Autosize" );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError( cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName);
+					ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatCapacityPerFloorAreaNumericNum ) );
+					ErrorsFound = true;
+				}
+			}
+			else if ( SameString( cAlphaArgs( iHeatCAPMAlphaNum ), "FractionOfAutosizedHeatingCapacity" ) ){
+				ElecBaseboard( BaseboardNum ).HeatingCapMethod = FractionOfAutosizedHeatingCapacity;
+				if ( !lNumericFieldBlanks( iHeatFracOfAutosizedCapacityNumericNum ) ) {
+					ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity = rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum );
+					if (ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity < 0.0) {
+						ShowSevereError(cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName);
+						ShowContinueError("Illegal " + cNumericFieldNames( iHeatFracOfAutosizedCapacityNumericNum ) + " = " + TrimSigDigits( rNumericArgs( iHeatFracOfAutosizedCapacityNumericNum ), 7) );
+						ErrorsFound = true;
+					}
+				} else {
+					ShowSevereError(cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName);
+					ShowContinueError( "Input for " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+					ShowContinueError( "Blank field not allowed for " + cNumericFieldNames( iHeatFracOfAutosizedCapacityNumericNum ) );
+					ErrorsFound = true;
+				}
+			} else {
+				ShowSevereError( cCurrentModuleObject + " = " + ElecBaseboard( BaseboardNum ).EquipName );
+				ShowContinueError( "Illegal " + cAlphaFieldNames( iHeatCAPMAlphaNum ) + " = " + cAlphaArgs( iHeatCAPMAlphaNum ) );
+				ErrorsFound = true;
+			}
+
+			ElecBaseboard( BaseboardNum ).BaseboardEfficiency = rNumericArgs( 4 );
+			ElecBaseboard( BaseboardNum ).FracRadiant = rNumericArgs( 5 );
 			if ( ElecBaseboard( BaseboardNum ).FracRadiant < MinFraction ) {
-				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 3 ) + " was lower than the allowable minimum." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 5 ) + " was lower than the allowable minimum." );
 				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracRadiant = MinFraction;
 			}
 			if ( ElecBaseboard( BaseboardNum ).FracRadiant > MaxFraction ) {
-				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 3 ) + " was higher than the allowable maximum." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 5 ) + " was higher than the allowable maximum." );
 				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracRadiant = MaxFraction;
 			}
@@ -307,19 +384,19 @@ namespace ElectricBaseboardRadiator {
 				ElecBaseboard( BaseboardNum ).FracConvect = 1.0 - AllFracsSummed;
 			}
 
-			ElecBaseboard( BaseboardNum ).FracDistribPerson = rNumericArgs( 4 );
+			ElecBaseboard( BaseboardNum ).FracDistribPerson = rNumericArgs( 6 );
 			if ( ElecBaseboard( BaseboardNum ).FracDistribPerson < MinFraction ) {
-				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 4 ) + " was lower than the allowable minimum." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 6 ) + " was lower than the allowable minimum." );
 				ShowContinueError( "...reset to minimum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracDistribPerson = MinFraction;
 			}
 			if ( ElecBaseboard( BaseboardNum ).FracDistribPerson > MaxFraction ) {
-				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 4 ) + " was higher than the allowable maximum." );
+				ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( 6 ) + " was higher than the allowable maximum." );
 				ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 				ElecBaseboard( BaseboardNum ).FracDistribPerson = MaxFraction;
 			}
 
-			ElecBaseboard( BaseboardNum ).TotSurfToDistrib = NumNumbers - 4;
+			ElecBaseboard( BaseboardNum ).TotSurfToDistrib = NumNumbers - 6;
 			//      IF (ElecBaseboard(BaseboardNum)%TotSurfToDistrib > MaxDistribSurfaces) THEN
 			//        CALL ShowWarningError(RoutineName//TRIM(cCurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))// &
 			//          '", the number of surface/radiant fraction groups entered was higher than the allowable maximum.')
@@ -343,20 +420,20 @@ namespace ElectricBaseboardRadiator {
 
 			AllFracsSummed = ElecBaseboard( BaseboardNum ).FracDistribPerson;
 			for ( SurfNum = 1; SurfNum <= ElecBaseboard( BaseboardNum ).TotSurfToDistrib; ++SurfNum ) {
-				ElecBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 2 );
-				ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 2 ), Surface.Name(), TotSurfaces );
-				ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 4 );
+				ElecBaseboard( BaseboardNum ).SurfaceName( SurfNum ) = cAlphaArgs( SurfNum + 3 );
+				ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) = FindItemInList( cAlphaArgs( SurfNum + 3 ), Surface.Name(), TotSurfaces );
+				ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) = rNumericArgs( SurfNum + 6 );
 				if ( ElecBaseboard( BaseboardNum ).SurfacePtr( SurfNum ) == 0 ) {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 2 ) + "=\"" + cAlphaArgs( SurfNum + 2 ) + "\" invalid - not found." );
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cAlphaFieldNames( SurfNum + 3 ) + "=\"" + cAlphaArgs( SurfNum + 3 ) + "\" invalid - not found." );
 					ErrorsFound = true;
 				}
 				if ( ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) > MaxFraction ) {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 4 ) + "was greater than the allowable maximum." );
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 6 ) + "was greater than the allowable maximum." );
 					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MaxFraction, 2 ) + "]." );
 					ElecBaseboard( BaseboardNum ).TotSurfToDistrib = MaxFraction;
 				}
 				if ( ElecBaseboard( BaseboardNum ).FracDistribToSurf( SurfNum ) < MinFraction ) {
-					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 4 ) + "was less than the allowable minimum." );
+					ShowWarningError( RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", " + cNumericFieldNames( SurfNum + 6 ) + "was less than the allowable minimum." );
 					ShowContinueError( "...reset to maximum value=[" + RoundSigDigits( MinFraction, 2 ) + "]." );
 					ElecBaseboard( BaseboardNum ).TotSurfToDistrib = MinFraction;
 				}
@@ -454,18 +531,12 @@ namespace ElectricBaseboardRadiator {
 			// initialize the environment and sizing flags
 			MyEnvrnFlag.allocate( NumElecBaseboards );
 			MySizeFlag.allocate( NumElecBaseboards );
-			ZeroSourceSumHATsurf.allocate( NumOfZones );
-			ZeroSourceSumHATsurf = 0.0;
-			QBBElecRadSource.allocate( NumElecBaseboards );
-			QBBElecRadSource = 0.0;
-			QBBElecRadSrcAvg.allocate( NumElecBaseboards );
-			QBBElecRadSrcAvg = 0.0;
-			LastQBBElecRadSrc.allocate( NumElecBaseboards );
-			LastQBBElecRadSrc = 0.0;
-			LastSysTimeElapsed.allocate( NumElecBaseboards );
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys.allocate( NumElecBaseboards );
-			LastTimeStepSys = 0.0;
+			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
+			QBBElecRadSource.dimension( NumElecBaseboards, 0.0 );
+			QBBElecRadSrcAvg.dimension( NumElecBaseboards, 0.0 );
+			LastQBBElecRadSrc.dimension( NumElecBaseboards, 0.0 );
+			LastSysTimeElapsed.dimension( NumElecBaseboards, 0.0 );
+			LastTimeStepSys.dimension( NumElecBaseboards, 0.0 );
 			MyEnvrnFlag = true;
 			MySizeFlag = true;
 
@@ -548,6 +619,7 @@ namespace ElectricBaseboardRadiator {
 		//       AUTHOR         Fred Buhl
 		//       DATE WRITTEN   February 2002
 		//       MODIFIED       August 2013 Daeho Kang, add component sizing table entries
+		//                      July 2014, B. Nigusse, added scalable sizing
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -564,13 +636,16 @@ namespace ElectricBaseboardRadiator {
 		// Using/Aliasing
 		using namespace DataSizing;
 		using ReportSizingManager::ReportSizingOutput;
+		using ReportSizingManager::RequestSizing;
 		using General::RoundSigDigits;
+		using DataHVACGlobals::HeatingCapacitySizing;
+		using DataHeatBalance::Zone;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		// na
+		static std::string const RoutineName("SizeElectricBaseboard");
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -583,42 +658,62 @@ namespace ElectricBaseboardRadiator {
 		Real64 NominalCapacityUser; // User hard-sized UA value for reproting
 		bool IsAutoSize; // Indicator to autosizing nominal capacity
 
+		std::string CompName; // component name
+		std::string CompType; // component type
+		std::string SizingString; // input field sizing description (e.g., Nominal Capacity)
+		Real64 TempSize; // autosized value of coil input field
+		int FieldNum = 1; // IDD numeric field number where input field description is found
+		int SizingMethod; // Integer representation of sizing method name (e.g., CoolingAirflowSizing, HeatingAirflowSizing, CoolingCapacitySizing, HeatingCapacitySizing, etc.)
+		bool PrintFlag; // TRUE when sizing information is reported in the eio file
+		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
+
 		IsAutoSize = false;
 		NominalCapacityDes = 0.0;
 		NominalCapacityUser = 0.0;
+		DataScalableCapSizingON = false;
 
 		if ( CurZoneEqNum > 0 ) {
 
-			if ( ElecBaseboard( BaseboardNum ).NominalCapacity == AutoSize ) {
-				IsAutoSize = true;
-			}
-			// Check if all are hard-sized
-			if ( ! IsAutoSize && ! ZoneSizingRunDone ) { // simulation should continue
-				if ( ElecBaseboard( BaseboardNum ).NominalCapacity > 0.0 ) {
-					ReportSizingOutput( cCMO_BBRadiator_Electric, ElecBaseboard( BaseboardNum ).EquipName, "User-Specified Nominal Capacity [W]", ElecBaseboard( BaseboardNum ).NominalCapacity );
-				}
-			} else { // AutoSize or hard-size with sizing run
-				CheckZoneSizing( cCMO_BBRadiator_Electric, ElecBaseboard( BaseboardNum ).EquipName );
-				NominalCapacityDes = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
-				if ( IsAutoSize ) {
-					ElecBaseboard( BaseboardNum ).NominalCapacity = NominalCapacityDes;
-					ReportSizingOutput( cCMO_BBRadiator_Electric, ElecBaseboard( BaseboardNum ).EquipName, "Design Size Nominal Capacity [W]", NominalCapacityDes );
-				} else { // Hard-size with sizing data
-					if ( ElecBaseboard( BaseboardNum ).NominalCapacity > 0.0 && NominalCapacityDes > 0.0 ) {
-						NominalCapacityUser = ElecBaseboard( BaseboardNum ).NominalCapacity;
-						ReportSizingOutput( cCMO_BBRadiator_Electric, ElecBaseboard( BaseboardNum ).EquipName, "Design Size Nominal Capacity [W]", NominalCapacityDes, "User-Specified Nominal Capacity [W]", NominalCapacityUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( NominalCapacityDes - NominalCapacityUser ) / NominalCapacityUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeElecBaseboard: Potential issue with equipment sizing for " "ZoneHVAC:Baseboard:RadiantConvective:Electric=\"" + ElecBaseboard( BaseboardNum ).EquipName + "\"." );
-								ShowContinueError( "User-Specified Nominal Capacity of " + RoundSigDigits( NominalCapacityUser, 2 ) + " [W]" );
-								ShowContinueError( "differs from Design Size Nominal Capacity of " + RoundSigDigits( NominalCapacityDes, 2 ) + " [W]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
+			CompType = cCMO_BBRadiator_Electric;
+			CompName = ElecBaseboard( BaseboardNum ).EquipName;
+			DataFracOfAutosizedHeatingCapacity = 1.0;
+			DataZoneNumber = ElecBaseboard( BaseboardNum ).ZonePtr;
+			SizingMethod = HeatingCapacitySizing;
+			FieldNum = 1;
+			PrintFlag = true;
+			SizingString = ElecBaseboardNumericFields( BaseboardNum ).FieldNames( FieldNum ) + " [W]";
+			CapSizingMethod = ElecBaseboard( BaseboardNum ).HeatingCapMethod;
+			ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+			if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+				if ( CapSizingMethod == HeatingDesignCapacity ){
+					if ( ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity == AutoSize ) {
+						CheckZoneSizing(CompType, CompName);
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+					} else {
+						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 					}
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+				} else if ( CapSizingMethod == CapacityPerFloorArea ){
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+					TempSize = ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad;
+					DataScalableCapSizingON = true;
+				} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+					CheckZoneSizing(CompType, CompName);
+					ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+					DataFracOfAutosizedHeatingCapacity = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
+					ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor;
+					TempSize = AutoSize;
+					DataScalableCapSizingON = true;
+				} else {
+					TempSize = ElecBaseboard( BaseboardNum ).ScaledHeatingCapacity;
 				}
+				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+				ElecBaseboard( BaseboardNum ).NominalCapacity = TempSize;
+				DataScalableCapSizingON = false;
 			}
+
 		}
 
 	}
@@ -1099,7 +1194,7 @@ namespace ElectricBaseboardRadiator {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -172,6 +172,9 @@ namespace SimAirServingZones {
 	void
 	UpdateSysSizing( int const CallIndicator );
 
+	void
+	UpdateSysSizingForScalableInputs( int const AirLoopNum );
+
 	// End Algorithm Section of the Module
 	// *****************************************************************************
 
@@ -196,7 +199,7 @@ namespace SimAirServingZones {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

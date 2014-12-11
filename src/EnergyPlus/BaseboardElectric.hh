@@ -46,6 +46,9 @@ namespace BaseboardElectric {
 		Real64 Energy;
 		Real64 ElecUseLoad;
 		Real64 ElecUseRate;
+		int ZonePtr; // point to teh zone where the basebaord is located   
+		int HeatingCapMethod; // - Method for heating capacity scaledsizing calculation- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // - scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		BaseboardParams() :
@@ -58,7 +61,10 @@ namespace BaseboardElectric {
 			Power( 0.0 ),
 			Energy( 0.0 ),
 			ElecUseLoad( 0.0 ),
-			ElecUseRate( 0.0 )
+			ElecUseRate( 0.0 ),
+			ZonePtr( 0 ),
+			HeatingCapMethod( 0.0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -75,7 +81,10 @@ namespace BaseboardElectric {
 			Real64 const Power,
 			Real64 const Energy,
 			Real64 const ElecUseLoad,
-			Real64 const ElecUseRate
+			Real64 const ElecUseRate,
+			int const ZonePtr, // point to teh zone where the electric baseboard is located  
+			int const HeatingCapMethod, // - Method for electric baseboard heating capacity scalable sizing calculation
+			Real64 const ScaledHeatingCapacity // - electric baseboard scaled maximum heating capacity {W} or scalable variable for sizing in {-}, or {W/m2} 
 		) :
 			EquipName( EquipName ),
 			EquipType( EquipType ),
@@ -89,13 +98,34 @@ namespace BaseboardElectric {
 			Power( Power ),
 			Energy( Energy ),
 			ElecUseLoad( ElecUseLoad ),
-			ElecUseRate( ElecUseRate )
+			ElecUseRate( ElecUseRate ),
+			ZonePtr( ZonePtr ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
 
 	};
 
+	struct BaseboardNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		BaseboardNumericFieldData()
+		{}
+
+		// Member Constructor
+		BaseboardNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< BaseboardParams > Baseboard;
+	extern FArray1D< BaseboardNumericFieldData > BaseboardNumericFields;
 
 	// Functions
 

@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -79,9 +80,9 @@ namespace SurfaceGeometry {
 	int const UnreconciledZoneSurface( -999 ); // interim value between entering surfaces ("Surface") and reconciling
 	// surface names in other zones
 
-	static gio::Fmt const fmtLD( "*" );
-	static gio::Fmt const fmtA( "(A)" );
-	static gio::Fmt const fmt3( "(A,3(1x,f18.13))" );
+	static gio::Fmt fmtLD( "*" );
+	static gio::Fmt fmtA( "(A)" );
+	static gio::Fmt fmt3( "(A,3(1x,f18.13))" );
 
 	// DERIVED TYPE DEFINITIONS
 
@@ -107,7 +108,6 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
-	FArray1D< SurfaceData > SurfaceTmpSave; // Allocated/Deallocated during input processing
 
 	// Functions
 
@@ -146,8 +146,8 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ValFmt( "(F20.2)" );
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt ValFmt( "(F20.2)" );
+		static gio::Fmt fmtA( "(A)" );
 		static std::string const RoutineName( "SetUpZoneGeometry: " );
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -187,8 +187,8 @@ namespace SurfaceGeometry {
 		bool DetailedWWR;
 
 		// Formats
-		static gio::Fmt const Format_720( "(' Zone Information, ',A,28(',',A))" );
-		static gio::Fmt const Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
+		static gio::Fmt Format_720( "(' Zone Information, ',A,28(',',A))" );
+		static gio::Fmt Format_721( "('! <Zone Information>,Zone Name,North Axis {deg},','Origin X-Coordinate {m},Origin Y-Coordinate {m},Origin Z-Coordinate {m},','Centroid X-Coordinate {m},Centroid Y-Coordinate {m},Centroid Z-Coordinate {m},','Type,Zone Multiplier,Zone List Multiplier,Minimum X {m},Maximum X {m},','Minimum Y {m},Maximum Y {m},Minimum Z {m},Maximum Z {m},Ceiling Height {m},Volume {m3},','Zone Inside Convection Algorithm {Simple-Detailed-CeilingDiffuser-TrombeWall},','Zone Outside Convection Algorithm {Simple-Detailed-Tarp-MoWitt-DOE-2-BLAST},',' Floor Area {m2},Exterior Gross Wall Area {m2},Exterior Net Wall Area {m2},Exterior Window Area {m2},',' Number of Surfaces, Number of SubSurfaces, Number of Shading SubSurfaces, ',' Part of Total Building Area')" );
 
 		// FLOW:
 		// Allocations and initializations...
@@ -208,10 +208,8 @@ namespace SurfaceGeometry {
 		CosZoneRelNorth.allocate( NumOfZones );
 		SinZoneRelNorth.allocate( NumOfZones );
 
-		ZoneCeilingHeightEntered.allocate( NumOfZones );
-		ZoneCeilingHeightEntered = false;
-		ZoneCeilingArea.allocate( NumOfZones );
-		ZoneCeilingArea = 0.0;
+		ZoneCeilingHeightEntered.dimension( NumOfZones, false );
+		ZoneCeilingArea.dimension( NumOfZones, 0.0 );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 
@@ -238,8 +236,7 @@ namespace SurfaceGeometry {
 
 		AllocateModuleArrays(); // This needs to be moved to the main manager routine of SSG at a later date
 
-		AirSkyRadSplit.allocate( TotSurfaces );
-		AirSkyRadSplit = 0.0;
+		AirSkyRadSplit.dimension( TotSurfaces, 0.0 );
 
 		CalcWindowRevealReflection = false; // Set to True in ProcessSurfaceVertices if beam solar reflection from window reveals
 		// is requested for one or more exterior windows.
@@ -456,8 +453,7 @@ namespace SurfaceGeometry {
 		ZoneCeilingHeightEntered.deallocate();
 		ZoneCeilingArea.deallocate();
 
-		AdjacentZoneToSurface.allocate( TotSurfaces );
-		AdjacentZoneToSurface = 0;
+		AdjacentZoneToSurface.dimension( TotSurfaces, 0 );
 		// note -- adiabatic surfaces will show same zone as surface
 		for ( SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 			if ( Surface( SurfNum ).ExtBoundCond <= 0 ) continue;
@@ -617,35 +613,21 @@ namespace SurfaceGeometry {
 		ShadeV.allocate( TotSurfaces );
 		ShadeV.NVert() = 0;
 		// Individual components (XV,YV,ZV) allocated in routine ProcessSurfaceVertices
-		X0.allocate( TotSurfaces );
-		X0 = 0.0;
-		Y0.allocate( TotSurfaces );
-		Y0 = 0.0;
-		Z0.allocate( TotSurfaces );
-		Z0 = 0.0;
+		X0.dimension( TotSurfaces, 0.0 );
+		Y0.dimension( TotSurfaces, 0.0 );
+		Z0.dimension( TotSurfaces, 0.0 );
 
-		CBZone.allocate( NumOfZones );
-		CBZone = 0.0;
-		DSZone.allocate( NumOfZones );
-		DSZone = 0.0;
-		DGZone.allocate( NumOfZones );
-		DGZone = 0.0;
-		DBZone.allocate( NumOfZones );
-		DBZone = 0.0;
-		DBZoneSSG.allocate( NumOfZones );
-		DBZoneSSG = 0.0;
-		QSDifSol.allocate( NumOfZones );
-		QSDifSol = 0.0;
-		AISurf.allocate( TotSurfaces );
-		AISurf = 0.0;
-		AOSurf.allocate( TotSurfaces );
-		AOSurf = 0.0;
-		BmToBmReflFacObs.allocate( TotSurfaces );
-		BmToBmReflFacObs = 0.0;
-		BmToDiffReflFacObs.allocate( TotSurfaces );
-		BmToDiffReflFacObs = 0.0;
-		BmToDiffReflFacGnd.allocate( TotSurfaces );
-		BmToDiffReflFacGnd = 0.0;
+		CBZone.dimension( NumOfZones, 0.0 );
+		DSZone.dimension( NumOfZones, 0.0 );
+		DGZone.dimension( NumOfZones, 0.0 );
+		DBZone.dimension( NumOfZones, 0.0 );
+		DBZoneSSG.dimension( NumOfZones, 0.0 );
+		QSDifSol.dimension( NumOfZones, 0.0 );
+		AISurf.dimension( TotSurfaces, 0.0 );
+		AOSurf.dimension( TotSurfaces, 0.0 );
+		BmToBmReflFacObs.dimension( TotSurfaces, 0.0 );
+		BmToDiffReflFacObs.dimension( TotSurfaces, 0.0 );
+		BmToDiffReflFacGnd.dimension( TotSurfaces, 0.0 );
 		AWinSurf.allocate( TotSurfaces, CFSMAXNL + 1 );
 		AWinSurf = 0.0;
 		AWinCFOverlap.allocate( TotSurfaces, MaxSolidWinLayers );
@@ -978,12 +960,7 @@ namespace SurfaceGeometry {
 		// Have to make room for added surfaces, if needed
 		FirstTotalSurfaces = SurfNum + AddedSubSurfaces;
 		if ( NeedToAddSurfaces + NeedToAddSubSurfaces > 0 ) {
-			SurfaceTmpSave.allocate( TotSurfaces );
-			SurfaceTmpSave( {1,FirstTotalSurfaces} ) = SurfaceTmp;
-			SurfaceTmp.deallocate();
-			SurfaceTmp.allocate( TotSurfaces );
-			SurfaceTmp = SurfaceTmpSave;
-			SurfaceTmpSave.deallocate();
+			SurfaceTmp.redimension( TotSurfaces );
 		}
 
 		SurfaceWindow.allocate( TotSurfaces );
@@ -2116,7 +2093,7 @@ namespace SurfaceGeometry {
 		std::string OutMsg;
 
 		// Formats
-		static gio::Fmt const Format_720( "(A)" );
+		static gio::Fmt Format_720( "(A)" );
 
 		cCurrentModuleObject = "GlobalGeometryRules";
 		NumStmt = GetNumObjectsFound( cCurrentModuleObject );
@@ -5053,7 +5030,7 @@ namespace SurfaceGeometry {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static FArray1D_string const cModuleObjects( 4, { "Shading:Overhang", "Shading:Overhang:Projection", "Shading:Fin", "Shading:Fin:Projection" } );
-		static gio::Fmt const dfmt( "(A,3(2x,f6.2))" );
+		static gio::Fmt dfmt( "(A,3(2x,f6.2))" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -5943,7 +5920,6 @@ namespace SurfaceGeometry {
 		bool SurfacesOfType;
 		int SurfNum;
 		//  INTEGER :: Index
-		FArray1D_int tmpHeatTransferAlgosUsed;
 		int NumEMPDMat;
 		int NumPCMat;
 		int NumVTCMat;
@@ -5958,7 +5934,7 @@ namespace SurfaceGeometry {
 		std::string AlgoName;
 
 		// Formats
-		static gio::Fmt const Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_725( "('Surface Heat Transfer Algorithm, ',A,',',A,',',A,',',A)" );
 
 		// first initialize each heat transfer surface with the overall model type, array assignment
 		Surface.HeatTransferAlgorithm() = HeatTransferAlgosUsed( 1 );
@@ -5999,14 +5975,8 @@ namespace SurfaceGeometry {
 				Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
 
 				if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-					tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-					++NumberOfHeatTransferAlgosUsed;
-					HeatTransferAlgosUsed.deallocate();
-					HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-					tmpHeatTransferAlgosUsed.deallocate();
 				}
 
 			} else {
@@ -6141,14 +6111,8 @@ namespace SurfaceGeometry {
 				ShowWarningError( "In " + cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", for Multiple Surface Assignment=\"" + cAlphaArgs( 2 ) + "\", there were no surfaces of that type found for assignment." );
 			} else {
 				if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-					tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-					++NumberOfHeatTransferAlgosUsed;
-					HeatTransferAlgosUsed.deallocate();
-					HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-					HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+					HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 					HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-					tmpHeatTransferAlgosUsed.deallocate();
 				}
 			}
 			if ( ErrorsFoundMultiSurf ) ErrorsFound = true;
@@ -6189,14 +6153,8 @@ namespace SurfaceGeometry {
 				if ( ! ErrorsFoundSurfList ) {
 					Surface( Found ).HeatTransferAlgorithm = tmpAlgoInput;
 					if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-						tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-						tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-						++NumberOfHeatTransferAlgosUsed;
-						HeatTransferAlgosUsed.deallocate();
-						HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-						HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+						HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 						HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-						tmpHeatTransferAlgosUsed.deallocate();
 					}
 				} else {
 					ErrorsFound = true;
@@ -6238,14 +6196,8 @@ namespace SurfaceGeometry {
 					if ( Surface( Item1 ).Construction == Found ) {
 						Surface( Item1 ).HeatTransferAlgorithm = tmpAlgoInput;
 						if ( ! any_eq( HeatTransferAlgosUsed, tmpAlgoInput ) ) { // add new algo
-							tmpHeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-							tmpHeatTransferAlgosUsed = HeatTransferAlgosUsed;
-							++NumberOfHeatTransferAlgosUsed;
-							HeatTransferAlgosUsed.deallocate();
-							HeatTransferAlgosUsed.allocate( NumberOfHeatTransferAlgosUsed );
-							HeatTransferAlgosUsed( {1,NumberOfHeatTransferAlgosUsed - 1} ) = tmpHeatTransferAlgosUsed;
+							HeatTransferAlgosUsed.redimension( ++NumberOfHeatTransferAlgosUsed );
 							HeatTransferAlgosUsed( NumberOfHeatTransferAlgosUsed ) = tmpAlgoInput;
-							tmpHeatTransferAlgosUsed.deallocate();
 						}
 					}
 				}
@@ -6371,7 +6323,7 @@ namespace SurfaceGeometry {
 		using namespace DataErrorTracking;
 
 		// Locals
-		static gio::Fmt const fmt3( "(A,I5,A,3(1X,F18.13))" );
+		static gio::Fmt fmt3( "(A,I5,A,3(1X,F18.13))" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -6680,7 +6632,7 @@ namespace SurfaceGeometry {
 		using General::RoundSigDigits;
 
 		// Locals
-		static gio::Fmt const fmt3( "(A,I5,A,3(1X,F18.13))" );
+		static gio::Fmt fmt3( "(A,I5,A,3(1X,F18.13))" );
 
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -7709,7 +7661,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OSCFormat1( "('! <Other Side Coefficients>,Name," "Combined convective/radiative film coefficient {W/m2-K}," "User selected Constant Temperature {C},Coefficient modifying the constant temperature term," "Coefficient modifying the external dry bulb temperature term," "Coefficient modifying the ground temperature term," "Coefficient modifying the wind speed term {s/m}," "Coefficient modifying the zone air temperature term," "Constant Temperature Schedule Name," "Sinusoidal Variation," "Period of Sinusoidal Variation," "Previous Other Side Temperature Coefficient," "Minimum Other Side Temperature {C}," "Maximum Other Side Temperature {C}')" );
+		static gio::Fmt OSCFormat1( "('! <Other Side Coefficients>,Name," "Combined convective/radiative film coefficient {W/m2-K}," "User selected Constant Temperature {C},Coefficient modifying the constant temperature term," "Coefficient modifying the external dry bulb temperature term," "Coefficient modifying the ground temperature term," "Coefficient modifying the wind speed term {s/m}," "Coefficient modifying the zone air temperature term," "Constant Temperature Schedule Name," "Sinusoidal Variation," "Period of Sinusoidal Variation," "Previous Other Side Temperature Coefficient," "Minimum Other Side Temperature {C}," "Maximum Other Side Temperature {C}')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -7870,7 +7822,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const OSCMFormat1( "('! <Other Side Conditions Model>,Name,Class')" );
+		static gio::Fmt OSCMFormat1( "('! <Other Side Conditions Model>,Name,Class')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8136,7 +8088,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const VolFmt( "(F20.2)" );
+		static gio::Fmt VolFmt( "(F20.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8182,8 +8134,7 @@ namespace SurfaceGeometry {
 			ZoneStruct.NumSurfaceFaces = NFaces;
 			ZoneStruct.SurfaceFace.allocate( NFaces );
 			NActFaces = 0;
-			surfacenotused.allocate( NFaces );
-			surfacenotused = 0;
+			surfacenotused.dimension( NFaces, 0 );
 
 			for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
 
@@ -8406,7 +8357,7 @@ namespace SurfaceGeometry {
 		//  REAL(r64) testval
 		//  INTEGER ploop
 		//  INTEGER vloop
-		int ThisShape;
+		int ThisShape( 0 );
 		bool BaseSurface; // True if a base surface or a detached shading surface
 		Real64 ThisSurfAz;
 		Real64 ThisSurfTilt;
@@ -8530,6 +8481,8 @@ namespace SurfaceGeometry {
 					ThisShape = TriangularWindow;
 				} else if ( Surface( ThisSurf ).Sides == 3 && Surface( ThisSurf ).Class == SurfaceClass_Door ) {
 					ThisShape = TriangularDoor;
+				} else {
+					assert( false );
 				}
 
 			} else { //  this is a shadowing subsurface
@@ -8888,7 +8841,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
+		static gio::Fmt ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -8993,27 +8946,12 @@ namespace SurfaceGeometry {
 
 			ConstrNewSh = TotConstructs + 1;
 			SurfaceTmp( SurfNum ).ShadedConstruction = ConstrNewSh;
-			ConstructSave.allocate( TotConstructs );
-			NominalRSave.allocate( TotConstructs );
-			NominalUSave.allocate( TotConstructs );
-			ConstructSave( {1,TotConstructs} ) = Construct( {1,TotConstructs} );
-			NominalRSave( {1,TotConstructs} ) = NominalRforNominalUCalculation( {1,TotConstructs} );
-			NominalUSave( {1,TotConstructs} ) = NominalU( {1,TotConstructs} );
-			Construct.deallocate();
-			NominalRforNominalUCalculation.deallocate();
-			NominalU.deallocate();
 			TotConstructs = ConstrNewSh;
-			Construct.allocate( TotConstructs );
-			NominalRforNominalUCalculation.allocate( TotConstructs );
-			NominalU.allocate( TotConstructs );
-			NominalRforNominalUCalculation = 0.0;
-			NominalU = 0.0;
-			Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );
-			NominalRforNominalUCalculation( {1,TotConstructs - 1} ) = NominalRSave( {1,TotConstructs - 1} );
-			NominalU( {1,TotConstructs - 1} ) = NominalUSave( {1,TotConstructs - 1} );
-			ConstructSave.deallocate();
-			NominalRSave.deallocate();
-			NominalUSave.deallocate();
+			Construct.redimension( TotConstructs );
+			NominalRforNominalUCalculation.redimension( TotConstructs );
+			NominalRforNominalUCalculation( TotConstructs ) = 0.0;
+			NominalU.redimension( TotConstructs );
+			NominalU( TotConstructs ) = 0.0;
 
 			TotLayersOld = Construct( ConstrNum ).TotLayers;
 			TotLayersNew = TotLayersOld + 1;
@@ -9217,19 +9155,9 @@ namespace SurfaceGeometry {
 					if ( MatNewStAir == 0 ) {
 						// Create new material
 						MatNewStAir = TotMaterials + 1;
-						MaterialSave.allocate( TotMaterials );
-						NominalRSave.allocate( TotMaterials );
-						MaterialSave( {1,TotMaterials} ) = Material( {1,TotMaterials} );
-						NominalRSave( {1,TotMaterials} ) = NominalR( {1,TotMaterials} );
-						Material.deallocate();
-						NominalR.deallocate();
 						TotMaterials = MatNewStAir;
-						Material.allocate( TotMaterials );
-						NominalR.allocate( TotMaterials );
-						Material( {1,TotMaterials - 1} ) = MaterialSave( {1,TotMaterials - 1} );
-						NominalR( {1,TotMaterials - 1} ) = NominalRSave( {1,TotMaterials - 1} );
-						MaterialSave.deallocate();
-						NominalRSave.deallocate();
+						Material.redimension( TotMaterials );
+						NominalR.redimension( TotMaterials );
 						Material( TotMaterials ).Name = MatNameStAir;
 						Material( TotMaterials ).Group = WindowGas;
 						Material( TotMaterials ).Roughness = 3;
@@ -9307,25 +9235,10 @@ namespace SurfaceGeometry {
 					} else {
 						Surface( SurfNum ).StormWinShadedConstruction = ConstrNew;
 					}
-					ConstructSave.allocate( TotConstructs );
-					NominalRSave.allocate( TotConstructs );
-					NominalUSave.allocate( TotConstructs );
-					ConstructSave( {1,TotConstructs} ) = Construct( {1,TotConstructs} );
-					NominalRSave( {1,TotConstructs} ) = NominalRforNominalUCalculation( {1,TotConstructs} );
-					NominalUSave( {1,TotConstructs} ) = NominalU( {1,TotConstructs} );
-					Construct.deallocate();
-					NominalRforNominalUCalculation.deallocate();
-					NominalU.deallocate();
 					TotConstructs = ConstrNew;
-					Construct.allocate( TotConstructs );
-					NominalRforNominalUCalculation.allocate( TotConstructs );
-					NominalU.allocate( TotConstructs );
-					Construct( {1,TotConstructs - 1} ) = ConstructSave( {1,TotConstructs - 1} );
-					NominalRforNominalUCalculation( {1,TotConstructs - 1} ) = NominalRSave( {1,TotConstructs - 1} );
-					NominalU( {1,TotConstructs - 1} ) = NominalUSave( {1,TotConstructs - 1} );
-					ConstructSave.deallocate();
-					NominalRSave.deallocate();
-					NominalUSave.deallocate();
+					Construct.redimension( TotConstructs );
+					NominalRforNominalUCalculation.redimension( TotConstructs );
+					NominalU.redimension( TotConstructs );
 
 					ConstrOld = ConstrNum;
 					if ( loop == 2 ) ConstrOld = ConstrNumSh;
@@ -9629,7 +9542,6 @@ namespace SurfaceGeometry {
 		// DERIVED TYPE DEFINITIONS:
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int TotSurfacesPrev; // Total number of surfaces before splitting window
 		int loop; // DO loop index
 		Real64 H; // Height and width of original window (m)
 		Real64 W;
@@ -9693,18 +9605,7 @@ namespace SurfaceGeometry {
 		IConst2 = FindItemInList( Const2Name, Construct.Name(), TotConstructs );
 
 		++AddedSubSurfaces;
-		TotSurfacesPrev = TotSurfaces;
-		SurfaceTmpSave.allocate( TotSurfacesPrev );
-		for ( loop = 1; loop <= TotSurfacesPrev; ++loop ) {
-			SurfaceTmpSave( loop ) = SurfaceTmp( loop );
-		}
-		SurfaceTmp.deallocate();
-		++TotSurfaces;
-		SurfaceTmp.allocate( TotSurfaces );
-		for ( loop = 1; loop <= TotSurfacesPrev; ++loop ) {
-			SurfaceTmp( loop ) = SurfaceTmpSave( loop );
-		}
-		SurfaceTmpSave.deallocate();
+		SurfaceTmp.redimension( ++TotSurfaces );
 
 		SurfaceTmp( TotSurfaces ).Vertex.allocate( 4 );
 
@@ -10502,10 +10403,6 @@ namespace SurfaceGeometry {
 
 		}
 
-		TmpCandidateSurfaceNames.deallocate();
-		TmpCandidateICSBCTypeNames.deallocate();
-		TmpCandidateICSSurfaceNames.deallocate();
-
 	}
 
 	void
@@ -10547,7 +10444,7 @@ namespace SurfaceGeometry {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const TurnThreshold( 0.000001 ); // Sensitivity of convexity test, in radians
-		static gio::Fmt const ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
+		static gio::Fmt ErrFmt( "(' (',F8.3,',',F8.3,',',F8.3,')')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -10759,7 +10656,7 @@ namespace SurfaceGeometry {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

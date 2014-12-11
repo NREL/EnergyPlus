@@ -50,17 +50,17 @@ public: // Creation
 	// Default Constructor
 	inline
 	DynamicIndexRange() :
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{}
 
 	// Copy Constructor
 	inline
 	DynamicIndexRange( DynamicIndexRange const & I ) :
-		Super( I ),
-		ObserverSingle( I ),
-		l_dim_p_( I.l_dim_clone() ),
-		u_dim_p_( I.u_dim_clone() )
+	 Super( I ),
+	 ObserverSingle( I ),
+	 l_dim_p_( I.l_dim_clone() ),
+	 u_dim_p_( I.u_dim_clone() )
 	{
 		assert( legal_dynamic() );
 		insert_as_observer();
@@ -69,9 +69,9 @@ public: // Creation
 	// IndexRange Constructor
 	inline
 	DynamicIndexRange( IndexRange const & I ) :
-		Super( I ),
-		l_dim_p_( I.l_dim_clone() ),
-		u_dim_p_( I.u_dim_clone() )
+	 Super( I ),
+	 l_dim_p_( I.l_dim_clone() ),
+	 u_dim_p_( I.u_dim_clone() )
 	{
 		assert( legal_dynamic() );
 		insert_as_observer();
@@ -80,9 +80,9 @@ public: // Creation
 	// Upper Index Constructor
 	inline
 	DynamicIndexRange( int const u ) :
-		Super( u ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( u ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -90,17 +90,17 @@ public: // Creation
 	// Star Constructor
 	inline
 	DynamicIndexRange( Star const s ) :
-		Super( s ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( s ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{}
 
 	// Upper Dimension Constructor
 	inline
 	DynamicIndexRange( Dimension const & u_dim ) :
-		Super( u_dim.zvalue() ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( u_dim.reference_copy() )
+	 Super( u_dim.zvalue() ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( u_dim.reference_copy() )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -110,9 +110,9 @@ public: // Creation
 	// Upper Expression Constructor
 	inline
 	DynamicIndexRange( Expression const & u_exp ) :
-		Super( u_exp.zvalue() ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( new Dimension( u_exp ) )
+	 Super( u_exp.zvalue() ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( new Dimension( u_exp ) )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -122,9 +122,9 @@ public: // Creation
 	// Index Range Constructor
 	inline
 	DynamicIndexRange( int const l, int const u ) :
-		Super( l, u ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( l, u ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -132,9 +132,9 @@ public: // Creation
 	// Lower Index + Star Constructor
 	inline
 	DynamicIndexRange( int const l, Star const s ) :
-		Super( l, s ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( l, s ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -142,20 +142,20 @@ public: // Creation
 	// Star + Upper Index Constructor
 	inline
 	DynamicIndexRange( Star const s, int const u ) :
-		Super( s, u ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( s, u ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
 
 	// Initializer List of Integer Constructor
-	template< typename U >
+	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
 	inline
-	DynamicIndexRange( std::initializer_list< U > const lu, typename std::enable_if< std::is_constructible< int, U >::value >::type * = 0 ) :
-		Super( lu ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	DynamicIndexRange( std::initializer_list< U > const lu ) :
+	 Super( lu ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -163,9 +163,9 @@ public: // Creation
 	// Initializer List of Index Constructor
 	inline
 	DynamicIndexRange( std::initializer_list< Index > const lu ) :
-		Super( lu ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( lu ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -173,9 +173,9 @@ public: // Creation
 	// Omit Constructor
 	inline
 	DynamicIndexRange( Omit const o ) :
-		Super( o ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( o ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -183,9 +183,9 @@ public: // Creation
 	// Lower Index + Omit Constructor
 	inline
 	DynamicIndexRange( int const l, Omit const o ) :
-		Super( l, o ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( l, o ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -193,9 +193,9 @@ public: // Creation
 	// Omit + Upper Index Constructor
 	inline
 	DynamicIndexRange( Omit const o, int const u ) :
-		Super( o, u ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( o, u ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -203,9 +203,9 @@ public: // Creation
 	// Omit + Omit Constructor
 	inline
 	DynamicIndexRange( Omit const ol, Omit const ou ) :
-		Super( ol, ou ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( nullptr )
+	 Super( ol, ou ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_static() );
 	}
@@ -213,9 +213,9 @@ public: // Creation
 	// Dimension Range Constructor
 	inline
 	DynamicIndexRange( Dimension const & l_dim, Dimension const & u_dim ) :
-		Super( l_dim.zvalue(), u_dim.zvalue() ),
-		l_dim_p_( l_dim.reference_copy() ),
-		u_dim_p_( u_dim.reference_copy() )
+	 Super( l_dim.zvalue(), u_dim.zvalue() ),
+	 l_dim_p_( l_dim.reference_copy() ),
+	 u_dim_p_( u_dim.reference_copy() )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -225,9 +225,9 @@ public: // Creation
 	// Expression Range Constructor
 	inline
 	DynamicIndexRange( Expression const & l_exp, Expression const & u_exp ) :
-		Super( l_exp.zvalue(), u_exp.zvalue() ),
-		l_dim_p_( new Dimension( l_exp ) ),
-		u_dim_p_( new Dimension( u_exp ) )
+	 Super( l_exp.zvalue(), u_exp.zvalue() ),
+	 l_dim_p_( new Dimension( l_exp ) ),
+	 u_dim_p_( new Dimension( u_exp ) )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -237,9 +237,9 @@ public: // Creation
 	// Index and Dimension Constructor
 	inline
 	DynamicIndexRange( int const l, Dimension const & u_dim ) :
-		Super( l, u_dim.zvalue() ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( u_dim.reference_copy() )
+	 Super( l, u_dim.zvalue() ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( u_dim.reference_copy() )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -249,9 +249,9 @@ public: // Creation
 	// Dimension and Index Constructor
 	inline
 	DynamicIndexRange( Dimension const & l_dim, int const u ) :
-		Super( l_dim.zvalue(), u ),
-		l_dim_p_( l_dim.reference_copy() ),
-		u_dim_p_( nullptr )
+	 Super( l_dim.zvalue(), u ),
+	 l_dim_p_( l_dim.reference_copy() ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -261,9 +261,9 @@ public: // Creation
 	// Index and Expression Constructor
 	inline
 	DynamicIndexRange( int const l, Expression const & u_exp ) :
-		Super( l, u_exp.zvalue() ),
-		l_dim_p_( nullptr ),
-		u_dim_p_( new Dimension( u_exp ) )
+	 Super( l, u_exp.zvalue() ),
+	 l_dim_p_( nullptr ),
+	 u_dim_p_( new Dimension( u_exp ) )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -273,9 +273,9 @@ public: // Creation
 	// Expression and Index Constructor
 	inline
 	DynamicIndexRange( Expression const & l_exp, int const u ) :
-		Super( l_exp.zvalue(), u ),
-		l_dim_p_( new Dimension( l_exp ) ),
-		u_dim_p_( nullptr )
+	 Super( l_exp.zvalue(), u ),
+	 l_dim_p_( new Dimension( l_exp ) ),
+	 u_dim_p_( nullptr )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -285,9 +285,9 @@ public: // Creation
 	// Dimension and Expression Constructor
 	inline
 	DynamicIndexRange( Dimension const & l_dim, Expression const & u_exp ) :
-		Super( l_dim.zvalue(), u_exp.zvalue() ),
-		l_dim_p_( l_dim.reference_copy() ),
-		u_dim_p_( new Dimension( u_exp ) )
+	 Super( l_dim.zvalue(), u_exp.zvalue() ),
+	 l_dim_p_( l_dim.reference_copy() ),
+	 u_dim_p_( new Dimension( u_exp ) )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -297,9 +297,9 @@ public: // Creation
 	// Expression and Dimension Constructor
 	inline
 	DynamicIndexRange( Expression const & l_exp, Dimension const & u_dim ) :
-		Super( l_exp.zvalue(), u_dim.zvalue() ),
-		l_dim_p_( new Dimension( l_exp ) ),
-		u_dim_p_( u_dim.reference_copy() )
+	 Super( l_exp.zvalue(), u_dim.zvalue() ),
+	 l_dim_p_( new Dimension( l_exp ) ),
+	 u_dim_p_( u_dim.reference_copy() )
 	{
 		assert( legal_dynamic() );
 		size_dynamic();
@@ -407,7 +407,7 @@ public: // Assignment
 	}
 
 	// Initializer List of int Assignment
-	template< typename U, class = typename std::enable_if< std::is_constructible< int, U >::value >::type >
+	template< typename U, class = typename std::enable_if< std::is_assignable< int&, U >::value >::type >
 	inline
 	DynamicIndexRange &
 	operator =( std::initializer_list< U > const lu )
@@ -1148,27 +1148,5 @@ swap_no_notify( DynamicIndexRange & a, DynamicIndexRange & b )
 }
 
 } // ObjexxFCL
-
-#ifndef NO_STD_SWAP_OVERLOADS
-
-// std::swap Overloads for Efficiency
-//
-// Technically you cannot add functions overloads to namespace std
-// but this works with most compilers and makes it much faster if someone uses
-// std::swap instead of swap or ObjexxFCL::swap.
-
-namespace std {
-
-// std::swap( DynamicIndexRange, DynamicIndexRange )
-inline
-void
-swap( ObjexxFCL::DynamicIndexRange & a, ObjexxFCL::DynamicIndexRange & b )
-{
-	a.swap( b );
-}
-
-} // std
-
-#endif // NO_STD_SWAP_OVERLOADS
 
 #endif // ObjexxFCL_DynamicIndexRange_hh_INCLUDED

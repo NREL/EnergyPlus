@@ -15,9 +15,8 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class Fstring;
-class Fsubstring;
 
 } // ObjexxFCL
 

@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -346,8 +347,7 @@ namespace FluidCoolers {
 		SimpleFluidCooler.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerReport.allocate( NumSimpleFluidCoolers );
 		SimpleFluidCoolerInlet.allocate( NumSimpleFluidCoolers );
-		CheckEquipName.allocate( NumSimpleFluidCoolers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumSimpleFluidCoolers, true );
 
 		// Load data structures with fluid cooler input data
 		cCurrentModuleObject = cFluidCooler_SingleSpeed;
@@ -749,7 +749,7 @@ namespace FluidCoolers {
 		static FArray1D_bool MyEnvrnFlag;
 		static FArray1D_bool OneTimeFlagForEachFluidCooler;
 		bool FatalError;
-		int TypeOf_Num;
+		int TypeOf_Num( 0 );
 		int LoopNum;
 		int LoopSideNum;
 		int BranchIndex;
@@ -774,6 +774,8 @@ namespace FluidCoolers {
 				TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
 			} else if ( SimpleFluidCooler( FluidCoolerNum ).FluidCoolerType_Num == FluidCooler_TwoSpeed ) {
 				TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
+			} else {
+				assert( false );
 			}
 
 			// Locate the tower on the plant loops for later usage
@@ -1751,7 +1753,7 @@ namespace FluidCoolers {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const LowTempFmt( "(' ',F6.2)" );
+		static gio::Fmt LowTempFmt( "(' ',F6.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -1933,7 +1935,7 @@ namespace FluidCoolers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

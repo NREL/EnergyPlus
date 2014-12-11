@@ -139,6 +139,10 @@ namespace LowTempRadiantSystem {
 		Real64 CoolEnergy; // cooling sent to panel in Joules
 		int OutRangeHiErrorCount; // recurring errors for crazy results too high fluid temperature
 		int OutRangeLoErrorCount; // recurring errors for crazy results too low fluid temperature
+		int HeatingCapMethod; // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity; // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+		int CoolingCapMethod; // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
+		Real64 ScaledCoolingCapacity; // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		HydronicRadiantSystemData() :
@@ -189,7 +193,11 @@ namespace LowTempRadiantSystem {
 			CoolPower( 0.0 ),
 			CoolEnergy( 0.0 ),
 			OutRangeHiErrorCount( 0 ),
-			OutRangeLoErrorCount( 0 )
+			OutRangeLoErrorCount( 0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 ),
+			CoolingCapMethod( 0 ),
+			ScaledCoolingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -251,7 +259,11 @@ namespace LowTempRadiantSystem {
 			Real64 const CoolPower, // cooling sent to panel in Watts
 			Real64 const CoolEnergy, // cooling sent to panel in Joules
 			int const OutRangeHiErrorCount, // recurring errors for crazy results too high fluid temperature
-			int const OutRangeLoErrorCount // recurring errors for crazy results too low fluid temperature
+			int const OutRangeLoErrorCount, // recurring errors for crazy results too low fluid temperature
+			int const HeatingCapMethod, // - Method for Low Temp Radiant system heating capacity scaledsizing calculation (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity, // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
+			int const CoolingCapMethod, // - Method for Low Temp Radiant system cooling capacity scaledsizing calculation (CoolingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedCoolingCapacity) 
+			Real64 const ScaledCoolingCapacity // -  Low Temp Radiant system scaled maximum cooling capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -310,9 +322,12 @@ namespace LowTempRadiantSystem {
 			CoolPower( CoolPower ),
 			CoolEnergy( CoolEnergy ),
 			OutRangeHiErrorCount( OutRangeHiErrorCount ),
-			OutRangeLoErrorCount( OutRangeLoErrorCount )
+			OutRangeLoErrorCount( OutRangeLoErrorCount ),
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity ),
+			CoolingCapMethod( CoolingCapMethod ),
+			ScaledCoolingCapacity( ScaledCoolingCapacity )
 		{}
-
 	};
 
 	struct ConstantFlowRadiantSystemData
@@ -678,6 +693,9 @@ namespace LowTempRadiantSystem {
 		Real64 ElecEnergy; // heating sent to panel in Joules
 		Real64 HeatPower; // heating sent to panel in Watts (same as ElecPower)
 		Real64 HeatEnergy; // heating sent to panel in Joules (same as ElecEnergy)
+		int HeatingCapMethod;    // - Method for Low Temp Radiant system heating capacity scaledsizing calculation
+		//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+		Real64 ScaledHeatingCapacity;   // -  Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 
 		// Default Constructor
 		ElectricRadiantSystemData() :
@@ -692,7 +710,9 @@ namespace LowTempRadiantSystem {
 			ElecPower( 0.0 ),
 			ElecEnergy( 0.0 ),
 			HeatPower( 0.0 ),
-			HeatEnergy( 0.0 )
+			HeatEnergy( 0.0 ),
+			HeatingCapMethod( 0 ),
+			ScaledHeatingCapacity( 0.0 )
 		{}
 
 		// Member Constructor
@@ -716,7 +736,10 @@ namespace LowTempRadiantSystem {
 			Real64 const ElecPower, // heating sent to panel in Watts
 			Real64 const ElecEnergy, // heating sent to panel in Joules
 			Real64 const HeatPower, // heating sent to panel in Watts (same as ElecPower)
-			Real64 const HeatEnergy // heating sent to panel in Joules (same as ElecEnergy)
+			Real64 const HeatEnergy, // heating sent to panel in Joules (same as ElecEnergy)
+			int const HeatingCapMethod,     // - Method for Low Temp Radiant system heating capacity scalable sizing calculation
+			//- (HeatingDesignCapacity, CapacityPerFloorArea, FracOfAutosizedHeatingCapacity) 
+			Real64 const ScaledHeatingCapacity   // - Low Temp Radiant system scaled maximum heating capacity {W} or scalable variable of zone HVAC equipment, {-}, or {W/m2} 
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -737,7 +760,9 @@ namespace LowTempRadiantSystem {
 			ElecPower( ElecPower ),
 			ElecEnergy( ElecEnergy ),
 			HeatPower( HeatPower ),
-			HeatEnergy( HeatEnergy )
+			HeatEnergy( HeatEnergy ), 
+			HeatingCapMethod( HeatingCapMethod ),
+			ScaledHeatingCapacity( ScaledHeatingCapacity )
 		{}
 
 	};
@@ -769,11 +794,47 @@ namespace LowTempRadiantSystem {
 
 	};
 
+	struct ElecRadSysNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		ElecRadSysNumericFieldData()
+		{}
+
+		// Member Constructor
+		ElecRadSysNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
+	struct HydronicRadiantSysNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		HydronicRadiantSysNumericFieldData()
+		{}
+
+		// Member Constructor
+		HydronicRadiantSysNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< HydronicRadiantSystemData > HydrRadSys;
 	extern FArray1D< ConstantFlowRadiantSystemData > CFloRadSys;
 	extern FArray1D< ElectricRadiantSystemData > ElecRadSys;
 	extern FArray1D< RadSysTypeData > RadSysTypes;
+	extern FArray1D< ElecRadSysNumericFieldData > ElecRadSysNumericFields;
+	extern FArray1D< HydronicRadiantSysNumericFieldData > HydronicRadiantSysNumericFields;
 
 	// Functions
 
@@ -883,7 +944,7 @@ namespace LowTempRadiantSystem {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

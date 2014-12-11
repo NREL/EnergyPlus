@@ -129,8 +129,10 @@ namespace ZoneEquipmentManager {
 	CalcZoneMassBalance();
 
 	void
-	CalcAirFlowSimple(Optional_int_const SysTimestepLoop = _, // System time step index
-		Optional_bool_const AdjustZoneMixingFlowFlag = _); // flags to adjust zone mxing mass flow rate
+	CalcAirFlowSimple(
+		int const SysTimestepLoop = 0, // System time step index
+		bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
+	);
 
 	void
 	GetStandAloneERVNodes(int const OutdoorNum); // Zone Air Balance Outdoor index
@@ -162,7 +164,7 @@ namespace ZoneEquipmentManager {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
