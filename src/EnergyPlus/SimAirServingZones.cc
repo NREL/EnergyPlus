@@ -4506,8 +4506,10 @@ namespace SimAirServingZones {
 		static gio::Fmt const fmtA( "(A)" );
 		static gio::Fmt const SSizeFmt10( "('Time')" );
 		static gio::Fmt const SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
+		static gio::Fmt const SSizeFmt12( "(A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A,A1,A,A,I2,A)" );
 		static gio::Fmt const SSizeFmt20( "(I2.2,':',I2.2,':00')" );
 		static gio::Fmt const SSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
+		static gio::Fmt const SSizeFmt22( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
 		static gio::Fmt const SSizeFmt30( "('Coinc Peak   ')" );
 		static gio::Fmt const SSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
 		static gio::Fmt const SSizeFmt40( "('NonCoinc Peak')" );
@@ -4529,6 +4531,7 @@ namespace SimAirServingZones {
 		int ZonesCooledNum; // loop index of zones cooled in a system
 		int CtrlZoneNum; // controlled zone number of a zone
 		int I; // write statement index
+		int J; // write statement index
 		//  REAL(r64)    :: HourFrac           ! fractional hour
 		Real64 SysCoolRetTemp; // system cooling return temperature for a time step [C]
 		Real64 SysHeatRetTemp; // system heating return temperature for a time step [C]
@@ -5467,14 +5470,17 @@ namespace SimAirServingZones {
 
 			// Get final design flows
 			for ( AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum ) {
+				SensCoolCapTemp( AirLoopNum ) = 0.0;
+				TotCoolCapTemp( AirLoopNum ) = 0.0;
 
 				// For coincident sizing, loop over design days and pick out the largest central heating amd
 				// cooling flow rates and associated data
 
 				for ( DDNum = 1; DDNum <= TotDesDays + TotRunDesPersDays; ++DDNum ) {
 
-					if ( SysSizing( AirLoopNum, DDNum ).SensCoolCap > CalcSysSizing( AirLoopNum ).SensCoolCap ) {
+					if ( SysSizing( AirLoopNum, DDNum ).SensCoolCap > SensCoolCapTemp( AirLoopNum ) ) {
 						SysSizPeakDDNum( AirLoopNum ).SensCoolPeakDD = DDNum;
+						SensCoolCapTemp( AirLoopNum ) = SysSizing( AirLoopNum, DDNum ).SensCoolCap;
 						if ( SysSizing( AirLoopNum, DDNum ).CoolingPeakLoadType == SensibleCoolingLoad ) {
 							CalcSysSizing( AirLoopNum ).DesCoolVolFlow = SysSizing( AirLoopNum, DDNum ).DesCoolVolFlow;
 							CalcSysSizing( AirLoopNum ).CoolDesDay = SysSizing( AirLoopNum, DDNum ).CoolDesDay;
@@ -5500,8 +5506,9 @@ namespace SimAirServingZones {
 						}
 					}
 
-					if ( SysSizing( AirLoopNum, DDNum ).TotCoolCap > CalcSysSizing( AirLoopNum ).TotCoolCap ) {
+					if ( SysSizing( AirLoopNum, DDNum ).TotCoolCap > TotCoolCapTemp( AirLoopNum ) ) {
 						SysSizPeakDDNum( AirLoopNum ).TotCoolPeakDD = DDNum;
+						TotCoolCapTemp( AirLoopNum ) = SysSizing( AirLoopNum, DDNum ).TotCoolCap;
 						if ( SysSizing( AirLoopNum, DDNum ).CoolingPeakLoadType == TotalCoolingLoad ) {
 							CalcSysSizing( AirLoopNum ).DesCoolVolFlow = SysSizing( AirLoopNum, DDNum ).DesCoolVolFlow;
 							CalcSysSizing( AirLoopNum ).CoolDesDay = SysSizing( AirLoopNum, DDNum ).CoolDesDay;
@@ -6017,8 +6024,18 @@ namespace SimAirServingZones {
 
 			// write out the sys design calc results
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt10, flags ); }
+			// for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
+			// 	{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Cool Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Cap [W]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Sens Cool Cap [W]"; }
+			// }
 			for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
-				{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt11, flags ) << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Cool Mass Flow [kg/s]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Heat Cap [W]" << SizingFileColSep << CalcSysSizing( I ).AirPriLoopName << ":Des Sens Cool Cap [W]"; }
+				for ( J = 1; J <= TotDesDays + TotRunDesPersDays; ++J ) {
+						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt12, flags ) << SizingFileColSep
+							<< CalcSysSizing( I ).AirPriLoopName << ":DesPer" << J << ":Des Heat Mass Flow [kg/s]" << SizingFileColSep
+							<< CalcSysSizing( I ).AirPriLoopName << ":DesPer" << J << ":Des Heat Cap [W]" << SizingFileColSep
+							<< CalcSysSizing( I ).AirPriLoopName << ":DesPer" << J << ":Des Cool Mass Flow [kg/s]" << SizingFileColSep
+							<< CalcSysSizing( I ).AirPriLoopName << ":DesPer" << J << ":Des Sens Cool Cap [W]" << SizingFileColSep
+							<< CalcSysSizing( I ).AirPriLoopName << ":DesPer" << J << ":Des Tot Cool Cap [W]"; }
+				}
 			}
 			gio::write( OutputFileSysSizing );
 			//      HourFrac = 0.0
@@ -6037,8 +6054,18 @@ namespace SimAirServingZones {
 					//      DO TimeStepIndex=1,NumOfTimeStepInDay
 					//        HourFrac = HourFrac + TimeStepZone
 					{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt20, flags ) << HourPrint << Minutes; }
+					// for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
+					// 	{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt21, flags ) << SizingFileColSep << CalcSysSizing( I ).HeatFlowSeq( TimeStepIndex ) << SizingFileColSep << CalcSysSizing( I ).CoolFlowSeq( TimeStepIndex ) << SizingFileColSep << CalcSysSizing( I ).HeatCapSeq( TimeStepIndex ) << SizingFileColSep << CalcSysSizing( I ).SensCoolCapSeq( TimeStepIndex ); }
+					// }
 					for ( I = 1; I <= NumPrimaryAirSys; ++I ) {
-						{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt21, flags ) << SizingFileColSep << CalcSysSizing( I ).HeatFlowSeq( TimeStepIndex ) << SizingFileColSep << CalcSysSizing( I ).CoolFlowSeq( TimeStepIndex ) << SizingFileColSep << CalcSysSizing( I ).HeatCapSeq( TimeStepIndex ) << SizingFileColSep << CalcSysSizing( I ).SensCoolCapSeq( TimeStepIndex ); }
+						for ( J = 1; J <= TotDesDays + TotRunDesPersDays; ++J ) {
+								{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileSysSizing, SSizeFmt22, flags ) << SizingFileColSep
+									 << SysSizing( I, J ).HeatFlowSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( I, J ).HeatCapSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( I, J ).CoolFlowSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( I, J ).SensCoolCapSeq( TimeStepIndex ) << SizingFileColSep
+									 << SysSizing( I, J ).TotCoolCapSeq( TimeStepIndex ); }
+						}
 					}
 					gio::write( OutputFileSysSizing );
 				}

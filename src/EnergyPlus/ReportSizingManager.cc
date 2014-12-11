@@ -1450,7 +1450,7 @@ namespace ReportSizingManager {
 						} else {
 							NominalCapacityDes = 0.0;
 						}
-						AutosizeDes = NominalCapacityDes * DataHeatSizeRatio * DataFracOfAutosizedCoolingCapacity; //Fixed Moved up 1 line inside block per Richard Raustad
+						AutosizeDes = NominalCapacityDes * DataFracOfAutosizedCoolingCapacity; //Fixed Moved up 1 line inside block per Richard Raustad
 					} // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
 				} else if (SizingType == HeatingCapacitySizing) {
 				    DataFracOfAutosizedHeatingCapacity = 1.0;
@@ -1873,11 +1873,15 @@ namespace ReportSizingManager {
 		using DataEnvironment::StdRhoAir;
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		int DDAtPeak; // index of design day at peak load
-		int TimeStepAtPeak; // time step index for peak load
+		int DDAtSensPeak;
+		int TimeStepAtSensPeak;
 		int DDAtFlowPeak;
 		int TimeStepAtFlowPeak;
 		int CoolCapCtrl; // type of coil capacity control
+		int PeakLoadType;
+		int DDAtTotPeak;
+		int TimeStepAtTotPeak;
+		int TimeStepAtPeak;
 		Real64 ZoneCoolLoadSum; // sum of zone cooling loads at the peak [W]
 		Real64 AvgZoneTemp; // average zone temperature [C]
 		Real64 AvgSupTemp; // average supply temperature for bypass control [C]
@@ -1885,11 +1889,19 @@ namespace ReportSizingManager {
 		Real64 MixTemp; // mixed air temperature at the peak [C]
 
 		CoolCapCtrl = SysSizInput( SysNum ).CoolCapControl;
-		DDAtPeak = SysSizPeakDDNum( SysNum ).SensCoolPeakDD;
-		TimeStepAtPeak = SysSizPeakDDNum( SysNum ).TimeStepAtSensCoolPk( DDAtPeak );
+		PeakLoadType = SysSizInput( SysNum ).CoolingPeakLoadType;
+		DDAtSensPeak = SysSizPeakDDNum( SysNum ).SensCoolPeakDD;
+		TimeStepAtSensPeak = SysSizPeakDDNum( SysNum ).TimeStepAtSensCoolPk( DDAtSensPeak );
 		DDAtFlowPeak = SysSizPeakDDNum( SysNum ).CoolFlowPeakDD;
 		TimeStepAtFlowPeak = SysSizPeakDDNum( SysNum ).TimeStepAtCoolFlowPk( DDAtFlowPeak );
+		DDAtTotPeak = SysSizPeakDDNum( SysNum ).TotCoolPeakDD;
+		TimeStepAtTotPeak = SysSizPeakDDNum( SysNum ).TimeStepAtTotCoolPk( DDAtTotPeak );
 
+		if ( PeakLoadType == TotalCoolingLoad ) {
+			TimeStepAtPeak = TimeStepAtTotPeak;
+		} else {
+			TimeStepAtPeak = TimeStepAtSensPeak;
+		}
 		if ( CoolCapCtrl == VAV ) {
 			DesExitTemp = FinalSysSizing( SysNum ).CoolSupTemp;
 			DesFlow = FinalSysSizing( SysNum ).MassFlowAtCoolPeak / StdRhoAir;
