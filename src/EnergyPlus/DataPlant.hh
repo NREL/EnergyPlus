@@ -263,6 +263,7 @@ namespace DataPlant {
 	extern int const TypeOf_UnitarySystemRecovery;
 	extern int const TypeOf_PackagedTESCoolingCoil;
 	extern int const TypeOf_CoolingTower_VarSpdMerkel;
+	extern int const TypeOf_SwimmingPool_Indoor;
 
 	// Parameters for General Equipment Types
 	extern int const NumGeneralEquipTypes;
