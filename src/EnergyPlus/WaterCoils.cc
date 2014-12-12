@@ -1695,8 +1695,9 @@ namespace WaterCoils {
 				bPRINT = true;
 				if ( WaterCoil ( CoilNum ).MaxWaterVolFlowRate != AutoSize ) bPRINT = false;
 				if ( CurSysNum == 0 ) bPRINT = false;
-				if ( CurSysNum > 0 ) {
+				if ( CurSysNum > 0 && CurOASysNum == 0 ) {
 					GetCoilDesFlowT( CurSysNum, CpAirStd, DesCoilAirFlow, DesCoilExitTemp );
+					DataAirFlowUsedForSizing = DesCoilAirFlow;
 					DataFlowUsedForSizing = DesCoilAirFlow;
 					DataDesOutletAirTemp = DesCoilExitTemp;
 				}

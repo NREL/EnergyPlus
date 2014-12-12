@@ -1125,10 +1125,13 @@ namespace ReportSizingManager {
 					if ( CurOASysNum > 0 ) {
 						if ( OASysEqSizing( CurOASysNum ).CoolingAirFlow ) {
 							// Parent object sets flow rate
-							AutosizeDes = OASysEqSizing ( CurOASysNum ).CoolingAirVolFlow;
-						} else {
-							AutosizeDes = FinalSysSizing ( CurSysNum ).DesOutAirVolFlow;
+							AutosizeDes = OASysEqSizing( CurOASysNum ).CoolingAirVolFlow;
 						}
+						else {
+							AutosizeDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow;
+						}
+					} else if (DataAirFlowUsedForSizing > 0.0 ) {
+						AutosizeDes = DataAirFlowUsedForSizing;
 					} else {
 						if ( CurDuctType == Main ) {
 							AutosizeDes = FinalSysSizing( CurSysNum ).DesMainVolFlow;
@@ -1285,12 +1288,10 @@ namespace ReportSizingManager {
 				} else if ( SizingType == CoolingWaterDesAirOutletTempSizing ) {
 					if ( CurOASysNum > 0 ) {
 						AutosizeDes = FinalSysSizing( CurSysNum ).PrecoolTemp;
+					} else if ( DataDesOutletAirTemp > 0.0 ) {
+						AutosizeDes = DataDesOutletAirTemp;
 					} else {
-						if ( DataDesOutletAirTemp > 0.0 ) {
-							AutosizeDes = DataDesOutletAirTemp;
-						} else {
 							AutosizeDes = FinalSysSizing( CurSysNum ).CoolSupTemp;
-						}
 					}
 					if ( AutosizeDes < DataDesInletWaterTemp && DataWaterFlowUsedForSizing > 0.0 ) {
 						ShowWarningError( CallingRoutine + ":" + " Coil=\"" + CompName + "\", Cooling Coil has leaving air temperature > entering water temperature." );
@@ -1412,7 +1413,14 @@ namespace ReportSizingManager {
 								CoilOutTemp = FinalSysSizing ( CurSysNum ).PrecoolTemp;
 								CoilOutHumRat = FinalSysSizing ( CurSysNum ).PrecoolHumRat;
 							} else { // coil is on the main air loop
-								CoilOutTemp = FinalSysSizing ( CurSysNum ).CoolSupTemp;
+								if ( DataAirFlowUsedForSizing > 0.0 ) {
+									DesVolFlow = DataAirFlowUsedForSizing;
+								}
+								if ( DataDesOutletAirTemp > 0.0 ) {
+									CoilOutTemp = DataDesOutletAirTemp;
+								} else {
+									CoilOutTemp = FinalSysSizing( CurSysNum ).CoolSupTemp;
+								}
 								CoilOutHumRat = FinalSysSizing ( CurSysNum ).CoolSupHumRat;
 								if ( PrimaryAirSystem( CurSysNum ).NumOACoolCoils == 0 ) { // there is no precooling of the OA stream
 									CoilInTemp = FinalSysSizing ( CurSysNum ).MixTempAtCoolPeak;
