@@ -194,7 +194,7 @@ namespace SurfaceGroundHeatExchanger {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		static bool GetInputFlag( true ); // Flag first time, input is fetched
-		int SurfaceGHENum; // index in local derived types
+		int SurfaceGHENum( 0 ); // index in local derived types
 
 		// check for input
 		if ( GetInputFlag ) {
@@ -309,8 +309,7 @@ namespace SurfaceGroundHeatExchanger {
 		SurfaceGHE.allocate( NumOfSurfaceGHEs );
 		SurfaceGHEQTF.allocate( NumOfSurfaceGHEs );
 		SurfaceGHEReport.allocate( NumOfSurfaceGHEs );
-		CheckEquipName.allocate( NumOfSurfaceGHEs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumOfSurfaceGHEs, true );
 
 		// initialize data structures
 		// surface data
@@ -1741,7 +1740,7 @@ namespace SurfaceGroundHeatExchanger {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

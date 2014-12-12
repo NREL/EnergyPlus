@@ -1465,7 +1465,6 @@ namespace CoolingPanelSimple {
 		// Using/Aliasing
 		using PlantUtilities::PullCompInterconnectTrigger;
 		using DataPlant::ccSimPlantEquipTypes;
-		using DataPlant::TypeOf_ChilledCeilingPanel_Simple;
 		using DataPlant::CriteriaType_MassFlowRate;
 		using DataPlant::CriteriaType_Temperature;
 		using DataPlant::CriteriaType_HeatTransferRate;

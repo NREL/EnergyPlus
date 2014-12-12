@@ -79,7 +79,7 @@ namespace DataSizing {
 	Real64 const AutoSize( -99999.0 );
 
 	// parameter for (time-of-peak) sizing format
-	gio::Fmt const PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
+	gio::Fmt PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
 
 	//Zone Outdoor Air Method
 	int const ZOAM_FlowPerPerson( 1 ); // set the outdoor air flow rate based on number of people in the zone
@@ -87,8 +87,7 @@ namespace DataSizing {
 	int const ZOAM_FlowPerArea( 3 ); // sum the outdoor air flow rate based on zone area
 	int const ZOAM_FlowPerACH( 4 ); // sum the outdoor air flow rate based on number of air changes for the zone
 	int const ZOAM_Sum( 5 ); // sum the outdoor air flow rate of the people component and the space floor area component
-	int const ZOAM_Max( 6 ); // use the maximum of the outdoor air flow rate of the people component and
-	// the space floor area component
+	int const ZOAM_Max( 6 ); // use the maximum of the outdoor air flow rate of the people component and the space floor area component
 
 	//System Outdoor Air Method
 	int const SOAM_ZoneSum( 1 ); // Sum the outdoor air flow rates of all zones
@@ -102,6 +101,21 @@ namespace DataSizing {
 	// based on the generic contaminant setpoint
 	int const SOAM_IAQPCOM( 6 ); // Take the maximum outdoor air rate from both CO2 and generic contaminant controls
 	// based on the generic contaminant setpoint
+
+	// Zone HVAC Equipment Supply Air Sizing Option
+	int const None( 1 );
+	int const SupplyAirFlowRate( 2 );
+	int const FlowPerFloorArea( 3 );
+	int const FractionOfAutosizedCoolingAirflow( 4 );
+	int const FractionOfAutosizedHeatingAirflow( 5 );
+	int const FlowPerCoolingCapacity( 6 );
+	int const FlowPerHeatingCapacity( 7 );
+
+	int const CoolingDesignCapacity( 8 );
+	int const HeatingDesignCapacity( 9 );
+	int const CapacityPerFloorArea( 10 );
+	int const FractionOfAutosizedCoolingCapacity( 11 );
+	int const FractionOfAutosizedHeatingCapacity( 12 );
 
 	// DERIVED TYPE DEFINITIONS:
 
@@ -143,11 +157,18 @@ namespace DataSizing {
 	bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
 	bool DataAutosizable( true ); // TRUE if component is autosizable
 	bool DataEMSOverrideON( false ); // boolean determines if user relies on EMS to override autosizing
+	bool DataScalableSizingON( false ); // boolean determines scalable flow sizing is specified
+	bool DataScalableCapSizingON( false ); // boolean determines scalable capacity sizing is specified
+	bool DataSysScalableFlowSizingON( false ); // boolean determines scalable system flow sizing is specified
+	bool DataSysScalableCapSizingON( false ); // boolean determines scalable system capacity sizing is specified
 	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
 	bool TermUnitSingDuct( false ); // TRUE if a non-induction single duct terminal unit
 	bool TermUnitPIU( false ); // TRUE if a powered induction terminal unit
 	bool TermUnitIU( false ); // TRUE if an unpowered induction terminal unit
 	bool ZoneEqFanCoil( false ); // TRUE if a 4 pipe fan coil unit is being simulated
+	bool ZoneEqUnitHeater( false ); // TRUE if a unit heater is being simulated
+	bool ZoneEqUnitVent( false ); // TRUE if a unit ventilator unit is being simulated
+	bool ZoneEqVentedSlab( false ); // TRUE if a ventilated slab is being simulated
 	bool ZoneEqDXCoil( false ); // TRUE if a ZoneHVAC DX coil is being simulated
 	bool ZoneCoolingOnlyFan( false ); // TRUE if a ZoneHVAC DX cooling coil is only coil in parent
 	bool ZoneHeatingOnlyFan( false ); // TRUE if zone unit only does heating and contains a fam (such as Unit Heater)
@@ -164,12 +185,22 @@ namespace DataSizing {
 	Real64 DataAirFlowUsedForSizing( 0.0 ); // air flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataWaterFlowUsedForSizing( 0.0 ); // water flow rate used for sizing with scalable inputs [m3/s]
 	Real64 DataCapacityUsedForSizing( 0.0 ); //capacity used for sizing with scalable inputs [W]
-	Real64 DataDesignCoilCapacity( 0.0); // calculated capacity of coil at end of UA calculation
+	Real64 DataDesignCoilCapacity( 0.0 ); // calculated capacity of coil at end of UA calculation
 	Real64 DataHeatSizeRatio( 1.0 ); // heating coil size as a ratio of cooling coil capacity
 	Real64 DataEMSOverride( 0.0 ); // value of EMS variable used to override autosizing
 	Real64 DataBypassFrac( 0.0 ); // value of bypass fraction for Coil:Cooling:DX:TwoStageWithHumidityControlMode coils
+	Real64 DataFracOfAutosizedCoolingAirflow( 1.0 ); // fraction of design cooling supply air flow rate
+	Real64 DataFracOfAutosizedHeatingAirflow( 1.0 ); // fraction of design heating supply air flow rate
+	Real64 DataFlowPerCoolingCapacity( 0.0 ); // cooling supply air flow per unit cooling capacity
+	Real64 DataFlowPerHeatingCapacity( 0.0 ); // heating supply air flow per unit heating capacity
+	Real64 DataFracOfAutosizedCoolingCapacity( 1.0 ); // fraction of autosized cooling capacity
+	Real64 DataFracOfAutosizedHeatingCapacity( 1.0 ); // fraction of autosized heating capacit
+	Real64 DataAutosizedCoolingCapacity( 0.0 ); // Autosized cooling capacity used for multiplying flow per capacity to get flow rate
+	Real64 DataAutosizedHeatingCapacity( 0.0 ); // Autosized heating capacit used for multiplying flow per capacity to get flow rate
 	Real64 DataConstantUsedForSizing( 0.0 ); // base value used for sizing inputs that are ratios of other inputs
 	Real64 DataFractionUsedForSizing( 0.0 ); // fractional value of base value used for sizing inputs that are ratios of other inputs
+	int DataZoneNumber( 0 ); // a pointer to a served by zoneHVAC equipment
+	int NumZoneHVACSizing( 0 ); // Number of zone HVAC sizing objects
 	Real64 DXCoolCap( 0.0 ); // The ARI cooling capacity of a DX unit.
 	Real64 GlobalHeatSizingFactor( 0.0 ); // the global heating sizing ratio
 	Real64 GlobalCoolSizingFactor( 0.0 ); // the global cooling sizing ratio
@@ -201,6 +232,7 @@ namespace DataSizing {
 	FArray1D< PlantSizingData > PlantSizData; // Input data array for plant sizing
 	FArray1D< DesDayWeathData > DesDayWeath; // design day weather saved at major time step
 	FArray1D< CompDesWaterFlowData > CompDesWaterFlow; // array to store components' design water flow
+	FArray1D< ZoneHVACSizingData > ZoneHVACSizing; // Input data for zone HVAC sizing
 
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
@@ -209,7 +241,7 @@ namespace DataSizing {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

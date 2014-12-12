@@ -258,10 +258,10 @@ namespace OutdoorAirUnit {
 		// Standard EnergyPlus methodology.
 
 		// REFERENCES:
-		// Fred Buhl's fan coil module (FanCoilUnits.f90)
-		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.f90)
-		// Young Tae Chae's Ventilated Slab System (VentilatedSlab.f90)
-		// Mixed Air.f90
+		// Fred Buhl's fan coil module (FanCoilUnits.cc)
+		// Kwang Ho Lee's Unit Ventilator Module (UnitVentilator.cc)
+		// Young Tae Chae's Ventilated Slab System (VentilatedSlab.cc)
+		// Mixed Air.cc
 
 		// Using/Aliasing
 		using namespace InputProcessor;
@@ -369,28 +369,19 @@ namespace OutdoorAirUnit {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		NumArray.dimension( MaxNums, 0.0 );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
 		NumOfOAUnits = GetNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
-		MyOneTimeErrorFlag.allocate( NumOfOAUnits );
-		MyOneTimeErrorFlag = true;
-		CheckEquipName.allocate( NumOfOAUnits );
-		CheckEquipName = true;
+		MyOneTimeErrorFlag.dimension( NumOfOAUnits, true );
+		CheckEquipName.dimension( NumOfOAUnits, true );
 
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 
@@ -2681,7 +2672,7 @@ namespace OutdoorAirUnit {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

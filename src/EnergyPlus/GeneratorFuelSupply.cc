@@ -44,7 +44,7 @@ namespace GeneratorFuelSupply {
 	// <description>
 
 	// METHODOLOGY EMPLOYED:
-	// data defined in DataGenerators.f90
+	// data defined in DataGenerators.cc
 	// this module only provides input and subroutines for other component simulations
 	//  no specific energyplus component is modeled here.  it is used by other generators
 
@@ -318,8 +318,8 @@ namespace GeneratorFuelSupply {
 		//unused  REAL(r64) :: LHV
 
 		// Formats
-		static gio::Fmt const fmtA( "(A)" );
-		static gio::Fmt const Format_501( "(' Fuel Supply, ',A,',',G13.6E2,',',G13.6E2,',',G13.6E2,',',G13.6E2)" );
+		static gio::Fmt fmtA( "(A)" );
+		static gio::Fmt Format_501( "(' Fuel Supply, ',A,',',G13.6E2,',',G13.6E2,',',G13.6E2,',',G13.6E2)" );
 
 		NumHardCodedConstituents = 14;
 

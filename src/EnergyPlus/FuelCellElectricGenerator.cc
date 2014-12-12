@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -54,7 +55,7 @@ namespace FuelCellElectricGenerator {
 	// Once the ElectricPowerManager determines that the FuelCell Generator
 	// is available to meet an electric load demand, it calls SimFuelCellGenerator
 	// which in turn calls the FuelCell model.
-	// See DataGenerators.f90 for structures and variables
+	// See DataGenerators.cc for structures and variables
 
 	// REFERENCES:
 	// IEA/ECBCS Annex 42 model specification for Solid oxide and proton exchange membrane fuel cells
@@ -274,8 +275,7 @@ namespace FuelCellElectricGenerator {
 
 			//ALLOCATE ARRAYS
 			FuelCell.allocate( NumFuelCellGenerators ); // inits handeled in derived type definitions
-			CheckEquipName.allocate( NumFuelCellGenerators );
-			CheckEquipName = true;
+			CheckEquipName.dimension( NumFuelCellGenerators, true );
 
 			// first load in FuelCell names
 			for ( GeneratorNum = 1; GeneratorNum <= NumFuelCellGenerators; ++GeneratorNum ) {
@@ -3315,8 +3315,8 @@ namespace FuelCellElectricGenerator {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		Real64 eHX; // fixed effectiveness
-		Real64 MdotWater;
-		int inNodeNum;
+		Real64 MdotWater( 0.0 );
+		int inNodeNum( 0 );
 		Real64 MWwater;
 		Real64 NdotWater;
 		Real64 TwaterIn;
@@ -3325,13 +3325,13 @@ namespace FuelCellElectricGenerator {
 		Real64 TprodGasIn;
 		Real64 CpProdGasMol;
 		Real64 NdotCp;
-		Real64 qHX;
+		Real64 qHX( 0.0 );
 		Real64 UAeff;
 		Real64 TauxMix;
 		Real64 NdotCpWater;
 		Real64 NdotCpAuxMix;
-		Real64 THXexh;
-		Real64 TwaterOut;
+		Real64 THXexh( 0.0 );
+		Real64 TwaterOut( 0.0 );
 		Real64 hgas;
 		Real64 hwater;
 		static Real64 waterFract( 0.0 );
@@ -3586,6 +3586,8 @@ namespace FuelCellElectricGenerator {
 			//    TwaterOut  =  TwaterIn + qHX / (MdotWater * CPCW( (TwaterIn + TwaterOut)/2 ))
 			//  ENDIF
 
+		} else {
+			assert( false ); // Variables not set are used below
 		}}
 
 		// update results in data structure.

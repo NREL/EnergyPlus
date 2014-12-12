@@ -642,8 +642,7 @@ namespace PlantCentralGSHP {
 		// ALLOCATE ARRAYS
 		Wrapper.allocate( NumWrappers );
 		WrapperReport.allocate( NumWrappers );
-		CheckEquipName.allocate( NumWrappers );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumWrappers, true );
 		AllocatedFlag = true;
 
 		// Load arrays with electric EIR chiller data
@@ -934,8 +933,8 @@ namespace PlantCentralGSHP {
 		Real64 CurveValTmp; // Used to evaluate PLFFPLR curve objects
 
 		// Formats
-		static gio::Fmt const Format_530( "('Curve Output = ',11(F7.2))" );
-		static gio::Fmt const Format_550( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_530( "('Curve Output = ',11(F7.2))" );
+		static gio::Fmt Format_550( "('Curve Output = ',11(F7.2))" );
 
 		cCurrentModuleObject = "ChillerHeaterPerformance:Electric:EIR";
 		NumChillerHeaters = GetNumObjectsFound( cCurrentModuleObject );
@@ -2750,7 +2749,7 @@ namespace PlantCentralGSHP {
 					if ( CHWBypassMassFlowRate > 0.0 ) {
 						CHWOutletTemp += CHWInletTemp * CHWBypassMassFlowRate / CHWInletMassFlowRate;
 					} else {
-						CHWOutletTemp = CHWOutletTemp;
+						//CHWOutletTemp = CHWOutletTemp; // Self-assignment commented out
 					}
 
 					if ( GLHEInletMassFlowRate > 0.0 ) {
@@ -2758,7 +2757,7 @@ namespace PlantCentralGSHP {
 						if ( GLHEBypassMassFlowRate > 0.0 ) {
 							GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 						} else {
-							GLHEOutletTemp = GLHEOutletTemp;
+							//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 						}
 					} else {
 						GLHEOutletTemp = GLHEInletTemp;
@@ -2919,8 +2918,8 @@ namespace PlantCentralGSHP {
 										GLHEInletMassFlowRate = 0.0;
 										GLHEOutletTemp = GLHEInletTemp;
 									} else { // At leaset, one of chiller heater units is cooling-only mode
-										GLHEOutletMassFlowRate = GLHEOutletMassFlowRate;
-										GLHEOutletTemp = GLHEOutletTemp;
+										//GLHEOutletMassFlowRate = GLHEOutletMassFlowRate; // Self-assignment commented out
+										//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 									}
 								}
 								// Calculate mass weighed chilled water temperatures
@@ -2948,7 +2947,7 @@ namespace PlantCentralGSHP {
 								if ( CHWBypassMassFlowRate > 0.0 ) {
 									CHWOutletTemp += CHWInletTemp * CHWBypassMassFlowRate / CHWInletMassFlowRate;
 								} else { // No bypass withnin a wrapper
-									CHWOutletTemp = CHWOutletTemp;
+									//CHWOutletTemp = CHWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								CHWOutletTemp = CHWInletTemp;
@@ -2959,7 +2958,7 @@ namespace PlantCentralGSHP {
 								if ( HWBypassMassFlowRate > 0.0 ) {
 									HWOutletTemp += HWInletTemp * HWBypassMassFlowRate / HWInletMassFlowRate;
 								} else {
-									HWOutletTemp = HWOutletTemp;
+									//HWOutletTemp = HWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								HWOutletTemp = HWInletTemp;
@@ -2970,7 +2969,7 @@ namespace PlantCentralGSHP {
 								if ( GLHEBypassMassFlowRate > 0.0 ) {
 									GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 								} else {
-									GLHEOutletTemp = GLHEOutletTemp;
+									//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								GLHEOutletTemp = GLHEInletTemp;
@@ -3026,8 +3025,8 @@ namespace PlantCentralGSHP {
 										GLHEInletMassFlowRate = 0.0;
 										GLHEOutletTemp = GLHEInletTemp;
 									} else { // At leaset, one of chiller heater units is heating only mode
-										GLHEOutletMassFlowRate = GLHEOutletMassFlowRate;
-										GLHEOutletTemp = GLHEOutletTemp;
+										//GLHEOutletMassFlowRate = GLHEOutletMassFlowRate; // Self-assignment commented out
+										//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 									}
 								}
 
@@ -3055,7 +3054,7 @@ namespace PlantCentralGSHP {
 								if ( CHWBypassMassFlowRate > 0.0 ) {
 									CHWOutletTemp += CHWInletTemp * CHWBypassMassFlowRate / CHWInletMassFlowRate;
 								} else { // No bypass withnin a wrapper
-									CHWOutletTemp = CHWOutletTemp;
+									//CHWOutletTemp = CHWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								CHWOutletTemp = CHWInletTemp;
@@ -3066,7 +3065,7 @@ namespace PlantCentralGSHP {
 								if ( HWBypassMassFlowRate > 0.0 ) {
 									HWOutletTemp += HWInletTemp * HWBypassMassFlowRate / HWInletMassFlowRate;
 								} else {
-									HWOutletTemp = HWOutletTemp;
+									//HWOutletTemp = HWOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								HWOutletTemp = HWInletTemp;
@@ -3077,7 +3076,7 @@ namespace PlantCentralGSHP {
 								if ( GLHEBypassMassFlowRate > 0.0 ) {
 									GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 								} else {
-									GLHEOutletTemp = GLHEOutletTemp;
+									//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 								}
 							} else {
 								GLHEOutletTemp = GLHEInletTemp;
@@ -3124,7 +3123,7 @@ namespace PlantCentralGSHP {
 							if ( HWBypassMassFlowRate > 0.0 ) {
 								HWOutletTemp += HWInletTemp * HWBypassMassFlowRate / HWInletMassFlowRate;
 							} else {
-								HWOutletTemp = HWOutletTemp;
+								//HWOutletTemp = HWOutletTemp; // Self-assignment commented out
 								if ( HWOutletTemp > HWInletTemp ) HWOutletTemp = HWInletTemp;
 							}
 						} else {
@@ -3137,7 +3136,7 @@ namespace PlantCentralGSHP {
 							if ( GLHEBypassMassFlowRate > 0.0 ) {
 								GLHEOutletTemp += GLHEInletTemp * GLHEBypassMassFlowRate / GLHEInletMassFlowRate;
 							} else {
-								GLHEOutletTemp = GLHEOutletTemp;
+								//GLHEOutletTemp = GLHEOutletTemp; // Self-assignment commented out
 							}
 						} else {
 							GLHEOutletTemp = GLHEInletTemp;
@@ -3377,7 +3376,7 @@ namespace PlantCentralGSHP {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

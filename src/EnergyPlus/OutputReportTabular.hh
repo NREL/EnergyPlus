@@ -2,6 +2,7 @@
 #define OutputReportTabular_hh_INCLUDED
 
 // C++ Headers
+#include <fstream>
 #include <string>
 
 // ObjexxFCL Headers
@@ -100,7 +101,12 @@ namespace OutputReportTabular {
 	// From Report:Table:Style
 	extern int unitsStyle; // see list of parameters
 	extern int numStyles;
-	extern FArray1D_int TabularOutputFile; // file number holder for output file
+	extern std::ofstream csv_stream; // CSV table stream
+	extern std::ofstream tab_stream; // Tab table stream
+	extern std::ofstream fix_stream; // Fixed table stream
+	extern std::ofstream htm_stream; // HTML table stream
+	extern std::ofstream xml_stream; // XML table stream
+	extern FArray1D< std::ofstream * > TabularOutputFile; // Table stream array
 	extern FArray1D_string del; // the delimiter to use
 	extern FArray1D_int TableStyle; // see list of parameters
 
@@ -714,13 +720,10 @@ namespace OutputReportTabular {
 	extern FArray1D< BinStatisticsType > BinStatistics;
 	extern FArray1D< NamedMonthlyType > namedMonthly; // for predefined monthly report titles
 	extern FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInput;
-	extern FArray1D< MonthlyFieldSetInputType > MonthlyFieldSetInputCopy;
 	extern FArray1D< MonthlyInputType > MonthlyInput;
-	extern FArray1D< MonthlyInputType > MonthlyInputCopy;
 	extern FArray1D< MonthlyTablesType > MonthlyTables;
 	extern FArray1D< MonthlyColumnsType > MonthlyColumns;
 	extern FArray1D< TOCEntriesType > TOCEntries;
-	extern FArray1D< TOCEntriesType > CopyOfTOCEntries;
 	extern FArray1D< UnitConvType > UnitConv;
 
 	// Functions
@@ -1070,7 +1073,7 @@ namespace OutputReportTabular {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

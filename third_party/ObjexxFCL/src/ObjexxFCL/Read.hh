@@ -30,1435 +30,1924 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 namespace ObjexxFCL {
 
-// Base Class for Formatted Read
-class ReadBase
-{
-
-protected: // Creation
-
-	// Constructor
-	inline
-	ReadBase()
-	{}
-
-public: // Creation
-
-	// Destructor
-	inline
-	virtual
-	~ReadBase()
-	{}
-
-private: // Creation
-
-	// Copy Constructor
-	ReadBase( ReadBase const & ); // Disallow
-
-private: // Assignment
-
-	// Copy Assignment
-	ReadBase &
-	operator =( ReadBase const & ); // Disallow
-
-protected: // Properties
-
-	// Stream
-	virtual
-	std::istream const &
-	stream() const = 0;
-
-	// Stream
-	virtual
-	std::istream &
-	stream() = 0;
-
-	// Absolute Stream Position
-	inline
-	virtual
-	std::streampos
-	poa() const
-	{ // Default implementation
-		return 0;
-	}
-
-	// Relative Virtual Stream Position
-	virtual
-	std::streampos
-	por() const = 0;
-
-	// Relative Virtual Stream Position
-	virtual
-	std::streampos &
-	por() = 0;
-
-	// Stream Position
-	virtual
-	std::streampos
-	pos() const = 0;
-
-	// Stream Position Set
-	virtual
-	void
-	pos( std::streampos const pos ) = 0;
-
-	// Format
-	virtual
-	Format const *
-	format() const = 0;
-
-	// Format
-	virtual
-	Format *
-	format() = 0;
-
-	// Flags
-	virtual
-	IOFlags const &
-	flags() const = 0;
-
-	// Stream Position
-	virtual
-	IOFlags &
-	flags() = 0;
-
-public: // Operators
-
-	// Stream Input
-	template< typename T >
-	inline
-	typename std::enable_if< ! std::is_base_of< BArray, T >::value, ReadBase & >::type // Force array overload selection for array types
-	operator >>( T & t )
-	{
-		if ( stream() && format() && format()->not_slash_terminated() ) {
-			Format::Size const reverts( format()->reverts() );
-			Format * active( format()->current() );
-			while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts ) && format()->not_slash_terminated() && active->input( stream(), poa(), por() ) ) { // Inputs up to arg-based format
-				active = active->next();
-			}
-			if ( stream() && active && active->uses_arg() && format()->not_slash_terminated() && active->input( stream(), poa(), por(), t ) ) { // Input arg using active format
-				Format::Size const reverts( format()->reverts() );
-				active = active->next();
-				while ( stream() && active && active->no_arg() && ( format()->reverts() == reverts ) && format()->not_terminated() && active->input( stream(), poa(), por() ) ) { // Inputs up to next arg-based format if not terminated
-					active = active->next();
-				}
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: complex Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( std::complex< T > & t )
-	{
-		if ( stream() && format() ) {
-			bool const ld( format()->is_list_directed() );
-			bool bad( false );
-			if ( ld ) {
-				while ( stream() && ( stream().peek() == ' ' ) ) stream().ignore();
-				if ( stream() && stream().peek() == '(' ) {
-					stream().ignore();
-				} else {
-					bad = true;
-				}
-			}
-			T real( 0.0 ), imag( 0.0 );
-			*this >> real; // Fortran uses separate format descriptors for real and imag
-			if ( bad ) { // No leading ( so treat as real part only specified
-				t = std::complex< T >( real, T( 0.0 ) ); // Intel Fortran will set the real part when the (real,imag) structure is not present
-			} else {
-				*this >> imag; // Fortran uses separate format descriptors for real and imag
-				if ( ld && stream() ) {
-					while ( stream() && ( stream().peek() == ' ' ) ) stream().ignore();
-					if ( stream() && stream().peek() == ')' ) {
-						stream().ignore();
-					} else {
-						bad = true;
-					}
-				}
-				if ( bad ) { // Partial (real,imag) structure: Bad input
-					t = std::complex< T >( T( 0.0 ), T( 0.0 ) );
-				} else {
-					t = std::complex< T >( real, imag );
-				}
-			}
-		}
-		pos( stream().tellg() );
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray< T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( typename FArray< T >::size_type i = 0; i < t.size(); ++i ) {
-				*this >> t[ i ];
-				if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray1S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray1S< T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i <= e; ++i ) {
-				*this >> t( i );
-				if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray2S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray2S< T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					*this >> t( i1, i2 );
-					if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray3S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray3S< T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						*this >> t( i1, i2, i3 );
-						if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray4S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray4S< T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							*this >> t( i1, i2, i3, i4 );
-							if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray5S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray5S< T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								*this >> t( i1, i2, i3, i4, i5 );
-								if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray6S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray6S< T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
-									*this >> t( i1, i2, i3, i4, i5, i6 );
-									if ( ! stream() ) break;
-								} if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray1S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray1S< T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i <= e; ++i ) {
-				*this >> t( i );
-				if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray2S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray2S< T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					*this >> t( i1, i2 );
-					if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray3S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray3S< T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						*this >> t( i1, i2, i3 );
-						if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray4S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray4S< T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							*this >> t( i1, i2, i3, i4 );
-							if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray5S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray5S< T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								*this >> t( i1, i2, i3, i4, i5 );
-								if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: FArray6S Overload
-	template< typename T >
-	inline
-	ReadBase &
-	operator >>( FArray6S< T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
-									*this >> t( i1, i2, i3, i4, i5, i6 );
-									if ( ! stream() ) break;
-								} if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray1 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray1< A, T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i <= e; ++i ) {
-				*this >> t( i );
-				if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray2 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray2< A, T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					*this >> t( i1, i2 );
-					if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray3 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray3< A, T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						*this >> t( i1, i2, i3 );
-						if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray4 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray4< A, T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							*this >> t( i1, i2, i3, i4 );
-							if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray5 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray5< A, T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								*this >> t( i1, i2, i3, i4, i5 );
-								if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray6 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray6< A, T > & t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
-									*this >> t( i1, i2, i3, i4, i5, i6 );
-									if ( ! stream() ) break;
-								} if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray1 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray1< A, T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i = 1, e = t.u(); i <= e; ++i ) {
-				*this >> t( i );
-				if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray2 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray2< A, T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					*this >> t( i1, i2 );
-					if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray3 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray3< A, T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						*this >> t( i1, i2, i3 );
-						if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray4 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray4< A, T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							*this >> t( i1, i2, i3, i4 );
-							if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray5 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray5< A, T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								*this >> t( i1, i2, i3, i4, i5 );
-								if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-	// Stream Input: MArray6 Overload
-	template< class A, typename T >
-	inline
-	ReadBase &
-	operator >>( MArray6< A, T > && t )
-	{
-		if ( stream() && format() ) {
-			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
-				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
-					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
-						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
-							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
-								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
-									*this >> t( i1, i2, i3, i4, i5, i6 );
-									if ( ! stream() ) break;
-								} if ( ! stream() ) break;
-							} if ( ! stream() ) break;
-						} if ( ! stream() ) break;
-					} if ( ! stream() ) break;
-				} if ( ! stream() ) break;
-			}
-		}
-		status_set();
-		return *this;
-	}
-
-protected: // Methods
-
-	// Status Flags Set
-	inline
-	void
-	status_set()
-	{
-		flags().set_status( stream() );
-	}
-
-}; // ReadBase
-
-class ReadStream : public ReadBase
-{
-
-public: // Creation
-
-	// Format String Constructor
-	inline
-	ReadStream( std::istream & stream, std::string const & fmt, IOFlags & flags ) :
-		stream_( stream ),
-		poa_( stream.tellg() ),
-		por_( 0 ),
-		format_( FormatFactory::create( fmt ) ),
-		flags_( flags )
-	{
-		flags_.clear_status();
-		if ( format_ ) {
-			format_->blank_zero() = flags_.blank_zero();
-			format_->non_advancing() = flags_.non_advancing(); // Allowed with list-directed format but Fortran doesn't
-		}
-	}
-
-	// Format Wrapper Constructor
-	inline
-	ReadStream( std::istream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
-		stream_( stream ),
-		poa_( stream.tellg() ),
-		por_( 0 ),
-		format_( fmt.format_clone() ),
-		flags_( flags )
-	{
-		flags_.clear_status();
-		if ( format_ ) {
-			format_->blank_zero() = flags_.blank_zero();
-			format_->non_advancing() = flags_.non_advancing(); // Allowed with list-directed format but Fortran doesn't
-		}
-	}
-
-	// Destructor
-	inline
-	virtual
-	~ReadStream()
-	{
-		if ( format_ ) {
-			if ( stream_ ) {
-				if ( format_->non_advancing() ) { // Non-advancing
-					format_->input_pos( stream_, pos() ); // Set final stream position
-				} else { // Advancing
-					stream_ >> Format::skip; // Advance to next line
-				}
-			}
-			delete format_;
-		}
-	}
-
-protected: // Properties
-
-	// Stream
-	inline
-	std::istream const &
-	stream() const
-	{
-		return stream_;
-	}
-
-	// Stream
-	inline
-	std::istream &
-	stream()
-	{
-		return stream_;
-	}
-
-	// Absolute Initial Stream Position
-	inline
-	std::streampos
-	poa() const
-	{
-		return poa_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos
-	por() const
-	{
-		return por_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos &
-	por()
-	{
-		return por_;
-	}
-
-	// Stream Position
-	inline
-	std::streampos
-	pos() const
-	{
-		return poa_ + por_;
-	}
-
-	// Stream Position Set
-	inline
-	void
-	pos( std::streampos const pos )
-	{
-		por_ = pos - poa_;
-	}
-
-	// Format
-	inline
-	Format const *
-	format() const
-	{
-		return format_;
-	}
-
-	// Format
-	inline
-	Format *
-	format()
-	{
-		return format_;
-	}
-
-	// Flags
-	inline
-	IOFlags const &
-	flags() const
-	{
-		return flags_;
-	}
-
-	// Stream Position
-	inline
-	IOFlags &
-	flags()
-	{
-		return flags_;
-	}
-
-private: // Data
-
-	std::istream & stream_; // Input stream
-	std::streampos const poa_; // Absolute initial stream position
-	std::streampos por_; // Relative virtual stream position
-	Format * format_; // Format expression
-	IOFlags & flags_; // I/o flags
-
-}; // ReadStream
-
-class ReadString : public ReadBase
-{
-
-public: // Creation
-
-	// Format String Constructor
-	inline
-	ReadString( std::string const & str, std::string const & fmt, IOFlags & flags ) :
-		stream_( str ),
-		pos_( 0 ),
-		format_( FormatFactory::create( fmt ) ),
-		flags_( flags )
-	{
-		flags_.clear_status();
-		if ( format_ ) {
-			format_->blank_zero() = flags_.blank_zero();
-		}
-	}
-
-	// Format Wrapper Constructor
-	inline
-	ReadString( std::string const & str, gio::Fmt const & fmt, IOFlags & flags ) :
-		stream_( str ),
-		pos_( 0 ),
-		format_( fmt.format_clone() ),
-		flags_( flags )
-	{
-		flags_.clear_status();
-		if ( format_ ) {
-			format_->blank_zero() = flags_.blank_zero();
-		}
-	}
-
-	// Destructor
-	inline
-	virtual
-	~ReadString()
-	{
-		if ( format_ ) delete format_;
-	}
-
-protected: // Properties
-
-	// Stream
-	inline
-	std::istream const &
-	stream() const
-	{
-		return stream_;
-	}
-
-	// Stream
-	inline
-	std::istream &
-	stream()
-	{
-		return stream_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos
-	por() const
-	{
-		return pos_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos &
-	por()
-	{
-		return pos_;
-	}
-
-	// Stream Position
-	inline
-	std::streampos
-	pos() const
-	{
-		return pos_;
-	}
-
-	// Stream Position Set
-	virtual
-	void
-	pos( std::streampos const pos )
-	{
-		pos_ = pos;
-	}
-
-	// Format
-	inline
-	Format const *
-	format() const
-	{
-		return format_;
-	}
-
-	// Format
-	inline
-	Format *
-	format()
-	{
-		return format_;
-	}
-
-	// Flags
-	inline
-	IOFlags const &
-	flags() const
-	{
-		return flags_;
-	}
-
-	// Stream Position
-	inline
-	IOFlags &
-	flags()
-	{
-		return flags_;
-	}
-
-private: // Data
-
-	std::istringstream stream_; // Internal stream
-	std::streampos pos_; // Stream position
-	Format * format_; // Format expression
-	IOFlags & flags_; // I/o flags
-
-}; // ReadString
-
-class ReadFstring : public ReadBase
-{
-
-public: // Creation
-
-	// Format String Constructor
-	inline
-	ReadFstring( Fstring const & str, std::string const & fmt, IOFlags & flags ) :
-		stream_( str ),
-		pos_( 0 ),
-		format_( FormatFactory::create( fmt ) ),
-		flags_( flags )
-	{
-		flags_.clear_status();
-		if ( format_ ) {
-			format_->blank_zero() = flags_.blank_zero();
-		}
-	}
-
-	// Format Wrapper Constructor
-	inline
-	ReadFstring( Fstring const & str, gio::Fmt const & fmt, IOFlags & flags ) :
-		stream_( str ),
-		pos_( 0 ),
-		format_( fmt.format_clone() ),
-		flags_( flags )
-	{
-		flags_.clear_status();
-		if ( format_ ) {
-			format_->blank_zero() = flags_.blank_zero();
-		}
-	}
-
-	// Destructor
-	inline
-	virtual
-	~ReadFstring()
-	{
-		if ( format_ ) delete format_;
-	}
-
-protected: // Properties
-
-	// Stream
-	inline
-	std::istream const &
-	stream() const
-	{
-		return stream_;
-	}
-
-	// Stream
-	inline
-	std::istream &
-	stream()
-	{
-		return stream_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos
-	por() const
-	{
-		return pos_;
-	}
-
-	// Relative Virtual Stream Position
-	inline
-	std::streampos &
-	por()
-	{
-		return pos_;
-	}
-
-	// Stream Position
-	inline
-	std::streampos
-	pos() const
-	{
-		return pos_;
-	}
-
-	// Stream Position Set
-	virtual
-	void
-	pos( std::streampos const pos )
-	{
-		pos_ = pos;
-	}
-
-	// Format
-	inline
-	Format const *
-	format() const
-	{
-		return format_;
-	}
-
-	// Format
-	inline
-	Format *
-	format()
-	{
-		return format_;
-	}
-
-	// Flags
-	inline
-	IOFlags const &
-	flags() const
-	{
-		return flags_;
-	}
-
-	// Stream Position
-	inline
-	IOFlags &
-	flags()
-	{
-		return flags_;
-	}
-
-private: // Data
-
-	std::istringstream stream_; // Internal stream
-	std::streampos pos_; // Stream position
-	Format * format_; // Format expression
-	IOFlags & flags_; // I/o flags
-
-}; // ReadFstring
-
-// Read Wrapper Factory
-class Read
+class ReadStream
 {
 
 public: // Creation
 
 	// Default Constructor
 	inline
-	Read() :
-		read_( nullptr )
+	ReadStream() :
+	 sstream_( nullptr ),
+	 stream_( internal_stream_ ),
+	 format_( nullptr ),
+	 format_own_( false ),
+	 flags_( nullptr ),
+	 poa_( 0 ),
+	 por_( 0 )
 	{}
 
 	// Move Constructor
 	inline
-	Read( Read && r ) :
-		flags_( r.flags_ ),
-		read_( r.read_ )
+	ReadStream( ReadStream && r ) :
+	 sstream_( nullptr ),
+	 stream_( r.stream_ ),
+	 format_( r.format_ ),
+	 format_own_( r.format_own_ ),
+	 flags_( r.flags_ ? &r.flags_->clear_status() : nullptr ),
+	 poa_( r.poa_ ),
+	 por_( r.por_ )
 	{
-		r.read_ = nullptr;
+		r.format_ = nullptr;
+		r.format_own_ = false;
 	}
 
 	// Flags Constructor
 	inline
 	explicit
-	Read( IOFlags & ) :
-		read_( nullptr )
+	ReadStream( IOFlags & flags ) :
+	 sstream_( nullptr ),
+	 stream_( internal_stream_ ),
+	 format_( nullptr ),
+	 format_own_( false ),
+	 flags_( &flags.clear_status() ),
+	 poa_( 0 ),
+	 por_( 0 )
 	{}
 
 	// Stream + Format Constructor
 	inline
-	Read( std::istream & stream, std::string const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags_ ) )
+	ReadStream( std::istream & stream, std::string const & fmt, bool const beg = false ) :
+	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
+	 stream_( sstream_ ? *sstream_ : stream ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 poa_( sstream_ || beg ? static_cast< std::streampos >( 0 ) : stream.tellg() ),
+	 por_( 0 )
 	{
-		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
+		if ( sstream_ ) { // Do the stdin read
 			std::string s;
 			cross_platform_get_line( stream, s );
-			read_ = new ReadString( s, fmt, flags_ );
-			flags_.set_status( stream );
+			sstream_->str( s );
 		}
 	}
 
 	// Stream + Format Constructor
 	inline
-	Read( std::istream & stream, gio::Fmt const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags_ ) )
+	ReadStream( std::istream & stream, gio::Fmt const & fmt, bool const beg = false ) :
+	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
+	 stream_( sstream_ ? *sstream_ : stream ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 poa_( sstream_ || beg ? static_cast< std::streampos >( 0 ) : stream.tellg() ),
+	 por_( 0 )
 	{
-		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
+		if ( sstream_ ) { // Do the stdin read
 			std::string s;
 			cross_platform_get_line( stream, s );
-			read_ = new ReadString( s, fmt, flags_ );
-			flags_.set_status( stream );
+			sstream_->str( s );
+		}
+	}
+
+	// Stream + Format Constructor
+	inline
+	ReadStream( std::istream & stream, gio::Fmt & fmt, bool const beg = false ) :
+	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
+	 stream_( sstream_ ? *sstream_ : stream ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( nullptr ),
+	 poa_( sstream_ || beg ? static_cast< std::streampos >( 0 ) : stream.tellg() ),
+	 por_( 0 )
+	{
+		if ( sstream_ ) { // Do the stdin read
+			std::string s;
+			cross_platform_get_line( stream, s );
+			sstream_->str( s );
 		}
 	}
 
 	// Stream + Format + Flags Constructor
 	inline
-	Read( std::istream & stream, std::string const & fmt, IOFlags & flags ) :
-		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags ) )
+	ReadStream( std::istream & stream, std::string const & fmt, IOFlags & flags, bool const beg = false ) :
+	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
+	 stream_( sstream_ ? *sstream_ : stream ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 poa_( sstream_ || beg ? static_cast< std::streampos >( 0 ) : stream.tellg() ),
+	 por_( 0 )
 	{
-		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
+		if ( format_ ) {
+			format_->blank_zero() = flags_->blank_zero();
+			format_->non_advancing() = flags_->non_advancing();
+		}
+		if ( sstream_ ) { // Do the stdin read
 			std::string s;
 			cross_platform_get_line( stream, s );
-			read_ = new ReadString( s, fmt, flags );
-			flags.set_status( stream );
+			sstream_->str( s );
 		}
 	}
 
 	// Stream + Format + Flags Constructor
 	inline
-	Read( std::istream & stream, gio::Fmt const & fmt, IOFlags & flags ) :
-		read_( stream.rdbuf() == std::cin.rdbuf() ? nullptr : new ReadStream( stream, fmt, flags ) )
+	ReadStream( std::istream & stream, gio::Fmt const & fmt, IOFlags & flags, bool const beg = false ) :
+	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
+	 stream_( sstream_ ? *sstream_ : stream ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 poa_( sstream_ || beg ? static_cast< std::streampos >( 0 ) : stream.tellg() ),
+	 por_( 0 )
 	{
-		if ( stream.rdbuf() == std::cin.rdbuf() ) { // Do the stdin read
+		if ( format_ ) {
+			format_->blank_zero() = flags_->blank_zero();
+			format_->non_advancing() = flags_->non_advancing();
+		}
+		if ( sstream_ ) { // Do the stdin read
 			std::string s;
 			cross_platform_get_line( stream, s );
-			read_ = new ReadString( s, fmt, flags );
-			flags.set_status( stream );
+			sstream_->str( s );
 		}
 	}
 
-	// String + Format Constructor
+	// Stream + Format + Flags Constructor
 	inline
-	Read( std::string const & str, std::string const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( new ReadString( str, fmt, flags_ ) )
-	{}
-
-	// String + Format Constructor
-	inline
-	Read( std::string const & str, gio::Fmt const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( new ReadString( str, fmt, flags_ ) )
-	{}
-
-	// String + Format + Flags Constructor
-	inline
-	Read( std::string const & str, std::string const & fmt, IOFlags & flags ) :
-		read_( new ReadString( str, fmt, flags ) )
-	{}
-
-	// String + Format + Flags Constructor
-	inline
-	Read( std::string const & str, gio::Fmt const & fmt, IOFlags & flags ) :
-		read_( new ReadString( str, fmt, flags ) )
-	{}
-
-	// Fstring + Format Constructor
-	inline
-	Read( Fstring const & str, std::string const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( new ReadFstring( str, fmt, flags_ ) )
-	{}
-
-	// Fstring + Format Constructor
-	inline
-	Read( Fstring const & str, gio::Fmt const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( new ReadFstring( str, fmt, flags_ ) )
-	{}
-
-	// Fstring + Format + Flags Constructor
-	inline
-	Read( Fstring const & str, std::string const & fmt, IOFlags & flags ) :
-		read_( new ReadFstring( str, fmt, flags ) )
-	{}
-
-	// Fstring + Format + Flags Constructor
-	inline
-	Read( Fstring const & str, gio::Fmt const & fmt, IOFlags & flags ) :
-		read_( new ReadFstring( str, fmt, flags ) )
-	{}
-
-	// C-String + Format Constructor
-	inline
-	Read( char const * str, std::string const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( new ReadString( std::string( str ), fmt, flags_ ) )
-	{}
-
-	// C-String + Format Constructor
-	inline
-	Read( char const * str, gio::Fmt const & fmt ) :
-		flags_( IOFlags::handler() ),
-		read_( new ReadString( std::string( str ), fmt, flags_ ) )
-	{}
-
-	// C-String + Format + Flags Constructor
-	inline
-	Read( char const * str, std::string const & fmt, IOFlags & flags ) :
-		read_( new ReadString( std::string( str ), fmt, flags ) )
-	{}
-
-	// C-String + Format + Flags Constructor
-	inline
-	Read( char const * str, gio::Fmt const & fmt, IOFlags & flags ) :
-		read_( new ReadString( std::string( str ), fmt, flags ) )
-	{}
+	ReadStream( std::istream & stream, gio::Fmt & fmt, IOFlags & flags, bool const beg = false ) :
+	 sstream_( stream.rdbuf() == std::cin.rdbuf() ? new std::istringstream : nullptr ),
+	 stream_( sstream_ ? *sstream_ : stream ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( &flags.clear_status() ),
+	 poa_( sstream_ || beg ? static_cast< std::streampos >( 0 ) : stream.tellg() ),
+	 por_( 0 )
+	{
+		if ( format_ ) {
+			format_->blank_zero() = flags_->blank_zero();
+			format_->non_advancing() = flags_->non_advancing();
+		}
+		if ( sstream_ ) { // Do the stdin read
+			std::string s;
+			cross_platform_get_line( stream, s );
+			sstream_->str( s );
+		}
+	}
 
 	// Destructor
 	inline
-	~Read()
+	~ReadStream()
 	{
-		if ( read_ ) delete read_;
+		if ( format_ ) {
+			if ( stream_ && ! sstream_ ) {
+				if ( format_->non_advancing() ) { // Non-advancing
+					format_->input_pos( stream_, poa_ + por_ ); // Set final stream position
+				} else { // Advancing
+					stream_ >> Format::skip; // Advance to next line
+				}
+			}
+			if ( format_own_ ) delete format_;
+			if ( sstream_ ) delete sstream_;
+		}
 	}
 
 private: // Creation
 
 	// Copy Constructor
-	Read( Read const & ); // Disallow
+	ReadStream( ReadStream const & ); // Disallow
 
 private: // Assignment
 
 	// Copy Assignment
-	Read &
-	operator =( Read const & ); // Disallow
+	ReadStream &
+	operator =( ReadStream const & ); // Disallow
+
+public: // Properties
+
+	// Stream
+	inline
+	std::istream const &
+	stream() const
+	{
+		return stream_;
+	}
+
+	// Stream
+	inline
+	std::istream &
+	stream()
+	{
+		return stream_;
+	}
+
+	// Format
+	inline
+	Format const *
+	format() const
+	{
+		return format_;
+	}
+
+	// Format
+	inline
+	Format *
+	format()
+	{
+		return format_;
+	}
 
 public: // Operators
 
 	// Stream Input
-	template< typename T >
+	template< typename T, class = typename std::enable_if< ! std::is_base_of< BArray, T >::value >::type >
 	inline
-	Read &
+	ReadStream &
 	operator >>( T & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ ) {
+			if ( format_ && format_->not_slash_terminated() ) {
+				Format::Size const reverts( format_->reverts() );
+				Format * active( format_->current() );
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_slash_terminated() && active->input( stream_, poa_, por_ ) ) { // Inputs up to arg-based format
+					active = active->next();
+				}
+				if ( stream_ && active && active->uses_arg() && format_->not_slash_terminated() && active->input( stream_, poa_, por_, t ) ) { // Input arg using active format
+					Format::Size const reverts( format_->reverts() );
+					active = active->next();
+					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_terminated() && active->input( stream_, poa_, por_ ) ) { // Inputs up to next arg-based format if not terminated
+						active = active->next();
+					}
+				}
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: complex Overload
+	template< typename T >
+	inline
+	ReadStream &
+	operator >>( std::complex< T > & t )
+	{
+		if ( stream_ ) {
+			if ( format_ ) {
+				bool const ld( format_->is_list_directed() );
+				bool bad( false );
+				if ( ld ) {
+					while ( stream_ && ( stream_.peek() == ' ' ) ) {
+						stream_.ignore();
+						por_ += 1;
+					}
+					if ( stream_ && stream_.peek() == '(' ) {
+						stream_.ignore();
+						por_ += 1;
+					} else {
+						bad = true;
+					}
+				}
+				T real( 0.0 ), imag( 0.0 );
+				*this >> real; // Fortran uses separate format descriptors for real and imag
+				if ( bad ) { // No leading ( so treat as real part only specified
+					t = std::complex< T >( real, T( 0.0 ) ); // Intel Fortran will set the real part when the (real,imag) structure is not present
+				} else {
+					*this >> imag; // Fortran uses separate format descriptors for real and imag
+					if ( ld && stream_ ) {
+						while ( stream_ && ( stream_.peek() == ' ' ) ) {
+							stream_.ignore();
+							por_ += 1;
+						}
+						if ( stream_ && stream_.peek() == ')' ) {
+							stream_.ignore();
+							por_ += 1;
+						} else {
+							bad = true;
+						}
+					}
+					if ( bad ) { // Partial (real,imag) structure: Bad input
+						t = std::complex< T >( T( 0.0 ), T( 0.0 ) );
+					} else {
+						t = std::complex< T >( real, imag );
+					}
+				}
+			}
+		}
+		por_ = stream_.tellg() - poa_;
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray Overload
+	template< typename T >
+	inline
+	ReadStream &
+	operator >>( FArray< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( typename FArray< T >::size_type i = 0; i < t.size(); ++i ) {
+				*this >> t[ i ];
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: FArray1S Overload
 	template< typename T >
 	inline
-	Read &
-	operator >>( FArray1S< T > && t )
+	ReadStream &
+	operator >>( FArray1S< T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: FArray2S Overload
 	template< typename T >
 	inline
-	Read &
-	operator >>( FArray2S< T > && t )
+	ReadStream &
+	operator >>( FArray2S< T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: FArray3S Overload
 	template< typename T >
 	inline
-	Read &
-	operator >>( FArray3S< T > && t )
+	ReadStream &
+	operator >>( FArray3S< T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: FArray4S Overload
 	template< typename T >
 	inline
-	Read &
-	operator >>( FArray4S< T > && t )
+	ReadStream &
+	operator >>( FArray4S< T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: FArray5S Overload
 	template< typename T >
 	inline
-	Read &
-	operator >>( FArray5S< T > && t )
+	ReadStream &
+	operator >>( FArray5S< T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: FArray6S Overload
 	template< typename T >
 	inline
-	Read &
+	ReadStream &
+	operator >>( FArray6S< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray1S Overload
+	template< typename T >
+	inline
+	ReadStream &
+	operator >>( FArray1S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray2S Overload
+	template< typename T >
+	inline
+	ReadStream &
+	operator >>( FArray2S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray3S Overload
+	template< typename T >
+	inline
+	ReadStream &
+	operator >>( FArray3S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray4S Overload
+	template< typename T >
+	inline
+	ReadStream &
+	operator >>( FArray4S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray5S Overload
+	template< typename T >
+	inline
+	ReadStream &
+	operator >>( FArray5S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray6S Overload
+	template< typename T >
+	inline
+	ReadStream &
 	operator >>( FArray6S< T > && t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: MArray1 Overload
 	template< class A, typename T >
 	inline
-	Read &
-	operator >>( MArray1< A, T > && t )
+	ReadStream &
+	operator >>( MArray1< A, T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: MArray2 Overload
 	template< class A, typename T >
 	inline
-	Read &
-	operator >>( MArray2< A, T > && t )
+	ReadStream &
+	operator >>( MArray2< A, T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: MArray3 Overload
 	template< class A, typename T >
 	inline
-	Read &
-	operator >>( MArray3< A, T > && t )
+	ReadStream &
+	operator >>( MArray3< A, T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: MArray4 Overload
 	template< class A, typename T >
 	inline
-	Read &
-	operator >>( MArray4< A, T > && t )
+	ReadStream &
+	operator >>( MArray4< A, T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: MArray5 Overload
 	template< class A, typename T >
 	inline
-	Read &
-	operator >>( MArray5< A, T > && t )
+	ReadStream &
+	operator >>( MArray5< A, T > & t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
 	}
 
 	// Stream Input: MArray6 Overload
 	template< class A, typename T >
 	inline
-	Read &
+	ReadStream &
+	operator >>( MArray6< A, T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray1 Overload
+	template< class A, typename T >
+	inline
+	ReadStream &
+	operator >>( MArray1< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray2 Overload
+	template< class A, typename T >
+	inline
+	ReadStream &
+	operator >>( MArray2< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray3 Overload
+	template< class A, typename T >
+	inline
+	ReadStream &
+	operator >>( MArray3< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray4 Overload
+	template< class A, typename T >
+	inline
+	ReadStream &
+	operator >>( MArray4< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray5 Overload
+	template< class A, typename T >
+	inline
+	ReadStream &
+	operator >>( MArray5< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray6 Overload
+	template< class A, typename T >
+	inline
+	ReadStream &
 	operator >>( MArray6< A, T > && t )
 	{
-		if ( read_ ) *read_ >> t;
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
 		return *this;
+	}
+
+private: // Methods
+
+	// Status Flags Set
+	inline
+	void
+	set_status()
+	{
+		if ( flags_ ) flags_->set_status( stream_ );
 	}
 
 private: // Data
 
-	IOFlags flags_; // Internal i/o flags
-	ReadBase * read_; // Implementation object
+	std::istringstream * sstream_; // Internal stream for std::cin reads
+	std::istream & stream_; // Input stream
+	Format * format_; // Format expression
+	bool format_own_; // Own the Format?
+	IOFlags * flags_; // I/o flags
+	std::streampos const poa_; // Absolute stream position
+	std::streampos por_; // Relative virtual stream position
 
-}; // Read
+private: // Static Data
+
+	static std::istringstream internal_stream_; // Internal stream
+
+}; // ReadStream
+
+class ReadString
+{
+
+public: // Creation
+
+	// Default Constructor
+	inline
+	ReadString() :
+	 format_( nullptr ),
+	 format_own_( false ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// Move Constructor
+	inline
+	ReadString( ReadString && r ) :
+#if defined(__GNUC__) && __GNUC__ < 5 // GCC 5 will add missing move constructor
+	 stream_( r.stream_.str() ),
+#else
+	 stream_( std::move( r.stream_ ) ),
+#endif
+	 format_( r.format_ ),
+	 format_own_( r.format_own_ ),
+	 flags_( r.flags_ ? &r.flags_->clear_status() : nullptr ),
+	 pos_( r.pos_ )
+	{
+#if defined(__GNUC__) && __GNUC__ < 5 // Finish copying state
+		stream_.copyfmt( r.stream_ );
+		stream_.clear( r.stream_.rdstate() );
+		stream_.seekg( r.stream_.tellg() );
+#endif
+		r.format_ = nullptr;
+		r.format_own_ = false;
+	}
+
+	// Flags Constructor
+	inline
+	explicit
+	ReadString( IOFlags & flags ) :
+	 format_( nullptr ),
+	 format_own_( false ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{}
+
+	// String + Format Constructor
+	inline
+	ReadString( std::string const & str, std::string const & fmt ) :
+	 stream_( str ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// String + Format Constructor
+	inline
+	ReadString( std::string const & str, gio::Fmt const & fmt ) :
+	 stream_( str ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// String + Format Constructor
+	inline
+	ReadString( std::string const & str, gio::Fmt & fmt ) :
+	 stream_( str ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// String + Format + Flags Constructor
+	inline
+	ReadString( std::string const & str, std::string const & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// String + Format + Flags Constructor
+	inline
+	ReadString( std::string const & str, gio::Fmt const & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// String + Format + Flags Constructor
+	inline
+	ReadString( std::string const & str, gio::Fmt & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// Fstring + Format Constructor
+	inline
+	ReadString( Fstring const & str, std::string const & fmt ) :
+	 stream_( str ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// Fstring + Format Constructor
+	inline
+	ReadString( Fstring const & str, gio::Fmt const & fmt ) :
+	 stream_( str ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// Fstring + Format Constructor
+	inline
+	ReadString( Fstring const & str, gio::Fmt & fmt ) :
+	 stream_( str ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// Fstring + Format + Flags Constructor
+	inline
+	ReadString( Fstring const & str, std::string const & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// Fstring + Format + Flags Constructor
+	inline
+	ReadString( Fstring const & str, gio::Fmt const & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// Fstring + Format + Flags Constructor
+	inline
+	ReadString( Fstring const & str, gio::Fmt & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// C-String + Format Constructor
+	inline
+	ReadString( char const * str, std::string const & fmt ) :
+	 stream_( str ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// C-String + Format Constructor
+	inline
+	ReadString( char const * str, gio::Fmt const & fmt ) :
+	 stream_( str ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// C-String + Format Constructor
+	inline
+	ReadString( char const * str, gio::Fmt & fmt ) :
+	 stream_( str ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( nullptr ),
+	 pos_( 0 )
+	{}
+
+	// C-String + Format + Flags Constructor
+	inline
+	ReadString( char const * str, std::string const & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( FormatFactory::create( fmt ) ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// C-String + Format + Flags Constructor
+	inline
+	ReadString( char const * str, gio::Fmt const & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( fmt.format_clone() ),
+	 format_own_( true ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// C-String + Format + Flags Constructor
+	inline
+	ReadString( char const * str, gio::Fmt & fmt, IOFlags & flags ) :
+	 stream_( str ),
+	 format_( fmt.format_reset() ),
+	 format_own_( false ),
+	 flags_( &flags.clear_status() ),
+	 pos_( 0 )
+	{
+		if ( format_ ) format_->blank_zero() = flags_->blank_zero();
+	}
+
+	// Destructor
+	inline
+	~ReadString()
+	{
+		if ( format_ && format_own_ ) delete format_;
+	}
+
+private: // Creation
+
+	// Copy Constructor
+	ReadString( ReadString const & ); // Disallow
+
+private: // Assignment
+
+	// Copy Assignment
+	ReadString &
+	operator =( ReadString const & ); // Disallow
+
+public: // Properties
+
+	// Stream
+	inline
+	std::istream const &
+	stream() const
+	{
+		return stream_;
+	}
+
+	// Stream
+	inline
+	std::istream &
+	stream()
+	{
+		return stream_;
+	}
+
+	// Format
+	inline
+	Format const *
+	format() const
+	{
+		return format_;
+	}
+
+	// Format
+	inline
+	Format *
+	format()
+	{
+		return format_;
+	}
+
+public: // Operators
+
+	// Stream Input
+	template< typename T, class = typename std::enable_if< ! std::is_base_of< BArray, T >::value >::type >
+	inline
+	ReadString &
+	operator >>( T & t )
+	{
+		if ( stream_ ) {
+			if ( format_ && format_->not_slash_terminated() ) {
+				Format::Size const reverts( format_->reverts() );
+				Format * active( format_->current() );
+				while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_slash_terminated() && active->input( stream_, pos_ ) ) { // Inputs up to arg-based format
+					active = active->next();
+				}
+				if ( stream_ && active && active->uses_arg() && format_->not_slash_terminated() && active->input( stream_, pos_, t ) ) { // Input arg using active format
+					Format::Size const reverts( format_->reverts() );
+					active = active->next();
+					while ( stream_ && active && active->no_arg() && ( format_->reverts() == reverts ) && format_->not_terminated() && active->input( stream_, pos_ ) ) { // Inputs up to next arg-based format if not terminated
+						active = active->next();
+					}
+				}
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: complex Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( std::complex< T > & t )
+	{
+		if ( stream_ ) {
+			if ( format_ ) {
+				bool const ld( format_->is_list_directed() );
+				bool bad( false );
+				if ( ld ) {
+					while ( stream_ && ( stream_.peek() == ' ' ) ) {
+						stream_.ignore();
+						pos_ += 1;
+					}
+					if ( stream_ && stream_.peek() == '(' ) {
+						stream_.ignore();
+						pos_ += 1;
+					} else {
+						bad = true;
+					}
+				}
+				T real( 0.0 ), imag( 0.0 );
+				*this >> real; // Fortran uses separate format descriptors for real and imag
+				if ( bad ) { // No leading ( so treat as real part only specified
+					t = std::complex< T >( real, T( 0.0 ) ); // Intel Fortran will set the real part when the (real,imag) structure is not present
+				} else {
+					*this >> imag; // Fortran uses separate format descriptors for real and imag
+					if ( ld && stream_ ) {
+						while ( stream_ && ( stream_.peek() == ' ' ) ) {
+							stream_.ignore();
+							pos_ += 1;
+						}
+						if ( stream_ && stream_.peek() == ')' ) {
+							stream_.ignore();
+							pos_ += 1;
+						} else {
+							bad = true;
+						}
+					}
+					if ( bad ) { // Partial (real,imag) structure: Bad input
+						t = std::complex< T >( T( 0.0 ), T( 0.0 ) );
+					} else {
+						t = std::complex< T >( real, imag );
+					}
+				}
+			}
+		}
+		pos_ = stream_.tellg();
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( typename FArray< T >::size_type i = 0; i < t.size(); ++i ) {
+				*this >> t[ i ];
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray1S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray1S< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray2S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray2S< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray3S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray3S< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray4S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray4S< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray5S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray5S< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray6S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray6S< T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray1S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray1S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray2S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray2S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray3S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray3S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray4S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray4S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray5S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray5S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: FArray6S Overload
+	template< typename T >
+	inline
+	ReadString &
+	operator >>( FArray6S< T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray1 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray1< A, T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray2 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray2< A, T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray3 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray3< A, T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray4 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray4< A, T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray5 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray5< A, T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray6 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray6< A, T > & t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray1 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray1< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i = 1, e = t.u(); i <= e; ++i ) {
+				*this >> t( i );
+				if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray2 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray2< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					*this >> t( i1, i2 );
+					if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray3 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray3< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						*this >> t( i1, i2, i3 );
+						if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray4 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray4< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							*this >> t( i1, i2, i3, i4 );
+							if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray5 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray5< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								*this >> t( i1, i2, i3, i4, i5 );
+								if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+	// Stream Input: MArray6 Overload
+	template< class A, typename T >
+	inline
+	ReadString &
+	operator >>( MArray6< A, T > && t )
+	{
+		if ( stream_ && format_ ) {
+			for ( int i1 = 1, e1 = t.u1(); i1 <= e1; ++i1 ) {
+				for ( int i2 = 1, e2 = t.u2(); i2 <= e2; ++i2 ) {
+					for ( int i3 = 1, e3 = t.u3(); i3 <= e3; ++i3 ) {
+						for ( int i4 = 1, e4 = t.u4(); i4 <= e4; ++i4 ) {
+							for ( int i5 = 1, e5 = t.u5(); i5 <= e5; ++i5 ) {
+								for ( int i6 = 1, e6 = t.u6(); i6 <= e6; ++i6 ) {
+									*this >> t( i1, i2, i3, i4, i5, i6 );
+									if ( ! stream_ ) break;
+								} if ( ! stream_ ) break;
+							} if ( ! stream_ ) break;
+						} if ( ! stream_ ) break;
+					} if ( ! stream_ ) break;
+				} if ( ! stream_ ) break;
+			}
+		}
+		set_status();
+		return *this;
+	}
+
+private: // Methods
+
+	// Status Flags Set
+	inline
+	void
+	set_status()
+	{
+		if ( flags_ ) flags_->set_status( stream_ );
+	}
+
+private: // Data
+
+	std::istringstream stream_; // Internal stream
+	Format * format_; // Format expression
+	bool format_own_; // Own the Format?
+	IOFlags * flags_; // I/o flags
+	std::streampos pos_; // Stream position
+
+}; // ReadString
+
+// Read from Stream
+inline
+ReadStream
+read( std::istream & stream, std::string const & fmt )
+{
+	return ReadStream( stream, fmt );
+}
+
+// Read from Stream
+inline
+ReadStream
+read( std::istream & stream, gio::Fmt const & fmt )
+{
+	return ReadStream( stream, fmt );
+}
+
+// Read from Stream
+inline
+ReadStream
+read( std::istream & stream, gio::Fmt & fmt )
+{
+	return ReadStream( stream, fmt );
+}
+
+// Read from Stream
+inline
+ReadStream
+read( std::istream & stream, std::string const & fmt, IOFlags & flags )
+{
+	return ReadStream( stream, fmt, flags );
+}
+
+// Read from Stream
+inline
+ReadStream
+read( std::istream & stream, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return ReadStream( stream, fmt, flags );
+}
+
+// Read from Stream
+inline
+ReadStream
+read( std::istream & stream, gio::Fmt & fmt, IOFlags & flags )
+{
+	return ReadStream( stream, fmt, flags );
+}
+
+// Read from stdin
+inline
+ReadStream
+read( std::string const & fmt )
+{
+	return ReadStream( std::cin, fmt );
+}
+
+// Read from stdin
+inline
+ReadStream
+read( gio::Fmt const & fmt )
+{
+	return ReadStream( std::cin, fmt );
+}
+
+// Read from stdin
+inline
+ReadStream
+read( gio::Fmt & fmt )
+{
+	return ReadStream( std::cin, fmt );
+}
+
+// Read from stdin
+inline
+ReadStream
+read( std::string const & fmt, IOFlags & flags )
+{
+	return ReadStream( std::cin, fmt, flags );
+}
+
+// Read from stdin
+inline
+ReadStream
+read( gio::Fmt const & fmt, IOFlags & flags )
+{
+	return ReadStream( std::cin, fmt, flags );
+}
+
+// Read from stdin
+inline
+ReadStream
+read( gio::Fmt & fmt, IOFlags & flags )
+{
+	return ReadStream( std::cin, fmt, flags );
+}
+
+// Read from String
+inline
+ReadString
+read( std::string const & str, std::string const & fmt )
+{
+	return ReadString( str, fmt );
+}
+
+// Read from String
+inline
+ReadString
+read( std::string const & str, gio::Fmt const & fmt )
+{
+	return ReadString( str, fmt );
+}
+
+// Read from String
+inline
+ReadString
+read( std::string const & str, gio::Fmt & fmt )
+{
+	return ReadString( str, fmt );
+}
+
+// Read from String
+inline
+ReadString
+read( std::string const & str, std::string const & fmt, IOFlags & flags )
+{
+	return ReadString( str, fmt, flags );
+}
+
+// Read from String
+inline
+ReadString
+read( std::string const & str, gio::Fmt const & fmt, IOFlags & flags )
+{
+	return ReadString( str, fmt, flags );
+}
+
+// Read from String
+inline
+ReadString
+read( std::string const & str, gio::Fmt & fmt, IOFlags & flags )
+{
+	return ReadString( str, fmt, flags );
+}
 
 } // ObjexxFCL
 

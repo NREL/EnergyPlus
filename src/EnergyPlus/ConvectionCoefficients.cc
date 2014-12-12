@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 #include <string>
 
@@ -67,8 +68,8 @@ namespace ConvectionCoefficients {
 	// MODULE PARAMETER DEFINITIONS:
 	Real64 const AdaptiveHcInsideLowLimit( 0.5 ); // W/m2-K
 	Real64 const AdaptiveHcOutsideLowLimit( 1.0 ); // W/m2-K
-	static gio::Fmt const fmtx( "(A,I4,1x,A,1x,6f16.8)" );
-	static gio::Fmt const fmty( "(A,1x,6f16.8)" );
+	static gio::Fmt fmtx( "(A,I4,1x,A,1x,6f16.8)" );
+	static gio::Fmt fmty( "(A,1x,6f16.8)" );
 
 	Real64 const MinFlow( 0.01 ); // Minimum mass flow rate
 	Real64 const MaxACH( 100.0 ); // Maximum ceiling diffuser correlation limit
@@ -4377,7 +4378,7 @@ namespace ConvectionCoefficients {
 		// na
 
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-		Real64 HExt; // Will become the returned value
+		Real64 HExt( 0.0 ); // Will become the returned value
 
 		{ auto const SELECT_CASE_var( UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).OverrideType );
 
@@ -4398,6 +4399,8 @@ namespace ConvectionCoefficients {
 			EvaluateExtHcModels( SurfNum, UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq, UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq, HExt );
 			Surface( SurfNum ).OutConvHfModelEq = UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq; //reporting
 			Surface( SurfNum ).OutConvHnModelEq = UserExtConvectionCoeffs( Surface( SurfNum ).ExtConvCoeff ).HcModelEq; //reporting
+		} else {
+			assert( false );
 		}}
 
 		SetExtConvectionCoeff = HExt;
@@ -4449,7 +4452,7 @@ namespace ConvectionCoefficients {
 		// FUNCTION LOCAL VARIABLE DECLARATIONS:
 		// na
 
-		Real64 HInt; // Will become the returned value
+		Real64 HInt( 0.0 ); // Will become the returned value
 
 		{ auto const SELECT_CASE_var( UserIntConvectionCoeffs( Surface( SurfNum ).IntConvCoeff ).OverrideType );
 
@@ -4468,6 +4471,8 @@ namespace ConvectionCoefficients {
 
 			EvaluateIntHcModels( SurfNum, UserIntConvectionCoeffs( Surface( SurfNum ).IntConvCoeff ).HcModelEq, HInt );
 			Surface( SurfNum ).IntConvHcModelEq = UserIntConvectionCoeffs( Surface( SurfNum ).IntConvCoeff ).HcModelEq;
+		} else {
+			assert( false );
 		}}
 
 		SetIntConvectionCoeff = HInt;
@@ -4538,7 +4543,7 @@ namespace ConvectionCoefficients {
 		Real64 RaCV; // Rayleigh number for slanted cavity
 		Real64 TiltDeg; // glazing tilt in degrees
 		Real64 sineTilt; // sine of glazing tilt
-		Real64 Nuint; // Nusselt number for interior surface convection
+		Real64 Nuint( 0.0 ); // Nusselt number for interior surface convection
 		Real64 SurfTempKelvin; // surface temperature in Kelvin
 		Real64 AirTempKelvin; // air temperature in Kelvin
 		Real64 AirHumRat; // air humidity ratio
@@ -4622,6 +4627,8 @@ namespace ConvectionCoefficients {
 				Nuint = 0.58 * std::pow( RaH, 0.2 );
 			}
 
+		} else {
+			assert( false );
 		}
 
 		HConvIn( SurfNum ) = Nuint * lambda / Height;
@@ -4768,28 +4775,28 @@ namespace ConvectionCoefficients {
 		static FacadeGeoCharactisticsStruct NorthWestFacade( 287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 );
 
 		// Formats
-		static gio::Fmt const Format_900( "('! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], ','Outside Perimeter [m], Outside Height [m], Inside Model Assignment, ','Inside Height [cm], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio [ ], ','Window Location [ ], Near Radiant [Yes/No], Has Active HVAC [Yes/No]')" );
-		static gio::Fmt const Format_901( "('Surface Convection Parameters,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8000( "('! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8001( "('Building Convection Parameters:North Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8100( "('! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8101( "('Building Convection Parameters:Northeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8200( "('! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8201( "('Building Convection Parameters:East Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8300( "('! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8301( "('Building Convection Parameters:Southeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8400( "('! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8401( "('Building Convection Parameters:South Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8500( "('! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8501( "('Building Convection Parameters:Southwest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8600( "('! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8601( "('Building Convection Parameters:West Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8700( "('! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
-		static gio::Fmt const Format_8701( "('Building Convection Parameters:NorthwWest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_8800( "('! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], ','XdYdZd:X, XdYdZd:Y, XdYdZd:Z',',XdYdZu:X, XdYdZu:Y, XdYdZu:Z',',XdYuZd:X, XdYuZd:Y, XdYuZd:Z',',XdYuZu:X, XdYuZu:Y, XdYuZu:Z',',XuYdZd:X, XuYdZd:Y, XuYdZd:Z',',XuYuZd:X, XuYuZd:Y, XuYuZd:Z',',XuYdZu:X, XuYdZu:Y, XuYdZu:Z',',XuYuZu:X, XuYuZu:Y, XuYuZu:Z')" );
-		static gio::Fmt const Format_8801( "('Building Convection Parameters:Roof,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt const Format_88012( "(A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt const Format_88013( "(A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_900( "('! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], ','Outside Perimeter [m], Outside Height [m], Inside Model Assignment, ','Inside Height [cm], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio [ ], ','Window Location [ ], Near Radiant [Yes/No], Has Active HVAC [Yes/No]')" );
+		static gio::Fmt Format_901( "('Surface Convection Parameters,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8000( "('! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8001( "('Building Convection Parameters:North Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8100( "('! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8101( "('Building Convection Parameters:Northeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8200( "('! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8201( "('Building Convection Parameters:East Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8300( "('! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8301( "('Building Convection Parameters:Southeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8400( "('! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8401( "('Building Convection Parameters:South Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8500( "('! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8501( "('Building Convection Parameters:Southwest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8600( "('! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8601( "('Building Convection Parameters:West Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8700( "('! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')" );
+		static gio::Fmt Format_8701( "('Building Convection Parameters:NorthwWest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_8800( "('! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], ','XdYdZd:X, XdYdZd:Y, XdYdZd:Z',',XdYdZu:X, XdYdZu:Y, XdYdZu:Z',',XdYuZd:X, XdYuZd:Y, XdYuZd:Z',',XdYuZu:X, XdYuZu:Y, XdYuZu:Z',',XuYdZd:X, XuYdZd:Y, XuYdZd:Z',',XuYuZd:X, XuYuZd:Y, XuYuZd:Z',',XuYdZu:X, XuYdZu:Y, XuYdZu:Z',',XuYuZu:X, XuYuZu:Y, XuYuZu:Z')" );
+		static gio::Fmt Format_8801( "('Building Convection Parameters:Roof,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_88012( "(A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_88013( "(A,',',A,',',A,',',A,',',A,',',A,',',A)" );
 
 		BldgVolumeSum = 0.0;
 		RoofBoundZvals = 0.0;
@@ -9919,7 +9926,7 @@ namespace ConvectionCoefficients {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

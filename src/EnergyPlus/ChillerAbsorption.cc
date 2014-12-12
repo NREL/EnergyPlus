@@ -1,4 +1,5 @@
 // C++ Headers
+#include <cassert>
 #include <cmath>
 
 // ObjexxFCL Headers
@@ -310,10 +311,8 @@ namespace ChillerAbsorption {
 		if ( allocated( BLASTAbsorber ) ) return;
 		//ALLOCATE ARRAYS
 		BLASTAbsorber.allocate( NumBLASTAbsorbers );
-		CheckEquipName.allocate( NumBLASTAbsorbers );
-		CheckEquipName = true;
-		GenInputOutputNodesUsed.allocate( NumBLASTAbsorbers );
-		GenInputOutputNodesUsed = false;
+		CheckEquipName.dimension( NumBLASTAbsorbers, true );
+		GenInputOutputNodesUsed.dimension( NumBLASTAbsorbers, false );
 
 		BLASTAbsorberReport.allocate( NumBLASTAbsorbers );
 
@@ -1273,12 +1272,12 @@ namespace ChillerAbsorption {
 		Real64 EvapInletTemp; // C - evaporator inlet temperature, water side
 		Real64 CondInletTemp; // C - condenser inlet temperature, water side
 		Real64 TempEvapOut; // C - evaporator outlet temperature, water side
-		Real64 TempEvapOutSetPoint; // C - evaporator outlet temperature setpoint
+		Real64 TempEvapOutSetPoint( 0.0 ); // C - evaporator outlet temperature setpoint
 		Real64 AbsorberNomCap; // Absorber nominal capacity
 		Real64 NomPumpPower; // Absorber nominal pumping power
 		Real64 PartLoadRat; // part load ratio for efficiency calc
 		Real64 OperPartLoadRat; // Operating part load ratio
-		Real64 EvapDeltaTemp; // C - evaporator temperature difference, water side
+		Real64 EvapDeltaTemp( 0.0 ); // C - evaporator temperature difference, water side
 		Real64 TempLowLimitEout; // C - Evaporator low temp. limit cut off
 		Real64 SteamInputRat; // energy input ratio
 		Real64 ElectricInputRat; // energy input ratio
@@ -1380,6 +1379,8 @@ namespace ChillerAbsorption {
 					EvapDeltaTemp = Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPoint;
 				} else if ( SELECT_CASE_var == DualSetPointDeadBand ) {
 					EvapDeltaTemp = Node( EvapInletNode ).Temp - Node( EvapOutletNode ).TempSetPointHi;
+				} else {
+					assert( false );
 				}}
 				if ( EvapDeltaTemp != 0 ) {
 
@@ -1423,6 +1424,8 @@ namespace ChillerAbsorption {
 					} else {
 						TempEvapOutSetPoint = Node( PlantLoop( LoopNum ).TempSetPointNodeNum ).TempSetPointHi;
 					}
+				} else {
+					assert( false );
 				}}
 				EvapDeltaTemp = Node( EvapInletNode ).Temp - TempEvapOutSetPoint;
 				QEvaporator = std::abs( EvapMassFlowRate * CpFluid * EvapDeltaTemp );

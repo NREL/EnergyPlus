@@ -369,17 +369,11 @@ namespace DesiccantDehumidifiers {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// loop over solid desiccant dehumidifiers and load the input data
 		CurrentModuleObject = dehumidifierDesiccantNoFans;
@@ -2000,6 +1994,11 @@ namespace DesiccantDehumidifiers {
 
 				ShowFatalError( "Invalid performance model in desiccant dehumidifier = " + TrimSigDigits( DesicDehum( DesicDehumNum ).PerformanceModel_Num ) );
 
+				// Suppress uninitialized warnings
+				ProcAirOutTemp = 0.0;
+				SpecRegenEnergy = 0.0;
+				RegenAirVel = 0.0;
+
 			}} // Performance Model Part B
 
 			ProcAirOutTemp = ( 1 - PartLoad ) * ProcAirInTemp + ( PartLoad ) * ProcAirOutTemp;
@@ -2124,7 +2123,7 @@ namespace DesiccantDehumidifiers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MinVolFlowPerRatedTotQ( 0.00002684 ); // m3/s per W = 200 cfm/ton,
 		// min vol flow per rated evaporator capacity
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -2841,7 +2840,7 @@ namespace DesiccantDehumidifiers {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

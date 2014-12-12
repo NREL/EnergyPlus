@@ -336,8 +336,7 @@ namespace ICEngineElectricGenerator {
 
 		//ALLOCATE ARRAYS
 		ICEngineGenerator.allocate( NumICEngineGenerators );
-		CheckEquipName.allocate( NumICEngineGenerators );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumICEngineGenerators, true );
 
 		ICEngineGeneratorReport.allocate( NumICEngineGenerators );
 
@@ -713,6 +712,7 @@ namespace ICEngineElectricGenerator {
 			}
 		} else {
 			QExhaustRec = 0.0;
+			//Bug ExhaustStackTemp not set but used below
 		}
 
 		QTotalHeatRecovered = QExhaustRec + QLubeOilRec + QJacketRec;

@@ -1449,7 +1449,7 @@ namespace EconomicLifeCycleCost {
 			{ auto const SELECT_CASE_var( CashFlow( iCashFlow ).SourceKind );
 			if ( SELECT_CASE_var == skResource ) {
 				//only for real fuels purchased such as electricity, natural gas, etc..
-				if ( ( CashFlow( iCashFlow ).Resource ) >= iRT_Electricity && ( CashFlow( iCashFlow ).Resource <= iRT_ResidualOil ) ) {
+				if ((CashFlow(iCashFlow).Resource) >= iRT_Electricity && (CashFlow(iCashFlow).Resource <= iRT_ElectricitySurplusSold)) {
 					CashFlow( iCashFlow ).pvKind = pvkEnergy;
 				} else {
 					CashFlow( iCashFlow ).pvKind = pvkNonEnergy;
@@ -1539,7 +1539,10 @@ namespace EconomicLifeCycleCost {
 			}}
 		}
 		// sum by category
-		for ( iCashFlow = countOfCostCat + 1; iCashFlow <= numCashFlow; ++iCashFlow ) {
+		for ( int i = 1; i <= countOfCostCat; ++i ) {
+			CashFlow(i).presentValue = 0; //initialize value to zero before summing in next for loop
+		}
+		for (iCashFlow = countOfCostCat + 1; iCashFlow <= numCashFlow; ++iCashFlow) {
 			curCategory = CashFlow( iCashFlow ).Category;
 			if ( ( curCategory <= countOfCostCat ) && ( curCategory >= 1 ) ) {
 				CashFlow( curCategory ).presentValue += CashFlow( iCashFlow ).presentValue;
@@ -2019,8 +2022,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numUsePriceEscalation );
 			rowHead.allocate( lengthStudyYears + 2 );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears + 2, numColumns );
 			tableBody = "";
 			columnHead = "none";
@@ -2052,8 +2054,7 @@ namespace EconomicLifeCycleCost {
 				numYears = lengthStudyYears - ( serviceDateYear - baseDateYear );
 				rowHead.allocate( numYears + 1 );
 				columnHead.allocate( numColumns );
-				columnWidth.allocate( numColumns );
-				columnWidth = 14; //array assignment - same for all columns
+				columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 				tableBody.allocate( numYears + 1, numColumns );
 				tableBody = "";
 				columnHead = "none";
@@ -2082,8 +2083,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numRecurringCosts + numNonrecurringCost );
 			rowHead.allocate( lengthStudyYears + 1 );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears + 1, numColumns );
 			tableBody = "";
 			rowHead( 1 ) = "";
@@ -2114,8 +2114,7 @@ namespace EconomicLifeCycleCost {
 			numColumns = max( 1, numResourcesUsed );
 			rowHead.allocate( lengthStudyYears );
 			columnHead.allocate( numColumns );
-			columnWidth.allocate( numColumns );
-			columnWidth = 14; //array assignment - same for all columns
+			columnWidth.dimension( numColumns, 14 ); //array assignment - same for all columns
 			tableBody.allocate( lengthStudyYears, numColumns );
 			tableBody = "";
 			for ( iYear = 1; iYear <= lengthStudyYears; ++iYear ) {
@@ -2469,7 +2468,7 @@ namespace EconomicLifeCycleCost {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

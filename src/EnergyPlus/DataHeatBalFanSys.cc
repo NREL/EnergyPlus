@@ -40,6 +40,8 @@ namespace DataHeatBalFanSys {
 	// MODULE VARIABLE DECLARATIONS:
 	FArray1D< Real64 > SumConvHTRadSys; // Sum of convection to zone air from hi temp radiant heaters
 	FArray1D< Real64 > SumLatentHTRadSys; // Sum of latent gains from hi temp radiant heaters
+	FArray1D< Real64 > SumConvPool; // Sum of convection to zone air from pools
+	FArray1D< Real64 > SumLatentPool; // Sum of latent gains from pools
 	FArray1D< Real64 > QHTRadSysToPerson; // Sum of radiant gains to people from hi temp radiant heaters
 	FArray1D< Real64 > QHWBaseboardToPerson; // Sum of radiant gains to people from hot water baseboard heaters
 	FArray1D< Real64 > QSteamBaseboardToPerson; // Sum of radiant gains to people from steam baseboard heaters
@@ -141,6 +143,8 @@ namespace DataHeatBalFanSys {
 	// of electric baseboard heaters
 	FArray1D< Real64 > QCoolingPanelSurf; // Current radiant heat flux at a surface due to the presence
 	// of simple cooling panels
+	FArray1D< Real64 > QPoolSurfNumerator; // Current pool heat flux impact at the surface (numerator of surface heat balance)
+	FArray1D< Real64 > PoolHeatTransCoefs; // Current pool heat transfer coefficients (denominator of surface heat balance)
 	FArray1D< Real64 > RadSysTiHBConstCoef; // Inside heat balance coefficient that is constant
 	FArray1D< Real64 > RadSysTiHBToutCoef; // Inside heat balance coefficient that modifies Toutside
 	FArray1D< Real64 > RadSysTiHBQsrcCoef; // Inside heat balance coefficient that modifies source/sink
@@ -196,7 +200,7 @@ namespace DataHeatBalFanSys {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
 	//     reproduce, prepare derivative works, and perform publicly and display publicly.

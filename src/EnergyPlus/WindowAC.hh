@@ -95,6 +95,8 @@ namespace WindowAC {
 		Real64 CompPartLoadRatio; // compressor part-load ratio for time step
 		std::string AvailManagerListName; // Name of an availability manager list object
 		int AvailStatus;
+		int ZonePtr; // pointer to a zone served by a Window AC unit
+		int HVACSizingIndex; // index of a HVACSizing object for a Window AC unit
 
 		// Default Constructor
 		WindACData() :
@@ -135,7 +137,9 @@ namespace WindowAC {
 			ElecConsumption( 0.0 ),
 			FanPartLoadRatio( 0.0 ),
 			CompPartLoadRatio( 0.0 ),
-			AvailStatus( 0 )
+			AvailStatus( 0 ),
+			ZonePtr( 0 ), 
+			HVACSizingIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -186,7 +190,10 @@ namespace WindowAC {
 			Real64 const FanPartLoadRatio, // fan part-load ratio for time step
 			Real64 const CompPartLoadRatio, // compressor part-load ratio for time step
 			std::string const & AvailManagerListName, // Name of an availability manager list object
-			int const AvailStatus
+			int const AvailStatus,
+			int const ZonePtr, // pointer to a zone served by a Window AC unit
+			int const HVACSizingIndex // index of a HVACSizing object for a Window AC unit
+
 		) :
 			Name( Name ),
 			UnitType( UnitType ),
@@ -234,13 +241,33 @@ namespace WindowAC {
 			FanPartLoadRatio( FanPartLoadRatio ),
 			CompPartLoadRatio( CompPartLoadRatio ),
 			AvailManagerListName( AvailManagerListName ),
-			AvailStatus( AvailStatus )
+			AvailStatus( AvailStatus ),
+			ZonePtr( ZonePtr ),
+			HVACSizingIndex( HVACSizingIndex )
 		{}
 
 	};
 
+	struct WindACNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		WindACNumericFieldData()
+		{}
+
+		// Member Constructor
+		WindACNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< WindACData > WindAC;
+	extern FArray1D< WindACNumericFieldData > WindACNumericFields; // holds window AC numeric input fields character field name 
 
 	// Functions
 
@@ -322,7 +349,7 @@ namespace WindowAC {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

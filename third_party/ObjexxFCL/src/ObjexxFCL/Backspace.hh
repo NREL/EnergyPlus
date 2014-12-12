@@ -26,7 +26,7 @@
 
 namespace ObjexxFCL {
 
-// Forward Declarations
+// Forward
 class IOFlags;
 
 // Backspace Input Stream

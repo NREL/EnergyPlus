@@ -371,6 +371,9 @@ namespace DataAirSystems {
 		int NumOACoolCoils; // number of cooling coils in the outside air system
 		int NumOAHeatCoils; // number of heating coils in the outside air system
 		bool SizeAirloopCoil; // simulates air loop coils before calling controllers
+		int SupFanNum; // index of the supply fan in the Fan data structure
+		int RetFanNum; // index of the return fan in the Fan data structure
+		Real64 FanDesCoolLoad; // design fan heat gain for the air loop [W]
 
 		// Default Constructor
 		DefinePrimaryAirSystem() :
@@ -393,7 +396,10 @@ namespace DataAirSystems {
 			OtherSplitOutNode( 0 ),
 			NumOACoolCoils( 0 ),
 			NumOAHeatCoils( 0 ),
-			SizeAirloopCoil( true )
+			SizeAirloopCoil( true ),
+			SupFanNum( 0 ),
+			RetFanNum( 0 ),
+			FanDesCoolLoad(0.0)
 		{}
 
 		// Member Constructor
@@ -426,7 +432,10 @@ namespace DataAirSystems {
 			int const OtherSplitOutNode, // node num of nonRAB splitter outlet
 			int const NumOACoolCoils, // number of cooling coils in the outside air system
 			int const NumOAHeatCoils, // number of heating coils in the outside air system
-			bool const SizeAirloopCoil // simulates air loop coils before calling controllers
+			bool const SizeAirloopCoil, // simulates air loop coils before calling controllers
+			int const SupFanNum, // index of the supply fan in the Fan data structure
+			int const RetFanNum, // index of the return fan in the Fan data structure
+			Real64 const FanDesCoolLoad // air loop fan design heat gain
 		) :
 			Name( Name ),
 			DesignVolFlowRate( DesignVolFlowRate ),
@@ -456,7 +465,10 @@ namespace DataAirSystems {
 			OtherSplitOutNode( OtherSplitOutNode ),
 			NumOACoolCoils( NumOACoolCoils ),
 			NumOAHeatCoils( NumOAHeatCoils ),
-			SizeAirloopCoil( SizeAirloopCoil )
+			SizeAirloopCoil( SizeAirloopCoil ),
+			SupFanNum( SupFanNum ),
+			RetFanNum( RetFanNum ),
+			FanDesCoolLoad( FanDesCoolLoad )
 		{}
 
 	};
@@ -819,13 +831,6 @@ namespace DataAirSystems {
 	extern FArray1D< ConnectAirSysComp > AirSysCompToPlant; // Connections between loops
 	extern FArray1D< ConnectAirSysSubComp > AirSysSubCompToPlant; // Connections between loops
 	extern FArray1D< ConnectAirSysSubSubComp > AirSysSubSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectionPoint > TempDemandSideConnect;
-	extern FArray1D< ConnectZoneComp > TempZoneCompToPlant; // Connections between loops
-	extern FArray1D< ConnectZoneSubComp > TempZoneSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectZoneSubSubComp > TempZoneSubSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysComp > TempAirSysCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysSubComp > TempAirSysSubCompToPlant; // Connections between loops
-	extern FArray1D< ConnectAirSysSubSubComp > TempAirSysSubSubCompToPlant; // Connections between loops
 
 } // DataAirSystems
 

@@ -419,8 +419,7 @@ namespace ThermalComfort {
 
 		GetAngleFactorList();
 
-		ZoneOccHrs.allocate( NumOfZones );
-		ZoneOccHrs = 0.0;
+		ZoneOccHrs.dimension( NumOfZones, 0.0 );
 
 	}
 
@@ -1188,8 +1187,11 @@ namespace ThermalComfort {
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
+		static FArray1D< Real64 > Coeff( 2 ); // Coefficients used in Range-Kutta's Method
+		static FArray1D< Real64 > Temp( 2 ); // Temperature
+		static FArray1D< Real64 > TempChange( 2 ); // Change of temperature
+
 		Real64 BodyWt; // Weight of body, kg
-		FArray1D< Real64 > Coeff( 2 ); // Coefficients used in Range-Kutta's Method
 		Real64 DayNum; // Number of days of acclimation
 		int NumDay; // Loop counter for DayNum
 		Real64 EmissAvg; // Average emissivity
@@ -1202,8 +1204,6 @@ namespace ThermalComfort {
 		int StartDayNum; // Number of days for the first print out
 		// Unacclimated man = 1, Acclimated man = 14
 		Real64 SweatSuppFac; // Sweat suppression factor due to skin wettedness
-		FArray1D< Real64 > Temp( 2 ); // Temperature
-		FArray1D< Real64 > TempChange( 2 ); // Change of temperature
 		Real64 TempDiffer; // Temperature difference between the rectal and esophageal temperatures
 		// If not measured, set it to be 0.5 Deg. C.
 		int TempIndiceNum; // Number of temperature indices
@@ -1311,8 +1311,7 @@ namespace ThermalComfort {
 				SweatSuppFac = 1.0;
 				Temp( 1 ) = CoreTemp;
 				Temp( 2 ) = SkinTemp;
-				Coeff( 1 ) = 0.0;
-				Coeff( 2 ) = 0.0;
+				Coeff( 1 ) = Coeff( 2 ) = 0.0;
 				//  PHYSIOLOGICAL ADJUSTMENTS IN HEAT ACCLIMATION.
 				AcclPattern = 1.0 - std::exp( -0.12 * ( DayNum - 1.0 ) );
 				CoreTempNeut = 36.9 - 0.6 * AcclPattern;
@@ -1625,10 +1624,8 @@ namespace ThermalComfort {
 		int J;
 		Real64 B;
 		Real64 H2;
-		FArray1D< Real64 > A( 2 );
+		static FArray1D< Real64 > const A( 2, { 0.29289321881345, 1.70710678118654 } );
 
-		A( 1 ) = 0.29289321881345;
-		A( 2 ) = 1.70710678118654;
 		H2 = 0.5 * H;
 
 		DERIV( NEQ, Y, DY );
@@ -2414,7 +2411,7 @@ namespace ThermalComfort {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2674,7 +2671,7 @@ namespace ThermalComfort {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static Real64 const alpha( 0.8 );
 		static FArray1D< Real64 > const alpha_pow( { pow_6( alpha ), pow_5( alpha ), pow_4( alpha ), pow_3( alpha ), pow_2( alpha ), alpha, 1.0 } ); // alpha^(7-i)
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -2701,7 +2698,7 @@ namespace ThermalComfort {
 		int calcStartHr;
 		int calcEndDay;
 		int calcEndHr;
-		int pos;
+		std::string::size_type pos;
 		int ind;
 		int i;
 		int j;
@@ -2936,7 +2933,7 @@ namespace ThermalComfort {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

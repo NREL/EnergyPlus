@@ -175,14 +175,305 @@ namespace DataPlant {
 	int const Press_PumpPowerCorrection( 2 ); // Only updating the pump power
 	int const Press_FlowCorrection( 3 ); // Update pump flow rate based on pump curve
 	int const Press_FlowSimulation( 4 ); // Full pressure network simulation
-	FArray1D_string const PressureSimType( 4, { "NONE", "PUMPPOWERCORRECTION", "LOOPFLOWCORRECTION", "PRESSURESIMULATION" } );
+	FArray1D_string const PressureSimType(
+		4, {
+			"NONE",
+			"PUMPPOWERCORRECTION",
+			"LOOPFLOWCORRECTION",
+			"PRESSURESIMULATION"
+		}
+	);
+	
 	// Parameters for Component/Equipment Types  (ref: TypeOf in CompData)
-	int const NumSimPlantEquipTypes( 89 );
-	FArray1D_string const SimPlantEquipTypes( NumSimPlantEquipTypes, { "BOILER:HOTWATER", "BOILER:STEAM", "CHILLER:ABSORPTION", "CHILLER:ABSORPTION:INDIRECT", "CHILLER:COMBUSTIONTURBINE", "CHILLER:CONSTANTCOP", "CHILLERHEATER:ABSORPTION:DIRECTFIRED", "CHILLER:ELECTRIC", "CHILLER:ELECTRIC:EIR", "CHILLER:ELECTRIC:REFORMULATEDEIR", "CHILLER:ENGINEDRIVEN", "COOLINGTOWER:SINGLESPEED", "COOLINGTOWER:TWOSPEED", "COOLINGTOWER:VARIABLESPEED", "GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER", "WATERHEATER:HEATPUMP", "HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING", "HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING", "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING", "HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING", "PIPE:ADIABATIC", "PIPE:ADIABATIC:STEAM", "PIPE:OUTDOOR", "PIPE:INDOOR", "PIPE:UNDERGROUND", "DISTRICTCOOLING", "DISTRICTHEATING", "THERMALSTORAGE:ICE:DETAILED", "THERMALSTORAGE:ICE:SIMPLE", "TEMPERINGVALVE", "WATERHEATER:MIXED", "WATERHEATER:STRATIFIED", "PUMP:VARIABLESPEED", "PUMP:CONSTANTSPEED", "PUMP:VARIABLESPEED:CONDENSATE", "HEADEREDPUMPS:VARIABLESPEED", "HEADEREDPUMPS:CONSTANTSPEED", "WATERUSE:CONNECTIONS", "COIL:COOLING:WATER", "COIL:COOLING:WATER:DETAILEDGEOMETRY", "COIL:HEATING:WATER", "COIL:HEATING:STEAM", "SOLARCOLLECTOR:FLATPLATE:WATER", "LOADPROFILE:PLANT", "GROUNDHEATEXCHANGER:VERTICAL", "GROUNDHEATEXCHANGER:SURFACE", "GROUNDHEATEXCHANGER:POND", "GENERATOR:MICROTURBINE", "GENERATOR:INTERNALCOMBUSTIONENGINE", "GENERATOR:COMBUSTIONTURBINE", "GENERATOR:MICROCHP", "GENERATOR:FUELCELL:STACKCOOLER", "FLUIDCOOLER:SINGLESPEED", "FLUIDCOOLER:TWOSPEED", "EVAPORATIVEFLUIDCOOLER:SINGLESPEED", "EVAPORATIVEFLUIDCOOLER:TWOSPEED", "THERMALSTORAGE:CHILLEDWATER:MIXED", "THERMALSTORAGE:CHILLEDWATER:STRATIFIED", "SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL", "ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", "ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", "ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW", "ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW", "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM", "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT", "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT", "COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION", "COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION", "REFRIGERATION:CONDENSER:WATERCOOLED", "REFRIGERATION:COMPRESSORRACK", "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED", "CHILLERHEATER:ABSORPTION:DOUBLEEFFECT", "PIPINGSYSTEM:UNDERGROUND:PIPECIRCUIT", "SOLARCOLLECTOR:INTEGRALCOLLECTORSTORAGE", "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", "PLANTCOMPONENT:USERDEFINED", "COIL:USERDEFINED", "ZONEHVAC:FORCEDAIR:USERDEFINED", "AIRTERMINAL:SINGLEDUCT:USERDEFINED", "AIRCONDITIONER:VARIABLEREFRIGERANTFLOW", "GROUNDHEATEXCHANGER:HORIZONTALTRENCH", "HEATEXCHANGER:FLUIDTOFLUID", "PLANTCOMPONENT:TEMPERATURESOURCE", "CENTRALHEATPUMPSYSTEM", "AIRLOOPHVAC:UNITARYSYSTEM", "COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE", "COOLINGTOWER:VARIABLESPEED:MERKEL" } ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 ! demand side component | 40 ! demand side component | 41 ! demand side component | 42 ! demand side component | 43 ! demand side component | 44 ! demand side component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
+	int const NumSimPlantEquipTypes( 91 );
+	FArray1D_string const SimPlantEquipTypes(
+		NumSimPlantEquipTypes, {
+			"BOILER:HOTWATER", // 01 
+			"BOILER:STEAM", // 02 
+			"CHILLER:ABSORPTION", // 03 
+			"CHILLER:ABSORPTION:INDIRECT", // 04 
+			"CHILLER:COMBUSTIONTURBINE", // 05 
+			"CHILLER:CONSTANTCOP", // 06 
+			"CHILLERHEATER:ABSORPTION:DIRECTFIRED", // 07 
+			"CHILLER:ELECTRIC", // 08 
+			"CHILLER:ELECTRIC:EIR", // 09 
+			"CHILLER:ELECTRIC:REFORMULATEDEIR", // 10 
+			"CHILLER:ENGINEDRIVEN", // 11 
+			"COOLINGTOWER:SINGLESPEED", // 12 
+			"COOLINGTOWER:TWOSPEED", // 13 
+			"COOLINGTOWER:VARIABLESPEED", // 14 
+			"GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER", // 15 
+			"WATERHEATER:HEATPUMP", // 16 
+			"HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING", // 17 
+			"HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING", // 18 
+			"HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING", // 19 
+			"HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING", // 20 
+			"PIPE:ADIABATIC", // 21 
+			"PIPE:ADIABATIC:STEAM", // 22 
+			"PIPE:OUTDOOR", // 23 
+			"PIPE:INDOOR", // 24 
+			"PIPE:UNDERGROUND", // 25 
+			"DISTRICTCOOLING", // 26 
+			"DISTRICTHEATING", // 27 
+			"THERMALSTORAGE:ICE:DETAILED", // 28 
+			"THERMALSTORAGE:ICE:SIMPLE", // 29 
+			"TEMPERINGVALVE", // 30 
+			"WATERHEATER:MIXED", // 31 
+			"WATERHEATER:STRATIFIED", // 32 
+			"PUMP:VARIABLESPEED", // 33 
+			"PUMP:CONSTANTSPEED", // 34 
+			"PUMP:VARIABLESPEED:CONDENSATE", // 35 
+			"HEADEREDPUMPS:VARIABLESPEED", // 36 
+			"HEADEREDPUMPS:CONSTANTSPEED", // 37 
+			"WATERUSE:CONNECTIONS", // 38 ! demand side component 
+			"COIL:COOLING:WATER", // 39 ! demand side component 
+			"COIL:COOLING:WATER:DETAILEDGEOMETRY", // 40 ! demand side component 
+			"COIL:HEATING:WATER", // 41 ! demand side component 
+			"COIL:HEATING:STEAM", // 42 ! demand side component 
+			"SOLARCOLLECTOR:FLATPLATE:WATER", // 43 ! demand side component 
+			"LOADPROFILE:PLANT", // 44 ! demand side component' 
+			"GROUNDHEATEXCHANGER:VERTICAL", // 45 
+			"GROUNDHEATEXCHANGER:SURFACE", // 46 
+			"GROUNDHEATEXCHANGER:POND", // 47 
+			"GENERATOR:MICROTURBINE", // 48 
+			"GENERATOR:INTERNALCOMBUSTIONENGINE", // 49 
+			"GENERATOR:COMBUSTIONTURBINE", // 50 
+			"GENERATOR:MICROCHP", // 51 
+			"GENERATOR:FUELCELL:STACKCOOLER", // 52 
+			"FLUIDCOOLER:SINGLESPEED", // 53 
+			"FLUIDCOOLER:TWOSPEED", // 54 
+			"EVAPORATIVEFLUIDCOOLER:SINGLESPEED", // 55 
+			"EVAPORATIVEFLUIDCOOLER:TWOSPEED", // 56 
+			"THERMALSTORAGE:CHILLEDWATER:MIXED", // 57 
+			"THERMALSTORAGE:CHILLEDWATER:STRATIFIED", // 58 
+			"SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL", // 59 
+			"ZONEHVAC:BASEBOARD:CONVECTIVE:WATER", // 60 
+			"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM", // 61 
+			"ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER", // 62 
+			"ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW", // 63 
+			"ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW", // 64 
+			"AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:COOLEDBEAM", // 65 
+			"COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT", // 66 
+			"COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT", // 67 
+			"COIL:HEATING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION", // 68 
+			"COIL:COOLING:WATERTOAIRHEATPUMP:PARAMETERESTIMATION", // 69 
+			"REFRIGERATION:CONDENSER:WATERCOOLED", // 70 
+			"REFRIGERATION:COMPRESSORRACK", // 71 
+			"AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED", // 72 
+			"CHILLERHEATER:ABSORPTION:DOUBLEEFFECT", // 73 
+			"PIPINGSYSTEM:UNDERGROUND:PIPECIRCUIT", // 74 
+			"SOLARCOLLECTOR:INTEGRALCOLLECTORSTORAGE", // 75 
+			"COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", // 76 
+			"COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT", // 77 
+			"PLANTCOMPONENT:USERDEFINED", // 78 
+			"COIL:USERDEFINED", // 79 
+			"ZONEHVAC:FORCEDAIR:USERDEFINED", // 80 
+			"AIRTERMINAL:SINGLEDUCT:USERDEFINED", // 81 
+			"AIRCONDITIONER:VARIABLEREFRIGERANTFLOW", // 82 
+			"GROUNDHEATEXCHANGER:HORIZONTALTRENCH", // 83 
+			"HEATEXCHANGER:FLUIDTOFLUID", // 84 
+			"PLANTCOMPONENT:TEMPERATURESOURCE", // 85 
+			"CENTRALHEATPUMPSYSTEM", // 86 
+			"AIRLOOPHVAC:UNITARYSYSTEM", // 87 
+			"COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE", // 88 
+			"COOLINGTOWER:VARIABLESPEED:MERKEL", // 89 
+			"SWIMMINGPOOL:INDOOR", // 90
+			"ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER" // 91
+		}
+	); 
 
-	FArray1D_string const ccSimPlantEquipTypes( NumSimPlantEquipTypes, { "Boiler:HotWater", "Boiler:Steam", "Chiller:Absorption", "Chiller:Absorption:Indirect", "Chiller:CombustionTurbine", "Chiller:ConstantCOP", "ChillerHeater:Absorption:DirectFired", "Chiller:Electric", "Chiller:Electric:EIR", "Chiller:Electric:ReformulatedEIR", "Chiller:EngineDriven", "CoolingTower:SingleSpeed", "CoolingTower:TwoSpeed", "CoolingTower:VariableSpeed", "Generator:Fuelcell:ExhaustGastoWaterHeatExchanger", "WaterHeater:Heatpump", "Heatpump:WatertoWater:Equationfit:Cooling", "Heatpump:WatertoWater:Equationfit:Heating", "Heatpump:WatertoWater:ParameterEstimation:Cooling", "Heatpump:WatertoWater:ParameterEstimation:Heating", "Pipe:Adiabatic", "Pipe:Adiabatic:Steam", "Pipe:Outdoor", "Pipe:Indoor", "Pipe:Underground", "DistrictCooling", "DistrictHeating", "ThermalStorage:Ice:Detailed", "ThermalStorage:Ice:Simple", "TemperingValve", "WaterHeater:Mixed", "WaterHeater:Stratified", "Pump:VariableSpeed", "Pump:ConstantSpeed", "Pump:VariableSpeed:Condensate", "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed", "WaterUse:Connections", "Coil:Cooling:Water", "Coil:Cooling:Water:DetailedGeometry", "Coil:Heating:Water", "Coil:Heating:Steam", "Solarcollector:Flatplate:Water", "LoadProfile:Plant", "GroundHeatExchanger:Vertical", "GroundHeatExchanger:Surface", "GroundHeatExchanger:Pond", "Generator:Microturbine", "Generator:InternalCombustionEngine", "Generator:CombustionTurbine", "Generator:Microchp", "Generator:Fuelcell:StackCooler", "FluidCooler:SingleSpeed", "FluidCooler:TwoSpeed", "EvaporativeFluidCooler:SingleSpeed", "EvaporativeFluidCooler:TwoSpeed", "ThermalStorage:ChilledWater:Mixed", "ThermalStorage:ChilledWater:Stratified", "SolarCollector:FlatPlate:PhotovoltaicThermal", "ZoneHVAC:Baseboard:Convective:Water", "ZoneHVAC:Baseboard:RadiantConvective:Steam", "ZoneHVAC:Baseboard:RadiantConvective:Water", "ZoneHVAC:LowTemperatureRadiant:VariableFlow", "ZoneHVAC:LowTemperatureRadiant:ConstantFlow", "AirTerminal:SingleDuct:ConstantVolume:CooledBeam", "Coil:Heating:WaterToAirHeatPump:EquationFit", "Coil:Cooling:WaterToAirHeatPump:EquationFit", "Coil:Heating:WaterToAirHeatPump:ParameterEstimation", "Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", "Refrigeration:Condenser:WaterCooled", "Refrigeration:CompressorRack", "AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed", "ChillerHeater:Absorption:DoubleEffect", "PipingSystem:Underground:PipeCircuit", "SolarCollector:IntegralCollectorStorage", "Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", "PlantComponent:UserDefined", "Coil:UserDefined", "ZoneHVAC:ForcedAir:UserDefined", "AirTerminal:SingleDuct:UserDefined", "AirConditioner:VariableRefrigerantFlow", "GroundHeatExchanger:HorizontalTrench", "HeatExchanger:FluidToFluid", "PlantComponent:TemperatureSource", "CentralHeatPumpSystem", "AirloopHVAC:UnitarySystem", "Coil:Cooling:DX:SingleSpeed:ThermalStorage", "CoolingTower:VariableSpeed:Merkel" } ); // 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 ! demand side component | 39 Demand Side Component | 40 Demand Side Component | 41 Demand Side Component | 42 Demand Side Component | 43 Demand Side Component | 44 Demand Side Component' | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89
+	FArray1D_string const ccSimPlantEquipTypes( 
+		NumSimPlantEquipTypes, {
+			"Boiler:HotWater", // 01 
+			"Boiler:Steam", // 02 
+			"Chiller:Absorption", // 03 
+			"Chiller:Absorption:Indirect", // 04 
+			"Chiller:CombustionTurbine", // 05 
+			"Chiller:ConstantCOP", // 06 
+			"ChillerHeater:Absorption:DirectFired", // 07 
+			"Chiller:Electric", // 08 
+			"Chiller:Electric:EIR", // 09 
+			"Chiller:Electric:ReformulatedEIR", // 10 
+			"Chiller:EngineDriven", // 11 
+			"CoolingTower:SingleSpeed", // 12 
+			"CoolingTower:TwoSpeed", // 13 
+			"CoolingTower:VariableSpeed", // 14 
+			"Generator:Fuelcell:ExhaustGastoWaterHeatExchanger", // 15 
+			"WaterHeater:Heatpump", // 16 
+			"Heatpump:WatertoWater:Equationfit:Cooling", // 17 
+			"Heatpump:WatertoWater:Equationfit:Heating", // 18 
+			"Heatpump:WatertoWater:ParameterEstimation:Cooling", // 19 
+			"Heatpump:WatertoWater:ParameterEstimation:Heating", // 20 
+			"Pipe:Adiabatic", // 21 
+			"Pipe:Adiabatic:Steam", // 22 
+			"Pipe:Outdoor", // 23 
+			"Pipe:Indoor", // 24 
+			"Pipe:Underground", // 25 
+			"DistrictCooling", // 26 
+			"DistrictHeating", // 27 
+			"ThermalStorage:Ice:Detailed", // 28 
+			"ThermalStorage:Ice:Simple", // 29 
+			"TemperingValve", // 30 
+			"WaterHeater:Mixed", // 31 
+			"WaterHeater:Stratified", // 32 
+			"Pump:VariableSpeed", // 33 
+			"Pump:ConstantSpeed", // 34 
+			"Pump:VariableSpeed:Condensate", // 35 
+			"HeaderedPumps:VariableSpeed", // 36 
+			"HeaderedPumps:ConstantSpeed", // 37 
+			"WaterUse:Connections", // 38 ! demand side component 
+			"Coil:Cooling:Water", // 39 ! demand side component 
+			"Coil:Cooling:Water:DetailedGeometry", // 40 ! demand side component 
+			"Coil:Heating:Water", // 41 ! demand side component 
+			"Coil:Heating:Steam", // 42 ! demand side component 
+			"Solarcollector:Flatplate:Water", // 43 ! demand side component 
+			"LoadProfile:Plant", // 44 ! demand side component' 
+			"GroundHeatExchanger:Vertical", // 45 
+			"GroundHeatExchanger:Surface", // 46 
+			"GroundHeatExchanger:Pond", // 47 
+			"Generator:Microturbine", // 48 
+			"Generator:InternalCombustionEngine", // 49 
+			"Generator:CombustionTurbine", // 50 
+			"Generator:Microchp", // 51 
+			"Generator:Fuelcell:StackCooler", // 52 
+			"FluidCooler:SingleSpeed", // 53 
+			"FluidCooler:TwoSpeed", // 54 
+			"EvaporativeFluidCooler:SingleSpeed", // 55 
+			"EvaporativeFluidCooler:TwoSpeed", // 56 
+			"ThermalStorage:ChilledWater:Mixed", // 57 
+			"ThermalStorage:ChilledWater:Stratified", // 58 
+			"SolarCollector:FlatPlate:PhotovoltaicThermal", // 59 
+			"ZoneHVAC:Baseboard:Convective:Water", // 60 
+			"ZoneHVAC:Baseboard:RadiantConvective:Steam", // 61 
+			"ZoneHVAC:Baseboard:RadiantConvective:Water", // 62 
+			"ZoneHVAC:LowTemperatureRadiant:VariableFlow", // 63 
+			"ZoneHVAC:LowTemperatureRadiant:ConstantFlow", // 64 
+			"AirTerminal:SingleDuct:ConstantVolume:CooledBeam", // 65 
+			"Coil:Heating:WaterToAirHeatPump:EquationFit", // 66 
+			"Coil:Cooling:WaterToAirHeatPump:EquationFit", // 67 
+			"Coil:Heating:WaterToAirHeatPump:ParameterEstimation", // 68 
+			"Coil:Cooling:WaterToAirHeatPump:ParameterEstimation", // 69 
+			"Refrigeration:Condenser:WaterCooled", // 70 
+			"Refrigeration:CompressorRack", // 71 
+			"AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed", // 72 
+			"ChillerHeater:Absorption:DoubleEffect", // 73 
+			"PipingSystem:Underground:PipeCircuit", // 74 
+			"SolarCollector:IntegralCollectorStorage", // 75 
+			"Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit", // 76 
+			"Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit", // 77 
+			"PlantComponent:UserDefined", // 78 
+			"Coil:UserDefined", // 79 
+			"ZoneHVAC:ForcedAir:UserDefined", // 80 
+			"AirTerminal:SingleDuct:UserDefined", // 81 
+			"AirConditioner:VariableRefrigerantFlow", // 82 
+			"GroundHeatExchanger:HorizontalTrench", // 83 
+			"HeatExchanger:FluidToFluid", // 84 
+			"PlantComponent:TemperatureSource", // 85 
+			"CentralHeatPumpSystem", // 86 
+			"AirloopHVAC:UnitarySystem", // 87 
+			"Coil:Cooling:DX:SingleSpeed:ThermalStorage", // 88 
+			"CoolingTower:VariableSpeed:Merkel", // 89 
+			"SwimmingPool:Indoor", // 90
+			"ZoneHVAC:CoolingPanel:RadiantConvective:Water" // 91
+		}
+	);
 
-	FArray1D_int const ValidLoopEquipTypes( NumSimPlantEquipTypes, { LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Both, LoopType_Plant, LoopType_Plant, LoopType_Both, LoopType_Both } ); // 01  BOILER:HOTWATER | 02  BOILER:STEAM | 03  CHILLER:ABSORPTION | 04  CHILLER:ABSORPTION:INDIRECT | 05  CHILLER:COMBUSTIONTURBINE | 06  CHILLER:CONSTANTCOP | 07  CHILLERHEATER:ABSORPTION:DIRECTFIRED | 08  CHILLER:ELECTRIC | 09  CHILLER:ELECTRIC:EIR | 10  CHILLER:ELECTRIC:REFORMULATEDEIR | 11  CHILLER:ENGINEDRIVEN | 12  COOLINGTOWER:SINGLESPEED | 13  COOLINGTOWER:TWOSPEED | 14  COOLINGTOWER:VARIABLESPEED | 15  GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER | 16  WATERHEATER:HEATPUMP | 17  HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING | 18  HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING | 19  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING | 20  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING | 21  PIPE:ADIABATIC | 22  PIPE:ADIABATIC:STEAM | 23  PIPE:OUTDOOR | 24  PIPE:INDOOR | 25  PIPE:UNDERGROUND | 26  DISTRICTCOOLING | 27  DISTRICTHEATING | 28  THERMALSTORAGE:ICE:DETAILED | 29  THERMALSTORAGE:ICE:SIMPLE | 30  TEMPERINGVALVE | 31  WATERHEATER:MIXED | 32  WATERHEATER:STRATIFIED | 33  PUMP:VARIABLESPEED | 34  PUMP:CONSTANTSPEED | 35  PUMP:VARIABLESPEED:CONDENSATE | 36  HEADEREDPUMPS:VARIABLESPEED | 37  HEADEREDPUMPS:CONSTANTSPEED | 38  WATERUSE:CONNECTIONS | 39  COIL:COOLING:WATER | 40  COIL:COOLING:WATER:DETAILEDGEOMETRY | 41  COIL:HEATING:WATER | 42  COIL:HEATING:STEAM | 43  SOLARCOLLECTOR:FLATPLATE:WATER | 44  LOADPROFILE:PLANT | 45  GROUNDHEATEXCHANGER:VERTICAL | 46  GROUNDHEATEXCHANGER:SURFACE | 47  GROUNDHEATEXCHANGER:POND | 48  GENERATOR:MICROTURBINE | 49  GENERATOR:INTERNALCOMBUSTIONENGINE | 50  GENERATOR:COMBUSTIONTURBINE | 51  GENERATOR:MICROCHP | 52  GENERATOR:FUELCELL:STACKCOOLER | 53  FLUIDCOOLER:SINGLESPEED | 54  FLUIDCOOLER:TWOSPEED | 55  EVAPORATIVEFLUIDCOOLER:SINGLESPEED | 56  EVAPORATIVEFLUIDCOOLER:TWOSPEED | 57  THERMALSTORAGE:CHILLEDWATER:MIXED | 58  THERMALSTORAGE:CHILLEDWATER:STRATIFIED | 59  SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL | 60  ZONEHVAC:BASEBOARD:CONVECTIVE:WATER | 61  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM | 62  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER | 63  ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW | 64  ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW | 65 AirTerminal:SingleDuct:ConstantVolume:CooledBeam | 66  Coil:Heating:WaterToAirHeatPump:EquationFit | 67  Coil:Cooling:WaterTOAIRHeatPump:EquationFit | 68  Coil:Heating:WaterTOAIRHeatPump:ParameterEstimation | 69  Coil:Cooling:WaterTOAIRHeatPump:ParameterEstimation | 70  Refrigeration:Condenser:WaterCooled | 71  Refrigeration:CompressorRack | 72  AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed | 73  CHILLERHEATER:ABSORPTION:DOUBLEEFFECT | 74  PipingSystem:Underground:PipeCircuit | 75  SolarCollector:IntegralCollectorStorage | 76  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit | 77  Coil:Cooling:WaterTOAIRHeatPump:VariableSpeedEquationFit | 78  PlantComponent:UserDefined | 79  Coil:UserDefined | 80  ZoneHVAC:ForcedAir:UserDefined | 81  AirTerminal:SingleDuct:UserDefined | 82  AirConditioner:VariableRefrigerantFlow | 83  GroundHeatExchanger:HorizontalTrench | 84  HeatExchanger:FluidToFluid | 85  PlantComponent:TemperatureSource | 86  PlantCentralGroundSourceWrapper | 87  AirloopHVAC:UnitarySystem | 88  Coil:Cooling:DX:SingleSpeed:ThermalStorage | 89  CoolingTower:VariableSpeed:Merkel
+
+	FArray1D_int const ValidLoopEquipTypes(
+		NumSimPlantEquipTypes, {
+			LoopType_Plant, // 01  BOILER:HOTWATER 
+			LoopType_Plant, // 02  BOILER:STEAM 
+			LoopType_Plant, // 03  CHILLER:ABSORPTION 
+			LoopType_Plant, // 04  CHILLER:ABSORPTION:INDIRECT 
+			LoopType_Plant, // 05  CHILLER:COMBUSTIONTURBINE 
+			LoopType_Plant, // 06  CHILLER:CONSTANTCOP 
+			LoopType_Plant, // 07  CHILLERHEATER:ABSORPTION:DIRECTFIRED 
+			LoopType_Plant, // 08  CHILLER:ELECTRIC 
+			LoopType_Plant, // 09  CHILLER:ELECTRIC:EIR 
+			LoopType_Plant, // 10  CHILLER:ELECTRIC:REFORMULATEDEIR 
+			LoopType_Plant, // 11  CHILLER:ENGINEDRIVEN 
+			LoopType_Both, // 12  COOLINGTOWER:SINGLESPEED 
+			LoopType_Both, // 13  COOLINGTOWER:TWOSPEED 
+			LoopType_Both, // 14  COOLINGTOWER:VARIABLESPEED 
+			LoopType_Plant, // 15  GENERATOR:FUELCELL:EXHAUSTGASTOWATERHEATEXCHANGER 
+			LoopType_Plant, // 16  WATERHEATER:HEATPUMP 
+			LoopType_Plant, // 17  HEATPUMP:WATERTOWATER:EQUATIONFIT:COOLING 
+			LoopType_Plant, // 18  HEATPUMP:WATERTOWATER:EQUATIONFIT:HEATING 
+			LoopType_Plant, // 19  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:COOLING 
+			LoopType_Plant, // 20  HEATPUMP:WATERTOWATER:PARAMETERESTIMATION:HEATING 
+			LoopType_Both, // 21  PIPE:ADIABATIC 
+			LoopType_Both, // 22  PIPE:ADIABATIC:STEAM 
+			LoopType_Both, // 23  PIPE:OUTDOOR 
+			LoopType_Both, // 24  PIPE:INDOOR 
+			LoopType_Both, // 25  PIPE:UNDERGROUND 
+			LoopType_Both, // 26  DISTRICTCOOLING 
+			LoopType_Both, // 27  DISTRICTHEATING 
+			LoopType_Plant, // 28  THERMALSTORAGE:ICE:DETAILED 
+			LoopType_Plant, // 29  THERMALSTORAGE:ICE:SIMPLE 
+			LoopType_Both, // 30  TEMPERINGVALVE 
+			LoopType_Both, // 31  WATERHEATER:MIXED 
+			LoopType_Both, // 32  WATERHEATER:STRATIFIED 
+			LoopType_Both, // 33  PUMP:VARIABLESPEED 
+			LoopType_Both, // 34  PUMP:CONSTANTSPEED 
+			LoopType_Both, // 35  PUMP:VARIABLESPEED:CONDENSATE 
+			LoopType_Both, // 36  HEADEREDPUMPS:VARIABLESPEED 
+			LoopType_Both, // 37  HEADEREDPUMPS:CONSTANTSPEED 
+			LoopType_Plant, // 38  WATERUSE:CONNECTIONS 
+			LoopType_Plant, // 39  COIL:COOLING:WATER 
+			LoopType_Plant, // 40  COIL:COOLING:WATER:DETAILEDGEOMETRY 
+			LoopType_Plant, // 41  COIL:HEATING:WATER 
+			LoopType_Plant, // 42  COIL:HEATING:STEAM 
+			LoopType_Plant, // 43  SOLARCOLLECTOR:FLATPLATE:WATER 
+			LoopType_Both, // 44  LOADPROFILE:PLANT 
+			LoopType_Both, // 45  GROUNDHEATEXCHANGER:VERTICAL 
+			LoopType_Both, // 46  GROUNDHEATEXCHANGER:SURFACE 
+			LoopType_Both, // 47  GROUNDHEATEXCHANGER:POND 
+			LoopType_Plant, // 48  GENERATOR:MICROTURBINE 
+			LoopType_Plant, // 49  GENERATOR:INTERNALCOMBUSTIONENGINE 
+			LoopType_Plant, // 50  GENERATOR:COMBUSTIONTURBINE 
+			LoopType_Plant, // 51  GENERATOR:MICROCHP 
+			LoopType_Plant, // 52  GENERATOR:FUELCELL:STACKCOOLER 
+			LoopType_Both, // 53  FLUIDCOOLER:SINGLESPEED 
+			LoopType_Both, // 54  FLUIDCOOLER:TWOSPEED 
+			LoopType_Both, // 55  EVAPORATIVEFLUIDCOOLER:SINGLESPEED 
+			LoopType_Both, // 56  EVAPORATIVEFLUIDCOOLER:TWOSPEED 
+			LoopType_Both, // 57  THERMALSTORAGE:CHILLEDWATER:MIXED 
+			LoopType_Both, // 58  THERMALSTORAGE:CHILLEDWATER:STRATIFIED 
+			LoopType_Both, // 59  SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL 
+			LoopType_Plant, // 60  ZONEHVAC:BASEBOARD:CONVECTIVE:WATER 
+			LoopType_Plant, // 61  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:STEAM 
+			LoopType_Plant, // 62  ZONEHVAC:BASEBOARD:RADIANTCONVECTIVE:WATER 
+			LoopType_Plant, // 63  ZONEHVAC:LOWTEMPERATURERADIANT:VARIABLEFLOW 
+			LoopType_Plant, // 64  ZONEHVAC:LOWTEMPERATURERADIANT:CONSTANTFLOW 
+			LoopType_Both, // 65  AirTerminal:SingleDuct:ConstantVolume:CooledBeam 
+			LoopType_Both, // 66  Coil:Heating:WaterToAirHeatPump:EquationFit 
+			LoopType_Both, // 67  Coil:Cooling:WaterTOAIRHeatPump:EquationFit 
+			LoopType_Both, // 68  Coil:Heating:WaterTOAIRHeatPump:ParameterEstimation 
+			LoopType_Both, // 69  Coil:Cooling:WaterTOAIRHeatPump:ParameterEstimation 
+			LoopType_Both, // 70  Refrigeration:Condenser:WaterCooled 
+			LoopType_Both, // 71  Refrigeration:CompressorRack 
+			LoopType_Plant, // 72  AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed 
+			LoopType_Plant, // 73  CHILLERHEATER:ABSORPTION:DOUBLEEFFECT 
+			LoopType_Both, // 74  PipingSystem:Underground:PipeCircuit 
+			LoopType_Both, // 75  SolarCollector:IntegralCollectorStorage 
+			LoopType_Both, // 76  Coil:Heating:WaterToAirHeatPump:VariableSpeedEquationFit 
+			LoopType_Both, // 77  Coil:Cooling:WaterTOAIRHeatPump:VariableSpeedEquationFit 
+			LoopType_Both, // 78  PlantComponent:UserDefined 
+			LoopType_Both, // 79  Coil:UserDefined 
+			LoopType_Both, // 80  ZoneHVAC:ForcedAir:UserDefined 
+			LoopType_Both, // 81  AirTerminal:SingleDuct:UserDefined 
+			LoopType_Both, // 82  AirConditioner:VariableRefrigerantFlow 
+			LoopType_Both, // 83  GroundHeatExchanger:HorizontalTrench 
+			LoopType_Both, // 84  HeatExchanger:FluidToFluid 
+			LoopType_Both, // 85  PlantComponent:TemperatureSource 
+			LoopType_Plant, // 86  PlantCentralGroundSourceWrapper 
+			LoopType_Plant, // 87  AirloopHVAC:UnitarySystem 
+			LoopType_Both, // 88  Coil:Cooling:DX:SingleSpeed:ThermalStorage 
+			LoopType_Both, // 89  CoolingTower:VariableSpeed:Merkel 
+			LoopType_Both, // 90  SwimmingPool:Indoor
+			LoopType_Plant // 91  ZoneHVAC:CoolingPanel:RadiantConvective:Water
+		}
+	); 
 
 	int const TypeOf_Other( -1 );
 	int const TypeOf_Boiler_Simple( 1 );
@@ -274,11 +565,38 @@ namespace DataPlant {
 	int const TypeOf_UnitarySystemRecovery( 87 );
 	int const TypeOf_PackagedTESCoolingCoil( 88 );
 	int const TypeOf_CoolingTower_VarSpdMerkel( 89 );
-    int const TypeOf_CoolingPanel_Simple( 90 );
-
+	int const TypeOf_SwimmingPool_Indoor( 90 );
+	int const TypeOf_CoolingPanel_Simple( 91 );
+	
 	// Parameters for General Equipment Types
 	int const NumGeneralEquipTypes( 23 );
-	FArray1D_string const GeneralEquipTypes( NumGeneralEquipTypes, { "BOILER", "CHILLER", "COOLINGTOWER", "GENERATOR", "HEATEXCHANGER", "HEATPUMP", "PIPE", "PUMP", "DISTRICT", "THERMALSTORAGE", "TEMPERINGVALVE", "WATERHEATER", "WATERUSE", "DEMANDCOIL", "SOLARCOLLECTOR", "LOADPROFILE", "FLUIDCOOLER", "EVAPORATIVEFLUIDCOOLER", "GROUNDHEATEXCHANGER", "ZONEHVACDEMAND", "REFRIGERATION", "PLANTCOMPONENT", "CENTRALHEATPUMPSYSTEM" } );
+	FArray1D_string const GeneralEquipTypes(
+		NumGeneralEquipTypes, {
+			"BOILER",
+			"CHILLER",
+			"COOLINGTOWER",
+			"GENERATOR",
+			"HEATEXCHANGER",
+			"HEATPUMP",
+			"PIPE",
+			"PUMP",
+			"DISTRICT",
+			"THERMALSTORAGE",
+			"TEMPERINGVALVE",
+			"WATERHEATER",
+			"WATERUSE",
+			"DEMANDCOIL",
+			"SOLARCOLLECTOR",
+			"LOADPROFILE",
+			"FLUIDCOOLER",
+			"EVAPORATIVEFLUIDCOOLER",
+			"GROUNDHEATEXCHANGER",
+			"ZONEHVACDEMAND",
+			"REFRIGERATION",
+			"PLANTCOMPONENT",
+			"CENTRALHEATPUMPSYSTEM"
+		}
+	);
 
 	int const GenEquipTypes_Boiler( 1 );
 	int const GenEquipTypes_Chiller( 2 );
@@ -304,24 +622,25 @@ namespace DataPlant {
 	int const GenEquipTypes_PlantComponent( 22 );
 	int const GenEquipTypes_CentralHeatPumpSystem( 23 );
 
-	FArray1D_string const OpSchemeTypes( {0,12}, { "Load Range Based Operation", "PLANTEQUIPMENTOPERATION:HEATINGLOAD", "PLANTEQUIPMENTOPERATION:COOLINGLOAD", "PLANTEQUIPMENTOPERATION:OUTDOORWETBULB", "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB", "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT", "PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY", "PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE", "PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE", "PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE", "PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT", "PLANTEQUIPMENTOPERATION:USERDEFINED", "PLANTEQUIPMENTOPERATION:UNCONTROLLED" } ); // long since Deprecated, remove?
+	FArray1D_string const OpSchemeTypes(
+		{0,12}, {
+			"Load Range Based Operation",
+			"PLANTEQUIPMENTOPERATION:HEATINGLOAD",
+			"PLANTEQUIPMENTOPERATION:COOLINGLOAD",
+			"PLANTEQUIPMENTOPERATION:OUTDOORWETBULB",
+			"PLANTEQUIPMENTOPERATION:OUTDOORDRYBULB",
+			"PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINT",
+			"PLANTEQUIPMENTOPERATION:OUTDOORRELATIVEHUMIDITY",
+			"PLANTEQUIPMENTOPERATION:OUTDOORDRYBULBDIFFERENCE",
+			"PLANTEQUIPMENTOPERATION:OUTDOORWETBULBDIFFERENCE",
+			"PLANTEQUIPMENTOPERATION:OUTDOORDEWPOINTDIFFERENCE",
+			"PLANTEQUIPMENTOPERATION:COMPONENTSETPOINT",
+			"PLANTEQUIPMENTOPERATION:USERDEFINED",
+			"PLANTEQUIPMENTOPERATION:UNCONTROLLED"
+		}
+	);
 
 	// DERIVED TYPE DEFINITIONS:
-
-	// two-way common pipe variables
-	//TYPE TwoWayCommonPipeData
-	//  LOGICAL   :: SetpointOnSecondarySide  ! true if control point is demand inlet, otherwise supply inlet
-	//  REAL(r64) :: CurSecCPLegFlow    !Mass flow rate in primary common pipe leg
-	//  REAL(r64) :: CurPriCPLegFlow    !Mass flow rate in secondary common pipe leg
-	//  REAL(r64) :: CurSectoPriFlow    !Secondary side to Primary side Mass flow rate
-	//  REAL(r64) :: CurPritoSecFlow    !Primary side to Secondary side Mass flow rate
-	//  REAL(r64) :: CurSecOutTemp      !Secondary outlet temperature
-	//  REAL(r64) :: CurPriOutTemp      !Primary outlet temperature
-	//  REAL(r64) :: CurPriInTemp       !Primary inlet temperature
-	//  REAL(r64) :: CurSecInTemp       !Secondary inlet temperature
-	//  !new/missing?
-	//  REAL(r64) :: mdotPriRequest     ! primary total flow request
-	//END TYPE TwoWayCommonPipeData
 
 	int const NumConvergenceHistoryTerms( 5 );
 	FArray1D< Real64 > const ConvergenceHistoryARR( NumConvergenceHistoryTerms, { 0.0, -1.0, -2.0, -3.0, -4.0 } );
@@ -329,7 +648,7 @@ namespace DataPlant {
 	Real64 const square_sum_ConvergenceHistoryARR( pow_2( sum_ConvergenceHistoryARR ) );
 	Real64 const sum_square_ConvergenceHistoryARR( sum( pow( ConvergenceHistoryARR, 2 ) ) );
 
-	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.f90.  A common definition would be nicer.
+	// The same as TYPE DefinePriAirSysAvailMgrs in DataAirLoop.cc.  A common definition would be nicer.
 
 	// The next three types (all starting with RepReport) are the "shadow"
 	// derived types for the ventilation reports.  It keeps the node and
@@ -364,19 +683,9 @@ namespace DataPlant {
 	int PlantManageSubIterations( 0 ); // tracks plant iterations to characterize solver
 	int PlantManageHalfLoopCalls( 0 ); // tracks number of half loop calls
 
-	// two-way common pipe variables
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSecCPLegFlow    !Mass flow rate in primary common pipe leg
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPriCPLegFlow    !Mass flow rate in secondary common pipe leg
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSectoPriFlow    !Secondary side to Primary side Mass flow rate
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPritoSecFlow    !Primary side to Secondary side Mass flow rate
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSecOutTemp      !Secondary outlet temperature
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPriOutTemp      !Primary outlet temperature
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurPriInTemp       !Primary inlet temperature
-	//REAL(r64),SAVE,ALLOCATABLE,DIMENSION(:)    :: CurSecInTemp       !Secondary inlet temperature
-
 	// these variables are arrays, allocated for the number of those particular loopsides, containing data for the vent reports
 	// they are operated on like normal in almost all cases currently, except in the routine which actually mines data and sets them up
-	// in that routine in SystemReports.f90, a POINTER is used to iterate over the different array variables below
+	// in that routine in SystemReports.cc, a POINTER is used to iterate over the different array variables below
 	// this is why the TARGET attribute is applied to them here
 	// further info can be found in SystemReports
 
@@ -970,7 +1279,7 @@ namespace DataPlant {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

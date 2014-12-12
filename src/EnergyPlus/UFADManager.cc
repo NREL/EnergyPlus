@@ -219,8 +219,7 @@ namespace UFADManager {
 			ThickOccupiedSubzoneMin = 0.2;
 			HeightIntMassDefault = 2.0;
 			MyOneTimeFlag = false;
-			MySizeFlag.allocate( NumOfZones );
-			MySizeFlag = true;
+			MySizeFlag.dimension( NumOfZones, true );
 		}
 
 		if ( MySizeFlag( ZoneNum ) ) {
@@ -1062,6 +1061,9 @@ namespace UFADManager {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesOccupied, RetAirGains );
 			ConvGainsOccSubzone += RetAirGains;
 		}
+		
+		// Add convection from pool cover to occupied region
+		ConvGainsOccSubzone += SumConvPool( ZoneNum );
 
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
@@ -1484,6 +1486,9 @@ namespace UFADManager {
 			ConvGainsOccSubzone += RetAirGains;
 		}
 
+		// Add convection from pool cover to occupied region
+		ConvGainsOccSubzone += SumConvPool( ZoneNum );
+		
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone );
 		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum );
@@ -1794,14 +1799,14 @@ namespace UFADManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

@@ -404,8 +404,8 @@ namespace ZoneTempPredictorCorrector {
 		FArray1D< NeededComfortControlTypes > TComfortControlTypes;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
-		static gio::Fmt const Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
+		static gio::Fmt Format_700( "('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, ','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')" );
+		static gio::Fmt Format_701( "('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)" );
 
 		// FLOW:
 		cCurrentModuleObject = cZControlTypes( iZC_TStat );
@@ -454,8 +454,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( NumTempControlledZones > 0 ) {
 			TempControlledZone.allocate( NumTempControlledZones );
 			TStatControlTypes.allocate( NumTempControlledZones ); // Number of set point types
-			CTSchedMapToControlledZone.allocate( NumTempControlledZones );
-			CTSchedMapToControlledZone = 0;
+			CTSchedMapToControlledZone.dimension( NumTempControlledZones, 0 );
 
 			TempControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumTStatStatements; ++Item ) {
@@ -921,8 +920,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( NumComfortControlledZones > 0 ) {
 			ComfortControlledZone.allocate( NumComfortControlledZones );
 			TComfortControlTypes.allocate( NumComfortControlledZones ); // Number of set point types
-			CCmSchedMapToControlledZone.allocate( NumComfortControlledZones );
-			CCmSchedMapToControlledZone = 0;
+			CCmSchedMapToControlledZone.dimension( NumComfortControlledZones, 0 );
 
 			ComfortControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumComfortTStatStatements; ++Item ) {
@@ -1774,8 +1772,7 @@ namespace ZoneTempPredictorCorrector {
 
 		if ( NumStageCtrZone > 0 ) {
 			StageControlledZone.allocate( NumStageCtrZone );
-			StageZoneLogic.allocate( NumOfZones );
-			StageZoneLogic = false;
+			StageZoneLogic.dimension( NumOfZones, false );
 
 			StageControlledZoneNum = 0;
 			for ( Item = 1; Item <= NumStageControlledZones; ++Item ) {
@@ -1970,118 +1967,65 @@ namespace ZoneTempPredictorCorrector {
 
 		// FLOW:
 		if ( MyOneTimeFlag ) {
-			TempZoneThermostatSetPoint.allocate( NumOfZones );
-			TempZoneThermostatSetPoint = 0.0;
-			ZoneThermostatSetPointHi.allocate( NumOfZones );
-			ZoneThermostatSetPointHi = 0.0;
-			ZoneThermostatSetPointLo.allocate( NumOfZones );
-			ZoneThermostatSetPointLo = 0.0;
+			TempZoneThermostatSetPoint.dimension( NumOfZones, 0.0 );
+			ZoneThermostatSetPointHi.dimension( NumOfZones, 0.0 );
+			ZoneThermostatSetPointLo.dimension( NumOfZones, 0.0 );
 
-			LoadCorrectionFactor.allocate( NumOfZones ); //PH 3/3/04
-			LoadCorrectionFactor = 0.0;
-			TempControlType.allocate( NumOfZones );
-			TempControlType = 0;
+			LoadCorrectionFactor.dimension( NumOfZones, 0.0 ); //PH 3/3/04
+			TempControlType.dimension( NumOfZones, 0 );
 			if ( NumComfortControlledZones > 0 ) {
-				ComfortControlType.allocate( NumOfZones );
-				ComfortControlType = 0;
+				ComfortControlType.dimension( NumOfZones, 0 );
 				ZoneComfortControlsFanger.allocate( NumOfZones );
 			}
-			ZoneSetPointLast.allocate( NumOfZones );
-			ZoneSetPointLast = 0.0;
-			Setback.allocate( NumOfZones );
-			Setback = false;
-			DeadBandOrSetback.allocate( NumOfZones );
-			DeadBandOrSetback = false;
-			CurDeadBandOrSetback.allocate( NumOfZones );
-			CurDeadBandOrSetback = false;
-			SNLoadHeatEnergy.allocate( NumOfZones );
-			SNLoadHeatEnergy = 0.0;
-			SNLoadCoolEnergy.allocate( NumOfZones );
-			SNLoadCoolEnergy = 0.0;
-			SNLoadHeatRate.allocate( NumOfZones );
-			SNLoadHeatRate = 0.0;
-			SNLoadCoolRate.allocate( NumOfZones );
-			SNLoadCoolRate = 0.0;
-			SNLoadPredictedRate.allocate( NumOfZones );
-			SNLoadPredictedRate = 0.0;
-			SNLoadPredictedHSPRate.allocate( NumOfZones );
-			SNLoadPredictedHSPRate = 0.0;
-			SNLoadPredictedCSPRate.allocate( NumOfZones );
-			SNLoadPredictedCSPRate = 0.0;
-			MoisturePredictedRate.allocate( NumOfZones );
-			MoisturePredictedRate = 0.0;
-			WZoneTimeMinus1.allocate( NumOfZones );
-			WZoneTimeMinus1 = 0.0;
-			WZoneTimeMinus2.allocate( NumOfZones );
-			WZoneTimeMinus2 = 0.0;
-			WZoneTimeMinus3.allocate( NumOfZones );
-			WZoneTimeMinus3 = 0.0;
-			WZoneTimeMinus4.allocate( NumOfZones );
-			WZoneTimeMinus4 = 0.0;
-			DSWZoneTimeMinus1.allocate( NumOfZones );
-			DSWZoneTimeMinus1 = 0.0;
-			DSWZoneTimeMinus2.allocate( NumOfZones );
-			DSWZoneTimeMinus2 = 0.0;
-			DSWZoneTimeMinus3.allocate( NumOfZones );
-			DSWZoneTimeMinus3 = 0.0;
-			DSWZoneTimeMinus4.allocate( NumOfZones );
-			DSWZoneTimeMinus4 = 0.0;
-			ZoneAirHumRatTemp.allocate( NumOfZones );
-			ZoneAirHumRatTemp = 0.0;
-			WZoneTimeMinus1Temp.allocate( NumOfZones );
-			WZoneTimeMinus1Temp = 0.0;
-			WZoneTimeMinus2Temp.allocate( NumOfZones );
-			WZoneTimeMinus2Temp = 0.0;
-			WZoneTimeMinus3Temp.allocate( NumOfZones );
-			WZoneTimeMinus3Temp = 0.0;
-			WZoneTimeMinusP.allocate( NumOfZones );
-			WZoneTimeMinusP = 0.0;
-			TempIndZnLd.allocate( NumOfZones );
-			TempIndZnLd = 0.0;
-			TempDepZnLd.allocate( NumOfZones );
-			TempDepZnLd = 0.0;
-			NonAirSystemResponse.allocate( NumOfZones );
-			NonAirSystemResponse = 0.0;
-			SysDepZoneLoads.allocate( NumOfZones );
-			SysDepZoneLoads = 0.0;
-			SysDepZoneLoadsLagged.allocate( NumOfZones );
-			SysDepZoneLoadsLagged = 0.0;
-			ZoneAirRelHum.allocate( NumOfZones );
-			ZoneAirRelHum = 0.0;
-			ZoneWMX.allocate( NumOfZones );
-			ZoneWMX = 0.0;
-			ZoneWM2.allocate( NumOfZones );
-			ZoneWM2 = 0.0;
-			ZoneT1.allocate( NumOfZones );
-			ZoneT1 = 0.0;
-			ZoneW1.allocate( NumOfZones );
-			ZoneW1 = 0.0;
+			ZoneSetPointLast.dimension( NumOfZones, 0.0 );
+			Setback.dimension( NumOfZones, false );
+			DeadBandOrSetback.dimension( NumOfZones, false );
+			CurDeadBandOrSetback.dimension( NumOfZones, false );
+			SNLoadHeatEnergy.dimension( NumOfZones, 0.0 );
+			SNLoadCoolEnergy.dimension( NumOfZones, 0.0 );
+			SNLoadHeatRate.dimension( NumOfZones, 0.0 );
+			SNLoadCoolRate.dimension( NumOfZones, 0.0 );
+			SNLoadPredictedRate.dimension( NumOfZones, 0.0 );
+			SNLoadPredictedHSPRate.dimension( NumOfZones, 0.0 );
+			SNLoadPredictedCSPRate.dimension( NumOfZones, 0.0 );
+			MoisturePredictedRate.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus1.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus2.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus3.dimension( NumOfZones, 0.0 );
+			DSWZoneTimeMinus4.dimension( NumOfZones, 0.0 );
+			ZoneAirHumRatTemp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus1Temp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus2Temp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinus3Temp.dimension( NumOfZones, 0.0 );
+			WZoneTimeMinusP.dimension( NumOfZones, 0.0 );
+			TempIndZnLd.dimension( NumOfZones, 0.0 );
+			TempDepZnLd.dimension( NumOfZones, 0.0 );
+			NonAirSystemResponse.dimension( NumOfZones, 0.0 );
+			SysDepZoneLoads.dimension( NumOfZones, 0.0 );
+			SysDepZoneLoadsLagged.dimension( NumOfZones, 0.0 );
+			ZoneAirRelHum.dimension( NumOfZones, 0.0 );
+			ZoneWMX.dimension( NumOfZones, 0.0 );
+			ZoneWM2.dimension( NumOfZones, 0.0 );
+			ZoneT1.dimension( NumOfZones, 0.0 );
+			ZoneW1.dimension( NumOfZones, 0.0 );
 
-			ListSNLoadHeatEnergy.allocate( NumOfZoneLists );
-			ListSNLoadHeatEnergy = 0.0;
-			ListSNLoadCoolEnergy.allocate( NumOfZoneLists );
-			ListSNLoadCoolEnergy = 0.0;
-			ListSNLoadHeatRate.allocate( NumOfZoneLists );
-			ListSNLoadHeatRate = 0.0;
-			ListSNLoadCoolRate.allocate( NumOfZoneLists );
-			ListSNLoadCoolRate = 0.0;
+			ListSNLoadHeatEnergy.dimension( NumOfZoneLists, 0.0 );
+			ListSNLoadCoolEnergy.dimension( NumOfZoneLists, 0.0 );
+			ListSNLoadHeatRate.dimension( NumOfZoneLists, 0.0 );
+			ListSNLoadCoolRate.dimension( NumOfZoneLists, 0.0 );
 
-			GroupSNLoadHeatEnergy.allocate( NumOfZoneGroups );
-			GroupSNLoadHeatEnergy = 0.0;
-			GroupSNLoadCoolEnergy.allocate( NumOfZoneGroups );
-			GroupSNLoadCoolEnergy = 0.0;
-			GroupSNLoadHeatRate.allocate( NumOfZoneGroups );
-			GroupSNLoadHeatRate = 0.0;
-			GroupSNLoadCoolRate.allocate( NumOfZoneGroups );
-			GroupSNLoadCoolRate = 0.0;
-			AIRRAT.allocate( NumOfZones );
-			AIRRAT = 0.0;
-			ZTM1.allocate( NumOfZones );
-			ZTM1 = 0.0;
-			ZTM2.allocate( NumOfZones );
-			ZTM2 = 0.0;
-			ZTM3.allocate( NumOfZones );
-			ZTM3 = 0.0;
+			GroupSNLoadHeatEnergy.dimension( NumOfZoneGroups, 0.0 );
+			GroupSNLoadCoolEnergy.dimension( NumOfZoneGroups, 0.0 );
+			GroupSNLoadHeatRate.dimension( NumOfZoneGroups, 0.0 );
+			GroupSNLoadCoolRate.dimension( NumOfZoneGroups, 0.0 );
+			AIRRAT.dimension( NumOfZones, 0.0 );
+			ZTM1.dimension( NumOfZones, 0.0 );
+			ZTM2.dimension( NumOfZones, 0.0 );
+			ZTM3.dimension( NumOfZones, 0.0 );
 
 			// Allocate Derived Types
 			ZoneSysEnergyDemand.allocate( NumOfZones );
@@ -3355,7 +3299,7 @@ namespace ZoneTempPredictorCorrector {
 
 			// Calculate hourly humidity ratio from infiltration + humidity added from latent load
 			// to determine system added/subtracted moisture.
-			LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum );
+			LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum ) + SumLatentPool( ZoneNum );
 
 			SysTimeStepInSeconds = SecInHour * TimeStepSys;
 
@@ -4194,7 +4138,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		// Calculate hourly humidity ratio from infiltration + humdidity added from latent load + system added moisture
-		LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum );
+		LatentGain = ZoneLatentGain( ZoneNum ) + SumLatentHTRadSys( ZoneNum )  + SumLatentPool( ZoneNum );
 
 		SysTimeStepInSeconds = SecInHour * TimeStepSys;
 
@@ -4469,7 +4413,7 @@ namespace ZoneTempPredictorCorrector {
 		// Sum all convective internal gains: SumIntGain
 
 		SumAllInternalConvectionGains( ZoneNum, SumIntGain );
-		SumIntGain += SumConvHTRadSys( ZoneNum );
+		SumIntGain += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 
 		// Add heat to return air if zonal system (no return air) or cycling system (return air frequently very
 		// low or zero)
@@ -4888,7 +4832,7 @@ namespace ZoneTempPredictorCorrector {
 		}
 
 		// non air system response.
-		SumNonAirSystem = NonAirSystemResponse( ZoneNum ) + SumConvHTRadSys( ZoneNum );
+		SumNonAirSystem = NonAirSystemResponse( ZoneNum ) + SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum );
 
 		// Sum all surface convection: SumHA, SumHATsurf, SumHATref (and additional contributions to SumIntGain)
 		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
@@ -5181,8 +5125,7 @@ namespace ZoneTempPredictorCorrector {
 		if ( SetupOscillationOutputFlag ) {
 			ZoneTempHist.allocate( NumOfZones, 4 );
 			ZoneTempHist = 0.0;
-			ZoneTempOscillate.allocate( NumOfZones );
-			ZoneTempOscillate = 0.0;
+			ZoneTempOscillate.dimension( NumOfZones, 0.0 );
 			//set up zone by zone variables
 			// CurrentModuleObject='Zone'
 			for ( iZone = 1; iZone <= NumOfZones; ++iZone ) {
@@ -5832,14 +5775,14 @@ namespace ZoneTempPredictorCorrector {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

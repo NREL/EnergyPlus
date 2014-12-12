@@ -1,11 +1,15 @@
 #ifndef InputProcessor_hh_INCLUDED
 #define InputProcessor_hh_INCLUDED
 
+// C++ Headers
+#include <iosfwd>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/FArray1S.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/string.functions.hh>
+#include <ObjexxFCL/Vector2.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus.hh>
@@ -50,8 +54,6 @@ namespace InputProcessor {
 	extern int NumSectionDefs; // Count of number of section defintions found in the IDD
 	extern int MaxObjectDefs; // Current "max" object defs (IDD), when reached will be reallocated and new Max set
 	extern int MaxSectionDefs; // Current "max" section defs (IDD), when reached will be reallocated and new Max set
-	extern int IDDFile; // Unit number for reading IDD (Energy+.idd)
-	extern int IDFFile; // Unit number for reading IDF (in.idf)
 	extern int NumLines; // Count of number of lines in IDF
 	extern int MaxIDFRecords; // Current "max" IDF records (lines), when reached will be reallocated and new Max set
 	extern int NumIDFRecords; // Count of number of IDF records
@@ -75,12 +77,13 @@ namespace InputProcessor {
 	extern int TotalAuditErrors; // Counting some warnings that go onto only the audit file
 	extern int NumSecretObjects; // Number of objects in "Secret Mode"
 	extern bool ProcessingIDD; // True when processing IDD, false when processing IDF
+	extern std::ostream * echo_stream; // Internal stream used for input file echoing (used for performance)
 
 	//Real Variables for Module
 	//na
 
 	//Character Variables for Module
-	extern std::string InputLine; // Each line can be up to MaxInputLineLength characters long
+	extern std::string InputLine;
 	extern FArray1D_string ListOfSections;
 	extern FArray1D_string ListOfObjects;
 	extern FArray1D_int iListOfObjects;
@@ -115,9 +118,9 @@ namespace InputProcessor {
 		bool MinMaxChk; // true when Min/Max has been added
 		int FieldNumber; // which field number this is
 		std::string FieldName; // Name of the field
-		FArray1D_string MinMaxString; // appropriate Min/Max Strings
-		FArray1D< Real64 > MinMaxValue; // appropriate Min/Max Values
-		FArray1D_int WhichMinMax; // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+		Vector2_string MinMaxString; // appropriate Min/Max Strings
+		Vector2< Real64 > MinMaxValue; // appropriate Min/Max Values
+		Vector2_int WhichMinMax; // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		bool DefaultChk; // true when default has been entered
 		Real64 Default; // Default value
 		bool DefAutoSize; // Default value is "autosize"
@@ -131,9 +134,8 @@ namespace InputProcessor {
 		RangeCheckDef() :
 			MinMaxChk( false ),
 			FieldNumber( 0 ),
-			MinMaxString( 2, Blank ),
-			MinMaxValue( 2, 0.0 ),
-			WhichMinMax( 2, 0 ),
+			MinMaxValue( 0.0 ),
+			WhichMinMax( 0 ),
 			DefaultChk( false ),
 			Default( 0.0 ),
 			DefAutoSize( false ),
@@ -149,9 +151,9 @@ namespace InputProcessor {
 			bool const MinMaxChk, // true when Min/Max has been added
 			int const FieldNumber, // which field number this is
 			std::string const & FieldName, // Name of the field
-			FArray1_string const & MinMaxString, // appropriate Min/Max Strings
-			FArray1< Real64 > const & MinMaxValue, // appropriate Min/Max Values
-			FArray1_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
+			Vector2_string const & MinMaxString, // appropriate Min/Max Strings
+			Vector2< Real64 > const & MinMaxValue, // appropriate Min/Max Values
+			Vector2_int const & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 			bool const DefaultChk, // true when default has been entered
 			Real64 const Default, // Default value
 			bool const DefAutoSize, // Default value is "autosize"
@@ -164,9 +166,9 @@ namespace InputProcessor {
 			MinMaxChk( MinMaxChk ),
 			FieldNumber( FieldNumber ),
 			FieldName( FieldName ),
-			MinMaxString( 2, MinMaxString ),
-			MinMaxValue( 2, MinMaxValue ),
-			WhichMinMax( 2, WhichMinMax ),
+			MinMaxString( MinMaxString ),
+			MinMaxValue( MinMaxValue ),
+			WhichMinMax( WhichMinMax ),
 			DefaultChk( DefaultChk ),
 			Default( Default ),
 			DefAutoSize( DefAutoSize ),
@@ -414,7 +416,10 @@ namespace InputProcessor {
 	ProcessInput();
 
 	void
-	ProcessDataDicFile( bool & ErrorsFound ); // set to true if any errors flagged during IDD processing
+	ProcessDataDicFile(
+		std::istream & idd_stream,
+		bool & ErrorsFound // set to true if any errors flagged during IDD processing
+	);
 
 	void
 	AddSectionDef(
@@ -424,6 +429,7 @@ namespace InputProcessor {
 
 	void
 	AddObjectDefandParse(
+		std::istream & idd_stream,
 		std::string const & ProposedObject, // Proposed Object to Add
 		std::string::size_type & CurPos, // Current position (initially at first ',') of InputLine
 		bool & EndofFile, // End of File marker
@@ -431,7 +437,7 @@ namespace InputProcessor {
 	);
 
 	void
-	ProcessInputDataFile();
+	ProcessInputDataFile( std::istream & idf_stream );
 
 	void
 	ValidateSection(
@@ -441,6 +447,7 @@ namespace InputProcessor {
 
 	void
 	ValidateObjectandParse(
+		std::istream & idf_stream,
 		std::string const & ProposedObject,
 		std::string::size_type & CurPos,
 		bool & EndofFile
@@ -517,21 +524,19 @@ namespace InputProcessor {
 
 	void
 	ReadInputLine(
-		int const UnitNumber,
+		std::istream & in_stream,
 		std::string::size_type & CurPos,
 		bool & BlankLine,
-		int & InputLineLength,
 		bool & EndofFile
 	);
 
 	void
 	ReadInputLine(
-		int const UnitNumber,
+		std::istream & in_stream,
 		std::string::size_type & CurPos,
 		bool & BlankLine,
-		int & InputLineLength,
 		bool & EndofFile,
-		bool MinMax,
+		bool & MinMax,
 		int & WhichMinMax, // =0 (none/invalid), =1 \min, =2 \min>, =3 \max, =4 \max<
 		std::string & MinMaxString,
 		Real64 & Value,
@@ -874,7 +879,7 @@ namespace InputProcessor {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to

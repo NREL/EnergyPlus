@@ -93,6 +93,8 @@ namespace UnitHeater {
 		int AvailStatus;
 		bool FanOffNoHeating; // True when fan is on during no heating load
 		Real64 FanPartLoadRatio; // fan part-load ratio for time step
+		int ZonePtr; // pointer to a zone served by a unit heater
+		int HVACSizingIndex; // index of a HVACSizing object for a unit heater
 
 		// Default Constructor
 		UnitHeaterData() :
@@ -134,7 +136,9 @@ namespace UnitHeater {
 			ElecEnergy( 0.0 ),
 			AvailStatus( 0 ),
 			FanOffNoHeating( false ),
-			FanPartLoadRatio( 0.0 )
+			FanPartLoadRatio( 0.0 ),
+			ZonePtr( 0 ),
+			HVACSizingIndex( 0 )
 		{}
 
 		// Member Constructor
@@ -186,7 +190,9 @@ namespace UnitHeater {
 			std::string const & AvailManagerListName, // Name of an availability manager list object
 			int const AvailStatus,
 			bool const FanOffNoHeating, // True when fan is on during no heating load
-			Real64 const FanPartLoadRatio // fan part-load ratio for time step
+			Real64 const FanPartLoadRatio, // fan part-load ratio for time step
+			int const ZonePtr, // pointer to a zone served by a unit heater
+			int const HVACSizingIndex // index of a HVACSizing object for a unit heater
 		) :
 			Name( Name ),
 			SchedName( SchedName ),
@@ -235,13 +241,33 @@ namespace UnitHeater {
 			AvailManagerListName( AvailManagerListName ),
 			AvailStatus( AvailStatus ),
 			FanOffNoHeating( FanOffNoHeating ),
-			FanPartLoadRatio( FanPartLoadRatio )
+			FanPartLoadRatio( FanPartLoadRatio ),
+			ZonePtr( ZonePtr ),
+			HVACSizingIndex( HVACSizingIndex )
 		{}
 
 	};
 
+	struct UnitHeatNumericFieldData
+	{
+		// Members
+		FArray1D_string FieldNames;
+
+		// Default Constructor
+		UnitHeatNumericFieldData()
+		{}
+
+		// Member Constructor
+		UnitHeatNumericFieldData(
+			FArray1_string const & FieldNames // Name of the HeatingCoil numeric field descriptions
+			) :
+			FieldNames(FieldNames)
+		{}
+	};
+
 	// Object Data
 	extern FArray1D< UnitHeaterData > UnitHeat;
+	extern FArray1D< UnitHeatNumericFieldData > UnitHeatNumericFields;
 
 	// Functions
 
@@ -311,7 +337,7 @@ namespace UnitHeater {
 	//     Portions of the EnergyPlus software package have been developed and copyrighted
 	//     by other individuals, companies and institutions.  These portions have been
 	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in EnergyPlus.f90.
+	//     list of contributors, see "Notice" located in main.cc.
 
 	//     NOTICE: The U.S. Government is granted for itself and others acting on its
 	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
