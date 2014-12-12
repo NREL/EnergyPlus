@@ -1,7 +1,7 @@
 #ifndef DataSurfaces_hh_INCLUDED
 #define DataSurfaces_hh_INCLUDED
 
-// standard lib stuff
+// C++ Headers
 #include <vector>
 #include <functional>
 
@@ -1243,7 +1243,6 @@ namespace DataSurfaces {
 			RhoFloorWall( 0.0 ),
 			FractionUpgoing( 0.0 ),
 			VisTransRatio( 0.0 ),
-			// IRfromParentZone( 0.0 ),
 			IRErrCount( 0 ),
 			IRErrCountC( 0 ),
 			FrameArea( 0.0 ),
@@ -1574,7 +1573,6 @@ namespace DataSurfaces {
 			RhoFloorWall( RhoFloorWall ),
 			FractionUpgoing( FractionUpgoing ),
 			VisTransRatio( VisTransRatio ),
-			//			IRfromParentZone( IRfromParentZone ),
 			IRErrCount( IRErrCount ),
 			IRErrCountC( IRErrCountC ),
 			FrameArea( FrameArea ),
@@ -2484,13 +2482,6 @@ namespace DataSurfaces {
 	extern FArray1D< FenestrationSolarAbsorbed > FenLayAbsSSG;
 
 	// Functions
-
-	  //zone and surf are 0 based indices
-	// inline void 
-	// setShadingFlag(int val, int zone, int surf){
-	//   SurfaceRadiantWin[ surf ].setShadingFlag(val);
-	//   DataViewFactorInformation::ZoneInfo[ zone ].shadeChanged = true;
-	// }
 
 	std::string
 	cSurfaceClass( int const ClassNo );

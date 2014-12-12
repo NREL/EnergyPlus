@@ -730,7 +730,7 @@ namespace DElightManagerF {
 		using DataDaylighting::ZoneDaylight;
 		using DataSurfaces::WorldCoordSystem;
 		using DataSurfaces::AspectTransform;
-
+		
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		static std::string const CurrentModuleObject( "GeometryTransform" );
 

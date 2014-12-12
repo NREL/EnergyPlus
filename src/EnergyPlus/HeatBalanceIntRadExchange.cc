@@ -46,7 +46,7 @@ extern "C"{
 namespace EnergyPlus {
 
 #define EP_HBIRE_SEQ
-#define DEBUG_SH
+
 namespace HeatBalanceIntRadExchange {
 	// Module containing the routines dealing with the interior radiant exchange
 	// between surfaces.
@@ -107,14 +107,13 @@ namespace HeatBalanceIntRadExchange {
 	std::vector<std::pair<std::vector< ReSurface >::iterator,
 			      std::vector< ReSurface >::iterator>> threadSurfIterators;	// SUBROUTINE SPECIFICATIONS FOR MODULE HeatBalanceIntRadExchange
 
-  int count = 0;
 	void
 	CalcInteriorRadExchange(const int SurfIterations,
 													const int ZoneToResimulate){
 		using EppPerformance::Timer;
     
-		static Timer timer(__PRETTY_FUNCTION__);
-		timer.startTimer();
+		// static Timer timer(__PRETTY_FUNCTION__);
+		// timer.startTimer();
 
 		static bool firstTime( true );
 		if(firstTime){
@@ -138,7 +137,7 @@ namespace HeatBalanceIntRadExchange {
 			}
 			for(auto& z: ZoneInfo){z.ready = false;}
 		}
-		timer.stopTimer();
+    //		timer.stopTimer();
 	}
 
 	void
@@ -250,8 +249,6 @@ namespace HeatBalanceIntRadExchange {
 	void
 	CalcScriptF(ZoneViewFactorInformation& Zone){
 		using EppPerformance::Timer;
-		// This thread_local static isn't working out -- actually,
-		// when you think about it, it doesn't make sense
 		//		thread_local static Timer timer(__PRETTY_FUNCTION__);
 		//timer.startTimer();
 
@@ -262,6 +259,7 @@ namespace HeatBalanceIntRadExchange {
 		int surfCount = Zone.NumOfSurfaces;
 		cMatrix = new Real64[surfCount * surfCount];
 		jMatrix = new Real64[surfCount * surfCount];
+
 
 
 		if(cMatrix == nullptr || jMatrix == nullptr){
@@ -287,13 +285,43 @@ namespace HeatBalanceIntRadExchange {
 		}
 
 		int *ipiv = new int[surfCount];
+// #ifdef DEBUG_CI
+// 		std::cout << "Dumping prelims in CalcScriptF Zone:" << Zone() << std::endl;
+// 		std::cout << "jMatrix first." << std::endl;
+// 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
+// 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
+// 				std::cout << jMatrix[ x * surfCount + y] << " ";
+// 			}
+// 			std::cout << std::endl;
+// 		}
+// 		std::cout << "Now cMatrix." << std::endl;
+// 		for(int x = 0; x < Zone.NumOfSurfaces; ++x){
+// 			for(int y = 0; y < Zone.NumOfSurfaces; ++y){
+// 				std::cout << cMatrix[ x * surfCount + y] << " ";
+// 			}
+// 			std::cout << std::endl;
+// 		}
+
+// #endif
 		int result = clapack_dgesv(CblasRowMajor, surfCount, 
 															 surfCount, cMatrix, surfCount, 
 															 ipiv, jMatrix, surfCount);
-		delete[] cMatrix; 
+		delete[] cMatrix; //made this as early as possible -- it appears that having 8 threads allocate NxN all at once for large zones 
+		//is having an acute impact on system memory
 		delete[] ipiv;
 
 		if( result == 0){ //success
+// #ifdef DEBUG_CI
+// 			std::cout << "Finished calculating linear system.  Here's the result: " << 
+// 				std::endl;
+// 			for(int x = 0; x < Zone.NumOfSurfaces; ++x){
+// 				for(int y = 0; y < Zone.NumOfSurfaces; ++y){
+// 					std::cout << jMatrix[ y * surfCount + x] << " ";
+// 				}
+// 				std::cout << std::endl;
+// 			}
+
+// #endif
 			for(auto i: Zone.surfaces){
 				Real64 emiss = Zone.Emissivity( i(false) + 1 );
 				emiss = emiss > MAX_EMISS ? MAX_EMISS : emiss;
@@ -389,13 +417,10 @@ namespace HeatBalanceIntRadExchange {
 
 		using EppPerformance::Timer;
     
-		static Timer timer(__PRETTY_FUNCTION__);
-		timer.startTimer();
+		// static Timer timer(__PRETTY_FUNCTION__);
+		// timer.startTimer();
 
 		// FLOW:
-// #ifdef DEBUG_SH
-// 		//		EppPerformance::Utility::doDataDump();
-// #endif
 
 
 		ZoneInfo.resize( NumOfZones ); // Allocate the entire derived type
@@ -440,20 +465,13 @@ namespace HeatBalanceIntRadExchange {
 			if ( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces < 1 ) ShowFatalError( "No surfaces in a zone in InitInteriorRadExchange" );
 
 			// Allocate the parts of the derived type
-			ZoneInfo[ ZoneNum - 1 ].F.allocate( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces );
-			ZoneInfo[ ZoneNum - 1 ].F = 0.0;
-			ZoneInfo[ ZoneNum - 1 ].ScriptF.allocate( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces );
-			ZoneInfo[ ZoneNum - 1 ].ScriptF = 0.0;
-			ZoneInfo[ ZoneNum - 1 ].Area.allocate( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces );
-			ZoneInfo[ ZoneNum - 1 ].Area = 0.0;
-			ZoneInfo[ ZoneNum - 1 ].Emissivity.allocate( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces );
-			ZoneInfo[ ZoneNum - 1 ].Emissivity = 0.0;
-			ZoneInfo[ ZoneNum - 1 ].Azimuth.allocate( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces );
-			ZoneInfo[ ZoneNum - 1 ].Azimuth = 0.0;
-			ZoneInfo[ ZoneNum - 1 ].Tilt.allocate( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces );
-			ZoneInfo[ ZoneNum - 1 ].Tilt = 0.0;
-			ZoneInfo[ ZoneNum - 1 ].SurfacePtr.allocate( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces );
-			ZoneInfo[ ZoneNum - 1 ].SurfacePtr = 0;//TODO is this redundant?
+			ZoneInfo[ ZoneNum - 1 ].F.dimension( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, 0.0 );
+			ZoneInfo[ ZoneNum - 1 ].ScriptF.dimension( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, 0.0 );
+			ZoneInfo[ ZoneNum - 1 ].Area.dimension( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, 0.0 );
+			ZoneInfo[ ZoneNum - 1 ].Emissivity.dimension( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, 0.0 );
+			ZoneInfo[ ZoneNum - 1 ].Azimuth.dimension( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, 0.0 );
+			ZoneInfo[ ZoneNum - 1 ].Tilt.dimension( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, 0.0 );
+			ZoneInfo[ ZoneNum - 1 ].SurfacePtr.dimension( ZoneInfo[ ZoneNum - 1 ].NumOfSurfaces, 0 );
 
 			// Initialize the surface pointer array
 			ZoneSurfNum = 0;
@@ -749,7 +767,7 @@ namespace HeatBalanceIntRadExchange {
 		if ( ErrorsFound ) {
 			ShowFatalError( "InitInteriorRadExchange: Errors found during initialization of radiant exchange.  Program terminated." );
 		}
-		timer.stopTimer();
+    //		timer.stopTimer();
 	}
 
 	void
@@ -1258,9 +1276,14 @@ namespace HeatBalanceIntRadExchange {
 				F = FixedF;
 				FinalCheckValue = FixedCheckValue;
 			} else {
-				ShowWarningError( "FixViewFactors: View factors not complete. Check for bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
+				ShowWarningError( "FixViewFactors: View factors not complete. Check for " "bad surface descriptions or unenclosed zone=\"" + Zone( ZoneNum ).Name + "\"." );
 			}
 		}
+
+		// FixedAF.deallocate();
+		// FixedF.deallocate();
+		// FixedAFTranspose.deallocate();
+		// RowCoefficient.deallocate();
 
 	}
 

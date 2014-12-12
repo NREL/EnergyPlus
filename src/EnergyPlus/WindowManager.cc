@@ -2110,7 +2110,6 @@ namespace WindowManager {
 
 			ConstrNum = Construction[ SurfNum  - 1 ];
 			TotGlassLay = ConstrWin[ ConstrNum  - 1 ].TotGlassLayers;
-			hcout = HextConvCoeff;
 			ngllayer = Construct( ConstrNum ).TotSolidLayers; // Simon: This is necessary to keep for frame calculations
 			// Simon: need to transfer surface temperatures because of frames calculation
 			for ( i = 1; i <= 2 * Construct( ConstrNum ).TotSolidLayers; ++i ) {

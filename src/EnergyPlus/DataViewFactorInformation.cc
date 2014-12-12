@@ -44,8 +44,8 @@ namespace DataViewFactorInformation {
 	// MODULE VARIABLE DECLARATIONS:
 
 	// Object Data
-        std::vector< ZoneViewFactorInformation > ZoneInfo;
-        std::vector< ReSurface > VfSurfaces;
+  std::vector< ZoneViewFactorInformation > ZoneInfo;
+  std::vector< ReSurface > VfSurfaces;
 	//     NOTICE
 	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence

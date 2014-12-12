@@ -297,7 +297,7 @@ namespace SteamBaseboardRadiator {
 		int const iHeatDesignCapacityNumericNum( 1 ); // get input index to steam baseboard Radiator system electric heating capacity
 		int const iHeatCapacityPerFloorAreaNumericNum( 2 ); // get input index to steam baseboard Radiator system electric heating capacity per floor area sizing
 		int const iHeatFracOfAutosizedCapacityNumericNum( 3 ); //  get input index to steam baseboard Radiator system electric heating capacity sizing as fraction of autozized heating capacity
-
+		
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
 

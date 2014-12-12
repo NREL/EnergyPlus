@@ -169,7 +169,7 @@ namespace DataHeatBalSurface {
 	FArray1D< Real64 > VMULT; // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
 	FArray1D< Real64 > VCONV; // Fraction Of Short-Wave Radiation From Lights Converted To Convection
   //FArray1D< Real64 > NetLWRadToSurf; // Net interior long wavelength radiation to a surface from other surfaces
-        EppPerformance::perTArray< Real64 > NetLWRadToSurf;
+  EppPerformance::perTArray< Real64 > NetLWRadToSurf;
 	FArray1D< Real64 > ZoneMRT; // Zone Mean Radiant Temperature
 	FArray1D< Real64 > QRadSWLightsInAbs; // Short wave from Lights radiation absorbed on inside of opaque surface
 	// Variables that are used in both the Surface Heat Balance and the Moisture Balance

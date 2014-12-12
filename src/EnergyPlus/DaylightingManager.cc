@@ -6599,7 +6599,7 @@ namespace DaylightingManager {
 
 		// Loop again over windows and reset remaining shading flags that
 		// are 10 or higher (i.e., conditionally off) to off
-		for ( IWin = ZoneSpecs[ZoneNum - 1 ].SurfaceFirst; IWin <= ZoneSpecs[ZoneNum - 1 ].SurfaceLast; ++IWin ) {
+		for ( IWin = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; IWin <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++IWin ) {
 			if ( Surface( IWin ).Class != SurfaceClass_Window ) continue;
 			if ( Surface( IWin ).ExtBoundCond != ExternalEnvironment ) continue;
 			if ( SurfaceRadiantWin[ IWin  - 1 ].getShadingFlag() >= 10 ) SurfaceRadiantWin[ IWin  - 1 ].setShadingFlag(ShadeOff);

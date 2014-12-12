@@ -289,7 +289,7 @@ namespace DataSurfaces {
 	int TotOSCM( 0 ); // Total number of Other Side Conditions Model Blocks.
 	int TotExtVentCav( 0 );
 	int TotSurfIncSolSSG( 0 ); // Total number of scheduled surface gains for incident solar radiation on surface
-	int TotFenLayAbsSSG( 0 ); // T number of scheduled surface gains for absorbed solar radiation in window layers
+	int TotFenLayAbsSSG( 0 ); // Total number of scheduled surface gains for absorbed solar radiation in window layers
 	int Corner( 0 ); // Which corner is specified as the first vertice
 	int MaxVerticesPerSurface( 4 ); // Maximum number of vertices allowed for a single surface (default -- can go higher)
 
@@ -424,8 +424,8 @@ namespace DataSurfaces {
 	// Object Data
 	FArray1D< SurfaceData > Surface;
 	FArray1D< SurfaceWindowCalc > SurfaceWindow;
-        std::vector< SurfaceWinRad > SurfaceRadiantWin;
-        EppPerformance::perTArray< Real64 > IRfromParentZone;
+  std::vector< SurfaceWinRad > SurfaceRadiantWin;
+  EppPerformance::perTArray< Real64 > IRfromParentZone;
 	FArray1D< FrameDividerProperties > FrameDivider;
 	FArray1D< StormWindowData > StormWindow;
 	FArray1D< WindowShadingControlData > WindowShadingControl;
@@ -527,14 +527,6 @@ namespace DataSurfaces {
 		return ClassName;
 
 	}
-        // void
-	// SurfaceWinRad::setShadingFlag(int val){
-	//   ShadingFlag = val;
-	//   func(shadeChangedCallback);
-	//   //we'll perhaps do a better check as to whether it actually changed, but we'll test for now like this
-	//   //TODO
-	// }
-
 
 	//     NOTICE
 

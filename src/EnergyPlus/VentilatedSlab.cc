@@ -41,143 +41,143 @@
 
 namespace EnergyPlus {
 
-namespace VentilatedSlab {
+  namespace VentilatedSlab {
 
-	// Module containing the routines dealing with the Ventilated Slab
+	 // Module containing the routines dealing with the Ventilated Slab
 
-	// MODULE INFORMATION:
-	//       AUTHOR         Young Tae Chae, Rick Strand
-	//       DATE WRITTEN   June 2008
-	//       MODIFIED
-	//       RE-ENGINEERED  na
+	 // MODULE INFORMATION:
+	 //       AUTHOR         Young Tae Chae, Rick Strand
+	 //       DATE WRITTEN   June 2008
+	 //       MODIFIED
+	 //       RE-ENGINEERED  na
 
-	// PURPOSE OF THIS MODULE:
-	// Simulate Ventilated Slab Systems.
+	 // PURPOSE OF THIS MODULE:
+	 // Simulate Ventilated Slab Systems.
 
-	// METHODOLOGY EMPLOYED:
-	// Systems are modeled as a collection of components: radiant panel, outside air mixer,
-	// fan, heating coil and/or cooling coil plus an integrated control
-	// algorithm that adjusts the hot or cold water flow to meet the setpoint
-	// condition.  Outside air mixing is handled locally as either fixed percent
-	// or as attempting to meet a prescribed mixed air temperature.
+	 // METHODOLOGY EMPLOYED:
+	 // Systems are modeled as a collection of components: radiant panel, outside air mixer,
+	 // fan, heating coil and/or cooling coil plus an integrated control
+	 // algorithm that adjusts the hot or cold water flow to meet the setpoint
+	 // condition.  Outside air mixing is handled locally as either fixed percent
+	 // or as attempting to meet a prescribed mixed air temperature.
 
-	// REFERENCES:
-	// ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
-	// Fred Buhl's fan coil module (FanCoilUnits.cc)
+	 // REFERENCES:
+	 // ASHRAE Systems and Equipment Handbook (SI), 1996. pp. 31.1-31.3
+	 // Fred Buhl's fan coil module (FanCoilUnits.cc)
 
-	// OTHER NOTES: none
+	 // OTHER NOTES: none
 
-	// USE STATEMENTS:
-	// Use statements for data only modules
-	// Using/Aliasing
-	using namespace DataLoopNode;
-	using DataGlobals::BeginEnvrnFlag;
-	using DataGlobals::BeginDayFlag;
-	using DataGlobals::BeginTimeStepFlag;
-	using DataGlobals::InitConvTemp;
-	using DataGlobals::SysSizingCalc;
-	using DataGlobals::WarmupFlag;
-	using DataGlobals::DisplayExtraWarnings;
+	 // USE STATEMENTS:
+	 // Use statements for data only modules
+	 // Using/Aliasing
+	 using namespace DataLoopNode;
+	 using DataGlobals::BeginEnvrnFlag;
+	 using DataGlobals::BeginDayFlag;
+	 using DataGlobals::BeginTimeStepFlag;
+	 using DataGlobals::InitConvTemp;
+	 using DataGlobals::SysSizingCalc;
+	 using DataGlobals::WarmupFlag;
+	 using DataGlobals::DisplayExtraWarnings;
 
-	using DataSurfaces::Surface;
-	using DataSurfaces::TotSurfaces;
-	using DataHeatBalFanSys::QRadSysSource;
-	using DataHVACGlobals::FanElecPower;
-	using DataHVACGlobals::SmallAirVolFlow;
-	using DataHVACGlobals::ContFanCycCoil;
-        using DataSurfaces::Construction;
+	 using DataSurfaces::Surface;
+	 using DataSurfaces::TotSurfaces;
+	 using DataHeatBalFanSys::QRadSysSource;
+	 using DataHVACGlobals::FanElecPower;
+	 using DataHVACGlobals::SmallAirVolFlow;
+	 using DataHVACGlobals::ContFanCycCoil;
+	 using DataSurfaces::Construction;
 
-	// Use statements for access to subroutines in other modules
-	using namespace ScheduleManager;
-	using namespace Psychrometrics;
-	using namespace FluidProperties;
+	 // Use statements for access to subroutines in other modules
+	 using namespace ScheduleManager;
+	 using namespace Psychrometrics;
+	 using namespace FluidProperties;
 
-	// Data
-	// MODULE PARAMETER DEFINITIONS
+	 // Data
+	 // MODULE PARAMETER DEFINITIONS
 
-	// Module Object
-	std::string const cMO_VentilatedSlab( "ZoneHVAC:VentilatedSlab" );
-	static std::string const BlankString;
+	 // Module Object
+	 std::string const cMO_VentilatedSlab( "ZoneHVAC:VentilatedSlab" );
+	 static std::string const BlankString;
 
-	// Parameters for outside air control types:
-	int const Heating_ElectricCoilType( 1 );
-	int const Heating_GasCoilType( 2 );
-	int const Heating_WaterCoilType( 3 );
-	int const Heating_SteamCoilType( 4 );
-	int const Cooling_CoilWaterCooling( 1 );
-	int const Cooling_CoilDetailedCooling( 2 );
-	int const Cooling_CoilHXAssisted( 3 );
-	int const VariablePercent( 1 );
-	int const FixedTemperature( 2 );
-	int const FixedOAControl( 3 );
-	int const NotOperating( 0 ); // Parameter for use with OperatingMode variable, set for no heating/cooling
-	int const HeatingMode( 1 ); // Parameter for use with OperatingMode variable, set for heating
-	int const CoolingMode( 2 ); // Parameter for use with OperatingMode variable, set for cooling
-	//Ventilated Slab Configurations
-	int const SlabOnly( 1 ); // Air circulate through cores of slab only
-	int const SlabAndZone( 2 ); // Circulated Air is introduced to zone
-	int const SeriesSlabs( 3 );
-	//  Control Types
-	int const MATControl( 1 ); // Controls system using mean air temperature
-	int const MRTControl( 2 ); // Controls system using mean radiant temperature
-	int const OPTControl( 3 ); // Controls system using operative temperature
-	int const ODBControl( 4 ); // Controls system using outside air dry-bulb temperature
-	int const OWBControl( 5 ); // Controls system using outside air wet-bulb temperature
-	int const SURControl( 6 ); // Controls system using surface temperature !Phase2-A
-	int const DPTZControl( 7 ); // Controls system using dew-point temperature of zone!Phase2-A
+	 // Parameters for outside air control types:
+	 int const Heating_ElectricCoilType( 1 );
+	 int const Heating_GasCoilType( 2 );
+	 int const Heating_WaterCoilType( 3 );
+	 int const Heating_SteamCoilType( 4 );
+	 int const Cooling_CoilWaterCooling( 1 );
+	 int const Cooling_CoilDetailedCooling( 2 );
+	 int const Cooling_CoilHXAssisted( 3 );
+	 int const VariablePercent( 1 );
+	 int const FixedTemperature( 2 );
+	 int const FixedOAControl( 3 );
+	 int const NotOperating( 0 ); // Parameter for use with OperatingMode variable, set for no heating/cooling
+	 int const HeatingMode( 1 ); // Parameter for use with OperatingMode variable, set for heating
+	 int const CoolingMode( 2 ); // Parameter for use with OperatingMode variable, set for cooling
+	 //Ventilated Slab Configurations
+	 int const SlabOnly( 1 ); // Air circulate through cores of slab only
+	 int const SlabAndZone( 2 ); // Circulated Air is introduced to zone
+	 int const SeriesSlabs( 3 );
+	 //  Control Types
+	 int const MATControl( 1 ); // Controls system using mean air temperature
+	 int const MRTControl( 2 ); // Controls system using mean radiant temperature
+	 int const OPTControl( 3 ); // Controls system using operative temperature
+	 int const ODBControl( 4 ); // Controls system using outside air dry-bulb temperature
+	 int const OWBControl( 5 ); // Controls system using outside air wet-bulb temperature
+	 int const SURControl( 6 ); // Controls system using surface temperature !Phase2-A
+	 int const DPTZControl( 7 ); // Controls system using dew-point temperature of zone!Phase2-A
 
-	// coil operation
-	int const On( 1 ); // normal coil operation
-	int const Off( 0 ); // signal coil shouldn't run
-	int const NoneOption( 0 );
-	int const BothOption( 1 );
-	int const HeatingOption( 2 );
-	int const CoolingOption( 3 );
-	int OperatingMode( 0 ); // Used to keep track of whether system is in heating or cooling mode
+	 // coil operation
+	 int const On( 1 ); // normal coil operation
+	 int const Off( 0 ); // signal coil shouldn't run
+	 int const NoneOption( 0 );
+	 int const BothOption( 1 );
+	 int const HeatingOption( 2 );
+	 int const CoolingOption( 3 );
+	 int OperatingMode( 0 ); // Used to keep track of whether system is in heating or cooling mode
 
-	static std::string const fluidNameSteam( "STEAM" );
-	static std::string const fluidNameWater( "WATER" );
+	 static std::string const fluidNameSteam( "STEAM" );
+	 static std::string const fluidNameWater( "WATER" );
 
-	// DERIVED TYPE DEFINITIONS
+	 // DERIVED TYPE DEFINITIONS
 
-	// MODULE VARIABLE DECLARATIONS:
-	bool HCoilOn( false ); // TRUE if the heating coil (gas or electric especially) should be running
-	int NumOfVentSlabs( 0 ); // Number of ventilated slab in the input file
-	Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the ventilated slab
-	FArray1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
-	FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
-	int MaxCloNumOfSurfaces( 0 ); // Used to set allocate size in CalcClo routine
-	Real64 QZnReq( 0.0 ); // heating or cooling needed by system [watts]
+	 // MODULE VARIABLE DECLARATIONS:
+	 bool HCoilOn( false ); // TRUE if the heating coil (gas or electric especially) should be running
+	 int NumOfVentSlabs( 0 ); // Number of ventilated slab in the input file
+	 Real64 OAMassFlowRate( 0.0 ); // Outside air mass flow rate for the ventilated slab
+	 FArray1D_double QRadSysSrcAvg; // Average source over the time step for a particular radiant surfaceD
+	 FArray1D< Real64 > ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
+	 int MaxCloNumOfSurfaces( 0 ); // Used to set allocate size in CalcClo routine
+	 Real64 QZnReq( 0.0 ); // heating or cooling needed by system [watts]
 
-	// Record keeping variables used to calculate QRadSysSrcAvg locally
+	 // Record keeping variables used to calculate QRadSysSrcAvg locally
 
-	FArray1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
-	FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
-	FArray1D_bool CheckEquipName;
+	 FArray1D_double LastQRadSysSrc; // Need to keep the last value in case we are still iterating
+	 FArray1D< Real64 > LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
+	 FArray1D< Real64 > LastTimeStepSys; // Need to keep the last value in case we are still iterating
+	 FArray1D_bool CheckEquipName;
 
-	// Autosizing variables
-	FArray1D_bool MySizeFlag;
+	 // Autosizing variables
+	 FArray1D_bool MySizeFlag;
 
-	// SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
-	// PRIVATE UpdateVentilatedSlabValAvg
+	 // SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
+	 // PRIVATE UpdateVentilatedSlabValAvg
 
-	// Object Data
-	FArray1D< VentilatedSlabData > VentSlab;
-	FArray1D< VentSlabNumericFieldData > VentSlabNumericFields;
+	 // Object Data
+	 FArray1D< VentilatedSlabData > VentSlab;
+	 FArray1D< VentSlabNumericFieldData > VentSlabNumericFields;
 
-	// Functions
+	 // Functions
 
-	void
-	SimVentilatedSlab(
-		std::string const & CompName, // name of the fan coil unit
-		int const ZoneNum, // number of zone being served
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		Real64 & PowerMet, // Sensible power supplied (W)
-		Real64 & LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
-		int & CompIndex
-	)
-	{
+	 void
+	 SimVentilatedSlab(
+							 std::string const & CompName, // name of the fan coil unit
+							 int const ZoneNum, // number of zone being served
+							 bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+							 Real64 & PowerMet, // Sensible power supplied (W)
+							 Real64 & LatOutputProvided, // Latent add/removal supplied by window AC (kg/s), dehumid = negative
+							 int & CompIndex
+							 )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
@@ -218,28 +218,28 @@ namespace VentilatedSlab {
 
 		// FLOW:
 		if ( GetInputFlag ) {
-			GetVentilatedSlabInput();
-			GetInputFlag = false;
+		  GetVentilatedSlabInput();
+		  GetInputFlag = false;
 		}
 
 		// Find the correct VentilatedSlabInput
 		if ( CompIndex == 0 ) {
-			Item = FindItemInList( CompName, VentSlab.Name(), NumOfVentSlabs );
-			if ( Item == 0 ) {
-				ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );
-			}
-			CompIndex = Item;
+		  Item = FindItemInList( CompName, VentSlab.Name(), NumOfVentSlabs );
+		  if ( Item == 0 ) {
+			 ShowFatalError( "SimVentilatedSlab: system not found=" + CompName );
+		  }
+		  CompIndex = Item;
 		} else {
-			Item = CompIndex;
-			if ( Item > NumOfVentSlabs || Item < 1 ) {
-				ShowFatalError( "SimVentilatedSlab:  Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", Number of Systems=" + TrimSigDigits( NumOfVentSlabs ) + ", Entered System name=" + CompName );
-			}
-			if ( CheckEquipName( Item ) ) {
-				if ( CompName != VentSlab( Item ).Name ) {
-					ShowFatalError( "SimVentilatedSlab: Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", System name=" + CompName + ", stored System Name for that index=" + VentSlab( Item ).Name );
-				}
-				CheckEquipName( Item ) = false;
-			}
+		  Item = CompIndex;
+		  if ( Item > NumOfVentSlabs || Item < 1 ) {
+			 ShowFatalError( "SimVentilatedSlab:  Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", Number of Systems=" + TrimSigDigits( NumOfVentSlabs ) + ", Entered System name=" + CompName );
+		  }
+		  if ( CheckEquipName( Item ) ) {
+			 if ( CompName != VentSlab( Item ).Name ) {
+				ShowFatalError( "SimVentilatedSlab: Invalid CompIndex passed=" + TrimSigDigits( Item ) + ", System name=" + CompName + ", stored System Name for that index=" + VentSlab( Item ).Name );
+			 }
+			 CheckEquipName( Item ) = false;
+		  }
 		}
 
 		ZoneEqVentedSlab = true;
@@ -253,11 +253,11 @@ namespace VentilatedSlab {
 		ReportVentilatedSlab( Item );
 
 		ZoneEqVentedSlab = false;
-	}
+	 }
 
-	void
-	GetVentilatedSlabInput()
-	{
+	 void
+	 GetVentilatedSlabInput()
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Young Tae Chae, Rick Strand
@@ -376,631 +376,631 @@ namespace VentilatedSlab {
 
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) { // Begin looping over the entire ventilated slab systems found in the input file...
 
-			GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
+		  GetObjectItem( CurrentModuleObject, Item, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-			VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers) ;
-			VentSlabNumericFields( Item ).FieldNames = "";
-			VentSlabNumericFields( Item ).FieldNames = cNumericFields;
+		  VentSlabNumericFields( Item ).FieldNames.allocate( NumNumbers) ;
+		  VentSlabNumericFields( Item ).FieldNames = "";
+		  VentSlabNumericFields( Item ).FieldNames = cNumericFields;
 
-			IsNotOK = false;
-			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), VentSlab.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
-			if ( IsNotOK ) {
+		  IsNotOK = false;
+		  IsBlank = false;
+		  VerifyName( cAlphaArgs( 1 ), VentSlab.Name(), Item - 1, IsNotOK, IsBlank, CurrentModuleObject + " Name" );
+		  if ( IsNotOK ) {
+			 ErrorsFound = true;
+			 if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
+		  }
+
+		  VentSlab( Item ).Name = cAlphaArgs( 1 );
+		  VentSlab( Item ).SchedName = cAlphaArgs( 2 );
+		  if ( lAlphaBlanks( 2 ) ) {
+			 VentSlab( Item ).SchedPtr = ScheduleAlwaysOn;
+		  } else {
+			 VentSlab( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) ); // convert schedule name to pointer
+			 if ( VentSlab( Item ).SchedPtr == 0 ) {
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
 				ErrorsFound = true;
-				if ( IsBlank ) cAlphaArgs( 1 ) = "xxxxx";
-			}
+			 }
+		  }
 
-			VentSlab( Item ).Name = cAlphaArgs( 1 );
-			VentSlab( Item ).SchedName = cAlphaArgs( 2 );
-			if ( lAlphaBlanks( 2 ) ) {
-				VentSlab( Item ).SchedPtr = ScheduleAlwaysOn;
-			} else {
-				VentSlab( Item ).SchedPtr = GetScheduleIndex( cAlphaArgs( 2 ) ); // convert schedule name to pointer
-				if ( VentSlab( Item ).SchedPtr == 0 ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\" not found." );
-					ErrorsFound = true;
-				}
-			}
+		  VentSlab( Item ).ZoneName = cAlphaArgs( 3 );
+		  VentSlab( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
+		  if ( VentSlab( Item ).ZonePtr == 0 ) {
+			 if ( lAlphaBlanks( 3 ) ) {
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
+			 } else {
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+			 }
+			 ErrorsFound = true;
+		  }
 
-			VentSlab( Item ).ZoneName = cAlphaArgs( 3 );
-			VentSlab( Item ).ZonePtr = FindItemInList( cAlphaArgs( 3 ), Zone.Name(), NumOfZones );
-			if ( VentSlab( Item ).ZonePtr == 0 ) {
-				if ( lAlphaBlanks( 3 ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + " is required but input is blank." );
-				} else {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\" not found." );
+		  VentSlab( Item ).SurfListName = cAlphaArgs( 4 );
+		  SurfListNum = 0;
+		  //    IF (NumOfSlabLists > 0) SurfListNum = FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
+		  if ( NumOfSurfListVentSlab > 0 ) SurfListNum = FindItemInList( VentSlab( Item ).SurfListName, SlabList.Name(), NumOfSurfListVentSlab );
+		  if ( SurfListNum > 0 ) { // Found a valid surface list
+			 VentSlab( Item ).NumOfSurfaces = SlabList( SurfListNum ).NumOfSurfaces;
+			 VentSlab( Item ).ZName.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).ZPtr.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).SurfaceName.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).SurfacePtr.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).CDiameter.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).CLength.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).CNumbers.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).SlabIn.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).SlabOut.allocate( VentSlab( Item ).NumOfSurfaces );
+
+			 MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, VentSlab( Item ).NumOfSurfaces );
+			 for ( SurfNum = 1; SurfNum <= SlabList( SurfListNum ).NumOfSurfaces; ++SurfNum ) {
+				VentSlab( Item ).ZName( SurfNum ) = SlabList( SurfListNum ).ZoneName( SurfNum );
+				VentSlab( Item ).ZPtr( SurfNum ) = SlabList( SurfListNum ).ZonePtr( SurfNum );
+				VentSlab( Item ).SurfaceName( SurfNum ) = SlabList( SurfListNum ).SurfName( SurfNum );
+				VentSlab( Item ).SurfacePtr( SurfNum ) = SlabList( SurfListNum ).SurfPtr( SurfNum );
+				VentSlab( Item ).CDiameter( SurfNum ) = SlabList( SurfListNum ).CoreDiameter( SurfNum );
+				VentSlab( Item ).CLength( SurfNum ) = SlabList( SurfListNum ).CoreLength( SurfNum );
+				VentSlab( Item ).CNumbers( SurfNum ) = SlabList( SurfListNum ).CoreNumbers( SurfNum );
+				VentSlab( Item ).SlabIn( SurfNum ) = SlabList( SurfListNum ).SlabInNodeName( SurfNum );
+				VentSlab( Item ).SlabOut( SurfNum ) = SlabList( SurfListNum ).SlabOutNodeName( SurfNum );
+				if ( VentSlab( Item ).SurfacePtr( SurfNum ) != 0 ) {
+				  Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).IntConvSurfHasActiveInIt = true;
 				}
+			 }
+
+		  } else { // User entered a single surface name rather than a surface list
+			 VentSlab( Item ).NumOfSurfaces = 1;
+			 VentSlab( Item ).SurfacePtr.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).SurfaceName.allocate( VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).SurfaceFlowFrac.allocate( VentSlab( Item ).NumOfSurfaces );
+			 MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, VentSlab( Item ).NumOfSurfaces );
+			 VentSlab( Item ).SurfaceName( 1 ) = VentSlab( Item ).SurfListName;
+			 VentSlab( Item ).SurfacePtr( 1 ) = FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
+			 VentSlab( Item ).SurfaceFlowFrac( 1 ) = 1.0;
+			 // Error checking for single surfaces
+			 if ( VentSlab( Item ).SurfacePtr( 1 ) == 0 ) {
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
 				ErrorsFound = true;
-			}
+			 } else if ( Surface( VentSlab( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface ) {
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid Surface" );
+				ShowContinueError( cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" has been used in another radiant system or ventilated slab." );
+				ErrorsFound = true;
+			 }
+			 if ( VentSlab( Item ).SurfacePtr( 1 ) != 0 ) {
+				Surface( VentSlab( Item ).SurfacePtr( 1 ) ).IntConvSurfHasActiveInIt = true;
+				Surface( VentSlab( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface = true;
+			 }
+		  }
 
-			VentSlab( Item ).SurfListName = cAlphaArgs( 4 );
-			SurfListNum = 0;
-			//    IF (NumOfSlabLists > 0) SurfListNum = FindItemInList(VentSlab(Item)%SurfListName, SlabList%Name, NumOfSlabLists)
-			if ( NumOfSurfListVentSlab > 0 ) SurfListNum = FindItemInList( VentSlab( Item ).SurfListName, SlabList.Name(), NumOfSurfListVentSlab );
-			if ( SurfListNum > 0 ) { // Found a valid surface list
-				VentSlab( Item ).NumOfSurfaces = SlabList( SurfListNum ).NumOfSurfaces;
-				VentSlab( Item ).ZName.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).ZPtr.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).SurfaceName.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).SurfacePtr.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).CDiameter.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).CLength.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).CNumbers.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).SlabIn.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).SlabOut.allocate( VentSlab( Item ).NumOfSurfaces );
+		  // Error checking for zones and construction information
 
-				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, VentSlab( Item ).NumOfSurfaces );
-				for ( SurfNum = 1; SurfNum <= SlabList( SurfListNum ).NumOfSurfaces; ++SurfNum ) {
-					VentSlab( Item ).ZName( SurfNum ) = SlabList( SurfListNum ).ZoneName( SurfNum );
-					VentSlab( Item ).ZPtr( SurfNum ) = SlabList( SurfListNum ).ZonePtr( SurfNum );
-					VentSlab( Item ).SurfaceName( SurfNum ) = SlabList( SurfListNum ).SurfName( SurfNum );
-					VentSlab( Item ).SurfacePtr( SurfNum ) = SlabList( SurfListNum ).SurfPtr( SurfNum );
-					VentSlab( Item ).CDiameter( SurfNum ) = SlabList( SurfListNum ).CoreDiameter( SurfNum );
-					VentSlab( Item ).CLength( SurfNum ) = SlabList( SurfListNum ).CoreLength( SurfNum );
-					VentSlab( Item ).CNumbers( SurfNum ) = SlabList( SurfListNum ).CoreNumbers( SurfNum );
-					VentSlab( Item ).SlabIn( SurfNum ) = SlabList( SurfListNum ).SlabInNodeName( SurfNum );
-					VentSlab( Item ).SlabOut( SurfNum ) = SlabList( SurfListNum ).SlabOutNodeName( SurfNum );
-					if ( VentSlab( Item ).SurfacePtr( SurfNum ) != 0 ) {
-						Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).IntConvSurfHasActiveInIt = true;
-					}
+		  if ( SurfListNum > 0 ) {
+
+			 for ( SurfNum = 1; SurfNum <= VentSlab( Item ).NumOfSurfaces; ++SurfNum ) {
+
+				if ( VentSlab( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
+				if ( VentSlab( Item ).ZPtr( SurfNum ) == 0 ) continue; // invalid zone -- detected earlier
+				//      IF (Surface(VentSlab(Item)%SurfacePtr(SurfNum))%Zone /= VentSlab(Item)%ZPtr(SurfNum)) THEN
+				//        CALL ShowSevereError(TRIM(CurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//'" invalid '//   &
+				//          'surface="'//TRIM(Surface(VentSlab(Item)%SurfacePtr(SurfNum))%Name)//'".')
+				//        CALL ShowContinueError('Surface in Zone='//TRIM(Zone(Surface(VentSlab(Item)%SurfacePtr(SurfNum))%Zone)%Name)//' '// &
+				//                         CurrentModuleObject//' in Zone='//TRIM(cAlphaArgs(3)))
+				//        ErrorsFound=.TRUE.
+				//      END IF
+				if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] == 0 ) continue; // invalid construction, detected earlier
+				if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).SourceSinkPresent ) {
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name  + "\"." );
+				  ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).Name + "\"." );
+				  ErrorsFound = true;
 				}
-
-			} else { // User entered a single surface name rather than a surface list
-				VentSlab( Item ).NumOfSurfaces = 1;
-				VentSlab( Item ).SurfacePtr.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).SurfaceName.allocate( VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).SurfaceFlowFrac.allocate( VentSlab( Item ).NumOfSurfaces );
-				MaxCloNumOfSurfaces = max( MaxCloNumOfSurfaces, VentSlab( Item ).NumOfSurfaces );
-				VentSlab( Item ).SurfaceName( 1 ) = VentSlab( Item ).SurfListName;
-				VentSlab( Item ).SurfacePtr( 1 ) = FindItemInList( VentSlab( Item ).SurfaceName( 1 ), Surface.Name(), TotSurfaces );
-				VentSlab( Item ).SurfaceFlowFrac( 1 ) = 1.0;
-				// Error checking for single surfaces
-				if ( VentSlab( Item ).SurfacePtr( 1 ) == 0 ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" not found." );
-					ErrorsFound = true;
-				} else if ( Surface( VentSlab( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", invalid Surface" );
-					ShowContinueError( cAlphaFields( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\" has been used in another radiant system or ventilated slab." );
-					ErrorsFound = true;
+			 }
+		  } else {
+			 for ( SurfNum = 1; SurfNum <= VentSlab( Item ).NumOfSurfaces; ++SurfNum ) {
+				if ( VentSlab( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
+				if ( VentSlab( Item ).ZonePtr == 0 ) continue; // invalid zone -- detected earlier
+				if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone != VentSlab( Item ).ZonePtr ) {
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+				  ShowContinueError( "Surface in Zone=" + Zone( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + ' ' + CurrentModuleObject + " in Zone=" + cAlphaArgs( 3 ) );
+				  ErrorsFound = true;
 				}
-				if ( VentSlab( Item ).SurfacePtr( 1 ) != 0 ) {
-					Surface( VentSlab( Item ).SurfacePtr( 1 ) ).IntConvSurfHasActiveInIt = true;
-					Surface( VentSlab( Item ).SurfacePtr( 1 ) ).PartOfVentSlabOrRadiantSurface = true;
+				if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] == 0 ) continue; // invalid construction, detected earlier
+				if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).SourceSinkPresent ) {
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
+				  ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).Name + "\"." );
+				  ErrorsFound = true;
 				}
-			}
+			 }
+		  }
 
-			// Error checking for zones and construction information
+		  VentSlab( Item ).MaxAirVolFlow = rNumericArgs( 1 );
 
-			if ( SurfListNum > 0 ) {
+		  // Outside air information:
+		  VentSlab( Item ).MinOutAirVolFlow = rNumericArgs( 2 );
+		  VentSlab( Item ).OutAirVolFlow = rNumericArgs( 3 );
 
-				for ( SurfNum = 1; SurfNum <= VentSlab( Item ).NumOfSurfaces; ++SurfNum ) {
-
-					if ( VentSlab( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
-					if ( VentSlab( Item ).ZPtr( SurfNum ) == 0 ) continue; // invalid zone -- detected earlier
-					//      IF (Surface(VentSlab(Item)%SurfacePtr(SurfNum))%Zone /= VentSlab(Item)%ZPtr(SurfNum)) THEN
-					//        CALL ShowSevereError(TRIM(CurrentModuleObject)//'="'//TRIM(cAlphaArgs(1))//'" invalid '//   &
-					//          'surface="'//TRIM(Surface(VentSlab(Item)%SurfacePtr(SurfNum))%Name)//'".')
-					//        CALL ShowContinueError('Surface in Zone='//TRIM(Zone(Surface(VentSlab(Item)%SurfacePtr(SurfNum))%Zone)%Name)//' '// &
-					//                         CurrentModuleObject//' in Zone='//TRIM(cAlphaArgs(3)))
-					//        ErrorsFound=.TRUE.
-					//      END IF
-					if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] == 0 ) continue; // invalid construction, detected earlier
-					if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).SourceSinkPresent ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name  + "\"." );
-						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).Name + "\"." );
-						ErrorsFound = true;
-					}
-				}
-			} else {
-				for ( SurfNum = 1; SurfNum <= VentSlab( Item ).NumOfSurfaces; ++SurfNum ) {
-					if ( VentSlab( Item ).SurfacePtr( SurfNum ) == 0 ) continue; // invalid surface -- detected earlier
-					if ( VentSlab( Item ).ZonePtr == 0 ) continue; // invalid zone -- detected earlier
-					if ( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone != VentSlab( Item ).ZonePtr ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
-						ShowContinueError( "Surface in Zone=" + Zone( Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Zone ).Name + ' ' + CurrentModuleObject + " in Zone=" + cAlphaArgs( 3 ) );
-						ErrorsFound = true;
-					}
-					if ( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] == 0 ) continue; // invalid construction, detected earlier
-					if ( ! Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).SourceSinkPresent ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " "surface=\"" + Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Name + "\"." );
-						ShowContinueError( "Surface Construction does not have a source/sink, Construction name= \"" + Construct( Construction[ VentSlab( Item ).SurfacePtr( SurfNum )  - 1 ] ).Name + "\"." );
-						ErrorsFound = true;
-					}
-				}
-			}
-
-			VentSlab( Item ).MaxAirVolFlow = rNumericArgs( 1 );
-
-			// Outside air information:
-			VentSlab( Item ).MinOutAirVolFlow = rNumericArgs( 2 );
-			VentSlab( Item ).OutAirVolFlow = rNumericArgs( 3 );
-
-			{ auto const SELECT_CASE_var( cAlphaArgs( 5 ) );
-			if ( SELECT_CASE_var == "VARIABLEPERCENT" ) {
+		  { auto const SELECT_CASE_var( cAlphaArgs( 5 ) );
+			 if ( SELECT_CASE_var == "VARIABLEPERCENT" ) {
 				VentSlab( Item ).OAControlType = VariablePercent;
 				VentSlab( Item ).MaxOASchedName = cAlphaArgs( 6 );
 				VentSlab( Item ).MaxOASchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) ); // convert schedule name to pointer
 				if ( VentSlab( Item ).MaxOASchedPtr == 0 ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
-					ErrorsFound = true;
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
+				  ErrorsFound = true;
 				} else if ( ! CheckScheduleValueMinMax( VentSlab( Item ).MaxOASchedPtr, ">=0", 0.0, "<=", 1.0 ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range [0,1 ]." );
-					ErrorsFound = true;
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range [0,1 ]." );
+				  ErrorsFound = true;
 				}
-			} else if ( SELECT_CASE_var == "FIXEDAMOUNT" ) {
+			 } else if ( SELECT_CASE_var == "FIXEDAMOUNT" ) {
 				VentSlab( Item ).OAControlType = FixedOAControl;
 				VentSlab( Item ).MaxOASchedName = cAlphaArgs( 7 );
 				VentSlab( Item ).MaxOASchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) ); // convert schedule name to pointer
 				if ( VentSlab( Item ).MaxOASchedPtr == 0 ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
-					ErrorsFound = true;
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
+				  ErrorsFound = true;
 				} else if ( ! CheckScheduleValueMinMax( VentSlab( Item ).MaxOASchedPtr, ">=0", 0.0 ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range (must be >=0)." );
-					ErrorsFound = true;
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" values out of range (must be >=0)." );
+				  ErrorsFound = true;
 				}
-			} else if ( SELECT_CASE_var == "FIXEDTEMPERATURE" ) {
+			 } else if ( SELECT_CASE_var == "FIXEDTEMPERATURE" ) {
 				VentSlab( Item ).OAControlType = FixedTemperature;
 				VentSlab( Item ).TempSchedName = cAlphaArgs( 7 );
 				VentSlab( Item ).TempSchedPtr = GetScheduleIndex( cAlphaArgs( 7 ) ); // convert schedule name to pointer
 				if ( VentSlab( Item ).TempSchedPtr == 0 ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
-					ErrorsFound = true;
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 7 ) + "=\"" + cAlphaArgs( 7 ) + "\" not found." );
+				  ErrorsFound = true;
 				}
-			} else {
+			 } else {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 5 ) + "=\"" + cAlphaArgs( 5 ) + "\"." );
-			}}
+			 }}
 
-			VentSlab( Item ).MinOASchedName = cAlphaArgs( 6 );
-			VentSlab( Item ).MinOASchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) ); // convert schedule name to pointer
-			if ( VentSlab( Item ).MinOASchedPtr == 0 ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
+		  VentSlab( Item ).MinOASchedName = cAlphaArgs( 6 );
+		  VentSlab( Item ).MinOASchedPtr = GetScheduleIndex( cAlphaArgs( 6 ) ); // convert schedule name to pointer
+		  if ( VentSlab( Item ).MinOASchedPtr == 0 ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 6 ) + "=\"" + cAlphaArgs( 6 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  // System Configuration:
+		  if ( SameString( cAlphaArgs( 8 ), "SlabOnly" ) ) {
+			 VentSlab( Item ).SysConfg = SlabOnly;
+		  } else if ( SameString( cAlphaArgs( 8 ), "SlabAndZone" ) ) {
+			 VentSlab( Item ).SysConfg = SlabAndZone;
+		  } else if ( SameString( cAlphaArgs( 8 ), "SeriesSlabs" ) ) {
+			 VentSlab( Item ).SysConfg = SeriesSlabs;
+		  } else {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
+			 ShowContinueError( "Control reset to SLAB ONLY Configuration." );
+			 VentSlab( Item ).SysConfg = SlabOnly;
+		  }
+
+		  // Hollow Core information :
+		  VentSlab( Item ).CoreDiameter = rNumericArgs( 4 );
+		  VentSlab( Item ).CoreLength = rNumericArgs( 5 );
+		  VentSlab( Item ).CoreNumbers = rNumericArgs( 6 );
+
+		  if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			 if ( ! lNumericBlanks( 4 ) ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Diameter is not needed for the series slabs configuration- ignored." );
+				ShowContinueError( "...It has been asigned on SlabGroup." );
+			 }
+		  }
+
+		  if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			 if ( ! lNumericBlanks( 5 ) ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Length is not needed for the series slabs configuration- ignored." );
+				ShowContinueError( "...It has been asigned on SlabGroup." );
+			 }
+		  }
+
+		  if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
+			 if ( ! lNumericBlanks( 6 ) ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Numbers is not needed for the series slabs configuration- ignored." );
+				ShowContinueError( "...It has been asigned on SlabGroup." );
+			 }
+		  }
+
+		  // Process the temperature control type
+		  if ( SameString( cAlphaArgs( 9 ), OutsideAirDryBulbTemperature ) ) {
+			 VentSlab( Item ).ControlType = ODBControl;
+		  } else if ( SameString( cAlphaArgs( 9 ), OutsideAirWetBulbTemperature ) ) {
+			 VentSlab( Item ).ControlType = OWBControl;
+		  } else if ( SameString( cAlphaArgs( 9 ), OperativeTemperature ) ) {
+			 VentSlab( Item ).ControlType = OPTControl;
+		  } else if ( SameString( cAlphaArgs( 9 ), MeanAirTemperature ) ) {
+			 VentSlab( Item ).ControlType = MATControl;
+		  } else if ( SameString( cAlphaArgs( 9 ), MeanRadiantTemperature ) ) {
+			 VentSlab( Item ).ControlType = MRTControl;
+		  } else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceTemperature ) ) {
+			 VentSlab( Item ).ControlType = SURControl;
+		  } else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceDewPointTemperature ) ) {
+			 VentSlab( Item ).ControlType = DPTZControl;
+		  } else {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
+			 ShowContinueError( "Control reset to ODB control." );
+			 VentSlab( Item ).ControlType = ODBControl;
+		  }
+
+		  // Heating User Input Data For Ventilated Slab Control :
+
+		  // High Air Temp :
+		  VentSlab( Item ).HotAirHiTempSched = cAlphaArgs( 10 );
+		  VentSlab( Item ).HotAirHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 10 ) );
+		  if ( ( VentSlab( Item ).HotAirHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 10 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 10 ) + "=\"" + cAlphaArgs( 10 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  // Low Air Temp :
+
+		  VentSlab( Item ).HotAirLoTempSched = cAlphaArgs( 11 );
+		  VentSlab( Item ).HotAirLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 11 ) );
+		  if ( ( VentSlab( Item ).HotAirLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 11 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 11 ) + "=\"" + cAlphaArgs( 11 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  VentSlab( Item ).HotCtrlHiTempSched = cAlphaArgs( 12 );
+		  VentSlab( Item ).HotCtrlHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 12 ) );
+		  if ( ( VentSlab( Item ).HotCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 12 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  VentSlab( Item ).HotCtrlLoTempSched = cAlphaArgs( 13 );
+		  VentSlab( Item ).HotCtrlLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 13 ) );
+		  if ( ( VentSlab( Item ).HotCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 13 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  // Cooling User Input Data For Ventilated Slab Control :
+		  // Cooling High Temp Sch.
+		  VentSlab( Item ).ColdAirHiTempSched = cAlphaArgs( 13 );
+		  VentSlab( Item ).ColdAirHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 14 ) );
+		  if ( ( VentSlab( Item ).ColdAirHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 14 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 14 ) + "=\"" + cAlphaArgs( 14 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  // Cooling Low Temp Sch.
+
+		  VentSlab( Item ).ColdAirLoTempSched = cAlphaArgs( 15 );
+		  VentSlab( Item ).ColdAirLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 15 ) );
+		  if ( ( VentSlab( Item ).ColdAirLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 15 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  // Cooling Control High Sch.
+
+		  VentSlab( Item ).ColdCtrlHiTempSched = cAlphaArgs( 16 );
+		  VentSlab( Item ).ColdCtrlHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 16 ) );
+		  if ( ( VentSlab( Item ).ColdCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 16 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 16 ) + "=\"" + cAlphaArgs( 16 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  // Cooling Control Low Sch.
+
+		  VentSlab( Item ).ColdCtrlLoTempSched = cAlphaArgs( 17 );
+		  VentSlab( Item ).ColdCtrlLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 17 ) );
+		  if ( ( VentSlab( Item ).ColdCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 17 ) ) ) {
+			 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 17 ) + "=\"" + cAlphaArgs( 17 ) + "\" not found." );
+			 ErrorsFound = true;
+		  }
+
+		  // Main air nodes (except outside air node):
+		  // Refer the Unit Ventilator Air Node note
+
+		  // MJW CR7903 - Ventilated slab was not drawing properly in HVAC Diagram svg output
+		  //  This object is structured differently from other zone equipment in that it functions
+		  //  as both a parent and non-parent, and it has an implicit OA mixer.  This makes it difficult
+		  //  to register the nodes in a way that HVAC Diagram can understand and in a way that satisfies
+		  //  node connection tests.  Here's an explanation of the changes made for this CR:
+		  //      In general, nodes associated with the ventilated slab system (the overall parent object)
+		  //         are registered with "-SYSTEM" appended to the object type and object name
+		  //         This same suffix is also added later when SetUpCompSets is called, for the same reason
+		  //      In general, nodes associated with the implicit OA mixer object
+		  //         are registered with "-OA MIXER" appended to the object type and object name
+		  //      %ReturnAirNode is one inlet to the implicit oa mixer
+		  //         For SlabOnly and SeriesSlab this node does nothing,
+		  //             so NodeConnectionType_Internal,ObjectIsNotParent, -OA MIXER
+		  //         For SlabandZone, this node extracts air from the zone,
+		  //             so NodeConnectionType_Inlet,ObjectIsNotParent, -OA MIXER
+		  //         For SlabandZone, this node is also used to associate the whole system with a pair of zone inlet/exhaust nodes,
+		  //             so it is registered again as NodeConnectionType_Inlet,1,ObjectIsParent, -SYSTEM
+		  //      %RadInNode is the ultimate air inlet to the slab or series of slabs
+		  //         For all types of ventilated slab, this is NodeConnectionType_Inlet,ObjectIsNotParent
+		  //      %OAMixerOutNode is the outlet from the implicit OA mixer
+		  //         For all types of ventilated slab, this is NodeConnectionType_Outlet,ObjectIsNotParent
+		  //      %FanOutletNode is the outlet from the explicit fan child object (redundant input, should mine from child)
+		  //         For all types of ventilated slab, this is NodeConnectionType_Internal,ObjectIsParent
+		  //      %ZoneAirInNode is applicable only to SlabandZone configuration. It is the node that flows into the zone,
+		  //         and it is also the outlet from the ventilated slab section, so it must be registered twice
+		  //         First for the overall system, NodeConnectionType_Outlet,ObjectIsParent, -SYSTEM
+		  //         Second as the slab outlet, NodeConnectionType_Outlet,ObjectIsNotParent
+		  //      %OutsideAirNode is the outdoor air inlet to the OA mixer
+		  //         For all types of ventilated slab, this is NodeConnectionType_Inlet,ObjectIsNotParent, -OA MIXER
+
+		  if ( VentSlab( Item ).SysConfg == SlabOnly ) {
+
+			 VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+			 VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+
+			 VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			 VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
+
+		  } else if ( VentSlab( Item ).SysConfg == SeriesSlabs ) {
+
+			 VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+			 VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+
+			 VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			 VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
+
+		  } else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
+
+			 VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-SYSTEM", cAlphaArgs( 1 ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
+			 VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			 VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
+			 VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+			 VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
+		  }
+
+		  if ( VentSlab( Item ).SysConfg == SlabOnly ) {
+			 if ( ! lAlphaBlanks( 20 ) ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " + cAlphaFields( 20 ) + "=\"" + cAlphaArgs( 20 ) + "\" not needed - ignored." );
+				ShowContinueError( "It is used for \"SlabAndZone\" only" );
+			 }
+
+		  } else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
+			 if ( lAlphaBlanks( 20 ) ) {
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 20 ) + " is blank and must be entered." );
 				ErrorsFound = true;
-			}
+			 }
 
-			// System Configuration:
-			if ( SameString( cAlphaArgs( 8 ), "SlabOnly" ) ) {
-				VentSlab( Item ).SysConfg = SlabOnly;
-			} else if ( SameString( cAlphaArgs( 8 ), "SlabAndZone" ) ) {
-				VentSlab( Item ).SysConfg = SlabAndZone;
-			} else if ( SameString( cAlphaArgs( 8 ), "SeriesSlabs" ) ) {
-				VentSlab( Item ).SysConfg = SeriesSlabs;
-			} else {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 8 ) + "=\"" + cAlphaArgs( 8 ) + "\"." );
-				ShowContinueError( "Control reset to SLAB ONLY Configuration." );
-				VentSlab( Item ).SysConfg = SlabOnly;
-			}
+			 VentSlab( Item ).ZoneAirInNode = GetOnlySingleNode( cAlphaArgs( 20 ), ErrorsFound, CurrentModuleObject + "-SYSTEM", cAlphaArgs( 1 ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
 
-			// Hollow Core information :
-			VentSlab( Item ).CoreDiameter = rNumericArgs( 4 );
-			VentSlab( Item ).CoreLength = rNumericArgs( 5 );
-			VentSlab( Item ).CoreNumbers = rNumericArgs( 6 );
+			 VentSlab( Item ).ZoneAirInNode = GetOnlySingleNode( cAlphaArgs( 20 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
+		  }
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
-				if ( ! lNumericBlanks( 4 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Diameter is not needed for the series slabs configuration- ignored." );
-					ShowContinueError( "...It has been asigned on SlabGroup." );
-				}
-			}
+		  //  Set connection type to 'Inlet', because it now uses an OA node
+		  VentSlab( Item ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 21 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
-				if ( ! lNumericBlanks( 5 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Length is not needed for the series slabs configuration- ignored." );
-					ShowContinueError( "...It has been asigned on SlabGroup." );
-				}
-			}
+		  if ( ! lAlphaBlanks( 21 ) ) {
+			 CheckAndAddAirNodeNumber( VentSlab( Item ).OutsideAirNode, IsValid );
+			 if ( ! IsValid ) {
+				ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Adding OutdoorAir:Node=" + cAlphaArgs( 21 ) );
+			 }
 
-			if ( SameString( cAlphaArgs( 8 ), "SurfaceListNames" ) ) {
-				if ( ! lNumericBlanks( 6 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " " Core Numbers is not needed for the series slabs configuration- ignored." );
-					ShowContinueError( "...It has been asigned on SlabGroup." );
-				}
-			}
+		  }
 
-			// Process the temperature control type
-			if ( SameString( cAlphaArgs( 9 ), OutsideAirDryBulbTemperature ) ) {
-				VentSlab( Item ).ControlType = ODBControl;
-			} else if ( SameString( cAlphaArgs( 9 ), OutsideAirWetBulbTemperature ) ) {
-				VentSlab( Item ).ControlType = OWBControl;
-			} else if ( SameString( cAlphaArgs( 9 ), OperativeTemperature ) ) {
-				VentSlab( Item ).ControlType = OPTControl;
-			} else if ( SameString( cAlphaArgs( 9 ), MeanAirTemperature ) ) {
-				VentSlab( Item ).ControlType = MATControl;
-			} else if ( SameString( cAlphaArgs( 9 ), MeanRadiantTemperature ) ) {
-				VentSlab( Item ).ControlType = MRTControl;
-			} else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceTemperature ) ) {
-				VentSlab( Item ).ControlType = SURControl;
-			} else if ( SameString( cAlphaArgs( 9 ), SlabSurfaceDewPointTemperature ) ) {
-				VentSlab( Item ).ControlType = DPTZControl;
-			} else {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 9 ) + "=\"" + cAlphaArgs( 9 ) + "\"." );
-				ShowContinueError( "Control reset to ODB control." );
-				VentSlab( Item ).ControlType = ODBControl;
-			}
+		  VentSlab( Item ).AirReliefNode = GetOnlySingleNode( cAlphaArgs( 22 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
 
-			// Heating User Input Data For Ventilated Slab Control :
+		  // Fan information:
+		  VentSlab( Item ).FanName = cAlphaArgs( 25 );
 
-			// High Air Temp :
-			VentSlab( Item ).HotAirHiTempSched = cAlphaArgs( 10 );
-			VentSlab( Item ).HotAirHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 10 ) );
-			if ( ( VentSlab( Item ).HotAirHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 10 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 10 ) + "=\"" + cAlphaArgs( 10 ) + "\" not found." );
-				ErrorsFound = true;
-			}
+		  if ( VentSlab( Item ).OAControlType == FixedOAControl ) {
+			 VentSlab( Item ).OutAirVolFlow = VentSlab( Item ).MinOutAirVolFlow;
+			 VentSlab( Item ).MaxOASchedName = VentSlab( Item ).MinOASchedName;
+			 VentSlab( Item ).MaxOASchedPtr = GetScheduleIndex( VentSlab( Item ).MinOASchedName );
+		  }
 
-			// Low Air Temp :
+		  // Add fan to component sets array
+		  SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", "UNDEFINED", cAlphaArgs( 25 ), cAlphaArgs( 23 ), cAlphaArgs( 24 ) );
 
-			VentSlab( Item ).HotAirLoTempSched = cAlphaArgs( 11 );
-			VentSlab( Item ).HotAirLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 11 ) );
-			if ( ( VentSlab( Item ).HotAirLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 11 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 11 ) + "=\"" + cAlphaArgs( 11 ) + "\" not found." );
-				ErrorsFound = true;
-			}
+		  // Coil options assign
 
-			VentSlab( Item ).HotCtrlHiTempSched = cAlphaArgs( 12 );
-			VentSlab( Item ).HotCtrlHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 12 ) );
-			if ( ( VentSlab( Item ).HotCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 12 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 12 ) + "=\"" + cAlphaArgs( 12 ) + "\" not found." );
-				ErrorsFound = true;
-			}
-
-			VentSlab( Item ).HotCtrlLoTempSched = cAlphaArgs( 13 );
-			VentSlab( Item ).HotCtrlLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 13 ) );
-			if ( ( VentSlab( Item ).HotCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 13 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 13 ) + "=\"" + cAlphaArgs( 13 ) + "\" not found." );
-				ErrorsFound = true;
-			}
-
-			// Cooling User Input Data For Ventilated Slab Control :
-			// Cooling High Temp Sch.
-			VentSlab( Item ).ColdAirHiTempSched = cAlphaArgs( 13 );
-			VentSlab( Item ).ColdAirHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 14 ) );
-			if ( ( VentSlab( Item ).ColdAirHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 14 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 14 ) + "=\"" + cAlphaArgs( 14 ) + "\" not found." );
-				ErrorsFound = true;
-			}
-
-			// Cooling Low Temp Sch.
-
-			VentSlab( Item ).ColdAirLoTempSched = cAlphaArgs( 15 );
-			VentSlab( Item ).ColdAirLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 15 ) );
-			if ( ( VentSlab( Item ).ColdAirLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 15 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 15 ) + "=\"" + cAlphaArgs( 15 ) + "\" not found." );
-				ErrorsFound = true;
-			}
-
-			// Cooling Control High Sch.
-
-			VentSlab( Item ).ColdCtrlHiTempSched = cAlphaArgs( 16 );
-			VentSlab( Item ).ColdCtrlHiTempSchedPtr = GetScheduleIndex( cAlphaArgs( 16 ) );
-			if ( ( VentSlab( Item ).ColdCtrlHiTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 16 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 16 ) + "=\"" + cAlphaArgs( 16 ) + "\" not found." );
-				ErrorsFound = true;
-			}
-
-			// Cooling Control Low Sch.
-
-			VentSlab( Item ).ColdCtrlLoTempSched = cAlphaArgs( 17 );
-			VentSlab( Item ).ColdCtrlLoTempSchedPtr = GetScheduleIndex( cAlphaArgs( 17 ) );
-			if ( ( VentSlab( Item ).ColdCtrlLoTempSchedPtr == 0 ) && ( ! lAlphaBlanks( 17 ) ) ) {
-				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 17 ) + "=\"" + cAlphaArgs( 17 ) + "\" not found." );
-				ErrorsFound = true;
-			}
-
-			// Main air nodes (except outside air node):
-			// Refer the Unit Ventilator Air Node note
-
-			// MJW CR7903 - Ventilated slab was not drawing properly in HVAC Diagram svg output
-			//  This object is structured differently from other zone equipment in that it functions
-			//  as both a parent and non-parent, and it has an implicit OA mixer.  This makes it difficult
-			//  to register the nodes in a way that HVAC Diagram can understand and in a way that satisfies
-			//  node connection tests.  Here's an explanation of the changes made for this CR:
-			//      In general, nodes associated with the ventilated slab system (the overall parent object)
-			//         are registered with "-SYSTEM" appended to the object type and object name
-			//         This same suffix is also added later when SetUpCompSets is called, for the same reason
-			//      In general, nodes associated with the implicit OA mixer object
-			//         are registered with "-OA MIXER" appended to the object type and object name
-			//      %ReturnAirNode is one inlet to the implicit oa mixer
-			//         For SlabOnly and SeriesSlab this node does nothing,
-			//             so NodeConnectionType_Internal,ObjectIsNotParent, -OA MIXER
-			//         For SlabandZone, this node extracts air from the zone,
-			//             so NodeConnectionType_Inlet,ObjectIsNotParent, -OA MIXER
-			//         For SlabandZone, this node is also used to associate the whole system with a pair of zone inlet/exhaust nodes,
-			//             so it is registered again as NodeConnectionType_Inlet,1,ObjectIsParent, -SYSTEM
-			//      %RadInNode is the ultimate air inlet to the slab or series of slabs
-			//         For all types of ventilated slab, this is NodeConnectionType_Inlet,ObjectIsNotParent
-			//      %OAMixerOutNode is the outlet from the implicit OA mixer
-			//         For all types of ventilated slab, this is NodeConnectionType_Outlet,ObjectIsNotParent
-			//      %FanOutletNode is the outlet from the explicit fan child object (redundant input, should mine from child)
-			//         For all types of ventilated slab, this is NodeConnectionType_Internal,ObjectIsParent
-			//      %ZoneAirInNode is applicable only to SlabandZone configuration. It is the node that flows into the zone,
-			//         and it is also the outlet from the ventilated slab section, so it must be registered twice
-			//         First for the overall system, NodeConnectionType_Outlet,ObjectIsParent, -SYSTEM
-			//         Second as the slab outlet, NodeConnectionType_Outlet,ObjectIsNotParent
-			//      %OutsideAirNode is the outdoor air inlet to the OA mixer
-			//         For all types of ventilated slab, this is NodeConnectionType_Inlet,ObjectIsNotParent, -OA MIXER
-
-			if ( VentSlab( Item ).SysConfg == SlabOnly ) {
-
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
-				VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
-				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
-
-			} else if ( VentSlab( Item ).SysConfg == SeriesSlabs ) {
-
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
-				VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
-				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
-
-			} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
-
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-SYSTEM", cAlphaArgs( 1 ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsParent );
-				VentSlab( Item ).ReturnAirNode = GetOnlySingleNode( cAlphaArgs( 18 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				VentSlab( Item ).RadInNode = GetOnlySingleNode( cAlphaArgs( 19 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-				VentSlab( Item ).OAMixerOutNode = GetOnlySingleNode( cAlphaArgs( 23 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-				VentSlab( Item ).FanOutletNode = GetOnlySingleNode( cAlphaArgs( 24 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsParent );
-			}
-
-			if ( VentSlab( Item ).SysConfg == SlabOnly ) {
-				if ( ! lAlphaBlanks( 20 ) ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " + cAlphaFields( 20 ) + "=\"" + cAlphaArgs( 20 ) + "\" not needed - ignored." );
-					ShowContinueError( "It is used for \"SlabAndZone\" only" );
-				}
-
-			} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
-				if ( lAlphaBlanks( 20 ) ) {
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 20 ) + " is blank and must be entered." );
-					ErrorsFound = true;
-				}
-
-				VentSlab( Item ).ZoneAirInNode = GetOnlySingleNode( cAlphaArgs( 20 ), ErrorsFound, CurrentModuleObject + "-SYSTEM", cAlphaArgs( 1 ) + "-SYSTEM", NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsParent );
-
-				VentSlab( Item ).ZoneAirInNode = GetOnlySingleNode( cAlphaArgs( 20 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Air, NodeConnectionType_Outlet, 1, ObjectIsNotParent );
-			}
-
-			//  Set connection type to 'Inlet', because it now uses an OA node
-			VentSlab( Item ).OutsideAirNode = GetOnlySingleNode( cAlphaArgs( 21 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_Inlet, 1, ObjectIsNotParent );
-
-			if ( ! lAlphaBlanks( 21 ) ) {
-				CheckAndAddAirNodeNumber( VentSlab( Item ).OutsideAirNode, IsValid );
-				if ( ! IsValid ) {
-					ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\", Adding OutdoorAir:Node=" + cAlphaArgs( 21 ) );
-				}
-
-			}
-
-			VentSlab( Item ).AirReliefNode = GetOnlySingleNode( cAlphaArgs( 22 ), ErrorsFound, CurrentModuleObject + "-OA MIXER", cAlphaArgs( 1 ) + "-OA MIXER", NodeType_Air, NodeConnectionType_ReliefAir, 1, ObjectIsNotParent );
-
-			// Fan information:
-			VentSlab( Item ).FanName = cAlphaArgs( 25 );
-
-			if ( VentSlab( Item ).OAControlType == FixedOAControl ) {
-				VentSlab( Item ).OutAirVolFlow = VentSlab( Item ).MinOutAirVolFlow;
-				VentSlab( Item ).MaxOASchedName = VentSlab( Item ).MinOASchedName;
-				VentSlab( Item ).MaxOASchedPtr = GetScheduleIndex( VentSlab( Item ).MinOASchedName );
-			}
-
-			// Add fan to component sets array
-			SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", "UNDEFINED", cAlphaArgs( 25 ), cAlphaArgs( 23 ), cAlphaArgs( 24 ) );
-
-			// Coil options assign
-
-			{ auto const SELECT_CASE_var( cAlphaArgs( 26 ) );
-			if ( SELECT_CASE_var == "HEATINGANDCOOLING" ) {
+		  { auto const SELECT_CASE_var( cAlphaArgs( 26 ) );
+			 if ( SELECT_CASE_var == "HEATINGANDCOOLING" ) {
 				VentSlab( Item ).CoilOption = BothOption;
-			} else if ( SELECT_CASE_var == "HEATING" ) {
+			 } else if ( SELECT_CASE_var == "HEATING" ) {
 				VentSlab( Item ).CoilOption = HeatingOption;
-			} else if ( SELECT_CASE_var == "COOLING" ) {
+			 } else if ( SELECT_CASE_var == "COOLING" ) {
 				VentSlab( Item ).CoilOption = CoolingOption;
-			} else if ( SELECT_CASE_var == "NONE" ) {
+			 } else if ( SELECT_CASE_var == "NONE" ) {
 				VentSlab( Item ).CoilOption = NoneOption;
-			} else {
+			 } else {
 				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
 				ErrorsFound = true;
-			}}
+			 }}
 
-			if ( VentSlab( Item ).CoilOption == BothOption || VentSlab( Item ).CoilOption == HeatingOption ) {
-				// Heating coil information:
-				//        A27, \field Heating Coil Object Type
-				//             \type choice
-				//             \key Coil:Heating:Water
-				//             \key Coil:Heating:Electric
-				//             \key Coil:Heating:Gas
-				//             \key Coil:Heating:Steam
-				//        A28, \field Heating Coil Name
-				//             \type object-list
-				//             \object-list HeatingCoilName
+		  if ( VentSlab( Item ).CoilOption == BothOption || VentSlab( Item ).CoilOption == HeatingOption ) {
+			 // Heating coil information:
+			 //        A27, \field Heating Coil Object Type
+			 //             \type choice
+			 //             \key Coil:Heating:Water
+			 //             \key Coil:Heating:Electric
+			 //             \key Coil:Heating:Gas
+			 //             \key Coil:Heating:Steam
+			 //        A28, \field Heating Coil Name
+			 //             \type object-list
+			 //             \object-list HeatingCoilName
 
-				// Heating coil information:
-				if ( ! lAlphaBlanks( 28 ) ) {
-					VentSlab( Item ).HCoilPresent = true;
-					VentSlab( Item ).HCoilTypeCh = cAlphaArgs( 27 );
-					errFlag = false;
+			 // Heating coil information:
+			 if ( ! lAlphaBlanks( 28 ) ) {
+				VentSlab( Item ).HCoilPresent = true;
+				VentSlab( Item ).HCoilTypeCh = cAlphaArgs( 27 );
+				errFlag = false;
 
-					{ auto const SELECT_CASE_var( cAlphaArgs( 27 ) );
-					if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
-						VentSlab( Item ).HCoilType = Heating_WaterCoilType;
-						VentSlab( Item ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
-					} else if ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) {
-						VentSlab( Item ).HCoilType = Heating_SteamCoilType;
-						VentSlab( Item ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
-						VentSlab( Item ).HCoil_FluidIndex = FindRefrigerant( "Steam" );
-						if ( VentSlab( Item ).HCoil_FluidIndex == 0 ) {
-							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "Steam Properties not found." );
-							if ( SteamMessageNeeded ) ShowContinueError( "Steam Fluid Properties should have been included in the input file." );
-							ErrorsFound = true;
-							SteamMessageNeeded = false;
-						}
-					} else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
-						VentSlab( Item ).HCoilType = Heating_ElectricCoilType;
-					} else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
-						VentSlab( Item ).HCoilType = Heating_GasCoilType;
-					} else {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
+				{ auto const SELECT_CASE_var( cAlphaArgs( 27 ) );
+				  if ( SELECT_CASE_var == "COIL:HEATING:WATER" ) {
+					 VentSlab( Item ).HCoilType = Heating_WaterCoilType;
+					 VentSlab( Item ).HCoil_PlantTypeNum = TypeOf_CoilWaterSimpleHeating;
+				  } else if ( SELECT_CASE_var == "COIL:HEATING:STEAM" ) {
+					 VentSlab( Item ).HCoilType = Heating_SteamCoilType;
+					 VentSlab( Item ).HCoil_PlantTypeNum = TypeOf_CoilSteamAirHeating;
+					 VentSlab( Item ).HCoil_FluidIndex = FindRefrigerant( "Steam" );
+					 if ( VentSlab( Item ).HCoil_FluidIndex == 0 ) {
+						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "Steam Properties not found." );
+						if ( SteamMessageNeeded ) ShowContinueError( "Steam Fluid Properties should have been included in the input file." );
 						ErrorsFound = true;
-					}}
-					if ( ! errFlag ) {
-						VentSlab( Item ).HCoilName = cAlphaArgs( 28 );
-						ValidateComponent( cAlphaArgs( 27 ), VentSlab( Item ).HCoilName, IsNotOK, CurrentModuleObject );
-						if ( IsNotOK ) {
-							ShowContinueError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 28 ) + "=\"" + cAlphaArgs( 28 ) + "\"." );
-							ShowContinueError( "... not valid for " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
-							ErrorsFound = true;
-						}
-					}
-
-					VentSlab( Item ).MinVolHotWaterFlow = 0.0;
-					VentSlab( Item ).MinVolHotSteamFlow = 0.0;
-
-					// The heating coil control node is necessary for a hot water coil, but not necessary for an
-					// electric or gas coil.
-					if ( VentSlab( Item ).HCoilType == Heating_GasCoilType || VentSlab( Item ).HCoilType == Heating_ElectricCoilType ) {
-						if ( ! lAlphaBlanks( 29 ) ) {
-							ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " + cAlphaFields( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\" not needed - ignored." );
-							ShowContinueError( "..It is used for hot water coils only." );
-						}
-					} else {
-						if ( lAlphaBlanks( 29 ) ) {
-							ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 29 ) + " is blank and must be entered." );
-							ErrorsFound = true;
-						}
-						VentSlab( Item ).HotControlNode = GetOnlySingleNode( cAlphaArgs( 29 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent );
-					}
-					VentSlab( Item ).HotControlOffset = 0.001;
-
-					if ( VentSlab( Item ).HCoilType == Heating_WaterCoilType ) {
-						VentSlab( Item ).MaxVolHotWaterFlow = GetWaterCoilMaxFlowRate( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
-						VentSlab( Item ).MaxVolHotSteamFlow = GetWaterCoilMaxFlowRate( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
-					} else if ( VentSlab( Item ).HCoilType == Heating_SteamCoilType ) {
-						VentSlab( Item ).MaxVolHotWaterFlow = GetSteamCoilMaxFlowRate( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
-						VentSlab( Item ).MaxVolHotSteamFlow = GetSteamCoilMaxFlowRate( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
-					}
-
-				} else { // no heating coil
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing heating coil." );
-					ShowContinueError( "a heating coil is required for " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
-					ErrorsFound = true;
+						SteamMessageNeeded = false;
+					 }
+				  } else if ( SELECT_CASE_var == "COIL:HEATING:ELECTRIC" ) {
+					 VentSlab( Item ).HCoilType = Heating_ElectricCoilType;
+				  } else if ( SELECT_CASE_var == "COIL:HEATING:GAS" ) {
+					 VentSlab( Item ).HCoilType = Heating_GasCoilType;
+				  } else {
+					 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
+					 ErrorsFound = true;
+				  }}
+				if ( ! errFlag ) {
+				  VentSlab( Item ).HCoilName = cAlphaArgs( 28 );
+				  ValidateComponent( cAlphaArgs( 27 ), VentSlab( Item ).HCoilName, IsNotOK, CurrentModuleObject );
+				  if ( IsNotOK ) {
+					 ShowContinueError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 28 ) + "=\"" + cAlphaArgs( 28 ) + "\"." );
+					 ShowContinueError( "... not valid for " + cAlphaFields( 27 ) + "=\"" + cAlphaArgs( 27 ) + "\"." );
+					 ErrorsFound = true;
+				  }
 				}
-			}
 
-			if ( VentSlab( Item ).CoilOption == BothOption || VentSlab( Item ).CoilOption == CoolingOption ) {
-				// Cooling coil information (if one is present):
-				//        A30, \field Cooling Coil Object Type
-				//             \type choice
-				//             \key Coil:Cooling:Water
-				//             \key Coil:Cooling:Water:DetailedGeometry
-				//             \key CoilSystem:Cooling:Water:HeatExchangerAssisted
-				//        A31, \field Cooling Coil Name
-				//             \type object-list
-				//             \object-list CoolingCoilsWater
-				// Cooling coil information (if one is present):
-				if ( ! lAlphaBlanks( 31 ) ) {
-					VentSlab( Item ).CCoilPresent = true;
-					VentSlab( Item ).CCoilTypeCh = cAlphaArgs( 30 );
-					errFlag = false;
+				VentSlab( Item ).MinVolHotWaterFlow = 0.0;
+				VentSlab( Item ).MinVolHotSteamFlow = 0.0;
 
-					{ auto const SELECT_CASE_var( cAlphaArgs( 30 ) );
-					if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
-						VentSlab( Item ).CCoilType = Cooling_CoilWaterCooling;
+				// The heating coil control node is necessary for a hot water coil, but not necessary for an
+				// electric or gas coil.
+				if ( VentSlab( Item ).HCoilType == Heating_GasCoilType || VentSlab( Item ).HCoilType == Heating_ElectricCoilType ) {
+				  if ( ! lAlphaBlanks( 29 ) ) {
+					 ShowWarningError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" " + cAlphaFields( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\" not needed - ignored." );
+					 ShowContinueError( "..It is used for hot water coils only." );
+				  }
+				} else {
+				  if ( lAlphaBlanks( 29 ) ) {
+					 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 29 ) + " is blank and must be entered." );
+					 ErrorsFound = true;
+				  }
+				  VentSlab( Item ).HotControlNode = GetOnlySingleNode( cAlphaArgs( 29 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent );
+				}
+				VentSlab( Item ).HotControlOffset = 0.001;
+
+				if ( VentSlab( Item ).HCoilType == Heating_WaterCoilType ) {
+				  VentSlab( Item ).MaxVolHotWaterFlow = GetWaterCoilMaxFlowRate( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
+				  VentSlab( Item ).MaxVolHotSteamFlow = GetWaterCoilMaxFlowRate( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
+				} else if ( VentSlab( Item ).HCoilType == Heating_SteamCoilType ) {
+				  VentSlab( Item ).MaxVolHotWaterFlow = GetSteamCoilMaxFlowRate( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
+				  VentSlab( Item ).MaxVolHotSteamFlow = GetSteamCoilMaxFlowRate( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
+				}
+
+			 } else { // no heating coil
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing heating coil." );
+				ShowContinueError( "a heating coil is required for " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
+				ErrorsFound = true;
+			 }
+		  }
+
+		  if ( VentSlab( Item ).CoilOption == BothOption || VentSlab( Item ).CoilOption == CoolingOption ) {
+			 // Cooling coil information (if one is present):
+			 //        A30, \field Cooling Coil Object Type
+			 //             \type choice
+			 //             \key Coil:Cooling:Water
+			 //             \key Coil:Cooling:Water:DetailedGeometry
+			 //             \key CoilSystem:Cooling:Water:HeatExchangerAssisted
+			 //        A31, \field Cooling Coil Name
+			 //             \type object-list
+			 //             \object-list CoolingCoilsWater
+			 // Cooling coil information (if one is present):
+			 if ( ! lAlphaBlanks( 31 ) ) {
+				VentSlab( Item ).CCoilPresent = true;
+				VentSlab( Item ).CCoilTypeCh = cAlphaArgs( 30 );
+				errFlag = false;
+
+				{ auto const SELECT_CASE_var( cAlphaArgs( 30 ) );
+				  if ( SELECT_CASE_var == "COIL:COOLING:WATER" ) {
+					 VentSlab( Item ).CCoilType = Cooling_CoilWaterCooling;
+					 VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
+					 VentSlab( Item ).CCoilPlantName = cAlphaArgs( 31 );
+				  } else if ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
+					 VentSlab( Item ).CCoilType = Cooling_CoilDetailedCooling;
+					 VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
+					 VentSlab( Item ).CCoilPlantName = cAlphaArgs( 31 );
+				  } else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
+					 VentSlab( Item ).CCoilType = Cooling_CoilHXAssisted;
+					 GetHXCoilTypeAndName( cAlphaArgs( 30 ), cAlphaArgs( 31 ), ErrorsFound, VentSlab( Item ).CCoilPlantType, VentSlab( Item ).CCoilPlantName );
+					 if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
 						VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						VentSlab( Item ).CCoilPlantName = cAlphaArgs( 31 );
-					} else if ( SELECT_CASE_var == "COIL:COOLING:WATER:DETAILEDGEOMETRY" ) {
-						VentSlab( Item ).CCoilType = Cooling_CoilDetailedCooling;
+					 } else if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
 						VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
-						VentSlab( Item ).CCoilPlantName = cAlphaArgs( 31 );
-					} else if ( SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED" ) {
-						VentSlab( Item ).CCoilType = Cooling_CoilHXAssisted;
-						GetHXCoilTypeAndName( cAlphaArgs( 30 ), cAlphaArgs( 31 ), ErrorsFound, VentSlab( Item ).CCoilPlantType, VentSlab( Item ).CCoilPlantName );
-						if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water" ) ) {
-							VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
-						} else if ( SameString( VentSlab( Item ).CCoilPlantType, "Coil:Cooling:Water:DetailedGeometry" ) ) {
-							VentSlab( Item ).CCoil_PlantTypeNum = TypeOf_CoilWaterDetailedFlatCooling;
-						} else {
-							ShowSevereError( "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" + VentSlab( Item ).Name + "\", invalid" );
-							ShowContinueError( "For: " + cAlphaFields( 30 ) + "=\"" + cAlphaArgs( 30 ) + "\"." );
-							ShowContinueError( "Invalid Coil Type=" + VentSlab( Item ).CCoilPlantType + ", Name=" + VentSlab( Item ).CCoilPlantName );
-							ShowContinueError( "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"" );
-							ErrorsFound = true;
-						}
-					} else {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\"." );
+					 } else {
+						ShowSevereError( "GetVentilatedSlabInput: " + CurrentModuleObject + "=\"" + VentSlab( Item ).Name + "\", invalid" );
+						ShowContinueError( "For: " + cAlphaFields( 30 ) + "=\"" + cAlphaArgs( 30 ) + "\"." );
+						ShowContinueError( "Invalid Coil Type=" + VentSlab( Item ).CCoilPlantType + ", Name=" + VentSlab( Item ).CCoilPlantName );
+						ShowContinueError( "must be \"Coil:Cooling:Water\" or \"Coil:Cooling:Water:DetailedGeometry\"" );
 						ErrorsFound = true;
-						errFlag = true;
-					}}
+					 }
+				  } else {
+					 ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 29 ) + "=\"" + cAlphaArgs( 29 ) + "\"." );
+					 ErrorsFound = true;
+					 errFlag = true;
+				  }}
 
-					if ( ! errFlag ) {
-						VentSlab( Item ).CCoilName = cAlphaArgs( 31 );
-						ValidateComponent( cAlphaArgs( 30 ), VentSlab( Item ).CCoilName, IsNotOK, "ZoneHVAC:VentilatedSlab " );
-						if ( IsNotOK ) {
-							ShowContinueError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 31 ) + "=\"" + cAlphaArgs( 31 ) + "\"." );
-							ShowContinueError( "... not valid for " + cAlphaFields( 30 ) + "=\"" + cAlphaArgs( 30 ) + "\"." );
-							ErrorsFound = true;
-						}
-					}
-
-					VentSlab( Item ).MinVolColdWaterFlow = 0.0;
-
-					VentSlab( Item ).ColdControlNode = GetOnlySingleNode( cAlphaArgs( 32 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent );
-
-					if ( lAlphaBlanks( 32 ) ) {
-						ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 32 ) + " is blank and must be entered." );
-						ErrorsFound = true;
-					}
-
-					VentSlab( Item ).ColdControlOffset = 0.001;
-
-					if ( VentSlab( Item ).CCoilType == Cooling_CoilWaterCooling ) {
-						VentSlab( Item ).MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate( "Coil:Cooling:Water", VentSlab( Item ).CCoilName, ErrorsFound );
-					} else if ( VentSlab( Item ).CCoilType == Cooling_CoilDetailedCooling ) {
-						VentSlab( Item ).MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate( "Coil:Cooling:Water:DetailedGeometry", VentSlab( Item ).CCoilName, ErrorsFound );
-					} else if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
-						VentSlab( Item ).MaxVolColdWaterFlow = GetHXAssistedCoilFlowRate( "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab( Item ).CCoilName, ErrorsFound );
-					}
-
-				} else { // No Cooling Coil
-					ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing cooling coil." );
-					ShowContinueError( "a cooling coil is required for " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
-					ErrorsFound = true;
+				if ( ! errFlag ) {
+				  VentSlab( Item ).CCoilName = cAlphaArgs( 31 );
+				  ValidateComponent( cAlphaArgs( 30 ), VentSlab( Item ).CCoilName, IsNotOK, "ZoneHVAC:VentilatedSlab " );
+				  if ( IsNotOK ) {
+					 ShowContinueError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 31 ) + "=\"" + cAlphaArgs( 31 ) + "\"." );
+					 ShowContinueError( "... not valid for " + cAlphaFields( 30 ) + "=\"" + cAlphaArgs( 30 ) + "\"." );
+					 ErrorsFound = true;
+				  }
 				}
-			}
-			if ( ! lAlphaBlanks( 33 ) ) {
-				VentSlab( Item ).AvailManagerListName = cAlphaArgs( 33 );
-			}
 
-			VentSlab( Item ).HVACSizingIndex = 0;
-			if ( ! lAlphaBlanks( 34 )) {
-				VentSlab( Item ).HVACSizingIndex = FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing.Name(), NumZoneHVACSizing);
-				if (VentSlab( Item ).HVACSizingIndex == 0) {
-					ShowSevereError( cAlphaFields( 34 ) + " = " + cAlphaArgs( 34 ) + " not found." );
-					ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " = " + VentSlab( Item ).Name );
-					ErrorsFound = true;
+				VentSlab( Item ).MinVolColdWaterFlow = 0.0;
+
+				VentSlab( Item ).ColdControlNode = GetOnlySingleNode( cAlphaArgs( 32 ), ErrorsFound, CurrentModuleObject, cAlphaArgs( 1 ), NodeType_Water, NodeConnectionType_Actuator, 1, ObjectIsParent );
+
+				if ( lAlphaBlanks( 32 ) ) {
+				  ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" invalid " + cAlphaFields( 32 ) + " is blank and must be entered." );
+				  ErrorsFound = true;
 				}
-			}
 
-			{ auto const SELECT_CASE_var( VentSlab( Item ).CoilOption );
-			if ( SELECT_CASE_var == BothOption ) { // 'HeatingAndCooling'
+				VentSlab( Item ).ColdControlOffset = 0.001;
+
+				if ( VentSlab( Item ).CCoilType == Cooling_CoilWaterCooling ) {
+				  VentSlab( Item ).MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate( "Coil:Cooling:Water", VentSlab( Item ).CCoilName, ErrorsFound );
+				} else if ( VentSlab( Item ).CCoilType == Cooling_CoilDetailedCooling ) {
+				  VentSlab( Item ).MaxVolColdWaterFlow = GetWaterCoilMaxFlowRate( "Coil:Cooling:Water:DetailedGeometry", VentSlab( Item ).CCoilName, ErrorsFound );
+				} else if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
+				  VentSlab( Item ).MaxVolColdWaterFlow = GetHXAssistedCoilFlowRate( "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab( Item ).CCoilName, ErrorsFound );
+				}
+
+			 } else { // No Cooling Coil
+				ShowSevereError( CurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + "\" missing cooling coil." );
+				ShowContinueError( "a cooling coil is required for " + cAlphaFields( 26 ) + "=\"" + cAlphaArgs( 26 ) + "\"." );
+				ErrorsFound = true;
+			 }
+		  }
+		  if ( ! lAlphaBlanks( 33 ) ) {
+			 VentSlab( Item ).AvailManagerListName = cAlphaArgs( 33 );
+		  }
+
+		  VentSlab( Item ).HVACSizingIndex = 0;
+		  if ( ! lAlphaBlanks( 34 )) {
+			 VentSlab( Item ).HVACSizingIndex = FindItemInList( cAlphaArgs( 34 ), ZoneHVACSizing.Name(), NumZoneHVACSizing);
+			 if (VentSlab( Item ).HVACSizingIndex == 0) {
+				ShowSevereError( cAlphaFields( 34 ) + " = " + cAlphaArgs( 34 ) + " not found." );
+				ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " = " + VentSlab( Item ).Name );
+				ErrorsFound = true;
+			 }
+		  }
+
+		  { auto const SELECT_CASE_var( VentSlab( Item ).CoilOption );
+			 if ( SELECT_CASE_var == BothOption ) { // 'HeatingAndCooling'
 				// Add cooling coil to component sets array when present
 				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 30 ), cAlphaArgs( 31 ), cAlphaArgs( 24 ), "UNDEFINED" );
 
 				// Add heating coil to component sets array when cooling coil present
 				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 27 ), cAlphaArgs( 28 ), "UNDEFINED", cAlphaArgs( 19 ) );
 
-			} else if ( SELECT_CASE_var == HeatingOption ) { // 'Heating'
+			 } else if ( SELECT_CASE_var == HeatingOption ) { // 'Heating'
 				// Add heating coil to component sets array when no cooling coil present
 				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 27 ), cAlphaArgs( 28 ), cAlphaArgs( 24 ), cAlphaArgs( 19 ) );
 
-			} else if ( SELECT_CASE_var == CoolingOption ) { // 'Cooling'
+			 } else if ( SELECT_CASE_var == CoolingOption ) { // 'Cooling'
 				// Add cooling coil to component sets array when no heating coil present
 				SetUpCompSets( CurrentModuleObject + "-SYSTEM", VentSlab( Item ).Name + "-SYSTEM", cAlphaArgs( 30 ), cAlphaArgs( 31 ), cAlphaArgs( 24 ), cAlphaArgs( 19 ) );
 
-			} else if ( SELECT_CASE_var == NoneOption ) {
+			 } else if ( SELECT_CASE_var == NoneOption ) {
 
-			} else {
+			 } else {
 
-			}}
+			 }}
 
 		} // ...loop over all of the ventilated slab found in the input file
 
@@ -1015,52 +1015,52 @@ namespace VentilatedSlab {
 
 		// Setup Report variables for the VENTILATED SLAB
 		for ( Item = 1; Item <= NumOfVentSlabs; ++Item ) {
-			//   CALL SetupOutputVariable('Ventilated Slab Direct Heat Loss Rate [W]', &
-			//                             VentSlab(Item)%DirectHeatLossRate,'System', &
-			//                             'Average', VentSlab(Item)%Name)
-			//   CALL SetupOutputVariable('Ventilated Slab Direct Heat Loss [W]',        &
-			//                             VentSlab(Item)%DirectHeatLoss,'System', &
-			//                             'Sum', VentSlab(Item)%Name)
-			//   CALL SetupOutputVariable('Ventilated Slab Direct Heat Gain Rate [W]',        &
-			//                             VentSlab(Item)%DirectHeatGainRate,'System', &
-			//                            'Average', VentSlab(Item)%Name)
-			//   CALL SetupOutputVariable('Ventilated Slab Direct Heat Gain [J]',        &
-			//                           VentSlab(Item)%DirectHeatGain,'System', &
-			//                             'Sum', VentSlab(Item)%Name)
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Rate [W]", VentSlab( Item ).RadHeatingPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Energy [J]", VentSlab( Item ).RadHeatingEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Rate [W]", VentSlab( Item ).RadCoolingPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Energy [J]", VentSlab( Item ).RadCoolingEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Rate [W]", VentSlab( Item ).HeatCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Heating Energy [J]", VentSlab( Item ).HeatCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Rate [W]", VentSlab( Item ).TotCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Energy [J]", VentSlab( Item ).TotCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Rate [W]", VentSlab( Item ).SensCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Energy [J]", VentSlab( Item ).SensCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Rate [W]", VentSlab( Item ).LateCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Energy [J]", VentSlab( Item ).LateCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Air Mass Flow Rate [kg/s]", VentSlab( Item ).AirMassFlowRate, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Power [W]", VentSlab( Item ).ElecFanPower, "System", "Average", VentSlab( Item ).Name );
-			//! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
-			SetupOutputVariable( "Zone Ventilated Slab Fan Electric Energy [J]", VentSlab( Item ).ElecFanEnergy, "System", "Sum", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Inlet Air Temperature [C]", VentSlab( Item ).SlabInTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Outlet Air Temperature [C]", VentSlab( Item ).SlabOutTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Zone Inlet Air Temperature [C]", VentSlab( Item ).ZoneInletTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Return Air Temperature [C]", VentSlab( Item ).ReturnAirTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Outlet Air Temperature [C]", VentSlab( Item ).FanOutletTemp, "System", "Average", VentSlab( Item ).Name );
-			SetupOutputVariable( "Zone Ventilated Slab Fan Availability Status []", VentSlab( Item ).AvailStatus, "System", "Average", VentSlab( Item ).Name );
+		  //   CALL SetupOutputVariable('Ventilated Slab Direct Heat Loss Rate [W]', &
+		  //                             VentSlab(Item)%DirectHeatLossRate,'System', &
+		  //                             'Average', VentSlab(Item)%Name)
+		  //   CALL SetupOutputVariable('Ventilated Slab Direct Heat Loss [W]',        &
+		  //                             VentSlab(Item)%DirectHeatLoss,'System', &
+		  //                             'Sum', VentSlab(Item)%Name)
+		  //   CALL SetupOutputVariable('Ventilated Slab Direct Heat Gain Rate [W]',        &
+		  //                             VentSlab(Item)%DirectHeatGainRate,'System', &
+		  //                            'Average', VentSlab(Item)%Name)
+		  //   CALL SetupOutputVariable('Ventilated Slab Direct Heat Gain [J]',        &
+		  //                           VentSlab(Item)%DirectHeatGain,'System', &
+		  //                             'Sum', VentSlab(Item)%Name)
+		  SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Rate [W]", VentSlab( Item ).RadHeatingPower, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Radiant Heating Energy [J]", VentSlab( Item ).RadHeatingEnergy, "System", "Sum", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Rate [W]", VentSlab( Item ).RadCoolingPower, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Radiant Cooling Energy [J]", VentSlab( Item ).RadCoolingEnergy, "System", "Sum", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Heating Rate [W]", VentSlab( Item ).HeatCoilPower, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Heating Energy [J]", VentSlab( Item ).HeatCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Rate [W]", VentSlab( Item ).TotCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Total Cooling Energy [J]", VentSlab( Item ).TotCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Rate [W]", VentSlab( Item ).SensCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Sensible Cooling Energy [J]", VentSlab( Item ).SensCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Rate [W]", VentSlab( Item ).LateCoolCoilPower, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Coil Latent Cooling Energy [J]", VentSlab( Item ).LateCoolCoilEnergy, "System", "Sum", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Air Mass Flow Rate [kg/s]", VentSlab( Item ).AirMassFlowRate, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Fan Electric Power [W]", VentSlab( Item ).ElecFanPower, "System", "Average", VentSlab( Item ).Name );
+		  //! Note that the ventilated slab fan electric is NOT metered because this value is already metered through the fan component
+		  SetupOutputVariable( "Zone Ventilated Slab Fan Electric Energy [J]", VentSlab( Item ).ElecFanEnergy, "System", "Sum", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Inlet Air Temperature [C]", VentSlab( Item ).SlabInTemp, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Outlet Air Temperature [C]", VentSlab( Item ).SlabOutTemp, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Zone Inlet Air Temperature [C]", VentSlab( Item ).ZoneInletTemp, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Return Air Temperature [C]", VentSlab( Item ).ReturnAirTemp, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Fan Outlet Air Temperature [C]", VentSlab( Item ).FanOutletTemp, "System", "Average", VentSlab( Item ).Name );
+		  SetupOutputVariable( "Zone Ventilated Slab Fan Availability Status []", VentSlab( Item ).AvailStatus, "System", "Average", VentSlab( Item ).Name );
 
 		}
 
-	}
+	 }
 
-	void
-	InitVentilatedSlab(
-		int const Item, // index for the current ventilated slab
-		int const VentSlabZoneNum, // number of zone being served
-		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
-	)
-	{
+	 void
+	 InitVentilatedSlab(
+							  int const Item, // index for the current ventilated slab
+							  int const VentSlabZoneNum, // number of zone being served
+							  bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
+							  )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Young Tae Chae, Rick Strand
@@ -1146,169 +1146,169 @@ namespace VentilatedSlab {
 		// Do the one time initializations
 
 		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.allocate( NumOfVentSlabs );
-			MySizeFlag.allocate( NumOfVentSlabs );
-			MyPlantScanFlag.allocate( NumOfVentSlabs );
-			MyZoneEqFlag.allocate ( NumOfVentSlabs );
+		  MyEnvrnFlag.allocate( NumOfVentSlabs );
+		  MySizeFlag.allocate( NumOfVentSlabs );
+		  MyPlantScanFlag.allocate( NumOfVentSlabs );
+		  MyZoneEqFlag.allocate ( NumOfVentSlabs );
 			ZeroSourceSumHATsurf.dimension( NumOfZones, 0.0 );
 			QRadSysSrcAvg.dimension( TotSurfaces, 0.0 );
 			LastQRadSysSrc.dimension( TotSurfaces, 0.0 );
 			LastSysTimeElapsed.dimension( TotSurfaces, 0.0 );
 			LastTimeStepSys.dimension( TotSurfaces, 0.0 );
 
-			// Initialize total areas for all radiant systems
-			for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
-				VentSlab( Item ).TotalSurfaceArea = 0.0;
-				for ( SurfNum = 1; SurfNum <= VentSlab( Item ).NumOfSurfaces; ++SurfNum ) {
-					VentSlab( Item ).TotalSurfaceArea += Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Area;
-				}
-			}
-			MyEnvrnFlag = true;
-			MySizeFlag = true;
-			MyPlantScanFlag = true;
-			MyZoneEqFlag = true;
-			MyOneTimeFlag = false;
+		  // Initialize total areas for all radiant systems
+		  for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
+			 VentSlab( Item ).TotalSurfaceArea = 0.0;
+			 for ( SurfNum = 1; SurfNum <= VentSlab( Item ).NumOfSurfaces; ++SurfNum ) {
+				VentSlab( Item ).TotalSurfaceArea += Surface( VentSlab( Item ).SurfacePtr( SurfNum ) ).Area;
+			 }
+		  }
+		  MyEnvrnFlag = true;
+		  MySizeFlag = true;
+		  MyPlantScanFlag = true;
+		  MyZoneEqFlag = true;
+		  MyOneTimeFlag = false;
 		}
 
 		if ( allocated( ZoneComp ) ) {
-			if ( MyZoneEqFlag( Item ) ) { // initialize the name of each availability manager list and zone number
-				ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).AvailManagerListName = VentSlab( Item ).AvailManagerListName;
-				ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).ZoneNum = VentSlabZoneNum;
-				MyZoneEqFlag ( Item ) = false;
-			}
-			VentSlab( Item ).AvailStatus = ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).AvailStatus;
+		  if ( MyZoneEqFlag( Item ) ) { // initialize the name of each availability manager list and zone number
+			 ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).AvailManagerListName = VentSlab( Item ).AvailManagerListName;
+			 ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).ZoneNum = VentSlabZoneNum;
+			 MyZoneEqFlag ( Item ) = false;
+		  }
+		  VentSlab( Item ).AvailStatus = ZoneComp( VentilatedSlab_Num ).ZoneCompAvailMgrs( Item ).AvailStatus;
 		}
 
 		if ( MyPlantScanFlag( Item ) && allocated( PlantLoop ) ) {
-			if ( ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating ) || ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating ) ) {
-				errFlag = false;
-				ScanPlantLoopsForObject( VentSlab( Item ).HCoilName, VentSlab( Item ).HCoil_PlantTypeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum, _, _, _, _, _, errFlag );
-				if ( errFlag ) {
-					ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
-					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
-				}
+		  if ( ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating ) || ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating ) ) {
+			 errFlag = false;
+			 ScanPlantLoopsForObject( VentSlab( Item ).HCoilName, VentSlab( Item ).HCoil_PlantTypeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum, _, _, _, _, _, errFlag );
+			 if ( errFlag ) {
+				ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
+				ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
+			 }
 
-				VentSlab( Item ).HotCoilOutNodeNum = PlantLoop( VentSlab( Item ).HWLoopNum ).LoopSide( VentSlab( Item ).HWLoopSide ).Branch( VentSlab( Item ).HWBranchNum ).Comp( VentSlab( Item ).HWCompNum ).NodeNumOut;
+			 VentSlab( Item ).HotCoilOutNodeNum = PlantLoop( VentSlab( Item ).HWLoopNum ).LoopSide( VentSlab( Item ).HWLoopSide ).Branch( VentSlab( Item ).HWBranchNum ).Comp( VentSlab( Item ).HWCompNum ).NodeNumOut;
 
-			}
-			if ( ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ) || ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
-				errFlag = false;
-				ScanPlantLoopsForObject( VentSlab( Item ).CCoilPlantName, VentSlab( Item ).CCoil_PlantTypeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
-				if ( errFlag ) {
-					ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
-					ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
-				}
-				VentSlab( Item ).ColdCoilOutNodeNum = PlantLoop( VentSlab( Item ).CWLoopNum ).LoopSide( VentSlab( Item ).CWLoopSide ).Branch( VentSlab( Item ).CWBranchNum ).Comp( VentSlab( Item ).CWCompNum ).NodeNumOut;
-			} else {
-				if ( VentSlab( Item ).CCoilPresent ) ShowFatalError( "InitVentilatedSlab: Unit=" + VentSlab( Item ).Name + ", invalid cooling coil type. Program terminated." );
-			}
-			MyPlantScanFlag( Item ) = false;
+		  }
+		  if ( ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ) || ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
+			 errFlag = false;
+			 ScanPlantLoopsForObject( VentSlab( Item ).CCoilPlantName, VentSlab( Item ).CCoil_PlantTypeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
+			 if ( errFlag ) {
+				ShowContinueError( "Reference Unit=\"" + VentSlab( Item ).Name + "\", type=ZoneHVAC:VentilatedSlab" );
+				ShowFatalError( "InitVentilatedSlab: Program terminated due to previous condition(s)." );
+			 }
+			 VentSlab( Item ).ColdCoilOutNodeNum = PlantLoop( VentSlab( Item ).CWLoopNum ).LoopSide( VentSlab( Item ).CWLoopSide ).Branch( VentSlab( Item ).CWBranchNum ).Comp( VentSlab( Item ).CWCompNum ).NodeNumOut;
+		  } else {
+			 if ( VentSlab( Item ).CCoilPresent ) ShowFatalError( "InitVentilatedSlab: Unit=" + VentSlab( Item ).Name + ", invalid cooling coil type. Program terminated." );
+		  }
+		  MyPlantScanFlag( Item ) = false;
 		} else if ( MyPlantScanFlag( Item ) && ! AnyPlantInModel ) {
-			MyPlantScanFlag( Item ) = false;
+		  MyPlantScanFlag( Item ) = false;
 		}
 
 		// need to check all Ventilated Slab units to see if they are on Zone Equipment List or issue warning
 		if ( ! ZoneEquipmentListChecked && ZoneEquipInputsFilled ) {
-			ZoneEquipmentListChecked = true;
-			for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
-				if ( CheckZoneEquipmentList( cMO_VentilatedSlab, VentSlab( RadNum ).Name ) ) continue;
-				ShowSevereError( "InitVentilatedSlab: Ventilated Slab Unit=[" + cMO_VentilatedSlab + ',' + VentSlab( RadNum ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
-			}
+		  ZoneEquipmentListChecked = true;
+		  for ( RadNum = 1; RadNum <= NumOfVentSlabs; ++RadNum ) {
+			 if ( CheckZoneEquipmentList( cMO_VentilatedSlab, VentSlab( RadNum ).Name ) ) continue;
+			 ShowSevereError( "InitVentilatedSlab: Ventilated Slab Unit=[" + cMO_VentilatedSlab + ',' + VentSlab( RadNum ).Name + "] is not on any ZoneHVAC:EquipmentList.  It will not be simulated." );
+		  }
 		}
 
 		if ( ! SysSizingCalc && MySizeFlag( Item ) && ! MyPlantScanFlag( Item ) ) {
 
-			SizeVentilatedSlab( Item );
+		  SizeVentilatedSlab( Item );
 
-			MySizeFlag( Item ) = false;
+		  MySizeFlag( Item ) = false;
 
 		}
 
 		// Do the one time initializations
 		if ( BeginEnvrnFlag && MyEnvrnFlag( Item ) && ! MyPlantScanFlag( Item ) ) {
 
-			// Coil Part
-			InNode = VentSlab( Item ).ReturnAirNode;
-			OutNode = VentSlab( Item ).RadInNode;
-			HotConNode = VentSlab( Item ).HotControlNode;
-			ColdConNode = VentSlab( Item ).ColdControlNode;
-			OutsideAirNode = VentSlab( Item ).OutsideAirNode;
-			RhoAir = StdRhoAir;
+		  // Coil Part
+		  InNode = VentSlab( Item ).ReturnAirNode;
+		  OutNode = VentSlab( Item ).RadInNode;
+		  HotConNode = VentSlab( Item ).HotControlNode;
+		  ColdConNode = VentSlab( Item ).ColdControlNode;
+		  OutsideAirNode = VentSlab( Item ).OutsideAirNode;
+		  RhoAir = StdRhoAir;
 
-			// Radiation Panel Part
-			ZeroSourceSumHATsurf = 0.0;
-			QRadSysSrcAvg = 0.0;
-			LastQRadSysSrc = 0.0;
-			LastSysTimeElapsed = 0.0;
-			LastTimeStepSys = 0.0;
-			if ( NumOfVentSlabs > 0 ) {
-				VentSlab.RadHeatingPower() = 0.0;
-				VentSlab.RadHeatingEnergy() = 0.0;
-				VentSlab.RadCoolingPower() = 0.0;
-				VentSlab.RadCoolingEnergy() = 0.0;
-			}
+		  // Radiation Panel Part
+		  ZeroSourceSumHATsurf = 0.0;
+		  QRadSysSrcAvg = 0.0;
+		  LastQRadSysSrc = 0.0;
+		  LastSysTimeElapsed = 0.0;
+		  LastTimeStepSys = 0.0;
+		  if ( NumOfVentSlabs > 0 ) {
+			 VentSlab.RadHeatingPower() = 0.0;
+			 VentSlab.RadHeatingEnergy() = 0.0;
+			 VentSlab.RadCoolingPower() = 0.0;
+			 VentSlab.RadCoolingEnergy() = 0.0;
+		  }
 
-			// set the initial Temperature of Return Air
+		  // set the initial Temperature of Return Air
 
-			// set the mass flow rates from the input volume flow rates
-			VentSlab( Item ).MaxAirMassFlow = RhoAir * VentSlab( Item ).MaxAirVolFlow;
-			VentSlab( Item ).OutAirMassFlow = RhoAir * VentSlab( Item ).OutAirVolFlow;
-			VentSlab( Item ).MinOutAirMassFlow = RhoAir * VentSlab( Item ).MinOutAirVolFlow;
-			if ( VentSlab( Item ).OutAirMassFlow > VentSlab( Item ).MaxAirMassFlow ) {
-				VentSlab( Item ).OutAirMassFlow = VentSlab( Item ).MaxAirMassFlow;
-				VentSlab( Item ).MinOutAirMassFlow = VentSlab( Item ).OutAirMassFlow * ( VentSlab( Item ).MinOutAirVolFlow / VentSlab( Item ).OutAirVolFlow );
-				ShowWarningError( "Outdoor air mass flow rate higher than unit flow rate, reset to unit flow rate for " + VentSlab( Item ).Name );
-			}
+		  // set the mass flow rates from the input volume flow rates
+		  VentSlab( Item ).MaxAirMassFlow = RhoAir * VentSlab( Item ).MaxAirVolFlow;
+		  VentSlab( Item ).OutAirMassFlow = RhoAir * VentSlab( Item ).OutAirVolFlow;
+		  VentSlab( Item ).MinOutAirMassFlow = RhoAir * VentSlab( Item ).MinOutAirVolFlow;
+		  if ( VentSlab( Item ).OutAirMassFlow > VentSlab( Item ).MaxAirMassFlow ) {
+			 VentSlab( Item ).OutAirMassFlow = VentSlab( Item ).MaxAirMassFlow;
+			 VentSlab( Item ).MinOutAirMassFlow = VentSlab( Item ).OutAirMassFlow * ( VentSlab( Item ).MinOutAirVolFlow / VentSlab( Item ).OutAirVolFlow );
+			 ShowWarningError( "Outdoor air mass flow rate higher than unit flow rate, reset to unit flow rate for " + VentSlab( Item ).Name );
+		  }
 
-			// set the node max and min mass flow rates
-			Node( OutsideAirNode ).MassFlowRateMax = VentSlab( Item ).OutAirMassFlow;
-			Node( OutsideAirNode ).MassFlowRateMin = 0.0;
+		  // set the node max and min mass flow rates
+		  Node( OutsideAirNode ).MassFlowRateMax = VentSlab( Item ).OutAirMassFlow;
+		  Node( OutsideAirNode ).MassFlowRateMin = 0.0;
 
-			Node( OutNode ).MassFlowRateMax = VentSlab( Item ).MaxAirMassFlow;
-			Node( OutNode ).MassFlowRateMin = 0.0;
+		  Node( OutNode ).MassFlowRateMax = VentSlab( Item ).MaxAirMassFlow;
+		  Node( OutNode ).MassFlowRateMin = 0.0;
 
-			Node( InNode ).MassFlowRateMax = VentSlab( Item ).MaxAirMassFlow;
-			Node( InNode ).MassFlowRateMin = 0.0;
+		  Node( InNode ).MassFlowRateMax = VentSlab( Item ).MaxAirMassFlow;
+		  Node( InNode ).MassFlowRateMin = 0.0;
 
-			if ( VentSlab( Item ).HCoilPresent ) { // Only initialize these if a heating coil is actually present
+		  if ( VentSlab( Item ).HCoilPresent ) { // Only initialize these if a heating coil is actually present
 
-				if ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && ! MyPlantScanFlag( Item ) ) {
-					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+			 if ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilWaterSimpleHeating && ! MyPlantScanFlag( Item ) ) {
+				rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60.0, PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
 
-					VentSlab( Item ).MaxHotWaterFlow = rho * VentSlab( Item ).MaxVolHotWaterFlow;
-					VentSlab( Item ).MinHotWaterFlow = rho * VentSlab( Item ).MinVolHotWaterFlow;
+				VentSlab( Item ).MaxHotWaterFlow = rho * VentSlab( Item ).MaxVolHotWaterFlow;
+				VentSlab( Item ).MinHotWaterFlow = rho * VentSlab( Item ).MinVolHotWaterFlow;
 
-					InitComponentNodes( VentSlab( Item ).MinHotWaterFlow, VentSlab( Item ).MaxHotWaterFlow, VentSlab( Item ).HotControlNode, VentSlab( Item ).HotCoilOutNodeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum );
+				InitComponentNodes( VentSlab( Item ).MinHotWaterFlow, VentSlab( Item ).MaxHotWaterFlow, VentSlab( Item ).HotControlNode, VentSlab( Item ).HotCoilOutNodeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum );
 
-				}
-				if ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating && ! MyPlantScanFlag( Item ) ) {
-					TempSteamIn = 100.00;
-					SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
-					VentSlab( Item ).MaxHotSteamFlow = SteamDensity * VentSlab( Item ).MaxVolHotSteamFlow;
-					VentSlab( Item ).MinHotSteamFlow = SteamDensity * VentSlab( Item ).MinVolHotSteamFlow;
+			 }
+			 if ( VentSlab( Item ).HCoil_PlantTypeNum == TypeOf_CoilSteamAirHeating && ! MyPlantScanFlag( Item ) ) {
+				TempSteamIn = 100.00;
+				SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
+				VentSlab( Item ).MaxHotSteamFlow = SteamDensity * VentSlab( Item ).MaxVolHotSteamFlow;
+				VentSlab( Item ).MinHotSteamFlow = SteamDensity * VentSlab( Item ).MinVolHotSteamFlow;
 
-					InitComponentNodes( VentSlab( Item ).MinHotSteamFlow, VentSlab( Item ).MaxHotSteamFlow, VentSlab( Item ).HotControlNode, VentSlab( Item ).HotCoilOutNodeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum );
+				InitComponentNodes( VentSlab( Item ).MinHotSteamFlow, VentSlab( Item ).MaxHotSteamFlow, VentSlab( Item ).HotControlNode, VentSlab( Item ).HotCoilOutNodeNum, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum, VentSlab( Item ).HWCompNum );
 
-				}
-			} //(VentSlab(Item)%HCoilPresent)
+			 }
+		  } //(VentSlab(Item)%HCoilPresent)
 
-			if ( VentSlab( Item ).CCoilPresent && ! MyPlantScanFlag( Item ) ) {
-				// Only initialize these if a cooling coil is actually present
-				if ( ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ) || ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
-					rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-					VentSlab( Item ).MaxColdWaterFlow = rho * VentSlab( Item ).MaxVolColdWaterFlow;
-					VentSlab( Item ).MinColdWaterFlow = rho * VentSlab( Item ).MinVolColdWaterFlow;
-					InitComponentNodes( VentSlab( Item ).MinColdWaterFlow, VentSlab( Item ).MaxColdWaterFlow, VentSlab( Item ).ColdControlNode, VentSlab( Item ).ColdCoilOutNodeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
-				}
-			}
+		  if ( VentSlab( Item ).CCoilPresent && ! MyPlantScanFlag( Item ) ) {
+			 // Only initialize these if a cooling coil is actually present
+			 if ( ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterCooling ) || ( VentSlab( Item ).CCoil_PlantTypeNum == TypeOf_CoilWaterDetailedFlatCooling ) ) {
+				rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, InitConvTemp, PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+				VentSlab( Item ).MaxColdWaterFlow = rho * VentSlab( Item ).MaxVolColdWaterFlow;
+				VentSlab( Item ).MinColdWaterFlow = rho * VentSlab( Item ).MinVolColdWaterFlow;
+				InitComponentNodes( VentSlab( Item ).MinColdWaterFlow, VentSlab( Item ).MaxColdWaterFlow, VentSlab( Item ).ColdControlNode, VentSlab( Item ).ColdCoilOutNodeNum, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum, VentSlab( Item ).CWCompNum );
+			 }
+		  }
 
-			MyEnvrnFlag( Item ) = false;
+		  MyEnvrnFlag( Item ) = false;
 
 		} // ...end start of environment inits
 
 		if ( ! BeginEnvrnFlag ) {
 
-			MyEnvrnFlag( Item ) = true;
+		  MyEnvrnFlag( Item ) = true;
 		}
 
 		// These initializations are done every iteration...
@@ -1350,28 +1350,28 @@ namespace VentilatedSlab {
 
 		// These initializations only need to be done once at the start of the iterations...
 		if ( BeginTimeStepFlag && FirstHVACIteration ) {
-			// Initialize the outside air conditions...
-			Node( OutsideAirNode ).Temp = Node( OutsideAirNode ).OutAirDryBulb;
-			Node( OutsideAirNode ).HumRat = OutHumRat;
-			Node( OutsideAirNode ).Press = OutBaroPress;
+		  // Initialize the outside air conditions...
+		  Node( OutsideAirNode ).Temp = Node( OutsideAirNode ).OutAirDryBulb;
+		  Node( OutsideAirNode ).HumRat = OutHumRat;
+		  Node( OutsideAirNode ).Press = OutBaroPress;
 
-			// The first pass through in a particular time step
-			ZoneNum = VentSlab( Item ).ZonePtr;
-			ZeroSourceSumHATsurf( ZoneNum ) = SumHATsurf( ZoneNum ); // Set this to figure what part of the load the radiant system meets
-			for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-				SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-				QRadSysSrcAvg( SurfNum ) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
-				LastQRadSysSrc( SurfNum ) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-				LastSysTimeElapsed( SurfNum ) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-				LastTimeStepSys( SurfNum ) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
-			}
+		  // The first pass through in a particular time step
+		  ZoneNum = VentSlab( Item ).ZonePtr;
+		  ZeroSourceSumHATsurf( ZoneNum ) = SumHATsurf( ZoneNum ); // Set this to figure what part of the load the radiant system meets
+		  for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+			 SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+			 QRadSysSrcAvg( SurfNum ) = 0.0; // Initialize this variable to zero (radiant system defaults to off)
+			 LastQRadSysSrc( SurfNum ) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+			 LastSysTimeElapsed( SurfNum ) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+			 LastTimeStepSys( SurfNum ) = 0.0; // At the start of a time step, reset to zero so average calculation can begin again
+		  }
 		}
 
-	}
+	 }
 
-	void
-	SizeVentilatedSlab( int const Item )
-	{
+	 void
+	 SizeVentilatedSlab( int const Item )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Young Tae Chae, Rick Strand
@@ -1502,493 +1502,493 @@ namespace VentilatedSlab {
 		DataZoneNumber = VentSlab( Item ).ZonePtr;
 
 		if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
-			zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
-			// N1 , \field Maximum Supply Air Flow Rate
-			FieldNum = 1;
-			PrintFlag = true;
-			SizingString = VentSlabNumericFields( Item ).FieldNames( FieldNum ) + " [m3/s]";
-			if ( ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod > 0 ) {
-				SizingMethod = CoolingAirflowSizing;
-				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
-				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
-				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
-						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-						}
-						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
-						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
-						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
-						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-						TempSize = AutoSize;
-						DataScalableSizingON = true;
-					} else {
-						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					}
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					CoolingAirVolFlowScalable = TempSize;
+		  zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
+		  // N1 , \field Maximum Supply Air Flow Rate
+		  FieldNum = 1;
+		  PrintFlag = true;
+		  SizingString = VentSlabNumericFields( Item ).FieldNames( FieldNum ) + " [m3/s]";
+		  if ( ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod > 0 ) {
+			 SizingMethod = CoolingAirflowSizing;
+			 SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
+			 ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+			 if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
+				if ( SAFMethod == SupplyAirFlowRate ){
+				  if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
+					 ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+					 ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+				  }
+				  TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+				} else if ( SAFMethod == FlowPerFloorArea ){
+				  ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+				  ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+				  TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+				  DataScalableSizingON = true;
+				} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+				  DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+				  TempSize = AutoSize;
+				  DataScalableSizingON = true;
+				} else {
+				  TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+				}
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				CoolingAirVolFlowScalable = TempSize;
 
-				} else if ( SAFMethod == FlowPerCoolingCapacity ) {
-					SizingMethod = CoolingCapacitySizing;
-					TempSize = AutoSize;
-					PrintFlag = false;
-					DataScalableSizingON = true;
-					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					DataAutosizedCoolingCapacity = TempSize;
-					DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
-					SizingMethod = CoolingAirflowSizing;
-					PrintFlag = true;
-					TempSize = AutoSize;
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					CoolingAirVolFlowScalable = TempSize;
+			 } else if ( SAFMethod == FlowPerCoolingCapacity ) {
+				SizingMethod = CoolingCapacitySizing;
+				TempSize = AutoSize;
+				PrintFlag = false;
+				DataScalableSizingON = true;
+				DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				DataAutosizedCoolingCapacity = TempSize;
+				DataFlowPerCoolingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
+				SizingMethod = CoolingAirflowSizing;
+				PrintFlag = true;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				CoolingAirVolFlowScalable = TempSize;
+			 }
+		  }
+		  if ( ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod > 0 )	{
+			 SizingMethod = HeatingAirflowSizing;
+			 SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
+			 ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
+			 if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
+				if ( SAFMethod == SupplyAirFlowRate ){
+				  if ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
+					 ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+					 ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+				  }
+				  TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+				} else if ( SAFMethod == FlowPerFloorArea ){
+				  ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
+				  ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
+				  TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
+				  DataScalableSizingON = true;
+				} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
+				  DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
+				  TempSize = AutoSize;
+				  DataScalableSizingON = true;
+				} else {
+				  TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 				}
-			}
-			if ( ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod > 0 )	{
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				HeatingAirVolFlowScalable = TempSize;
+			 } else if ( SAFMethod == FlowPerHeatingCapacity ) {
+				SizingMethod = HeatingCapacitySizing;
+				TempSize = AutoSize;
+				PrintFlag = false;
+				DataScalableSizingON = true;
+				DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				DataAutosizedHeatingCapacity = TempSize;
+				DataFlowPerHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
 				SizingMethod = HeatingAirflowSizing;
-				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingSAFMethod;
-				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
-				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedHeatingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
-						if ( ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow > 0.0 ) {
-							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-						}
-						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					} else if ( SAFMethod == FlowPerFloorArea ){
-						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
-						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow * Zone( DataZoneNumber ).FloorArea;
-						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
-						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedHeatingAirflow ){
-						DataFracOfAutosizedHeatingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-						TempSize = AutoSize;
-						DataScalableSizingON = true;
-					} else {
-						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					}
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					HeatingAirVolFlowScalable = TempSize;
-				} else if ( SAFMethod == FlowPerHeatingCapacity ) {
-					SizingMethod = HeatingCapacitySizing;
-					TempSize = AutoSize;
-					PrintFlag = false;
-					DataScalableSizingON = true;
-					DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					DataAutosizedHeatingCapacity = TempSize;
-					DataFlowPerHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).MaxHeatAirVolFlow;
-					SizingMethod = HeatingAirflowSizing;
-					PrintFlag = true;
-					TempSize = AutoSize;
-					RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-					HeatingAirVolFlowScalable = TempSize;
-				}
-			}
-			//DataScalableSizingON = false;
-			VentSlab( Item ).MaxAirVolFlow = max( CoolingAirVolFlowScalable, HeatingAirVolFlowScalable );
+				PrintFlag = true;
+				TempSize = AutoSize;
+				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+				HeatingAirVolFlowScalable = TempSize;
+			 }
+		  }
+		  //DataScalableSizingON = false;
+		  VentSlab( Item ).MaxAirVolFlow = max( CoolingAirVolFlowScalable, HeatingAirVolFlowScalable );
 		} else {
-			// no scalble sizing method has been specified. Sizing proceeds using the method
-			// specified in the zoneHVAC object
-			// N1 , \field Maximum Supply Air Flow Rate
-			SizingMethod = SystemAirflowSizing;
-			FieldNum = 1;
-			PrintFlag = true;
-			SizingString = VentSlabNumericFields( Item ).FieldNames( FieldNum ) + " [m3/s]";
-			TempSize = VentSlab( Item ).MaxAirVolFlow;
-			RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-			VentSlab( Item ).MaxAirVolFlow = TempSize;
+		  // no scalble sizing method has been specified. Sizing proceeds using the method
+		  // specified in the zoneHVAC object 
+		  // N1 , \field Maximum Supply Air Flow Rate
+		  SizingMethod = SystemAirflowSizing;
+		  FieldNum = 1;
+		  PrintFlag = true;
+		  SizingString = VentSlabNumericFields( Item ).FieldNames( FieldNum ) + " [m3/s]";
+		  TempSize = VentSlab( Item ).MaxAirVolFlow;
+		  RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+		  VentSlab( Item ).MaxAirVolFlow = TempSize;
 		}
 
 		IsAutoSize = false;
 		if ( VentSlab( Item ).OutAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
+		  IsAutoSize = true;
 		}
 		if ( CurZoneEqNum > 0 ) {
-			if ( !IsAutoSize && !ZoneSizingRunDone ) {
-				if ( VentSlab( Item ).OutAirVolFlow > 0.0 ) {
-					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", VentSlab( Item ).OutAirVolFlow );
+		  if ( !IsAutoSize && !ZoneSizingRunDone ) {
+			 if ( VentSlab( Item ).OutAirVolFlow > 0.0 ) {
+				ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", VentSlab( Item ).OutAirVolFlow );
+			 }
+		  } else { // Autosize or hard-size with sizing run
+			 CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
+			 OutAirVolFlowDes = VentSlab( Item ).MaxAirVolFlow;
+			 if ( IsAutoSize ) {
+				VentSlab( Item ).OutAirVolFlow = OutAirVolFlowDes;
+				ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes );
+			 } else {
+				if ( VentSlab( Item ).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0 ) {
+				  OutAirVolFlowUser = VentSlab( Item ).OutAirVolFlow;
+				  ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
+				  if ( DisplayExtraWarnings ) {
+					 if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+						ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+						ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+					 }
+				  }
 				}
-			} else { // Autosize or hard-size with sizing run
-				CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
-				OutAirVolFlowDes = VentSlab( Item ).MaxAirVolFlow;
-				if ( IsAutoSize ) {
-					VentSlab( Item ).OutAirVolFlow = OutAirVolFlowDes;
-					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes );
-				} else {
-					if ( VentSlab( Item ).OutAirVolFlow > 0.0 && OutAirVolFlowDes > 0.0 ) {
-						OutAirVolFlowUser = VentSlab( Item ).OutAirVolFlow;
-						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowDes, "User-Specified Maximum Outdoor Air Flow Rate [m3/s]", OutAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( OutAirVolFlowDes - OutAirVolFlowUser ) / OutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
-								ShowContinueError( "User-Specified Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Outdoor Air Flow Rate of " + RoundSigDigits( OutAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
-				}
-			}
+			 }
+		  }
 		}
 
 		IsAutoSize = false;
 		if ( VentSlab( Item ).MinOutAirVolFlow == AutoSize ) {
-			IsAutoSize = true;
+		  IsAutoSize = true;
 		}
 		if ( CurZoneEqNum > 0 ) {
-			if ( !IsAutoSize && !ZoneSizingRunDone ) {
-				if ( VentSlab( Item ).MinOutAirVolFlow > 0.0 ) {
-					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", VentSlab( Item ).MinOutAirVolFlow );
+		  if ( !IsAutoSize && !ZoneSizingRunDone ) {
+			 if ( VentSlab( Item ).MinOutAirVolFlow > 0.0 ) {
+				ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", VentSlab( Item ).MinOutAirVolFlow );
+			 }
+		  } else {
+			 CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
+			 MinOutAirVolFlowDes = min( FinalZoneSizing( CurZoneEqNum ).MinOA, VentSlab( Item ).MaxAirVolFlow );
+			 if ( MinOutAirVolFlowDes < SmallAirVolFlow ) {
+				MinOutAirVolFlowDes = 0.0;
+			 }
+			 if ( IsAutoSize ) {
+				VentSlab( Item ).MinOutAirVolFlow = MinOutAirVolFlowDes;
+				ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes );
+			 } else { // Hard-size with sizing data
+				if ( VentSlab( Item ).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0 ) {
+				  MinOutAirVolFlowUser = VentSlab( Item ).MinOutAirVolFlow;
+				  ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowUser );
+				  if ( DisplayExtraWarnings ) {
+					 if ( ( std::abs( MinOutAirVolFlowDes - MinOutAirVolFlowUser ) / MinOutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
+						ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+						ShowContinueError( "User-Specified Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from Design Size Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+					 }
+				  }
 				}
-			} else {
-				CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
-				MinOutAirVolFlowDes = min( FinalZoneSizing( CurZoneEqNum ).MinOA, VentSlab( Item ).MaxAirVolFlow );
-				if ( MinOutAirVolFlowDes < SmallAirVolFlow ) {
-					MinOutAirVolFlowDes = 0.0;
-				}
-				if ( IsAutoSize ) {
-					VentSlab( Item ).MinOutAirVolFlow = MinOutAirVolFlowDes;
-					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes );
-				} else { // Hard-size with sizing data
-					if ( VentSlab( Item ).MinOutAirVolFlow > 0.0 && MinOutAirVolFlowDes > 0.0 ) {
-						MinOutAirVolFlowUser = VentSlab( Item ).MinOutAirVolFlow;
-						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowDes, "User-Specified Minimum Outdoor Air Flow Rate [m3/s]", MinOutAirVolFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MinOutAirVolFlowDes - MinOutAirVolFlowUser ) / MinOutAirVolFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
-								ShowContinueError( "User-Specified Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Minimum Outdoor Air Flow Rate of " + RoundSigDigits( MinOutAirVolFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
-				}
-			}
+			 }
+		  }
 		}
 
 		IsAutoSize = false;
 		if ( VentSlab( Item ).MaxVolHotWaterFlow == AutoSize ) {
-			IsAutoSize = true;
+		  IsAutoSize = true;
 		}
 		if ( VentSlab( Item ).HCoilType == Heating_WaterCoilType ) {
 
-			if ( CurZoneEqNum > 0 ) {
-				if ( !IsAutoSize && !ZoneSizingRunDone ) {
-					if ( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 ) {
-						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Hot Water Flow [m3/s]", VentSlab( Item ).MaxVolHotWaterFlow );
-					}
-				} else { // Autosize or hard-size with sizing run
-					CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
-
-					CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
-					CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
-					if ( IsAutoSize ) {
-						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", VentSlab( Item ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-						//END IF
-						if ( PltSizHeatNum > 0 ) {
-							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-								SizingMethod = HeatingCapacitySizing;
-								if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
-									zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
-									CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
-									ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-									if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-										if ( CapSizingMethod == HeatingDesignCapacity ){
-											if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
-												ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-												ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-											} else {
-												DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-											}
-											TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-										} else if ( CapSizingMethod == CapacityPerFloorArea ){
-											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
-											DataScalableCapSizingON = true;
-										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
-											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-											TempSize = AutoSize;
-											DataScalableCapSizingON = true;
-										}
-									}
-									SizingString = "";
-									PrintFlag = false;
-									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-									DesCoilLoad = TempSize;
-								} else {
-									SizingString = "";
-									PrintFlag = false;
-									TempSize = AutoSize;
-									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-									DesCoilLoad = TempSize;
-								}
-								rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
-								MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
-							} else {
-								MaxVolHotWaterFlowDes = 0.0;
-							}
-						} else {
-							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
-							ErrorsFound = true;
-						}
-					}
-
-					if ( IsAutoSize ) {
-						VentSlab( Item ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
-						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes );
-					} else { // Hard-size with sizing data
-						if ( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
-							MaxVolHotWaterFlowUser = VentSlab( Item ).MaxVolHotWaterFlow;
-							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowUser );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser ) / MaxVolHotWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
-									ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) + " [m3/s]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+		  if ( CurZoneEqNum > 0 ) {
+			 if ( !IsAutoSize && !ZoneSizingRunDone ) {
+				if ( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 ) {
+				  ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Hot Water Flow [m3/s]", VentSlab( Item ).MaxVolHotWaterFlow );
 				}
-			}
+			 } else { // Autosize or hard-size with sizing run
+				CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
+
+				CoilWaterInletNode = GetCoilWaterInletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
+				CoilWaterOutletNode = GetCoilWaterOutletNode( "Coil:Heating:Water", VentSlab( Item ).HCoilName, ErrorsFound );
+				if ( IsAutoSize ) {
+				  PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Water", VentSlab( Item ).HCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
+				  //END IF
+				  if ( PltSizHeatNum > 0 ) {
+					 if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+						SizingMethod = HeatingCapacitySizing;
+						if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
+						  zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
+						  CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
+						  ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+						  if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+							 if ( CapSizingMethod == HeatingDesignCapacity ){
+								if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
+								  ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+								  ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+								} else {
+								  DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+								}
+								TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+							 } else if ( CapSizingMethod == CapacityPerFloorArea ){
+								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+								DataScalableCapSizingON = true;
+							 } else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+								DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+								DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+								TempSize = AutoSize;
+								DataScalableCapSizingON = true;
+							 }
+						  }
+						  SizingString = "";
+						  PrintFlag = false;
+						  RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						  DesCoilLoad = TempSize;
+						} else {
+						  SizingString = "";
+						  PrintFlag = false;
+						  TempSize = AutoSize;
+						  RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						  DesCoilLoad = TempSize;
+						}
+						rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+						Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).HWLoopNum ).FluidName, 60., PlantLoop( VentSlab( Item ).HWLoopNum ).FluidIndex, RoutineName );
+						MaxVolHotWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho );
+					 } else {
+						MaxVolHotWaterFlowDes = 0.0;
+					 }
+				  } else {
+					 ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
+					 ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
+					 ErrorsFound = true;
+				  }
+				}
+
+				if ( IsAutoSize ) {
+				  VentSlab( Item ).MaxVolHotWaterFlow = MaxVolHotWaterFlowDes;
+				  ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes );
+				} else { // Hard-size with sizing data
+				  if ( VentSlab( Item ).MaxVolHotWaterFlow > 0.0 && MaxVolHotWaterFlowDes > 0.0 ) {
+					 MaxVolHotWaterFlowUser = VentSlab( Item ).MaxVolHotWaterFlow;
+					 ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowDes, "User-Specified Maximum Hot Water Flow [m3/s]", MaxVolHotWaterFlowUser );
+					 if ( DisplayExtraWarnings ) {
+						if ( ( std::abs( MaxVolHotWaterFlowDes - MaxVolHotWaterFlowUser ) / MaxVolHotWaterFlowUser ) > AutoVsHardSizingThreshold ) {
+						  ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+						  ShowContinueError( "User-Specified Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowUser, 5 ) + " [m3/s]" );
+						  ShowContinueError( "differs from Design Size Maximum Hot Water Flow of " + RoundSigDigits( MaxVolHotWaterFlowDes, 5 ) + " [m3/s]" );
+						  ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+						  ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					 }
+				  }
+				}
+			 }
+		  }
 		} else {
-			VentSlab( Item ).MaxVolHotWaterFlow = 0.0;
+		  VentSlab( Item ).MaxVolHotWaterFlow = 0.0;
 		}
 
 		IsAutoSize = false;
 		if ( VentSlab( Item ).MaxVolHotSteamFlow == AutoSize ) {
-			IsAutoSize = true;
+		  IsAutoSize = true;
 		}
 		if ( VentSlab( Item ).HCoilType == Heating_SteamCoilType ) {
 
-			if ( CurZoneEqNum > 0 ) {
-				if ( !IsAutoSize && !ZoneSizingRunDone ) {
-					if ( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 ) {
-						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Steam Flow [m3/s]", VentSlab( Item ).MaxVolHotSteamFlow );
-					}
-				} else { // Autosize or hard-size with sizing run
-					CheckZoneSizing( "ZoneHVAC:VentilatedSlab", VentSlab( Item ).Name );
-
-					CoilSteamInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
-					CoilSteamOutletNode = GetCoilSteamOutletNode( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
-					if ( IsAutoSize ) {
-						PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound );
-						if ( PltSizHeatNum > 0 ) {
-							if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
-								SizingMethod = HeatingCapacitySizing;
-								if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
-									zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
-									CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
-									ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-									if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
-										if ( CapSizingMethod == HeatingDesignCapacity ){
-											if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
-												ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-												ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-											} else {
-												DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-											}
-											TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-										} else if ( CapSizingMethod == CapacityPerFloorArea ){
-											ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
-											ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
-											DataScalableCapSizingON = true;
-										} else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
-											DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
-											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
-											TempSize = AutoSize;
-											DataScalableCapSizingON = true;
-										}
-									}
-									SizingString = "";
-									PrintFlag = false;
-									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-									DesCoilLoad = TempSize;
-								} else {
-									SizingString = "";
-									PrintFlag = false;
-									TempSize = AutoSize;
-									RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-									DesCoilLoad = TempSize;
-								}
-								TempSteamIn = 100.00;
-								EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
-								EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
-								LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
-								SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
-								Cp = GetSpecificHeatGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
-								rho = GetDensityGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
-								MaxVolHotSteamFlowDes = DesCoilLoad / ( ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho ) + SteamDensity * LatentHeatSteam );
-							} else {
-								MaxVolHotSteamFlowDes = 0.0;
-							}
-						} else {
-							ShowSevereError( "Autosizing of Steam flow requires a heating loop Sizing:Plant object" );
-							ShowContinueError( "Occurs in " "ZoneHVAC:VentilatedSlab" " Object=" + VentSlab( Item ).Name );
-							ErrorsFound = true;
-						}
-					}
-					if ( IsAutoSize ) {
-						VentSlab( Item ).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
-						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes );
-					} else {
-						if ( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0 ) {
-							MaxVolHotSteamFlowUser = VentSlab( Item ).MaxVolHotSteamFlow;
-							ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser );
-							if ( DisplayExtraWarnings ) {
-								if ( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
-									ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
-									ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) + " [m3/s]" );
-									ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) + " [m3/s]" );
-									ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-									ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-								}
-							}
-						}
-					}
+		  if ( CurZoneEqNum > 0 ) {
+			 if ( !IsAutoSize && !ZoneSizingRunDone ) {
+				if ( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 ) {
+				  ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Steam Flow [m3/s]", VentSlab( Item ).MaxVolHotSteamFlow );
 				}
-			}
+			 } else { // Autosize or hard-size with sizing run
+				CheckZoneSizing( "ZoneHVAC:VentilatedSlab", VentSlab( Item ).Name );
+
+				CoilSteamInletNode = GetCoilSteamInletNode( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
+				CoilSteamOutletNode = GetCoilSteamOutletNode( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, ErrorsFound );
+				if ( IsAutoSize ) {
+				  PltSizHeatNum = MyPlantSizingIndex( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, CoilSteamInletNode, CoilSteamOutletNode, ErrorsFound );
+				  if ( PltSizHeatNum > 0 ) {
+					 if ( FinalZoneSizing( CurZoneEqNum ).DesHeatMassFlow >= SmallAirVolFlow ) {
+						SizingMethod = HeatingCapacitySizing;
+						if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
+						  zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
+						  CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).HeatingCapMethod;
+						  ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+						  if ( CapSizingMethod == HeatingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedHeatingCapacity ) {
+							 if ( CapSizingMethod == HeatingDesignCapacity ){
+								if ( ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity > 0.0 ) {
+								  ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+								  ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+								} else {
+								  DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+								}
+								TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+							 } else if ( CapSizingMethod == CapacityPerFloorArea ){
+								ZoneEqSizing( CurZoneEqNum ).HeatingCapacity = true;
+								ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity * Zone( DataZoneNumber ).FloorArea;
+								DataScalableCapSizingON = true;
+							 } else if ( CapSizingMethod == FractionOfAutosizedHeatingCapacity ){
+								DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledHeatingCapacity;
+								DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow;
+								TempSize = AutoSize;
+								DataScalableCapSizingON = true;
+							 }
+						  }
+						  SizingString = "";
+						  PrintFlag = false;
+						  RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						  DesCoilLoad = TempSize;
+						} else {
+						  SizingString = "";
+						  PrintFlag = false;
+						  TempSize = AutoSize;
+						  RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						  DesCoilLoad = TempSize;
+						}
+						TempSteamIn = 100.00;
+						EnthSteamInDry = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
+						EnthSteamOutWet = GetSatEnthalpyRefrig( fluidNameSteam, TempSteamIn, 0.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
+						LatentHeatSteam = EnthSteamInDry - EnthSteamOutWet;
+						SteamDensity = GetSatDensityRefrig( fluidNameSteam, TempSteamIn, 1.0, VentSlab( Item ).HCoil_FluidIndex, RoutineName );
+						Cp = GetSpecificHeatGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
+						rho = GetDensityGlycol( fluidNameWater, 60.0, DummyWaterIndex, RoutineName );
+						MaxVolHotSteamFlowDes = DesCoilLoad / ( ( PlantSizData( PltSizHeatNum ).DeltaT * Cp * rho ) + SteamDensity * LatentHeatSteam );
+					 } else {
+						MaxVolHotSteamFlowDes = 0.0;
+					 }
+				  } else {
+					 ShowSevereError( "Autosizing of Steam flow requires a heating loop Sizing:Plant object" );
+					 ShowContinueError( "Occurs in " "ZoneHVAC:VentilatedSlab" " Object=" + VentSlab( Item ).Name );
+					 ErrorsFound = true;
+				  }
+				}
+				if ( IsAutoSize ) {
+				  VentSlab( Item ).MaxVolHotSteamFlow = MaxVolHotSteamFlowDes;
+				  ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes );
+				} else {
+				  if ( VentSlab( Item ).MaxVolHotSteamFlow > 0.0 && MaxVolHotSteamFlowDes > 0.0 ) {
+					 MaxVolHotSteamFlowUser = VentSlab( Item ).MaxVolHotSteamFlow;
+					 ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowDes, "User-Specified Maximum Steam Flow [m3/s]", MaxVolHotSteamFlowUser );
+					 if ( DisplayExtraWarnings ) {
+						if ( ( std::abs( MaxVolHotSteamFlowDes - MaxVolHotSteamFlowUser ) / MaxVolHotSteamFlowUser ) > AutoVsHardSizingThreshold ) {
+						  ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+						  ShowContinueError( "User-Specified Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowUser, 5 ) + " [m3/s]" );
+						  ShowContinueError( "differs from Design Size Maximum Steam Flow of " + RoundSigDigits( MaxVolHotSteamFlowDes, 5 ) + " [m3/s]" );
+						  ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+						  ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					 }
+				  }
+				}
+			 }
+		  }
 		} else {
-			VentSlab( Item ).MaxVolHotSteamFlow = 0.0;
+		  VentSlab( Item ).MaxVolHotSteamFlow = 0.0;
 		}
 
 		IsAutoSize = false;
 		if ( VentSlab( Item ).MaxVolColdWaterFlow == AutoSize ) {
-			IsAutoSize = true;
+		  IsAutoSize = true;
 		}
 		if ( CurZoneEqNum > 0 ) {
-			if ( !IsAutoSize && !ZoneSizingRunDone ) {
-				if ( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 ) {
-					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", VentSlab( Item ).MaxVolColdWaterFlow );
-				}
-			} else {
-				CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
-				if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
-					CoolingCoilName = GetHXDXCoilName( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
-					CoolingCoilType = GetHXCoilType( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
-				} else {
-					CoolingCoilName = VentSlab( Item ).CCoilName;
-					CoolingCoilType = VentSlab( Item ).CCoilTypeCh;
-				}
-				CoilWaterInletNode = GetCoilWaterInletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
-				CoilWaterOutletNode = GetCoilWaterOutletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
-				if ( IsAutoSize ) {
-					PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
-					if ( PltSizCoolNum > 0 ) {
-						if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
-							SizingMethod = CoolingCapacitySizing;
-							if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
-								zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
-								CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
-								ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
-								if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
-									if ( CapSizingMethod == CoolingDesignCapacity ){
-										if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
-											ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-											ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-										} else {
-											DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-										}
-										TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-									} else if ( CapSizingMethod == CapacityPerFloorArea ){
-										ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
-										ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
-										DataScalableCapSizingON = true;
-									} else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
-										DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
-										DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-										TempSize = AutoSize;
-										DataScalableCapSizingON = true;
-									}
-								}
-								SizingString = "";
-								PrintFlag = false;
-								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-								DesCoilLoad = TempSize;
-							} else {
-								SizingString = "";
-								PrintFlag = false;
-								TempSize = AutoSize;
+		  if ( !IsAutoSize && !ZoneSizingRunDone ) {
+			 if ( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 ) {
+				ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "User-Specified Maximum Cold Water Flow [m3/s]", VentSlab( Item ).MaxVolColdWaterFlow );
+			 }
+		  } else {
+			 CheckZoneSizing( cMO_VentilatedSlab, VentSlab( Item ).Name );
+			 if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
+				CoolingCoilName = GetHXDXCoilName( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
+				CoolingCoilType = GetHXCoilType( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
+			 } else {
+				CoolingCoilName = VentSlab( Item ).CCoilName;
+				CoolingCoilType = VentSlab( Item ).CCoilTypeCh;
+			 }
+			 CoilWaterInletNode = GetCoilWaterInletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
+			 CoilWaterOutletNode = GetCoilWaterOutletNode( CoolingCoilType, CoolingCoilName, ErrorsFound );
+			 if ( IsAutoSize ) {
+				PltSizCoolNum = MyPlantSizingIndex( CoolingCoilType, CoolingCoilName, CoilWaterInletNode, CoilWaterOutletNode, ErrorsFound );
+				if ( PltSizCoolNum > 0 ) {
+				  if ( FinalZoneSizing( CurZoneEqNum ).DesCoolMassFlow >= SmallAirVolFlow ) {
+					 SizingMethod = CoolingCapacitySizing;
+					 if ( VentSlab( Item ).HVACSizingIndex > 0 ) {
+						zoneHVACIndex = VentSlab( Item ).HVACSizingIndex;
+						CapSizingMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingCapMethod;
+						ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = CapSizingMethod;
+						if ( CapSizingMethod == CoolingDesignCapacity || CapSizingMethod == CapacityPerFloorArea || CapSizingMethod == FractionOfAutosizedCoolingCapacity ) {
+						  if ( CapSizingMethod == CoolingDesignCapacity ){
+							 if ( ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity > 0.0 ) {
+								ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+								ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+							 } else {
 								DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
-								RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
-								DesCoilLoad = TempSize;
-							}
-							rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-							Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
-							MaxVolColdWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
-						} else {
-							MaxVolColdWaterFlowDes = 0.0;
+							 }
+							 TempSize = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+						  } else if ( CapSizingMethod == CapacityPerFloorArea ){
+							 ZoneEqSizing( CurZoneEqNum ).CoolingCapacity = true;
+							 ZoneEqSizing( CurZoneEqNum ).DesCoolingLoad = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity * Zone( DataZoneNumber ).FloorArea;
+							 DataScalableCapSizingON = true;
+						  } else if ( CapSizingMethod == FractionOfAutosizedCoolingCapacity ){
+							 DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing( zoneHVACIndex ).ScaledCoolingCapacity;
+							 DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+							 TempSize = AutoSize;
+							 DataScalableCapSizingON = true;
+						  }
 						}
-					} else {
-						ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
-						ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
-						ErrorsFound = true;
-					}
-				}
-				if ( IsAutoSize ) {
-					VentSlab( Item ).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
-					ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes );
+						SizingString = "";
+						PrintFlag = false;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					 } else {
+						SizingString = "";
+						PrintFlag = false;
+						TempSize = AutoSize;
+						DataFlowUsedForSizing = FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow;
+						RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+						DesCoilLoad = TempSize;
+					 }
+					 rho = GetDensityGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+					 Cp = GetSpecificHeatGlycol( PlantLoop( VentSlab( Item ).CWLoopNum ).FluidName, 5., PlantLoop( VentSlab( Item ).CWLoopNum ).FluidIndex, RoutineName );
+					 MaxVolColdWaterFlowDes = DesCoilLoad / ( PlantSizData( PltSizCoolNum ).DeltaT * Cp * rho );
+				  } else {
+					 MaxVolColdWaterFlowDes = 0.0;
+				  }
 				} else {
-					if ( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0 ) {
-						MaxVolColdWaterFlowUser = VentSlab( Item ).MaxVolColdWaterFlow;
-						ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowUser );
-						if ( DisplayExtraWarnings ) {
-							if ( ( std::abs( MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser ) / MaxVolColdWaterFlowUser ) > AutoVsHardSizingThreshold ) {
-								ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
-								ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowUser, 5 ) + " [m3/s]" );
-								ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowDes, 5 ) + " [m3/s]" );
-								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
-								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
-							}
-						}
-					}
+				  ShowSevereError( "Autosizing of water flow requires a cooling loop Sizing:Plant object" );
+				  ShowContinueError( "Occurs in " + cMO_VentilatedSlab + " Object=" + VentSlab( Item ).Name );
+				  ErrorsFound = true;
 				}
-			}
+			 }
+			 if ( IsAutoSize ) {
+				VentSlab( Item ).MaxVolColdWaterFlow = MaxVolColdWaterFlowDes;
+				ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes );
+			 } else {
+				if ( VentSlab( Item ).MaxVolColdWaterFlow > 0.0 && MaxVolColdWaterFlowDes > 0.0 ) {
+				  MaxVolColdWaterFlowUser = VentSlab( Item ).MaxVolColdWaterFlow;
+				  ReportSizingOutput( cMO_VentilatedSlab, VentSlab( Item ).Name, "Design Size Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowDes, "User-Specified Maximum Cold Water Flow [m3/s]", MaxVolColdWaterFlowUser );
+				  if ( DisplayExtraWarnings ) {
+					 if ( ( std::abs( MaxVolColdWaterFlowDes - MaxVolColdWaterFlowUser ) / MaxVolColdWaterFlowUser ) > AutoVsHardSizingThreshold ) {
+						ShowMessage( "SizeVentilatedSlab: Potential issue with equipment sizing for ZoneHVAC:VentilatedSlab = \" " + VentSlab( Item ).Name + "\"." );
+						ShowContinueError( "User-Specified Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowUser, 5 ) + " [m3/s]" );
+						ShowContinueError( "differs from Design Size Maximum Cold Water Flow of " + RoundSigDigits( MaxVolColdWaterFlowDes, 5 ) + " [m3/s]" );
+						ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+						ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+					 }
+				  }
+				}
+			 }
+		  }
 		}
 
 		if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
-			CoolingCoilName = GetHXDXCoilName( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
-			CoolingCoilType = GetHXCoilType( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
+		  CoolingCoilName = GetHXDXCoilName( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
+		  CoolingCoilType = GetHXCoilType( VentSlab( Item ).CCoilTypeCh, VentSlab( Item ).CCoilName, ErrorsFound );
 		} else {
-			CoolingCoilName = VentSlab( Item ).CCoilName;
-			CoolingCoilType = VentSlab( Item ).CCoilTypeCh;
+		  CoolingCoilName = VentSlab( Item ).CCoilName;
+		  CoolingCoilType = VentSlab( Item ).CCoilTypeCh;
 		}
 		SetCoilDesFlow( CoolingCoilType, CoolingCoilName, VentSlab( Item ).MaxAirVolFlow, ErrorsFound );
 		SetCoilDesFlow( VentSlab( Item ).HCoilTypeCh, VentSlab( Item ).HCoilName, VentSlab( Item ).MaxAirVolFlow, ErrorsFound );
 
 		if ( CurZoneEqNum > 0 ) {
-			ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow = VentSlab( Item ).MaxVolHotWaterFlow;
-			ZoneEqSizing( CurZoneEqNum ).MaxCWVolFlow = VentSlab( Item ).MaxVolColdWaterFlow;
+		  ZoneEqSizing( CurZoneEqNum ).MaxHWVolFlow = VentSlab( Item ).MaxVolHotWaterFlow;
+		  ZoneEqSizing( CurZoneEqNum ).MaxCWVolFlow = VentSlab( Item ).MaxVolColdWaterFlow;
 		}
 
 		if ( ErrorsFound ) {
-			ShowFatalError( "Preceding sizing errors cause program termination" );
+		  ShowFatalError( "Preceding sizing errors cause program termination" );
 		}
 
-	}
+	 }
 
-	void
-	CalcVentilatedSlab(
-		int & Item, // number of the current ventilated slab being simulated
-		int const ZoneNum, // number of zone being served
-		bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
-		Real64 & PowerMet, // power supplied (W)
-		Real64 & LatOutputProvided // latent capacity supplied (kg/s)
-	)
-	{
+	 void
+	 CalcVentilatedSlab(
+							  int & Item, // number of the current ventilated slab being simulated
+							  int const ZoneNum, // number of zone being served
+							  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+							  Real64 & PowerMet, // power supplied (W)
+							  Real64 & LatOutputProvided // latent capacity supplied (kg/s)
+							  )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Young Tae Chae, Rick Strand
@@ -2120,64 +2120,64 @@ namespace VentilatedSlab {
 		static std::string const CurrentModuleObject( "ZoneHVAC:VentilatedSlab" );
 
 		{ auto const SELECT_CASE_var( VentSlab( Item ).CoilOption );
-		if ( SELECT_CASE_var == BothOption ) {
+		  if ( SELECT_CASE_var == BothOption ) {
 
-			{ auto const SELECT_CASE_var1( VentSlab( Item ).HCoilType );
+			 { auto const SELECT_CASE_var1( VentSlab( Item ).HCoilType );
 
-			if ( SELECT_CASE_var1 == Heating_WaterCoilType ) {
-				CheckWaterCoilSchedule( "Coil:Heating:Water", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else if ( SELECT_CASE_var1 == Heating_SteamCoilType ) {
-				CheckSteamCoilSchedule( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else {
-			}}
+				if ( SELECT_CASE_var1 == Heating_WaterCoilType ) {
+				  CheckWaterCoilSchedule( "Coil:Heating:Water", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else if ( SELECT_CASE_var1 == Heating_SteamCoilType ) {
+				  CheckSteamCoilSchedule( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
+				  CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
+				  CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else {
+				}}
 
-			{ auto const SELECT_CASE_var1( VentSlab( Item ).CCoilType );
+			 { auto const SELECT_CASE_var1( VentSlab( Item ).CCoilType );
 
-			if ( SELECT_CASE_var1 == Cooling_CoilWaterCooling ) {
-				CheckWaterCoilSchedule( "Coil:Cooling:Water", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
-			} else if ( SELECT_CASE_var1 == Cooling_CoilDetailedCooling ) {
-				CheckWaterCoilSchedule( "Coil:Cooling:Water:DetailedGeometry", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
-			} else if ( SELECT_CASE_var1 == Cooling_CoilHXAssisted ) {
-				CheckHXAssistedCoolingCoilSchedule( "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
-			} else {
-			}}
+				if ( SELECT_CASE_var1 == Cooling_CoilWaterCooling ) {
+				  CheckWaterCoilSchedule( "Coil:Cooling:Water", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
+				} else if ( SELECT_CASE_var1 == Cooling_CoilDetailedCooling ) {
+				  CheckWaterCoilSchedule( "Coil:Cooling:Water:DetailedGeometry", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
+				} else if ( SELECT_CASE_var1 == Cooling_CoilHXAssisted ) {
+				  CheckHXAssistedCoolingCoilSchedule( "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
+				} else {
+				}}
 
-		} else if ( SELECT_CASE_var == HeatingOption ) {
+		  } else if ( SELECT_CASE_var == HeatingOption ) {
 
-			{ auto const SELECT_CASE_var1( VentSlab( Item ).HCoilType );
+			 { auto const SELECT_CASE_var1( VentSlab( Item ).HCoilType );
 
-			if ( SELECT_CASE_var1 == Heating_WaterCoilType ) {
-				CheckWaterCoilSchedule( "Coil:Heating:Water", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else if ( SELECT_CASE_var1 == Heating_SteamCoilType ) {
-				CheckSteamCoilSchedule( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
-				CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
-			} else {
-			}}
+				if ( SELECT_CASE_var1 == Heating_WaterCoilType ) {
+				  CheckWaterCoilSchedule( "Coil:Heating:Water", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else if ( SELECT_CASE_var1 == Heating_SteamCoilType ) {
+				  CheckSteamCoilSchedule( "Coil:Heating:Steam", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else if ( SELECT_CASE_var1 == Heating_ElectricCoilType ) {
+				  CheckHeatingCoilSchedule( "Coil:Heating:Electric", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else if ( SELECT_CASE_var1 == Heating_GasCoilType ) {
+				  CheckHeatingCoilSchedule( "Coil:Heating:Gas", VentSlab( Item ).HCoilName, VentSlab( Item ).HCoilSchedValue, VentSlab( Item ).HCoil_Index );
+				} else {
+				}}
 
-		} else if ( SELECT_CASE_var == CoolingOption ) {
+		  } else if ( SELECT_CASE_var == CoolingOption ) {
 
-			{ auto const SELECT_CASE_var1( VentSlab( Item ).CCoilType );
+			 { auto const SELECT_CASE_var1( VentSlab( Item ).CCoilType );
 
-			if ( SELECT_CASE_var1 == Cooling_CoilWaterCooling ) {
-				CheckWaterCoilSchedule( "Coil:Cooling:Water", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
-			} else if ( SELECT_CASE_var1 == Cooling_CoilDetailedCooling ) {
-				CheckWaterCoilSchedule( "Coil:Cooling:Water:DetailedGeometry", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
-			} else if ( SELECT_CASE_var1 == Cooling_CoilHXAssisted ) {
-				CheckHXAssistedCoolingCoilSchedule( "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
-			} else {
+				if ( SELECT_CASE_var1 == Cooling_CoilWaterCooling ) {
+				  CheckWaterCoilSchedule( "Coil:Cooling:Water", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
+				} else if ( SELECT_CASE_var1 == Cooling_CoilDetailedCooling ) {
+				  CheckWaterCoilSchedule( "Coil:Cooling:Water:DetailedGeometry", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
+				} else if ( SELECT_CASE_var1 == Cooling_CoilHXAssisted ) {
+				  CheckHXAssistedCoolingCoilSchedule( "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab( Item ).CCoilName, VentSlab( Item ).CCoilSchedValue, VentSlab( Item ).CCoil_Index );
+				} else {
 
-			}}
+				}}
 
-		} else if ( SELECT_CASE_var == NoneOption ) {
+		  } else if ( SELECT_CASE_var == NoneOption ) {
 
-		}}
+		  }}
 
 		// FLOW:
 
@@ -2201,25 +2201,25 @@ namespace VentilatedSlab {
 
 		// Control Type Check
 		{ auto const SELECT_CASE_var( VentSlab( Item ).ControlType );
-		if ( SELECT_CASE_var == MATControl ) {
-			SetPointTemp = MAT( ZoneNum );
-		} else if ( SELECT_CASE_var == MRTControl ) {
-			SetPointTemp = MRT( ZoneNum );
-		} else if ( SELECT_CASE_var == OPTControl ) {
-			SetPointTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
-		} else if ( SELECT_CASE_var == ODBControl ) {
-			SetPointTemp = OutDryBulbTemp;
-		} else if ( SELECT_CASE_var == OWBControl ) {
-			SetPointTemp = OutWetBulbTemp;
-		} else if ( SELECT_CASE_var == SURControl ) {
-			SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
-		} else if ( SELECT_CASE_var == DPTZControl ) {
-			SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
-		} else { // Should never get here
-			SetPointTemp = 0.0; // Suppress uninitialized warning
-			ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
-			ShowFatalError( "Preceding condition causes termination." );
-		}}
+		  if ( SELECT_CASE_var == MATControl ) {
+			 SetPointTemp = MAT( ZoneNum );
+		  } else if ( SELECT_CASE_var == MRTControl ) {
+			 SetPointTemp = MRT( ZoneNum );
+		  } else if ( SELECT_CASE_var == OPTControl ) {
+			 SetPointTemp = 0.5 * ( MAT( ZoneNum ) + MRT( ZoneNum ) );
+		  } else if ( SELECT_CASE_var == ODBControl ) {
+			 SetPointTemp = OutDryBulbTemp;
+		  } else if ( SELECT_CASE_var == OWBControl ) {
+			 SetPointTemp = OutWetBulbTemp;
+		  } else if ( SELECT_CASE_var == SURControl ) {
+			 SetPointTemp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
+		  } else if ( SELECT_CASE_var == DPTZControl ) {
+			 SetPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
+		  } else { // Should never get here
+			 SetPointTemp = 0.0; // Suppress uninitialized warning
+			 ShowSevereError( "Illegal control type in low temperature radiant system: " + VentSlab( Item ).Name );
+			 ShowFatalError( "Preceding condition causes termination." );
+		  }}
 
 		// Load Check
 
@@ -2228,495 +2228,495 @@ namespace VentilatedSlab {
 
 		if ( ( ( SetPointTemp >= AirTempHeatHi ) && ( SetPointTemp <= AirTempCoolLo ) ) || ( GetCurrentScheduleValue( VentSlab( Item ).SchedPtr ) <= 0 ) ) {
 
-			// System is off or has no load upon it; set the flow rates to zero and then
-			// simulate the components with the no flow conditions
-			Node( InletNode ).MassFlowRate = 0.0;
-			Node( InletNode ).MassFlowRateMaxAvail = 0.0;
-			Node( InletNode ).MassFlowRateMinAvail = 0.0;
-			Node( OutletNode ).MassFlowRate = 0.0;
-			Node( OutletNode ).MassFlowRateMaxAvail = 0.0;
-			Node( OutletNode ).MassFlowRateMinAvail = 0.0;
-			Node( OutsideAirNode ).MassFlowRate = 0.0;
-			Node( OutsideAirNode ).MassFlowRateMaxAvail = 0.0;
-			Node( OutsideAirNode ).MassFlowRateMinAvail = 0.0;
-			Node( AirRelNode ).MassFlowRate = 0.0;
-			Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
-			Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
-			AirMassFlow = Node( FanOutletNode ).MassFlowRate;
-			HCoilOn = false;
+		  // System is off or has no load upon it; set the flow rates to zero and then
+		  // simulate the components with the no flow conditions
+		  Node( InletNode ).MassFlowRate = 0.0;
+		  Node( InletNode ).MassFlowRateMaxAvail = 0.0;
+		  Node( InletNode ).MassFlowRateMinAvail = 0.0;
+		  Node( OutletNode ).MassFlowRate = 0.0;
+		  Node( OutletNode ).MassFlowRateMaxAvail = 0.0;
+		  Node( OutletNode ).MassFlowRateMinAvail = 0.0;
+		  Node( OutsideAirNode ).MassFlowRate = 0.0;
+		  Node( OutsideAirNode ).MassFlowRateMaxAvail = 0.0;
+		  Node( OutsideAirNode ).MassFlowRateMinAvail = 0.0;
+		  Node( AirRelNode ).MassFlowRate = 0.0;
+		  Node( AirRelNode ).MassFlowRateMaxAvail = 0.0;
+		  Node( AirRelNode ).MassFlowRateMinAvail = 0.0;
+		  AirMassFlow = Node( FanOutletNode ).MassFlowRate;
+		  HCoilOn = false;
 
-			// Node condition
-			Node( InletNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
-			Node( FanOutletNode ).Temp = Node( InletNode ).Temp;
-			Node( OutletNode ).Temp = Node( FanOutletNode ).Temp;
+		  // Node condition
+		  Node( InletNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
+		  Node( FanOutletNode ).Temp = Node( InletNode ).Temp;
+		  Node( OutletNode ).Temp = Node( FanOutletNode ).Temp;
 
-			// Node condition
-			if ( VentSlab( Item ).SysConfg == SeriesSlabs ) {
-				for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-					SlabName = VentSlab( Item ).SurfaceName( RadSurfNum );
-					MSlabIn = VentSlab( Item ).SlabIn( RadSurfNum );
-					MSlabOut = VentSlab( Item ).SlabOut( RadSurfNum );
-					VentSlab( Item ).MSlabInNode = GetOnlySingleNode( MSlabIn, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
-					VentSlab( Item ).MSlabOutNode = GetOnlySingleNode( MSlabOut, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
-					MSlabInletNode = VentSlab( Item ).MSlabInNode;
-					MSlabOutletNode = VentSlab( Item ).MSlabOutNode;
+		  // Node condition
+		  if ( VentSlab( Item ).SysConfg == SeriesSlabs ) {
+			 for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+				SlabName = VentSlab( Item ).SurfaceName( RadSurfNum );
+				MSlabIn = VentSlab( Item ).SlabIn( RadSurfNum );
+				MSlabOut = VentSlab( Item ).SlabOut( RadSurfNum );
+				VentSlab( Item ).MSlabInNode = GetOnlySingleNode( MSlabIn, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+				VentSlab( Item ).MSlabOutNode = GetOnlySingleNode( MSlabOut, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+				MSlabInletNode = VentSlab( Item ).MSlabInNode;
+				MSlabOutletNode = VentSlab( Item ).MSlabOutNode;
 
-					Node( MSlabInletNode ).Temp = Node( InletNode ).Temp;
-					Node( MSlabOutletNode ).Temp = Node( MSlabInletNode ).Temp;
-				}
-			}
+				Node( MSlabInletNode ).Temp = Node( InletNode ).Temp;
+				Node( MSlabOutletNode ).Temp = Node( MSlabInletNode ).Temp;
+			 }
+		  }
 
-			CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
+		  CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
 
 		} else { // System On
 
-			if ( SetPointTemp < AirTempHeatHi ) { // HEATING MODE
-				OperatingMode = HeatingMode;
+		  if ( SetPointTemp < AirTempHeatHi ) { // HEATING MODE
+			 OperatingMode = HeatingMode;
 
-				//Check the setpoint and temperature span
-				SetPointTempHi = GetCurrentScheduleValue( VentSlab( Item ).HotCtrlHiTempSchedPtr );
-				SetPointTempLo = GetCurrentScheduleValue( VentSlab( Item ).HotCtrlLoTempSchedPtr );
-				if ( SetPointTempHi < SetPointTempLo ) {
-					ShowSevereError( "Heating setpoint temperature mismatch in" + VentSlab( Item ).Name );
-					ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
-				}
-				AirTempHi = GetCurrentScheduleValue( VentSlab( Item ).HotAirHiTempSchedPtr );
-				AirTempLo = GetCurrentScheduleValue( VentSlab( Item ).HotAirLoTempSchedPtr );
+			 //Check the setpoint and temperature span
+			 SetPointTempHi = GetCurrentScheduleValue( VentSlab( Item ).HotCtrlHiTempSchedPtr );
+			 SetPointTempLo = GetCurrentScheduleValue( VentSlab( Item ).HotCtrlLoTempSchedPtr );
+			 if ( SetPointTempHi < SetPointTempLo ) {
+				ShowSevereError( "Heating setpoint temperature mismatch in" + VentSlab( Item ).Name );
+				ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
+				ShowFatalError( "Preceding condition causes termination." );
+			 }
+			 AirTempHi = GetCurrentScheduleValue( VentSlab( Item ).HotAirHiTempSchedPtr );
+			 AirTempLo = GetCurrentScheduleValue( VentSlab( Item ).HotAirLoTempSchedPtr );
 
-				if ( AirTempHi < AirTempLo ) {
-					ShowSevereError( "Heating Air temperature mismatch in" + VentSlab( Item ).Name );
-					ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
-				}
+			 if ( AirTempHi < AirTempLo ) {
+				ShowSevereError( "Heating Air temperature mismatch in" + VentSlab( Item ).Name );
+				ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
+				ShowFatalError( "Preceding condition causes termination." );
+			 }
 
-				if ( SetPointTemp >= SetPointTempHi ) {
-					// System is above high heating setpoint so we should be able to turn the system off
-					RadInTemp = AirTempLo;
+			 if ( SetPointTemp >= SetPointTempHi ) {
+				// System is above high heating setpoint so we should be able to turn the system off
+				RadInTemp = AirTempLo;
 
-				} else if ( SetPointTemp <= SetPointTempLo ) {
-					// System is running with its highest inlet temperature
-					RadInTemp = AirTempHi;
-				} else {
-					// Interpolate to obtain the current radiant system inlet temperature
-					RadInTemp = AirTempHi - ( AirTempHi - AirTempLo ) * ( SetPointTemp - SetPointTempLo ) / ( SetPointTempHi - SetPointTempLo );
-				}
+			 } else if ( SetPointTemp <= SetPointTempLo ) {
+				// System is running with its highest inlet temperature
+				RadInTemp = AirTempHi;
+			 } else {
+				// Interpolate to obtain the current radiant system inlet temperature
+				RadInTemp = AirTempHi - ( AirTempHi - AirTempLo ) * ( SetPointTemp - SetPointTempLo ) / ( SetPointTempHi - SetPointTempLo );
+			 }
 
-				Node( VentSlab( Item ).RadInNode ).Temp = RadInTemp;
+			 Node( VentSlab( Item ).RadInNode ).Temp = RadInTemp;
 
-				ControlNode = VentSlab( Item ).HotControlNode;
-				MaxWaterFlow = VentSlab( Item ).MaxHotWaterFlow;
-				MinWaterFlow = VentSlab( Item ).MinHotWaterFlow;
-				MaxSteamFlow = VentSlab( Item ).MaxHotSteamFlow;
-				MinSteamFlow = VentSlab( Item ).MinHotSteamFlow;
+			 ControlNode = VentSlab( Item ).HotControlNode;
+			 MaxWaterFlow = VentSlab( Item ).MaxHotWaterFlow;
+			 MinWaterFlow = VentSlab( Item ).MinHotWaterFlow;
+			 MaxSteamFlow = VentSlab( Item ).MaxHotSteamFlow;
+			 MinSteamFlow = VentSlab( Item ).MinHotSteamFlow;
 
-				// On the first HVAC iteration the system values are given to the controller, but after that
-				// the demand limits are in place and there needs to be feedback to the Zone Equipment
+			 // On the first HVAC iteration the system values are given to the controller, but after that
+			 // the demand limits are in place and there needs to be feedback to the Zone Equipment
 
-				if ( ! FirstHVACIteration && VentSlab( Item ).HCoilType == Heating_WaterCoilType ) {
-					MaxWaterFlow = Node( ControlNode ).MassFlowRateMaxAvail;
-					MinWaterFlow = Node( ControlNode ).MassFlowRateMinAvail;
-				}
+			 if ( ! FirstHVACIteration && VentSlab( Item ).HCoilType == Heating_WaterCoilType ) {
+				MaxWaterFlow = Node( ControlNode ).MassFlowRateMaxAvail;
+				MinWaterFlow = Node( ControlNode ).MassFlowRateMinAvail;
+			 }
 
-				if ( ! FirstHVACIteration && VentSlab( Item ).HCoilType == Heating_SteamCoilType ) {
-					MaxSteamFlow = Node( ControlNode ).MassFlowRateMaxAvail;
-					MinSteamFlow = Node( ControlNode ).MassFlowRateMinAvail;
-				}
+			 if ( ! FirstHVACIteration && VentSlab( Item ).HCoilType == Heating_SteamCoilType ) {
+				MaxSteamFlow = Node( ControlNode ).MassFlowRateMaxAvail;
+				MinSteamFlow = Node( ControlNode ).MassFlowRateMinAvail;
+			 }
 
-				HCoilOn = true;
+			 HCoilOn = true;
 
-				if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
-					MinOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MinOASchedPtr ) * ( VentSlab( Item ).MinOutAirMassFlow / Node( OutsideAirNode ).MassFlowRate );
-				} else {
-					MinOAFrac = 0.0;
-				}
+			 if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
+				MinOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MinOASchedPtr ) * ( VentSlab( Item ).MinOutAirMassFlow / Node( OutsideAirNode ).MassFlowRate );
+			 } else {
+				MinOAFrac = 0.0;
+			 }
 
-				MinOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
+			 MinOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
 
-				if ( ( ! VentSlab( Item ).HCoilPresent ) || ( VentSlab( Item ).HCoilSchedValue <= 0.0 ) ) {
-					// In heating mode, but there is no coil to provide heating.  This is handled
-					// differently than if there was a heating coil present.  Fixed temperature
-					// will still try to vary the amount of outside air to meet the desired
-					// mixed air temperature, while variable percent will go to full ventilation
-					// when it is most advantageous.
+			 if ( ( ! VentSlab( Item ).HCoilPresent ) || ( VentSlab( Item ).HCoilSchedValue <= 0.0 ) ) {
+				// In heating mode, but there is no coil to provide heating.  This is handled
+				// differently than if there was a heating coil present.  Fixed temperature
+				// will still try to vary the amount of outside air to meet the desired
+				// mixed air temperature, while variable percent will go to full ventilation
+				// when it is most advantageous.
 
-					// If there are no coil, Slab In Node is assumed to be Fan Outlet Node
+				// If there are no coil, Slab In Node is assumed to be Fan Outlet Node
 
-					OutletNode = FanOutletNode;
+				OutletNode = FanOutletNode;
 
-					{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
+				{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
 
-					if ( SELECT_CASE_var == FixedOAControl ) {
-						// In this control type, the outdoor air flow rate is fixed to the maximum value
-						// which is equal to the minimum value, regardless of all the other conditions.
+				  if ( SELECT_CASE_var == FixedOAControl ) {
+					 // In this control type, the outdoor air flow rate is fixed to the maximum value
+					 // which is equal to the minimum value, regardless of all the other conditions.
+					 OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+
+				  } else if ( SELECT_CASE_var == VariablePercent ) {
+					 // This algorithm is probably a bit simplistic in that it just bounces
+					 // back and forth between the maximum outside air and the minimum.  In
+					 // reality, a system *might* vary between the two based on the load in
+					 // the zone.  This simple flow control might cause some overcooling but
+					 // chances are that if there is a cooling load and the zone temperature
+					 // gets above the outside temperature that overcooling won't be significant.
+					 Tinlet = Node( InletNode ).Temp;
+					 Toutdoor = Node( OutsideAirNode ).Temp;
+
+					 if ( Tinlet >= Toutdoor ) {
+
 						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
 
-					} else if ( SELECT_CASE_var == VariablePercent ) {
-						// This algorithm is probably a bit simplistic in that it just bounces
-						// back and forth between the maximum outside air and the minimum.  In
-						// reality, a system *might* vary between the two based on the load in
-						// the zone.  This simple flow control might cause some overcooling but
-						// chances are that if there is a cooling load and the zone temperature
-						// gets above the outside temperature that overcooling won't be significant.
-						Tinlet = Node( InletNode ).Temp;
-						Toutdoor = Node( OutsideAirNode ).Temp;
+					 } else { // Tinlet < Toutdoor
 
-						if ( Tinlet >= Toutdoor ) {
-
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-
-						} else { // Tinlet < Toutdoor
-
-							MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
-							OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-
-						}
-
-					} else if ( SELECT_CASE_var == FixedTemperature ) {
-						// This is basically the same algorithm as for the heating case...
-						Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
-						MaxOAFrac = 1.0;
-
-						if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
-							// Desired temperature is between the inlet and outdoor temperatures
-							// so vary the flow rate between no outside air and no recirculation air
-							// then applying the maximum and minimum limits the user has scheduled
-							// to make sure too much/little outside air is being introduced
-							OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
-							OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-							OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-						} else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
-							// Desired temperature is below both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
-							// Desired temperature is above both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else {
-							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
-						}
-
-					}}
-
-					CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
-
-				} else { // Heating Coil present
-
-					{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
-
-					if ( SELECT_CASE_var == FixedOAControl ) {
-						// In this control type, the outdoor air flow rate is fixed to the maximum value
-						// which is equal to the minimum value, regardless of all the other conditions.
-						if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
-							MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
-						} else {
-							MaxOAFrac = 0.0;
-						}
-						MaxOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
+						MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
 						OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
 
-					} else if ( SELECT_CASE_var == VariablePercent ) {
-						// In heating mode, the ouside air for "variable percent" control
-						// is set to the minimum value
+					 }
+
+				  } else if ( SELECT_CASE_var == FixedTemperature ) {
+					 // This is basically the same algorithm as for the heating case...
+					 Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
+					 MaxOAFrac = 1.0;
+
+					 if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
+						// Desired temperature is between the inlet and outdoor temperatures
+						// so vary the flow rate between no outside air and no recirculation air
+						// then applying the maximum and minimum limits the user has scheduled
+						// to make sure too much/little outside air is being introduced
+						OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
+						OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+						OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+					 } else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
+						// Desired temperature is below both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						}
+					 } else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
+						// Desired temperature is above both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						}
+					 } else {
+						// It should NEVER get to this point, but just in case...
+						ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
+					 }
+
+				  }}
+
+				CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
+
+			 } else { // Heating Coil present
+
+				{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
+
+				  if ( SELECT_CASE_var == FixedOAControl ) {
+					 // In this control type, the outdoor air flow rate is fixed to the maximum value
+					 // which is equal to the minimum value, regardless of all the other conditions.
+					 if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
+						MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
+					 } else {
+						MaxOAFrac = 0.0;
+					 }
+					 MaxOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
+					 OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+
+				  } else if ( SELECT_CASE_var == VariablePercent ) {
+					 // In heating mode, the ouside air for "variable percent" control
+					 // is set to the minimum value
+
+					 OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+
+				  } else if ( SELECT_CASE_var == FixedTemperature ) {
+					 // This is basically the same algorithm as for the heating case...
+					 Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
+					 MaxOAFrac = 1.0;
+
+					 if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
+						// Desired temperature is between the inlet and outdoor temperatures
+						// so vary the flow rate between no outside air and no recirculation air
+						// then applying the maximum and minimum limits the user has scheduled
+						// to make sure too much/little outside air is being introduced
+						OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
+						OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+						OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+					 } else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
+						// Desired temperature is below both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						}
+					 } else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
+						// Desired temperature is above both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						}
+					 } else {
+						// It should NEVER get to this point, but just in case...
+						ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
+					 }
+
+				  }}
+
+				SimVentSlabOAMixer( Item );
+				SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
+				CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
+				QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
+
+				// Setup the coil configuration
+				{ auto const SELECT_CASE_var( VentSlab( Item ).HCoilType );
+
+				  if ( SELECT_CASE_var == Heating_WaterCoilType ) {
+					 // control water flow to obtain output matching QZnReq
+
+					 ControlCompOutput( VentSlab( Item ).Name, cMO_VentilatedSlab, Item, FirstHVACIteration, QZnReq, ControlNode, MaxWaterFlow, MinWaterFlow, 0.001, VentSlab( Item ).ControlCompTypeNum, VentSlab( Item ).CompErrIndex, _, _, _, _, _, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum );
+
+				  } else if ( ( SELECT_CASE_var == Heating_GasCoilType ) || ( SELECT_CASE_var == Heating_ElectricCoilType ) || ( SELECT_CASE_var == Heating_SteamCoilType ) ) {
+
+					 CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
+
+				  }}
+
+			 } //  Coil/no coil block
+
+		  } else if ( SetPointTemp > AirTempCoolLo ) { // Cooling Mode
+
+			 OperatingMode = CoolingMode;
+
+			 SetPointTempHi = GetCurrentScheduleValue( VentSlab( Item ).ColdCtrlHiTempSchedPtr );
+			 SetPointTempLo = GetCurrentScheduleValue( VentSlab( Item ).ColdCtrlLoTempSchedPtr );
+			 if ( SetPointTempHi < SetPointTempLo ) {
+				ShowSevereError( "Cooling setpoint temperature mismatch in" + VentSlab( Item ).Name );
+				ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
+				ShowFatalError( "Preceding condition causes termination." );
+			 }
+
+			 AirTempHi = GetCurrentScheduleValue( VentSlab( Item ).ColdAirHiTempSchedPtr );
+			 AirTempLo = GetCurrentScheduleValue( VentSlab( Item ).ColdAirLoTempSchedPtr );
+			 if ( AirTempHi < AirTempLo ) {
+				ShowSevereError( "Cooling Air temperature mismatch in" + VentSlab( Item ).Name );
+				ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
+				ShowFatalError( "Preceding condition causes termination." );
+			 }
+
+			 if ( SetPointTemp <= SetPointTempLo ) {
+				// System is below low cooling setpoint so we should be able to turn the system off
+				RadInTemp = AirTempHi;
+			 } else if ( SetPointTemp >= SetPointTempHi ) {
+				// System is running with its lowest inlet temperature
+				RadInTemp = AirTempLo;
+			 } else {
+				// Interpolate to obtain the current radiant system inlet temperature
+				RadInTemp = AirTempHi - ( AirTempHi - AirTempLo ) * ( SetPointTemp - SetPointTempLo ) / ( SetPointTempHi - SetPointTempLo );
+
+			 }
+
+			 ControlNode = VentSlab( Item ).ColdControlNode;
+			 MaxWaterFlow = VentSlab( Item ).MaxColdWaterFlow;
+			 MinWaterFlow = VentSlab( Item ).MinColdWaterFlow;
+
+			 //On the first HVAC iteration the system values are given to the controller, but after that
+			 // the demand limits are in place and there needs to be feedback to the Zone Equipment
+			 if ( ( ! FirstHVACIteration ) && ( ControlNode > 0 ) && ( VentSlab( Item ).CCoilPresent ) ) {
+				MaxWaterFlow = Node( ControlNode ).MassFlowRateMaxAvail;
+				MinWaterFlow = Node( ControlNode ).MassFlowRateMinAvail;
+			 }
+			 HCoilOn = false;
+
+			 if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
+				MinOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MinOASchedPtr ) * ( VentSlab( Item ).MinOutAirMassFlow / Node( OutsideAirNode ).MassFlowRate );
+			 } else {
+				MinOAFrac = 0.0;
+			 }
+			 MinOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
+
+			 if ( ( ! VentSlab( Item ).CCoilPresent ) || ( VentSlab( Item ).CCoilSchedValue <= 0.0 ) ) {
+				// In cooling mode, but there is no coil to provide cooling.  This is handled
+				// differently than if there was a cooling coil present.  Fixed temperature
+				// will still try to vary the amount of outside air to meet the desired
+				// mixed air temperature, while variable percent will go to full ventilation
+				// when it is most advantageous.
+
+				// If there are no coil, Slab In Node is assumed to be Fan Outlet Node
+				OutletNode = FanOutletNode;
+
+				{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
+
+				  if ( SELECT_CASE_var == FixedOAControl ) {
+					 // In this control type, the outdoor air flow rate is fixed to the maximum value
+					 // which is equal to the minimum value, regardless of all the other conditions.
+					 if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
+						MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
+					 } else {
+						MaxOAFrac = 0.0;
+					 }
+					 MaxOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
+					 OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+
+				  } else if ( SELECT_CASE_var == VariablePercent ) {
+					 // This algorithm is probably a bit simplistic in that it just bounces
+					 // back and forth between the maximum outside air and the minimum.  In
+					 // reality, a system *might* vary between the two based on the load in
+					 // the zone.  This simple flow control might cause some overcooling but
+					 // chances are that if there is a cooling load and the zone temperature
+					 // gets above the outside temperature that overcooling won't be significant.
+
+					 Tinlet = Node( InletNode ).Temp;
+					 Toutdoor = Node( OutsideAirNode ).Temp;
+
+					 if ( Tinlet <= Toutdoor ) {
 
 						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
 
-					} else if ( SELECT_CASE_var == FixedTemperature ) {
-						// This is basically the same algorithm as for the heating case...
-						Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
-						MaxOAFrac = 1.0;
+					 } else { // Tinlet > Toutdoor
 
-						if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
-							// Desired temperature is between the inlet and outdoor temperatures
-							// so vary the flow rate between no outside air and no recirculation air
-							// then applying the maximum and minimum limits the user has scheduled
-							// to make sure too much/little outside air is being introduced
-							OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
-							OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-							OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-						} else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
-							// Desired temperature is below both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
-							// Desired temperature is above both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else {
-							// It should NEVER get to this point, but just in case...
-							ShowFatalError( "Ventilated Slab simulation control: illogical condition for " + VentSlab( Item ).Name );
+						MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
+						OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+
+					 }
+
+				  } else if ( SELECT_CASE_var == FixedTemperature ) {
+					 // This is basically the same algorithm as for the heating case...
+					 Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
+					 MaxOAFrac = 1.0;
+
+					 if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
+						// Desired temperature is between the inlet and outdoor temperatures
+						// so vary the flow rate between no outside air and no recirculation air
+						// then applying the maximum and minimum limits the user has scheduled
+						// to make sure too much/little outside air is being introduced
+						OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
+						OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+						OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+					 } else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
+						// Desired temperature is below both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
 						}
+					 } else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
+						// Desired temperature is above both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						}
+					 } else {
+						// It should NEVER get to this point, but just in case...
+						ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
+					 }
 
-					}}
+				  }}
 
-					SimVentSlabOAMixer( Item );
-					SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-					CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
-					QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
+				CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
 
-					// Setup the coil configuration
-					{ auto const SELECT_CASE_var( VentSlab( Item ).HCoilType );
+			 } else {
+				// There is a cooling load and there is a cooling coil present (presumably).
+				// Variable percent will throttle outside air back to the minimum while
+				// fixed temperature will still try to vary the outside air amount to meet
+				// the desired mixed air temperature.
 
-					if ( SELECT_CASE_var == Heating_WaterCoilType ) {
-						// control water flow to obtain output matching QZnReq
+				{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
 
-						ControlCompOutput( VentSlab( Item ).Name, cMO_VentilatedSlab, Item, FirstHVACIteration, QZnReq, ControlNode, MaxWaterFlow, MinWaterFlow, 0.001, VentSlab( Item ).ControlCompTypeNum, VentSlab( Item ).CompErrIndex, _, _, _, _, _, VentSlab( Item ).HWLoopNum, VentSlab( Item ).HWLoopSide, VentSlab( Item ).HWBranchNum );
+				  if ( SELECT_CASE_var == FixedOAControl ) {
+					 // In this control type, the outdoor air flow rate is fixed to the maximum value
+					 // which is equal to the minimum value, regardless of all the other conditions.
+					 if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
+						MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
+					 } else {
+						MaxOAFrac = 0.0;
+					 }
+					 MaxOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
+					 OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
 
-					} else if ( ( SELECT_CASE_var == Heating_GasCoilType ) || ( SELECT_CASE_var == Heating_ElectricCoilType ) || ( SELECT_CASE_var == Heating_SteamCoilType ) ) {
+				  } else if ( SELECT_CASE_var == VariablePercent ) {
+					 // A cooling coil is present so let it try to do the cooling...
+					 OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
 
-						CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
+				  } else if ( SELECT_CASE_var == FixedTemperature ) {
+					 // This is basically the same algorithm as for the heating case...
+					 Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
 
-					}}
+					 MaxOAFrac = 1.0;
 
-				} //  Coil/no coil block
+					 if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
+						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+					 } else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
+						// Desired temperature is between the inlet and outdoor temperatures
+						// so vary the flow rate between no outside air and no recirculation air
+						// then applying the maximum and minimum limits the user has scheduled
+						// to make sure too much/little outside air is being introduced
+						OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
+						OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+						OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
+					 } else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
+						// Desired temperature is below both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						}
+					 } else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
+						// Desired temperature is above both the inlet and outdoor temperatures
+						// so use whichever flow rate (max or min) that will get closer
+						if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
+						  OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						} else { // Toutdoor closer to Tdesired so use maximum outside air
+						  OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+						}
+					 } else {
+						// It should NEVER get to this point, but just in case...
+						ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
+					 }
 
-			} else if ( SetPointTemp > AirTempCoolLo ) { // Cooling Mode
+				  }}
 
-				OperatingMode = CoolingMode;
-
-				SetPointTempHi = GetCurrentScheduleValue( VentSlab( Item ).ColdCtrlHiTempSchedPtr );
-				SetPointTempLo = GetCurrentScheduleValue( VentSlab( Item ).ColdCtrlLoTempSchedPtr );
-				if ( SetPointTempHi < SetPointTempLo ) {
-					ShowSevereError( "Cooling setpoint temperature mismatch in" + VentSlab( Item ).Name );
-					ShowContinueError( "High setpoint temperature is less than low setpoint temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
-				}
-
-				AirTempHi = GetCurrentScheduleValue( VentSlab( Item ).ColdAirHiTempSchedPtr );
-				AirTempLo = GetCurrentScheduleValue( VentSlab( Item ).ColdAirLoTempSchedPtr );
-				if ( AirTempHi < AirTempLo ) {
-					ShowSevereError( "Cooling Air temperature mismatch in" + VentSlab( Item ).Name );
-					ShowContinueError( "High Air temperature is less than low Air temperature--check your schedule input" );
-					ShowFatalError( "Preceding condition causes termination." );
-				}
-
-				if ( SetPointTemp <= SetPointTempLo ) {
-					// System is below low cooling setpoint so we should be able to turn the system off
-					RadInTemp = AirTempHi;
-				} else if ( SetPointTemp >= SetPointTempHi ) {
-					// System is running with its lowest inlet temperature
-					RadInTemp = AirTempLo;
-				} else {
-					// Interpolate to obtain the current radiant system inlet temperature
-					RadInTemp = AirTempHi - ( AirTempHi - AirTempLo ) * ( SetPointTemp - SetPointTempLo ) / ( SetPointTempHi - SetPointTempLo );
-
-				}
-
-				ControlNode = VentSlab( Item ).ColdControlNode;
-				MaxWaterFlow = VentSlab( Item ).MaxColdWaterFlow;
-				MinWaterFlow = VentSlab( Item ).MinColdWaterFlow;
-
-				//On the first HVAC iteration the system values are given to the controller, but after that
-				// the demand limits are in place and there needs to be feedback to the Zone Equipment
-				if ( ( ! FirstHVACIteration ) && ( ControlNode > 0 ) && ( VentSlab( Item ).CCoilPresent ) ) {
-					MaxWaterFlow = Node( ControlNode ).MassFlowRateMaxAvail;
-					MinWaterFlow = Node( ControlNode ).MassFlowRateMinAvail;
-				}
+				// control water flow to obtain output matching Low Setpoint Temperateure
 				HCoilOn = false;
 
-				if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
-					MinOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MinOASchedPtr ) * ( VentSlab( Item ).MinOutAirMassFlow / Node( OutsideAirNode ).MassFlowRate );
-				} else {
-					MinOAFrac = 0.0;
-				}
-				MinOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
+				SimVentSlabOAMixer( Item );
+				SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 
-				if ( ( ! VentSlab( Item ).CCoilPresent ) || ( VentSlab( Item ).CCoilSchedValue <= 0.0 ) ) {
-					// In cooling mode, but there is no coil to provide cooling.  This is handled
-					// differently than if there was a cooling coil present.  Fixed temperature
-					// will still try to vary the amount of outside air to meet the desired
-					// mixed air temperature, while variable percent will go to full ventilation
-					// when it is most advantageous.
+				CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
+				QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
 
-					// If there are no coil, Slab In Node is assumed to be Fan Outlet Node
-					OutletNode = FanOutletNode;
+				ControlCompOutput( VentSlab( Item ).Name, cMO_VentilatedSlab, Item, FirstHVACIteration, QZnReq, ControlNode, MaxWaterFlow, MinWaterFlow, 0.001, VentSlab( Item ).ControlCompTypeNum, VentSlab( Item ).CompErrIndex, _, _, _, _, _, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum );
 
-					{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
+			 }
 
-					if ( SELECT_CASE_var == FixedOAControl ) {
-						// In this control type, the outdoor air flow rate is fixed to the maximum value
-						// which is equal to the minimum value, regardless of all the other conditions.
-						if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
-							MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
-						} else {
-							MaxOAFrac = 0.0;
-						}
-						MaxOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
-						OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
+		  } // ...end of HEATING/COOLING IF-THEN block
 
-					} else if ( SELECT_CASE_var == VariablePercent ) {
-						// This algorithm is probably a bit simplistic in that it just bounces
-						// back and forth between the maximum outside air and the minimum.  In
-						// reality, a system *might* vary between the two based on the load in
-						// the zone.  This simple flow control might cause some overcooling but
-						// chances are that if there is a cooling load and the zone temperature
-						// gets above the outside temperature that overcooling won't be significant.
+		  CalcVentilatedSlabRadComps( Item, FirstHVACIteration );
 
-						Tinlet = Node( InletNode ).Temp;
-						Toutdoor = Node( OutsideAirNode ).Temp;
-
-						if ( Tinlet <= Toutdoor ) {
-
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-
-						} else { // Tinlet > Toutdoor
-
-							MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
-							OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-
-						}
-
-					} else if ( SELECT_CASE_var == FixedTemperature ) {
-						// This is basically the same algorithm as for the heating case...
-						Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
-						MaxOAFrac = 1.0;
-
-						if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
-							// Desired temperature is between the inlet and outdoor temperatures
-							// so vary the flow rate between no outside air and no recirculation air
-							// then applying the maximum and minimum limits the user has scheduled
-							// to make sure too much/little outside air is being introduced
-							OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
-							OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-							OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-						} else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
-							// Desired temperature is below both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
-							// Desired temperature is above both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else {
-							// It should NEVER get to this point, but just in case...
-							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
-						}
-
-					}}
-
-					CalcVentilatedSlabComps( Item, FirstHVACIteration, QUnitOut );
-
-				} else {
-					// There is a cooling load and there is a cooling coil present (presumably).
-					// Variable percent will throttle outside air back to the minimum while
-					// fixed temperature will still try to vary the outside air amount to meet
-					// the desired mixed air temperature.
-
-					{ auto const SELECT_CASE_var( VentSlab( Item ).OAControlType );
-
-					if ( SELECT_CASE_var == FixedOAControl ) {
-						// In this control type, the outdoor air flow rate is fixed to the maximum value
-						// which is equal to the minimum value, regardless of all the other conditions.
-						if ( Node( OutsideAirNode ).MassFlowRate > 0.0 ) {
-							MaxOAFrac = GetCurrentScheduleValue( VentSlab( Item ).MaxOASchedPtr );
-						} else {
-							MaxOAFrac = 0.0;
-						}
-						MaxOAFrac = min( 1.0, max( 0.0, MinOAFrac ) );
-						OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-
-					} else if ( SELECT_CASE_var == VariablePercent ) {
-						// A cooling coil is present so let it try to do the cooling...
-						OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-
-					} else if ( SELECT_CASE_var == FixedTemperature ) {
-						// This is basically the same algorithm as for the heating case...
-						Tdesired = GetCurrentScheduleValue( VentSlab( Item ).TempSchedPtr );
-
-						MaxOAFrac = 1.0;
-
-						if ( std::abs( Tinlet - Toutdoor ) <= LowTempDiff ) { // no difference in indoor and outdoor conditions-->set OA to minimum
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( std::abs( MaxOAFrac - MinOAFrac ) <= LowOAFracDiff ) { // no difference in outside air fractions
-							OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-						} else if ( ( ( Tdesired <= Tinlet ) && ( Tdesired >= Toutdoor ) ) || ( ( Tdesired >= Tinlet ) && ( Tdesired <= Toutdoor ) ) ) {
-							// Desired temperature is between the inlet and outdoor temperatures
-							// so vary the flow rate between no outside air and no recirculation air
-							// then applying the maximum and minimum limits the user has scheduled
-							// to make sure too much/little outside air is being introduced
-							OAMassFlowRate = ( ( Tdesired - Tinlet ) / ( Toutdoor - Tinlet ) ) * Node( InletNode ).MassFlowRate;
-							OAMassFlowRate = max( OAMassFlowRate, ( MinOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-							OAMassFlowRate = min( OAMassFlowRate, ( MaxOAFrac * Node( OutsideAirNode ).MassFlowRate ) );
-						} else if ( ( Tdesired < Tinlet ) && ( Tdesired < Toutdoor ) ) {
-							// Desired temperature is below both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet < Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else if ( ( Tdesired > Tinlet ) && ( Tdesired > Toutdoor ) ) {
-							// Desired temperature is above both the inlet and outdoor temperatures
-							// so use whichever flow rate (max or min) that will get closer
-							if ( Tinlet > Toutdoor ) { // Tinlet closer to Tdesired so use minimum outside air
-								OAMassFlowRate = MinOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							} else { // Toutdoor closer to Tdesired so use maximum outside air
-								OAMassFlowRate = MaxOAFrac * Node( OutsideAirNode ).MassFlowRate;
-							}
-						} else {
-							// It should NEVER get to this point, but just in case...
-							ShowFatalError( cMO_VentilatedSlab + " simulation control: illogical condition for " + VentSlab( Item ).Name );
-						}
-
-					}}
-
-					// control water flow to obtain output matching Low Setpoint Temperateure
-					HCoilOn = false;
-
-					SimVentSlabOAMixer( Item );
-					SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
-
-					CpFan = PsyCpAirFnWTdb( Node( FanOutletNode ).HumRat, Node( FanOutletNode ).Temp );
-					QZnReq = ( Node( OutletNode ).MassFlowRate ) * CpFan * ( RadInTemp - Node( FanOutletNode ).Temp );
-
-					ControlCompOutput( VentSlab( Item ).Name, cMO_VentilatedSlab, Item, FirstHVACIteration, QZnReq, ControlNode, MaxWaterFlow, MinWaterFlow, 0.001, VentSlab( Item ).ControlCompTypeNum, VentSlab( Item ).CompErrIndex, _, _, _, _, _, VentSlab( Item ).CWLoopNum, VentSlab( Item ).CWLoopSide, VentSlab( Item ).CWBranchNum );
-
-				}
-
-			} // ...end of HEATING/COOLING IF-THEN block
-
-			CalcVentilatedSlabRadComps( Item, FirstHVACIteration );
-
-			AirMassFlow = Node( OutletNode ).MassFlowRate;
-			QUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( FanOutletNode ).HumRat ) - PsyHFnTdbW( Node( FanOutletNode ).Temp, Node( FanOutletNode ).HumRat ) );
+		  AirMassFlow = Node( OutletNode ).MassFlowRate;
+		  QUnitOut = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( FanOutletNode ).HumRat ) - PsyHFnTdbW( Node( FanOutletNode ).Temp, Node( FanOutletNode ).HumRat ) );
 
 		} // ...end of system ON/OFF IF-THEN block
 
@@ -2738,15 +2738,15 @@ namespace VentilatedSlab {
 		PowerMet = QUnitOut;
 		LatOutputProvided = LatentOutput;
 
-	}
+	 }
 
-	void
-	CalcVentilatedSlabComps(
-		int const Item, // system index in ventilated slab array
-		bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
-		Real64 & LoadMet // load met by the system (watts)
-	)
-	{
+	 void
+	 CalcVentilatedSlabComps(
+									 int const Item, // system index in ventilated slab array
+									 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
+									 Real64 & LoadMet // load met by the system (watts)
+									 )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Young Tae Chae, Rick Strand
@@ -2807,45 +2807,45 @@ namespace VentilatedSlab {
 		SimVentSlabOAMixer( Item );
 		SimulateFanComponents( VentSlab( Item ).FanName, FirstHVACIteration, VentSlab( Item ).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff );
 		if ( ( VentSlab( Item ).CCoilPresent ) && ( VentSlab( Item ).CCoilSchedValue >= 0.0 ) ) {
-			if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
-				SimHXAssistedCoolingCoil( VentSlab( Item ).CCoilName, FirstHVACIteration, On, 0.0, VentSlab( Item ).CCoil_Index, ContFanCycCoil );
-			} else {
-				SimulateWaterCoilComponents( VentSlab( Item ).CCoilName, FirstHVACIteration, VentSlab( Item ).CCoil_Index );
-			}
+		  if ( VentSlab( Item ).CCoilType == Cooling_CoilHXAssisted ) {
+			 SimHXAssistedCoolingCoil( VentSlab( Item ).CCoilName, FirstHVACIteration, On, 0.0, VentSlab( Item ).CCoil_Index, ContFanCycCoil );
+		  } else {
+			 SimulateWaterCoilComponents( VentSlab( Item ).CCoilName, FirstHVACIteration, VentSlab( Item ).CCoil_Index );
+		  }
 
 		}
 
 		if ( ( VentSlab( Item ).HCoilPresent ) && ( VentSlab( Item ).HCoilSchedValue >= 0.0 ) ) {
 
-			{ auto const SELECT_CASE_var( VentSlab( Item ).HCoilType );
+		  { auto const SELECT_CASE_var( VentSlab( Item ).HCoilType );
 
-			if ( SELECT_CASE_var == Heating_WaterCoilType ) {
+			 if ( SELECT_CASE_var == Heating_WaterCoilType ) {
 
 				SimulateWaterCoilComponents( VentSlab( Item ).HCoilName, FirstHVACIteration, VentSlab( Item ).HCoil_Index );
 
-			} else if ( SELECT_CASE_var == Heating_SteamCoilType ) {
+			 } else if ( SELECT_CASE_var == Heating_SteamCoilType ) {
 
 				if ( ! HCoilOn ) {
-					QCoilReq = 0.0;
+				  QCoilReq = 0.0;
 				} else {
-					HCoilInAirNode = VentSlab( Item ).FanOutletNode;
-					CpAirZn = PsyCpAirFnWTdb( Node( HCoilInAirNode ).HumRat, Node( HCoilInAirNode ).Temp );
-					QCoilReq = Node( HCoilInAirNode ).MassFlowRate * CpAirZn * ( Node( VentSlab( Item ).RadInNode ).Temp ) - ( Node( HCoilInAirNode ).Temp );
+				  HCoilInAirNode = VentSlab( Item ).FanOutletNode;
+				  CpAirZn = PsyCpAirFnWTdb( Node( HCoilInAirNode ).HumRat, Node( HCoilInAirNode ).Temp );
+				  QCoilReq = Node( HCoilInAirNode ).MassFlowRate * CpAirZn * ( Node( VentSlab( Item ).RadInNode ).Temp ) - ( Node( HCoilInAirNode ).Temp );
 				}
 
 				if ( QCoilReq < 0.0 ) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
 				SimulateSteamCoilComponents( VentSlab( Item ).HCoilName, FirstHVACIteration, VentSlab( Item ).HCoil_Index, QCoilReq );
 
-			} else if ( ( SELECT_CASE_var == Heating_ElectricCoilType ) || ( SELECT_CASE_var == Heating_GasCoilType ) ) {
+			 } else if ( ( SELECT_CASE_var == Heating_ElectricCoilType ) || ( SELECT_CASE_var == Heating_GasCoilType ) ) {
 
 				if ( ! HCoilOn ) {
-					QCoilReq = 0.0;
+				  QCoilReq = 0.0;
 				} else {
-					HCoilInAirTemp = Node( VentSlab( Item ).FanOutletNode ).Temp;
-					HCoilOutAirTemp = Node( VentSlab( Item ).RadInNode ).Temp;
-					CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
-					QCoilReq = Node( VentSlab( Item ).FanOutletNode ).MassFlowRate * CpAirZn * ( HCoilOutAirTemp - HCoilInAirTemp );
+				  HCoilInAirTemp = Node( VentSlab( Item ).FanOutletNode ).Temp;
+				  HCoilOutAirTemp = Node( VentSlab( Item ).RadInNode ).Temp;
+				  CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
+				  QCoilReq = Node( VentSlab( Item ).FanOutletNode ).MassFlowRate * CpAirZn * ( HCoilOutAirTemp - HCoilInAirTemp );
 
 				}
 
@@ -2853,7 +2853,7 @@ namespace VentilatedSlab {
 
 				SimulateHeatingCoilComponents( VentSlab( Item ).HCoilName, FirstHVACIteration, QCoilReq, VentSlab( Item ).HCoil_Index );
 
-			}}
+			 }}
 
 		}
 
@@ -2863,14 +2863,14 @@ namespace VentilatedSlab {
 
 		LoadMet = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, Node( InletNode ).HumRat ) - PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat ) );
 
-	}
+	 }
 
-	void
-	CalcVentilatedSlabRadComps(
-		int const Item, // System index in ventilated slab array
-		bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
-	)
-	{
+	 void
+	 CalcVentilatedSlabRadComps(
+										 int const Item, // System index in ventilated slab array
+										 bool const FirstHVACIteration // flag for 1st HVAV iteration in the time step !unused1208
+										 )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Young Tae Chae, Rick Strand
@@ -2996,8 +2996,8 @@ namespace VentilatedSlab {
 		// FLOW:
 
 		if ( FirstTimeFlag ) {
-			AirTempOut.allocate( MaxCloNumOfSurfaces );
-			FirstTimeFlag = false;
+		  AirTempOut.allocate( MaxCloNumOfSurfaces );
+		  FirstTimeFlag = false;
 		}
 
 		Ckj = 0.0;
@@ -3017,504 +3017,504 @@ namespace VentilatedSlab {
 
 		if ( OperatingMode == HeatingMode ) {
 
-			if ( ( ! VentSlab( Item ).HCoilPresent ) || ( VentSlab( Item ).HCoilSchedValue <= 0.0 ) ) {
+		  if ( ( ! VentSlab( Item ).HCoilPresent ) || ( VentSlab( Item ).HCoilSchedValue <= 0.0 ) ) {
 
-				AirTempIn = Node( FanOutletNode ).Temp;
-				Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp; // If coil not available or running, then coil in and out temps same
+			 AirTempIn = Node( FanOutletNode ).Temp;
+			 Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp; // If coil not available or running, then coil in and out temps same
 
-			} else {
+		  } else {
 
-				AirTempIn = Node( SlabInNode ).Temp;
-			}
+			 AirTempIn = Node( SlabInNode ).Temp;
+		  }
 		}
 
 		if ( OperatingMode == CoolingMode ) {
 
-			if ( ( ! VentSlab( Item ).CCoilPresent ) || ( VentSlab( Item ).CCoilSchedValue <= 0.0 ) ) {
+		  if ( ( ! VentSlab( Item ).CCoilPresent ) || ( VentSlab( Item ).CCoilSchedValue <= 0.0 ) ) {
 
-				AirTempIn = Node( FanOutletNode ).Temp;
-				Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp; // If coil not available or running, then coil in and out temps same
+			 AirTempIn = Node( FanOutletNode ).Temp;
+			 Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp; // If coil not available or running, then coil in and out temps same
 
-			} else {
+		  } else {
 
-				AirTempIn = Node( SlabInNode ).Temp;
-			}
+			 AirTempIn = Node( SlabInNode ).Temp;
+		  }
 
 		}
 
 		if ( AirMassFlow <= 0.0 ) {
-			// No flow or below minimum allowed so there is no heat source/sink
-			// This is possible with a mismatch between system and plant operation
-			// or a slight mismatch between zone and system controls.  This is not
-			// necessarily a "problem" so this exception is necessary in the code.
+		  // No flow or below minimum allowed so there is no heat source/sink
+		  // This is possible with a mismatch between system and plant operation
+		  // or a slight mismatch between zone and system controls.  This is not
+		  // necessarily a "problem" so this exception is necessary in the code.
 
-			for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-				SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-				QRadSysSource( SurfNum ) = 0.0;
-				if ( Surface( SurfNum ).ExtBoundCond > 0 && Surface( SurfNum ).ExtBoundCond != SurfNum ) QRadSysSource( Surface( SurfNum ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
-			}
+		  for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+			 SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+			 QRadSysSource( SurfNum ) = 0.0;
+			 if ( Surface( SurfNum ).ExtBoundCond > 0 && Surface( SurfNum ).ExtBoundCond != SurfNum ) QRadSysSource( Surface( SurfNum ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
+		  }
 
-			VentSlab( Item ).SlabOutTemp = VentSlab( Item ).SlabInTemp;
+		  VentSlab( Item ).SlabOutTemp = VentSlab( Item ).SlabInTemp;
 
-			// zero out node flows
-			Node( SlabInNode ).MassFlowRate = 0.0;
-			Node( FanOutletNode ).MassFlowRate = 0.0;
-			Node( OAInletNode ).MassFlowRate = 0.0;
-			Node( MixoutNode ).MassFlowRate = 0.0;
-			Node( ReturnAirNode ).MassFlowRate = 0.0;
-			Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
-			AirMassFlow = 0.0;
+		  // zero out node flows
+		  Node( SlabInNode ).MassFlowRate = 0.0;
+		  Node( FanOutletNode ).MassFlowRate = 0.0;
+		  Node( OAInletNode ).MassFlowRate = 0.0;
+		  Node( MixoutNode ).MassFlowRate = 0.0;
+		  Node( ReturnAirNode ).MassFlowRate = 0.0;
+		  Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
+		  AirMassFlow = 0.0;
 		}
 
 		if ( AirMassFlow > 0.0 ) {
 
-			if ( ( VentSlab( Item ).SysConfg == SlabOnly ) || ( VentSlab( Item ).SysConfg == SlabAndZone ) ) {
+		  if ( ( VentSlab( Item ).SysConfg == SlabOnly ) || ( VentSlab( Item ).SysConfg == SlabAndZone ) ) {
 
-				for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-					SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-					// Determine the heat exchanger "effectiveness" term
-					EpsMdotCpAirZn = CalcVentSlabHXEffectTerm( Item, AirTempIn, AirMassFlow, VentSlab( Item ).SurfaceFlowFrac( RadSurfNum ), VentSlab( Item ).CoreLength, VentSlab( Item ).CoreDiameter, VentSlab( Item ).CoreNumbers );
+			 for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+				SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+				// Determine the heat exchanger "effectiveness" term
+				EpsMdotCpAirZn = CalcVentSlabHXEffectTerm( Item, AirTempIn, AirMassFlow, VentSlab( Item ).SurfaceFlowFrac( RadSurfNum ), VentSlab( Item ).CoreLength, VentSlab( Item ).CoreDiameter, VentSlab( Item ).CoreNumbers );
 
-					// Obtain the heat balance coefficients and calculate the intermediate coefficients
-					// linking the inlet air temperature to the heat source/sink to the radiant system.
-					// The coefficients are based on the Constant Flow Radiation System.
+				// Obtain the heat balance coefficients and calculate the intermediate coefficients
+				// linking the inlet air temperature to the heat source/sink to the radiant system.
+				// The coefficients are based on the Constant Flow Radiation System.
 
-					ConstrNum = Construction[ SurfNum  - 1 ];
+				ConstrNum = Construction[ SurfNum  - 1 ];
 
-					Ca = RadSysTiHBConstCoef( SurfNum );
-					Cb = RadSysTiHBToutCoef( SurfNum );
-					Cc = RadSysTiHBQsrcCoef( SurfNum );
+				Ca = RadSysTiHBConstCoef( SurfNum );
+				Cb = RadSysTiHBToutCoef( SurfNum );
+				Cc = RadSysTiHBQsrcCoef( SurfNum );
 
-					Cd = RadSysToHBConstCoef( SurfNum );
-					Ce = RadSysToHBTinCoef( SurfNum );
-					Cf = RadSysToHBQsrcCoef( SurfNum );
+				Cd = RadSysToHBConstCoef( SurfNum );
+				Ce = RadSysToHBTinCoef( SurfNum );
+				Cf = RadSysToHBQsrcCoef( SurfNum );
 
-					Cg = CTFTsrcConstPart( SurfNum );
-					Ch = double( Construct( ConstrNum ).CTFTSourceQ( 0 ) );
-					Ci = double( Construct( ConstrNum ).CTFTSourceIn( 0 ) );
-					Cj = double( Construct( ConstrNum ).CTFTSourceOut( 0 ) );
+				Cg = CTFTsrcConstPart( SurfNum );
+				Ch = double( Construct( ConstrNum ).CTFTSourceQ( 0 ) );
+				Ci = double( Construct( ConstrNum ).CTFTSourceIn( 0 ) );
+				Cj = double( Construct( ConstrNum ).CTFTSourceOut( 0 ) );
 
-					Ck = Cg + ( ( Ci * ( Ca + Cb * Cd ) + Cj * ( Cd + Ce * Ca ) ) / ( 1.0 - Ce * Cb ) );
-					Cl = Ch + ( ( Ci * ( Cc + Cb * Cf ) + Cj * ( Cf + Ce * Cc ) ) / ( 1.0 - Ce * Cb ) );
+				Ck = Cg + ( ( Ci * ( Ca + Cb * Cd ) + Cj * ( Cd + Ce * Ca ) ) / ( 1.0 - Ce * Cb ) );
+				Cl = Ch + ( ( Ci * ( Cc + Cb * Cf ) + Cj * ( Cf + Ce * Cc ) ) / ( 1.0 - Ce * Cb ) );
 
-					Mdot = AirMassFlow * VentSlab( Item ).SurfaceFlowFrac( RadSurfNum );
-					CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
+				Mdot = AirMassFlow * VentSlab( Item ).SurfaceFlowFrac( RadSurfNum );
+				CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
 
-					QRadSysSource( SurfNum ) = VentSlab( Item ).CoreNumbers * EpsMdotCpAirZn * ( AirTempIn - Ck ) / ( 1.0 + ( EpsMdotCpAirZn * Cl / Surface( SurfNum ).Area ) );
+				QRadSysSource( SurfNum ) = VentSlab( Item ).CoreNumbers * EpsMdotCpAirZn * ( AirTempIn - Ck ) / ( 1.0 + ( EpsMdotCpAirZn * Cl / Surface( SurfNum ).Area ) );
 
-					if ( Surface( SurfNum ).ExtBoundCond > 0 && Surface( SurfNum ).ExtBoundCond != SurfNum ) QRadSysSource( Surface( SurfNum ).ExtBoundCond ) = QRadSysSource( SurfNum );
-					// Also set the other side of an interzone!
-					AirTempOut( RadSurfNum ) = AirTempIn - ( QRadSysSource( SurfNum ) / ( Mdot * CpAirZn ) );
+				if ( Surface( SurfNum ).ExtBoundCond > 0 && Surface( SurfNum ).ExtBoundCond != SurfNum ) QRadSysSource( Surface( SurfNum ).ExtBoundCond ) = QRadSysSource( SurfNum );
+				// Also set the other side of an interzone!
+				AirTempOut( RadSurfNum ) = AirTempIn - ( QRadSysSource( SurfNum ) / ( Mdot * CpAirZn ) );
 
-					// "Temperature Comparison" Cut-off:
-					// Check to see whether or not the system should really be running.  If
-					// QRadSysSource is negative when we are in heating mode or QRadSysSource
-					// is positive when we are in cooling mode, then the radiant system will
-					// be doing the opposite of its intention.  In this case, the flow rate
-					// is set to zero to avoid heating in cooling mode or cooling in heating
-					// mode.
+				// "Temperature Comparison" Cut-off:
+				// Check to see whether or not the system should really be running.  If
+				// QRadSysSource is negative when we are in heating mode or QRadSysSource
+				// is positive when we are in cooling mode, then the radiant system will
+				// be doing the opposite of its intention.  In this case, the flow rate
+				// is set to zero to avoid heating in cooling mode or cooling in heating
+				// mode.
 
-					if ( ( ( OperatingMode == HeatingMode ) && ( QRadSysSource( SurfNum ) <= 0.0 ) ) || ( ( OperatingMode == CoolingMode ) && ( QRadSysSource( SurfNum ) >= 0.0 ) ) ) {
+				if ( ( ( OperatingMode == HeatingMode ) && ( QRadSysSource( SurfNum ) <= 0.0 ) ) || ( ( OperatingMode == CoolingMode ) && ( QRadSysSource( SurfNum ) >= 0.0 ) ) ) {
 
-						// IF (.not. WarmupFlag) THEN
-						//   TempComparisonErrorCount = TempComparisonErrorCount + 1
-						//   IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
-						//     CALL ShowWarningError('Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')
-						//     CALL ShowContinueError('Flow to the following ventilated slab will be shut-off to avoid heating in cooling mode or cooling &
-						//                             in heating mode')
-						//     CALL ShowContinueError('Ventilated Slab Name = '//TRIM(VentSlab(Item)%Name))
-						//     CALL ShowContinueError('All node temperature are reseted at the ventilated slab surface temperature = '// &
-						//                            RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(RadSurfNum),1,2),2))
-						//     CALL ShowContinueErrorTimeStamp(' ')
-						//   ELSE
-						//     CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
-						//                  '] Temperature Comparison Error shut-off occurrence continues.',  &
-						//                  VentSlab(Item)%CondErrCount)
-						//   END IF
-						// END IF
+				  // IF (.not. WarmupFlag) THEN
+				  //   TempComparisonErrorCount = TempComparisonErrorCount + 1
+				  //   IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
+				  //     CALL ShowWarningError('Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')
+				  //     CALL ShowContinueError('Flow to the following ventilated slab will be shut-off to avoid heating in cooling mode or cooling &
+				  //                             in heating mode')
+				  //     CALL ShowContinueError('Ventilated Slab Name = '//TRIM(VentSlab(Item)%Name))
+				  //     CALL ShowContinueError('All node temperature are reseted at the ventilated slab surface temperature = '// &
+				  //                            RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(RadSurfNum),1,2),2))
+				  //     CALL ShowContinueErrorTimeStamp(' ')
+				  //   ELSE
+				  //     CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
+				  //                  '] Temperature Comparison Error shut-off occurrence continues.',  &
+				  //                  VentSlab(Item)%CondErrCount)
+				  //   END IF
+				  // END IF
 
+				  Node( SlabInNode ).MassFlowRate = 0.0;
+				  Node( FanOutletNode ).MassFlowRate = 0.0;
+				  Node( OAInletNode ).MassFlowRate = 0.0;
+				  Node( MixoutNode ).MassFlowRate = 0.0;
+				  Node( ReturnAirNode ).MassFlowRate = 0.0;
+				  AirMassFlow = 0.0;
+
+				  for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
+					 SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum2 );
+					 QRadSysSource( SurfNum2 ) = 0.0;
+					 if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
+
+					 if ( VentSlab( Item ).SysConfg == SlabOnly ) {
+						//            Node(Returnairnode)%Temp = MAT(Zonenum)
+						Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
+						Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
+						Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
+					 } else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
+						Node( ReturnAirNode ).Temp = MAT( ZoneNum );
+						Node( SlabInNode ).Temp = Node( ReturnAirNode ).Temp;
+						Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
+						Node( ZoneAirInNode ).Temp = Node( SlabInNode ).Temp;
+					 }
+
+				  }
+				  break; // outer do loop
+				}
+
+				// Condensation Cut-off:
+				// Check to see whether there are any surface temperatures within the radiant system that have
+				// dropped below the dew-point temperature.  If so, we need to shut off this radiant system.
+				// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
+				// conditions.
+
+				if ( OperatingMode == CoolingMode ) {
+				  DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
+				  for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
+					 if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
+						// Condensation warning--must shut off radiant system
 						Node( SlabInNode ).MassFlowRate = 0.0;
 						Node( FanOutletNode ).MassFlowRate = 0.0;
 						Node( OAInletNode ).MassFlowRate = 0.0;
 						Node( MixoutNode ).MassFlowRate = 0.0;
 						Node( ReturnAirNode ).MassFlowRate = 0.0;
+						Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
 						AirMassFlow = 0.0;
+						for ( RadSurfNum3 = 1; RadSurfNum3 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum3 ) {
+						  SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum3 );
+						  QRadSysSource( SurfNum2 ) = 0.0;
+						  if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
+						}
+						// Produce a warning message so that user knows the system was shut-off due to potential for condensation
+						if ( ! WarmupFlag ) {
+						  ++CondensationErrorCount;
 
-						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-							SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum2 );
-							QRadSysSource( SurfNum2 ) = 0.0;
-							if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
-
-							if ( VentSlab( Item ).SysConfg == SlabOnly ) {
-								//            Node(Returnairnode)%Temp = MAT(Zonenum)
-								Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( RadSurfNum ), 1, 2 );
-								Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
-								Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
-							} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
-								Node( ReturnAirNode ).Temp = MAT( ZoneNum );
-								Node( SlabInNode ).Temp = Node( ReturnAirNode ).Temp;
-								Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
-								Node( ZoneAirInNode ).Temp = Node( SlabInNode ).Temp;
-							}
-
+						  if ( VentSlab( Item ).CondErrIndex == 0 ) {
+							 ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
+							 ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
+							 ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
+							 ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+							 ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
+							 ShowContinueErrorTimeStamp( "" );
+						  }
+						  if ( CondensationErrorCount == 1 ) {
+							 ShowContinueError( "Note that there is a " + RoundSigDigits( CondDeltaTemp, 4 ) + " C safety built-in to the shut-off criteria" );
+							 ShowContinueError( "Note also that this affects all surfaces that are part of this system" );
+						  }
+						  ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 						}
 						break; // outer do loop
-					}
+					 }
+				  }
+				}
+			 }
 
-					// Condensation Cut-off:
-					// Check to see whether there are any surface temperatures within the radiant system that have
-					// dropped below the dew-point temperature.  If so, we need to shut off this radiant system.
-					// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
-					// conditions.
+			 // Total Radiant Power
+			 AirOutletTempCheck = 0.0;
+			 TotalVentSlabRadPower = 0.0;
+			 for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+				SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+				TotalVentSlabRadPower += QRadSysSource( SurfNum );
+				AirOutletTempCheck += ( VentSlab( Item ).SurfaceFlowFrac( RadSurfNum ) * AirTempOut( RadSurfNum ) );
+			 }
+			 TotalVentSlabRadPower *= ZoneMult;
 
-					if ( OperatingMode == CoolingMode ) {
-						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZonePtr ), OutBaroPress );
-						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
-								// Condensation warning--must shut off radiant system
-								Node( SlabInNode ).MassFlowRate = 0.0;
-								Node( FanOutletNode ).MassFlowRate = 0.0;
-								Node( OAInletNode ).MassFlowRate = 0.0;
-								Node( MixoutNode ).MassFlowRate = 0.0;
-								Node( ReturnAirNode ).MassFlowRate = 0.0;
-								Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
-								AirMassFlow = 0.0;
-								for ( RadSurfNum3 = 1; RadSurfNum3 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum3 ) {
-									SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum3 );
-									QRadSysSource( SurfNum2 ) = 0.0;
-									if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
-								}
-								// Produce a warning message so that user knows the system was shut-off due to potential for condensation
-								if ( ! WarmupFlag ) {
-									++CondensationErrorCount;
+			 // Return Air temp Check
+			 if ( VentSlab( Item ).SysConfg == SlabOnly ) {
+				if ( AirMassFlow > 0.0 ) {
+				  CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
+				  Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp - ( TotalVentSlabRadPower / ( AirMassFlow * CpAirZn ) );
+				  if ( ( std::abs( Node( ReturnAirNode ).Temp - AirOutletTempCheck ) > TempCheckLimit ) && ( std::abs( TotalVentSlabRadPower ) > ZeroSystemResp ) ) {
 
-									if ( VentSlab( Item ).CondErrIndex == 0 ) {
-										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
-										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
-										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
-										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
-										ShowContinueErrorTimeStamp( "" );
-									}
-									if ( CondensationErrorCount == 1 ) {
-										ShowContinueError( "Note that there is a " + RoundSigDigits( CondDeltaTemp, 4 ) + " C safety built-in to the shut-off criteria" );
-										ShowContinueError( "Note also that this affects all surfaces that are part of this system" );
-									}
-									ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
-								}
-								break; // outer do loop
-							}
+					 if ( ! WarmupFlag ) {
+						++EnergyImbalanceErrorCount;
+						if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
+						  ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
+						  ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
+						  ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
+						  ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
+						  ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
+						  ShowContinueError( "also look at the internal data shown below." );
+						  ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
+						  ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
+						  ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
+						  ShowContinueErrorTimeStamp( "" );
 						}
-					}
+						ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
+					 }
+
+				  }
+				} else {
+				  Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp;
 				}
+			 }
 
-				// Total Radiant Power
-				AirOutletTempCheck = 0.0;
-				TotalVentSlabRadPower = 0.0;
-				for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-					SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-					TotalVentSlabRadPower += QRadSysSource( SurfNum );
-					AirOutletTempCheck += ( VentSlab( Item ).SurfaceFlowFrac( RadSurfNum ) * AirTempOut( RadSurfNum ) );
-				}
-				TotalVentSlabRadPower *= ZoneMult;
+			 if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
+				if ( AirMassFlow > 0.0 ) {
+				  Node( ZoneAirInNode ).Temp = Node( SlabInNode ).Temp - ( TotalVentSlabRadPower / ( AirMassFlow * CpAirZn ) );
+				  if ( ( std::abs( Node( ZoneAirInNode ).Temp - AirOutletTempCheck ) > TempCheckLimit ) && ( std::abs( TotalVentSlabRadPower ) > ZeroSystemResp ) ) {
 
-				// Return Air temp Check
-				if ( VentSlab( Item ).SysConfg == SlabOnly ) {
-					if ( AirMassFlow > 0.0 ) {
-						CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
-						Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp - ( TotalVentSlabRadPower / ( AirMassFlow * CpAirZn ) );
-						if ( ( std::abs( Node( ReturnAirNode ).Temp - AirOutletTempCheck ) > TempCheckLimit ) && ( std::abs( TotalVentSlabRadPower ) > ZeroSystemResp ) ) {
-
-							if ( ! WarmupFlag ) {
-								++EnergyImbalanceErrorCount;
-								if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
-									ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
-									ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
-									ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
-									ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
-									ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
-									ShowContinueError( "also look at the internal data shown below." );
-									ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
-									ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
-									ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
-									ShowContinueErrorTimeStamp( "" );
-								}
-								ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
-							}
-
+					 if ( ! WarmupFlag ) {
+						++EnergyImbalanceErrorCount;
+						if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
+						  ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
+						  ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
+						  ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
+						  ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
+						  ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
+						  ShowContinueError( "also look at the internal data shown below." );
+						  ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
+						  ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
+						  ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
+						  ShowContinueErrorTimeStamp( "" );
 						}
-					} else {
-						Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp;
-					}
+						ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
+					 }
+
+				  }
+				  //       IF ((.NOT. FirstHVACIteration) .AND. &
+				  //          (ABS(Node(ReturnAirNode)%Temp-MAT(Zonenum)) > VentSlabAirTempToler))THEN
+				  //          NeedtoIterate = .TRUE.
+				  //      END IF
+				  //         Node(ReturnAirNode)%Temp = MAT(Zonenum)
+				} else {
+				  Node( ZoneAirInNode ).Temp = Node( SlabInNode ).Temp;
+				  Node( ReturnAirNode ).Temp = MAT( ZoneNum );
 				}
+			 }
 
-				if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
-					if ( AirMassFlow > 0.0 ) {
-						Node( ZoneAirInNode ).Temp = Node( SlabInNode ).Temp - ( TotalVentSlabRadPower / ( AirMassFlow * CpAirZn ) );
-						if ( ( std::abs( Node( ZoneAirInNode ).Temp - AirOutletTempCheck ) > TempCheckLimit ) && ( std::abs( TotalVentSlabRadPower ) > ZeroSystemResp ) ) {
+			 // Now that we have the source/sink term, we must redo the heat balances to obtain
+			 // the new SumHATsurf value for the zone.  Note that the difference between the new
+			 // SumHATsurf and the value originally calculated by the heat balance with a zero
+			 // source for all radiant systems in the zone is the load met by the system (approximately).
+			 CalcHeatBalanceOutsideSurf( ZoneNum );
+			 CalcHeatBalanceInsideSurf( ZoneNum );
 
-							if ( ! WarmupFlag ) {
-								++EnergyImbalanceErrorCount;
-								if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
-									ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
-									ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
-									ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
-									ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
-									ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
-									ShowContinueError( "also look at the internal data shown below." );
-									ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
-									ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
-									ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
-									ShowContinueErrorTimeStamp( "" );
-								}
-								ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
-							}
+		  } //SYSCONFIG. SLABONLY&SLABANDZONE
 
+		  if ( VentSlab( Item ).SysConfg == SeriesSlabs ) {
+
+			 for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+
+				CNumDS = VentSlab( Item ).CNumbers( RadSurfNum );
+				CLengDS = VentSlab( Item ).CLength( RadSurfNum ); // for check
+				CDiaDS = VentSlab( Item ).CDiameter( RadSurfNum ); // for check
+				FlowFrac = 1.0;
+
+				SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+
+				// Determine the heat exchanger "effectiveness" term
+				EpsMdotCpAirZn = CalcVentSlabHXEffectTerm( Item, AirTempIn, AirMassFlow, FlowFrac, CLengDS, CDiaDS, CNumDS );
+
+				// Obtain the heat balance coefficients and calculate the intermediate coefficients
+				// linking the inlet air temperature to the heat source/sink to the radiant system.
+				// The coefficients are based on the Constant Flow Radiation System.
+
+				ConstrNum = Construction[ SurfNum  - 1 ];
+
+				Ca = RadSysTiHBConstCoef( SurfNum );
+				Cb = RadSysTiHBToutCoef( SurfNum );
+				Cc = RadSysTiHBQsrcCoef( SurfNum );
+
+				Cd = RadSysToHBConstCoef( SurfNum );
+				Ce = RadSysToHBTinCoef( SurfNum );
+				Cf = RadSysToHBQsrcCoef( SurfNum );
+
+				Cg = CTFTsrcConstPart( SurfNum );
+				Ch = double( Construct( ConstrNum ).CTFTSourceQ( 0 ) );
+				Ci = double( Construct( ConstrNum ).CTFTSourceIn( 0 ) );
+				Cj = double( Construct( ConstrNum ).CTFTSourceOut( 0 ) );
+
+				Ck = Cg + ( ( Ci * ( Ca + Cb * Cd ) + Cj * ( Cd + Ce * Ca ) ) / ( 1.0 - Ce * Cb ) );
+				Cl = Ch + ( ( Ci * ( Cc + Cb * Cf ) + Cj * ( Cf + Ce * Cc ) ) / ( 1.0 - Ce * Cb ) );
+
+				Mdot = AirMassFlow * FlowFrac;
+				CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
+
+				QRadSysSource( SurfNum ) = CNumDS * EpsMdotCpAirZn * ( AirTempIn - Ck ) / ( 1.0 + ( EpsMdotCpAirZn * Cl / Surface( SurfNum ).Area ) );
+
+				if ( Surface( SurfNum ).ExtBoundCond > 0 && Surface( SurfNum ).ExtBoundCond != SurfNum ) QRadSysSource( Surface( SurfNum ).ExtBoundCond ) = QRadSysSource( SurfNum );
+				// Also set the other side of an interzone!
+
+				AirTempOut( RadSurfNum ) = AirTempIn - ( QRadSysSource( SurfNum ) / ( Mdot * CpAirZn ) );
+				AirTempIn = AirTempOut( RadSurfNum );
+				// "Temperature Comparison" Cut-off:
+				// Check to see whether or not the system should really be running.  If
+				// QRadSysSource is negative when we are in heating mode or QRadSysSource
+				// is positive when we are in cooling mode, then the radiant system will
+				// be doing the opposite of its intention.  In this case, the flow rate
+				// is set to zero to avoid heating in cooling mode or cooling in heating
+				// mode.
+
+				if ( RadSurfNum == 1 ) {
+				  if ( ( ( OperatingMode == HeatingMode ) && ( QRadSysSource( SurfNum ) <= 0.0 ) ) || ( ( OperatingMode == CoolingMode ) && ( QRadSysSource( SurfNum ) >= 0.0 ) ) ) {
+					 //IF (.not. WarmupFlag) THEN
+					 //  TempComparisonErrorCount = TempComparisonErrorCount + 1
+					 //  IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
+					 //    CALL ShowWarningError('Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')
+					 //    CALL ShowContinueError('Flow to the following ventilated slab will be shut-off to avoid heating in cooling mode or cooling &
+					 //                            in heating mode')
+					 //    CALL ShowContinueError('Ventilated Slab Name = '//TRIM(VentSlab(Item)%Name))
+					 //    CALL ShowContinueError('Surface Name  = '//TRIM(VentSlab(Item)%SurfaceName(RadSurfNum)))
+					 //    CALL ShowContinueError('All node temperature are reseted at the surface temperature of control zone = '// &
+					 //                           RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(1),1,2),2))
+					 //    CALL ShowContinueErrorTimeStamp(' ')
+					 //  ELSE
+					 //    CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
+					 //                 ']  shut-off occurrence continues due to temperature comparison error.',  &
+					 //                 VentSlab(Item)%CondErrCount)
+					 //  END IF
+					 //END IF
+
+					 Node( SlabInNode ).MassFlowRate = 0.0;
+					 Node( FanOutletNode ).MassFlowRate = 0.0;
+					 Node( OAInletNode ).MassFlowRate = 0.0;
+					 Node( MixoutNode ).MassFlowRate = 0.0;
+					 Node( ReturnAirNode ).MassFlowRate = 0.0;
+					 AirMassFlow = 0.0;
+
+					 for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
+						SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum2 );
+						QRadSysSource( SurfNum2 ) = 0.0;
+						if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
+					 }
+					 Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
+					 Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
+					 Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
+					 // Each Internal node is reseted at the surface temperature
+
+					 break; // outer do loop
+				  }
+				}
+				// Condensation Cut-off:
+				// Check to see whether there are any surface temperatures within the radiant system that have
+				// dropped below the dew-point temperature.  If so, we need to shut off this radiant system.
+				// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
+				// conditions.
+
+				if ( OperatingMode == CoolingMode ) {
+				  DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress );
+				  for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
+					 if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
+						// Condensation warning--must shut off radiant system
+						Node( SlabInNode ).MassFlowRate = 0.0;
+						Node( FanOutletNode ).MassFlowRate = 0.0;
+						Node( OAInletNode ).MassFlowRate = 0.0;
+						Node( MixoutNode ).MassFlowRate = 0.0;
+						Node( ReturnAirNode ).MassFlowRate = 0.0;
+						Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
+						AirMassFlow = 0.0;
+						for ( RadSurfNum3 = 1; RadSurfNum3 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum3 ) {
+						  SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum3 );
+						  QRadSysSource( SurfNum2 ) = 0.0;
+						  if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
 						}
-						//       IF ((.NOT. FirstHVACIteration) .AND. &
-						//          (ABS(Node(ReturnAirNode)%Temp-MAT(Zonenum)) > VentSlabAirTempToler))THEN
-						//          NeedtoIterate = .TRUE.
-						//      END IF
-						//         Node(ReturnAirNode)%Temp = MAT(Zonenum)
-					} else {
-						Node( ZoneAirInNode ).Temp = Node( SlabInNode ).Temp;
-						Node( ReturnAirNode ).Temp = MAT( ZoneNum );
-					}
-				}
-
-				// Now that we have the source/sink term, we must redo the heat balances to obtain
-				// the new SumHATsurf value for the zone.  Note that the difference between the new
-				// SumHATsurf and the value originally calculated by the heat balance with a zero
-				// source for all radiant systems in the zone is the load met by the system (approximately).
-				CalcHeatBalanceOutsideSurf( ZoneNum );
-				CalcHeatBalanceInsideSurf( ZoneNum );
-
-			} //SYSCONFIG. SLABONLY&SLABANDZONE
-
-			if ( VentSlab( Item ).SysConfg == SeriesSlabs ) {
-
-				for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-
-					CNumDS = VentSlab( Item ).CNumbers( RadSurfNum );
-					CLengDS = VentSlab( Item ).CLength( RadSurfNum ); // for check
-					CDiaDS = VentSlab( Item ).CDiameter( RadSurfNum ); // for check
-					FlowFrac = 1.0;
-
-					SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-
-					// Determine the heat exchanger "effectiveness" term
-					EpsMdotCpAirZn = CalcVentSlabHXEffectTerm( Item, AirTempIn, AirMassFlow, FlowFrac, CLengDS, CDiaDS, CNumDS );
-
-					// Obtain the heat balance coefficients and calculate the intermediate coefficients
-					// linking the inlet air temperature to the heat source/sink to the radiant system.
-					// The coefficients are based on the Constant Flow Radiation System.
-
-					ConstrNum = Construction[ SurfNum  - 1 ];
-
-					Ca = RadSysTiHBConstCoef( SurfNum );
-					Cb = RadSysTiHBToutCoef( SurfNum );
-					Cc = RadSysTiHBQsrcCoef( SurfNum );
-
-					Cd = RadSysToHBConstCoef( SurfNum );
-					Ce = RadSysToHBTinCoef( SurfNum );
-					Cf = RadSysToHBQsrcCoef( SurfNum );
-
-					Cg = CTFTsrcConstPart( SurfNum );
-					Ch = double( Construct( ConstrNum ).CTFTSourceQ( 0 ) );
-					Ci = double( Construct( ConstrNum ).CTFTSourceIn( 0 ) );
-					Cj = double( Construct( ConstrNum ).CTFTSourceOut( 0 ) );
-
-					Ck = Cg + ( ( Ci * ( Ca + Cb * Cd ) + Cj * ( Cd + Ce * Ca ) ) / ( 1.0 - Ce * Cb ) );
-					Cl = Ch + ( ( Ci * ( Cc + Cb * Cf ) + Cj * ( Cf + Ce * Cc ) ) / ( 1.0 - Ce * Cb ) );
-
-					Mdot = AirMassFlow * FlowFrac;
-					CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
-
-					QRadSysSource( SurfNum ) = CNumDS * EpsMdotCpAirZn * ( AirTempIn - Ck ) / ( 1.0 + ( EpsMdotCpAirZn * Cl / Surface( SurfNum ).Area ) );
-
-					if ( Surface( SurfNum ).ExtBoundCond > 0 && Surface( SurfNum ).ExtBoundCond != SurfNum ) QRadSysSource( Surface( SurfNum ).ExtBoundCond ) = QRadSysSource( SurfNum );
-					// Also set the other side of an interzone!
-
-					AirTempOut( RadSurfNum ) = AirTempIn - ( QRadSysSource( SurfNum ) / ( Mdot * CpAirZn ) );
-					AirTempIn = AirTempOut( RadSurfNum );
-					// "Temperature Comparison" Cut-off:
-					// Check to see whether or not the system should really be running.  If
-					// QRadSysSource is negative when we are in heating mode or QRadSysSource
-					// is positive when we are in cooling mode, then the radiant system will
-					// be doing the opposite of its intention.  In this case, the flow rate
-					// is set to zero to avoid heating in cooling mode or cooling in heating
-					// mode.
-
-					if ( RadSurfNum == 1 ) {
-						if ( ( ( OperatingMode == HeatingMode ) && ( QRadSysSource( SurfNum ) <= 0.0 ) ) || ( ( OperatingMode == CoolingMode ) && ( QRadSysSource( SurfNum ) >= 0.0 ) ) ) {
-							//IF (.not. WarmupFlag) THEN
-							//  TempComparisonErrorCount = TempComparisonErrorCount + 1
-							//  IF (TempComparisonErrorCount <= NumOfVentSlabs) THEN
-							//    CALL ShowWarningError('Radaint Heat exchange is negative in Heating Mode or posive in Cooling Mode')
-							//    CALL ShowContinueError('Flow to the following ventilated slab will be shut-off to avoid heating in cooling mode or cooling &
-							//                            in heating mode')
-							//    CALL ShowContinueError('Ventilated Slab Name = '//TRIM(VentSlab(Item)%Name))
-							//    CALL ShowContinueError('Surface Name  = '//TRIM(VentSlab(Item)%SurfaceName(RadSurfNum)))
-							//    CALL ShowContinueError('All node temperature are reseted at the surface temperature of control zone = '// &
-							//                           RoundSigDigits(TH(VentSlab(Item)%SurfacePtr(1),1,2),2))
-							//    CALL ShowContinueErrorTimeStamp(' ')
-							//  ELSE
-							//    CALL ShowRecurringWarningErrorAtEnd('Ventilated Slab ['//TRIM(VentSlab(Item)%Name)//  &
-							//                 ']  shut-off occurrence continues due to temperature comparison error.',  &
-							//                 VentSlab(Item)%CondErrCount)
-							//  END IF
-							//END IF
-
-							Node( SlabInNode ).MassFlowRate = 0.0;
-							Node( FanOutletNode ).MassFlowRate = 0.0;
-							Node( OAInletNode ).MassFlowRate = 0.0;
-							Node( MixoutNode ).MassFlowRate = 0.0;
-							Node( ReturnAirNode ).MassFlowRate = 0.0;
-							AirMassFlow = 0.0;
-
-							for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-								SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum2 );
-								QRadSysSource( SurfNum2 ) = 0.0;
-								if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
-							}
-							Node( ReturnAirNode ).Temp = TH( VentSlab( Item ).SurfacePtr( 1 ), 1, 2 );
-							Node( FanOutletNode ).Temp = Node( ReturnAirNode ).Temp;
-							Node( SlabInNode ).Temp = Node( FanOutletNode ).Temp;
-							// Each Internal node is reseted at the surface temperature
-
-							break; // outer do loop
+						// Produce a warning message so that user knows the system was shut-off due to potential for condensation
+						if ( ! WarmupFlag ) {
+						  ++CondensationErrorCount;
+						  if ( VentSlab( Item ).CondErrIndex == 0 ) {
+							 ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
+							 ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
+							 ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
+							 ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
+							 ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
+							 ShowContinueErrorTimeStamp( "" );
+						  }
+						  if ( CondensationErrorCount == 1 ) {
+							 ShowContinueError( "Note that there is a " + RoundSigDigits( CondDeltaTemp, 4 ) + " C safety built-in to the shut-off criteria" );
+							 ShowContinueError( "Note also that this affects all surfaces that are part of this system" );
+						  }
+						  ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
 						}
-					}
-					// Condensation Cut-off:
-					// Check to see whether there are any surface temperatures within the radiant system that have
-					// dropped below the dew-point temperature.  If so, we need to shut off this radiant system.
-					// A safety parameter is added (hardwired parameter) to avoid getting too close to condensation
-					// conditions.
-
-					if ( OperatingMode == CoolingMode ) {
-						DewPointTemp = PsyTdpFnWPb( ZoneAirHumRat( VentSlab( Item ).ZPtr( RadSurfNum ) ), OutBaroPress );
-						for ( RadSurfNum2 = 1; RadSurfNum2 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum2 ) {
-							if ( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ) < ( DewPointTemp + CondDeltaTemp ) ) {
-								// Condensation warning--must shut off radiant system
-								Node( SlabInNode ).MassFlowRate = 0.0;
-								Node( FanOutletNode ).MassFlowRate = 0.0;
-								Node( OAInletNode ).MassFlowRate = 0.0;
-								Node( MixoutNode ).MassFlowRate = 0.0;
-								Node( ReturnAirNode ).MassFlowRate = 0.0;
-								Node( FanOutletNode ).Temp = Node( SlabInNode ).Temp;
-								AirMassFlow = 0.0;
-								for ( RadSurfNum3 = 1; RadSurfNum3 <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum3 ) {
-									SurfNum2 = VentSlab( Item ).SurfacePtr( RadSurfNum3 );
-									QRadSysSource( SurfNum2 ) = 0.0;
-									if ( Surface( SurfNum2 ).ExtBoundCond > 0 && Surface( SurfNum2 ).ExtBoundCond != SurfNum2 ) QRadSysSource( Surface( SurfNum2 ).ExtBoundCond ) = 0.0; // Also zero the other side of an interzone
-								}
-								// Produce a warning message so that user knows the system was shut-off due to potential for condensation
-								if ( ! WarmupFlag ) {
-									++CondensationErrorCount;
-									if ( VentSlab( Item ).CondErrIndex == 0 ) {
-										ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
-										ShowContinueError( "Surface [" + Surface( VentSlab( Item ).SurfacePtr( RadSurfNum2 ) ).Name + "] temperature below dew-point temperature--potential for condensation exists" );
-										ShowContinueError( "Flow to the ventilated slab system will be shut-off to avoid condensation" );
-										ShowContinueError( "Predicted radiant system surface temperature = " + RoundSigDigits( TH( VentSlab( Item ).SurfacePtr( RadSurfNum2 ), 1, 2 ), 2 ) );
-										ShowContinueError( "Zone dew-point temperature + safety factor delta= " + RoundSigDigits( DewPointTemp + CondDeltaTemp, 2 ) );
-										ShowContinueErrorTimeStamp( "" );
-									}
-									if ( CondensationErrorCount == 1 ) {
-										ShowContinueError( "Note that there is a " + RoundSigDigits( CondDeltaTemp, 4 ) + " C safety built-in to the shut-off criteria" );
-										ShowContinueError( "Note also that this affects all surfaces that are part of this system" );
-									}
-									ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] condensation shut-off occurrence continues.", VentSlab( Item ).CondErrIndex, DewPointTemp, DewPointTemp, _, "C", "C" );
-								}
-								break; // outer do loop
-							}
-						}
-					}
+						break; // outer do loop
+					 }
+				  }
 				}
+			 }
 
-				// Total Radiant Power
-				AirOutletTempCheck = 0.0;
-				TotalVentSlabRadPower = 0.0;
-				for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-					SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-					TotalVentSlabRadPower += QRadSysSource( SurfNum );
-					AirOutletTempCheck = AirTempOut( RadSurfNum );
-				}
-				TotalVentSlabRadPower *= ZoneMult;
+			 // Total Radiant Power
+			 AirOutletTempCheck = 0.0;
+			 TotalVentSlabRadPower = 0.0;
+			 for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+				SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+				TotalVentSlabRadPower += QRadSysSource( SurfNum );
+				AirOutletTempCheck = AirTempOut( RadSurfNum );
+			 }
+			 TotalVentSlabRadPower *= ZoneMult;
 
-				// Intenal Node Temperature Check
+			 // Intenal Node Temperature Check
 
-				MSlabAirInTemp = Node( SlabInNode ).Temp;
+			 MSlabAirInTemp = Node( SlabInNode ).Temp;
 
-				for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-					SlabName = VentSlab( Item ).SurfaceName( RadSurfNum );
-					MSlabIn = VentSlab( Item ).SlabIn( RadSurfNum );
-					MSlabOut = VentSlab( Item ).SlabOut( RadSurfNum );
-					VentSlab( Item ).MSlabInNode = GetOnlySingleNode( MSlabIn, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
-					VentSlab( Item ).MSlabOutNode = GetOnlySingleNode( MSlabOut, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
-					MSlabInletNode = VentSlab( Item ).MSlabInNode;
-					MSlabOutletNode = VentSlab( Item ).MSlabOutNode;
-					SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+			 for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
+				SlabName = VentSlab( Item ).SurfaceName( RadSurfNum );
+				MSlabIn = VentSlab( Item ).SlabIn( RadSurfNum );
+				MSlabOut = VentSlab( Item ).SlabOut( RadSurfNum );
+				VentSlab( Item ).MSlabInNode = GetOnlySingleNode( MSlabIn, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+				VentSlab( Item ).MSlabOutNode = GetOnlySingleNode( MSlabOut, ErrorsFound, CurrentModuleObject, SlabName, NodeType_Air, NodeConnectionType_Internal, 1, ObjectIsNotParent );
+				MSlabInletNode = VentSlab( Item ).MSlabInNode;
+				MSlabOutletNode = VentSlab( Item ).MSlabOutNode;
+				SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
 
-					if ( AirMassFlow > 0.0 ) {
-
-						CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
-
-						Node( MSlabInletNode ).Temp = MSlabAirInTemp;
-						Node( MSlabOutletNode ).Temp = Node( MSlabInletNode ).Temp - ( QRadSysSource( SurfNum ) / ( AirMassFlow * CpAirZn ) );
-						MSlabAirInTemp = Node( MSlabOutletNode ).Temp;
-					} else {
-						Node( MSlabInletNode ).Temp = Node( ReturnAirNode ).Temp;
-						Node( MSlabOutletNode ).Temp = Node( MSlabInletNode ).Temp;
-					}
-				}
-
-				// Return Air temp Check
 				if ( AirMassFlow > 0.0 ) {
 
-					CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
-					Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp - ( TotalVentSlabRadPower / ( AirMassFlow * CpAirZn ) );
+				  CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
 
-					if ( ( std::abs( Node( ReturnAirNode ).Temp - AirOutletTempCheck ) > TempCheckLimit ) && ( std::abs( TotalVentSlabRadPower ) > ZeroSystemResp ) ) { // Return air temperature check did not match calculated temp
-
-						if ( ! WarmupFlag ) {
-							++EnergyImbalanceErrorCount;
-							if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
-								ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
-								ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
-								ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
-								ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
-								ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
-								ShowContinueError( "also look at the internal data shown below." );
-								ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
-								ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
-								ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
-								ShowContinueErrorTimeStamp( "" );
-							}
-							ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
-						}
-					}
-
+				  Node( MSlabInletNode ).Temp = MSlabAirInTemp;
+				  Node( MSlabOutletNode ).Temp = Node( MSlabInletNode ).Temp - ( QRadSysSource( SurfNum ) / ( AirMassFlow * CpAirZn ) );
+				  MSlabAirInTemp = Node( MSlabOutletNode ).Temp;
 				} else {
-					Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp;
+				  Node( MSlabInletNode ).Temp = Node( ReturnAirNode ).Temp;
+				  Node( MSlabOutletNode ).Temp = Node( MSlabInletNode ).Temp;
+				}
+			 }
+
+			 // Return Air temp Check
+			 if ( AirMassFlow > 0.0 ) {
+
+				CpAirZn = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
+				Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp - ( TotalVentSlabRadPower / ( AirMassFlow * CpAirZn ) );
+
+				if ( ( std::abs( Node( ReturnAirNode ).Temp - AirOutletTempCheck ) > TempCheckLimit ) && ( std::abs( TotalVentSlabRadPower ) > ZeroSystemResp ) ) { // Return air temperature check did not match calculated temp
+
+				  if ( ! WarmupFlag ) {
+					 ++EnergyImbalanceErrorCount;
+					 if ( VentSlab( Item ).EnrgyImbalErrIndex == 0 ) {
+						ShowWarningMessage( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + ']' );
+						ShowContinueError( "Ventilated Slab (slab only type) air outlet temperature calculation mismatch." );
+						ShowContinueError( "This should not happen as it indicates a potential energy imbalance in the calculations." );
+						ShowContinueError( "However, it could also result from improper input for the ventilated slab or" );
+						ShowContinueError( "illogical control temperatures.  Check your input for this ventilated slab and" );
+						ShowContinueError( "also look at the internal data shown below." );
+						ShowContinueError( "Predicted return air temperature [C] from the overall energy balance = " + RoundSigDigits( Node( ReturnAirNode ).Temp, 4 ) );
+						ShowContinueError( "Predicted return air temperature [C] from the slab section energy balances = " + RoundSigDigits( AirOutletTempCheck, 4 ) );
+						ShowContinueError( "Total energy rate (power) [W] added to the slab = " + RoundSigDigits( TotalVentSlabRadPower, 4 ) );
+						ShowContinueErrorTimeStamp( "" );
+					 }
+					 ShowRecurringWarningErrorAtEnd( cMO_VentilatedSlab + " [" + VentSlab( Item ).Name + "] temperature calculation mismatch occurrence continues.", VentSlab( Item ).EnrgyImbalErrIndex );
+				  }
 				}
 
-				// Now that we have the source/sink term, we must redo the heat balances to obtain
-				// the new SumHATsurf value for the zone.  Note that the difference between the new
-				// SumHATsurf and the value originally calculated by the heat balance with a zero
-				// source for all radiant systems in the zone is the load met by the system (approximately).
+			 } else {
+				Node( ReturnAirNode ).Temp = Node( SlabInNode ).Temp;
+			 }
 
-				CalcHeatBalanceOutsideSurf();
-				CalcHeatBalanceInsideSurf();
+			 // Now that we have the source/sink term, we must redo the heat balances to obtain
+			 // the new SumHATsurf value for the zone.  Note that the difference between the new
+			 // SumHATsurf and the value originally calculated by the heat balance with a zero
+			 // source for all radiant systems in the zone is the load met by the system (approximately).
 
-			} // SeriesSlabs
+			 CalcHeatBalanceOutsideSurf();
+			 CalcHeatBalanceInsideSurf();
+
+		  } // SeriesSlabs
 
 		} //(AirMassFlow > 0.0d0)
 
-	}
+	 }
 
-	void
-	SimVentSlabOAMixer( int const Item ) // System index in Ventilated Slab array
-	{
+	 void
+	 SimVentSlabOAMixer( int const Item ) // System index in Ventilated Slab array
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
@@ -3593,10 +3593,10 @@ namespace VentilatedSlab {
 
 		if ( Node( InletNode ).MassFlowRate > 0.0 ) {
 
-			OAFraction = Node( OutsideAirNode ).MassFlowRate / Node( InletNode ).MassFlowRate;
+		  OAFraction = Node( OutsideAirNode ).MassFlowRate / Node( InletNode ).MassFlowRate;
 
 		} else {
-			OAFraction = 0.0;
+		  OAFraction = 0.0;
 		}
 
 		Node( InletNode ).Enthalpy = PsyHFnTdbW( Node( InletNode ).Temp, Node( InletNode ).HumRat );
@@ -3609,14 +3609,14 @@ namespace VentilatedSlab {
 		Node( OAMixOutNode ).Temp = PsyTdbFnHW( Node( OAMixOutNode ).Enthalpy, Node( OAMixOutNode ).HumRat );
 		Node( OAMixOutNode ).Press = Node( InletNode ).Press;
 
-	}
+	 }
 
-	void
-	UpdateVentilatedSlab(
-		int const Item, // Index for the ventilated slab under consideration within the derived types
-		bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
-	)
-	{
+	 void
+	 UpdateVentilatedSlab(
+								 int const Item, // Index for the ventilated slab under consideration within the derived types
+								 bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
+								 )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Young Tae Chae, Rick Strand
@@ -3694,28 +3694,28 @@ namespace VentilatedSlab {
 
 		for ( RadSurfNum = 1; RadSurfNum <= TotRadSurfaces; ++RadSurfNum ) {
 
-			SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+		  SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
 
-			if ( LastSysTimeElapsed( SurfNum ) == SysTimeElapsed ) {
-				// Still iterating or reducing system time step, so subtract old values which were
-				// not valid
-				QRadSysSrcAvg( SurfNum ) -= LastQRadSysSrc( SurfNum ) * LastTimeStepSys( SurfNum ) / TimeStepZone;
-			}
+		  if ( LastSysTimeElapsed( SurfNum ) == SysTimeElapsed ) {
+			 // Still iterating or reducing system time step, so subtract old values which were
+			 // not valid
+			 QRadSysSrcAvg( SurfNum ) -= LastQRadSysSrc( SurfNum ) * LastTimeStepSys( SurfNum ) / TimeStepZone;
+		  }
 
-			// Update the running average and the "last" values with the current values of the appropriate variables
-			QRadSysSrcAvg( SurfNum ) += QRadSysSource( SurfNum ) * TimeStepSys / TimeStepZone;
+		  // Update the running average and the "last" values with the current values of the appropriate variables
+		  QRadSysSrcAvg( SurfNum ) += QRadSysSource( SurfNum ) * TimeStepSys / TimeStepZone;
 
-			LastQRadSysSrc( SurfNum ) = QRadSysSource( SurfNum );
-			LastSysTimeElapsed( SurfNum ) = SysTimeElapsed;
-			LastTimeStepSys( SurfNum ) = TimeStepSys;
+		  LastQRadSysSrc( SurfNum ) = QRadSysSource( SurfNum );
+		  LastSysTimeElapsed( SurfNum ) = SysTimeElapsed;
+		  LastTimeStepSys( SurfNum ) = TimeStepSys;
 
 		}
 
 		// First sum up all of the heat sources/sinks associated with this system
 		TotalHeatSource = 0.0;
 		for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-			SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-			TotalHeatSource += QRadSysSource( SurfNum );
+		  SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+		  TotalHeatSource += QRadSysSource( SurfNum );
 		}
 		ZoneNum = VentSlab( Item ).ZonePtr;
 		ZoneMult = double( Zone( ZoneNum ).Multiplier * Zone( ZoneNum ).ListMultiplier );
@@ -3725,30 +3725,30 @@ namespace VentilatedSlab {
 
 		if ( ( CpAppAir > 0.0 ) && ( AirMassFlow > 0.0 ) ) {
 
-			if ( ( VentSlab( Item ).SysConfg == SlabOnly ) || ( VentSlab( Item ).SysConfg == SeriesSlabs ) ) {
-				Node( AirInletNode ) = Node( AirInletNode );
-				Node( AirInletNode ).Temp = Node( AirOutletNode ).Temp - TotalHeatSource / AirMassFlow / CpAppAir;
-				Node( AirInletNode ).MassFlowRate = Node( AirOutletNode ).MassFlowRate;
-				Node( AirInletNode ).HumRat = Node( AirOutletNode ).HumRat;
+		  if ( ( VentSlab( Item ).SysConfg == SlabOnly ) || ( VentSlab( Item ).SysConfg == SeriesSlabs ) ) {
+			 Node( AirInletNode ) = Node( AirInletNode );
+			 Node( AirInletNode ).Temp = Node( AirOutletNode ).Temp - TotalHeatSource / AirMassFlow / CpAppAir;
+			 Node( AirInletNode ).MassFlowRate = Node( AirOutletNode ).MassFlowRate;
+			 Node( AirInletNode ).HumRat = Node( AirOutletNode ).HumRat;
 
-			} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
-				Node( ZoneInletNode ) = Node( ZoneInletNode );
-				Node( ZoneInletNode ).Temp = Node( AirOutletNode ).Temp - TotalHeatSource / AirMassFlow / CpAppAir;
-				Node( ZoneInletNode ).MassFlowRate = Node( AirOutletNode ).MassFlowRate;
-				Node( ZoneInletNode ).HumRat = Node( AirOutletNode ).HumRat;
-				Node( VentSlab( Item ).ReturnAirNode ).Temp = MAT( ZoneNum );
-			}
+		  } else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
+			 Node( ZoneInletNode ) = Node( ZoneInletNode );
+			 Node( ZoneInletNode ).Temp = Node( AirOutletNode ).Temp - TotalHeatSource / AirMassFlow / CpAppAir;
+			 Node( ZoneInletNode ).MassFlowRate = Node( AirOutletNode ).MassFlowRate;
+			 Node( ZoneInletNode ).HumRat = Node( AirOutletNode ).HumRat;
+			 Node( VentSlab( Item ).ReturnAirNode ).Temp = MAT( ZoneNum );
+		  }
 
 		} else {
-			if ( ( VentSlab( Item ).SysConfg == SlabOnly ) || ( VentSlab( Item ).SysConfg == SeriesSlabs ) ) {
-				Node( FanOutNode ) = Node( AirOutletNode );
-				QRadSysSource( SurfNum ) = 0.0;
+		  if ( ( VentSlab( Item ).SysConfg == SlabOnly ) || ( VentSlab( Item ).SysConfg == SeriesSlabs ) ) {
+			 Node( FanOutNode ) = Node( AirOutletNode );
+			 QRadSysSource( SurfNum ) = 0.0;
 
-			} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
-				Node( ZoneInletNode ) = Node( AirInletNode );
-				Node( FanOutNode ) = Node( AirOutletNode ); // Fan Resolve
-				QRadSysSource( SurfNum ) = 0.0;
-			}
+		  } else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
+			 Node( ZoneInletNode ) = Node( AirInletNode );
+			 Node( FanOutNode ) = Node( AirOutletNode ); // Fan Resolve
+			 QRadSysSource( SurfNum ) = 0.0;
+		  }
 
 		}
 
@@ -3756,39 +3756,39 @@ namespace VentilatedSlab {
 
 		if ( Node( AirInletNode ).MassFlowRate > 0.0 ) {
 
-			OAFraction = Node( OANode ).MassFlowRate / Node( AirInletNode ).MassFlowRate;
+		  OAFraction = Node( OANode ).MassFlowRate / Node( AirInletNode ).MassFlowRate;
 
 		} else {
-			OAFraction = 0.0;
+		  OAFraction = 0.0;
 		}
 
 		if ( OAFraction <= 0.0 ) {
 
-			Node( MixOutNode ).HumRat = Node( AirInletNode ).HumRat;
-			Node( MixOutNode ).Temp = Node( AirInletNode ).Temp;
+		  Node( MixOutNode ).HumRat = Node( AirInletNode ).HumRat;
+		  Node( MixOutNode ).Temp = Node( AirInletNode ).Temp;
 
 		} else {
 
-			Node( MixOutNode ).Enthalpy = OAFraction * Node( OANode ).Enthalpy + ( 1.0 - OAFraction ) * Node( AirInletNode ).Enthalpy;
-			Node( MixOutNode ).HumRat = OAFraction * Node( OANode ).HumRat + ( 1.0 - OAFraction ) * Node( AirInletNode ).HumRat;
+		  Node( MixOutNode ).Enthalpy = OAFraction * Node( OANode ).Enthalpy + ( 1.0 - OAFraction ) * Node( AirInletNode ).Enthalpy;
+		  Node( MixOutNode ).HumRat = OAFraction * Node( OANode ).HumRat + ( 1.0 - OAFraction ) * Node( AirInletNode ).HumRat;
 
-			Node( MixOutNode ).Temp = PsyTdbFnHW( Node( MixOutNode ).Enthalpy, Node( MixOutNode ).HumRat );
+		  Node( MixOutNode ).Temp = PsyTdbFnHW( Node( MixOutNode ).Enthalpy, Node( MixOutNode ).HumRat );
 
 		}
 
-	}
+	 }
 
-	Real64
-	CalcVentSlabHXEffectTerm(
-		int const Item, // Index number of radiant system under consideration
-		Real64 const Temperature, // Temperature of air entering the radiant system, in C
-		Real64 const AirMassFlow, // Mass flow rate of water in the radiant system, in kg/s
-		Real64 const FlowFraction, // Mass flow rate fraction for this surface in the radiant system
-		Real64 const CoreLength, // Length of tubing in the radiant system, in m
-		Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
-		Real64 const CoreNumbers
-	)
-	{
+	 Real64
+	 CalcVentSlabHXEffectTerm(
+									  int const Item, // Index number of radiant system under consideration
+									  Real64 const Temperature, // Temperature of air entering the radiant system, in C
+									  Real64 const AirMassFlow, // Mass flow rate of water in the radiant system, in kg/s
+									  Real64 const FlowFraction, // Mass flow rate fraction for this surface in the radiant system
+									  Real64 const CoreLength, // Length of tubing in the radiant system, in m
+									  Real64 const CoreDiameter, // Inside diameter of the tubing in the radiant system, in m
+									  Real64 const CoreNumbers
+									  )
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
@@ -3857,25 +3857,25 @@ namespace VentilatedSlab {
 		// First find out where we are in the range of temperatures
 		Index = 1;
 		while ( Index <= NumOfPropDivisions ) {
-			if ( Temperature < Temps( Index ) ) break; // DO loop
-			++Index;
+		  if ( Temperature < Temps( Index ) ) break; // DO loop
+		  ++Index;
 		}
 
 		// Initialize thermal properties of Air
 		if ( Index == 1 ) {
-			MUactual = Mu( Index );
-			Kactual = Conductivity( Index );
-			PRactual = Pr( Index );
+		  MUactual = Mu( Index );
+		  Kactual = Conductivity( Index );
+		  PRactual = Pr( Index );
 		} else if ( Index > NumOfPropDivisions ) {
-			Index = NumOfPropDivisions;
-			MUactual = Mu( Index );
-			Kactual = Conductivity( Index );
-			PRactual = Pr( Index );
+		  Index = NumOfPropDivisions;
+		  MUactual = Mu( Index );
+		  Kactual = Conductivity( Index );
+		  PRactual = Pr( Index );
 		} else {
-			InterpFrac = ( Temperature - Temps( Index - 1 ) ) / ( Temps( Index ) - Temps( Index - 1 ) );
-			MUactual = Mu( Index - 1 ) + InterpFrac * ( Mu( Index ) - Mu( Index - 1 ) );
-			Kactual = Conductivity( Index - 1 ) + InterpFrac * ( Conductivity( Index ) - Conductivity( Index - 1 ) );
-			PRactual = Pr( Index - 1 ) + InterpFrac * ( Pr( Index ) - Pr( Index - 1 ) );
+		  InterpFrac = ( Temperature - Temps( Index - 1 ) ) / ( Temps( Index ) - Temps( Index - 1 ) );
+		  MUactual = Mu( Index - 1 ) + InterpFrac * ( Mu( Index ) - Mu( Index - 1 ) );
+		  Kactual = Conductivity( Index - 1 ) + InterpFrac * ( Conductivity( Index ) - Conductivity( Index - 1 ) );
+		  PRactual = Pr( Index - 1 ) + InterpFrac * ( Pr( Index ) - Pr( Index - 1 ) );
 		}
 		// arguments are glycol name, temperature, and concentration
 		CpAppAir = PsyCpAirFnWTdb( Node( VentSlab( Item ).RadInNode ).HumRat, Node( VentSlab( Item ).RadInNode ).Temp );
@@ -3887,11 +3887,11 @@ namespace VentilatedSlab {
 		// Calculate the Nusselt number based on what flow regime one is in
 		if ( ReD >= MaxLaminarRe ) { // Turbulent flow --> use Colburn equation
 
-			NuD = 0.023 * std::pow( ReD, 0.8 ) * std::pow( PRactual, 1.0 / 3.0 );
+		  NuD = 0.023 * std::pow( ReD, 0.8 ) * std::pow( PRactual, 1.0 / 3.0 );
 
 		} else { // Laminar flow --> use constant surface temperature relation
 
-			NuD = 3.66;
+		  NuD = 3.66;
 
 		}
 
@@ -3903,18 +3903,18 @@ namespace VentilatedSlab {
 
 		// Calculate Epsilon*MassFlowRate*Cp
 		if ( NTU > MaxExpPower ) {
-			CalcVentSlabHXEffectTerm = FlowFraction * SysAirMassFlow * CpAppAir;
+		  CalcVentSlabHXEffectTerm = FlowFraction * SysAirMassFlow * CpAppAir;
 		} else {
-			CalcVentSlabHXEffectTerm = ( 1.0 - std::exp( -NTU ) ) * FlowFraction * SysAirMassFlow * CpAppAir;
+		  CalcVentSlabHXEffectTerm = ( 1.0 - std::exp( -NTU ) ) * FlowFraction * SysAirMassFlow * CpAppAir;
 		}
 
 		return CalcVentSlabHXEffectTerm;
 
-	}
+	 }
 
-	Real64
-	SumHATsurf( int const ZoneNum ) // Zone number
-	{
+	 Real64
+	 SumHATsurf( int const ZoneNum ) // Zone number
+	 {
 
 		// FUNCTION INFORMATION:
 		//       AUTHOR         Peter Graham Ellis
@@ -3952,37 +3952,37 @@ namespace VentilatedSlab {
 		SumHATsurf = 0.0;
 
 		for ( SurfNum = ZoneSpecs[ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
-			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
+		  if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 
-			Area = Surface( SurfNum ).Area;
+		  Area = Surface( SurfNum ).Area;
 
-			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
-				if ( SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntBlindOn ) {
-					// The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
-					Area += SurfaceWindow( SurfNum ).DividerArea;
-				}
+		  if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
+			 if ( SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() == IntBlindOn ) {
+				// The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
+				Area += SurfaceWindow( SurfNum ).DividerArea;
+			 }
 
-				if ( SurfaceWindow( SurfNum ).FrameArea > 0.0 ) {
-					// Window frame contribution
-					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * SurfaceWindow( SurfNum ).FrameTempSurfIn;
-				}
+			 if ( SurfaceWindow( SurfNum ).FrameArea > 0.0 ) {
+				// Window frame contribution
+				SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * SurfaceWindow( SurfNum ).FrameTempSurfIn;
+			 }
 
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() != IntShadeOn && SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() != IntBlindOn ) {
-					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
-					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
-				}
-			}
+			 if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() != IntShadeOn && SurfaceRadiantWin[ SurfNum  - 1 ].getShadingFlag() != IntBlindOn ) {
+				// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
+				SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
+			 }
+		  }
 
-			SumHATsurf += HConvIn( SurfNum ) * Area * TempSurfInTmp( SurfNum );
+		  SumHATsurf += HConvIn( SurfNum ) * Area * TempSurfInTmp( SurfNum );
 		}
 
 		return SumHATsurf;
 
-	}
+	 }
 
-	void
-	ReportVentilatedSlab( int const Item ) // Index for the ventilated slab under consideration within the derived types
-	{
+	 void
+	 ReportVentilatedSlab( int const Item ) // Index for the ventilated slab under consideration within the derived types
+	 {
 
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Rick Strand
@@ -4032,8 +4032,8 @@ namespace VentilatedSlab {
 		ZoneMult = 1.0;
 
 		for ( RadSurfNum = 1; RadSurfNum <= VentSlab( Item ).NumOfSurfaces; ++RadSurfNum ) {
-			SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
-			TotalVentSlabRadPower += QRadSysSource( SurfNum );
+		  SurfNum = VentSlab( Item ).SurfacePtr( RadSurfNum );
+		  TotalVentSlabRadPower += QRadSysSource( SurfNum );
 		}
 		ZoneMult = double( Zone( VentSlab( Item ).ZonePtr ).Multiplier * Zone( VentSlab( Item ).ZonePtr ).ListMultiplier );
 		TotalVentSlabRadPower *= ZoneMult;
@@ -4042,10 +4042,10 @@ namespace VentilatedSlab {
 
 		if ( TotalVentSlabRadPower >= 0.01 ) {
 
-			VentSlab( Item ).RadHeatingPower = +TotalVentSlabRadPower;
+		  VentSlab( Item ).RadHeatingPower = +TotalVentSlabRadPower;
 		} else {
 
-			VentSlab( Item ).RadCoolingPower = -TotalVentSlabRadPower;
+		  VentSlab( Item ).RadCoolingPower = -TotalVentSlabRadPower;
 		}
 
 		VentSlab( Item ).RadHeatingEnergy = VentSlab( Item ).RadHeatingPower * TimeStepSys * SecInHour;
@@ -4059,45 +4059,45 @@ namespace VentilatedSlab {
 		VentSlab( Item ).ElecFanEnergy = VentSlab( Item ).ElecFanPower * TimeStepSys * SecInHour;
 
 		if ( ( VentSlab( Item ).SysConfg == SlabOnly ) || ( VentSlab( Item ).SysConfg == SeriesSlabs ) ) {
-			VentSlab( Item ).SlabInTemp = Node( VentSlab( Item ).RadInNode ).Temp;
-			VentSlab( Item ).SlabOutTemp = Node( VentSlab( Item ).ReturnAirNode ).Temp;
+		  VentSlab( Item ).SlabInTemp = Node( VentSlab( Item ).RadInNode ).Temp;
+		  VentSlab( Item ).SlabOutTemp = Node( VentSlab( Item ).ReturnAirNode ).Temp;
 
 		} else if ( VentSlab( Item ).SysConfg == SlabAndZone ) {
-			VentSlab( Item ).SlabInTemp = Node( VentSlab( Item ).RadInNode ).Temp;
-			VentSlab( Item ).ZoneInletTemp = Node( VentSlab( Item ).ZoneAirInNode ).Temp;
-			VentSlab( Item ).SlabOutTemp = Node( VentSlab( Item ).ReturnAirNode ).Temp;
+		  VentSlab( Item ).SlabInTemp = Node( VentSlab( Item ).RadInNode ).Temp;
+		  VentSlab( Item ).ZoneInletTemp = Node( VentSlab( Item ).ZoneAirInNode ).Temp;
+		  VentSlab( Item ).SlabOutTemp = Node( VentSlab( Item ).ReturnAirNode ).Temp;
 		}
 
 		VentSlab( Item ).ReturnAirTemp = Node( VentSlab( Item ).ReturnAirNode ).Temp;
 		VentSlab( Item ).FanOutletTemp = Node( VentSlab( Item ).FanOutletNode ).Temp;
 
-	}
+	 }
 
-	//*****************************************************************************************
+	 //*****************************************************************************************
 
-	//     NOTICE
+	 //     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
-	//     and The Regents of the University of California through Ernest Orlando Lawrence
-	//     Berkeley National Laboratory.  All rights reserved.
+	 //     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	 //     and The Regents of the University of California through Ernest Orlando Lawrence
+	 //     Berkeley National Laboratory.  All rights reserved.
 
-	//     Portions of the EnergyPlus software package have been developed and copyrighted
-	//     by other individuals, companies and institutions.  These portions have been
-	//     incorporated into the EnergyPlus software package under license.   For a complete
-	//     list of contributors, see "Notice" located in main.cc.
+	 //     Portions of the EnergyPlus software package have been developed and copyrighted
+	 //     by other individuals, companies and institutions.  These portions have been
+	 //     incorporated into the EnergyPlus software package under license.   For a complete
+	 //     list of contributors, see "Notice" located in main.cc.
 
-	//     NOTICE: The U.S. Government is granted for itself and others acting on its
-	//     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
-	//     reproduce, prepare derivative works, and perform publicly and display publicly.
-	//     Beginning five (5) years after permission to assert copyright is granted,
-	//     subject to two possible five year renewals, the U.S. Government is granted for
-	//     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
-	//     worldwide license in this data to reproduce, prepare derivative works,
-	//     distribute copies to the public, perform publicly and display publicly, and to
-	//     permit others to do so.
+	 //     NOTICE: The U.S. Government is granted for itself and others acting on its
+	 //     behalf a paid-up, nonexclusive, irrevocable, worldwide license in this data to
+	 //     reproduce, prepare derivative works, and perform publicly and display publicly.
+	 //     Beginning five (5) years after permission to assert copyright is granted,
+	 //     subject to two possible five year renewals, the U.S. Government is granted for
+	 //     itself and others acting on its behalf a paid-up, non-exclusive, irrevocable
+	 //     worldwide license in this data to reproduce, prepare derivative works,
+	 //     distribute copies to the public, perform publicly and display publicly, and to
+	 //     permit others to do so.
 
-	//     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
+	 //     TRADEMARKS: EnergyPlus is a trademark of the US Department of Energy.
 
-} // VentilatedSlab
+  } // VentilatedSlab
 
 } // EnergyPlus

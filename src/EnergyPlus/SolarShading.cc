@@ -915,7 +915,7 @@ namespace SolarShading {
 					// CurrentModuleObject='Switchable Windows'
 					if ( Surface( SurfLoop ).WindowShadingControlPtr > 0 ) {
 						if ( WindowShadingControl( Surface( SurfLoop ).WindowShadingControlPtr ).ShadingType == WSC_ST_SwitchableGlazing ) {
-							//IF (SurfaceRadiantWin[SurfLoop - 1 ].getShadingFlag() == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
+							//IF (SurfaceWindow(SurfLoop)%ShadingFlag == SwitchableGlazing) THEN  !ShadingFlag is not set to SwitchableGlazing yet!
 							SetupOutputVariable( "Surface Window Switchable Glazing Switching Factor []", SurfaceWindow( SurfLoop ).SwitchingFactor, "Zone", "Average", Surface( SurfLoop ).Name );
 							SetupOutputVariable( "Surface Window Switchable Glazing Visible Transmittance []", SurfaceWindow( SurfLoop ).VisTransSelected, "Zone", "Average", Surface( SurfLoop ).Name );
 						}
@@ -1210,7 +1210,7 @@ namespace SolarShading {
 		Real64 KappaZ3; // Intermediate variable
 		Real64 ViewFactorSkyGeom; // Geometrical sky view factor
 		Real64 const cosine_tolerance( 0.0001 );
-
+			
 		// FLOW:
 #ifdef EP_Count_Calls
 		++NumAnisoSky_Calls;
@@ -1244,7 +1244,7 @@ namespace SolarShading {
 			if ( ! Surface( SurfNum ).ExtSolar ) continue;
 
 			CosIncAngBeamOnSurface = SOLCOS( 1 ) * Surface( SurfNum ).OutNormVec( 1 ) + SOLCOS( 2 ) * Surface( SurfNum ).OutNormVec( 2 ) + SOLCOS( 3 ) * Surface( SurfNum ).OutNormVec( 3 );
-
+			
 			// So I believe this should only be a diagnostic error...the calcs should always be within -1,+1; it's just round-off that we need to trap for
 			if ( CosIncAngBeamOnSurface > 1.0 ) {
 				if ( CosIncAngBeamOnSurface > ( 1.0 + cosine_tolerance ) ) {
@@ -1265,7 +1265,7 @@ namespace SolarShading {
 				}
 				CosIncAngBeamOnSurface = -1.0;
 			}
-
+			
 			IncAng = std::acos( CosIncAngBeamOnSurface );
 
 			ViewFactorSkyGeom = Surface( SurfNum ).ViewFactorSky;
@@ -4377,7 +4377,7 @@ namespace SolarShading {
 
 				//TODO by Geof -- why are we checking this stuff AGAIN??!? RECHECK (would comment out but no time to risk a failure!
 				//      No shadow if shading surface is transparent
-				if (! CalcSkyDifShading ) {
+				if ( ! CalcSkyDifShading ) {
 					if ( ! Surface( GSSNR ).HeatTransSurf ) {
 						if ( Surface( GSSNR ).IsTransparent ) continue;
 						if ( Surface( GSSNR ).SchedShadowSurfIndex > 0 ) {
@@ -6486,6 +6486,13 @@ namespace SolarShading {
 													for ( CurBackDir = 1; CurBackDir <= ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).Trn.NBasis; ++CurBackDir ) {
 														// Purpose of this part is to find best match for outgoing beam number of window back surface and incoming beam
 														// number of complex fenestration which this beam will hit on (back surface again)
+														// tempVec1( 1 ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ).x;
+														// tempVec1( 2 ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ).y;
+														// tempVec1( 3 ) = ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ).z;
+														// tempVec2( 1 ) = ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ).x;
+														// tempVec2( 2 ) = ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ).y;
+														// tempVec2( 3 ) = ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ).z;
+														// curDot = dot( tempVec1, tempVec2 );
 														curDot = dot( ComplexWind( SurfNum ).Geom( CurCplxFenState ).sTrn( CurTrnDir ), ComplexWind( BackSurfaceNumber ).Geom( CurBackState ).sTrn( CurBackDir ) );
 														if ( CurBackDir == 1 ) {
 															bestDot = curDot;
@@ -7215,7 +7222,9 @@ namespace SolarShading {
 
 			// Currently (06May02) windows are either rectangles (NVS=4) or triangles (NVS=3)
 
-			if ( NVS == 4 ) { // Rectangular subsurface
+			{ auto const SELECT_CASE_var( NVS );
+
+			if ( SELECT_CASE_var == 4 ) { // Rectangular subsurface
 
 				// Determine vertices of reveal.
 				// Project the subsurface up to the plane of the wall.
@@ -7257,7 +7266,7 @@ namespace SolarShading {
 
 				}
 
-			} else if ( NVS == 3 ) { // Triangular window
+			} else if ( SELECT_CASE_var == 3 ) { // Triangular window
 
 				// Project window to outside plane of parent surface
 
@@ -7302,7 +7311,7 @@ namespace SolarShading {
 					RevealStatusSet = true;
 				}
 
-			}
+			}}
 
 		}
 

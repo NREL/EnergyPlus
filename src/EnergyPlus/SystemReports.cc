@@ -1145,6 +1145,7 @@ namespace SystemReports {
 			DemandSideConnect.allocate( MaxCompArraySize );
 
 			OneTimeFlag = false;
+
 		}
 		LoopStack.LoopNum() = 0;
 		LoopStack.LoopType() = 0;

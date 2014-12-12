@@ -128,6 +128,7 @@ namespace GlobalNames {
 			ChillerNames( NumChillers ).CompType = MakeUPPERCase( TypeToVerify );
 			ChillerNames( NumChillers ).CompName = NameToVerify;
 		}
+
 	}
 
 	void
@@ -314,7 +315,6 @@ namespace GlobalNames {
 		int Found = 0;
 
 		if ( NumCoils > 0 ) Found = FindItemInList( NameToVerify, CoilNames.CompName(), NumCoils );
-
 		if ( Found != 0 ) {
 			ShowSevereError( StringToDisplay + ", duplicate name=" + NameToVerify + ", Coil Type=\"" + CoilNames( Found ).CompType + "\"" );
 			ShowContinueError( "...Current entry is Coil Type=\"" + TypeToVerify + "\"." );

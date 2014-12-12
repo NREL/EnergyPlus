@@ -482,7 +482,7 @@ namespace LowTempRadiantSystem {
 
 			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-
+			
 			HydronicRadiantSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			HydronicRadiantSysNumericFields( Item ).FieldNames = "";
 			HydronicRadiantSysNumericFields( Item ).FieldNames = cNumericFields;
@@ -1071,7 +1071,7 @@ namespace LowTempRadiantSystem {
 
 			GetObjectItem( CurrentModuleObject, Item, Alphas, NumAlphas, Numbers, NumNumbers, IOStatus, lNumericBlanks, lAlphaBlanks, cAlphaFields, cNumericFields );
 
-
+			
 			ElecRadSysNumericFields( Item ).FieldNames.allocate( NumNumbers );
 			ElecRadSysNumericFields( Item ).FieldNames = "";
 			ElecRadSysNumericFields( Item ).FieldNames = cNumericFields;
@@ -1952,7 +1952,7 @@ namespace LowTempRadiantSystem {
 		int SizingMethod; // Integer representation of sizing method name (e.g. CoolingCapacitySizing, HeatingCapacitySizing)
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
-		Real64 DesCoilLoad; // design autosized or user specified capacity
+		Real64 DesCoilLoad; // design autosized or user specified capacity   
 
 		ErrorsFound = false;
 		IsAutoSize = false;
@@ -2011,7 +2011,7 @@ namespace LowTempRadiantSystem {
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 					ElecRadSys(RadSysNum).MaxElecPower = TempSize;
-				}
+				}			
 			}
 		}
 
@@ -2080,7 +2080,7 @@ namespace LowTempRadiantSystem {
 							} else {
 								WaterVolFlowMaxHeatDes = 0.0;
 							}
-
+												
 						} else {
 							ShowSevereError( "Autosizing of water flow requires a heating loop Sizing:Plant object" );
 							ShowContinueError( "Occurs in " "ZoneHVAC:LowTemperatureRadiant:VariableFlow" " Object=" + HydrRadSys( RadSysNum ).Name );

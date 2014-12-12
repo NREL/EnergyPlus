@@ -670,8 +670,8 @@ namespace NodeInputManager {
 				// Set new item in Node
 				Node( NumOfNodes ).FluidType = NodeFluidType;
 				NodeRef( NumOfNodes ) = 0;
-				NodeID( NumOfUniqueNodeNames ) = Name;
 
+				NodeID( NumOfUniqueNodeNames ) = Name;
 				AssignNodeNumber = NumOfUniqueNodeNames;
 			}
 		} else {

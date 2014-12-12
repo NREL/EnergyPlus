@@ -300,7 +300,7 @@ namespace ZoneEquipmentManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		int NumOfSizingTypes = 24; // number of sizing types
+		int NumOfSizingTypes = 24; // number of sizing types 
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -343,6 +343,7 @@ namespace ZoneEquipmentManager {
 				ZoneSysMoistureDemand( ControlledZoneNum ).SequencedOutputRequiredToDehumidSP.allocate( ZoneEquipCount );
 				ZoneEqSizing( ControlledZoneNum ).SizingMethod.allocate( NumOfSizingTypes );
 				ZoneEqSizing( ControlledZoneNum ).SizingMethod = 0;
+
 			}
 		}
 
@@ -432,7 +433,8 @@ namespace ZoneEquipmentManager {
 						Node( ZoneReturnAirNode ).GenContam = OutdoorGC;
 					}
 				}
-
+			
+			
 			}
 
 			MyEnvrnFlag = false;
@@ -4811,7 +4813,7 @@ namespace ZoneEquipmentManager {
 	}
 
 	void
-	GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
+		GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
 	{
 
 			// SUBROUTINE INFORMATION:
@@ -4881,8 +4883,8 @@ namespace ZoneEquipmentManager {
 
 	}
 
-	void
-	CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 & ZoneMixingMassFlowRate)
+	void 
+	    CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 & ZoneMixingMassFlowRate)
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4900,7 +4902,7 @@ namespace ZoneEquipmentManager {
 
 		// REFERENCES:
 		// na
-		//
+		// 
 
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;
@@ -4945,8 +4947,8 @@ namespace ZoneEquipmentManager {
 		ZoneMixingMassFlowRate = MixingMassFlowRate;
 	}
 
-	void
-	CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum)
+	void 
+		CalcZoneMixingFlowRateOfSourceZone(int const ZoneNum) 
 	{
 
 		// SUBROUTINE INFORMATION:
@@ -4964,7 +4966,7 @@ namespace ZoneEquipmentManager {
 
 		// REFERENCES:
 		// na
-		//
+		// 
 
 		// Using/Aliasing
 		using DataZoneEquipment::ZoneEquipConfig;

@@ -3,6 +3,7 @@ extern "C" {
 #include <FMI/main.h>
 }
 
+
 // C++ Headers
 #include <cmath>
 #include <string>
@@ -457,7 +458,7 @@ namespace SimulationManager {
 						if ( AnySlabsInModel || AnyBasementsInModel ){
 							InitAndSimGroundDomains();
 						}
-
+						
 						BeginTimeStepFlag = true;
 						ExternalInterfaceExchangeVariables();
 

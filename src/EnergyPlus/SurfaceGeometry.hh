@@ -55,6 +55,7 @@ namespace SurfaceGeometry {
 
 	// Object Data
 	extern FArray1D< SurfaceData > SurfaceTmp; // Allocated/Deallocated during input processing
+  extern std::vector< int > TmpConstruction;
 
 	// Functions
 

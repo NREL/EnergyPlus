@@ -257,7 +257,7 @@ namespace InputProcessor {
 			ShowFatalError( "ProcessInput: Could not open file \"eplusout.audit\" for output (write)." );
 		}
 
-		// FullName from StringGlobals is used to build file name with Path
+		//               FullName from StringGlobals is used to build file name with Path
 		if ( len( ProgramPath ) == 0 ) {
 			FullName = "Energy+.idd";
 		} else {
@@ -483,6 +483,7 @@ namespace InputProcessor {
 		MaxObjectDefs = ObjectDefAllocInc;
 
 		SectionDef.allocate( MaxSectionDefs );
+
 		ObjectDef.allocate( MaxObjectDefs );
 
 		NumObjectDefs = 0;
@@ -508,6 +509,7 @@ namespace InputProcessor {
 			if ( BlankLine || EndofFile ) continue;
 			Pos = scan( InputLine, ",;" );
 			if ( Pos != std::string::npos ) {
+
 				if ( InputLine[ Pos ] == ';' ) {
 					AddSectionDef( InputLine.substr( 0, Pos ), ErrorsFound );
 					if ( NumSectionDefs == MaxSectionDefs ) {
@@ -519,10 +521,12 @@ namespace InputProcessor {
 						ObjectDef.redimension( MaxObjectDefs += ObjectDefAllocInc );
 					}
 				}
+
 			} else {
 				ShowSevereError( "IP: IDD line~" + IPTrimSigDigits( NumLines ) + " , or ; expected on this line", EchoInputFile );
 				ErrorsFound = true;
 			}
+
 		}
 
 	}
@@ -1168,10 +1172,12 @@ namespace InputProcessor {
 						IDFRecords.redimension( MaxIDFRecords += ObjectsIDFAllocInc );
 					}
 				}
-			} else { // Error condition, no , or ; on first line
+			} else {
+				//Error condition, no , or ; on first line
 				ShowMessage( "IP: IDF Line~" + IPTrimSigDigits( NumLines ) + ' ' + InputLine );
 				ShowSevereError( ", or ; expected on this line", EchoInputFile );
 			}
+
 		}
 
 		//   IF (NumIDFSections > 0) THEN
@@ -4357,7 +4363,7 @@ namespace InputProcessor {
 		}
 
 		// there are some orphans that we are deeming as special, in that they should be warned in detail even if !DisplayUnusedObjects and !DisplayAllWarnings
-		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if
+		// these are trapped by the potentialOrphanedSpecialObjects flag so that nothing is looked up if 
 		// for now, the list includes:
 		//  - objects that start with "ZONEHVAC:"
 		if ( potentialOrphanedSpecialObjects ) {

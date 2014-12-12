@@ -41,10 +41,6 @@
  #include <unistd.h>
 #endif
 
-//speedup
-#include <timers.hh>
-
-
 void 
 EnergyPlusPgm( std::string filepath )
 {
@@ -437,8 +433,9 @@ EnergyPlusPgm( std::string filepath )
 	ReportOrphanRecordObjects();
 	ReportOrphanFluids();
 	ReportOrphanSchedules();
-
+#ifdef EPPERF_PRINT
 	EppPerformance::Timer::printTimerData();
+#endif
 
 	EndEnergyPlus();
 }

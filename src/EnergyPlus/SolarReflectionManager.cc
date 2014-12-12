@@ -483,7 +483,7 @@ namespace SolarReflectionManager {
 						if ( dot( VNorm, -RayVec ) < 0.0 ) VNorm = -VNorm;
 						SolReflRecSurf( RecSurfNum ).HitPtNormVec( RecPtNum, RayNum ) = VNorm;
 						// Get solar and visible beam-to-diffuse reflectance at nearest hit point
-						ObsConstrNum = Construction[ NearestHitSurfNum  - 1];
+						ObsConstrNum = Construction[ NearestHitSurfNum  - 1 ];
 						if ( ObsConstrNum > 0 ) {
 							// Exterior building surface is nearest hit
 							if ( ! ConstrWin[ ObsConstrNum  - 1 ].TypeIsWindow ) {
@@ -1025,7 +1025,7 @@ namespace SolarReflectionManager {
 								// No obstructions. Calculate reflected beam irradiance at receiving pt. from this reflecting surface.
 								SpecReflectance = 0.0;
 								if ( Surface( ReflSurfNum ).Class == SurfaceClass_Window ) {
-									ConstrNumRefl = Construction[ ReflSurfNum  - 1];
+									ConstrNumRefl = Construction[ ReflSurfNum  - 1 ];
 									SpecReflectance = POLYF( std::abs( CosIncAngRefl ), Construct( ConstrNumRefl ).ReflSolBeamFrontCoef( {1,6} ) );
 								}
 								if ( Surface( ReflSurfNum ).ShadowingSurf && Surface( ReflSurfNum ).ShadowSurfGlazingConstruct > 0 ) {

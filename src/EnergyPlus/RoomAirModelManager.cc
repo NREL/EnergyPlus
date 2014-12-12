@@ -60,7 +60,7 @@ namespace RoomAirModelManager {
 	using InputProcessor::SameString;
 	using namespace DataRoomAirModel;
 	using General::RoundSigDigits;
-        using DataHeatBalance::ZoneSpecs;
+  using DataHeatBalance::ZoneSpecs;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS

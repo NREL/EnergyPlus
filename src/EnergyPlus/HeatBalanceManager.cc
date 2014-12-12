@@ -546,14 +546,14 @@ namespace HeatBalanceManager {
 		// then process the rest of the relevant constructions
 		std::string constructName( "Construction:WindowEquivalentLayer" );
 		int numConstructions( GetNumObjectsFound( constructName ) );
-		for ( int constructionNum = 1; constructionNum <= numConstructions; ++constructionNum ) {
+		for ( int constructionNum = 1; constructionNum <= numConstructions; ++ constructionNum ) {
 			GetObjectItem( constructName, constructionNum, cAlphaArgs, NumAlpha, rNumericArgs, NumNumber, IOStat, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			int numLayersInThisConstruct( NumAlpha - 1 );
 			MaxSolidWinLayers = max( MaxSolidWinLayers, numLayersInThisConstruct );
 		}
-
+		
 		// construction types being ignored as they are opaque: Construction:CfactorUndergroundWall, Construction:FfactorGroundFloor, Construction:InternalSource
-
+		
 
 	}
 
@@ -1094,7 +1094,7 @@ namespace HeatBalanceManager {
 			ZoneAirMassFlow.EnforceZoneMassBalance = false;
 			AlphaName(1) = "NO";
 		}
-		//// allocate if the global variable ZoneAirMassFlow is ON
+		//// allocate if the global variable ZoneAirMassFlow is ON 
 		//if ( ZoneAirMassFlow.EnforceZoneMassBalance ) {
 		//	MassConservation.allocate( NumOfZones );
 		//}
@@ -4016,12 +4016,12 @@ namespace HeatBalanceManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			TMP = index( cAlphaArgs( 1 ), CHAR( 1 ) );
 			while ( TMP != std::string::npos ) {
-				cAlphaArgs( 1 )[TMP] = ',';
+				cAlphaArgs( 1 )[ TMP ] = ',';
 				TMP = index( cAlphaArgs( 1 ), CHAR( 1 ) );
 			}
 			TMP = index( cAlphaArgs( 1 ), CHAR( 2 ) );
 			while ( TMP != std::string::npos ) {
-				cAlphaArgs( 1 )[TMP] = '!';
+				cAlphaArgs( 1 )[ TMP ] = '!';
 				TMP = index( cAlphaArgs( 1 ), CHAR( 2 ) );
 			}
 
@@ -6746,7 +6746,7 @@ Label1000: ;
 					Construct( NumNewConst ).TCMasterConst = Loop;
 					Construct( NumNewConst ).TCLayerID = Construct( Loop ).TCLayerID;
 					Construct( NumNewConst ).TCGlassID = Construct( Loop ).TCGlassID;
-               ConstrWin[ NumNewConst - 1 ] = ConstrWin[ Loop - 1 ];
+          ConstrWin[ NumNewConst - 1 ] = ConstrWin[ Loop - 1 ];
 					ConstrWin[ NumNewConst  - 1 ].TypeIsWindow = true;
 				}
 			}

@@ -772,7 +772,7 @@ namespace HighTempRadiantSystem {
 
 				if ( CapSizingMethod == HeatingDesignCapacity ) {
 					if ( HighTempRadSys( RadSysNum ).ScaledHeatingCapacity == AutoSize ) {
-						CheckZoneSizing( CompType, CompName );
+						CheckZoneSizing( CompType, CompName );						
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = CalcFinalZoneSizing( CurZoneEqNum ).DesHeatLoad * CalcFinalZoneSizing( CurZoneEqNum ).HeatSizingFactor / (HighTempRadSys( RadSysNum ).FracRadiant + HighTempRadSys( RadSysNum ).FracConvect );
 					} else {
 						ZoneEqSizing( CurZoneEqNum ).DesHeatingLoad = HighTempRadSys( RadSysNum ).ScaledHeatingCapacity;
@@ -797,7 +797,7 @@ namespace HighTempRadiantSystem {
 				RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
 				HighTempRadSys( RadSysNum ).MaxPowerCapac = TempSize;
 			}
-
+		
 		}
 
 	}

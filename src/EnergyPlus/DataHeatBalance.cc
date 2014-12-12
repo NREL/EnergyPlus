@@ -571,7 +571,7 @@ namespace DataHeatBalance {
 	FArray1D< MaterialProperties > Material;
 	FArray1D< GapSupportPillar > SupportPillar;
 	FArray1D< GapDeflectionState > DeflectionState;
-        std::vector< WindowAbsThermLay > ConstrWin;
+  std::vector< WindowAbsThermLay > ConstrWin;
 	FArray1D< ConstructionData > Construct;
 	FArray1D< SpectralDataProperties > SpectralData;
 	FArray1D< ZoneData > Zone;
@@ -582,7 +582,7 @@ namespace DataHeatBalance {
 	FArray1D< ZoneEquipData > ZoneElectric;
 	FArray1D< ZoneEquipData > ZoneGas;
 	FArray1D< ZoneEquipData > ZoneOtherEq;
-        std::vector< GenZone > ZoneSpecs;
+  std::vector< GenZone > ZoneSpecs;
 	FArray1D< ZoneEquipData > ZoneHWEq;
 	FArray1D< ZoneEquipData > ZoneSteamEq;
 	FArray1D< BBHeatData > ZoneBBHeat;
@@ -1104,8 +1104,8 @@ namespace DataHeatBalance {
 		if ( NewConstrNum == 0 ) {
 			++TotConstructs;
 			Construct.redimension( TotConstructs );
-      ConstrWin.resize( TotConstructs );
-      NominalRforNominalUCalculation.redimension( TotConstructs );
+			ConstrWin.resize( TotConstructs );
+			NominalRforNominalUCalculation.redimension( TotConstructs );
 			NominalRforNominalUCalculation( TotConstructs ) = 0.0;
 			NominalU.redimension( TotConstructs );
 			NominalU( TotConstructs ) = 0.0;
@@ -1113,7 +1113,7 @@ namespace DataHeatBalance {
 			NewConstrNum = TotConstructs;
 			Construct( NewConstrNum ).IsUsed = true;
 			Construct( TotConstructs ) = Construct( ConstrNum ); // preserve some of the attributes.
-         ConstrWin[ TotConstructs - 1 ] = ConstrWin[ ConstrNum - 1 ];
+			ConstrWin[ TotConstructs - 1 ] = ConstrWin[ ConstrNum - 1 ];
 			// replace others...
 			Construct( TotConstructs ).Name = "iz-" + Construct( ConstrNum ).Name;
 			Construct( TotConstructs ).TotLayers = Construct( ConstrNum ).TotLayers;

@@ -44,7 +44,6 @@
 #include <Psychrometrics.hh>
 #include <ScheduleManager.hh>
 #include <SQLiteProcedures.hh>
-#include <timers.hh>
 #include <UtilityRoutines.hh>
 #include <VentilatedSlab.hh>
 #include <ZonePlenum.hh>
@@ -10248,22 +10247,21 @@ namespace OutputReportTabular {
 		//   Write out tables based on which surfaces shade subsurfaces.
 
 		// METHODOLOGY EMPLOYED:
-		//   Create arrays for the call to writeTable and then call it.
+		//   Create arrays for the call to WriteTable and then call it.
 		//   Use <br> tag to put multiple rows into a single cell.
 
 		// REFERENCES:
 		// na
 
-		// USE STATEMENTS:
 		// Using/Aliasing
 		using DataSurfaces::Surface;
 		using DataSurfaces::TotSurfaces;
 		using namespace DataShadowingCombinations;
-		using EppPerformance::Timer;
+		// using EppPerformance::Timer;
 
-		static Timer timer(__PRETTY_FUNCTION__);
+		// static Timer timer(__PRETTY_FUNCTION__);
 
-		timer.startTimer();
+		// timer.startTimer();
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -10335,13 +10333,13 @@ namespace OutputReportTabular {
 							"Subsurfaces (Windows and Doors) that may be Shadowed by Surfaces " );
 		    }
 		    WriteTable( tableBody, rowHead, columnHead, columnWidth );
-		    rowHead.deallocate();
-		    columnHead.deallocate();
-		    columnWidth.deallocate();
-		    tableBody.deallocate();
+		    // rowHead.deallocate();
+		    // columnHead.deallocate();
+		    // columnWidth.deallocate();
+		    // tableBody.deallocate();
 		  }
 		}
-		timer.stopTimer();
+		// timer.stopTimer();
 	}
 
 	void
@@ -12646,7 +12644,7 @@ namespace OutputReportTabular {
 					if ( ! doTransposeXML ) {
 						// body with row headers
 						for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
-							// check if record is blank and it if is skip generating anything
+							//check if record is blank and it if is skip generating anything
 							isRecordBlank = true;
 							for ( iCol = 1; iCol <= colsBody; ++iCol ) {
 								if ( len( bodyEsc( jRow, iCol ) ) > 0 ) {
@@ -12673,10 +12671,10 @@ namespace OutputReportTabular {
 								tbl_stream << "  </" << activeSubTableName << ">\n";
 							}
 						}
-					} else { // transpose XML table
+					} else { //transpose XML table
 						// body with row headers
 						for ( iCol = 1; iCol <= colsBody; ++iCol ) {
-							// check if record is blank and it if is skip generating anything
+							//check if record is blank and it if is skip generating anything
 							isRecordBlank = true;
 							for ( jRow = 1; jRow <= rowsBody; ++jRow ) {
 								if ( len( bodyEsc( jRow, iCol ) ) > 0 ) {

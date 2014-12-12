@@ -1923,7 +1923,7 @@ namespace HeatBalanceAirManager {
 				}
 			}
 
-			// check zones which are used only as a source zones
+			// check zones which are used only as a source zones      
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				IsSourceZone = false;
 				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
@@ -1961,7 +1961,7 @@ namespace HeatBalanceAirManager {
 		}
 
 		// zone mass conservation calculation order starts with receiving zones
-		// and then proceeds to source zones
+		// and then proceeds to source zones 
 		Loop = 0;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ! MassConservation( ZoneNum ).IsOnlySourceZone ) {

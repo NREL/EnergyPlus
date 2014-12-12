@@ -258,6 +258,7 @@ namespace WindowComplexManager {
 		WindowStateList.allocate( TotSurfaces, TotComplexFenStates ); //Temporary allocation
 		SfLoop: for ( ISurf = 1; ISurf <= TotSurfaces; ++ISurf ) {
 			IConst = Construction[ ISurf  - 1 ];
+			if ( IConst == 0 ) continue; // This is true for overhangs (Shading:Zone:Detailed)
 			if ( ! ( ConstrWin[ IConst  - 1 ].TypeIsWindow && ( Construct( IConst ).WindowTypeBSDF ) ) ) continue; //Only BSDF windows
 			//Simon Check: Thermal construction removed
 			//ThConst = Construct(IConst)%BSDFInput%ThermalConstruction
@@ -1261,11 +1262,11 @@ namespace WindowComplexManager {
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			ComplexFenInZone = false;
-			for ( SurfNum = ZoneSpecs[ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
+			for ( SurfNum = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
 				if ( SurfaceWindow( SurfNum ).WindowModelType == WindowBSDFModel ) ComplexFenInZone = true;
 			}
 			if ( ComplexFenInZone ) {
-				NumSurfInZone = ZoneSpecs[ZoneNum - 1 ].SurfaceLast - ZoneSpecs[ZoneNum - 1 ].SurfaceFirst + 1;
+				NumSurfInZone = ZoneSpecs[ ZoneNum - 1 ].SurfaceLast - ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst + 1;
 				if ( MaxBkSurf < NumSurfInZone ) MaxBkSurf = NumSurfInZone;
 			}
 		}
@@ -3900,9 +3901,9 @@ namespace WindowComplexManager {
 				EpsGlassIR = Material( GlassLayPtr ).AbsorpThermalBack;
 				RhoGlassIR = 1 - EpsGlassIR;
 
-				EffShBlEmiss = EpsShadeIR * ( 1. + RhoGlassIR * TauShadeIR / ( 1. - RhoGlassIR * RhoShadeIR ) );
+				EffShBlEmiss = EpsShadeIR * ( 1.0 + RhoGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR ) );
 				SurfaceRadiantWin[ SurfNum  - 1 ].EffShBlindEmiss = EffShBlEmiss;
-				EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1. - RhoGlassIR * RhoShadeIR );
+				EffGlEmiss = EpsGlassIR * TauShadeIR / ( 1.0 - RhoGlassIR * RhoShadeIR );
 				SurfaceRadiantWin[ SurfNum  - 1 ].EffGlassEmiss = EffGlEmiss;
 				//  EffShBlEmiss = InterpSlatAng(SurfaceRadiantWin[SurfNum)%SlatAngThisTS,SurfaceWindow(SurfNum - 1 ].MovableSlats, &
 				//                    SurfaceRadiantWin[SurfNum - 1 ].EffShBlindEmiss)

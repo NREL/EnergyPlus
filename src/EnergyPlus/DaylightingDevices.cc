@@ -521,7 +521,7 @@ namespace DaylightingDevices {
 						ErrorsFound = true;
 					}
 
-					if ( Construct( Construction[ SurfNum  - 1] ).TransDiff <= 1.e-10 ) {
+					if ( Construct( Construction[ SurfNum  - 1] ).TransDiff <= 1.0e-10 ) {
 						ShowSevereError( cCurrentModuleObject + " = " + cAlphaArgs( 1 ) + ":  Diffuser " + cAlphaArgs( 3 ) + " construction (" + Construct( Construction[ SurfNum  - 1] ).Name  + ") invalid value." );
 						ShowContinueError( "Diffuse solar transmittance of construction [" + RoundSigDigits( Construct( Construction[ SurfNum  - 1] ).TransDiff, 4 ) + "] too small for calculations." );
 						ErrorsFound = true;

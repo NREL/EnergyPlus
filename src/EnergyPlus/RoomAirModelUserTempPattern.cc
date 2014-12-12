@@ -60,7 +60,7 @@ namespace RoomAirModelUserTempPattern {
 	using namespace DataPrecisionGlobals;
 	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataRoomAirModel;
-        using DataHeatBalance::ZoneSpecs;
+  using DataHeatBalance::ZoneSpecs;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
