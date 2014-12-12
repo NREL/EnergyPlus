@@ -803,7 +803,9 @@ namespace Psychrometrics {
 
 		// FUNCTION PARAMETER DEFINITIONS:
 		int const cache_size( 64 * 1024 );
-		int const precision_bits( 20 ); // 28  // 24  // 32
+
+		// AR: Resolution of < 24 bits causes a non-convergence in the SizeTower routine!!
+		int const precision_bits( 24 ); // 28  // 20  // 32
 		Int64 const shift = (64 - 12 - precision_bits); 
 
 		struct cached_t
@@ -843,6 +845,7 @@ namespace Psychrometrics {
 
 			Tdb_tag <<= shift;
 			Tdb_tag_r = *reinterpret_cast<Real64 *>( &Tdb_tag );
+
 			cache( hash ).Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
 		}
 
@@ -1845,7 +1848,6 @@ Label170: ;
 			Tdb_tag_r = *reinterpret_cast<Real64 *>( &Tdb_tag );
 			Twb_tag_r = *reinterpret_cast<Real64 *>( &Twb_tag );
 			Pb_tag_r = *reinterpret_cast<Real64 *>( &Pb_tag );
-
 
 			cache( hash ).W = PsyWFnTdbTwbPb_raw( Tdb_tag_r, Twb_tag_r, Pb_tag_r, CalledFrom );
 		}
