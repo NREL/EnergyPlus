@@ -179,7 +179,7 @@ endif()
 set(OPTIMIZABLE_TARGETS
   sqlite objexx bcvtb epexpat epfmiimport miniziplib DElight EnergyPlus EnergyPlusAPI EnergyPlusLib EnergyPlusLib2 
     )
-if(NOT APPLE)
+if(NOT APPLE AND NOT MSVC)
   list(APPEND OPTIMIZABLE_TARGETS parser)
 endif()
 
