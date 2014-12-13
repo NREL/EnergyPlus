@@ -158,11 +158,11 @@ namespace SolarShading {
 	std::ofstream shd_stream; // Shading file stream
 	FArray1D_int HCNS; // Surface number of back surface HC figures
 	FArray1D_int HCNV; // Number of vertices of each HC figure
-	FArray2D< Real64 > HCA; // 'A' homogeneous coordinates of sides
-	FArray2D< Real64 > HCB; // 'B' homogeneous coordinates of sides
-	FArray2D< Real64 > HCC; // 'C' homogeneous coordinates of sides
-	FArray2D< Real64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
-	FArray2D< Real64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
+	FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
+	FArray2D< Int64 > HCB; // 'B' homogeneous coordinates of sides
+	FArray2D< Int64 > HCC; // 'C' homogeneous coordinates of sides
+	FArray2D< Int64 > HCX; // 'X' homogeneous coordinates of vertices of figure.
+	FArray2D< Int64 > HCY; // 'Y' homogeneous coordinates of vertices of figure.
 	FArray3D_int WindowRevealStatus;
 	FArray1D< Real64 > HCAREA; // Area of each HC figure.  Sign Convention:  Base Surface
 	// - Positive, Shadow - Negative, Overlap between two shadows
@@ -2306,8 +2306,8 @@ namespace SolarShading {
 
 			// See comment at top of module regarding HCMULT
 			for ( int N = 1; N <= NumVertices; ++N ) {
-				HCX( N, NS ) = XVS( N ) * HCMULT;
-				HCY( N, NS ) = YVS( N ) * HCMULT;
+				HCX( N, NS ) = nint64( XVS( N ) * HCMULT );
+				HCY( N, NS ) = nint64( YVS( N ) * HCMULT );
 			}
 
 		}
@@ -2400,8 +2400,8 @@ namespace SolarShading {
 		auto const l1( HCX.index( 1, NS ) );
 		auto l( l1 );
 		for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( N, NS )
-			HCX[ l ] = XVS( N ) * HCMULT;
-			HCY[ l ] = YVS( N ) * HCMULT;
+			HCX[ l ] = nint64( XVS( N ) * HCMULT );
+			HCY[ l ] = nint64( YVS( N ) * HCMULT );
 		}
 
 		HCNV( NS ) = NumVertices;
@@ -2565,8 +2565,8 @@ namespace SolarShading {
 		Real64 W; // Normalization factor
 		Real64 XUntrunc; // Untruncated X coordinate
 		Real64 YUntrunc; // Untruncated Y coordinate
-		Real64 I1; // Intermediate result for testing intersection
-		Real64 I2; // Intermediate result for testing intersection
+		Int64 I1; // Intermediate result for testing intersection
+		Int64 I2; // Intermediate result for testing intersection
 		int K;
 		int KK;
 		int M; // Side number of figure NS2
@@ -2579,13 +2579,13 @@ namespace SolarShading {
 
 				I1 = HCA( N, NS1 ) * HCX( M, NS2 ) + HCB( N, NS1 ) * HCY( M, NS2 ) + HCC( N, NS1 );
 				I2 = HCA( N, NS1 ) * HCX( M + 1, NS2 ) + HCB( N, NS1 ) * HCY( M + 1, NS2 ) + HCC( N, NS1 );
-				if ( I1 >= 0.0 && I2 >= 0.0 ) continue;
-				if ( I1 <= 0.0 && I2 <= 0.0 ) continue;
+				if ( I1 >= 0 && I2 >= 0 ) continue;
+				if ( I1 <= 0 && I2 <= 0 ) continue;
 
 				I1 = HCA( M, NS2 ) * HCX( N, NS1 ) + HCB( M, NS2 ) * HCY( N, NS1 ) + HCC( M, NS2 );
 				I2 = HCA( M, NS2 ) * HCX( N + 1, NS1 ) + HCB( M, NS2 ) * HCY( N + 1, NS1 ) + HCC( M, NS2 );
-				if ( I1 >= 0.0 && I2 >= 0.0 ) continue;
-				if ( I1 <= 0.0 && I2 <= 0.0 ) continue;
+				if ( I1 >= 0 && I2 >= 0 ) continue;
+				if ( I1 <= 0 && I2 <= 0 ) continue;
 
 				// Determine the point of intersection and record in the temporary array.
 
@@ -2607,8 +2607,8 @@ namespace SolarShading {
 					XTEMP1.deallocate();
 					YTEMP1.deallocate();
 				}
-				XTEMP( NV3 ) = std::round( XUntrunc );
-				YTEMP( NV3 ) = std::round( YUntrunc );
+				XTEMP( NV3 ) = nint64( XUntrunc );
+				YTEMP( NV3 ) = nint64( YUntrunc );
 
 				// Eliminate near-duplicate points.
 
@@ -2719,9 +2719,9 @@ namespace SolarShading {
 				YTEMP1( P ) = YTEMP( P );
 			}
 			S = NVOUT;
-			Real64 const HCA_E( HCA[ l ] );
-			Real64 const HCB_E( HCB[ l ] );
-			Real64 const HCC_E( HCC[ l ] );
+			Int64 const HCA_E( HCA[ l ] );
+			Int64 const HCB_E( HCB[ l ] );
+			Int64 const HCC_E( HCC[ l ] );
 			for ( P = 1; P <= NVOUT; ++P ) {
 				HFunct = XTEMP1( P ) * HCA_E + YTEMP1( P ) * HCB_E + HCC_E;
 				// S is constant within this block
@@ -2738,8 +2738,8 @@ namespace SolarShading {
 						W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
 						if ( W != 0.0 ) {
 							Real64 const W_inv( 1.0 / W );
-							XTEMP( NVTEMP ) = std::round( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
-							YTEMP( NVTEMP ) = std::round( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
+							XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
+							YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
 						} else {
 							XTEMP( NVTEMP ) = SafeDivide( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ), W );
 							YTEMP( NVTEMP ) = SafeDivide( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ), W );
@@ -2800,8 +2800,8 @@ namespace SolarShading {
 						W = HCB_E * ATEMP_S - HCA_E * BTEMP_S;
 						if ( W != 0.0 ) {
 							Real64 const W_inv( 1.0 / W );
-							XTEMP( NVTEMP ) = std::round( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
-							YTEMP( NVTEMP ) = std::round( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
+							XTEMP( NVTEMP ) = nint64( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ) * W_inv );
+							YTEMP( NVTEMP ) = nint64( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ) * W_inv );
 						} else {
 							XTEMP( NVTEMP ) = SafeDivide( ( HCC_E * BTEMP_S - HCB_E * CTEMP_S ), W );
 							YTEMP( NVTEMP ) = SafeDivide( ( HCA_E * CTEMP_S - HCC_E * ATEMP_S ), W );
@@ -3014,18 +3014,18 @@ namespace SolarShading {
 			} else if ( DELTAY > 0.5 ) {
 
 				P = 2;
-				HCX( 2, NS3 ) = XTEMP( N );
-				HCY( 2, NS3 ) = YTEMP( N );
+				HCX( 2, NS3 ) = nint64( XTEMP( N ) );
+				HCY( 2, NS3 ) = nint64( YTEMP( N ) );
 
 			} else if ( DELTAY < -0.5 ) {
 
-				HCX( NV3, NS3 ) = XTEMP( N );
-				HCY( NV3, NS3 ) = YTEMP( N );
+				HCX( NV3, NS3 ) = nint64( XTEMP( N ) );
+				HCY( NV3, NS3 ) = nint64( YTEMP( N ) );
 
 			} else {
 
-				HCX( 1, NS3 ) = XMIN;
-				HCY( 1, NS3 ) = YXMIN;
+				HCX( 1, NS3 ) = nint64( XMIN );
+				HCY( 1, NS3 ) = nint64( YXMIN );
 
 			}
 
@@ -3056,8 +3056,8 @@ namespace SolarShading {
 		// Place sequenced points in the homogeneous coordinate arrays.
 
 		for ( N = 1; N <= M; ++N ) {
-			HCX( N + P, NS3 ) = XTEMP( N );
-			HCY( N + P, NS3 ) = YTEMP( N );
+			HCX( N + P, NS3 ) = nint64( XTEMP( N ) );
+			HCY( N + P, NS3 ) = nint64( YTEMP( N ) );
 		}
 
 	}
@@ -3199,8 +3199,8 @@ namespace SolarShading {
 				assert( equal_dimensions( HCX, HCY ) );
 				auto l( HCX.index( 1, NS3 ) );
 				for ( N = 1; N <= NV3; ++N, ++l ) {
-					HCX[ l ] = XTEMP( N ); // [ l ] == ( N, NS3 )
-					HCY[ l ] = YTEMP( N ); // [ l ] == ( N, NS3 )
+					HCX[ l ] = nint64( XTEMP( N ) ); // [ l ] == ( N, NS3 )
+					HCY[ l ] = nint64( YTEMP( N ) ); // [ l ] == ( N, NS3 )
 				}
 			}
 
@@ -4408,15 +4408,15 @@ namespace SolarShading {
 
 				assert( equal_dimensions( HCX, HCY ) ); // For linear indexing
 				assert( HCX.index( 1, 1 ) == 0u ); // For linear indexing
-				FArray2D< Real64 >::size_type l, j( HCX.index( 1, NS3 ) );
+				FArray2D< Int64 >::size_type l, j( HCX.index( 1, NS3 ) );
 				NVR = HCNV( 1 );
 				for ( N = 1; N <= NumVertInShadowOrClippedSurface; ++N, ++j ) {
 					auto HCX_N( HCX[ j ] ); // [ j ] == ( N, NS3 )
 					auto HCY_N( HCY[ j ] );
 					l = 0u;
 					for ( M = 1; M <= NVR; ++M, ++l ) { // [ l ] == ( M, 1 )
-						if ( std::abs( HCX[ l ] - HCX_N ) > 6.0 ) continue;
-						if ( std::abs( HCY[ l ] - HCY_N ) > 6.0 ) continue;
+						if ( std::abs( HCX[ l ] - HCX_N ) > 6 ) continue;
+						if ( std::abs( HCY[ l ] - HCY_N ) > 6 ) continue;
 						HCX_N = HCX[ l ]; //? This is fishy: Ends up with last values that get past the abs checks
 						HCY_N = HCY[ l ];
 					}
