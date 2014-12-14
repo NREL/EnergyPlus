@@ -3664,7 +3664,7 @@ namespace SolarShading {
 		HCAREA.dimension( MaxHCS * 2, 0.0 );
 		HCNS.dimension( MaxHCS * 2, 0 );
 		HCNV.dimension( MaxHCS * 2, 0 );
-		HCT.dimension( MaxHCS * 2, 0 );
+		HCT.dimension( MaxHCS * 2, 0.0 );
 
 		GSS.dimension( MaxGSS, 0 );
 		BKS.dimension( MaxGSS, 0 );
