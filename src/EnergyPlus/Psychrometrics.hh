@@ -6,7 +6,6 @@
 #include <cmath>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/bit.hh>
 #include <ObjexxFCL/FArray1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -18,13 +17,6 @@
 
 namespace EnergyPlus {
 
-#ifdef EP_nocache_Psychrometrics
-#undef EP_cache_PsyTwbFnTdbWPb
-#undef EP_cache_PsyPsatFnTemp
-#else
-#define EP_cache_PsyTwbFnTdbWPb
-#define EP_cache_PsyPsatFnTemp
-#endif
 #define EP_psych_errors
 
 namespace Psychrometrics {
@@ -36,45 +28,10 @@ namespace Psychrometrics {
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
 	// call for recurring errors
-	extern int const iPsyTdpFnTdbTwbPb;
-	extern int const iPsyRhFnTdbWPb;
-	extern int const iPsyTwbFnTdbWPb;
-	extern int const iPsyTwbFnTdbWPb2;
-	extern int const iPsyTwbFnTdbWPb3; // convergence
-	extern int const iPsyVFnTdbWPb;
-	extern int const iPsyWFnTdpPb;
-	extern int const iPsyWFnTdbH;
-	extern int const iPsyWFnTdbTwbPb;
-	extern int const iPsyWFnTdbTwbPb2;
-	extern int const iPsyWFnTdbRhPb;
-	extern int const iPsyPsatFnTemp;
-	extern int const iPsyTsatFnHPb;
-	extern int const iPsyTsatFnPb;
-	extern int const iPsyTsatFnPb2; // iterations
-	extern int const iPsyRhFnTdbRhov;
-	extern int const iPsyRhFnTdbRhovLBnd0C;
-	extern int const iPsyTwbFnTdbWPb_cache;
-	extern int const iPsyPsatFnTemp_cache;
-	extern int const NumPsychMonitors; // Parameterization of Number of psychrometric routines that
 	extern std::string const blank_string;
-#ifdef EP_psych_stats
-	extern FArray1D_string const PsyRoutineNames; // 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 - HR | 15 - max iter | 16 - HR | 17 - max iter | 18 - PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw (raw calc)
-
-	extern FArray1D_bool const PsyReportIt; // PsyTdpFnTdbTwbPb     1 | PsyRhFnTdbWPb        2 | PsyTwbFnTdbWPb       3 | PsyVFnTdbWPb         4 | PsyWFnTdpPb          5 | PsyWFnTdbH           6 | PsyWFnTdbTwbPb       7 | PsyWFnTdbRhPb        8 | PsyPsatFnTemp        9 | PsyTsatFnHPb         10 | PsyTsatFnPb          11 | PsyRhFnTdbRhov       12 | PsyRhFnTdbRhovLBnd0C 13 | PsyTwbFnTdbWPb       14 - HR | PsyTwbFnTdbWPb       15 - max iter | PsyWFnTdbTwbPb       16 - HR | PsyTsatFnPb          17 - max iter | PsyTwbFnTdbWPb_cache 18 - PsyTwbFnTdbWPb_raw (raw calc) | PsyPsatFnTemp_cache  19 - PsyPsatFnTemp_raw (raw calc)
-#endif
 
 #ifndef EP_psych_errors
 	extern Real64 const KelvinConv;
-#endif
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-	extern int const twbcache_size;
-	extern int const twbprecision_bits;
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-	extern int const psatcache_size;
-	extern int const psatprecision_bits; // 28  //24  //32
-	extern Int64 const psatcache_mask;
 #endif
 
 	// MODULE VARIABLE DECLARATIONS:
@@ -92,72 +49,6 @@ namespace Psychrometrics {
 	// DERIVED TYPE DEFINITIONS
 
 	// Types
-
-#ifdef EP_cache_PsyTwbFnTdbWPb
-	struct cached_twb_t
-	{
-		// Members
-		Int64 iTdb;
-		Int64 iW;
-		Int64 iPb;
-		Real64 Twb;
-
-		// Default Constructor
-		cached_twb_t() :
-			iTdb( 0 ),
-			iW( 0 ),
-			iPb( 0 ),
-			Twb( 0.0 )
-		{}
-
-		// Member Constructor
-		cached_twb_t(
-			Int64 const iTdb,
-			Int64 const iW,
-			Int64 const iPb,
-			Real64 const Twb
-		) :
-			iTdb( iTdb ),
-			iW( iW ),
-			iPb( iPb ),
-			Twb( Twb )
-		{}
-
-	};
-#endif
-
-#ifdef EP_cache_PsyPsatFnTemp
-	struct cached_psat_t
-	{
-		// Members
-		Int64 iTdb;
-		Real64 Psat;
-
-		// Default Constructor
-		cached_psat_t() :
-			iTdb( -1000 ),
-			Psat( 0.0 )
-		{}
-
-		// Member Constructor
-		cached_psat_t(
-			Int64 const iTdb,
-			Real64 const Psat
-		) :
-			iTdb( iTdb ),
-			Psat( Psat )
-		{}
-
-	};
-#endif
-
-	// Object Data
-#ifdef EP_cache_PsyTwbFnTdbWPb
-	extern FArray1D< cached_twb_t > cached_Twb; // DIMENSION(0:twbcache_size)
-#endif
-#ifdef EP_cache_PsyPsatFnTemp
-	extern FArray1D< cached_psat_t > cached_Psat; // DIMENSION(0:psatcache_size)
-#endif
 
 	// Subroutine Specifications for the Module
 
@@ -477,26 +368,6 @@ namespace Psychrometrics {
 		}
 	}
 
-#ifdef EP_cache_PsyTwbFnTdbWPb
-
-	Real64
-	PsyTwbFnTdbWPb(
-		Real64 const Tdb, // dry-bulb temperature {C}
-		Real64 const W, // humidity ratio
-		Real64 const Pb, // barometric pressure {Pascals}
-		std::string const & CalledFrom = blank_string // routine this function was called from (error messages)
-	);
-
-	Real64
-	PsyTwbFnTdbWPb_raw(
-		Real64 const TDB, // dry-bulb temperature {C}
-		Real64 const dW, // humidity ratio
-		Real64 const Patm, // barometric pressure {Pascals}
-		std::string const & CalledFrom = blank_string // routine this function was called from (error messages)
-	);
-
-#else
-
 	Real64
 	PsyTwbFnTdbWPb(
 		Real64 const TDB, // dry-bulb temperature {C}
@@ -504,8 +375,6 @@ namespace Psychrometrics {
 		Real64 const Patm, // barometric pressure {Pascals}
 		std::string const & CalledFrom = blank_string // routine this function was called from (error messages)
 	);
-
-#endif
 
 #ifdef EP_psych_errors
 	void
@@ -607,69 +476,12 @@ namespace Psychrometrics {
 		}
 	}
 
-#ifdef EP_cache_PsyPsatFnTemp
-
-	Real64
-	PsyPsatFnTemp_raw(
-		Real64 const T, // dry-bulb temperature {C}
-		std::string const & CalledFrom = blank_string // routine this function was called from (error messages)
-	);
-
-	inline
-	Real64
-	PsyPsatFnTemp(
-		Real64 const T, // dry-bulb temperature {C}
-		std::string const & CalledFrom = blank_string // routine this function was called from (error messages)
-	)
-	{
-		// FUNCTION INFORMATION:
-		//       AUTHOR         Linda Lawrie
-		//       DATE WRITTEN   March 2013
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// Provide a "cache" of results for the given argument (T) and pressure (Pascal) output result.
-
-		// METHODOLOGY EMPLOYED:
-		// Use grid shifting and masking to provide hash into the cache. Use Equivalence to
-		// make Fortran ignore "types".
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		//  integer(i64), parameter :: Grid_Mask=NOT(ISHFT(1_i64, Grid_Shift)-1)
-		Int64 const Grid_Shift( 28 ); //Tuned This is a hot spot
-		assert( Grid_Shift == 64 - 12 - psatprecision_bits ); // Force Grid_Shift updates when precision bits changes
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyPsatFnTemp_cache );
-#endif
-
-		// FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-		Int64 const Tdb_tag( bit::bit_shift( TRANSFER( T, Grid_Shift ), -Grid_Shift ) ); // Note that 2nd arg to TRANSFER is not used: Only type matters
-//		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
-		Int64 const hash( Tdb_tag & psatcache_mask );
-		auto & cPsat( cached_Psat( hash ) );
-
-		if ( cPsat.iTdb != Tdb_tag ) {
-			cPsat.iTdb = Tdb_tag;
-			Real64 Tdb_tag_r;
-			Tdb_tag_r = TRANSFER( bit::bit_shift( Tdb_tag, Grid_Shift ), Tdb_tag_r );
-			cPsat.Psat = PsyPsatFnTemp_raw( Tdb_tag_r, CalledFrom );
-		}
-
-		return cPsat.Psat; // saturation pressure {Pascals}
-	}
-
-#else
-
 	Real64
 	PsyPsatFnTemp(
 		Real64 const T, // dry-bulb temperature {C}
 		std::string const & CalledFrom = blank_string // routine this function was called from (error messages)
 	);
 
-#endif
 
 	Real64
 	PsyTsatFnHPb(
@@ -961,60 +773,13 @@ namespace Psychrometrics {
 
 #endif
 
-	inline
 	Real64
 	PsyWFnTdbTwbPb(
 		Real64 const TDB, // dry-bulb temperature {C}
 		Real64 const TWBin, // wet-bulb temperature {C}
 		Real64 const PB, // barometric pressure {Pascals}
 		std::string const & CalledFrom = blank_string // routine this function was called from (error messages)
-	)
-	{
-		// FUNCTION INFORMATION:
-		//       AUTHOR         George Shih
-		//       DATE WRITTEN   May 1976
-		//       MODIFIED       na
-		//       RE-ENGINEERED  na
-
-		// PURPOSE OF THIS FUNCTION:
-		// This function provides the humidity ratio from dry-bulb temperature,
-		// wet-bulb temperature and barometric pressure.
-
-		// REFERENCES:
-		// ASHRAE HANDBOOK OF FUNDAMENTALS, 1972, P99, EQ 22,35
-
-		// FUNCTION PARAMETER DEFINITIONS:
-		static std::string const RoutineName( "PsyWFnTdbTwbPb" );
-
-#ifdef EP_psych_stats
-		++NumTimesCalled( iPsyWFnTdbTwbPb );
-#endif
-
-		Real64 TWB( TWBin ); // test wet-bulb temperature
-
-		// Validity check
-		if ( TWB > TDB ) {
-#ifdef EP_psych_errors
-			if ( TWB > TDB + 0.01 ) PsyWFnTdbTwbPb_temperature_error( TDB, TWB, PB, CalledFrom );
-#endif
-			TWB = TDB;
-		}
-
-		// Calculation
-		Real64 const PWET( PsyPsatFnTemp( TWB, ( CalledFrom.empty() ? RoutineName : CalledFrom ) ) ); // Pressure at wet-bulb temperature {Pascals}
-		Real64 const WET( 0.62198 * PWET / ( PB - PWET ) ); // Humidity ratio at wet-bulb temperature
-		Real64 const W( ( ( 2501.0 - 2.381 * TWB ) * WET - ( TDB - TWB ) ) / ( 2501.0 + 1.805 * TDB - 4.186 * TWB ) ); // humidity ratio
-
-		// Validity check
-		if ( W < 0.0 ) {
-#ifdef EP_psych_errors
-			PsyWFnTdbTwbPb_humidity_error( TDB, TWB, PB, W, CalledFrom );
-#endif
-			return PsyWFnTdbRhPb( TDB, 0.0001, PB, CalledFrom );
-		} else {
-			return W;
-		}
-	}
+	);
 
 	inline
 	Real64

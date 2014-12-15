@@ -27,6 +27,8 @@
 #include <Pumps.hh>
 #include <UtilityRoutines.hh>
 
+#define reduce_allocations
+
 namespace EnergyPlus {
 
 namespace PlantLoopSolver {
@@ -1100,6 +1102,7 @@ namespace PlantLoopSolver {
 		static int LastLoopSideNum( -1 );
 		static int LastFirstBranchNum( -1 );
 		static int LastLastBranchNum( -1 );
+		static int LastNumBranchesInRegion( -1 );
 
 		//~ Indexing variables
 		int BranchCounter; // ~ This contains the index for the %Branch(:) structure
@@ -1129,31 +1132,17 @@ namespace PlantLoopSolver {
 
 		LoadToLoopSetPoint = 0.0; //Autodesk:Init Fix possible use uninitialized
 
-		//~ Debug variables
+		// Split allocation from initialization and allocate only if arrays need to grow. 
 
-		// We only need to reallocate the accessible array and reset the LastComponentSimulated if
-		//  either is currently NOT allocated, or if we are coming into this routine with a
-		//  new simulation region.  Otherwise leave it alone and save computation time
+		// How many will we need?
+		NumBranchesInRegion = LastBranchNum - FirstBranchNum + 1;
+
 		if ( ( ! allocated( LastComponentSimulated ) ) || ( LoopNum != LastLoopNum ) || ( LoopSideNum != LastLoopSideNum ) || ( FirstBranchNum != LastFirstBranchNum ) || ( LastBranchNum != LastLastBranchNum ) || StartingNewLoopSidePass ) { //we need to reallocate // ( ! allocated( AccessibleBranches ) ) ||
-
-			// How many will we need?
-			NumBranchesInRegion = LastBranchNum - FirstBranchNum + 1;
-
-			// Reallocate for the number of locations we have available // No heap if size is unchanged
+		// Reallocate for the number of locations we have available // No heap if size is unchanged
 			if ( NumBranchesInRegion > LastComponentSimulated.isize() ) { //Tuned Changed to grow-only strategy
 				LastComponentSimulated.allocate( NumBranchesInRegion );
 			}
 			for ( int i = 1; i <= NumBranchesInRegion; ++i ) LastComponentSimulated = 0; // Only zero the active elements
-//			AccessibleBranches.allocate( NumBranchesInRegion );
-
-//			BranchIndex = 0;
-//			for ( BranchCounter = FirstBranchNum; BranchCounter <= LastBranchNum; ++BranchCounter ) {
-//				++BranchIndex;
-//				AccessibleBranches( BranchIndex ).LoopNum = LoopNum;
-//				AccessibleBranches( BranchIndex ).LoopSideNum = LoopSideNum;
-//				AccessibleBranches( BranchIndex ).BranchNum = BranchCounter;
-//			}
-
 		}
 
 		// Store the arguments for the next call
