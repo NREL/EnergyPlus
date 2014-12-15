@@ -3339,10 +3339,7 @@ namespace HeatBalanceSurfaceManager {
 
 		RecDifShortFromZ = false;
 		FractDifShortZtoZ = 0.0;
-		D = 0.0;
-		for ( NZ = 1; NZ <= NumberOfZones; ++NZ ) {
-			D( NZ, NZ ) = 1.0;
-		}
+		D.to_identity();
 
 		//      IF (.not. ANY(Zone%HasInterZoneWindow)) RETURN  ! this caused massive diffs
 		if ( KickOffSimulation || KickOffSizing ) return;
@@ -3362,12 +3359,16 @@ namespace HeatBalanceSurfaceManager {
 		}
 		//          Compute fractions for multiple passes.
 
-		for ( NZ = 1; NZ <= NumberOfZones; ++NZ ) {
-			for ( MZ = 1; MZ <= NumberOfZones; ++MZ ) {
+		FArray2D< Real64 >::size_type l( 0u ), m( 0u ), d( 0u );
+		for ( NZ = 1; NZ <= NumberOfZones; ++NZ, d += NumberOfZones + 1 ) {
+			m = NZ - 1;
+			Real64 D_d( 0.0 ); // Local accumulator
+			for ( MZ = 1; MZ <= NumberOfZones; ++MZ, ++l, m += NumberOfZones ) {
 				if ( MZ == NZ ) continue;
-				D( MZ, NZ ) = FractDifShortZtoZ( MZ, NZ ) / ( 1.0 - FractDifShortZtoZ( MZ, NZ ) * FractDifShortZtoZ( NZ, MZ ) );
-				D( NZ, NZ ) += FractDifShortZtoZ( NZ, MZ ) * D( MZ, NZ );
+				D[ l ] = FractDifShortZtoZ[ l ] / ( 1.0 - FractDifShortZtoZ[ l ] * FractDifShortZtoZ[ m ] ); // [ l ] == ( MZ, NZ ), [ m ] == ( NZ, MZ )
+				D_d += FractDifShortZtoZ[ m ] * D[ l ];
 			}
+			D[ d ] += D_d; // [ d ] == ( NZ, NZ )
 		}
 
 		FractDifShortZtoZ = D;
@@ -3494,7 +3495,6 @@ namespace HeatBalanceSurfaceManager {
 			} else {
 				Material( MaterNum ).AbsorpVisible = Material( MaterNum ).AbsorpVisibleInput;
 			}
-
 		} // loop over materials
 
 		// second, loop over constructions
@@ -3515,7 +3515,6 @@ namespace HeatBalanceSurfaceManager {
 				Construct( ConstrNum ).OutsideAbsorpSolar = Material( OutsideMaterNum ).AbsorpSolar;
 				Construct( ConstrNum ).OutsideAbsorpThermal = Material( OutsideMaterNum ).AbsorpThermal;
 			}
-
 		}
 
 	}
