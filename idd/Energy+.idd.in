@@ -382,6 +382,7 @@ SimulationControl,
       \memo fields set to No, the corresponding Sizing object is ignored.
       \memo Note also, if you want to do system sizing, you must also do zone sizing in the same
       \memo run or an error will result.
+      \min-fields 5
   A1, \field Do Zone Sizing Calculation
       \note If Yes, Zone sizing is accomplished from corresponding Sizing:Zone objects
       \note and autosize fields.
@@ -410,12 +411,24 @@ SimulationControl,
       \key Yes
       \key No
       \default Yes
-  A5; \field Run Simulation for Weather File Run Periods
+  A5, \field Run Simulation for Weather File Run Periods
       \note If Yes, RunPeriod:* objects are executed and results from those may be displayed..
       \type choice
       \key Yes
       \key No
       \default Yes
+  A6, \field Do HVAC Sizing Simulation for Sizing Periods
+      \note If Yes, SizingPeriod:* objects are exectuted additional times for advanced sizing.
+      \note Currently limited to use with coincident plant sizing
+      \type choice
+      \key Yes
+      \key No
+      \default No
+  A7; \field Maximum Number of HVAC Sizing Simulation Iterations
+      \type integer
+      \minimum 1
+      \default 1
+      
 
 Building,
        \memo Describes parameters that are used during the simulation

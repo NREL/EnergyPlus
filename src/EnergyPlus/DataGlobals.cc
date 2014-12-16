@@ -154,6 +154,8 @@ namespace DataGlobals {
 	bool DoPlantSizing( false ); // User input in SimulationControl object
 	bool DoDesDaySim( false ); // User input in SimulationControl object
 	bool DoWeathSim( false ); // User input in SimulationControl object
+	bool DoHVACSizingSimulation( false ); // User input in SimulationControl object
+	int HVACSizingSimMaxIterations( 0 ); // User input in SimulationControl object
 	bool WeathSimReq( false ); // Input has a RunPeriod request
 	int KindOfSim( 0 ); // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
 	bool DoOutputReporting( false ); // TRUE if variables to be written out

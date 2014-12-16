@@ -967,6 +967,7 @@ namespace WeatherManager {
 					Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeDesignDay;
 					Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Iteration " + RoundSigDigits( HVACSizingIterCount );
 					Environment(NumOfEnvrn).DesignDayNum = i;
+					Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
 					++NumDesignEnv;
 				}
 				else if (Environment(i).KindOfEnvrn == ksRunPeriodDesign)
@@ -975,6 +976,7 @@ namespace WeatherManager {
 					Environment(NumOfEnvrn) = Environment(i); // copy over seed data
 					Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeRunPeriodDesign;
 					Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Iteration " + RoundSigDigits( HVACSizingIterCount );
+					Environment(NumOfEnvrn).HVACSizingIterationNum = HVACSizingIterCount;
 					++NumDesignEnv;
 				}
 

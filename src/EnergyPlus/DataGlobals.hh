@@ -127,6 +127,8 @@ namespace DataGlobals {
 	extern bool DoPlantSizing; // User input in SimulationControl object
 	extern bool DoDesDaySim; // User input in SimulationControl object
 	extern bool DoWeathSim; // User input in SimulationControl object
+	extern bool DoHVACSizingSimulation; //User input in SimulationControl object
+	extern int HVACSizingSimMaxIterations; //User input in SimulationControl object
 	extern bool WeathSimReq; // Input has a RunPeriod request
 	extern int KindOfSim; // See parameters. (ksDesignDay, ksRunPeriodDesign, ksRunPeriodWeather)
 	extern bool DoOutputReporting; // TRUE if variables to be written out
