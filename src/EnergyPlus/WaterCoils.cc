@@ -1701,6 +1701,7 @@ namespace WaterCoils {
 					DataFlowUsedForSizing = DesCoilAirFlow;
 					DataDesOutletAirTemp = DesCoilExitTemp;
 				}
+
 				SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should always print this!)
 				RequestSizing( CompType, CompName, CoolingCapacitySizing, SizingString, TempSize, bPRINT, RoutineName );
 				WaterCoil( CoilNum ).DesWaterCoolingCoilRate = TempSize;

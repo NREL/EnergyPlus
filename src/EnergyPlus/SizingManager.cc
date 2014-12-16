@@ -648,7 +648,7 @@ namespace SizingManager {
 			}
 			// Deallocate arrays no longer needed
 			SysSizing.deallocate();
-			CalcSysSizing.deallocate();
+			// CalcSysSizing.deallocate();
 		}
 
 		if ( ( DoPlantSizing ) && ( NumPltSizInput == 0 ) ) {
