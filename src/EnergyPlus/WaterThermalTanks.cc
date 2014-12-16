@@ -6023,7 +6023,6 @@ namespace WaterThermalTanks {
 					}
 				}
 
-				Euse += Quse * dt;
 				Esource += Qsource * dt;
 				Eloss += Qloss * dt;
 				Elosszone += Qlosszone * dt;
@@ -6031,6 +6030,8 @@ namespace WaterThermalTanks {
 				Eunmet += Qunmet * dt;
 
 			} // NodeNum
+
+			Euse += UseMassFlowRate * Cp * (UseInletTemp - Tank.Node( Tank.UseOutletStratNode ).Temp) * dt;
 
 			// Calculation for standard ratings
 			if ( ! Tank.FirstRecoveryDone ) {
