@@ -424,7 +424,7 @@ SimulationControl,
       \key Yes
       \key No
       \default No
-  A7; \field Maximum Number of HVAC Sizing Simulation Iterations
+  N1; \field Maximum Number of HVAC Sizing Simulation Iterations
       \type integer
       \minimum 1
       \default 1
