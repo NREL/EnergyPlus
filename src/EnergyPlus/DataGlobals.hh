@@ -27,6 +27,8 @@ namespace DataGlobals {
 	extern int const ksDesignDay;
 	extern int const ksRunPeriodDesign;
 	extern int const ksRunPeriodWeather;
+	extern int const ksHVACSizeDesignDay; // a regular design day run during HVAC Sizing Simulation
+	extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
 
 	extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
 	extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)

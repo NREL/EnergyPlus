@@ -550,7 +550,7 @@ namespace WeatherManager {
 			if ( NumOfEnvrn > 0 ) {
 				ResolveLocationInformation( ErrorsFound ); // Obtain weather related info from input file
 				CheckLocationValidity();
-				if ( Environment( NumOfEnvrn ).KindOfEnvrn != ksDesignDay ) {
+				if ((Environment(NumOfEnvrn).KindOfEnvrn != ksDesignDay) && (Environment(NumOfEnvrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
 					CheckWeatherFileValidity();
 				}
 				if ( ErrorsFound ) {
@@ -909,16 +909,16 @@ namespace WeatherManager {
 							}
 						}
 
-					} else if ( SELECT_CASE_var == ksDesignDay ) { // Design Day
+					} else if (SELECT_CASE_var == ksDesignDay || SELECT_CASE_var == ksHVACSizeDesignDay ) { // Design Day
 						RunPeriodEnvironment = false;
-						gio::write( StDate, DateFormat ) << DesDayInput( Envrn ).Month << DesDayInput( Envrn ).DayOfMonth;
+						gio::write(StDate, DateFormat) << DesDayInput(Environment(Envrn).DesignDayNum).Month << DesDayInput(Environment(Envrn).DesignDayNum).DayOfMonth;
 						EnDate = StDate;
-						if ( DesDayInput( Envrn ).DayType <= 7 && DoWeatherInitReporting ) {
-							gio::write( OutputFileInits, EnvNameFormat ) << Environment( Envrn ).Title << "SizingPeriod:DesignDay" << StDate << EnDate << DaysOfWeek( DesDayInput( Envrn ).DayType ) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
+						if (DesDayInput(Environment(Envrn).DesignDayNum).DayType <= 7 && DoWeatherInitReporting) {
+							gio::write(OutputFileInits, EnvNameFormat) << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate << DaysOfWeek(DesDayInput(Environment(Envrn).DesignDayNum).DayType) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
 						} else if ( DoWeatherInitReporting ) {
-							gio::write( OutputFileInits, EnvNameFormat ) << Environment( Envrn ).Title << "SizingPeriod:DesignDay" << StDate << EnDate << SpecialDayNames( DesDayInput( Envrn ).DayType - 7 ) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
+							gio::write(OutputFileInits, EnvNameFormat) << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate << SpecialDayNames(DesDayInput(Environment(Envrn).DesignDayNum).DayType - 7) << "1" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A" << "N/A";
 						}
-						if ( DesDayInput( Envrn ).DSTIndicator == 0 && DoWeatherInitReporting ) {
+						if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
 							gio::write( OutputFileInits, EnvDSTNFormat ) << "SizingPeriod:DesignDay";
 						} else if ( DoWeatherInitReporting ) {
 							gio::write( OutputFileInits, EnvDSTYFormat ) << "SizingPeriod:DesignDay" << StDate << EnDate;
@@ -936,6 +936,55 @@ namespace WeatherManager {
 		} else if ( ErrorsFound ) {
 			Available = false;
 		}
+
+	}
+
+	void
+	AddDesignSetToEnvironmentStruct(
+		int const HVACSizingIterCount
+	)
+	{
+		// SUBROUTINE INFORMATION:
+
+		using DataGlobals::ksDesignDay;
+		using DataGlobals::ksRunPeriodDesign;
+		using DataGlobals::ksHVACSizeDesignDay;
+		using DataGlobals::ksHVACSizeRunPeriodDesign;
+
+		int OrigNumOfEnvrn;
+		int NumDesignEnv(0);
+		int i;
+
+		OrigNumOfEnvrn = NumOfEnvrn;
+			//for (auto & e : Environment)
+			for (i = 1; i <= OrigNumOfEnvrn; i++)
+		{
+				if (Environment(i).KindOfEnvrn == ksDesignDay)
+				{
+
+					Environment.redimension(++NumOfEnvrn);
+					Environment(NumOfEnvrn) = Environment(i); // copy over seed data from current array element
+					Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeDesignDay;
+					Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Iteration " + RoundSigDigits( HVACSizingIterCount );
+					Environment(NumOfEnvrn).DesignDayNum = i;
+					++NumDesignEnv;
+				}
+				else if (Environment(i).KindOfEnvrn == ksRunPeriodDesign)
+				{
+					Environment.redimension(++NumOfEnvrn);
+					Environment(NumOfEnvrn) = Environment(i); // copy over seed data
+					Environment(NumOfEnvrn).KindOfEnvrn = ksHVACSizeRunPeriodDesign;
+					Environment(NumOfEnvrn).Title = Environment(i).Title + " HVAC Sizing Iteration " + RoundSigDigits( HVACSizingIterCount );
+					++NumDesignEnv;
+				}
+
+
+		}  // for each loop over Environment data strucure
+
+
+		//next is temporary for testing could be weather period, need to examine contents of structure first
+
+
 
 	}
 
@@ -1618,8 +1667,10 @@ namespace WeatherManager {
 
 			//Call and setup the Design Day environment
 			if ( Environment( Envrn ).KindOfEnvrn != ksRunPeriodWeather ) {
-				if ( Envrn <= TotDesDays ) {
-					SetUpDesignDay( Envrn );
+				if (Environment(Envrn).DesignDayNum > 0) 
+				{
+					SetUpDesignDay(Environment(Envrn).DesignDayNum);
+					EnvironmentName = Environment(Envrn).Title;
 				}
 			}
 
@@ -1678,10 +1729,10 @@ namespace WeatherManager {
 				SpecialDays( Loop ).Used = false;
 			}
 
-			if ( KindOfSim != ksDesignDay ) {
+			if ((KindOfSim != ksDesignDay) && (KindOfSim != ksHVACSizeDesignDay)) {
 				ReadWeatherForDay( 1, Envrn, false ); // Read first day's weather
 			} else {
-				TomorrowVariables = DesignDay( Envrn );
+				TomorrowVariables = DesignDay(Environment(Envrn).DesignDayNum);
 			}
 
 		} // ... end of BeginEnvrnFlag IF-THEN block.
@@ -1701,7 +1752,7 @@ namespace WeatherManager {
 			// In a multi year simulation with run period less than 365, we need to position the weather line
 			// appropriately.
 
-			if ( ( ! WarmupFlag ) && ( Environment( Envrn ).KindOfEnvrn != ksDesignDay ) ) {
+			if ((!WarmupFlag) && ((Environment(Envrn).KindOfEnvrn != ksDesignDay) && (Environment(Envrn).KindOfEnvrn != ksHVACSizeDesignDay))) {
 				if ( DayOfSim < NumOfDayInEnvrn ) {
 					if ( DayOfSim == curSimDayForEndOfRunPeriod ) {
 						curSimDayForEndOfRunPeriod += Environment( Envrn ).RawSimDays;
@@ -1813,7 +1864,7 @@ namespace WeatherManager {
 			DatesShouldBeReset = true;
 		}
 
-		if ( EndEnvrnFlag && ( Environment( Envrn ).KindOfEnvrn != ksDesignDay ) ) {
+		if (EndEnvrnFlag && (Environment(Envrn).KindOfEnvrn != ksDesignDay) && (Environment(Envrn).KindOfEnvrn != ksHVACSizeDesignDay)) {
 			gio::rewind( WeatherFileUnitNumber );
 			SkipEPlusWFHeader();
 			ReportMissing_RangeData();
@@ -2049,27 +2100,28 @@ namespace WeatherManager {
 			OutDewPointTemp = OutWetBulbTemp;
 		}
 
-		if ( KindOfSim == ksDesignDay ) {
+		if ((KindOfSim == ksDesignDay) || (KindOfSim == ksHVACSizeDesignDay)) {
 			SPSiteDryBulbRangeModScheduleValue = -999.0; // N/A Drybulb Temperature Range Modifier Schedule Value
 			SPSiteHumidityConditionScheduleValue = -999.0; // N/A Humidity Condition Schedule Value
 			SPSiteBeamSolarScheduleValue = -999.0; // N/A Beam Solar Schedule Value
 			SPSiteDiffuseSolarScheduleValue = -999.0; // N/A Diffuse Solar Schedule Value
 			SPSiteSkyTemperatureScheduleValue = -999.0; // N/A SkyTemperature Modifier Schedule Value
 
-			if ( DesDayInput( Envrn ).DBTempRangeType != DDDBRangeType_Default ) {
-				SPSiteDryBulbRangeModScheduleValue( Envrn ) = DDDBRngModifier( Envrn, HourOfDay, TimeStep );
+			if ( DesDayInput( Environment( Envrn ).DesignDayNum ).DBTempRangeType != DDDBRangeType_Default ) {
+				SPSiteDryBulbRangeModScheduleValue(Environment(Envrn).DesignDayNum) = DDDBRngModifier(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
-			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDef || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDif || DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfMul ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_RelHumSch ) {
-				SPSiteHumidityConditionScheduleValue( Envrn ) = DDHumIndModifier( Envrn, HourOfDay, TimeStep );
+			if (DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_WBProfDef || DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_WBProfDif || DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_WBProfMul) {
+				SPSiteHumidityConditionScheduleValue(Environment(Envrn).DesignDayNum) = DDHumIndModifier(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
-			if ( DesDayInput( Envrn ).SolarModel == SolarModel_Schedule ) {
-				SPSiteBeamSolarScheduleValue( Envrn ) = DDBeamSolarValues( Envrn, HourOfDay, TimeStep );
-				SPSiteDiffuseSolarScheduleValue( Envrn ) = DDDiffuseSolarValues( Envrn, HourOfDay, TimeStep );
+			else if (DesDayInput(Environment(Envrn).DesignDayNum).HumIndType == DDHumIndType_RelHumSch) {
+				SPSiteHumidityConditionScheduleValue(Environment(Envrn).DesignDayNum) = DDHumIndModifier(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
+			}
+			if (DesDayInput(Environment(Envrn).DesignDayNum).SolarModel == SolarModel_Schedule) {
+				SPSiteBeamSolarScheduleValue(Environment(Envrn).DesignDayNum) = DDBeamSolarValues(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
+				SPSiteDiffuseSolarScheduleValue(Environment(Envrn).DesignDayNum) = DDDiffuseSolarValues(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
 			if ( Environment( Envrn ).WP_Type1 != 0 ) {
-				SPSiteSkyTemperatureScheduleValue( Envrn ) = DDSkyTempScheduleValues( Envrn, HourOfDay, TimeStep );
+				SPSiteSkyTemperatureScheduleValue(Environment(Envrn).DesignDayNum) = DDSkyTempScheduleValues(Environment(Envrn).DesignDayNum, HourOfDay, TimeStep);
 			}
 		} else if ( TotDesDays > 0 ) {
 			SPSiteDryBulbRangeModScheduleValue = -999.0; // N/A Drybulb Temperature Range Modifier Schedule Value
@@ -3483,7 +3535,7 @@ Label903: ;
 		DesignDay( EnvrnNum ).DayOfMonth = DesDayInput( EnvrnNum ).DayOfMonth;
 		DesignDay( EnvrnNum ).DayOfYear = JulianDay( DesignDay( EnvrnNum ).Month, DesignDay( EnvrnNum ).DayOfMonth, 0 );
 		gio::write( CurMnDy, MnDyFmt ) << DesDayInput( EnvrnNum ).Month << DesDayInput( EnvrnNum ).DayOfMonth;
-		EnvironmentName = DesDayInput( EnvrnNum ).Title;
+		//EnvironmentName = DesDayInput( EnvrnNum ).Title;
 		RunPeriodEnvironment = false;
 		// Following builds Environment start/end for ASHRAE 55 warnings
 		EnvironmentStartEnd = CurMnDy + " - " + CurMnDy;
@@ -3525,56 +3577,66 @@ Label903: ;
 			PrintDDHeader = false;
 		}
 		if ( DoWeatherInitReporting ) {
-			if ( DesDayInput( Envrn ).RainInd == 1 ) {
+			if (DesDayInput(EnvrnNum).RainInd == 1) {
 				AlpUseRain = "Yes";
 			} else {
 				AlpUseRain = "No";
 			}
-			if ( DesDayInput( Envrn ).SnowInd == 1 ) {
+			if (DesDayInput(EnvrnNum).SnowInd == 1) {
 				AlpUseSnow = "Yes";
 			} else {
 				AlpUseSnow = "No";
 			}
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, EnvDDayFormat, flags ); }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).MaxDryBulb, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).MaxDryBulb, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).DailyDBRange, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).DailyDBRange, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			StringOut = ",";
-			if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Default ) {
+			if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Default) {
 				StringOut = "DefaultMultipliers,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Multiplier ) {
+			}
+			else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Multiplier) {
 				StringOut = "MultiplierSchedule,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Profile ) {
+			}
+			else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Profile) {
 				StringOut = "TemperatureProfile,";
-			} else if ( DesDayInput( Envrn ).DBTempRangeType == DDDBRangeType_Difference ) {
+			}
+			else if (DesDayInput(EnvrnNum).DBTempRangeType == DDDBRangeType_Difference) {
 				StringOut = "DifferenceSchedule,";
 			}
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut; }
-			if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WetBulb ) {
-				StringOut = "Wetbulb," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_DewPoint ) {
-				StringOut = "Dewpoint," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_Enthalpy ) {
-				StringOut = "Enthalpy," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {kJ/kg},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_HumRatio ) {
-				StringOut = "HumidityRatio," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 4 ) + " {},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_RelHumSch ) {
-				StringOut = "Schedule,<schedule values from 0.0 to 100.0 {percent},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDef ) {
-				StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfDif ) {
-				StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
-			} else if ( DesDayInput( Envrn ).HumIndType == DDHumIndType_WBProfMul ) {
-				StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
+			if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
+				StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
 			}
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).PressBarom, 0 );
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
+				StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_Enthalpy) {
+				StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {kJ/kg},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_HumRatio) {
+				StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + " {},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch) {
+				StringOut = "Schedule,<schedule values from 0.0 to 100.0 {percent},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef) {
+				StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits( DesDayInput( Envrn ).HumIndValue, 2 ) + " {C},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
+				StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits( DesDayInput( EnvrnNum ).HumIndValue, 2 ) + " {C},";
+			}
+			else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
+				StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits( DesDayInput( EnvrnNum ).HumIndValue, 2 ) + " {C},";
+			}
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).PressBarom, 0);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindDir, 0 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindDir, 0);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).WindSpeed, 1 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).WindSpeed, 1);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
-			StringOut = RoundSigDigits( DesDayInput( Envrn ).SkyClear, 2 );
+			StringOut = RoundSigDigits(DesDayInput(EnvrnNum).SkyClear, 2);
 			{ IOFlags flags; flags.ADVANCE( "No" ); gio::write( OutputFileInits, fmtA, flags ) << StringOut + ','; }
 			gio::write( OutputFileInits, fmtA ) << AlpUseRain + ',' + AlpUseSnow;
 
@@ -3612,7 +3674,7 @@ Label903: ;
 
 		CurrentTime = 25.0;
 
-		{ auto const SELECT_CASE_var( DesDayInput( Envrn ).HumIndType );
+		{ auto const SELECT_CASE_var( DesDayInput( EnvrnNum ).HumIndType );
 
 		if ( SELECT_CASE_var == DDHumIndType_WetBulb ) {
 			HumidityRatio = PsyWFnTdbTwbPb( DesDayInput( EnvrnNum ).MaxDryBulb, DesDayInput( EnvrnNum ).HumIndValue, DesDayInput( EnvrnNum ).PressBarom, RoutineNamePsyWFnTdbTwbPb );
@@ -3640,7 +3702,7 @@ Label903: ;
 
 		} else {
 			ShowSevereError( "SetUpDesignDay: Invalid Humidity Indicator type" );
-			ShowContinueError( "Occurred in Design Day=" + DesDayInput( Envrn ).Title );
+			ShowContinueError( "Occurred in Design Day=" + DesDayInput( EnvrnNum ).Title );
 
 		}}
 
@@ -6774,6 +6836,7 @@ Label9999: ;
 
 			Environment( EnvrnNum ).Title = DesDayInput( EnvrnNum ).Title;
 			Environment( EnvrnNum ).KindOfEnvrn = ksDesignDay;
+			Environment( EnvrnNum ).DesignDayNum = EnvrnNum;
 			Environment( EnvrnNum ).TotalDays = 1;
 			Environment( EnvrnNum ).StartMonth = DesDayInput( EnvrnNum ).Month;
 			Environment( EnvrnNum ).StartDay = DesDayInput( EnvrnNum ).DayOfMonth;
