@@ -878,6 +878,8 @@ namespace SimulationManager {
 					TimingFlag = true;
 				} else if ( SameString( Alphas( NumA ), "ReportDetailedWarmupConvergence" ) ) {
 					ReportDetailedWarmupConvergence = true;
+				} else if ( SameString( Alphas( NumA ), "ReportDuringHVACSizingSimulation")) {
+					ReportDuringHVACSizingSimulation = true;
 				} else if ( SameString( Alphas( NumA ), "CreateMinimalSurfaceVariables" ) ) {
 					continue;
 					//        CreateMinimalSurfaceVariables=.TRUE.
@@ -1619,7 +1621,8 @@ namespace SimulationManager {
 		static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
 
 		DisplayString( "Beginning HVAC Sizing Simulation" );
-
+		if (! ReportDuringHVACSizingSimulation) DoOutputReporting = false;
+		
 		ResetEnvironmentCounter();
 		// iterations over set of sizing periods for HVAC sizing Simulation
 		// currently just running up to max. 
@@ -1647,13 +1650,13 @@ namespace SimulationManager {
 				if (Environment(Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
 
 				++EnvCount;
-
-				if (sqlite->writeOutputToSQLite()) {
-					sqlite->sqliteBegin();
-					sqlite->createSQLiteEnvironmentPeriodRecord();
-					sqlite->sqliteCommit();
+				if (ReportDuringHVACSizingSimulation){
+					if (sqlite->writeOutputToSQLite()) {
+						sqlite->sqliteBegin();
+						sqlite->createSQLiteEnvironmentPeriodRecord();
+						sqlite->sqliteCommit();
+					}
 				}
-
 				ExitDuringSimulations = true;
 				SimsDone = true;
 				DisplayString("Initializing New Environment Parameters, HVAC Sizing Simulation");
@@ -1670,8 +1673,9 @@ namespace SimulationManager {
 
 				while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 
-					if (sqlite->writeOutputToSQLite()) sqlite->sqliteBegin(); // setup for one transaction per day
-
+					if (ReportDuringHVACSizingSimulation) {
+						if (sqlite->writeOutputToSQLite()) sqlite->sqliteBegin(); // setup for one transaction per day
+					}
 					++DayOfSim;
 					gio::write(DayOfSimChr, fmtLD) << DayOfSim;
 					strip(DayOfSimChr);
@@ -1755,6 +1759,7 @@ namespace SimulationManager {
 			} // ... End environment loop.
 		} // End HVAC Sizing Iteration loop
 		WarmupFlag = false;
+		DoOutputReporting = true;
 	}
 
 	void

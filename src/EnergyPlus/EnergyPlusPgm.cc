@@ -306,6 +306,9 @@ EnergyPlusPgm( std::string filepath )
 	get_environment_variable( cReportDuringWarmup, cEnvValue );
 	if ( ! cEnvValue.empty() ) ReportDuringWarmup = env_var_on( cEnvValue ); // Yes or True
 
+	get_environment_variable( cReportDuringHVACSizingSimulation, cEnvValue);
+	if ( ! cEnvValue.empty() ) ReportDuringHVACSizingSimulation = env_var_on( cEnvValue ); // Yes or True
+
 	get_environment_variable( cIgnoreSolarRadiation, cEnvValue );
 	if ( ! cEnvValue.empty() ) IgnoreSolarRadiation = env_var_on( cEnvValue ); // Yes or True
 

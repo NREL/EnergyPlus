@@ -91650,6 +91650,7 @@ Output:Diagnostics,
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
+       \key ReportDuringHVACSizingSimulation
   A2 ; \field Key 2
        \type choice
        \key DisplayAllWarnings
@@ -91662,6 +91663,7 @@ Output:Diagnostics,
        \key DisplayWeatherMissingDataWarnings
        \key ReportDuringWarmup
        \key ReportDetailedWarmupConvergence
+       \key ReportDuringHVACSizingSimulation
 
 Output:DebuggingData,
        \memo switch eplusout.dbg file on or off
