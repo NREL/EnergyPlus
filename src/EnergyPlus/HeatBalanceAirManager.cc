@@ -192,8 +192,7 @@ namespace HeatBalanceAirManager {
 
 		// FLOW:
 
-		CrossMixingFlag.allocate( NumOfZones );
-		CrossMixingFlag = false;
+		CrossMixingFlag.dimension( NumOfZones, false );
 		GetAirFlowFlag( ErrorsFound );
 
 		SetZoneMassConservationFlag();
@@ -237,7 +236,7 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// Formats
-		static gio::Fmt const Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
+		static gio::Fmt Format_720( "('! <AirFlow Model>, Simple',/,' AirFlow Model, ',A)" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -366,7 +365,7 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 		Real64 const VentilTempLimit( 100.0 ); // degrees Celsius
 		Real64 const MixingTempLimit( 100.0 ); // degrees Celsius
 		Real64 const VentilWSLimit( 40.0 ); // m/s
@@ -435,14 +434,13 @@ namespace HeatBalanceAirManager {
 		int IsSourceZone;
 
 		// Formats
-		static gio::Fmt const Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
-		static gio::Fmt const Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
-		static gio::Fmt const Format_722( "(' ',A,', ',A)" );
-		static gio::Fmt const Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
-		static gio::Fmt const Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
+		static gio::Fmt Format_720( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',')" );
+		static gio::Fmt Format_721( "('! <',A,' Airflow Stats - Nominal>,Name,Schedule Name,Zone Name, Zone Floor Area {m2}, # Zone Occupants,',A)" );
+		static gio::Fmt Format_722( "(' ',A,', ',A)" );
+		static gio::Fmt Format_723( "(' ',A,' Airflow Stats, ',A,',',A,',',A,',',A,',',A,',',A,',',A)" );
+		static gio::Fmt Format_724( "('! <',A,' Airflow Stats - Nominal>, ',A)" );
 
-		RepVarSet.allocate( NumOfZones );
-		RepVarSet = true;
+		RepVarSet.dimension( NumOfZones, true );
 
 		// Following used for reporting
 		ZnAirRpt.allocate( NumOfZones );
@@ -503,17 +501,11 @@ namespace HeatBalanceAirManager {
 		maxNumber = max( NumNumber, maxNumber );
 
 		cAlphaArgs.allocate( maxAlpha );
-		cAlphaArgs = "";
 		cAlphaFieldNames.allocate( maxAlpha );
-		cAlphaFieldNames = "";
 		cNumericFieldNames.allocate( maxNumber );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( maxNumber );
-		rNumericArgs = 0.0;
-		lAlphaFieldBlanks.allocate( maxAlpha );
-		lAlphaFieldBlanks = true;
-		lNumericFieldBlanks.allocate( maxNumber );
-		lNumericFieldBlanks = true;
+		rNumericArgs.dimension( maxNumber, 0.0 );
+		lAlphaFieldBlanks.dimension( maxAlpha, true );
+		lNumericFieldBlanks.dimension( maxNumber, true );
 
 		cCurrentModuleObject = "ZoneAirBalance:OutdoorAir";
 		TotZoneAirBalance = GetNumObjectsFound( cCurrentModuleObject );
@@ -1931,7 +1923,7 @@ namespace HeatBalanceAirManager {
 				}
 			}
 
-			// check zones which are used only as a source zones      
+			// check zones which are used only as a source zones
 			for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 				IsSourceZone = false;
 				for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
@@ -1969,7 +1961,7 @@ namespace HeatBalanceAirManager {
 		}
 
 		// zone mass conservation calculation order starts with receiving zones
-		// and then proceeds to source zones 
+		// and then proceeds to source zones
 		Loop = 0;
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ! MassConservation( ZoneNum ).IsOnlySourceZone ) {
@@ -2261,8 +2253,7 @@ namespace HeatBalanceAirManager {
 			SVals1 = 0.0;
 			SVals2.allocate( 24, NumOfTimeStepInHour );
 			SVals2 = 0.0;
-			OverLap.allocate( TotCrossMixing );
-			OverLap = false;
+			OverLap.dimension( TotCrossMixing, false );
 			for ( Loop = 1; Loop <= TotCrossMixing; ++Loop ) {
 				for ( Loop1 = 1; Loop1 <= TotCrossMixing; ++Loop1 ) {
 
@@ -2525,8 +2516,7 @@ namespace HeatBalanceAirManager {
 		lAlphaFieldBlanks.deallocate();
 		lNumericFieldBlanks.deallocate();
 
-		TotInfilVentFlow.allocate( NumOfZones );
-		TotInfilVentFlow = 0.0;
+		TotInfilVentFlow.dimension( NumOfZones, 0.0 );
 
 		for ( Loop = 1; Loop <= TotInfiltration; ++Loop ) {
 			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Infiltration" << "Design Volume Flow Rate {m3/s}," "Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/Exterior Surface Area {m3/s/m2}," "ACH - Air Changes per Hour,Equation A - Constant Term Coefficient {}," "Equation B - Temperature Term Coefficient {1/C}," "Equation C - Velocity Term Coefficient {s/m}, Equation D - Velocity Squared Term Coefficient {s2/m2}";
@@ -2660,8 +2650,7 @@ namespace HeatBalanceAirManager {
 			gio::write( OutputFileInits, fmtA ) << StringOut;
 		}
 
-		TotMixingFlow.allocate( NumOfZones );
-		TotMixingFlow = 0.0;
+		TotMixingFlow.dimension( NumOfZones, 0.0 );
 		for ( Loop = 1; Loop <= TotMixing; ++Loop ) {
 			if ( Loop == 1 ) gio::write( OutputFileInits, Format_721 ) << "Mixing" << "Design Volume Flow Rate {m3/s}," "Volume Flow Rate/Floor Area {m3/s/m2},Volume Flow Rate/person Area {m3/s/person}," "ACH - Air Changes per Hour,From/Source Zone,Delta Temperature {C}";
 
@@ -2816,8 +2805,8 @@ namespace HeatBalanceAirManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
-		static gio::Fmt const RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
+		static gio::Fmt RoomAirHeader( "('! <RoomAir Model>, Zone Name, Mixing/Mundt/UCSDDV/UCSDCV/UCSDUFI/UCSDUFE/User Defined')" );
+		static gio::Fmt RoomAirZoneFmt( "('RoomAir Model,',A,',',A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -3094,10 +3083,8 @@ namespace HeatBalanceAirManager {
 		// FLOW:
 
 		// Use the total number of zones to allocate variables to avoid a zone number limit
-		MVFC.allocate( NumOfZones );
-		MVFC = 0.0;
-		MTC.allocate( NumOfZones );
-		MTC = 0.0;
+		MVFC.dimension( NumOfZones, 0.0 );
+		MTC.dimension( NumOfZones, 0.0 );
 
 	}
 

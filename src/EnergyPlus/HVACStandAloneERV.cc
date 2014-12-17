@@ -319,17 +319,11 @@ namespace HVACStandAloneERV {
 		MaxNumbers = max( MaxNumbers, NumNumbers );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
-		Numbers.allocate( MaxNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( MaxNumbers, 0.0 );
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNumbers );
-		cNumericFields = "";
-		lNumericBlanks.allocate( MaxNumbers );
-		lNumericBlanks = false;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = false;
+		lNumericBlanks.dimension( MaxNumbers, false );
+		lAlphaBlanks.dimension( MaxAlphas, false );
 
 		GetERVInputFlag = false;
 
@@ -340,8 +334,7 @@ namespace HVACStandAloneERV {
 
 		// allocate the data structures
 		StandAloneERV.allocate( NumStandAloneERVs );
-		CheckEquipName.allocate( NumStandAloneERVs );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumStandAloneERVs, true );
 
 		// loop over Stand Alone ERV units; get and load the input data
 		for ( StandAloneERVIndex = 1; StandAloneERVIndex <= NumStandAloneERVs; ++StandAloneERVIndex ) {

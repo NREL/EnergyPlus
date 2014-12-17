@@ -194,8 +194,7 @@ namespace EarthTube {
 		int Loop1;
 		FArray1D_bool RepVarSet;
 
-		RepVarSet.allocate( NumOfZones );
-		RepVarSet = true;
+		RepVarSet.dimension( NumOfZones, true );
 
 		// Following used for reporting
 		ZnRptET.allocate( NumOfZones );

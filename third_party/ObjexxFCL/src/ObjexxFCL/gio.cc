@@ -33,6 +33,9 @@
 namespace ObjexxFCL {
 namespace gio {
 
+// Data
+std::string const LF( "\n" ); // Linefeed
+
 // Streams Collection
 inline
 static
@@ -248,87 +251,141 @@ open()
 // Read /////
 
 // Read from Unit
-Read
-read( Unit const unit, std::string const & fmt, IOFlags & flags )
+ReadStream
+read( Unit const unit, std::string const & fmt, bool const beg )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, beg );
+	}
+	return ReadStream();
+}
+
+// Read from Unit
+ReadStream
+read( Unit const unit, Fmt const & fmt, bool const beg )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, beg );
+	}
+	return ReadStream();
+}
+
+// Read from Unit
+ReadStream
+read( Unit const unit, Fmt & fmt, bool const beg )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, beg );
+	}
+	return ReadStream();
+}
+
+// Read from Unit
+ReadStream
+read( Unit const unit, std::string const & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt, flags );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, flags, beg );
 	}
 	flags.err( true ).ios( 11 );
-	return Read( flags );
+	return ReadStream( flags );
 }
 
 // Read from Unit
-Read
-read( Unit const unit, gio::Fmt const & fmt, IOFlags & flags )
+ReadStream
+read( Unit const unit, Fmt const & fmt, IOFlags & flags, bool const beg )
 {
 	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt, flags );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, flags, beg );
 	}
 	flags.err( true ).ios( 11 );
-	return Read( flags );
+	return ReadStream( flags );
 }
 
 // Read from Unit
-Read
-read( Unit const unit, std::string const & fmt )
+ReadStream
+read( Unit const unit, Fmt & fmt, IOFlags & flags, bool const beg )
 {
+	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
-	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt );
+		if ( stream_p ) return ReadStream( *stream_p, fmt, flags, beg );
 	}
-	return Read();
-}
-
-// Read from Unit
-Read
-read( Unit const unit, gio::Fmt const & fmt )
-{
-	Stream * Stream_p( streams()[ unit ] );
-	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
-	if ( Stream_p && Stream_p->is_open() ) {
-		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Read( *stream_p, fmt );
-	}
-	return Read();
+	flags.err( true ).ios( 11 );
+	return ReadStream( flags );
 }
 
 // Read from stdin
-Read
-read( std::string const & fmt, IOFlags & flags )
-{
-	return Read( std::cin, fmt, flags );
-}
-
-// Read from stdin
-Read
-read( gio::Fmt const & fmt, IOFlags & flags )
-{
-	return Read( std::cin, fmt, flags );
-}
-
-// Read from stdin
-Read
+ReadStream
 read( std::string const & fmt )
 {
-	return Read( std::cin, fmt );
+	return ReadStream( std::cin, fmt );
 }
 
 // Read from stdin
-Read
-read( gio::Fmt const & fmt )
+ReadStream
+read( Fmt const & fmt )
 {
-	return Read( std::cin, fmt );
+	return ReadStream( std::cin, fmt );
+}
+
+// Read from stdin
+ReadStream
+read( Fmt & fmt )
+{
+	return ReadStream( std::cin, fmt );
+}
+
+// Read from stdin
+ReadStream
+read( std::string const & fmt, IOFlags & flags )
+{
+	return ReadStream( std::cin, fmt, flags );
+}
+
+// Read from stdin
+ReadStream
+read( Fmt const & fmt, IOFlags & flags )
+{
+	return ReadStream( std::cin, fmt, flags );
+}
+
+// Read from stdin
+ReadStream
+read( Fmt & fmt, IOFlags & flags )
+{
+	return ReadStream( std::cin, fmt, flags );
+}
+
+// Read Line from Unit
+void
+read_line( Unit const unit, std::string & line )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
+		if ( stream_p ) cross_platform_get_line( *stream_p, line );
+	}
 }
 
 // Read Line from Unit
@@ -349,19 +406,54 @@ read_line( Unit const unit, IOFlags & flags, std::string & line )
 	}
 }
 
-// Read Line from Unit
-void
-read_line( Unit const unit, std::string & line )
+// Input Stream of Unit
+std::istream *
+inp_stream( Unit const unit )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	return ( Stream_p ? dynamic_cast< std::istream * >( &Stream_p->stream() ) : nullptr );
+}
+
+// Write /////
+
+// Write to Unit
+Write
+write( Unit const unit, std::string const & fmt )
 {
 	Stream * Stream_p( streams()[ unit ] );
 	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
-		auto stream_p( dynamic_cast< std::istream * >( &Stream_p->stream() ) );
-		if ( stream_p ) cross_platform_get_line( *stream_p, line );
+		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
+		if ( stream_p ) return Write( *stream_p, fmt, Stream_p->ter() );
 	}
+	return Write();
 }
 
-// Write /////
+// Write to Unit
+Write
+write( Unit const unit, Fmt const & fmt )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
+		if ( stream_p ) return Write( *stream_p, fmt, Stream_p->ter() );
+	}
+	return Write();
+}
+
+// Write to Unit
+Write
+write( Unit const unit, Fmt & fmt )
+{
+	Stream * Stream_p( streams()[ unit ] );
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( Stream_p && Stream_p->is_open() ) {
+		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
+		if ( stream_p ) return Write( *stream_p, fmt, Stream_p->ter() );
+	}
+	return Write();
+}
 
 // Write to Unit
 Write
@@ -383,7 +475,7 @@ write( Unit const unit, std::string const & fmt, IOFlags & flags )
 
 // Write to Unit
 Write
-write( Unit const unit, gio::Fmt const & fmt, IOFlags & flags )
+write( Unit const unit, Fmt const & fmt, IOFlags & flags )
 {
 	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
@@ -401,28 +493,20 @@ write( Unit const unit, gio::Fmt const & fmt, IOFlags & flags )
 
 // Write to Unit
 Write
-write( Unit const unit, std::string const & fmt )
+write( Unit const unit, Fmt & fmt, IOFlags & flags )
 {
+	flags.clear_status();
 	Stream * Stream_p( streams()[ unit ] );
-	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
+	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit, flags ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
 	if ( Stream_p && Stream_p->is_open() ) {
 		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Write( *stream_p, fmt, Stream_p->ter() );
+		if ( stream_p ) {
+			flags.ter( Stream_p->ter() );
+			return Write( *stream_p, fmt, flags );
+		}
 	}
-	return Write();
-}
-
-// Write to Unit
-Write
-write( Unit const unit, gio::Fmt const & fmt )
-{
-	Stream * Stream_p( streams()[ unit ] );
-	if ( ( ! ( Stream_p && Stream_p->is_open() ) ) && open( unit ) ) Stream_p = streams()[ unit ]; // Opened a default file on the unit
-	if ( Stream_p && Stream_p->is_open() ) {
-		auto stream_p( dynamic_cast< std::ostream * >( &Stream_p->stream() ) );
-		if ( stream_p ) return Write( *stream_p, fmt, Stream_p->ter() );
-	}
-	return Write();
+	flags.err( true ).ios( 11 );
+	return Write( flags );
 }
 
 // Write End-of-Line to Unit
@@ -439,30 +523,52 @@ write( Unit const unit )
 
 // Write to stdout
 Write
-write( std::string const & fmt, IOFlags & flags )
-{
-	return Write( std::cout, fmt, flags, Write::LF );
-}
-
-// Write to stdout
-Write
-write( gio::Fmt const & fmt, IOFlags & flags )
-{
-	return Write( std::cout, fmt, flags, Write::LF );
-}
-
-// Write to stdout
-Write
 write( std::string const & fmt )
 {
-	return Write( std::cout, fmt, Write::LF );
+	return Write( std::cout, fmt, LF );
 }
 
 // Write to stdout
 Write
-write( gio::Fmt const & fmt )
+write( Fmt const & fmt )
 {
-	return Write( std::cout, fmt, Write::LF );
+	return Write( std::cout, fmt, LF );
+}
+
+// Write to stdout
+Write
+write( Fmt & fmt )
+{
+	return Write( std::cout, fmt, LF );
+}
+
+// Write to stdout
+Write
+write( std::string const & fmt, IOFlags & flags )
+{
+	return Write( std::cout, fmt, flags.ter( LF ) );
+}
+
+// Write to stdout
+Write
+write( Fmt const & fmt, IOFlags & flags )
+{
+	return Write( std::cout, fmt, flags.ter( LF ) );
+}
+
+// Write to stdout
+Write
+write( Fmt & fmt, IOFlags & flags )
+{
+	return Write( std::cout, fmt, flags.ter( LF ) );
+}
+
+// Output Stream of Unit
+std::ostream *
+out_stream( Unit const unit )
+{
+	Stream * const Stream_p( streams()[ unit ] );
+	return ( Stream_p ? dynamic_cast< std::ostream * >( &Stream_p->stream() ) : nullptr );
 }
 
 // Print /////
@@ -477,6 +583,13 @@ print( std::string const & fmt )
 // Print to stdout
 Print
 print( Fmt const & fmt )
+{
+	return Print( fmt );
+}
+
+// Print to stdout
+Print
+print( Fmt & fmt )
 {
 	return Print( fmt );
 }
@@ -580,6 +693,36 @@ void
 inquire( c_cstring const name, IOFlags & flags )
 {
 	inquire( std::string( name ), flags );
+}
+
+// File Exists?
+bool
+file_exists( std::string const & file_name )
+{
+	struct stat file_stat;
+	return ( stat( file_name.c_str(), &file_stat ) == 0 );
+}
+
+// File Exists?
+bool
+file_exists( c_cstring const file_name )
+{
+	struct stat file_stat;
+	return ( stat( file_name, &file_stat ) == 0 );
+}
+
+// File Openable?
+bool
+file_openable( std::string const & file_name )
+{
+	return std::ifstream( file_name ).good();
+}
+
+// File Openable?
+bool
+file_openable( c_cstring const file_name )
+{
+	return std::ifstream( file_name ).good();
 }
 
 // Backspace /////

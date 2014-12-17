@@ -969,8 +969,7 @@ namespace WaterUse {
 		bool errFlag;
 
 		if ( MyOneTimeFlag ) { //DSU
-			SetLoopIndexFlag.allocate( NumWaterConnections );
-			SetLoopIndexFlag = true; //DSU
+			SetLoopIndexFlag.dimension( NumWaterConnections, true ); //DSU
 			MyOneTimeFlag = false; //DSU
 		} //DSU
 

@@ -134,7 +134,7 @@ FArray1D< bool >
 operator !( FArray1< bool > const & a )
 {
 	FArray1D< bool > r( a );
-	for ( FArray1< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( FArray< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
 	}
 	return r;
@@ -145,7 +145,7 @@ FArray2D< bool >
 operator !( FArray2< bool > const & a )
 {
 	FArray2D< bool > r( a );
-	for ( FArray2< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( FArray< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
 	}
 	return r;
@@ -156,7 +156,7 @@ FArray3D< bool >
 operator !( FArray3< bool > const & a )
 {
 	FArray3D< bool > r( a );
-	for ( FArray3< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( FArray< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
 	}
 	return r;
@@ -167,7 +167,7 @@ FArray4D< bool >
 operator !( FArray4< bool > const & a )
 {
 	FArray4D< bool > r( a );
-	for ( FArray4< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( FArray< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
 	}
 	return r;
@@ -178,7 +178,7 @@ FArray5D< bool >
 operator !( FArray5< bool > const & a )
 {
 	FArray5D< bool > r( a );
-	for ( FArray5< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( FArray< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
 	}
 	return r;
@@ -189,7 +189,7 @@ FArray6D< bool >
 operator !( FArray6< bool > const & a )
 {
 	FArray6D< bool > r( a );
-	for ( FArray6< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( FArray< bool >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = ! r[ i ];
 	}
 	return r;
@@ -227,34 +227,37 @@ FArray1D< FArray< bool >::size_type >
 count( FArray2< bool > const & a, int const dim )
 {
 	assert( a.size_bounded() );
+	typedef  FArray< bool >::size_type  size_type;
+	size_type const as1( a.size1() );
+	size_type const as2( a.size2() );
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< FArray< bool >::size_type > v( a.isize2() );
-			for ( int i2 = a.l2(), e2 = a.u2(), k2 = 1; i2 <= e2; ++i2, ++k2 ) {
-				FArray< bool >::size_type c( 0u );
-				for ( int i1 = a.l1(), e1 = a.u1(); i1 <= e1; ++i1 ) {
-					if ( a( i1, i2 ) ) ++c;
+			FArray1D< size_type > res( static_cast< int >( as2 ) );
+			for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
+				size_type c( 0u );
+				for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
+					if ( a[ l ] ) ++c;
 				}
-				v( k2 ) = c;
+				res[ i2 ] = c;
 			}
-			return v;
+			return res;
 		}
 	case 2:
 		{
-			FArray1D< FArray< bool >::size_type > v( a.isize1() );
-			for ( int i1 = a.l1(), e1 = a.u1(), k1 = 1; i1 <= e1; ++i1, ++k1 ) {
-				FArray< bool >::size_type c( 0u );
-				for ( int i2 = a.l2(), e2 = a.u2(); i2 <= e2; ++i2 ) {
-					if ( a( i1, i2 ) ) ++c;
+			FArray1D< size_type > res( static_cast< int >( as1 ) );
+			for ( size_type i1 = 0; i1 < as1; ++i1 ) {
+				size_type c( 0u );
+				for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
+					if ( a[ l ] ) ++c;
 				}
-				v( k1 ) = c;
+				res[ i1 ] = c;
 			}
-			return v;
+			return res;
 		}
 	default:
 		assert( false );
-		return FArray1D< FArray< bool >::size_type >();
+		return FArray1D< size_type >();
 	}
 }
 
@@ -1163,7 +1166,7 @@ pack( FArray1< T > const & a, FArray1< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  FArray1< bool >::size_type  size_type;
+	typedef  FArray< bool >::size_type  size_type;
 	size_type n( 0 );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
@@ -1182,7 +1185,7 @@ pack( FArray2< T > const & a, FArray2< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  FArray2< bool >::size_type  size_type;
+	typedef  FArray< bool >::size_type  size_type;
 	size_type n( 0 );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
@@ -1201,7 +1204,7 @@ pack( FArray3< T > const & a, FArray3< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  FArray3< bool >::size_type  size_type;
+	typedef  FArray< bool >::size_type  size_type;
 	size_type n( 0 );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
@@ -1220,7 +1223,7 @@ pack( FArray4< T > const & a, FArray4< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  FArray4< bool >::size_type  size_type;
+	typedef  FArray< bool >::size_type  size_type;
 	size_type n( 0 );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
@@ -1239,7 +1242,7 @@ pack( FArray5< T > const & a, FArray5< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  FArray5< bool >::size_type  size_type;
+	typedef  FArray< bool >::size_type  size_type;
 	size_type n( 0 );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
@@ -1258,7 +1261,7 @@ pack( FArray6< T > const & a, FArray6< bool > const & mask )
 {
 	assert( a.size_bounded() );
 	assert( conformable( a, mask ) );
-	typedef  FArray6< bool >::size_type  size_type;
+	typedef  FArray< bool >::size_type  size_type;
 	size_type n( 0 );
 	for ( size_type i = 0, e = mask.size(); i < e; ++i ) {
 		if ( mask[ i ] ) ++n;
@@ -1490,32 +1493,30 @@ sum( FArray2< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	int const as1( a.isize1() );
-	int const as2( a.isize2() );
-	size_type l( 0 ); // Linear index
+	size_type const as1( a.size1() );
+	size_type const as2( a.size2() );
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > res( as2, T( 0 ) );
-			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( 0 );
-				for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
-					r += a[ l ];
+			FArray1D< T > res( static_cast< int >( as2 ), T( 0 ) );
+			for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
+				T s( 0 );
+				for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
+					s += a[ l ];
 				}
-				res( i2 ) = r;
+				res[ i2 ] = s;
 			}
 			return res;
 		}
 	case 2:
 		{
-			FArray1D< T > res( as1, T( 0 ) );
-			for ( int i1 = 1; i1 <= as1; ++i1 ) {
-				T r( 0 );
-				l = i1 - 1;
-				for ( int i2 = 1; i2 <= as2; ++i2, l += as1 ) {
-					r += a[ l ];
+			FArray1D< T > res( static_cast< int >( as1 ), T( 0 ) );
+			for ( size_type i1 = 0; i1 < as1; ++i1 ) {
+				T s( 0 );
+				for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
+					s += a[ l ];
 				}
-				res( i1 ) = r;
+				res[ i1 ] = s;
 			}
 			return res;
 		}
@@ -1584,32 +1585,30 @@ product( FArray2< T > const & a, int const dim )
 {
 	assert( a.size_bounded() );
 	typedef  typename FArray< T >::size_type  size_type;
-	int const as1( a.isize1() );
-	int const as2( a.isize2() );
-	size_type l( 0 ); // Linear index
+	size_type const as1( a.size1() );
+	size_type const as2( a.size2() );
 	switch ( dim ) {
 	case 1:
 		{
-			FArray1D< T > res( as2, T( 1 ) );
-			for ( int i2 = 1; i2 <= as2; ++i2 ) {
-				T r( 1 );
-				for ( int i1 = 1; i1 <= as1; ++i1, ++l ) {
-					r *= a[ l ];
+			FArray1D< T > res( static_cast< int >( as2 ), T( 1 ) );
+			for ( size_type i2 = 0, l = 0; i2 < as2; ++i2 ) {
+				T p( 1 );
+				for ( size_type i1 = 0; i1 < as1; ++i1, ++l ) {
+					p *= a[ l ];
 				}
-				res( i2 ) = r;
+				res[ i2 ] = p;
 			}
 			return res;
 		}
 	case 2:
 		{
-			FArray1D< T > res( as1, T( 1 ) );
-			for ( int i1 = 1; i1 <= as1; ++i1 ) {
-				T r( 1 );
-				l = i1 - 1;
-				for ( int i2 = 1; i2 <= as2; ++i2, l *= as1 ) {
-					r *= a[ l ];
+			FArray1D< T > res( static_cast< int >( as1 ), T( 1 ) );
+			for ( size_type i1 = 0; i1 < as1; ++i1 ) {
+				T p( 1 );
+				for ( size_type i2 = 0, l = i1; i2 < as2; ++i2, l += as1 ) {
+					p *= a[ l ];
 				}
-				res( i1 ) = r;
+				res[ i1 ] = p;
 			}
 			return res;
 		}
@@ -1644,7 +1643,7 @@ abs( FArray1< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray1D< T > r( a );
-	for ( typename FArray1< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::abs( r[ i ] );
 	}
 	return r;
@@ -1657,7 +1656,7 @@ abs( FArray2< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray2D< T > r( a );
-	for ( typename FArray2< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::abs( r[ i ] );
 	}
 	return r;
@@ -1670,7 +1669,7 @@ abs( FArray3< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray3D< T > r( a );
-	for ( typename FArray3< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::abs( r[ i ] );
 	}
 	return r;
@@ -1683,7 +1682,7 @@ abs( FArray4< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray4D< T > r( a );
-	for ( typename FArray4< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::abs( r[ i ] );
 	}
 	return r;
@@ -1696,7 +1695,7 @@ abs( FArray5< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray5D< T > r( a );
-	for ( typename FArray5< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::abs( r[ i ] );
 	}
 	return r;
@@ -1709,7 +1708,7 @@ abs( FArray6< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray6D< T > r( a );
-	for ( typename FArray6< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::abs( r[ i ] );
 	}
 	return r;
@@ -1724,7 +1723,7 @@ pow( FArray1< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray1D< T > r( a );
-	for ( typename FArray1< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::pow( r[ i ], x );
 	}
 	return r;
@@ -1737,7 +1736,7 @@ pow( FArray2< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray2D< T > r( a );
-	for ( typename FArray2< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::pow( r[ i ], x );
 	}
 	return r;
@@ -1750,7 +1749,7 @@ pow( FArray3< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray3D< T > r( a );
-	for ( typename FArray3< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::pow( r[ i ], x );
 	}
 	return r;
@@ -1763,7 +1762,7 @@ pow( FArray4< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray4D< T > r( a );
-	for ( typename FArray4< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::pow( r[ i ], x );
 	}
 	return r;
@@ -1776,7 +1775,7 @@ pow( FArray5< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray5D< T > r( a );
-	for ( typename FArray5< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::pow( r[ i ], x );
 	}
 	return r;
@@ -1789,7 +1788,7 @@ pow( FArray6< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray6D< T > r( a );
-	for ( typename FArray6< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = std::pow( r[ i ], x );
 	}
 	return r;
@@ -1804,7 +1803,7 @@ sign( FArray1< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray1D< T > r( a );
-	for ( typename FArray1< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( r[ i ], x );
 	}
 	return r;
@@ -1817,7 +1816,7 @@ sign( FArray2< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray2D< T > r( a );
-	for ( typename FArray2< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( r[ i ], x );
 	}
 	return r;
@@ -1830,7 +1829,7 @@ sign( FArray3< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray3D< T > r( a );
-	for ( typename FArray3< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( r[ i ], x );
 	}
 	return r;
@@ -1843,7 +1842,7 @@ sign( FArray4< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray4D< T > r( a );
-	for ( typename FArray4< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( r[ i ], x );
 	}
 	return r;
@@ -1856,7 +1855,7 @@ sign( FArray5< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray5D< T > r( a );
-	for ( typename FArray5< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( r[ i ], x );
 	}
 	return r;
@@ -1869,7 +1868,7 @@ sign( FArray6< T > const & a, X const & x )
 {
 	assert( a.size_bounded() );
 	FArray6D< T > r( a );
-	for ( typename FArray6< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( r[ i ], x );
 	}
 	return r;
@@ -1882,7 +1881,7 @@ sign( X const & x, FArray1< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray1D< X > r( a );
-	for ( typename FArray1< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;
@@ -1895,7 +1894,7 @@ sign( X const & x, FArray2< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray2D< X > r( a );
-	for ( typename FArray2< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;
@@ -1908,7 +1907,7 @@ sign( X const & x, FArray3< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray3D< X > r( a );
-	for ( typename FArray3< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;
@@ -1921,7 +1920,7 @@ sign( X const & x, FArray4< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray4D< X > r( a );
-	for ( typename FArray4< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;
@@ -1934,7 +1933,7 @@ sign( X const & x, FArray5< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray5D< X > r( a );
-	for ( typename FArray5< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;
@@ -1947,7 +1946,7 @@ sign( X const & x, FArray6< T > const & a )
 {
 	assert( a.size_bounded() );
 	FArray6D< X > r( a );
-	for ( typename FArray6< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
+	for ( typename FArray< T >::size_type i = 0, e = a.size(); i < e; ++i ) {
 		r[ i ] = sign( x, r[ i ] );
 	}
 	return r;

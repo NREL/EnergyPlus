@@ -7,7 +7,7 @@ This is the EnergyPlus Development Repository.
 
  - The Department of Energy maintains a [public website for EnergyPlus](www.energyplus.gov) where you can find much more information about the program.  
  - For detailed developer information, consult the [wiki](https://github.com/nrel/EnergyPlusTeam/wiki).  
- - For support questions, plese utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
+ - For support questions, please utilize the [EnergyPlus Helpdesk](http://energyplus.helpserve.com/).
 
 # Releases
 Although iteration **(pre-)releases** will be posted to this repository during a development cycle, users should generally avoid these, as input syntax may change which won't be supported by the major release version transition tools, and could require manual intervention to remedy.  If a release is intended for active use by users, such as a bug-fix-only or performance-only re-release, it will be clearly specified on the release notes and a public announcement will accompany this type of release.
@@ -31,7 +31,7 @@ The C++ code in EnergyPlus utilizes many C++11 features, and so a modern compile
 6. Check the configuration settings, keeping them default should suffice, and click Generate.
 7. Browse to the build folder and there will be a Visual Studio solution file you can click on, and it will include multiple projects for each build target.  Choose the type of build (Debug or Release), then right click on EnergyPlus in the solution explorer and "Build".  This will build EnergyPlus and all of its dependencies.  The target executables will be found in the Products subfolder.
 8. The solution will include the ZERO_CHECK project as the default target to run when you execute, so when you are ready to debug, manually set the default target to EnergyPlus.
-9. In the EnergyPlus and EnergyPlusLib projects: right click on each project and select Properties. Under Configuration Properties select Debugging. In the Enviroment field, enter ```_NO_DEBUG_HEAP=1```, without quote marks.  The debug heap in Visual Studio doesn't play nicely with the input processor in EnergyPlus, and for debug builds, skipping this will result in a _very_ long IDD reading time.
+9. In the EnergyPlus and EnergyPlusLib projects: right click on each project and select Properties. Under Configuration Properties select Debugging. In the Enviroment field, enter ```_NO_DEBUG_HEAP=1```.  The debug heap in Visual Studio doesn't play nicely with the input processor in EnergyPlus, and for debug builds, skipping this will result in a _very_ long IDD reading time.
 
 ## Linux
 

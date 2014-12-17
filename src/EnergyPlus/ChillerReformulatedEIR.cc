@@ -930,12 +930,11 @@ namespace ChillerReformulatedEIR {
 		Real64 DesignHeatRecVolFlowRateUser; // Hardsized design heat recovery flow for reporting
 
 		// Formats
-		static gio::Fmt const Format_530( "('Cond Temp (C) = ',11(F7.2))" );
-		static gio::Fmt const Format_531( "('Curve Output  = ',11(F7.2))" );
+		static gio::Fmt Format_530( "('Cond Temp (C) = ',11(F7.2))" );
+		static gio::Fmt Format_531( "('Curve Output  = ',11(F7.2))" );
 
 		if ( MyOneTimeFlag ) {
-			MyFlag.allocate( NumElecReformEIRChillers );
-			MyFlag = true;
+			MyFlag.dimension( NumElecReformEIRChillers, true );
 			MyOneTimeFlag = false;
 		}
 
@@ -1818,7 +1817,7 @@ namespace ChillerReformulatedEIR {
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 
-		static gio::Fmt const OutputFormat( "(F6.2)" );
+		static gio::Fmt OutputFormat( "(F6.2)" );
 		static std::string const RoutineName( "CalcElecReformEIRChillerModel" );
 
 		// INTERFACE BLOCK SPECIFICATIONS

@@ -284,8 +284,7 @@ namespace CTElectricGenerator {
 
 		//ALLOCATE ARRAYS
 		CTGenerator.allocate( NumCTGenerators );
-		CheckEquipName.allocate( NumCTGenerators );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumCTGenerators, true );
 
 		CTGeneratorReport.allocate( NumCTGenerators );
 
