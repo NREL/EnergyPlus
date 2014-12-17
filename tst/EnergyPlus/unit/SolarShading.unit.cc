@@ -58,162 +58,19 @@ TEST( CalcPerSolarBeamTest, Test1 )
 	DetailedSolarTimestepIntegration = false;
 	CalcPerSolarBeam( AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );
 
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 24 ) );
-
-	// Test integrated option, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 only for the specified hour
-	// Re-initialize first
 	for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
 		for ( int Hour = 1; Hour <= 24; ++Hour ) {
-			SurfaceWindow( SurfNum ).OutProjSLFracMult( Hour ) = 999.0;
-			SurfaceWindow( SurfNum ).InOutProjSLFracMult( Hour ) = 888.0;
+			EXPECT_EQ( 1.0, SurfaceWindow( SurfNum ).OutProjSLFracMult( Hour ) );
+			EXPECT_EQ( 1.0, SurfaceWindow( SurfNum ).InOutProjSLFracMult( Hour ) );
+		}
+	}
+
+	// Test integrated option, CalcPerSolarBeam should set OutProjSLFracMult and InOutProjSLFracMult to 1.0 only for the specified hour
+	// Re-initialize to new values
+	for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+		for ( int Hour = 1; Hour <= 24; ++Hour ) {
+			SurfaceWindow( SurfNum ).OutProjSLFracMult( Hour ) = 555.0;
+			SurfaceWindow( SurfNum ).InOutProjSLFracMult( Hour ) = 444.0;
 		}
 	}
 
@@ -221,154 +78,16 @@ TEST( CalcPerSolarBeamTest, Test1 )
 	HourOfDay = 23;
 	CalcPerSolarBeam( AvgEqOfTime, AvgSinSolarDeclin, AvgCosSolarDeclin );
 
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).OutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 1 ).OutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).OutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 2 ).OutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).OutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 999.0, SurfaceWindow( 3 ).OutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 1 ).InOutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 2 ).InOutProjSLFracMult( 24 ) );
-
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 1 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 2 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 3 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 4 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 5 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 6 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 7 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 8 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 9 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 10 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 11 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 12 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 13 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 14 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 15 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 16 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 17 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 18 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 19 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 20 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 21 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 22 ) );
-	EXPECT_EQ( 1.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 23 ) );
-	EXPECT_EQ( 888.0, SurfaceWindow( 3 ).InOutProjSLFracMult( 24 ) );
+	for ( int SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum ) {
+		for ( int Hour = 1; Hour <= 24; ++Hour ) {
+			if ( Hour == HourOfDay ) {
+				EXPECT_EQ( 1.0, SurfaceWindow( SurfNum ).OutProjSLFracMult( Hour ) );
+				EXPECT_EQ( 1.0, SurfaceWindow( SurfNum ).InOutProjSLFracMult( Hour ) );
+			} else {
+				EXPECT_EQ( 555.0, SurfaceWindow( SurfNum ).OutProjSLFracMult( Hour ) );
+				EXPECT_EQ( 444.0, SurfaceWindow( SurfNum ).InOutProjSLFracMult( Hour ) );
+			}
+		}
+	}
 
 }
