@@ -50,8 +50,6 @@ namespace DataBranchNodeConnections {
 	FArray1D< ComponentListData > CompSets;
 	FArray1D< ParentListData > ParentNodeList;
 	FArray1D< NodeConnectionDef > NodeConnections;
-	FArray1D< NodeConnectionDef > tmpNodeConnections;
-	FArray1D< EqNodeConnectionDef > tmpEqNodeConnections;
 	FArray1D< EqNodeConnectionDef > AirTerminalNodeConnections;
 
 	//     NOTICE

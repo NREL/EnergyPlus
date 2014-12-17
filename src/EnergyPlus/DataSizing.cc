@@ -89,7 +89,7 @@ namespace DataSizing {
 	Real64 const AutoSize( -99999.0 );
 
 	// parameter for (time-of-peak) sizing format
-	gio::Fmt const PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
+	gio::Fmt PeakHrMinFmt( "(I2.2,':',I2.2,':00')" );
 
 	//Zone Outdoor Air Method
 	int const ZOAM_FlowPerPerson( 1 ); // set the outdoor air flow rate based on number of people in the zone
@@ -167,10 +167,10 @@ namespace DataSizing {
 	bool DataIsDXCoil( false ); // TRUE if direct-expansion coil
 	bool DataAutosizable( true ); // TRUE if component is autosizable
 	bool DataEMSOverrideON( false ); // boolean determines if user relies on EMS to override autosizing
-	bool DataScalableSizingON( false ); // boolean determines scalable flow sizing is specified 
+	bool DataScalableSizingON( false ); // boolean determines scalable flow sizing is specified
 	bool DataScalableCapSizingON( false ); // boolean determines scalable capacity sizing is specified
-	bool DataSysScalableFlowSizingON( false ); // boolean determines scalable system flow sizing is specified 
-	bool DataSysScalableCapSizingON( false ); // boolean determines scalable system capacity sizing is specified 
+	bool DataSysScalableFlowSizingON( false ); // boolean determines scalable system flow sizing is specified
+	bool DataSysScalableCapSizingON( false ); // boolean determines scalable system capacity sizing is specified
 	bool SysSizingRunDone( false ); // True if a system sizing run is successfully completed.
 	bool TermUnitSingDuct( false ); // TRUE if a non-induction single duct terminal unit
 	bool TermUnitPIU( false ); // TRUE if a powered induction terminal unit

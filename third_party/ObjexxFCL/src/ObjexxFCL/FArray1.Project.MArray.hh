@@ -1482,17 +1482,14 @@
 	inline MA1c_string AssignedLoopName() const { return ma( &T::AssignedLoopName ); }
 	inline MA1c_string CompName() const { return ma( &T::CompName ); }
 	inline MA1c_string ComponentListName() const { return ma( &T::ComponentListName ); }
-	inline MA1c_string ComponentTypeName() const { return ma( &T::ComponentTypeName ); }
 	inline MA1c_string CompType() const { return ma( &T::CompType ); }
 	inline MA1c_string computeName() const { return ma( &T::computeName ); }
 	inline MA1c_string ConstituentName() const { return ma( &T::ConstituentName ); }
 	inline MA1c_string ControllerListName() const { return ma( &T::ControllerListName ); }
 	inline MA1c_string ControllerName() const { return ma( &T::ControllerName ); }
 	inline MA1c_string ControlName() const { return ma( &T::ControlName ); }
-	inline MA1c_string ControlTypeName() const { return ma( &T::ControlTypeName ); }
 	inline MA1c_string CoolDesDay() const { return ma( &T::CoolDesDay ); }
 	inline MA1c_string DamperName() const { return ma( &T::DamperName ); }
-	inline MA1c_string DataTypeName() const { return ma( &T::DataTypeName ); }
 	inline MA1c_string EquipID() const { return ma( &T::EquipID ); }
 	inline MA1c_string EquipListName() const { return ma( &T::EquipListName ); }
 	inline MA1c_string EquipName() const { return ma( &T::EquipName ); }
@@ -1546,17 +1543,14 @@
 	inline MA1_string AssignedLoopName() { return ma( &T::AssignedLoopName ); }
 	inline MA1_string CompName() { return ma( &T::CompName ); }
 	inline MA1_string ComponentListName() { return ma( &T::ComponentListName ); }
-	inline MA1_string ComponentTypeName() { return ma( &T::ComponentTypeName ); }
 	inline MA1_string CompType() { return ma( &T::CompType ); }
 	inline MA1_string computeName() { return ma( &T::computeName ); }
 	inline MA1_string ConstituentName() { return ma( &T::ConstituentName ); }
 	inline MA1_string ControllerListName() { return ma( &T::ControllerListName ); }
 	inline MA1_string ControllerName() { return ma( &T::ControllerName ); }
 	inline MA1_string ControlName() { return ma( &T::ControlName ); }
-	inline MA1_string ControlTypeName() { return ma( &T::ControlTypeName ); }
 	inline MA1_string CoolDesDay() { return ma( &T::CoolDesDay ); }
 	inline MA1_string DamperName() { return ma( &T::DamperName ); }
-	inline MA1_string DataTypeName() { return ma( &T::DataTypeName ); }
 	inline MA1_string EquipID() { return ma( &T::EquipID ); }
 	inline MA1_string EquipListName() { return ma( &T::EquipListName ); }
 	inline MA1_string EquipName() { return ma( &T::EquipName ); }

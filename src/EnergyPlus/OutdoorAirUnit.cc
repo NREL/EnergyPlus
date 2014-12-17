@@ -369,28 +369,19 @@ namespace OutdoorAirUnit {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		NumArray.dimension( MaxNums, 0.0 );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
 
 		CurrentModuleObject = CurrentModuleObjects( CO_OAUnit );
 		NumOfOAUnits = GetNumObjectsFound( CurrentModuleObject );
 
 		OutAirUnit.allocate( NumOfOAUnits );
-		MyOneTimeErrorFlag.allocate( NumOfOAUnits );
-		MyOneTimeErrorFlag = true;
-		CheckEquipName.allocate( NumOfOAUnits );
-		CheckEquipName = true;
+		MyOneTimeErrorFlag.dimension( NumOfOAUnits, true );
+		CheckEquipName.dimension( NumOfOAUnits, true );
 
 		for ( OAUnitNum = 1; OAUnitNum <= NumOfOAUnits; ++OAUnitNum ) {
 

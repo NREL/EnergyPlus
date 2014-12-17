@@ -376,17 +376,11 @@ namespace VariableSpeedCoils {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		AlphArray.allocate( MaxAlphas );
-		AlphArray = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
+		lAlphaBlanks.dimension( MaxAlphas, true );
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
-		NumArray.allocate( MaxNums );
-		NumArray = 0.0;
+		lNumericBlanks.dimension( MaxNums, true );
+		NumArray.dimension( MaxNums, 0.0 );
 
 		// Get the data for cooling coil, WATER SOURCE
 		CurrentModuleObject = "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit"; //for reporting
