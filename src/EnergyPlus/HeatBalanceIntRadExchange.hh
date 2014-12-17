@@ -92,7 +92,7 @@ namespace HeatBalanceIntRadExchange {
 		FArray1< Real64 > const & A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
 		FArray2< Real64 > const & F, // DIRECT VIEW FACTOR MATRIX (N X N)
 		FArray1< Real64 > & EMISS, // VECTOR OF SURFACE EMISSIVITIES
-		FArray2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N)
+		FArray2< Real64 > & ScriptF // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
 	);
 
 	void

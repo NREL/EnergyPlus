@@ -149,7 +149,7 @@ llt( char const c, char const d )
 
 // Integer Conversion
 
-// Integer Value of a Given One-Character Fstring
+// Integer Value of a Character
 inline
 int
 ICHAR( char const c )
@@ -157,7 +157,7 @@ ICHAR( char const c )
 	return static_cast< int >( c );
 }
 
-// ASCII Integer Value for a Given One-Character Fstring
+// ASCII Integer Value of a Character
 inline
 int
 IACHAR( char const c )
