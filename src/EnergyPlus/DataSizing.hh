@@ -179,6 +179,7 @@ namespace DataSizing {
 	extern Real64 DataDesInletAirHumRat; // coil inlet air humidity ratio used for warning messages
 	extern Real64 DataDesInletAirTemp; // coil inlet air temperature used for warning messages
 	extern Real64 DataDesOutletAirTemp; // coil outlet air temperature used for sizing
+	extern Real64 DataDesOutletAirHumRat; // coil air outlet humidity ratio used in sizing calculations [kg water / kg dry air]
 	extern Real64 DataCoolCoilCap; // cooling coil capacity used for sizing with scalable inputs
 	extern Real64 DataFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
 	extern Real64 DataAirFlowUsedForSizing; // air flow rate used for sizing with scalable inputs [m3/s]
@@ -1428,7 +1429,6 @@ namespace DataSizing {
 		Real64 FractionOfAutosizedHeatingCapacity; // fraction of of heating total capacity
 		Real64 CoolingTotalCapacity; // system total cooling capacity
 		Real64 HeatingTotalCapacity; // system total heating capacity
-		// wfb
 		int CoolingPeakLoadType; //Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
 		int CoolCapControl; // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
 
@@ -1617,7 +1617,6 @@ namespace DataSizing {
 			Real64 const FractionOfAutosizedHeatingCapacity, // fraction of of heating total capacity
 			Real64 const CoolingTotalCapacity, // system total cooling capacity
 			Real64 const HeatingTotalCapacity, // system total heating capacity
-			// wfb
 			int const CoolingPeakLoadType, // Type of peak to size cooling coils on   1=SensibleCoolingLoad; 2=TotalCooligLoad
 			int const CoolCapControl // type of control of cooling coil  1=VAV; 2=Bypass; 3=VT; 4=OnOff
 		) :
@@ -1719,8 +1718,8 @@ namespace DataSizing {
 			FractionOfAutosizedHeatingCapacity( FractionOfAutosizedHeatingCapacity ),
 			CoolingTotalCapacity( CoolingTotalCapacity ),
 			HeatingTotalCapacity( HeatingTotalCapacity ),
-			CoolingPeakLoadType( CoolingPeakLoadType ), // wfb
-			CoolCapControl( CoolCapControl ) // wfb
+			CoolingPeakLoadType( CoolingPeakLoadType ),
+			CoolCapControl( CoolCapControl ) //
 		{}
 
 	};

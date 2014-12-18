@@ -1691,6 +1691,7 @@ namespace WaterCoils {
 					DataAirFlowUsedForSizing = DesCoilAirFlow;
 					DataFlowUsedForSizing = DesCoilAirFlow;
 					DataDesOutletAirTemp = DesCoilExitTemp;
+					DataDesOutletAirHumRat = PsyWFnTdbRhPb( DataDesOutletAirTemp, 0.9, StdBaroPress );
 				}
 
 				SizingString = "Design Coil Load [W]"; // there is no input field for this value and this is not the rated capacity (we should always print this!)
@@ -1897,6 +1898,7 @@ namespace WaterCoils {
 				DataCapacityUsedForSizing = 0.0;
 				DataDesInletAirTemp = 0.0;
 				DataDesOutletAirTemp = 0.0;
+				DataDesOutletAirHumRat = 0.0;
 				DataDesInletAirHumRat = 0.0;
 				DataDesInletWaterTemp = 0.0;
 

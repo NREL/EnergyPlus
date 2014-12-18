@@ -4481,7 +4481,6 @@ namespace SimAirServingZones {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-<<<<<<< .mine
 		static gio::Fmt const fmtA( "(A)" );
 		static gio::Fmt const SSizeFmt10( "('Time')" );
 		static gio::Fmt const SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
@@ -4493,19 +4492,6 @@ namespace SimAirServingZones {
 		static gio::Fmt const SSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
 		static gio::Fmt const SSizeFmt40( "('NonCoinc Peak')" );
 		static gio::Fmt const SSizeFmt41( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
-=======
-		static gio::Fmt fmtA( "(A)" );
-		static gio::Fmt SSizeFmt10( "('Time')" );
-		static gio::Fmt SSizeFmt11( "(A1,A,A,A1,A,A,A1,A,A,A1,A,A)" );
-		static gio::Fmt SSizeFmt20( "(I2.2,':',I2.2,':00')" );
-		static gio::Fmt SSizeFmt21( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static gio::Fmt SSizeFmt30( "('Coinc Peak   ')" );
-		static gio::Fmt SSizeFmt31( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6)" );
-		static gio::Fmt SSizeFmt40( "('NonCoinc Peak')" );
-		static gio::Fmt SSizeFmt41( "(A1,ES12.6,A1,ES12.6,A1,ES12.6,A1,ES12.6 )" );
-
-
->>>>>>> .theirs
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

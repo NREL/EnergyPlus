@@ -1322,6 +1322,8 @@ namespace ReportSizingManager {
 				} else if ( SizingType == CoolingWaterDesAirOutletHumRatSizing ) {
 					if ( CurOASysNum > 0 ) {
 						AutosizeDes = FinalSysSizing( CurSysNum ).PrecoolHumRat;
+					} else if ( DataDesOutletAirHumRat > 0.0 ) {
+						AutosizeDes = DataDesOutletAirHumRat;
 					} else {
 						AutosizeDes = FinalSysSizing( CurSysNum ).CoolSupHumRat;
 					}
@@ -1927,7 +1929,7 @@ namespace ReportSizingManager {
 				ZoneCoolLoadSum = CalcSysSizing( SysNum ).SumZoneCoolLoadSeq( TimeStepAtPeak );
 				AvgZoneTemp = CalcSysSizing( SysNum ).CoolZoneAvgTempSeq( TimeStepAtPeak );
 			}
-			DesExitTemp = AvgZoneTemp - ZoneCoolLoadSum / ( StdRhoAir * CpAir * FinalSysSizing( SysNum ).DesCoolVolFlow );
+			DesExitTemp = max( FinalSysSizing( SysNum ).CoolSupTemp, AvgZoneTemp - ZoneCoolLoadSum / ( StdRhoAir * CpAir * FinalSysSizing( SysNum ).DesCoolVolFlow ) );
 			DesFlow = FinalSysSizing( SysNum ).DesCoolVolFlow;
 		}
 		else if ( CoolCapCtrl == Bypass ) {
@@ -1943,7 +1945,11 @@ namespace ReportSizingManager {
 			TotFlow = FinalSysSizing( SysNum ).DesCoolVolFlow;
 			MixTemp = CalcSysSizing( SysNum ).MixTempAtCoolPeak;
 			DesExitTemp = FinalSysSizing( SysNum ).CoolSupTemp;
-			DesFlow = TotFlow * ( ( MixTemp - AvgSupTemp ) / ( MixTemp - DesExitTemp ) );
+			if ( MixTemp > DesExitTemp ) {
+				DesFlow = TotFlow * max( 0.0, min( 1.0, ( ( MixTemp - AvgSupTemp ) / ( MixTemp - DesExitTemp ) ) ) );
+			} else {
+				DesFlow = TotFlow;
+			}
 		}
 	}
 
