@@ -20041,7 +20041,8 @@ SwimmingPool:Indoor,
        \units m3/s
        \minimum 0.0
   N7,  \field Pool Miscellaneous Equipment Power
-       \units W/(m3/s of pool water flow)
+       \note Power input per pool water flow rate
+       \units W/(m3/s)
        \type real
        \minimum 0.0
   A8,  \field Setpoint Temperature Schedule
