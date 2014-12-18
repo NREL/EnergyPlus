@@ -437,9 +437,9 @@ namespace SolarShading {
 
 	void
 	CalcInteriorWinTransDifSolInitialDistribution(
-		int & ZoneNum, // Zone index number
-		int & IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
-		Real64 & IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
+		int const ZoneNum, // Zone index number
+		int const IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
+		Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
 	);
 
 	void
