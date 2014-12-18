@@ -80,6 +80,7 @@ namespace HVACStandAloneERV {
 		Real64 HighRHOAFlowRatio; // ratio of outside air flow to max outside air flow
 		Real64 DesignSAFanVolFlowRate; // SA fan volumetric flow rate
 		Real64 DesignEAFanVolFlowRate; // EA fan volumetric flow rate
+		Real64 DesignHXVolFlowRate; // HX (heat exchanger) volumetric flow rate
 		Real64 DesignSAFanMassFlowRate; // SA fan mass flow rate
 		Real64 DesignEAFanMassFlowRate; // EA fan mass flow rate
 		Real64 AirVolFlowPerFloorArea; // Air flow rate per unit floor area, used for autosizing
@@ -129,6 +130,7 @@ namespace HVACStandAloneERV {
 			HighRHOAFlowRatio( 1.0 ),
 			DesignSAFanVolFlowRate( 0.0 ),
 			DesignEAFanVolFlowRate( 0.0 ),
+			DesignHXVolFlowRate( 0.0 ),
 			DesignSAFanMassFlowRate( 0.0 ),
 			DesignEAFanMassFlowRate( 0.0 ),
 			AirVolFlowPerFloorArea( 0.0 ),
@@ -183,6 +185,7 @@ namespace HVACStandAloneERV {
 			Real64 const HighRHOAFlowRatio, // ratio of outside air flow to max outside air flow
 			Real64 const DesignSAFanVolFlowRate, // SA fan volumetric flow rate
 			Real64 const DesignEAFanVolFlowRate, // EA fan volumetric flow rate
+			Real64 const DesignHXVolFlowRate, // HX (heat exchanger) volumetric flow rate
 			Real64 const DesignSAFanMassFlowRate, // SA fan mass flow rate
 			Real64 const DesignEAFanMassFlowRate, // EA fan mass flow rate
 			Real64 const AirVolFlowPerFloorArea, // Air flow rate per unit floor area, used for autosizing
@@ -235,6 +238,7 @@ namespace HVACStandAloneERV {
 			HighRHOAFlowRatio( HighRHOAFlowRatio ),
 			DesignSAFanVolFlowRate( DesignSAFanVolFlowRate ),
 			DesignEAFanVolFlowRate( DesignEAFanVolFlowRate ),
+			DesignHXVolFlowRate( DesignHXVolFlowRate ),
 			DesignSAFanMassFlowRate( DesignSAFanMassFlowRate ),
 			DesignEAFanMassFlowRate( DesignEAFanMassFlowRate ),
 			AirVolFlowPerFloorArea( AirVolFlowPerFloorArea ),
