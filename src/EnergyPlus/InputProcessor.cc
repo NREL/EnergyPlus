@@ -66,6 +66,7 @@ namespace InputProcessor {
 	using DataSystemVariables::SortedIDD;
 	using DataSystemVariables::iASCII_CR;
 	using DataSystemVariables::iUnicode_end;
+	using DataGlobals::DisplayInputInAudit;
 
 	// Use statements for access to subroutines in other modules
 
@@ -147,7 +148,6 @@ namespace InputProcessor {
 	//Logical Variables for Module
 	bool OverallErrorFlag( false ); // If errors found during parse of IDF, will fatal at end
 	bool EchoInputLine( true ); // Usually True, if the IDD is backspaced, then is set to false, then back to true
-	bool EchoInputInAudit(false); // Enables the line-by-line echoing of the input file into the audit file. Set to true when Output:Diagnostics, DisplayInputInAudit
 	bool ReportRangeCheckErrors(true); // Module level reporting logical, can be turned off from outside the module (and then
 	// must be turned back on.
 	bool FieldSet( false ); // Set to true when ReadInputLine has just scanned a "field"
@@ -314,7 +314,7 @@ namespace InputProcessor {
 		gio::write( EchoInputFile, fmtLD ) << " Total Number of Fields=" << NumAlphaArgsFound + NumNumericArgsFound;
 
 		gio::write( EchoInputFile, fmtLD ) << " Processing Input Data File (in.idf) -- Start";
-		if (!EchoInputInAudit){
+		if (!DisplayInputInAudit){
 			gio::write(EchoInputFile, fmtLD) << " Echo of input lines is off. May be activated with Output:Diagnostics, DisplayInputInAudit;";
 		}
 
@@ -2643,7 +2643,7 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if (EchoInputInAudit) {
+				if (DisplayInputInAudit) {
 					if (echo_stream) *echo_stream << std::setw(7) << NumLines << ' ' << InputLine << NL;
 				}
 			}
@@ -2824,7 +2824,7 @@ namespace InputProcessor {
 		} else {
 			if ( EchoInputLine ) {
 				++NumLines;
-				if (EchoInputInAudit) {
+				if (DisplayInputInAudit) {
 					if ( echo_stream ) *echo_stream << std::setw( 7 ) << NumLines << ' ' << InputLine << NL;
 				}
 			}

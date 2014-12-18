@@ -163,7 +163,8 @@ namespace DataGlobals {
 	bool DisplayUnusedSchedules( false ); // True when selection for  "DisplayUnusedSchedules" is entered
 	bool DisplayAdvancedReportVariables( false ); // True when selection for  "DisplayAdvancedReportVariables" is entered
 	bool DisplayZoneAirHeatBalanceOffBalance( false ); // True when selection for  "DisplayZoneAirHeatBalanceOffBalance" is entered
-	bool CreateMinimalSurfaceVariables( false ); // True when selection for  "CreateMinimalSurfaceVariables" is entered
+	bool DisplayInputInAudit(false); // True when environmental variable "DisplayInputInAudit" is used
+	bool CreateMinimalSurfaceVariables(false); // True when selection for  "CreateMinimalSurfaceVariables" is entered
 	Real64 CurrentTime( 0.0 ); // CurrentTime, in fractional hours, from start of day. Uses Loads time step.
 	int SimTimeSteps( 0 ); // Number of (Loads) timesteps since beginning of run period (environment).
 	int MinutesPerTimeStep; // Minutes per time step calculated from NumTimeStepInHour (number of minutes per load time step)
