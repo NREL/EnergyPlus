@@ -389,6 +389,8 @@ SET( SRC
   RefrigeratedCase.hh
   ReportSizingManager.cc
   ReportSizingManager.hh
+  ResultsSchema.cc
+  ResultsSchema.hh
   ReturnAirPathManager.cc
   ReturnAirPathManager.hh
   RoomAirModelManager.cc
@@ -522,7 +524,7 @@ SET( SRC
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( EnergyPlusLib STATIC ${SRC} )
-target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight )
+target_link_libraries( EnergyPlusLib objexx sqlite bcvtb epexpat epfmiimport DElight cJSON)
 if(UNIX AND NOT APPLE)
   target_link_libraries( EnergyPlusLib dl )
 endif()

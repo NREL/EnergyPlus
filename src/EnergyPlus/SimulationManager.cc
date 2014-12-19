@@ -76,6 +76,7 @@ extern "C" {
 #include <PlantPipingSystemsManager.hh>
 #include <Psychrometrics.hh>
 #include <RefrigeratedCase.hh>
+#include <ResultsSchema.hh>
 #include <SetPointManager.hh>
 #include <SizingManager.hh>
 #include <SolarShading.hh>
@@ -132,6 +133,7 @@ namespace SimulationManager {
 	using namespace HeatBalanceManager;
 	using namespace WeatherManager;
 	using namespace ExternalInterface;
+	using namespace ResultsSchema;
 
 	// Data
 	// MODULE PARAMETER DEFINITIONS:
@@ -526,6 +528,34 @@ namespace SimulationManager {
 		}
 
 		if ( sqlite->writeOutputToSQLite() ) sqlite->sqliteBegin(); // for final data to write
+
+		// Output detailed ZONE time series data
+		if (OutputSchema.RIDetailedZoneTSData.RDataFrameEnabled || OutputSchema.RIDetailedZoneTSData.IDataFrameEnabled)
+			OutputSchema.RIDetailedZoneTSData.WriteFile();
+
+		// Output detailed HVAC time series data
+		if (OutputSchema.RIDetailedHVACTSData.RDataFrameEnabled || OutputSchema.RIDetailedHVACTSData.IDataFrameEnabled)
+			OutputSchema.RIDetailedHVACTSData.WriteFile();
+
+		// Output timestep time series data
+		if (OutputSchema.RITimestepTSData.RDataFrameEnabled || OutputSchema.RITimestepTSData.IDataFrameEnabled)
+			OutputSchema.RITimestepTSData.WriteFile();
+
+		// Output hourly time series data
+		if (OutputSchema.RIHourlyTSData.RDataFrameEnabled || OutputSchema.RIHourlyTSData.IDataFrameEnabled)
+			OutputSchema.RIHourlyTSData.WriteFile();
+		
+		// Output daily time series data
+		if (OutputSchema.RIDailyTSData.RDataFrameEnabled || OutputSchema.RIDailyTSData.IDataFrameEnabled)
+			OutputSchema.RIDailyTSData.WriteFile();
+
+		// Output monthly time series data
+		if (OutputSchema.RIMonthlyTSData.RDataFrameEnabled || OutputSchema.RIMonthlyTSData.IDataFrameEnabled)
+			OutputSchema.RIMonthlyTSData.WriteFile();
+
+		// Output run period time series data
+		if (OutputSchema.RIRunPeriodTSData.RDataFrameEnabled || OutputSchema.RIRunPeriodTSData.IDataFrameEnabled)
+			OutputSchema.RIRunPeriodTSData.WriteFile();
 
 #ifdef EP_Detailed_Timings
 		epStartTime( "Closeout Reporting=" );
@@ -1244,6 +1274,12 @@ namespace SimulationManager {
 		}
 		gio::write( OutputFileBNDetails, fmtA ) << "Program Version," + VerString;
 
+		// Open the Schema Output File
+		OutputFileSchema = GetNewUnitNumber();
+		{ IOFlags flags; flags.ACTION("write"); flags.STATUS("UNKNOWN"); gio::open(OutputFileSchema, "eplusout.json", flags); write_stat = flags.ios(); }
+		if (write_stat != 0) {
+			ShowFatalError("OpenOutputFiles: Could not open file \"eplusout.json\" for output (write).");
+		}
 	}
 
 	void
@@ -1439,6 +1475,8 @@ namespace SimulationManager {
 		}
 		mtr_stream = nullptr;
 
+		// Close the Schema Output File
+		gio::close(OutputFileSchema);
 	}
 
 	void
