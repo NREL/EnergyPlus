@@ -25,11 +25,11 @@ The C++ code in EnergyPlus utilizes many C++11 features, and so a modern compile
 
 1. Install Visual Studio 2013 Express **for WIndows Desktop**, at least update 3.  This is available [here](http://www.visualstudio.com/downloads/download-visual-studio-vs#d-express-windows-desktop)
 2. Install cmake, from [http://www.cmake.org/cmake/resources/software.html].  This includes a GUI.  From the start menu, you should be able to launch the gui (it is called cmake-gui).  
-3. Point cmake source code to the root of the repository, the root of the source tree.
-4. Point cmake build to the folder you created, the root of the build tree.  CMake will offer to create this folder if it doesn't exist.
+3. Point cmake source code to the root of the repository, the root of the source tree. e.g. C:\GitHubClones\EnergyPlus
+4. Point cmake build to the folder you created, the root of the build tree.  CMake will offer to create this folder if it doesn't exist. e.g. C:\GitHubClones\EnergyPlus\Build (This may be anywhere on your system, but this arrangement is convenient, because the EnergyPlus repo ignores folders named Build or build.)
 5. Click configure.  This may bring up a dialog box where you choose the build environment to use. Choose Visual Studio 12 or Visual Studio 12 Win64 (for 64-bit builds), which is the 2013 version of the toolchain.
 6. Check the configuration settings, keeping them default should suffice, and click Generate.
-7. Browse to the build folder and there will be a Visual Studio solution file you can click on, and it will include multiple projects for each build target.  Choose the type of build (Debug or Release), then right click on EnergyPlus in the solution explorer and "Build".  This will build EnergyPlus and all of its dependencies.  The target executables will be found in the Products subfolder.
+7. Browse to the build folder and there will be a Visual Studio solution file you can click on, EnergyPlus.sln. It will include multiple projects for each build target.  Choose the type of build (Debug or Release), then right click on EnergyPlus in the solution explorer and "Build".  This will build EnergyPlus and all of its dependencies.  The target executables will be found in the Products subfolder.
 8. The solution will include the ZERO_CHECK project as the default target to run when you execute, so when you are ready to debug, manually set the default target to EnergyPlus.
 9. In the EnergyPlus and EnergyPlusLib projects: right click on each project and select Properties. Under Configuration Properties select Debugging. In the Enviroment field, enter ```_NO_DEBUG_HEAP=1```.  The debug heap in Visual Studio doesn't play nicely with the input processor in EnergyPlus, and for debug builds, skipping this will result in a _very_ long IDD reading time.
 
