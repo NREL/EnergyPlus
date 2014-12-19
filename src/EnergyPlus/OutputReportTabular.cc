@@ -1325,12 +1325,7 @@ namespace OutputReportTabular {
 					BinObjVarID( firstReport ).namesOfObj = objNames( found );
 					BinObjVarID( firstReport ).varMeterNum = objVarIDs( found );
 				} else {
-					ShowWarningError( CurrentModuleObject + ": Specified key not found, the first key will be used: " + OutputTableBinned( iInObj ).keyValue );
-					BinObjVarID( firstReport ).namesOfObj = objNames( 1 );
-					BinObjVarID( firstReport ).varMeterNum = objVarIDs( 1 );
-					if ( objVarIDs( 1 ) == 0 ) {
-						ShowWarningError( CurrentModuleObject + ": Specified meter or variable not found: " + objNames( 1 ) );
-					}
+					ShowWarningError( CurrentModuleObject + ": Specified key not found: " + OutputTableBinned( iInObj ).keyValue );
 				}
 				// reset the number of tables to one
 				OutputTableBinned( iInObj ).numTables = 1;
