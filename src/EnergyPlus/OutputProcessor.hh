@@ -1136,6 +1136,7 @@ namespace OutputProcessor {
 		std::string const & reportIDString, // The ID of the time stamp
 		int const DayOfSim, // the number of days simulated so far
 		std::string const & DayOfSimChr, // the number of days simulated so far
+		bool writeToSQL, // write to SQLite
 		Optional_int_const Month = _, // the month of the reporting interval
 		Optional_int_const DayOfMonth = _, // The day of the reporting interval
 		Optional_int_const Hour = _, // The hour of the reporting interval
@@ -1428,7 +1429,7 @@ AddToOutputVariableList(
 );
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted
