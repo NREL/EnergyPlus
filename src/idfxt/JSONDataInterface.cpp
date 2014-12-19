@@ -77,7 +77,7 @@ JSONDataInterface::~JSONDataInterface()
     cJSON_Delete(model_j);
 }
 
-cJSON *JSONDataInterface::getSchemaObject(string object_type)
+cJSON *JSONDataInterface::getSchemaObject(const string &object_type)
 {
     return cJSON_GetObjectItem(schema_j, object_type.c_str());
 }
@@ -87,7 +87,7 @@ cJSON *JSONDataInterface::getModelRootObject()
     return model_j;
 }
 
-bool JSONDataInterface::importModel(string json_content)
+bool JSONDataInterface::importModel(const string &json_content)
 {
     model_j = cJSON_Parse(json_content.c_str());
     if (!model_j->child) {
@@ -105,7 +105,7 @@ bool JSONDataInterface::integrateModel()
     //TBD: remap references from Label to uuid
 }
 
-void JSONDataInterface::writeJSONdata(string filename)
+void JSONDataInterface::writeJSONdata(const string &filename)
 {
     ofstream idfj(filename.c_str());
     if (idfj) {
@@ -129,7 +129,7 @@ void JSONDataInterface::insertUUIDs()
 }
 
 
-void JSONDataInterface::checkRange(cJSON *attribute, string property_name, string child_name, bool &valid, double property_value)
+void JSONDataInterface::checkRange(cJSON *attribute, const string &property_name, const string &child_name, bool &valid, double property_value)
 {
     if (attribute) {
         string attribute_name = attribute->string;
@@ -160,7 +160,7 @@ void JSONDataInterface::checkRange(cJSON *attribute, string property_name, strin
     }
 }
 
-void JSONDataInterface::checkNumeric(double property_value, string property_name, cJSON *schema_object, bool &valid, string child_name)
+void JSONDataInterface::checkNumeric(double property_value, const string &property_name, cJSON *schema_object, bool &valid, const string &child_name)
 {
     if (schema_object) {                               //get matching schema property
         cJSON *schema_property = cJSON_GetObjectItem(schema_object, property_name.c_str());

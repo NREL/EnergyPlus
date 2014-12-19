@@ -17,12 +17,12 @@ public:
     JSONDataInterface(const std::string &json_schema);
     ~JSONDataInterface();
 
-    cJSON *getSchemaObject(std::string object_type);
+    cJSON *getSchemaObject(const std::string &object_type);
     cJSON *getModelRootObject();
 
-    bool importModel(std::string json_content);
+    bool importModel(const std::string &json_content);
     bool integrateModel();
-    void writeJSONdata(std::string filename);
+    void writeJSONdata(const std::string &filename);
 
 private:
     cJSON *schema_j;
@@ -30,8 +30,8 @@ private:
 
     void insertUUIDs();
     bool validateModel();
-    void checkRange(cJSON *attribute, std::string property_name, std::string child_name, bool &valid, double property_value);
-    void checkNumeric(double property_value, std::string property_name, cJSON *schema_object, bool &valid, std::string child_name);
+    void checkRange(cJSON *attribute, const std::string &property_name, const std::string &child_name, bool &valid, double property_value);
+    void checkNumeric(double property_value, const std::string &property_name, cJSON *schema_object, bool &valid, const std::string &child_name);
 };
 
 } //idfxt namespace
