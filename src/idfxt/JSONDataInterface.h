@@ -14,8 +14,6 @@ namespace idfx {
 class JSONDataInterface
 {
 public:
-    JSONDataInterface() : JSONDataInterface(""){};
-    JSONDataInterface(const JSONDataInterface&) = delete;
     JSONDataInterface(std::string json_schema);
     ~JSONDataInterface();
 
