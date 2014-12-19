@@ -1,6 +1,5 @@
 // copyright 2014, Shannon Mackey <mackey@BUILDlab.net>
 
-#include <unistd.h>
 #include <algorithm>
 #include <cctype>
 #include <cstring>
