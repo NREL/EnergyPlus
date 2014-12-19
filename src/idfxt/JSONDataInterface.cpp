@@ -5,63 +5,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <algorithm>
-#include <random>
-
 
 using namespace std;
 using namespace idfx;
 
-/////////////////////////////// begin  random and uuid gen
-//these random functions from here:
-// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3551.pdf
-std::default_random_engine & global_urng( )
-{
-    static std::default_random_engine u {};
-    return u;
-}
-void randomize( )
-{
-    static std::random_device rd {};
-    global_urng().seed( rd() );
-}
-int randomInRange( int from, int thru )
-{
-    static std::uniform_int_distribution<> d {};
-    using parm_t = decltype(d)::param_type;
-    return d( global_urng(), parm_t {from, thru} );
-}
-double randomInRange( double from, double upto )
-{
-    static std::uniform_real_distribution<> d {};
-    using parm_t = decltype(d)::param_type;
-    return d( global_urng(), parm_t {from, upto} );
-}
-
-//return a version 4 (random) uuid
-string getUuid()
-{
-    stringstream uuid_str;
-    int four_low = 4096;
-    int four_high = 65535;
-    int three_low = 256;
-    int three_high = 4095;
-    uuid_str << std::hex << randomInRange(four_low,four_high);
-    uuid_str << std::hex << randomInRange(four_low,four_high);
-    uuid_str << "-" << std::hex << randomInRange(four_low,four_high);
-    uuid_str << "-" << std::hex << randomInRange(four_low,four_high);
-    uuid_str << "-4" << std::hex << randomInRange(three_low,three_high);
-    uuid_str << "-8" << std::hex << randomInRange(three_low,three_high);
-    uuid_str << std::hex << randomInRange(four_low,four_high);
-    uuid_str << std::hex << randomInRange(four_low,four_high);
-    return uuid_str.str();
-}
-/////////////////////// end random and uuid gen
-
-
 JSONDataInterface::JSONDataInterface(const string &json_schema)
 {
-    randomize(); //init for uuidv4 generator
     schema_j = cJSON_Parse(json_schema.c_str());
     if (!schema_j)
         cout << "ERROR: schema load failure - "<< endl << cJSON_GetErrorPtr();
@@ -100,7 +49,6 @@ bool JSONDataInterface::importModel(const string &json_content)
 bool JSONDataInterface::integrateModel()
 {
     //add uuid to all objects
-    insertUUIDs();
     return validateModel();
     //TBD: remap references from Label to uuid
 }
@@ -112,22 +60,6 @@ void JSONDataInterface::writeJSONdata(const string &filename)
         idfj << cJSON_Print(model_j);
     }
 }
-
-void JSONDataInterface::insertUUIDs()
-{
-    cJSON *child = model_j->child;
-    if (child) {
-        do {
-            if (!cJSON_GetObjectItem(child, "uuid")) {
-                cJSON_AddStringToObject(child, "uuid", getUuid().c_str());
-            }
-            child = child->next;
-        } while (child);
-    } else {
-        cout << "ERROR: model is empty" << endl;
-    }
-}
-
 
 void JSONDataInterface::checkRange(cJSON *attribute, const string &property_name, const string &child_name, bool &valid, double property_value)
 {

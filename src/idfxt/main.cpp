@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <random>
 
 extern "C"
 {
@@ -50,6 +51,55 @@ void importJsonModel(string filename);
 void importIDFModel(string filename);
 
 //utility functions
+
+/////////////////////////////// begin  random and uuid gen
+//these random functions from here:
+// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3551.pdf
+std::default_random_engine & global_urng( )
+{
+    static std::default_random_engine u {};
+    return u;
+}
+void randomize( )
+{
+    static std::random_device rd {};
+    global_urng().seed( rd() );
+}
+int randomInRange( int from, int thru )
+{
+    static std::uniform_int_distribution<> d {};
+    using parm_t = decltype(d)::param_type;
+    return d( global_urng(), parm_t {from, thru} );
+}
+double randomInRange( double from, double upto )
+{
+    static std::uniform_real_distribution<> d {};
+    using parm_t = decltype(d)::param_type;
+    return d( global_urng(), parm_t {from, upto} );
+}
+
+//return a version 4 (random) uuid
+string getUuid()
+{
+    stringstream uuid_str;
+    int four_low = 4096;
+    int four_high = 65535;
+    int three_low = 256;
+    int three_high = 4095;
+    uuid_str << std::hex << randomInRange(four_low,four_high);
+    uuid_str << std::hex << randomInRange(four_low,four_high);
+    uuid_str << "-" << std::hex << randomInRange(four_low,four_high);
+    uuid_str << "-" << std::hex << randomInRange(four_low,four_high);
+    uuid_str << "-4" << std::hex << randomInRange(three_low,three_high);
+    uuid_str << "-8" << std::hex << randomInRange(three_low,three_high);
+    uuid_str << std::hex << randomInRange(four_low,four_high);
+    uuid_str << std::hex << randomInRange(four_low,four_high);
+    return uuid_str.str();
+}
+/////////////////////// end random and uuid gen
+///
+///
+
 std::vector<std::string> insertStringSplit(const std::string &s, char delim)
 {
     std::vector<std::string> elems;
@@ -239,7 +289,8 @@ void importIDFModel(string filename)
             unsigned int base_field_count = (model_field_count < schema_field_count) ? model_field_count : schema_field_count;
             cJSON *current_object = cJSON_CreateObject();
             if (current_object) {
-                cJSON_AddItemToObject(Data->getModelRootObject(), object_type, current_object);
+                cJSON_AddItemToObject(Data->getModelRootObject(), getUuid().c_str(), current_object);
+                cJSON_AddStringToObject(current_object, "object_type", object_type);
                 //set this loop count for base object
                 cJSON *full_schema_object = Data->getSchemaObject(object_type);
                 if (full_schema_object){
@@ -292,6 +343,7 @@ void importIDFModel(string filename)
 //// MAIN ////
 int main(int argc, char **argv)
 {
+    randomize(); //init for uuidv4 generator
     string input_filename = "";
     // process args - set ActionMode and ActionValue
     // plain and simple - takes only single switches and/or arguments as shown in HELP_TEXT

@@ -28,7 +28,6 @@ private:
     cJSON *schema_j;
     cJSON *model_j;
 
-    void insertUUIDs();
     bool validateModel();
     void checkRange(cJSON *attribute, const std::string &property_name, const std::string &child_name, bool &valid, double property_value);
     void checkNumeric(double property_value, const std::string &property_name, cJSON *schema_object, bool &valid, const std::string &child_name);
