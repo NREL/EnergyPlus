@@ -59,7 +59,7 @@ string getUuid()
 /////////////////////// end random and uuid gen
 
 
-JSONDataInterface::JSONDataInterface(string json_schema)
+JSONDataInterface::JSONDataInterface(const string &json_schema)
 {
     randomize(); //init for uuidv4 generator
     schema_j = cJSON_Parse(json_schema.c_str());

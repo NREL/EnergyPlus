@@ -14,7 +14,7 @@ namespace idfx {
 class JSONDataInterface
 {
 public:
-    JSONDataInterface(std::string json_schema);
+    JSONDataInterface(const std::string &json_schema);
     ~JSONDataInterface();
 
     cJSON *getSchemaObject(std::string object_type);
