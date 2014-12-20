@@ -16,5 +16,5 @@ if (UNIX)
   ADD_DEFINITIONS( " -fPIC " )
 endif()
 
-ADD_LIBRARY( sqlite ${SRC} )
+ADD_LIBRARY( sqlite SHARED ${SRC} )
 
