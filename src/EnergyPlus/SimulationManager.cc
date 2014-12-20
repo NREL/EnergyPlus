@@ -87,6 +87,7 @@ extern "C" {
 #include <ZoneTempPredictorCorrector.hh>
 #include <ZoneEquipmentManager.hh>
 #include <Timer.h>
+#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -234,6 +235,7 @@ namespace SimulationManager {
 		using PlantPipingSystemsManager::InitAndSimGroundDomains;
 		using PlantPipingSystemsManager::CheckIfAnySlabs;
 		using PlantPipingSystemsManager::CheckIfAnyBasements;
+		using HVACSizingSimulationManagerNamespace::ManageAdvancedSizing;
 
 		// Locals
 		// SUBROUTINE PARAMETER DEFINITIONS:
@@ -383,13 +385,15 @@ namespace SimulationManager {
 
 		GetInputForLifeCycleCost(); //must be prior to WriteTabularReports -- do here before big simulation stuff.
 
-		// if user requested HVAC Sizing Simulation, call advanced sizing manager
+		// if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
 		if (DoHVACSizingSimulation){
+
 			ManageAdvancedSizing(ErrorsFound);
+			
 		}
 
 		ShowMessage( "Beginning Simulation" );
-		DisplayString( "Beginning Simulation" );
+		DisplayString( "Beginning Primary Simulation" );
 
 		ResetEnvironmentCounter();
 
@@ -1592,174 +1596,6 @@ namespace SimulationManager {
 		if ( ! ErrorsFound ) SimCostEstimate(); // basically will get and check input
 		if ( ErrorsFound ) ShowFatalError( "Previous Conditions cause program termination." );
 
-	}
-
-	void
-	ManageAdvancedSizing( bool & ErrorsFound )
-	{
-		
-
-		using DataErrorTracking::ExitDuringSimulations;
-
-		using EMSManager::ManageEMS;
-		using DataEnvironment::EnvironmentName;
-		using DataEnvironment::EndMonthFlag;
-		using DataEnvironment::CurMnDy;
-		using DataEnvironment::CurrentOverallSimDay;
-		using DataEnvironment::TotalOverallSimDays;
-		using DataGlobals::WarmupFlag;
-		using General::TrimSigDigits;
-		using PlantPipingSystemsManager::InitAndSimGroundDomains;
-		
-		using ExteriorEnergyUse::ManageExteriorEnergyUse;
-
-
-		static bool Available; // an environment is available to process
-		int EnvCount;
-		int HVACSizingIterCount;
-		bool SimsDone;
-		static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
-
-		DisplayString( "Beginning HVAC Sizing Simulation" );
-		if (! ReportDuringHVACSizingSimulation) DoOutputReporting = false;
-		
-		ResetEnvironmentCounter();
-		// iterations over set of sizing periods for HVAC sizing Simulation
-		// currently just running up to max. 
-		for (HVACSizingIterCount = 1; HVACSizingIterCount <= HVACSizingSimMaxIterations; HVACSizingIterCount++) {
-		
-
-			//need to extend Environment structure array to distinguish the HVAC Sizing Simulation from the regular run of that sizing period
-			AddDesignSetToEnvironmentStruct(HVACSizingIterCount);
-
-
-			EnvCount = 0;
-			WarmupFlag = true;
-			Available = true;
-			while (Available) {
-
-				GetNextEnvironment(Available, ErrorsFound);
-
-				if (!Available) break;
-				if (ErrorsFound) break;
-				if (!DoDesDaySim)  continue;
-				if (KindOfSim == ksRunPeriodWeather) continue;
-				if (KindOfSim == ksDesignDay) continue;
-				if (KindOfSim == ksRunPeriodDesign) continue;
-
-				if (Environment(Envrn).HVACSizingIterationNum != HVACSizingIterCount) continue;
-
-				++EnvCount;
-				if (ReportDuringHVACSizingSimulation){
-					if (sqlite->writeOutputToSQLite()) {
-						sqlite->sqliteBegin();
-						sqlite->createSQLiteEnvironmentPeriodRecord();
-						sqlite->sqliteCommit();
-					}
-				}
-				ExitDuringSimulations = true;
-				SimsDone = true;
-				DisplayString("Initializing New Environment Parameters, HVAC Sizing Simulation");
-
-				BeginEnvrnFlag = true;
-				EndEnvrnFlag = false;
-				EndMonthFlag = false;
-				WarmupFlag = true;
-				DayOfSim = 0;
-				DayOfSimChr = "0";
-				NumOfWarmupDays = 0;
-
-				ManageEMS(emsCallFromBeginNewEvironment); // calling point
-
-				while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
-
-					if (ReportDuringHVACSizingSimulation) {
-						if (sqlite->writeOutputToSQLite()) sqlite->sqliteBegin(); // setup for one transaction per day
-					}
-					++DayOfSim;
-					gio::write(DayOfSimChr, fmtLD) << DayOfSim;
-					strip(DayOfSimChr);
-					if (!WarmupFlag) {
-						++CurrentOverallSimDay;
-						DisplaySimDaysProgress(CurrentOverallSimDay, TotalOverallSimDays);
-					}
-					else {
-						DayOfSimChr = "0";
-					}
-					BeginDayFlag = true;
-					EndDayFlag = false;
-
-					if (WarmupFlag) {
-						++NumOfWarmupDays;
-						cWarmupDay = TrimSigDigits(NumOfWarmupDays);
-						DisplayString("Warming up {" + cWarmupDay + '}');
-					}
-					else if (DayOfSim == 1) {
-						DisplayString("Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
-						gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
-					}
-					else if (DisplayPerfSimulationFlag) {
-						DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
-						DisplayPerfSimulationFlag = false;
-					}
-
-					for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
-
-						BeginHourFlag = true;
-						EndHourFlag = false;
-
-						for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
-							if (AnySlabsInModel || AnyBasementsInModel){
-								InitAndSimGroundDomains();
-							}
-
-							BeginTimeStepFlag = true;
-
-
-							// Set the End__Flag variables to true if necessary.  Note that
-							// each flag builds on the previous level.  EndDayFlag cannot be
-							// .TRUE. unless EndHourFlag is also .TRUE., etc.  Note that the
-							// EndEnvrnFlag and the EndSimFlag cannot be set during warmup.
-							// Note also that BeginTimeStepFlag, EndTimeStepFlag, and the
-							// SubTimeStepFlags can/will be set/reset in the HVAC Manager.
-
-							if (TimeStep == NumOfTimeStepInHour) {
-								EndHourFlag = true;
-								if (HourOfDay == 24) {
-									EndDayFlag = true;
-									if ((!WarmupFlag) && (DayOfSim == NumOfDayInEnvrn)) {
-										EndEnvrnFlag = true;
-									}
-								}
-							}
-
-							ManageWeather();
-
-							ManageExteriorEnergyUse();
-
-							ManageHeatBalance();
-
-							BeginHourFlag = false;
-							BeginDayFlag = false;
-							BeginEnvrnFlag = false;
-							BeginSimFlag = false;
-							BeginFullSimFlag = false;
-
-						} // TimeStep loop
-
-						PreviousHour = HourOfDay;
-
-					} // ... End hour loop.
-
-					if (sqlite->writeOutputToSQLite()) sqlite->sqliteCommit(); // one transaction per day
-
-				} // ... End day loop.
-
-
-			} // ... End environment loop.
-		} // End HVAC Sizing Iteration loop
-		WarmupFlag = false;
-		DoOutputReporting = true;
 	}
 
 	void

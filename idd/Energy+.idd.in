@@ -30876,11 +30876,20 @@ Sizing:Plant,
       \required-field
       \type real
       \units C
-  N2; \field Loop Design Temperature Difference
+  N2, \field Loop Design Temperature Difference
       \required-field
       \type real
       \units deltaC
       \minimum> 0.0
+  A3, \field Sizing Option
+      \type choice
+      \key Coincident
+      \key NonCoincident
+      \default NonCoincident
+  N3; \field Zone Timesteps in Averaging Window
+      \type integer
+      \minimum 0
+      \default 1
 
 OutputControl:Sizing:Style,
        \memo Default style for the Sizing output files is comma -- this works well for

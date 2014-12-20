@@ -58,9 +58,6 @@ namespace SimulationManager {
 	SetupSimulation( bool & ErrorsFound );
 
 	void
-	ManageAdvancedSizing( bool & ErrorsFound );
-
-	void
 	ReportNodeConnections();
 
 	void

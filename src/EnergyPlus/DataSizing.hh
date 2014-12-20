@@ -1687,6 +1687,8 @@ namespace DataSizing {
 		int LoopType; // type of loop: 1=heating, 2=cooling, 3=condenser
 		Real64 ExitTemp; // loop design exit (supply) temperature [C]
 		Real64 DeltaT; // loop design temperature drop (or rise) [DelK]
+		int ConcurrenceOption; // sizing option for coincident or noncoincident
+		int NumTimeStepsInAvg; // number of zone timesteps in the averaging window for coincident plant flow 
 		// Calculated
 		Real64 DesVolFlowRate; // loop design flow rate in m3/s
 		bool VolFlowSizingDone; // flag to indicate when this loop has finished sizing flow rate
@@ -1696,6 +1698,8 @@ namespace DataSizing {
 			LoopType( 0 ),
 			ExitTemp( 0.0 ),
 			DeltaT( 0.0 ),
+			ConcurrenceOption( 0 ),
+			NumTimeStepsInAvg( 0 ),
 			DesVolFlowRate( 0.0 ),
 			VolFlowSizingDone( false )
 		{}
@@ -1706,6 +1710,8 @@ namespace DataSizing {
 			int const LoopType, // type of loop: 1=heating, 2=cooling, 3=condenser
 			Real64 const ExitTemp, // loop design exit (supply) temperature [C]
 			Real64 const DeltaT, // loop design temperature drop (or rise) [DelK]
+			int const ConcurrenceOption,
+			int const NumTimeStepsInAvg,
 			Real64 const DesVolFlowRate, // loop design flow rate in m3/s
 			bool const VolFlowSizingDone // flag to indicate when this loop has finished sizing flow rate
 		) :
@@ -1713,6 +1719,8 @@ namespace DataSizing {
 			LoopType( LoopType ),
 			ExitTemp( ExitTemp ),
 			DeltaT( DeltaT ),
+			ConcurrenceOption( ConcurrenceOption ),
+			NumTimeStepsInAvg( NumTimeStepsInAvg ),
 			DesVolFlowRate( DesVolFlowRate ),
 			VolFlowSizingDone( VolFlowSizingDone )
 		{}
