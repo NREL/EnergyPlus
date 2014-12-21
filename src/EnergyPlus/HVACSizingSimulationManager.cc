@@ -157,10 +157,10 @@ namespace EnergyPlus {
 			static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
 			static gio::Fmt fmtLD( "*" );
 
-			if (stillNeedToSetupOnce) { // should only enter once but to be safe
-				HVACSizingSimulationManager SizeSimManagerObj;
-				stillNeedToSetupOnce = false;
-			}
+		//	if (stillNeedToSetupOnce) { // should only enter once// but to be safe
+		//		HVACSizingSimulationManager SizeSimManagerObj;
+		//		stillNeedToSetupOnce = false;
+		//	}
 			SizeSimManagerObj.determineSizingAnalysesNeeded();
 
 			SizeSimManagerObj.setupSizingAnalyses();
@@ -310,10 +310,10 @@ namespace EnergyPlus {
 	
 		}
 
-		void UpdateSizingLogger (){
+		void UpdateSizingLogsZoneStep (){
 		
 		//SizingLogger.
-		
+			SizeSimManagerObj.SizingLogger.UpdateSizingLogValuesZoneStep();
 		}
 	}
 }

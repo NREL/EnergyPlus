@@ -50,6 +50,7 @@
 #include <WindowComplexManager.hh>
 #include <WindowEquivalentLayer.hh>
 #include <WindowManager.hh>
+#include <HVACSizingSimulationManager.hh>
 
 namespace EnergyPlus {
 
@@ -5007,6 +5008,7 @@ namespace HeatBalanceManager {
 		using DataSystemVariables::ReportDuringWarmup; // added for FMI
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
 		using namespace DataReportingFlags;
+		using namespace HVACSizingSimulationManagerNamespace;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5033,6 +5035,7 @@ namespace HeatBalanceManager {
 		if ( ! WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
+			UpdateSizingLogsZoneStep();
 			UpdateTabularReports( ZoneTSReporting );
 			UpdateUtilityBills();
 		} else if ( ! KickOffSimulation && DoOutputReporting && ReportDuringWarmup ) {

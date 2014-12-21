@@ -73,7 +73,7 @@ public:
 		int const & SupplySideInletNodeNum  //change to pointers for generality later
 	);
 
-	void UpdateSizingLogValues();
+	void UpdateSizingLogValuesZoneStep();
 
 };
 

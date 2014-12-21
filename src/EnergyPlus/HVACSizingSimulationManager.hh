@@ -62,7 +62,7 @@ namespace EnergyPlus {
 			bool & ErrorsFound
 		);
 
-		void UpdateSizingLogger();
+		void UpdateSizingLogsZoneStep();
 
 	}
 

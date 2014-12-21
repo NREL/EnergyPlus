@@ -86,7 +86,7 @@ namespace EnergyPlus {
 		
 	}
 
-	void SizingLoggerFramework::UpdateSizingLogValues(){
+	void SizingLoggerFramework::UpdateSizingLogValuesZoneStep(){
 
 		using DataGlobals::KindOfSim;
 		using DataGlobals::DayOfSim;
@@ -95,13 +95,13 @@ namespace EnergyPlus {
 		using namespace OutputProcessor;
 		int const ZoneIndex (1);
 
-		//prepare current timing data once and then pass into 
+		//prepare current timing data once and then pass into fill routines
 		zoneTimestepObject tmpztStepStamp; 
 
-		tmpztStepStamp.KindofSim = KindOfSim;
-		tmpztStepStamp.EnvrnNum = Envrn;
-		tmpztStepStamp.DayOfSim = DayOfSim;
-		tmpztStepStamp.HourOfDay = HourOfDay;
+		tmpztStepStamp.KindofSim       = KindOfSim;
+		tmpztStepStamp.EnvrnNum        = Envrn;
+		tmpztStepStamp.DayOfSim        = DayOfSim;
+		tmpztStepStamp.HourOfDay       = HourOfDay;
 		tmpztStepStamp.stepStartMinute = TimeValue( ZoneIndex ).CurMinute;
 		tmpztStepStamp.stepEndMinute = tmpztStepStamp.stepStartMinute + TimeValue( ZoneIndex ).TimeStep * 60.0;
 		tmpztStepStamp.TimeStepDuration = TimeValue( ZoneIndex ).TimeStep;
@@ -109,7 +109,7 @@ namespace EnergyPlus {
 		tmpztStepStamp.NumSubSteps = 0;
 
 
-		for (auto &L : logObjs) {
+		for (auto &L : this->logObjs) {
 			L.fillZoneStep(tmpztStepStamp);
 		}
 	}
