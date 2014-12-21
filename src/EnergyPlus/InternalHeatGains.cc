@@ -45,6 +45,7 @@
 #include <DataLoopNode.hh>
 #include <NodeInputManager.hh>
 #include <CurveManager.hh>
+#include <DataHVACGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -3649,6 +3650,8 @@ namespace InternalHeatGains {
 		using DataRoomAirModel::IsZoneUI;
 		using DataLoopNode::Node;
 		using CurveManager::CurveValue;
+		using DataHVACGlobals::SmallAirVolFlow;
+		using DataHVACGlobals::SmallTempDiff;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3821,30 +3824,47 @@ namespace InternalHeatGains {
 			// Calculate power input and airflow
 			TAirInDesign = ZoneITEq( Loop ).DesignTAirIn;
 
-			CPUPower = ZoneITEq( Loop ).DesignCPUPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn );
-			ZoneITEq( Loop ).CPUPowerAtDesign = ZoneITEq( Loop ).DesignCPUPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign );
+			CPUPower = max( ZoneITEq( Loop ).DesignCPUPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn ) , 0.0 );
+			ZoneITEq( Loop ).CPUPowerAtDesign = max( ZoneITEq( Loop ).DesignCPUPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign ) , 0.0 );
 
-			AirVolFlowFrac = CurveValue( ZoneITEq( Loop ).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn );
+			AirVolFlowFrac = max( CurveValue( ZoneITEq( Loop ).AirFlowFLTCurve, CPULoadSchedFrac, TAirIn ) , 0.0 );
 			AirVolFlowRate = ZoneITEq( Loop ).DesignAirVolFlowRate * OperSchedFrac * AirVolFlowFrac;
-			AirVolFlowFracDesignT = CurveValue( ZoneITEq( Loop ).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign );
+			if ( AirVolFlowRate < SmallAirVolFlow ) {
+				AirVolFlowRate = 0.0;
+			}
+			AirVolFlowFracDesignT = max( CurveValue( ZoneITEq( Loop ).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign ) , 0.0 );
 
-			FanPower = ZoneITEq( Loop ).DesignFanPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).FanPowerFFCurve, AirVolFlowFrac );
-			ZoneITEq( Loop ).FanPowerAtDesign = ZoneITEq( Loop ).DesignFanPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).FanPowerFFCurve, AirVolFlowFracDesignT );
+			FanPower = max( ZoneITEq( Loop ).DesignFanPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).FanPowerFFCurve, AirVolFlowFrac ) , 0.0 );
+			ZoneITEq( Loop ).FanPowerAtDesign = max( ZoneITEq( Loop ).DesignFanPower * OperSchedFrac * CurveValue( ZoneITEq( Loop ).FanPowerFFCurve, AirVolFlowFracDesignT ) , 0.0);
 
 			//Calcaulate UPS net power input (power in less power to ITEquip) and UPS heat gain to zone
-			UPSPartLoadRatio = ( CPUPower + FanPower ) / ZoneITEq( Loop ).DesignTotalPower;
-			UPSPower = ( CPUPower + FanPower ) * ( 1.0 - ZoneITEq( Loop ).DesignUPSEfficiency * CurveValue( ZoneITEq( Loop ).UPSEfficFPLRCurve, UPSPartLoadRatio ) );
+			if ( ZoneITEq( Loop ).DesignTotalPower > 0.0 ) {
+				UPSPartLoadRatio = ( CPUPower + FanPower ) / ZoneITEq( Loop ).DesignTotalPower;
+			} else {
+				UPSPartLoadRatio = 0.0;
+			}
+			UPSPower = ( CPUPower + FanPower ) * max(( 1.0 - ZoneITEq( Loop ).DesignUPSEfficiency * CurveValue( ZoneITEq( Loop ).UPSEfficFPLRCurve, UPSPartLoadRatio ) ) , 0.0 );
 			UPSHeatGain = UPSPower * ZoneITEq( Loop ).UPSLossToZoneFrac;
 
 			// Calculate air outlet conditions and convective heat gain to zone
 
 			AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW( StdBaroPress, TAirIn, WAirIn, RoutineName );
-			TAirOut = TAirIn + ( CPUPower + FanPower ) / AirMassFlowRate / PsyCpAirFnWTdb( WAirIn, TAirIn );
-			if ( SupplyNodeNum != 0 ) {
+			if ( AirMassFlowRate > 0.0 ) {
+				TAirOut = TAirIn + ( CPUPower + FanPower ) / AirMassFlowRate / PsyCpAirFnWTdb( WAirIn, TAirIn );
+			} else {
+				TAirOut = TAirIn;
+			}
+
+			if ( abs( TAirOut - TSupply ) < SmallTempDiff ) {
+				TAirOut = TSupply;
+			}
+
+			if ( ( SupplyNodeNum != 0 ) && ( TAirOut != TSupply ) ) {
 				SupplyHeatIndex = ( TAirIn - TSupply ) / ( TAirOut - TSupply );
 			} else {
 				SupplyHeatIndex = 0.0;
 			}
+
 			if ( AirConnection == ITEInletAdjustedSupply || AirConnection == ITEInletZoneAirNode ) {
 				// If not a room air model, then all ITEquip power input is a convective heat gain to the zone heat balance, plus UPS heat gain
 				ZoneITEq( Loop ).ConGainRateToZone = CPUPower + FanPower + UPSHeatGain;
@@ -3952,7 +3972,9 @@ namespace InternalHeatGains {
 
 		// Zone-level sensible heat index
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
-			ZnRpt( Loop ).ITEqSHI = ZoneSumTinMinusTSup( Loop ) / ZoneSumToutMinusTSup( Loop );
+			if ( ZoneSumToutMinusTSup( Loop ) != 0.0 ) {
+				ZnRpt( Loop ).ITEqSHI = ZoneSumTinMinusTSup( Loop ) / ZoneSumToutMinusTSup( Loop );
+			}
 		}
 
 	} // End CalcZoneITEq
