@@ -18819,7 +18819,7 @@ RoomAir:TemperaturePattern:SurfaceMapping,
 RoomAir:Node,
       \memo Define an air node for some types of nodal room air models
   A1, \field Name
-      \type Alpha
+      \type alpha
   A2, \field Node Type
       \required-field
       \type choice
