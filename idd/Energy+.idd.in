@@ -19986,7 +19986,7 @@ ZoneContaminantSourceAndSink:CarbonDioxide,
   N1 , \field Design Generation Rate
        \units m3/s
        \type real
-       \Note Positive values represent sources and negative values represent sinks.
+       \note Positive values represent sources and negative values represent sinks.
   A3 ; \field Schedule Name
        \required-field
        \type object-list
@@ -20006,7 +20006,7 @@ ZoneContaminantSourceAndSink:Generic:Constant,
        \units m3/s
        \type real
        \minimum 0.0
-       \Note The values represent source.
+       \note The values represent source.
   A3 , \field Generation Schedule Name
        \required-field
        \type object-list
@@ -20016,7 +20016,7 @@ ZoneContaminantSourceAndSink:Generic:Constant,
        \units m3/s
        \type real
        \minimum 0.0
-       \Note The value represent sink.
+       \note The value represent sink.
   A4 ; \field Removal Schedule Name
        \required-field
        \type object-list
