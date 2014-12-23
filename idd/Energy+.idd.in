@@ -42366,7 +42366,7 @@ Coil:Heating:Water,
        \required-field
        \type node
   A7 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default UFactorTimesAreaAndDesignWaterFlowRate
@@ -51167,7 +51167,7 @@ Controller:OutdoorAir,
        \note setpoint and the outdoor humidity ratio is less than the indoor humidity ratio.
        \note This field is only used when the field High Humidity Control = Yes.
   A19; \field Heat Recovery Bypass Control Type
-       \type Choice
+       \type choice
        \key BypassWhenWithinEconomizerLimits
        \key BypassWhenOAFlowGreaterThanMinimum
        \default BypassWhenWithinEconomizerLimits
@@ -59379,7 +59379,7 @@ CoolingTower:SingleSpeed,
        \note This field is only used if the previous field is set to autocalculate and
        \note the Performance Input Method is UFactorTimesAreaAndDesignWaterFlowRate
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default UFactorTimesAreaAndDesignWaterFlowRate
@@ -59492,7 +59492,7 @@ CoolingTower:SingleSpeed,
        \minimum 1
        \default 1
   A12, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -59638,7 +59638,7 @@ CoolingTower:TwoSpeed,
        \note This field is only used if the previous field is set to autocalculate and
        \note the Performance Input Method is UFactorTimesAreaAndDesignWaterFlowRate
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default UFactorTimesAreaAndDesignWaterFlowRate
@@ -59766,7 +59766,7 @@ CoolingTower:TwoSpeed,
        \minimum 1
        \default 1
   A11, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -59809,7 +59809,7 @@ CoolingTower:VariableSpeed:Merkel,
        \note Name of tower water outlet node
   A4 , \field Performance Input Method
        \required-field
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default NominalCapacity
@@ -60043,7 +60043,7 @@ CoolingTower:VariableSpeed:Merkel,
        \minimum 1
        \default 1
   A15, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -60241,7 +60241,7 @@ CoolingTower:VariableSpeed,
        \minimum 1
        \default 1
   A13, \field Cell Control
-       \type Choice
+       \type choice
        \key MinimalCell
        \key MaximalCell
        \default MinimalCell
@@ -60599,7 +60599,7 @@ EvaporativeFluidCooler:SingleSpeed,
        \minimum> 0.0
        \ip-units gal/min
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key StandardDesignCapacity
        \key UserSpecifiedDesignCapacity
@@ -60795,7 +60795,7 @@ EvaporativeFluidCooler:TwoSpeed,
        \ip-units gal/min
   A4 , \field Performance Input Method
        \required-field
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key StandardDesignCapacity
        \key UserSpecifiedDesignCapacity
@@ -60987,7 +60987,7 @@ FluidCooler:SingleSpeed,
        \type node
        \note Name of fluid cooler water outlet node
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default NominalCapacity
@@ -61071,7 +61071,7 @@ FluidCooler:TwoSpeed,
        \type node
        \note Name of fluid cooler water outlet node
   A4 , \field Performance Input Method
-       \type Choice
+       \type choice
        \key UFactorTimesAreaAndDesignWaterFlowRate
        \key NominalCapacity
        \default NominalCapacity
@@ -66285,7 +66285,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetsLoadWithNominalCapacityHiOutLimit
         \required-field
    A6 , \field Plant Connection 1 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
@@ -66308,7 +66308,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetLoadWithNominalCapacityLowOutLimit
         \key MeetLoadWithNominalCapacityHiOutLimit
    A12, \field Plant Connection 2 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
@@ -66330,7 +66330,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetLoadWithNominalCapacityLowOutLimit
         \key MeetLoadWithNominalCapacityHiOutLimit
    A18, \field Plant Connection 3 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
@@ -66352,7 +66352,7 @@ ZoneHVAC:ForcedAir:UserDefined,
         \key MeetLoadWithNominalCapacityLowOutLimit
         \key MeetLoadWithNominalCapacityHiOutLimit
    A24, \field Plant Connection 4 Loop Flow Request Mode
-        \type Choice
+        \type choice
         \key NeedsFlowIfLoopOn
         \key NeedsFlowAndTurnsLoopOn
         \key ReceivesWhateverFlowAvailable
