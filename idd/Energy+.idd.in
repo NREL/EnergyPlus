@@ -47584,9 +47584,9 @@ EvaporativeCooler:Direct:CelDekPad,
        \type node
   A4 , \field Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
        \note This field is not currently used and can be left blank
-  A6 ; \Field Water Supply Storage Tank Name
+  A6 ; \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
 
@@ -47630,9 +47630,9 @@ EvaporativeCooler:Indirect:CelDekPad,
        \type node
   A4 , \field Primary Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
        \note This field is not currently used and can be left blank
-  A6 , \Field Water Supply Storage Tank Name
+  A6 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   A7 ; \field Secondary Air Inlet Node Name
@@ -47674,9 +47674,9 @@ EvaporativeCooler:Indirect:WetCoil,
        \type node
   A4 , \field Primary Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
        \note This field is not currently used and can be left blank
-  A6 , \Field Water Supply Storage Tank Name
+  A6 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   A7 ; \field Secondary Air Inlet Node Name
@@ -47720,15 +47720,15 @@ EvaporativeCooler:Indirect:ResearchSpecial,
        \type node
   A4 , \field Primary Air Outlet Node Name
        \type node
-  A5 , \Field Control Type
+  A5 , \field Control Type
   N7 , \field Dewpoint Effectiveness Factor
-  A6 , \Field Secondary Air Inlet Node Name
+  A6 , \field Secondary Air Inlet Node Name
        \type node
-  A7 , \Field Sensor Node Name
+  A7 , \field Sensor Node Name
        \type node
-  A8 , \Field Relief Air Inlet Node Name
+  A8 , \field Relief Air Inlet Node Name
        \type node
-  A9 , \Field Water Supply Storage Tank Name
+  A9 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   N8 , \field Drift Loss Fraction
@@ -47769,9 +47769,9 @@ EvaporativeCooler:Direct:ResearchSpecial,
        \type node
   A4 , \field Air Outlet Node Name
        \type node
-  A5 , \Field Sensor Node Name
+  A5 , \field Sensor Node Name
        \type node
-  A6 , \Field Water Supply Storage Tank Name
+  A6 , \field Water Supply Storage Tank Name
        \type object-list
        \object-list WaterStorageTankNames
   N3 , \field Drift Loss Fraction
@@ -55876,9 +55876,9 @@ HeaderedPumps:VariableSpeed,
         \autosizable
         \ip-units gal/min
         \minimum> 0
-  N2 , \Field Number of Pumps in Bank
+  N2 , \field Number of Pumps in Bank
        \type integer
-  A4 , \Field Flow Sequencing Control Scheme
+  A4 , \field Flow Sequencing Control Scheme
         \type choice
         \key Sequential
         \default Sequential
@@ -56109,7 +56109,7 @@ SolarCollector:FlatPlate:PhotovoltaicThermal,
        \type node
   A9 , \field Air Outlet Node Name
        \type node
-  N1 ; \Field Design Flow Rate
+  N1 ; \field Design Flow Rate
        \units m3/s
        \autosizable
 
