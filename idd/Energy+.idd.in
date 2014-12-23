@@ -90516,7 +90516,7 @@ Output:Table:TimeBins,
        \note Optional input on the type of units for the variable used by other fields in the object.
 
 Output:Table:Monthly,
-       \Memo Provides a generic method of setting up tables of monthly results. The report
+       \memo Provides a generic method of setting up tables of monthly results. The report
        \memo has multiple columns that are each defined using a repeated group of fields for any
        \memo number of columns. A single Output:Table:Monthly object often produces multiple
        \memo tables in the output. A table is produced for every instance of a particular output
