@@ -48867,7 +48867,7 @@ AirLoopHVAC:UnitarySystem,
        \key LatentOnlyLoadControl
        \key LatentWithSensibleLoadControl
        \key LatentOrSensibleLoadControl
-       \Default SensibleOnlyLoadControl
+       \default SensibleOnlyLoadControl
        \note SensibleOnlyLoadControl is selected when thermostat control is used.
        \note LatentOnlyLoadControl is selected when humidistat control is used.
        \note LatentWithSensibleLoadControl is selected when thermostat control is used and
@@ -56248,7 +56248,7 @@ SolarCollector:IntegralCollectorStorage,
        \type choice
        \key OtherSideConditionsModel
        \key AmbientAir
-       \Default AmbientAir
+       \default AmbientAir
   A5 , \field Boundary Condition Model Name
        \type alpha
        \note Enter the name of a SurfaceProperty:OtherSideConditionsModel
