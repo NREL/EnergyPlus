@@ -69445,7 +69445,7 @@ Refrigeration:SecondarySystem,
         \type object-list
         \object-list ZoneNames
   N14,  \field Evaporator Refrigerant Inventory
-        \Units kg
+        \units kg
         \type real
         \default 0.0
         \note This value refers to the refrigerant circulating within the primary system providing
@@ -69574,7 +69574,7 @@ Refrigeration:SecondarySystem,
         \note Schedule values should be in units of Watts
         \note Leave this field blank if no restocking is to be modeled
   N10,  \field Average Refrigerant Charge Inventory
-        \Units kg
+        \units kg
         \type real
         \default 0.0
         \note This value is only used if the Cooling Source Type is DXEvaporator
@@ -70035,7 +70035,7 @@ Refrigeration:AirChiller,
         \key Floor
         \default Middle
   N16;  \field Average Refrigerant Charge Inventory
-        \Units kg
+        \units kg
         \type real
         \default 0.0
         \note This value is only used if the Cooling Source Type is DXEvaporator
