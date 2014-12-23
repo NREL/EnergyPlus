@@ -56161,8 +56161,8 @@ SolarCollector:IntegralCollectorStorage,
   A4 , \field Bottom Surface Boundary Conditions Type
        \required-field
        \type choice
-       \Key OtherSideConditionsModel
-       \Key AmbientAir
+       \key OtherSideConditionsModel
+       \key AmbientAir
        \Default AmbientAir
   A5 , \field Boundary Condition Model Name
        \type alpha
@@ -56190,7 +56190,7 @@ SolarCollectorPerformance:IntegralCollectorStorage,
   A2,  \field ICS Collector Type
        \required-field
        \type choice
-       \Key RectangularTank
+       \key RectangularTank
        \note Currently only RectangularTank ICS collector type is available.
   N1,  \field Gross Area
        \type real
