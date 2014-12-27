@@ -39883,40 +39883,40 @@ Fan:ComponentModel,
         \object-list RectangularHyperbola2Curves
         \object-list UniVariateTables
         \note Region 1 (0 <= xbelt < xbelt,trans)
-        \note Curve should have minimum>  0.0 and maximum of 1.0
+        \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes output of curve is always 1.0 in Region 1
   A14 , \field Normalized Belt Efficiency Curve Name - Region 2
         \type object-list
         \object-list ExponentialDecayCurves
         \object-list UniVariateTables
         \note Region 2 (xbelt,trans <= xbelt <= 1)
-        \note Curve should have minimum>  0.0 and maximum of 1.0
+        \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes output of curve is always 1.0 in Region 2
   A15 , \field Normalized Belt Efficiency Curve Name - Region 3
         \type object-list
         \object-list RectangularHyperbola2Curves
         \object-list UniVariateTables
         \note Determines normalized drive belt efficiency Region 3 (xbelt > 1)
-        \note Curve should have minimum>  0.0 and maximum of 1.0
+        \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes output of curve is always 1.0 in Region 3
   A16 , \field Maximum Motor Efficiency Curve Name
         \type object-list
         \object-list RectangularHyperbola1Curves
         \object-list UniVariateTables
-        \note Curve should have minimum>  0.0 and maximum of 1.0
+        \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes output of curve is always 1.0
   A17 , \field Normalized Motor Efficiency Curve Name
         \type object-list
         \object-list RectangularHyperbola2Curves
         \object-list UniVariateTables
-        \note Curve should have minimum>  0.0 and maximum of 1.0
+        \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes output of curve is always 1.0
   A18 , \field VFD Efficiency Curve Name
         \type object-list
         \object-list RectangularHyperbola2Curves
         \object-list UniVariateTables
         \note Determines VFD efficiency as function of motor load or speed fraction
-        \note Curve should have minimum>  0.0 and maximum of 1.0
+        \note Curve should have minimum > 0.0 and maximum of 1.0
         \note If field blank, assumes constant VFD efficiency (0.97)
   A19 ; \field End-Use Subcategory
         \type alpha
