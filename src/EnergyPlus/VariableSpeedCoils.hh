@@ -91,8 +91,8 @@ namespace VariableSpeedCoils {
 	extern Real64 Winput; // Power Consumption [W]
 	extern Real64 PLRCorrLoadSideMdot; // Load Side Mdot corrected for Part Load Ratio of the unit
 
-	extern Real64 HPWHHeatingCapacity; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
-	extern Real64 HPWHHeatingCOP; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
+	extern Real64 VSHPWHHeatingCapacity; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
+	extern Real64 VSHPWHHeatingCOP; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
 
 
 	// SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -223,6 +223,9 @@ namespace VariableSpeedCoils {
 		FArray1D_int MSWasteHeat;
 		// index of waste heat as a function of temperature
 		FArray1D< Real64 > MSWasteHeatFrac;
+		// water heating coil pump power at various speeds
+		FArray1D< Real64 > MSWHPumpPower;
+		FArray1D< Real64 > MSWHPumpPowerPerRatedTotCap;
 		// Waste heat fraction
 		Real64 SpeedNumReport;
 		//speed number for output
@@ -399,6 +402,8 @@ namespace VariableSpeedCoils {
 			MSEIRWaterFFlow( MaxSpedLevels, 0 ),
 			MSWasteHeat( MaxSpedLevels, 0 ),
 			MSWasteHeatFrac( MaxSpedLevels, 0.0 ),
+			MSWHPumpPower( MaxSpedLevels, 0.0 ),
+			MSWHPumpPowerPerRatedTotCap(MaxSpedLevels, 0.0),
 			SpeedNumReport( 0.0 ),
 			SpeedRatioReport( 0.0 ),
 			DefrostStrategy( 0 ),
@@ -560,6 +565,8 @@ namespace VariableSpeedCoils {
 			FArray1_int const & MSEIRWaterFFlow,
 			FArray1_int const & MSWasteHeat,
 			FArray1< Real64 > const & MSWasteHeatFrac,
+			FArray1< Real64 > const & MSWHPumpPower,
+			FArray1< Real64 > const & MSWHPumpPowerPerRatedTotCap,
 			Real64 const SpeedNumReport,
 			Real64 const SpeedRatioReport,
 			int const DefrostStrategy, // defrost strategy; 1=reverse-cycle, 2=resistive
@@ -720,6 +727,8 @@ namespace VariableSpeedCoils {
 			MSEIRWaterFFlow( MaxSpedLevels, MSEIRWaterFFlow ),
 			MSWasteHeat( MaxSpedLevels, MSWasteHeat ),
 			MSWasteHeatFrac( MaxSpedLevels, MSWasteHeatFrac ),
+			MSWHPumpPower(MaxSpedLevels, MSWHPumpPower),
+			MSWHPumpPowerPerRatedTotCap(MaxSpedLevels, MSWHPumpPowerPerRatedTotCap),
 			SpeedNumReport( SpeedNumReport ),
 			SpeedRatioReport( SpeedRatioReport ),
 			DefrostStrategy( DefrostStrategy ),
@@ -907,6 +916,13 @@ namespace VariableSpeedCoils {
 		bool & ErrorsFound // set to true if problem
 	);
 
+	int
+	GetVSCoilPLFFPLR(
+		std::string const & CoilType, // must match coil types in this module
+		std::string const & CoilName, // must match coil names for the coil type
+		bool & ErrorsFound // set to true if problem
+	);
+
 	Real64
 	GetVSCoilMinOATCompressor(
 		std::string const & CoilName, // must match coil names for the coil type
@@ -991,7 +1007,6 @@ namespace VariableSpeedCoils {
 	void
 		CalcVarSpeedHPWH(
 		int const DXCoilNum, // the number of the DX coil to be simulated
-		int const CyclingScheme, // Fan/Compressor cycling scheme indicator
 		Real64 & RuntimeFrac, // Runtime Fraction of compressor or percent on time (on-time/cycle time)
 		Real64 const PartLoadRatio, // sensible water heating load / full load sensible water heating capacity
 		Real64 const SpeedRatio, // SpeedRatio varies between 1.0 (higher speed) and 0.0 (lower speed)
