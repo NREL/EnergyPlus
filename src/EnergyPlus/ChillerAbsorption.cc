@@ -311,10 +311,8 @@ namespace ChillerAbsorption {
 		if ( allocated( BLASTAbsorber ) ) return;
 		//ALLOCATE ARRAYS
 		BLASTAbsorber.allocate( NumBLASTAbsorbers );
-		CheckEquipName.allocate( NumBLASTAbsorbers );
-		CheckEquipName = true;
-		GenInputOutputNodesUsed.allocate( NumBLASTAbsorbers );
-		GenInputOutputNodesUsed = false;
+		CheckEquipName.dimension( NumBLASTAbsorbers, true );
+		GenInputOutputNodesUsed.dimension( NumBLASTAbsorbers, false );
 
 		BLASTAbsorberReport.allocate( NumBLASTAbsorbers );
 

@@ -416,7 +416,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
 
 		// Locals
@@ -424,7 +423,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -461,7 +460,7 @@ namespace DaylightingManager {
 		static bool doSkyReporting( true );
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')" );
+		static gio::Fmt Format_700( "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')" );
 
 		// FLOW:
 		if ( firstTime ) {
@@ -790,7 +789,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 
@@ -885,7 +883,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -1143,7 +1140,6 @@ namespace DaylightingManager {
 		using General::RoundSigDigits;
 		using DaylightingDevices::FindTDDPipe;
 		using DaylightingDevices::TransTDD;
-		using SolarReflectionManager::SolReflRecSurf;
 		using namespace Vectors;
 		using DataSystemVariables::DetailedSkyDiffuseAlgorithm;
 		using DataSystemVariables::DetailedSolarTimestepIntegration;
@@ -4024,7 +4020,7 @@ namespace DaylightingManager {
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		// na
@@ -4299,7 +4295,7 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS: na
 		// DERIVED TYPE DEFINITIONS: na
@@ -4361,8 +4357,7 @@ namespace DaylightingManager {
 
 		IllumMap.allocate( TotIllumMaps );
 		IllumMapCalc.allocate( TotIllumMaps );
-		ZoneMapCount.allocate( NumOfZones );
-		ZoneMapCount = 0;
+		ZoneMapCount.dimension( NumOfZones, 0 );
 
 		if ( TotIllumMaps > 0 ) {
 			for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
@@ -4812,8 +4807,7 @@ namespace DaylightingManager {
 
 		}
 
-		ZoneMsgDone.allocate( NumOfZones );
-		ZoneMsgDone = false;
+		ZoneMsgDone.dimension( NumOfZones, false );
 		for ( MapNum = 1; MapNum <= TotIllumMaps; ++MapNum ) {
 			if ( IllumMap( MapNum ).Zone == 0 ) continue;
 			if ( ZoneDaylight( IllumMap( MapNum ).Zone ).DaylightType != DetailedDaylighting && ! ZoneMsgDone( IllumMap( MapNum ).Zone ) ) {
@@ -4909,7 +4903,7 @@ namespace DaylightingManager {
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const fmtA( "(A)" );
+		static gio::Fmt fmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -4925,8 +4919,7 @@ namespace DaylightingManager {
 		static bool firstTime( true );
 
 		if ( firstTime ) {
-			CheckTDDZone.allocate( NumOfZones );
-			CheckTDDZone = true;
+			CheckTDDZone.dimension( NumOfZones, true );
 			firstTime = false;
 		}
 
@@ -8137,25 +8130,19 @@ namespace DaylightingManager {
 
 		if ( ! allocated( FLSK ) ) FLSK.allocate( NTrnBasis, 4 );
 		FLSK = 0.0;
-		if ( ! allocated( FLSU ) ) FLSU.allocate( NTrnBasis );
-		FLSU = 0.0;
-		if ( ! allocated( FLSUdisk ) ) FLSUdisk.allocate( NTrnBasis );
-		FLSUdisk = 0.0;
+		if ( ! allocated( FLSU ) ) FLSU.dimension( NTrnBasis, 0.0 );
+		if ( ! allocated( FLSUdisk ) ) FLSUdisk.dimension( NTrnBasis, 0.0 );
 
 		if ( ! allocated( FirstFluxSK ) ) FirstFluxSK.allocate( NTrnBasis, 4 );
 		FirstFluxSK = 0.0;
-		if ( ! allocated( FirstFluxSU ) ) FirstFluxSU.allocate( NTrnBasis );
-		FirstFluxSU = 0.0;
-		if ( ! allocated( FirstFluxSUdisk ) ) FirstFluxSUdisk.allocate( NTrnBasis );
-		FirstFluxSUdisk = 0.0;
+		if ( ! allocated( FirstFluxSU ) ) FirstFluxSU.dimension( NTrnBasis, 0.0 );
+		if ( ! allocated( FirstFluxSUdisk ) ) FirstFluxSUdisk.dimension( NTrnBasis, 0.0 );
 
 		NIncBasis = ComplexWind( IWin ).Geom( CurCplxFenState ).Inc.NBasis;
 		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
 		ElementLuminanceSky = 0.0;
-		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.allocate( NIncBasis );
-		ElementLuminanceSun = 0.0;
-		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.allocate( NIncBasis );
-		ElementLuminanceSunDisk = 0.0;
+		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
+		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
 
 		// Integration over sky/ground/sun elements is done over window incoming basis element and flux is calculated for each
 		// outgoing direction. This is used to calculate first reflected flux
@@ -8293,10 +8280,8 @@ namespace DaylightingManager {
 
 		if ( ! allocated( ElementLuminanceSky ) ) ElementLuminanceSky.allocate( NIncBasis, 4 );
 		ElementLuminanceSky = 0.0;
-		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.allocate( NIncBasis );
-		ElementLuminanceSun = 0.0;
-		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.allocate( NIncBasis );
-		ElementLuminanceSunDisk = 0.0;
+		if ( ! allocated( ElementLuminanceSun ) ) ElementLuminanceSun.dimension( NIncBasis, 0.0 );
+		if ( ! allocated( ElementLuminanceSunDisk ) ) ElementLuminanceSunDisk.dimension( NIncBasis, 0.0 );
 
 		ComplexFenestrationLuminances( IWin, WinEl, NIncBasis, IHR, iRefPoint, ElementLuminanceSky, ElementLuminanceSun, ElementLuminanceSunDisk, CalledFrom, MapNum );
 
@@ -9269,8 +9254,8 @@ namespace DaylightingManager {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
-		static gio::Fmt const HrFmt( "(I2.2)" );
+		static gio::Fmt FmtA( "(A)" );
+		static gio::Fmt HrFmt( "(I2.2)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS:
 		// na
@@ -9310,14 +9295,10 @@ namespace DaylightingManager {
 		// FLOW:
 		if ( firstTime ) {
 			firstTime = false;
-			FirstTimeMaps.allocate( TotIllumMaps );
-			FirstTimeMaps = true;
-			EnvrnPrint.allocate( TotIllumMaps );
-			EnvrnPrint = true;
+			FirstTimeMaps.dimension( TotIllumMaps, true );
+			EnvrnPrint.dimension( TotIllumMaps, true );
 			RefPts.allocate( MaxRefPoints, NumOfZones );
-			RefPts = "";
 			SavedMnDy.allocate( TotIllumMaps );
-			SavedMnDy = "";
 		}
 
 		if ( FirstTimeMaps( MapNum ) ) {
@@ -9482,7 +9463,7 @@ Label903: ;
 		// na
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
+		static gio::Fmt FmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -9658,11 +9639,11 @@ Label903: ;
 		int MapNum;
 
 		// Formats
-		static gio::Fmt const Format_700( "('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones')" );
-		static gio::Fmt const Format_701( "('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)" );
-		static gio::Fmt const Format_702( "('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent Zone Names - 1st 100 (max)')" );
-		static gio::Fmt const Format_703( "('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)" );
-		static gio::Fmt const fmtCommaA( "(',',A,$)" );
+		static gio::Fmt Format_700( "('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones')" );
+		static gio::Fmt Format_701( "('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)" );
+		static gio::Fmt Format_702( "('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent Zone Names - 1st 100 (max)')" );
+		static gio::Fmt Format_703( "('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)" );
+		static gio::Fmt fmtCommaA( "(',',A,$)" );
 
 		// FLOW:
 		// Count number of exterior Windows (use to allocate arrays)
@@ -9801,8 +9782,7 @@ Label903: ;
 
 		}
 
-		ZoneExtWin.allocate( NumOfZones );
-		ZoneExtWin = 0;
+		ZoneExtWin.dimension( NumOfZones, 0 );
 
 		for ( ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum ) {
 			if ( ZoneDaylight( ZoneNum ).TotalDaylRefPoints > 0 ) {
@@ -10277,7 +10257,7 @@ Label903: ;
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt const FmtA( "(A)" );
+		static gio::Fmt FmtA( "(A)" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
@@ -10300,7 +10280,7 @@ Label903: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

@@ -72,7 +72,6 @@ SetupZoneInternalGain(
 	std::string UpperCaseObjectName;
 
 	// Object Data
-	FArray1D< GenericComponentZoneIntGainStruct > TempGenDeviceIntGainsArr;
 
 	FoundIntGainsType = false;
 	FoundDuplicate = false;
@@ -107,20 +106,13 @@ SetupZoneInternalGain(
 
 	if ( ZoneIntGain( ZoneNum ).NumberOfDevices == 0 ) {
 		ZoneIntGain( ZoneNum ).Device.allocate( DeviceAllocInc );
-		ZoneIntGain( ZoneNum ).NumberOfDevices = 1;
 		ZoneIntGain( ZoneNum ).MaxNumberOfDevices = DeviceAllocInc;
 	} else {
 		if ( ZoneIntGain( ZoneNum ).NumberOfDevices + 1 > ZoneIntGain( ZoneNum ).MaxNumberOfDevices ) {
-			TempGenDeviceIntGainsArr.allocate( ZoneIntGain( ZoneNum ).MaxNumberOfDevices + DeviceAllocInc );
-			TempGenDeviceIntGainsArr( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} ) = ZoneIntGain( ZoneNum ).Device( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} );
-			ZoneIntGain( ZoneNum ).Device.deallocate();
-			ZoneIntGain( ZoneNum ).Device.allocate( ZoneIntGain( ZoneNum ).MaxNumberOfDevices + DeviceAllocInc );
-			ZoneIntGain( ZoneNum ).MaxNumberOfDevices += DeviceAllocInc;
-			ZoneIntGain( ZoneNum ).Device( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} ) = TempGenDeviceIntGainsArr( {1,ZoneIntGain( ZoneNum ).NumberOfDevices} );
-			TempGenDeviceIntGainsArr.deallocate();
+			ZoneIntGain( ZoneNum ).Device.redimension( ZoneIntGain( ZoneNum ).MaxNumberOfDevices += DeviceAllocInc );
 		}
-		++ZoneIntGain( ZoneNum ).NumberOfDevices;
 	}
+	++ZoneIntGain( ZoneNum ).NumberOfDevices;
 
 	ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).CompObjectType = UpperCaseObjectType;
 	ZoneIntGain( ZoneNum ).Device( ZoneIntGain( ZoneNum ).NumberOfDevices ).CompObjectName = UpperCaseObjectName;

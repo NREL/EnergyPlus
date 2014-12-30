@@ -310,23 +310,16 @@ namespace HVACDXHeatPumpSystem {
 		NumDXHeatPumpSystems = GetNumObjectsFound( CurrentModuleObject );
 
 		DXHeatPumpSystem.allocate( NumDXHeatPumpSystems );
-		CheckEquipName.allocate( NumDXHeatPumpSystems );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumDXHeatPumpSystems, true );
 
 		GetObjectDefMaxArgs( "CoilSystem:Heating:DX", TotalArgs, NumAlphas, NumNums );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNums );
-		cNumericFields = "";
-		Numbers.allocate( NumNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNums );
-		lNumericBlanks = true;
+		Numbers.dimension( NumNums, 0.0 );
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNums, true );
 
 		// Get the data for the DX Cooling System
 		for ( DXHeatSysNum = 1; DXHeatSysNum <= NumDXHeatPumpSystems; ++DXHeatSysNum ) {

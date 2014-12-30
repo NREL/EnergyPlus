@@ -184,8 +184,7 @@ namespace DisplacementVentMgr {
 
 		// Do the one time initializations
 		if ( MyOneTimeFlag ) {
-			MyEnvrnFlag.allocate( NumOfZones );
-			MyEnvrnFlag = true;
+			MyEnvrnFlag.dimension( NumOfZones, true );
 			HeightFloorSubzoneTop = 0.2;
 			ThickOccupiedSubzoneMin = 0.2;
 			HeightIntMassDefault = 2.0;
@@ -668,7 +667,7 @@ namespace DisplacementVentMgr {
 		}
 
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesMixedSubzone, ConvGainsMixedSubzone );
-		ConvGainsMixedSubzone += SumConvHTRadSys( ZoneNum ) + 0.5 * SysDepZoneLoadsLagged( ZoneNum );
+		ConvGainsMixedSubzone += SumConvHTRadSys( ZoneNum ) + SumConvPool( ZoneNum ) + 0.5 * SysDepZoneLoadsLagged( ZoneNum );
 		if ( Zone( ZoneNum ).NoHeatToReturnAir ) {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesMixedSubzone, RetAirGain );
 			ConvGainsMixedSubzone += RetAirGain;

@@ -1,6 +1,9 @@
 #ifndef SolarShading_hh_INCLUDED
 #define SolarShading_hh_INCLUDED
 
+// C++ Headers
+#include <fstream>
+
 // ObjexxFCL Headers
 #include <ObjexxFCL/FArray1A.hh>
 #include <ObjexxFCL/FArray1S.hh>
@@ -80,7 +83,7 @@ namespace SolarShading {
 	extern int ShadowingCalcFrequency; // Frequency for Shadowing Calculations
 	extern int ShadowingDaysLeft; // Days left in current shadowing period
 	extern bool debugging;
-	extern int OutputFileShading;
+	extern std::ofstream shd_stream; // Shading file stream
 	extern FArray1D_int HCNS; // Surface number of back surface HC figures
 	extern FArray1D_int HCNV; // Number of vertices of each HC figure
 	extern FArray2D< Int64 > HCA; // 'A' homogeneous coordinates of sides
@@ -155,7 +158,6 @@ namespace SolarShading {
 	extern FArray1D< SurfaceErrorTracking > TrackTooManyFigures;
 	extern FArray1D< SurfaceErrorTracking > TrackTooManyVertices;
 	extern FArray1D< SurfaceErrorTracking > TrackBaseSubSurround;
-	extern FArray1D< SurfaceErrorTracking > TempSurfErrorTracking;
 
 	// Functions
 
@@ -435,9 +437,9 @@ namespace SolarShading {
 
 	void
 	CalcInteriorWinTransDifSolInitialDistribution(
-		int & ZoneNum, // Zone index number
-		int & IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
-		Real64 & IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
+		int const ZoneNum, // Zone index number
+		int const IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
+		Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
 	);
 
 	void

@@ -307,17 +307,11 @@ namespace UnitHeater {
 		GetObjectDefMaxArgs( CurrentModuleObject, NumFields, NumAlphas, NumNumbers );
 
 		Alphas.allocate( NumAlphas );
-		Alphas = "";
-		Numbers.allocate( NumNumbers );
-		Numbers = 0.0;
+		Numbers.dimension( NumNumbers, 0.0 );
 		cAlphaFields.allocate( NumAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( NumNumbers );
-		cNumericFields = "";
-		lAlphaBlanks.allocate( NumAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( NumNumbers );
-		lNumericBlanks = true;
+		lAlphaBlanks.dimension( NumAlphas, true );
+		lNumericBlanks.dimension( NumNumbers, true );
 
 		// Allocate the local derived type and do one-time initializations for all parts of it
 		if ( NumOfUnitHeats > 0 ) {
@@ -963,7 +957,7 @@ namespace UnitHeater {
 				DataScalableSizingON = false;
 			} else {
 				// no scalble sizing method has been specified. Sizing proceeds using the method
-				// specified in the zoneHVAC object 
+				// specified in the zoneHVAC object
 				SizingMethod = HeatingAirflowSizing;
 				FieldNum = 1; // N1 , \field Maximum Supply Air Flow Rate
 				PrintFlag = true;
