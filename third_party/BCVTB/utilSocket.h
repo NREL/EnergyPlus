@@ -133,14 +133,14 @@ derivative works thereof, in binary and source code form.
 
 #include "defines.h"
 
-FILE *f1 = NULL; 
+extern FILE *f1;
 #define HEADER_LENGTH 54 // =10 + 4*(10+1);
-int REQUIRED_READ_LENGTH  = 0;
-int REQUIRED_WRITE_LENGTH = 0;
+extern int REQUIRED_READ_LENGTH;
+extern int REQUIRED_WRITE_LENGTH;
 
 /// This will be overwritten to contain the
 /// version number of the server
-int SERVER_VERSION = 0; 
+extern int SERVER_VERSION;
 
 ////////////////////////////////////////////////////////////////
 /// Appends a character array to another character array.
@@ -319,9 +319,7 @@ int sendclientmessage(const int *sockfd, const int *flaWri);
 ///
 ///\param sockfd Socket file descripter
 ///\param flaWri should be set to a negative value.
-int sendclienterror(const int *sockfd, const int *flaWri){
-    return sendclientmessage(sockfd, flaWri);
-}
+int sendclienterror(const int *sockfd, const int *flaWri);
 
 /////////////////////////////////////////////////////////////////
 /// Returns the required socket buffer length by reading from

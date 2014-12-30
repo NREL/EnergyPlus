@@ -919,7 +919,7 @@ public: // Slice Proxy Generators
 
 public: // Predicate
 
-	// contains( i )
+	// Contains Indexed Element?
 	inline
 	bool
 	contains( int const i1, int const i2 ) const
@@ -1008,6 +1008,14 @@ public: // Predicate
 	square() const
 	{
 		return ( ( dimensions_initialized() ) && ( z1_ == size2() ) );
+	}
+
+	// Square and Equal Dimensions?
+	inline
+	bool
+	equal_square_dimensions() const
+	{
+		return ( ( dimensions_initialized() ) && ( I1() == I2() ) );
 	}
 
 	// Symmetric?
@@ -1205,8 +1213,8 @@ public: // Modifier
 		FArray2 & A( *this ); // Shorthand name
 		A = T( 0 ); // Zero the array
 		T const One( T( 1 ) );
-		for ( int i = l1(), j = l2(), e = u1(); i <= e; ++i, ++j ) { // Set diagonal to unity
-			A( i, j ) = One;
+		for ( size_type l = 0, l_end = size(), l_inc = z1_ + 1; l < l_end; l += l_inc ) {
+			A[ l ] = One;
 		}
 		return *this;
 	}
@@ -1220,8 +1228,8 @@ public: // Modifier
 		assert( square() );
 		FArray2 & A( *this ); // Shorthand name
 		A = T( 0 ); // Zero the array
-		for ( int i = l1(), j = l2(), e = u1(); i <= e; ++i, ++j ) { // Set diagonal value
-			A( i, j ) = d;
+		for ( size_type l = 0, l_end = size(), l_inc = z1_ + 1; l < l_end; l += l_inc ) {
+			A[ l ] = d;
 		}
 		return *this;
 	}
@@ -1234,8 +1242,8 @@ public: // Modifier
 		proxy_const_assert( not_const_proxy() );
 		assert( square() );
 		FArray2 & A( *this ); // Shorthand name
-		for ( int i = l1(), j = l2(), e = u1(); i <= e; ++i, ++j ) { // Set diagonal value
-			A( i, j ) = d;
+		for ( size_type l = 0, l_end = size(), l_inc = z1_ + 1; l < l_end; l += l_inc ) {
+			A[ l ] = d;
 		}
 		return *this;
 	}
@@ -1245,15 +1253,13 @@ public: // Modifier
 	FArray2 &
 	transpose()
 	{
+		using std::swap; // Allows std::swap to be used if no T version
 		proxy_const_assert( not_const_proxy() );
 		assert( square() ); // So dimensions aren't changed
 		FArray2 & A( *this ); // Shorthand name
-		int const l_off( l2() - l1() );
-		for ( int i = l1(), ie = u1(); i <= ie; ++i ) {
-			for ( int j = l2(), je = i + l_off; j < je; ++j ) {
-				T const A_ij( A( i, j ) );
-				A( i, j ) = A( j, i );
-				A( j, i ) = A_ij;
+		for ( size_type j = 0; j < z1_; ++j ) {
+			for ( size_type i = 0, l = j * z1_, lT = j; i < j; ++i, ++l, lT += z1_ ) {
+				swap( A[ lT ], A[ l ] );
 			}
 		}
 		return *this;
@@ -1276,12 +1282,12 @@ public: // Modifier
 		FArray2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ s2 ] ); // Temporary row
 		for ( size_type i = 0; i < s1; ++i ) {
-			for ( size_type j = 0, la = 0, l = 0; j < as2; ++j, ++l ) {
+			for ( size_type j = 0, la = 0; j < as2; ++j ) {
 				T d( 0 );
 				for ( size_type lt = i; lt < s; lt += s1, ++la ) {
 					d += t[ lt ] * a[ la ];
 				}
-				r[ l ] = d;
+				r[ j ] = d;
 			}
 			for ( size_type l = 0, lt = i; l < s2; ++l, lt += s1 ) { // Copy in the new row
 				t[ lt ] = r[ l ];
@@ -1308,12 +1314,12 @@ public: // Modifier
 		FArray2 & t( *this ); // Shorthand name for this array
 		T * const r( new T[ s2 ] ); // Temporary row
 		for ( size_type i = 0; i < s1; ++i ) {
-			for ( size_type j = 0, l = 0; j < as1; ++j, ++l ) {
+			for ( size_type j = 0; j < as1; ++j ) {
 				T d( 0 );
 				for ( size_type lt = i, la = j; lt < s; lt += s1, la += as1 ) {
 					d += t[ lt ] * a[ la ];
 				}
-				r[ l ] = d;
+				r[ j ] = d;
 			}
 			for ( size_type l = 0, lt = i; l < s2; ++l, lt += s1 ) { // Copy in the new row
 				t[ lt ] = r[ l ];

@@ -34,27 +34,27 @@ TEST( BackspaceTest, BackspaceIStream )
 {
 	std::istringstream stream( "Line 1\nLine 2\nLine 3\n" );
 	std::string s;
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 1", s );
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 2", s );
 	Backspace( stream );
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 2", s );
 	Backspace( stream );
 	Backspace( stream );
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 1", s );
 	Backspace( stream );
 	Backspace( stream );
 	Backspace( stream );
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 1", s );
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 2", s );
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 3", s );
 	Backspace( stream );
-	Read( stream, "(A)" ) >> s;
+	read( stream, "(A)" ) >> s;
 	EXPECT_EQ( "Line 3", s );
 }
