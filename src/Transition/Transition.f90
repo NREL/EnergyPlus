@@ -256,6 +256,10 @@ INCLUDE 'IDDAssignV8_1_0.f90'
 INCLUDE 'VerStringV8_2_0.f90'
 INCLUDE 'IDDAssignV8_2_0.f90'
 #endif
+#ifdef V8_3_0
+INCLUDE 'VerStringV8_3_0.f90'
+INCLUDE 'IDDAssignV8_3_0.f90'
+#endif
       Progname='Conversion'
       PrognameConversion=VerString
       CALL DisplayString(VerString)

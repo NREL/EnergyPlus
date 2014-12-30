@@ -1,4 +1,4 @@
-ENERGYPLUS(tm)
+ENERGYPLUS (tm)
 END  USER  LICENSE  AGREEMENT
 Software: EnergyPlus
 Version: 8.2
