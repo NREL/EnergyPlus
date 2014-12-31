@@ -3505,7 +3505,7 @@ namespace VariableSpeedCoils {
 				VarSpeedCoil( DXCoilNum ).MSRatedWaterMassFlowRate( Mode ) = VarSpeedCoil( DXCoilNum ).MSRatedWaterVolFlowRate( Mode ) * rhoW;
 			}
 		} 
-		if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
+		else if (VarSpeedCoil(DXCoilNum).CoolHeatType == "WATERHEATING") {
 			RatedSourceTempCool = VarSpeedCoil(DXCoilNum).WHRatedInletWaterTemp;
 			rhoW = RhoH2O(RatedSourceTempCool); 			
 			VarSpeedCoil(DXCoilNum).RatedWaterMassFlowRate = VarSpeedCoil(DXCoilNum).RatedWaterVolFlowRate * rhoW;
