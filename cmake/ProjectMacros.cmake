@@ -112,7 +112,7 @@ endmacro()
 
 function( ADD_SIMULATION_TEST )
   set(options ANNUAL_SIMULATION DESIGN_DAY_ONLY EXPECT_FATAL)
-  set(oneValueArgs IDF_FILE EPW_FILE)
+  set(oneValueArgs IDF_FILE EPW_FILE COST)
   set(multiValueArgs "")
   cmake_parse_arguments(ADD_SIM_TEST "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -147,6 +147,10 @@ function( ADD_SIMULATION_TEST )
   #if( MSVC AND PROFILE_GENERATE )
     #set_tests_properties("integration.${IDF_NAME}" PROPERTIES RUN_SERIAL true)
   #endif()
+
+  if (ADD_SIM_TEST_COST AND NOT ADD_SIM_TEST_COST STREQUAL "" )
+    set_tests_properties("integration.${IDF_NAME}" PROPERTIES COST ${ADD_SIM_TEST_COST})
+  endif()
 
   # Added the expect_fatal here to detect files that are expected to fatal error properly
   if( ADD_SIM_TEST_EXPECT_FATAL )
