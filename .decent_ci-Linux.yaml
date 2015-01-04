@@ -20,5 +20,6 @@ compilers:
     coverage_base_dir: src/EnergyPlus
     coverage_pass_limit: 90
     coverage_warn_limit: 80
+    coverage_s3_bucket: energyplus
 
 
