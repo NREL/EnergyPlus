@@ -558,6 +558,7 @@ namespace DataSurfaces {
 		int ExtCavNum; // index for this surface in ExtVentedCavity structure (if any)
 		bool IsPV; // true if this is a photovoltaic surface (dxf output)
 		bool IsICS; // true if this is an ICS collector
+		bool IsPool; // true if this is a pool
 		int ICSPtr; // Index to ICS collector
 		// TH added 3/26/2010
 		bool MirroredSurf; // Ture if it is a mirrored surface
@@ -677,6 +678,7 @@ namespace DataSurfaces {
 			ExtCavNum( 0 ),
 			IsPV( false ),
 			IsICS( false ),
+			IsPool( false ),
 			ICSPtr( 0 ),
 			MirroredSurf( false ),
 			IntConvClassification( 0 ),
@@ -798,6 +800,7 @@ namespace DataSurfaces {
 			int const ExtCavNum, // index for this surface in ExtVentedCavity structure (if any)
 			bool const IsPV, // true if this is a photovoltaic surface (dxf output)
 			bool const IsICS, // true if this is an ICS collector
+			bool const IsPool, // true if this is a pool
 			int const ICSPtr, // Index to ICS collector
 			bool const MirroredSurf, // Ture if it is a mirrored surface
 			int const IntConvClassification, // current classification for inside face air flow regime and surface orientation
@@ -916,6 +919,7 @@ namespace DataSurfaces {
 			ExtCavNum( ExtCavNum ),
 			IsPV( IsPV ),
 			IsICS( IsICS ),
+			IsPool( IsPool ),
 			ICSPtr( ICSPtr ),
 			MirroredSurf( MirroredSurf ),
 			IntConvClassification( IntConvClassification ),

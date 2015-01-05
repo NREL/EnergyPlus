@@ -1061,6 +1061,9 @@ namespace UFADManager {
 			SumReturnAirConvectionGainsByTypes( ZoneNum, IntGainTypesOccupied, RetAirGains );
 			ConvGainsOccSubzone += RetAirGains;
 		}
+		
+		// Add convection from pool cover to occupied region
+		ConvGainsOccSubzone += SumConvPool( ZoneNum );
 
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 
@@ -1483,6 +1486,9 @@ namespace UFADManager {
 			ConvGainsOccSubzone += RetAirGains;
 		}
 
+		// Add convection from pool cover to occupied region
+		ConvGainsOccSubzone += SumConvPool( ZoneNum );
+		
 		// gains from lights (ceiling), tubular daylighting devices, high temp radiant heaters
 		SumInternalConvectionGainsByTypes( ZoneNum, IntGainTypesUpSubzone, ConvGainsUpSubzone );
 		ConvGainsUpSubzone += SumConvHTRadSys( ZoneNum );

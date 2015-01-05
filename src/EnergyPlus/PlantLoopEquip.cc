@@ -1042,6 +1042,8 @@ namespace PlantLoopEquip {
 
 			} else if ( EquipTypeNum == TypeOf_UnitarySystemRecovery ) {
 
+			} else if ( EquipTypeNum == TypeOf_SwimmingPool_Indoor ) {
+				
 			} else {
 
 				ShowSevereError( "SimPlantEquip: Invalid ZoneHVAC Type=" + sim_component.TypeOf );
@@ -1133,7 +1135,7 @@ namespace PlantLoopEquip {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 
