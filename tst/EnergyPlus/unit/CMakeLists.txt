@@ -7,19 +7,21 @@ endif()
 
 set( test_src
   DataPlant.unit.cc
+  ExteriorEnergyUse.unit.cc
+  HeatBalanceManager.unit.cc
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
 )
 
 set( test_dependencies
-  EnergyPlusLib
-  objexx
-  sqlite
-  bcvtb 
-  epexpat 
-  epfmiimport 
-  DElight
+  EnergyPlusAPI
+#  objexx
+#  sqlite
+#  bcvtb 
+#  epexpat 
+#  epfmiimport 
+#  DElight
  )
 
 if(CMAKE_HOST_UNIX)

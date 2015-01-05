@@ -369,17 +369,11 @@ namespace DesiccantDehumidifiers {
 		MaxAlphas = max( MaxAlphas, NumAlphas );
 
 		Alphas.allocate( MaxAlphas );
-		Alphas = "";
 		cAlphaFields.allocate( MaxAlphas );
-		cAlphaFields = "";
 		cNumericFields.allocate( MaxNums );
-		cNumericFields = "";
-		Numbers.allocate( MaxNums );
-		Numbers = 0.0;
-		lAlphaBlanks.allocate( MaxAlphas );
-		lAlphaBlanks = true;
-		lNumericBlanks.allocate( MaxNums );
-		lNumericBlanks = true;
+		Numbers.dimension( MaxNums, 0.0 );
+		lAlphaBlanks.dimension( MaxAlphas, true );
+		lNumericBlanks.dimension( MaxNums, true );
 
 		// loop over solid desiccant dehumidifiers and load the input data
 		CurrentModuleObject = dehumidifierDesiccantNoFans;
@@ -2129,7 +2123,7 @@ namespace DesiccantDehumidifiers {
 		// SUBROUTINE PARAMETER DEFINITIONS:
 		Real64 const MinVolFlowPerRatedTotQ( 0.00002684 ); // m3/s per W = 200 cfm/ton,
 		// min vol flow per rated evaporator capacity
-		static gio::Fmt const fmtLD( "*" );
+		static gio::Fmt fmtLD( "*" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na

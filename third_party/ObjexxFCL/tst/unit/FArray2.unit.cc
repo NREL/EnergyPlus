@@ -1352,7 +1352,7 @@ TEST( FArray2Test, SubscriptOperator )
 	EXPECT_EQ( 23, A1[ 5 ] );
 
 	for ( std::size_t i = 0; i < A1.size(); ++i ) A1[ i ] = static_cast< int >( i * 10 );
-	EXPECT_EQ( 0, A1[ 0 ] );
+	EXPECT_EQ(  0, A1[ 0 ] );
 	EXPECT_EQ( 10, A1[ 1 ] );
 	EXPECT_EQ( 20, A1[ 2 ] );
 	EXPECT_EQ( 30, A1[ 3 ] );
@@ -1452,7 +1452,6 @@ TEST( FArray2Test, PredicateComparisonsValues )
 	EXPECT_TRUE( ge( A2, 31459 ) && ge( 31459, A2 ) );
 	EXPECT_TRUE( ge( A2, 31458 ) && ge( 31460, A2 ) );
 
-	// Elements compared in order
 	FArray2D_int A3( 2, 3, { 11, 21, 12, 22, 13, 23 } );
 	EXPECT_FALSE( eq( A3, 11 ) || eq( 23, A3 ) );
 	EXPECT_TRUE( ne( A3, 11 ) && ne( 23, A3 ) );
@@ -1948,14 +1947,14 @@ TEST( FArray2Test, ModifierInvert )
 	// Illegal to call on an uninitialized array
 
 	// Inverts values of an initialized array
-	FArray2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01 } );
+	FArray2D_double A2( 2, 3, { 1.0, 10.0, 100.0, 0.1, 0.01, 0.001 } );
 	A2.invert();
-	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0 } ), A2 ) );
+	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { 1.0, 0.1, 0.01, 10.0, 100.0, 1000.0 } ), A2 ) );
 
 	// Inverts values of an initialized array
-	FArray2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01 } );
+	FArray2D_double A3( 2, 3, { -1.0, -10.0, -100.0, -0.1, -0.01, -0.001 } );
 	A3.invert();
-	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0 } ), A3 ) );
+	EXPECT_TRUE( eq( FArray2D_double( 2, 3, { -1.0, -0.1, -0.01, -10.0, -100.0, -1000.0 } ), A3 ) );
 }
 
 TEST( FArray2Test, ModifierAllocateDeallocate )
@@ -2391,4 +2390,155 @@ TEST( FArray2Test, Swap )
 	A1.swap( A2 );
 	EXPECT_TRUE( eq( A2, A3 ) );
 	EXPECT_TRUE( eq( FArray2D_int(), A1 ) );
+}
+
+TEST( FArray2Test, Diagonals )
+{
+	{
+		FArray2D_int A( 3, 3, { 11, 21, 31, 12, 22, 32, 13, 23, 33 } );
+		A.to_identity();
+		EXPECT_EQ( 1, A( 1, 1 ) );
+		EXPECT_EQ( 1, A( 2, 2 ) );
+		EXPECT_EQ( 1, A( 3, 3 ) );
+		EXPECT_EQ( 0, A( 2, 1 ) );
+		EXPECT_EQ( 0, A( 3, 1 ) );
+		EXPECT_EQ( 0, A( 1, 2 ) );
+		EXPECT_EQ( 0, A( 3, 2 ) );
+		EXPECT_EQ( 0, A( 1, 3 ) );
+		EXPECT_EQ( 0, A( 2, 3 ) );
+	}
+	{
+		FArray2D_int A( {-1,1}, 3, { 11, 21, 31, 12, 22, 32, 13, 23, 33 } );
+		A.to_diag( 9 );
+		EXPECT_EQ( 9, A( -1, 1 ) );
+		EXPECT_EQ( 9, A(  0, 2 ) );
+		EXPECT_EQ( 9, A(  1, 3 ) );
+		EXPECT_EQ( 0, A(  0, 1 ) );
+		EXPECT_EQ( 0, A(  1, 1 ) );
+		EXPECT_EQ( 0, A( -1, 2 ) );
+		EXPECT_EQ( 0, A(  1, 2 ) );
+		EXPECT_EQ( 0, A( -1, 3 ) );
+		EXPECT_EQ( 0, A(  0, 3 ) );
+	}
+	{
+		FArray2D_int A( 3, 3, { 11, 21, 31, 12, 22, 32, 13, 23, 33 } );
+		A.set_diagonal( 9 );
+		EXPECT_EQ( 9, A( 1, 1 ) );
+		EXPECT_EQ( 9, A( 2, 2 ) );
+		EXPECT_EQ( 9, A( 3, 3 ) );
+		EXPECT_EQ( 21, A( 2, 1 ) );
+		EXPECT_EQ( 31, A( 3, 1 ) );
+		EXPECT_EQ( 12, A( 1, 2 ) );
+		EXPECT_EQ( 32, A( 3, 2 ) );
+		EXPECT_EQ( 13, A( 1, 3 ) );
+		EXPECT_EQ( 23, A( 2, 3 ) );
+	}
+}
+
+TEST( FArray2Test, Transpose )
+{
+	{
+		FArray2D_int A( 2, {-1,0}, { 11, 21, 12, 22 } ), C( A );
+		A.transpose();
+		EXPECT_EQ( C( 1, -1 ), A( 1, -1 ) );
+		EXPECT_EQ( C( 1,  0 ), A( 2, -1 ) );
+		EXPECT_EQ( C( 2, -1 ), A( 1,  0 ) );
+		EXPECT_EQ( C( 2,  0 ), A( 2,  0 ) );
+	}
+	{
+		FArray2D_int A( 2, 3 );
+		A( 1, 1 ) = 4;
+		A( 1, 2 ) = 3;
+		A( 1, 3 ) = 5;
+		A( 2, 1 ) = 9;
+		A( 2, 2 ) = 2;
+		A( 2, 3 ) = 8;
+		FArray2D_int B( transpose( A ) );
+		EXPECT_EQ( 1, B.l1() );
+		EXPECT_EQ( 3, B.u1() );
+		EXPECT_EQ( 1, B.l2() );
+		EXPECT_EQ( 2, B.u2() );
+		EXPECT_EQ( 3u, B.size1() );
+		EXPECT_EQ( 2u, B.size2() );
+		EXPECT_EQ( A( 1, 1 ), B( 1, 1 ) );
+		EXPECT_EQ( A( 1, 2 ), B( 2, 1 ) );
+		EXPECT_EQ( A( 1, 3 ), B( 3, 1 ) );
+		EXPECT_EQ( A( 2, 1 ), B( 1, 2 ) );
+		EXPECT_EQ( A( 2, 2 ), B( 2, 2 ) );
+		EXPECT_EQ( A( 2, 3 ), B( 3, 2 ) );
+	}
+	{
+		FArray2D_int A( 2, {-1,1} );
+		A( 1, -1 ) = 4;
+		A( 1,  0 ) = 3;
+		A( 1,  1 ) = 5;
+		A( 2, -1 ) = 9;
+		A( 2,  0 ) = 2;
+		A( 2,  1 ) = 8;
+		FArray2D_int B( transpose( A ) );
+		EXPECT_EQ( 1, B.l1() );
+		EXPECT_EQ( 3, B.u1() );
+		EXPECT_EQ( 1, B.l2() );
+		EXPECT_EQ( 2, B.u2() );
+		EXPECT_EQ( 3u, B.size1() );
+		EXPECT_EQ( 2u, B.size2() );
+		EXPECT_EQ( A( 1, -1 ), B( 1, 1 ) );
+		EXPECT_EQ( A( 1,  0 ), B( 2, 1 ) );
+		EXPECT_EQ( A( 1,  1 ), B( 3, 1 ) );
+		EXPECT_EQ( A( 2, -1 ), B( 1, 2 ) );
+		EXPECT_EQ( A( 2,  0 ), B( 2, 2 ) );
+		EXPECT_EQ( A( 2,  1 ), B( 3, 2 ) );
+	}
+	{
+		FArray2D_int A( 2, {-1,1} );
+		A( 1, -1 ) = 4;
+		A( 1,  0 ) = 3;
+		A( 1,  1 ) = 5;
+		A( 2, -1 ) = 9;
+		A( 2,  0 ) = 2;
+		A( 2,  1 ) = 8;
+		FArray2D_int B( transposed( A ) );
+		EXPECT_EQ( -1, B.l1() );
+		EXPECT_EQ( 1, B.u1() );
+		EXPECT_EQ( 1, B.l2() );
+		EXPECT_EQ( 2, B.u2() );
+		EXPECT_EQ( 3u, B.size1() );
+		EXPECT_EQ( 2u, B.size2() );
+		EXPECT_EQ( A( 1, -1 ), B( -1, 1 ) );
+		EXPECT_EQ( A( 1,  0 ), B(  0, 1 ) );
+		EXPECT_EQ( A( 1,  1 ), B(  1, 1 ) );
+		EXPECT_EQ( A( 2, -1 ), B( -1, 2 ) );
+		EXPECT_EQ( A( 2,  0 ), B(  0, 2 ) );
+		EXPECT_EQ( A( 2,  1 ), B(  1, 2 ) );
+	}
+}
+
+TEST( FArray2FunctionsTest, Count )
+{
+	FArray2D_bool A( 2, 3, { true, false, false, false, true, true } );
+	FArray1D_size C1( 3, { 1, 0, 2 } );
+	FArray1D_size C2( 2, { 2, 1 } );
+	EXPECT_EQ( 3u, count( A ) );
+	EXPECT_TRUE( eq( C1, count( A, 1 ) ) );
+	EXPECT_TRUE( eq( C2, count( A, 2 ) ) );
+}
+
+TEST( FArray2FunctionsTest, Sum )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1D_int S1( 2, { 32, 34 } );
+	FArray1D_int S2( 2, { 23, 43 } );
+	EXPECT_EQ( 66, sum( A ) );
+	EXPECT_TRUE( eq( S1, sum( A, 1 ) ) );
+	EXPECT_TRUE( eq( S2, sum( A, 2 ) ) );
+}
+
+TEST( FArray2FunctionsTest, Product )
+{
+	FArray2D_int A( 2, 2, { 11, 21, 12, 22 } );
+	FArray1D_int P1( 2, { 231, 264 } );
+	FArray1D_int P2( 2, { 132, 462 } );
+	EXPECT_EQ( 60984, product( A ) );
+	EXPECT_TRUE( eq( P1, product( A, 1 ) ) );
+	EXPECT_TRUE( eq( P2, product( A, 2 ) ) );
 }

@@ -63,8 +63,10 @@ public: // Creation
 
 	// Default Constructor
 	inline
-	Vector2()
-	{} // Coordinate are not explicitly initialized
+	Vector2() :
+	 x( T() ),
+	 y( T() )
+	{}
 
 	// Copy Constructor
 	inline
@@ -117,6 +119,15 @@ public: // Creation
 	 y( a[ 1 ] )
 	{
 		assert( a.size() == 2 );
+	}
+
+	// Default Vector Named Constructor
+	inline
+	static
+	Vector2
+	default_vector()
+	{
+		return Vector2( T() );
 	}
 
 	// Zero Vector Named Constructor
@@ -686,12 +697,32 @@ public: // Properties: General
 		return ( x * v.x ) + ( y * v.y );
 	}
 
+	// Dot Product
+	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
+	inline
+	T
+	dot( A const & a ) const
+	{
+		assert( a.size() == 2 );
+		return ( x * a[ 0 ] ) + ( y * a[ 1 ] );
+	}
+
 	// Cross Product
 	inline
 	T
 	cross( Vector2 const & v ) const
 	{
 		return ( x * v.y ) - ( y * v.x );
+	}
+
+	// Cross Product
+	template< typename A, class = typename std::enable_if< std::is_assignable< T&, typename A::value_type >::value >::type >
+	inline
+	T
+	cross( A const & a ) const
+	{
+		assert( a.size() == 2 );
+		return ( x * a[ 1 ] ) - ( y * a[ 0 ] );
 	}
 
 	// Alias for Element 1
@@ -826,7 +857,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Set Minimum Coordinates wrt an Vector2
+	// Set Minimum Coordinates wrt a Vector2
 	inline
 	Vector2 &
 	min( Vector2 const & v )
@@ -836,7 +867,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Set Maximum Coordinates wrt an Vector2
+	// Set Maximum Coordinates wrt a Vector2
 	inline
 	Vector2 &
 	max( Vector2 const & v )
@@ -846,7 +877,68 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Project Normally Onto an Vector2
+	// Sum of Vector2s
+	inline
+	Vector2 &
+	sum( Vector2 const & a, Vector2 const & b )
+	{
+		x = a.x + b.x;
+		y = a.y + b.y;
+		return *this;
+	}
+
+	// Difference of Vector2s
+	inline
+	Vector2 &
+	diff( Vector2 const & a, Vector2 const & b )
+	{
+		x = a.x - b.x;
+		y = a.y - b.y;
+		return *this;
+	}
+
+	// Midpoint of Two Vector2s
+	inline
+	Vector2 &
+	mid( Vector2 const & a, Vector2 const & b )
+	{
+		x = T( 0.5 * ( a.x + b.x ) );
+		y = T( 0.5 * ( a.y + b.y ) );
+		return *this;
+	}
+
+	// Center of Two Vector2s
+	inline
+	Vector2 &
+	cen( Vector2 const & a, Vector2 const & b )
+	{
+		x = T( 0.5 * ( a.x + b.x ) );
+		y = T( 0.5 * ( a.y + b.y ) );
+		return *this;
+	}
+
+	// Center of Three Vector2s
+	inline
+	Vector2 &
+	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c )
+	{
+		static long double const third( 1.0 / 3.0 );
+		x = T( third * ( a.x + b.x + c.x ) );
+		y = T( third * ( a.y + b.y + c.y ) );
+		return *this;
+	}
+
+	// Center of Four Vector2s
+	inline
+	Vector2 &
+	cen( Vector2 const & a, Vector2 const & b, Vector2 const & c, Vector2 const & d )
+	{
+		x = T( 0.25 * ( a.x + b.x + c.x + d.x ) );
+		y = T( 0.25 * ( a.y + b.y + c.y + d.y ) );
+		return *this;
+	}
+
+	// Project Normally onto a Vector2
 	inline
 	Vector2 &
 	project_normal( Vector2 const & v )
@@ -858,7 +950,7 @@ public: // Modifiers
 		return *this;
 	}
 
-	// Project in Direction of an Vector2
+	// Project in Direction of a Vector2
 	inline
 	Vector2 &
 	project_parallel( Vector2 const & v )
@@ -1137,7 +1229,7 @@ public: // Generators
 		);
 	}
 
-	// Projected Normally Onto an Vector2
+	// Projected Normally onto a Vector2
 	inline
 	Vector2
 	projected_normal( Vector2 const & v ) const
@@ -1147,7 +1239,7 @@ public: // Generators
 		return Vector2( x - ( c * v.x ), y - ( c * v.y ) );
 	}
 
-	// Projected in Direction of an Vector2
+	// Projected in Direction of a Vector2
 	inline
 	Vector2
 	projected_parallel( Vector2 const & v ) const

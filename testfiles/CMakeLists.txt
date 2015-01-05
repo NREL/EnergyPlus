@@ -6,6 +6,7 @@
 # ADD_SIMULATION_TEST(IDF_FILE 1ZoneEvapCooler.idf EPW_FILE GBR_London.Gatwick.037760_IWEC.epw DESIGN_DAY_ONLY)
 # This will override any attempt to run an annual simulation.  Use DESIGN_DAY_ONLY for files without annual run periods
 
+ADD_SIMULATION_TEST(IDF_FILE 1ZoneDataCenterCRAC_wPumpedDXCoolingCoil.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneEvapCooler.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolled.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 1ZoneUncontrolledCondFDWithVariableKat24C.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
@@ -55,6 +56,7 @@ ADD_SIMULATION_TEST(IDF_FILE 5ZoneReturnFan.idf EPW_FILE USA_IL_Chicago-OHare.In
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSteamBaseboard.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSupRetPlenRAB.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneSupRetPlenVSATU.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE 5ZoneSwimmingPool.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneTDV.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE 5ZoneVAV-ChilledWaterStorage-Mixed_DCV_MaxZd.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -345,8 +347,6 @@ ADD_SIMULATION_TEST(IDF_FILE ShopWithPVandBattery.idf EPW_FILE USA_OK_Oklahoma.C
 ADD_SIMULATION_TEST(IDF_FILE ShopWithPVandStorage.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ShopWithSimplePVT.idf EPW_FILE USA_OK_Oklahoma.City-Will.Rogers.World.AP.723530_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SingleFamilyHouse_TwoSpeed_ZoneAirBalance.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE SlabInGradeWithInsulation.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE SlabOnGradeWithInsulation.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SmOffPSZ-MultiModeDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SmOffPSZ.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE SmOffPSZ_OnOffStagedControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -432,6 +432,9 @@ ADD_SIMULATION_TEST(IDF_FILE WindACAuto.idf EPW_FILE USA_IL_Chicago-OHare.Intl.A
 ADD_SIMULATION_TEST(IDF_FILE WindACRHControl.idf EPW_FILE USA_FL_Miami.Intl.AP.722020_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WindowTests.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE WindowTestsSimple.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE ZoneCoupledGroundHTBasement.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE ZoneCoupledGroundHTSlabInGrade.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE ZoneCoupledGroundHTSlabOnGrade.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ZoneSysAvailManager.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ZoneVSWSHP_wDOAS.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE ZoneWSHP_wDOAS.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
@@ -471,8 +474,8 @@ ADD_SIMULATION_TEST(IDF_FILE gasAbsorptionChillerHeater.idf EPW_FILE USA_IL_Chic
 # Macro files
 ADD_SIMULATION_TEST(IDF_FILE AbsorptionChiller_Macro.imf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw) 
 
-# External interface files -- note we only have Windows 32-bit FMUs
-if ( MSVC AND ("${CMAKE_SIZEOF_VOID_P}" EQUAL "4") )
+# External interface files -- note they don't work on Mac
+if ( NOT APPLE )
   ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-actuator.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
   ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-schedule.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
   ADD_SIMULATION_TEST(IDF_FILE _ExternalInterface-functionalmockupunit-to-variable.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

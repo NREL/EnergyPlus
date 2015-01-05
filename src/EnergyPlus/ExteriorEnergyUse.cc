@@ -617,7 +617,8 @@ namespace ExteriorEnergyUse {
 		}
 
 		for ( Item = 1; Item <= NumExteriorEqs; ++Item ) {
-			ExteriorEquipment( Item ).CurrentUse = ExteriorEquipment( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorEquipment( Item ).SchedPtr ) * TimeStepZone * SecInHour;
+			ExteriorEquipment( Item ).Power = ExteriorEquipment( Item ).DesignLevel * GetCurrentScheduleValue( ExteriorEquipment( Item ).SchedPtr );
+			ExteriorEquipment( Item ).CurrentUse = ExteriorEquipment( Item ).Power * TimeStepZone * SecInHour;
 		}
 
 	}

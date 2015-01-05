@@ -444,17 +444,11 @@ namespace SystemAvailabilityManager {
 		maxAlphas = max( maxAlphas, NumAlphas );
 
 		cAlphaFieldNames.allocate( maxAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( maxAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( maxAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( maxAlphas, false );
 		cNumericFieldNames.allocate( maxNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( maxNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( maxNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( maxNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( maxNumbers, false );
 
 		if ( ! allocated( ZoneComp ) ) {
 			ZoneComp.allocate( NumValidSysAvailZoneComponents );
@@ -1090,17 +1084,11 @@ namespace SystemAvailabilityManager {
 		cCurrentModuleObject = "AvailabilityManagerAssignmentList";
 		GetObjectDefMaxArgs( cCurrentModuleObject, numArgs, NumAlphas, NumNumbers );
 		cAlphaFieldNames.allocate( NumAlphas );
-		cAlphaFieldNames = "";
 		cAlphaArgs.allocate( NumAlphas );
-		cAlphaArgs = "";
-		lAlphaFieldBlanks.allocate( NumAlphas );
-		lAlphaFieldBlanks = false;
+		lAlphaFieldBlanks.dimension( NumAlphas, false );
 		cNumericFieldNames.allocate( NumNumbers );
-		cNumericFieldNames = "";
-		rNumericArgs.allocate( NumNumbers );
-		rNumericArgs = 0.0;
-		lNumericFieldBlanks.allocate( NumNumbers );
-		lNumericFieldBlanks = false;
+		rNumericArgs.dimension( NumNumbers, 0.0 );
+		lNumericFieldBlanks.dimension( NumNumbers, false );
 
 		cCurrentModuleObject = "AvailabilityManagerAssignmentList";
 		NumAvailManagerLists = GetNumObjectsFound( cCurrentModuleObject );
@@ -1950,8 +1938,7 @@ namespace SystemAvailabilityManager {
 			StartTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StartTime;
 			StopTime = ZoneComp( ZoneEquipType ).ZoneCompAvailMgrs( CompNum ).StopTime;
 			if ( OneTimeFlag ) {
-				ZoneCompNCControlType.allocate( NumNCycSysAvailMgrs );
-				ZoneCompNCControlType = true;
+				ZoneCompNCControlType.dimension( NumNCycSysAvailMgrs, true );
 				OneTimeFlag = false;
 			}
 		} else {

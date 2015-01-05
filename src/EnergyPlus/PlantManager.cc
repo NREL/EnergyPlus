@@ -791,19 +791,12 @@ namespace PlantManager {
 					TempLoop.Branch( BranchNum ).IsBypass = false;
 
 					CompTypes.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompTypes = "";
 					CompNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompNames = "";
-					CompCtrls.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					CompCtrls = 0;
+					CompCtrls.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 					InletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					InletNodeNames = "";
-					InletNodeNumbers.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					InletNodeNumbers = 0;
+					InletNodeNumbers.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 					OutletNodeNames.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					OutletNodeNames = "";
-					OutletNodeNumbers.allocate( TempLoop.Branch( BranchNum ).TotalComponents );
-					OutletNodeNumbers = 0;
+					OutletNodeNumbers.dimension( TempLoop.Branch( BranchNum ).TotalComponents, 0 );
 
 					GetBranchData( TempLoop.Name, BranchNames( BranchNum ), TempLoop.Branch( BranchNum ).MaxVolFlowRate, TempLoop.Branch( BranchNum ).PressureCurveType, TempLoop.Branch( BranchNum ).PressureCurveIndex, TempLoop.Branch( BranchNum ).TotalComponents, CompTypes, CompNames, InletNodeNames, InletNodeNumbers, OutletNodeNames, OutletNodeNumbers, ErrorsFound ); // Why is this Vdot and not mdot?
 
@@ -1250,6 +1243,10 @@ namespace PlantManager {
 							this_comp.TypeOf_Num = TypeOf_PackagedTESCoolingCoil;
 							this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
 							this_comp.CurOpSchemeType = DemandOpSchemeType;
+						} else if ( SameString( this_comp_type, "SwimmingPool:Indoor" ) ) {
+							this_comp.TypeOf_Num = TypeOf_SwimmingPool_Indoor;
+							this_comp.GeneralEquipType = GenEquipTypes_ZoneHVACDemand;
+							this_comp.CurOpSchemeType = DemandOpSchemeType;
 						} else {
 							//discover unsupported equipment on branches.
 							ShowSevereError( "GetPlantInput: Branch=\"" + BranchNames( BranchNum ) + "\", invalid component on branch." );
@@ -1367,11 +1364,8 @@ namespace PlantManager {
 						}
 
 						TempLoop.Splitter( SplitNum - 1 ).NodeNameOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
-						TempLoop.Splitter( SplitNum - 1 ).NodeNameOut = "";
-						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
-						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut = 0;
-						TempLoop.Splitter( SplitNum - 1 ).BranchNumOut.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
-						TempLoop.Splitter( SplitNum - 1 ).BranchNumOut = 0;
+						TempLoop.Splitter( SplitNum - 1 ).NodeNumOut.dimension( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes, 0 );
+						TempLoop.Splitter( SplitNum - 1 ).BranchNumOut.dimension( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes, 0 );
 
 						SplitOutBranch.allocate( TempLoop.Splitter( SplitNum - 1 ).TotalOutletNodes );
 						SplitOutBranch = false;
@@ -1437,11 +1431,8 @@ namespace PlantManager {
 						}
 
 						TempLoop.Mixer( MixNum - 1 ).NodeNameIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
-						TempLoop.Mixer( MixNum - 1 ).NodeNameIn = "";
-						TempLoop.Mixer( MixNum - 1 ).NodeNumIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
-						TempLoop.Mixer( MixNum - 1 ).NodeNumIn = 0;
-						TempLoop.Mixer( MixNum - 1 ).BranchNumIn.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
-						TempLoop.Mixer( MixNum - 1 ).BranchNumIn = 0;
+						TempLoop.Mixer( MixNum - 1 ).NodeNumIn.dimension( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes, 0 );
+						TempLoop.Mixer( MixNum - 1 ).BranchNumIn.dimension( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes, 0 );
 
 						MixerInBranch.allocate( TempLoop.Mixer( MixNum - 1 ).TotalInletNodes );
 						MixerInBranch = false;
@@ -3419,37 +3410,19 @@ namespace PlantManager {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int PumpsBeforeIncrement;
-		int PumpsAfterIncrement;
 
 		// Object Data
-		FArray1D< LoopSidePumpInformation > TempPumpArray;
 
-		if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) {
-			PumpsBeforeIncrement = size( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps );
-			TempPumpArray.allocate( PumpsBeforeIncrement + 1 );
-			TempPumpArray( {1,PumpsBeforeIncrement} ) = PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps;
-		} else {
-			PumpsBeforeIncrement = 0;
-			TempPumpArray.allocate( 1 );
-		}
-
-		PumpsAfterIncrement = size( TempPumpArray );
-
-		TempPumpArray( PumpsAfterIncrement ).PumpName = PumpName;
-		// TempPumpArray(PumpsAfterIncrement)%PumpTypeOf = FindItemInList(PumpType, SimPlantEquipTypes, SIZE(SimPlantEquipTypes))
-		TempPumpArray( PumpsAfterIncrement ).BranchNum = BranchNum;
-		TempPumpArray( PumpsAfterIncrement ).CompNum = CompNum;
-		TempPumpArray( PumpsAfterIncrement ).PumpOutletNode = PumpOutletNode;
-
-		if ( allocated( PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps ) ) PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps.deallocate();
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps.allocate( PumpsAfterIncrement );
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).Pumps = TempPumpArray;
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).TotalPumps = PumpsAfterIncrement;
-		PlantLoop( LoopNum ).LoopSide( LoopSideNum ).BranchPumpsExist = HasBranchPumps;
-
-		if ( allocated( TempPumpArray ) ) TempPumpArray.deallocate();
-
+		auto & loop_side( PlantLoop( LoopNum ).LoopSide( LoopSideNum ) );
+		auto & pumps( loop_side.Pumps );
+		int const nPumpsAfterIncrement = loop_side.TotalPumps = pumps.size() + 1;
+		pumps.redimension( nPumpsAfterIncrement );
+		pumps( nPumpsAfterIncrement ).PumpName = PumpName;
+		// pumps( nPumpsAfterIncrement ).PumpTypeOf = FindItemInList( PumpType, SimPlantEquipTypes, SimPlantEquipTypes.size() );
+		pumps( nPumpsAfterIncrement ).BranchNum = BranchNum;
+		pumps( nPumpsAfterIncrement ).CompNum = CompNum;
+		pumps( nPumpsAfterIncrement ).PumpOutletNode = PumpOutletNode;
+		loop_side.BranchPumpsExist = HasBranchPumps;
 	}
 
 	void
@@ -4056,6 +4029,10 @@ namespace PlantManager {
 						} else if ( SELECT_CASE_var == TypeOf_PackagedTESCoolingCoil ) { // 88
 							this_component.FlowCtrl = ControlType_Active;
 							this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
+							this_component.HowLoadServed = HowMet_NoneDemand;
+						} else if ( SELECT_CASE_var == TypeOf_SwimmingPool_Indoor ) { // 90
+							this_component.FlowCtrl = ControlType_Active;
+							this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
 							this_component.HowLoadServed = HowMet_NoneDemand;
 						} else {
 							ShowSevereError( "SetBranchControlTypes: Caught unexpected equipment type of number" );

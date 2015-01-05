@@ -177,7 +177,7 @@ public: // Assignment: Array
 				for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 					for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 						for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+							for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 								c[ l ] = a( i1, i2, i3, i4 );
 							}
 						}
@@ -187,7 +187,7 @@ public: // Assignment: Array
 				for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 					for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 						for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+							for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 								operator ()( i1, i2, i3, i4 ) = c[ l ];
 							}
 						}
@@ -197,7 +197,7 @@ public: // Assignment: Array
 				for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 					for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 						for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-							for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+							for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 								operator ()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
 							}
 						}
@@ -218,7 +218,7 @@ public: // Assignment: Array
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
 					}
 				}
@@ -238,7 +238,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							operator ()( i1, i2, i3, i4 ) = a( i1, i2, i3, i4 );
 						}
 					}
@@ -271,7 +271,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							operator ()( i1, i2, i3, i4 ) = c[ l ];
 						}
 					}
@@ -281,7 +281,7 @@ public: // Assignment: Array
 			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+						for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 							operator ()( i1, i2, i3, i4 ) = a( j1, j2, j3, j4 );
 						}
 					}
@@ -301,7 +301,7 @@ public: // Assignment: Array
 		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3, i4 ) = a( j1, j2, j3, j4 );
 					}
 				}
@@ -321,7 +321,7 @@ public: // Assignment: Array
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++r ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++r ) {
 						operator ()( i1, i2, i3, i4 ) = *r;
 					}
 				}
@@ -341,7 +341,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							operator ()( i1, i2, i3, i4 ) += a( i1, i2, i3, i4 );
 						}
 					}
@@ -362,7 +362,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							operator ()( i1, i2, i3, i4 ) -= a( i1, i2, i3, i4 );
 						}
 					}
@@ -383,7 +383,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							operator ()( i1, i2, i3, i4 ) *= a( i1, i2, i3, i4 );
 						}
 					}
@@ -404,7 +404,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							assert( T( a( i1, i2, i3, i4 ) ) != T( 0 ) );
 							operator ()( i1, i2, i3, i4 ) /= a( i1, i2, i3, i4 );
 						}
@@ -438,7 +438,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							operator ()( i1, i2, i3, i4 ) += c[ l ];
 						}
 					}
@@ -448,7 +448,7 @@ public: // Assignment: Array
 			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+						for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 							operator ()( i1, i2, i3, i4 ) += a( j1, j2, j3, j4 );
 						}
 					}
@@ -481,7 +481,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							operator ()( i1, i2, i3, i4 ) -= c[ l ];
 						}
 					}
@@ -491,7 +491,7 @@ public: // Assignment: Array
 			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+						for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 							operator ()( i1, i2, i3, i4 ) -= a( j1, j2, j3, j4 );
 						}
 					}
@@ -524,7 +524,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							operator ()( i1, i2, i3, i4 ) *= c[ l ];
 						}
 					}
@@ -534,7 +534,7 @@ public: // Assignment: Array
 			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+						for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 							operator ()( i1, i2, i3, i4 ) *= a( j1, j2, j3, j4 );
 						}
 					}
@@ -568,7 +568,7 @@ public: // Assignment: Array
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							operator ()( i1, i2, i3, i4 ) /= c[ l ];
 						}
 					}
@@ -578,7 +578,7 @@ public: // Assignment: Array
 			for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 				for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 					for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-						for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+						for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 							assert( T( a( j1, j2, j3, j4 ) ) != T( 0 ) );
 							operator ()( i1, i2, i3, i4 ) /= a( j1, j2, j3, j4 );
 						}
@@ -599,7 +599,7 @@ public: // Assignment: Array
 		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3, i4 ) += a( j1, j2, j3, j4 );
 					}
 				}
@@ -618,7 +618,7 @@ public: // Assignment: Array
 		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3, i4 ) -= a( j1, j2, j3, j4 );
 					}
 				}
@@ -637,7 +637,7 @@ public: // Assignment: Array
 		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3, i4 ) *= a( j1, j2, j3, j4 );
 					}
 				}
@@ -656,7 +656,7 @@ public: // Assignment: Array
 		for ( int i4 = 1, j4 = a.l4(); i4 <= u4_; ++i4, ++j4 ) {
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						assert( T( a( j1, j2, j3, j4 ) ) != T( 0 ) );
 						operator ()( i1, i2, i3, i4 ) /= a( j1, j2, j3, j4 );
 					}
@@ -680,7 +680,7 @@ public: // Assignment: Logical
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							c[ l ] = a( i1, i2, i3, i4 );
 						}
 					}
@@ -690,7 +690,7 @@ public: // Assignment: Logical
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							auto & v( operator ()( i1, i2, i3, i4 ) );
 							v = v && c[ l ];
 						}
@@ -701,7 +701,7 @@ public: // Assignment: Logical
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							auto & v( operator ()( i1, i2, i3, i4 ) );
 							v = v && a( i1, i2, i3, i4 );
 						}
@@ -724,7 +724,7 @@ public: // Assignment: Logical
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							c[ l ] = a( i1, i2, i3, i4 );
 						}
 					}
@@ -734,7 +734,7 @@ public: // Assignment: Logical
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							auto & v( operator ()( i1, i2, i3, i4 ) );
 							v = v || c[ l ];
 						}
@@ -745,7 +745,7 @@ public: // Assignment: Logical
 			for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							auto & v( operator ()( i1, i2, i3, i4 ) );
 							v = v || a( i1, i2, i3, i4 );
 						}
@@ -766,7 +766,7 @@ public: // Assignment: Logical
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						auto & v( operator ()( i1, i2, i3, i4 ) );
 						v = v && a( i1, i2, i3, i4 );
 					}
@@ -786,7 +786,7 @@ public: // Assignment: Logical
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						auto & v( operator ()( i1, i2, i3, i4 ) );
 						v = v || a( i1, i2, i3, i4 );
 					}
@@ -806,7 +806,7 @@ public: // Assignment: Value
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3, i4 ) = t;
 					}
 				}
@@ -823,7 +823,7 @@ public: // Assignment: Value
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3, i4 ) += t;
 					}
 				}
@@ -840,7 +840,7 @@ public: // Assignment: Value
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3, i4 ) -= t;
 					}
 				}
@@ -857,7 +857,7 @@ public: // Assignment: Value
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3, i4 ) *= t;
 					}
 				}
@@ -877,7 +877,7 @@ public: // Assignment: Value
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3, i4 ) *= inv_u;
 					}
 				}
@@ -896,7 +896,7 @@ public: // Assignment: Value
 		for ( int i4 = 1; i4 <= u4_; ++i4 ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3, i4 ) /= u;
 					}
 				}
@@ -1325,7 +1325,7 @@ public: // Slice Proxy Generators
 
 public: // Predicate
 
-	// contains( i1, i2, i3, i4 )
+	// Contains Indexed Element?
 	inline
 	bool
 	contains( int const i1, int const i2, int const i3, int const i4 ) const

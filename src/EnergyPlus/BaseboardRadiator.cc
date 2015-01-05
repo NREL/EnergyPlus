@@ -285,8 +285,7 @@ namespace BaseboardRadiator {
 		NumBaseboards = NumConvHWBaseboards;
 
 		Baseboard.allocate( NumBaseboards );
-		CheckEquipName.allocate( NumBaseboards );
-		CheckEquipName = true;
+		CheckEquipName.dimension( NumBaseboards, true );
 		BaseboardParamsNumericFields.allocate( NumBaseboards );
 
 		if ( NumConvHWBaseboards > 0 ) { //Get the data for cooling schemes
@@ -695,7 +694,7 @@ namespace BaseboardRadiator {
 						RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
 						DesCoilLoad = TempSize;
 					} else {
-						DesCoilLoad = 0.0; 
+						DesCoilLoad = 0.0;
 					}
 
 					if ( DesCoilLoad >= SmallLoad ) {
