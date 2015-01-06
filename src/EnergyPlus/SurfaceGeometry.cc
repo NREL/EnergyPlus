@@ -7661,7 +7661,7 @@ namespace SurfaceGeometry {
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 
 		// SUBROUTINE PARAMETER DEFINITIONS:
-		static gio::Fmt OSCFormat1( "('! <Other Side Coefficients>,Name,Combined convective/radiative film coefficient {W/m2-K},User selected Constant Temperature {C},Coefficient modifying the constant temperature term,Coefficient modifying the external dry bulb temperature term,Coefficient modifying the ground temperature term,Coefficient modifying the wind speed term {s/m},Coefficient modifying the zone air temperature term,Constant Temperature Schedule Name,Sinusoidal VariationPeriod of Sinusoidal Variation,Previous Other Side Temperature Coefficient,Minimum Other Side Temperature {C},Maximum Other Side Temperature {C}')" );
+		static gio::Fmt OSCFormat1( "('! <Other Side Coefficients>,Name,Combined convective/radiative film coefficient {W/m2-K},User selected Constant Temperature {C},Coefficient modifying the constant temperature term,Coefficient modifying the external dry bulb temperature term,Coefficient modifying the ground temperature term,Coefficient modifying the wind speed term {s/m},Coefficient modifying the zone air temperature term,Constant Temperature Schedule Name,Sinusoidal Variation,Period of Sinusoidal Variation,Previous Other Side Temperature Coefficient,Minimum Other Side Temperature {C},Maximum Other Side Temperature {C}')" );
 
 		// INTERFACE BLOCK SPECIFICATIONS
 		// na
