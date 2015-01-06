@@ -2442,6 +2442,9 @@ namespace VariableSpeedCoils {
 
 					SetupOutputVariable("Cooling Coil Upper Speed Level []", VarSpeedCoil(DXCoilNum).SpeedNumReport, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
 					SetupOutputVariable("Cooling Coil Neighboring Speed Levels Ratio []", VarSpeedCoil(DXCoilNum).SpeedRatioReport, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
+
+					SetupOutputVariable("Cooling Coil Water Heating Pump Electric Power [W]", VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower, "System", "Average", VarSpeedCoil(DXCoilNum).Name);
+					SetupOutputVariable("Cooling Coil Water Heating Pump Electric Energy [J]", VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption, "System", "Sum", VarSpeedCoil(DXCoilNum).Name, _, "Electric", "HEATING", _, "System");
 				}
 			}
 		}
@@ -2827,6 +2830,7 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil(DXCoilNum).ElecWaterHeatingConsumption = 0.0; // Total electric consumption by compressor and condenser pump [J]
 		VarSpeedCoil(DXCoilNum).TotalHeatingEnergy = 0.0; //total water heating energy
 		VarSpeedCoil(DXCoilNum).TotalHeatingEnergyRate = 0.0;//total WH energy rate
+		VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower = 0.0;//power power
 
 		VSHPWHHeatingCapacity = 0.0; // Used by Heat Pump:Water Heater object as total water heating capacity [W]
 		VSHPWHHeatingCOP = 0.0; // Used by Heat Pump:Water Heater object as water heating COP [W/W]
@@ -4904,6 +4908,8 @@ namespace VariableSpeedCoils {
 
 		ReportingConstant = TimeStepSys * SecInHour;
 		//Update heat pump data structure
+		VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower =
+			VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower*RuntimeFrac;// water heating pump power
 		VarSpeedCoil(DXCoilNum).Power = Winput;
 		VarSpeedCoil(DXCoilNum).QLoadTotal = QLoadTotal;
 		VarSpeedCoil(DXCoilNum).QSensible = QSensible;
@@ -4917,7 +4923,9 @@ namespace VariableSpeedCoils {
 		VarSpeedCoil(DXCoilNum).CrankcaseHeaterConsumption = VarSpeedCoil(DXCoilNum).CrankcaseHeaterPower * ReportingConstant;
 		VarSpeedCoil(DXCoilNum).EvapWaterConsump = 0.0;
 		VarSpeedCoil(DXCoilNum).BasinHeaterConsumption = 0.0;
-		VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption = 0.0;
+		//re-use EvapCondPumpElecConsumption to store WH pump energy consumption
+		VarSpeedCoil(DXCoilNum).EvapCondPumpElecConsumption = 
+			VarSpeedCoil(DXCoilNum).HPWHCondPumpElecNomPower * ReportingConstant;
 		if (RuntimeFrac == 0.0) {
 			VarSpeedCoil(DXCoilNum).COP = 0.0;
 		}
