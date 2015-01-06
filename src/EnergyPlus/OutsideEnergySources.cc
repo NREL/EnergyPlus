@@ -160,7 +160,10 @@ namespace OutsideEnergySources {
 		//CALCULATE
 		if ( InitLoopEquip ) {
 			InitSimVars( EqNum, MassFlowRate, InletTemp, OutletTemp, MyLoad );
-			SizeDistrictEnergy( EqNum );
+			if ( ! EnergySource( EqNum ).isThisSized ) {
+				SizeDistrictEnergy( EqNum );
+				EnergySource( EqNum ).isThisSized = true;
+			}
 			MinCap = 0.0;
 			MaxCap = EnergySource( EqNum ).NomCap;
 			OptCap = EnergySource( EqNum ).NomCap;

@@ -1955,6 +1955,11 @@ namespace LowTempRadiantSystem {
 		bool PrintFlag; // TRUE when sizing information is reported in the eio file
 		int CapSizingMethod( 0 ); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and FractionOfAutosizedHeatingCapacity )
 		Real64 DesCoilLoad; // design autosized or user specified capacity
+		int OpMode;				// System operating mode
+		int HeatNode;			// Hot water inlet node to determine system operating mode
+		int CoolNode;			// Chilled water inlet node to determine system operating mode
+		Real64 WaterVolFlowMaxDes;		// Design water volume flow rate for reproting
+		Real64 WaterVolFlowMaxUser;		// User hard-sized water volume flow rate for reproting
 
 		ErrorsFound = false;
 		IsAutoSize = false;
