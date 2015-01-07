@@ -20,5 +20,12 @@ if (MSVC)
   ADD_LIBRARY( sqlite ${SRC} )
 else()
   ADD_LIBRARY( sqlite SHARED ${SRC} )
+
+  set_target_properties(
+    sqlite
+    PROPERTIES
+    INSTALL_NAME_DIR "@executable_path"
+  )
+  install( TARGETS sqlite DESTINATION ./ ) 
 endif()
 
