@@ -32,7 +32,6 @@ namespace EnergyPlus {
 	void HVACSizingSimulationManager::initialize() {
 
 		if (this->oneTimeInit ) {
-		
 
 			this->oneTimeInit = false;
 		}
@@ -61,13 +60,7 @@ namespace EnergyPlus {
 				anyAdvancedSizingNeeded = true;
 			}
 		}
-
-		if (anyAdvancedSizingNeeded) {
-			//setup central sizing logger framework
-			//how make an instance of SizingLogger?
-			SizingLoggerFramework SizingLogger;
-
-		}
+		
 	}
 
 	void HVACSizingSimulationManager::createNewCoincidentPlantAnalysisObject(
@@ -83,10 +76,10 @@ namespace EnergyPlus {
 			//find plant loop number
 			for (int i = 1; i <= TotNumLoops; i++ ){
 			
-				if (PlantLoopName == PlantLoop(i).Name) { //found it
+				if (PlantLoopName == PlantLoop( i ).Name) { //found it
 					tmpAnalysisObj.PlantLoop = i;
-					tmpAnalysisObj.SupplySideInletNodeNum = PlantLoop(i).LoopSide(SupplySide).NodeNumIn;
-					tmpAnalysisObj.SizingLogger = SizingLogger;
+					tmpAnalysisObj.SupplySideInletNodeNum = PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn;
+					//tmpAnalysisObj.SizingLogger = this -> SizingLogger;
 				}
 			}
 
@@ -95,15 +88,13 @@ namespace EnergyPlus {
 
 	void HVACSizingSimulationManager::setupSizingAnalyses(){
 	
-		for (auto &P : PlantCoincAnalyObjs) {
+		for ( auto &P : this -> PlantCoincAnalyObjs ) {
 			//call setup routine on each coincident plant analysis object 
-			P.SetupPlantLogs();
+			P.LogIndex = SizingLogger.AddSizingLog( P.SupplySideInletNodeNum );
 
 	}
-	
+		
 	}
-
-	
 
 
 	namespace HVACSizingSimulationManagerNamespace { 
@@ -157,10 +148,6 @@ namespace EnergyPlus {
 			static gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
 			static gio::Fmt fmtLD( "*" );
 
-		//	if (stillNeedToSetupOnce) { // should only enter once// but to be safe
-		//		HVACSizingSimulationManager SizeSimManagerObj;
-		//		stillNeedToSetupOnce = false;
-		//	}
 			SizeSimManagerObj.determineSizingAnalysesNeeded();
 
 			SizeSimManagerObj.setupSizingAnalyses();

@@ -11,6 +11,7 @@
 #include <WeatherManager.hh>
 #include <OutputProcessor.hh>
 
+
 namespace EnergyPlus {
 
 
@@ -87,18 +88,13 @@ public:
 	int SupplySideInletNodeNum = 0;
 
 	Real64 previousDesignFlowRate = 0.0;
-	SizingLoggerFramework SizingLogger;
 
 	int LogIndex;
 
 	void initialize();
-
-	void SetupPlantLogs();
-
-
+	
 };
 
 }
 
 #endif
-

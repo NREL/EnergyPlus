@@ -49,7 +49,6 @@ namespace EnergyPlus {
 		void setupSizingAnalyses();
 
 
-
 	};
 
 	namespace HVACSizingSimulationManagerNamespace {

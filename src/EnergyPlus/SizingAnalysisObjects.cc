@@ -3,28 +3,12 @@
 #include <vector>
 
 // EnergyPlus Headers
-//#include <DataPrecisionGlobals.hh>
 #include <SizingAnalysisObjects.hh>
 #include <DataLoopNode.hh>
 #include <WeatherManager.hh>
 #include <OutputProcessor.hh>
 
 namespace EnergyPlus {
-
-
-	void PlantCoinicidentAnalyis::SetupPlantLogs() {
-		//Real64 mdot;
-
-		using DataLoopNode::Node;
-
-		//eventually will use pointers, for now passing node num for hard coded to node mass flow rate
-		LogIndex = SizingLogger.AddSizingLog(SupplySideInletNodeNum);
-
-		//mdot = Node( SupplySideInletNodeNum ).MassFlowRate;
-	
-
-
-	}
 
 	void SizingLog::fillZoneStep(
 		zoneTimestepObject tmpztStepStamp 
@@ -93,7 +77,7 @@ namespace EnergyPlus {
 		using DataGlobals::HourOfDay;
 		using namespace WeatherManager;
 		using namespace OutputProcessor;
-		int const ZoneIndex (1);
+		int const ZoneIndex ( 1 );
 
 		//prepare current timing data once and then pass into fill routines
 		zoneTimestepObject tmpztStepStamp; 
@@ -109,13 +93,12 @@ namespace EnergyPlus {
 		tmpztStepStamp.NumSubSteps = 0;
 
 
-		for (auto &L : this->logObjs) {
+		for ( auto &L : this->logObjs ) {
+
+
 			L.fillZoneStep(tmpztStepStamp);
 		}
 	}
 	
 
 }
-
-
-
