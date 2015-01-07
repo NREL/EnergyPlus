@@ -7410,7 +7410,7 @@ namespace SurfaceGeometry {
 		bool WrongSurfaceType; // True if associated surface is not 2- or 3-pane exterior window
 		int Loop;
 		int SurfNum; // Surface number
-		int ConstrNum; // Construction number
+		int ConstrNum( 0 ); // Construction number
 		int ConstrNumSh; // Shaded Construction number
 		int WSCPtr; // Window shading control pointer
 		int MatGapFlow; // Material number of gas in airflow gap of window's construction
@@ -10462,9 +10462,8 @@ namespace SurfaceGeometry {
 		Real64 LastTheta; // Angle between edge vectors
 		Real64 V1len; // Edge vector length
 		Real64 V2len; // Edge vector length
-		bool SignFlag; // Direction of edge turn : .TRUE. is right, .FALSE. is left
-		bool PrevSignFlag; // Container for the sign of the previous iteration's edge turn
-		bool FirstTimeFlag; // Flag indicating first iteration
+		bool SignFlag; // Direction of edge turn : true is right, false is left
+		bool PrevSignFlag( false ); // Container for the sign of the previous iteration's edge turn
 		static FArray1D< Real64 > X; // containers for x,y,z vertices of the surface
 		static FArray1D< Real64 > Y;
 		static FArray1D< Real64 > Z;
@@ -10560,13 +10559,12 @@ namespace SurfaceGeometry {
 		}
 
 		M = 0;
-		FirstTimeFlag = true;
 		SurfCollinearWarning = false;
 		for ( n = 1; n <= NSides; ++n ) { // perform convexity test in the plane determined above.
-			DotProd = ( A( n + 1 ) - A( n ) ) * ( B( n + 2 ) - B( n + 1 ) ) - ( B( n + 1 ) - B( n ) ) * ( A( n + 2 ) - A( n + 1 ) );
 			V1len = std::sqrt( pow_2( A( n + 1 ) - A( n ) ) + pow_2( B( n + 1 ) - B( n ) ) );
 			V2len = std::sqrt( pow_2( A( n + 2 ) - A( n + 1 ) ) + pow_2( B( n + 2 ) - B( n + 1 ) ) );
 			if ( V1len <= 1.e-8 || V2len <= 1.e-8 ) continue;
+			DotProd = ( A( n + 1 ) - A( n ) ) * ( B( n + 2 ) - B( n + 1 ) ) - ( B( n + 1 ) - B( n ) ) * ( A( n + 2 ) - A( n + 1 ) );
 			cosarg = DotProd / ( V1len * V2len );
 			if ( cosarg < -1.0 ) {
 				cosarg = -1.0;
@@ -10593,9 +10591,9 @@ namespace SurfaceGeometry {
 				}
 			}
 
-			if ( FirstTimeFlag ) {
+			if ( n == 1 ) {
 				PrevSignFlag = SignFlag;
-				FirstTimeFlag = false;
+				LastTheta = Theta;
 				continue;
 			}
 

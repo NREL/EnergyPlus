@@ -76,6 +76,7 @@ derivative works thereof, in binary and source code form.
 ********************************************************************
 */
 
+
 ///////////////////////////////////////////////////////
 /// \file   utilSocket.c
 ///
@@ -115,11 +116,12 @@ derivative works thereof, in binary and source code form.
 #include "utilSocket.h"
 #include "utilXml.h"
 
-// Definitions of utilSocket.h variables
-FILE *f1 = NULL;
+
+FILE *f1 = NULL; 
+#define HEADER_LENGTH 54 // =10 + 4*(10+1);
 int REQUIRED_READ_LENGTH  = 0;
 int REQUIRED_WRITE_LENGTH = 0;
-int SERVER_VERSION = 0;
+int SERVER_VERSION = 0; 
 
 // Global variable to check for FMUExport case
 int FMUEXPORT = 0;
@@ -1197,5 +1199,9 @@ int closeipc(int* sockfd){
 #endif
 }
 
+
+int sendclienterror(const int *sockfd, const int *flaWri) {
+    return sendclientmessage(sockfd, flaWri);
+}
 
 

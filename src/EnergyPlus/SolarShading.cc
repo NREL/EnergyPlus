@@ -716,50 +716,34 @@ namespace SolarShading {
 		BSDFBeamPhiRep.dimension( TotSurfaces, 0.0 );
 		QRadSWwinAbsTot.dimension( TotSurfaces, 0.0 );
 
-		QRadSWwinAbsLayer.allocate( TotSurfaces, MaxSolidWinLayers );
-		QRadSWwinAbsLayer = 0.0;
+		QRadSWwinAbsLayer.dimension( TotSurfaces, MaxSolidWinLayers, 0.0 );
 
-		FenLaySurfTempFront.allocate( TotSurfaces, MaxSolidWinLayers );
-		FenLaySurfTempFront = 0.0;
-		FenLaySurfTempBack.allocate( TotSurfaces, MaxSolidWinLayers );
-		FenLaySurfTempBack = 0.0;
+		FenLaySurfTempFront.dimension( TotSurfaces, MaxSolidWinLayers, 0.0 );
+		FenLaySurfTempBack.dimension( TotSurfaces, MaxSolidWinLayers, 0.0 );
 
 		SWwinAbsTotalReport.dimension( TotSurfaces, 0.0 );
 		InitialDifSolInAbsReport.dimension( TotSurfaces, 0.0 );
 		InitialDifSolInTransReport.dimension( TotSurfaces, 0.0 );
 		SWInAbsTotalReport.dimension( TotSurfaces, 0.0 );
-		WindowRevealStatus.allocate( TotSurfaces, 24, NumOfTimeStepInHour );
-		WindowRevealStatus = 0;
+		WindowRevealStatus.dimension( TotSurfaces, 24, NumOfTimeStepInHour, 0 );
 
 		// Weiler-Atherton
 		MAXHCArrayBounds = 2 * ( MaxVerticesPerSurface + 1 );
 		MAXHCArrayIncrement = MaxVerticesPerSurface + 1;
-		XTEMP.allocate( ( MaxVerticesPerSurface + 1 ) * 2 );
-		XTEMP = 0.0;
-		YTEMP.allocate( ( MaxVerticesPerSurface + 1 ) * 2 );
-		YTEMP = 0.0;
-		XVC.allocate( MaxVerticesPerSurface + 1 );
-		XVC = 0.0;
-		XVS.allocate( MaxVerticesPerSurface + 1 );
-		XVS = 0.0;
-		YVC.allocate( MaxVerticesPerSurface + 1 );
-		YVC = 0.0;
-		YVS.allocate( MaxVerticesPerSurface + 1 );
-		YVS = 0.0;
-		ZVC.allocate( MaxVerticesPerSurface + 1 );
-		ZVC = 0.0;
+		XTEMP.dimension( ( MaxVerticesPerSurface + 1 ) * 2, 0.0 );
+		YTEMP.dimension( ( MaxVerticesPerSurface + 1 ) * 2, 0.0 );
+		XVC.dimension( MaxVerticesPerSurface + 1, 0.0 );
+		XVS.dimension( MaxVerticesPerSurface + 1, 0.0 );
+		YVC.dimension( MaxVerticesPerSurface + 1, 0.0 );
+		YVS.dimension( MaxVerticesPerSurface + 1, 0.0 );
+		ZVC.dimension( MaxVerticesPerSurface + 1, 0.0 );
 
 		//Sutherland-Hodgman
-		ATEMP.allocate( 2 * ( MaxVerticesPerSurface + 1 ) );
-		ATEMP = 0.0;
-		BTEMP.allocate( 2 * ( MaxVerticesPerSurface + 1 ) );
-		BTEMP = 0.0;
-		CTEMP.allocate( 2 * ( MaxVerticesPerSurface + 1 ) );
-		CTEMP = 0.0;
-		XTEMP1.allocate( 2 * ( MaxVerticesPerSurface + 1 ) );
-		XTEMP1 = 0.0;
-		YTEMP1.allocate( 2 * ( MaxVerticesPerSurface + 1 ) );
-		YTEMP1 = 0.0;
+		ATEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
+		BTEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
+		CTEMP.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
+		XTEMP1.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
+		YTEMP1.dimension( 2 * ( MaxVerticesPerSurface + 1 ), 0.0 );
 
 		//energy
 		WinTransSolarEnergy.dimension( TotSurfaces, 0.0 );
@@ -2311,9 +2295,6 @@ namespace SolarShading {
 		// na
 
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-		int N; // Loop Control (vertex number)
-		Real64 SUM; // Sum variable
-		Int64 ITEMP;
 
 		if ( NS > MaxHCS * 2 ) {
 			ShowFatalError( "Solar Shading: HTrans: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
@@ -2324,11 +2305,9 @@ namespace SolarShading {
 		if ( I != 0 ) { // Transform vertices of figure ns.
 
 			// See comment at top of module regarding HCMULT
-			for ( N = 1; N <= NumVertices; ++N ) {
-				ITEMP = nint64( XVS( N ) * HCMULT );
-				HCX( N, NS ) = ITEMP;
-				ITEMP = nint64( YVS( N ) * HCMULT );
-				HCY( N, NS ) = ITEMP;
+			for ( int N = 1; N <= NumVertices; ++N ) {
+				HCX( N, NS ) = nint64( XVS( N ) * HCMULT );
+				HCY( N, NS ) = nint64( YVS( N ) * HCMULT );
 			}
 
 		}
@@ -2339,8 +2318,8 @@ namespace SolarShading {
 		HCY( NumVertices + 1, NS ) = HCY( 1, NS );
 
 		// Determine lines between points.
-		SUM = 0.0;
-		for ( N = 1; N <= NumVertices; ++N ) {
+		Real64 SUM( 0.0 ); // Sum variable
+		for ( int N = 1; N <= NumVertices; ++N ) {
 			HCA( N, NS ) = HCY( N, NS ) - HCY( N + 1, NS );
 			HCB( N, NS ) = HCX( N + 1, NS ) - HCX( N, NS );
 			HCC( N, NS ) = ( HCY( N + 1, NS ) * HCX( N, NS ) ) - ( HCX( N + 1, NS ) * HCY( N, NS ) );
@@ -2377,13 +2356,16 @@ namespace SolarShading {
 		assert( equal_dimensions( HCX, HCB ) ); // For linear indexing
 		assert( equal_dimensions( HCX, HCC ) ); // For linear indexing
 
+		auto const l1( HCX.index( 1, NS ) );
+
 		HCNV( NS ) = NumVertices;
+		auto l( HCX.index( NumVertices + 1, NS ) );
+		HCX[ l ] = HCX[ l1 ]; // [ l1 ] == ( 1, NS )
+		HCY[ l ] = HCY[ l1 ]; // [ l1 ] == ( 1, NS )
 
 		//Tuned Linear indexing
-		auto l( HCX.index( 1, NS ) );
+		l = l1;
 		auto m( l + 1u );
-		HCX( NumVertices + 1, NS ) = HCX[ l ]; // [ l ] == ( 1, NS )
-		HCY( NumVertices + 1, NS ) = HCY[ l ]; // [ l ] == ( 1, NS )
 		Real64 SUM( 0.0 );
 		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
 			HCA[ l ] = HCY[ l ] - HCY[ m ];
@@ -2404,9 +2386,6 @@ namespace SolarShading {
 		// Using/Aliasing
 		using General::TrimSigDigits;
 
-		// Locals
-		Int64 ITEMP;
-
 		if ( NS > MaxHCS * 2 ) {
 			ShowFatalError( "Solar Shading: HTrans1: Too many Figures (>" + TrimSigDigits( MaxHCS ) + ')' );
 		}
@@ -2418,23 +2397,22 @@ namespace SolarShading {
 
 		// only in HTRANS1
 		//Tuned Linear indexing
-		auto l( HCX.index( 1, NS ) );
-		auto const l1( l );
+		auto const l1( HCX.index( 1, NS ) );
+		auto l( l1 );
 		for ( int N = 1; N <= NumVertices; ++N, ++l ) { // [ l ] == ( N, NS )
-			ITEMP = nint64( XVS( N ) * HCMULT );
-			HCX[ l ] = ITEMP;
-			ITEMP = nint64( YVS( N ) * HCMULT );
-			HCY[ l ] = ITEMP;
+			HCX[ l ] = nint64( XVS( N ) * HCMULT );
+			HCY[ l ] = nint64( YVS( N ) * HCMULT );
 		}
 
 		HCNV( NS ) = NumVertices;
-		HCX( NumVertices + 1, NS ) = HCX[ l1 ]; // [ l1 ] == ( 1, NS )
-		HCY( NumVertices + 1, NS ) = HCY[ l1 ]; // [ l1 ] == ( 1, NS )
+		l = HCX.index( NumVertices + 1, NS );
+		HCX[ l ] = HCX[ l1 ]; // [ l1 ] == ( 1, NS )
+		HCY[ l ] = HCY[ l1 ]; // [ l1 ] == ( 1, NS )
 
 		//Tuned Linear indexing
-		Real64 SUM( 0.0 );
 		l = l1;
 		auto m( l + 1u );
+		Real64 SUM( 0.0 );
 		for ( int N = 1; N <= NumVertices; ++N, ++l, ++m ) { // [ l ] == ( N, NS ), [ m ] == ( N + 1, NS )
 			HCA[ l ] = HCY[ l ] - HCY[ m ];
 			HCB[ l ] = HCX[ m ] - HCX[ l ];
@@ -2618,14 +2596,10 @@ namespace SolarShading {
 				YUntrunc = ( HCA( M, NS2 ) * HCC( N, NS1 ) - HCC( M, NS2 ) * HCA( N, NS1 ) ) / W;
 				if ( NV3 > isize( XTEMP ) ) {
 					//        write(outputfiledebug,*) 'nv3=',nv3,' SIZE(xtemp)=',SIZE(xtemp)
-					XTEMP1.allocate( isize( XTEMP ) + 10 );
-					YTEMP1.allocate( isize( YTEMP ) + 10 );
-					XTEMP1 = 0.0;
-					YTEMP1 = 0.0;
+					XTEMP1.dimension( isize( XTEMP ) + 10, 0.0 );
+					YTEMP1.dimension( isize( YTEMP ) + 10, 0.0 );
 					XTEMP1( {1,NV3 - 1} ) = XTEMP( {1,NV3 - 1} );
 					YTEMP1( {1,NV3 - 1} ) = YTEMP( {1,NV3 - 1} );
-					XTEMP.deallocate();
-					YTEMP.deallocate();
 					XTEMP.allocate( isize( XTEMP1 ) );
 					YTEMP.allocate( isize( YTEMP1 ) );
 					XTEMP = XTEMP1;
@@ -2639,9 +2613,11 @@ namespace SolarShading {
 				// Eliminate near-duplicate points.
 
 				if ( KK != 0 ) {
+					auto const x( XTEMP( NV3 ) );
+					auto const y( YTEMP( NV3 ) );
 					for ( K = 1; K <= KK; ++K ) {
-						if ( std::abs( XTEMP( NV3 ) - XTEMP( K ) ) > 2.0 ) continue;
-						if ( std::abs( YTEMP( NV3 ) - YTEMP( K ) ) > 2.0 ) continue;
+						if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
+						if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
 						NV3 = KK;
 						break; // K DO loop
 					}
@@ -2719,12 +2695,16 @@ namespace SolarShading {
 		++NumClipPoly_Calls;
 #endif
 		// Populate the arrays with the original polygon
-		for ( P = 1; P <= NV1; ++P ) {
-			XTEMP( P ) = HCX( P, NS1 );
-			YTEMP( P ) = HCY( P, NS1 );
-			ATEMP( P ) = HCA( P, NS1 );
-			BTEMP( P ) = HCB( P, NS1 );
-			CTEMP( P ) = HCC( P, NS1 );
+		assert( equal_dimensions( HCX, HCY ) ); // For linear indexing
+		assert( equal_dimensions( HCX, HCA ) );
+		assert( equal_dimensions( HCX, HCB ) );
+		assert( equal_dimensions( HCX, HCC ) );
+		for ( FArray2D< Real64 >::size_type j = 0, l = HCX.index( 1, NS1 ), e = NV1; j < e; ++j, ++l ) { //Tuned
+			XTEMP[ j ] = HCX[ l ]; // [ l ] == ( j+1, NS1 )
+			YTEMP[ j ] = HCY[ l ];
+			ATEMP[ j ] = HCA[ l ];
+			BTEMP[ j ] = HCB[ l ];
+			CTEMP[ j ] = HCC[ l ];
 		}
 
 		NVOUT = NV1; // First point-loop is the length of the subject polygon.
@@ -2732,15 +2712,13 @@ namespace SolarShading {
 		NVTEMP = 0;
 		KK = 0;
 
-		for ( E = 1; E <= NV2; ++E ) { // Loop over edges of the clipping polygon
+		auto l( HCA.index( 1, NS2 ) );
+		for ( E = 1; E <= NV2; ++E, ++l ) { // Loop over edges of the clipping polygon
 			for ( P = 1; P <= NVOUT; ++P ) {
 				XTEMP1( P ) = XTEMP( P );
 				YTEMP1( P ) = YTEMP( P );
 			}
 			S = NVOUT;
-			assert( equal_dimensions( HCA, HCB ) ); // For linear indexing
-			assert( equal_dimensions( HCA, HCC ) ); // For linear indexing
-			auto const l( HCA.index( E, NS2 ) );
 			Int64 const HCA_E( HCA[ l ] );
 			Int64 const HCB_E( HCB[ l ] );
 			Int64 const HCC_E( HCC[ l ] );
@@ -2770,9 +2748,11 @@ namespace SolarShading {
 
 						if ( E == NV2 ) { // Remove near-duplicates on last edge
 							if ( KK != 0 ) {
+								auto const x( XTEMP( NVTEMP ) );
+								auto const y( YTEMP( NVTEMP ) );
 								for ( K = 1; K <= KK; ++K ) {
-									if ( std::abs( XTEMP( NVTEMP ) - XTEMP( K ) ) > 2.0 ) continue;
-									if ( std::abs( YTEMP( NVTEMP ) - YTEMP( K ) ) > 2.0 ) continue;
+									if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
+									if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
 									NVTEMP = KK;
 									break; // K DO loop
 								}
@@ -2800,9 +2780,11 @@ namespace SolarShading {
 
 					if ( E == NV2 ) { // Remove near-duplicates on last edge
 						if ( KK != 0 ) {
+							auto const x( XTEMP( NVTEMP ) );
+							auto const y( YTEMP( NVTEMP ) );
 							for ( K = 1; K <= KK; ++K ) {
-								if ( std::abs( XTEMP( NVTEMP ) - XTEMP( K ) ) > 2.0 ) continue;
-								if ( std::abs( YTEMP( NVTEMP ) - YTEMP( K ) ) > 2.0 ) continue;
+								if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
+								if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
 								NVTEMP = KK;
 								break; // K DO loop
 							}
@@ -2828,9 +2810,11 @@ namespace SolarShading {
 
 						if ( E == NV2 ) { // Remove near-duplicates on last edge
 							if ( KK != 0 ) {
+								auto const x( XTEMP( NVTEMP ) );
+								auto const y( YTEMP( NVTEMP ) );
 								for ( K = 1; K <= KK; ++K ) {
-									if ( std::abs( XTEMP( NVTEMP ) - XTEMP( K ) ) > 2.0 ) continue;
-									if ( std::abs( YTEMP( NVTEMP ) - YTEMP( K ) ) > 2.0 ) continue;
+									if ( std::abs( x - XTEMP( K ) ) > 2.0 ) continue;
+									if ( std::abs( y - YTEMP( K ) ) > 2.0 ) continue;
 									NVTEMP = KK;
 									break; // K DO loop
 								}
@@ -3672,31 +3656,19 @@ namespace SolarShading {
 
 		CastingSurface.dimension( TotSurfaces, false );
 
-		HCA.allocate( MaxHCV + 1, MaxHCS * 2 );
-		HCA = 0;
-		HCB.allocate( MaxHCV + 1, MaxHCS * 2 );
-		HCB = 0;
-		HCC.allocate( MaxHCV + 1, MaxHCS * 2 );
-		HCC = 0;
-		HCX.allocate( MaxHCV + 1, MaxHCS * 2 );
-		HCX = 0;
-		HCY.allocate( MaxHCV + 1, MaxHCS * 2 );
-		HCY = 0;
-		HCAREA.allocate( MaxHCS * 2 );
-		HCAREA = 0.0;
-		HCNS.allocate( MaxHCS * 2 );
-		HCNS = 0;
-		HCNV.allocate( MaxHCS * 2 );
-		HCNV = 0;
-		HCT.allocate( MaxHCS * 2 );
-		HCT = 0.0;
+		HCA.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
+		HCB.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
+		HCC.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
+		HCX.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
+		HCY.dimension( MaxHCV + 1, MaxHCS * 2, 0 );
+		HCAREA.dimension( MaxHCS * 2, 0.0 );
+		HCNS.dimension( MaxHCS * 2, 0 );
+		HCNV.dimension( MaxHCS * 2, 0 );
+		HCT.dimension( MaxHCS * 2, 0.0 );
 
-		GSS.allocate( MaxGSS );
-		BKS.allocate( MaxGSS );
-		SBS.allocate( MaxGSS );
-		GSS = 0;
-		BKS = 0;
-		SBS = 0;
+		GSS.dimension( MaxGSS, 0 );
+		BKS.dimension( MaxGSS, 0 );
+		SBS.dimension( MaxGSS, 0 );
 
 		HTS = 0;
 
@@ -4332,12 +4304,9 @@ namespace SolarShading {
 		int ExitLoopStatus;
 
 		if ( OneTimeFlag ) {
-			XVT.allocate( MaxVerticesPerSurface + 1 );
-			YVT.allocate( MaxVerticesPerSurface + 1 );
-			ZVT.allocate( MaxVerticesPerSurface + 1 );
-			XVT = 0.0;
-			YVT = 0.0;
-			ZVT = 0.0;
+			XVT.dimension( MaxVerticesPerSurface + 1, 0.0 );
+			YVT.dimension( MaxVerticesPerSurface + 1, 0.0 );
+			ZVT.dimension( MaxVerticesPerSurface + 1, 0.0 );
 			OneTimeFlag = false;
 		}
 
@@ -4351,15 +4320,18 @@ namespace SolarShading {
 
 		} else {
 
+			auto const & GenSurf( ShadowComb( CurSurf ).GenSurf );
 			ShadowingSurfaces: for ( I = 1; I <= NGSS; ++I ) { // Loop through all shadowing surfaces...
 
-				GSSNR = ShadowComb( CurSurf ).GenSurf( I );
+				GSSNR = GenSurf( I );
 				CurrentSurfaceBeingShadowed = GSSNR;
 				CurrentShadowingSurface = I;
 
 				ExitLoopStatus = -1;
 
 				if ( CTHETA( GSSNR ) > SunIsUpValue ) continue; //.001) CYCLE ! NO SHADOW IF GSS IN SUNLIGHT.
+
+				auto const & surface( Surface( GSSNR ) );
 
 				//     This used to check to see if the shadowing surface was not opaque (within the scheduled dates of
 				//            transmittance value.  Perhaps it ignored it if it were outside the range.  (if so, was an error)
@@ -4368,25 +4340,25 @@ namespace SolarShading {
 				//---former stmt      IF ((.NOT.Surface(GSSNR)%HeatTransSurf) .AND. &
 				//---former stmt            GetCurrentScheduleValue(Surface(GSSNR)%SchedShadowSurfIndex,IHOUR) == 0.0) CYCLE
 
-				if ( ! Surface( GSSNR ).HeatTransSurf ) {
-					if ( Surface( GSSNR ).IsTransparent ) continue;
-					if ( Surface( GSSNR ).SchedShadowSurfIndex > 0 ) {
-						if ( LookUpScheduleValue( Surface( GSSNR ).SchedShadowSurfIndex, iHour ) == 1.0 ) continue;
+				if ( ! surface.HeatTransSurf ) {
+					if ( surface.IsTransparent ) continue;
+					if ( surface.SchedShadowSurfIndex > 0 ) {
+						if ( LookUpScheduleValue( surface.SchedShadowSurfIndex, iHour ) == 1.0 ) continue;
 					}
 				}
 
 				//      No shadow if shading surface is transparent
 				if ( ! CalcSkyDifShading ) {
-					if ( ! Surface( GSSNR ).HeatTransSurf ) {
-						if ( Surface( GSSNR ).IsTransparent ) continue;
-						if ( Surface( GSSNR ).SchedShadowSurfIndex > 0 ) {
-							if ( LookUpScheduleValue( Surface( GSSNR ).SchedShadowSurfIndex, iHour, TS ) == 1.0 ) continue;
+					if ( ! surface.HeatTransSurf ) {
+						if ( surface.IsTransparent ) continue;
+						if ( surface.SchedShadowSurfIndex > 0 ) {
+							if ( LookUpScheduleValue( surface.SchedShadowSurfIndex, iHour, TS ) == 1.0 ) continue;
 						}
 					}
 				} else {
-					if ( ! Surface( GSSNR ).HeatTransSurf ) {
-						if ( Surface( GSSNR ).SchedShadowSurfIndex > 0 ) {
-							if ( Surface( GSSNR ).IsTransparent ) continue;
+					if ( ! surface.HeatTransSurf ) {
+						if ( surface.SchedShadowSurfIndex > 0 ) {
+							if ( surface.IsTransparent ) continue;
 						}
 					}
 				}
@@ -4396,15 +4368,18 @@ namespace SolarShading {
 
 				// Transform shadow casting surface from cartesian to homogeneous coordinates according to surface type.
 
-				if ( ( Surface( GSSNR ).BaseSurf != 0 ) && ( ! Surface( GSSNR ).HeatTransSurf ) ) {
+				if ( ( surface.BaseSurf != 0 ) && ( ! surface.HeatTransSurf ) ) {
 
 					// For shadowing subsurface coordinates of shadow casting surface are relative to the receiving surface
 					// project shadow to the receiving surface
 
-					NVS = Surface( GSSNR ).Sides;
+					NVS = surface.Sides;
+					auto const & XV( ShadeV( GSSNR ).XV );
+					auto const & YV( ShadeV( GSSNR ).YV );
+					auto const & ZV( ShadeV( GSSNR ).ZV );
 					for ( N = 1; N <= NVS; ++N ) {
-						XVS( N ) = ShadeV( GSSNR ).XV( N ) - XShadowProjection * ShadeV( GSSNR ).ZV( N );
-						YVS( N ) = ShadeV( GSSNR ).YV( N ) - YShadowProjection * ShadeV( GSSNR ).ZV( N );
+						XVS( N ) = XV( N ) - XShadowProjection * ZV( N );
+						YVS( N ) = YV( N ) - YShadowProjection * ZV( N );
 					}
 
 				} else {
@@ -4433,11 +4408,11 @@ namespace SolarShading {
 
 				assert( equal_dimensions( HCX, HCY ) ); // For linear indexing
 				assert( HCX.index( 1, 1 ) == 0u ); // For linear indexing
-				FArray2D< Int64 >::size_type l;
+				FArray2D< Int64 >::size_type l, j( HCX.index( 1, NS3 ) );
 				NVR = HCNV( 1 );
-				for ( N = 1; N <= NumVertInShadowOrClippedSurface; ++N ) {
-					auto & HCX_N( HCX( N, NS3 ) );
-					auto & HCY_N( HCY( N, NS3 ) );
+				for ( N = 1; N <= NumVertInShadowOrClippedSurface; ++N, ++j ) {
+					auto HCX_N( HCX[ j ] ); // [ j ] == ( N, NS3 )
+					auto HCY_N( HCY[ j ] );
 					l = 0u;
 					for ( M = 1; M <= NVR; ++M, ++l ) { // [ l ] == ( M, 1 )
 						if ( std::abs( HCX[ l ] - HCX_N ) > 6 ) continue;
@@ -4445,16 +4420,18 @@ namespace SolarShading {
 						HCX_N = HCX[ l ]; //? This is fishy: Ends up with last values that get past the abs checks
 						HCY_N = HCY[ l ];
 					}
+					HCX[ j ] = HCX_N; // [ j ] == ( N, NS3 )
+					HCY[ j ] = HCY_N;
 				}
 				HTRANS0( NS3, NumVertInShadowOrClippedSurface );
 				if ( ! CalcSkyDifShading ) {
 					if ( iHour != 0 ) {
-						SchValue = LookUpScheduleValue( Surface( GSSNR ).SchedShadowSurfIndex, iHour, TS );
+						SchValue = LookUpScheduleValue( surface.SchedShadowSurfIndex, iHour, TS );
 					} else {
-						SchValue = Surface( GSSNR ).SchedMinValue;
+						SchValue = surface.SchedMinValue;
 					}
 				} else {
-					SchValue = Surface( GSSNR ).SchedMinValue;
+					SchValue = surface.SchedMinValue;
 				}
 
 				HCT( NS3 ) = SchValue;
@@ -10123,9 +10100,9 @@ namespace SolarShading {
 
 	void
 	CalcInteriorWinTransDifSolInitialDistribution(
-		int & ZoneNum, // Zone index number
-		int & IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
-		Real64 & IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
+		int const ZoneNum, // Zone index number
+		int const IntWinSurfNum, // Interior Window Surface number in Zone ZoneNum
+		Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
 	)
 	{
 
@@ -10184,7 +10161,6 @@ namespace SolarShading {
 		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 		int AdjZoneNum; // Index for adjacent zones
 		int AdjSurfNum; // Index for adjacent surfaces
-		int HeatTransSurfNum; // Heat Transfer Surface number
 		int ConstrNum; // Construction number
 		//  INTEGER :: AdjConstrNum       ! Construction number of other side surface
 		int ConstrNumSh; // Shaded construction number
@@ -10209,28 +10185,25 @@ namespace SolarShading {
 		Real64 ViewFactor; // temp var for view factor
 		Real64 ViewFactorTotal; // debug var for view factor total
 		Real64 WinDifSolarTrans; // debug var for WinDifSolar() [W]
-		Real64 WinDifSolarDistTotl; // debug var for window total distributed diffuse solar [W]
-		Real64 WinDifSolarDistAbsorbedTotl; // debug var for individual exterior window total distributed
+//		Real64 WinDifSolarDistTotl; // debug var for window total distributed diffuse solar [W]
+//		Real64 WinDifSolarDistAbsorbedTotl( 0.0 ); // debug var for individual exterior window total distributed
 		//           diffuse solar absorbed [W]
-		Real64 WinDifSolarDistReflectedTotl; // debug var for individual exterior window total distributed
+//		Real64 WinDifSolarDistReflectedTotl( 0.0 ); // debug var for individual exterior window total distributed
 		//           diffuse solar reflected [W]
-		Real64 WinDifSolarDistTransmittedTotl; // debug var for individual exterior window total distributed
+//		Real64 WinDifSolarDistTransmittedTotl( 0.0 ); // debug var for individual exterior window total distributed
 		//           diffuse solar transmitted [W]
 		Real64 WinDifSolLayAbsW; // temp var for diffuse solar absorbed by individual glass layer [W]
-		Real64 ZoneDifSolarTrans; // debug var for WinDifSolar() [W]
+//		Real64 ZoneDifSolarTrans( 0.0 ); // debug var for WinDifSolar() [W]
 		//  REAL(r64)    :: ZoneDifSolarDistTotl    ! debug var for zone total distributed diffuse solar [W]
-		Real64 ZoneDifSolarDistAbsorbedTotl; // debug var for zone total distributed diffuse solar absorbed [W]
-		Real64 ZoneDifSolarDistReflectedTotl; // debug var for zone total distributed diffuse solar reflected [W]
-		Real64 ZoneDifSolarDistTransmittedTotl; // debug var for zone total distributed diffuse solar transmitted [W]
+//		Real64 ZoneDifSolarDistAbsorbedTotl( 0.0 ); // debug var for zone total distributed diffuse solar absorbed [W]
+//		Real64 ZoneDifSolarDistReflectedTotl( 0.0 ); // debug var for zone total distributed diffuse solar reflected [W]
+//		Real64 ZoneDifSolarDistTransmittedTotl( 0.0 ); // debug var for zone total distributed diffuse solar transmitted [W]
 
 		Real64 DifSolarAbsW; // temp var for diffuse solar absorbed by surface [W]
 		Real64 DifSolarAbs; // temp var for diffuse solar absorbed by surface [W/m2]
 		Real64 DifSolarReflW; // temp var for diffuse solar reflected by surface [W]
 		Real64 DifSolarTransW; // temp var for diffuse solar transmitted through interior window surface [W]
 		Real64 ShBlDifSolarAbsW; // temp var for diffuse solar absorbed by shade/blind [W]
-
-		int FirstZoneSurf; // conversion index for ViewFactor
-		int LastZoneSurf; // debug
 
 		//-------------------------------------------------------------------------------------------------
 		// DISTRIBUTE TRANSMITTED DIFFUSE SOLAR THROUGH INTERIOR WINDOW TO INTERIOR HEAT TRANSFER SURFACES
@@ -10240,22 +10213,13 @@ namespace SolarShading {
 		ViewFactorTotal = 0.0;
 		WinDifSolarTrans = IntWinDifSolarTransW;
 
-		// Init Interior Window accumulators for debugging
-		WinDifSolarDistAbsorbedTotl = 0.0;
-		WinDifSolarDistReflectedTotl = 0.0;
-		WinDifSolarDistTransmittedTotl = 0.0;
-
 		// Init first and last surfnums for this zone
-		FirstZoneSurf = Zone( ZoneNum ).SurfaceFirst;
-		LastZoneSurf = Zone( ZoneNum ).SurfaceLast;
-
-		ZoneDifSolarTrans = 0.0;
-		ZoneDifSolarDistAbsorbedTotl = 0.0;
-		ZoneDifSolarDistReflectedTotl = 0.0;
-		ZoneDifSolarDistTransmittedTotl = 0.0;
+		int const FirstZoneSurf( Zone( ZoneNum ).SurfaceFirst );
+		int const LastZoneSurf( Zone( ZoneNum ).SurfaceLast );
 
 		// Loop over all heat transfer surfaces in the current zone that might receive diffuse solar
-		for ( HeatTransSurfNum = Zone( ZoneNum ).SurfaceFirst; HeatTransSurfNum <= Zone( ZoneNum ).SurfaceLast; ++HeatTransSurfNum ) {
+		Real64 InitialZoneDifSolReflW_zone( 0.0 );
+		for ( int HeatTransSurfNum = FirstZoneSurf; HeatTransSurfNum <= LastZoneSurf; ++HeatTransSurfNum ) {
 			// Skip surfaces that are not heat transfer surfaces
 			if ( ! Surface( HeatTransSurfNum ).HeatTransSurf ) continue;
 			// Skip tubular daylighting device domes
@@ -10268,6 +10232,7 @@ namespace SolarShading {
 
 			// Skip receiving surfaces with 0.0 view factor
 			if ( ViewFactor <= 0.0 ) continue;
+			Real64 const SolarTrans_ViewFactor( IntWinDifSolarTransW * ViewFactor );
 
 			// Calculate diffuse solar from current interior window absorbed and reflected by current heat transfer surface
 			// And calculate transmitted diffuse solar to adjacent zones through interior windows
@@ -10297,7 +10262,7 @@ namespace SolarShading {
 				// Absorbed diffuse solar [W] = current window transmitted diffuse solar [W]
 				//    * view factor from current (sending) window IntWinSurfNum to current (receiving) surface HeatTransSurfNum
 				//    * current surface inside solar absorptance
-				DifSolarAbsW = IntWinDifSolarTransW * ViewFactor * InsideDifAbsorptance; // [W]
+				DifSolarAbsW = SolarTrans_ViewFactor * InsideDifAbsorptance; // [W]
 
 				// Absorbed diffuse solar [W/m2] = Absorbed diffuse solar [W]
 				//                                 / current surface net area
@@ -10309,17 +10274,17 @@ namespace SolarShading {
 				// Reflected diffuse solar [W] = current window transmitted diffuse solar
 				//    * view factor from current (sending) window IntWinSurfNum to current (receiving) surface HeatTransSurfNum
 				//    * current window inside solar reflectance
-				DifSolarReflW = IntWinDifSolarTransW * ViewFactor * InsideDifReflectance;
+				DifSolarReflW = SolarTrans_ViewFactor * InsideDifReflectance;
 
 				// Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-				InitialZoneDifSolReflW( ZoneNum ) += DifSolarReflW; // [W]
+				InitialZoneDifSolReflW_zone += DifSolarReflW; // [W]
 
 				// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
 				// For opaque surfaces all incident diffuse is either absorbed or reflected
-				WinDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug [W]
-				WinDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
-				ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug [W]
-				ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
+//				WinDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug [W]
+//				WinDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
+//				ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug [W]
+//				ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug [W]
 
 			} else { // Exterior or Interior Window
 
@@ -10341,18 +10306,17 @@ namespace SolarShading {
 					for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 						// Calc diffuse solar absorbed from the inside by each window glass layer [W]
 						AbsInt = Construct( ConstrNum ).AbsDiffBack( IGlass );
-						WinDifSolLayAbsW = IntWinDifSolarTransW * ViewFactor * Construct( ConstrNum ).AbsDiffBack( IGlass );
+						WinDifSolLayAbsW = SolarTrans_ViewFactor * Construct( ConstrNum ).AbsDiffBack( IGlass );
 
 						// Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
 						DifSolarAbsW += WinDifSolLayAbsW;
 
-						// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-						WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
-						ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
-
 						// Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
 						InitialDifSolwinAbs( HeatTransSurfNum, IGlass ) += ( WinDifSolLayAbsW / Surface( HeatTransSurfNum ).Area );
 					}
+					// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+//					WinDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
+//					ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
 
 					// Calc diffuse solar reflected back to zone
 					// I don't really care if this is a window or opaque surface since I am just
@@ -10360,23 +10324,23 @@ namespace SolarShading {
 					// Reflected diffuse solar [W] = current window transmitted diffuse solar
 					//    * view factor from current (sending) window IntWinSurfNum to current (receiving) surface HeatTransSurfNum
 					//    * current window inside solar reflectance
-					DifSolarReflW = IntWinDifSolarTransW * ViewFactor * Construct( ConstrNum ).ReflectSolDiffBack;
+					DifSolarReflW = SolarTrans_ViewFactor * Construct( ConstrNum ).ReflectSolDiffBack;
 
 					// Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-					InitialZoneDifSolReflW( ZoneNum ) += DifSolarReflW; // [W]
+					InitialZoneDifSolReflW_zone += DifSolarReflW; // [W]
 
 					// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
-					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
 
 					// Calc transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
 					// This is not very effective since it assigns whatever distributed diffuse solar has not been
 					// absorbed or reflected to transmitted.
-					DifSolarTransW = IntWinDifSolarTransW * ViewFactor - DifSolarAbsW - DifSolarReflW;
+					DifSolarTransW = SolarTrans_ViewFactor - DifSolarAbsW - DifSolarReflW;
 
 					// Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
-					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
-					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
 					// Accumulate transmitted diffuse solar for reporting
 					InitialDifSolInTrans( HeatTransSurfNum ) += ( DifSolarTransW / Surface( HeatTransSurfNum ).Area );
@@ -10416,25 +10380,24 @@ namespace SolarShading {
 					for ( IGlass = 1; IGlass <= Construct( ConstrNumSh ).TotGlassLayers; ++IGlass ) {
 						if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
 							// Calc diffuse solar absorbed in each window glass layer and shade
-							WinDifSolLayAbsW = IntWinDifSolarTransW * ViewFactor * Construct( ConstrNumSh ).AbsDiffBack( IGlass );
+							WinDifSolLayAbsW = SolarTrans_ViewFactor * Construct( ConstrNumSh ).AbsDiffBack( IGlass );
 						}
 
 						if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
 							BlAbsDiffBk = InterpSlatAng( SurfaceWindow( HeatTransSurfNum ).SlatAngThisTS, SurfaceWindow( HeatTransSurfNum ).MovableSlats, Construct( ConstrNumSh ).BlAbsDiffBack( IGlass, _ ) );
 							// Calc diffuse solar absorbed in each window glass layer and shade
-							WinDifSolLayAbsW = IntWinDifSolarTransW * ViewFactor * BlAbsDiffBk;
+							WinDifSolLayAbsW = SolarTrans_ViewFactor * BlAbsDiffBk;
 						}
 
 						// Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
 						DifSolarAbsW += WinDifSolLayAbsW;
 
-						// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-						WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
-						ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
-
 						// Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
 						InitialDifSolwinAbs( HeatTransSurfNum, IGlass ) += ( WinDifSolLayAbsW / Surface( HeatTransSurfNum ).Area );
 					}
+					// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+//					WinDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
+//					ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
 
 					// Next calc diffuse solar reflected back to zone from window with shade or blind on
 					// Diffuse back solar reflectance, bare glass or shade on
@@ -10443,25 +10406,25 @@ namespace SolarShading {
 						// Diffuse back solar reflectance, blind present, vs. slat angle
 						InsideDifReflectance = InterpSlatAng( SurfaceWindow( HeatTransSurfNum ).SlatAngThisTS, SurfaceWindow( HeatTransSurfNum ).MovableSlats, Construct( ConstrNum ).BlReflectSolDiffBack );
 					}
-					DifSolarReflW = IntWinDifSolarTransW * ViewFactor * InsideDifReflectance;
+					DifSolarReflW = SolarTrans_ViewFactor * InsideDifReflectance;
 
 					// Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-					InitialZoneDifSolReflW( ZoneNum ) += DifSolarReflW; // [W]
+					InitialZoneDifSolReflW_zone += DifSolarReflW; // [W]
 
 					// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
-					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
 
 					// Now calc diffuse solar absorbed by shade/blind itself
 					BlNum = SurfaceWindow( HeatTransSurfNum ).BlindNumber;
 					if ( ShadeFlag == IntShadeOn || ShadeFlag == ExtShadeOn || ShadeFlag == BGShadeOn || ShadeFlag == ExtScreenOn ) {
 						// Calc diffuse solar absorbed by shade or screen [W]
-						ShBlDifSolarAbsW = IntWinDifSolarTransW * ViewFactor * Construct( ConstrNumSh ).AbsDiffBackShade;
+						ShBlDifSolarAbsW = SolarTrans_ViewFactor * Construct( ConstrNumSh ).AbsDiffBackShade;
 					}
 					if ( ShadeFlag == IntBlindOn || ShadeFlag == ExtBlindOn || ShadeFlag == BGBlindOn ) {
 						// Calc diffuse solar absorbed by blind [W]
 						AbsDiffBkBl = InterpSlatAng( SurfaceWindow( HeatTransSurfNum ).SlatAngThisTS, SurfaceWindow( HeatTransSurfNum ).MovableSlats, Construct( ConstrNumSh ).AbsDiffBackBlind );
-						ShBlDifSolarAbsW = IntWinDifSolarTransW * ViewFactor * AbsDiffBkBl;
+						ShBlDifSolarAbsW = SolarTrans_ViewFactor * AbsDiffBkBl;
 					}
 					// Correct for divider shadowing
 					if ( ShadeFlag == ExtShadeOn || ShadeFlag == ExtBlindOn || ShadeFlag == ExtScreenOn ) ShBlDifSolarAbsW *= SurfaceWindow( HeatTransSurfNum ).GlazedFrac;
@@ -10473,15 +10436,15 @@ namespace SolarShading {
 					DifSolarAbsW += ShBlDifSolarAbsW;
 
 					// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-					WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
-					ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
+//					WinDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
+//					ZoneDifSolarDistAbsorbedTotl += ShBlDifSolarAbsW; // debug
 
 					// Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
 					// This is not very effective since it assigns whatever distributed diffuse solar has not been
 					// absorbed or reflected to transmitted.
-					DifSolarTransW = IntWinDifSolarTransW * ViewFactor - DifSolarAbsW - DifSolarReflW;
-					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
-					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+					DifSolarTransW = SolarTrans_ViewFactor - DifSolarAbsW - DifSolarReflW;
+//					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
 					// Accumulate transmitted diffuse solar for reporting
 					InitialDifSolInTrans( HeatTransSurfNum ) += ( DifSolarTransW / Surface( HeatTransSurfNum ).Area );
@@ -10492,36 +10455,35 @@ namespace SolarShading {
 
 					for ( IGlass = 1; IGlass <= TotGlassLayers; ++IGlass ) {
 						// Calc diffuse solar absorbed in each window glass layer
-						WinDifSolLayAbsW = IntWinDifSolarTransW * ViewFactor * InterpSw( SurfaceWindow( HeatTransSurfNum ).SwitchingFactor, Construct( ConstrNum ).AbsDiffBack( IGlass ), Construct( ConstrNumSh ).AbsDiffBack( IGlass ) );
+						WinDifSolLayAbsW = SolarTrans_ViewFactor * InterpSw( SurfaceWindow( HeatTransSurfNum ).SwitchingFactor, Construct( ConstrNum ).AbsDiffBack( IGlass ), Construct( ConstrNumSh ).AbsDiffBack( IGlass ) );
 
 						// Accumulate distributed diffuse solar absorbed [W] by overall window for transmittance calc below
 						DifSolarAbsW += WinDifSolLayAbsW;
-
-						// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-						WinDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
-						ZoneDifSolarDistAbsorbedTotl += WinDifSolLayAbsW; // debug
 
 						// Accumulate diffuse solar absorbed from the inside by each window glass layer [W/m2] for heat balance calcs
 						InitialDifSolwinAbs( HeatTransSurfNum, IGlass ) += ( WinDifSolLayAbsW / Surface( HeatTransSurfNum ).Area );
 
 					}
+					// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
+//					WinDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
+//					ZoneDifSolarDistAbsorbedTotl += DifSolarAbsW; // debug
 
 					// Calc diffuse solar reflected back to zone
-					DifSolarReflW = IntWinDifSolarTransW * ViewFactor * InterpSw( SurfaceWindow( HeatTransSurfNum ).SwitchingFactor, Construct( ConstrNum ).ReflectSolDiffBack, Construct( ConstrNumSh ).ReflectSolDiffBack );
+					DifSolarReflW = SolarTrans_ViewFactor * InterpSw( SurfaceWindow( HeatTransSurfNum ).SwitchingFactor, Construct( ConstrNum ).ReflectSolDiffBack, Construct( ConstrNumSh ).ReflectSolDiffBack );
 
 					// Accumulate total reflected distributed diffuse solar for each zone for subsequent interreflection calcs
-					InitialZoneDifSolReflW( ZoneNum ) += DifSolarReflW; // [W]
+					InitialZoneDifSolReflW_zone += DifSolarReflW; // [W]
 
 					// Accumulate Window and Zone total distributed diffuse solar to check for conservation of energy
-					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
-					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//					WinDifSolarDistReflectedTotl += DifSolarReflW; // debug
+//					ZoneDifSolarDistReflectedTotl += DifSolarReflW; // debug
 
 					// Accumulate transmitted Window and Zone total distributed diffuse solar to check for conservation of energy
 					// This is not very effective since it assigns whatever distributed diffuse solar has not been
 					// absorbed or reflected to transmitted.
-					DifSolarTransW = IntWinDifSolarTransW * ViewFactor - DifSolarAbsW - DifSolarReflW;
-					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
-					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+					DifSolarTransW = SolarTrans_ViewFactor - DifSolarAbsW - DifSolarReflW;
+//					WinDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
+//					ZoneDifSolarDistTransmittedTotl += DifSolarTransW; // debug [W]
 
 					// Accumulate transmitted diffuse solar for reporting
 					InitialDifSolInTrans( HeatTransSurfNum ) += ( DifSolarTransW / Surface( HeatTransSurfNum ).Area );
@@ -10560,11 +10522,12 @@ namespace SolarShading {
 			} // opaque or window heat transfer surface
 
 		} // HeatTransSurfNum = Zone(ZoneNum)%SurfaceFirst, Zone(ZoneNum)%SurfaceLast
+		InitialZoneDifSolReflW( ZoneNum ) += InitialZoneDifSolReflW_zone;
 
 		// Check debug var for view factors here
 		// ViewFactorTotal
 		// Check debug vars for individual transmitting surfaces here
-		WinDifSolarDistTotl = WinDifSolarDistAbsorbedTotl + WinDifSolarDistReflectedTotl + WinDifSolarDistTransmittedTotl;
+//		WinDifSolarDistTotl = WinDifSolarDistAbsorbedTotl + WinDifSolarDistReflectedTotl + WinDifSolarDistTransmittedTotl; //Debug
 		// WinDifSolarTrans
 
 	}

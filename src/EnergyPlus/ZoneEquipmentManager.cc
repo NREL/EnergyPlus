@@ -56,6 +56,7 @@
 #include <ScheduleManager.hh>
 #include <SplitterComponent.hh>
 #include <SteamBaseboardRadiator.hh>
+#include <SwimmingPool.hh>
 #include <SystemAvailabilityManager.hh>
 #include <ThermalChimney.hh>
 #include <UnitHeater.hh>
@@ -2601,6 +2602,7 @@ namespace ZoneEquipmentManager {
 		using HVACUnitarySystem::SimUnitarySystem;
 		using DataHeatBalance::Mixing;
 		using DataHeatBalance::ZoneAirMassFlow;
+		using SwimmingPool::SimSwimmingPool;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2675,6 +2677,10 @@ namespace ZoneEquipmentManager {
 		}
 
 		FirstCall = false;
+		
+		// Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
+		// These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
+		SimSwimmingPool( FirstHVACIteration );
 
 		// Loop over all the primary air loop; simulate their components (equipment)
 		// and controllers
@@ -5003,7 +5009,7 @@ namespace ZoneEquipmentManager {
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

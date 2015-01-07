@@ -166,7 +166,7 @@ public: // Assignment: Array
 				size_type l( 0 );
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							c[ l ] = a( i1, i2, i3 );
 						}
 					}
@@ -174,7 +174,7 @@ public: // Assignment: Array
 				l = 0;
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 							operator ()( i1, i2, i3 ) = c[ l ];
 						}
 					}
@@ -182,7 +182,7 @@ public: // Assignment: Array
 			} else { // Not overlap-safe
 				for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 					for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-						for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+						for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 							operator ()( i1, i2, i3 ) = a( i1, i2, i3 );
 						}
 					}
@@ -201,7 +201,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					operator ()( i1, i2, i3 ) = a( i1, i2, i3 );
 				}
 			}
@@ -219,7 +219,7 @@ public: // Assignment: Array
 		if ( a.dimensions_initialized() ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator ()( i1, i2, i3 ) = a( i1, i2, i3 );
 					}
 				}
@@ -248,7 +248,7 @@ public: // Assignment: Array
 			l = 0;
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						operator ()( i1, i2, i3 ) = c[ l ];
 					}
 				}
@@ -256,7 +256,7 @@ public: // Assignment: Array
 		} else { // Not overlap-safe
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3 ) = a( j1, j2, j3 );
 					}
 				}
@@ -274,7 +274,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 			for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+				for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 					operator ()( i1, i2, i3 ) = a( j1, j2, j3 );
 				}
 			}
@@ -292,7 +292,7 @@ public: // Assignment: Array
 		auto r( l.begin() );
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++r ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1, ++r ) {
 					operator ()( i1, i2, i3 ) = *r;
 				}
 			}
@@ -310,7 +310,7 @@ public: // Assignment: Array
 		if ( a.dimensions_initialized() ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator () ( i1, i2, i3 ) += a( i1, i2, i3 );
 					}
 				}
@@ -329,7 +329,7 @@ public: // Assignment: Array
 		if ( a.dimensions_initialized() ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator () ( i1, i2, i3 ) -= a( i1, i2, i3 );
 					}
 				}
@@ -348,7 +348,7 @@ public: // Assignment: Array
 		if ( a.dimensions_initialized() ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						operator () ( i1, i2, i3 ) *= a( i1, i2, i3 );
 					}
 				}
@@ -367,7 +367,7 @@ public: // Assignment: Array
 		if ( a.dimensions_initialized() ) {
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						assert( T( a( i1, i2, i3 ) ) != T( 0 ) );
 						operator () ( i1, i2, i3 ) /= a( i1, i2, i3 );
 					}
@@ -397,7 +397,7 @@ public: // Assignment: Array
 			l = 0;
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						operator ()( i1, i2, i3 ) += c[ l ];
 					}
 				}
@@ -405,7 +405,7 @@ public: // Assignment: Array
 		} else { // Not overlap-safe
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3 ) += a( j1, j2, j3 );
 					}
 				}
@@ -434,7 +434,7 @@ public: // Assignment: Array
 			l = 0;
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						operator ()( i1, i2, i3 ) -= c[ l ];
 					}
 				}
@@ -442,7 +442,7 @@ public: // Assignment: Array
 		} else { // Not overlap-safe
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3 ) -= a( j1, j2, j3 );
 					}
 				}
@@ -471,7 +471,7 @@ public: // Assignment: Array
 			l = 0;
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						operator ()( i1, i2, i3 ) *= c[ l ];
 					}
 				}
@@ -479,7 +479,7 @@ public: // Assignment: Array
 		} else { // Not overlap-safe
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						operator ()( i1, i2, i3 ) *= a( j1, j2, j3 );
 					}
 				}
@@ -509,7 +509,7 @@ public: // Assignment: Array
 			l = 0;
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						operator ()( i1, i2, i3 ) /= c[ l ];
 					}
 				}
@@ -517,7 +517,7 @@ public: // Assignment: Array
 		} else { // Not overlap-safe
 			for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 				for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-					for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+					for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 						assert( T( a( j1, j2, j3 ) ) != T( 0 ) );
 						operator ()( i1, i2, i3 ) /= a( j1, j2, j3 );
 					}
@@ -536,7 +536,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 			for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+				for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 					operator ()( i1, i2, i3 ) += a( j1, j2, j3 );
 				}
 			}
@@ -553,7 +553,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 			for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+				for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 					operator ()( i1, i2, i3 ) -= a( j1, j2, j3 );
 				}
 			}
@@ -570,7 +570,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 			for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+				for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 					operator ()( i1, i2, i3 ) *= a( j1, j2, j3 );
 				}
 			}
@@ -587,7 +587,7 @@ public: // Assignment: Array
 		assert( conformable( a ) );
 		for ( int i3 = 1, j3 = a.l3(); i3 <= u3_; ++i3, ++j3 ) {
 			for ( int i2 = 1, j2 = a.l2(); i2 <= u2_; ++i2, ++j2 ) {
-				for ( int i1 = 1, j1 = a.l1(), e1 = u1_; i1 <= e1; ++i1, ++j1 ) {
+				for ( int i1 = 1, j1 = a.l1(); i1 <= u1_; ++i1, ++j1 ) {
 					assert( T( a( j1, j2, j3 ) ) != T( 0 ) );
 					operator ()( i1, i2, i3 ) /= a( j1, j2, j3 );
 				}
@@ -609,7 +609,7 @@ public: // Assignment: Logical
 			size_type l( 0 );
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						c[ l ] = a( i1, i2, i3 );
 					}
 				}
@@ -617,7 +617,7 @@ public: // Assignment: Logical
 			l = 0;
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						auto & v( operator ()( i1, i2, i3 ) );
 						v = v && c[ l ];
 					}
@@ -626,7 +626,7 @@ public: // Assignment: Logical
 		} else { // Not overlap-safe
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						auto & v( operator ()( i1, i2, i3 ) );
 						v = v && a( i1, i2, i3 );
 					}
@@ -647,7 +647,7 @@ public: // Assignment: Logical
 			size_type l( 0 );
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						c[ l ] = a( i1, i2, i3 );
 					}
 				}
@@ -655,7 +655,7 @@ public: // Assignment: Logical
 			l = 0;
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1, ++l ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1, ++l ) {
 						auto & v( operator ()( i1, i2, i3 ) );
 						v = v || c[ l ];
 					}
@@ -664,7 +664,7 @@ public: // Assignment: Logical
 		} else { // Not overlap-safe
 			for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 				for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-					for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+					for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 						auto & v( operator ()( i1, i2, i3 ) );
 						v = v || a( i1, i2, i3 );
 					}
@@ -683,7 +683,7 @@ public: // Assignment: Logical
 		assert( conformable( a ) );
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					auto & v( operator ()( i1, i2, i3 ) );
 					v = v && a( i1, i2, i3 );
 				}
@@ -701,7 +701,7 @@ public: // Assignment: Logical
 		assert( conformable( a ) );
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					auto & v( operator ()( i1, i2, i3 ) );
 					v = v || a( i1, i2, i3 );
 				}
@@ -719,7 +719,7 @@ public: // Assignment: Value
 	{
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					operator ()( i1, i2, i3 ) = t;
 				}
 			}
@@ -734,7 +734,7 @@ public: // Assignment: Value
 	{
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					operator ()( i1, i2, i3 ) += t;
 				}
 			}
@@ -749,7 +749,7 @@ public: // Assignment: Value
 	{
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					operator ()( i1, i2, i3 ) -= t;
 				}
 			}
@@ -764,7 +764,7 @@ public: // Assignment: Value
 	{
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					operator ()( i1, i2, i3 ) *= t;
 				}
 			}
@@ -780,7 +780,7 @@ public: // Assignment: Value
 		assert( t != T( 0 ) );
 		for ( int i3 = 1; i3 <= u3_; ++i3 ) {
 			for ( int i2 = 1; i2 <= u2_; ++i2 ) {
-				for ( int i1 = 1, e1 = u1_; i1 <= e1; ++i1 ) {
+				for ( int i1 = 1; i1 <= u1_; ++i1 ) {
 					operator ()( i1, i2, i3 ) /= t;
 				}
 			}
