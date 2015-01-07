@@ -16,6 +16,7 @@
 #include <EMSManager.hh>
 #include <FluidProperties.hh>
 #include <General.hh>
+#include <GeneralRoutines.hh>
 #include <InputProcessor.hh>
 #include <NodeInputManager.hh>
 #include <OutputProcessor.hh>
@@ -60,8 +61,11 @@ namespace Humidifiers {
 	using DataGlobals::SysSizingCalc;
 	using DataGlobals::SecInHour;
 	using DataGlobals::ScheduleAlwaysOn;
+	using DataGlobals::DisplayExtraWarnings;
 	using namespace DataLoopNode;
 	using DataEnvironment::OutBaroPress;
+	using DataEnvironment::OutDryBulbTemp;
+	using DataEnvironment::OutHumRat;
 	using DataHVACGlobals::SmallMassFlow;
 	using DataHVACGlobals::SetPointErrorFlag;
 
@@ -473,7 +477,7 @@ namespace Humidifiers {
 		// SUBROUTINE INFORMATION:
 		//       AUTHOR         Bereket Nigusse, UCF/FSEC,
 		//       DATE WRITTEN   March, 2012
-		//       MODIFIED       na
+		//       MODIFIED       May 2014, Daeho Kang, PNNL - Added additional sizing field
 		//       RE-ENGINEERED  na
 
 		// PURPOSE OF THIS SUBROUTINE:
@@ -490,6 +494,7 @@ namespace Humidifiers {
 
 		// Using/Aliasing
 		using Psychrometrics::RhoH2O;
+		using Psychrometrics::PsyRhoAirFnPbTdbW;
 		using FluidProperties::GetSatEnthalpyRefrig;
 		using FluidProperties::GetSpecificHeatGlycol;
 		using FluidProperties::FindGlycol;
@@ -497,6 +502,20 @@ namespace Humidifiers {
 		using General::RoundSigDigits;
 		using ReportSizingManager::ReportSizingOutput;
 		using DataSizing::AutoSize;
+		using DataSizing::CurZoneEqNum;
+		using DataSizing::ZoneSizingRunDone;
+		using DataSizing::CurSysNum;
+		using DataSizing::SysSizingRunDone;
+		using DataSizing::CurOASysNum;
+		using DataSizing::CurDuctType;
+		using DataSizing::FinalZoneSizing;
+		using DataSizing::FinalSysSizing;
+		using DataSizing::AutoVsHardSizingDeltaTempThreshold;
+		using DataSizing::AutoVsHardSizingThreshold;
+		using DataHVACGlobals::Main;
+		using DataHVACGlobals::Cooling;
+		using DataHVACGlobals::Heating;
+		using DataHVACGlobals::Other;
 
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
@@ -520,10 +539,120 @@ namespace Humidifiers {
 		Real64 WaterSpecHeatAvg; // specific heat of water, J/kgK
 		Real64 SteamSatEnthalpy; // enthalpy of saturated steam at 100C, J/kg
 		Real64 WaterSatEnthalpy; // enthalpy of saturated water at 100C, J/kg
+		bool IsAutoSize;			// Indicator to autosize
+		bool HardSizeNoDesRun;		// Indicator to a hard-sized field with no design sizing data
+		Real64 NomPowerDes;			// Autosized nominal power for reporting 
+		Real64 NomPowerUser;		// Hardsized nominal power for reporting  
+		Real64 MassFlowDes;			// Design air mass flow rate   
+		Real64 InletHumRatDes;		// Design inlet humidity ratio 
+		Real64 OutletHumRatDes;		// Design outlet humidity ratio
+		Real64 NomCapVolDes;		// Autosized Nominal capacity volume for reporting
+		Real64 NomCapVolUser;		// HardSized nominal capacity volume for reporting
+		Real64 AirVolFlow;			// Design air volume flow rate
+		Real64 AirDensity;			// Density of air 
+  
 
 		if ( Humidifier( HumNum ).HumType_Code == Humidifier_Steam_Electric ) {
-			Humidifier( HumNum ).NomCap = RhoH2O( InitConvTemp ) * Humidifier( HumNum ).NomCapVol;
+			IsAutoSize = false;
+			HardSizeNoDesRun = false;
+			NomPowerDes = 0.0;
+			NomPowerUser = 0.0;
 
+			if ( Humidifier( HumNum ).NomCapVol == AutoSize ) {
+				IsAutoSize = true;
+			}
+			if ( CurZoneEqNum > 0 ) {
+				if ( !IsAutoSize && !ZoneSizingRunDone ) {	// Hardsize with no sizing run
+					HardSizeNoDesRun = true;
+					if ( Humidifier( HumNum ).NomCapVol > 0.0 ) {
+						ReportSizingOutput( "Humidifier:SizeHumidifier", Humidifier( HumNum ).Name, "User-Specified Nominal Capacity Volume [m3/s]", Humidifier( HumNum ).NomCapVol );
+					}
+				} else {	// Sizing run done  
+					CheckZoneSizing( "Humidifier:SizeHumidifier", Humidifier( HumNum ).Name );
+					AirDensity = FinalZoneSizing( CurZoneEqNum ).DesCoolDens;
+					MassFlowDes = max( FinalZoneSizing( CurZoneEqNum ).DesCoolVolFlow, FinalZoneSizing( CurZoneEqNum ).DesHeatVolFlow ) * AirDensity;
+					InletHumRatDes = std::min( FinalZoneSizing( CurZoneEqNum ).OutHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).OutHumRatAtCoolPeak );
+					OutletHumRatDes = std::max( FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtHeatPeak, FinalZoneSizing( CurZoneEqNum ).ZoneHumRatAtCoolPeak );
+				}
+			} else if ( CurSysNum > 0 ) {
+				if ( !IsAutoSize && !SysSizingRunDone ) {
+					HardSizeNoDesRun = true;
+					if ( Humidifier( HumNum ).NomCapVol > 0.0 ) {
+						ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "User-Specified Nominal Capacity Volume [m3/s]", Humidifier( HumNum ).NomCapVol );
+					}
+				} else {
+					CheckSysSizing( "Humidifier:SizeHumidifier", Humidifier( HumNum ).Name );
+					if ( CurOASysNum > 0 ) {
+						// size to outdoor air volume flow rate if available
+						if ( FinalSysSizing( CurSysNum ).DesOutAirVolFlow > 0.0 ) {
+							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, OutDryBulbTemp, OutHumRat, CalledFrom );
+							MassFlowDes = FinalSysSizing( CurSysNum ).DesOutAirVolFlow * AirDensity;
+							InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).CoolOutHumRat, FinalSysSizing( CurSysNum ).HeatOutHumRat );
+							OutletHumRatDes = std::max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat );
+						} else {	// ELSE size to supply air duct flow rate
+							auto const SELECT_CASE_var( CurDuctType );
+							if ( SELECT_CASE_var == Main ) {
+								AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							} else if ( SELECT_CASE_var == Cooling ) {
+								AirVolFlow = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+							} else if ( SELECT_CASE_var == Heating ) {
+								AirVolFlow = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+							} else if ( SELECT_CASE_var == Other ) {
+								AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							} else {
+								AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+							}
+							AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );
+							MassFlowDes = AirVolFlow * AirDensity;
+							InletHumRatDes = min( FinalSysSizing( CurSysNum ).CoolMixHumRat, FinalSysSizing( CurSysNum ).HeatMixHumRat);
+							OutletHumRatDes = max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat);
+						}
+					} else {
+						auto const SELECT_CASE_var( CurDuctType );
+						if ( SELECT_CASE_var == Main ) {
+							AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						} else if ( SELECT_CASE_var == Cooling ) {
+							AirVolFlow = FinalSysSizing( CurSysNum ).DesCoolVolFlow;
+						} else if ( SELECT_CASE_var == Heating ) {
+							AirVolFlow = FinalSysSizing( CurSysNum ).DesHeatVolFlow;
+						} else if ( SELECT_CASE_var == Other ) {
+							AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						} else {
+							AirVolFlow = FinalSysSizing( CurSysNum ).DesMainVolFlow;
+						}
+						AirDensity = PsyRhoAirFnPbTdbW( OutBaroPress, FinalSysSizing( CurSysNum ).CoolMixTemp, FinalSysSizing( CurSysNum ).CoolMixHumRat, CalledFrom );    
+						MassFlowDes = AirVolFlow * AirDensity;
+						InletHumRatDes = std::min( FinalSysSizing( CurSysNum ).CoolMixHumRat, FinalSysSizing( CurSysNum ).HeatMixHumRat );
+						OutletHumRatDes = std::max( FinalSysSizing( CurSysNum ).CoolSupHumRat, FinalSysSizing( CurSysNum ).HeatSupHumRat);
+					}
+				}
+			}
+
+			if ( !HardSizeNoDesRun ) {
+				NomCapVolDes = MassFlowDes * ( OutletHumRatDes - InletHumRatDes ) / AirDensity;
+				if ( NomCapVolDes < 0.0 ) NomCapVolDes = 0.0;	// No humidity demand
+
+				if ( IsAutoSize ) {
+					Humidifier( HumNum ).NomCapVol = NomCapVolDes;
+					ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes );
+				} else {
+					if ( Humidifier( HumNum ).NomCapVol > 0.0) {
+						NomCapVolUser = Humidifier( HumNum ).NomCapVol;
+						ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Nominal Capacity Volume [m3/s]", NomCapVolDes, "User-Specified Nominal Capacity Volume [m3/s]", NomCapVolUser);
+						if ( DisplayExtraWarnings ) {
+							if ( ( std::abs( NomCapVolDes - NomCapVolUser )/NomCapVolUser ) > AutoVsHardSizingThreshold ) {
+								ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for Humidifier:Steam:Electric=\"" + Humidifier( HumNum ).Name + "\"." );
+								ShowContinueError( "User-Specified Nominal Capacity Volume of " + RoundSigDigits( NomCapVolUser, 2 ) + " [Wm3/s]" );
+								ShowContinueError( "differs from Design Size Nominal Capacity Volume of " + RoundSigDigits( NomCapVolDes, 2 ) + " [m3/s]" );
+								ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+								ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+							}
+						}
+					}
+				}
+			}
+			
+			Humidifier( HumNum ).NomCap = RhoH2O( InitConvTemp ) * Humidifier( HumNum ).NomCapVol;
 			RefrigerantIndex = FindRefrigerant( fluidNameSteam );
 			WaterIndex = FindGlycol( fluidNameWater );
 			SteamSatEnthalpy = GetSatEnthalpyRefrig( fluidNameSteam, TSteam, 1.0, RefrigerantIndex, CalledFrom );
@@ -533,20 +662,37 @@ namespace Humidifiers {
 			NominalPower = Humidifier( HumNum ).NomCap * ( ( SteamSatEnthalpy - WaterSatEnthalpy ) + WaterSpecHeatAvg * ( TSteam - Tref ) );
 
 			if ( Humidifier( HumNum ).NomPower == AutoSize ) {
-				Humidifier( HumNum ).NomPower = NominalPower;
-				ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Rated Power [W]", Humidifier( HumNum ).NomPower );
-			} else if ( Humidifier( HumNum ).NomPower >= 0.0 && Humidifier( HumNum ).NomCap > 0.0 ) {
-				if ( Humidifier( HumNum ).NomPower < NominalPower ) {
-					ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
-					ShowContinueError( " specified Rated Power = " + RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) );
-					ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
-				}
+				IsAutoSize = true;
+			}
+			
+			NomPowerDes = NominalPower;
+			if ( IsAutoSize ) {
+				Humidifier( HumNum ).NomPower = NomPowerDes;
+				ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes );
 			} else {
-				ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
-				ShowContinueError( " For zero rated capacity humidifier the rated power is zero." );
+				if ( Humidifier( HumNum ).NomPower >= 0.0 && Humidifier( HumNum ).NomCap > 0.0 ) {
+					NomPowerUser = Humidifier( HumNum ).NomPower;
+					ReportSizingOutput( "Humidifier:Steam:Electric", Humidifier( HumNum ).Name, "Design Size Rated Power [W]", NomPowerDes, "User-Specified Rated Power [W]", NomPowerUser);
+					if ( DisplayExtraWarnings ) {
+						if ( ( std::abs( NomPowerDes - NomPowerUser ) / NomPowerUser ) > AutoVsHardSizingThreshold ) {
+							ShowMessage( "SizeHumidifier: Potential issue with equipment sizing for Humidifier:Steam:Electric=\"" + Humidifier( HumNum ).Name + "\"." );
+							ShowContinueError( "User-Specified Rated Power of " + RoundSigDigits( NomPowerUser, 2 ) + " [W]" );
+							ShowContinueError( "differs from Design Size Rated Power of " + RoundSigDigits( NomPowerDes, 2 ) + " [W]" );
+							ShowContinueError( "This may, or may not, indicate mismatched component sizes." );
+							ShowContinueError( "Verify that the value entered is intended and is consistent with other components." );
+						}
+					}
+					if ( Humidifier( HumNum ).NomPower < NominalPower ) {
+						ShowWarningError( "Humidifier:Steam:Electric: specified Rated Power is less than nominal Rated " " Power for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+						ShowContinueError( " specified Rated Power = " + RoundSigDigits( Humidifier( HumNum ).NomPower, 2 ) );
+						ShowContinueError( " while expecting a minimum Rated Power = " + RoundSigDigits( NominalPower, 2 ) );
+					}
+				} else {
+					ShowWarningError( "Humidifier:Steam:Electric: specified nominal capacity is zero for electric steam humidifier = " + Humidifier( HumNum ).Name + ". " );
+					ShowContinueError( " For zero nominal capacity humidifier the rated power is zero." );
+				}
 			}
 		}
-
 	}
 
 	void
