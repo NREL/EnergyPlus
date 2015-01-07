@@ -1198,10 +1198,3 @@ int closeipc(int* sockfd){
   return close(*sockfd);
 #endif
 }
-
-
-int sendclienterror(const int *sockfd, const int *flaWri) {
-    return sendclientmessage(sockfd, flaWri);
-}
-
-
