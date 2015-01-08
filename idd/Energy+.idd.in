@@ -19931,6 +19931,181 @@ OtherEquipment,
        \maximum 1.0
        \default 0
 
+ElectricEquipment:ITE:AirCooled,
+   \memo This object describes air-cooled electric information technology equipment (ITE) which has 
+   \memo variable power consumption as a function of loading and temperature.
+       \min-fields 27
+  A1 , \field Name
+       \required-field
+       \type alpha
+       \reference ITEEquipmentNames
+  A2 , \field Zone Name
+       \required-field
+       \type object-list
+       \object-list ZoneNames
+  A3 , \field Design Power Input Calculation Method
+       \note The entered calculation method is used to specify the design power input
+       \note Watts/Unit => Watts per Unit -- Design Power = Watts per Unit * Number of Units
+       \note Watts/Area => Watts per Zone Floor Area -- Design Power = Watts per Zone Floor Area * Floor Area
+       \required-field
+       \type choice
+       \key Watts/Unit
+       \key Watts/Area
+       \default Watts/Unit
+  N1 , \field Watts per Unit
+       \units W
+       \type real
+       \minimum 0
+       \ip-units W
+  N2 , \field Number of Units
+       \type real
+       \minimum 0
+       \default 1
+  N3 , \field Watts per Zone Floor Area
+       \type real
+       \minimum 0
+       \units W/m2
+       \ip-units W/ft2
+  A4 , \field Design Power Input Schedule Name
+       \note Operating schedule for this equipment, fraction applied to the design power input,
+       \note generally (0.0 - 1.0)
+       \note If this field is blank, the schedule is assumed to always be 1.0.
+       \type object-list
+       \object-list ScheduleNames
+  A5 , \field CPU Loading  Schedule Name
+       \note CPU loading schedule for this equipment as a fraction from 0.0 (idle) to 1.0 (full load).
+       \note If this field is blank, the schedule is assumed to always be 1.0.
+       \type object-list
+       \object-list ScheduleNames
+  A6 , \field CPU Power Input Function of Loading and Air Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the CPU power
+       \note input as a function of CPU loading (x) and air inlet node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).
+  N4 , \field Design Fan Power Input Fraction
+       \note The fraction of the total power input at design conditions which is for the cooling fan(s)
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N5,  \field Design Fan Air Flow Rate per Power Input
+       \note The cooling fan air flow rate per total electric power input at design conditions
+       \required-field
+       \type real
+       \units m3/s-W
+       \minimum 0.0
+  A7 , \field Air Flow Function of Loading and Air Temperature Curve Name
+       \required-field
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the cooling
+       \note air flow rate as a function of CPU loading (x) and air inlet node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).
+  A8 , \field Fan Power Input Function of Flow Curve Name
+       \required-field
+       \type object-list
+       \object-list UniVariateCurves
+       \note The name of a single-variable curve or table lookup object which modifies the cooling
+       \note fan power as a function of flow fraction (x). 
+       \note This curve (table) should equal 1.0 at a flow fraction of 1.0. 
+  N6,  \field Design Entering Air Temperature
+       \note The entering air temperature at design conditions.
+       \type real
+       \units C
+       \default 15.0
+  A9,  \field Environmental Class
+       \note Specifies the allowable operating conditions for the air inlet conditions.
+       \note Used for reporting time outside allowable conditions.
+       \type choice 
+       \key None
+       \key A1
+       \key A2
+       \key A3
+       \key A4
+       \key B
+       \key C
+       \default None
+  A10, \field Air Inlet Connection Type
+       \note Specifies the type of connection between the zone and the ITE air inlet node.
+       \note AdjustedSupply = ITE inlet temperature will be the current Supply Air Node temperature
+       \note adjusted by the current recirculation fraction. 
+       \note All heat output is added to the zone air heat balance as a convective gain.
+       \note ZoneAirNode = ITE air inlet condition is  the average zone condition. 
+       \note All heat output is added to the zone air heat balance as a convective gain. 
+       \note RoomAirModel = ITE air inlet and outlet are connected to room air model nodes. 
+       \type choice 
+       \key AdjustedSupply
+       \key ZoneAirNode
+       \key RoomAirModel
+       \default AdjustedSupply
+  A11, \field Air Inlet Room Air Model Node Name
+       \note Name of a RoomAir:Node object which is connect to the ITE air inlet.
+       \type object-list
+       \object-list RoomAirNodes
+  A12, \field Air Outlet Room Air Model Node Name
+       \note Name of a RoomAir:Node object which is connect to the ITE air outlet.
+       \type object-list
+       \object-list RoomAirNodes
+  A13, \field Supply Air Node Name
+       \note Name of the supply air inlet node serving this ITE. Required if the 
+       \note Air Node Connection Type = AdjustedSupply. Also required if reporting of 
+       \note Supply Heat Index is desired.
+       \type node
+  N7,  \field Design Recirculation Fraction
+       \note The recirculation fraction for this equipment at design conditions. This field is used only 
+       \note if the Air Node Connection Type = AdjustedSupply. The default is 0.0 (no recirculation).
+       \type real
+       \minimum 0.0
+       \maximum 0.5
+       \default 0.0
+  A14, \field Recirculation Function of Loading and Supply Temperature Curve Name
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the recirculation
+       \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).This field is used only if the 
+       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve 
+       \note is assumed to always equal 1.0.
+  N8 , \field Design Electric Power Supply Efficiency
+       \note The efficiency of the power supply system serving this ITE
+       \type real
+       \minimum> 0.0
+       \maximum 1.0
+       \default 1.0
+  A15, \field Electric Power Supply Efficiency Function of Part Load Ratio Curve Name
+       \type object-list
+       \object-list BiVariateCurves
+       \note The name of a two-variable curve or table lookup object which modifies the recirculation
+       \note fractionas a function of CPU loading (x) and supply air node temperature (y). 
+       \note This curve (table) should equal 1.0 at design conditions (CPU loading = 1.0 and 
+       \note Design Entering Air Temperature).This field is used only if the 
+       \note Air Node Connection Type = AdjustedSupply. If this curve is left blank, then the curve 
+       \note is assumed to always equal 1.0.
+  N9 , \field Fraction of Electric Power Supply Losses to Zone
+       \note Fraction of the electric power supply losses which are a heat gain to the zone 
+       \note If this field is <1.0, the remainder of the losses are assumed to be lost to the outdoors.
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 1.0
+  A16, \field CPU End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default ITE-CPU
+  A17, \field Fan End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default ITE-Fans
+  A18; \field Electric Power Supply End-Use Subcategory
+       \type alpha
+       \retaincase
+       \default ITE-UPS
+
 ZoneBaseboard:OutdoorTemperatureControlled,
        \memo Specifies outside temperature-controlled electric baseboard heating.
   A1 , \field Name
@@ -19973,6 +20148,91 @@ ZoneBaseboard:OutdoorTemperatureControlled,
        \type alpha
        \retaincase
        \default General
+
+
+SwimmingPool:Indoor,
+  A1,  \field Name
+       \required-field
+       \type alpha
+  A2,  \field Surface Name
+       \required-field
+       \note To be matched with a construction in this input file
+       \type object-list
+       \object-list ConstructionNames
+       \reference SurfaceNames
+       \reference SurfAndSubSurfNames
+       \reference AllHeatTranSurfNames
+       \reference HeatTranBaseSurfNames
+       \reference OutFaceEnvNames
+       \reference AllHeatTranAngFacNames
+       \reference RadGroupAndSurfNames
+       \reference SurfGroupAndHTSurfNames
+       \reference AllShadingAndHTSurfNames
+  N1,  \field Average Depth
+       \required-field
+       \type real
+       \units m
+  A3,  \field Activity Factor Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+  A4,  \field Make-up Water Supply Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames  
+  A5,  \field Cover Schedule Name
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+  N2,  \field Cover Evaporation Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N3,  \field Cover Convection Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N4,  \field Cover Short-Wavelength Radiation Factor
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  N5,  \field Cover Long-Wavelength Radiation Factor
+       \required-field
+       \type real
+       \minimum 0.0
+       \maximum 1.0
+       \default 0.0
+  A6,  \field Pool Water Inlet Node
+       \required-field
+       \type node
+  A7,  \field Pool Water Outlet Node
+       \required-field
+       \type node
+  N6,  \field Pool Heating System Maximum Water Flow Rate
+       \type real
+       \units m3/s
+       \minimum 0.0
+  N7,  \field Pool Miscellaneous Equipment Power
+       \note Power input per pool water flow rate
+       \units W/(m3/s)
+       \type real
+       \minimum 0.0
+  A8,  \field Setpoint Temperature Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+  N8,  \field Maximum Number of People
+       \required-field
+       \minimum 0.0
+  A9,  \field People Schedule
+       \type object-list
+       \object-list ScheduleNames
+  A10; \field People Heat Gain Schedule
+       \type object-list
+       \object-list ScheduleNames
 
 ZoneContaminantSourceAndSink:CarbonDioxide,
    \memo Represents internal CO2 gains and sinks in the zone.
@@ -35769,6 +36029,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \note Total length of pipe embedded in surface
         \units m
         \minimum> 0
+        \autosizable
    A5 , \field Temperature Control Type
         \note Temperature used to control system
         \type choice
@@ -35780,6 +36041,7 @@ ZoneHVAC:LowTemperatureRadiant:ConstantFlow,
         \default MeanAirTemperature
    N3 , \field Rated Flow Rate
         \units m3/s
+        \autosizable
    A6 , \field Pump Flow Rate Schedule Name
         \note Modifies the Rated Flow Rate of the pump on a time basis
         \note the default is that the pump is ON and runs according to its other
@@ -47804,6 +48066,7 @@ Humidifier:Steam:Electric,
       \units m3/s
       \minimum 0.0
       \ip-units gal/min
+      \autosizable
   N2, \field Rated Power
       \type real
       \units W
@@ -58694,7 +58957,7 @@ DistrictCooling,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
+       \autosizable
        \units W
        \minimum 0.0
   A4 ; \field Capacity Fraction Schedule Name
@@ -58713,7 +58976,7 @@ DistrictHeating,
        \required-field
        \type node
   N1 , \field Nominal Capacity
-       \required-field
+       \autosizable
        \units W
        \minimum 0.0
   A4 ; \field Capacity Fraction Schedule Name
@@ -91608,4 +91871,3 @@ Output:PreprocessorMessage,
         \retaincase
    A12; \field Message Line 10
         \retaincase
-

@@ -3002,7 +3002,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
@@ -3011,7 +3011,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, EndMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 				PrintESOTimeStamp = false;
 			}
 
@@ -3086,7 +3086,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
@@ -3156,7 +3156,7 @@ namespace OutputProcessor {
 				if ( HolidayIndex > 0 ) {
 					CurDayType = 7 + HolidayIndex;
 				}
-				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+				WriteTimeStampFormatData( mtr_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, false, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 				PrintTimeStamp = false;
 			}
 
@@ -3221,7 +3221,7 @@ namespace OutputProcessor {
 		for ( Loop = 1; Loop <= NumEnergyMeters; ++Loop ) {
 			if ( ! EnergyMeters( Loop ).RptMN && ! EnergyMeters( Loop ).RptAccMN ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
+				WriteTimeStampFormatData( mtr_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
 				PrintTimeStamp = false;
 			}
 
@@ -3293,7 +3293,7 @@ namespace OutputProcessor {
 			EnergyMeters( Loop ).LastSMMaxValDate = EnergyMeters( Loop ).SMMaxValDate;
 			if ( ! EnergyMeters( Loop ).RptSM && ! EnergyMeters( Loop ).RptAccSM ) continue;
 			if ( PrintTimeStamp ) {
-				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
+				WriteTimeStampFormatData( mtr_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
 				PrintTimeStamp = false;
 			}
 
@@ -3719,6 +3719,7 @@ namespace OutputProcessor {
 		std::string const & reportIDString, // The ID of the time stamp
 		int const DayOfSim, // the number of days simulated so far
 		std::string const & DayOfSimChr, // the number of days simulated so far
+		bool writeToSQL,
 		Optional_int_const Month, // the month of the reporting interval
 		Optional_int_const DayOfMonth, // The day of the reporting interval
 		Optional_int_const Hour, // The hour of the reporting interval
@@ -3774,29 +3775,27 @@ namespace OutputProcessor {
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), StartMinute(), EndMinute(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, EndMinute, StartMinute, DST, DayType );
 		} else if ( reportingInterval == ReportHourly ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%2d,%5.2f,%5.2f,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), Hour(), 0.0, 60.0, DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, Hour, _, _, DST, DayType );
 		} else if ( reportingInterval == ReportDaily ) {
 			std::sprintf( stamp, "%s,%s,%2d,%2d,%2d,%s", reportIDString.c_str(), DayOfSimChr.c_str(), Month(), DayOfMonth(), DST(), DayType().c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim, Month, DayOfMonth, _, _, _, DST, DayType );
 		} else if ( reportingInterval == ReportMonthly ) {
 			std::sprintf( stamp, "%s,%s,%2d", reportIDString.c_str(), DayOfSimChr.c_str(), Month() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( ReportMonthly, reportID, DayOfSim, Month );
 		} else if ( reportingInterval == ReportSim ) {
 			std::sprintf( stamp, "%s,%s", reportIDString.c_str(), DayOfSimChr.c_str() );
 			out_stream << stamp << NL;
-			if ( sqlite->writeOutputToSQLite() ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
+			if ( writeToSQL ) sqlite->createSQLiteTimeIndexRecord( reportingInterval, reportID, DayOfSim );
 		} else {
-			if ( sqlite->writeOutputToSQLite() ) {
-				std::ostringstream ss;
-				ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
-				sqlite->sqliteWriteMessage( ss.str() );
-			}
+			std::ostringstream ss;
+			ss << "Illegal reportingInterval passed to WriteTimeStampFormatData: " << reportingInterval;
+			sqlite->sqliteWriteMessage( ss.str() );
 		}
 	}
 
@@ -3872,13 +3871,7 @@ namespace OutputProcessor {
 			if ( eso_stream ) *eso_stream << reportIDChr << ",11," << keyedValue << ',' << variableName << " [" << UnitsString << ']' << FreqString << NL;
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			if ( ! present( ScheduleName ) ) {
-				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval );
-			} else {
-				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, ScheduleName );
-			}
-		}
+		sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValue, variableName, indexType, UnitsString, reportingInterval, false, ScheduleName );
 
 	}
 
@@ -4002,17 +3995,11 @@ namespace OutputProcessor {
 
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			static std::string const keyedValueStringCum( "Cumulative " );
-			static std::string const keyedValueStringNon( "" );
-			std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
+		static std::string const keyedValueStringCum( "Cumulative " );
+		static std::string const keyedValueStringNon( "" );
+		std::string const & keyedValueString( cumulativeMeterFlag ? keyedValueStringCum : keyedValueStringNon );
 
-			sqlite->createSQLiteMeterDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
-
-			if ( ! meterFileOnlyFlag ) {
-				sqlite->createSQLiteReportVariableDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval );
-			}
-		}
+		sqlite->createSQLiteReportDictionaryRecord( reportID, storeType, indexGroup, keyedValueString, meterName, 1, UnitsString, reportingInterval, true );
 
 	}
 
@@ -4169,10 +4156,7 @@ namespace OutputProcessor {
 		if (reportingInterval == ReportSim)
 			OutputSchema.RIRunPeriodTSData.AddToCurrentRRow(repVal);
 
-		
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
@@ -4239,18 +4223,12 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( NumberOut ) );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteMeterRecord( reportID, repValue );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue );
 
 		if ( mtr_stream ) *mtr_stream << creportID << ',' << NumberOut << NL;
 		++StdMeterRecordCount;
 
 		if ( ! meterOnlyFlag ) {
-			if ( sqlite->writeOutputToSQLite() ) {
-				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-			}
-
 			if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
 			++StdOutputRecordCount;
 		}
@@ -4334,9 +4312,7 @@ namespace OutputProcessor {
 			strip_trailing_zeros( strip( MinOut ) );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteMeterRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
 
 		// Append the min and max strings with date information
 		//    CALL ProduceMinMaxStringWStartMinute(MinOut, minValueDate, reportingInterval)
@@ -4355,10 +4331,6 @@ namespace OutputProcessor {
 		}
 
 		if ( ! meterOnlyFlag ) {
-			if ( sqlite->writeOutputToSQLite() ) {
-				sqlite->createSQLiteReportVariableDataRecord( reportID, repValue, reportingInterval, minValue, minValueDate, MaxValue, maxValueDate, MinutesPerTimeStep );
-			}
-
 			if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 				if ( eso_stream ) *eso_stream << creportID << ',' << NumberOut << NL;
 				++StdOutputRecordCount;
@@ -4525,9 +4497,7 @@ namespace OutputProcessor {
 			strip_number( s );
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue );
 
 		if ( eso_stream ) *eso_stream << creportID << ',' << s << NL;
 
@@ -4680,11 +4650,9 @@ namespace OutputProcessor {
 		if (reportingInterval == ReportSim)
 			OutputSchema.RIRunPeriodTSData.AddToCurrentIRow(repVal);
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			rminValue = minValue;
-			rmaxValue = MaxValue;
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
-		}
+		rminValue = minValue;
+		rmaxValue = MaxValue;
+		sqlite->createSQLiteReportDataRecord( reportID, repVal, reportingInterval, rminValue, minValueDate, rmaxValue, maxValueDate );
 
 		if ( ( reportingInterval == ReportEach ) || ( reportingInterval == ReportTimeStep ) || ( reportingInterval == ReportHourly ) ) { // -1, 0, 1
 			if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
@@ -4749,9 +4717,7 @@ namespace OutputProcessor {
 			}
 		}
 
-		if ( sqlite->writeOutputToSQLite() ) {
-			sqlite->createSQLiteReportVariableDataRecord( reportID, repValue );
-		}
+		sqlite->createSQLiteReportDataRecord( reportID, repValue );
 
 		if ( eso_stream ) *eso_stream << reportIDString << ',' << NumberOut << NL;
 
@@ -5657,7 +5623,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
 						}
-						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 						LHourP = HourOfDay;
 						LStartMin = StartMinute;
 						LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5723,7 +5689,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 						if ( HolidayIndex > 0 ) {
 							CurDayType = 7 + HolidayIndex;
 						}
-						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+						WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 						LHourP = HourOfDay;
 						LStartMin = StartMinute;
 						LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5789,7 +5755,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
 							}
-							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 							LHourP = HourOfDay;
 							LStartMin = StartMinute;
 							LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5831,7 +5797,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 							if ( HolidayIndex > 0 ) {
 								CurDayType = 7 + HolidayIndex;
 							}
-							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
+							WriteTimeStampFormatData( eso_stream, ReportEach, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, TimeValue( IndexType ).CurMinute, StartMinute, DSTIndicator, DayTypes( CurDayType ) );
 							LHourP = HourOfDay;
 							LStartMin = StartMinute;
 							LEndMin = TimeValue( IndexType ).CurMinute;
@@ -5861,7 +5827,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			if ( HolidayIndex > 0 ) {
 				CurDayType = 7 + HolidayIndex;
 			}
-			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			WriteTimeStampFormatData( eso_stream, ReportHourly, TimeStepStampReportNbr, TimeStepStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, HourOfDay, _, _, DSTIndicator, DayTypes( CurDayType ) );
 		}
 
 		if (OutputSchema.RIHourlyTSData.RDataFrameEnabled == false)
@@ -5941,7 +5907,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 			if ( HolidayIndex > 0 ) {
 				CurDayType = 7 + HolidayIndex;
 			}
-			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
+			WriteTimeStampFormatData( eso_stream, ReportDaily, DailyStampReportNbr, DailyStampReportChr, DayOfSim, DayOfSimChr, true, Month, DayOfMonth, _, _, _, DSTIndicator, DayTypes( CurDayType ) );
 		}
 
 		if (OutputSchema.RIDailyTSData.RDataFrameEnabled == false)
@@ -5979,7 +5945,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Month Block
 	if ( EndMonthFlag || EndEnvrnFlag ) {
 		if ( TrackingMonthlyVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, Month );
+			WriteTimeStampFormatData( eso_stream, ReportMonthly, MonthlyStampReportNbr, MonthlyStampReportChr, DayOfSim, DayOfSimChr, false, Month );
 		}
 
 		if (OutputSchema.RIMonthlyTSData.RDataFrameEnabled == false)
@@ -6016,7 +5982,7 @@ UpdateDataandReport( int const IndexTypeKey ) // What kind of data to update (Zo
 	// Sim/Environment Block
 	if ( EndEnvrnFlag ) {
 		if ( TrackingRunPeriodVariables ) {
-			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr );
+			WriteTimeStampFormatData( eso_stream, ReportSim, RunPeriodStampReportNbr, RunPeriodStampReportChr, DayOfSim, DayOfSimChr, false );
 		}
 
 		if (OutputSchema.RIRunPeriodTSData.RDataFrameEnabled == false)
@@ -8187,7 +8153,7 @@ AddToOutputVariableList(
 }
 
 //     NOTICE
-//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 //     and The Regents of the University of California through Ernest Orlando Lawrence
 //     Berkeley National Laboratory.  All rights reserved.
 //     Portions of the EnergyPlus software package have been developed and copyrighted
