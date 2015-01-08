@@ -61454,13 +61454,13 @@ FluidCooler:TwoSpeed,
        \type node
 
 GroundHeatExchanger:Vertical,
- \min-fields 21
+ \min-fields 20
  \memo Variable short time step vertical ground heat exchanger model based on
  \memo Yavuztruk, C., J.D.Spitler. 1999. A Short Time Step response Factor Model for
  \memo Vertical Ground Loop Heat Exchangers
  \memo The Fluid Type in the associated condenser loop must be same for which the
  \memo g-functions below are calculated.
-  A1,  \field Name
+  A1,   \field Name
         \required-field
   A2,   \field Inlet Node Name
         \required-field
@@ -61468,7 +61468,7 @@ GroundHeatExchanger:Vertical,
   A3,   \field Outlet Node Name
         \required-field
         \type node
-  N1,   \field Maximum Flow Rate
+  N1,   \field Design Flow Rate
         \units m3/s
         \minimum> 0.0
         \ip-units gal/min
@@ -61489,439 +61489,436 @@ GroundHeatExchanger:Vertical,
   N7,   \field Ground Temperature
         \units C
         \minimum> 0.0
-  N8,   \field Design Flow Rate
-        \units m3/s
-        \minimum> 0.0
         \ip-units gal/min
-  N9,   \field Grout Thermal Conductivity
+  N8,   \field Grout Thermal Conductivity
         \units W/m-K
         \minimum> 0.0
-  N10,  \field Pipe Thermal Conductivity
+  N9,   \field Pipe Thermal Conductivity
         \units W/m-K
         \minimum> 0.0
-  N11,  \field Pipe Out Diameter
+  N10,  \field Pipe Out Diameter
         \units m
         \minimum> 0.0
         \ip-units in
-  N12,  \field U-Tube Distance
+  N11,  \field U-Tube Distance
         \units m
         \minimum> 0.0
-  N13,  \field Pipe Thickness
+  N12,  \field Pipe Thickness
         \units m
         \minimum> 0.0
         \ip-units in
-  N14,  \field Maximum Length of Simulation
+  N13,  \field Maximum Length of Simulation
         \minimum> 0.0
-  N15,  \field G-Function Reference Ratio
+  N14,  \field G-Function Reference Ratio
         \type real
         \units dimensionless
         \minimum> 0.0
         \default 0.0005
-  N16,  \field Number of Data Pairs of the G Function
+  N15,  \field Number of Data Pairs of the G Function
         \required-field
         \minimum> 0.0
         \maximum 100
-  N17, \field G-Function Ln(T/Ts) Value 1
-       \required-field
-       \type real
-  N18, \field G-Function G Value 1
-       \required-field
-       \type real
-  N19, \field G-Function Ln(T/Ts) Value 2
-       \type real
-  N20, \field G-Function G Value 2
-       \type real
-  N21, \field G-Function Ln(T/Ts) Value 3
-       \type real
-  N22, \field G-Function G Value 3
-       \type real
-  N23, \field G-Function Ln(T/Ts) Value 4
-       \type real
-  N24, \field G-Function G Value 4
-       \type real
-  N25, \field G-Function Ln(T/Ts) Value 5
-       \type real
-  N26, \field G-Function G Value 5
-       \type real
-  N27, \field G-Function Ln(T/Ts) Value 6
-       \type real
-  N28, \field G-Function G Value 6
-       \type real
-  N29, \field G-Function Ln(T/Ts) Value 7
-       \type real
-  N30, \field G-Function G Value 7
-       \type real
-  N31, \field G-Function Ln(T/Ts) Value 8
-       \type real
-  N32, \field G-Function G Value 8
-       \type real
-  N33, \field G-Function Ln(T/Ts) Value 9
-       \type real
-  N34, \field G-Function G Value 9
-       \type real
-  N35, \field G-Function Ln(T/Ts) Value 10
-       \type real
-  N36, \field G-Function G Value 10
-       \type real
-  N37, \field G-Function Ln(T/Ts) Value 11
-       \type real
-  N38, \field G-Function G Value 11
-       \type real
-  N39, \field G-Function Ln(T/Ts) Value 12
-       \type real
-  N40, \field G-Function G Value 12
-       \type real
-  N41, \field G-Function Ln(T/Ts) Value 13
-       \type real
-  N42, \field G-Function G Value 13
-       \type real
-  N43, \field G-Function Ln(T/Ts) Value 14
-       \type real
-  N44, \field G-Function G Value 14
-       \type real
-  N45, \field G-Function Ln(T/Ts) Value 15
-       \type real
-  N46, \field G-Function G Value 15
-       \type real
-  N47, \field G-Function Ln(T/Ts) Value 16
-       \type real
-  N48, \field G-Function G Value 16
-       \type real
-  N49, \field G-Function Ln(T/Ts) Value 17
-       \type real
-  N50, \field G-Function G Value 17
-       \type real
-  N51, \field G-Function Ln(T/Ts) Value 18
-       \type real
-  N52, \field G-Function G Value 18
-       \type real
-  N53, \field G-Function Ln(T/Ts) Value 19
-       \type real
-  N54, \field G-Function G Value 19
-       \type real
-  N55, \field G-Function Ln(T/Ts) Value 20
-       \type real
-  N56, \field G-Function G Value 20
-       \type real
-  N57, \field G-Function Ln(T/Ts) Value 21
-       \type real
-  N58, \field G-Function G Value 21
-       \type real
-  N59, \field G-Function Ln(T/Ts) Value 22
-       \type real
-  N60, \field G-Function G Value 22
-       \type real
-  N61, \field G-Function Ln(T/Ts) Value 23
-       \type real
-  N62, \field G-Function G Value 23
-       \type real
-  N63, \field G-Function Ln(T/Ts) Value 24
-       \type real
-  N64, \field G-Function G Value 24
-       \type real
-  N65, \field G-Function Ln(T/Ts) Value 25
-       \type real
-  N66, \field G-Function G Value 25
-       \type real
-  N67, \field G-Function Ln(T/Ts) Value 26
-       \type real
-  N68, \field G-Function G Value 26
-       \type real
-  N69, \field G-Function Ln(T/Ts) Value 27
-       \type real
-  N70, \field G-Function G Value 27
-       \type real
-  N71, \field G-Function Ln(T/Ts) Value 28
-       \type real
-  N72, \field G-Function G Value 28
-       \type real
-  N73, \field G-Function Ln(T/Ts) Value 29
-       \type real
-  N74, \field G-Function G Value 29
-       \type real
-  N75, \field G-Function Ln(T/Ts) Value 30
-       \type real
-  N76, \field G-Function G Value 30
-       \type real
-  N77, \field G-Function Ln(T/Ts) Value 31
-       \type real
-  N78, \field G-Function G Value 31
-       \type real
-  N79, \field G-Function Ln(T/Ts) Value 32
-       \type real
-  N80, \field G-Function G Value 32
-       \type real
-  N81, \field G-Function Ln(T/Ts) Value 33
-       \type real
-  N82, \field G-Function G Value 33
-       \type real
-  N83, \field G-Function Ln(T/Ts) Value 34
-       \type real
-  N84, \field G-Function G Value 34
-       \type real
-  N85, \field G-Function Ln(T/Ts) Value 35
-       \type real
-  N86, \field G-Function G Value 35
-       \type real
-  N87, \field G-Function Ln(T/Ts) Value 36
-       \type real
-  N88, \field G-Function G Value 36
-       \type real
-  N89, \field G-Function Ln(T/Ts) Value 37
-       \type real
-  N90, \field G-Function G Value 37
-       \type real
-  N91, \field G-Function Ln(T/Ts) Value 38
-       \type real
-  N92, \field G-Function G Value 38
-       \type real
-  N93, \field G-Function Ln(T/Ts) Value 39
-       \type real
-  N94, \field G-Function G Value 39
-       \type real
-  N95, \field G-Function Ln(T/Ts) Value 40
-       \type real
-  N96, \field G-Function G Value 40
-       \type real
-  N97, \field G-Function Ln(T/Ts) Value 41
+  N16,  \field G-Function Ln(T/Ts) Value 1
+        \required-field
         \type real
-  N98, \field G-Function G Value 41
+  N17,  \field G-Function G Value 1
+        \required-field
         \type real
-  N99, \field G-Function Ln(T/Ts) Value 42
+  N18,  \field G-Function Ln(T/Ts) Value 2
         \type real
-  N100, \field G-Function G Value 42
+  N19,  \field G-Function G Value 2
         \type real
-  N101, \field G-Function Ln(T/Ts) Value 43
+  N20,  \field G-Function Ln(T/Ts) Value 3
         \type real
-  N102, \field G-Function G Value 43
+  N21,  \field G-Function G Value 3
         \type real
-  N103, \field G-Function Ln(T/Ts) Value 44
+  N22,  \field G-Function Ln(T/Ts) Value 4
         \type real
-  N104, \field G-Function G Value 44
+  N23,  \field G-Function G Value 4
         \type real
-  N105, \field G-Function Ln(T/Ts) Value 45
+  N24,  \field G-Function Ln(T/Ts) Value 5
         \type real
-  N106, \field G-Function G Value 45
+  N25,  \field G-Function G Value 5
         \type real
-  N107, \field G-Function Ln(T/Ts) Value 46
+  N26,  \field G-Function Ln(T/Ts) Value 6
         \type real
-  N108, \field G-Function G Value 46
+  N27,  \field G-Function G Value 6
         \type real
-  N109, \field G-Function Ln(T/Ts) Value 47
+  N28,  \field G-Function Ln(T/Ts) Value 7
         \type real
-  N110, \field G-Function G Value 47
+  N29,  \field G-Function G Value 7
         \type real
-  N111, \field G-Function Ln(T/Ts) Value 48
+  N30,  \field G-Function Ln(T/Ts) Value 8
         \type real
-  N112, \field G-Function G Value 48
+  N31,  \field G-Function G Value 8
         \type real
-  N113, \field G-Function Ln(T/Ts) Value 49
+  N32,  \field G-Function Ln(T/Ts) Value 9
         \type real
-  N114, \field G-Function G Value 49
+  N33,  \field G-Function G Value 9
         \type real
-  N115, \field G-Function Ln(T/Ts) Value 50
+  N34,  \field G-Function Ln(T/Ts) Value 10
         \type real
-  N116, \field G-Function G Value 50
+  N35,  \field G-Function G Value 10
         \type real
-  N117, \field G-Function Ln(T/Ts) Value 51
+  N36,  \field G-Function Ln(T/Ts) Value 11
         \type real
-  N118, \field G-Function G Value 51
+  N37,  \field G-Function G Value 11
         \type real
-  N119, \field G-Function Ln(T/Ts) Value 52
+  N38,  \field G-Function Ln(T/Ts) Value 12
         \type real
-  N120, \field G-Function G Value 52
+  N39,  \field G-Function G Value 12
         \type real
-  N121, \field G-Function Ln(T/Ts) Value 53
+  N40,  \field G-Function Ln(T/Ts) Value 13
         \type real
-  N122, \field G-Function G Value 53
+  N41,  \field G-Function G Value 13
         \type real
-  N123, \field G-Function Ln(T/Ts) Value 54
+  N42,  \field G-Function Ln(T/Ts) Value 14
         \type real
-  N124, \field G-Function G Value 54
+  N43,  \field G-Function G Value 14
         \type real
-  N125, \field G-Function Ln(T/Ts) Value 55
+  N44,  \field G-Function Ln(T/Ts) Value 15
         \type real
-  N126, \field G-Function G Value 55
+  N45,  \field G-Function G Value 15
         \type real
-  N127, \field G-Function Ln(T/Ts) Value 56
+  N46,  \field G-Function Ln(T/Ts) Value 16
         \type real
-  N128, \field G-Function G Value 56
+  N47,  \field G-Function G Value 16
         \type real
-  N129, \field G-Function Ln(T/Ts) Value 57
+  N48,  \field G-Function Ln(T/Ts) Value 17
         \type real
-  N130, \field G-Function G Value 57
+  N49,  \field G-Function G Value 17
         \type real
-  N131, \field G-Function Ln(T/Ts) Value 58
+  N50,  \field G-Function Ln(T/Ts) Value 18
         \type real
-  N132, \field G-Function G Value 58
+  N51,  \field G-Function G Value 18
         \type real
-  N133, \field G-Function Ln(T/Ts) Value 59
+  N52,  \field G-Function Ln(T/Ts) Value 19
         \type real
-  N134, \field G-Function G Value 59
+  N53,  \field G-Function G Value 19
         \type real
-  N135, \field G-Function Ln(T/Ts) Value 60
+  N54,  \field G-Function Ln(T/Ts) Value 20
         \type real
-  N136, \field G-Function G Value 60
+  N55,  \field G-Function G Value 20
         \type real
-  N137, \field G-Function Ln(T/Ts) Value 61
+  N56,  \field G-Function Ln(T/Ts) Value 21
         \type real
-  N138, \field G-Function G Value 61
+  N57,  \field G-Function G Value 21
         \type real
-  N139, \field G-Function Ln(T/Ts) Value 62
+  N58,  \field G-Function Ln(T/Ts) Value 22
         \type real
-  N140, \field G-Function G Value 62
+  N59,  \field G-Function G Value 22
         \type real
-  N141, \field G-Function Ln(T/Ts) Value 63
+  N60,  \field G-Function Ln(T/Ts) Value 23
         \type real
-  N142, \field G-Function G Value 63
+  N61,  \field G-Function G Value 23
         \type real
-  N143, \field G-Function Ln(T/Ts) Value 64
+  N62,  \field G-Function Ln(T/Ts) Value 24
         \type real
-  N144, \field G-Function G Value 64
+  N63,  \field G-Function G Value 24
         \type real
-  N145, \field G-Function Ln(T/Ts) Value 65
+  N64,  \field G-Function Ln(T/Ts) Value 25
         \type real
-  N146, \field G-Function G Value 65
+  N65,  \field G-Function G Value 25
         \type real
-  N147, \field G-Function Ln(T/Ts) Value 66
+  N66,  \field G-Function Ln(T/Ts) Value 26
         \type real
-  N148, \field G-Function G Value 66
+  N67,  \field G-Function G Value 26
         \type real
-  N149, \field G-Function Ln(T/Ts) Value 67
+  N68,  \field G-Function Ln(T/Ts) Value 27
         \type real
-  N150, \field G-Function G Value 67
+  N69,  \field G-Function G Value 27
         \type real
-  N151, \field G-Function Ln(T/Ts) Value 68
+  N70,  \field G-Function Ln(T/Ts) Value 28
         \type real
-  N152, \field G-Function G Value 68
+  N71,  \field G-Function G Value 28
         \type real
-  N153, \field G-Function Ln(T/Ts) Value 69
+  N72,  \field G-Function Ln(T/Ts) Value 29
         \type real
-  N154, \field G-Function G Value 69
+  N73,  \field G-Function G Value 29
         \type real
-  N155, \field G-Function Ln(T/Ts) Value 70
+  N74,  \field G-Function Ln(T/Ts) Value 30
         \type real
-  N156, \field G-Function G Value 70
+  N75,  \field G-Function G Value 30
         \type real
-  N157, \field G-Function Ln(T/Ts) Value 71
+  N76,  \field G-Function Ln(T/Ts) Value 31
         \type real
-  N158, \field G-Function G Value 71
+  N77,  \field G-Function G Value 31
         \type real
-  N159, \field G-Function Ln(T/Ts) Value 72
+  N78,  \field G-Function Ln(T/Ts) Value 32
         \type real
-  N160, \field G-Function G Value 72
+  N79,  \field G-Function G Value 32
         \type real
-  N161, \field G-Function Ln(T/Ts) Value 73
+  N80,  \field G-Function Ln(T/Ts) Value 33
         \type real
-  N162, \field G-Function G Value 73
+  N81,  \field G-Function G Value 33
         \type real
-  N163, \field G-Function Ln(T/Ts) Value 74
+  N82,  \field G-Function Ln(T/Ts) Value 34
         \type real
-  N164, \field G-Function G Value 74
+  N83,  \field G-Function G Value 34
         \type real
-  N165, \field G-Function Ln(T/Ts) Value 75
+  N84,  \field G-Function Ln(T/Ts) Value 35
         \type real
-  N166, \field G-Function G Value 75
+  N85,  \field G-Function G Value 35
         \type real
-  N167, \field G-Function Ln(T/Ts) Value 76
+  N86,  \field G-Function Ln(T/Ts) Value 36
         \type real
-  N168, \field G-Function G Value 76
+  N87,  \field G-Function G Value 36
         \type real
-  N169, \field G-Function Ln(T/Ts) Value 77
+  N88,  \field G-Function Ln(T/Ts) Value 37
         \type real
-  N170, \field G-Function G Value 77
+  N89,  \field G-Function G Value 37
         \type real
-  N171, \field G-Function Ln(T/Ts) Value 78
+  N90,  \field G-Function Ln(T/Ts) Value 38
         \type real
-  N172, \field G-Function G Value 78
+  N91,  \field G-Function G Value 38
         \type real
-  N173, \field G-Function Ln(T/Ts) Value 79
+  N92,  \field G-Function Ln(T/Ts) Value 39
         \type real
-  N174, \field G-Function G Value 79
+  N93,  \field G-Function G Value 39
         \type real
-  N175, \field G-Function Ln(T/Ts) Value 80
+  N94,  \field G-Function Ln(T/Ts) Value 40
         \type real
-  N176, \field G-Function G Value 80
+  N95,  \field G-Function G Value 40
         \type real
-  N177, \field G-Function Ln(T/Ts) Value 81
+  N96,  \field G-Function Ln(T/Ts) Value 41
         \type real
-  N178, \field G-Function G Value 81
+  N97,  \field G-Function G Value 41
         \type real
-  N179, \field G-Function Ln(T/Ts) Value 82
+  N98,  \field G-Function Ln(T/Ts) Value 42
         \type real
-  N180, \field G-Function G Value 82
+  N99, \field G-Function G Value 42
         \type real
-  N181, \field G-Function Ln(T/Ts) Value 83
+  N100, \field G-Function Ln(T/Ts) Value 43
         \type real
-  N182, \field G-Function G Value 83
+  N101, \field G-Function G Value 43
         \type real
-  N183, \field G-Function Ln(T/Ts) Value 84
+  N102, \field G-Function Ln(T/Ts) Value 44
         \type real
-  N184, \field G-Function G Value 84
+  N103, \field G-Function G Value 44
         \type real
-  N185, \field G-Function Ln(T/Ts) Value 85
+  N104, \field G-Function Ln(T/Ts) Value 45
         \type real
-  N186, \field G-Function G Value 85
+  N105, \field G-Function G Value 45
         \type real
-  N187, \field G-Function Ln(T/Ts) Value 86
+  N106, \field G-Function Ln(T/Ts) Value 46
         \type real
-  N188, \field G-Function G Value 86
+  N107, \field G-Function G Value 46
         \type real
-  N189, \field G-Function Ln(T/Ts) Value 87
+  N108, \field G-Function Ln(T/Ts) Value 47
         \type real
-  N190, \field G-Function G Value 87
+  N109, \field G-Function G Value 47
         \type real
-  N191, \field G-Function Ln(T/Ts) Value 88
+  N110, \field G-Function Ln(T/Ts) Value 48
         \type real
-  N192, \field G-Function G Value 88
+  N111, \field G-Function G Value 48
         \type real
-  N193, \field G-Function Ln(T/Ts) Value 89
+  N112, \field G-Function Ln(T/Ts) Value 49
         \type real
-  N194, \field G-Function G Value 89
+  N113, \field G-Function G Value 49
         \type real
-  N195, \field G-Function Ln(T/Ts) Value 90
+  N114, \field G-Function Ln(T/Ts) Value 50
         \type real
-  N196, \field G-Function G Value 90
+  N115, \field G-Function G Value 50
         \type real
-  N197, \field G-Function Ln(T/Ts) Value 91
+  N116, \field G-Function Ln(T/Ts) Value 51
         \type real
-  N198, \field G-Function G Value 91
+  N117, \field G-Function G Value 51
         \type real
-  N199, \field G-Function Ln(T/Ts) Value 92
+  N118, \field G-Function Ln(T/Ts) Value 52
         \type real
-  N200, \field G-Function G Value 92
+  N119, \field G-Function G Value 52
         \type real
-  N201, \field G-Function Ln(T/Ts) Value 93
+  N120, \field G-Function Ln(T/Ts) Value 53
         \type real
-  N202, \field G-Function G Value 93
+  N121, \field G-Function G Value 53
         \type real
-  N203, \field G-Function Ln(T/Ts) Value 94
+  N122, \field G-Function Ln(T/Ts) Value 54
         \type real
-  N204, \field G-Function G Value 94
+  N123, \field G-Function G Value 54
         \type real
-  N205, \field G-Function Ln(T/Ts) Value 95
+  N124, \field G-Function Ln(T/Ts) Value 55
         \type real
-  N206, \field G-Function G Value 95
+  N125, \field G-Function G Value 55
         \type real
-  N207, \field G-Function Ln(T/Ts) Value 96
+  N126, \field G-Function Ln(T/Ts) Value 56
         \type real
-  N208, \field G-Function G Value 96
+  N127, \field G-Function G Value 56
         \type real
-  N209, \field G-Function Ln(T/Ts) Value 97
+  N128, \field G-Function Ln(T/Ts) Value 57
         \type real
-  N210, \field G-Function G Value 97
+  N129, \field G-Function G Value 57
         \type real
-  N211, \field G-Function Ln(T/Ts) Value 98
+  N130, \field G-Function Ln(T/Ts) Value 58
         \type real
-  N212, \field G-Function G Value 98
+  N131, \field G-Function G Value 58
         \type real
-  N213, \field G-Function Ln(T/Ts) Value 99
+  N132, \field G-Function Ln(T/Ts) Value 59
         \type real
-  N214, \field G-Function G Value 99
+  N133, \field G-Function G Value 59
         \type real
-  N215, \field G-Function Ln(T/Ts) Value 100
+  N134, \field G-Function Ln(T/Ts) Value 60
         \type real
-  N216; \field G-Function G Value 100
+  N135, \field G-Function G Value 60
+        \type real
+  N136, \field G-Function Ln(T/Ts) Value 61
+        \type real
+  N137, \field G-Function G Value 61
+        \type real
+  N138, \field G-Function Ln(T/Ts) Value 62
+        \type real
+  N139, \field G-Function G Value 62
+        \type real
+  N140, \field G-Function Ln(T/Ts) Value 63
+        \type real
+  N141, \field G-Function G Value 63
+        \type real
+  N142, \field G-Function Ln(T/Ts) Value 64
+        \type real
+  N143, \field G-Function G Value 64
+        \type real
+  N144, \field G-Function Ln(T/Ts) Value 65
+        \type real
+  N145, \field G-Function G Value 65
+        \type real
+  N146, \field G-Function Ln(T/Ts) Value 66
+        \type real
+  N147, \field G-Function G Value 66
+        \type real
+  N148, \field G-Function Ln(T/Ts) Value 67
+        \type real
+  N149, \field G-Function G Value 67
+        \type real
+  N150, \field G-Function Ln(T/Ts) Value 68
+        \type real
+  N151, \field G-Function G Value 68
+        \type real
+  N152, \field G-Function Ln(T/Ts) Value 69
+        \type real
+  N153, \field G-Function G Value 69
+        \type real
+  N154, \field G-Function Ln(T/Ts) Value 70
+        \type real
+  N155, \field G-Function G Value 70
+        \type real
+  N156, \field G-Function Ln(T/Ts) Value 71
+        \type real
+  N157, \field G-Function G Value 71
+        \type real
+  N158, \field G-Function Ln(T/Ts) Value 72
+        \type real
+  N159, \field G-Function G Value 72
+        \type real
+  N160, \field G-Function Ln(T/Ts) Value 73
+        \type real
+  N161, \field G-Function G Value 73
+        \type real
+  N162, \field G-Function Ln(T/Ts) Value 74
+        \type real
+  N163, \field G-Function G Value 74
+        \type real
+  N164, \field G-Function Ln(T/Ts) Value 75
+        \type real
+  N165, \field G-Function G Value 75
+        \type real
+  N166, \field G-Function Ln(T/Ts) Value 76
+        \type real
+  N167, \field G-Function G Value 76
+        \type real
+  N168, \field G-Function Ln(T/Ts) Value 77
+        \type real
+  N169, \field G-Function G Value 77
+        \type real
+  N170, \field G-Function Ln(T/Ts) Value 78
+        \type real
+  N171, \field G-Function G Value 78
+        \type real
+  N172, \field G-Function Ln(T/Ts) Value 79
+        \type real
+  N173, \field G-Function G Value 79
+        \type real
+  N174, \field G-Function Ln(T/Ts) Value 80
+        \type real
+  N175, \field G-Function G Value 80
+        \type real
+  N176, \field G-Function Ln(T/Ts) Value 81
+        \type real
+  N177, \field G-Function G Value 81
+        \type real
+  N178, \field G-Function Ln(T/Ts) Value 82
+        \type real
+  N179, \field G-Function G Value 82
+        \type real
+  N180, \field G-Function Ln(T/Ts) Value 83
+        \type real
+  N181, \field G-Function G Value 83
+        \type real
+  N182, \field G-Function Ln(T/Ts) Value 84
+        \type real
+  N183, \field G-Function G Value 84
+        \type real
+  N184, \field G-Function Ln(T/Ts) Value 85
+        \type real
+  N185, \field G-Function G Value 85
+        \type real
+  N186, \field G-Function Ln(T/Ts) Value 86
+        \type real
+  N187, \field G-Function G Value 86
+        \type real
+  N188, \field G-Function Ln(T/Ts) Value 87
+        \type real
+  N189, \field G-Function G Value 87
+        \type real
+  N190, \field G-Function Ln(T/Ts) Value 88
+        \type real
+  N191, \field G-Function G Value 88
+        \type real
+  N192, \field G-Function Ln(T/Ts) Value 89
+        \type real
+  N193, \field G-Function G Value 89
+        \type real
+  N194, \field G-Function Ln(T/Ts) Value 90
+        \type real
+  N195, \field G-Function G Value 90
+        \type real
+  N196, \field G-Function Ln(T/Ts) Value 91
+        \type real
+  N197, \field G-Function G Value 91
+        \type real
+  N198, \field G-Function Ln(T/Ts) Value 92
+        \type real
+  N199, \field G-Function G Value 92
+        \type real
+  N200, \field G-Function Ln(T/Ts) Value 93
+        \type real
+  N201, \field G-Function G Value 93
+        \type real
+  N202, \field G-Function Ln(T/Ts) Value 94
+        \type real
+  N203, \field G-Function G Value 94
+        \type real
+  N204, \field G-Function Ln(T/Ts) Value 95
+        \type real
+  N205, \field G-Function G Value 95
+        \type real
+  N206, \field G-Function Ln(T/Ts) Value 96
+        \type real
+  N207, \field G-Function G Value 96
+        \type real
+  N208, \field G-Function Ln(T/Ts) Value 97
+        \type real
+  N209, \field G-Function G Value 97
+        \type real
+  N210, \field G-Function Ln(T/Ts) Value 98
+        \type real
+  N211, \field G-Function G Value 98
+        \type real
+  N212, \field G-Function Ln(T/Ts) Value 99
+        \type real
+  N213, \field G-Function G Value 99
+        \type real
+  N214, \field G-Function Ln(T/Ts) Value 100
+        \type real
+  N215; \field G-Function G Value 100
         \type real
 
 GroundHeatExchanger:Pond,
