@@ -133,10 +133,6 @@ removeFileExtension(std::string const &fileName){
 void
 makeDirectory(std::string const &directoryPath)
 {
-	if (!directoryExists(directoryPath))
-		DisplayString("ERROR: " + getAbsolutePath(directoryPath) + " is not a directory.");
-
-		
 	// Create a directory if doesn't already exist
 	if ( pathExists(directoryPath) ){ // path already exists
 		if ( !(directoryExists(directoryPath)) )
