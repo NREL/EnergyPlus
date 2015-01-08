@@ -362,7 +362,7 @@ EnergyPlusPgm( std::string filepath )
 			DisplayString( "Directory change successful." );
 		} else {
 			DisplayString( "Couldn't change directory; aborting EnergyPlus" );
-			return 1;
+			exit(EXIT_FAILURE);
 		}
 #endif
 		ProgramPath = filepath + pathChar;
