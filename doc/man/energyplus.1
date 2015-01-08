@@ -35,7 +35,7 @@ Force annual simulation
 .RE
 .TP
 .B \-d, \-\-output\-directory \f[I]ARG\f[]
-Output directory path (default: \f[I]INPUTFILE\f[]-output)
+Output directory path (default: \f[I]INPUTFILE\f[]-output in current directory)
 .RS
 .RE
 .TP
@@ -55,7 +55,7 @@ Input data dictionary path (default: Energy+.idd in executable directory)
 .RE
 .TP
 .B \-m, \-\-epmacro
-Run EPMacro
+Run EPMacro prior to simulation
 .RS
 .RE
 .TP
@@ -65,7 +65,7 @@ Prefix for output file names (default: ep)
 .RE
 .TP
 .B \-r, \-\-readvars
-Run ReadVarsESO
+Run ReadVarsESO after simulation
 .RS
 .RE
 .TP
@@ -75,9 +75,9 @@ Display version information
 .RE
 .TP
 .B \-w, \-\-weather \f[I]ARG\f[]
-Weather file path (default: in.epw)
+Weather file path (default: in.epw in current directory)
 .RS
 .RE
 .TP
 .B \-x, \-\-expandobjects
-Run ExpandObjects
+Run ExpandObjects prior to simulation

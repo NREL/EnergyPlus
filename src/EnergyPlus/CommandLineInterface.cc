@@ -145,7 +145,7 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("", 0, 0, 0, "Force annual simulation", "-a", "--annual");
 
-	opt.add("", 0, 1, 0, "Output directory path (default: INPUTFILE-output)", "-d", "--output-directory");
+	opt.add("", 0, 1, 0, "Output directory path (default: INPUTFILE-output in current directory)", "-d", "--output-directory");
 
 	opt.add("", 0, 0, 0, "Force design-day-only simulation", "-D", "--design-day");
 
@@ -153,17 +153,17 @@ ProcessArgs(int argc, const char * argv[])
 
 	opt.add("Energy+.idd", 0, 1, 0, "Input data dictionary path (default: Energy+.idd in executable directory)", "-i", "--idd");
 
-	opt.add("", 0, 0, 0, "Run EPMacro", "-m", "--epmacro");
+	opt.add("", 0, 0, 0, "Run EPMacro prior to simulation", "-m", "--epmacro");
 
 	opt.add("", 0, 1, 0, "Prefix for output file names (default: ep)", "-p", "--output-prefix");
 
-	opt.add("", 0, 0, 0, "Run ReadVarsESO", "-r", "--readvars");
+	opt.add("", 0, 0, 0, "Run ReadVarsESO after simulation", "-r", "--readvars");
 
 	opt.add("", 0, 0, 0, "Display version information", "-v", "--version");
 
-	opt.add("in.epw", 0, 1, 0, "Weather file path (default: in.epw)", "-w", "--weather");
+	opt.add("in.epw", 0, 1, 0, "Weather file path (default: in.epw in current directory)", "-w", "--weather");
 
-	opt.add("", 0, 0, 0, "Run ExpandObjects", "-x", "--expandobjects");
+	opt.add("", 0, 0, 0, "Run ExpandObjects prior to simulation", "-x", "--expandobjects");
 
 	opt.example = "energyplus -w weather.epw -r input.idf";
 
