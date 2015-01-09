@@ -15,11 +15,29 @@ compilers:
     version: "4.8"
     build_type: Debug
     build_package_generator: "STGZ"
-    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=ON -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON
     coverage_enabled: true
     coverage_base_dir: src/EnergyPlus
     coverage_pass_limit: 90
     coverage_warn_limit: 80
     coverage_s3_bucket: energyplus
+    build_tag: UnitTests
+    ctest_filter: -E "integration.*"
+    skip_regression: true
+    skip_packaging: true
+
+
+  - name: "gcc"
+    version: "4.8"
+    build_type: Debug
+    build_package_generator: "STGZ"
+    cmake_extra_flags: -DBUILD_FORTRAN=ON -DBUILD_PACKAGE:BOOL=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DREGRESSION_BASELINE_PATH:PATH=$REGRESSION_BASELINE -DREGRESSION_SCRIPT_PATH:PATH=$REGRESSION_DIR -DREGRESSION_BASELINE_SHA:STRING=$REGRESSION_BASELINE_SHA -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON
+    coverage_enabled: true
+    coverage_base_dir: src/EnergyPlus
+    coverage_pass_limit: 90
+    coverage_warn_limit: 80
+    coverage_s3_bucket: energyplus
+    skip_regression: true
+    skip_packaging: true
 
 
