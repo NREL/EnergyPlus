@@ -5057,19 +5057,13 @@ namespace WaterThermalTanks {
 			HPWHCondenserDeltaT = 0.0;
 		}
         assert( HPWHCondenserDeltaT >= 0 );
-		Qheatpump = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
 		
-		// Calculate steady-state heat rates.
+		CalcMixedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SetPointTemp,
+												SourceMassFlowRate, Qheatpump, Qsource);
+		
+		// Calculate steady-state use heat rate.
 		Quse = UseMassFlowRate * Cp * ( UseInletTemp - SetPointTemp );
-
-		// Determine if the source side heating is coming from a heat pump.
-		if ( Tank.HeatPumpNum > 0 ) {
-			SourceMassFlowRate = 0.0; // Handle this heating as a constant heat source
-			Qsource = Qheatpump;
-		} else {
-			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - SetPointTemp );
-		}
-
+		
 		while ( TimeRemaining > 0.0 ) {
 
 			TimeNeeded = 0.0;
@@ -5417,6 +5411,40 @@ namespace WaterThermalTanks {
 
 	}
 
+	void
+	CalcMixedTankSourceSideHeatTransferRate(
+		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 SourceInletTemp, // input, Source inlet temperature (C)
+		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+		Real64 SetPointTemp, // input, Mixed tank set point temperature
+		Real64 & SourceMassFlowRate, // source mass flow rate (kg/s)
+		Real64 & Qheatpump, // heat transfer rate from heat pump
+		Real64 & Qsource // steady state heat transfer rate from a constant temperature source side flow
+	)
+	{
+		// Function Information:
+		//		Author: Noel Merket
+		//		Date Written: January 2015
+		//		Modified: na
+		//		Re-engineered: na
+		
+		// Purpose of this function:
+		// Determines if the source side heat transfer is coming from a heat pump.
+		// If so it treats the source side heat transfer as a constant heat source
+		// If it is not coming from a heat pump it treats the source side heat transfer
+		// as a constant temperature.
+		
+		// Determine if the source side heating is coming from a heat pump.
+		Qheatpump = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
+		if ( Qheatpump > 0.0 ) {
+			SourceMassFlowRate = 0.0; // Handle this heating as a constant heat source
+			Qsource = Qheatpump;
+		} else {
+			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - SetPointTemp );
+		}
+		
+	}
+	
 	Real64
 	CalcTimeNeeded(
 		Real64 const Ti, // Initial tank temperature (C)

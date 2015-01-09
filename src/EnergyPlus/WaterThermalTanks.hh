@@ -1694,6 +1694,16 @@ namespace WaterThermalTanks {
 	CalcWaterThermalTankMixed(
         int const WaterThermalTankNum // Water Heater being simulated
     );
+	
+	void CalcMixedTankSourceSideHeatTransferRate(
+		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 SourceInletTemp, // input, Source inlet temperature (C)
+		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+		Real64 SetPointTemp, // input, Mixed tank set point temperature
+		Real64 & SourceMassFlowRate, // source mass flow rate (kg/s)
+		Real64 & Qheatpump, // heat transfer rate from heat pump
+		Real64 & Qsource // steady state heat transfer rate from a constant source side flow
+	);
 
 	Real64
 	CalcTimeNeeded(

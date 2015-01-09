@@ -12,6 +12,7 @@ set( test_src
   SortAndStringUtilities.unit.cc
   Vectors.unit.cc
   Vector.unit.cc
+  WaterThermalTanks.unit.cc
 )
 
 set( test_dependencies
