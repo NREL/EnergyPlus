@@ -5991,12 +5991,8 @@ namespace WaterThermalTanks {
 
 				// Heat transfer due to fluid flow entering an inlet node
 				Quse = UseMassFlowRate * Cp * ( UseInletTemp - NodeTemp );
-				if ( Tank.HeatPumpNum > 0 ) {
-					Qsource = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
-				} else {
-					Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
-				}
-
+				Qsource = CalcStratifiedTankSourceSideHeatTransferRate(HPWHCondenserDeltaT, SourceInletTemp, Cp, SourceMassFlowRate, NodeTemp);
+				
 				InvMixUp = 0.0;
 				if ( NodeNum > 1 ) {
 					TempUp = Tank.Node( NodeNum - 1 ).Temp;
@@ -6156,6 +6152,33 @@ namespace WaterThermalTanks {
 		// Add water heater skin losses and venting losses to ambient zone, if specified
 		if ( Tank.AmbientTempZone > 0 ) WaterThermalTank( WaterThermalTankNum ).AmbientZoneGain = -Qlosszone - Qvent;
 
+	}
+	
+	Real64
+	CalcStratifiedTankSourceSideHeatTransferRate(
+		Real64 HPWHCondenserDeltaT, // input, The temperature difference (C) across the heat pump, zero if there is no heat pump or if the heat pump is off
+		Real64 SourceInletTemp, // input, Source inlet temperature (C)
+		Real64 Cp, // Specific heat of fluid (J/kg deltaC)
+		Real64 SourceMassFlowRate, // source mass flow rate (kg/s)
+		Real64 NodeTemp // temperature of the source inlet node (C)
+	)
+	{
+		// Function Information:
+		//	Author: Noel Merket
+		//	Date Written: January 2015
+
+		// Purpose of this function:
+		// Calculates the source side heat transfer rate of a stratified tank.
+		
+		// Methodology:
+		// If the source side heat transfer is coming from a heat pump, then
+		Real64 Qsource;
+		if ( HPWHCondenserDeltaT > 0.0 ) {
+			Qsource = SourceMassFlowRate * Cp * HPWHCondenserDeltaT;
+		} else {
+			Qsource = SourceMassFlowRate * Cp * ( SourceInletTemp - NodeTemp );
+		}
+		return Qsource;
 	}
 
 	void
