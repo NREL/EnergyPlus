@@ -1856,8 +1856,8 @@ namespace HeatBalFiniteDiffManager {
 
 		if ( surface.HeatTransferAlgorithm == HeatTransferModel_CondFD ) { // HT Algo issue
 
-			int const ConstrNum( Construction[ Surf - 1 ] );
-			auto const & construct( Construct( ConstrNum ) );
+		  int const ConstrNum( DataSurfaces::Construction[ Surf - 1 ] );
+		  auto const & construct( Construct( ConstrNum ) );
 
 			int const MatLay( construct.LayerPoint( Lay ) );
 			auto const & mat( Material( MatLay ) );

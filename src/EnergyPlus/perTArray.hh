@@ -5,7 +5,7 @@
 
 //This class implements an array (with a subset of std::Array type ops).
 //It is specially allocated in sub-arrays, each with cache line boundary
-//alignment.  It is statically allocated at creation time.
+//alignment. 
 
 #include <cstddef>
 #include <iterator>
@@ -75,7 +75,6 @@ public:
 		threads(threads),
 		el_size(size)
 	{
-    AlignedAlloc<T> a(Utility::getL1CacheLineSize());
     data_ = new T*[threads];
     sizes = vector<size_t>(threads, size);
     doAllocation();
@@ -95,7 +94,7 @@ public:
   ~perTArray(){
     if(data_ != nullptr){
       for(int x = 0; x < threads; ++x){
-	free(data_[x]);
+		  AlignedAlloc<T>::deallocate(data_[x]);
       }
       delete[] data_;
       data_ = nullptr;
@@ -107,10 +106,10 @@ public:
   void
   optimize(vector<size_t>& sizes){
     auto temp = new T*[threads];
-    AlignedAlloc<T> a(Utility::getL1CacheLineSize());
+    typedef AlignedAlloc<T> alloc;
     size_t newLength = 0;
     for(int x = 0; x < threads; ++x){
-      temp[x] = a.allocate(sizes[x]);
+      temp[x] = alloc::allocate(sizes[x], Utility::getL1CacheLineSize());
       newLength += sizes[x];
       // std::copy(temp[x], temp[x] + sizes[x], data_[x]);
       // free(data_[x]);
@@ -120,7 +119,7 @@ public:
     copyData(temp, sizes);
     this->sizes = sizes;
     length = newLength;
-    for(int x = 0; x < threads; ++x) free(data_[x]);
+    for(int x = 0; x < threads; ++x) alloc::deallocate(data_[x]);
     delete[] data_;
     data_ = temp;
     setFirstIndex();
@@ -163,10 +162,10 @@ private:
   void
   doAllocation(){
     length = 0;
-    AlignedAlloc<T> a(Utility::getL1CacheLineSize());
+    typedef AlignedAlloc<T> alloc;
     data_ = new T*[threads];
     for(int x = 0; x < threads; ++x){
-      data_[x] = a.allocate(sizes[x]);
+      data_[x] = alloc::allocate(sizes[x], Utility::getL1CacheLineSize());
       length += sizes[x];
     }
   }
@@ -208,9 +207,9 @@ private:
       return index / el_size;
     }else{
       for(int x = 1; x < firstIndex.size(); ++x){
-				if(firstIndex[x] > index){
-					return x - 1;
-				}
+	if(firstIndex[x] > index){
+	  return x - 1;
+	}
       }
       return firstIndex.size() - 1;
     }

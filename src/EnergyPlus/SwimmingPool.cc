@@ -324,7 +324,7 @@ namespace SwimmingPool {
 			} else if ( Surface( Pool( Item ).SurfacePtr ).MaterialMovInsulInt > 0 ) {
 				ShowSevereError( Surface( Pool( Item ).SurfacePtr ).Name + " is a pool and has movable insulation.  This is not allowed.  Remove the movable insulation for this surface." );
 				ErrorsFound = true;
-			} else if ( Construct( Surface( Pool( Item ).SurfacePtr ).Construction ).SourceSinkPresent ) {
+			} else if ( Construct( DataSurfaces::Construction[ Pool( Item ).SurfacePtr - 1 ] ).SourceSinkPresent ) {
 				ShowSevereError( Surface( Pool( Item ).SurfacePtr ).Name + " is a pool and uses a construction with a source/sink.  This is not allowed.  Use a standard construction for this surface." );
 				ErrorsFound = true;
 			} else { // ( Pool( Item ).SurfacePtr > 0 )
@@ -874,7 +874,7 @@ namespace SwimmingPool {
 
 		// LW and SW radiation term modification: any "excess" radiation blocked by the cover gets convected
 		// to the air directly and added to the zone air heat balance
-		LWsum = ( QRadThermInAbs( SurfNum ) +  NetLWRadToSurf( SurfNum ) + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) );
+		LWsum = ( QRadThermInAbs( SurfNum ) +  NetLWRadToSurf[ SurfNum - 1 ] + QHTRadSysSurf( SurfNum ) + QHWBaseboardSurf( SurfNum ) + QSteamBaseboardSurf( SurfNum ) + QElecBaseboardSurf( SurfNum ) );
 		LWtotal = Pool( PoolNum ).CurCoverLWRadFac * LWsum;
 		SWtotal = Pool( PoolNum ).CurCoverSWRadFac * QRadSWInAbs( SurfNum );
 		Pool( PoolNum ).RadConvertToConvect = ( ( 1.0 - Pool( PoolNum ).CurCoverLWRadFac ) * LWsum ) + ( ( 1.0 - Pool( PoolNum ).CurCoverSWRadFac ) * QRadSWInAbs( SurfNum ) );
@@ -887,7 +887,7 @@ namespace SwimmingPool {
 
 		TH22 = TH( SurfNum, 2, 2 ); // inside surface temperature at the previous time step equals the old pool water temperature
 		TH11 = TH( SurfNum, 1, 1 ); // outside surface temperature at the current time step
-		ConstrNum = Surface( SurfNum ).Construction;
+		ConstrNum = DataSurfaces::Construction[ SurfNum - 1 ];
 		TInSurf = Pool( PoolNum ).CurSetPtTemp;
 		Tmuw = Pool( PoolNum ).CurMakeupWaterTemp;
 		TLoopInletTemp = Node( Pool( PoolNum ).WaterInletNode ).Temp;
@@ -1135,13 +1135,13 @@ namespace SwimmingPool {
 		// FLOW:
 		SumHATsurf = 0.0;
 		
-		for ( SurfNum = Zone( ZoneNum ).SurfaceFirst; SurfNum <= Zone( ZoneNum ).SurfaceLast; ++SurfNum ) {
+		for ( SurfNum = ZoneSpecs[ ZoneNum - 1 ].SurfaceFirst; SurfNum <= ZoneSpecs[ ZoneNum - 1 ].SurfaceLast; ++SurfNum ) {
 			if ( ! Surface( SurfNum ).HeatTransSurf ) continue; // Skip non-heat transfer surfaces
 			
 			Area = Surface( SurfNum ).Area;
 			
 			if ( Surface( SurfNum ).Class == SurfaceClass_Window ) {
-				if ( SurfaceWindow( SurfNum ).ShadingFlag == IntShadeOn || SurfaceWindow( SurfNum ).ShadingFlag == IntBlindOn ) {
+				if ( SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag() == IntShadeOn || SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag() == IntBlindOn ) {
 					// The area is the shade or blind are = sum of the glazing area and the divider area (which is zero if no divider)
 					Area += SurfaceWindow( SurfNum ).DividerArea;
 				}
@@ -1151,7 +1151,9 @@ namespace SwimmingPool {
 					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).FrameArea * ( 1.0 + SurfaceWindow( SurfNum ).ProjCorrFrIn ) * SurfaceWindow( SurfNum ).FrameTempSurfIn;
 				}
 				
-				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && SurfaceWindow( SurfNum ).ShadingFlag != IntShadeOn && SurfaceWindow( SurfNum ).ShadingFlag != IntBlindOn ) {
+				if ( SurfaceWindow( SurfNum ).DividerArea > 0.0 && 
+				     SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag() != IntShadeOn && 
+				     SurfaceRadiantWin[ SurfNum - 1 ].getShadingFlag()  != IntBlindOn ) {
 					// Window divider contribution (only from shade or blind for window with divider and interior shade or blind)
 					SumHATsurf += HConvIn( SurfNum ) * SurfaceWindow( SurfNum ).DividerArea * ( 1.0 + 2.0 * SurfaceWindow( SurfNum ).ProjCorrDivIn ) * SurfaceWindow( SurfNum ).DividerTempSurfIn;
 				}
