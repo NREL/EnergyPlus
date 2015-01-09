@@ -7,7 +7,10 @@ if(MSVC)
 #  add_definitions(/Za)
 endif()
 
-configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+# Don't reconfigure this file when moving from PROFILE_GENERATE to PROFILE_USE
+if(NOT PROFILE_USE)
+  configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc" )
+endif()
 
 SET( SRC
   Timer.h
@@ -295,6 +298,10 @@ SET( SRC
   HighTempRadiantSystem.hh
   Humidifiers.cc
   Humidifiers.hh
+)
+
+SET( SRC_2
+  Timer.h
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -437,6 +444,8 @@ SET( SRC
   SurfaceGeometry.hh
   SurfaceGroundHeatExchanger.cc
   SurfaceGroundHeatExchanger.hh
+  SwimmingPool.cc
+  SwimmingPool.hh
   SystemAvailabilityManager.cc
   SystemAvailabilityManager.hh
   SystemReports.cc
@@ -523,6 +532,11 @@ SET( SRC
   ZoneTempPredictorCorrector.hh
 )
 
+if (UNIX)
+  ADD_DEFINITIONS("-fPIC")
+endif()
+
+
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
@@ -534,12 +548,18 @@ if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
 endif()
 
-# second we will create the shared library that is actually packaged with EnergyPlus
-add_library( energyplusapi SHARED "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
-if (UNIX)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+add_library( energypluslib2 STATIC ${SRC_2} )
+target_link_libraries( energypluslib2 )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( energypluslib2 dl )
 endif()
-target_link_libraries( energyplusapi energypluslib )
+
+
+# second we will create the shared library that is actually packaged with EnergyPlus
+add_library( energyplusapi SHARED  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+target_link_libraries( energyplusapi energypluslib energypluslib2 )
+
+
 set_target_properties(
   energyplusapi
   PROPERTIES
@@ -550,8 +570,15 @@ install( TARGETS energyplusapi
   LIBRARY DESTINATION ./ 
 )
 
-add_executable( energyplus main.cc )
-target_link_libraries( energyplus energyplusapi )
+if (CMAKE_COMPILER_IS_GNUCXX AND ENABLE_LTO)
+  target_link_libraries( energypluslib2 energypluslib )
+  target_link_libraries( energypluslib energypluslib2 )
+  add_executable( energyplus main.cc  "EnergyPlusPgm.cc" "public/EnergyPlusPgm.hh" )
+  target_link_libraries( energyplus energypluslib energypluslib2 )
+else()
+  add_executable( energyplus main.cc  )
+  target_link_libraries( energyplus energyplusapi )
+endif()
 
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})

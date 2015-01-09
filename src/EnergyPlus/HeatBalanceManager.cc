@@ -4015,133 +4015,27 @@ namespace HeatBalanceManager {
 			GetObjectItem( cCurrentModuleObject, Loop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, IOStatus, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames );
 			TMP = index( cAlphaArgs( 1 ), CHAR( 1 ) );
 			while ( TMP != std::string::npos ) {
-				cAlphaArgs( 1 )[ TMP ] = ',';
+				cAlphaArgs( 1 )[TMP] = ',';
 				TMP = index( cAlphaArgs( 1 ), CHAR( 1 ) );
 			}
 			TMP = index( cAlphaArgs( 1 ), CHAR( 2 ) );
 			while ( TMP != std::string::npos ) {
-				cAlphaArgs( 1 )[ TMP ] = '!';
+				cAlphaArgs( 1 )[TMP] = '!';
 				TMP = index( cAlphaArgs( 1 ), CHAR( 2 ) );
 			}
 
 			//    Make sure Zone Name is unique
 			ErrorInName = false;
 			IsBlank = false;
-			VerifyName( cAlphaArgs( 1 ), Zone.Name(), ZoneLoop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
+			VerifyName( cAlphaArgs( 1 ), Zone.Name( ), ZoneLoop, ErrorInName, IsBlank, cCurrentModuleObject + " Name" );
 			if ( ErrorInName ) {
 				ErrorsFound = true;
 				continue;
 			}
 
 			++ZoneLoop;
-			Zone( ZoneLoop ).Name = cAlphaArgs( 1 );
-			if ( NumNumbers >= 1 ) Zone( ZoneLoop ).RelNorth = rNumericArgs( 1 );
-			if ( NumNumbers >= 2 ) Zone( ZoneLoop ).OriginX = rNumericArgs( 2 );
-			if ( NumNumbers >= 3 ) Zone( ZoneLoop ).OriginY = rNumericArgs( 3 );
-			if ( NumNumbers >= 4 ) Zone( ZoneLoop ).OriginZ = rNumericArgs( 4 );
-			if ( NumNumbers >= 5 ) Zone( ZoneLoop ).OfType = rNumericArgs( 5 );
-			Zone( ZoneLoop ).OfType = StandardZone;
-			if ( NumNumbers >= 6 ) Zone( ZoneLoop ).Multiplier = rNumericArgs( 6 );
-			if ( NumNumbers >= 7 ) Zone( ZoneLoop ).CeilingHeight = rNumericArgs( 7 );
-			if ( NumNumbers >= 8 ) Zone( ZoneLoop ).Volume = rNumericArgs( 8 );
-			if ( NumNumbers >= 9 ) Zone( ZoneLoop ).UserEnteredFloorArea = rNumericArgs( 9 );
+			ProcessZoneData( cCurrentModuleObject, ZoneLoop, cAlphaArgs, NumAlphas, rNumericArgs, NumNumbers, lNumericFieldBlanks, lAlphaFieldBlanks, cAlphaFieldNames, cNumericFieldNames, ErrorsFound );
 
-			if ( NumAlphas > 1 && ! lAlphaFieldBlanks( 2 ) ) {
-				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
-
-				if ( SELECT_CASE_var == "SIMPLE" ) {
-					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAESimple;
-
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
-					if ( cAlphaArgs( 2 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\", defaulting to TARP." );
-					}
-					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
-
-				} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
-					Zone( ZoneLoop ).InsideConvectionAlgo = CeilingDiffuser;
-
-				} else if ( SELECT_CASE_var == "TROMBEWALL" ) {
-					Zone( ZoneLoop ).InsideConvectionAlgo = TrombeWall;
-
-				} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM " ) {
-					Zone( ZoneLoop ).InsideConvectionAlgo = AdaptiveConvectionAlgorithm;
-
-				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-					ShowContinueError( "Invalid value for " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
-					ErrorsFound = true;
-					//Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
-
-				}}
-			} else {
-				// No zone specific algorithm specified, use default Inside Convection Algorithm
-				Zone( ZoneLoop ).InsideConvectionAlgo = DefaultInsideConvectionAlgo;
-
-			}
-
-			if ( NumAlphas > 2 && ! lAlphaFieldBlanks( 3 ) ) {
-				{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
-
-				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
-					if ( cAlphaArgs( 3 ) == "SIMPLE" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to SimpleCombined." );
-					}
-					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAESimple;
-
-				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
-					if ( cAlphaArgs( 3 ) == "DETAILED" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
-					if ( cAlphaArgs( 3 ) == "BLAST" ) {
-						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
-					}
-					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAETARP;
-
-				} else if ( SELECT_CASE_var == "MOWITT" ) {
-					Zone( ZoneLoop ).OutsideConvectionAlgo = MoWiTTHcOutside;
-
-				} else if ( ( SELECT_CASE_var == "DOE2" ) || ( SELECT_CASE_var == "DOE-2" ) ) {
-					Zone( ZoneLoop ).OutsideConvectionAlgo = DOE2HcOutside;
-
-				} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
-					Zone( ZoneLoop ).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
-
-				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-					ShowContinueError( "Invalid value for " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
-					ErrorsFound = true;
-					//Zone( ZoneLoop ).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
-
-				}}
-			} else {
-				// No zone specific algorithm specified, use default Outside Convection Algorithm
-				Zone( ZoneLoop ).OutsideConvectionAlgo = DefaultOutsideConvectionAlgo;
-
-			}
-
-			// Process the input field:    Part of Total Floor Area
-			//   The default value is YES and so only NO needs to be handled
-			if ( NumAlphas > 3 ) {
-				if ( SameString( "No", cAlphaArgs( 4 ) ) ) {
-					Zone( ZoneLoop ).isPartOfTotalArea = false;
-				} else if ( SameString( "Yes", cAlphaArgs( 4 ) ) || lAlphaFieldBlanks( 4 ) ) {
-					Zone( ZoneLoop ).isPartOfTotalArea = true;
-				} else {
-					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
-					ShowContinueError( "Invalid value for " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
-					ErrorsFound = true;
-				}
-			}
-
-			// Zone outdoor environmental variables, used for zone infiltration/ventilation
-			SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
-			SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
 		} // Loop
 
 		for ( Loop = 1; Loop <= NumOfZones; ++Loop ) {
@@ -4276,6 +4170,168 @@ namespace HeatBalanceManager {
 		//allocate the array the holds the predefined report data
 		ZonePreDefRep.allocate( NumOfZones );
 
+	}
+
+	void
+		ProcessZoneData( 
+		std::string const & cCurrentModuleObject,
+		int const ZoneLoop,
+		FArray1S_string cAlphaArgs,
+		int & NumAlphas,
+		FArray1S< Real64 > rNumericArgs,
+		int & NumNumbers,
+		FArray1S_bool lNumericFieldBlanks,
+		FArray1S_bool lAlphaFieldBlanks,
+		FArray1S_string cAlphaFieldNames,
+		FArray1S_string cNumericFieldNames,
+		bool & ErrorsFound ) // If errors found in input
+	{
+
+		// SUBROUTINE INFORMATION:
+		//       AUTHOR         Linda K. Lawrie
+		//       DATE WRITTEN   November 1997
+		//       MODIFIED       PGE: Added ZONE LIST and ZONE GROUP objects, Nov 2003
+		//                      RJH: Added init of DElight member of ZoneDaylight object, Jan 2004
+		//                      JG: Added Part of Total Floor Area field March 2006
+		//       RE-ENGINEERED  MJW: Split out processing zone input to facilitate unit testing, Nov 2014
+
+		// PURPOSE OF THIS SUBROUTINE:
+		// This subroutine gets the zone data for each zone in the input file.
+
+		// METHODOLOGY EMPLOYED:
+		// The GetObjectItem routines are employed to retrieve the data.
+
+		// REFERENCES:
+		// IDD Definition for Zone object
+
+		// Using/Aliasing
+		using DataDaylighting::ZoneDaylight;
+
+		// Locals
+		// SUBROUTINE ARGUMENT DEFINITIONS:
+
+		// SUBROUTINE PARAMETER DEFINITIONS:
+		static std::string const RoutineName( "ProcessZoneData: " );
+		//  INTEGER, PARAMETER :: MaxZonesInList = 100 ! This is to allow DIMENSIONing below
+
+		// INTERFACE BLOCK SPECIFICATIONS:
+		// na
+
+		// DERIVED TYPE DEFINITIONS:
+		// na
+
+		// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+		//  CHARACTER(len=MaxNameLength), DIMENSION(MaxZonesInList + 1) :: Alphas
+		//  REAL(r64), DIMENSION(8)              :: Numbers
+
+		Zone( ZoneLoop ).Name = cAlphaArgs( 1 );
+		if ( NumNumbers >= 1 ) Zone( ZoneLoop ).RelNorth = rNumericArgs( 1 );
+		if ( NumNumbers >= 2 ) Zone( ZoneLoop ).OriginX = rNumericArgs( 2 );
+		if ( NumNumbers >= 3 ) Zone( ZoneLoop ).OriginY = rNumericArgs( 3 );
+		if ( NumNumbers >= 4 ) Zone( ZoneLoop ).OriginZ = rNumericArgs( 4 );
+		if ( NumNumbers >= 5 ) Zone( ZoneLoop ).OfType = rNumericArgs( 5 );
+		Zone( ZoneLoop ).OfType = StandardZone;
+		if ( NumNumbers >= 6 ) Zone( ZoneLoop ).Multiplier = rNumericArgs( 6 );
+		if ( NumNumbers >= 7 ) Zone( ZoneLoop ).CeilingHeight = rNumericArgs( 7 );
+		if ( NumNumbers >= 8 ) Zone( ZoneLoop ).Volume = rNumericArgs( 8 );
+		if ( NumNumbers >= 9 ) Zone( ZoneLoop ).UserEnteredFloorArea = rNumericArgs( 9 );
+
+		if ( NumAlphas > 1 && !lAlphaFieldBlanks( 2 ) ) {
+				{ auto const SELECT_CASE_var( cAlphaArgs( 2 ) );
+
+				if ( SELECT_CASE_var == "SIMPLE" ) {
+					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAESimple;
+
+				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) ) {
+					if ( cAlphaArgs( 2 ) == "DETAILED" ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
+						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\", defaulting to TARP." );
+					}
+					Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
+
+				} else if ( SELECT_CASE_var == "CEILINGDIFFUSER" ) {
+					Zone( ZoneLoop ).InsideConvectionAlgo = CeilingDiffuser;
+
+				} else if ( SELECT_CASE_var == "TROMBEWALL" ) {
+					Zone( ZoneLoop ).InsideConvectionAlgo = TrombeWall;
+
+				} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
+					Zone( ZoneLoop ).InsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
+					ShowContinueError( "Invalid value for " + cAlphaFieldNames( 2 ) + "=\"" + cAlphaArgs( 2 ) + "\"." );
+					ErrorsFound = true;
+					//Zone( ZoneLoop ).InsideConvectionAlgo = ASHRAETARP;
+
+				}}
+		} else {
+			// No zone specific algorithm specified, use default Inside Convection Algorithm
+			Zone( ZoneLoop ).InsideConvectionAlgo = DefaultInsideConvectionAlgo;
+
+		}
+
+		if ( NumAlphas > 2 && !lAlphaFieldBlanks( 3 ) ) {
+				{ auto const SELECT_CASE_var( cAlphaArgs( 3 ) );
+
+				if ( ( SELECT_CASE_var == "SIMPLECOMBINED" ) || ( SELECT_CASE_var == "SIMPLE" ) ) {
+					if ( cAlphaArgs( 3 ) == "SIMPLE" ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
+						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to SimpleCombined." );
+					}
+					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAESimple;
+
+				} else if ( ( SELECT_CASE_var == "TARP" ) || ( SELECT_CASE_var == "DETAILED" ) || ( SELECT_CASE_var == "BLAST" ) ) {
+					if ( cAlphaArgs( 3 ) == "DETAILED" ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
+						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
+					}
+					if ( cAlphaArgs( 3 ) == "BLAST" ) {
+						ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
+						ShowContinueError( "Deprecated value in " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\", defaulting to TARP." );
+					}
+					Zone( ZoneLoop ).OutsideConvectionAlgo = ASHRAETARP;
+
+				} else if ( SELECT_CASE_var == "MOWITT" ) {
+					Zone( ZoneLoop ).OutsideConvectionAlgo = MoWiTTHcOutside;
+
+				} else if ( ( SELECT_CASE_var == "DOE2" ) || ( SELECT_CASE_var == "DOE-2" ) ) {
+					Zone( ZoneLoop ).OutsideConvectionAlgo = DOE2HcOutside;
+
+				} else if ( SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM" ) {
+					Zone( ZoneLoop ).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+
+				} else {
+					ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
+					ShowContinueError( "Invalid value for " + cAlphaFieldNames( 3 ) + "=\"" + cAlphaArgs( 3 ) + "\"." );
+					ErrorsFound = true;
+					//Zone( ZoneLoop ).OutsideConvectionAlgo = AdaptiveConvectionAlgorithm;
+
+				}}
+		} else {
+			// No zone specific algorithm specified, use default Outside Convection Algorithm
+			Zone( ZoneLoop ).OutsideConvectionAlgo = DefaultOutsideConvectionAlgo;
+
+		}
+
+		// Process the input field:    Part of Total Floor Area
+		//   The default value is YES and so only NO needs to be handled
+		if ( NumAlphas > 3 ) {
+			if ( SameString( "No", cAlphaArgs( 4 ) ) ) {
+				Zone( ZoneLoop ).isPartOfTotalArea = false;
+			} else if ( SameString( "Yes", cAlphaArgs( 4 ) ) || lAlphaFieldBlanks( 4 ) ) {
+				Zone( ZoneLoop ).isPartOfTotalArea = true;
+			} else {
+				ShowSevereError( RoutineName + cCurrentModuleObject + "=\"" + Zone( ZoneLoop ).Name + "\"." );
+				ShowContinueError( "Invalid value for " + cAlphaFieldNames( 4 ) + "=\"" + cAlphaArgs( 4 ) + "\"." );
+				ErrorsFound = true;
+			}
+		}
+
+		// Zone outdoor environmental variables, used for zone infiltration/ventilation
+		SetupOutputVariable( "Zone Outdoor Air Drybulb Temperature [C]", Zone( ZoneLoop ).OutDryBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wetbulb Temperature [C]", Zone( ZoneLoop ).OutWetBulbTemp, "Zone", "Average", Zone( ZoneLoop ).Name );
+		SetupOutputVariable( "Zone Outdoor Air Wind Speed [m/s]", Zone( ZoneLoop ).WindSpeed, "Zone", "Average", Zone( ZoneLoop ).Name );
 	}
 
 	// End of Get Input subroutines for the HB Module
@@ -4458,6 +4514,8 @@ namespace HeatBalanceManager {
 		//  Allocate variables in DataHeatBalSys
 		SumConvHTRadSys.dimension( NumOfZones, 0.0 );
 		SumLatentHTRadSys.dimension( NumOfZones, 0.0 );
+		SumConvPool.dimension( NumOfZones, 0.0 );
+		SumLatentPool.dimension( NumOfZones, 0.0 );
 		QHTRadSysToPerson.dimension( NumOfZones, 0.0 );
 		QHWBaseboardToPerson.dimension( NumOfZones, 0.0 );
 		QSteamBaseboardToPerson.dimension( NumOfZones, 0.0 );
@@ -7954,7 +8012,7 @@ Label1000: ;
 
 	//     NOTICE
 
-	//     Copyright © 1996-2014 The Board of Trustees of the University of Illinois
+	//     Copyright ï¿½ 1996-2014 The Board of Trustees of the University of Illinois
 	//     and The Regents of the University of California through Ernest Orlando Lawrence
 	//     Berkeley National Laboratory.  All rights reserved.
 

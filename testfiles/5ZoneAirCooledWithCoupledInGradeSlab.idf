@@ -244,7 +244,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
 
-  Site:GroundDomain,
+  Site:GroundDomain:Slab,
     IngradeCoupledSlab,	!- Name
     5,                  !- Ground Domain Depth {m}
     1,                  !- Aspect Ratio
