@@ -21,7 +21,7 @@ compilers:
     coverage_pass_limit: 90
     coverage_warn_limit: 80
     coverage_s3_bucket: energyplus
-    build_tag: UnitTests
+    build_tag: UnitTestsCoverage
     ctest_filter: -E "integration.*"
     skip_regression: true
     skip_packaging: true
@@ -37,6 +37,7 @@ compilers:
     coverage_pass_limit: 90
     coverage_warn_limit: 80
     coverage_s3_bucket: energyplus
+    build_tag: IntegrationCoverage
     skip_regression: true
     skip_packaging: true
 
