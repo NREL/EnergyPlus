@@ -21,6 +21,12 @@ JSONDataObject::JSONDataObject(const string &json_content) :
 
 }
 
+//JSONDataObject::JSONDataObject(cJSON &cjson) :
+//    data_j(&cjson)
+//{
+
+//}
+
 JSONDataObject::~JSONDataObject()
 {
     cJSON_Delete(data_j);
@@ -29,11 +35,35 @@ JSONDataObject::~JSONDataObject()
 std::map<std::string, std::string> JSONDataObject::getProperties()
 {
     map<string, string> property_map;
-
+    for (int i=0; i < cJSON_GetArraySize(data_j); i++)
+    {
+        cJSON *property = cJSON_GetArrayItem(data_j,i);
+        if (property) {
+            string property_name = property->string;
+            switch (property->type) {
+            case cJSON_Number: { //get numeric types
+                double property_value = (property->valuedouble) ? property->valuedouble : property->valueint;
+ property_map.emplace(property_name, to_string(property_value));
+                break; }
+            case cJSON_String: { //get alpha types
+                string property_value = property->valuestring;
+ property_map.emplace(property_name, property_value);
+                break; }
+            default: {
+                // nothing to do
+                break; }
+            }
+        }
+    }
     return property_map;
 }
 
-////
+
+
+
+/////////////////////////////////////////////////////
+
+
 
 JSONDataInterface::JSONDataInterface(const string &json_schema)
 {
@@ -53,7 +83,25 @@ JSONDataInterface::~JSONDataInterface()
     cJSON_Delete(model_j);
 }
 
-std::list<JSONDataObject> JSONDataInterface::getModelObjects(string object_type_regex)
+std::list<std::shared_ptr<JSONDataObject> > JSONDataInterface::getModelObjects(string object_type)
+{
+    std::list<std::shared_ptr<JSONDataObject> > return_object_list;
+    //    std::list<shared_ptr<JSONDataObject> >  return_object_list(make_shared<std::list<shared_ptr<JSONDataObject> > >());
+    for (int i=0; i < cJSON_GetArraySize(model_j); ++i)
+    {
+        cJSON *subItem = cJSON_GetArrayItem(model_j,i);
+        if (subItem) {
+            //this next line would benefit from a direct cJSON object constructor,
+            //but hidden the pointers proved problematic.  we can optimize later, if necessary.
+            return_object_list.push_back(make_shared<JSONDataObject>(cJSON_Print(subItem)));
+        } else {
+            cout << "ERROR: subItem not returned" << endl;
+        }
+    }
+    return return_object_list;
+}
+
+std::list<JSONDataObject> JSONDataInterface::getModelObjectDataByIndex(string object_uuid, int index)
 {
 
 }

@@ -21,6 +21,7 @@ const std::string HELP_TEXT =
         "\nUSAGE:\n\tidfxt [option] [value]\n\nOPTIONS:\n"
         "  --idf \t -i <input_filename>\n\t\t\t Translate an IDF (.IDF) file to JSON (.IDFj),\n\t\t\t and validate.\n\n"
         "  --json\t -j <input_filename>\n\t\t\t Validate a JSON (.IDFj) file,\n\t\t\t and show results.\n\n"
+        "  --json\t -t <input_filename>\n\t\t\t Test - dump to console all the objects' property maps\n\n"
         "  --version\t -v      Display idfxt version information.\n"
         "  --help\t -h      Display usage information.\n"
         "\nExamples:\n"
@@ -72,8 +73,24 @@ int actionTranslate(string in_file)
         cout << "FAILURE: Invalid values detected in - " << in_file << endl;
         return 1;
     }
+
     Data->writeJSONdata(replaceString(in_file, ".idf", ".idfx"));
     return 0;
+}
+
+void test_DumpPropertyMaps(string in_file)
+{
+    Data->importIDFModel(in_file);  //load Data
+    auto allobjects = Data->getModelObjects();
+    while (!allobjects.empty()) {
+        auto oneObject(allobjects.front());
+        auto onePropertyMap = oneObject->getProperties();
+        for (const auto& one : onePropertyMap) {
+            cout << one.first << " : " << one.second << endl;
+        }
+        cout << endl;
+        allobjects.pop_front();
+    }
 }
 
 
@@ -93,6 +110,9 @@ int main(int argc, char **argv)
             } else if ((arg1 == "-j") || (arg1 == "--json")) {
                 initData(); // setup JSONDataInterface
                 actionJSON(input_filename);
+            } else if ((arg1 == "-t") || (arg1 == "--test")) {
+                initData();
+                test_DumpPropertyMaps(input_filename);
             }
         } else { // action arg only
             if ((arg1 == "-v") || (arg1 == "--version")) {

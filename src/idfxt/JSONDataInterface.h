@@ -6,6 +6,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <memory>
 
 //for old IDF text import only
 #include <algorithm>
@@ -29,6 +30,7 @@ extern "C"
 
 namespace idfx {
 
+
 class JSONDataObject
 {
 public:
@@ -43,10 +45,17 @@ public:
 
     std::list<JSONDataObject> getChildren();
 
+    //friend access private constructor to avoid conversion to/from strings internally
+//    friend std::list<JSONDataObject> JSONDataInterface::getModelObjects(std::string);
+
 private:
     cJSON *data_j;
+
+//    JSONDataObject(cJSON &cjson); //to hide cJSON pointer
 };
 
+
+//////////////////////////////////////////////////////////
 
 class JSONDataInterface
 {
@@ -54,8 +63,7 @@ public:
     JSONDataInterface(const std::string &json_schema);
     ~JSONDataInterface();
 
-    std::list<JSONDataObject> getModelObjects(
-            std::string object_type_regex = "");
+    std::list<std::shared_ptr<JSONDataObject> > getModelObjects(std::string object_type = "");
 
     std::list<JSONDataObject> getModelObjectDataByIndex(
             std::string object_uuid,
