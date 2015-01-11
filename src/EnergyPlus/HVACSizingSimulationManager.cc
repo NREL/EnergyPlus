@@ -23,6 +23,7 @@
 #include <ExteriorEnergyUse.hh>
 #include <DataSizing.hh>
 #include <DataPlant.hh>
+#include <FluidProperties.hh>
 
 
 
@@ -69,6 +70,8 @@ namespace EnergyPlus {
 			using DataPlant::PlantLoop;
 			using DataPlant::TotNumLoops;
 			using DataPlant::SupplySide;
+			using DataGlobals::InitConvTemp;
+			using namespace FluidProperties;
 
 			PlantCoinicidentAnalyis tmpAnalysisObj;
 
@@ -79,6 +82,9 @@ namespace EnergyPlus {
 				if (PlantLoopName == PlantLoop( i ).Name) { //found it
 					tmpAnalysisObj.PlantLoop = i;
 					tmpAnalysisObj.SupplySideInletNodeNum = PlantLoop( i ).LoopSide( SupplySide ).NodeNumIn;
+					tmpAnalysisObj.DensityForSizing = GetDensityGlycol( PlantLoop( i ).FluidName, 
+						InitConvTemp, PlantLoop( i ).FluidIndex, 
+						"createNewCoincidentPlantAnalysisObject" );
 					//tmpAnalysisObj.SizingLogger = this -> SizingLogger;
 				}
 			}
@@ -89,12 +95,23 @@ namespace EnergyPlus {
 	void HVACSizingSimulationManager::setupSizingAnalyses(){
 	
 		for ( auto &P : this -> PlantCoincAnalyObjs ) {
-			//call setup routine on each coincident plant analysis object 
-			P.LogIndex = SizingLogger.AddSizingLog( P.SupplySideInletNodeNum );
+			//call setup routine for each coincident plant analysis object 
+			P.LogIndex = SizingLogger.SetupVariableSizingLog( P.SupplySideInletNodeNum );
+		}
+	}
 
+	void HVACSizingSimulationManager::processCoincidentPlantSizeAdjustments(){
+
+		for ( auto &P : this -> PlantCoincAnalyObjs ) {
+		
+			P.newFoundMassFlowRateTimeStamp = SizingLogger.logObjs[ P.LogIndex ].GetLogVariableDataMax( );
+
+			P.DetermineMaxFlowRate();
+
+		}
 	}
 		
-	}
+
 
 
 	namespace HVACSizingSimulationManagerNamespace { 
@@ -292,6 +309,10 @@ namespace EnergyPlus {
 
 			} // ... End environment loop.
 		} // End HVAC Sizing Iteration loop
+
+		//
+		SizeSimManagerObj.processCoincidentPlantSizeAdjustments();
+
 		WarmupFlag = false;
 		DoOutputReporting = true;
 	

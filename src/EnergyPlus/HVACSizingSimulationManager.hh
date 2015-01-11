@@ -25,7 +25,7 @@
 #include <ExteriorEnergyUse.hh>
 #include <DataSizing.hh>
 #include <DataPlant.hh>
-
+#include <FluidProperties.hh>
 
 namespace EnergyPlus {
 
@@ -47,6 +47,8 @@ namespace EnergyPlus {
 		);
 
 		void setupSizingAnalyses();
+
+		void processCoincidentPlantSizeAdjustments();
 
 
 	};

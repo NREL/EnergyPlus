@@ -5009,7 +5009,8 @@ namespace HeatBalanceManager {
 		using DataSystemVariables::UpdateDataDuringWarmupExternalInterface;
 		using namespace DataReportingFlags;
 		using namespace HVACSizingSimulationManagerNamespace;
-
+		using DataGlobals::KindOfSim;
+		using DataGlobals::ksHVACSizeDesignDay;
 		// Locals
 		// SUBROUTINE ARGUMENT DEFINITIONS:
 		// na
@@ -5035,7 +5036,10 @@ namespace HeatBalanceManager {
 		if ( ! WarmupFlag && DoOutputReporting ) {
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
-			UpdateSizingLogsZoneStep();
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+				UpdateSizingLogsZoneStep();
+			}
+			
 			UpdateTabularReports( ZoneTSReporting );
 			UpdateUtilityBills();
 		} else if ( ! KickOffSimulation && DoOutputReporting && ReportDuringWarmup ) {
@@ -5058,8 +5062,15 @@ namespace HeatBalanceManager {
 			}
 			CalcMoreNodeInfo();
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+				UpdateSizingLogsZoneStep();
+			}
+			
 		} else if ( UpdateDataDuringWarmupExternalInterface ) { // added for FMI
 			UpdateDataandReport( ZoneTSReporting );
+			if ( KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign ){
+				UpdateSizingLogsZoneStep();
+			}
 		}
 		// There is no hourly reporting in the heat balance.
 
