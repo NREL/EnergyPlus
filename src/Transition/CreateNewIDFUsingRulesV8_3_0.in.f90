@@ -332,6 +332,13 @@
                 ObjectName = 'Site:GroundDomain:Slab'
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 
+              CASE('GROUNDHEATEXCHANGER:VERTICAL')
+                ! Remove Max flow rate field
+                nodiff=.false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNUmArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:10) = InArgs(1:10)
+                OutArgs(11:CurArgs) = InArgs(10:CurArgs-1)
+                CurArgs = CurArgs - 1 
     !!!   Changes for report variables, meters, tables -- update names
 
               CASE('OUTPUT:VARIABLE')
