@@ -64837,6 +64837,208 @@ PlantEquipmentOperation:ComponentSetpoint,
        \key Cooling
        \key Dual
 
+PlantEquipmentOperation:ThermalEnergyStorage,
+       \memo Plant equipment operation scheme for simpler input to control thermal (ice)
+       \memo energy storage systems.  It replaces a host of setpoint managers with simple,
+       \memo single input values.  For more complex controls, use the ComponentSetpoint
+       \memo scheme.
+    \min-fields 7
+   A1, \field Name
+       \required-field
+       \reference ControlSchemeList
+   A2, \field On-Peak Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   A3, \field Charging Availability Schedule
+       \required-field
+       \type object-list
+       \object-list ScheduleNames
+   N1, \field Non-Charging Chilled Water Temperature
+       \memo Single temperature for chiller outlet when not in cooling season
+       \memo or during on-peak cooling (discharge)
+       \type real
+       \units C
+   N2, \field Off-Peak Chilled Water Temperature
+       \memo Single temperature for chiller outlet when off-peak during cooling
+       \memo season (charging)
+   A4, \field Equipment 1 Object Type
+       \required-field
+       \type alpha
+   A5, \field Equipment 1 Name
+       \required-field
+       \type alpha
+   A6, \field Demand Calculation 1 Node Name
+       \required-field
+       \type node
+   A7, \field Setpoint 1 Node Name
+       \required-field
+       \type node
+   N3, \field Component 1 Flow Rate
+       \required-field
+       \type real
+       \units m3/s
+       \autosizable
+   A8, \field Operation 1 Type
+       \required-field
+       \type choice
+       \key Heating
+       \key Cooling
+       \key Dual
+   A9, \field Equipment 2 Object Type
+       \type alpha
+   A10, \field Equipment 2 Name
+        \type alpha
+   A11, \field Demand Calculation 2 Node Name
+        \type node
+   A12, \field Setpoint 2 Node Name
+        \type node
+   N4,  \field Component 2 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A13, \field Operation 2 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A14, \field Equipment 3 Object Type
+        \type alpha
+   A15, \field Equipment 3 Name
+        \type alpha
+   A16, \field Demand Calculation 3 Node Name
+        \type node
+   A17, \field Setpoint 3 Node Name
+        \type node
+   N5,  \field Component 3 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A18, \field Operation 3 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A19, \field Equipment 4 Object Type
+        \type alpha
+   A20, \field Equipment 4 Name
+        \type alpha
+   A21, \field Demand Calculation 4 Node Name
+        \type node
+   A22, \field Setpoint 4 Node Name
+        \type node
+   N6,  \field Component 4 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A23, \field Operation 4 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A24, \field Equipment 5 Object Type
+        \type alpha
+   A25, \field Equipment 5 Name
+        \type alpha
+   A26, \field Demand Calculation 5 Node Name
+        \type node
+   A27, \field Setpoint 5 Node Name
+        \type node
+   N7,  \field Component 5 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A28, \field Operation 5 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A29, \field Equipment 6 Object Type
+        \type alpha
+   A30, \field Equipment 6 Name
+        \type alpha
+   A31, \field Demand Calculation 6 Node Name
+        \type node
+   A32, \field Setpoint 6 Node Name
+        \type node
+   N8,  \field Component 6 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A33, \field Operation 6 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A34, \field Equipment 7 Object Type
+        \type alpha
+   A35, \field Equipment 7 Name
+        \type alpha
+   A36, \field Demand Calculation 7 Node Name
+        \type node
+   A37, \field Setpoint 7 Node Name
+        \type node
+   N9,  \field Component 7 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A38, \field Operation 7 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A39, \field Equipment 8 Object Type
+        \type alpha
+   A40, \field Equipment 8 Name
+        \type alpha
+   A41, \field Demand Calculation 8 Node Name
+        \type node
+   A42, \field Setpoint 8 Node Name
+        \type node
+   N10, \field Component 8 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A43, \field Operation 8 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A44, \field Equipment 9 Object Type
+        \type alpha
+   A45, \field Equipment 9 Name
+        \type alpha
+   A46, \field Demand Calculation 9 Node Name
+        \type node
+   A47, \field Setpoint 9 Node Name
+        \type node
+   N11, \field Component 9 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A48, \field Operation 9 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+   A49, \field Equipment 10 Object Type
+        \type alpha
+   A50, \field Equipment 10 Name
+        \type alpha
+   A51, \field Demand Calculation 10 Node Name
+        \type node
+   A52, \field Setpoint 10 Node Name
+        \type node
+   N12, \field Component 10 Flow Rate
+        \type real
+        \units m3/s
+        \autosizable
+   A53; \field Operation 10 Type
+        \type choice
+        \key Heating
+        \key Cooling
+        \key Dual
+
 PlantEquipmentOperation:OutdoorDryBulbDifference,
        \memo Plant equipment operation scheme for outdoor dry-bulb temperature difference
        \memo operation. Specifies one or more groups of equipment which are available to operate
