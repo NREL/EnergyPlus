@@ -2653,7 +2653,7 @@ namespace EvaporativeCoolers {
 				SAFMethod = ZoneHVACSizing( zoneHVACIndex ).CoolingSAFMethod;
 				ZoneEqSizing( CurZoneEqNum ).SizingMethod( SizingMethod ) = SAFMethod;
 				if ( SAFMethod == None || SAFMethod == SupplyAirFlowRate || SAFMethod == FlowPerFloorArea || SAFMethod == FractionOfAutosizedCoolingAirflow ) {
-					if ( SAFMethod == SupplyAirFlowRate ){
+					if ( SAFMethod == SupplyAirFlowRate ) {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 							ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
@@ -2662,17 +2662,16 @@ namespace EvaporativeCoolers {
 						if ( ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow > 0.0 ) {
 							PrintFlag = false;
 						}
-					} else if ( SAFMethod == FlowPerFloorArea ){
+					} else if ( SAFMethod == FlowPerFloorArea ) {
 						ZoneEqSizing( CurZoneEqNum ).SystemAirFlow = true;
 						ZoneEqSizing( CurZoneEqNum ).AirVolFlow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow * Zone( DataZoneNumber ).FloorArea;
 						TempSize = ZoneEqSizing( CurZoneEqNum ).AirVolFlow;
 						DataScalableSizingON = true;
-					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ){
+					} else if ( SAFMethod == FractionOfAutosizedCoolingAirflow ) {
 						DataFracOfAutosizedCoolingAirflow = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 						TempSize = AutoSize;
 						DataScalableSizingON = true;
-					}
-					else {
+					} else {
 						TempSize = ZoneHVACSizing( zoneHVACIndex ).MaxCoolAirVolFlow;
 					}
 					RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -2703,7 +2702,7 @@ namespace EvaporativeCoolers {
 				// N1 , \field Maximum Supply Air Flow Rate
 				ZoneCoolingOnlyFan = true;
 				if ( ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate > 0.0) {
-					 PrintFlag = false;
+					PrintFlag = false;
 				}
 				TempSize = ZoneEvapUnit( UnitNum ).DesignAirVolumeFlowRate;
 				RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -3115,12 +3114,12 @@ namespace EvaporativeCoolers {
 
 			} else if ( SolFla == -2 ) {
 				if ( ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex == 0 ) {
-					ShowWarningError( "Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded," " for unit = " + ZoneEvapUnit( UnitNum ).Name );
+					ShowWarningError( "Variable speed evaporative cooler unit calculation failed: fan speed ratio limits exceeded, for unit = " + ZoneEvapUnit( UnitNum ).Name );
 					ShowContinueError( "Check input for Fan Placement." );
 					ShowContinueErrorTimeStamp( "" );
 					if ( WarmupFlag ) ShowContinueError( "Error occurred during warmup days." );
 				}
-				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (limits exceeded) " "for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit( UnitNum ).Name, ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex );
+				ShowRecurringWarningErrorAtEnd( "Zone Evaporative Cooler unit control failed (limits exceeded) for ZoneHVAC:EvaporativeCoolerUnit =\"" + ZoneEvapUnit( UnitNum ).Name, ZoneEvapUnit( UnitNum ).UnitVSControlLimitsErrorIndex );
 			}
 			ZoneEvapUnit( UnitNum ).FanSpeedRatio = FanSpeedRatio;
 		}

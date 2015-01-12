@@ -317,7 +317,7 @@ namespace ThermalChimney {
 
 			// Error trap if the sum of fractions is not equal to 1.0
 			if ( std::abs( AllRatiosSummed - 1.0 ) > FlowFractionTolerance ) {
-				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid " "sum of fractions, must be =1.0, entered value (summed from entries)=[" + RoundSigDigits( AllRatiosSummed, 4 ) + "]." );
+				ShowSevereError( cCurrentModuleObject + "=\"" + cAlphaArgs( 1 ) + " invalid sum of fractions, must be =1.0, entered value (summed from entries)=[" + RoundSigDigits( AllRatiosSummed, 4 ) + "]." );
 				ErrorsFound = true;
 			}
 

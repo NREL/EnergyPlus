@@ -41,8 +41,8 @@
  #include <unistd.h>
 #endif
 
-void 
-EnergyPlusPgm( std::string filepath )
+void
+EnergyPlusPgm( std::string const & filepath )
 {
 	// Using/Aliasing
 	using namespace EnergyPlus;
@@ -245,7 +245,7 @@ EnergyPlusPgm( std::string filepath )
 	// Locals
 	// PROGRAM PARAMETER DEFINITIONS:
 	// Note: General Parameters for the entire EnergyPlus program are contained
-	// in "DataGlobals.f90"
+	// in "DataGlobals.cc"
 	gio::Fmt EPlusiniFormat( "(/,'[',A,']',/,'dir=',A)" );
 	std::string const BlankString;
 
@@ -397,7 +397,7 @@ EnergyPlusPgm( std::string filepath )
 		gio::close( LFN );
 	}
 
-	if( ! filepath.empty() ) {
+	if ( ! filepath.empty() ) {
 #ifdef _WIN32
 		int status = _chdir(filepath.c_str());
 #else
@@ -437,12 +437,12 @@ EnergyPlusPgm( std::string filepath )
 	EndEnergyPlus();
 }
 
-void StoreProgressCallback(void(*f)(int))
+void StoreProgressCallback( void(*f)( int const ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	fProgressPtr = f;
 }
-void StoreMessageCallback(void(*f)(std::string))
+void StoreMessageCallback( void(*f)( std::string const & ) )
 {
 	using namespace EnergyPlus::DataGlobals;
 	fMessagePtr = f;

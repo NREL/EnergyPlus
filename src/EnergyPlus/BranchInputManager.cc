@@ -1105,7 +1105,7 @@ namespace BranchInputManager {
 				RegisterNodeConnection( OutletNodeNum, NodeID( OutletNodeNum ), "Connector:Mixer", MixerName, ValidConnectionTypes( NodeConnectionType_Outlet ), 1, ObjectIsNotParent, errFlag );
 
 				if ( NumInletNodes > isize( InletNodeNames ) || NumInletNodes > isize( InletNodeNums ) ) {
-					ShowSevereError( "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of " "Inlet Array." );
+					ShowSevereError( "GetLoopMixer: Connector:Mixer=" + MixerName + " contains too many inlets for size of Inlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( InletNodeNames ) ) + ", Mixer statement inlets=" + TrimSigDigits( NumInletNodes ) );
 					ShowFatalError( "Program terminates due to preceding condition." );
 				}
@@ -1258,7 +1258,7 @@ namespace BranchInputManager {
 				RegisterNodeConnection( InletNodeNum, NodeID( InletNodeNum ), "Connector:Splitter", SplitterName, ValidConnectionTypes( NodeConnectionType_Inlet ), 1, ObjectIsNotParent, errFlag );
 
 				if ( NumOutletNodes > isize( OutletNodeNames ) || NumOutletNodes > isize( OutletNodeNums ) ) {
-					ShowSevereError( "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of " "Outlet Array." );
+					ShowSevereError( "GetLoopSplitter: Connector:Splitter=" + SplitterName + " contains too many outlets for size of Outlet Array." );
 					ShowContinueError( "Max array size=" + TrimSigDigits( size( OutletNodeNames ) ) + ", Splitter statement outlets=" + TrimSigDigits( NumOutletNodes ) );
 					ShowFatalError( "Program terminates due to preceding condition." );
 				}
@@ -1489,7 +1489,7 @@ namespace BranchInputManager {
 					ShowWarningError( "Branch maximum flow rate differs from system flow rate." );
 					ShowContinueError( "Branch = " + BranchName + " has volume flow rate = " + TrimSigDigits( BranchFlow, 6 ) + " m3/s." );
 					ShowContinueError( "System = " + SystemType + " \"" + SystemName + "\" has volume flow rate = " + TrimSigDigits( BranchFanFlow, 6 ) + " m3/s." );
-					ShowContinueError( "A branch flow rate that is different from the system flow rate can cause" " discrepancies with outdoor air control." );
+					ShowContinueError( "A branch flow rate that is different from the system flow rate can cause discrepancies with outdoor air control." );
 				}
 			}
 		}
@@ -1984,7 +1984,7 @@ namespace BranchInputManager {
 		ConnectorLists.allocate( NumOfConnectorLists );
 		GetObjectDefMaxArgs( CurrentModuleObject, NumParams, NumAlphas, NumNumbers );
 		if ( NumAlphas != 5 || NumNumbers != 0 ) {
-			ShowWarningError( "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject + " object. " "Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)" );
+			ShowWarningError( "GetConnectorList: Illegal \"extension\" to " + CurrentModuleObject + " object. Internal code does not support > 2 connectors (Connector:Splitter and Connector:Mixer)" );
 		}
 		Alphas.allocate( NumAlphas );
 		Numbers.dimension( NumNumbers, 0.0 );
@@ -2128,9 +2128,9 @@ namespace BranchInputManager {
 				ShowSevereError( "For " + CurrentModuleObject + '=' + ConnectorLists( Count ).Name );
 				ShowContinueError( "...Item=" + ConnectorLists( Count ).ConnectorName( Loop ) + ", Type=" + ConnectorLists( Count ).ConnectorType( Loop ) + " was not matched." );
 				if ( SameString( ConnectorLists( Count ).ConnectorType( Loop ), "Connector:Splitter" ) ) {
-					ShowContinueError( "The BranchList for this Connector:Splitter does not match the BranchList" " for its corresponding Connector:Mixer." );
+					ShowContinueError( "The BranchList for this Connector:Splitter does not match the BranchList for its corresponding Connector:Mixer." );
 				} else {
-					ShowContinueError( "The BranchList for this Connector:Mixer does not match the BranchList" " for its corresponding Connector:Splitter." );
+					ShowContinueError( "The BranchList for this Connector:Mixer does not match the BranchList for its corresponding Connector:Splitter." );
 				}
 				ErrorsFound = true;
 			}
@@ -3180,7 +3180,7 @@ namespace BranchInputManager {
 
 				Found = FoundBranches( Count );
 				if ( Found == 0 ) {
-					gio::write( OutputFileBNDetails, Format_701 ) << "   Branch," + ChrOut + ',' + BranchList( BCount ).BranchNames( Count ) + "(not found)," "**Unknown**,**Unknown**,**Unknown**,**Unknown**";
+					gio::write( OutputFileBNDetails, Format_701 ) << "   Branch," + ChrOut + ',' + BranchList( BCount ).BranchNames( Count ) + "(not found),**Unknown**,**Unknown**,**Unknown**,**Unknown**";
 					continue;
 				}
 				BranchReported( Found ) = true;
